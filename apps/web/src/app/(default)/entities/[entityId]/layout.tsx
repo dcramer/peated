@@ -1,7 +1,7 @@
 import Button from "@peated/web/components/button";
 import EntityHeader from "@peated/web/components/entityHeader";
 import ShareButton from "@peated/web/components/shareButton";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { redirect } from "next/navigation";
 import { type ReactNode } from "react";
 import type { Organization, WithContext } from "schema-dts";
@@ -14,6 +14,8 @@ export default async function Layout({
   params: Record<string, any>;
   children: ReactNode;
 }) {
+  const client = await getServerClient();
+
   const entityId = Number(params.entityId);
   const entity = await client.entities.details({
     entity: entityId,

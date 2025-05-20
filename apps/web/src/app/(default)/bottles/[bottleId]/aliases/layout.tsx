@@ -1,5 +1,5 @@
 import SimpleHeader from "@peated/web/components/simpleHeader";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { type ReactNode } from "react";
 
 export async function generateMetadata({
@@ -7,6 +7,7 @@ export async function generateMetadata({
 }: {
   params: { bottleId: string };
 }) {
+  const client = await getServerClient();
   const bottle = await client.bottles.details({
     bottle: Number(bottleId),
   });

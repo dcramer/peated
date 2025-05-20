@@ -23,6 +23,4 @@ export async function createServerClient(): Promise<RouterClient<Router>> {
   return client;
 }
 
-export const getOrpcClient = cache(createServerClient);
-
-globalThis.$client = await createServerClient();
+export const getServerClient = cache(createServerClient);

@@ -1,4 +1,4 @@
-import { client } from "@peated/web/lib/orpc/client";
+import { createServerClient } from "@peated/web/lib/orpc/client.server";
 import { buildPagesSitemap, type Sitemap } from "@peated/web/lib/sitemaps";
 
 export const dynamic = "force-dynamic";
@@ -6,6 +6,8 @@ export const dynamic = "force-dynamic";
 export const revalidate = 86400;
 
 export async function GET() {
+  const client = await createServerClient();
+
   let cursor: number | null = 1;
   const pages: Sitemap = [{ url: "/locations" }];
   while (cursor) {

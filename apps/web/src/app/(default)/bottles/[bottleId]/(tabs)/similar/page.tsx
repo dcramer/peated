@@ -1,12 +1,14 @@
 import BetaNotice from "@peated/web/components/betaNotice";
 import BottleTable from "@peated/web/components/bottleTable";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 
 export async function generateMetadata({
   params: { bottleId },
 }: {
   params: { bottleId: string };
 }) {
+  const client = await getServerClient();
+
   const bottle = await client.bottles.details({
     bottle: Number(bottleId),
   });
@@ -21,6 +23,8 @@ export default async function Page({
 }: {
   params: { bottleId: string };
 }) {
+  const client = await getServerClient();
+
   const bottleList = await client.bottles.similar({
     bottle: Number(bottleId),
   });

@@ -1,4 +1,4 @@
-import { client } from "@peated/web/lib/orpc/client";
+import { createServerClient } from "@peated/web/lib/orpc/client.server";
 import { buildPagesSitemap, type Sitemap } from "@peated/web/lib/sitemaps";
 
 export const dynamic = "force-dynamic";
@@ -11,6 +11,8 @@ export async function GET(
   request: Request,
   { params: { id } }: { params: { id: string } },
 ) {
+  const client = await createServerClient();
+
   let cursor: number | null = (Number(id) - 1) * (PAGE_LIMIT / 100) + 1;
   let count = 0;
   const pages: Sitemap = [];

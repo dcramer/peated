@@ -1,5 +1,5 @@
 import SimpleHeader from "@peated/web/components/simpleHeader";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { type ReactNode } from "react";
 
 export async function generateMetadata({
@@ -7,6 +7,8 @@ export async function generateMetadata({
 }: {
   params: { entityId: string };
 }) {
+  const client = await getServerClient();
+
   const entity = await client.entities.details({ entity: Number(entityId) });
 
   return {

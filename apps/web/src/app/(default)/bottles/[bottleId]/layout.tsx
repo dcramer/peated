@@ -6,7 +6,7 @@ import FlavorProfile from "@peated/web/components/flavorProfile";
 import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
 import { summarize } from "@peated/web/lib/markdown";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import type { Product, WithContext } from "schema-dts";
@@ -19,6 +19,8 @@ export default async function Layout({
   params: Record<string, any>;
   children: ReactNode;
 }) {
+  const client = await getServerClient();
+
   const bottleId = Number(params.bottleId);
   const bottle = await client.bottles.details({
     bottle: bottleId,

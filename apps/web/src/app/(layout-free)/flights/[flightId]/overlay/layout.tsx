@@ -1,5 +1,5 @@
 import { summarize } from "@peated/web/lib/markdown";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 export { default } from "@peated/web/components/defaultLayout";
 
 export async function generateMetadata({
@@ -7,6 +7,7 @@ export async function generateMetadata({
 }: {
   params: { flightId: string };
 }) {
+  const client = await getServerClient();
   const flight = await client.flights.details({
     flight: flightId,
   });

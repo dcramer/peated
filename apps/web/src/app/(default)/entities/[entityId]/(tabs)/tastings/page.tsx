@@ -1,12 +1,14 @@
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import TastingList from "@peated/web/components/tastingList";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 
 export async function generateMetadata({
   params: { entityId },
 }: {
   params: { entityId: string };
 }) {
+  const client = await getServerClient();
+
   const entity = await client.entities.details({
     entity: Number(entityId),
   });
@@ -21,6 +23,8 @@ export default async function EntityTastings({
 }: {
   params: { entityId: string };
 }) {
+  const client = await getServerClient();
+
   const tastingList = await client.tastings.list({
     entity: Number(entityId),
   });

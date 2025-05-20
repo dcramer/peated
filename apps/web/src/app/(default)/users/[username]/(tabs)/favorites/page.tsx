@@ -1,12 +1,13 @@
 import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 
 export async function generateMetadata({
   params: { username },
 }: {
   params: { username: string };
 }) {
+  const client = await getServerClient();
   const user = await client.users.details({
     user: username,
   });
@@ -27,6 +28,7 @@ export default async function UserFavorites({
 }: {
   params: { username: string };
 }) {
+  const client = await getServerClient();
   const favoriteList = await client.collections.bottles.list({
     user: username,
     collection: "default",

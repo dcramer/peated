@@ -4,7 +4,7 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import BottleLink from "@peated/web/components/bottleLink";
 import Button from "@peated/web/components/button";
 import { summarize } from "@peated/web/lib/markdown";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import ModActions from "./modActions";
 
 export async function generateMetadata({
@@ -12,6 +12,8 @@ export async function generateMetadata({
 }: {
   params: { flightId: string };
 }) {
+  const client = await getServerClient();
+
   const flight = await client.flights.details({
     flight: flightId,
   });
@@ -28,6 +30,8 @@ export default async function Page({
 }: {
   params: { flightId: string };
 }) {
+  const client = await getServerClient();
+
   const [flight, bottleList] = await Promise.all([
     client.flights.details({
       flight: flightId,

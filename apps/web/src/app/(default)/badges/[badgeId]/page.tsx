@@ -2,7 +2,7 @@ import BadgeImage from "@peated/web/components/badgeImage";
 import BetaNotice from "@peated/web/components/betaNotice";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { isLoggedIn } from "@peated/web/lib/auth.server";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { Suspense } from "react";
 import Leaderboard from "./leaderboard";
 
@@ -11,6 +11,7 @@ export async function generateMetadata({
 }: {
   params: { badgeId: string };
 }) {
+  const client = await getServerClient();
   const badge = await client.badges.details({
     badge: parseInt(badgeId, 10),
   });
@@ -29,6 +30,7 @@ export default async function Page({
     return redirectToAuth({ pathname: `/badges/${badgeId}` });
   }
 
+  const client = await getServerClient();
   const badge = await client.badges.details({
     badge: parseInt(badgeId, 10),
   });

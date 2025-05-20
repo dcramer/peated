@@ -4,7 +4,7 @@ import EntityMap from "@peated/web/components/entityMap";
 import Link from "@peated/web/components/link";
 import Markdown from "@peated/web/components/markdown";
 import { summarize } from "@peated/web/lib/markdown";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { parseDomain } from "@peated/web/lib/urls";
 
 export async function generateMetadata({
@@ -12,6 +12,8 @@ export async function generateMetadata({
 }: {
   params: { entityId: string };
 }) {
+  const client = await getServerClient();
+
   const entity = await client.entities.details({
     entity: Number(entityId),
   });
@@ -36,6 +38,8 @@ export default async function EntityDetails({
 }: {
   params: { entityId: string };
 }) {
+  const client = await getServerClient();
+
   const entity = await client.entities.details({
     entity: Number(entityId),
   });

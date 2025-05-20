@@ -1,6 +1,6 @@
 ---
 description: oRPC Usage Guidelines for Next.js + TanStack Query
-globs: 
+globs:
 alwaysApply: false
 ---
 # oRPC Usage Guidelines for Next.js + TanStack Query
@@ -14,8 +14,6 @@ We use the `@peated/server/orpc` package to communicate with our backend API usi
 * Client Docs: [https://orpc.unnoq.com/docs/client/error-handling](mdc:https:/orpc.unnoq.com/docs/client/error-handling)
 * Next.js: [https://orpc.unnoq.com/docs/integrations/next](mdc:https:/orpc.unnoq.com/docs/integrations/next)
 * TanStack Query: [https://orpc.unnoq.com/docs/tanstack-query/react](mdc:https:/orpc.unnoq.com/docs/tanstack-query/react)
-
----
 
 ## Project Conventions
 
@@ -34,18 +32,24 @@ available endpoints defined `@peated/server/orpc/routes` and the typechecker wil
 
 There are three general ways you're going to obtain an oRPC client to query against it:
 
-1. Via the `useORPC` hook (within React Components)
-2. the `client` export in `@peated/web/orpc/client`
-3. `makeORPCClient` when you need explicit control over the accessToken.
+1. the `useORPC` hook (within React Components)
+2. server-side: `createServerClient` from `@peated/web/lib/orpc/client.server`
+3. client-side: `createBrowserClient` from `@peated/web/lib/orpc/client` when you need to manage the
+   accessToken.
 
-### Next.js Routes and Server Actions
+### Server Components and Server Actions
 
-You'll generally use this in places like `route.ts` or in functions like `generateMetadata`.
+You'll generally use this in places like `route.ts` or in functions like `generateMetadata`. This
+**should not** be used in components marked `'use client';`.
+
 
 ```ts
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 
 export async function GET() {
+  // this will create a new client as needed, and use React's cache mechanism
+  // otherwise
+  const client = await getServerClient();
   const { totalBottles } = await client.stats();
   // ...
 }
@@ -55,10 +59,13 @@ If you need control over the access token, such as within a call
 where it might change. You won't need `call()` in this case. **This should be uncommon usage.**
 
 ```ts
-import { makeORPCClient } from "@peated/server/orpc/client";
+import { createServerClient } from "@peated/server/orpc/client.server";
 
 async function registerUser({ email, password, username, session }) {
-  const orpcClient = makeORPCClient(config.API_SERVER, session.accessToken);
+  const orpcClient = createServerClient({
+    apiServer: config.API_SERVER,
+    accessToken: session.accessToken,
+  });
 
   const { error, data, isDefined } = await safe(
     orpcClient.auth.register({ email, password, username })

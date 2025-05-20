@@ -6,7 +6,7 @@ import Markdown from "@peated/web/components/markdown";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { type ReactNode } from "react";
 
 export async function generateMetadata({
@@ -14,6 +14,8 @@ export async function generateMetadata({
 }: {
   params: { countrySlug: string };
 }) {
+  const client = await getServerClient();
+
   const country = await client.countries.details({
     country: countrySlug,
   });
@@ -31,6 +33,8 @@ export default async function Page({
   params: { countrySlug: string };
   children: ReactNode;
 }) {
+  const client = await getServerClient();
+
   const country = await client.countries.details({
     country: countrySlug,
   });

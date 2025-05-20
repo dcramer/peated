@@ -1,6 +1,6 @@
 import CountryMapIcon from "@peated/web/components/countryMapIcon";
 import Link from "@peated/web/components/link";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -8,6 +8,8 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
+  const client = await getServerClient();
+
   const countryList = await client.countries.list({
     onlyMajor: true,
     sort: "-bottles",

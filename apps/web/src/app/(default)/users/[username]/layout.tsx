@@ -7,7 +7,7 @@ import UserAvatar from "@peated/web/components/userAvatar";
 import UserFlavorDistributionChart from "@peated/web/components/userFlavorDistributionChart";
 import UserLocationChart from "@peated/web/components/userLocationChart";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { type ReactNode } from "react";
 import type { ProfilePage, WithContext } from "schema-dts";
 import FriendButton from "./friendButton";
@@ -24,6 +24,7 @@ export default async function Layout({
   params: { username: string };
   children: ReactNode;
 }) {
+  const client = await getServerClient();
   const user = await client.users.details({
     user: username,
   });

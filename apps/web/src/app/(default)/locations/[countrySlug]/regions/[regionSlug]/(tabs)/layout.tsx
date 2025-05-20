@@ -6,7 +6,7 @@ import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import UsStateMapIcon from "@peated/web/components/usStateMapIcon";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { type ReactNode } from "react";
 
 export async function generateMetadata({
@@ -14,6 +14,8 @@ export async function generateMetadata({
 }: {
   params: { countrySlug: string; regionSlug: string };
 }) {
+  const client = await getServerClient();
+
   const region = await client.regions.details({
     country: countrySlug,
     region: regionSlug,
@@ -32,6 +34,8 @@ export default async function Page({
   params: { countrySlug: string; regionSlug: string };
   children: ReactNode;
 }) {
+  const client = await getServerClient();
+
   const region = await client.regions.details({
     country: countrySlug,
     region: regionSlug,

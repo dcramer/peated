@@ -4,11 +4,6 @@ import type { Router } from "@peated/server/orpc/router";
 import config from "@peated/web/config";
 import { getLink } from "./link";
 
-declare global {
-  // eslint-disable-next-line no-var
-  var $client: RouterClient<Router> | undefined;
-}
-
 export function createBrowserClient(): RouterClient<Router> {
   const client: RouterClient<Router> = createORPCClient(
     getLink({
@@ -18,6 +13,3 @@ export function createBrowserClient(): RouterClient<Router> {
   );
   return client;
 }
-
-export const client: RouterClient<Router> =
-  globalThis.$client ?? createBrowserClient();

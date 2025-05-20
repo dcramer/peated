@@ -1,12 +1,14 @@
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import TastingList from "@peated/web/components/tastingList";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 
 export async function generateMetadata({
   params: { bottleId },
 }: {
   params: { bottleId: string };
 }) {
+  const client = await getServerClient();
+
   const bottle = await client.bottles.details({
     bottle: Number(bottleId),
   });
@@ -21,6 +23,8 @@ export default async function BottleTastings({
 }: {
   params: { bottleId: string };
 }) {
+  const client = await getServerClient();
+
   const tastingList = await client.tastings.list({
     bottle: Number(bottleId),
   });

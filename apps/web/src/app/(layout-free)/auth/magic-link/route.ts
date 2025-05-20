@@ -1,11 +1,13 @@
 import { safe } from "@orpc/client";
 import { getSafeRedirect } from "@peated/web/lib/auth";
 import { logError } from "@peated/web/lib/log";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { getSession } from "@peated/web/lib/session.server";
 import { redirect } from "next/navigation";
 
 export async function GET(request: Request) {
+  const client = await getServerClient();
+
   const { searchParams } = new URL(request.url);
   const redirectTo = searchParams.get("redirectTo");
   const token = searchParams.get("token");

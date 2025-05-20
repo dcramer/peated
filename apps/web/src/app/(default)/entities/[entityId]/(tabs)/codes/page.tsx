@@ -4,7 +4,7 @@ import {
 } from "@peated/server/lib/smws";
 import Heading from "@peated/web/components/heading";
 import Link from "@peated/web/components/link";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { notFound } from "next/navigation";
 
 export const revalidate = 60;
@@ -14,6 +14,7 @@ export async function generateMetadata({
 }: {
   params: { entityId: string };
 }) {
+  const client = await getServerClient();
   const entity = await client.entities.details({ entity: Number(entityId) });
 
   const title = `${entity.name}${entity.shortName ? ` (${entity.shortName})` : ""} Distillery Codes`;
@@ -30,6 +31,7 @@ export default async function Page({
 }: {
   params: { entityId: string };
 }) {
+  const client = await getServerClient();
   const entity = await client.entities.details({ entity: Number(entityId) });
 
   if (entity.shortName !== "SMWS") {

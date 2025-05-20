@@ -1,12 +1,14 @@
 import TastingComments from "@peated/web/components/tastingComments";
 import TastingList from "@peated/web/components/tastingList";
-import { client } from "@peated/web/lib/orpc/client";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 
 export async function generateMetadata({
   params: { tastingId },
 }: {
   params: { tastingId: string };
 }) {
+  const client = await getServerClient();
+
   const tasting = await client.tastings.details({ tasting: Number(tastingId) });
   const title = `${tasting.bottle.fullName} - Tasting Notes by ${tasting.createdBy.username}`;
   return {
@@ -37,6 +39,7 @@ export default async function Page({
 }: {
   params: { tastingId: string };
 }) {
+  const client = await getServerClient();
   const tasting = await client.tastings.details({ tasting: Number(tastingId) });
 
   return (
