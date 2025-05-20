@@ -126,7 +126,7 @@ export async function authenticate(
 }
 
 export async function registerForm(
-  prevState: string | undefined,
+  prevState: GenericResult | undefined,
   formData: FormData,
 ) {
   "use server";

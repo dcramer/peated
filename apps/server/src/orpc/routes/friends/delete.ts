@@ -3,6 +3,7 @@ import { follows, users } from "@peated/server/db/schema";
 import { deleteNotification } from "@peated/server/lib/notifications";
 import { procedure } from "@peated/server/orpc";
 import { requireAuth } from "@peated/server/orpc/middleware/auth";
+import { FriendStatusEnum } from "@peated/server/schemas";
 import type { FriendStatus } from "@peated/server/types";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -14,7 +15,7 @@ export default procedure
   .input(z.object({ user: z.coerce.number() }))
   .output(
     z.object({
-      status: z.enum(["none", "pending", "following", "friends"]).optional(),
+      status: FriendStatusEnum,
     }),
   )
   .handler(async function ({ input, context, errors }) {

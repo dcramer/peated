@@ -16,7 +16,7 @@ export default function FriendButton({ user }: { user: User }) {
     ...orpc.friends.create.mutationOptions(),
     onSuccess: (data, mutationInput) => {
       queryClient.setQueryData(
-        orpc.users.details.key({ input: { user: mutationInput.friend } }),
+        orpc.users.details.key({ input: { user: mutationInput.user } }),
         (oldData: any) =>
           oldData
             ? {
@@ -33,7 +33,7 @@ export default function FriendButton({ user }: { user: User }) {
     ...orpc.friends.delete.mutationOptions(),
     onSuccess: (data, mutationInput) => {
       queryClient.setQueryData(
-        orpc.users.details.key({ input: { user: mutationInput.friend } }),
+        orpc.users.details.key({ input: { user: mutationInput.user } }),
         (oldData: any) =>
           oldData
             ? {
@@ -51,8 +51,8 @@ export default function FriendButton({ user }: { user: User }) {
       color="primary"
       onClick={() => {
         if (friendStatus === "none")
-          friendCreateMutation.mutate({ friend: user.id });
-        else friendDeleteMutation.mutate({ friend: user.id });
+          friendCreateMutation.mutate({ user: user.id });
+        else friendDeleteMutation.mutate({ user: user.id });
       }}
     >
       {friendStatus === "none"
