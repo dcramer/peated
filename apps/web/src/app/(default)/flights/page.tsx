@@ -4,12 +4,16 @@ import Button from "@peated/web/components/button";
 import PageHeader from "@peated/web/components/pageHeader";
 import Table from "@peated/web/components/table";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Page() {
   useAuthRequired();
+  const orpc = useORPC();
 
-  const [flightList] = trpc.flightList.useSuspenseQuery();
+  const { data: flightList } = useSuspenseQuery(
+    orpc.flights.list.queryOptions(),
+  );
 
   return (
     <>

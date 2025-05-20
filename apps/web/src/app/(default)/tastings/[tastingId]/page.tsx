@@ -1,14 +1,13 @@
 import TastingComments from "@peated/web/components/tastingComments";
 import TastingList from "@peated/web/components/tastingList";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { client } from "@peated/web/lib/orpc/client";
 
 export async function generateMetadata({
   params: { tastingId },
 }: {
   params: { tastingId: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const tasting = await trpcClient.tastingById.fetch(Number(tastingId));
+  const tasting = await client.tastings.details({ tasting: Number(tastingId) });
   const title = `${tasting.bottle.fullName} - Tasting Notes by ${tasting.createdBy.username}`;
   return {
     title,
@@ -38,8 +37,7 @@ export default async function Page({
 }: {
   params: { tastingId: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const tasting = await trpcClient.tastingById.fetch(Number(tastingId));
+  const tasting = await client.tastings.details({ tasting: Number(tastingId) });
 
   return (
     <>

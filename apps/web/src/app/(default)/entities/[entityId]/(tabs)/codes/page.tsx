@@ -4,7 +4,7 @@ import {
 } from "@peated/server/lib/smws";
 import Heading from "@peated/web/components/heading";
 import Link from "@peated/web/components/link";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { client } from "@peated/web/lib/orpc/client";
 import { notFound } from "next/navigation";
 
 export const revalidate = 60;
@@ -14,8 +14,7 @@ export async function generateMetadata({
 }: {
   params: { entityId: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const entity = await trpcClient.entityById.fetch(Number(entityId));
+  const entity = await client.entities.details({ entity: Number(entityId) });
 
   const title = `${entity.name}${entity.shortName ? ` (${entity.shortName})` : ""} Distillery Codes`;
   const description = `Mapping of distillery codes found on bottles from ${entity.name}${entity.shortName ? ` (${entity.shortName})` : ""}.`;
@@ -31,14 +30,13 @@ export default async function Page({
 }: {
   params: { entityId: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const entity = await trpcClient.entityById.fetch(Number(entityId));
+  const entity = await client.entities.details({ entity: Number(entityId) });
 
   if (entity.shortName !== "SMWS") {
     return notFound();
   }
 
-  const { results: distillerList } = await trpcClient.smwsDistillerList.fetch();
+  const { results: distillerList } = await client.smws.distillerList();
 
   const exampleDistiller = distillerList.find(
     (d) => d.name.toLowerCase() === SMWS_DISTILLERY_CODES[4].toLowerCase(),

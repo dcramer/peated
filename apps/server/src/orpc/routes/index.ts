@@ -13,13 +13,13 @@ import events from "./events";
 import externalSites from "./external-sites";
 import flights from "./flights";
 import friends from "./friends";
-import misc from "./misc";
 import notifications from "./notifications";
 import prices from "./prices";
 import regions from "./regions";
 import reviews from "./reviews";
 import root from "./root";
 import search from "./search";
+import smws from "./smws";
 import stats from "./stats";
 import tags from "./tags";
 import tastings from "./tastings";
@@ -43,13 +43,13 @@ export interface Router {
   externalSites: typeof externalSites;
   flights: typeof flights;
   friends: typeof friends;
-  misc: typeof misc;
   notifications: typeof notifications;
   prices: typeof prices;
   regions: typeof regions;
   reviews: typeof reviews;
   root: typeof root;
   search: typeof search;
+  smws: typeof smws;
   stats: typeof stats;
   tags: typeof tags;
   tastings: typeof tastings;
@@ -74,7 +74,7 @@ export default {
   externalSites,
   flights,
   friends,
-  misc,
+  smws,
   notifications,
   prices,
   regions,

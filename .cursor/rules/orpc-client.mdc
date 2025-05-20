@@ -182,6 +182,11 @@ need to use `call()` (and include any parameters as needed):
 ```ts
   const orpc = useORPC();
   const results = orpc.tastings.list.call()
+
+  // or with input params
+  const results = orpc.tastings.list.call({
+    input: { country: "us" }
+  })
 ```
 
 ## Error Handling
