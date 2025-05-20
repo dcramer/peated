@@ -5,16 +5,18 @@ import config from "@peated/web/config";
 import { getLink } from "./link";
 
 declare global {
-  let $client: RouterClient<Router> | undefined;
+  // eslint-disable-next-line no-var
+  var $client: RouterClient<Router> | undefined;
 }
 
-export function createBrowserClient() {
-  return createORPCClient(
+export function createBrowserClient(): RouterClient<Router> {
+  const client: RouterClient<Router> = createORPCClient(
     getLink({
       apiServer: config.API_SERVER,
       userAgent: "@peated/web (orpc/react)",
     }),
   );
+  return client;
 }
 
 export const client: RouterClient<Router> =
