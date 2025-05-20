@@ -6,7 +6,6 @@ import {
 import { ApiClient } from "@peated/server/lib/apiClient";
 import { logError } from "@peated/server/lib/log";
 import { orpcClient } from "@peated/server/lib/orpc-client/server";
-import { isORPCClientError } from "@peated/server/orpc/client";
 import type { Currency, ExternalSiteType } from "@peated/server/types";
 import { type Category } from "@peated/server/types";
 import axios from "axios";
@@ -191,15 +190,18 @@ export async function handleBottle(
     }
 
     if (price) {
-      try {
-        await orpcClient.prices.createBatch({
+      const {
+        data: priceResult,
+        error: priceError,
+        isDefined: priceIsDefined,
+      } = await safe(
+        orpcClient.prices.createBatch({
           site: "smws",
           prices: [price],
-        });
-      } catch (err) {
-        if (!isORPCClientError(err) || (err as any).data?.httpStatus !== 409) {
-          logError(err, { bottle, price });
-        }
+        }),
+      );
+      if (priceError && (!priceIsDefined || priceError.name !== "CONFLICT")) {
+        logError(priceError, { bottle, price });
       }
     }
   } else {
