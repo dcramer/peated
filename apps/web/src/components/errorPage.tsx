@@ -56,7 +56,10 @@ export default function ErrorPage({
 
   // i hate all of this
   if (typedError && (!title || !subtitle)) {
-    if (typedError instanceof ApiUnavailable) {
+    if (
+      typedError instanceof ApiUnavailable ||
+      typedError.message === "Failed to fetch"
+    ) {
       title = (title ?? isOnline) ? "Server Unreachable" : "Connection Offline";
       subtitle =
         (subtitle ?? isOnline)
@@ -79,12 +82,6 @@ export default function ErrorPage({
       subtitle =
         subtitle ??
         "To get to where you're going we need you to tell us who you are. We don't just let anyone in here.";
-    } else if (typedError.message === "Failed to fetch") {
-      title = (title ?? isOnline) ? "Server Unreachable" : "Connection Offline";
-      subtitle =
-        (subtitle ?? isOnline)
-          ? "It looks like Peated's API is unreachable right now. Please try again shortly."
-          : "It looks like your network is offline.";
     }
   }
 
