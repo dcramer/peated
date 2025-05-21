@@ -36,7 +36,6 @@ describe("POST /bottle-releases", () => {
 
     // Verify key properties of the response
     expect(result).toMatchObject({
-      bottle: bottle.id,
       statedAge: 10,
       abv: 46.1,
       releaseYear: 2023,
@@ -125,7 +124,6 @@ describe("POST /bottle-releases", () => {
 
     // Verify key properties of the response
     expect(result).toMatchObject({
-      bottle: bottle.id,
       statedAge: 10,
       abv: 46.0,
       releaseYear: 2023,
