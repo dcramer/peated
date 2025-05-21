@@ -62,21 +62,17 @@ export default function ErrorPage({
         (subtitle ?? isOnline)
           ? "It looks like Peated's API is unreachable right now. Please try again shortly."
           : "It looks like your network is offline.";
-    } else if (typedError instanceof ApiUnauthorized) {
-      title = title ?? "Identify Yourself";
-      subtitle =
-        subtitle ??
-        "To get to where you're going we need you to tell us who you are. We don't just let anyone in here.";
     } else if (
       (typedError instanceof ApiError && typedError.statusCode === 404) ||
-      (typedError instanceof ORPCError && typedError.data.statusCode === 404) ||
+      (typedError instanceof ORPCError && typedError.status === 404) ||
       (typedError as any).message === "NOT_FOUND"
     ) {
       title = title ?? "Not Found";
       subtitle = subtitle ?? "We couldn't find the page you were looking for.";
     } else if (
+      typedError instanceof ApiUnauthorized ||
       (typedError instanceof ApiError && typedError.statusCode === 401) ||
-      (typedError instanceof ORPCError && typedError.data.httpStatus === 401) ||
+      (typedError instanceof ORPCError && typedError.status === 401) ||
       (typedError as any).message === "UNAUTHORIZED"
     ) {
       title = title ?? "Identify Yourself";
