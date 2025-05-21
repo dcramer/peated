@@ -14,6 +14,7 @@ import { setTimeout } from "node:timers/promises";
 import { format } from "path";
 import config from "./config";
 import { getUserFromHeader } from "./lib/auth";
+import { logError } from "./lib/log";
 import router from "./orpc/router";
 
 const openapiHandler = new OpenAPIHandler(router, {
@@ -29,6 +30,11 @@ const rpcHandler = new RPCHandler(router);
 const ONE_DAY = 60 * 60 * 24;
 
 export const app = new Hono()
+  // TODO: Sentry needs Hono support
+  .onError((err, c) => {
+    logError(err);
+    return c.json({ error: "Internal Server Error" }, 500);
+  })
   .use(
     cors({
       credentials: true,
