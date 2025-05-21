@@ -13,7 +13,7 @@ function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
 
     const { traceContext } = context;
 
-    return await Sentry.continueTrace(
+    const rv = await Sentry.continueTrace(
       {
         sentryTrace: traceContext ? traceContext["sentry-trace"] : undefined,
         baggage: traceContext?.baggage,
@@ -69,6 +69,8 @@ function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
         });
       },
     );
+    await Sentry.flush(2000);
+    return rv;
   };
   return wrappedJob;
 }

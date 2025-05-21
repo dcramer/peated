@@ -1,17 +1,30 @@
 import { Storage } from "@google-cloud/storage";
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
+import { onError, ORPCError, ValidationError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { ZodSmartCoercionPlugin, ZodToJsonSchemaConverter } from "@orpc/zod";
-import { setUser } from "@sentry/core";
+import {
+  captureException,
+  continueTrace,
+  flush,
+  getHttpSpanDetailsFromUrlObject,
+  parseStringToURLObject,
+  setHttpStatus,
+  setUser,
+  startSpan,
+} from "@sentry/core";
 import { open } from "fs/promises";
 import { Hono } from "hono";
 import { cache } from "hono/cache";
 import { cors } from "hono/cors";
+import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import { contentType } from "mime-types";
 import { setTimeout } from "node:timers/promises";
 import { format } from "path";
+import type { ZodIssue } from "zod";
+import { ZodError } from "zod";
 import config from "./config";
 import { getUserFromHeader } from "./lib/auth";
 import { logError } from "./lib/log";
@@ -24,17 +37,94 @@ const openAPIGenerator = new OpenAPIGenerator({
   schemaConverters: [new ZodToJsonSchemaConverter()],
 });
 
-const rpcHandler = new RPCHandler(router);
+const rpcHandler = new RPCHandler(router, {
+  clientInterceptors: [
+    onError((error) => {
+      if (
+        error instanceof ORPCError &&
+        error.code === "BAD_REQUEST" &&
+        error.cause instanceof ValidationError
+      ) {
+        // If you only use Zod you can safely cast to ZodIssue[]
+        const zodError = new ZodError(error.cause.issues as ZodIssue[]);
+
+        throw new ORPCError("INPUT_VALIDATION_FAILED", {
+          status: 422,
+          data: zodError.flatten(),
+          cause: error.cause,
+        });
+      }
+
+      if (
+        error instanceof ORPCError &&
+        error.code === "INTERNAL_SERVER_ERROR" &&
+        error.cause instanceof ValidationError
+      ) {
+        const zodError = new ZodError(error.cause.issues as ZodIssue[]);
+
+        logError(error, {
+          zod: {
+            error: zodError.flatten(),
+          },
+        });
+        throw new ORPCError("OUTPUT_VALIDATION_FAILED", {
+          cause: error.cause,
+        });
+      }
+    }),
+  ],
+});
 
 // File upload handler constants
 const ONE_DAY = 60 * 60 * 24;
 
 export const app = new Hono()
+  .use(async (c, next) => {
+    const urlObject = parseStringToURLObject(c.req.url);
+    const [name, attributes] = getHttpSpanDetailsFromUrlObject(
+      urlObject,
+      "server",
+      "auto.http.hono",
+      c.req,
+    );
+
+    try {
+      await continueTrace(
+        {
+          sentryTrace: c.req.header("sentry-trace") || "",
+          baggage: c.req.header("baggage"),
+        },
+        async () => {
+          await startSpan(
+            {
+              name,
+              attributes,
+            },
+            async (span) => {
+              try {
+                await next();
+                setHttpStatus(span, c.res.status);
+              } catch (err) {
+                setHttpStatus(span, 500);
+                captureException(err, {
+                  mechanism: { handled: false, type: "hono" },
+                });
+                throw err;
+              }
+            },
+          );
+        },
+      );
+    } finally {
+      await flush(2000);
+    }
+  })
   // TODO: Sentry needs Hono support
   .onError((err, c) => {
     logError(err);
     return c.json({ error: "Internal Server Error" }, 500);
   })
+  .use(logger())
   .use(
     cors({
       credentials: true,

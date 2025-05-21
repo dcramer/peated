@@ -1,3 +1,6 @@
+// make sure to import this _before_ all other code
+import "./sentry";
+
 import { serve } from "@hono/node-server";
 import * as Sentry from "@sentry/node";
 import { app } from "./app";
