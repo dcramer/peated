@@ -1,4 +1,4 @@
-import * as Sentry from "@sentry/node";
+import { logger } from "@sentry/node";
 import { hashSync } from "bcrypt";
 import { eq } from "drizzle-orm";
 import config from "../config";
@@ -11,8 +11,6 @@ import { serialize } from "../serializers";
 import { UserSerializer } from "../serializers/user";
 import { logError } from "./log";
 import { absoluteUrl } from "./urls";
-
-const { warn, info, fmt } = Sentry._experiment_log; // Temporary destructuring while this is experimental
 
 // I love to ESM.
 import type { JwtPayload } from "jsonwebtoken";
@@ -62,7 +60,7 @@ export async function getUserFromHeader(
 
   const { id } = (await verifyPayload(token)) as any;
   if (!id) {
-    warn(`Invalid Bearer token`);
+    logger.warn(`Invalid Bearer token`);
     return null;
   }
   const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -72,7 +70,7 @@ export async function getUserFromHeader(
   }
 
   if (!user.active) {
-    info(`Inactive user found for token`);
+    logger.warn(`Inactive user found for token`);
     return null;
   }
 
@@ -128,7 +126,7 @@ export async function createUser(
   if (!user.verified) {
     await sendVerificationEmail({ user });
   } else {
-    warn(fmt`Skipping email verification for ${user.email}`);
+    logger.warn(logger.fmt`Skipping email verification for ${user.email}`);
   }
 
   return user;

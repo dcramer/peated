@@ -1,7 +1,5 @@
-import * as Sentry from "@sentry/nextjs";
+import { logger } from "@sentry/nextjs";
 import { useState } from "react";
-
-const { info } = Sentry._experiment_log; // Temporary destructuring while this is experimental
 
 export default function useLocalStorage<T>(key: string, initialValue: T) {
   // State to store our value
@@ -17,7 +15,9 @@ export default function useLocalStorage<T>(key: string, initialValue: T) {
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       // If error also return initialValue
-      info(error as string);
+      logger.error(
+        logger.fmt`Error getting local storage value for key [${key}]: ${error}`,
+      );
       return initialValue;
     }
   });
@@ -36,7 +36,9 @@ export default function useLocalStorage<T>(key: string, initialValue: T) {
       }
     } catch (error) {
       // A more advanced implementation would handle the error case
-      info(error as string);
+      logger.error(
+        logger.fmt`Error setting local storage value for key [${key}]: ${error}`,
+      );
     }
   };
   return [storedValue, setValue] as const;
