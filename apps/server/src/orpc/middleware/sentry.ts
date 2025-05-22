@@ -8,18 +8,31 @@ import type { Context } from "../context";
  */
 export const sentryCapture = os
   .$context<Context>()
-  .middleware(async ({ context, next }) => {
-    return await Sentry.withScope(async (scope) => {
-      try {
-        return await next({
-          context,
-        });
-      } catch (error) {
-        Sentry.captureException(error);
-        console.error(error);
+  .middleware(async ({ context, next, path }, input) => {
+    return await Sentry.startSpan(
+      {
+        name: `orpc.${path.join("/")}`,
+        attributes: {
+          "rpc.system": "orpc",
+          "rpc.method": path.join("."),
+          "rpc.arguments": input ? JSON.stringify(input) : undefined,
+        },
+      },
+      async (span) => {
+        try {
+          return await next({
+            context,
+          });
+        } catch (error) {
+          span.setStatus({
+            code: 2,
+          });
+          Sentry.captureException(error);
+          console.error(error);
 
-        // Re-throw the error so it can be handled by the error handler
-        throw error;
-      }
-    });
+          // Re-throw the error so it can be handled by the error handler
+          throw error;
+        }
+      },
+    );
   });
