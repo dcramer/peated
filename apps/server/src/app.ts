@@ -3,6 +3,7 @@ import { OpenAPIGenerator } from "@orpc/openapi";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { onError, ORPCError, ValidationError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
+import { BatchHandlerPlugin } from "@orpc/server/plugins";
 import { ZodSmartCoercionPlugin, ZodToJsonSchemaConverter } from "@orpc/zod";
 import {
   captureException,
@@ -38,6 +39,8 @@ const openAPIGenerator = new OpenAPIGenerator({
 });
 
 const rpcHandler = new RPCHandler(router, {
+  plugins: [new BatchHandlerPlugin()],
+
   clientInterceptors: [
     onError((error) => {
       if (

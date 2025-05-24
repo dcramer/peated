@@ -1,4 +1,5 @@
 import { RPCLink } from "@orpc/client/fetch";
+import { BatchLinkPlugin } from "@orpc/client/plugins";
 import { logError } from "../log";
 
 export function getLink({
@@ -40,6 +41,16 @@ export function getLink({
           throw error;
         }
       },
+    ],
+    plugins: [
+      new BatchLinkPlugin({
+        groups: [
+          {
+            condition: (options) => !!batch,
+            context: {},
+          },
+        ],
+      }),
     ],
   });
 }
