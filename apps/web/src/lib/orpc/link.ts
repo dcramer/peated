@@ -1,4 +1,5 @@
 import { RPCLink } from "@orpc/client/fetch";
+import { logError } from "../log";
 
 export function getLink({
   apiServer,
@@ -19,7 +20,7 @@ export function getLink({
   return new RPCLink({
     async headers() {
       return {
-        authorization: accessToken ? `Bearer ${accessToken}` : "",
+        authorization: accessToken ? `Bearer ${accessToken}` : undefined,
         "user-agent": userAgent,
         ...(traceContext
           ? {
@@ -30,5 +31,15 @@ export function getLink({
       };
     },
     url: `${apiServer}/rpc`,
+    interceptors: [
+      async ({ next, path }) => {
+        try {
+          return await next();
+        } catch (error) {
+          logError(error);
+          throw error;
+        }
+      },
+    ],
   });
 }

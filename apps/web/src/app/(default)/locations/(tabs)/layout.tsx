@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { type ReactNode } from "react";
 
 export const metadata: Metadata = {
-  title: "Locations",
+  title: "Major Whisky Regions",
 };
 
 export default async function Layout({ children }: { children: ReactNode }) {

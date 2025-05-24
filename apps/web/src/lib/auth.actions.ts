@@ -1,8 +1,7 @@
 "use server";
 
-import { isDefinedError, safe } from "@orpc/client";
-import { makeORPCClient } from "@peated/server/orpc/client";
-import config from "@peated/web/config";
+import { safe } from "@orpc/client";
+import { createServerClient } from "@peated/web/lib/orpc/client.server";
 import { redirect } from "next/navigation";
 import { getSafeRedirect } from "./auth";
 import type { SessionData } from "./session.server";
@@ -63,7 +62,7 @@ export async function authenticate(
     (formData.get("redirectTo") || "/") as string,
   );
 
-  const orpcClient = makeORPCClient(config.API_SERVER, session.accessToken);
+  const orpcClient = await createServerClient();
 
   if (email && !password) {
     const { error, isDefined } = await safe(
@@ -147,7 +146,7 @@ export async function register(formData: FormData) {
   const password = (formData.get("password") || "") as string;
   const username = formData.get("username") as string;
 
-  const orpcClient = makeORPCClient(config.API_SERVER, session.accessToken);
+  const orpcClient = await createServerClient();
 
   const { error, isDefined, data } = await safe(
     orpcClient.auth.register({
@@ -192,7 +191,7 @@ export async function resendVerificationForm(
 
   const session = await getSession();
 
-  const orpcClient = makeORPCClient(config.API_SERVER, session.accessToken);
+  const orpcClient = await createServerClient();
   const { isDefined, error } = await safe(
     orpcClient.email.resendVerification(),
   );
@@ -215,7 +214,7 @@ export async function passwordResetForm(
   const email = (formData.get("email") || "") as string;
 
   const session = await getSession();
-  const orpcClient = makeORPCClient(config.API_SERVER, session.accessToken);
+  const orpcClient = await createServerClient();
 
   const { error, isDefined } = await safe(
     orpcClient.auth.passwordReset.create({ email }),
@@ -240,7 +239,7 @@ export async function passwordResetConfirmForm(
   const password = (formData.get("password") || "") as string;
 
   const session = await getSession();
-  const orpcClient = makeORPCClient(config.API_SERVER, session.accessToken);
+  const orpcClient = await createServerClient();
 
   const { error, isDefined, data } = await safe(
     orpcClient.auth.passwordReset.confirm({ token, password }),
@@ -265,7 +264,7 @@ export async function updateSession(): Promise<SessionData> {
   "use server";
 
   const session = await getSession();
-  const orpcClient = makeORPCClient(config.API_SERVER, session.accessToken);
+  const orpcClient = await createServerClient();
 
   const user = await orpcClient.users.details({ user: "me" });
   session.user = user;

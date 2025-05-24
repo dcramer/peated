@@ -37,4 +37,5 @@ export async function createServerClient(
 }
 
 // TODO: this is a little risky to cache given its variable based on the session
-export const getServerClient = cache(createServerClient);
+// export const getServerClient = cache(createServerClient);
+export const getServerClient = createServerClient;

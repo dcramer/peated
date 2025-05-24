@@ -20,7 +20,6 @@ export default function ORPCProvider({
 >) {
   const queryClient = getQueryClient(false);
   const traceData = getTraceData();
-  console.log("traceData", traceData);
 
   const [client] = useState<RouterClient<Router>>(() =>
     createORPCClient(

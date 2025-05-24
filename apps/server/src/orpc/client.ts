@@ -2,6 +2,7 @@ import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import type { RouterClient } from "@orpc/server";
 import { type Router } from "@peated/server/orpc/router";
+import { logError } from "../lib/log";
 
 export function makeORPCClient(
   apiServer: string,
@@ -15,6 +16,18 @@ export function makeORPCClient(
         "user-agent": "@peated (orpc/proxy)",
       };
     },
+    interceptors: [
+      async ({ next, path }) => {
+        console.log("RPC call", path);
+        if (path[0] === "then") throw new Error("then is not a valid path");
+        try {
+          return await next();
+        } catch (error) {
+          logError(error);
+          throw error;
+        }
+      },
+    ],
   });
 
   return createORPCClient(link);
