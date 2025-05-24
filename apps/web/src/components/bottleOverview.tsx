@@ -1,9 +1,9 @@
 "use client";
 
+import type { Outputs } from "@peated/server/orpc/router";
 import RobotImage from "@peated/web/assets/robot.png";
 import Link from "@peated/web/components/link";
 import { Suspense } from "react";
-import type { RouterOutputs } from "../lib/trpc/client";
 import BottleReviews from "./bottleReviews";
 import BottleTagDistribution from "./bottleTagDistribution";
 import CaskDetails from "./caskDetails";
@@ -16,7 +16,7 @@ import UserAvatar from "./userAvatar";
 export default function BottleOverview({
   bottle: { createdBy, ...bottle },
 }: {
-  bottle: RouterOutputs["bottleById"];
+  bottle: Outputs["bottles"]["details"];
 }) {
   return (
     <>

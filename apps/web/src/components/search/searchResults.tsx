@@ -1,8 +1,7 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
 import { toTitleCase } from "@peated/server/lib/strings";
+import type { Outputs } from "@peated/server/orpc/router";
 import Link from "@peated/web/components/link";
-import type { RouterOutputs } from "@peated/web/lib/trpc/client";
-import EmptyActivity from "../emptyActivity";
 import ListItem from "../listItem";
 import ResultRow from "./result";
 
@@ -13,7 +12,7 @@ export default function SearchResults({
   directToTasting = false,
 }: {
   query: string;
-  results: RouterOutputs["search"]["results"];
+  results: Outputs["search"]["results"];
   canSuggestAdd?: boolean;
   directToTasting?: boolean;
 }) {

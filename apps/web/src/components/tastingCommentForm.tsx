@@ -1,7 +1,8 @@
 "use client";
 
 import type { Comment, User } from "@peated/server/types";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import Button from "./button";
 import Fieldset from "./fieldset";
@@ -18,7 +19,10 @@ export default function TastingCommentForm({
   user: User;
   onComment: (comment: Comment) => void;
 }) {
-  const commentCreateMutation = trpc.commentCreate.useMutation();
+  const orpc = useORPC();
+  const commentCreateMutation = useMutation(
+    orpc.comments.create.mutationOptions(),
+  );
 
   const [formData, setFormData] = useState({
     comment: "",

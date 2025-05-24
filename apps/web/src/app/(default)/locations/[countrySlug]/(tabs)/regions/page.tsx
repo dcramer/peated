@@ -2,13 +2,15 @@
 
 import Table from "@peated/web/components/table";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Page({
   params: { countrySlug },
 }: {
   params: { countrySlug: string };
 }) {
+  const orpc = useORPC();
   const queryParams = useApiQueryParams({
     numericFields: ["cursor", "limit"],
     overrides: {
@@ -18,9 +20,11 @@ export default function Page({
     },
   });
 
-  const [[regionList]] = trpc.useSuspenseQueries((t) => [
-    t.regionList(queryParams),
-  ]);
+  const { data: regionList } = useSuspenseQuery(
+    orpc.regions.list.queryOptions({
+      input: queryParams,
+    }),
+  );
 
   return (
     <Table

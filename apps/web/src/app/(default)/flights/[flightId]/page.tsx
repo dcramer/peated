@@ -1,39 +1,34 @@
+"use client";
+
 import { CheckBadgeIcon } from "@heroicons/react/20/solid";
 import { ArrowsPointingOutIcon, StarIcon } from "@heroicons/react/24/outline";
 import { formatCategoryName } from "@peated/server/lib/format";
 import BottleLink from "@peated/web/components/bottleLink";
 import Button from "@peated/web/components/button";
-import { summarize } from "@peated/web/lib/markdown";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import ModActions from "./modActions";
 
-export async function generateMetadata({
+export default function Page({
   params: { flightId },
 }: {
   params: { flightId: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const flight = await trpcClient.flightById.fetch(flightId);
-  const description = summarize(flight.description || "", 200);
-
-  return {
-    title: `${flight.name} - Flight Details`,
-    description,
-  };
-}
-
-export default async function Page({
-  params: { flightId },
-}: {
-  params: { flightId: string };
-}) {
-  const trpcClient = await getTrpcClient();
-  const [flight, bottleList] = await Promise.all([
-    trpcClient.flightById.fetch(flightId),
-    trpcClient.bottleList.fetch({
-      flight: flightId,
+  const orpc = useORPC();
+  const { data: flight } = useSuspenseQuery(
+    orpc.flights.details.queryOptions({
+      input: {
+        flight: flightId,
+      },
     }),
-  ]);
+  );
+  const { data: bottleList } = useSuspenseQuery(
+    orpc.bottles.list.queryOptions({
+      input: {
+        flight: flightId,
+      },
+    }),
+  );
 
   return (
     <>

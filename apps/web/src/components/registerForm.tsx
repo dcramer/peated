@@ -51,11 +51,11 @@ function FormComponent() {
 }
 
 export default function RegisterForm() {
-  const [error, formAction] = useFormState(registerForm, undefined);
+  const [result, formAction] = useFormState(registerForm, undefined);
 
   return (
     <div className="min-w-sm flex flex-auto flex-col gap-y-4">
-      {error ? <Alert>{error}</Alert> : null}
+      {result?.error ? <Alert>{result.error}</Alert> : null}
 
       {config.GOOGLE_CLIENT_ID && (
         <>

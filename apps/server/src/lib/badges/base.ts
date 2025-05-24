@@ -1,10 +1,10 @@
-import type { SQL } from "drizzle-orm";
 import type {
   Bottle,
   BottlesToDistillers,
   Entity,
   Tasting,
-} from "../../db/schema";
+} from "@peated/server/db/schema";
+import type { SQL } from "drizzle-orm";
 
 export type CheckConfigSchema = Record<string, any>;
 

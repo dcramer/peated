@@ -13,3 +13,14 @@ export const pushUniqueJob: typeof jobs.pushUniqueJob = vi.fn(
 export const runJob = jobs.runJob;
 
 export const runWorker: typeof jobs.runWorker = vi.fn(async () => undefined);
+
+export const getQueue: typeof jobs.getQueue = vi
+  .mocked(jobs.getQueue)
+  .mockResolvedValue({
+    getJobCounts: vi.fn().mockResolvedValue({
+      wait: 5,
+      active: 10,
+      completed: 100,
+      failed: 2,
+    }),
+  } as any);

@@ -6,7 +6,8 @@ import useApi from "@peated/web/hooks/useApi";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 export default function Page({
@@ -16,9 +17,14 @@ export default function Page({
 }) {
   useModRequired();
 
-  const [bottle] = trpc.bottleById.useSuspenseQuery(Number(bottleId));
+  const orpc = useORPC();
+  const { data: bottle } = useSuspenseQuery(
+    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
+  );
   const router = useRouter();
-  const bottleUpdateMutation = trpc.bottleUpdate.useMutation();
+  const bottleUpdateMutation = useMutation(
+    orpc.bottles.update.mutationOptions(),
+  );
   const api = useApi();
   const { flash } = useFlashMessages();
 

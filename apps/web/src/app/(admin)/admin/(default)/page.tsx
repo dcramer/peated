@@ -7,15 +7,17 @@ import Form from "@peated/web/components/form";
 import ImageField from "@peated/web/components/imageField";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import TextField from "@peated/web/components/textField";
-import TextInput from "@peated/web/components/textInput";
-import { toBlob } from "@peated/web/lib/blobs";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 function QueueStats() {
-  const [data] = trpc.queueInfo.useSuspenseQuery(undefined, {
-    refetchInterval: 5000,
-  });
+  const orpc = useORPC();
+  const { data } = useSuspenseQuery(
+    orpc.admin.queueInfo.queryOptions({
+      refetchInterval: 5000,
+    }),
+  );
 
   return (
     <>
@@ -56,7 +58,8 @@ function LabelTester() {
   const [result, setResult] = useState<ExtractedLabelData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const labelExtract = trpc.labelExtract.useMutation();
+  const orpc = useORPC();
+  const labelExtract = useMutation(orpc.ai.labelExtract.mutationOptions());
 
   return (
     <>

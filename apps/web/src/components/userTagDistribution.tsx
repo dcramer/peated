@@ -1,6 +1,7 @@
 "use client";
 
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import type { ComponentProps } from "react";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -12,9 +13,14 @@ import DistributionChart, {
 } from "./distributionChart";
 
 function UserTagDistributionElement({ userId }: { userId: number }) {
-  const [data] = trpc.userTagList.useSuspenseQuery({
-    user: userId,
-  });
+  const orpc = useORPC();
+  const { data } = useSuspenseQuery(
+    orpc.users.tagList.queryOptions({
+      input: {
+        user: userId,
+      },
+    }),
+  );
 
   const { results, totalCount } = data;
 

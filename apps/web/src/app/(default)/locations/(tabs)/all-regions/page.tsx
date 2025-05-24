@@ -1,13 +1,19 @@
 "use client";
 
 import Table from "@peated/web/components/table";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Page() {
-  const [countryList] = trpc.countryList.useSuspenseQuery({
-    hasBottles: true,
-    sort: "-bottles",
-  });
+  const orpc = useORPC();
+  const { data: countryList } = useSuspenseQuery(
+    orpc.countries.list.queryOptions({
+      input: {
+        hasBottles: true,
+        sort: "-bottles",
+      },
+    }),
+  );
 
   return (
     <Table

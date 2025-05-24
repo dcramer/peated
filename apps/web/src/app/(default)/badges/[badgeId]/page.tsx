@@ -1,37 +1,32 @@
+"use client";
+
 import BadgeImage from "@peated/web/components/badgeImage";
 import BetaNotice from "@peated/web/components/betaNotice";
+import useAuth from "@peated/web/hooks/useAuth";
 import { redirectToAuth } from "@peated/web/lib/auth";
-import { isLoggedIn } from "@peated/web/lib/auth.server";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 import Leaderboard from "./leaderboard";
 
-export async function generateMetadata({
+export default function Page({
   params: { badgeId },
 }: {
   params: { badgeId: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const badge = await trpcClient.badgeById.fetch(parseInt(badgeId, 10));
+  const { user } = useAuth();
+  const orpc = useORPC();
+  const { data: badge } = useSuspenseQuery(
+    orpc.badges.details.queryOptions({
+      input: {
+        badge: parseInt(badgeId, 10),
+      },
+    }),
+  );
 
-  return {
-    title: `${badge.name} - Badge Details`,
-  };
-}
-
-export default async function Page({
-  params: { badgeId },
-}: {
-  params: { badgeId: string };
-}) {
-  if (!(await isLoggedIn())) {
+  if (!user) {
     return redirectToAuth({ pathname: `/badges/${badgeId}` });
   }
-
-  const trpcClient = await getTrpcClient();
-  const [badge] = await Promise.all([
-    trpcClient.badgeById.fetch(parseInt(badgeId, 10)),
-  ]);
 
   return (
     <>

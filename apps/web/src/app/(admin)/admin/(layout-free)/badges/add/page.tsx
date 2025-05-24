@@ -5,12 +5,14 @@ import { useFlashMessages } from "@peated/web/components/flash";
 import useApi from "@peated/web/hooks/useApi";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 export default function Page() {
   const router = useRouter();
-  const badgeCreateMutation = trpc.badgeCreate.useMutation();
+  const orpc = useORPC();
+  const badgeCreateMutation = useMutation(orpc.badges.create.mutationOptions());
   const api = useApi();
   const { flash } = useFlashMessages();
 

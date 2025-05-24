@@ -1,10 +1,10 @@
-import { type RouterOutputs } from "../lib/trpc/client";
+import { type Outputs } from "@peated/server/orpc/router";
 import Price from "./price";
 
 export default function BottleStats({
   bottle,
 }: {
-  bottle: RouterOutputs["bottleById"];
+  bottle: Outputs["bottles"]["details"];
 }) {
   const stats = [
     {

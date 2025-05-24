@@ -1,12 +1,14 @@
 "use client";
 
 import TagForm from "@peated/web/components/admin/tagForm";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 export default function Page() {
   const router = useRouter();
-  const tagCreateMutation = trpc.tagCreate.useMutation();
+  const orpc = useORPC();
+  const tagCreateMutation = useMutation(orpc.tags.create.mutationOptions());
 
   return (
     <TagForm

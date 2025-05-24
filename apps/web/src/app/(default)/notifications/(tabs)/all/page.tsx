@@ -4,7 +4,8 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import NotificationList from "@peated/web/components/notifications/list";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Page() {
   useAuthRequired();
@@ -15,8 +16,13 @@ export default function Page() {
       filter: "all",
     },
   });
-  const [notificationList] =
-    trpc.notificationList.useSuspenseQuery(queryParams);
+
+  const orpc = useORPC();
+  const { data: notificationList } = useSuspenseQuery(
+    orpc.notifications.list.queryOptions({
+      input: queryParams,
+    }),
+  );
 
   return notificationList.results.length ? (
     <NotificationList values={notificationList.results} />

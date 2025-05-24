@@ -101,11 +101,21 @@ const clearTables = async () => {
   }
 };
 
+/**
+ * Creates a default user for testing purposes.
+ *
+ * This user will have basic permissions (no admin, no mod).
+ *
+ * @returns The created user.
+ */
 const createDefaultUser = async () => {
   return await fixtures.User({
     email: "fizz.buzz@example.com",
     displayName: "Fizzy Buzz",
     username: "fizz.buzz",
+    admin: false,
+    mod: false,
+    active: true,
   });
 };
 

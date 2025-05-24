@@ -3,14 +3,22 @@
 import { toTitleCase } from "@peated/server/lib/strings";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Page({
   params: { tagId },
 }: {
   params: { tagId: string };
 }) {
-  const [tag] = trpc.tagByName.useSuspenseQuery(tagId);
+  const orpc = useORPC();
+  const { data: tag } = useSuspenseQuery(
+    orpc.tags.details.queryOptions({
+      input: {
+        tag: tagId,
+      },
+    }),
+  );
 
   return (
     <div className="w-full p-3 lg:py-0">

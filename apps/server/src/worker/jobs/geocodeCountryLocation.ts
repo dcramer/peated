@@ -1,10 +1,10 @@
 import { BOT_USER_AGENT } from "@peated/server/constants";
+import { db } from "@peated/server/db";
+import type { Country } from "@peated/server/db/schema";
+import { countries } from "@peated/server/db/schema";
 import { OSMSchema } from "@peated/server/lib/osm";
 import axios from "axios";
 import { eq } from "drizzle-orm";
-import { db } from "../../db";
-import type { Country } from "../../db/schema";
-import { countries } from "../../db/schema";
 
 export default async ({ countryId }: { countryId: number }) => {
   const country = await db.query.countries.findFirst({

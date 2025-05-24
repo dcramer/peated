@@ -1,135 +1,297 @@
-// make sure to import this _before_ all other code
-import "./sentry";
-
-import FastifyCors from "@fastify/cors";
-import FastifyHelmet from "@fastify/helmet";
-import FastifyMultipart from "@fastify/multipart";
-import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
-import { fastify } from "fastify";
+import { Storage } from "@google-cloud/storage";
+import { OpenAPIGenerator } from "@orpc/openapi";
+import { OpenAPIHandler } from "@orpc/openapi/fetch";
+import { onError, ORPCError, ValidationError } from "@orpc/server";
+import { RPCHandler } from "@orpc/server/fetch";
+import { BatchHandlerPlugin } from "@orpc/server/plugins";
+import { ZodSmartCoercionPlugin, ZodToJsonSchemaConverter } from "@orpc/zod";
+import {
+  captureException,
+  continueTrace,
+  flush,
+  getHttpSpanDetailsFromUrlObject,
+  parseStringToURLObject,
+  setHttpStatus,
+  setUser,
+  startSpan,
+} from "@sentry/core";
+import { open } from "fs/promises";
+import { Hono } from "hono";
+import { cache } from "hono/cache";
+import { cors } from "hono/cors";
+import { logger } from "hono/logger";
+import { secureHeaders } from "hono/secure-headers";
+import { contentType } from "mime-types";
 import { setTimeout } from "node:timers/promises";
+import { format } from "path";
+import type { ZodIssue } from "zod";
+import { ZodError } from "zod";
 import config from "./config";
-import { MAX_FILESIZE } from "./constants";
-import { injectAuth } from "./middleware/auth";
-import { router } from "./routes";
-import FastifySentry from "./sentryPlugin";
-import { createContext } from "./trpc/context";
-import { appRouter } from "./trpc/router";
-import { gracefulShutdown } from "./worker/client";
+import { getUserFromHeader } from "./lib/auth";
+import { logError } from "./lib/log";
+import router from "./orpc/router";
 
-const envToLogger: {
-  [env: string]: any;
-} = {
-  development: {
-    level: "info",
-    transport: {
-      target: "@fastify/one-line-logger",
-    },
-  },
-  production: {
-    level: "warn",
-  },
-  test: {
-    level: "error",
-    transport: {
-      target: "@fastify/one-line-logger",
-    },
-  },
-};
+const openapiHandler = new OpenAPIHandler(router, {
+  plugins: [new ZodSmartCoercionPlugin()],
+});
+const openAPIGenerator = new OpenAPIGenerator({
+  schemaConverters: [new ZodToJsonSchemaConverter()],
+});
 
-export default async function buildFastify(options = {}) {
-  const app = fastify({
-    logger: envToLogger[config.ENV] ?? true,
-    maxParamLength: 5000,
-    trustProxy: true,
-    ajv: {
-      customOptions: {
-        allErrors: process.env.NODE_ENV === "test",
-      },
-    },
-    ...options,
-  });
+const rpcHandler = new RPCHandler(router, {
+  plugins: [new BatchHandlerPlugin()],
 
-  app.addHook("preHandler", (request, reply, done) => {
-    // default
-    reply.headers({
-      "Cache-Control":
-        "private, no-cache, no-store, max-age=0, must-revalidate",
-    });
-    done();
-  });
+  clientInterceptors: [
+    onError((error) => {
+      if (
+        error instanceof ORPCError &&
+        error.code === "BAD_REQUEST" &&
+        error.cause instanceof ValidationError
+      ) {
+        // If you only use Zod you can safely cast to ZodIssue[]
+        const zodError = new ZodError(error.cause.issues as ZodIssue[]);
 
-  if (config.ENV === "development") {
-    console.log("Adding 300ms delay to all requests");
-    app.addHook("onRequest", async (request, reply) => {
-      await setTimeout(300);
-    });
-  }
+        throw new ORPCError("INPUT_VALIDATION_FAILED", {
+          status: 422,
+          data: zodError.flatten(),
+          cause: error.cause,
+        });
+      }
 
-  app.register(fastifyTRPCPlugin, {
-    prefix: "/trpc",
-    trpcOptions: { router: appRouter, createContext },
-  });
+      if (
+        error instanceof ORPCError &&
+        error.code === "INTERNAL_SERVER_ERROR" &&
+        error.cause instanceof ValidationError
+      ) {
+        const zodError = new ZodError(error.cause.issues as ZodIssue[]);
 
-  app.register(FastifyMultipart, {
-    limits: {
-      fieldNameSize: 100, // Max field name size in bytes
-      fieldSize: 100, // Max field value size in bytes
-      fields: 10,
-      fileSize: MAX_FILESIZE,
-      files: 1, // Max number of file fields
-      headerPairs: 2000, // Max number of header key=>value pairs
-    },
-  });
-  app.register(FastifyHelmet, {
-    crossOriginResourcePolicy: {
-      policy: "same-site",
-    },
-    contentSecurityPolicy: false,
-  });
-  app.register(FastifyCors, {
-    credentials: true,
-    origin: config.CORS_HOST.split(","),
-    maxAge: 600,
-  });
+        logError(error, {
+          zod: {
+            error: zodError.flatten(),
+          },
+        });
+        throw new ORPCError("OUTPUT_VALIDATION_FAILED", {
+          cause: error.cause,
+        });
+      }
+    }),
+  ],
+});
 
-  app.register(router);
-  app.register(FastifySentry);
+// File upload handler constants
+const ONE_DAY = 60 * 60 * 24;
 
-  app.addHook("preHandler", injectAuth);
-  app.addHook("onClose", async () => {
-    await gracefulShutdown();
-  });
+export const app = new Hono()
+  .use(async (c, next) => {
+    const urlObject = parseStringToURLObject(c.req.url);
+    const [name, attributes] = getHttpSpanDetailsFromUrlObject(
+      urlObject,
+      "server",
+      "auto.http.hono",
+      c.req,
+    );
 
-  app.setErrorHandler(function (error, request, reply) {
-    const { validation, validationContext } = error;
-
-    if (validation) {
-      reply.status(error.statusCode || 500).send({
-        ok: false,
-        name: "validation",
-        // validationContext will be 'body' or 'params' or 'headers' or 'query'
-        message: `A validation error occurred when validating the ${validationContext}...`,
-        // this is the result of your validation library...
-        errors: validation,
-      });
-      // } else if (error instanceof errorCodes.FST_ERR_BAD_STATUS_CODE) {
-      //   // Log error
-      //   this.log.error(error);
-      //   // Send error response
-      //   reply.status(error.statusCode || 500).send({
-      //     ok: false,
-      //     stack: config.ENV !== "production" ? error.stack : undefined,
-      //   });
-    } else {
-      console.error(error);
-      // fastify will use parent error handler to handle this
-      reply.status(error.statusCode || 500).send({
-        ok: false,
-        error: "Internal Server Error",
-        stack: config.ENV !== "production" ? error.stack : undefined,
-      });
+    try {
+      await continueTrace(
+        {
+          sentryTrace: c.req.header("sentry-trace") || "",
+          baggage: c.req.header("baggage"),
+        },
+        async () => {
+          await startSpan(
+            {
+              name,
+              attributes,
+            },
+            async (span) => {
+              try {
+                await next();
+                setHttpStatus(span, c.res.status);
+              } catch (err) {
+                setHttpStatus(span, 500);
+                captureException(err, {
+                  mechanism: { handled: false, type: "hono" },
+                });
+                throw err;
+              }
+            },
+          );
+        },
+      );
+    } finally {
+      await flush(2000);
     }
+  })
+  // TODO: Sentry needs Hono support
+  .onError((err, c) => {
+    logError(err);
+    return c.json({ error: "Internal Server Error" }, 500);
+  })
+  .use(logger())
+  .use(
+    cors({
+      credentials: true,
+      origin: config.CORS_HOST,
+      maxAge: 600,
+    }),
+  )
+  .use(
+    cache({
+      cacheName: "default",
+      cacheControl: "private, no-cache, no-store, max-age=0, must-revalidate",
+    }),
+  )
+
+  .use(
+    secureHeaders({
+      crossOriginResourcePolicy: "same-site",
+      // contentSecurityPolicy: false,
+    }),
+  )
+  .use(async (c, next) => {
+    if (config.ENV === "development") {
+      console.log("Adding 300ms delay to all requests");
+
+      await setTimeout(300);
+    }
+
+    await next();
+  })
+  .get("/_health", (c) => {
+    return c.json({ ok: true });
+  })
+  .get("/robots.txt", (c) => {
+    return c.text("User-agent: *\nDisallow: /");
+  })
+  // File upload handler
+  .get("/uploads/:filename", async (c) => {
+    const filename = c.req.param("filename");
+
+    let stream;
+    if (process.env.USE_GCS_STORAGE) {
+      const bucketName = process.env.GCS_BUCKET_NAME as string;
+      const bucketPath = process.env.GCS_BUCKET_PATH
+        ? `${process.env.GCS_BUCKET_PATH}/`
+        : "";
+
+      const cloudStorage = new Storage({
+        credentials: config.GCP_CREDENTIALS,
+      });
+      const file = cloudStorage
+        .bucket(bucketName)
+        .file(`${bucketPath}${filename}`);
+
+      stream = file.createReadStream();
+    } else {
+      const filepath = format({
+        dir: config.UPLOAD_PATH,
+        base: filename,
+      });
+
+      try {
+        const fd = await open(filepath, "r");
+        stream = fd.createReadStream();
+      } catch (err) {
+        return c.notFound();
+      }
+    }
+
+    // Set appropriate headers
+    c.header("Cache-Control", `public, max-age=${ONE_DAY}`);
+    c.header(
+      "Content-Type",
+      contentType(filename) || "application/octet-stream",
+    );
+
+    // Return the stream
+    // TODO: fix this
+    return c.body(stream as any);
+  })
+  .get("/", async (c) => {
+    return c.html(`
+      <!doctype html>
+      <html>
+        <head>
+          <title>My Client</title>
+          <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="icon" type="image/svg+xml" href="https://orpc.unnoq.com/icon.svg" />
+        </head>
+        <body>
+          <div id="app"></div>
+
+          <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+          <script>
+            Scalar.createApiReference('#app', {
+              url: '/spec.json',
+              authentication: {
+                securitySchemes: {
+                  bearerAuth: {
+                    token: 'default-token',
+                  },
+                },
+              },
+            })
+          </script>
+        </body>
+      </html>
+    `);
+  })
+  .get("/spec.json", async (c) => {
+    return c.json(
+      await openAPIGenerator.generate(router, {
+        info: {
+          title: "Peated API",
+          version: "1.0.0",
+          description: "The Peated API",
+        },
+        servers: [{ url: "/v1" } /** Should use absolute URLs in production */],
+      }),
+    );
+  })
+  .use("/v1/*", async (c, next) => {
+    const user = await getUserFromHeader(c.req.header("authorization"));
+
+    user
+      ? setUser({
+          id: `${user.id}`,
+          username: user.username,
+          email: user.email,
+        })
+      : setUser(null);
+
+    const { matched, response } = await openapiHandler.handle(c.req.raw, {
+      prefix: "/v1",
+      context: { user }, // Provide initial context if needed
+    });
+
+    if (matched) {
+      return c.newResponse(response.body, response);
+    }
+
+    await next();
+  })
+  .use("/rpc/*", async (c, next) => {
+    const user = await getUserFromHeader(c.req.header("authorization"));
+
+    user
+      ? setUser({
+          id: `${user.id}`,
+          username: user.username,
+          email: user.email,
+        })
+      : setUser(null);
+
+    const { matched, response } = await rpcHandler.handle(c.req.raw, {
+      prefix: "/rpc",
+      context: { user }, // Provide initial context if needed
+    });
+
+    if (matched) {
+      return c.newResponse(response.body, response);
+    }
+
+    await next();
   });
 
-  return app;
-}
+export type AppType = typeof app;

@@ -1,18 +1,7 @@
 import { faker } from "@faker-js/faker";
+import type { AnyDatabase } from "@peated/server/db";
+import { db as dbConn } from "@peated/server/db";
 import * as dbSchema from "@peated/server/db/schema";
-import { generatePublicId } from "@peated/server/lib/publicId";
-import { type ExternalSiteType } from "@peated/server/types";
-import slugify from "@sindresorhus/slugify";
-import { eq, inArray, or, sql } from "drizzle-orm";
-import { readFile } from "fs/promises";
-import path from "path";
-import {
-  EXTERNAL_SITE_TYPE_LIST,
-  FLAVOR_PROFILES,
-  TAG_CATEGORIES,
-} from "../../constants";
-import type { AnyDatabase } from "../../db";
-import { db as dbConn } from "../../db";
 import {
   badgeAwards,
   badges,
@@ -35,7 +24,18 @@ import {
   tastings,
   toasts,
   users,
-} from "../../db/schema";
+} from "@peated/server/db/schema";
+import { generatePublicId } from "@peated/server/lib/publicId";
+import { type ExternalSiteType } from "@peated/server/types";
+import slugify from "@sindresorhus/slugify";
+import { eq, inArray, or, sql } from "drizzle-orm";
+import { readFile } from "fs/promises";
+import path from "path";
+import {
+  EXTERNAL_SITE_TYPE_LIST,
+  FLAVOR_PROFILES,
+  TAG_CATEGORIES,
+} from "../../constants";
 import { createAccessToken, generatePasswordHash } from "../auth";
 import { mapRows } from "../db";
 import { formatBottleName } from "../format";
@@ -483,7 +483,7 @@ export const Tasting = async (
         .onConflictDoUpdate({
           target: [bottleTags.bottleId, bottleTags.tag],
           set: {
-            count: sql<number>`${bottleTags.count} + 1`,
+            count: sql<string>`${bottleTags.count} + 1`,
           },
         });
     }

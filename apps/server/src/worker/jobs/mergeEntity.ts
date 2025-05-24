@@ -10,7 +10,7 @@ import {
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { formatBottleName, formatReleaseName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
-import { ConflictError } from "@peated/server/trpc/errors";
+import { ConflictError } from "@peated/server/orpc/errors";
 import { pushUniqueJob, runJob } from "@peated/server/worker/client";
 import { eq, inArray } from "drizzle-orm";
 

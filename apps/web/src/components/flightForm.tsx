@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { isDefinedError } from "@orpc/client";
 import { FlightInputSchema } from "@peated/server/schemas";
 import type { Bottle } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
@@ -9,7 +10,7 @@ import FormHeader from "@peated/web/components/formHeader";
 import Layout from "@peated/web/components/layout";
 import TextField from "@peated/web/components/textField";
 import { logError } from "@peated/web/lib/log";
-import { isTRPCClientError, trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
@@ -60,8 +61,8 @@ export default function FlightForm({
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
       await onSubmit(data);
-    } catch (err) {
-      if (isTRPCClientError(err)) {
+    } catch (err: any) {
+      if (isDefinedError(err)) {
         setError(err.message);
       } else {
         logError(err);
@@ -70,7 +71,7 @@ export default function FlightForm({
     }
   };
 
-  const trpcUtils = trpc.useUtils();
+  const orpc = useORPC();
 
   const [bottlesValue, setBottlesValue] = useState<Option[]>(
     initialData.bottles ? initialData.bottles.map(bottleToOption) : [],
@@ -124,7 +125,7 @@ export default function FlightForm({
                 {...field}
                 error={errors.bottles}
                 onQuery={async (query) => {
-                  const { results } = await trpcUtils.bottleList.fetch({
+                  const { results } = await orpc.bottles.list.call({
                     query,
                   });
                   return results;

@@ -4,7 +4,8 @@ import { type ExternalSiteType } from "@peated/server/types";
 import ReviewTable from "@peated/web/components/admin/reviewTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Page({
   params: { siteId },
@@ -17,7 +18,13 @@ export default function Page({
     },
   });
 
-  const [reviewList] = trpc.reviewList.useSuspenseQuery(queryParams);
+  const orpc = useORPC();
+  const { data: reviewList } = useSuspenseQuery(
+    orpc.reviews.list.queryOptions({
+      input: queryParams,
+    }),
+  );
+
   return (
     <div>
       {reviewList.results.length > 0 ? (

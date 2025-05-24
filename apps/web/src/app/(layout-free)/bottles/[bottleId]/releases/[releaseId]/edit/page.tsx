@@ -2,7 +2,8 @@
 
 import ReleaseForm from "@peated/web/components/releaseForm";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 export default function Page({
@@ -12,10 +13,19 @@ export default function Page({
 }) {
   useModRequired();
 
-  const [bottle] = trpc.bottleById.useSuspenseQuery(Number(bottleId));
-  const [release] = trpc.bottleReleaseById.useSuspenseQuery(Number(releaseId));
+  const orpc = useORPC();
+  const { data: bottle } = useSuspenseQuery(
+    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
+  );
+  const { data: release } = useSuspenseQuery(
+    orpc.bottles.releases.details.queryOptions({
+      input: { release: Number(releaseId) },
+    }),
+  );
   const router = useRouter();
-  const bottleReleaseUpdateMutation = trpc.bottleReleaseUpdate.useMutation();
+  const bottleReleaseUpdateMutation = useMutation(
+    orpc.bottles.releases.update.mutationOptions(),
+  );
 
   return (
     <ReleaseForm

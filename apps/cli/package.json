@@ -17,8 +17,6 @@
     "@peated/tsconfig": "workspace:*",
     "@sentry/node": "catalog:",
     "@sindresorhus/slugify": "^2.2.1",
-    "@trpc/client": "catalog:",
-    "@trpc/server": "catalog:",
     "@types/bcrypt": "^5.0.2",
     "@types/node": "catalog:",
     "@types/pg": "catalog:",

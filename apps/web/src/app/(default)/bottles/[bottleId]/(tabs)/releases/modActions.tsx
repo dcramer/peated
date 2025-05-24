@@ -7,21 +7,26 @@ import Button from "@peated/web/components/button";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 export default function ModActions({ release }: { release: BottleRelease }) {
   const { user } = useAuth();
-
   const router = useRouter();
+  const orpc = useORPC();
 
-  const deleteBottleReleaseMutation = trpc.bottleReleaseDelete.useMutation();
+  const deleteBottleReleaseMutation = useMutation(
+    orpc.bottles.releases.delete.mutationOptions(),
+  );
 
   if (!user?.mod) return null;
 
   const deleteRelease = async () => {
     // TODO: show confirmation message
-    await deleteBottleReleaseMutation.mutateAsync(release.id);
+    await deleteBottleReleaseMutation.mutateAsync({
+      release: release.id,
+    });
     router.refresh();
   };
 

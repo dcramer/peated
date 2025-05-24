@@ -1,7 +1,8 @@
 "use client";
 
 import { formatCategoryName } from "@peated/server/lib/format";
-import { trpc } from "../lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import DistributionChart from "./distributionChart";
 
 export default function CountrySpiritDistribution({
@@ -9,9 +10,14 @@ export default function CountrySpiritDistribution({
 }: {
   countrySlug: string;
 }) {
-  const [data] = trpc.countryCategoryList.useSuspenseQuery({
-    country: countrySlug,
-  });
+  const orpc = useORPC();
+  const { data } = useSuspenseQuery(
+    orpc.countries.categories.queryOptions({
+      input: {
+        country: countrySlug,
+      },
+    }),
+  );
 
   const { results, totalCount } = data;
 

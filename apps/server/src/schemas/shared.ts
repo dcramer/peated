@@ -16,3 +16,8 @@ export const ObjectTypeEnum = z.enum([
   "entity",
   "tasting",
 ]);
+
+export const CursorSchema = z.object({
+  nextCursor: z.number().nullable(),
+  prevCursor: z.number().nullable(),
+});

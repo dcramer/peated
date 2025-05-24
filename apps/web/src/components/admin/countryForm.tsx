@@ -2,6 +2,7 @@
 
 import { BoltIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { isDefinedError } from "@orpc/client";
 import { CountryInputSchema } from "@peated/server/schemas";
 import { type Country } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
@@ -11,7 +12,8 @@ import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
 import TextField from "@peated/web/components/textField";
 import { logError } from "@peated/web/lib/log";
-import { isTRPCClientError, trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
@@ -45,15 +47,18 @@ export default function CountryForm({
     defaultValues: initialData,
   });
 
-  const generateDataMutation = trpc.countryGenerateDetails.useMutation();
+  const orpc = useORPC();
+  const generateDataMutation = useMutation(
+    orpc.ai.countryLookup.mutationOptions(),
+  );
 
   const [error, setError] = useState<string | undefined>();
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
       await onSubmit(data);
-    } catch (err) {
-      if (isTRPCClientError(err)) {
+    } catch (err: any) {
+      if (isDefinedError(err)) {
         setError(err.message);
       } else {
         logError(err);

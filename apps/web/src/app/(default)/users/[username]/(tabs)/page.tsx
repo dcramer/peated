@@ -1,42 +1,27 @@
+"use client";
+
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import TastingList from "@peated/web/components/tastingList";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const fetchCache = "default-no-store";
 
-export async function generateMetadata({
+export default function UserProfilePage({
   params: { username },
 }: {
   params: { username: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const user = await trpcClient.userById.fetch(username);
-
-  return {
-    title: `@${user.username}`,
-    openGraph: {
-      type: "profile",
-      profile: {
-        username: user.username,
-      },
-    },
-  };
-}
-
-export default async function UserTastings({
-  params: { username },
-}: {
-  params: { username: string };
-}) {
-  const trpcClient = await getTrpcClient();
-  const user = await trpcClient.userById.fetch(username);
-  const tastingList = await trpcClient.tastingList.fetch({
-    user: user.id,
-  });
-
-  return tastingList.results.length ? (
-    <TastingList values={tastingList.results} />
-  ) : (
-    <EmptyActivity>Looks like this ones a bit short on tastings.</EmptyActivity>
+  const orpc = useORPC();
+  const { data: tastings } = useSuspenseQuery(
+    orpc.tastings.list.queryOptions({
+      input: { user: username, limit: 10 },
+    }),
   );
+
+  if (!tastings.results.length) {
+    return <EmptyActivity />;
+  }
+
+  return <TastingList values={tastings.results} />;
 }

@@ -11,13 +11,13 @@ export default async ({ regionId }: { regionId: number }) => {
   await db
     .update(regions)
     .set({
-      totalDistillers: sql<number>`(
+      totalDistillers: sql<string>`(
         SELECT COUNT(*)
         FROM ${entities}
         WHERE 'distiller' = ANY(${entities.type})
           AND ${entities.regionId} = ${regions.id}
       )`,
-      totalBottles: sql<number>`(
+      totalBottles: sql<string>`(
         SELECT COUNT(*)
         FROM ${bottles}
         WHERE EXISTS (

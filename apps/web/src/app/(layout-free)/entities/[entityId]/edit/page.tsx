@@ -2,7 +2,8 @@
 
 import EntityForm from "@peated/web/components/entityForm";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 export default function Page({
@@ -12,9 +13,15 @@ export default function Page({
 }) {
   useModRequired();
 
-  const [entity] = trpc.entityById.useSuspenseQuery(Number(entityId));
+  const orpc = useORPC();
+  const { data: entity } = useSuspenseQuery(
+    orpc.entities.details.queryOptions({ input: { entity: Number(entityId) } }),
+  );
   const router = useRouter();
-  const entityUpdateMutation = trpc.entityUpdate.useMutation();
+
+  const entityUpdateMutation = useMutation(
+    orpc.entities.update.mutationOptions(),
+  );
 
   return (
     <EntityForm

@@ -49,7 +49,7 @@ export function normalizeEntityName(name: string): string {
 }
 
 // TODO: this is no longer normalizing a bottle name, lets rethink this code
-type NormalizedBottle = {
+export type NormalizedBottle = {
   name: string;
   statedAge: number | null;
   vintageYear: number | null;

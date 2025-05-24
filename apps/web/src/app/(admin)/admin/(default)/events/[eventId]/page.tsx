@@ -9,14 +9,22 @@ import Link from "@peated/web/components/link";
 import Markdown from "@peated/web/components/markdown";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Page({
   params: { eventId },
 }: {
   params: { eventId: string };
 }) {
-  const [event] = trpc.eventById.useSuspenseQuery(parseInt(eventId, 10));
+  const orpc = useORPC();
+  const { data: event } = useSuspenseQuery(
+    orpc.events.details.queryOptions({
+      input: {
+        event: parseInt(eventId, 10),
+      },
+    }),
+  );
 
   return (
     <div className="w-full p-3 lg:py-0">

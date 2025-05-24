@@ -3,7 +3,8 @@
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import EntityTable from "@peated/web/components/entityTable";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 const DEFAULT_SORT = "-tastings";
 
@@ -15,7 +16,12 @@ export default function Page() {
     },
   });
 
-  const [entityList] = trpc.entityList.useSuspenseQuery(queryParams);
+  const orpc = useORPC();
+  const { data: entityList } = useSuspenseQuery(
+    orpc.entities.list.queryOptions({
+      input: queryParams,
+    }),
+  );
 
   return (
     <>

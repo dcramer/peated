@@ -2,14 +2,18 @@
 
 import FlightForm from "@peated/web/components/flightForm";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 export default function AddFlight() {
   useAuthRequired();
 
   const router = useRouter();
-  const flightCreateMutation = trpc.flightCreate.useMutation();
+  const orpc = useORPC();
+  const flightCreateMutation = useMutation(
+    orpc.flights.create.mutationOptions(),
+  );
 
   return (
     <FlightForm

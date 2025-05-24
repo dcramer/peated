@@ -1,7 +1,8 @@
 "use client";
 
 import { formatCategoryName } from "@peated/server/lib/format";
-import { trpc } from "../lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import DistributionChart from "./distributionChart";
 
 export default function EntitySpiritDistribution({
@@ -9,9 +10,12 @@ export default function EntitySpiritDistribution({
 }: {
   entityId: number;
 }) {
-  const [data] = trpc.entityCategoryList.useSuspenseQuery({
-    entity: entityId,
-  });
+  const orpc = useORPC();
+  const { data } = useSuspenseQuery(
+    orpc.entities.categories.list.queryOptions({
+      input: { entity: entityId },
+    }),
+  );
 
   const { results, totalCount } = data;
 

@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { type EntityType } from "@peated/server/types";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
@@ -29,11 +29,11 @@ export default function EntityField({
     bottleName?: string | null;
   };
 }) {
-  const trpcUtils = trpc.useUtils();
+  const orpc = useORPC();
   return (
     <SelectField<Option>
       onQuery={async (query) => {
-        const { results } = await trpcUtils.entityList.fetch({
+        const { results } = await orpc.entities.list.call({
           query,
           searchContext,
         });

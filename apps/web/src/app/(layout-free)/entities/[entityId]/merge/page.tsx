@@ -12,7 +12,12 @@ import FormHeader from "@peated/web/components/formHeader";
 import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
@@ -28,23 +33,25 @@ export default function Page({
 }) {
   useModRequired();
 
-  const [entity] = trpc.entityById.useSuspenseQuery(Number(entityId));
-  const trpcUtils = trpc.useUtils();
+  const orpc = useORPC();
+  const queryClient = useQueryClient();
+  const { data: entity } = useSuspenseQuery(
+    orpc.entities.details.queryOptions({ input: { entity: Number(entityId) } }),
+  );
   const { flash } = useFlashMessages();
 
   const router = useRouter();
 
   const [otherEntityName, setOtherEntityName] = useState<string>("Other");
 
-  // TODO: move to queries
-  const entityMergeMutation = trpc.entityMerge.useMutation({
+  const entityMergeMutation = useMutation({
+    ...orpc.entities.merge.mutationOptions(),
     onSuccess: (newEntity) => {
-      trpcUtils.entityById.invalidate(newEntity.id);
-      // const previous = trpcUtils.bottleById.getData(newBottle.id);
-      // trpcUtils.bottleById.setData(newBottle.id, {
-      //   ...previous,
-      //   ...newBottle,
-      // });
+      queryClient.invalidateQueries({
+        queryKey: orpc.entities.details.key({
+          input: { entity: newEntity.id },
+        }),
+      });
     },
   });
 
@@ -62,7 +69,7 @@ export default function Page({
   const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
     await entityMergeMutation.mutateAsync(
       {
-        root: entity.id,
+        entity: entity.id,
         other: data.entityId,
         direction: data.direction,
       },

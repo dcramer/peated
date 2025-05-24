@@ -5,7 +5,8 @@ import ConfirmationButton from "@peated/web/components/confirmationButton";
 import Table from "@peated/web/components/table";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 
 export default function BottleAliases({
   params: { bottleId },
@@ -13,10 +14,15 @@ export default function BottleAliases({
   params: { bottleId: string };
 }) {
   const { user } = useAuth();
-  const [aliasList] = trpc.bottleAliasList.useSuspenseQuery({
-    bottle: Number(bottleId),
-  });
-  const deleteAliasMutation = trpc.bottleAliasDelete.useMutation();
+  const orpc = useORPC();
+  const { data: aliasList } = useSuspenseQuery(
+    orpc.bottles.aliases.list.queryOptions({
+      input: { bottle: Number(bottleId) },
+    }),
+  );
+  const deleteAliasMutation = useMutation(
+    orpc.bottles.aliases.delete.mutationOptions(),
+  );
 
   return (
     <Table
@@ -46,7 +52,9 @@ export default function BottleAliases({
           value: (item) =>
             !item.isCanonical && (
               <ConfirmationButton
-                onContinue={() => deleteAliasMutation.mutate(item.name)}
+                onContinue={() =>
+                  deleteAliasMutation.mutate({ alias: item.name })
+                }
               >
                 Delete
               </ConfirmationButton>

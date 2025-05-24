@@ -6,7 +6,8 @@ import useApi from "@peated/web/hooks/useApi";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 export default function Page({
@@ -16,14 +17,26 @@ export default function Page({
 }) {
   useAuthRequired();
 
-  const [tasting] = trpc.tastingById.useSuspenseQuery(Number(tastingId));
-  const [suggestedTags] = trpc.bottleSuggestedTagList.useSuspenseQuery({
-    bottle: tasting.bottle.id,
-  });
+  const orpc = useORPC();
+
+  // TODO: run these queries in parallel
+  const { data: tasting } = useSuspenseQuery(
+    orpc.tastings.details.queryOptions({
+      input: { tasting: Number(tastingId) },
+    }),
+  );
+
+  const { data: suggestedTags } = useSuspenseQuery(
+    orpc.bottles.suggestedTags.queryOptions({
+      input: { bottle: tasting.bottle.id },
+    }),
+  );
 
   const router = useRouter();
 
-  const tastingUpdateMutation = trpc.tastingUpdate.useMutation();
+  const tastingUpdateMutation = useMutation(
+    orpc.tastings.update.mutationOptions(),
+  );
   const api = useApi();
   const { flash } = useFlashMessages();
 

@@ -5,19 +5,28 @@ import { Distillers } from "@peated/web/components/bottleMetadata";
 import { ClientOnly } from "@peated/web/components/clientOnly";
 import LayoutEmpty from "@peated/web/components/layoutEmpty";
 import QRCodeClient from "@peated/web/components/qrcode.client";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Page({
   params: { flightId },
 }: {
   params: { flightId: string };
 }) {
-  const [[flight, bottles]] = trpc.useSuspenseQueries((t) => [
-    t.flightById(flightId),
-    t.bottleList({
-      flight: flightId,
+  const orpc = useORPC();
+
+  // TODO: we'd like to use `useSuspenseQueries`, but oRPC has an issue atm:
+  // https://github.com/unnoq/orpc/issues/519
+  const { data: flight } = useSuspenseQuery(
+    orpc.flights.details.queryOptions({
+      input: { flight: flightId },
     }),
-  ]);
+  );
+  const { data: bottleList } = useSuspenseQuery(
+    orpc.bottles.list.queryOptions({
+      input: { flight: flightId },
+    }),
+  );
 
   return (
     <LayoutEmpty fullWidth>
@@ -38,7 +47,7 @@ export default function Page({
           <div className="w-full lg:w-8/12">
             <table className="min-w-full">
               <tbody>
-                {bottles.results.map((bottle) => {
+                {bottleList.results.map((bottle) => {
                   return (
                     <tr key={bottle.id} className="border-b border-slate-800">
                       <td className="group relative max-w-0 py-4 pl-4 pr-3 sm:pl-3">

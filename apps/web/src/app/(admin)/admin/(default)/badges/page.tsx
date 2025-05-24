@@ -5,7 +5,8 @@ import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Page() {
   const queryParams = useApiQueryParams({
@@ -15,7 +16,12 @@ export default function Page() {
     numericFields: ["cursor", "limit"],
   });
 
-  const [badgeList] = trpc.badgeList.useSuspenseQuery(queryParams);
+  const orpc = useORPC();
+  const { data: badgeList } = useSuspenseQuery(
+    orpc.badges.list.queryOptions({
+      input: queryParams,
+    }),
+  );
 
   return (
     <div>

@@ -1,45 +1,21 @@
+"use client";
+
 import TastingComments from "@peated/web/components/tastingComments";
 import TastingList from "@peated/web/components/tastingList";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
-export async function generateMetadata({
+export default function Page({
   params: { tastingId },
 }: {
   params: { tastingId: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const tasting = await trpcClient.tastingById.fetch(Number(tastingId));
-  const title = `${tasting.bottle.fullName} - Tasting Notes by ${tasting.createdBy.username}`;
-  return {
-    title,
-    description: tasting.notes,
-    openGraph: {
-      title,
-      description: tasting.notes,
-      ...(tasting.imageUrl
-        ? {
-            images: [tasting.imageUrl],
-          }
-        : {}),
-    },
-    twitter: {
-      ...(tasting.imageUrl
-        ? {
-            card: "summary_large_image",
-            images: [tasting.imageUrl],
-          }
-        : {}),
-    },
-  };
-}
-
-export default async function Page({
-  params: { tastingId },
-}: {
-  params: { tastingId: string };
-}) {
-  const trpcClient = await getTrpcClient();
-  const tasting = await trpcClient.tastingById.fetch(Number(tastingId));
+  const orpc = useORPC();
+  const { data: tasting } = useSuspenseQuery(
+    orpc.tastings.details.queryOptions({
+      input: { tasting: Number(tastingId) },
+    }),
+  );
 
   return (
     <>

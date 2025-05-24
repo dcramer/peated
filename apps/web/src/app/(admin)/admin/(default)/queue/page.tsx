@@ -1,5 +1,6 @@
 "use client";
 
+import type { Outputs } from "@peated/server/orpc/router";
 import { type Bottle } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import { useFlashMessages } from "@peated/web/components/flash";
@@ -7,7 +8,8 @@ import Link from "@peated/web/components/link";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import Table from "@peated/web/components/table";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { trpc, type RouterOutputs } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import BottleSelector from "./bottleSelector";
@@ -22,16 +24,26 @@ export default function Page() {
     },
   });
 
-  const [aliasList] = trpc.unmatchedBottleList.useSuspenseQuery(queryParams);
+  const orpc = useORPC();
+  const { data: aliasList } = useSuspenseQuery(
+    orpc.bottles.unmatched.queryOptions({
+      input: queryParams,
+    }),
+  );
+
   const [unmatchedBottle, setUnmatchedBottle] = useState<
-    null | RouterOutputs["unmatchedBottleList"]["results"][number]
+    Outputs["bottles"]["unmatched"]["results"][number] | null
   >(null);
 
   // this isnt useful as the upsert wipes the cache but we dont totally want that
   const [assignments, setAssignments] = useState<Record<string, Bottle>>({});
 
-  const bottleAliasUpdateMutation = trpc.bottleAliasUpdate.useMutation();
-  const bottleAliasUpsertMutation = trpc.bottleAliasUpsert.useMutation();
+  const bottleAliasUpdateMutation = useMutation(
+    orpc.bottles.aliases.update.mutationOptions(),
+  );
+  const bottleAliasUpsertMutation = useMutation(
+    orpc.bottles.aliases.upsert.mutationOptions(),
+  );
 
   const { flash } = useFlashMessages();
 
@@ -79,7 +91,7 @@ export default function Page() {
                 <Button
                   onClick={async () => {
                     await bottleAliasUpdateMutation.mutateAsync({
-                      name: item.name,
+                      alias: item.name,
                       ignored: true,
                     });
                     flash(

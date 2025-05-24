@@ -9,14 +9,22 @@ import Link from "@peated/web/components/link";
 // import Markdown from "@peated/web/components/markdown";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Page({
   params: { badgeId },
 }: {
   params: { badgeId: string };
 }) {
-  const [badge] = trpc.badgeById.useSuspenseQuery(parseInt(badgeId, 10));
+  const orpc = useORPC();
+  const { data: badge } = useSuspenseQuery(
+    orpc.badges.details.queryOptions({
+      input: {
+        badge: parseInt(badgeId, 10),
+      },
+    }),
+  );
 
   return (
     <div className="w-full p-3 lg:py-0">

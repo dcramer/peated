@@ -4,13 +4,15 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import EntityTable from "@peated/web/components/entityTable";
 import PaginationButtons from "@peated/web/components/paginationButtons";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Page({
   params: { countrySlug },
 }: {
   params: { countrySlug: string };
 }) {
+  const orpc = useORPC();
   const queryParams = useApiQueryParams({
     numericFields: ["cursor", "limit"],
     overrides: {
@@ -21,9 +23,11 @@ export default function Page({
     },
   });
 
-  const [[topEntityList]] = trpc.useSuspenseQueries((t) => [
-    t.entityList(queryParams),
-  ]);
+  const { data: topEntityList } = useSuspenseQuery(
+    orpc.entities.list.queryOptions({
+      input: queryParams,
+    }),
+  );
 
   return (
     <>

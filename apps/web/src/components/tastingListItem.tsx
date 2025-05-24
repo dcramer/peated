@@ -11,10 +11,11 @@ import { formatColor, formatServingStyle } from "@peated/server/lib/format";
 import type { Tasting } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useMutation } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ComponentPropsWithoutRef } from "react";
 import { getAuthRedirect } from "../lib/auth";
+import { useORPC } from "../lib/orpc/context";
 import BadgeImage from "./badgeImage";
 import BottleCard from "./bottleCard";
 import Button from "./button";
@@ -85,8 +86,12 @@ export default function TastingListItem({
 
   const router = useRouter();
 
-  const tastingDeleteMutation = trpc.tastingDelete.useMutation();
-  const toastCreateMutation = trpc.toastCreate.useMutation();
+  const orpc = useORPC();
+
+  const tastingDeleteMutation = useMutation(
+    orpc.tastings.delete.mutationOptions(),
+  );
+  const toastCreateMutation = useMutation(orpc.toasts.create.mutationOptions());
 
   const [imageOpen, setImageOpen] = useState(false);
 
@@ -237,14 +242,17 @@ export default function TastingListItem({
             canToast
               ? () => {
                   setHasToasted(true);
-                  toastCreateMutation.mutate(tasting.id, {
-                    onError: () => {
-                      setHasToasted(false);
+                  toastCreateMutation.mutate(
+                    { tasting: tasting.id },
+                    {
+                      onError: () => {
+                        setHasToasted(false);
+                      },
+                      onSuccess: () => {
+                        onToast && onToast(tasting);
+                      },
                     },
-                    onSuccess: () => {
-                      onToast && onToast(tasting);
-                    },
-                  });
+                  );
                 }
               : () => {
                   router.push(getAuthRedirect({ pathname }));
@@ -287,7 +295,9 @@ export default function TastingListItem({
                   <MenuItem
                     as="button"
                     onClick={async () => {
-                      await tastingDeleteMutation.mutateAsync(tasting.id);
+                      await tastingDeleteMutation.mutateAsync({
+                        tasting: tasting.id,
+                      });
                       if (onDelete) onDelete(tasting);
                       else {
                         location.reload();

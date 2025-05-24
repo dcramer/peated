@@ -30,13 +30,14 @@ import SeriesField from "@peated/web/components/seriesField";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
 import { logError } from "@peated/web/lib/log";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import useAuth from "../hooks/useAuth";
-import { isTRPCClientError, trpc } from "../lib/trpc/client";
 import BooleanField from "./booleanField";
 import Button from "./button";
 import Collapsable from "./collapsable";
@@ -123,14 +124,17 @@ export default function BottleForm({
     undefined,
   );
   const router = useRouter();
+  const orpc = useORPC();
 
-  const generateDataMutation = trpc.bottleGenerateDetails.useMutation();
+  const generateDataMutation = useMutation(
+    orpc.ai.bottleLookup.mutationOptions(),
+  );
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
       await onSubmit({ image, ...data });
     } catch (err) {
-      if (isTRPCClientError(err)) {
+      if (err instanceof Error) {
         setError(err.message);
       } else {
         logError(err);

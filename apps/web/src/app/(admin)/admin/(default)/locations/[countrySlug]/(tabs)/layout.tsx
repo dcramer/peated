@@ -5,7 +5,8 @@ import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { type ReactNode } from "react";
 
 export default function Page({
@@ -15,7 +16,14 @@ export default function Page({
   params: { countrySlug: string };
   children: ReactNode;
 }) {
-  const [country] = trpc.countryBySlug.useSuspenseQuery(countrySlug);
+  const orpc = useORPC();
+  const { data: country } = useSuspenseQuery(
+    orpc.countries.details.queryOptions({
+      input: {
+        country: countrySlug,
+      },
+    }),
+  );
 
   return (
     <div className="w-full p-3 lg:py-0">

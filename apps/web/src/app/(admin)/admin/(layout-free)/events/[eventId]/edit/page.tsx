@@ -1,7 +1,8 @@
 "use client";
 
 import EventForm from "@peated/web/components/admin/eventForm";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 export default function Page({
@@ -9,17 +10,24 @@ export default function Page({
 }: {
   params: { eventId: string };
 }) {
-  const [event] = trpc.eventById.useSuspenseQuery(parseInt(eventId, 10));
+  const orpc = useORPC();
+  const { data: event } = useSuspenseQuery(
+    orpc.events.details.queryOptions({
+      input: {
+        event: parseInt(eventId, 10),
+      },
+    }),
+  );
 
   const router = useRouter();
-  const eventUpdateMutation = trpc.eventUpdate.useMutation();
+  const eventUpdateMutation = useMutation(orpc.events.update.mutationOptions());
 
   return (
     <EventForm
       onSubmit={async (data) => {
         const newEvent = await eventUpdateMutation.mutateAsync({
           ...data,
-          id: event.id,
+          event: event.id,
         });
         router.push(`/admin/events/${newEvent.id}`);
       }}
