@@ -1,35 +1,25 @@
+"use client";
+
 import BetaNotice from "@peated/web/components/betaNotice";
 import Price from "@peated/web/components/price";
 import TimeSince from "@peated/web/components/timeSince";
 import classNames from "@peated/web/lib/classNames";
-import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
-export async function generateMetadata({
+export default function BottlePrices({
   params: { bottleId },
 }: {
   params: { bottleId: string };
 }) {
-  const client = await getServerClient();
-
-  const bottle = await client.bottles.details({
-    bottle: Number(bottleId),
-  });
-
-  return {
-    title: `Prices for ${bottle.fullName}`,
-  };
-}
-
-export default async function BottlePrices({
-  params: { bottleId },
-}: {
-  params: { bottleId: string };
-}) {
-  const client = await getServerClient();
-
-  const priceList = await client.bottles.prices.list({
-    bottle: Number(bottleId),
-  });
+  const orpc = useORPC();
+  const { data: priceList } = useSuspenseQuery(
+    orpc.bottles.prices.list.queryOptions({
+      input: {
+        bottle: Number(bottleId),
+      },
+    }),
+  );
 
   return (
     <div className="mt-6 px-3 lg:px-0">

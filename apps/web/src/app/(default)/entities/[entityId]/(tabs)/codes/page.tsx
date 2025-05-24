@@ -1,44 +1,35 @@
+"use client";
+
 import {
   SMWS_CATEGORY_LIST,
   SMWS_DISTILLERY_CODES,
 } from "@peated/server/lib/smws";
 import Heading from "@peated/web/components/heading";
 import Link from "@peated/web/components/link";
-import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { notFound } from "next/navigation";
 
 export const revalidate = 60;
 
-export async function generateMetadata({
+export default function Page({
   params: { entityId },
 }: {
   params: { entityId: string };
 }) {
-  const client = await getServerClient();
-  const entity = await client.entities.details({ entity: Number(entityId) });
+  const orpc = useORPC();
+  const { data: entity } = useSuspenseQuery(
+    orpc.entities.details.queryOptions({
+      input: { entity: Number(entityId) },
+    }),
+  );
 
-  const title = `${entity.name}${entity.shortName ? ` (${entity.shortName})` : ""} Distillery Codes`;
-  const description = `Mapping of distillery codes found on bottles from ${entity.name}${entity.shortName ? ` (${entity.shortName})` : ""}.`;
-
-  return {
-    title,
-    description,
-  };
-}
-
-export default async function Page({
-  params: { entityId },
-}: {
-  params: { entityId: string };
-}) {
-  const client = await getServerClient();
-  const entity = await client.entities.details({ entity: Number(entityId) });
+  const { data } = useSuspenseQuery(orpc.smws.distillerList.queryOptions({}));
+  const distillerList = data.results;
 
   if (entity.shortName !== "SMWS") {
     return notFound();
   }
-
-  const { results: distillerList } = await client.smws.distillerList();
 
   const exampleDistiller = distillerList.find(
     (d) => d.name.toLowerCase() === SMWS_DISTILLERY_CODES[4].toLowerCase(),

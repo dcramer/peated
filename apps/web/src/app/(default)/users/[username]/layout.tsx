@@ -17,6 +17,25 @@ import { UserBadgeList } from "./userBadgeList";
 
 export const fetchCache = "default-no-store";
 
+export async function generateMetadata({
+  params: { username },
+}: {
+  params: { username: string };
+}) {
+  const client = await getServerClient();
+  const user = await client.users.details({ user: username });
+
+  return {
+    title: `@${user.username}`,
+    openGraph: {
+      type: "profile",
+      profile: {
+        username: user.username,
+      },
+    },
+  };
+}
+
 export default async function Layout({
   params: { username },
   children,

@@ -1,33 +1,23 @@
+"use client";
+
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import TastingList from "@peated/web/components/tastingList";
-import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
-export async function generateMetadata({
+export default function BottleTastings({
   params: { bottleId },
 }: {
   params: { bottleId: string };
 }) {
-  const client = await getServerClient();
-
-  const bottle = await client.bottles.details({
-    bottle: Number(bottleId),
-  });
-
-  return {
-    title: `Tastings for ${bottle.fullName}`,
-  };
-}
-
-export default async function BottleTastings({
-  params: { bottleId },
-}: {
-  params: { bottleId: string };
-}) {
-  const client = await getServerClient();
-
-  const tastingList = await client.tastings.list({
-    bottle: Number(bottleId),
-  });
+  const orpc = useORPC();
+  const { data: tastingList } = useSuspenseQuery(
+    orpc.tastings.list.queryOptions({
+      input: {
+        bottle: Number(bottleId),
+      },
+    }),
+  );
 
   return (
     <>

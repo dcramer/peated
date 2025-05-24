@@ -1,41 +1,27 @@
+"use client";
+
 import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
-export async function generateMetadata({
+export default function UserFavorites({
   params: { username },
 }: {
   params: { username: string };
 }) {
-  const client = await getServerClient();
-  const user = await client.users.details({
-    user: username,
-  });
-
-  return {
-    title: `Favorites by @${user.username}`,
-    openGraph: {
-      type: "profile",
-      profile: {
-        username: user.username,
+  const orpc = useORPC();
+  const { data: bottles } = useSuspenseQuery(
+    orpc.bottles.list.queryOptions({
+      input: {
+        user: username,
+        collection: "favorites",
       },
-    },
-  };
-}
+    }),
+  );
 
-export default async function UserFavorites({
-  params: { username },
-}: {
-  params: { username: string };
-}) {
-  const client = await getServerClient();
-  const favoriteList = await client.collections.bottles.list({
-    user: username,
-    collection: "default",
-  });
-
-  return favoriteList.results.length ? (
-    <BottleTable bottleList={favoriteList.results} rel={favoriteList.rel} />
+  return bottles.results.length ? (
+    <BottleTable bottleList={bottles.results} rel={bottles.rel} />
   ) : (
     <EmptyActivity>No favorites recorded yet.</EmptyActivity>
   );

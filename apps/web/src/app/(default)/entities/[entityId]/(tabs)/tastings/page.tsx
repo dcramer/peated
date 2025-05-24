@@ -1,33 +1,22 @@
+"use client";
+
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import TastingList from "@peated/web/components/tastingList";
-import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
-export async function generateMetadata({
+export default function EntityTastings({
   params: { entityId },
 }: {
   params: { entityId: string };
 }) {
-  const client = await getServerClient();
+  const orpc = useORPC();
 
-  const entity = await client.entities.details({
-    entity: Number(entityId),
-  });
-
-  return {
-    title: `Tastings for ${entity.name}`,
-  };
-}
-
-export default async function EntityTastings({
-  params: { entityId },
-}: {
-  params: { entityId: string };
-}) {
-  const client = await getServerClient();
-
-  const tastingList = await client.tastings.list({
-    entity: Number(entityId),
-  });
+  const { data: tastingList } = useSuspenseQuery(
+    orpc.tastings.list.queryOptions({
+      entity: Number(entityId),
+    }),
+  );
 
   return (
     <>
