@@ -18,7 +18,7 @@ export function getLink({
   };
 }) {
   return new RPCLink({
-    async headers() {
+    headers() {
       return {
         authorization: accessToken ? `Bearer ${accessToken}` : undefined,
         "user-agent": userAgent,
