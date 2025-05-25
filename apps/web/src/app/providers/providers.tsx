@@ -2,16 +2,15 @@
 
 import FlashMessages from "@peated/web/components/flash";
 import { default as config } from "@peated/web/config";
-import { ApiProvider } from "@peated/web/hooks/useApi";
 import { AuthProvider } from "@peated/web/hooks/useAuth";
 import { OnlineStatusProvider } from "@peated/web/hooks/useOnlineStatus";
 import { ensureSessionSynced } from "@peated/web/lib/auth.actions";
-import TRPCProvider from "@peated/web/lib/trpc/provider";
+import ORPCProvider from "@peated/web/lib/orpc/provider";
+import { type SessionData } from "@peated/web/lib/session.server";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { setUser } from "@sentry/nextjs";
 import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
 import { useInterval } from "usehooks-ts";
-import { type SessionData } from "../../lib/session.server";
 
 export default function Providers({
   children,
@@ -36,7 +35,7 @@ export default function Providers({
 
   return (
     <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
-      <TRPCProvider
+      <ORPCProvider
         apiServer={config.API_SERVER}
         accessToken={accessToken}
         key={accessToken}
@@ -44,13 +43,11 @@ export default function Providers({
         <ReactQueryStreamedHydration>
           <OnlineStatusProvider>
             <AuthProvider user={user}>
-              <ApiProvider accessToken={accessToken} server={config.API_SERVER}>
-                <FlashMessages>{children}</FlashMessages>
-              </ApiProvider>
+              <FlashMessages>{children}</FlashMessages>
             </AuthProvider>
           </OnlineStatusProvider>
         </ReactQueryStreamedHydration>
-      </TRPCProvider>
+      </ORPCProvider>
     </GoogleOAuthProvider>
   );
 }

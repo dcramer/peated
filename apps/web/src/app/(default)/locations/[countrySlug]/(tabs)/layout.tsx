@@ -6,7 +6,7 @@ import Markdown from "@peated/web/components/markdown";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { type ReactNode } from "react";
 
 export async function generateMetadata({
@@ -14,8 +14,11 @@ export async function generateMetadata({
 }: {
   params: { countrySlug: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const country = await trpcClient.countryBySlug.fetch(countrySlug);
+  const { client } = await getServerClient();
+
+  const country = await client.countries.details({
+    country: countrySlug,
+  });
 
   return {
     title: `Whisky from ${country.name}`,
@@ -30,8 +33,11 @@ export default async function Page({
   params: { countrySlug: string };
   children: ReactNode;
 }) {
-  const trpcClient = await getTrpcClient();
-  const country = await trpcClient.countryBySlug.fetch(countrySlug);
+  const { client } = await getServerClient();
+
+  const country = await client.countries.details({
+    country: countrySlug,
+  });
   const user = await getCurrentUser();
 
   const stats = [

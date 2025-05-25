@@ -2,12 +2,16 @@
 
 import Link from "@peated/web/components/link";
 import UserAvatar from "@peated/web/components/userAvatar";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Leaderboard({ badgeId }: { badgeId: number }) {
-  const [awardList] = trpc.badgeUserList.useSuspenseQuery({
-    badge: badgeId,
-  });
+  const orpc = useORPC();
+  const { data: awardList } = useSuspenseQuery(
+    orpc.badges.userList.queryOptions({
+      input: { badge: badgeId },
+    }),
+  );
 
   return (
     <ul className="flex flex-col gap-y-2">

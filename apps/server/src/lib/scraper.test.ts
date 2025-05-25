@@ -1,12 +1,12 @@
-import { trpcClient } from "@peated/server/lib/trpc/server";
+import { orpcClient } from "@peated/server/lib/orpc-client/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import scrapePrices, { type ScrapePricesCallback } from "./scraper";
 import waitError from "./test/waitError";
 
-vi.mock("@peated/server/lib/trpc/server", () => ({
-  trpcClient: {
-    priceCreateBatch: {
-      mutate: vi.fn(),
+vi.mock("@peated/server/lib/orpc-client/server", () => ({
+  orpcClient: {
+    prices: {
+      createBatch: vi.fn(),
     },
   },
 }));
@@ -57,7 +57,7 @@ describe("scrapePrices", () => {
     await scrapePrices(mockSite, mockUrlFn, mockScrapeProducts);
 
     expect(mockScrapeProducts).toHaveBeenCalledTimes(3);
-    expect(trpcClient.priceCreateBatch.mutate).toHaveBeenCalledWith({
+    expect(orpcClient.prices.createBatch).toHaveBeenCalledWith({
       site: mockSite,
       prices: [
         {
@@ -114,7 +114,7 @@ describe("scrapePrices", () => {
     await scrapePrices(mockSite, mockUrlFn, mockScrapeProducts);
 
     expect(mockScrapeProducts).toHaveBeenCalledTimes(2);
-    expect(trpcClient.priceCreateBatch.mutate).toHaveBeenCalledWith({
+    expect(orpcClient.prices.createBatch).toHaveBeenCalledWith({
       site: mockSite,
       prices: [
         {
@@ -139,7 +139,8 @@ describe("scrapePrices", () => {
       scrapePrices(mockSite, mockUrlFn, mockScrapeProducts),
     );
 
-    expect(error).toBeInstanceOf(Error);
-    expect(error.message).toBe("Failed to scrape any products.");
+    expect(error).toMatchInlineSnapshot(
+      `[Error: Failed to scrape any products.]`,
+    );
   });
 });

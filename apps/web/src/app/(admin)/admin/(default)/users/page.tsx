@@ -4,7 +4,8 @@ import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Table from "@peated/web/components/table";
 import TimeSince from "@peated/web/components/timeSince";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Page() {
   const queryParams = useApiQueryParams({
@@ -13,7 +14,14 @@ export default function Page() {
     },
   });
 
-  const [userList] = trpc.userList.useSuspenseQuery(queryParams);
+  const orpc = useORPC();
+  const { data: userList } = useSuspenseQuery(
+    orpc.users.list.queryOptions({
+      input: {
+        ...queryParams,
+      },
+    }),
+  );
 
   return (
     <div>

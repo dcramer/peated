@@ -1,4 +1,4 @@
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 
 export { default } from "@peated/web/components/defaultLayout";
 
@@ -7,8 +7,10 @@ export async function generateMetadata({
 }: {
   params: { countrySlug: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const country = await trpcClient.countryBySlug.fetch(countrySlug);
+  const { client } = await getServerClient();
+  const country = await client.countries.details({
+    country: countrySlug,
+  });
 
   return {
     title: `Whisky Regions in ${country.name}`,

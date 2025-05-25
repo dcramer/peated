@@ -3,9 +3,9 @@
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import type { Notification } from "@peated/server/types";
 import Link from "@peated/web/components/link";
+import classNames from "@peated/web/lib/classNames";
 import type { FriendRequestNotification } from "@peated/web/types";
 import { useRouter } from "next/navigation";
-import classNames from "../../lib/classNames";
 import UserAvatar from "../userAvatar";
 import FriendRequestEntry from "./friendRequestEntry";
 

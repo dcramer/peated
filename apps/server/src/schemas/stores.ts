@@ -4,6 +4,8 @@ import { BottleSchema } from "./bottles";
 import { CurrencyEnum } from "./common";
 import { ExternalSiteSchema } from "./externalSites";
 
+// TODO: lets rename price to value in all of these, and update
+// the schema accordingly
 export const StorePriceSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -33,5 +35,5 @@ export const BottlePriceChangeSchema = z.object({
   price: z.number(),
   previousPrice: z.number(),
   currency: CurrencyEnum,
-  bottle: BottleSchema,
+  bottle: BottleSchema.nullable(),
 });

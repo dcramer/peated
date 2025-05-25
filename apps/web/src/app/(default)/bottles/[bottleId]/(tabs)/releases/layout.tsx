@@ -1,4 +1,4 @@
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 
 export { default } from "@peated/web/components/defaultLayout";
 
@@ -7,8 +7,9 @@ export async function generateMetadata({
 }: {
   params: { bottleId: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const bottle = await trpcClient.bottleById.fetch(Number(bottleId));
+  const { client } = await getServerClient();
+
+  const bottle = await client.bottles.details({ bottle: Number(bottleId) });
 
   return {
     title: `Releases of ${bottle.fullName}`,

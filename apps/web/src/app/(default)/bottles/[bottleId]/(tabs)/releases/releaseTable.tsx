@@ -1,11 +1,11 @@
 "use client";
 
+import { type Outputs } from "@peated/server/orpc/router";
 import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Link from "@peated/web/components/link";
 import Table from "@peated/web/components/table";
-import type { RouterOutputs } from "@peated/web/lib/trpc/client";
 import ModActions from "./modActions";
 
 export default function ReleaseTable({
@@ -13,7 +13,7 @@ export default function ReleaseTable({
   releaseList,
 }: {
   bottleId: number;
-  releaseList: RouterOutputs["bottleReleaseList"];
+  releaseList: Outputs["bottles"]["releases"]["list"];
 }) {
   if (!releaseList.results.length) {
     return (

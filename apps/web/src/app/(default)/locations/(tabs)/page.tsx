@@ -1,18 +1,20 @@
+"use client";
+
 import CountryMapIcon from "@peated/web/components/countryMapIcon";
 import Link from "@peated/web/components/link";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
-import type { Metadata } from "next";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
-export const metadata: Metadata = {
-  title: "Major Whisky Regions",
-};
-
-export default async function Page() {
-  const trpcClient = await getTrpcClient();
-  const countryList = await trpcClient.countryList.fetch({
-    onlyMajor: true,
-    sort: "-bottles",
-  });
+export default function Page() {
+  const orpc = useORPC();
+  const { data: countryList } = useSuspenseQuery(
+    orpc.countries.list.queryOptions({
+      input: {
+        onlyMajor: true,
+        sort: "-bottles",
+      },
+    }),
+  );
 
   return (
     <ul

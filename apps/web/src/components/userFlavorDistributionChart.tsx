@@ -1,7 +1,8 @@
 "use client";
 
 import { formatFlavorProfile } from "@peated/server/lib/format";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import type { ComponentProps } from "react";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -13,9 +14,14 @@ import DistributionChart, {
 } from "./distributionChart";
 
 function UserFlavorDistributionElement({ userId }: { userId: number }) {
-  const [data] = trpc.userFlavorList.useSuspenseQuery({
-    user: userId,
-  });
+  const orpc = useORPC();
+  const { data } = useSuspenseQuery(
+    orpc.users.flavorList.queryOptions({
+      input: {
+        user: userId,
+      },
+    }),
+  );
 
   const { results, totalCount } = data;
 

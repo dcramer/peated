@@ -1,6 +1,6 @@
 import Link from "@peated/web/components/link";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { type ReactNode } from "react";
 
 export default async function Layout({
@@ -10,8 +10,11 @@ export default async function Layout({
   params: { entityId: string };
   children: ReactNode;
 }) {
-  const trpcClient = await getTrpcClient();
-  const entity = await trpcClient.entityById.fetch(Number(entityId));
+  const { client } = await getServerClient();
+
+  const entity = await client.entities.details({
+    entity: Number(entityId),
+  });
 
   const baseUrl = `/entities/${entity.id}`;
 

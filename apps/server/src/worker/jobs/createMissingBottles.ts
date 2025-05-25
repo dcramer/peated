@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { reviews } from "@peated/server/db/schema";
 import { findBottleId, findEntity } from "@peated/server/lib/bottleFinder";
-import { createCaller } from "@peated/server/trpc/router";
+import { routerClient } from "@peated/server/orpc/router";
 import { and, eq, isNull } from "drizzle-orm";
 
 export default async function createMissingBottles() {
@@ -30,13 +30,13 @@ export default async function createMissingBottles() {
 
         const entity = await findEntity(review.name);
         if (entity) {
-          const caller = createCaller({
-            user: systemUser,
-          });
-          const result = await caller.bottleCreate({
-            name: review.name,
-            brand: entity.id,
-          });
+          const result = await routerClient.bottles.create(
+            {
+              name: review.name,
+              brand: entity.id,
+            },
+            { context: { user: systemUser } },
+          );
           bottleId = result.id;
         }
       } else {

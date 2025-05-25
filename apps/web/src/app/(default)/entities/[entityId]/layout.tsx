@@ -1,11 +1,38 @@
 import Button from "@peated/web/components/button";
 import EntityHeader from "@peated/web/components/entityHeader";
 import ShareButton from "@peated/web/components/shareButton";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { summarize } from "@peated/web/lib/markdown";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { redirect } from "next/navigation";
 import { type ReactNode } from "react";
 import type { Organization, WithContext } from "schema-dts";
 import ModActions from "./modActions";
+
+export async function generateMetadata({
+  params: { entityId },
+}: {
+  params: { entityId: string };
+}) {
+  const { client } = await getServerClient();
+
+  const entity = await client.entities.details({
+    entity: Number(entityId),
+  });
+
+  const description = summarize(entity.description || "", 200);
+
+  return {
+    title: entity.name,
+    description,
+    openGraph: {
+      title: entity.name,
+      description: description,
+    },
+    twitter: {
+      card: "product",
+    },
+  };
+}
 
 export default async function Layout({
   params,
@@ -14,9 +41,12 @@ export default async function Layout({
   params: Record<string, any>;
   children: ReactNode;
 }) {
+  const { client } = await getServerClient();
+
   const entityId = Number(params.entityId);
-  const trpcClient = await getTrpcClient();
-  const entity = await trpcClient.entityById.fetch(entityId);
+  const entity = await client.entities.details({
+    entity: entityId,
+  });
 
   // tombstone path - redirect to the absolute url to ensure search engines dont get mad
   if (entity.id !== entityId) {

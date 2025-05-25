@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CASK_FILLS, CASK_SIZES, CASK_TYPES } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { BottleReleaseInputSchema } from "@peated/server/schemas";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import BooleanField from "./booleanField";
@@ -40,11 +40,11 @@ export default function ReleaseField({
   createDialogHelpText?: string;
   bottle: number;
 }) {
-  const trpcUtils = trpc.useUtils();
+  const orpc = useORPC();
   return (
     <SelectField<Option>
       onQuery={async (query) => {
-        const { results } = await trpcUtils.bottleReleaseList.fetch({
+        const { results } = await orpc.bottles.releases.list.call({
           query,
           bottle,
         });

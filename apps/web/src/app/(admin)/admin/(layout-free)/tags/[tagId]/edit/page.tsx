@@ -1,7 +1,8 @@
 "use client";
 
 import TagForm from "@peated/web/components/admin/tagForm";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 export default function Page({
@@ -9,17 +10,24 @@ export default function Page({
 }: {
   params: { tagId: string };
 }) {
-  const [tag] = trpc.tagByName.useSuspenseQuery(tagId);
+  const orpc = useORPC();
+  const { data: tag } = useSuspenseQuery(
+    orpc.tags.details.queryOptions({
+      input: {
+        tag: tagId,
+      },
+    }),
+  );
 
   const router = useRouter();
-  const tagUpdateMutation = trpc.tagUpdate.useMutation();
+  const tagUpdateMutation = useMutation(orpc.tags.update.mutationOptions());
 
   return (
     <TagForm
       onSubmit={async (data) => {
         const newTag = await tagUpdateMutation.mutateAsync({
           ...data,
-          name: tag.name,
+          tag: tag.name,
         });
         router.push(`/admin/tags/${newTag.name}`);
       }}

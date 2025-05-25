@@ -6,7 +6,7 @@ import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import UsStateMapIcon from "@peated/web/components/usStateMapIcon";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { type ReactNode } from "react";
 
 export async function generateMetadata({
@@ -14,10 +14,11 @@ export async function generateMetadata({
 }: {
   params: { countrySlug: string; regionSlug: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const region = await trpcClient.regionBySlug.fetch({
+  const { client } = await getServerClient();
+
+  const region = await client.regions.details({
     country: countrySlug,
-    slug: regionSlug,
+    region: regionSlug,
   });
 
   return {
@@ -33,10 +34,11 @@ export default async function Page({
   params: { countrySlug: string; regionSlug: string };
   children: ReactNode;
 }) {
-  const trpcClient = await getTrpcClient();
-  const region = await trpcClient.regionBySlug.fetch({
+  const { client } = await getServerClient();
+
+  const region = await client.regions.details({
     country: countrySlug,
-    slug: regionSlug,
+    region: regionSlug,
   });
   const user = await getCurrentUser();
 

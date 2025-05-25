@@ -3,8 +3,10 @@
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "types": ["node", "vitest/globals", "./src/global.d.ts"],
-    "moduleResolution": "Node",
-    "composite": true,
+    "module": "ES2022",
+    "moduleResolution": "Bundler",
+    "declaration": false,
+    "composite": false,
     "paths": {
       "@peated/server/*": ["./src/*"]
     }

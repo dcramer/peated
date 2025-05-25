@@ -1,42 +1,27 @@
+"use client";
+
 import { MapIcon } from "@heroicons/react/24/outline";
 import RobotImage from "@peated/web/assets/robot.png";
 import EntityMap from "@peated/web/components/entityMap";
 import Link from "@peated/web/components/link";
 import Markdown from "@peated/web/components/markdown";
-import { summarize } from "@peated/web/lib/markdown";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { useORPC } from "@peated/web/lib/orpc/context";
 import { parseDomain } from "@peated/web/lib/urls";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
-export async function generateMetadata({
+export default function EntityDetails({
   params: { entityId },
 }: {
   params: { entityId: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const entity = await trpcClient.entityById.fetch(Number(entityId));
-
-  const description = summarize(entity.description || "", 200);
-
-  return {
-    title: entity.name,
-    description,
-    openGraph: {
-      title: entity.name,
-      description: description,
-    },
-    twitter: {
-      card: "product",
-    },
-  };
-}
-
-export default async function EntityDetails({
-  params: { entityId },
-}: {
-  params: { entityId: string };
-}) {
-  const trpcClient = await getTrpcClient();
-  const entity = await trpcClient.entityById.fetch(Number(entityId));
+  const orpc = useORPC();
+  const { data: entity } = useSuspenseQuery(
+    orpc.entities.details.queryOptions({
+      input: {
+        entity: Number(entityId),
+      },
+    }),
+  );
 
   return (
     <>

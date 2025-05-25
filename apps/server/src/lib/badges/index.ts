@@ -1,8 +1,5 @@
-import type { SQL } from "drizzle-orm";
-import { and, eq, inArray, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
-import { db, type AnyDatabase } from "../../db";
-import type { BadgeAward } from "../../db/schema";
+import { db, type AnyDatabase } from "@peated/server/db";
+import type { BadgeAward } from "@peated/server/db/schema";
 import {
   badgeAwards,
   badgeAwardTrackedObjects,
@@ -12,7 +9,10 @@ import {
   tastingBadgeAwards,
   tastings,
   type Badge,
-} from "../../db/schema";
+} from "@peated/server/db/schema";
+import type { SQL } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import type { BadgeCheckType } from "../../types";
 import { getCheck } from "./checks";
 import { getFormula } from "./formula";

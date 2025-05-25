@@ -4,7 +4,8 @@ import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/lib/format";
 import BottleLink from "@peated/web/components/bottleLink";
 import Link from "@peated/web/components/link";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export function NewBottlesSkeleton() {
   const Row = () => (
@@ -38,10 +39,10 @@ export function NewBottlesSkeleton() {
 }
 
 export default function NewBottles() {
-  const [newBottleList] = trpc.bottleList.useSuspenseQuery({
-    sort: "-created",
-    limit: 10,
-  });
+  const orpc = useORPC();
+  const { data: newBottleList } = useSuspenseQuery(
+    orpc.bottles.list.queryOptions({ input: { limit: 10, sort: "-created" } }),
+  );
 
   return (
     <table className="mb-4 min-w-full">

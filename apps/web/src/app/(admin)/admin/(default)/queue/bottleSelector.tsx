@@ -11,7 +11,7 @@ import ListItem from "@peated/web/components/listItem";
 import { Modal } from "@peated/web/components/modal";
 import SearchHeader from "@peated/web/components/searchHeader";
 import Spinner from "@peated/web/components/spinner";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
@@ -35,14 +35,19 @@ export default function BottleSelector({
   const [results, setResults] = useState<Bottle[]>([]);
   const [isLoading, setLoading] = useState(false);
 
-  const trpcUtils = trpc.useUtils();
+  const orpc = useORPC();
 
-  const unsafe_onSearch = useCallback(async (query = "") => {
-    setLoading(true);
-    const { results } = await trpcUtils.bottleList.fetch({ query });
-    setResults(results);
-    setLoading(false);
-  }, []);
+  const unsafe_onSearch = useCallback(
+    async (query = "") => {
+      setLoading(true);
+      const { results } = await orpc.bottles.list.call({
+        query,
+      });
+      setResults(results);
+      setLoading(false);
+    },
+    [orpc],
+  );
 
   const onSearch = useDebounceCallback(unsafe_onSearch);
 

@@ -14,7 +14,7 @@ import {
   formatCategoryName,
 } from "@peated/server/lib/format";
 import { normalizeBottle } from "@peated/server/lib/normalize";
-import { createCaller } from "@peated/server/trpc/router";
+import { routerClient } from "@peated/server/orpc/router";
 import { runJob } from "@peated/server/worker/client";
 import { and, asc, eq, inArray, isNull, ne } from "drizzle-orm";
 
@@ -146,10 +146,6 @@ subcommand
     });
     if (!systemUser) throw new Error("Unable to identify system user");
 
-    const caller = createCaller({
-      user: systemUser,
-    });
-
     for (const { bottle, review } of results) {
       if (bottle.fullName.indexOf(review.name) !== 0) {
         const entity = await findEntity(review.name);
@@ -157,7 +153,12 @@ subcommand
           console.warn(
             `Removing bottle due to unknown entity: ${bottle.fullName}`,
           );
-          await caller.bottleDelete(bottle.id);
+          await routerClient.bottles.delete(
+            { bottle: bottle.id },
+            {
+              context: { user: systemUser },
+            },
+          );
         } else {
           // probably mismatched bottle
           if (bottle.brandId === entity.id) continue;
@@ -173,11 +174,14 @@ subcommand
             `Updating ${bottle.fullName} to ${entity.name} ${newName} (from ${entity.name})`,
           );
 
-          await caller.bottleUpdate({
-            bottle: bottle.id,
-            name: newName,
-            brand: entity.id,
-          });
+          await routerClient.bottles.update(
+            {
+              bottle: bottle.id,
+              name: newName,
+              brand: entity.id,
+            },
+            { context: { user: systemUser } },
+          );
         }
       }
     }

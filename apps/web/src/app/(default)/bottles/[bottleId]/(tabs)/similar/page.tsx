@@ -1,29 +1,23 @@
+"use client";
+
 import BetaNotice from "@peated/web/components/betaNotice";
 import BottleTable from "@peated/web/components/bottleTable";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
-export async function generateMetadata({
+export default function Page({
   params: { bottleId },
 }: {
   params: { bottleId: string };
 }) {
-  const trpcClient = await getTrpcClient();
-  const bottle = await trpcClient.bottleById.fetch(Number(bottleId));
-
-  return {
-    title: `Whisky Similar to ${bottle.fullName}`,
-  };
-}
-
-export default async function Page({
-  params: { bottleId },
-}: {
-  params: { bottleId: string };
-}) {
-  const trpcClient = await getTrpcClient();
-  const bottleList = await trpcClient.similarBottleList.fetch({
-    bottle: Number(bottleId),
-  });
+  const orpc = useORPC();
+  const { data: bottleList } = useSuspenseQuery(
+    orpc.bottles.similar.queryOptions({
+      input: {
+        bottle: Number(bottleId),
+      },
+    }),
+  );
 
   return (
     <div className="mt-6 px-3 lg:px-0">

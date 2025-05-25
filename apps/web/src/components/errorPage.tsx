@@ -1,16 +1,8 @@
 "use client";
 
-import { isTRPCClientError } from "@peated/server/trpc/client";
-
-import {
-  ApiError,
-  ApiUnauthorized,
-  ApiUnavailable,
-} from "@peated/server/lib/apiClient";
-import { type AppRouter } from "@peated/server/trpc/router";
+import { isDefinedError, ORPCError } from "@orpc/client";
 import Button from "@peated/web/components/button";
 import config from "@peated/web/config";
-import { type TRPCClientError } from "@trpc/client";
 import { type ComponentProps, type ReactNode } from "react";
 import { useOnlineStatus } from "../hooks/useOnlineStatus";
 
@@ -33,6 +25,14 @@ export function ErrorPageForbidden({
   return <ErrorPage title={title} subtitle={subtitle} {...props} />;
 }
 
+function getTypedError<T>(
+  error: T,
+): Error | Extract<T, ORPCError<any, any>> | undefined {
+  if (error instanceof Error) return error;
+  if (isDefinedError(error)) return error;
+  return undefined;
+}
+
 export default function ErrorPage({
   title,
   subtitle,
@@ -41,49 +41,35 @@ export default function ErrorPage({
 }: {
   title?: ReactNode | string;
   subtitle?: ReactNode | string;
-  error?: Error | ApiError | TRPCClientError<AppRouter>;
+  error?: unknown;
   onTryAgain?: () => void;
 }) {
   const isOnline = useOnlineStatus();
+  // XXX: there must be a better way to do this
+  const typedError = getTypedError(error);
 
   // i hate all of this
-  if (error && (!title || !subtitle)) {
-    if (error instanceof ApiUnavailable) {
+  if (typedError && (!title || !subtitle)) {
+    if (typedError.message === "Failed to fetch") {
       title = (title ?? isOnline) ? "Server Unreachable" : "Connection Offline";
       subtitle =
         (subtitle ?? isOnline)
           ? "It looks like Peated's API is unreachable right now. Please try again shortly."
           : "It looks like your network is offline.";
-    } else if (error instanceof ApiUnauthorized) {
-      title = title ?? "Identify Yourself";
-      subtitle =
-        subtitle ??
-        "To get to where you're going we need you to tell us who you are. We don't just let anyone in here.";
     } else if (
-      (error instanceof ApiError && error.statusCode === 404) ||
-      (isTRPCClientError(error) && error.data?.httpStatus === 404) ||
-      error.message === "NOT_FOUND"
+      (typedError instanceof ORPCError && typedError.status === 404) ||
+      (typedError as any).message === "NOT_FOUND"
     ) {
       title = title ?? "Not Found";
       subtitle = subtitle ?? "We couldn't find the page you were looking for.";
     } else if (
-      (error instanceof ApiError && error.statusCode === 401) ||
-      (isTRPCClientError(error) && error.data?.httpStatus === 401) ||
-      error.message === "UNAUTHORIZED"
+      (typedError instanceof ORPCError && typedError.status === 401) ||
+      (typedError as any).message === "UNAUTHORIZED"
     ) {
       title = title ?? "Identify Yourself";
       subtitle =
         subtitle ??
         "To get to where you're going we need you to tell us who you are. We don't just let anyone in here.";
-    } else if (
-      isTRPCClientError(error) &&
-      error.message === "Failed to fetch"
-    ) {
-      title = (title ?? isOnline) ? "Server Unreachable" : "Connection Offline";
-      subtitle =
-        (subtitle ?? isOnline)
-          ? "It looks like Peated's API is unreachable right now. Please try again shortly."
-          : "It looks like your network is offline.";
     }
   }
 
@@ -110,21 +96,13 @@ export default function ErrorPage({
             </div>
           </div>
 
-          {error && (
+          {typedError && (
             <div className="mt-12">
-              {error instanceof ApiError && (
-                <div className="prose prose-invert mx-auto mb-4">
-                  <h3 className="text-white">Remote Stack</h3>
-                  <pre className="max-h-full overflow-y-auto whitespace-pre-wrap break-all text-left">
-                    {error.remoteStack}
-                  </pre>
-                </div>
-              )}
-              {error.stack && (
+              {"stack" in typedError && typedError.stack && (
                 <div className="prose prose-invert mx-auto mb-4">
                   <h3 className="text-white">Local Stack</h3>
                   <pre className="max-h-full overflow-y-auto whitespace-pre-wrap break-all text-left">
-                    {error.stack}
+                    {typedError.stack}
                   </pre>
                 </div>
               )}

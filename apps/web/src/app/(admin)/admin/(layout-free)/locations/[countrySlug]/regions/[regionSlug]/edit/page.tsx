@@ -2,7 +2,12 @@
 
 import RegionForm from "@peated/web/components/admin/regionForm";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Page({
@@ -12,37 +17,45 @@ export default function Page({
 }) {
   useModRequired();
 
-  const [region] = trpc.regionBySlug.useSuspenseQuery({
-    country: countrySlug,
-    slug: regionSlug,
-  });
+  const orpc = useORPC();
+  const { data: region } = useSuspenseQuery(
+    orpc.regions.details.queryOptions({
+      input: {
+        country: countrySlug,
+        region: regionSlug,
+      },
+    }),
+  );
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("returnTo");
 
-  const trpcUtils = trpc.useUtils();
+  const queryClient = useQueryClient();
 
-  const regionUpdateMutation = trpc.regionUpdate.useMutation({
-    onSuccess: (data) => {
-      if (!data) return;
-      const previous = trpcUtils.regionBySlug.getData({
-        country: countrySlug,
-        slug: data.slug,
-      });
-      if (previous) {
-        trpcUtils.regionBySlug.setData(
-          {
-            country: countrySlug,
-            slug: data.slug,
-          },
-          {
-            ...previous,
-            ...data,
-          },
+  const regionUpdateMutation = useMutation(
+    orpc.regions.update.mutationOptions({
+      onSuccess: (data) => {
+        if (!data) return;
+        // TODO: this might be wrong
+        queryClient.setQueryData(
+          orpc.regions.details.key({
+            input: {
+              country: countrySlug,
+              region: data.slug,
+            },
+          }),
+          (oldData: any) =>
+            oldData
+              ? {
+                  ...oldData,
+                  ...data,
+                }
+              : oldData,
         );
-      }
-    },
-  });
+      },
+    }),
+  );
 
   return (
     <RegionForm
@@ -51,7 +64,7 @@ export default function Page({
           {
             ...data,
             country: region.country.slug,
-            slug: region.slug,
+            region: region.slug,
           },
           {
             onSuccess: (result) => {

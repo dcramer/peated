@@ -1,5 +1,5 @@
+import { createServerClient } from "@peated/web/lib/orpc/client.server";
 import { buildSitemapIndex } from "@peated/web/lib/sitemaps";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
 
 const PAGE_LIMIT = 1000;
 
@@ -17,8 +17,8 @@ function range(start: number, end?: number): number[] {
 }
 
 export async function GET() {
-  const trpcClient = await getTrpcClient();
-  const { totalBottles } = await trpcClient.stats.fetch();
+  const { client } = await createServerClient();
+  const { totalBottles } = await client.stats.call({});
   const sitemapIndexXML = await buildSitemapIndex(
     range(1, Math.ceil(totalBottles / PAGE_LIMIT)).map(
       (i) => `/sitemaps/bottles/${i}/sitemap.xml`,

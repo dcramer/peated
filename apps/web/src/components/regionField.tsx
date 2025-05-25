@@ -1,4 +1,5 @@
-import { trpc } from "@peated/web/lib/trpc/client";
+import type { Inputs } from "@peated/server/orpc/router";
+import { useORPC } from "@peated/web/lib/orpc/context";
 import SelectField from "./selectField";
 
 export default function RegionField({
@@ -9,13 +10,13 @@ export default function RegionField({
     country?: string | number | null;
   };
 }) {
-  const trpcUtils = trpc.useUtils();
+  const orpc = useORPC();
   return (
     <SelectField
       onQuery={async (query) => {
         if (!searchContext.country) return [];
-        const { results } = await trpcUtils.regionList.fetch({
-          country: searchContext.country,
+        const { results } = await orpc.regions.list.call({
+          country: searchContext.country.toString(),
           query,
         });
         return results;

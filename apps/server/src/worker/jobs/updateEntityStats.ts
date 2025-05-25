@@ -20,7 +20,7 @@ export default async ({ entityId }: { entityId: number }) => {
     await tx
       .update(entities)
       .set({
-        totalBottles: sql<number>`(
+        totalBottles: sql<string>`(
         SELECT COUNT(*)
         FROM ${bottles}
         WHERE (
@@ -39,7 +39,7 @@ export default async ({ entityId }: { entityId: number }) => {
     await tx
       .update(entities)
       .set({
-        totalBottles: sql<number>`(
+        totalBottles: sql<string>`(
           SELECT COUNT(*)
           FROM ${bottles}
           WHERE (
@@ -52,7 +52,7 @@ export default async ({ entityId }: { entityId: number }) => {
             )
           )
         )`,
-        totalTastings: sql<number>`(
+        totalTastings: sql<string>`(
           SELECT COUNT(*)
           FROM ${tastings}
           WHERE ${tastings.bottleId} IN (

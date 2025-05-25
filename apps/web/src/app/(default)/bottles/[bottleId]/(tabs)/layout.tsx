@@ -1,7 +1,37 @@
 import Link from "@peated/web/components/link";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { summarize } from "@peated/web/lib/markdown";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { type ReactNode } from "react";
+
+export async function generateMetadata({
+  params: { bottleId },
+}: {
+  params: { bottleId: string };
+}) {
+  const { client } = await getServerClient();
+
+  const bottle = await client.bottles.details({
+    bottle: Number(bottleId),
+  });
+
+  const description = summarize(bottle.description || "", 200);
+
+  return {
+    title: bottle.fullName,
+    description,
+    images: [bottle.imageUrl],
+    openGraph: {
+      title: bottle.fullName,
+      description: description,
+      images: [bottle.imageUrl],
+    },
+    twitter: {
+      card: "summary",
+      images: [bottle.imageUrl],
+    },
+  };
+}
 
 export default async function Layout({
   params,
@@ -10,9 +40,10 @@ export default async function Layout({
   params: Record<string, any>;
   children: ReactNode;
 }) {
+  const { client } = await getServerClient();
+
   const bottleId = Number(params.bottleId);
-  const trpcClient = await getTrpcClient();
-  const bottle = await trpcClient.bottleById.fetch(bottleId);
+  const bottle = await client.bottles.details({ bottle: bottleId });
 
   const baseUrl = `/bottles/${bottle.id}`;
 
@@ -35,7 +66,6 @@ export default async function Layout({
           Similar
         </TabItem>
       </Tabs>
-
       {children}
     </>
   );

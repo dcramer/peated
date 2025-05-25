@@ -15,6 +15,7 @@ export const NotificationSchema = z.object({
   createdAt: z.string().datetime(),
   read: z.boolean(),
   ref: z.any().nullable(),
+  // TODO:
   // ref: z.union([TastingSchema, FriendSchema, z.null()]),
 });
 

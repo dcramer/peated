@@ -1,7 +1,8 @@
 "use client";
 
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import ReleaseTable from "./releaseTable";
 
 export default function Page({
@@ -9,6 +10,7 @@ export default function Page({
 }: {
   params: { bottleId: string };
 }) {
+  const orpc = useORPC();
   const queryParams = useApiQueryParams({
     numericFields: ["cursor", "limit"],
     overrides: {
@@ -17,7 +19,11 @@ export default function Page({
     },
   });
 
-  const [releaseList] = trpc.bottleReleaseList.useSuspenseQuery(queryParams);
+  const { data: releaseList } = useSuspenseQuery(
+    orpc.bottles.releases.list.queryOptions({
+      input: queryParams,
+    }),
+  );
 
   return (
     <div className="mt-6 px-3 lg:px-0">

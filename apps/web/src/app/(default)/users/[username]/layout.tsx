@@ -6,9 +6,8 @@ import Tabs, { TabItem } from "@peated/web/components/tabs";
 import UserAvatar from "@peated/web/components/userAvatar";
 import UserFlavorDistributionChart from "@peated/web/components/userFlavorDistributionChart";
 import UserLocationChart from "@peated/web/components/userLocationChart";
-import UserTagDistribution from "@peated/web/components/userTagDistribution";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
-import { getTrpcClient } from "@peated/web/lib/trpc/client.server";
+import { createServerClient } from "@peated/web/lib/orpc/client.server";
 import { type ReactNode } from "react";
 import type { ProfilePage, WithContext } from "schema-dts";
 import FriendButton from "./friendButton";
@@ -18,6 +17,25 @@ import { UserBadgeList } from "./userBadgeList";
 
 export const fetchCache = "default-no-store";
 
+export async function generateMetadata({
+  params: { username },
+}: {
+  params: { username: string };
+}) {
+  const { client } = await createServerClient();
+  const user = await client.users.details({ user: username });
+
+  return {
+    title: `@${user.username}`,
+    openGraph: {
+      type: "profile",
+      profile: {
+        username: user.username,
+      },
+    },
+  };
+}
+
 export default async function Layout({
   params: { username },
   children,
@@ -25,8 +43,10 @@ export default async function Layout({
   params: { username: string };
   children: ReactNode;
 }) {
-  const trpcClient = await getTrpcClient();
-  const user = await trpcClient.userById.fetch(username);
+  const { client } = await createServerClient();
+  const user = await client.users.details({
+    user: username,
+  });
 
   const currentUser = await getCurrentUser();
 

@@ -1,12 +1,13 @@
 "use server";
 
-import { makeTRPCClient } from "@peated/server/trpc/client";
-import config from "@peated/web/config";
-import { isTRPCClientError } from "@peated/web/lib/trpc/client";
+import { safe } from "@orpc/client";
+import { createServerClient } from "@peated/web/lib/orpc/client.server";
 import { redirect } from "next/navigation";
 import { getSafeRedirect } from "./auth";
 import type { SessionData } from "./session.server";
 import { getSession } from "./session.server";
+
+const SESSION_REFRESH = 60 * 60; // 1 hour
 
 export async function logoutForm(
   prevState: void | undefined,
@@ -61,20 +62,22 @@ export async function authenticate(
     (formData.get("redirectTo") || "/") as string,
   );
 
-  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
+  const { client } = await createServerClient();
 
   if (email && !password) {
-    try {
-      await trpcClient.authMagicLinkSend.mutate({ email });
-    } catch (err) {
-      if (isTRPCClientError(err) && err.data?.code === "UNAUTHORIZED") {
-        return {
-          magicLink: false,
-          error: "Invalid credentials",
-        };
-      }
-
-      throw err;
+    const { error, isDefined } = await safe(
+      client.auth.magicLink.create({ email }),
+    );
+    if (isDefined) {
+      return {
+        magicLink: false,
+        error: error.message,
+      };
+    } else if (error) {
+      return {
+        magicLink: false,
+        error: "Internal server error.",
+      };
     }
 
     return {
@@ -83,34 +86,36 @@ export async function authenticate(
     };
   }
 
-  let data;
-  try {
-    data = code
-      ? await trpcClient.authGoogle.mutate({
+  const { error, isDefined, data } = await safe(
+    code
+      ? client.auth.login({
           code,
         })
-      : await trpcClient.authBasic.mutate({
+      : client.auth.login({
           email,
           password,
-        });
+        }),
+  );
 
-    session.user = data.user;
-    session.accessToken = data.accessToken;
-
-    await session.save();
-
-    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
-    // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
-  } catch (err) {
-    if (isTRPCClientError(err) && err.data?.code === "UNAUTHORIZED") {
-      return {
-        magicLink: false,
-        error: "Invalid credentials",
-      };
-    }
-
-    throw err;
+  if (isDefined) {
+    return {
+      magicLink: false,
+      error: error.message,
+    };
+  } else if (error) {
+    return {
+      magicLink: false,
+      error: "Internal server error.",
+    };
   }
+
+  session.user = data.user;
+  session.accessToken = data.accessToken ?? null;
+
+  await session.save();
+
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
+  // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
 
   if (!data.user.verified) {
     redirect("/verify");
@@ -120,7 +125,7 @@ export async function authenticate(
 }
 
 export async function registerForm(
-  prevState: string | undefined,
+  prevState: GenericResult | undefined,
   formData: FormData,
 ) {
   "use server";
@@ -141,25 +146,24 @@ export async function register(formData: FormData) {
   const password = (formData.get("password") || "") as string;
   const username = formData.get("username") as string;
 
-  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
+  const { client } = await createServerClient();
 
-  let data;
-  try {
-    data = await trpcClient.authRegister.mutate({
+  const { error, isDefined, data } = await safe(
+    client.auth.register({
       email,
       password,
       username,
-    });
-  } catch (err) {
-    if (isTRPCClientError(err) && err.data?.code === "CONFLICT") {
-      return "An account already exists matching that username or email address.";
-    }
+    }),
+  );
 
-    throw err;
+  if (isDefined) {
+    return { ok: false, error: error.message };
+  } else if (error) {
+    return { ok: false, error: "Internal server error." };
   }
 
   session.user = data.user;
-  session.accessToken = data.accessToken;
+  session.accessToken = data.accessToken ?? null;
   session.ts = new Date().getTime();
 
   await session.save();
@@ -172,6 +176,7 @@ export async function register(formData: FormData) {
 
 type GenericResult = {
   ok: boolean;
+  error?: string;
 };
 
 export async function resendVerificationForm(
@@ -186,15 +191,13 @@ export async function resendVerificationForm(
 
   const session = await getSession();
 
-  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
-  try {
-    await trpcClient.emailResendVerification.mutate();
-  } catch (err) {
-    if (isTRPCClientError(err) && err.data?.code === "CONFLICT") {
-      return { ok: true, alreadyVerified: true };
-    }
+  const { client } = await createServerClient();
+  const { isDefined, error } = await safe(client.email.resendVerification());
 
-    throw err;
+  if (isDefined && error.name === "CONFLICT") {
+    return { ok: true, alreadyVerified: true };
+  } else if (error) {
+    return { ok: false, error: "Internal server error." };
   }
 
   return { ok: true };
@@ -209,16 +212,16 @@ export async function passwordResetForm(
   const email = (formData.get("email") || "") as string;
 
   const session = await getSession();
+  const { client } = await createServerClient();
 
-  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
-  try {
-    await trpcClient.authPasswordReset.mutate({ email });
-  } catch (err) {
-    if (isTRPCClientError(err)) {
-      return { ok: false, error: err.message };
-    }
+  const { error, isDefined } = await safe(
+    client.auth.passwordReset.create({ email }),
+  );
 
-    throw err;
+  if (isDefined) {
+    return { ok: false, error: error.message };
+  } else if (error) {
+    return { ok: false, error: "Internal server error." };
   }
 
   return { ok: true };
@@ -234,25 +237,20 @@ export async function passwordResetConfirmForm(
   const password = (formData.get("password") || "") as string;
 
   const session = await getSession();
+  const { client } = await createServerClient();
 
-  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
+  const { error, isDefined, data } = await safe(
+    client.auth.passwordReset.confirm({ token, password }),
+  );
 
-  let data;
-  try {
-    data = await trpcClient.authPasswordResetConfirm.mutate({
-      token,
-      password,
-    });
-  } catch (err) {
-    if (isTRPCClientError(err)) {
-      return { ok: false, error: err.message };
-    }
-
-    throw err;
+  if (isDefined) {
+    return { ok: false, error: error.message };
+  } else if (error) {
+    return { ok: false, error: "Internal server error." };
   }
 
   session.user = data.user;
-  session.accessToken = data.accessToken;
+  session.accessToken = data.accessToken ?? null;
   session.ts = new Date().getTime();
 
   await session.save();
@@ -264,9 +262,9 @@ export async function updateSession(): Promise<SessionData> {
   "use server";
 
   const session = await getSession();
-  const trpcClient = makeTRPCClient(config.API_SERVER, session.accessToken);
+  const { client } = await createServerClient();
 
-  const user = await trpcClient.userById.query("me");
+  const user = await client.users.details({ user: "me" });
   session.user = user;
   session.ts = new Date().getTime();
   // should rotate access token too
@@ -277,8 +275,6 @@ export async function updateSession(): Promise<SessionData> {
     ...session,
   };
 }
-
-const SESSION_REFRESH = 60;
 
 export async function ensureSessionSynced(): Promise<SessionData> {
   "use server";

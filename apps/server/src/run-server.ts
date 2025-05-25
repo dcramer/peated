@@ -1,15 +1,23 @@
+// make sure to import this _before_ all other code
+import "./sentry";
+
+import { serve } from "@hono/node-server";
 import * as Sentry from "@sentry/node";
-import buildFastify from "./app";
+import { app } from "./app";
 import config from "./config";
 
 const start = async () => {
   try {
-    const fastify = await buildFastify();
     console.info(`API exposed at http://${config.HOST}:${config.PORT}/`);
-    await fastify.listen({ port: config.PORT as number, host: config.HOST });
+
+    serve({
+      fetch: app.fetch,
+      port: config.PORT as number,
+      hostname: config.HOST,
+    });
   } catch (err) {
     Sentry.captureException(err);
-    console.error(`Fastify process received an error: ${err}`, err);
+    console.error(`Server process received an error: ${err}`, err);
     process.exit(1);
   }
 };

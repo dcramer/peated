@@ -1,4 +1,3 @@
-import type { MultipartFile } from "@fastify/multipart";
 import { Storage } from "@google-cloud/storage";
 import { createId } from "@paralleldrive/cuid2";
 import { createWriteStream } from "node:fs";
@@ -39,6 +38,17 @@ type ProcessCallback = (
   stream: Readable,
   filename: string,
 ) => { stream: Readable; filename: string };
+
+// New MultipartFile type to replace the Fastify one
+interface MultipartFile {
+  file: Readable;
+  filename: string;
+  fieldname: string;
+  encoding?: string;
+  mimetype?: string;
+  fields?: Record<string, string | string[]>;
+  toBuffer(): Promise<Buffer>;
+}
 
 export async function copyFile({
   input,
@@ -117,7 +127,7 @@ export const storeFile = async ({
   data:
     | MultipartFile
     | {
-        filename: string;
+        filename?: string;
         file: Readable;
       };
   namespace: string;
@@ -132,7 +142,7 @@ export const storeFile = async ({
   return await startSpan(
     {
       op: "peated.store-file",
-      name: data.filename,
+      name: data.filename || "file",
     },
     async (span) => {
       span?.setAttributes({

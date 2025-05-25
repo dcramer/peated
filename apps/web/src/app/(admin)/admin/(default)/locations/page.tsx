@@ -3,7 +3,8 @@
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Table from "@peated/web/components/table";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Page() {
   const queryParams = useApiQueryParams({
@@ -12,7 +13,13 @@ export default function Page() {
     },
     numericFields: ["cursor", "limit"],
   });
-  const [countryList] = trpc.countryList.useSuspenseQuery(queryParams);
+
+  const orpc = useORPC();
+  const { data: countryList } = useSuspenseQuery(
+    orpc.countries.list.queryOptions({
+      input: queryParams,
+    }),
+  );
 
   return (
     <div>

@@ -2,7 +2,8 @@
 
 import Table from "@peated/web/components/table";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Page({
   params: { countrySlug },
@@ -19,7 +20,16 @@ export default function Page({
     },
   });
 
-  const [regionList] = trpc.regionList.useSuspenseQuery(queryParams);
+  const orpc = useORPC();
+  const { data: regionList } = useSuspenseQuery(
+    orpc.regions.list.queryOptions({
+      input: {
+        country: countrySlug,
+        ...queryParams,
+      },
+    }),
+  );
+
   return (
     <div>
       <Table

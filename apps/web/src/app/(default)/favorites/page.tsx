@@ -3,15 +3,21 @@
 import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import PaginationButtons from "@peated/web/components/paginationButtons";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const fetchCache = "default-no-store";
 
 export default function Page() {
-  const [favoriteList] = trpc.collectionBottleList.useSuspenseQuery({
-    user: "me",
-    collection: "default",
-  });
+  const orpc = useORPC();
+  const { data: favoriteList } = useSuspenseQuery(
+    orpc.collections.bottles.list.queryOptions({
+      input: {
+        user: "me",
+        collection: "default",
+      },
+    }),
+  );
 
   return (
     <>

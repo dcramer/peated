@@ -27,10 +27,13 @@ export async function getUserFromId(
     return currentUser || null;
   }
 
-  if (typeof userId === "number") {
+  // TODO: this isnt ideal, but if we're only going to use this in the API
+  // its ok. The rationale here is that numbers are passed as strings from
+  // the query string, thus we have to coerce sometimes.
+  if (typeof userId === "number" || Number.isFinite(+userId)) {
     return (
       (await db.query.users.findFirst({
-        where: eq(users.id, userId),
+        where: eq(users.id, Number(userId)),
       })) || null
     );
   }

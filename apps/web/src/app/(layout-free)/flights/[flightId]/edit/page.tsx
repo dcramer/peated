@@ -1,7 +1,12 @@
 "use client";
 
 import FlightForm from "@peated/web/components/flightForm";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 export default function Page({
@@ -9,29 +14,42 @@ export default function Page({
 }: {
   params: { flightId: string };
 }) {
-  const [[flight, bottles]] = trpc.useSuspenseQueries((t) => [
-    t.flightById(flightId),
-    t.bottleList({
-      flight: flightId,
+  const orpc = useORPC();
+  const { data: flight } = useSuspenseQuery(
+    orpc.flights.details.queryOptions({
+      input: { flight: flightId },
     }),
-  ]);
+  );
+
+  const { data: bottles } = useSuspenseQuery(
+    orpc.bottles.list.queryOptions({
+      input: { flight: flightId },
+    }),
+  );
 
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  const trpcUtils = trpc.useUtils();
-
-  const flightUpdateMutation = trpc.flightUpdate.useMutation({
-    onSuccess: (data) => {
-      if (!data) return;
-      const previous = trpcUtils.flightById.getData(data.id);
-      if (previous) {
-        trpcUtils.flightById.setData(data.id, {
-          ...previous,
-          ...data,
-        });
-      }
-    },
-  });
+  const flightUpdateMutation = useMutation(
+    orpc.flights.update.mutationOptions({
+      onSuccess: (data) => {
+        if (!data) return;
+        // TODO: this might be wrong
+        queryClient.setQueryData(
+          orpc.flights.details.key({
+            input: { flight: data.id },
+          }),
+          (oldData: any) =>
+            oldData
+              ? {
+                  ...oldData,
+                  ...data,
+                }
+              : oldData,
+        );
+      },
+    }),
+  );
 
   return (
     <FlightForm

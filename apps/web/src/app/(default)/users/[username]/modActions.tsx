@@ -5,27 +5,14 @@ import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { type User } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import useAuth from "@peated/web/hooks/useAuth";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation } from "@tanstack/react-query";
 
 export default function ModActions({ user }: { user: User }) {
   const { user: currentUser } = useAuth();
+  const orpc = useORPC();
 
-  const trpcUtils = trpc.useUtils();
-
-  const userUpdateMutation = trpc.userUpdate.useMutation({
-    onSuccess: (data, input) => {
-      const previous = trpcUtils.userById.getData(input.user);
-      if (previous) {
-        const newUser = {
-          ...previous,
-          ...data,
-        };
-        trpcUtils.userById.setData(input.user, newUser);
-        if (data.id === currentUser?.id)
-          trpcUtils.userById.setData("me", newUser);
-      }
-    },
-  });
+  const userUpdateMutation = useMutation(orpc.users.update.mutationOptions());
 
   if (!currentUser?.admin) return null;
 

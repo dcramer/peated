@@ -6,7 +6,8 @@ import Spinner from "@peated/web/components/spinner";
 import useAuth from "@peated/web/hooks/useAuth";
 import { updateSession } from "@peated/web/lib/auth.actions";
 import { logError } from "@peated/web/lib/log";
-import { isTRPCClientError, trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation } from "@tanstack/react-query";
 import { redirect, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import ResendVerificationForm from "./resendForm";
@@ -14,17 +15,20 @@ import ResendVerificationForm from "./resendForm";
 export default function Verify() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
+  const orpc = useORPC();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const emailVerifyMutation = trpc.emailVerify.useMutation({
-    onSuccess: async () => {
-      setSuccess(true);
-      await updateSession();
-    },
-  });
+  const emailVerifyMutation = useMutation(
+    orpc.email.verify.mutationOptions({
+      onSuccess: async () => {
+        setSuccess(true);
+        await updateSession();
+      },
+    }),
+  );
 
   const token = searchParams.get("token") || "";
   if (user?.verified || (!user && !token)) {
@@ -36,20 +40,23 @@ export default function Verify() {
       setLoading(false);
       return;
     }
-    emailVerifyMutation.mutate(token, {
-      onError: (err) => {
-        if (isTRPCClientError(err)) {
-          setError(err.message);
-        } else {
-          logError(err);
-          setError("An unknown internal error occurred.");
-        }
-        setLoading(false);
+    emailVerifyMutation.mutate(
+      { token },
+      {
+        onError: (err: any) => {
+          if (err.name === "INVALID_TOKEN") {
+            setError(err.message);
+          } else {
+            logError(err);
+            setError("An unknown internal error occurred.");
+          }
+          setLoading(false);
+        },
+        onSuccess: () => {
+          setLoading(false);
+        },
       },
-      onSuccess: () => {
-        setLoading(false);
-      },
-    });
+    );
   }, [token]);
 
   return (

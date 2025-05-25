@@ -1,11 +1,10 @@
+import { safe } from "@orpc/client";
 import {
   defaultHeaders,
   SCRAPER_PRICE_BATCH_SIZE,
 } from "@peated/server/constants";
-import { ApiClient } from "@peated/server/lib/apiClient";
 import { logError } from "@peated/server/lib/log";
-import { trpcClient } from "@peated/server/lib/trpc/server";
-import { isTRPCClientError } from "@peated/server/trpc/client";
+import { orpcClient } from "@peated/server/lib/orpc-client/server";
 import type { Currency, ExternalSiteType } from "@peated/server/types";
 import { type Category } from "@peated/server/types";
 import axios from "axios";
@@ -158,31 +157,25 @@ export async function handleBottle(
   price?: z.input<typeof StorePriceInputSchema> | null,
   imageUrl?: string | null,
 ) {
-  const apiClient = new ApiClient({
-    server: config.API_SERVER,
-    accessToken: process.env.ACCESS_TOKEN,
-  });
-
   if (process.env.ACCESS_TOKEN) {
     console.log(`Submitting [${formatBottleName(bottle)}]`);
 
-    let bottleResult;
-    try {
-      bottleResult = await trpcClient.bottleUpsert.mutate(bottle);
-    } catch (err) {
-      if (!isTRPCClientError(err) || (err as any).data?.httpStatus !== 409) {
-        logError(err, { bottle });
-        return;
-      }
+    const {
+      data: bottleResult,
+      error,
+      isDefined,
+    } = await safe(orpcClient.bottles.upsert(bottle));
+    if (error && (!isDefined || error.name !== "CONFLICT")) {
+      logError(error, { bottle });
+      return;
     }
 
     if (bottleResult && !bottleResult.imageUrl && imageUrl) {
       try {
         const blob = await downloadFileAsBlob(imageUrl);
-        await apiClient.post(`/bottles/${bottleResult.id}/image`, {
-          data: {
-            image: blob,
-          },
+        await orpcClient.bottles.imageUpdate({
+          bottle: bottleResult.id,
+          file: blob,
         });
       } catch (err) {
         logError(err, { bottle });
@@ -190,15 +183,18 @@ export async function handleBottle(
     }
 
     if (price) {
-      try {
-        await trpcClient.priceCreateBatch.mutate({
+      const {
+        data: priceResult,
+        error: priceError,
+        isDefined: priceIsDefined,
+      } = await safe(
+        orpcClient.prices.createBatch({
           site: "smws",
           prices: [price],
-        });
-      } catch (err) {
-        if (!isTRPCClientError(err) || (err as any).data?.httpStatus !== 409) {
-          logError(err, { bottle, price });
-        }
+        }),
+      );
+      if (priceError && (!priceIsDefined || priceError.name !== "CONFLICT")) {
+        logError(priceError, { bottle, price });
       }
     }
   } else {
@@ -219,7 +215,7 @@ export default async function scrapePrices(
     SCRAPER_PRICE_BATCH_SIZE,
     async (prices) => {
       console.log("Pushing new price data to API");
-      await trpcClient.priceCreateBatch.mutate({
+      await orpcClient.prices.createBatch({
         site,
         prices,
       });

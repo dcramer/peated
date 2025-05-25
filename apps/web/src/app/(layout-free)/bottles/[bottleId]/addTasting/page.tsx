@@ -4,11 +4,16 @@ import BadgeImage from "@peated/web/components/badgeImage";
 import { useFlashMessages } from "@peated/web/components/flash";
 import Link from "@peated/web/components/link";
 import TastingForm from "@peated/web/components/tastingForm";
-import useApi from "@peated/web/hooks/useApi";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import {
+  skipToken,
+  useMutation,
+  useQuery,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AddTasting({
@@ -19,26 +24,48 @@ export default function AddTasting({
   useAuthRequired();
 
   const router = useRouter();
+  const orpc = useORPC();
 
   const params = useSearchParams();
   const releaseId = params.get("release");
 
-  const [bottle] = trpc.bottleById.useSuspenseQuery(Number(bottleId));
-  const [release] = releaseId
-    ? trpc.bottleReleaseById.useSuspenseQuery(Number(releaseId))
-    : [null];
-  const [suggestedTags] = trpc.bottleSuggestedTagList.useSuspenseQuery({
-    bottle: Number(bottleId),
-  });
+  const { data: bottle } = useSuspenseQuery(
+    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
+  );
 
-  const qs = useSearchParams();
-  const flightId = qs.get("flight") || null;
-  const [flight] = flightId
-    ? trpc.flightById.useSuspenseQuery(flightId)
-    : [null];
+  const { data: suggestedTags } = useSuspenseQuery(
+    orpc.bottles.suggestedTags.queryOptions({
+      input: { bottle: Number(bottleId) },
+    }),
+  );
 
-  const tastingCreateMutation = trpc.tastingCreate.useMutation();
-  const api = useApi();
+  // TODO: we want this to be suspense, but skipToken wont work
+  const releaseQuery = useQuery(
+    releaseId
+      ? orpc.bottles.releases.details.queryOptions({
+          input: { release: Number(releaseId) },
+        })
+      : { queryFn: skipToken, queryKey: ["release", ""] },
+  );
+  const release = releaseId ? releaseQuery.data : null;
+
+  const flightId = params.get("flight") || null;
+  // TODO: we want this to be suspense, but skipToken wont work
+  const flightQuery = useQuery(
+    flightId
+      ? orpc.flights.details.queryOptions({
+          input: { flight: flightId },
+        })
+      : { queryFn: skipToken, queryKey: ["flight", ""] },
+  );
+  const flight = flightId ? flightQuery.data : null;
+
+  const tastingCreateMutation = useMutation(
+    orpc.tastings.create.mutationOptions(),
+  );
+  const tastingImageUpdateMutation = useMutation(
+    orpc.tastings.imageUpdate.mutationOptions(),
+  );
 
   // capture this on initial load as its utilized to prevent
   // duplicate tasting submissions
@@ -62,10 +89,9 @@ export default function AddTasting({
         if (tasting) {
           if (image) {
             try {
-              await api.post(`/tastings/${tasting.id}/image`, {
-                data: {
-                  image: image ? await toBlob(image) : null,
-                },
+              await tastingImageUpdateMutation.mutateAsync({
+                tasting: tasting.id,
+                file: await toBlob(image),
               });
             } catch (err) {
               logError(err);

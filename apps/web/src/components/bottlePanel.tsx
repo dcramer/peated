@@ -2,8 +2,9 @@
 
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import { type Bottle } from "@peated/server/types";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense, type ComponentPropsWithoutRef } from "react";
-import { trpc } from "../lib/trpc/client";
+import { useORPC } from "../lib/orpc/context";
 import BottleHeader from "./bottleHeader";
 import BottleOverview from "./bottleOverview";
 import BottleStats from "./bottleStats";
@@ -23,7 +24,10 @@ export default function BottlePanel({
   bottle: Bottle;
   tastingPath?: string;
 } & Omit<ComponentPropsWithoutRef<typeof SidePanel>, "children">) {
-  const [data] = trpc.bottleById.useSuspenseQuery(bottle.id);
+  const orpc = useORPC();
+  const { data } = useSuspenseQuery(
+    orpc.bottles.details.queryOptions({ input: { bottle: bottle.id } }),
+  );
 
   return (
     <SidePanel {...props}>

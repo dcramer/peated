@@ -1,6 +1,7 @@
 "use client";
 
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { RangeBarChart } from "./rangeBarChart.client";
 
 export function BottlePriceHistorySkeleton() {
@@ -8,9 +9,12 @@ export function BottlePriceHistorySkeleton() {
 }
 
 export default function BottlePriceHistory({ bottleId }: { bottleId: number }) {
-  const [data] = trpc.bottlePriceHistory.useSuspenseQuery({
-    bottle: bottleId,
-  });
+  const orpc = useORPC();
+  const { data } = useSuspenseQuery(
+    orpc.bottles.prices.history.queryOptions({
+      input: { bottle: bottleId },
+    }),
+  );
 
   if (typeof window === "undefined") {
     return <BottlePriceHistorySkeleton />;

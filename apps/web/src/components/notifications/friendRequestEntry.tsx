@@ -1,7 +1,8 @@
 "use client";
 
 import type { FriendStatus } from "@peated/server/types";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation } from "@tanstack/react-query";
 import type { FriendRequestNotification } from "../../types";
 import Button from "../button";
 
@@ -14,9 +15,12 @@ export default function FriendRequestEntry({
   onArchive: () => void;
   onMarkRead: () => void;
 }) {
-  const friendCreateMutation = trpc.friendCreate.useMutation({
-    onSuccess: () => onArchive(),
-  });
+  const orpc = useORPC();
+  const friendCreateMutation = useMutation(
+    orpc.friends.create.mutationOptions({
+      onSuccess: () => onArchive(),
+    }),
+  );
 
   const actionLabel = (status: FriendStatus) => {
     switch (status) {
@@ -36,7 +40,7 @@ export default function FriendRequestEntry({
         size="small"
         onClick={(e) => {
           e.stopPropagation();
-          friendCreateMutation.mutate(ref.user.id);
+          friendCreateMutation.mutate({ user: ref.user.id });
         }}
       >
         {actionLabel(ref.status)}

@@ -1,0 +1,247 @@
+---
+description: Instructions when working on OpenAPI routes in Hono.
+globs: 
+alwaysApply: false
+---
+# oRPC Route Implementation Conventions
+
+This document defines conventions for implementing and testing API endpoints using the `@orpc/server` framework. It focuses on producing consistent and composable oRPC procedures that align with OpenAPI principles. The guidelines cover how procedures should be structured, named, composed, and validated within a TypeScript codebase.
+
+## 1. Directory Layout & Imports
+
+| Path                              | Purpose                                                                        |
+| --------------------------------- | ------------------------------------------------------------------------------ |
+| `apps/server/src/orpc/routes`     | **Single source of truth** for HTTP routes.  Flat, one folder per URL segment. |
+| `apps/server/src/orpc/middleware` | Shared middleware (`requireAuth`, etc.).                                       |
+| `apps/server/src/schemas`         | Zod schemas.                                                                   |
+| `apps/server/src/serializers`     | Serialization helpers.                                                         |
+
+### 1.1 Import Policy
+
+* **Absolute** imports for everything outside the current folder, e.g. `@peated/server/orpc/middleware`.
+* **Relative** (`./xxx`) only for siblings **and children**.
+* Never climb the tree with `../../..`.
+
+```ts
+import { requireAuth } from "@peated/server/orpc/middleware";
+import { BottleSerializer } from "@peated/server/serializers";
+```
+
+## 2. Router Composition & File Naming
+
+### 2.1 File Rules
+
+| File                              | HTTP semantics                                     |
+| --------------------------------- | -------------------------------------------------- |
+| `list.ts`                         | Collection route (e.g. GET /things)                |
+| `details.ts`                      | Single-resource route (e.g. GET /things/:thing) |
+| `create.ts`                       | Create route (POST /things)                        |
+| `upsert.ts`                       | Upsert / update route (PUT/PATCH /things/:thing)     |
+| `delete.ts`                       | Delete route (DELETE /things/:thing)                 |
+| Descriptive (`login.ts`, `me.ts`) | Functional endpoints                               |
+
+* **No dynamic segments** in folder names.  Path params live inside the file.
+* Each folder exports an `index.ts` to assemble its children into a router object.
+* **Route parameters must be explicitly named** for the domain object - use `:tasting`, `:user`, not bare `:id`, and not `:thingId`.
+* Routes are flattened based on their object type (e.g. `users/`, `collections/`, vs `/users/collections/`).
+* Sub-collections (such as `bottleSeries/`) should be prefixed when flattened (rather than `bottles/series/`) if they are unique to another entity type.
+
+```bash
+routes/
+├── collections/
+    ├── details.ts     # /users/:userId/collections/:collectionId
+    ├── bottles.ts     # /users/:userId/collections/:collectionId/bottles
+    └── index.ts       # router export
+└── users/
+    ├── details.ts     # /users/:userId
+    └── index.ts       # router export
+```
+
+### 2.2 Base Router & Tagging
+
+All child routers extend the shared **`base`** exported from `@peated/server/orpc`.  Always specify a tag for OpenAPI grouping.
+
+```ts
+import { base } from "@peated/server/orpc";
+import details from "./details";
+
+export default base.tag("tastings").router({
+  details,
+});
+```
+
+`routes/index.ts` composes top‑level routers; all routers are imported eagerly; we do **not** use lazy imports.
+
+```ts
+import auth from "./auth";
+import tastings from "./tastings";
+
+export default { auth, tastings };
+```
+
+## 3. Procedure Definition Pattern
+
+Always chain in the following order—LLMs need the cue sequence:
+
+1. `.use()`     - middleware (optional, repeatable)
+2. `.route()`   - `{ method, path, ...meta }`
+3. `.input()`   - Zod **object** schema
+4. `.output()`  - Zod **object** schema  *(mandatory; scalars are forbidden)*
+5. `.handler()` - async business logic **(last)**
+
+```ts
+export default procedure
+  .use(requireAuth)
+  .route({ method: "GET", path: "/ping", summary: "Health check" })
+  .input(z.object({}))
+  .output(z.object({ ping: z.literal("pong") }))
+  .handler(() => ({ ping: "pong" }));
+```
+
+## 4. HTTP Method Semantics
+
+| Method | Meaning        | Typical file             |
+| ------ | -------------- | ------------------------ |
+| GET    | Read           | `list.ts`, `details.ts`  |
+| POST   | Create         | `create.ts`              |
+| PUT    | Upsert         | `upsert.ts` (idempotent) |
+| PATCH  | Partial update | `upsert.ts`              |
+| DELETE | Remove         | `delete.ts`              |
+
+* Use **PUT** on `/collectionName/:primaryKey` when upserting by primary key.
+* Use **PUT** on `/collectionName` for batch or composite-key upserts.
+* Collection‑level mutations are always **batch** operations and therefore must accept **array** input.
+
+```ts
+// routes/bottles/upsert.ts
+export default procedure
+  .use(requireAuth)
+  .route({ method: "PUT", path: "/bottles", summary: "Batch upsert bottles" })
+  .input(z.object({
+    bottles: z.array(UpsertBottleSchema).min(1),
+  }))
+  .output(z.object({
+    results: z.array(BottleSchema),
+  }))
+  .handler(async ({ input, context }) => {
+    const saved = await db.batchUpsertBottles(input.bottles, context.user.id);
+    return { results: await serialize(BottleSerializer, saved, context.user) };
+  });
+```
+
+## 5. Path & Query Parameters
+
+### 5.1 Naming
+
+* Use descriptive nouns (`bottle`, `tasting`).
+* Never reuse a path param name for a body/query field.
+
+### 5.2 Coercion & Validation
+
+* Provide sensible defaults.
+* Every path/query value is a string → wrap with `z.coerce.*`.
+
+```ts
+// basic coercion + default example
+const Input = z.object({
+  tastingId: z.coerce.number(), // path param as number
+  cursor:    z.coerce.number().gte(1).default(1), // query param with default
+});
+```
+
+* For polymorphic filters (`slug` *or* numeric `id`) use a union and branch at runtime.
+
+```ts
+// example: allow either numeric ID or slug for a country filter
+const Input = z.object({
+  country: z.union([z.coerce.number(), z.string()]),
+});
+
+if (Number.isFinite(+input.country)) {
+  // treat as primary‑key lookup
+  await db.where(eq(countries.id, Number(input.country)));
+} else {
+  // treat as slug search
+  await db.where(eq(countries.slug, input.country));
+}
+```
+
+## 6. Error Handling
+
+`procedure` injects an **`errors`** helper exposing canonical REST errors (`NOT_FOUND`, `CONFLICT`, `UNAUTHORIZED`, etc.).  Prefer these over manual `ORPCError` construction—consistency matters for clients.
+
+```ts
+export default procedure
+  .route({ method: "GET", path: "/tastings/:tasting" })
+  .input(z.object({ tasting: z.coerce.number() }))
+  .output(TastingSchema)
+  .handler(async ({ input, context, errors }) => {
+    const [tasting] = await db
+      .select()
+      .from(tastings)
+      .where(eq(tastings.id, input.tasting));
+
+    if (!tasting) {
+      throw errors.NOT_FOUND({ message: "Tasting not found." });
+    }
+
+    return serialize(TastingSerializer, tasting, context.user);
+  });
+```
+
+If you truly need custom behaviour, fall back to `new ORPCError(code, { message })` after wrapping the DB call in `try/catch`.
+
+## 7. Authentication Middleware
+
+```ts
+export default procedure
+  .use(requireAuth)
+  .route({ method: "GET", path: "/auth/me" })
+  .output(z.object({ user: UserSchema }))
+  .handler(({ context }) => ({ user: serialize(UserSerializer, context.user, context.user) }));
+```
+
+## 8. Testing Conventions
+
+* Test file: **`<routeFile>.test.ts`**.
+* `describe` label: `METHOD /path`.
+* Cover success, validation errors, and auth failures.
+* Use `routerClient` for testing routes:
+
+```ts
+import { routerClient } from "@peated/server/orpc/router";
+
+describe("POST /auth/login", () => {
+  it("returns token on valid credentials", async ({ fixtures }) => {
+    const user = await fixtures.User();
+    const res  = await routerClient.auth.login({ email: user.email, password: "pass" });
+    expect(res.user.id).toBe(user.id);
+    expect(res.accessToken).toBeDefined();
+  });
+});
+```
+
+Use `waitError` + inline snapshots to assert structured errors.
+
+```ts
+const err = await waitError(
+  routerClient.auth.login({ email: "wrong", password: "bad" })
+);
+expect(err).toMatchInlineSnapshot();
+```
+
+## 9. Response Design
+
+### 9.1 Cursor Pagination
+
+```ts
+.output(
+  z.object({
+    results: z.array(BottleSchema),
+    rel: CursorSchema,
+  })
+)
+```
+
+* Fetch `limit + 1` to detect `nextCursor`.
+* Remove the extra record before serialization.

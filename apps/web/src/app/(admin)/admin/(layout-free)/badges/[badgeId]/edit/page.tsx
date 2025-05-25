@@ -2,10 +2,10 @@
 
 import BadgeForm from "@peated/web/components/admin/badgeForm";
 import { useFlashMessages } from "@peated/web/components/flash";
-import useApi from "@peated/web/hooks/useApi";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
-import { trpc } from "@peated/web/lib/trpc/client";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 export default function Page({
@@ -13,11 +13,20 @@ export default function Page({
 }: {
   params: { badgeId: string };
 }) {
-  const [badge] = trpc.badgeById.useSuspenseQuery(parseInt(badgeId, 10));
+  const orpc = useORPC();
+  const { data: badge } = useSuspenseQuery(
+    orpc.badges.details.queryOptions({
+      input: {
+        badge: parseInt(badgeId, 10),
+      },
+    }),
+  );
 
   const router = useRouter();
-  const badgeUpdateMutation = trpc.badgeUpdate.useMutation();
-  const api = useApi();
+  const badgeUpdateMutation = useMutation(orpc.badges.update.mutationOptions());
+  const badgeImageUpdateMutation = useMutation(
+    orpc.badges.imageUpdate.mutationOptions(),
+  );
   const { flash } = useFlashMessages();
 
   return (
@@ -25,17 +34,16 @@ export default function Page({
       onSubmit={async ({ image, ...data }) => {
         const newBadge = await badgeUpdateMutation.mutateAsync({
           ...data,
-          id: badge.id,
+          badge: badge.id,
         });
 
         if (image) {
           const blob = await toBlob(image);
           try {
             // TODO: switch to fetch maybe?
-            await api.post(`/badges/${newBadge.id}/image`, {
-              data: {
-                image: blob,
-              },
+            await badgeImageUpdateMutation.mutateAsync({
+              badge: newBadge.id,
+              file: blob,
             });
           } catch (err) {
             logError(err);
