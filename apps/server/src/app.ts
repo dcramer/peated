@@ -82,7 +82,7 @@ const rpcHandler = new RPCHandler(router, {
 const ONE_DAY = 60 * 60 * 24;
 
 export const app = new Hono()
-  .use(async (c, next) => {
+  .use("*", async (c, next) => {
     const urlObject = parseStringToURLObject(c.req.url);
     const [name, attributes] = getHttpSpanDetailsFromUrlObject(
       urlObject,
@@ -127,12 +127,12 @@ export const app = new Hono()
     logError(err);
     return c.json({ error: "Internal Server Error" }, 500);
   })
-  .use(logger())
+  .use("*", logger())
   .use(
     "*",
     cors({
       credentials: true,
-      origin: config.CORS_HOST,
+      origin: config.CORS_HOST.split(","),
       maxAge: 600,
     }),
   )
@@ -151,7 +151,7 @@ export const app = new Hono()
       // contentSecurityPolicy: false,
     }),
   )
-  .use(async (c, next) => {
+  .use("*", async (c, next) => {
     if (config.ENV === "development") {
       console.log("Adding 300ms delay to all requests");
 
