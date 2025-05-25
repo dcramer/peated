@@ -2,7 +2,6 @@
 
 import BadgeForm from "@peated/web/components/admin/badgeForm";
 import { useFlashMessages } from "@peated/web/components/flash";
-import useApi from "@peated/web/hooks/useApi";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -25,7 +24,9 @@ export default function Page({
 
   const router = useRouter();
   const badgeUpdateMutation = useMutation(orpc.badges.update.mutationOptions());
-  const api = useApi();
+  const badgeImageUpdateMutation = useMutation(
+    orpc.badges.imageUpdate.mutationOptions(),
+  );
   const { flash } = useFlashMessages();
 
   return (
@@ -40,10 +41,9 @@ export default function Page({
           const blob = await toBlob(image);
           try {
             // TODO: switch to fetch maybe?
-            await api.post(`/badges/${newBadge.id}/image`, {
-              data: {
-                image: blob,
-              },
+            await badgeImageUpdateMutation.mutateAsync({
+              badge: newBadge.id,
+              file: blob,
             });
           } catch (err) {
             logError(err);

@@ -2,7 +2,6 @@
 
 import BottleForm from "@peated/web/components/bottleForm";
 import { useFlashMessages } from "@peated/web/components/flash";
-import useApi from "@peated/web/hooks/useApi";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
@@ -25,7 +24,9 @@ export default function Page({
   const bottleUpdateMutation = useMutation(
     orpc.bottles.update.mutationOptions(),
   );
-  const api = useApi();
+  const bottleImageUpdateMutation = useMutation(
+    orpc.bottles.imageUpdate.mutationOptions(),
+  );
   const { flash } = useFlashMessages();
 
   return (
@@ -39,10 +40,9 @@ export default function Page({
 
         if (image) {
           try {
-            await api.post(`/bottles/${bottle.id}/image`, {
-              data: {
-                image: image ? await toBlob(image) : null,
-              },
+            await bottleImageUpdateMutation.mutateAsync({
+              bottle: bottle.id,
+              file: await toBlob(image),
             });
           } catch (err) {
             logError(err);

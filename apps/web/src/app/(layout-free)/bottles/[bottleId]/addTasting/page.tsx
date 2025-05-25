@@ -4,7 +4,6 @@ import BadgeImage from "@peated/web/components/badgeImage";
 import { useFlashMessages } from "@peated/web/components/flash";
 import Link from "@peated/web/components/link";
 import TastingForm from "@peated/web/components/tastingForm";
-import useApi from "@peated/web/hooks/useApi";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
@@ -64,7 +63,9 @@ export default function AddTasting({
   const tastingCreateMutation = useMutation(
     orpc.tastings.create.mutationOptions(),
   );
-  const api = useApi();
+  const tastingImageUpdateMutation = useMutation(
+    orpc.tastings.imageUpdate.mutationOptions(),
+  );
 
   // capture this on initial load as its utilized to prevent
   // duplicate tasting submissions
@@ -88,10 +89,9 @@ export default function AddTasting({
         if (tasting) {
           if (image) {
             try {
-              await api.post(`/tastings/${tasting.id}/image`, {
-                data: {
-                  image: image ? await toBlob(image) : null,
-                },
+              await tastingImageUpdateMutation.mutateAsync({
+                tasting: tasting.id,
+                file: await toBlob(image),
               });
             } catch (err) {
               logError(err);

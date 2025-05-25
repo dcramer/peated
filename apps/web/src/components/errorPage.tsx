@@ -1,11 +1,6 @@
 "use client";
 
 import { isDefinedError, ORPCError } from "@orpc/client";
-import {
-  ApiError,
-  ApiUnauthorized,
-  ApiUnavailable,
-} from "@peated/server/lib/apiClient";
 import Button from "@peated/web/components/button";
 import config from "@peated/web/config";
 import { type ComponentProps, type ReactNode } from "react";
@@ -32,9 +27,8 @@ export function ErrorPageForbidden({
 
 function getTypedError<T>(
   error: T,
-): Error | ApiError | Extract<T, ORPCError<any, any>> | undefined {
+): Error | Extract<T, ORPCError<any, any>> | undefined {
   if (error instanceof Error) return error;
-  if (error instanceof ApiError) return error;
   if (isDefinedError(error)) return error;
   return undefined;
 }
@@ -56,25 +50,19 @@ export default function ErrorPage({
 
   // i hate all of this
   if (typedError && (!title || !subtitle)) {
-    if (
-      typedError instanceof ApiUnavailable ||
-      typedError.message === "Failed to fetch"
-    ) {
+    if (typedError.message === "Failed to fetch") {
       title = (title ?? isOnline) ? "Server Unreachable" : "Connection Offline";
       subtitle =
         (subtitle ?? isOnline)
           ? "It looks like Peated's API is unreachable right now. Please try again shortly."
           : "It looks like your network is offline.";
     } else if (
-      (typedError instanceof ApiError && typedError.statusCode === 404) ||
       (typedError instanceof ORPCError && typedError.status === 404) ||
       (typedError as any).message === "NOT_FOUND"
     ) {
       title = title ?? "Not Found";
       subtitle = subtitle ?? "We couldn't find the page you were looking for.";
     } else if (
-      typedError instanceof ApiUnauthorized ||
-      (typedError instanceof ApiError && typedError.statusCode === 401) ||
       (typedError instanceof ORPCError && typedError.status === 401) ||
       (typedError as any).message === "UNAUTHORIZED"
     ) {
@@ -110,14 +98,6 @@ export default function ErrorPage({
 
           {typedError && (
             <div className="mt-12">
-              {typedError instanceof ApiError && typedError.remoteStack && (
-                <div className="prose prose-invert mx-auto mb-4">
-                  <h3 className="text-white">Remote Stack</h3>
-                  <pre className="max-h-full overflow-y-auto whitespace-pre-wrap break-all text-left">
-                    {typedError.remoteStack}
-                  </pre>
-                </div>
-              )}
               {"stack" in typedError && typedError.stack && (
                 <div className="prose prose-invert mx-auto mb-4">
                   <h3 className="text-white">Local Stack</h3>

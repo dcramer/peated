@@ -1,16 +1,14 @@
 "use client";
 
 import { toTitleCase } from "@peated/server/lib/strings";
-import type { Entity } from "@peated/server/types";
 import BottleForm from "@peated/web/components/bottleForm";
 import { useFlashMessages } from "@peated/web/components/flash";
 import Spinner from "@peated/web/components/spinner";
-import useApi from "@peated/web/hooks/useApi";
 import { useVerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { skipToken, useMutation, useQueries } from "@tanstack/react-query";
+import { useMutation, useQueries } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -82,7 +80,9 @@ export default function AddBottle() {
   const bottleCreateMutation = useMutation(
     orpc.bottles.create.mutationOptions(),
   );
-  const api = useApi();
+  const bottleImageUpdateMutation = useMutation(
+    orpc.bottles.imageUpdate.mutationOptions(),
+  );
   const { flash } = useFlashMessages();
 
   if (loading) {
@@ -96,11 +96,9 @@ export default function AddBottle() {
         if (image) {
           const blob = await toBlob(image);
           try {
-            // TODO: switch to fetch maybe?
-            await api.post(`/bottles/${newBottle.id}/image`, {
-              data: {
-                image: blob,
-              },
+            await bottleImageUpdateMutation.mutateAsync({
+              bottle: newBottle.id,
+              file: blob,
             });
           } catch (err) {
             logError(err);

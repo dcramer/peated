@@ -74,6 +74,14 @@ export default procedure
       throw err;
     }
 
+    // TODO: handle failure
+    await db
+      .update(tastings)
+      .set({
+        imageUrl,
+      })
+      .where(eq(tastings.id, tastingId));
+
     return {
       imageUrl: absoluteUrl(config.API_SERVER, imageUrl),
     };

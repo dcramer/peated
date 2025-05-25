@@ -2,7 +2,6 @@
 
 import { useFlashMessages } from "@peated/web/components/flash";
 import TastingForm from "@peated/web/components/tastingForm";
-import useApi from "@peated/web/hooks/useApi";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
@@ -37,7 +36,9 @@ export default function Page({
   const tastingUpdateMutation = useMutation(
     orpc.tastings.update.mutationOptions(),
   );
-  const api = useApi();
+  const tastingImageUpdateMutation = useMutation(
+    orpc.tastings.imageUpdate.mutationOptions(),
+  );
   const { flash } = useFlashMessages();
 
   return (
@@ -55,10 +56,9 @@ export default function Page({
 
         if (image) {
           try {
-            await api.post(`/tastings/${tasting.id}/image`, {
-              data: {
-                image: image ? await toBlob(image) : null,
-              },
+            await tastingImageUpdateMutation.mutateAsync({
+              tasting: tasting.id,
+              file: await toBlob(image),
             });
           } catch (err) {
             logError(err);

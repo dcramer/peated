@@ -3,7 +3,6 @@ import {
   defaultHeaders,
   SCRAPER_PRICE_BATCH_SIZE,
 } from "@peated/server/constants";
-import { ApiClient } from "@peated/server/lib/apiClient";
 import { logError } from "@peated/server/lib/log";
 import { orpcClient } from "@peated/server/lib/orpc-client/server";
 import type { Currency, ExternalSiteType } from "@peated/server/types";
@@ -158,11 +157,6 @@ export async function handleBottle(
   price?: z.input<typeof StorePriceInputSchema> | null,
   imageUrl?: string | null,
 ) {
-  const apiClient = new ApiClient({
-    server: config.API_SERVER,
-    accessToken: process.env.ACCESS_TOKEN,
-  });
-
   if (process.env.ACCESS_TOKEN) {
     console.log(`Submitting [${formatBottleName(bottle)}]`);
 
@@ -179,10 +173,9 @@ export async function handleBottle(
     if (bottleResult && !bottleResult.imageUrl && imageUrl) {
       try {
         const blob = await downloadFileAsBlob(imageUrl);
-        await apiClient.post(`/bottles/${bottleResult.id}/image`, {
-          data: {
-            image: blob,
-          },
+        await orpcClient.bottles.imageUpdate({
+          bottle: bottleResult.id,
+          file: blob,
         });
       } catch (err) {
         logError(err, { bottle });

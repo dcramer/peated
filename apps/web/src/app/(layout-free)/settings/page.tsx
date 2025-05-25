@@ -4,7 +4,6 @@ import { XMarkIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isDefinedError } from "@orpc/client";
 import { UserInputSchema } from "@peated/server/schemas";
-import { type User } from "@peated/server/types";
 import BooleanField from "@peated/web/components/booleanField";
 import Fieldset from "@peated/web/components/fieldset";
 import Form from "@peated/web/components/form";
@@ -16,7 +15,6 @@ import Layout from "@peated/web/components/layout";
 import Legend from "@peated/web/components/legend";
 import PendingVerificationAlert from "@peated/web/components/pendingVerificationAlert";
 import TextField from "@peated/web/components/textField";
-import useApi from "@peated/web/hooks/useApi";
 import useAuth from "@peated/web/hooks/useAuth";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { updateSession } from "@peated/web/lib/auth.actions";
@@ -35,7 +33,6 @@ export default function Page() {
   useAuthRequired();
 
   const { setUser } = useAuth();
-  const api = useApi();
   const orpc = useORPC();
 
   const router = useRouter();

@@ -1,6 +1,9 @@
 import config from "@peated/server/config";
+import { db } from "@peated/server/db";
+import { tastings } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 import path from "path";
 import sharp from "sharp";
 
@@ -50,5 +53,15 @@ describe("POST /tastings/:tasting/image", () => {
     expect(metadata.format).toBe("webp");
     expect(metadata.height).toBeLessThanOrEqual(1024);
     expect(metadata.width).toBeLessThanOrEqual(1024);
+
+    // Verify the tasting's imageUrl field was updated in the database
+    const [updatedTasting] = await db
+      .select()
+      .from(tastings)
+      .where(eq(tastings.id, tasting.id))
+      .limit(1);
+
+    expect(updatedTasting.imageUrl).toBeDefined();
+    expect(updatedTasting.imageUrl).toContain(path.basename(response.imageUrl));
   });
 });
