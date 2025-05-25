@@ -25,7 +25,8 @@ export async function createServerClient(
   }
   const link = getLink({
     accessToken: context.accessToken ?? accessToken,
-    batch: true,
+    // https://peated.sentry.io/share/issue/c6bccda67b0648caa6949aed4d72abb3/
+    batch: false,
     apiServer: config.API_SERVER,
     userAgent: "@peated/web (orpc/server)",
     traceContext: context.traceContext,
