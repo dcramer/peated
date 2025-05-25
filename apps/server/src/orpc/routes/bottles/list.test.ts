@@ -299,37 +299,42 @@ describe("GET /bottles", () => {
 
   // Sorting tests
   test("sorts bottles by name ascending", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({ name: "Zebra Whisky" });
-    const bottle2 = await fixtures.Bottle({ name: "Alpha Whisky" });
+    const brand = await fixtures.Entity({ name: "Singleton" });
+    const bottle1 = await fixtures.Bottle({
+      name: "Zebra Whisky",
+      brandId: brand.id,
+    });
+    const bottle2 = await fixtures.Bottle({
+      name: "Alpha Whisky",
+      brandId: brand.id,
+    });
 
     const { results } = await routerClient.bottles.list({
       sort: "name",
     });
 
-    expect(results.length).toBeGreaterThanOrEqual(2);
-    // Find our specific bottles in the results
-    const zebraBottle = results.find((b) => b.id === bottle1.id);
-    const alphaBottle = results.find((b) => b.id === bottle2.id);
-
-    expect(zebraBottle).toBeDefined();
-    expect(alphaBottle).toBeDefined();
-
-    // Alpha should come before Zebra in alphabetical order
-    const alphaIndex = results.findIndex((b) => b.id === bottle2.id);
-    const zebraIndex = results.findIndex((b) => b.id === bottle1.id);
-    expect(alphaIndex).toBeLessThan(zebraIndex);
+    expect(results.length).toBe(2);
+    expect(results[0].id).toBe(bottle2.id);
+    expect(results[1].id).toBe(bottle1.id);
   });
 
   test("sorts bottles by name descending", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({ name: "Alpha Whisky" });
-    const bottle2 = await fixtures.Bottle({ name: "Zebra Whisky" });
+    const brand = await fixtures.Entity({ name: "Singleton" });
+    const bottle1 = await fixtures.Bottle({
+      name: "Alpha Whisky",
+      brandId: brand.id,
+    });
+    const bottle2 = await fixtures.Bottle({
+      name: "Zebra Whisky",
+      brandId: brand.id,
+    });
 
     const { results } = await routerClient.bottles.list({
       sort: "-name",
     });
 
     expect(results.length).toBe(2);
-    expect(results[0].id).toBe(bottle2.id); // Zebra comes first
+    expect(results[0].id).toBe(bottle2.id);
     expect(results[1].id).toBe(bottle1.id);
   });
 
