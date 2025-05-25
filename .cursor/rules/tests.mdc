@@ -1,14 +1,26 @@
 ---
-description:
+description: 
 globs: *.test.ts*
 alwaysApply: false
 ---
+## Running Tests
+
+```shell
+# use --filter to select the appropriate package in the monorepo
+pnpm --filter=./apps/server test --run
+
+# pass in a partial match to test only specific concerns
+pnpm --filter=./apps/server test --run routes/entities/list.test.ts
+```
+
+## Writing Tests
+
 Follow these rules when you write tests:
 
 - Use Vitest, do not use Jest.
 - When you are testing for errors, use `waitError` to wait for the error to be thrown. For example:
 
-```
+```ts
 import waitError from "@peated/server/lib/test/waitError";
 
 const err = await waitError(
@@ -27,7 +39,7 @@ const err = await waitError(
 
 Test fixtures should be referenced via the context (found in [fixtures.ts](mdc:apps/server/src/lib/test/fixtures.ts)):
 
-```
+```ts
   it("returns a bottle release", async function ({ fixtures }) {
     const bottle = await fixtures.Bottle();
   });
@@ -35,7 +47,7 @@ Test fixtures should be referenced via the context (found in [fixtures.ts](mdc:a
 
 User context - such as for an oRPC route caller - should use the `defaults` (as defauled in [setup-test-env.ts](mdc:apps/server/src/test/setup-test-env.ts)) when available. For example:
 
-```
+```ts
   it("returns a bottle release", async function ({ defaults }) {
     const defaultUser = defaults.user;
   });

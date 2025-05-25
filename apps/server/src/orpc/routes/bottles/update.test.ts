@@ -35,6 +35,20 @@ describe("PUT /bottles/:bottle", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
+  test("bottle not found", async ({ fixtures }) => {
+    const modUser = await fixtures.User({ mod: true });
+
+    const err = await waitError(
+      routerClient.bottles.update(
+        {
+          bottle: 999999,
+        },
+        { context: { user: modUser } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
+  });
+
   test("no changes", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle({
       name: "Cool Bottle",
@@ -220,6 +234,85 @@ describe("PUT /bottles/:bottle", () => {
     expect(bottle2.fullName).toBe(`${newBrand.name} ${bottle.name}`);
   });
 
+  test("changes brand with new brand name", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle({
+      name: "Nice Oak",
+    });
+    const modUser = await fixtures.User({ mod: true });
+
+    await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        brand: {
+          name: "New Brand Name",
+        },
+      },
+      { context: { user: modUser } },
+    );
+
+    const [bottle2] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    const [newBrand] = await db
+      .select()
+      .from(entities)
+      .where(eq(entities.id, bottle2.brandId));
+
+    expect(newBrand.name).toBe("New Brand Name");
+    expect(newBrand.createdById).toBe(modUser.id);
+    expect(bottle2.fullName).toBe(`${newBrand.name} ${bottle.name}`);
+
+    // Verify change record was created for the new brand
+    const brandChange = await db.query.changes.findFirst({
+      where: and(
+        eq(changes.objectId, newBrand.id),
+        eq(changes.objectType, "entity"),
+      ),
+    });
+    expect(brandChange).toBeDefined();
+    expect(brandChange!.type).toEqual("add");
+  });
+
+  test("changes brand with existing brand name", async ({ fixtures }) => {
+    const existingBrand = await fixtures.Entity();
+    const bottle = await fixtures.Bottle({
+      name: "Nice Oak",
+    });
+    const modUser = await fixtures.User({ mod: true });
+
+    await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        brand: {
+          name: existingBrand.name,
+        },
+      },
+      { context: { user: modUser } },
+    );
+
+    const [bottle2] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    expect(bottle2.brandId).toBe(existingBrand.id);
+
+    // Should not create a change record for existing brand
+    const brandChanges = await db
+      .select()
+      .from(changes)
+      .where(
+        and(
+          eq(changes.objectId, existingBrand.id),
+          eq(changes.objectType, "entity"),
+          eq(changes.createdById, modUser.id),
+        ),
+      );
+    expect(brandChanges.length).toBe(0);
+  });
+
   test("removes distiller", async ({ fixtures }) => {
     const distillerA = await fixtures.Entity();
     const distillerB = await fixtures.Entity();
@@ -292,6 +385,109 @@ describe("PUT /bottles/:bottle", () => {
     expect(distiller.id).toEqual(distillerA.id);
   });
 
+  test("adds distiller with new distiller name", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle({
+      distillerIds: [],
+    });
+    const modUser = await fixtures.User({ mod: true });
+
+    await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        distillers: [
+          {
+            name: "New Distillery",
+          },
+        ],
+      },
+      { context: { user: modUser } },
+    );
+
+    const distillers = await db
+      .select({ distiller: entities })
+      .from(entities)
+      .innerJoin(
+        bottlesToDistillers,
+        eq(bottlesToDistillers.distillerId, entities.id),
+      )
+      .where(eq(bottlesToDistillers.bottleId, bottle.id));
+    expect(distillers.length).toBe(1);
+    const { distiller } = distillers[0];
+    expect(distiller.name).toBe("New Distillery");
+    expect(distiller.createdById).toBe(modUser.id);
+
+    // Verify change record was created for the new distiller
+    const distillerChange = await db.query.changes.findFirst({
+      where: and(
+        eq(changes.objectId, distiller.id),
+        eq(changes.objectType, "entity"),
+      ),
+    });
+    expect(distillerChange).toBeDefined();
+    expect(distillerChange!.type).toEqual("add");
+  });
+
+  test("adds distiller with existing distiller name", async ({ fixtures }) => {
+    const existingDistiller = await fixtures.Entity();
+    const bottle = await fixtures.Bottle({
+      distillerIds: [],
+    });
+    const modUser = await fixtures.User({ mod: true });
+
+    await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        distillers: [
+          {
+            name: existingDistiller.name,
+          },
+        ],
+      },
+      { context: { user: modUser } },
+    );
+
+    const distillers = await db
+      .select({ distiller: entities })
+      .from(entities)
+      .innerJoin(
+        bottlesToDistillers,
+        eq(bottlesToDistillers.distillerId, entities.id),
+      )
+      .where(eq(bottlesToDistillers.bottleId, bottle.id));
+    expect(distillers.length).toBe(1);
+    const { distiller } = distillers[0];
+    expect(distiller.id).toEqual(existingDistiller.id);
+
+    // Should not create a change record for existing distiller
+    const distillerChanges = await db
+      .select()
+      .from(changes)
+      .where(
+        and(
+          eq(changes.objectId, existingDistiller.id),
+          eq(changes.objectType, "entity"),
+          eq(changes.createdById, modUser.id),
+        ),
+      );
+    expect(distillerChanges.length).toBe(0);
+  });
+
+  test("rejects invalid distiller ID", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+    const modUser = await fixtures.User({ mod: true });
+
+    const err = await waitError(
+      routerClient.bottles.update(
+        {
+          bottle: bottle.id,
+          distillers: [999999],
+        },
+        { context: { user: modUser } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(`[Error: Entity not found [id: 999999]]`);
+  });
+
   test("changes bottler", async ({ fixtures }) => {
     const bottlerA = await fixtures.Entity();
     const bottlerB = await fixtures.Entity();
@@ -313,6 +509,96 @@ describe("PUT /bottles/:bottle", () => {
       .from(bottles)
       .where(eq(bottles.id, bottle.id));
     expect(newBottle.bottlerId).toEqual(bottlerB.id);
+  });
+
+  test("changes bottler with new bottler name", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+    const modUser = await fixtures.User({ mod: true });
+
+    await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        bottler: {
+          name: "New Bottler",
+        },
+      },
+      { context: { user: modUser } },
+    );
+
+    const [newBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    const [bottler] = await db
+      .select()
+      .from(entities)
+      .where(eq(entities.id, newBottle.bottlerId!));
+
+    expect(bottler.name).toBe("New Bottler");
+    expect(bottler.createdById).toBe(modUser.id);
+
+    // Verify change record was created for the new bottler
+    const bottlerChange = await db.query.changes.findFirst({
+      where: and(
+        eq(changes.objectId, bottler.id),
+        eq(changes.objectType, "entity"),
+      ),
+    });
+    expect(bottlerChange).toBeDefined();
+    expect(bottlerChange!.type).toEqual("add");
+  });
+
+  test("changes bottler with existing bottler name", async ({ fixtures }) => {
+    const existingBottler = await fixtures.Entity();
+    const bottle = await fixtures.Bottle();
+    const modUser = await fixtures.User({ mod: true });
+
+    await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        bottler: {
+          name: existingBottler.name,
+        },
+      },
+      { context: { user: modUser } },
+    );
+
+    const [newBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    expect(newBottle.bottlerId).toEqual(existingBottler.id);
+
+    // Should not create a change record for existing bottler
+    const bottlerChanges = await db
+      .select()
+      .from(changes)
+      .where(
+        and(
+          eq(changes.objectId, existingBottler.id),
+          eq(changes.objectType, "entity"),
+          eq(changes.createdById, modUser.id),
+        ),
+      );
+    expect(bottlerChanges.length).toBe(0);
+  });
+
+  test("rejects invalid bottler ID", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+    const modUser = await fixtures.User({ mod: true });
+
+    const err = await waitError(
+      routerClient.bottles.update(
+        {
+          bottle: bottle.id,
+          bottler: 999999,
+        },
+        { context: { user: modUser } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(`[Error: Entity not found [id: 999999]]`);
   });
 
   test("changes distiller with previous identical brand", async ({
@@ -502,6 +788,230 @@ describe("PUT /bottles/:bottle", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
 
+  test("saves flavor profile", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+    const modUser = await fixtures.User({ mod: true });
+
+    const data = await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        flavorProfile: "peated",
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(data.id).toBeDefined();
+
+    const [newBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    expect(newBottle.flavorProfile).toEqual("peated");
+  });
+
+  test("removes flavor profile", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle({ flavorProfile: "peated" });
+    const modUser = await fixtures.User({ mod: true });
+
+    const data = await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        flavorProfile: null,
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(data.id).toBeDefined();
+
+    const [newBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    expect(newBottle.flavorProfile).toBeNull();
+  });
+
+  test("saves description and descriptionSrc", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+    const modUser = await fixtures.User({ mod: true });
+
+    const data = await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        description: "A wonderful whisky with complex flavors.",
+        descriptionSrc: "user",
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(data.id).toBeDefined();
+
+    const [newBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    expect(newBottle.description).toEqual(
+      "A wonderful whisky with complex flavors.",
+    );
+    expect(newBottle.descriptionSrc).toEqual("user");
+  });
+
+  test("updates description without descriptionSrc", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+    const modUser = await fixtures.User({ mod: true });
+
+    const data = await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        description: "A wonderful whisky with complex flavors.",
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(data.id).toBeDefined();
+
+    const [newBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    expect(newBottle.description).toEqual(
+      "A wonderful whisky with complex flavors.",
+    );
+    expect(newBottle.descriptionSrc).toEqual("user");
+  });
+
+  test("clears description", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle({
+      description: "Old description",
+      descriptionSrc: "user",
+    });
+    const modUser = await fixtures.User({ mod: true });
+
+    const data = await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        description: null,
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(data.id).toBeDefined();
+
+    const [newBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    expect(newBottle.description).toBeNull();
+    expect(newBottle.descriptionSrc).toBeNull();
+  });
+
+  test("removes image as mod", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle({
+      imageUrl: "https://example.com/image.jpg",
+    });
+    const modUser = await fixtures.User({ mod: true });
+
+    const data = await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        image: null,
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(data.id).toBeDefined();
+
+    const [newBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    expect(newBottle.imageUrl).toBeNull();
+  });
+
+  test("removes image as admin", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle({
+      imageUrl: "https://example.com/image.jpg",
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        image: null,
+      },
+      { context: { user: adminUser } },
+    );
+
+    expect(data.id).toBeDefined();
+
+    const [newBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    expect(newBottle.imageUrl).toBeNull();
+  });
+
+  test("removes image as creator", async ({ fixtures }) => {
+    const creator = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({
+      imageUrl: "https://example.com/image.jpg",
+      createdById: creator.id,
+    });
+
+    const data = await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        image: null,
+      },
+      { context: { user: creator } },
+    );
+
+    expect(data.id).toBeDefined();
+
+    const [newBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    expect(newBottle.imageUrl).toBeNull();
+  });
+
+  test("removes image as mod (different from creator)", async ({
+    fixtures,
+  }) => {
+    const creator = await fixtures.User({ mod: true });
+    const otherMod = await fixtures.User({ mod: true }); // Different mod user
+    const bottle = await fixtures.Bottle({
+      imageUrl: "https://example.com/image.jpg",
+      createdById: creator.id,
+    });
+
+    const data = await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        image: null,
+      },
+      { context: { user: otherMod } },
+    );
+
+    expect(data.id).toBeDefined();
+
+    const [newBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    // Since otherMod is a mod, they can remove images
+    // The logic is: admin || mod || creator can remove images
+    expect(newBottle.imageUrl).toBeNull();
+  });
+
   test("updates associated bottle releases when name changes", async ({
     fixtures,
   }) => {
@@ -663,5 +1173,132 @@ describe("PUT /bottles/:bottle", () => {
       fullName: `${brand.name} ${data.series.name}`,
       brandId: brand.id,
     });
+  });
+
+  test("updates bottle with existing series ID", async ({ fixtures }) => {
+    const brand = await fixtures.Entity();
+    const series = await fixtures.BottleSeries({ brandId: brand.id });
+    const bottle = await fixtures.Bottle({ brandId: brand.id });
+    const modUser = await fixtures.User({ mod: true });
+
+    await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        series: series.id,
+      },
+      { context: { user: modUser } },
+    );
+
+    const [updatedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    expect(updatedBottle.seriesId).toEqual(series.id);
+
+    // Verify numReleases was incremented
+    const [updatedSeries] = await db
+      .select()
+      .from(bottleSeries)
+      .where(eq(bottleSeries.id, series.id));
+
+    expect(updatedSeries.numReleases).toEqual(1);
+  });
+
+  test("rejects invalid series ID", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+    const modUser = await fixtures.User({ mod: true });
+
+    const err = await waitError(
+      routerClient.bottles.update(
+        {
+          bottle: bottle.id,
+          series: 999999,
+        },
+        { context: { user: modUser } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(`[Error: Series not found.]`);
+  });
+
+  test("removes brand name duplication from bottle name", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Delicious Wood" });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Original Name",
+    });
+    const modUser = await fixtures.User({ mod: true });
+
+    await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        name: "Delicious Wood Yum Yum",
+      },
+      { context: { user: modUser } },
+    );
+
+    const [updatedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    expect(updatedBottle.name).toEqual("Yum Yum");
+    expect(updatedBottle.fullName).toEqual("Delicious Wood Yum Yum");
+  });
+
+  test("updates multiple fields simultaneously", async ({ fixtures }) => {
+    const brand = await fixtures.Entity();
+    const newBrand = await fixtures.Entity();
+    const distiller = await fixtures.Entity();
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Original Name",
+      statedAge: null,
+      abv: null,
+      flavorProfile: null,
+    });
+    const modUser = await fixtures.User({ mod: true });
+
+    await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        name: "New Name",
+        brand: newBrand.id,
+        statedAge: 12,
+        abv: 43.0,
+        flavorProfile: "peated",
+        distillers: [distiller.id],
+        description: "A complex whisky",
+        caskType: "bourbon",
+        vintageYear: 2010,
+        releaseYear: 2022,
+      },
+      { context: { user: modUser } },
+    );
+
+    const [updatedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    expect(updatedBottle.name).toEqual("New Name");
+    expect(updatedBottle.brandId).toEqual(newBrand.id);
+    expect(updatedBottle.statedAge).toEqual(12);
+    expect(updatedBottle.abv).toEqual(43.0);
+    expect(updatedBottle.flavorProfile).toEqual("peated");
+    expect(updatedBottle.description).toEqual("A complex whisky");
+    expect(updatedBottle.caskType).toEqual("bourbon");
+    expect(updatedBottle.vintageYear).toEqual(2010);
+    expect(updatedBottle.releaseYear).toEqual(2022);
+
+    // Verify distiller was added
+    const distillers = await db
+      .select()
+      .from(bottlesToDistillers)
+      .where(eq(bottlesToDistillers.bottleId, bottle.id));
+    expect(distillers.length).toBe(1);
+    expect(distillers[0].distillerId).toEqual(distiller.id);
   });
 });
