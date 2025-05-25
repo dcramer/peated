@@ -45,7 +45,7 @@ Test fixtures should be referenced via the context (found in [fixtures.ts](mdc:a
   });
 ```
 
-User context - such as for an oRPC route caller - should use the `defaults` (as defauled in [setup-test-env.ts](mdc:apps/server/src/test/setup-test-env.ts)) when available. For example:
+User context - such as for an oRPC route caller - should use the `defaults` (as defaulted in [setup-test-env.ts](mdc:apps/server/src/test/setup-test-env.ts)) when available. For example:
 
 ```ts
   it("returns a bottle release", async function ({ defaults }) {

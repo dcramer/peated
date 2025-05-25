@@ -1,6 +1,6 @@
 ---
 description: Instructions when working on OpenAPI routes in Hono.
-globs:
+globs: 
 alwaysApply: false
 ---
 # oRPC Route Implementation Conventions
@@ -34,15 +34,15 @@ import { BottleSerializer } from "@peated/server/serializers";
 | File                              | HTTP semantics                                     |
 | --------------------------------- | -------------------------------------------------- |
 | `list.ts`                         | Collection route (e.g. GET /things)                |
-| `details.ts`                      | Single‑resource route (e.g. GET /things/\:thin) |
+| `details.ts`                      | Single-resource route (e.g. GET /things/:thing) |
 | `create.ts`                       | Create route (POST /things)                        |
-| `upsert.ts`                       | Upsert / update route (PUT/PATCH /things/\:thing)     |
-| `delete.ts`                       | Delete route (DELETE /things/\:thing)                 |
+| `upsert.ts`                       | Upsert / update route (PUT/PATCH /things/:thing)     |
+| `delete.ts`                       | Delete route (DELETE /things/:thing)                 |
 | Descriptive (`login.ts`, `me.ts`) | Functional endpoints                               |
 
 * **No dynamic segments** in folder names.  Path params live inside the file.
 * Each folder exports an `index.ts` to assemble its children into a router object.
-* **Route parameters must be explicitly named** for the domain object – use `:tasting`, `:user`, not bare `:id`, and not `:thingId`.
+* **Route parameters must be explicitly named** for the domain object - use `:tasting`, `:user`, not bare `:id`, and not `:thingId`.
 * Routes are flattened based on their object type (e.g. `users/`, `collections/`, vs `/users/collections/`).
 * Sub-collections (such as `bottleSeries/`) should be prefixed when flattened (rather than `bottles/series/`) if they are unique to another entity type.
 
@@ -85,7 +85,7 @@ Always chain in the following order—LLMs need the cue sequence:
 
 1. `.use()`     - middleware (optional, repeatable)
 2. `.route()`   - `{ method, path, ...meta }`
-3. `.input()`   - Zod **object** schema  *(mandatory; scalars are forbidden)*
+3. `.input()`   - Zod **object** schema
 4. `.output()`  - Zod **object** schema  *(mandatory; scalars are forbidden)*
 5. `.handler()` - async business logic **(last)**
 

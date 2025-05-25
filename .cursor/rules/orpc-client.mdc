@@ -1,6 +1,6 @@
 ---
 description: oRPC Usage Guidelines for Next.js + TanStack Query
-globs:
+globs: 
 alwaysApply: false
 ---
 # oRPC Usage Guidelines for Next.js + TanStack Query
@@ -17,7 +17,7 @@ We use the `@peated/server/orpc` package to communicate with our backend API usi
 
 ## Project Conventions
 
-* Use `makeORPCClient()` in server actions with the current `accessToken`.
+* Use `createServerClient()` in server actions with the current `accessToken`.
 * Use the `useORPC()` hook in client components to access typed query and mutation helpers.
 * Use `safe()` when calling an oRPC function to extract `{ data, error, isDefined }`.
 * Use `queryOptions()` from `orpc.<namespace>.<method>` to pass directly into `useQuery`.

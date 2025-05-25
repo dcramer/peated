@@ -8,7 +8,7 @@ import { bustAppCache } from "../cache.actions";
 // import { cache } from "react";
 
 // https://tanstack.com/query/latest/docs/framework/react/guides/advanced-ssr
-const makeQueryClient = () => {
+const createQueryClient = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -38,22 +38,18 @@ const makeQueryClient = () => {
   return queryClient;
 };
 
-// TODO:
-// const getServerQueryClient = cache(() => makeQueryClient());
-const getServerQueryClient = makeQueryClient;
-
 let browserQueryClient: QueryClient | undefined = undefined;
 
 // isServerComponent must be true for any server component
 // and false for any client component (even if server rendered)
 export function getQueryClient(isServerComponent = true) {
   // react.cache only works for server components
-  if (isServerComponent) return getServerQueryClient();
+  if (isServerComponent) return createQueryClient();
 
-  if (isServer) return makeQueryClient();
+  if (isServer) return createQueryClient();
 
   if (!browserQueryClient) {
-    browserQueryClient = makeQueryClient();
+    browserQueryClient = createQueryClient();
   }
   return browserQueryClient;
 }

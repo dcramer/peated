@@ -4,7 +4,7 @@ import type { RouterClient } from "@orpc/server";
 import { type Router } from "@peated/server/orpc/router";
 import { logError } from "../lib/log";
 
-export function makeORPCClient(
+export function createClient(
   apiServer: string,
   accessToken?: string | null | undefined,
 ): RouterClient<Router> {
