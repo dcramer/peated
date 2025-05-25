@@ -17,7 +17,7 @@ function range(start: number, end?: number): number[] {
 }
 
 export async function GET() {
-  const client = await createServerClient();
+  const { client } = await createServerClient();
 
   const { totalEntities } = await client.stats.call({});
   const sitemapIndexXML = await buildSitemapIndex(

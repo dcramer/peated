@@ -14,7 +14,7 @@ export async function generateMetadata({
 }: {
   params: { countrySlug: string; regionSlug: string };
 }) {
-  const client = await getServerClient();
+  const { client } = await getServerClient();
 
   const region = await client.regions.details({
     country: countrySlug,
@@ -34,7 +34,7 @@ export default async function Page({
   params: { countrySlug: string; regionSlug: string };
   children: ReactNode;
 }) {
-  const client = await getServerClient();
+  const { client } = await getServerClient();
 
   const region = await client.regions.details({
     country: countrySlug,

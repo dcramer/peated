@@ -7,7 +7,7 @@ export async function generateMetadata({
 }: {
   params: { bottleId: string };
 }) {
-  const client = await getServerClient();
+  const { client } = await getServerClient();
   const bottle = await client.bottles.details({
     bottle: Number(bottleId),
   });

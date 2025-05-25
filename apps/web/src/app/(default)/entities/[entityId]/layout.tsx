@@ -13,7 +13,7 @@ export async function generateMetadata({
 }: {
   params: { entityId: string };
 }) {
-  const client = await getServerClient();
+  const { client } = await getServerClient();
 
   const entity = await client.entities.details({
     entity: Number(entityId),
@@ -41,7 +41,7 @@ export default async function Layout({
   params: Record<string, any>;
   children: ReactNode;
 }) {
-  const client = await getServerClient();
+  const { client } = await getServerClient();
 
   const entityId = Number(params.entityId);
   const entity = await client.entities.details({

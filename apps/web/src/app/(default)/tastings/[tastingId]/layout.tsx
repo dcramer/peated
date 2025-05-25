@@ -6,7 +6,7 @@ export async function generateMetadata({
 }: {
   params: { tastingId: string };
 }) {
-  const client = await getServerClient();
+  const { client } = await getServerClient();
 
   const tasting = await client.tastings.details({ tasting: Number(tastingId) });
   const title = `${tasting.bottle.fullName} - Tasting Notes by ${tasting.createdBy.username}`;

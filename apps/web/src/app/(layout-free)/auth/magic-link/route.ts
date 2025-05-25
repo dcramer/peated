@@ -6,7 +6,7 @@ import { getSession } from "@peated/web/lib/session.server";
 import { redirect } from "next/navigation";
 
 export async function GET(request: Request) {
-  const client = await getServerClient();
+  const { client } = await getServerClient();
 
   const { searchParams } = new URL(request.url);
   const redirectTo = searchParams.get("redirectTo");

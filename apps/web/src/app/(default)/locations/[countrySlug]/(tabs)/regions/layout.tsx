@@ -7,7 +7,7 @@ export async function generateMetadata({
 }: {
   params: { countrySlug: string };
 }) {
-  const client = await getServerClient();
+  const { client } = await getServerClient();
   const country = await client.countries.details({
     country: countrySlug,
   });

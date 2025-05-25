@@ -12,7 +12,7 @@ import { getLink } from "./link";
 
 export async function createServerClient(
   context: ClientContext = {},
-): Promise<RouterClient<Router, ClientContext>> {
+): Promise<{ client: RouterClient<Router, ClientContext> }> {
   const session = await getSession();
   const accessToken = session.accessToken;
 
@@ -23,17 +23,16 @@ export async function createServerClient(
       baggage: reqHeaders.get("baggage"),
     };
   }
+  const link = getLink({
+    accessToken: context.accessToken ?? accessToken,
+    batch: true,
+    apiServer: config.API_SERVER,
+    userAgent: "@peated/web (orpc/server)",
+    traceContext: context.traceContext,
+  });
 
-  const client: RouterClient<Router, ClientContext> = createORPCClient(
-    getLink({
-      accessToken: context.accessToken ?? accessToken,
-      batch: true,
-      apiServer: config.API_SERVER,
-      userAgent: "@peated/web (orpc/server)",
-      traceContext: context.traceContext,
-    }),
-  );
-  return client;
+  const client: RouterClient<Router, ClientContext> = createORPCClient(link);
+  return { client };
 }
 
 // TODO: this is a little risky to cache given its variable based on the session

@@ -11,7 +11,7 @@ export async function GET(
   request: Request,
   { params: { id } }: { params: { id: string } },
 ) {
-  const client = await createServerClient();
+  const { client } = await createServerClient();
 
   const startCursor = (Number(id) - 1) * (PAGE_LIMIT / 100) + 1;
 

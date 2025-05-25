@@ -19,7 +19,7 @@ export default async function Layout({
   params: Record<string, any>;
   children: ReactNode;
 }) {
-  const client = await getServerClient();
+  const { client } = await getServerClient();
 
   const bottleId = Number(params.bottleId);
   const bottle = await client.bottles.details({

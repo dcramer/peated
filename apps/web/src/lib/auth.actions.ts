@@ -62,11 +62,11 @@ export async function authenticate(
     (formData.get("redirectTo") || "/") as string,
   );
 
-  const orpcClient = await createServerClient();
+  const { client } = await createServerClient();
 
   if (email && !password) {
     const { error, isDefined } = await safe(
-      orpcClient.auth.magicLink.create({ email }),
+      client.auth.magicLink.create({ email }),
     );
     if (isDefined) {
       return {
@@ -88,10 +88,10 @@ export async function authenticate(
 
   const { error, isDefined, data } = await safe(
     code
-      ? orpcClient.auth.login({
+      ? client.auth.login({
           code,
         })
-      : orpcClient.auth.login({
+      : client.auth.login({
           email,
           password,
         }),
@@ -146,10 +146,10 @@ export async function register(formData: FormData) {
   const password = (formData.get("password") || "") as string;
   const username = formData.get("username") as string;
 
-  const orpcClient = await createServerClient();
+  const { client } = await createServerClient();
 
   const { error, isDefined, data } = await safe(
-    orpcClient.auth.register({
+    client.auth.register({
       email,
       password,
       username,
@@ -191,10 +191,8 @@ export async function resendVerificationForm(
 
   const session = await getSession();
 
-  const orpcClient = await createServerClient();
-  const { isDefined, error } = await safe(
-    orpcClient.email.resendVerification(),
-  );
+  const { client } = await createServerClient();
+  const { isDefined, error } = await safe(client.email.resendVerification());
 
   if (isDefined && error.name === "CONFLICT") {
     return { ok: true, alreadyVerified: true };
@@ -214,10 +212,10 @@ export async function passwordResetForm(
   const email = (formData.get("email") || "") as string;
 
   const session = await getSession();
-  const orpcClient = await createServerClient();
+  const { client } = await createServerClient();
 
   const { error, isDefined } = await safe(
-    orpcClient.auth.passwordReset.create({ email }),
+    client.auth.passwordReset.create({ email }),
   );
 
   if (isDefined) {
@@ -239,10 +237,10 @@ export async function passwordResetConfirmForm(
   const password = (formData.get("password") || "") as string;
 
   const session = await getSession();
-  const orpcClient = await createServerClient();
+  const { client } = await createServerClient();
 
   const { error, isDefined, data } = await safe(
-    orpcClient.auth.passwordReset.confirm({ token, password }),
+    client.auth.passwordReset.confirm({ token, password }),
   );
 
   if (isDefined) {
@@ -264,9 +262,9 @@ export async function updateSession(): Promise<SessionData> {
   "use server";
 
   const session = await getSession();
-  const orpcClient = await createServerClient();
+  const { client } = await createServerClient();
 
-  const user = await orpcClient.users.details({ user: "me" });
+  const user = await client.users.details({ user: "me" });
   session.user = user;
   session.ts = new Date().getTime();
   // should rotate access token too

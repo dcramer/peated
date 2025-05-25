@@ -12,9 +12,9 @@ export interface ClientContext {
   };
 }
 
-export function createBrowserClient(
-  context: ClientContext = {},
-): RouterClient<Router, ClientContext> {
+export function createBrowserClient(context: ClientContext = {}): {
+  client: RouterClient<Router, ClientContext>;
+} {
   const client: RouterClient<Router, ClientContext> = createORPCClient(
     getLink({
       apiServer: config.API_SERVER,
@@ -23,5 +23,5 @@ export function createBrowserClient(
       traceContext: context.traceContext,
     }),
   );
-  return client;
+  return { client };
 }

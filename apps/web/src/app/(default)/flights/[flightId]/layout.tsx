@@ -7,7 +7,7 @@ export async function generateMetadata({
 }: {
   params: { flightId: string };
 }) {
-  const client = await getServerClient();
+  const { client } = await getServerClient();
 
   const flight = await client.flights.details({
     flight: flightId,

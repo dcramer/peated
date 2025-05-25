@@ -49,7 +49,7 @@ import { getServerClient } from "@peated/web/lib/orpc/client.server";
 export async function GET() {
   // this will create a new client as needed, and use React's cache mechanism
   // otherwise
-  const client = await getServerClient();
+  const { client } = await getServerClient();
   const { totalBottles } = await client.stats();
   // ...
 }

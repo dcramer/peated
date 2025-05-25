@@ -10,7 +10,7 @@ export default async function Layout({
   params: { entityId: string };
   children: ReactNode;
 }) {
-  const client = await getServerClient();
+  const { client } = await getServerClient();
 
   const entity = await client.entities.details({
     entity: Number(entityId),

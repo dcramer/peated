@@ -6,7 +6,7 @@ export async function generateMetadata({
 }: {
   params: { badgeId: string };
 }) {
-  const client = await getServerClient();
+  const { client } = await getServerClient();
   const badge = await client.badges.details({
     badge: parseInt(badgeId, 10),
   });

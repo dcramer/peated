@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 86400;
 
 export async function GET() {
-  const client = await createServerClient();
+  const { client } = await createServerClient();
 
   let cursor: number | null = 1;
   const pages: Sitemap = [{ url: "/locations" }];

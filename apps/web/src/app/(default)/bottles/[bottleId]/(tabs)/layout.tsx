@@ -9,7 +9,7 @@ export async function generateMetadata({
 }: {
   params: { bottleId: string };
 }) {
-  const client = await getServerClient();
+  const { client } = await getServerClient();
 
   const bottle = await client.bottles.details({
     bottle: Number(bottleId),
@@ -40,7 +40,7 @@ export default async function Layout({
   params: Record<string, any>;
   children: ReactNode;
 }) {
-  const client = await getServerClient();
+  const { client } = await getServerClient();
 
   const bottleId = Number(params.bottleId);
   const bottle = await client.bottles.details({ bottle: bottleId });
