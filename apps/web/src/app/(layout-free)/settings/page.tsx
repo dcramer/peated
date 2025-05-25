@@ -54,6 +54,9 @@ export default function Page() {
   const [picture, setPicture] = useState<HTMLCanvasElement | null | undefined>(
     undefined,
   );
+  const userAvatarUpdateMutation = useMutation(
+    orpc.users.avatarUpdate.mutationOptions(),
+  );
   const {
     control,
     register,
@@ -76,10 +79,9 @@ export default function Page() {
     let newAvatar: any;
 
     if (picture) {
-      newAvatar = await api.post(`/users/me/avatar`, {
-        data: {
-          picture: picture ? await toBlob(picture) : null,
-        },
+      newAvatar = await userAvatarUpdateMutation.mutateAsync({
+        user: "me",
+        file: await toBlob(picture),
       });
     } else {
       newAvatar = {};
