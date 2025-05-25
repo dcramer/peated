@@ -129,6 +129,7 @@ export const app = new Hono()
   })
   .use(logger())
   .use(
+    "*",
     cors({
       credentials: true,
       origin: config.CORS_HOST,
@@ -136,6 +137,7 @@ export const app = new Hono()
     }),
   )
   .use(
+    "*",
     cache({
       cacheName: "default",
       cacheControl: "private, no-cache, no-store, max-age=0, must-revalidate",
@@ -143,6 +145,7 @@ export const app = new Hono()
   )
 
   .use(
+    "*",
     secureHeaders({
       crossOriginResourcePolicy: "same-site",
       // contentSecurityPolicy: false,
