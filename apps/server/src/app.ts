@@ -65,7 +65,7 @@ const rpcHandler = new RPCHandler(router, {
       ) {
         const zodError = new ZodError(error.cause.issues as ZodIssue[]);
 
-        logError(error, {
+        logError(`Validation error with output: ${zodError.toString()}`, {
           zod: {
             error: zodError.flatten(),
           },
