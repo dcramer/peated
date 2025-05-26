@@ -18,7 +18,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "DELETE", path: "/bottles/{bottle}" })
+  .route({
+    method: "DELETE",
+    path: "/bottles/{bottle}",
+    summary: "Delete bottle",
+    description:
+      "Permanently delete a bottle and create a tombstone record. Requires admin privileges",
+  })
   .input(z.object({ bottle: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {

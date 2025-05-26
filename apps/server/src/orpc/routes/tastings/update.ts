@@ -24,7 +24,13 @@ const InputSchema = TastingInputSchema.partial()
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "PATCH", path: "/tastings/{tasting}" })
+  .route({
+    method: "PATCH",
+    path: "/tastings/{tasting}",
+    summary: "Update tasting",
+    description:
+      "Update tasting information including notes, rating, tags, and friends. Only the tasting creator can update",
+  })
   .input(InputSchema)
   .output(TastingSchema)
   .handler(async function ({ input, context, errors }) {

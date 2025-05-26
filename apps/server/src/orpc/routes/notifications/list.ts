@@ -11,7 +11,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "GET", path: "/notifications" })
+  .route({
+    method: "GET",
+    path: "/notifications",
+    summary: "List notifications",
+    description:
+      "Retrieve user notifications with filtering by read status and pagination support",
+  })
   .input(
     z
       .object({

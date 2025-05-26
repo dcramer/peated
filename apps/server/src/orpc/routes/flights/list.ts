@@ -21,7 +21,13 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "GET", path: "/flights" })
+  .route({
+    method: "GET",
+    path: "/flights",
+    summary: "List flights",
+    description:
+      "Retrieve tasting flights with filtering by visibility and search. Respects user permissions for private flights",
+  })
   .input(
     z
       .object({

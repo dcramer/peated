@@ -14,7 +14,12 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "GET", path: "/badges" })
+  .route({
+    method: "GET",
+    path: "/badges",
+    summary: "List badges",
+    description: "Retrieve available badges with search and pagination support",
+  })
   .input(
     z
       .object({

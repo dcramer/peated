@@ -8,7 +8,12 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/tastings/{tasting}" })
+  .route({
+    method: "GET",
+    path: "/tastings/{tasting}",
+    summary: "Get tasting details",
+    description: "Retrieve detailed information about a specific tasting",
+  })
   .input(
     z.object({
       tasting: z.coerce.number(),

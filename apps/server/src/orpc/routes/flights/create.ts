@@ -9,7 +9,13 @@ import { serialize } from "@peated/server/serializers";
 import { FlightSerializer } from "@peated/server/serializers/flight";
 
 export default procedure
-  .route({ method: "POST", path: "/flights" })
+  .route({
+    method: "POST",
+    path: "/flights",
+    summary: "Create flight",
+    description:
+      "Create a new tasting flight with bottles and visibility settings",
+  })
   .use(requireAuth)
   .input(FlightInputSchema)
   .output(FlightSchema)

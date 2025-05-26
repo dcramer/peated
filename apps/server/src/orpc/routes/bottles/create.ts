@@ -29,7 +29,13 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 
 export default procedure
   .use(requireVerified)
-  .route({ method: "POST", path: "/bottles" })
+  .route({
+    method: "POST",
+    path: "/bottles",
+    summary: "Create bottle",
+    description:
+      "Create a new bottle entry with brand, distillery, and whisky details",
+  })
   .input(BottleInputSchema)
   .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {

@@ -39,7 +39,13 @@ const SORT_OPTIONS = [
 ] as const;
 
 export default procedure
-  .route({ method: "GET", path: "/bottles" })
+  .route({
+    method: "GET",
+    path: "/bottles",
+    summary: "List bottles",
+    description:
+      "Search and filter bottles with pagination support. Supports filtering by brand, distillery, category, age, and more",
+  })
   .input(
     z.object({
       query: z.coerce.string().default(""),

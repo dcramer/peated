@@ -14,7 +14,13 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "POST", path: "/auth/register" })
+  .route({
+    method: "POST",
+    path: "/auth/register",
+    summary: "User registration",
+    description:
+      "Register a new user account with username, email, and password",
+  })
   .input(
     z.object({
       username: z.string().toLowerCase(),

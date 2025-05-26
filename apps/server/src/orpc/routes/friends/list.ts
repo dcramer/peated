@@ -20,7 +20,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "GET", path: "/friends" })
+  .route({
+    method: "GET",
+    path: "/friends",
+    summary: "List friends",
+    description:
+      "Retrieve user's friend relationships with filtering by status (pending/active) and search support",
+  })
   .input(
     z
       .object({

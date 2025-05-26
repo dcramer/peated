@@ -35,7 +35,13 @@ const InputSchema = BottleInputSchema.partial().extend({
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/bottles/{bottle}" })
+  .route({
+    method: "PATCH",
+    path: "/bottles/{bottle}",
+    summary: "Update bottle",
+    description:
+      "Update bottle information including name, brand, distillers, and other metadata. Requires moderator privileges",
+  })
   .input(InputSchema)
   .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {

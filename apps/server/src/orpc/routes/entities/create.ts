@@ -20,7 +20,13 @@ import { eq } from "drizzle-orm";
 
 export default procedure
   .use(requireVerified)
-  .route({ method: "POST", path: "/entities" })
+  .route({
+    method: "POST",
+    path: "/entities",
+    summary: "Create entity",
+    description:
+      "Create a new entity (brand, distillery, or bottler) with location and type information",
+  })
   .input(EntityInputSchema)
   .output(EntitySchema)
   .handler(async function ({ input, context, errors }) {

@@ -57,7 +57,13 @@ function sortResults(query: string, unsortedResults: Result[]) {
 }
 
 export default procedure
-  .route({ method: "GET", path: "/search" })
+  .route({
+    method: "GET",
+    path: "/search",
+    summary: "Global search",
+    description:
+      "Search across bottles, entities, and users with configurable result types and limits",
+  })
   .input(
     z.object({
       query: z.coerce.string(),

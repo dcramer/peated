@@ -28,7 +28,13 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "GET", path: "/countries/{country}/regions" })
+  .route({
+    method: "GET",
+    path: "/countries/{country}/regions",
+    summary: "List regions",
+    description:
+      "Retrieve regions within a specific country with filtering by bottle counts and search support",
+  })
   .input(InputSchema)
   .output(OutputSchema)
   .handler(async function ({

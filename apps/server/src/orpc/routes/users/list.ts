@@ -13,7 +13,13 @@ const SORT_OPTIONS = ["name", "created", "-created", "-name"] as const;
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "GET", path: "/users" })
+  .route({
+    method: "GET",
+    path: "/users",
+    summary: "List users",
+    description:
+      "Search and list users with pagination support. Requires authentication",
+  })
   .input(
     z
       .object({

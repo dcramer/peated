@@ -11,7 +11,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "GET", path: "/users/{user}/collections" })
+  .route({
+    method: "GET",
+    path: "/users/{user}/collections",
+    summary: "List user collections",
+    description:
+      "Retrieve collections for a specific user with optional bottle filtering. Respects user privacy settings",
+  })
   .input(
     z.object({
       user: z.union([z.literal("me"), z.string(), z.coerce.number()]),

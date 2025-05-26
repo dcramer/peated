@@ -66,7 +66,13 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "GET", path: "/entities" })
+  .route({
+    method: "GET",
+    path: "/entities",
+    summary: "List entities",
+    description:
+      "Search and filter entities (brands, distilleries, bottlers) with advanced filtering by location, type, and search context",
+  })
   .input(InputSchema)
   .output(OutputSchema)
   .handler(async function ({

@@ -32,7 +32,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "POST", path: "/tastings" })
+  .route({
+    method: "POST",
+    path: "/tastings",
+    summary: "Create tasting",
+    description:
+      "Create a new tasting entry for a bottle with notes, rating, and optional metadata like flight and friends",
+  })
   .input(TastingInputSchema)
   .output(
     z.object({

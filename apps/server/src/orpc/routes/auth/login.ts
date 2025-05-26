@@ -13,7 +13,12 @@ import { OAuth2Client } from "google-auth-library";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "POST", path: "/auth/login" })
+  .route({
+    method: "POST",
+    path: "/auth/login",
+    summary: "User login",
+    description: "Authenticate user with email/password or Google OAuth code",
+  })
   .input(
     z.union([
       z.object({

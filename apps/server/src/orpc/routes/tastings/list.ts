@@ -16,7 +16,13 @@ import { and, desc, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/tastings" })
+  .route({
+    method: "GET",
+    path: "/tastings",
+    summary: "List tastings",
+    description:
+      "Retrieve tastings with filtering by bottle, entity, user, and privacy settings. Supports pagination",
+  })
   .input(
     z
       .object({

@@ -15,7 +15,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "DELETE", path: "/tastings/{tasting}" })
+  .route({
+    method: "DELETE",
+    path: "/tastings/{tasting}",
+    summary: "Delete tasting",
+    description:
+      "Delete a tasting and update related statistics. Only the tasting creator or admin can delete",
+  })
   .input(z.object({ tasting: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {

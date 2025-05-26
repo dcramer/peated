@@ -12,7 +12,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "PATCH", path: "/users/{user}" })
+  .route({
+    method: "PATCH",
+    path: "/users/{user}",
+    summary: "Update user",
+    description:
+      "Update user profile information including username, privacy settings, and admin status. Users can only edit their own profile unless they are admin",
+  })
   .input(
     UserInputSchema.partial().extend({
       user: z.union([z.literal("me"), z.coerce.number(), z.string()]),

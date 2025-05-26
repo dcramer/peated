@@ -8,7 +8,12 @@ import { and, asc, ilike, type SQL } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/tags" })
+  .route({
+    method: "GET",
+    path: "/tags",
+    summary: "List tags",
+    description: "Retrieve available tags with search and pagination support",
+  })
   .input(
     z
       .object({

@@ -14,7 +14,13 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/users/{user}" })
+  .route({
+    method: "GET",
+    path: "/users/{user}",
+    summary: "Get user details",
+    description:
+      "Retrieve user profile information including statistics for tastings, bottles, and contributions",
+  })
   .input(
     z.object({
       user: z.union([z.coerce.number(), z.literal("me"), z.string()]),

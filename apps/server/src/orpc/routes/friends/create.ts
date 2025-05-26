@@ -11,7 +11,13 @@ import { z } from "zod";
 export default procedure
   .use(requireAuth)
   // TODO: better path
-  .route({ method: "PUT", path: "/friends/{user}" })
+  .route({
+    method: "PUT",
+    path: "/friends/{user}",
+    summary: "Send friend request",
+    description:
+      "Send a friend request to another user or accept a pending request. Creates mutual following relationship when accepted",
+  })
   .input(
     z.object({
       user: z.coerce.number(),

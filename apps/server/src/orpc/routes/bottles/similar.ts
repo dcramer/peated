@@ -20,7 +20,13 @@ import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/bottles/{bottle}/similar" })
+  .route({
+    method: "GET",
+    path: "/bottles/{bottle}/similar",
+    summary: "Get similar bottles",
+    description:
+      "Find bottles similar to the specified bottle based on brand, category, age, and distillery",
+  })
   .input(
     z.object({
       bottle: z.coerce.number(),

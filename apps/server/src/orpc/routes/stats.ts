@@ -5,7 +5,13 @@ import { sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/stats" })
+  .route({
+    method: "GET",
+    path: "/stats",
+    summary: "Get platform statistics",
+    description:
+      "Retrieve overall platform statistics including total tastings, bottles, and entities",
+  })
   .output(
     z.object({
       totalTastings: z.number(),
