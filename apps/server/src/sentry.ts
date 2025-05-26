@@ -10,7 +10,10 @@ if (config.ENV !== "test") {
     spotlight: config.ENV === "development",
     includeLocalVariables: true,
     sendDefaultPii: true,
-
+    integrations: [
+      Sentry.consoleLoggingIntegration(),
+      Sentry.zodErrorsIntegration(),
+    ],
     _experiments: {
       enableLogs: true,
     },
