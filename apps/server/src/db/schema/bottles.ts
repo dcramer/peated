@@ -3,6 +3,7 @@ import {
   bigint,
   bigserial,
   boolean,
+  check,
   doublePrecision,
   index,
   integer,
@@ -174,6 +175,10 @@ export const bottles = pgTable(
     index("bottle_created_by_idx").on(table.createdById),
     index("bottle_category_idx").on(table.category),
     index("bottle_flavor_profile_idx").on(table.flavorProfile),
+    check(
+      "bottle_stated_age_check",
+      sql`${table.statedAge} IS NULL OR (${table.statedAge} >= 0 AND ${table.statedAge} <= 100)`,
+    ),
   ],
 );
 
@@ -302,6 +307,10 @@ export const bottleReleases = pgTable(
     index("bottle_release_bottle_idx").on(table.bottleId),
     index("bottle_release_created_by_idx").on(table.createdById),
     uniqueIndex("bottle_release_full_name_idx").on(table.fullName),
+    check(
+      "bottle_release_stated_age_check",
+      sql`${table.statedAge} IS NULL OR (${table.statedAge} >= 0 AND ${table.statedAge} <= 100)`,
+    ),
   ],
 );
 
