@@ -10,7 +10,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "POST", path: "/external-sites/:site/trigger" })
+  .route({ method: "POST", path: "/external-sites/{site}/trigger" })
   .input(
     z.object({
       site: ExternalSiteTypeEnum,

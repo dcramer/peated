@@ -7,7 +7,7 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "POST", path: "/tastings/:tasting/toast" })
+  .route({ method: "POST", path: "/tastings/{tasting}/toast" })
   .input(z.object({ tasting: z.coerce.number() }))
   .output(z.object({}))
   .use(requireAuth)

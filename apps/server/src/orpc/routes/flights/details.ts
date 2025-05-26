@@ -10,7 +10,7 @@ import { z } from "zod";
 export default procedure
   // we use the publicId as the route param here as an easy solution
   // to make the flight private (through obscuring the id)
-  .route({ method: "GET", path: "/flights/:flight" })
+  .route({ method: "GET", path: "/flights/{flight}" })
   .input(z.object({ flight: z.string() }))
   .output(FlightSchema)
   .handler(async function ({ input, context, errors }) {

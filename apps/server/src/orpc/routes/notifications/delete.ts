@@ -7,7 +7,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "DELETE", path: "/notifications/:notification" })
+  .route({ method: "DELETE", path: "/notifications/{notification}" })
   .input(z.object({ notification: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {

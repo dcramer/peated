@@ -12,7 +12,7 @@ export default procedure
   .use(requireAuth)
   .route({
     method: "DELETE",
-    path: "/users/:user/collections/:collection/bottles",
+    path: "/users/{user}/collections/{collection}/bottles",
   })
   .input(
     CollectionBottleInputSchema.extend({

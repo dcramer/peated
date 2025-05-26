@@ -13,7 +13,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "POST", path: "/countries/:country/regions" })
+  .route({ method: "POST", path: "/countries/{country}/regions" })
   .input(RegionInputSchema.extend({ country: z.string() }))
   .output(RegionSchema)
   .handler(async function ({ input, context, errors }) {

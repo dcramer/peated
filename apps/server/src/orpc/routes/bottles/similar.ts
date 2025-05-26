@@ -20,7 +20,7 @@ import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/bottles/:bottle/similar" })
+  .route({ method: "GET", path: "/bottles/{bottle}/similar" })
   .input(
     z.object({
       bottle: z.coerce.number(),

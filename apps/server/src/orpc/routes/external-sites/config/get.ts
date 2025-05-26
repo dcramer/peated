@@ -8,7 +8,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "GET", path: "/external-sites/:site/config/:key" })
+  .route({ method: "GET", path: "/external-sites/{site}/config/{key}" })
   .input(
     z.object({
       site: ExternalSiteTypeEnum,

@@ -13,7 +13,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "POST", path: "/tastings/:tasting/image" })
+  .route({ method: "POST", path: "/tastings/{tasting}/image" })
   .input(
     z.object({
       tasting: z.coerce.number(),

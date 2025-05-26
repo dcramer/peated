@@ -25,7 +25,7 @@ const OutputSchema = BottleSchema.extend({
 });
 
 export default procedure
-  .route({ method: "GET", path: "/bottles/:bottle" })
+  .route({ method: "GET", path: "/bottles/{bottle}" })
   .input(z.object({ bottle: z.coerce.number() }))
   .output(OutputSchema)
   .handler(async function ({ input, context, errors }) {

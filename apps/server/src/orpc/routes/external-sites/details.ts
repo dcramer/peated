@@ -11,7 +11,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/external-sites/:site" })
+  .route({ method: "GET", path: "/external-sites/{site}" })
   .input(
     z.object({
       site: ExternalSiteTypeEnum,

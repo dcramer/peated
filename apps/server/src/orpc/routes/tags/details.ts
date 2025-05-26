@@ -8,7 +8,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/tags/:tag" })
+  .route({ method: "GET", path: "/tags/{tag}" })
   .input(z.object({ tag: z.string() }))
   .output(TagSchema)
   .handler(async function ({ input, context, errors }) {

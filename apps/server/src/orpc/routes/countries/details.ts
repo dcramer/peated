@@ -9,7 +9,7 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/countries/:country" })
+  .route({ method: "GET", path: "/countries/{country}" })
   .input(
     z.object({
       country: z.string(),

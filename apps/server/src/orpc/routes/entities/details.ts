@@ -18,7 +18,7 @@ const OutputSchema = EntitySchema.extend({
 });
 
 export default procedure
-  .route({ method: "GET", path: "/entities/:entity" })
+  .route({ method: "GET", path: "/entities/{entity}" })
   .input(z.object({ entity: z.coerce.number() }))
   .output(OutputSchema)
   .handler(async function ({ input, context, errors }) {

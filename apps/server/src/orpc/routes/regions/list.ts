@@ -28,7 +28,7 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "GET", path: "/countries/:country/regions" })
+  .route({ method: "GET", path: "/countries/{country}/regions" })
   .input(InputSchema)
   .output(OutputSchema)
   .handler(async function ({

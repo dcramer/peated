@@ -15,7 +15,7 @@ const InputSchema = RegionInputSchema.partial().extend({
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/countries/:country/regions/:region" })
+  .route({ method: "PATCH", path: "/countries/{country}/regions/{region}" })
   .input(InputSchema)
   .output(RegionSchema)
   .handler(async function ({ input, context, errors }) {

@@ -34,15 +34,15 @@ import { BottleSerializer } from "@peated/server/serializers";
 | File                              | HTTP semantics                                     |
 | --------------------------------- | -------------------------------------------------- |
 | `list.ts`                         | Collection route (e.g. GET /things)                |
-| `details.ts`                      | Single-resource route (e.g. GET /things/:thing) |
+| `details.ts`                      | Single-resource route (e.g. GET /things/{thing})   |
 | `create.ts`                       | Create route (POST /things)                        |
-| `upsert.ts`                       | Upsert / update route (PUT/PATCH /things/:thing)     |
-| `delete.ts`                       | Delete route (DELETE /things/:thing)                 |
+| `upsert.ts`                       | Upsert / update route (PUT/PATCH /things/{thing})  |
+| `delete.ts`                       | Delete route (DELETE /things/{thing}               |
 | Descriptive (`login.ts`, `me.ts`) | Functional endpoints                               |
 
 * **No dynamic segments** in folder names.  Path params live inside the file.
 * Each folder exports an `index.ts` to assemble its children into a router object.
-* **Route parameters must be explicitly named** for the domain object - use `:tasting`, `:user`, not bare `:id`, and not `:thingId`.
+* **Route parameters must be explicitly named** for the domain object - use `{tasting}`, `{user}`, not bare `{id}`, and not `{thingId}`.
 * Routes are flattened based on their object type (e.g. `users/`, `collections/`, vs `/users/collections/`).
 * Sub-collections (such as `bottleSeries/`) should be prefixed when flattened (rather than `bottles/series/`) if they are unique to another entity type.
 
@@ -108,9 +108,9 @@ export default procedure
 | PATCH  | Partial update | `upsert.ts`              |
 | DELETE | Remove         | `delete.ts`              |
 
-* Use **PUT** on `/collectionName/:primaryKey` when upserting by primary key.
+* Use **PUT** on `/collectionName/{primaryKey}` when upserting by primary key.
 * Use **PUT** on `/collectionName` for batch or composite-key upserts.
-* Collection‑level mutations are always **batch** operations and therefore must accept **array** input.
+* Collection-level mutations are always **batch** operations and therefore must accept **array** input.
 
 ```ts
 // routes/bottles/upsert.ts
@@ -172,7 +172,7 @@ if (Number.isFinite(+input.country)) {
 
 ```ts
 export default procedure
-  .route({ method: "GET", path: "/tastings/:tasting" })
+  .route({ method: "GET", path: "/tastings/{tasting}" })
   .input(z.object({ tasting: z.coerce.number() }))
   .output(TastingSchema)
   .handler(async ({ input, context, errors }) => {

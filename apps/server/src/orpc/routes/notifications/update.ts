@@ -13,7 +13,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "PATCH", path: "/notifications/:notification" })
+  .route({ method: "PATCH", path: "/notifications/{notification}" })
   .input(
     NotificationInputSchema.partial().extend({
       notification: z.coerce.number(),

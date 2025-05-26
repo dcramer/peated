@@ -13,7 +13,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "POST", path: "/badges/:badge/image" })
+  .route({ method: "POST", path: "/badges/{badge}/image" })
   .input(
     z.object({
       badge: z.coerce.number(),

@@ -13,7 +13,7 @@ const InputSchema = FlightInputSchema.partial().extend({
 });
 
 export default procedure
-  .route({ method: "PATCH", path: "/flights/:flight" })
+  .route({ method: "PATCH", path: "/flights/{flight}" })
   .use(requireAuth)
   .input(InputSchema)
   .output(FlightSchema)

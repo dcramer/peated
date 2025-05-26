@@ -8,7 +8,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "DELETE", path: "/entity-aliases/:name" })
+  .route({ method: "DELETE", path: "/entity-aliases/{name}" })
   .input(
     z.object({
       name: z.string(),

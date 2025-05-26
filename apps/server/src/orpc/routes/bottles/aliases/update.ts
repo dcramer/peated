@@ -16,7 +16,7 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "PATCH", path: "/bottle-aliases/:alias" })
+  .route({ method: "PATCH", path: "/bottle-aliases/{alias}" })
   .use(requireMod)
   .input(InputSchema)
   .output(OutputSchema)

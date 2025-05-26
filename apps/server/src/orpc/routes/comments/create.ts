@@ -20,7 +20,7 @@ export default procedure
   .use(requireAuth)
   .route({
     method: "POST",
-    path: "/tastings/:tasting/comments",
+    path: "/tastings/{tasting}/comments",
     tags: ["tastings"],
   })
   .input(

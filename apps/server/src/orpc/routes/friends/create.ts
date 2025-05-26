@@ -11,7 +11,7 @@ import { z } from "zod";
 export default procedure
   .use(requireAuth)
   // TODO: better path
-  .route({ method: "PUT", path: "/friends/:user" })
+  .route({ method: "PUT", path: "/friends/{user}" })
   .input(
     z.object({
       user: z.coerce.number(),

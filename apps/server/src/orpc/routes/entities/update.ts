@@ -23,7 +23,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/entities/:entity" })
+  .route({ method: "PATCH", path: "/entities/{entity}" })
   .input(
     EntityInputSchema.partial().extend({
       entity: z.number(),

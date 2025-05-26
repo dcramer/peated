@@ -12,7 +12,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/tags/:tag" })
+  .route({ method: "PATCH", path: "/tags/{tag}" })
   .input(
     TagInputSchema.partial().extend({
       tag: z.string(),

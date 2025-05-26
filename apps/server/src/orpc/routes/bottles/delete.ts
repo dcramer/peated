@@ -18,7 +18,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "DELETE", path: "/bottles/:bottle" })
+  .route({ method: "DELETE", path: "/bottles/{bottle}" })
   .input(z.object({ bottle: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {

@@ -21,7 +21,7 @@ const InputSchema = BottleReleaseInputSchema.partial().extend({
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/bottle-releases/:release" })
+  .route({ method: "PATCH", path: "/bottle-releases/{release}" })
   .input(InputSchema)
   .output(BottleReleaseSchema)
   .handler(async function ({ input, context, errors }) {

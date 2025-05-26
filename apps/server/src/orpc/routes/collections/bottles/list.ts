@@ -17,7 +17,7 @@ import { z } from "zod";
 export default procedure
   .route({
     method: "GET",
-    path: "/users/:user/collections/:collection/bottles",
+    path: "/users/{user}/collections/{collection}/bottles",
   })
   .input(
     z.object({

@@ -11,7 +11,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "PATCH", path: "/events/:event" })
+  .route({ method: "PATCH", path: "/events/{event}" })
   .input(EventInputSchema.partial().extend({ event: z.coerce.number() }))
   .output(EventSchema)
   .handler(async function ({ input, context, errors }) {

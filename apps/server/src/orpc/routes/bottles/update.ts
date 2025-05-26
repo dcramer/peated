@@ -35,7 +35,7 @@ const InputSchema = BottleInputSchema.partial().extend({
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/bottles/:bottle" })
+  .route({ method: "PATCH", path: "/bottles/{bottle}" })
   .input(InputSchema)
   .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {

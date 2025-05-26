@@ -12,7 +12,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "DELETE", path: "/entities/:entity" })
+  .route({ method: "DELETE", path: "/entities/{entity}" })
   .input(z.object({ entity: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {

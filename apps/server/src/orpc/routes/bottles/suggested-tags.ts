@@ -7,7 +7,7 @@ import { desc, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/bottles/:bottle/suggested-tags" })
+  .route({ method: "GET", path: "/bottles/{bottle}/suggested-tags" })
   .input(
     z.object({
       bottle: z.coerce.number(),

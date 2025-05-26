@@ -12,7 +12,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "PATCH", path: "/users/:user" })
+  .route({ method: "PATCH", path: "/users/{user}" })
   .input(
     UserInputSchema.partial().extend({
       user: z.union([z.literal("me"), z.coerce.number(), z.string()]),

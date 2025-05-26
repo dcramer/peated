@@ -17,7 +17,7 @@ export default procedure
   .use(requireAuth)
   .route({
     method: "POST",
-    path: "/users/:user/collections/:collection/bottles",
+    path: "/users/{user}/collections/{collection}/bottles",
   })
   .input(
     CollectionBottleInputSchema.extend({

@@ -8,15 +8,15 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "DELETE", path: "/comments/:comment" })
+  .route({ method: "DELETE", path: "/comments/{comment}" })
   // .route({
   //   method: "DELETE",
-  //   path: "/tastings/:tasting/comments/:id",
+  //   path: "/tastings/{tasting}/comments/{id}",
   //   tags: ["tastings"],
   // })
   // .route({
   //   method: "DELETE",
-  //   path: "/users/:user/comments/:id",
+  //   path: "/users/{user}/comments/{id}",
   //   tags: ["users"],
   // })
   .input(

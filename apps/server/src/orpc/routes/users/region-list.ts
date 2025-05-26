@@ -12,7 +12,7 @@ import { inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/users/:user/regions" })
+  .route({ method: "GET", path: "/users/{user}/regions" })
   .input(
     z.object({
       user: z.union([z.literal("me"), z.string(), z.coerce.number()]),

@@ -22,7 +22,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "POST", path: "/external-sites/:site/prices" })
+  .route({ method: "POST", path: "/external-sites/{site}/prices" })
   .input(
     z.object({
       site: ExternalSiteTypeEnum,
