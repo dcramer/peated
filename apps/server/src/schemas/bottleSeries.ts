@@ -7,13 +7,21 @@ export const BottleSeriesSchema = z.object({
     .string()
     .trim()
     .describe("Name of the series (e.g., Supernova, 18-year-old)"),
-  brand: EntitySchema,
+  brand: EntitySchema.describe("The brand that produces this series"),
   fullName: z
     .string()
     .describe("Full name of the series (brand name + series name)")
     .readonly(),
-  description: z.string().nullable().default(null),
-  numReleases: z.number().default(0).readonly(),
+  description: z
+    .string()
+    .nullable()
+    .default(null)
+    .describe("Detailed description of the series"),
+  numReleases: z
+    .number()
+    .default(0)
+    .readonly()
+    .describe("Number of releases in this series"),
   createdAt: z
     .string()
     .datetime()
@@ -34,5 +42,5 @@ export const BottleSeriesInputSchema = BottleSeriesSchema.omit({
   createdAt: true,
   updatedAt: true,
 }).extend({
-  brand: z.number(),
+  brand: z.number().describe("ID of the brand that produces this series"),
 });

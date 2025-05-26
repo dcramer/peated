@@ -30,10 +30,17 @@ export const BottleSchema = z.object({
       "Series name for this bottling (e.g. Supernova for Ardbeg Supernova)",
     ),
 
-  category: CategoryEnum.nullable().default(null),
+  category: CategoryEnum.nullable()
+    .default(null)
+    .describe("Category of the whisky (e.g., Scotch, Bourbon, etc.)"),
 
   // <deprecated>: moving to editions
-  edition: z.string().trim().nullable().default(null),
+  edition: z
+    .string()
+    .trim()
+    .nullable()
+    .default(null)
+    .describe("Edition name or number for this bottling"),
   statedAge: z
     .number()
     .min(0)
