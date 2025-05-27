@@ -3,7 +3,7 @@ import Fathom from "@peated/web/components/fathom";
 import config from "@peated/web/config";
 import { getSession } from "@peated/web/lib/session.server";
 import "@peated/web/styles/index.css";
-import { setUser } from "@sentry/nextjs";
+import * as Sentry from "@sentry/nextjs";
 import type { Metadata, Viewport } from "next";
 import React from "react";
 import Providers from "./providers/providers";
@@ -23,16 +23,21 @@ export const viewport: Viewport = {
   themeColor: config.THEME_COLOR,
 };
 
-export const metadata: Metadata = {
-  title: {
-    template: "%s | Peated",
-    default: "Peated",
-  },
-  openGraph: {
-    siteName: "Peated",
-  },
-  description: config.DESCRIPTION,
-};
+export function generateMetadata(): Metadata {
+  return {
+    title: {
+      template: "%s | Peated",
+      default: "Peated",
+    },
+    openGraph: {
+      siteName: "Peated",
+    },
+    description: config.DESCRIPTION,
+    other: {
+      ...Sentry.getTraceData(),
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -45,7 +50,7 @@ export default async function RootLayout({
 
   // we need to bind the user on the server, but we also do this in providers
   // so it stays updated on the client appropriately
-  setUser(
+  Sentry.setUser(
     session.user
       ? {
           id: `${session.user.id}`,
