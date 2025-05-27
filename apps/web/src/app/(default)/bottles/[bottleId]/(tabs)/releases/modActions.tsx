@@ -17,7 +17,7 @@ export default function ModActions({ release }: { release: BottleRelease }) {
   const orpc = useORPC();
 
   const deleteBottleReleaseMutation = useMutation(
-    orpc.bottles.releases.delete.mutationOptions(),
+    orpc.bottleReleases.delete.mutationOptions(),
   );
 
   if (!user?.mod) return null;

@@ -13,7 +13,7 @@ import { describe, expect, it } from "vitest";
 describe("PATCH /bottle-releases/:release", () => {
   it("requires authentication", async () => {
     const err = await waitError(
-      routerClient.bottles.releases.update({
+      routerClient.bottleReleases.update({
         release: 1,
       }),
     );
@@ -22,7 +22,7 @@ describe("PATCH /bottle-releases/:release", () => {
 
   it("requires moderator access", async ({ defaults }) => {
     const err = await waitError(
-      routerClient.bottles.releases.update(
+      routerClient.bottleReleases.update(
         {
           release: 1,
         },
@@ -59,7 +59,7 @@ describe("PATCH /bottle-releases/:release", () => {
       vintageYear: 2009,
     };
 
-    const result = await routerClient.bottles.releases.update(data, {
+    const result = await routerClient.bottleReleases.update(data, {
       context: { user: modUser },
     });
 
@@ -116,7 +116,7 @@ describe("PATCH /bottle-releases/:release", () => {
     const modUser = await fixtures.User({ mod: true });
 
     const err = await waitError(
-      routerClient.bottles.releases.update(
+      routerClient.bottleReleases.update(
         {
           release: 999999,
         },
@@ -144,7 +144,7 @@ describe("PATCH /bottle-releases/:release", () => {
     });
 
     const err = await waitError(
-      routerClient.bottles.releases.update(
+      routerClient.bottleReleases.update(
         {
           release: release.id,
           statedAge: 12, // Different from bottle's statedAge
@@ -189,7 +189,7 @@ describe("PATCH /bottle-releases/:release", () => {
 
     // Try to update release2 to match release1's attributes
     const err = await waitError(
-      routerClient.bottles.releases.update(
+      routerClient.bottleReleases.update(
         {
           release: release2.id,
           edition: "Batch 1",
@@ -225,7 +225,7 @@ describe("PATCH /bottle-releases/:release", () => {
       caskStrength: true,
     };
 
-    const result = await routerClient.bottles.releases.update(data, {
+    const result = await routerClient.bottleReleases.update(data, {
       context: { user: modUser },
     });
 
@@ -268,7 +268,7 @@ describe("PATCH /bottle-releases/:release", () => {
       },
     };
 
-    const result = await routerClient.bottles.releases.update(data, {
+    const result = await routerClient.bottleReleases.update(data, {
       context: { user: modUser },
     });
 
@@ -308,7 +308,7 @@ describe("PATCH /bottle-releases/:release", () => {
     });
 
     const err = await waitError(
-      routerClient.bottles.releases.update(
+      routerClient.bottleReleases.update(
         {
           release: release.id,
           edition: null,
@@ -349,7 +349,7 @@ describe("PATCH /bottle-releases/:release", () => {
       releaseYear: 2021,
     };
 
-    const result = await routerClient.bottles.releases.update(data, {
+    const result = await routerClient.bottleReleases.update(data, {
       context: { user: modUser },
     });
 
@@ -392,7 +392,7 @@ describe("PATCH /bottle-releases/:release", () => {
       imageUrl: "https://example.com/new-image.jpg",
     };
 
-    const result = await routerClient.bottles.releases.update(data, {
+    const result = await routerClient.bottleReleases.update(data, {
       context: { user: modUser },
     });
 
@@ -429,7 +429,7 @@ describe("PATCH /bottle-releases/:release", () => {
 
     // Try to update with invalid data that will cause a conflict
     const err = await waitError(
-      routerClient.bottles.releases.update(
+      routerClient.bottleReleases.update(
         {
           release: release2.id,
           edition: "Batch 1", // Same as existing

@@ -23,7 +23,7 @@ describe("POST /bottle-aliases", () => {
     const bottle = await fixtures.Bottle();
     const user = await fixtures.User({ mod: true });
 
-    const result = await routerClient.bottles.aliases.upsert(
+    const result = await routerClient.bottleAliases.upsert(
       {
         bottle: bottle.id,
         name: "New Alias",
@@ -49,7 +49,7 @@ describe("POST /bottle-aliases", () => {
     });
     const user = await fixtures.User({ mod: true });
 
-    await routerClient.bottles.aliases.upsert(
+    await routerClient.bottleAliases.upsert(
       {
         bottle: bottle.id,
         name: "Test Alias",
@@ -72,7 +72,7 @@ describe("POST /bottle-aliases", () => {
     });
     const user = await fixtures.User({ mod: true });
 
-    await routerClient.bottles.aliases.upsert(
+    await routerClient.bottleAliases.upsert(
       {
         bottle: bottle.id,
         name: "Test Alias",
@@ -98,7 +98,7 @@ describe("POST /bottle-aliases", () => {
     });
     const user = await fixtures.User({ mod: true });
 
-    await routerClient.bottles.aliases.upsert(
+    await routerClient.bottleAliases.upsert(
       {
         bottle: bottle.id,
         name: "Test Alias",
@@ -117,7 +117,7 @@ describe("POST /bottle-aliases", () => {
     const user = await fixtures.User({ mod: true });
 
     const err = await waitError(
-      routerClient.bottles.aliases.upsert(
+      routerClient.bottleAliases.upsert(
         {
           bottle: 9999,
           name: "Test Alias",
@@ -134,7 +134,7 @@ describe("POST /bottle-aliases", () => {
     const user = await fixtures.User({ mod: false });
 
     const err = await waitError(
-      routerClient.bottles.aliases.upsert(
+      routerClient.bottleAliases.upsert(
         {
           bottle: bottle.id,
           name: "Test Alias",
@@ -158,7 +158,7 @@ describe("POST /bottle-aliases", () => {
     const user = await fixtures.User({ mod: true });
 
     const err = await waitError(
-      routerClient.bottles.aliases.upsert(
+      routerClient.bottleAliases.upsert(
         {
           bottle: bottle2.id,
           name: "Duplicate Alias",

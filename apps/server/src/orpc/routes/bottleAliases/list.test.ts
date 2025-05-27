@@ -9,7 +9,7 @@ describe("GET /bottle-aliases", () => {
       name: "Foo Bar",
     });
 
-    const { results } = await routerClient.bottles.aliases.list({
+    const { results } = await routerClient.bottleAliases.list({
       bottle: bottle.id,
     });
     expect(results.length).toEqual(2);
@@ -22,7 +22,7 @@ describe("GET /bottle-aliases", () => {
   test("lists unmatched aliases", async ({ fixtures }) => {
     await fixtures.BottleAlias({ name: "Foo", bottleId: null });
 
-    const { results } = await routerClient.bottles.aliases.list({
+    const { results } = await routerClient.bottleAliases.list({
       onlyUnknown: true,
     });
     expect(results.length).toEqual(1);

@@ -2,7 +2,10 @@ import admin from "./admin";
 import ai from "./ai";
 import auth from "./auth";
 import badges from "./badges";
+import bottleAliases from "./bottleAliases";
+import bottleReleases from "./bottleReleases";
 import bottles from "./bottles";
+import bottleSeries from "./bottleSeries";
 import changes from "./changes";
 import collections from "./collections";
 import comments from "./comments";
@@ -33,6 +36,9 @@ export interface Router {
   auth: typeof auth;
   badges: typeof badges;
   bottles: typeof bottles;
+  bottleAliases: typeof bottleAliases;
+  bottleReleases: typeof bottleReleases;
+  bottleSeries: typeof bottleSeries;
   changes: typeof changes;
   collections: typeof collections;
   comments: typeof comments;
@@ -64,6 +70,9 @@ export default {
   auth,
   badges,
   bottles,
+  bottleAliases,
+  bottleReleases,
+  bottleSeries,
   changes,
   collections,
   comments,

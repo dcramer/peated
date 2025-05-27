@@ -11,7 +11,7 @@ describe("GET /bottle-series/:series", () => {
       brandId: brand.id,
     });
 
-    const result = await routerClient.bottles.series.details({
+    const result = await routerClient.bottleSeries.details({
       series: series.id,
     });
 
@@ -30,7 +30,7 @@ describe("GET /bottle-series/:series", () => {
 
   it("returns 404 for non-existent series", async function () {
     const err = await waitError(
-      routerClient.bottles.series.details({
+      routerClient.bottleSeries.details({
         series: 999999,
       }),
     );

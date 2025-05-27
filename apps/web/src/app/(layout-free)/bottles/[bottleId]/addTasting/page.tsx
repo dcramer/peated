@@ -42,7 +42,7 @@ export default function AddTasting({
   // TODO: we want this to be suspense, but skipToken wont work
   const releaseQuery = useQuery(
     releaseId
-      ? orpc.bottles.releases.details.queryOptions({
+      ? orpc.bottleReleases.details.queryOptions({
           input: { release: Number(releaseId) },
         })
       : { queryFn: skipToken, queryKey: ["release", ""] },

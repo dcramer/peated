@@ -20,7 +20,7 @@ export default function Page({
   });
 
   const { data: releaseList } = useSuspenseQuery(
-    orpc.bottles.releases.list.queryOptions({
+    orpc.bottleReleases.list.queryOptions({
       input: queryParams,
     }),
   );

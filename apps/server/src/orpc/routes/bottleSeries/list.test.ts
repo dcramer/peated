@@ -25,7 +25,7 @@ describe("GET /bottle-series", () => {
       brandId: otherBrand.id,
     });
 
-    const { results } = await routerClient.bottles.series.list({
+    const { results } = await routerClient.bottleSeries.list({
       brand: brand.id,
     });
 
@@ -67,7 +67,7 @@ describe("GET /bottle-series", () => {
       brandId: brand.id,
     });
 
-    const { results } = await routerClient.bottles.series.list({
+    const { results } = await routerClient.bottleSeries.list({
       brand: brand.id,
       query: "supernova",
     });
@@ -88,7 +88,7 @@ describe("GET /bottle-series", () => {
     fixtures,
     defaults,
   }) {
-    const { results } = await routerClient.bottles.series.list({
+    const { results } = await routerClient.bottleSeries.list({
       brand: 12345,
     });
 

@@ -39,10 +39,10 @@ export default function Page() {
   const [assignments, setAssignments] = useState<Record<string, Bottle>>({});
 
   const bottleAliasUpdateMutation = useMutation(
-    orpc.bottles.aliases.update.mutationOptions(),
+    orpc.bottleAliases.update.mutationOptions(),
   );
   const bottleAliasUpsertMutation = useMutation(
-    orpc.bottles.aliases.upsert.mutationOptions(),
+    orpc.bottleAliases.upsert.mutationOptions(),
   );
 
   const { flash } = useFlashMessages();

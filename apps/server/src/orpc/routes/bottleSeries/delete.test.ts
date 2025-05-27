@@ -8,7 +8,7 @@ import { describe, expect, test } from "vitest";
 describe("DELETE /bottle-series/:series", () => {
   test("requires authentication", async () => {
     const err = await waitError(() =>
-      routerClient.bottles.series.delete({
+      routerClient.bottleSeries.delete({
         series: 1,
       }),
     );
@@ -17,7 +17,7 @@ describe("DELETE /bottle-series/:series", () => {
 
   test("requires moderator access", async ({ defaults }) => {
     const err = await waitError(() =>
-      routerClient.bottles.series.delete(
+      routerClient.bottleSeries.delete(
         {
           series: 1,
         },
@@ -49,7 +49,7 @@ describe("DELETE /bottle-series/:series", () => {
       seriesId: series.id,
     });
 
-    await routerClient.bottles.series.delete(
+    await routerClient.bottleSeries.delete(
       {
         series: series.id,
       },
@@ -96,7 +96,7 @@ describe("DELETE /bottle-series/:series", () => {
     const user = await fixtures.User({ admin: true });
 
     const err = await waitError(() =>
-      routerClient.bottles.series.delete(
+      routerClient.bottleSeries.delete(
         {
           series: 12345,
         },

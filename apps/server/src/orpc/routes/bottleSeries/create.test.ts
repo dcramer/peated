@@ -15,7 +15,7 @@ describe("POST /bottle-series", () => {
       brand: brand.id,
     };
 
-    const result = await routerClient.bottles.series.create(data, {
+    const result = await routerClient.bottleSeries.create(data, {
       context: { user: defaults.user },
     });
 
@@ -72,9 +72,7 @@ describe("POST /bottle-series", () => {
       brand: brand.id,
     };
 
-    const error = await waitError(() =>
-      routerClient.bottles.series.create(data),
-    );
+    const error = await waitError(() => routerClient.bottleSeries.create(data));
 
     expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -87,7 +85,7 @@ describe("POST /bottle-series", () => {
     };
 
     const error = await waitError(() =>
-      routerClient.bottles.series.create(data, {
+      routerClient.bottleSeries.create(data, {
         context: { user: defaults.user },
       }),
     );

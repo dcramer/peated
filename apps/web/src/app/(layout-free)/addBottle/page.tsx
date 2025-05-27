@@ -54,7 +54,7 @@ export default function AddBottle() {
         enabled: !!bottler,
       },
       {
-        ...orpc.bottles.series.details.queryOptions({
+        ...orpc.bottleSeries.details.queryOptions({
           input: { series: Number(series) },
         }),
         enabled: !!series,

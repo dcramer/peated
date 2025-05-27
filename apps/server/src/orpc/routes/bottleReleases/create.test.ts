@@ -30,7 +30,7 @@ describe("POST /bottle-releases", () => {
       caskFill: "refill" as const,
     };
 
-    const result = await routerClient.bottles.releases.create(data, {
+    const result = await routerClient.bottleReleases.create(data, {
       context: { user: defaults.user },
     });
 
@@ -118,7 +118,7 @@ describe("POST /bottle-releases", () => {
       caskFill: "refill" as const,
     };
 
-    const result = await routerClient.bottles.releases.create(data, {
+    const result = await routerClient.bottleReleases.create(data, {
       context: { user: defaults.user },
     });
 
@@ -199,7 +199,7 @@ describe("POST /bottle-releases", () => {
     };
 
     const err = await waitError(() =>
-      routerClient.bottles.releases.create(data, {
+      routerClient.bottleReleases.create(data, {
         context: { user: defaults.user },
       }),
     );
@@ -224,7 +224,7 @@ describe("POST /bottle-releases", () => {
     };
 
     const err = await waitError(() =>
-      routerClient.bottles.releases.create(data, {
+      routerClient.bottleReleases.create(data, {
         context: { user: defaults.user },
       }),
     );
@@ -261,7 +261,7 @@ describe("POST /bottle-releases", () => {
     };
 
     const err = await waitError(() =>
-      routerClient.bottles.releases.create(data, {
+      routerClient.bottleReleases.create(data, {
         context: { user: defaults.user },
       }),
     );
@@ -303,7 +303,7 @@ describe("POST /bottle-releases", () => {
     };
 
     const err = await waitError(() =>
-      routerClient.bottles.releases.create(data, {
+      routerClient.bottleReleases.create(data, {
         context: { user: defaults.user },
       }),
     );

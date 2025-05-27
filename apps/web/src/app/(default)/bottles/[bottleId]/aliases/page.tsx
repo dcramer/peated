@@ -16,12 +16,12 @@ export default function BottleAliases({
   const { user } = useAuth();
   const orpc = useORPC();
   const { data: aliasList } = useSuspenseQuery(
-    orpc.bottles.aliases.list.queryOptions({
+    orpc.bottleAliases.list.queryOptions({
       input: { bottle: Number(bottleId) },
     }),
   );
   const deleteAliasMutation = useMutation(
-    orpc.bottles.aliases.delete.mutationOptions(),
+    orpc.bottleAliases.delete.mutationOptions(),
   );
 
   return (

@@ -18,13 +18,13 @@ export default function Page({
     orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
   );
   const { data: release } = useSuspenseQuery(
-    orpc.bottles.releases.details.queryOptions({
+    orpc.bottleReleases.details.queryOptions({
       input: { release: Number(releaseId) },
     }),
   );
   const router = useRouter();
   const bottleReleaseUpdateMutation = useMutation(
-    orpc.bottles.releases.update.mutationOptions(),
+    orpc.bottleReleases.update.mutationOptions(),
   );
 
   return (
