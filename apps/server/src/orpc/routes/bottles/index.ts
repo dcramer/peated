@@ -1,5 +1,4 @@
 import { base } from "@peated/server/orpc";
-import aliases from "./aliases";
 import create from "./create";
 import delete_ from "./delete";
 import details from "./details";
@@ -7,8 +6,6 @@ import imageUpdate from "./image-update";
 import list from "./list";
 import merge from "./merge";
 import prices from "./prices";
-import releases from "./releases";
-import series from "./series";
 import similar from "./similar";
 import suggestedTags from "./suggested-tags";
 import tags from "./tags";
@@ -31,8 +28,5 @@ export default base.tag("bottles").router({
   imageUpdate,
   upsert,
   unmatched,
-  aliases,
-  releases,
-  series,
   prices,
 });

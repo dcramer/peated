@@ -25,7 +25,7 @@ export default function AddRelease({
   );
 
   const bottleReleaseCreateMutation = useMutation(
-    orpc.bottles.releases.create.mutationOptions(),
+    orpc.bottleReleases.create.mutationOptions(),
   );
 
   if (!bottle) return null;

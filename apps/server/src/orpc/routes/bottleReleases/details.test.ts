@@ -14,7 +14,7 @@ describe("GET /bottle-releases/:release", function () {
       abv: 40,
     });
 
-    const result = await routerClient.bottles.releases.details({
+    const result = await routerClient.bottleReleases.details({
       release: release.id,
     });
 
@@ -26,7 +26,7 @@ describe("GET /bottle-releases/:release", function () {
 
   it("errors on invalid release", async function () {
     const err = await waitError(
-      routerClient.bottles.releases.details({
+      routerClient.bottleReleases.details({
         release: 1234,
       }),
     );

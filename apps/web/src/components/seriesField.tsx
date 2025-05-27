@@ -25,7 +25,7 @@ export default function SeriesField({
   return (
     <SelectField<Option>
       onQuery={async (query) => {
-        const { results } = await orpc.bottles.series.list.call({
+        const { results } = await orpc.bottleSeries.list.call({
           query,
           brand,
         });

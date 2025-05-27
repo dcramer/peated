@@ -20,7 +20,7 @@ describe("GET /bottles/:bottle/releases", () => {
       name: "C",
     });
 
-    const { results, rel } = await routerClient.bottles.releases.list({
+    const { results, rel } = await routerClient.bottleReleases.list({
       bottle: bottle.id,
       limit: 2,
     });
@@ -34,7 +34,7 @@ describe("GET /bottles/:bottle/releases", () => {
 
   it("errors on invalid bottle", async () => {
     const err = await waitError(
-      routerClient.bottles.releases.list({
+      routerClient.bottleReleases.list({
         bottle: 1,
       }),
     );
@@ -54,7 +54,7 @@ describe("GET /bottles/:bottle/releases", () => {
       name: "B",
     });
 
-    const { results, rel } = await routerClient.bottles.releases.list({
+    const { results, rel } = await routerClient.bottleReleases.list({
       bottle: bottle.id,
     });
 
@@ -76,7 +76,7 @@ describe("GET /bottles/:bottle/releases", () => {
       name: "B",
     });
 
-    const { results, rel } = await routerClient.bottles.releases.list({
+    const { results, rel } = await routerClient.bottleReleases.list({
       bottle: bottle.id,
     });
 

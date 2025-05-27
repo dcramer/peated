@@ -44,7 +44,7 @@ export default function ReleaseField({
   return (
     <SelectField<Option>
       onQuery={async (query) => {
-        const { results } = await orpc.bottles.releases.list.call({
+        const { results } = await orpc.bottleReleases.list.call({
           query,
           bottle,
         });

@@ -52,7 +52,7 @@ describe("DELETE /bottle-releases/:release", () => {
     });
 
     // Delete the release
-    await routerClient.bottles.releases.delete(
+    await routerClient.bottleReleases.delete(
       { release: release.id },
       {
         context: { user: admin },
@@ -117,7 +117,7 @@ describe("DELETE /bottle-releases/:release", () => {
     const admin = await fixtures.User({ admin: true });
 
     const err = await waitError(() =>
-      routerClient.bottles.releases.delete(
+      routerClient.bottleReleases.delete(
         { release: 999999 },
         {
           context: { user: admin },

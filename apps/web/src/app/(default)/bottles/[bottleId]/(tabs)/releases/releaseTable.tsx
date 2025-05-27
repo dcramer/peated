@@ -13,7 +13,7 @@ export default function ReleaseTable({
   releaseList,
 }: {
   bottleId: number;
-  releaseList: Outputs["bottles"]["releases"]["list"];
+  releaseList: Outputs["bottleReleases"]["list"];
 }) {
   if (!releaseList.results.length) {
     return (

@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 describe("PATCH /bottle-series/:series", () => {
   it("requires authentication", async () => {
     const err = await waitError(
-      routerClient.bottles.series.update({
+      routerClient.bottleSeries.update({
         series: 1,
       }),
     );
@@ -17,7 +17,7 @@ describe("PATCH /bottle-series/:series", () => {
 
   it("requires moderator access", async ({ defaults }) => {
     const err = await waitError(
-      routerClient.bottles.series.update(
+      routerClient.bottleSeries.update(
         {
           series: 1,
         },
@@ -43,7 +43,7 @@ describe("PATCH /bottle-series/:series", () => {
       description: "The updated series description",
     };
 
-    const result = await routerClient.bottles.series.update(data, {
+    const result = await routerClient.bottleSeries.update(data, {
       context: { user },
     });
 
@@ -94,7 +94,7 @@ describe("PATCH /bottle-series/:series", () => {
     });
 
     const err = await waitError(
-      routerClient.bottles.series.update(
+      routerClient.bottleSeries.update(
         {
           series: series2.id,
           name: series1.name,
@@ -119,7 +119,7 @@ describe("PATCH /bottle-series/:series", () => {
     });
 
     // Update only the name
-    const result = await routerClient.bottles.series.update(
+    const result = await routerClient.bottleSeries.update(
       {
         series: series.id,
         name: "Updated Series",

@@ -10,7 +10,7 @@ describe("PUT /bottle-aliases/:name", () => {
     const user = await fixtures.User();
 
     const err = await waitError(
-      routerClient.bottles.aliases.update(
+      routerClient.bottleAliases.update(
         {
           alias: alias.name,
         },
@@ -24,7 +24,7 @@ describe("PUT /bottle-aliases/:name", () => {
     const alias = await fixtures.BottleAlias({ ignored: false });
     const user = await fixtures.User({ admin: true });
 
-    await routerClient.bottles.aliases.update(
+    await routerClient.bottleAliases.update(
       {
         alias: alias.name,
         ignored: true,
