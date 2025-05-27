@@ -17,7 +17,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "POST", path: "/bottle-releases" })
+  .route({
+    method: "POST",
+    path: "/bottle-releases",
+    summary: "Create bottle release",
+    description:
+      "Create a new bottle release with specific edition, vintage, and cask details. Requires authentication",
+  })
   .input(
     BottleReleaseInputSchema.extend({
       bottle: z.coerce.number(),

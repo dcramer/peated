@@ -11,7 +11,13 @@ import type { BadgeCheck } from "@peated/server/types";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "POST", path: "/badges" })
+  .route({
+    method: "POST",
+    path: "/badges",
+    summary: "Create badge",
+    description:
+      "Create a new achievement badge with validation checks and configuration. Requires admin privileges",
+  })
   .input(BadgeInputSchema)
   .output(BadgeSchema)
   .handler(async function ({ input, context, errors }) {

@@ -6,7 +6,13 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "POST", path: "/auth/magic-link" })
+  .route({
+    method: "POST",
+    path: "/auth/magic-link",
+    summary: "Create magic link",
+    description:
+      "Send a magic link authentication email to the specified email address",
+  })
   .input(
     z.object({
       email: z.string().email(),

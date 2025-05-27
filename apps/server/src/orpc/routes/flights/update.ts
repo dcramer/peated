@@ -13,7 +13,13 @@ const InputSchema = FlightInputSchema.partial().extend({
 });
 
 export default procedure
-  .route({ method: "PATCH", path: "/flights/{flight}" })
+  .route({
+    method: "PATCH",
+    path: "/flights/{flight}",
+    summary: "Update flight",
+    description:
+      "Update flight information including name, description, and bottle list. Only the flight creator or moderator can update",
+  })
   .use(requireAuth)
   .input(InputSchema)
   .output(FlightSchema)

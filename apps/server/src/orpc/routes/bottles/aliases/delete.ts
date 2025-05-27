@@ -7,7 +7,13 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "DELETE", path: "/bottle-aliases/{alias}" })
+  .route({
+    method: "DELETE",
+    path: "/bottle-aliases/{alias}",
+    summary: "Delete bottle alias",
+    description:
+      "Remove bottle alias association and clear related references. Cannot delete canonical names. Requires moderator privileges",
+  })
   .use(requireMod)
   .input(z.object({ alias: z.string() }))
   .output(z.object({}))

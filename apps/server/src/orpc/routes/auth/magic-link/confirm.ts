@@ -12,7 +12,13 @@ import { z } from "zod";
 const TOKEN_CUTOFF = 600; // 10 minutes
 
 export default procedure
-  .route({ method: "POST", path: "/auth/magic-link/confirm" })
+  .route({
+    method: "POST",
+    path: "/auth/magic-link/confirm",
+    summary: "Confirm magic link",
+    description:
+      "Confirm magic link authentication and return access token. Automatically verifies the user account",
+  })
   .input(
     z.object({
       token: z.string(),

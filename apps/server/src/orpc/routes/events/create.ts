@@ -8,7 +8,13 @@ import { EventSerializer } from "@peated/server/serializers/event";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "POST", path: "/events" })
+  .route({
+    method: "POST",
+    path: "/events",
+    summary: "Create event",
+    description:
+      "Create a new whisky event with dates and details. Requires admin privileges",
+  })
   .input(EventInputSchema)
   .output(EventSchema)
   .handler(async function ({ input, context, errors }) {

@@ -12,7 +12,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "DELETE", path: "/entities/{entity}" })
+  .route({
+    method: "DELETE",
+    path: "/entities/{entity}",
+    summary: "Delete entity",
+    description:
+      "Delete an entity and create a tombstone record. Removes associated aliases. Requires admin privileges",
+  })
   .input(z.object({ entity: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {

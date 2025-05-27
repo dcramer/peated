@@ -16,7 +16,13 @@ import {
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/bottles/{bottle}/prices" })
+  .route({
+    method: "GET",
+    path: "/bottles/{bottle}/prices",
+    summary: "List bottle prices",
+    description:
+      "Retrieve current and historical prices for a specific bottle from various external sites",
+  })
   .input(
     z.object({
       bottle: z.coerce.number(),

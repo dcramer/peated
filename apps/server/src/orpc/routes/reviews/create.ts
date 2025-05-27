@@ -22,7 +22,13 @@ import bottleCreate from "../bottles/create";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "POST", path: "/reviews" })
+  .route({
+    method: "POST",
+    path: "/reviews",
+    summary: "Create review",
+    description:
+      "Create a new review from external site data with automatic bottle matching and alias creation. Requires admin privileges",
+  })
   .input(ReviewInputSchema)
   .output(ReviewSchema)
   .handler(async function ({ input, context, errors }) {

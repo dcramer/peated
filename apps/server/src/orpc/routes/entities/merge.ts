@@ -11,7 +11,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "POST", path: "/entities/{entity}/merge" })
+  .route({
+    method: "POST",
+    path: "/entities/{entity}/merge",
+    summary: "Merge entities",
+    description:
+      "Merge two entities together, combining their data and references. Requires moderator privileges",
+  })
   .input(
     z.object({
       entity: z.coerce.number(),

@@ -13,7 +13,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "PATCH", path: "/badges/{badge}" })
+  .route({
+    method: "PATCH",
+    path: "/badges/{badge}",
+    summary: "Update badge",
+    description:
+      "Update badge information including name, description, and validation checks. Requires admin privileges",
+  })
   .input(
     BadgeInputSchema.partial().extend({
       badge: z.coerce.number(),

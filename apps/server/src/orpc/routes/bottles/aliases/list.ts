@@ -27,7 +27,13 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "GET", path: "/bottle-aliases" })
+  .route({
+    method: "GET",
+    path: "/bottle-aliases",
+    summary: "List bottle aliases",
+    description:
+      "Retrieve bottle aliases with filtering by bottle, unknown status, and search support",
+  })
   .input(
     z
       .object({

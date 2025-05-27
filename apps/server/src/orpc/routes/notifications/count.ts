@@ -8,7 +8,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "GET", path: "/notifications/count" })
+  .route({
+    method: "GET",
+    path: "/notifications/count",
+    summary: "Count notifications",
+    description:
+      "Get the count of user notifications with optional filtering by read status",
+  })
   .input(
     z
       .object({

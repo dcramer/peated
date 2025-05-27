@@ -8,7 +8,13 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/tags/{tag}" })
+  .route({
+    method: "GET",
+    path: "/tags/{tag}",
+    summary: "Get tag details",
+    description:
+      "Retrieve detailed information about a specific tag by its name",
+  })
   .input(z.object({ tag: z.string() }))
   .output(TagSchema)
   .handler(async function ({ input, context, errors }) {

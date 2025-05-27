@@ -8,7 +8,13 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/bottle-releases/{release}" })
+  .route({
+    method: "GET",
+    path: "/bottle-releases/{release}",
+    summary: "Get bottle release details",
+    description:
+      "Retrieve detailed information about a specific bottle release including bottle and creator information",
+  })
   .input(z.object({ release: z.coerce.number() }))
   .output(BottleReleaseSchema)
   .handler(async function ({ input, context, errors }) {

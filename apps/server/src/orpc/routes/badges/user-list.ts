@@ -72,7 +72,13 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "GET", path: "/badges/{badge}/users" })
+  .route({
+    method: "GET",
+    path: "/badges/{badge}/users",
+    summary: "List badge users",
+    description:
+      "Retrieve users who have earned a specific badge, ordered by XP. Requires authentication",
+  })
   .use(requireAuth)
   .input(InputSchema)
   .output(OutputSchema)

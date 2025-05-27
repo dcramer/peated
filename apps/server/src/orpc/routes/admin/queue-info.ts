@@ -16,7 +16,13 @@ type QueueInfoType = z.infer<typeof QueueInfoSchema>;
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "GET", path: "/admin/queue/info" })
+  .route({
+    method: "GET",
+    path: "/admin/queue/info",
+    summary: "Get queue information",
+    description:
+      "Retrieve job queue statistics including waiting, active, completed, and failed jobs. Requires admin privileges",
+  })
   .output(QueueInfoSchema)
   .handler(async function () {
     const queue = await getQueue("default");

@@ -7,7 +7,13 @@ import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "POST", path: "/email/verify" })
+  .route({
+    method: "POST",
+    path: "/email/verify",
+    summary: "Verify email",
+    description:
+      "Verify user email address using verification token from email",
+  })
   .input(z.object({ token: z.string() }))
   .output(z.object({}))
   .handler(async function ({ input, errors }) {

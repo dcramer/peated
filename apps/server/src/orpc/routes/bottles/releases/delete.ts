@@ -15,7 +15,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "DELETE", path: "/bottle-releases/{release}" })
+  .route({
+    method: "DELETE",
+    path: "/bottle-releases/{release}",
+    summary: "Delete bottle release",
+    description:
+      "Delete a bottle release and remove its references from related entities. Requires admin privileges",
+  })
   .input(z.object({ release: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {

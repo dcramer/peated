@@ -9,7 +9,13 @@ import { TagSerializer } from "@peated/server/serializers/tag";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "POST", path: "/tags" })
+  .route({
+    method: "POST",
+    path: "/tags",
+    summary: "Create tag",
+    description:
+      "Create a new tag with synonyms, category, and flavor profiles. Requires moderator privileges",
+  })
   .input(TagInputSchema)
   .output(TagSchema)
   .handler(async function ({ input, context, errors }) {

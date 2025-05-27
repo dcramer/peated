@@ -6,7 +6,13 @@ import { sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/users/{user}/tags" })
+  .route({
+    method: "GET",
+    path: "/users/{user}/tags",
+    summary: "List user tags",
+    description:
+      "Retrieve tags used by a user in their tastings with usage counts. Respects privacy settings",
+  })
   .input(
     z.object({
       user: z.union([z.literal("me"), z.string(), z.coerce.number()]),

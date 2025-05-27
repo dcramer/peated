@@ -8,7 +8,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "GET", path: "/external-sites/{site}/config/{key}" })
+  .route({
+    method: "GET",
+    path: "/external-sites/{site}/config/{key}",
+    summary: "Get external site config",
+    description:
+      "Retrieve a configuration value for an external site. Returns default if not set. Requires admin privileges",
+  })
   .input(
     z.object({
       site: ExternalSiteTypeEnum,

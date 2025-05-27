@@ -38,7 +38,13 @@ const OutputSchema = z.object({
 
 export default procedure
   .use(requireMod)
-  .route({ method: "GET", path: "/bottles/unmatched" })
+  .route({
+    method: "GET",
+    path: "/bottles/unmatched",
+    summary: "List unmatched bottles",
+    description:
+      "Retrieve bottle aliases that haven't been matched to existing bottles, with example store listings. Requires moderator privileges",
+  })
   .input(
     z
       .object({

@@ -8,7 +8,12 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/events/{event}" })
+  .route({
+    method: "GET",
+    path: "/events/{event}",
+    summary: "Get event details",
+    description: "Retrieve detailed information about a specific whisky event",
+  })
   .input(z.object({ event: z.coerce.number() }))
   .output(EventSchema)
   .handler(async function ({ input, context, errors }) {

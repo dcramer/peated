@@ -5,7 +5,13 @@ import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/entities/{entity}/aliases" })
+  .route({
+    method: "GET",
+    path: "/entities/{entity}/aliases",
+    summary: "List entity aliases",
+    description:
+      "Retrieve all aliases for a specific entity, indicating which is canonical",
+  })
   .input(
     z.object({
       entity: z.coerce.number(),

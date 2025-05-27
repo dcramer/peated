@@ -15,7 +15,13 @@ const InputSchema = z.object({
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/reviews/{review}" })
+  .route({
+    method: "PATCH",
+    path: "/reviews/{review}",
+    summary: "Update review",
+    description:
+      "Update review properties such as visibility. Requires moderator privileges",
+  })
   .input(
     InputSchema.partial().extend({
       review: z.coerce.number(),

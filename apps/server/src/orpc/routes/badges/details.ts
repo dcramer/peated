@@ -8,7 +8,13 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/badges/{badge}" })
+  .route({
+    method: "GET",
+    path: "/badges/{badge}",
+    summary: "Get badge details",
+    description:
+      "Retrieve detailed information about a specific achievement badge",
+  })
   .input(z.object({ badge: z.coerce.number() }))
   .output(BadgeSchema)
   .handler(async function ({ input, context, errors }) {

@@ -13,7 +13,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "POST", path: "/users/{user}/avatar" })
+  .route({
+    method: "POST",
+    path: "/users/{user}/avatar",
+    summary: "Update user avatar",
+    description:
+      "Upload and update a user's avatar image with automatic compression and resizing. Requires authentication and ownership or admin privileges",
+  })
   .input(
     z.object({
       user: z.union([z.coerce.number(), z.literal("me")]),

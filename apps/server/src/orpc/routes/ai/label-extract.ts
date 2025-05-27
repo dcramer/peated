@@ -27,7 +27,13 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "POST", path: "/ai/extract-labels" })
+  .route({
+    method: "POST",
+    path: "/ai/extract-labels",
+    summary: "Extract bottle information from labels",
+    description:
+      "Use AI to extract bottle details from image URLs or text labels including brand, expression, age, and other metadata",
+  })
   .input(InputSchema)
   .output(OutputSchema)
   .handler(async function ({ input, errors }) {

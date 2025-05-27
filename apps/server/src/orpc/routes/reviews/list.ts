@@ -33,7 +33,13 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "GET", path: "/reviews" })
+  .route({
+    method: "GET",
+    path: "/reviews",
+    summary: "List reviews",
+    description:
+      "Retrieve reviews with filtering by site, bottle, and unknown status. Requires moderator privileges for full access",
+  })
   .input(InputSchema)
   .output(OutputSchema)
   .handler(async function ({

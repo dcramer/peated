@@ -22,7 +22,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "POST", path: "/external-sites/{site}/prices" })
+  .route({
+    method: "POST",
+    path: "/external-sites/{site}/prices",
+    summary: "Create batch prices",
+    description:
+      "Bulk create or update store prices for an external site with automatic bottle matching and alias creation. Requires admin privileges",
+  })
   .input(
     z.object({
       site: ExternalSiteTypeEnum,

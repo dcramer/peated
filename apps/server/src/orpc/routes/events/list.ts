@@ -35,7 +35,13 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "GET", path: "/events" })
+  .route({
+    method: "GET",
+    path: "/events",
+    summary: "List events",
+    description:
+      "Retrieve whisky events with filtering by upcoming dates, search, and sorting options",
+  })
   .input(InputSchema)
   .output(OutputSchema)
   .handler(async function ({

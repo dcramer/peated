@@ -10,7 +10,13 @@ import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/countries/categories" })
+  .route({
+    method: "GET",
+    path: "/countries/categories",
+    summary: "Get country categories",
+    description:
+      "Retrieve whisky categories and their counts for a specific country based on distillery locations",
+  })
   .input(
     z.object({
       country: z.union([z.string(), z.coerce.number()]),

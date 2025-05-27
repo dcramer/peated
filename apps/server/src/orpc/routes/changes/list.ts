@@ -9,7 +9,13 @@ import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/changes" })
+  .route({
+    method: "GET",
+    path: "/changes",
+    summary: "List changes",
+    description:
+      "Retrieve change history for bottles and entities with filtering by user and object type",
+  })
   .input(
     z.object({
       user: z.union([z.literal("me"), z.coerce.number()]).optional(),

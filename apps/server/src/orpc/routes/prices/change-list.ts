@@ -26,7 +26,13 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "GET", path: "/price-changes" })
+  .route({
+    method: "GET",
+    path: "/price-changes",
+    summary: "List price changes",
+    description:
+      "Retrieve significant bottle price changes from the past week with search and pagination support",
+  })
   .input(InputSchema)
   .output(OutputSchema)
   .handler(async function ({ input: { query, cursor, limit }, context }) {

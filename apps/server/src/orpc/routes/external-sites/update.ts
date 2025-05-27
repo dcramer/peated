@@ -14,7 +14,13 @@ import { eq } from "drizzle-orm";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "PATCH", path: "/external-sites/{site}" })
+  .route({
+    method: "PATCH",
+    path: "/external-sites/{site}",
+    summary: "Update external site",
+    description:
+      "Update external site configuration including name, type, and run frequency. Requires admin privileges",
+  })
   .input(
     ExternalSiteInputSchema.partial().extend({
       site: ExternalSiteTypeEnum,

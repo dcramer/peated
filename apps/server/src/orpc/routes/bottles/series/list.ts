@@ -9,7 +9,13 @@ import { and, asc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/bottle-series" })
+  .route({
+    method: "GET",
+    path: "/bottle-series",
+    summary: "List bottle series",
+    description:
+      "Retrieve bottle series for a specific brand with search and pagination support",
+  })
   .input(
     z.object({
       query: z.coerce.string().default(""),

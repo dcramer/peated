@@ -27,7 +27,13 @@ const SORT_OPTIONS = [
 const DEFAULT_SORT = "releaseYear";
 
 export default procedure
-  .route({ method: "GET", path: "/bottles/{bottle}/releases" })
+  .route({
+    method: "GET",
+    path: "/bottles/{bottle}/releases",
+    summary: "List bottle releases",
+    description:
+      "Retrieve releases for a specific bottle with search, sorting, and pagination support",
+  })
   .input(
     z.object({
       bottle: z.coerce.number(),

@@ -12,7 +12,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/tags/{tag}" })
+  .route({
+    method: "PATCH",
+    path: "/tags/{tag}",
+    summary: "Update tag",
+    description:
+      "Update tag properties including category, flavor profiles, and synonyms. Requires moderator privileges",
+  })
   .input(
     TagInputSchema.partial().extend({
       tag: z.string(),

@@ -5,7 +5,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "POST", path: "/email/resend-verification" })
+  .route({
+    method: "POST",
+    path: "/email/resend-verification",
+    summary: "Resend verification email",
+    description:
+      "Resend email verification to the authenticated user's email address",
+  })
   .input(z.void())
   .output(z.object({}))
   .handler(async function ({ context: { user }, errors }) {

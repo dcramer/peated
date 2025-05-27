@@ -6,7 +6,12 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "DELETE", path: "/flights/{flight}" })
+  .route({
+    method: "DELETE",
+    path: "/flights/{flight}",
+    summary: "Delete flight",
+    description: "Delete a tasting flight. Requires admin privileges",
+  })
   .use(requireAdmin)
   .input(
     z.object({

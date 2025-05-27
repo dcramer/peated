@@ -11,7 +11,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "PATCH", path: "/events/{event}" })
+  .route({
+    method: "PATCH",
+    path: "/events/{event}",
+    summary: "Update event",
+    description:
+      "Update event information including dates, location, and details. Requires admin privileges",
+  })
   .input(EventInputSchema.partial().extend({ event: z.coerce.number() }))
   .output(EventSchema)
   .handler(async function ({ input, context, errors }) {

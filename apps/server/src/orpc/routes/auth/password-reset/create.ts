@@ -6,7 +6,12 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "POST", path: "/auth/password-reset" })
+  .route({
+    method: "POST",
+    path: "/auth/password-reset",
+    summary: "Request password reset",
+    description: "Send a password reset email to the specified email address",
+  })
   .input(
     z.object({
       email: z.string().email(),

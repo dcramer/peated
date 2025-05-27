@@ -9,7 +9,13 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/entities/{entity}/categories" })
+  .route({
+    method: "GET",
+    path: "/entities/{entity}/categories",
+    summary: "List entity categories",
+    description:
+      "Retrieve whisky categories and their counts for bottles associated with a specific entity",
+  })
   .input(
     z.object({
       entity: z.coerce.number(),

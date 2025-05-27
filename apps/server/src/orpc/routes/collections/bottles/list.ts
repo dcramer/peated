@@ -18,6 +18,9 @@ export default procedure
   .route({
     method: "GET",
     path: "/users/{user}/collections/{collection}/bottles",
+    summary: "List collection bottles",
+    description:
+      "Retrieve bottles in a user's collection with pagination support. Respects privacy settings",
   })
   .input(
     z.object({

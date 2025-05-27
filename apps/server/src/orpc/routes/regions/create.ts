@@ -13,7 +13,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "POST", path: "/countries/{country}/regions" })
+  .route({
+    method: "POST",
+    path: "/countries/{country}/regions",
+    summary: "Create region",
+    description:
+      "Create a new region within a country with automatic slug generation. Requires moderator privileges",
+  })
   .input(RegionInputSchema.extend({ country: z.string() }))
   .output(RegionSchema)
   .handler(async function ({ input, context, errors }) {

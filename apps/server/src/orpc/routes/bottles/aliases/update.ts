@@ -16,7 +16,13 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "PATCH", path: "/bottle-aliases/{alias}" })
+  .route({
+    method: "PATCH",
+    path: "/bottle-aliases/{alias}",
+    summary: "Update bottle alias",
+    description:
+      "Update bottle alias properties such as ignored status. Requires moderator privileges",
+  })
   .use(requireMod)
   .input(InputSchema)
   .output(OutputSchema)

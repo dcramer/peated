@@ -7,7 +7,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "DELETE", path: "/tastings/{tasting}/image" })
+  .route({
+    method: "DELETE",
+    path: "/tastings/{tasting}/image",
+    summary: "Delete tasting image",
+    description:
+      "Remove the image from a tasting. Requires authentication and ownership or admin privileges",
+  })
   .input(z.object({ tasting: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {

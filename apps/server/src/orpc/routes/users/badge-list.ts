@@ -9,7 +9,13 @@ import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/users/{user}/badges" })
+  .route({
+    method: "GET",
+    path: "/users/{user}/badges",
+    summary: "List user badges",
+    description:
+      "Retrieve badges earned by a user with pagination support. Respects privacy settings",
+  })
   .input(
     z.object({
       user: z.union([z.literal("me"), z.string(), z.coerce.number()]),

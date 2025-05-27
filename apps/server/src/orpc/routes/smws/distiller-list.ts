@@ -17,7 +17,13 @@ const OutputSchema = z.object({
 });
 
 export default procedure
-  .route({ method: "GET", path: "/smws/distillers" })
+  .route({
+    method: "GET",
+    path: "/smws/distillers",
+    summary: "List SMWS distillers",
+    description:
+      "Retrieve distillers that are part of the Scotch Malt Whisky Society (SMWS) system",
+  })
   .output(OutputSchema)
   .handler(async function ({ context }) {
     const results = await db

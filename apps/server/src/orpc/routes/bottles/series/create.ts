@@ -13,7 +13,13 @@ import { pushJob } from "@peated/server/worker/client";
 import { eq, sql } from "drizzle-orm";
 
 export default procedure
-  .route({ method: "POST", path: "/bottle-series" })
+  .route({
+    method: "POST",
+    path: "/bottle-series",
+    summary: "Create bottle series",
+    description:
+      "Create a new bottle series for a brand with name and description",
+  })
   .use(requireAuth)
   .input(BottleSeriesInputSchema)
   .output(BottleSeriesSchema)

@@ -10,7 +10,13 @@ import { bottleNormalize } from "./validation";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PUT", path: "/bottles" })
+  .route({
+    method: "PUT",
+    path: "/bottles",
+    summary: "Upsert bottle",
+    description:
+      "Create a new bottle or update existing one if it already exists. Requires moderator privileges",
+  })
   .input(BottleInputSchema)
   .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {

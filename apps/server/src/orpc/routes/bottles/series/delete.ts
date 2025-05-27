@@ -7,7 +7,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "DELETE", path: "/bottle-series/{series}" })
+  .route({
+    method: "DELETE",
+    path: "/bottle-series/{series}",
+    summary: "Delete bottle series",
+    description:
+      "Delete a bottle series and remove its reference from associated bottles. Requires moderator privileges",
+  })
   .input(z.object({ series: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {

@@ -15,7 +15,13 @@ const OutputSchema = z.object({
 
 export default procedure
   .use(requireMod)
-  .route({ method: "POST", path: "/ai/region-lookup" })
+  .route({
+    method: "POST",
+    path: "/ai/region-lookup",
+    summary: "AI region lookup",
+    description:
+      "Use AI to generate region details and descriptions for a specific country. Requires moderator privileges",
+  })
   .input(InputSchema)
   .output(OutputSchema)
   .handler(async function ({ input, context, errors }) {

@@ -8,7 +8,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "DELETE", path: "/entity-aliases/{name}" })
+  .route({
+    method: "DELETE",
+    path: "/entity-aliases/{name}",
+    summary: "Delete entity alias",
+    description:
+      "Remove entity alias association. Cannot delete canonical names. Requires moderator privileges",
+  })
   .input(
     z.object({
       name: z.string(),

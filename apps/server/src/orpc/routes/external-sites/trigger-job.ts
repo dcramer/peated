@@ -10,7 +10,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "POST", path: "/external-sites/{site}/trigger" })
+  .route({
+    method: "POST",
+    path: "/external-sites/{site}/trigger",
+    summary: "Trigger external site job",
+    description:
+      "Manually trigger a scraping job for an external site. Requires admin privileges",
+  })
   .input(
     z.object({
       site: ExternalSiteTypeEnum,

@@ -11,7 +11,13 @@ import { ExternalSiteSerializer } from "@peated/server/serializers/externalSite"
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "POST", path: "/external-sites" })
+  .route({
+    method: "POST",
+    path: "/external-sites",
+    summary: "Create external site",
+    description:
+      "Create a new external site configuration for price scraping or data integration. Requires admin privileges",
+  })
   .input(ExternalSiteInputSchema)
   .output(ExternalSiteSchema)
   .handler(async function ({ input, context, errors }) {

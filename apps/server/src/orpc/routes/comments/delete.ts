@@ -8,7 +8,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "DELETE", path: "/comments/{comment}" })
+  .route({
+    method: "DELETE",
+    path: "/comments/{comment}",
+    summary: "Delete comment",
+    description:
+      "Delete a comment and update related counters. Requires authentication and ownership or admin privileges",
+  })
   // .route({
   //   method: "DELETE",
   //   path: "/tastings/{tasting}/comments/{id}",

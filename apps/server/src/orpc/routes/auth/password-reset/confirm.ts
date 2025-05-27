@@ -16,7 +16,13 @@ import { z } from "zod";
 const TOKEN_CUTOFF = 600; // 10 minutes
 
 export default procedure
-  .route({ method: "POST", path: "/auth/password-reset/confirm" })
+  .route({
+    method: "POST",
+    path: "/auth/password-reset/confirm",
+    summary: "Confirm password reset",
+    description:
+      "Confirm password reset using token from email and set new password. Automatically verifies the user account",
+  })
   .input(
     z.object({
       token: z.string(),

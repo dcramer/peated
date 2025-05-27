@@ -13,7 +13,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
-  .route({ method: "POST", path: "/tastings/{tasting}/image" })
+  .route({
+    method: "POST",
+    path: "/tastings/{tasting}/image",
+    summary: "Update tasting image",
+    description:
+      "Upload and update the image for a tasting with automatic compression and resizing. Requires authentication and ownership or admin privileges",
+  })
   .input(
     z.object({
       tasting: z.coerce.number(),

@@ -23,7 +23,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/entities/{entity}" })
+  .route({
+    method: "PATCH",
+    path: "/entities/{entity}",
+    summary: "Update entity",
+    description:
+      "Update entity information including name, location, type, and description. Automatically updates related bottles and aliases. Requires moderator privileges",
+  })
   .input(
     EntityInputSchema.partial().extend({
       entity: z.number(),

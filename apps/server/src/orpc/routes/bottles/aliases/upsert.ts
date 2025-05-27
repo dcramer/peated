@@ -16,7 +16,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PUT", path: "/bottle-aliases" })
+  .route({
+    method: "PUT",
+    path: "/bottle-aliases",
+    summary: "Upsert bottle alias",
+    description:
+      "Create or update a bottle alias and associate it with a bottle. Updates related prices and reviews. Requires moderator privileges",
+  })
   .input(BottleAliasSchema)
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {

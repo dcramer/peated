@@ -11,7 +11,13 @@ import { z } from "zod";
 export default procedure
   .use(requireAuth)
   // TODO: better path
-  .route({ method: "DELETE", path: "/friends/{user}" })
+  .route({
+    method: "DELETE",
+    path: "/friends/{user}",
+    summary: "Remove friend",
+    description:
+      "Remove a friend relationship and cancel any pending friend requests. Requires authentication",
+  })
   .input(z.object({ user: z.coerce.number() }))
   .output(
     z.object({

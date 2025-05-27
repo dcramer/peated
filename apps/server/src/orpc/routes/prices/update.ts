@@ -15,7 +15,13 @@ const InputSchema = z.object({
 
 export default procedure
   .use(requireMod)
-  .route({ method: "PATCH", path: "/prices/{price}" })
+  .route({
+    method: "PATCH",
+    path: "/prices/{price}",
+    summary: "Update price",
+    description:
+      "Update store price properties such as visibility. Requires moderator privileges",
+  })
   .input(InputSchema)
   .output(StorePriceSchema)
   .handler(async function ({ input, context, errors }) {

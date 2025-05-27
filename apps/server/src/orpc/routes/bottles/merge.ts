@@ -11,7 +11,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireMod)
-  .route({ method: "POST", path: "/bottles/{bottle}/merge-targets" })
+  .route({
+    method: "POST",
+    path: "/bottles/{bottle}/merge-targets",
+    summary: "Merge bottles",
+    description:
+      "Merge two bottles together, combining their data and references. Requires moderator privileges",
+  })
   .input(
     z.object({
       bottle: z.coerce.number(),

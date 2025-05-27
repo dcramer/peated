@@ -9,7 +9,12 @@ import { and, asc, desc, ilike } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
-  .route({ method: "GET", path: "/external-sites" })
+  .route({
+    method: "GET",
+    path: "/external-sites",
+    summary: "List external sites",
+    description: "Retrieve external sites with search and sorting options",
+  })
   .input(
     z.object({
       query: z.coerce.string().default(""),

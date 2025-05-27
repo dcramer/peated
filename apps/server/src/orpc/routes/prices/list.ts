@@ -15,7 +15,13 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAdmin)
-  .route({ method: "GET", path: "/prices" })
+  .route({
+    method: "GET",
+    path: "/prices",
+    summary: "List store prices",
+    description:
+      "Retrieve store prices with filtering by site, validity, and unknown bottles. Requires admin privileges",
+  })
   .input(
     z
       .object({
