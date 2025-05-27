@@ -51,6 +51,10 @@ const rpcHandler = new RPCHandler(router, {
         // If you only use Zod you can safely cast to ZodIssue[]
         const zodError = new ZodError(error.cause.issues as ZodIssue[]);
 
+        console.log("INPUT_VALIDATION_ERROR", {
+          zodError: zodError.toString(),
+        });
+
         throw new ORPCError("INPUT_VALIDATION_FAILED", {
           status: 422,
           data: zodError.flatten(),
@@ -65,11 +69,10 @@ const rpcHandler = new RPCHandler(router, {
       ) {
         const zodError = new ZodError(error.cause.issues as ZodIssue[]);
 
-        logError(`Validation error with output: ${zodError.toString()}`, {
-          zod: {
-            error: zodError.flatten(),
-          },
+        console.log("OUTPUT_VALIDATION_ERROR", {
+          zodError: zodError.toString(),
         });
+
         throw new ORPCError("OUTPUT_VALIDATION_FAILED", {
           cause: error.cause,
         });

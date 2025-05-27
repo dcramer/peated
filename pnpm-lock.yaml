@@ -234,6 +234,9 @@ importers:
       '@peated/email':
         specifier: workspace:*
         version: link:../../packages/email
+      '@peated/orpc':
+        specifier: workspace:*
+        version: link:../../packages/orpc
       '@peated/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -421,6 +424,9 @@ importers:
       '@peated/design':
         specifier: workspace:*
         version: link:../../packages/design
+      '@peated/orpc':
+        specifier: workspace:*
+        version: link:../../packages/orpc
       '@peated/server':
         specifier: workspace:*
         version: link:../server
@@ -633,6 +639,25 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.5.4
+
+  packages/orpc:
+    dependencies:
+      '@peated/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@sentry/core':
+        specifier: '*'
+        version: 9.22.0
+    devDependencies:
+      '@orpc/client':
+        specifier: ^1.3.0
+        version: 1.3.0
+      '@orpc/server':
+        specifier: ^1.3.0
+        version: 1.3.0
+      '@orpc/shared':
+        specifier: ^1.3.0
+        version: 1.3.0
 
   packages/tsconfig:
     dependencies:

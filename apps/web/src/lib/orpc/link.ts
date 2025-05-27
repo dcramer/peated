@@ -1,6 +1,6 @@
 import { RPCLink } from "@orpc/client/fetch";
 import { BatchLinkPlugin } from "@orpc/client/plugins";
-import { logError } from "../log";
+import sentryInterceptor from "@peated/orpc/client/interceptors";
 
 export function getLink({
   apiServer,
@@ -32,16 +32,7 @@ export function getLink({
       };
     },
     url: `${apiServer}/rpc`,
-    interceptors: [
-      async ({ next, path }) => {
-        try {
-          return await next();
-        } catch (error) {
-          logError(error);
-          throw error;
-        }
-      },
-    ],
+    interceptors: [sentryInterceptor({ captureInputs: true })],
     plugins: [
       new BatchLinkPlugin({
         groups: [
