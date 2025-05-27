@@ -1,6 +1,6 @@
 import { os } from "@orpc/server";
+import sentryMiddleware from "@peated/orpc/server/middleware";
 import type { User } from "../db/schema";
-import { sentryCapture } from "./middleware/sentry";
 
 interface ErrorShape {
   // the message should always be a punctuated sentence
@@ -70,4 +70,4 @@ export const base = os
   });
 
 // Base procedure with Sentry error tracking for all routes
-export const procedure = base.use(sentryCapture);
+export const procedure = base.use(sentryMiddleware({ captureInputs: true }));
