@@ -5,6 +5,8 @@ export const dynamic = "force-static";
 export async function GET() {
   const sitemapIndexXML = await buildSitemapIndex([
     "/sitemaps/locations.xml",
+    "/sitemaps/entities/sitemap.xml",
+    "/sitemaps/bottles/sitemap.xml",
     "/sitemaps/static.xml",
   ]);
 
