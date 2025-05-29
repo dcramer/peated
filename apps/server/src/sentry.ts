@@ -7,6 +7,7 @@ if (config.ENV !== "test") {
     dsn: config.SENTRY_DSN,
     release: config.VERSION,
     tracesSampleRate: 1.0,
+    tracePropagationTargets: ["localhost", "api.peated.com", "peated.com"],
     profilesSampleRate: 1.0,
     profileLifecycle: "trace",
     spotlight: config.ENV === "development",
