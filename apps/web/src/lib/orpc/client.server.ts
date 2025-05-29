@@ -4,7 +4,6 @@ import { createORPCClient } from "@orpc/client";
 import type { RouterClient } from "@orpc/server";
 import type { Router } from "@peated/server/orpc/router";
 import config from "@peated/web/config";
-import { getTraceData } from "@sentry/core";
 import { headers } from "next/headers";
 import { cache } from "react";
 import { getSession } from "../session.server";
@@ -18,24 +17,16 @@ export async function createServerClient(
   const accessToken = session.accessToken;
 
   if (context.traceContext === undefined) {
-    const existingTrace = getTraceData();
-    if (existingTrace) {
-      context.traceContext = {
-        sentryTrace: existingTrace["sentry-trace"],
-        baggage: existingTrace.baggage,
-      };
-    } else {
-      const reqHeaders = headers();
-      context.traceContext = {
-        sentryTrace: reqHeaders.get("sentry-trace"),
-        baggage: reqHeaders.get("baggage"),
-      };
-    }
+    const reqHeaders = headers();
+    context.traceContext = {
+      sentryTrace: reqHeaders.get("sentry-trace"),
+      baggage: reqHeaders.get("baggage"),
+    };
   }
   const link = getLink({
     accessToken: context.accessToken ?? accessToken,
     // https://peated.sentry.io/share/issue/c6bccda67b0648caa6949aed4d72abb3/
-    batch: true,
+    batch: false,
     apiServer: config.API_SERVER,
     userAgent: "@peated/web (orpc/server)",
     traceContext: context.traceContext,
