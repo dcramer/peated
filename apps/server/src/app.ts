@@ -86,41 +86,13 @@ const ONE_DAY = 60 * 60 * 24;
 
 export const app = new Hono()
   .use("*", async (c, next) => {
-    const urlObject = parseStringToURLObject(c.req.url);
-    const [name, attributes] = getHttpSpanDetailsFromUrlObject(
-      urlObject,
-      "server",
-      "auto.http.hono",
-      c.req,
-    );
-
     try {
-      await continueTrace(
-        {
-          sentryTrace: c.req.header("sentry-trace") || "",
-          baggage: c.req.header("baggage"),
-        },
-        async () => {
-          await startSpan(
-            {
-              name,
-              attributes,
-            },
-            async (span) => {
-              try {
-                await next();
-                setHttpStatus(span, c.res.status);
-              } catch (err) {
-                setHttpStatus(span, 500);
-                captureException(err, {
-                  mechanism: { handled: false, type: "hono" },
-                });
-                throw err;
-              }
-            },
-          );
-        },
-      );
+      await next();
+    } catch (err) {
+      captureException(err, {
+        mechanism: { handled: false, type: "hono" },
+      });
+      throw err;
     } finally {
       await flush(2000);
     }
