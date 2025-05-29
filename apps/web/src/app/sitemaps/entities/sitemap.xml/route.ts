@@ -19,7 +19,7 @@ function range(start: number, end?: number): number[] {
 export async function GET() {
   const { client } = await createServerClient();
 
-  const { totalEntities } = await client.stats.call({});
+  const { totalEntities } = await client.stats();
   const sitemapIndexXML = await buildSitemapIndex(
     range(1, Math.ceil(totalEntities / PAGE_LIMIT)).map(
       (i) => `/sitemaps/entities/${i}/sitemap.xml`,
