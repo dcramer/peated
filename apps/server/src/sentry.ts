@@ -15,12 +15,11 @@ if (config.ENV !== "test") {
     integrations: [
       Sentry.consoleLoggingIntegration(),
       Sentry.zodErrorsIntegration(),
+      nodeProfilingIntegration(),
     ],
     _experiments: {
       enableLogs: true,
     },
-
-    integrations: [Sentry.consoleIntegration(), nodeProfilingIntegration()],
   });
 
   Sentry.setTag("service", config.SENTRY_SERVICE);
