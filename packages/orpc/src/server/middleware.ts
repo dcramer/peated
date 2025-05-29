@@ -33,6 +33,7 @@ const sentryMiddleware = (options: Options = {}) =>
       {
         name: `orpc.${path.join("/")}`,
         attributes: {
+          "span.kind": "SERVER",
           "rpc.system": "orpc",
           "rpc.method": path.join("."),
           ...(options.captureInputs && {

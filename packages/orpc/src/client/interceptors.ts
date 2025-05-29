@@ -32,6 +32,7 @@ const sentryInterceptor = (
       {
         name: `orpc.${path.join("/")}`,
         attributes: {
+          "span.kind": "CLIENT",
           "rpc.system": "orpc",
           "rpc.method": path.join("."),
           ...(options.captureInputs && {
