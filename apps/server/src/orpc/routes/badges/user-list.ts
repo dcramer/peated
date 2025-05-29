@@ -11,6 +11,7 @@ import { and, desc, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 
 export const Serializer = serializer({
+  name: "badgeAwardUser",
   attrs: async (
     itemList: (BadgeAward & { user: User })[],
     currentUser?: User,
