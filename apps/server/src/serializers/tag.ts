@@ -4,6 +4,7 @@ import { serializer } from ".";
 import { type Tag, type User } from "../db/schema";
 
 export const TagSerializer = serializer({
+  name: "tag",
   item: (
     item: Tag,
     attrs: Record<string, any>,

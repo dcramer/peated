@@ -17,6 +17,7 @@ type CollectionBottleAttrs = {
 };
 
 export const CollectionBottleSerializer = serializer({
+  name: "collectionBottle",
   attrs: async (
     itemList: (CollectionBottle & {
       bottle: Bottle;

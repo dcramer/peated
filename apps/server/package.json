@@ -33,6 +33,7 @@
     "@peated/tsconfig": "workspace:*",
     "@sentry/core": "catalog:",
     "@sentry/node": "catalog:",
+    "@sentry/profiling-node": "^9.23.0",
     "@sindresorhus/slugify": "^2.2.1",
     "@tanstack/react-query": "catalog:",
     "@types/bcrypt": "^5.0.2",

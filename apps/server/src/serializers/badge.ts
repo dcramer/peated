@@ -6,6 +6,7 @@ import { absoluteUrl } from "../lib/urls";
 import type { BadgeSchema } from "../schemas";
 
 export const BadgeSerializer = serializer({
+  name: "badge",
   item: (
     item: Badge,
     attrs: Record<string, any>,

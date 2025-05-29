@@ -9,6 +9,7 @@ import type { Badge } from "../types";
 import { BadgeSerializer } from "./badge";
 
 export const BadgeAwardSerializer = serializer({
+  name: "badgeAward",
   attrs: async (
     itemList: (BadgeAward & {
       badge?: Badge;

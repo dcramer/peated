@@ -7,6 +7,7 @@ import { db } from "../db";
 import { CountrySerializer } from "./country";
 
 export const RegionSerializer = serializer({
+  name: "region",
   attrs: async (itemList: Region[], currentUser?: User) => {
     const countryIds = itemList.map((i) => i.countryId);
     const countryList = countryIds.length

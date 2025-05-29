@@ -13,6 +13,7 @@ type Attrs = {
 };
 
 export const BottleReleaseSerializer = serializer({
+  name: "bottleRelease",
   attrs: async (
     itemList: BottleRelease[],
     currentUser?: User,

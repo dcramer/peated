@@ -4,6 +4,7 @@ import type { ExternalSite, User } from "../db/schema";
 import { type ExternalSiteSchema } from "../schemas";
 
 export const ExternalSiteSerializer = serializer({
+  name: "externalSite",
   item: (
     item: ExternalSite,
     attrs: Record<string, any>,

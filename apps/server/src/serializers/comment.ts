@@ -8,6 +8,7 @@ import { type CommentSchema } from "../schemas";
 import { UserSerializer } from "./user";
 
 export const CommentSerializer = serializer({
+  name: "comment",
   attrs: async (itemList: Comment[], currentUser?: User) => {
     const userList = await db
       .select()

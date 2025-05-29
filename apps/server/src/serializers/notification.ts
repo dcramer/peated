@@ -18,6 +18,7 @@ type NotificationAttrs = {
 };
 
 export const NotificationSerializer = serializer({
+  name: "notification",
   attrs: async (
     itemList: Notification[],
     currentUser: User,
@@ -151,6 +152,7 @@ export const NotificationSerializer = serializer({
 });
 
 export const FriendRequestReceipientSerializer = serializer({
+  name: "friendRequestReceipient",
   attrs: async (itemList: Follow[], currentUser?: User) => {
     const userList = await db
       .select()

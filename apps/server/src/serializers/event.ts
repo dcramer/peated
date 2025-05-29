@@ -8,6 +8,7 @@ import { type EventSchema } from "../schemas";
 import { CountrySerializer } from "./country";
 
 export const EventSerializer = serializer({
+  name: "event",
   attrs: async (itemList: Event[], currentUser?: User) => {
     const countryIds = itemList.map((i) => i.countryId).filter(notEmpty);
     const countryList = countryIds.length

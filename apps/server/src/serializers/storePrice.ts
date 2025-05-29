@@ -20,6 +20,7 @@ function priceIsValid(price: StorePrice) {
 }
 
 export const StorePriceSerializer = serializer({
+  name: "storePrice",
   item: (
     item: StorePrice,
     attrs: Record<string, any>,
@@ -42,6 +43,7 @@ export const StorePriceSerializer = serializer({
 });
 
 export const StorePriceWithSiteSerializer = serializer({
+  name: "storePriceWithSite",
   attrs: async (
     itemList: (StorePrice & { externalSite: ExternalSite })[],
     currentUser?: User,
@@ -109,6 +111,7 @@ export type BottlePriceChange = {
 };
 
 export const BottlePriceChangeSerializer = serializer({
+  name: "bottlePriceChange",
   attrs: async (itemList: BottlePriceChange[], currentUser?: User) => {
     const bottleList = await db.query.bottles.findMany({
       where: (bottles, { inArray }) =>

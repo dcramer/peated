@@ -9,6 +9,7 @@ import { CountrySerializer } from "./country";
 import { RegionSerializer } from "./region";
 
 export const EntitySerializer = serializer({
+  name: "entity",
   attrs: async (itemList: Entity[], currentUser?: User) => {
     const countryIds = itemList.map((i) => i.countryId).filter(notEmpty);
     const countryList = countryIds.length

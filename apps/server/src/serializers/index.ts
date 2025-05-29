@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import type { User } from "../db/schema";
 
 type Item = Record<string, any>;
@@ -10,6 +11,7 @@ export interface Serializer<
   C extends Record<string, any> = Record<string, any>,
   A extends Record<string, any> = Record<string, any>,
 > {
+  name: string;
   attrs?(
     itemList: T[],
     currentUser?: User | null,
@@ -58,23 +60,34 @@ export async function serialize<
   excludeFields: string[] = [],
   context?: C,
 ): Promise<R | R[]> {
-  if (Array.isArray(itemList) && !itemList.length) return [];
+  return await Sentry.startSpan(
+    {
+      name: `peated.serializer/${serializer.name}`,
+      attributes: {
+        "item.count": itemList.length,
+        "item.type": serializer.name,
+      },
+    },
+    async (span) => {
+      if (Array.isArray(itemList) && !itemList.length) return [];
 
-  const attrs = await (serializer.attrs || DefaultAttrs<T>)(
-    Array.isArray(itemList) ? itemList : [itemList],
-    currentUser,
-    context,
+      const attrs = await (serializer.attrs || DefaultAttrs<T>)(
+        Array.isArray(itemList) ? itemList : [itemList],
+        currentUser,
+        context,
+      );
+
+      const results = (Array.isArray(itemList) ? itemList : [itemList]).map(
+        (i: T) =>
+          removeAttributes(
+            serializer.item(i, attrs[i.id] || {}, currentUser, context),
+            excludeFields,
+          ),
+      ) as R[];
+
+      return Array.isArray(itemList) ? results : results[0];
+    },
   );
-
-  const results = (Array.isArray(itemList) ? itemList : [itemList]).map(
-    (i: T) =>
-      removeAttributes(
-        serializer.item(i, attrs[i.id] || {}, currentUser, context),
-        excludeFields,
-      ),
-  ) as R[];
-
-  return Array.isArray(itemList) ? results : results[0];
 }
 
 export function serializer<

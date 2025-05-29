@@ -34,6 +34,7 @@ type Context =
   | undefined;
 
 export const BottleSerializer = serializer({
+  name: "bottle",
   attrs: async (
     itemList: Bottle[],
     currentUser?: User,

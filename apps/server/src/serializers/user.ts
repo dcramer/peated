@@ -9,6 +9,7 @@ import { absoluteUrl } from "../lib/urls";
 import { type UserSchema } from "../schemas";
 
 export const UserSerializer = serializer({
+  name: "user",
   attrs: async (itemList: User[], currentUser) => {
     const followsByRef = currentUser
       ? Object.fromEntries(

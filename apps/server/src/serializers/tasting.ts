@@ -30,6 +30,7 @@ type TastingAttrs = {
 };
 
 export const TastingSerializer = serializer({
+  name: "tasting",
   attrs: async (
     itemList: Tasting[],
     currentUser?: User,

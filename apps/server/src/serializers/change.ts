@@ -13,6 +13,7 @@ type ChangeAttrs = {
 };
 
 export const ChangeSerializer = serializer({
+  name: "change",
   attrs: async (
     itemList: Change[],
     currentUser: User,

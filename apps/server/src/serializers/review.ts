@@ -20,6 +20,7 @@ type ReviewAttrs = {
 };
 
 export const ReviewSerializer = serializer({
+  name: "review",
   attrs: async (
     itemList: (Review & { bottle: Bottle })[],
     currentUser?: User,

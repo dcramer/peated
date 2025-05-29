@@ -4,6 +4,7 @@ import type { Collection, User } from "../db/schema";
 import { type CollectionSchema } from "../schemas";
 
 export const CollectionSerializer = serializer({
+  name: "collection",
   item: (
     item: Collection,
     attrs: Record<string, any>,

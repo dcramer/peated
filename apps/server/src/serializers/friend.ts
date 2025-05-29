@@ -7,6 +7,7 @@ import { UserSerializer } from "./user";
 type FriendEntry = Follow & { toUser: User };
 
 export const FriendSerializer = serializer({
+  name: "friend",
   attrs: async (itemList: FriendEntry[], currentUser?: User) => {
     const userList = itemList.map((i) => i.toUser);
     const usersById = Object.fromEntries(
