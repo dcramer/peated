@@ -1,0 +1,11 @@
+import bottleCreate from "./bottle-create";
+import bottleDelete from "./bottle-delete";
+import bottleList from "./bottle-list";
+import list from "./list";
+
+export default {
+  list,
+  bottleCreate,
+  bottleDelete,
+  bottleList,
+};

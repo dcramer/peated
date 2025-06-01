@@ -1,0 +1,61 @@
+import type { User } from "@peated/server/types";
+import { createContext, useContext, useState } from "react";
+
+type Auth = {
+  setUser: (value: { user: User | null; accessToken: string | null }) => void;
+  user: User | null;
+  isLoggedIn: boolean;
+  accessToken: string | null;
+};
+
+const AuthContext = createContext<Auth>({
+  setUser: () => {
+    throw new Error("Missing AuthProvider");
+  },
+  user: null,
+  accessToken: null,
+  isLoggedIn: false,
+});
+
+export const AuthProvider = ({
+  user = null,
+  accessToken = null,
+  children,
+}: {
+  user: User | null;
+  accessToken: string | null;
+  children: any;
+}) => {
+  const [value, setValue] = useState<{
+    user: User | null;
+    accessToken: string | null;
+  }>({ user, accessToken });
+
+  // useEffect(() => {
+  //   setValue(value);
+  // }, [value]);
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user: user
+          ? {
+              ...user,
+              ...value,
+            }
+          : null,
+        accessToken: accessToken,
+        setUser: (value) => {
+          setValue(value);
+        },
+        isLoggedIn: !!user,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export default function useAuth() {
+  return useContext(AuthContext);
+}

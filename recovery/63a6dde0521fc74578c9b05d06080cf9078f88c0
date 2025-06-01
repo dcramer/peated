@@ -1,0 +1,128 @@
+import { db } from "@peated/server/db";
+import type { Flight, NewTasting, Tasting } from "@peated/server/db/schema";
+import {
+  bottleReleases,
+  bottles,
+  bottleTags,
+  entities,
+  flightBottles,
+  flights,
+  follows,
+  tastings,
+} from "@peated/server/db/schema";
+import { awardAllBadgeXp } from "@peated/server/lib/badges";
+import { notEmpty } from "@peated/server/lib/filter";
+import { logError } from "@peated/server/lib/log";
+import { TastingInputSchema } from "@peated/server/schemas";
+import { serialize } from "@peated/server/serializers";
+import { BadgeSerializer } from "@peated/server/serializers/badge";
+import { BadgeAwardSerializer } from "@peated/server/serializers/badgeAward";
+import { TastingSerializer } from "@peated/server/serializers/tasting";
+import { pushJob } from "@peated/server/worker/client";
+import { TRPCError } from "@trpc/server";
+import { and, eq, inArray, sql } from "drizzle-orm";
+import { authedProcedure } from "..";
+import { validateTags } from "../validators/tags";
+import { z } from "zod";
+
+export default authedProcedure
+  .input(
+    z.object({
+      bottle: z.number(),
+      edition: z.number().optional(),
+      rating: z.number().min(1).max(5).optional(),
+      notes: z.string().optional(),
+      tags: z.array(z.string()).optional(),
+      imageUrl: z.string().optional(),
+      servingStyle: z.enum(["neat", "rocks", "splash"]).optional(),
+      friends: z.array(z.number()).optional(),
+      flightId: z.number().optional(),
+    }),
+  )
+  .mutation(async function ({ input, ctx }) {
+    const [bottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, input.bottle));
+
+    if (!bottle) {
+      throw new TRPCError({
+        message: "Bottle not found.",
+        code: "NOT_FOUND",
+      });
+    }
+
+    let release;
+    if (input.edition) {
+      release = await db.query.bottleReleases.findFirst({
+        where: and(
+          eq(bottleReleases.id, input.edition),
+          eq(bottleReleases.bottleId, bottle.id),
+        ),
+      });
+      if (!release) {
+        throw new TRPCError({
+          message: "Release not found.",
+          code: "NOT_FOUND",
+        });
+      }
+    }
+
+    let flight: Flight | null = null;
+    if (input.flightId) {
+      const flightResults = await db
+        .select()
+        .from(flights)
+        .innerJoin(flightBottles, eq(flightBottles.flightId, flights.id))
+        .where(
+          and(
+            eq(flights.id, input.flightId),
+            eq(flightBottles.bottleId, bottle.id),
+          ),
+        )
+        .limit(1);
+      if (flightResults.length !== 1) {
+        throw new TRPCError({
+          message: "Cannot identify flight.",
+          code: "BAD_REQUEST",
+        });
+      }
+      flight = flightResults[0].flight;
+    }
+
+    const tastingData: NewTasting = {
+      bottleId: bottle.id,
+      releaseId: release?.id,
+      rating: input.rating,
+      notes: input.notes,
+      tags: input.tags || [],
+      imageUrl: input.imageUrl,
+      servingStyle: input.servingStyle,
+      friends: input.friends || [],
+      flightId: input.flightId,
+      createdById: ctx.user.id,
+      createdAt: new Date(),
+    };
+
+    const [result] = await db.insert(tastings).values(tastingData).returning();
+
+    if (!result) throw new Error("Unable to create tasting");
+
+    if (!ctx.user.private) {
+      try {
+        await pushJob("NotifyDiscordOnTasting", { tastingId: result.id });
+      } catch (err) {
+        logError(err, {
+          tasting: {
+            id: result.id,
+          },
+        });
+      }
+    }
+
+    return {
+      tasting: await serialize(TastingSerializer, result, ctx.user),
+      // TODO:
+      awards: await serialize(BadgeAwardSerializer, [], ctx.user),
+    };
+  });

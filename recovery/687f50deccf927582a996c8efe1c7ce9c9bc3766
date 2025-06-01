@@ -1,0 +1,13 @@
+import login from "./login";
+import magicLink from "./magic-link/router";
+import me from "./me";
+import passwordReset from "./password-reset/router";
+import register from "./register";
+
+export default {
+  login,
+  me,
+  register,
+  magicLink,
+  passwordReset,
+};

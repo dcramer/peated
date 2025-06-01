@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Test script for filename fixing logic
+
+fix_filename() {
+    local old_path="$1"
+    local new_path="$old_path"
+    
+    # Get just the filename part
+    local dir=$(dirname "$old_path")
+    local filename=$(basename "$old_path")
+    
+    # Remove route groups (parentheses and their contents) followed by dots
+    filename=$(echo "$filename" | sed 's/([^)]*)\.*//g')
+    
+    # Clean up any double dots that might remain
+    filename=$(echo "$filename" | sed 's/\.\.*/./g')
+    
+    # Remove leading dot if present
+    filename="${filename#.}"
+    
+    # Construct new path
+    new_path="$dir/$filename"
+    
+    echo "$new_path"
+}
+
+echo "Testing filename fix logic:"
+echo ""
+
+# Test cases from the actual files we found
+test_cases=(
+    "apps/web/src/app/(admin).admin.(default).tags.$tagId.tsx"
+    "apps/web/src/app/(entities-sidebar).distillers.tsx"
+    "apps/web/src/app/(layout-free).entities.$entityId.merge.tsx"
+    "apps/web/src/app/(default).friends.tsx"
+    "apps/web/src/app/(default).locations.(tabs).tsx"
+    "apps/web/src/app/(admin).admin.(default).tags.tsx"
+    "apps/web/src/app/(default).bottles.$bottleId.(tabs).prices.tsx"
+)
+
+for test_case in "${test_cases[@]}"; do
+    result=$(fix_filename "$test_case")
+    echo "Input:  $test_case"
+    echo "Output: $result"
+    echo ""
+done 

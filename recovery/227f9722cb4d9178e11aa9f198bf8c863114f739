@@ -1,0 +1,76 @@
+import waitError from "@peated/server/lib/test/waitError";
+import { routerClient } from "@peated/server/orpc/router";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import * as labelExtractor from "../../agents/labelExtractor";
+
+vi.mock("../../agents/labelExtractor");
+
+describe("POST /labels/extract", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
+  test("extracts from image URL", async () => {
+    const mockResult = {
+      brand: "Macallan",
+      expression: "12 Year Old",
+      category: "single_malt",
+      statedAge: 12,
+      abv: 43,
+      caskType: "Sherry Oak",
+    };
+
+    vi.mocked(labelExtractor.extractFromImage).mockResolvedValue(mockResult);
+
+    const result = await routerClient.labelExtract({
+      imageUrl: "https://example.com/image.jpg",
+    });
+
+    expect(labelExtractor.extractFromImage).toHaveBeenCalledWith(
+      "https://example.com/image.jpg",
+    );
+    expect(result).toEqual(mockResult);
+  });
+
+  test("extracts from text", async () => {
+    const mockResult = {
+      brand: "Macallan",
+      expression: "12 Year Old",
+      category: "single_malt",
+      statedAge: 12,
+      abv: 43,
+      caskType: "Sherry Oak",
+    };
+
+    vi.mocked(labelExtractor.extractFromText).mockResolvedValue(mockResult);
+
+    const result = await routerClient.labelExtract({
+      label: "Macallan 12 Year Old Single Malt",
+    });
+
+    expect(labelExtractor.extractFromText).toHaveBeenCalledWith(
+      "Macallan 12 Year Old Single Malt",
+    );
+    expect(result).toEqual(mockResult);
+  });
+
+  test("requires either imageUrl or label", async () => {
+    const err = await waitError(routerClient.labelExtract({}));
+
+    expect(err).toMatchInlineSnapshot();
+  });
+
+  test("handles extraction errors", async () => {
+    vi.mocked(labelExtractor.extractFromImage).mockRejectedValue(
+      new Error("Failed to process image"),
+    );
+
+    const err = await waitError(
+      routerClient.labelExtract({
+        imageUrl: "https://example.com/image.jpg",
+      }),
+    );
+
+    expect(err).toMatchInlineSnapshot();
+  });
+});

@@ -1,0 +1,133 @@
+import { db } from "@peated/server/db";
+import { regions } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
+import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
+
+describe("PATCH /regions/:country/:slug", () => {
+  test("requires authentication", async () => {
+    const err = await waitError(
+      routerClient.regionUpdate(
+        {
+          country: "test-country",
+          slug: "test-region",
+        },
+        { context: { user: null } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot();
+  });
+
+  test("requires mod", async ({ fixtures }) => {
+    const user = await fixtures.User();
+    const err = await waitError(
+      routerClient.regionUpdate(
+        {
+          country: "test-country",
+          slug: "test-region",
+        },
+        { context: { user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot();
+  });
+
+  test("updates region description", async ({ fixtures }) => {
+    const country = await fixtures.Country();
+    const region = await fixtures.Region({ countryId: country.id });
+    const modUser = await fixtures.User({ mod: true });
+
+    const updatedRegion = await routerClient.regionUpdate(
+      {
+        country: country.id,
+        slug: region.slug,
+        description: "New description",
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(updatedRegion.id).toBe(region.id);
+    expect(updatedRegion.description).toBe("New description");
+
+    const [dbRegion] = await db
+      .select()
+      .from(regions)
+      .where(eq(regions.id, region.id));
+    expect(dbRegion.description).toBe("New description");
+    expect(dbRegion.descriptionSrc).toBe("user");
+  });
+
+  test("updates region with country slug", async ({ fixtures }) => {
+    const country = await fixtures.Country();
+    const region = await fixtures.Region({ countryId: country.id });
+    const modUser = await fixtures.User({ mod: true });
+
+    const updatedRegion = await routerClient.regionUpdate(
+      {
+        country: country.slug,
+        slug: region.slug,
+        description: "New description",
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(updatedRegion.id).toBe(region.id);
+    expect(updatedRegion.description).toBe("New description");
+  });
+
+  test("returns unchanged region when no updates provided", async ({
+    fixtures,
+  }) => {
+    const country = await fixtures.Country();
+    const region = await fixtures.Region({ countryId: country.id });
+    const modUser = await fixtures.User({ mod: true });
+
+    const result = await routerClient.regionUpdate(
+      {
+        country: country.id,
+        slug: region.slug,
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        id: region.id,
+        name: region.name,
+        slug: region.slug,
+        description: region.description,
+      }),
+    );
+  });
+
+  test("throws BAD_REQUEST for invalid country", async ({ fixtures }) => {
+    const modUser = await fixtures.User({ mod: true });
+
+    const err = await waitError(
+      routerClient.regionUpdate(
+        {
+          country: "nonexistent-country",
+          slug: "some-region",
+        },
+        { context: { user: modUser } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot();
+  });
+
+  test("throws NOT_FOUND for non-existent region", async ({ fixtures }) => {
+    const country = await fixtures.Country();
+    const modUser = await fixtures.User({ mod: true });
+
+    const err = await waitError(
+      routerClient.regionUpdate(
+        {
+          country: country.id,
+          slug: "nonexistent-region",
+        },
+        { context: { user: modUser } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot();
+  });
+});

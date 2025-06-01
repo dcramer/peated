@@ -1,0 +1,242 @@
+import { eq } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
+import { db } from "../../db";
+import { bottleReleases } from "../../db/schema";
+import waitError from "../../lib/test/waitError";
+import { createCaller } from "../router";
+
+describe("bottleReleaseCreate", () => {
+  it("creates a new release for a bottle without statedAge", async function ({
+    fixtures,
+    defaults,
+  }) {
+    const caller = createCaller({ user: defaults.user });
+
+    const bottle = await fixtures.Bottle({
+      name: "Urquhart",
+      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+    });
+
+    const data = {
+      bottleId: bottle.id,
+      edition: "Batch 1",
+      statedAge: 10,
+      abv: 46.0,
+      releaseYear: 2023,
+      vintageYear: 2013,
+      singleCask: false,
+      caskStrength: false,
+      caskType: "bourbon" as const,
+      caskSize: "hogshead" as const,
+      caskFill: "refill" as const,
+    };
+
+    const result = await caller.bottleReleaseCreate(data);
+
+    // Verify key properties of the response
+    expect(result).toMatchObject({
+      bottleId: bottle.id,
+      statedAge: 10,
+      abv: 46.0,
+      releaseYear: 2023,
+      vintageYear: 2013,
+      edition: "Batch 1",
+      fullName: "Ardbeg Urquhart Batch 1 10-year-old 2023 Release 2013 Vintage",
+      name: "Urquhart Batch 1 10-year-old 2023 Release 2013 Vintage",
+      hasTasted: false,
+      isFavorite: false,
+      totalTastings: 0,
+      avgRating: null,
+      suggestedTags: [],
+    });
+
+    // Verify the release was created in the database
+    const [release] = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, result.id));
+
+    expect(release).toBeDefined();
+    expect(release.bottleId).toBe(bottle.id);
+    expect(release.edition).toBe("Batch 1");
+    expect(release.statedAge).toBe(10);
+    expect(release.abv).toBe(46.0);
+    expect(release.releaseYear).toBe(2023);
+    expect(release.vintageYear).toBe(2013);
+    expect(release.fullName).toBe(
+      "Ardbeg Urquhart Batch 1 10-year-old 2023 Release 2013 Vintage",
+    );
+    expect(release.name).toBe(
+      "Urquhart Batch 1 10-year-old 2023 Release 2013 Vintage",
+    );
+  });
+
+  it("creates a new release for a bottle with statedAge", async function ({
+    fixtures,
+    defaults,
+  }) {
+    const caller = createCaller({ user: defaults.user });
+
+    const bottle = await fixtures.Bottle({
+      name: "10",
+      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+      statedAge: 10,
+    });
+
+    const data = {
+      bottleId: bottle.id,
+      edition: "Batch 1",
+      abv: 46.0,
+      releaseYear: 2023,
+      vintageYear: 2013,
+      singleCask: false,
+      caskStrength: false,
+      caskType: "bourbon" as const,
+      caskSize: "hogshead" as const,
+      caskFill: "refill" as const,
+    };
+
+    const result = await caller.bottleReleaseCreate(data);
+
+    // Verify key properties of the response
+    expect(result).toMatchObject({
+      bottleId: bottle.id,
+      statedAge: 10,
+      abv: 46.0,
+      releaseYear: 2023,
+      vintageYear: 2013,
+      edition: "Batch 1",
+      fullName: "Ardbeg 10 Batch 1 2023 Release 2013 Vintage",
+      name: "10 Batch 1 2023 Release 2013 Vintage",
+      hasTasted: false,
+      isFavorite: false,
+      totalTastings: 0,
+      avgRating: null,
+      suggestedTags: [],
+    });
+
+    // Verify the release was created in the database
+    const [release] = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, result.id));
+
+    expect(release).toBeDefined();
+    expect(release.bottleId).toBe(bottle.id);
+    expect(release.edition).toBe("Batch 1");
+    expect(release.statedAge).toBe(10); // Should use bottle's statedAge
+    expect(release.abv).toBe(46.0);
+    expect(release.releaseYear).toBe(2023);
+    expect(release.vintageYear).toBe(2013);
+    expect(release.fullName).toBe(
+      "Ardbeg 10 Batch 1 2023 Release 2013 Vintage", // No age in name since it's in bottle
+    );
+    expect(release.name).toBe(
+      "10 Batch 1 2023 Release 2013 Vintage", // No age in name since it's in bottle
+    );
+  });
+
+  it("throws error if release statedAge differs from bottle statedAge", async function ({
+    fixtures,
+    defaults,
+  }) {
+    const caller = createCaller({ user: defaults.user });
+
+    const bottle = await fixtures.Bottle({
+      name: "10",
+      statedAge: 10,
+    });
+
+    const data = {
+      bottleId: bottle.id,
+      edition: "Batch 1",
+      statedAge: 12, // Different from bottle's statedAge
+      abv: 46.0,
+    };
+
+    const err = await waitError(caller.bottleReleaseCreate(data));
+    expect(err).toMatchInlineSnapshot(
+      `[TRPCError: Release statedAge must match bottle's statedAge.]`,
+    );
+  });
+
+  it("throws error if bottle not found", async function ({ defaults }) {
+    const caller = createCaller({ user: defaults.user });
+
+    const data = {
+      bottleId: 999999,
+      edition: "Batch 1",
+      statedAge: 10,
+      abv: 46.0,
+    };
+
+    const err = await waitError(caller.bottleReleaseCreate(data));
+    expect(err).toMatchInlineSnapshot(`[TRPCError: Bottle not found.]`);
+  });
+
+  it("throws error if release with same attributes exists", async function ({
+    fixtures,
+    defaults,
+  }) {
+    const caller = createCaller({ user: defaults.user });
+
+    const bottle = await fixtures.Bottle({
+      name: "10",
+      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+    });
+
+    // Create initial release
+    await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      fullName: "Ardbeg 10 Batch 1",
+      name: "10 Batch 1",
+      edition: "Batch 1",
+      statedAge: 10,
+      abv: 46.0,
+    });
+
+    // Try to create duplicate release
+    const data = {
+      bottleId: bottle.id,
+      edition: "Batch 1",
+      statedAge: 10,
+      abv: 46.0,
+    };
+
+    const err = await waitError(caller.bottleReleaseCreate(data));
+    expect(err).toMatchInlineSnapshot(
+      `[TRPCError: Release statedAge must match bottle's statedAge.]`,
+    );
+  });
+
+  it("handles null values in uniqueness check", async function ({
+    fixtures,
+    defaults,
+  }) {
+    const caller = createCaller({ user: defaults.user });
+
+    const bottle = await fixtures.Bottle({
+      statedAge: null,
+    });
+
+    // Create initial release with null values
+    await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      statedAge: null,
+      vintageYear: null,
+      releaseYear: null,
+      edition: null,
+      abv: null,
+    });
+
+    // Try to create duplicate release with null values
+    const data = {
+      bottleId: bottle.id,
+    };
+
+    const err = await waitError(caller.bottleReleaseCreate(data));
+    expect(err).toMatchInlineSnapshot(
+      `[TRPCError: duplicate key value violates unique constraint "bottle_release_full_name_idx"]`,
+    );
+  });
+});

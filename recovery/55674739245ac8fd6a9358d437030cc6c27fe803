@@ -1,0 +1,43 @@
+import { call, ORPCError } from "@orpc/server";
+import { procedure } from "@peated/server/orpc";
+import { requireMod } from "@peated/server/orpc/middleware";
+import { BottleInputSchema, BottleSchema } from "@peated/server/schemas";
+import type { BottlePreviewResult } from "@peated/server/types";
+import { ConflictError } from "../errors";
+import bottleCreate from "./bottleCreate";
+import bottleUpdate from "./bottleUpdate";
+import { bottleNormalize } from "./bottleValidation";
+
+export default procedure
+  .use(requireMod)
+  .route({ method: "PUT", path: "/bottles" })
+  .input(BottleInputSchema)
+  .output(BottleSchema)
+  .handler(async function ({ input, context }) {
+    const user = context.user;
+
+    const bottleData: BottlePreviewResult & Record<string, any> =
+      await bottleNormalize({ input, context });
+
+    if (!bottleData.name) {
+      throw new ORPCError("BAD_REQUEST", {
+        message: "Invalid bottle name.",
+      });
+    }
+
+    try {
+      return await call(bottleCreate, input, { context });
+    } catch (err) {
+      if (err instanceof ConflictError) {
+        return await call(
+          bottleUpdate,
+          {
+            ...input,
+            bottle: err.existingRow.id,
+          },
+          { context },
+        );
+      }
+      throw err;
+    }
+  });

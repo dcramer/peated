@@ -1,0 +1,36 @@
+import waitError from "@peated/server/lib/test/waitError";
+import { routerClient } from "@peated/server/orpc/router";
+
+describe("PATCH /events/:id", () => {
+  test("requires admin", async ({ fixtures }) => {
+    const event = await fixtures.Event();
+    const modUser = await fixtures.User({ mod: true });
+
+    const err = await waitError(
+      routerClient.events.update(
+        {
+          id: event.id,
+          name: "Foobar",
+        },
+        { context: { user: modUser } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot();
+  });
+
+  test("updates event", async ({ fixtures }) => {
+    const event = await fixtures.Event();
+    const adminUser = await fixtures.User({ admin: true });
+
+    const newEvent = await routerClient.events.update(
+      {
+        id: event.id,
+        name: "Foobar",
+      },
+      { context: { user: adminUser } },
+    );
+
+    expect(newEvent).toBeDefined();
+    expect(newEvent.name).toEqual("Foobar");
+  });
+});

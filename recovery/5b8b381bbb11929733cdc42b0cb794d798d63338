@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# Migration script: Next.js to TanStack Start file structure
+# Converts page.tsx files from Next.js folder structure to TanStack Start naming conventions
+
+set -e
+
+echo "🚀 Starting TanStack Start file structure migration..."
+echo "Converting 81 page.tsx files to TanStack Start conventions..."
+
+# Function to convert Next.js path to TanStack Start path
+convert_path() {
+    local old_path="$1"
+    local new_path="$old_path"
+    
+    # Remove the apps/web/src/app/ prefix and /page.tsx suffix
+    new_path="${new_path#apps/web/src/app/}"
+    new_path="${new_path%/page.tsx}"
+    
+    # Convert [param] to $param
+    new_path="${new_path//\[/\$}"
+    new_path="${new_path//\]/}"
+    
+    # Convert folder separators to dots
+    # Replace all / with . 
+    new_path="${new_path//\//.}"
+    
+    # Add .tsx extension
+    new_path="${new_path}.tsx"
+    
+    # Add back the apps/web/src/app/ prefix
+    new_path="apps/web/src/app/$new_path"
+    
+    echo "$new_path"
+}
+
+# Get all page.tsx files and process them
+find apps/web/src/app -name "page.tsx" | while read -r old_file; do
+    new_file=$(convert_path "$old_file")
+    
+    echo "📁 $old_file"
+    echo "   → $new_file"
+    
+    # Create directory if it doesn't exist
+    mkdir -p "$(dirname "$new_file")"
+    
+    # Move the file
+    mv "$old_file" "$new_file"
+    
+    echo "   ✅ Moved"
+    echo ""
+done
+
+echo "🧹 Cleaning up empty directories..."
+find apps/web/src/app -type d -empty -delete 2>/dev/null || true
+
+echo "✅ Migration complete!"
+echo "📊 Files migrated: $(find apps/web/src/app -name "*.tsx" -not -name "__root.tsx" | wc -l)" 
