@@ -8,7 +8,7 @@ import Heading from "@peated/web/components/heading";
 import Link from "@peated/web/components/link";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { notFound } from "next/navigation";
+import { notFound } from "@tanstack/react-router";
 
 export const revalidate = 60;
 

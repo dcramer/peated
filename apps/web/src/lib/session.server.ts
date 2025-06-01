@@ -1,6 +1,5 @@
 import type { User } from "@peated/server/types";
-import { type SessionOptions, getIronSession } from "iron-session";
-import { cookies } from "next/headers";
+import { useSession } from "@tanstack/react-start/server";
 
 if (!process.env.SESSION_SECRET) {
   console.warn("SESSION_SECRET is not defined.");
@@ -18,19 +17,17 @@ export const defaultSession: SessionData = {
   ts: null,
 };
 
-export const sessionOptions: SessionOptions = {
-  password: process.env.SESSION_SECRET || "", // TODO: this should error out
-  cookieName: "_session",
-  cookieOptions: {
-    // secure only works in `https` environments
-    // if your localhost is not on `https`, then use: `secure: process.env.NODE_ENV === "production"`
-    sameSite: "lax",
-    path: "/",
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // enable this in prod only
-  },
-};
-
-export async function getSession() {
-  return await getIronSession<SessionData>(cookies(), sessionOptions);
+export function useAppSession() {
+  return useSession<SessionData>({
+    password: process.env.SESSION_SECRET || "", // TODO: this should error out
+    // cookieName: "_session",
+    cookie: {
+      // secure only works in `https` environments
+      // if your localhost is not on `https`, then use: `secure: process.env.NODE_ENV === "production"`
+      sameSite: "lax",
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // enable this in prod only
+    },
+  });
 }

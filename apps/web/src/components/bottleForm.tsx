@@ -32,7 +32,7 @@ import config from "@peated/web/config";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
@@ -123,7 +123,7 @@ export default function BottleForm({
   const [image, setImage] = useState<HTMLCanvasElement | null | undefined>(
     undefined
   );
-  const router = useRouter();
+  const navigate = useNavigate();
   const orpc = useORPC();
 
   const generateDataMutation = useMutation(
@@ -169,7 +169,9 @@ export default function BottleForm({
             title={title}
             saveDisabled={isSubmitting}
             onSave={handleSubmit(onSubmitHandler)}
-            onClose={() => (returnTo ? router.push(returnTo) : router.back())}
+            onClose={() =>
+              returnTo ? navigate({ to: returnTo }) : navigate({ to: ".." })
+            }
           />
         </Header>
       }

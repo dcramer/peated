@@ -1,10 +1,11 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { useLocation } from "@tanstack/react-router";
 import Button from "./button";
 
 export default function EmbeddedLogin() {
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
   return (
     <div className="mx-auto flex max-w-md flex-col items-center justify-center p-4">
       <p className="mb-4 text-muted text-sm">

@@ -2,7 +2,7 @@
 
 import { safe } from "@orpc/client";
 import { createServerClient } from "@peated/web/lib/orpc/client.server";
-import { redirect } from "next/navigation";
+import { redirect } from "@tanstack/react-router";
 import { getSafeRedirect } from "./auth";
 import type { SessionData } from "./session.server";
 import { getSession } from "./session.server";
@@ -27,7 +27,7 @@ export async function logout(formData?: FormData) {
 
   const session = await getSession();
   session.destroy();
-  redirect(redirectTo);
+  redirect({ to: redirectTo, search: {} });
 }
 
 type AuthenticateFormResult = {
@@ -120,9 +120,9 @@ export async function authenticate(
   // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
 
   if (!data.user.verified) {
-    redirect("/verify");
+    redirect({ to: "/verify" });
   } else {
-    redirect(redirectTo);
+    redirect({ to: redirectTo });
   }
 }
 
@@ -174,7 +174,7 @@ export async function register(formData: FormData) {
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
   // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
 
-  return redirect("/verify");
+  return redirect({ to: "/verify", search: {} });
 }
 
 type GenericResult = {

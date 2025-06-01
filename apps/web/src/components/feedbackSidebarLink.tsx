@@ -1,8 +1,8 @@
 "use client";
 
 import { BugAntIcon } from "@heroicons/react/24/outline";
-import type { feedbackIntegration } from "@sentry/nextjs";
-import { getClient } from "@sentry/nextjs";
+import type { feedbackIntegration } from "@sentry/react";
+import { getClient } from "@sentry/react";
 import { useCallback, useState } from "react";
 import SidebarLink from "./sidebarLink";
 

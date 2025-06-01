@@ -17,7 +17,7 @@ export default function AppHeader() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const searchParams = useSearch();
+  const searchParams = new URLSearchParams(location.search);
 
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);

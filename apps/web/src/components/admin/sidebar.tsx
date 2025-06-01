@@ -3,10 +3,11 @@
 import Button from "@peated/web/components/button";
 import HeaderLogo from "@peated/web/components/headerLogo";
 import SidebarLink from "@peated/web/components/sidebarLink";
-import { usePathname } from "next/navigation";
+import { useLocation } from "@tanstack/react-router";
 
 export default function AdminSidebar() {
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
 
   return (
     <>

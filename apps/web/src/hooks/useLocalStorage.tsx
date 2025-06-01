@@ -1,4 +1,4 @@
-import { logger } from "@sentry/nextjs";
+import { logger } from "@sentry/react";
 import { useState } from "react";
 
 export default function useLocalStorage<T>(key: string, initialValue: T) {

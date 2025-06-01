@@ -12,7 +12,7 @@ import type { Tasting } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useMutation } from "@tanstack/react-query";
-import { usePathname, useRouter } from "next/navigation";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import { type ComponentPropsWithoutRef, useEffect, useState } from "react";
 import { getAuthRedirect } from "../lib/auth";
 import { useORPC } from "../lib/orpc/context";
@@ -82,9 +82,10 @@ export default function TastingListItem({
   const { bottle, release } = tasting;
   const { user } = useAuth();
 
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
 
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const orpc = useORPC();
 
@@ -255,7 +256,7 @@ export default function TastingListItem({
                   );
                 }
               : () => {
-                  router.push(getAuthRedirect({ pathname }));
+                  navigate({ to: getAuthRedirect({ pathname }) });
                 }
           }
         >
@@ -300,7 +301,7 @@ export default function TastingListItem({
                       });
                       if (onDelete) onDelete(tasting);
                       else {
-                        location.reload();
+                        window.location.reload();
                       }
                     }}
                   >

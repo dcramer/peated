@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { redirect } from "@tanstack/react-router";
 
 export function getSafeRedirect(value: string | null) {
   if (!value || value?.indexOf("/") !== 0 || value?.indexOf("//") === 0)
@@ -13,7 +13,10 @@ export function redirectToAuth({
   pathname?: string;
   searchParams?: URLSearchParams;
 }) {
-  return redirect(getAuthRedirect({ pathname, searchParams }));
+  return redirect({
+    to: getAuthRedirect({ pathname, searchParams }),
+    search: {},
+  });
 }
 
 export function getAuthRedirect({

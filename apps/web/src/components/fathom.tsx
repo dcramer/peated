@@ -1,7 +1,7 @@
 "use client";
 
+import { useLocation } from "@tanstack/react-router";
 import { load, trackPageview } from "fathom-client";
-import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
 export type Props = {
@@ -10,8 +10,9 @@ export type Props = {
 };
 
 function TrackPageView({ siteId, includedDomains }: Props) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const location = useLocation();
+  const pathname = location.pathname;
+  const searchParams = new URLSearchParams(location.search);
 
   useEffect(() => {
     load(siteId, {

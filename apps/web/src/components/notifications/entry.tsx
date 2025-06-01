@@ -5,7 +5,7 @@ import type { Notification } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
 import type { FriendRequestNotification } from "@peated/web/types";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import UserAvatar from "../userAvatar";
 import FriendRequestEntry from "./friendRequestEntry";
 
@@ -18,7 +18,7 @@ export default function NotificationEntry({
   onArchive: () => void;
   onMarkRead: () => void;
 }) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const link = getLink({ notification });
   return (
     <div
@@ -31,7 +31,7 @@ export default function NotificationEntry({
         link
           ? () => {
               onMarkRead();
-              router.push(link);
+              navigate({ to: link });
             }
           : undefined
       }
@@ -48,9 +48,11 @@ export default function NotificationEntry({
                   <Link
                     href={`/users/${notification.fromUser.username}`}
                     className="mr-1 inline-flex items-center font-semibold hover:underline"
-                    onClick={(e) => {
+                    onClick={(e: React.MouseEvent) => {
                       e.stopPropagation();
-                      router.push(`/users/${notification.fromUser?.username}`);
+                      navigate({
+                        to: `/users/${notification.fromUser?.username}`,
+                      });
                     }}
                   >
                     {notification.fromUser.username}

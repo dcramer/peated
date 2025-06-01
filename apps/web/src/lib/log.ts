@@ -1,4 +1,4 @@
-import { captureException, captureMessage } from "@sentry/nextjs";
+import { captureException, captureMessage } from "@sentry/react";
 
 export function logError(
   error: Error | unknown,

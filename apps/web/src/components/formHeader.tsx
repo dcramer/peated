@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import type { FormEvent, ReactNode } from "react";
 import classNames from "../lib/classNames";
 
@@ -22,7 +22,7 @@ export default function FormHeader({
   onClose?: () => void;
   onSave: (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => void;
 }) {
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const blockStyles = "p-3";
 
@@ -31,7 +31,7 @@ export default function FormHeader({
       <div className="-mx-3 flex justify-center">
         <button
           type="button"
-          onClick={() => (onClose ? onClose() : router.back())}
+          onClick={() => (onClose ? onClose() : navigate({ to: ".." }))}
           className={`${blockStyles} group text-muted`}
         >
           <div className="sr-only">Back</div>

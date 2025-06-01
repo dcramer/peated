@@ -32,7 +32,6 @@
     "dayjs": "^1.11.13",
     "fathom-client": "^3.7.2",
     "framer-motion": "^10.18.0",
-    "iron-session": "^8.0.4",
     "isomorphic-dompurify": "^2.25.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.414.0",

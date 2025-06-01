@@ -13,14 +13,15 @@ import BottlerIcon from "@peated/web/assets/bottler.svg";
 import BrandIcon from "@peated/web/assets/brand.svg";
 import DistillerIcon from "@peated/web/assets/distiller.svg";
 import PeatedGlyph from "@peated/web/assets/glyph.svg";
-import { usePathname } from "next/navigation";
+import { useLocation } from "@tanstack/react-router";
 import Button from "./button";
 import FeedbackSidebarLink from "./feedbackSidebarLink";
 import HeaderLogo from "./headerLogo";
 import SidebarLink from "./sidebarLink";
 
 export default function Sidebar() {
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
 
   return (
     <>

@@ -1,7 +1,7 @@
 "use client";
 
 import type { PolymorphicProps } from "@peated/web/types";
-import { usePathname } from "next/navigation";
+import { useLocation } from "@tanstack/react-router";
 import type { ElementType } from "react";
 import classNames from "../lib/classNames";
 
@@ -48,7 +48,8 @@ export function TabItem<E extends ElementType = typeof defaultElement>({
 }: PolymorphicProps<E, ItemProps>) {
   const Component = as ?? defaultElement;
 
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
 
   const activeStyles = "text-highlight border-highlight";
   const inactiveStyles =

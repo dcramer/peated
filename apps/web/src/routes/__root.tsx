@@ -1,19 +1,28 @@
 import "@fontsource/raleway/index.css";
 import Fathom from "@peated/web/components/fathom";
 import config from "@peated/web/config";
-import { getSession } from "@peated/web/lib/session.server";
+import {
+  type SessionData,
+  useAppSession,
+} from "@peated/web/lib/session.server";
 import "@peated/web/styles/index.css";
+import type { RouterUtils } from "@orpc/react-query";
 import * as Sentry from "@sentry/react";
+import type { QueryClient } from "@tanstack/react-query";
 import {
   HeadContent,
   Outlet,
   Scripts,
-  createRootRoute,
+  createRootRouteWithContext,
 } from "@tanstack/react-router";
 import React from "react";
 import Providers from "../app/providers/providers";
+import type { ServerClient } from "../lib/orpc/client.server";
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+  orpc: RouterUtils<ServerClient>;
+}>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -28,24 +37,25 @@ export const Route = createRootRoute({
     links: [{ rel: "icon", href: "/favicon.ico" }],
   }),
   loader: async () => {
-    const session = await getSession();
+    const session = await useAppSession();
+    const user = session.data.user;
 
     // Bind the user on the server for Sentry
     Sentry.setUser(
-      session.user
+      user
         ? {
-            id: `${session.user.id}`,
-            username: session.user.username,
-            email: session.user.email,
+            id: `${user.id}`,
+            username: user.username,
+            email: user.email,
           }
         : null
     );
 
     return {
       session: {
-        user: session.user,
-        accessToken: session.accessToken,
-        ts: session.ts,
+        user: user,
+        accessToken: session.data.accessToken,
+        ts: session.data.ts,
       },
     };
   },
@@ -61,11 +71,7 @@ function RootComponent() {
 function RootDocument({
   session,
 }: {
-  session: {
-    user: any;
-    accessToken: string;
-    ts: number;
-  };
+  session: SessionData;
 }) {
   return (
     <html lang="en">

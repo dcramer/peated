@@ -1,10 +1,10 @@
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
-import { useSearchParams } from "next/navigation";
+import { useSearch } from "@tanstack/react-router";
 import Form from "./form";
 import TextInput from "./textInput";
 
 export default function SearchBar({ name = "query" }: { name?: string }) {
-  const searchParams = useSearchParams();
+  const searchParams = useSearch({ strict: false });
 
   return (
     <Form className="">
@@ -14,7 +14,7 @@ export default function SearchBar({ name = "query" }: { name?: string }) {
           <TextInput
             type="text"
             name={name}
-            defaultValue={searchParams.get(name) ?? ""}
+            defaultValue={(searchParams as any)[name] ?? ""}
           />
         </div>
       </div>

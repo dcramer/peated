@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import SearchHeaderForm from "./searchHeaderForm";
 
@@ -15,7 +15,7 @@ export default function SearchHeader({
   onClose?: () => void;
   onDone?: () => void;
 }) {
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const blockStyles = "";
 
@@ -24,7 +24,7 @@ export default function SearchHeader({
       <div className="flex items-center">
         <button
           type="button"
-          onClick={() => (onClose ? onClose() : router.back())}
+          onClick={() => (onClose ? onClose() : navigate({ to: ".." }))}
           className={`${blockStyles} group flex justify-center text-muted`}
         >
           <div className="-my-1 rounded bg-slate-800 p-1 group-hover:bg-slate-700 group-hover:text-white">

@@ -2,7 +2,7 @@
 
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import Header from "../header";
@@ -28,10 +28,10 @@ export default function SearchPanel({
   onQueryChange,
 }: Props) {
   const { user } = useAuth();
-  const qs = useSearchParams();
-  const directToTasting = qs.has("tasting");
+  const search = useSearch({ strict: false });
+  const directToTasting = "tasting" in search;
 
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const [initialState, setInitialState] = useState<"loading" | "ready">(
     "loading"
@@ -96,11 +96,14 @@ export default function SearchPanel({
               onQuery(value);
             }}
             onSubmit={(value) => {
-              router.replace(
-                `${location.pathname}?q=${encodeURIComponent(value)}&${
-                  directToTasting ? "tasting" : ""
-                }`
-              );
+              const newSearch = { q: value };
+              if (directToTasting) {
+                newSearch.tasting = "";
+              }
+              navigate({
+                search: newSearch,
+                replace: true,
+              });
             }}
             loading={state === "loading"}
             onClose={onClose}
