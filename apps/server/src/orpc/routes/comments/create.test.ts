@@ -14,7 +14,7 @@ describe("POST /tastings/:tasting/comments", () => {
         createdAt: new Date().toISOString(),
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("new comment", async ({ fixtures, defaults }) => {

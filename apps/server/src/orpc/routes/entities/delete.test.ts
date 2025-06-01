@@ -30,6 +30,6 @@ describe("DELETE /entities/:entity", () => {
     const err = await waitError(() =>
       routerClient.entities.delete({ entity: entity.id }, { context: { user } })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 });

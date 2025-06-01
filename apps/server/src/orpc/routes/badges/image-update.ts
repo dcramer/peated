@@ -58,7 +58,7 @@ export default procedure
           filename: "badge-image.jpg",
           file: fileStream,
         },
-        namespace: `badges`,
+        namespace: "badges",
         urlPrefix: "/uploads",
         onProcess: (...args) => compressAndResizeImage(...args, 500, 500),
       });

@@ -33,11 +33,16 @@
     "rules": {
       "recommended": true,
       "a11y": {
-        "noSvgWithoutTitle": "off"
+        "useKeyWithClickEvents": "off",
+        "useButtonType": "warn",
+        "noSvgWithoutTitle": "off",
+        "useAltText": "warn",
+        "useAnchorContent": "warn"
       },
       "complexity": {
         "noExcessiveCognitiveComplexity": "off",
-        "noVoid": "off"
+        "noVoid": "off",
+        "noForEach": "off"
       },
       "correctness": {
         "noUnusedVariables": "off",
@@ -51,9 +56,15 @@
         "useConst": "off",
         "useImportType": "error"
       },
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
+      },
       "suspicious": {
         "noExplicitAny": "off",
-        "noEmptyInterface": "off"
+        "noEmptyInterface": "off",
+        "noArrayIndexKey": "off",
+        "noImplicitAnyLet": "off",
+        "noAssignInExpressions": "off"
       }
     }
   },

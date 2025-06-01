@@ -8,7 +8,7 @@ describe("findBottleId", () => {
       releaseYear: null,
     });
     const result = await findBottleId(bottle.fullName);
-    expect(result).toMatchInlineSnapshot(`1`);
+    expect(result).toMatchInlineSnapshot("1");
   });
 
   // test("matches fullName as prefix", async ({ fixtures }) => {
@@ -24,13 +24,13 @@ describe("findBottleId", () => {
       name: "12-year-old Double Cask",
     });
     const result = await findBottleId("The Macallan 12-year-old");
-    expect(result).toMatchInlineSnapshot(`null`);
+    expect(result).toMatchInlineSnapshot("null");
   });
 
   test("doesnt match random junk", async ({ fixtures }) => {
     await fixtures.Bottle();
     const result = await findBottleId("No Chance");
-    expect(result).toMatchInlineSnapshot(`null`);
+    expect(result).toMatchInlineSnapshot("null");
   });
 
   test("matches alias", async ({ fixtures }) => {
@@ -40,7 +40,7 @@ describe("findBottleId", () => {
       name: "Something Silly",
     });
     const result = await findBottleId("Something Silly");
-    expect(result).toMatchInlineSnapshot(`1`);
+    expect(result).toMatchInlineSnapshot("1");
   });
 
   test("prioritizes correct prefix", async ({ fixtures }) => {
@@ -54,10 +54,10 @@ describe("findBottleId", () => {
       name: "18-year-old Port Cask",
     });
     const result = await findBottleId("Aberfeldy 18-year-old Port Cask");
-    expect(result).toMatchInlineSnapshot(`2`);
+    expect(result).toMatchInlineSnapshot("2");
 
     const result2 = await findBottleId("Aberfeldy 18-year-old");
-    expect(result2).toMatchInlineSnapshot(`1`);
+    expect(result2).toMatchInlineSnapshot("1");
   });
 });
 

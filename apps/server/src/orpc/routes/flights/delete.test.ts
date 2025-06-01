@@ -36,6 +36,6 @@ describe("DELETE /flights/:flight", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 });

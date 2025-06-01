@@ -40,7 +40,7 @@ export default function BottleStats({
       {stats.map((stat) => (
         <div key={stat.name}>
           <div className="text-muted leading-7">{stat.name}</div>
-          <div className="order-first text-3xl font-semibold tracking-tight lg:text-5xl">
+          <div className="order-first font-semibold text-3xl tracking-tight lg:text-5xl">
             {stat.value || "-"}
           </div>
         </div>

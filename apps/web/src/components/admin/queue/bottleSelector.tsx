@@ -58,12 +58,13 @@ export default function BottleSelector({
   }, [name, open]);
 
   const selectOption = async (option: Bottle) => {
-    onSelect && onSelect(option);
+    onSelect?.(option);
   };
 
   if (!name) return null;
 
-  const listItemClasses = `px-3 group relative border-b border-slate-800 bg-slate-950 hover:bg-slate-900`;
+  const listItemClasses =
+    "px-3 group relative border-b border-slate-800 bg-slate-950 hover:bg-slate-900";
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -83,7 +84,7 @@ export default function BottleSelector({
       >
         <div className="relative mx-auto lg:px-8">
           {(name || source) && (
-            <div className="prose prose-invert text-muted max-w-none bg-slate-800 p-6">
+            <div className="prose prose-invert max-w-none bg-slate-800 p-6 text-muted">
               {name && (
                 <p>
                   Select the bottle that is identified as{" "}
@@ -107,7 +108,7 @@ export default function BottleSelector({
               <Spinner />
             </div>
           )}
-          <ul role="list" className="divide-y divide-slate-800">
+          <ul className="divide-y divide-slate-800">
             {results.map((bottle) => {
               return (
                 <ListItem
@@ -120,6 +121,7 @@ export default function BottleSelector({
                   </div>
 
                   <button
+                    type="button"
                     onClick={() => {
                       selectOption(bottle);
                     }}
@@ -128,7 +130,7 @@ export default function BottleSelector({
                     <div className="flex items-center gap-x-1 font-bold">
                       {bottle.fullName}
                     </div>
-                    <div className="text-muted flex space-x-2">
+                    <div className="flex space-x-2 text-muted">
                       {bottle.distillers.length ? (
                         <Join divider=", ">
                           {bottle.distillers.map((distiller) => distiller.name)}
@@ -148,7 +150,7 @@ export default function BottleSelector({
                     <a
                       href={`/addBottle?name=${encodeURIComponent(toTitleCase(query))}&${returnTo ? `returnTo=${encodeURIComponent(returnTo)}` : ""}`}
                     >
-                      <span className="absolute inset-x-0 -top-px bottom-0" />
+                      <span className="-top-px absolute inset-x-0 bottom-0" />
                       Can't find what you're looking for?
                     </a>
                   </div>

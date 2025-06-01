@@ -7,7 +7,7 @@ export default function EmbeddedLogin() {
   const pathname = usePathname();
   return (
     <div className="mx-auto flex max-w-md flex-col items-center justify-center p-4">
-      <p className="text-muted mb-4 text-sm">
+      <p className="mb-4 text-muted text-sm">
         Looks like you'll need to login to participate here.
       </p>
       <Button

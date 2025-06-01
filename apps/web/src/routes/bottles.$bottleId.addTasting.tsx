@@ -103,7 +103,7 @@ function Page() {
 
           for (const award of awards) {
             // TODO: show "Youve discovered" flow for level 0 badges
-            if (award.level != award.prevLevel && award.level) {
+            if (award.level !== award.prevLevel && award.level) {
               flash(
                 <div className="relative flex flex-row items-center gap-x-3">
                   <Link

@@ -20,7 +20,7 @@ function NotificationCountAuthentciated() {
   if (!user || !unreadNotificationCount) return null;
 
   return (
-    <span className="bg-highlight absolute right-0 top-0 inline-flex h-5 w-5 items-center justify-center rounded-full text-xs font-semibold text-black">
+    <span className="absolute top-0 right-0 inline-flex h-5 w-5 items-center justify-center rounded-full bg-highlight font-semibold text-black text-xs">
       {unreadNotificationCount.toLocaleString()}
     </span>
   );

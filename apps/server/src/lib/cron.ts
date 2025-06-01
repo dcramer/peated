@@ -34,7 +34,7 @@ export function scheduledJob(
 
         return await Sentry.startSpan(
           {
-            op: `execute`,
+            op: "execute",
             name: `cron.${jobName}`,
           },
           async (span) => {

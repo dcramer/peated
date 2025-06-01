@@ -12,7 +12,7 @@ describe("POST /entities/:entity/merge", () => {
         { context: { user: null } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("requires mod", async ({ defaults }) => {
@@ -25,7 +25,7 @@ describe("POST /entities/:entity/merge", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   // TODO: test call to pushJob

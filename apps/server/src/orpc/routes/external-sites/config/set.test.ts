@@ -14,7 +14,7 @@ describe("PUT /external-sites/:site/config/:key", () => {
         value: "test",
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("requires admin", async ({ fixtures }) => {
@@ -31,7 +31,7 @@ describe("PUT /external-sites/:site/config/:key", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("returns error for non-existent site", async ({ fixtures }) => {
@@ -47,7 +47,7 @@ describe("PUT /external-sites/:site/config/:key", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+    expect(err).toMatchInlineSnapshot("[Error: Input validation failed]");
   });
 
   test("set new value", async ({ fixtures }) => {

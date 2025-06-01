@@ -17,7 +17,7 @@ export default procedure
   .input(z.object({ token: z.string() }))
   .output(z.object({}))
   .handler(async ({ input, errors }) => {
-    let payload;
+    let payload: any;
     try {
       payload = await verifyPayload(input.token);
     } catch (err) {

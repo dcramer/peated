@@ -25,8 +25,8 @@ export default function FilterSidebarSection({
 
   return (
     <li>
-      <div className="text-sm font-semibold text-slate-200">{titleValue}</div>
-      <ul role="list" className="-mx-3 mt-2 space-y-1">
+      <div className="font-semibold text-slate-200 text-sm">{titleValue}</div>
+      <ul className="-mx-3 mt-2 space-y-1">
         <SidebarLink
           active={!currentValue}
           href={{

@@ -15,7 +15,7 @@ export default function Footer({
         mobileOnly ? "block lg:hidden" : ""
       )}
     >
-      <div className="fixed bottom-0 left-0 right-0 z-10 border-t border-t-slate-700 bg-slate-950 pb-2 sm:pb-0">
+      <div className="fixed right-0 bottom-0 left-0 z-10 border-t border-t-slate-700 bg-slate-950 pb-2 sm:pb-0">
         <div className="mx-auto flex min-h-14 w-full max-w-4xl items-center justify-center gap-x-6 px-3 pb-4 sm:min-h-20 sm:px-3 lg:px-0">
           {children || null}
         </div>

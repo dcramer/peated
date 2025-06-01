@@ -77,7 +77,7 @@ export function normalizeBottle({
   isFullName?: boolean;
 }): NormalizedBottle {
   // try to ease UX and normalize common name components
-  if (statedAge && name == `${statedAge}`)
+  if (statedAge && name === `${statedAge}`)
     return {
       name: `${statedAge}${ageSuffix}`,
       statedAge,
@@ -231,7 +231,7 @@ export function normalizeBottleAge({
 
   // TODO: this needs subbed in search too...
   name = name.replace(AGE_EXTRACT_REGEXP, (match, p1) => {
-    return convertWordToNumber(p1) + "-year-old";
+    return `${convertWordToNumber(p1)}-year-old`;
   });
 
   // normalize prefix/suffix numbers
@@ -271,12 +271,12 @@ export function normalizeBottleBatchNumber(name: string) {
   return name.replace(
     /(?:,)?(^|\s)?(?:(?:\()batch (no.?\s|number\s|#)?([^)]+)(?:\))|batch (no.?\s|number\s|#)?((?!kentucky|proof)[^,\s]+))(?:,)?($|\s)?/i,
     (fullMatch, ...match: string[]) => {
-      if (name == fullMatch)
+      if (name === fullMatch)
         return `Batch ${convertWordToNumber(match[2] || match[4])}`;
       if (match[2])
         return `${match[0] || ""}(Batch ${convertWordToNumber(match[2])})${match[5] || ""}`;
-      else
-        return `${match[0] || ""}(Batch ${convertWordToNumber(match[4])})${match[5] || ""}`;
+
+      return `${match[0] || ""}(Batch ${convertWordToNumber(match[4])})${match[5] || ""}`;
     }
   );
 }

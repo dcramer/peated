@@ -10,7 +10,7 @@ describe("POST /tastings", () => {
     const err = await waitError(() =>
       routerClient.tastings.create({ bottle: 1 })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("creates a new tasting with minimal params", async ({
@@ -211,7 +211,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Cannot identify flight.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Cannot identify flight.]");
   });
 
   test("creates a new tasting with flight", async ({ defaults, fixtures }) => {
@@ -324,7 +324,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Cannot identify release.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Cannot identify release.]");
   });
 
   test("fails with nonexistent release", async ({ defaults, fixtures }) => {
@@ -339,7 +339,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Cannot identify release.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Cannot identify release.]");
   });
 
   test("creates a new tasting with serving style and color", async ({
@@ -406,7 +406,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+    expect(err).toMatchInlineSnapshot("[Error: Input validation failed]");
   });
 
   test("fails with future date", async ({ defaults, fixtures }) => {
@@ -422,7 +422,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+    expect(err).toMatchInlineSnapshot("[Error: Input validation failed]");
   });
 
   test("fails with non-following friends", async ({ defaults, fixtures }) => {
@@ -439,7 +439,7 @@ describe("POST /tastings", () => {
       )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Friends must all be active relationships.]`
+      "[Error: Friends must all be active relationships.]"
     );
   });
 
@@ -494,7 +494,7 @@ describe("POST /tastings", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Tasting already exists.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Tasting already exists.]");
   });
 
   test("updates entity stats correctly", async ({ defaults, fixtures }) => {
@@ -631,7 +631,7 @@ describe("POST /tastings", () => {
       )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Friends must all be active relationships.]`
+      "[Error: Friends must all be active relationships.]"
     );
   });
 });

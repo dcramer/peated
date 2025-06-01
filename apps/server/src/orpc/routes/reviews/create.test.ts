@@ -21,7 +21,7 @@ describe("POST /reviews", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("new review with new bottle no entity", async ({ fixtures }) => {
@@ -136,6 +136,6 @@ describe("POST /reviews", () => {
         { context: { user: adminUser } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+    expect(err).toMatchInlineSnapshot("[Error: Input validation failed]");
   });
 });

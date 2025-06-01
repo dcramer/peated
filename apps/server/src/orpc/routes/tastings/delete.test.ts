@@ -10,7 +10,7 @@ describe("DELETE /tastings/:tasting", () => {
     const err = await waitError(() =>
       routerClient.tastings.delete({ tasting: 1 })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("delete own tasting", async ({ defaults, fixtures }) => {

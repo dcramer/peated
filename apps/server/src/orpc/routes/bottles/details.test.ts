@@ -15,7 +15,7 @@ describe("GET /bottles/:bottle", () => {
 
   test("errors on invalid bottle", async () => {
     const err = await waitError(routerClient.bottles.details({ bottle: 1 }));
-    expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Bottle not found.]");
   });
 
   test("gets bottle with tombstone", async ({ fixtures }) => {

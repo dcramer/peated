@@ -1,4 +1,4 @@
-import { createHash } from "crypto";
+import { createHash } from "node:crypto";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { signPayload } from "@peated/server/lib/auth";
@@ -49,7 +49,7 @@ describe("POST /auth/password-reset/confirm", () => {
       })
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Invalid verification token.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Invalid verification token.]");
 
     const [newUser] = await db
       .select()
@@ -77,7 +77,7 @@ describe("POST /auth/password-reset/confirm", () => {
       })
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Invalid verification token.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Invalid verification token.]");
 
     const [newUser] = await db
       .select()

@@ -204,9 +204,9 @@ export default function BadgeForm({
         </Fieldset>
       </Form>
 
-      <div className="mb-4 mt-4 border-y border-slate-800 sm:rounded sm:border">
+      <div className="mt-4 mb-4 border-slate-800 border-y sm:rounded sm:border">
         <Legend title="Checks" />
-        <div className="mb-8 mt-4 flex flex-wrap items-center gap-2 px-5">
+        <div className="mt-4 mb-8 flex flex-wrap items-center gap-2 px-5">
           <div className="font-bold">Add:</div>
           {BADGE_CHECK_TYPE_LIST.map((t) => {
             return (
@@ -264,7 +264,7 @@ export default function BadgeForm({
                       className="absolute inset-0 flex items-center"
                       aria-hidden="true"
                     >
-                      <div className="min-w-full border-t-2 border-slate-700" />
+                      <div className="min-w-full border-slate-700 border-t-2" />
                     </div>
                     <div className="relative flex justify-center">
                       <span className="bg-slate-950 px-2 text-lg uppercase">

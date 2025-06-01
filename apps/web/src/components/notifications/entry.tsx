@@ -66,11 +66,12 @@ export default function NotificationEntry({
             </div>
             <div className="flex min-h-full flex-shrink">
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   onArchive();
                 }}
-                className="group-hover:text-muted block h-full w-full rounded bg-inherit p-2 px-1 text-slate-600 hover:bg-slate-800 hover:text-slate-400"
+                className="block h-full w-full rounded bg-inherit p-2 px-1 text-slate-600 hover:bg-slate-800 hover:text-slate-400 group-hover:text-muted"
               >
                 <XMarkIcon className="h-6 w-6" />
               </button>

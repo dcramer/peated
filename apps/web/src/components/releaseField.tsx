@@ -109,8 +109,8 @@ function CreateForm({
       }
     >
       {!!createDialogHelpText && (
-        <div className="border-y border-slate-700 p-3 lg:mb-4 lg:border lg:p-4">
-          <div className="prose prose-invert text-muted max-w-full text-sm leading-6">
+        <div className="border-slate-700 border-y p-3 lg:mb-4 lg:border lg:p-4">
+          <div className="prose prose-invert max-w-full text-muted text-sm leading-6">
             {createDialogHelpText}
           </div>
         </div>

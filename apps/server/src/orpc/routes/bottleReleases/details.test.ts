@@ -30,6 +30,6 @@ describe("GET /bottle-releases/:release", () => {
         release: 1234,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Release not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Release not found.]");
   });
 });

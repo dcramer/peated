@@ -12,7 +12,7 @@ describe("PATCH /bottle-series/:series", () => {
         series: 1,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   it("requires moderator access", async ({ defaults }) => {
@@ -24,7 +24,7 @@ describe("PATCH /bottle-series/:series", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   it("updates a series with new attributes", async ({ fixtures }) => {
@@ -104,7 +104,7 @@ describe("PATCH /bottle-series/:series", () => {
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: A series with this name already exists.]`
+      "[Error: A series with this name already exists.]"
     );
   });
 

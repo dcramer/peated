@@ -198,7 +198,6 @@ export default procedure
         case "tastings":
           orderBy = asc(entities.totalTastings);
           break;
-        case "-tastings":
         default:
           orderBy = desc(entities.totalTastings);
       }

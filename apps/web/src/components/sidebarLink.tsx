@@ -33,10 +33,10 @@ export default forwardRef(function SidebarLink<
         href=""
         className={classNames(
           active
-            ? "text-highlight border-highlight"
-            : "text-muted border-transparent hover:border-slate-400 hover:text-slate-400",
+            ? "border-highlight text-highlight"
+            : "border-transparent text-muted hover:border-slate-400 hover:text-slate-400",
           "relative cursor-pointer border-l-4",
-          "group flex gap-x-3 text-sm font-semibold leading-6",
+          "group flex gap-x-3 font-semibold text-sm leading-6",
           size === "default" ? "p-2" : "px-2"
         )}
         ref={ref}

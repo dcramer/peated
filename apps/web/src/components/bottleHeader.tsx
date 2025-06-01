@@ -40,12 +40,12 @@ export default function BottleHeader({
       titleExtra={
         <BottleMetadata
           data={bottle}
-          className="text-muted w-full truncate text-center lg:text-left"
+          className="w-full truncate text-center text-muted lg:text-left"
         />
       }
       metadata={
         (bottle.category || bottle.statedAge) && (
-          <div className="text-muted flex w-full min-w-[150px] flex-col items-center justify-center gap-x-1 lg:w-auto lg:items-end">
+          <div className="flex w-full min-w-[150px] flex-col items-center justify-center gap-x-1 text-muted lg:w-auto lg:items-end">
             <div>
               {bottle.category && (
                 <Link

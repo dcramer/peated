@@ -37,7 +37,7 @@ describe("GET /countries/:country/regions/:region", () => {
         region: "some-region",
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Invalid country.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Invalid country.]");
   });
 
   test("errors on non-existent region", async ({ fixtures }) => {
@@ -49,7 +49,7 @@ describe("GET /countries/:country/regions/:region", () => {
         region: "nonexistent-region",
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Region not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Region not found.]");
   });
 
   test("is case-insensitive for country and region slugs", async ({

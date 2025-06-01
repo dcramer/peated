@@ -5,7 +5,7 @@ import type { AnyConnection } from ".";
 export const migrate = async ({
   db,
   fake = false,
-  migrationsFolder = __dirname + "/../../migrations",
+  migrationsFolder = `${__dirname}/../../migrations`,
 }: {
   db: AnyConnection;
   fake?: boolean;

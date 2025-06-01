@@ -26,13 +26,13 @@ export default function Leaderboard({ badgeId }: { badgeId: number }) {
               href={`/users/${user.username}`}
               className="absolute inset-0"
             />
-            <div className="text-muted font-mono text-2xl">#{index + 1}</div>
+            <div className="font-mono text-2xl text-muted">#{index + 1}</div>
             <UserAvatar user={user} size={36} />
             <div className="flex flex-col">
               <strong>{user.username}</strong>
               <div className="text-muted text-sm">Level {award.level}</div>
             </div>
-            <div className="text-muted flex-grow text-right">
+            <div className="flex-grow text-right text-muted">
               <div className="inline-flex flex-col items-center">
                 <div>{award.xp}</div>
                 <div className="text-muted text-sm">Points</div>

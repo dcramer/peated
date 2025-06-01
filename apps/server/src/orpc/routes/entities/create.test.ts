@@ -12,7 +12,7 @@ describe("POST /entities", () => {
         name: "Delicious Wood",
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("creates a new entity", async ({ defaults }) => {

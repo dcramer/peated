@@ -39,7 +39,7 @@ export default function PasswordResetChangeForm({ token }: { token: string }) {
   );
 
   return (
-    <div className="min-w-sm flex flex-auto flex-col gap-y-4">
+    <div className="flex min-w-sm flex-auto flex-col gap-y-4">
       {result?.error && <Alert>{result.error}</Alert>}
       {result?.ok ? (
         <>

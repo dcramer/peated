@@ -17,14 +17,15 @@ export default function SearchHeader({
 }) {
   const router = useRouter();
 
-  const blockStyles = ``;
+  const blockStyles = "";
 
   return (
     <nav className="flex min-w-full items-stretch justify-between gap-x-4 text-white">
       <div className="flex items-center">
         <button
+          type="button"
           onClick={() => (onClose ? onClose() : router.back())}
-          className={`${blockStyles} text-muted group flex justify-center`}
+          className={`${blockStyles} group flex justify-center text-muted`}
         >
           <div className="-my-1 rounded bg-slate-800 p-1 group-hover:bg-slate-700 group-hover:text-white">
             {closeIcon}
@@ -35,10 +36,11 @@ export default function SearchHeader({
       {onDone && (
         <div className="flex">
           <button
+            type="button"
             onClick={onDone}
             className={`group min-h-full ${blockStyles}`}
           >
-            <span className="text-muted rounded bg-slate-800 p-2.5 font-semibold group-hover:bg-slate-700 group-hover:text-white">
+            <span className="rounded bg-slate-800 p-2.5 font-semibold text-muted group-hover:bg-slate-700 group-hover:text-white">
               Done
             </span>
           </button>

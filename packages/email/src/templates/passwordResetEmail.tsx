@@ -14,7 +14,7 @@ export const TemplateStruct = object({
 export type TemplateProps = Infer<typeof TemplateStruct>;
 
 export const Template = ({ resetUrl, baseUrl }: TemplateProps) => {
-  const previewText = `A password reset was requested.`;
+  const previewText = "A password reset was requested.";
 
   return (
     <Layout baseUrl={baseUrl}>

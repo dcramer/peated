@@ -63,7 +63,7 @@ function CollectionActionAuthenticated({ bottle }: { bottle: Bottle }) {
       color="primary"
     >
       {isCollected ? (
-        <StarIconFilled className="text-highlight h-4 w-4" aria-hidden="true" />
+        <StarIconFilled className="h-4 w-4 text-highlight" aria-hidden="true" />
       ) : (
         <StarIcon className="h-4 w-4" aria-hidden="true" />
       )}

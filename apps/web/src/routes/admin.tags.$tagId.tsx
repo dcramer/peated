@@ -42,10 +42,10 @@ function Page() {
 
       <div className="my-8 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap">
         <div className="flex w-full flex-col justify-center gap-y-4 px-4 sm:w-auto sm:flex-auto sm:gap-y-2">
-          <h3 className="self-center text-4xl font-semibold text-white sm:self-start">
+          <h3 className="self-center font-semibold text-4xl text-white sm:self-start">
             {toTitleCase(tag.name)}
           </h3>
-          <div className="text-muted flex flex-col items-center self-center sm:flex-row sm:self-start lg:mb-8">
+          <div className="flex flex-col items-center self-center text-muted sm:flex-row sm:self-start lg:mb-8">
             {toTitleCase(tag.tagCategory)}
           </div>
         </div>

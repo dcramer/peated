@@ -9,9 +9,9 @@ export default function SimpleHeader<
   const Component = as ?? defaultElement;
 
   return (
-    <div className="mb-4 flex space-x-8 border-b border-slate-700">
+    <div className="mb-4 flex space-x-8 border-slate-700 border-b">
       <Component
-        className="text-highlight border-highlight flex justify-center whitespace-nowrap border-b-4 px-3 py-4 text-sm font-medium"
+        className="flex justify-center whitespace-nowrap border-highlight border-b-4 px-3 py-4 font-medium text-highlight text-sm"
         {...props}
       />
     </div>

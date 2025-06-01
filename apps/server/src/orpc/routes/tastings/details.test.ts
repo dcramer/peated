@@ -17,6 +17,6 @@ describe("GET /tastings/:tasting", () => {
         tasting: 1,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Tasting not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Tasting not found.]");
   });
 });

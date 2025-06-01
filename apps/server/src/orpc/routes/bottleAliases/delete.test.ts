@@ -63,6 +63,6 @@ describe("DELETE /bottle-aliases/:name", () => {
         }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 });

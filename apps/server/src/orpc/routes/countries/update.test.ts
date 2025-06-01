@@ -13,7 +13,7 @@ describe("PATCH /countries/:country", () => {
           country: "test-country",
         })
       );
-      expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+      expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
     });
 
     test("requires mod", async ({ defaults }) => {
@@ -25,7 +25,7 @@ describe("PATCH /countries/:country", () => {
           { context: { user: defaults.user } }
         )
       );
-      expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+      expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
     });
   });
 
@@ -114,7 +114,7 @@ describe("PATCH /countries/:country", () => {
           { context: { user: modUser } }
         )
       );
-      expect(err).toMatchInlineSnapshot(`[Error: Country not found.]`);
+      expect(err).toMatchInlineSnapshot("[Error: Country not found.]");
     });
   });
 });

@@ -11,86 +11,86 @@
 // Import Routes
 
 import type {
-  FileRoutesByPath,
   CreateServerFileRoute,
-} from '@tanstack/react-start/server'
+  FileRoutesByPath,
+} from "@tanstack/react-start/server";
 import {
-  createServerRoute,
   createServerFileRoute,
-} from '@tanstack/react-start/server'
+  createServerRoute,
+} from "@tanstack/react-start/server";
 
-import { ServerRoute as HealthRouteImport } from './../../src/routes/_health'
+import { ServerRoute as HealthRouteImport } from "./../../src/routes/_health";
 
 // Create/Update Routes
 
-const rootRoute = createServerRoute()
+const rootRoute = createServerRoute();
 
 const HealthRoute = HealthRouteImport.update({
-  id: '/_health',
+  id: "/_health",
   getParentRoute: () => rootRoute,
-} as any)
+} as any);
 
 // Populate the FileRoutesByPath interface
 
-declare module '@tanstack/react-start/server' {
+declare module "@tanstack/react-start/server" {
   interface FileRoutesByPath {
-    '/_health': {
-      id: '/_health'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof HealthRouteImport
-      parentRoute: typeof rootRoute
-    }
+    "/_health": {
+      id: "/_health";
+      path: "";
+      fullPath: "";
+      preLoaderRoute: typeof HealthRouteImport;
+      parentRoute: typeof rootRoute;
+    };
   }
 }
 
 // Add type-safety to the createFileRoute function across the route tree
 
-declare module './../../src/routes/_health' {
+declare module "./../../src/routes/_health" {
   const createServerFileRoute: CreateServerFileRoute<
-    FileRoutesByPath['/_health']['parentRoute'],
-    FileRoutesByPath['/_health']['id'],
-    FileRoutesByPath['/_health']['path'],
-    FileRoutesByPath['/_health']['fullPath'],
+    FileRoutesByPath["/_health"]["parentRoute"],
+    FileRoutesByPath["/_health"]["id"],
+    FileRoutesByPath["/_health"]["path"],
+    FileRoutesByPath["/_health"]["fullPath"],
     unknown
-  >
+  >;
 }
 
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '': typeof HealthRoute
+  "": typeof HealthRoute;
 }
 
 export interface FileRoutesByTo {
-  '': typeof HealthRoute
+  "": typeof HealthRoute;
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/_health': typeof HealthRoute
+  __root__: typeof rootRoute;
+  "/_health": typeof HealthRoute;
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: ''
-  fileRoutesByTo: FileRoutesByTo
-  to: ''
-  id: '__root__' | '/_health'
-  fileRoutesById: FileRoutesById
+  fileRoutesByFullPath: FileRoutesByFullPath;
+  fullPaths: "";
+  fileRoutesByTo: FileRoutesByTo;
+  to: "";
+  id: "__root__" | "/_health";
+  fileRoutesById: FileRoutesById;
 }
 
 export interface RootRouteChildren {
-  HealthRoute: typeof HealthRoute
+  HealthRoute: typeof HealthRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
   HealthRoute: HealthRoute,
-}
+};
 
 export const routeTree = rootRoute
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
 
 /* ROUTE_MANIFEST_START
 {

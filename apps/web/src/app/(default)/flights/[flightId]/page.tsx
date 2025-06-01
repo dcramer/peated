@@ -35,7 +35,7 @@ export default function Page({
       <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4 p-3 sm:flex-nowrap sm:py-0">
         <div className="w-full flex-auto flex-col items-center space-y-1 sm:w-auto sm:items-start">
           <div className="mb-2 flex flex-col items-center gap-4 sm:flex-row">
-            <h1 className="truncate text-center text-3xl font-semibold leading-7 sm:text-left">
+            <h1 className="truncate text-center font-semibold text-3xl leading-7 sm:text-left">
               {flight.name}
             </h1>
             <div className="flex flex-row gap-2">
@@ -46,7 +46,7 @@ export default function Page({
             </div>
           </div>
           {flight.description && (
-            <div className="text-muted truncate text-center sm:text-left">
+            <div className="truncate text-center text-muted sm:text-left">
               {flight.description}
             </div>
           )}
@@ -60,8 +60,8 @@ export default function Page({
         <tbody>
           {bottleList.results.map((bottle) => {
             return (
-              <tr key={bottle.id} className="border-b border-slate-800">
-                <td className="group relative max-w-0 py-4 pl-4 pr-3 text-sm sm:pl-3">
+              <tr key={bottle.id} className="border-slate-800 border-b">
+                <td className="group relative max-w-0 py-4 pr-3 pl-4 text-sm sm:pl-3">
                   <BottleLink
                     bottle={bottle}
                     flightId={flight.id}
@@ -81,7 +81,7 @@ export default function Page({
                     {formatCategoryName(bottle.category)}
                   </div>
                 </td>
-                <td className="hidden py-4 pl-3 pr-4 text-right text-sm sm:table-cell sm:pr-3">
+                <td className="hidden py-4 pr-4 pl-3 text-right text-sm sm:table-cell sm:pr-3">
                   <Button
                     color={bottle.hasTasted ? "default" : "highlight"}
                     size="small"

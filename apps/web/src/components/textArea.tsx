@@ -18,7 +18,7 @@ export default forwardRef<
   // const inputStyles = "placeholder:text-muted sm:leading-6";
   return (
     <textarea
-      className={classNames(`block min-w-full p-0`, baseStyles, inputStyles)}
+      className={classNames("block min-w-full p-0", baseStyles, inputStyles)}
       ref={ref}
       {...props}
     />

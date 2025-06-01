@@ -75,7 +75,7 @@ export default function ImageEditorModal({
                         setRotate(newRotate);
                       }}
                       icon={<ArrowPathRoundedSquareIcon className="h-6 w-6" />}
-                    ></Button>
+                    />
                   </div>
                 </div>
               </Footer>

@@ -10,6 +10,6 @@ export default function Heading<E extends ElementType = typeof defaultElement>({
   const Component = as ?? defaultElement;
 
   return (
-    <Component className="text-highlight mb-4 text-lg font-bold" {...props} />
+    <Component className="mb-4 font-bold text-highlight text-lg" {...props} />
   );
 }

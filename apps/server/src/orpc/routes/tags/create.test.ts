@@ -14,7 +14,7 @@ describe("POST /tags", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("creates tag", async ({ fixtures }) => {

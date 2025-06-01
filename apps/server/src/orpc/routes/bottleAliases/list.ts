@@ -94,7 +94,7 @@ export default procedure
         name: a.name,
         createdAt: a.createdAt.toISOString(),
         bottleId: a.bottleId,
-        isCanonical: bottle ? bottle.fullName == a.name : undefined,
+        isCanonical: bottle ? bottle.fullName === a.name : undefined,
       })),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

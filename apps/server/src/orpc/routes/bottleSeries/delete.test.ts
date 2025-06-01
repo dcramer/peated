@@ -12,7 +12,7 @@ describe("DELETE /bottle-series/:series", () => {
         series: 1,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("requires moderator access", async ({ defaults }) => {
@@ -24,7 +24,7 @@ describe("DELETE /bottle-series/:series", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("deletes a series and updates related bottles", async ({ fixtures }) => {
@@ -101,6 +101,6 @@ describe("DELETE /bottle-series/:series", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Series not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Series not found.]");
   });
 });

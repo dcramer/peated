@@ -15,7 +15,7 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
         bottle: 1,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("adds bottle to default collection", async ({ fixtures, defaults }) => {
@@ -126,7 +126,7 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Cannot identify release.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Cannot identify release.]");
   });
 
   test("fails with nonexistent release", async ({ fixtures, defaults }) => {
@@ -143,7 +143,7 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Cannot identify release.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Cannot identify release.]");
   });
 
   test("fails with nonexistent bottle", async ({ fixtures, defaults }) => {
@@ -157,7 +157,7 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Cannot find bottle.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Cannot find bottle.]");
   });
 
   test("prevents modifying another user's collection", async ({

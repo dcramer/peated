@@ -34,7 +34,7 @@ export default function FormField({
   return (
     <div
       className={classNames(
-        `relative block px-4 py-4 text-white focus-within:z-10`,
+        "relative block px-4 py-4 text-white focus-within:z-10",
         className,
         onClick ? "cursor-pointer" : "",
         error ? "border border-red-500" : ""
@@ -42,7 +42,7 @@ export default function FormField({
       onClick={onClick}
     >
       {error?.message && (
-        <div className="-mx-3 -mt-2.5 mb-2.5 bg-red-600 px-3 py-2.5 sm:-mx-5 sm:-mt-4 sm:mb-4 sm:px-5">
+        <div className="-mx-3 -mt-2.5 sm:-mx-5 sm:-mt-4 mb-2.5 bg-red-600 px-3 py-2.5 sm:mb-4 sm:px-5">
           {error.message}
         </div>
       )}

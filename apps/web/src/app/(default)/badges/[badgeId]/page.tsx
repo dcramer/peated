@@ -36,7 +36,7 @@ export default function Page({
         </div>
 
         <div className="flex flex-auto flex-col items-center justify-center truncate lg:w-auto lg:items-start">
-          <h1 className="max-w-full truncate text-center text-2xl font-semibold lg:mx-0 lg:text-left">
+          <h1 className="max-w-full truncate text-center font-semibold text-2xl lg:mx-0 lg:text-left">
             {badge.name}
           </h1>
           <div className="text-muted">Max Level: {badge.maxLevel}</div>

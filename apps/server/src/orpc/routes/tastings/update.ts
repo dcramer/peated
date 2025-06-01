@@ -69,7 +69,7 @@ export default procedure
       tastingData.color = input.color;
     }
     // TODO: needs tests yet
-    if (input.friends && input.friends.length) {
+    if (input.friends?.length) {
       const friendUserIds = Array.from(new Set(input.friends));
       const matches = friendUserIds.length
         ? await db
@@ -83,7 +83,7 @@ export default procedure
               )
             )
         : [];
-      if (matches.length != friendUserIds.length) {
+      if (matches.length !== friendUserIds.length) {
         throw errors.BAD_REQUEST({
           message: "Friends must all be active relationships.",
         });

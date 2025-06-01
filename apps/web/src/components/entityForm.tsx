@@ -151,18 +151,10 @@ export default function EntityForm({
                   );
 
                   const currentValues = getValues();
-                  if (
-                    result &&
-                    result.description &&
-                    !currentValues.description
-                  )
+                  if (result?.description && !currentValues.description)
                     setValue("description", result.description);
                   setValue("descriptionSrc", "generated");
-                  if (
-                    result &&
-                    result.yearEstablished &&
-                    !currentValues.yearEstablished
-                  )
+                  if (result?.yearEstablished && !currentValues.yearEstablished)
                     setValue("yearEstablished", result.yearEstablished);
                 }}
                 disabled={generateDataMutation.isPending}

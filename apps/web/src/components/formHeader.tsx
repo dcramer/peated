@@ -24,14 +24,15 @@ export default function FormHeader({
 }) {
   const router = useRouter();
 
-  const blockStyles = `p-3`;
+  const blockStyles = "p-3";
 
   return (
     <nav className="flex min-w-full items-stretch justify-between text-white lg:mx-3">
       <div className="-mx-3 flex justify-center">
         <button
+          type="button"
           onClick={() => (onClose ? onClose() : router.back())}
-          className={`${blockStyles} text-muted group`}
+          className={`${blockStyles} group text-muted`}
         >
           <div className="sr-only">Back</div>
           <div className="-my-1 rounded bg-slate-800 p-1 group-hover:bg-slate-700 group-hover:text-white">
@@ -44,16 +45,17 @@ export default function FormHeader({
       >
         <h1 className="text-lg">{title}</h1>
         {subtitle && (
-          <h2 className="text-muted hidden truncate text-sm sm:block">
+          <h2 className="hidden truncate text-muted text-sm sm:block">
             {subtitle}
           </h2>
         )}
       </div>
       <div className="-mr-3 flex justify-center lg:mr-3">
         <button
+          type="button"
           onClick={!saveDisabled ? onSave : undefined}
           className={classNames(
-            `text-muted group hover:text-white`,
+            "group text-muted hover:text-white",
             blockStyles,
             saveDisabled ? "cursor-auto" : ""
           )}

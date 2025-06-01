@@ -1,16 +1,16 @@
 import Link from "@peated/web/components/link";
 import type { ComponentPropsWithoutRef } from "react";
 import { formatFlavorProfile } from "../../../server/src/lib/format";
-import type { FlavorProfile } from "../../../server/src/types";
+import type { FlavorProfile as FlavorProfileType } from "../../../server/src/types";
 
 export default function FlavorProfile({
   profile,
   ...props
-}: { profile: FlavorProfile | string } & ComponentPropsWithoutRef<"div">) {
+}: { profile: FlavorProfileType | string } & ComponentPropsWithoutRef<"div">) {
   const classes = classesForProfile(profile);
   return (
     <span
-      className={`rounded px-2 py-1 text-xs text-white ${classes.bg} ${classes.bgHover}`}
+      className={`rounded px-2 py-1 text-white text-xs ${classes.bg} ${classes.bgHover}`}
       {...props}
     >
       <Link
@@ -25,7 +25,7 @@ export default function FlavorProfile({
   );
 }
 
-export function classesForProfile(profile: FlavorProfile | string): {
+export function classesForProfile(profile: FlavorProfileType | string): {
   bg: string;
   bgHover: string;
   border: string;

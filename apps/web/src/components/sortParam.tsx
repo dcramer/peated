@@ -35,7 +35,7 @@ export default function SortParam({
                   : invertSort,
         }),
       }}
-      className="gap-x inline-flex items-center hover:underline"
+      className="inline-flex items-center gap-x hover:underline"
     >
       {label ?? toTitleCase(name)}
       {sort === name && <ArrowDownIcon className="h-4 w-4" />}

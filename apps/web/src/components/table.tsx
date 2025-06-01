@@ -72,7 +72,7 @@ export default function Table<
           })}
         </colgroup>
         {!noHeaders && (
-          <thead className="text-muted hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
+          <thead className="hidden border-slate-800 border-b font-semibold text-muted text-sm sm:table-header-group">
             <tr>
               {columns.map((col, colN) => {
                 if (col.hidden) return null;
@@ -120,16 +120,16 @@ export default function Table<
             const pk = primaryKey(item);
             const urlPath = url(item);
 
-            const group = groupBy && groupBy(item);
+            const group = groupBy?.(item);
             const showGroup = group && group.id !== lastGroup?.id;
             if (group) lastGroup = group;
             return [
               showGroup ? (
-                <tr key={`g-${group.id}`} className="border-b border-slate-800">
+                <tr key={`g-${group.id}`} className="border-slate-800 border-b">
                   <th
                     colSpan={5}
                     scope="colgroup"
-                    className="bg-slate-800 py-2 pl-4 pr-3 text-left text-sm font-semibold sm:pl-3"
+                    className="bg-slate-800 py-2 pr-3 pl-4 text-left font-semibold text-sm sm:pl-3"
                   >
                     {groupTo ? (
                       <Link href={groupTo(group)} className="hover:underline">
@@ -143,7 +143,7 @@ export default function Table<
               ) : null,
               <tr
                 key={pk}
-                className="table-row border-b border-slate-800 text-sm"
+                className="table-row border-slate-800 border-b text-sm"
               >
                 {columns.map((col, colN) => {
                   if (col.hidden) return null;

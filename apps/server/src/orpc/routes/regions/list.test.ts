@@ -139,6 +139,6 @@ describe("GET /countries/:country/regions", () => {
         country: "nonexistent-country",
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Invalid country.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Invalid country.]");
   });
 });

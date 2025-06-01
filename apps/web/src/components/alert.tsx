@@ -15,7 +15,7 @@ export default function Alert({
     <div
       className={classNames(
         "flex items-start gap-x-3 p-4 font-semibold opacity-90 sm:rounded",
-        type === "success" ? "text-l-50 bg-lime-700" : "",
+        type === "success" ? "bg-lime-700 text-l-50" : "",
         type === "warn" ? "bg-amber-700 text-amber-50" : "",
         type === "error" ? "bg-red-700 text-red-50" : "",
         type === "default"

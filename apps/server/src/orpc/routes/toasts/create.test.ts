@@ -12,7 +12,7 @@ describe("POST /tastings/:tasting/toast", () => {
         tasting: 1,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("cannot toast self", async ({ defaults, fixtures }) => {
@@ -29,7 +29,7 @@ describe("POST /tastings/:tasting/toast", () => {
       )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Cannot toast your own tasting.]`
+      "[Error: Cannot toast your own tasting.]"
     );
   });
 

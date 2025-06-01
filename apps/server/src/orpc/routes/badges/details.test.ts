@@ -13,6 +13,6 @@ describe("GET /badges/:badge", () => {
 
   test("errors on invalid badge", async () => {
     const err = await waitError(routerClient.badges.details({ badge: 1 }));
-    expect(err).toMatchInlineSnapshot(`[Error: Badge not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Badge not found.]");
   });
 });

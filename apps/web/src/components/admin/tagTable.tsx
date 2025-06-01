@@ -18,7 +18,7 @@ export default function TagTable({
           <col className="min-w-full sm:w-1/2" />
           <col className="sm:w-1/2" />
         </colgroup>
-        <thead className="text-muted hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
+        <thead className="hidden border-slate-800 border-b font-semibold text-muted text-sm sm:table-header-group">
           <tr>
             <th scope="col" className="px-3 py-2.5 text-left">
               Tag
@@ -34,7 +34,7 @@ export default function TagTable({
         <tbody>
           {tagList.map((tag) => {
             return (
-              <tr key={tag.name} className="border-b border-slate-800 text-sm">
+              <tr key={tag.name} className="border-slate-800 border-b text-sm">
                 <td className="max-w-0 px-3 py-3">
                   <Link
                     href={`/admin/tags/${tag.name}`}

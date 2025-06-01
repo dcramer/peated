@@ -142,7 +142,7 @@ export default function RegionForm({
                 );
 
                 const currentValues = getValues();
-                if (result && result.description && !currentValues.description)
+                if (result?.description && !currentValues.description)
                   setValue("description", result.description);
                 setValue("descriptionSrc", "generated");
               }}

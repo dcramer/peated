@@ -20,14 +20,14 @@ export default function PageHeader({
       )}
 
       <div className="flex flex-auto flex-col items-center justify-center truncate lg:w-auto lg:items-start">
-        <h1 className="max-w-full truncate text-center text-2xl font-semibold lg:mx-0 lg:text-left">
+        <h1 className="max-w-full truncate text-center font-semibold text-2xl lg:mx-0 lg:text-left">
           {title}
         </h1>
         {titleExtra}
       </div>
 
       {!!metadata && (
-        <div className="text-muted flex w-full min-w-[150px] flex-col items-center justify-center gap-x-1 lg:w-auto lg:items-end">
+        <div className="flex w-full min-w-[150px] flex-col items-center justify-center gap-x-1 text-muted lg:w-auto lg:items-end">
           {metadata}
         </div>
       )}

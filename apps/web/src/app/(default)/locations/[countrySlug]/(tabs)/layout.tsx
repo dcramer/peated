@@ -65,7 +65,7 @@ export default async function Page({
         {stats.map((stat) => (
           <div key={stat.name}>
             <div className="text-muted leading-7">{stat.name}</div>
-            <div className="order-first text-3xl font-semibold tracking-tight lg:text-5xl">
+            <div className="order-first font-semibold text-3xl tracking-tight lg:text-5xl">
               {stat.value || "-"}
             </div>
           </div>
@@ -81,7 +81,7 @@ export default async function Page({
             </div>
             <CountryMapIcon
               slug={country.slug}
-              className="text-muted ml-8 hidden max-h-64 max-w-64 lg:block"
+              className="ml-8 hidden max-h-64 max-w-64 text-muted lg:block"
             />
           </div>
         </>

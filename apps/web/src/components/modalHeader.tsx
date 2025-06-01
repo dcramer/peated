@@ -14,7 +14,7 @@ export default function ModalHeader({ children, color = "default" }: Props) {
       >
         <div
           className={classNames(
-            "fixed left-0 right-0 z-30",
+            "fixed right-0 left-0 z-30",
             color === "primary"
               ? "main-gradient backdrop-blur"
               : "border-b border-b-slate-700 bg-slate-950"

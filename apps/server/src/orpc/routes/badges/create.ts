@@ -23,7 +23,7 @@ export default procedure
   .handler(async ({ input, context, errors }) => {
     const checks: BadgeCheck[] = [];
     for (const check of input.checks) {
-      let config;
+      let config: any;
       try {
         config = await checkBadgeConfig(check.type as any, check.config);
       } catch (err) {

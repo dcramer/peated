@@ -93,7 +93,7 @@ export default function Page({
         if (!categoryDistillerList.length) return null;
 
         return (
-          <div className="mb-8 mt-4" key={catCode}>
+          <div className="mt-4 mb-8" key={catCode}>
             <Heading as="h3">
               {catTitle} {catCode && <>({catCode})</>}
             </Heading>
@@ -108,14 +108,14 @@ export default function Page({
                   ([code, distillerName, distiller]) => {
                     return (
                       <tr key={code}>
-                        <td className="border-b border-slate-800 p-3 text-sm">
+                        <td className="border-slate-800 border-b p-3 text-sm">
                           <abbr
                             title={`${entity.shortName || entity.name} ${code}`}
                           >
                             {code}
                           </abbr>
                         </td>
-                        <td className="border-b border-slate-800 p-3 text-sm">
+                        <td className="border-slate-800 border-b p-3 text-sm">
                           {distiller ? (
                             <Link
                               href={`/entities/${distiller.id}`}
@@ -127,8 +127,8 @@ export default function Page({
                             distillerName || <em>Unknown</em>
                           )}
                         </td>
-                        <td className="text-muted hidden border-b border-slate-800 p-3 text-center text-sm sm:table-cell">
-                          {distiller && distiller.country ? (
+                        <td className="hidden border-slate-800 border-b p-3 text-center text-muted text-sm sm:table-cell">
+                          {distiller?.country ? (
                             <Link
                               href={`/countries/${distiller.country.slug}`}
                               className="hover:underline"

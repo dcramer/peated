@@ -41,7 +41,7 @@ export default function BadgeImage({
       alt={badge.name}
       className={classNames(
         "rounded",
-        isMaxLevel ? "ring-highlight ring-1 ring-inset" : ""
+        isMaxLevel ? "ring-1 ring-highlight ring-inset" : ""
       )}
       style={{
         width: size,

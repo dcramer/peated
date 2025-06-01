@@ -72,6 +72,6 @@ describe("GET /bottles/:bottle/similar", () => {
         bottle: 999999,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Bottle not found.]");
   });
 });

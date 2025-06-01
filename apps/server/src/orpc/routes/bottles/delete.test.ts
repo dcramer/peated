@@ -32,6 +32,6 @@ describe("DELETE /bottles/:bottle", () => {
     const err = await waitError(
       routerClient.bottles.delete({ bottle: bottle.id }, { context: { user } })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 });

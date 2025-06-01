@@ -25,7 +25,7 @@ export default function EntityListSidebar({ type }: { type: EntityType }) {
 
   return (
     <div className="mt-8 flex flex-col overflow-y-auto bg-slate-950 px-6 py-4">
-      <ul role="list" className="flex flex-auto flex-col gap-y-7">
+      <ul className="flex flex-auto flex-col gap-y-7">
         <li>
           <Button href={`/addEntity?type=${type}`} fullWidth color="highlight">
             Add {toTitleCase(type)}

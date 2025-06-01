@@ -31,7 +31,7 @@ export default function PendingVerificationAlert() {
         className="flex items-center gap-x-4 text-sm"
       >
         Your account is pending verification.
-        {state?.ok ? <div></div> : <ResendVerificationButton />}
+        {state?.ok ? <div /> : <ResendVerificationButton />}
       </form>
     </Alert>
   );

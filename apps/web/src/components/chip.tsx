@@ -37,7 +37,6 @@ export default function Chip<E extends ElementType = typeof defaultElement>({
     case "highlight":
       colorClass = "border-highlight text-black bg-highlight";
       break;
-    case "default":
     default:
       colorClass = " border-slate-700 text-muted";
   }
@@ -47,7 +46,7 @@ export default function Chip<E extends ElementType = typeof defaultElement>({
   return (
     <Component
       className={classNames(
-        "[word-wrap: break-word] inline-flex items-center justify-between truncate rounded border py-0 font-normal normal-case leading-loose shadow-none transition-[opacity] duration-300 ease-linear hover:!shadow-none",
+        "break-word] hover:!shadow-none inline-flex items-center justify-between truncate rounded border py-0 font-normal normal-case leading-loose shadow-none transition-[opacity] duration-300 ease-linear [word-wrap:",
         onClick ? "cursor-pointer hover:bg-slate-800" : "",
         active
           ? "border-slate-700 bg-slate-700 text-white hover:bg-slate-700"

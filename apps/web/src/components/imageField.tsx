@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { forwardRef, useEffect, useRef, useState } from "react";
 
-import { rejects } from "assert";
+import { rejects } from "node:assert";
 import { PhotoIcon } from "@heroicons/react/20/solid";
 import setRef from "../lib/setRef";
 import Button from "./button";
@@ -154,7 +154,9 @@ export default forwardRef<HTMLInputElement, Props>(
         onDrop={(e) => {
           e.preventDefault();
           const dt = new DataTransfer();
-          Array.from(e.dataTransfer.files).forEach((f) => dt.items.add(f));
+          for (const f of Array.from(e.dataTransfer.files)) {
+            dt.items.add(f);
+          }
           if (fileRef.current) fileRef.current.files = dt.files;
           updateImageSrc();
         }}
@@ -167,7 +169,7 @@ export default forwardRef<HTMLInputElement, Props>(
                   (finalImage ? finalImage.toDataURL() : imageSrc) || undefined
                 }
                 ref={imageRef}
-                alt="uploaded image"
+                alt="current upload"
                 className="rounded object-contain"
                 style={{
                   maxHeight: imageHeight,
@@ -181,7 +183,9 @@ export default forwardRef<HTMLInputElement, Props>(
             )}
             {(imageSrc || finalImage) && (
               <div
-                className={`text-muted flex items-center justify-center gap-x-4`}
+                className={
+                  "flex items-center justify-center gap-x-4 text-muted"
+                }
                 style={{
                   maxHeight: imageHeight,
                 }}

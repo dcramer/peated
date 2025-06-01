@@ -140,7 +140,7 @@ describe("scrapePrices", () => {
     );
 
     expect(error).toMatchInlineSnapshot(
-      `[Error: Failed to scrape any products.]`
+      "[Error: Failed to scrape any products.]"
     );
   });
 });

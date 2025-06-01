@@ -49,7 +49,7 @@ export default forwardRef<HTMLInputElement, Props>(
       <FormField
         label={label}
         labelNote={
-          <div className="text-sm font-medium">
+          <div className="font-medium text-sm">
             {!value || typeof value !== "number" ? (
               "Not Rated"
             ) : (
@@ -81,7 +81,7 @@ export default forwardRef<HTMLInputElement, Props>(
           }}
           onChange={(e) => {
             setValue(Number.parseFloat(e.target.value));
-            onChange && onChange(e);
+            onChange?.(e);
           }}
         />
       </FormField>

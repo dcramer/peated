@@ -14,7 +14,7 @@ export const TemplateStruct = object({
 export type TemplateProps = Infer<typeof TemplateStruct>;
 
 export const Template = ({ magicLinkUrl, baseUrl }: TemplateProps) => {
-  const previewText = `Login to your Peated account.`;
+  const previewText = "Login to your Peated account.";
 
   return (
     <Layout baseUrl={baseUrl}>

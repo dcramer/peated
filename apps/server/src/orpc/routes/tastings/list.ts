@@ -76,11 +76,10 @@ export default procedure
       if (!selectedUser) {
         if (input.user === "me") {
           throw errors.UNAUTHORIZED();
-        } else {
-          throw errors.NOT_FOUND({
-            message: "User not found.",
-          });
         }
+        throw errors.NOT_FOUND({
+          message: "User not found.",
+        });
       }
 
       where.push(eq(tastings.createdById, selectedUser.id));

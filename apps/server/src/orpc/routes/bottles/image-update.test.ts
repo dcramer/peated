@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import config from "@peated/server/config";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";

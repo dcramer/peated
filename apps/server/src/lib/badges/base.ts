@@ -59,7 +59,7 @@ export function defaultFormula(
   let requiredXp = 0;
   while (requiredXp <= totalXp && level < maxLevel + 1) {
     level++;
-    requiredXp += a * Math.pow(level, 2) + b * level + c;
+    requiredXp += a * level ** 2 + b * level + c;
   }
 
   return level - 1;

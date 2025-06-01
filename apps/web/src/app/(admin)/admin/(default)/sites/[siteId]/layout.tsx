@@ -77,15 +77,15 @@ export default function Layout({
 
       <div className="my-8 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap">
         <div className="flex w-full flex-col justify-center gap-y-4 px-4 sm:w-auto sm:flex-auto sm:gap-y-2">
-          <h3 className="self-center text-4xl font-semibold text-white sm:self-start">
+          <h3 className="self-center font-semibold text-4xl text-white sm:self-start">
             {site.name}
           </h3>
-          <div className="text-muted flex flex-col items-center self-center sm:flex-row sm:self-start lg:mb-8">
+          <div className="flex flex-col items-center self-center text-muted sm:flex-row sm:self-start lg:mb-8">
             {site.type}
           </div>
           <div className="flex justify-center sm:justify-start">
             <div className="mr-4 pr-3 text-center">
-              <span className="racking-wide block text-xl  font-bold text-white">
+              <span className="racking-wide block font-bold text-white text-xl">
                 {site.lastRunAt ? (
                   <TimeSince date={site.lastRunAt} />
                 ) : (
@@ -95,7 +95,7 @@ export default function Layout({
               <span className="text-muted text-sm">Last Run</span>
             </div>
             <div className="mb-4 px-3 text-center">
-              <span className="block text-xl font-bold tracking-wide text-white">
+              <span className="block font-bold text-white text-xl tracking-wide">
                 {site.nextRunAt ? (
                   <TimeSince date={site.nextRunAt} />
                 ) : (
@@ -105,7 +105,7 @@ export default function Layout({
               <span className="text-muted text-sm">Next Run</span>
             </div>
             <div className="mb-4 px-3 text-center">
-              <span className="block text-xl font-bold tracking-wide text-white">
+              <span className="block font-bold text-white text-xl tracking-wide">
                 {site.runEvery ? (
                   formatDuration(site.runEvery * 60 * 1000)
                 ) : (

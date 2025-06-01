@@ -46,7 +46,7 @@ export default function BottleTable({
                     <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
                   )}
                 </div>
-                <div className="text-muted flex gap-x-1 text-sm">
+                <div className="flex gap-x-1 text-muted text-sm">
                   {item.category && (
                     <Link
                       href={`/bottles/?category=${item.category}`}

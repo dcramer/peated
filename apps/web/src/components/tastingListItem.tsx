@@ -117,7 +117,7 @@ export default function TastingListItem({
         <div className="flex flex-col items-end">
           <Link href={`/tastings/${tasting.id}`} className="hover:underline">
             <TimeSince
-              className="font-muted block text-sm"
+              className="block font-muted text-sm"
               date={tasting.createdAt}
             />
           </Link>
@@ -161,7 +161,7 @@ export default function TastingListItem({
         tasting.color ||
         tasting.rating ||
         tasting.tags.length > 0) && (
-        <div className="text-muted px-3 text-sm sm:px-5">
+        <div className="px-3 text-muted text-sm sm:px-5">
           <DefinitionList className="grid-cols grid grid-cols-2 sm:grid-cols-2">
             {tasting.rating && (
               <div>
@@ -221,7 +221,7 @@ export default function TastingListItem({
                   className="absolute inset-0"
                 />
                 <BadgeImage badge={award.badge} level={award.level} size={16} />
-                <div className="text-muted inline-block text-xs group-hover:underline">
+                <div className="inline-block text-muted text-xs group-hover:underline">
                   <strong className="font-bold">{award.badge.name}</strong>{" "}
                   level {award.level}
                 </div>
@@ -249,7 +249,7 @@ export default function TastingListItem({
                         setHasToasted(false);
                       },
                       onSuccess: () => {
-                        onToast && onToast(tasting);
+                        onToast?.(tasting);
                       },
                     }
                   );
@@ -284,7 +284,7 @@ export default function TastingListItem({
             <MenuButton as={Button}>
               <EllipsisVerticalIcon className="h-5 w-5" />
             </MenuButton>
-            <MenuItems className="absolute inset-x-0 bottom-10 right-0 z-40 w-44 origin-bottom-right">
+            <MenuItems className="absolute inset-x-0 right-0 bottom-10 z-40 w-44 origin-bottom-right">
               {(user?.admin || isTaster) && (
                 <>
                   {isTaster && (

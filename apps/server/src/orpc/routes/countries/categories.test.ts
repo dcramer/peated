@@ -72,7 +72,7 @@ describe("GET /countries/categories", () => {
       country: country.id,
     });
 
-    expect(results).toMatchInlineSnapshot(`[]`);
+    expect(results).toMatchInlineSnapshot("[]");
     expect(totalCount).toBe(0);
   });
 
@@ -125,6 +125,6 @@ describe("GET /countries/categories", () => {
     const err = await waitError(() =>
       routerClient.countries.categories({ country: "nonexistent" })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Invalid country.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Invalid country.]");
   });
 });

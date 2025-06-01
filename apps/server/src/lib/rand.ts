@@ -10,9 +10,9 @@ export function choose<T>(choices: T[] | readonly T[]): T {
 export function sample<T>(choices: T[] | readonly T[], num: number): T[] {
   const samples = [...choices];
   const length = choices.length;
-  num = Math.max(Math.min(num, length), 0);
+  const safeNum = Math.max(Math.min(num, length), 0);
   const last = length - 1;
-  for (let index = 0; index < num; index++) {
+  for (let index = 0; index < safeNum; index++) {
     const rand = random(index, last);
     const temp = samples[index];
     samples[index] = samples[rand];
@@ -23,11 +23,11 @@ export function sample<T>(choices: T[] | readonly T[], num: number): T[] {
 
 export function shuffle<T>(choices: T[] | readonly T[]): T[] {
   const value = [...choices];
-  let currentIndex = choices.length,
-    randomIndex;
+  let currentIndex = choices.length;
+  let randomIndex: number;
 
   // While there remain elements to shuffle.
-  while (currentIndex != 0) {
+  while (currentIndex !== 0) {
     // Pick a remaining element.
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;

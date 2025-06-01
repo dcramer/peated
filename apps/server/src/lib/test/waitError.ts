@@ -33,7 +33,7 @@ export default async function waitError<TError extends Error = Error>(
    **/
   errorConstructor?: Constructor<TError>
 ): Promise<TError> {
-  let res;
+  let res: any;
   try {
     if (typeof fnOrPromise === "function") {
       res = await fnOrPromise();

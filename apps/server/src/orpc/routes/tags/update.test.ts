@@ -10,7 +10,7 @@ describe("PATCH /tags/:name", () => {
         tag: tag.name,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("requires mod privileges", async ({ fixtures }) => {
@@ -25,7 +25,7 @@ describe("PATCH /tags/:name", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("returns 404 for non-existent tag", async ({ fixtures }) => {
@@ -39,7 +39,7 @@ describe("PATCH /tags/:name", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Tag not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Tag not found.]");
   });
 
   test("updates tag category", async ({ fixtures }) => {

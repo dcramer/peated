@@ -13,10 +13,10 @@ export default async function Layout({ children }: { children: ReactNode }) {
     <>
       <PageHeader title="Locations" />
       <Tabs border>
-        <TabItem as={Link} href={`/locations`} controlled>
+        <TabItem as={Link} href={"/locations"} controlled>
           Overview
         </TabItem>
-        <TabItem as={Link} href={`/locations/all-regions`} controlled>
+        <TabItem as={Link} href={"/locations/all-regions"} controlled>
           All Regions
         </TabItem>
       </Tabs>

@@ -57,7 +57,6 @@ export default function SearchHeaderForm({
       }}
     >
       <input
-        autoFocus={autoFocus || !onFocus}
         name={name}
         value={value}
         placeholder={placeholder}
@@ -71,7 +70,7 @@ export default function SearchHeaderForm({
         ref={ref}
       />
       {loading && (
-        <div className="absolute bottom-0 right-0 top-0 z-10 p-1">
+        <div className="absolute top-0 right-0 bottom-0 z-10 p-1">
           <Spinner
             className="m-0 h-7 w-7 text-white"
             pathClassName="stroke-white"

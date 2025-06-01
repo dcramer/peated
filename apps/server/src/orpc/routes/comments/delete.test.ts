@@ -10,7 +10,7 @@ describe("DELETE comments/:comment", () => {
     const err = await waitError(() =>
       routerClient.comments.delete({ comment: 1 })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("delete own", async ({ defaults, fixtures }) => {

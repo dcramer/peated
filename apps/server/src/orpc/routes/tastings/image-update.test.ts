@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { tastings } from "@peated/server/db/schema";

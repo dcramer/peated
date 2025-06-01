@@ -10,7 +10,7 @@ describe("GET /notifications/count", () => {
         context: { user: null },
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("counts all notifications by default", async ({ fixtures }) => {

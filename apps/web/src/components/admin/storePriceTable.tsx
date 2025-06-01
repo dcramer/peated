@@ -21,7 +21,7 @@ export default function StorePriceTable({
           <col className="sm:w-2/12" />
           <col className="sm:w-2/12" />
         </colgroup>
-        <thead className="text-muted hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
+        <thead className="hidden border-slate-800 border-b font-semibold text-muted text-sm sm:table-header-group">
           <tr>
             <th scope="col" className="px-3 py-2.5 text-left" />
             <th scope="col" className="px-3 py-2.5 text-left">
@@ -40,7 +40,7 @@ export default function StorePriceTable({
             return (
               <tr
                 key={price.name}
-                className="border-b border-slate-800 text-sm"
+                className="border-slate-800 border-b text-sm"
               >
                 <td>
                   {price.imageUrl && (

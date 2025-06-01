@@ -16,7 +16,7 @@ export default function DateRange({
   const startDateParsed = dayjs(start);
   const endDateParsed = end ? dayjs(end) : null;
 
-  if (end && endDateParsed && start != end) {
+  if (end && endDateParsed && start !== end) {
     const startMonth = startDateParsed.month();
     const endMonth = endDateParsed.month();
     const startYear = startDateParsed.year();

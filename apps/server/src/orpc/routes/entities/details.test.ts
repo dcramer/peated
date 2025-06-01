@@ -19,7 +19,7 @@ describe("GET /entities/:entity", () => {
         entity: 1,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Entity not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Entity not found.]");
   });
 
   test("gets entity with tombstone", async ({ fixtures }) => {

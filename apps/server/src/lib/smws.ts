@@ -278,26 +278,33 @@ export const SMWS_CATEGORY_LIST = [
 export function getCategoryFromCask(caskNumber: string) {
   if (caskNumber.startsWith("GN")) {
     return "gin";
-  } else if (caskNumber.startsWith("RW")) {
+  }
+  if (caskNumber.startsWith("RW")) {
     return "rye";
-  } else if (caskNumber.startsWith("CW1")) {
+  }
+  if (caskNumber.startsWith("CW1")) {
     // corn - where should it go?
     return null;
-  } else if (caskNumber.startsWith("B")) {
-    return "bourbon";
-  } else if (caskNumber.startsWith("R")) {
-    return "rum";
-  } else if (caskNumber.startsWith("A")) {
-    return "armagnac";
-  } else if (caskNumber.startsWith("C")) {
-    return "cognac";
-  } else if (caskNumber.startsWith("G")) {
-    return "single_grain";
-  } else if (Number(caskNumber[0]) > 0) {
-    return "single_malt";
-  } else {
-    return null;
   }
+  if (caskNumber.startsWith("B")) {
+    return "bourbon";
+  }
+  if (caskNumber.startsWith("R")) {
+    return "rum";
+  }
+  if (caskNumber.startsWith("A")) {
+    return "armagnac";
+  }
+  if (caskNumber.startsWith("C")) {
+    return "cognac";
+  }
+  if (caskNumber.startsWith("G")) {
+    return "single_grain";
+  }
+  if (Number(caskNumber[0]) > 0) {
+    return "single_malt";
+  }
+  return null;
 }
 
 export type SMWSCaskDetails = {
@@ -340,9 +347,9 @@ export function parseDetailsFromName(name: string): SMWSCaskDetails | null {
 }
 
 export function parseFlavorProfile(name: string): FlavorProfile | null {
-  name = name.replace("&amp;", "&").replace(",", "");
+  const cleanName = name.replace("&amp;", "&").replace(",", "");
 
-  switch (name) {
+  switch (cleanName) {
     case "Young & Spritely":
       return "young_spritely";
     case "Sweet Fruit & Mellow":
@@ -378,8 +385,8 @@ export function parseFlavorProfile(name: string): FlavorProfile | null {
 function parseFill(value: string): CaskFill | null {
   if (!value) return null;
 
-  value = value.toLowerCase();
-  switch (value) {
+  const lowerValue = value.toLowerCase();
+  switch (lowerValue) {
     case "new":
     case "1st fill":
     case "first fill":

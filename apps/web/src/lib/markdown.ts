@@ -11,6 +11,6 @@ export const summarize = (content: string, maxLength = 256): string => {
     ALLOWED_TAGS: [],
   }).replace(/^[\s\n]+|[\s\n]+$/g, "");
   if (sum.length > maxLength)
-    return sum.substring(0, maxLength - 3).split("\n")[0] + "...";
+    return `${sum.substring(0, maxLength - 3).split("\n")[0]}...`;
   return sum;
 };

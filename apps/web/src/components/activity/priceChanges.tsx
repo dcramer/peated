@@ -55,8 +55,8 @@ export default function PriceChanges() {
               const { bottle } = price;
               if (!bottle) return null;
               return (
-                <tr key={price.id} className="border-b border-slate-800">
-                  <td className="max-w-0 py-2 pl-4 pr-3 text-sm sm:pl-3">
+                <tr key={price.id} className="border-slate-800 border-b">
+                  <td className="max-w-0 py-2 pr-3 pl-4 text-sm sm:pl-3">
                     <div className="flex items-center space-x-1">
                       <BottleLink
                         bottle={bottle}
@@ -85,8 +85,8 @@ export default function PriceChanges() {
                       </div>
                     )}
                   </td>
-                  <td className="py-2 pl-3 pr-4 text-right sm:table-cell sm:pr-3">
-                    <div className="text-muted flex flex-col items-end text-xs">
+                  <td className="py-2 pr-4 pl-3 text-right sm:table-cell sm:pr-3">
+                    <div className="flex flex-col items-end text-muted text-xs">
                       <span>
                         <Price value={price.price} currency={price.currency} />
                       </span>
@@ -111,7 +111,7 @@ export default function PriceChanges() {
           </tbody>
         </table>
       ) : (
-        <p className="text-muted mb-8 text-center text-sm">
+        <p className="mb-8 text-center text-muted text-sm">
           No price history found.
         </p>
       )}

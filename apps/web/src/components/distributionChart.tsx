@@ -19,7 +19,7 @@ export function DistributionChartSkeleton() {
 export function DistributionChartError() {
   return (
     <div
-      className="text-muted flex items-center justify-center rounded bg-slate-900 p-3 text-center text-sm"
+      className="flex items-center justify-center rounded bg-slate-900 p-3 text-center text-muted text-sm"
       style={{ height: 100 }}
     >
       There was an error loading this chart.
@@ -30,7 +30,7 @@ export function DistributionChartError() {
 export function DistributionChartEmpty() {
   return (
     <div
-      className="text-muted flex items-center justify-center rounded bg-slate-900 p-3 text-center text-sm"
+      className="flex items-center justify-center rounded bg-slate-900 p-3 text-center text-muted text-sm"
       style={{ height: 100 }}
     >
       No information available for this chart.
@@ -51,7 +51,7 @@ const colorNames = [
 ];
 
 export function DistributionChartLegend(props: ComponentProps<"div">) {
-  return <div className="text-muted mb-2 text-xs font-semibold" {...props} />;
+  return <div className="mb-2 font-semibold text-muted text-xs" {...props} />;
 }
 
 export default function DistributionChart({
@@ -82,10 +82,10 @@ export default function DistributionChart({
   ].sort((a, b) => b.count - a.count);
 
   return (
-    <div className="relative flex flex-col space-y-1 truncate text-xs font-bold">
+    <div className="relative flex flex-col space-y-1 truncate font-bold text-xs">
       {results.map((item, index) => {
         const pct = (item.count / totalCount) * 100;
-        const itemTo = href && href(item);
+        const itemTo = href?.(item);
         return itemTo ? (
           <Link
             key={item.name}

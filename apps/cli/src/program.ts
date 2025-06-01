@@ -1,4 +1,4 @@
-import { basename } from "path";
+import { basename } from "node:path";
 import { startInactiveSpan } from "@sentry/node";
 import { Command } from "commander";
 import { gracefulShutdown } from "../../server/src/worker/client";

@@ -85,7 +85,7 @@ function match(
   const brand = possibleEntities
     .sort((a, b) => b.length - a.length)
     .find((entity) =>
-      inputNameLower.startsWith(entity.toLocaleLowerCase() + " ")
+      inputNameLower.startsWith(`${entity.toLocaleLowerCase()} `)
     );
 
   console.log(`  Brand identified as [${brand}]`);
@@ -99,7 +99,7 @@ function match(
   console.log(`    Looking for [${searchedName}]`);
   const bottle = possibleBottles
     .sort((a, b) => b.length - a.length)
-    .find((bottle) => removeNoise(bottle.toLowerCase()) == searchedName);
+    .find((bottle) => removeNoise(bottle.toLowerCase()) === searchedName);
 
   console.log(`  Bottle identified as [${bottle}]`);
   if (!bottle) return null;

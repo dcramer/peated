@@ -6,7 +6,7 @@ import NotificationsPanel from "./notifications/panel";
 
 export default function AppFooter() {
   return (
-    <nav className="sm:min-h-18 mx-auto flex min-h-14 w-full max-w-4xl items-center justify-center gap-x-6 px-3 sm:px-3 lg:px-0">
+    <nav className="mx-auto flex min-h-14 w-full max-w-4xl items-center justify-center gap-x-6 px-3 sm:min-h-18 sm:px-3 lg:px-0">
       <NavLink href="/">
         <GlobeAmericasIcon className="h-8 w-8 sm:h-9 sm:w-9" />
       </NavLink>
@@ -16,7 +16,7 @@ export default function AppFooter() {
 
       <NavLink
         href="/search?tasting"
-        className="focus:ring-highlight text-muted relative -mt-5 flex max-w-xs items-center rounded border-t border-t-slate-700 bg-slate-950 text-sm hover:bg-slate-700 focus:outline-none focus:ring"
+        className="-mt-5 relative flex max-w-xs items-center rounded border-t border-t-slate-700 bg-slate-950 text-muted text-sm hover:bg-slate-700 focus:outline-none focus:ring focus:ring-highlight"
       >
         <PeatedGlyph className="m-5 h-9 w-9" />
       </NavLink>

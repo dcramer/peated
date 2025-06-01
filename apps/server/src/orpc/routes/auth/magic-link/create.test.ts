@@ -31,7 +31,7 @@ describe("POST /auth/magic-link", () => {
       })
     );
 
-    expect(error).toMatchInlineSnapshot(`[Error: Account not found.]`);
+    expect(error).toMatchInlineSnapshot("[Error: Account not found.]");
   });
 
   test("throws error when user is not active", async ({ fixtures }) => {
@@ -43,7 +43,7 @@ describe("POST /auth/magic-link", () => {
       })
     );
 
-    expect(error).toMatchInlineSnapshot(`[Error: Account not found.]`);
+    expect(error).toMatchInlineSnapshot("[Error: Account not found.]");
   });
 
   test("is case-insensitive for email", async ({ fixtures }) => {

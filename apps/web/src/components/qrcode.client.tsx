@@ -9,7 +9,7 @@ export default function QRCodeClient({ value }: { value?: string }) {
         value={value ?? window.location.href}
         size={256}
         style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-        viewBox={`0 0 256 256`}
+        viewBox={"0 0 256 256"}
         fgColor="#020617"
       />
     </div>

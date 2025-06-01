@@ -17,7 +17,7 @@ export default function ReviewTable({
           <col className="min-w-full sm:w-1/2" />
           <col className="sm:w-1/2" />
         </colgroup>
-        <thead className="text-muted hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
+        <thead className="hidden border-slate-800 border-b font-semibold text-muted text-sm sm:table-header-group">
           <tr>
             <th scope="col" className="px-3 py-2.5 text-left">
               Name
@@ -35,7 +35,7 @@ export default function ReviewTable({
             return (
               <tr
                 key={review.name}
-                className="border-b border-slate-800 text-sm"
+                className="border-slate-800 border-b text-sm"
               >
                 <td className="max-w-0 px-3 py-3">
                   <Link

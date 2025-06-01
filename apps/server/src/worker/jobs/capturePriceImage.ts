@@ -1,4 +1,4 @@
-import { Readable } from "stream";
+import { Readable } from "node:stream";
 import { defaultHeaders } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { bottles, storePrices } from "@peated/server/db/schema";
@@ -22,7 +22,7 @@ async function fetchAndStoreImage(imageUrl: string): Promise<string | null> {
 
   return await storeFile({
     data: fileData,
-    namespace: `prices`,
+    namespace: "prices",
     urlPrefix: "/uploads",
     onProcess: (...args) => compressAndResizeImage(...args, undefined, 1024),
   });

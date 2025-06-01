@@ -126,7 +126,7 @@ async function setupDatabase() {
   const applicationDatabaseName = "test_peated";
 
   const dbQuery = await client.query(
-    `SELECT FROM pg_database WHERE datname = $1`,
+    "SELECT FROM pg_database WHERE datname = $1",
     [applicationDatabaseName]
   );
   if (dbQuery.rows.length === 0) {

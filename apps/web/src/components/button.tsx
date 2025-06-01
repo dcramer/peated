@@ -1,4 +1,4 @@
-import type { UrlObject } from "url";
+import type { UrlObject } from "node:url";
 import Link from "@peated/web/components/link";
 import type { ForwardedRef, ReactNode } from "react";
 import { forwardRef } from "react";
@@ -57,7 +57,7 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
       "inline-flex gap-x-2 justify-center border items-center text-center rounded font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated";
 
     let textColor = "text-white";
-    let colorClassName;
+    let colorClassName: string;
     switch (color) {
       case "highlight":
         colorClassName = classNames(

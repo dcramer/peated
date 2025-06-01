@@ -114,7 +114,7 @@ describe("GET /prices", () => {
     const err = await waitError(
       routerClient.prices.list({}, { context: { user } })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("excludes hidden prices", async ({ fixtures }) => {

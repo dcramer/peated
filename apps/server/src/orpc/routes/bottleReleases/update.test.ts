@@ -17,7 +17,7 @@ describe("PATCH /bottle-releases/:release", () => {
         release: 1,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   it("requires moderator access", async ({ defaults }) => {
@@ -29,7 +29,7 @@ describe("PATCH /bottle-releases/:release", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   it("updates a release with new attributes", async ({ fixtures }) => {
@@ -123,7 +123,7 @@ describe("PATCH /bottle-releases/:release", () => {
         { context: { user: modUser } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Release not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Release not found.]");
   });
 
   it("throws error if release statedAge differs from bottle statedAge", async ({
@@ -202,7 +202,7 @@ describe("PATCH /bottle-releases/:release", () => {
       )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: A release with these attributes already exists.]`
+      "[Error: A release with these attributes already exists.]"
     );
   });
 
@@ -320,7 +320,7 @@ describe("PATCH /bottle-releases/:release", () => {
       )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Release name cannot be the same as the bottle name.]`
+      "[Error: Release name cannot be the same as the bottle name.]"
     );
   });
 
@@ -440,7 +440,7 @@ describe("PATCH /bottle-releases/:release", () => {
       )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: A release with these attributes already exists.]`
+      "[Error: A release with these attributes already exists.]"
     );
 
     // Verify the release was not changed

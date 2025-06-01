@@ -17,15 +17,12 @@ export default function Page() {
   );
 
   return (
-    <ul
-      role="list"
-      className="mt-4 grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-3 lg:gap-x-8"
-    >
+    <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-3 lg:gap-x-8">
       {countryList.results.map((country) => {
         return (
           <li
             key={country.slug}
-            className="hover:border-highlight group relative border border-transparent text-white"
+            className="group relative border border-transparent text-white hover:border-highlight"
           >
             <Link
               href={`/locations/${country.slug}`}
@@ -35,10 +32,10 @@ export default function Page() {
               <div className="mb-4 flex w-full items-center justify-center bg-slate-900 p-4 lg:p-8">
                 <CountryMapIcon
                   slug={country.slug}
-                  className="group-hover:text-highlight max-h-32 text-white"
+                  className="max-h-32 text-white group-hover:text-highlight"
                 />
               </div>
-              <h3 className="group-hover:text-highlight text-lg font-bold">
+              <h3 className="font-bold text-lg group-hover:text-highlight">
                 {country.name}
               </h3>
               {!!country.summary && (

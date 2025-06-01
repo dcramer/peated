@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import config from "@peated/server/config";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -20,7 +20,7 @@ describe("POST /badges/:badge/image", () => {
         }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("badge image does resize down", async ({ fixtures }) => {

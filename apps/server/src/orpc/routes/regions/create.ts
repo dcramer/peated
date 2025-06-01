@@ -61,10 +61,8 @@ export default procedure
               )
             );
           throw new ConflictError(existingRegion, err);
-        } else if (
-          err?.code === "23505" &&
-          err?.constraint === "region_name_unq"
-        ) {
+        }
+        if (err?.code === "23505" && err?.constraint === "region_name_unq") {
           const [existingRegion] = await db
             .select()
             .from(regions)

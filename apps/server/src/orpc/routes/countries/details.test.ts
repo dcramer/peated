@@ -17,6 +17,6 @@ describe("GET /countries/:country", () => {
         country: "nochance",
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Country not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Country not found.]");
   });
 });

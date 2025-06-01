@@ -20,7 +20,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: 1,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("requires mod", async ({ defaults }) => {
@@ -32,7 +32,7 @@ describe("PUT /bottles/:bottle", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("bottle not found", async ({ fixtures }) => {
@@ -46,7 +46,7 @@ describe("PUT /bottles/:bottle", () => {
         { context: { user: modUser } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Bottle not found.]");
   });
 
   test("no changes", async ({ fixtures }) => {
@@ -485,7 +485,7 @@ describe("PUT /bottles/:bottle", () => {
         { context: { user: modUser } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Entity not found [id: 999999]]`);
+    expect(err).toMatchInlineSnapshot("[Error: Entity not found [id: 999999]]");
   });
 
   test("changes bottler", async ({ fixtures }) => {
@@ -598,7 +598,7 @@ describe("PUT /bottles/:bottle", () => {
         { context: { user: modUser } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Entity not found [id: 999999]]`);
+    expect(err).toMatchInlineSnapshot("[Error: Entity not found [id: 999999]]");
   });
 
   test("changes distiller with previous identical brand", async ({
@@ -785,7 +785,7 @@ describe("PUT /bottles/:bottle", () => {
         { context: { user: modUser } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+    expect(err).toMatchInlineSnapshot("[Error: Input validation failed]");
   });
 
   test("saves flavor profile", async ({ fixtures }) => {
@@ -1218,7 +1218,7 @@ describe("PUT /bottles/:bottle", () => {
         { context: { user: modUser } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Series not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Series not found.]");
   });
 
   test("removes brand name duplication from bottle name", async ({

@@ -10,7 +10,7 @@ describe("DELETE /tastings/:tasting/image", () => {
         tasting: 1,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("cannot delete another user's image", async ({ fixtures }) => {

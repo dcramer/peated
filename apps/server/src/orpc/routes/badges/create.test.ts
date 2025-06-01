@@ -18,7 +18,7 @@ describe("POST /badges", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("creates badge", async ({ fixtures }) => {

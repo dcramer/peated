@@ -108,10 +108,10 @@ export default function CountryForm({
                 );
 
                 const currentValues = getValues();
-                if (result && result.description && !currentValues.description)
+                if (result?.description && !currentValues.description)
                   setValue("description", result.description);
                 setValue("descriptionSrc", "generated");
-                if (result && result.summary && !currentValues.summary)
+                if (result?.summary && !currentValues.summary)
                   setValue("summary", result.summary);
               }}
               disabled={generateDataMutation.isPending}

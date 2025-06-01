@@ -45,7 +45,7 @@ describe("POST /auth/magic-link/confirm", () => {
       routerClient.auth.magicLink.confirm({ token })
     );
 
-    expect(error).toMatchInlineSnapshot(`[Error: Invalid magic link token.]`);
+    expect(error).toMatchInlineSnapshot("[Error: Invalid magic link token.]");
   });
 
   test("throws error for expired token", async ({ fixtures }) => {
@@ -65,7 +65,7 @@ describe("POST /auth/magic-link/confirm", () => {
       routerClient.auth.magicLink.confirm({ token })
     );
 
-    expect(error).toMatchInlineSnapshot(`[Error: Invalid magic link token.]`);
+    expect(error).toMatchInlineSnapshot("[Error: Invalid magic link token.]");
   });
 
   test("throws error for inactive user", async ({ fixtures }) => {
@@ -82,7 +82,7 @@ describe("POST /auth/magic-link/confirm", () => {
       routerClient.auth.magicLink.confirm({ token })
     );
 
-    expect(error).toMatchInlineSnapshot(`[Error: Invalid magic link token.]`);
+    expect(error).toMatchInlineSnapshot("[Error: Invalid magic link token.]");
   });
 
   test("throws error for non-existent user", async ({ fixtures }) => {
@@ -98,6 +98,6 @@ describe("POST /auth/magic-link/confirm", () => {
       routerClient.auth.magicLink.confirm({ token })
     );
 
-    expect(error).toMatchInlineSnapshot(`[Error: Invalid magic link token.]`);
+    expect(error).toMatchInlineSnapshot("[Error: Invalid magic link token.]");
   });
 });

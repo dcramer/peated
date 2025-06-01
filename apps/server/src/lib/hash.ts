@@ -1,4 +1,4 @@
-import { createHash } from "crypto";
+import { createHash } from "node:crypto";
 import { notEmpty } from "../lib/filter";
 
 export function sha1(...value: (string | number | null | undefined)[]) {

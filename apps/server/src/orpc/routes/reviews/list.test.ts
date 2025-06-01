@@ -23,7 +23,7 @@ describe("GET /reviews", () => {
       routerClient.reviews.list({}, { context: { user } })
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Must be a moderator to list all reviews.]`
+      "[Error: Must be a moderator to list all reviews.]"
     );
   });
 
@@ -59,7 +59,7 @@ describe("GET /reviews", () => {
       )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Must be a moderator to list all reviews.]`
+      "[Error: Must be a moderator to list all reviews.]"
     );
   });
 });

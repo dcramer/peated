@@ -16,7 +16,6 @@ function actionLabel(status: FriendStatus) {
       return "Remove Friend";
     case "pending":
       return "Request Sent";
-    case "none":
     default:
       return "Add Friend";
   }

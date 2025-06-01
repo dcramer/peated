@@ -40,7 +40,7 @@ export default forwardRef<HTMLInputElement, Props>(
       <FormField
         label={label}
         labelNote={
-          <div className="text-sm font-medium">
+          <div className="font-medium text-sm">
             {value === -1 || typeof value !== "number" ? (
               "Unsure"
             ) : (
@@ -56,13 +56,14 @@ export default forwardRef<HTMLInputElement, Props>(
       >
         <div className="flex flex-1 items-center gap-x-1 sm:gap-x-2">
           <button
+            type="button"
             className={classNames(
-              "pointer text-muted h-8 flex-1 border border-slate-700",
+              "pointer h-8 flex-1 border border-slate-700 text-muted",
               value === -1 ? "h-12 px-2" : ""
             )}
             onClick={(e) => {
               e.preventDefault();
-              onChange && onChange(undefined);
+              onChange?.(undefined);
               setValue(-1);
             }}
           >
@@ -71,6 +72,7 @@ export default forwardRef<HTMLInputElement, Props>(
           {COLOR_SCALE.map(([num, _, hexColor]) => {
             return (
               <button
+                type="button"
                 key={num}
                 className={classNames(
                   "pointer h-8 flex-1",
@@ -79,12 +81,12 @@ export default forwardRef<HTMLInputElement, Props>(
                 onClick={(e) => {
                   e.preventDefault();
                   setValue(num);
-                  onChange && onChange(num);
+                  onChange?.(num);
                 }}
                 style={{
                   background: hexColor,
                 }}
-              ></button>
+              />
             );
           })}
           <input
@@ -95,7 +97,7 @@ export default forwardRef<HTMLInputElement, Props>(
             onChange={(e) => {
               const value = Number.parseInt(e.target.value, 10);
               setValue(value);
-              onChange && onChange(value);
+              onChange?.(value);
             }}
           />
         </div>

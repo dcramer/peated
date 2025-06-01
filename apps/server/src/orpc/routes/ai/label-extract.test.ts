@@ -57,7 +57,7 @@ describe("POST /labels/extract", () => {
   test("requires either imageUrl or label", async () => {
     const err = await waitError(routerClient.ai.labelExtract({}));
 
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+    expect(err).toMatchInlineSnapshot("[Error: Input validation failed]");
   });
 
   test("handles extraction errors", async () => {
@@ -72,7 +72,7 @@ describe("POST /labels/extract", () => {
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: Failed to extract label information]`
+      "[Error: Failed to extract label information]"
     );
   });
 });

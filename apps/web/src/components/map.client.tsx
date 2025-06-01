@@ -93,10 +93,7 @@ export default function MapClient({
       >
         <TileLayer
           attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
-          url={
-            "https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}" +
-            (L.Browser.retina ? "@2x.png" : ".png")
-          }
+          url={`https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}${L.Browser.retina ? "@2x.png" : ".png"}`}
           subdomains="abcd"
           maxZoom={20}
           minZoom={0}

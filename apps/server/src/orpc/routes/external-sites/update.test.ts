@@ -14,7 +14,7 @@ describe("PATCH /external-sites/:site", () => {
         { context: { user: modUser } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("updates site", async ({ fixtures }) => {

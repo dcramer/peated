@@ -13,7 +13,7 @@ describe("PATCH /users/:user", () => {
         user: 1,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("cannot update another user", async ({ fixtures }) => {
@@ -28,7 +28,7 @@ describe("PATCH /users/:user", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Cannot edit another user.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Cannot edit another user.]");
   });
 
   test("can change username", async ({ defaults, fixtures }) => {
@@ -100,7 +100,7 @@ describe("PATCH /users/:user", () => {
       )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Admin privileges required to modify mod status.]`
+      "[Error: Admin privileges required to modify mod status.]"
     );
   });
 
@@ -115,7 +115,7 @@ describe("PATCH /users/:user", () => {
       )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Admin privileges required to modify admin status.]`
+      "[Error: Admin privileges required to modify admin status.]"
     );
   });
 
@@ -148,6 +148,6 @@ describe("PATCH /users/:user", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Invalid username.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Invalid username.]");
   });
 });

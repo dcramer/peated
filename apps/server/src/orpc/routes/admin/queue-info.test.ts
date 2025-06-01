@@ -24,7 +24,7 @@ describe("GET /admin/queue/info", () => {
 
   test("requires authentication", async () => {
     const err = await waitError(() => routerClient.admin.queueInfo());
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("requires admin privileges", async ({ fixtures }) => {
@@ -33,7 +33,7 @@ describe("GET /admin/queue/info", () => {
     const err = await waitError(() =>
       routerClient.admin.queueInfo(undefined, { context: { user } })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("returns queue stats", async ({ fixtures }) => {

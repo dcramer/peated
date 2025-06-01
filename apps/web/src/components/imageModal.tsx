@@ -15,12 +15,12 @@ export function ImageModal({
     <Dialog open={open} as="div" className="dialog" onClose={setOpen}>
       <div className="fixed inset-0">
         <DialogPanel
-          className="dialog-panel flex flex-col items-center justify-center px-4 pb-4 pt-5 sm:p-6"
+          className="dialog-panel flex flex-col items-center justify-center px-4 pt-5 pb-4 sm:p-6"
           onClick={() => {
             setOpen(false);
           }}
         >
-          <img src={image} className="max-h-full max-w-full" />
+          <img alt="modal" src={image} className="max-h-full max-w-full" />
         </DialogPanel>
       </div>
     </Dialog>

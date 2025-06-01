@@ -26,8 +26,6 @@ export default function FriendRequestEntry({
     switch (status) {
       case "friends":
         return "Remove Friend";
-      case "pending":
-      case "none":
       default:
         return "Add Friend";
     }

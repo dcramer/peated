@@ -35,7 +35,7 @@ describe("POST /auth/password-reset", () => {
       })
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Account not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Account not found.]");
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
   });
 
@@ -48,7 +48,7 @@ describe("POST /auth/password-reset", () => {
       })
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+    expect(err).toMatchInlineSnapshot("[Error: Input validation failed]");
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
   });
 });

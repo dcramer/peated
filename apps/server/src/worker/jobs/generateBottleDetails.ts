@@ -173,7 +173,7 @@ export default async function ({ bottleId }: { bottleId: number }) {
     if (!result.suggestedTags.find((t) => !tagList.includes(t))) {
       data.suggestedTags = result.suggestedTags;
     } else {
-      logError(`Invalid value for suggestedTags`, {
+      logError("Invalid value for suggestedTags", {
         tag: {
           values: result.suggestedTags.filter((t) => !tagList.includes(t)),
         },

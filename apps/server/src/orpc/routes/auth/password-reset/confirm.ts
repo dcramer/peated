@@ -1,4 +1,4 @@
-import { createHash } from "crypto";
+import { createHash } from "node:crypto";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import {
@@ -31,7 +31,7 @@ export default procedure
   )
   .output(AuthSchema)
   .handler(async ({ input, errors }) => {
-    let payload;
+    let payload: any;
     try {
       payload = await verifyPayload(input.token);
     } catch (err) {

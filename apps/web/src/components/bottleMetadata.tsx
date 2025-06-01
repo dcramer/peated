@@ -23,7 +23,7 @@ type Props = {
 
 export default function BottleMetadata({ data, ...props }: Props) {
   return (
-    <div {...props} className="text-muted flex gap-x-2">
+    <div {...props} className="flex gap-x-2 text-muted">
       {data.distillers?.length ? (
         <Join divider=", ">
           {data.distillers.map((d) => {

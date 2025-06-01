@@ -17,11 +17,11 @@ function GlobalError({ error }: { error?: Error & { digest?: string } }) {
   }, [error]);
 
   return (
-    <html>
+    <html lang="en">
       <body>
         <div className="flex min-h-screen items-center justify-center">
           <div className="text-center">
-            <h1 className="mb-4 text-2xl font-bold">Something went wrong</h1>
+            <h1 className="mb-4 font-bold text-2xl">Something went wrong</h1>
             <p className="text-gray-600">
               An unexpected error occurred. Please try refreshing the page.
             </p>

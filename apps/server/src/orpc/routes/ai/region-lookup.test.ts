@@ -25,7 +25,7 @@ describe("POST /ai/region-lookup", () => {
         country: 1,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("requires mod privileges", async ({ fixtures }) => {
@@ -39,7 +39,7 @@ describe("POST /ai/region-lookup", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("returns error with invalid country", async ({ fixtures }) => {
@@ -53,7 +53,7 @@ describe("POST /ai/region-lookup", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Cannot find country]`);
+    expect(err).toMatchInlineSnapshot("[Error: Cannot find country]");
   });
 
   test("generates region details", async ({ fixtures }) => {

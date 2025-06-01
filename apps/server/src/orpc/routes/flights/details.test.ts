@@ -17,6 +17,6 @@ describe("GET /flights/:flight", () => {
         flight: "123",
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Flight not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Flight not found.]");
   });
 });

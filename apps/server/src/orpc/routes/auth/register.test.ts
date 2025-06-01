@@ -38,7 +38,7 @@ describe("POST /auth/register", () => {
       })
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Conflicting object already exists (ID=2).]`
+      "[Error: Conflicting object already exists (ID=2).]"
     );
   });
 
@@ -53,7 +53,7 @@ describe("POST /auth/register", () => {
       })
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Conflicting object already exists (ID=2).]`
+      "[Error: Conflicting object already exists (ID=2).]"
     );
   });
 });

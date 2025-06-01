@@ -1,4 +1,5 @@
-import { existsSync, mkdirSync, statSync } from "fs";
+import { existsSync, mkdirSync, statSync } from "node:fs";
+import { open } from "node:fs/promises";
 import { safe } from "@orpc/client";
 import {
   SCRAPER_PRICE_BATCH_SIZE,
@@ -9,7 +10,6 @@ import { orpcClient } from "@peated/server/lib/orpc-client/server";
 import type { Currency, ExternalSiteType } from "@peated/server/types";
 import type { Category } from "@peated/server/types";
 import axios from "axios";
-import { open } from "fs/promises";
 import type { z } from "zod";
 import config from "../config";
 import type { BottleInputSchema, StorePriceInputSchema } from "../schemas";
@@ -37,8 +37,8 @@ export async function getUrl(
 ) {
   const filename = `${CACHE}/${encodeURIComponent(url)}`;
 
-  let data = "",
-    status = 0;
+  let data = "";
+  let status = 0;
   if (!existsSync(filename) || noCache) {
     console.log(`${url} not cached, fetching from internet`);
     ({ data, status } = await cacheUrl(url, filename, headers));

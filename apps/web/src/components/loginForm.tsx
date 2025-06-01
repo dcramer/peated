@@ -53,7 +53,7 @@ export default function LoginForm() {
   const [result, formAction] = useFormState(authenticateForm, undefined);
 
   return (
-    <div className="min-w-sm flex flex-auto flex-col gap-y-4">
+    <div className="flex min-w-sm flex-auto flex-col gap-y-4">
       {result?.error ? <Alert>{result.error}</Alert> : null}
 
       {result?.magicLink ? (
@@ -70,7 +70,7 @@ export default function LoginForm() {
                   className="absolute inset-0 flex items-center"
                   aria-hidden="true"
                 >
-                  <div className="min-w-full border-t-2 border-slate-700" />
+                  <div className="min-w-full border-slate-700 border-t-2" />
                 </div>
                 <div className="relative flex justify-center">
                   <span className="bg-slate-900 px-2 text-lg uppercase">

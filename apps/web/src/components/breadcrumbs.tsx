@@ -10,8 +10,8 @@ type Page = {
 
 export function Breadcrumbs({ pages }: { pages: Page[] }) {
   return (
-    <nav className="mb-4 flex text-sm font-medium" aria-label="Breadcrumb">
-      <ol role="list" className="flex items-center space-x-2">
+    <nav className="mb-4 flex font-medium text-sm" aria-label="Breadcrumb">
+      <ol className="flex items-center space-x-2">
         <li className="flex">
           <div className="flex items-center">
             <Link href="/" className="text-muted hover:text-slate-400">
@@ -29,7 +29,7 @@ export function Breadcrumbs({ pages }: { pages: Page[] }) {
               />
               <Link
                 href={page.href}
-                className={classNames("hover:text-muted ml-2 text-slate-600")}
+                className={classNames("ml-2 text-slate-600 hover:text-muted")}
                 aria-current={page.current ? "page" : undefined}
               >
                 {page.name}

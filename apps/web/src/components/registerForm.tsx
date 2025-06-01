@@ -54,7 +54,7 @@ export default function RegisterForm() {
   const [result, formAction] = useFormState(registerForm, undefined);
 
   return (
-    <div className="min-w-sm flex flex-auto flex-col gap-y-4">
+    <div className="flex min-w-sm flex-auto flex-col gap-y-4">
       {result?.error ? <Alert>{result.error}</Alert> : null}
 
       {config.GOOGLE_CLIENT_ID && (
@@ -68,7 +68,7 @@ export default function RegisterForm() {
               className="absolute inset-0 flex items-center"
               aria-hidden="true"
             >
-              <div className="min-w-full border-t-2 border-slate-700" />
+              <div className="min-w-full border-slate-700 border-t-2" />
             </div>
             <div className="relative flex justify-center">
               <span className="bg-slate-900 px-2 text-lg uppercase">Or</span>

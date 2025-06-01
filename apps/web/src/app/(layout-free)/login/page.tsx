@@ -10,8 +10,8 @@ export default function Login() {
   return (
     <LayoutSplash>
       <div className="mb-16 flex flex-col items-center">
-        <h1 className="mb-4 text-2xl font-semibold">Welcome Back</h1>
-        <p className="text-muted text-center">
+        <h1 className="mb-4 font-semibold text-2xl">Welcome Back</h1>
+        <p className="text-center text-muted">
           Continue with Google or enter your credentials.
         </p>
       </div>

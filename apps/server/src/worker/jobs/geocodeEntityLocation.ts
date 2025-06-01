@@ -31,7 +31,7 @@ async function locateAddress(
     },
   });
 
-  if (result.data.status != "OK" || !result.data.results.length) {
+  if (result.data.status !== "OK" || !result.data.results.length) {
     throw new Error(`Failed to identify address of Entity: ${entity.id}`);
   }
 
@@ -51,7 +51,7 @@ async function geocodeAddress(
 
   const client = new Client();
 
-  const query = `${entity.address}, ${entity.region ? entity.region.name + "," : ""} ${entity.country.name}`;
+  const query = `${entity.address}, ${entity.region ? `${entity.region.name},` : ""} ${entity.country.name}`;
   const result = await client.geocode({
     params: {
       key: config.GOOGLE_MAPS_API_KEY,
@@ -59,7 +59,7 @@ async function geocodeAddress(
     },
   });
 
-  if (result.data.status != "OK" || !result.data.results.length) {
+  if (result.data.status !== "OK" || !result.data.results.length) {
     throw new Error(`Failed to geocode address of Entity: ${entity.id}`);
   }
 

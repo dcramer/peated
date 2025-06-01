@@ -12,7 +12,7 @@ describe("PUT /notifications/:notification", () => {
         notification: 1,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("mark own notification as read", async ({ defaults, fixtures }) => {

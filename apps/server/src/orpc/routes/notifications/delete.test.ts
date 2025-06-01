@@ -12,7 +12,7 @@ describe("DELETE /notifications/:notification", () => {
         notification: 1,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("invalid notification", async ({ defaults }) => {
@@ -24,7 +24,7 @@ describe("DELETE /notifications/:notification", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Notification not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Notification not found.]");
   });
 
   test("delete own notification", async ({ defaults, fixtures }) => {

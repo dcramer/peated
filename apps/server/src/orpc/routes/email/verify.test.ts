@@ -29,6 +29,6 @@ describe("POST /email/verify", () => {
       routerClient.email.verify({ token: "invalid-token" })
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Invalid verification token.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Invalid verification token.]");
   });
 });

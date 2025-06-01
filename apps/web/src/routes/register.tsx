@@ -10,8 +10,8 @@ function Register() {
   return (
     <LayoutSplash>
       <div className="mb-16 flex flex-col items-center">
-        <h1 className="mb-4 text-2xl font-semibold">Join Us</h1>
-        <p className="text-muted text-center">
+        <h1 className="mb-4 font-semibold text-2xl">Join Us</h1>
+        <p className="text-center text-muted">
           Create an account to start exploring the world of whiskey.
         </p>
       </div>

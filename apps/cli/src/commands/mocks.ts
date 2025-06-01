@@ -1,5 +1,6 @@
-import path, { basename } from "path";
-import { Readable } from "stream";
+import { readFile, readdir } from "node:fs/promises";
+import path, { basename } from "node:path";
+import { Readable } from "node:stream";
 import program from "@peated/cli/program";
 import { MAJOR_COUNTRIES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
@@ -23,7 +24,6 @@ import * as Fixtures from "@peated/server/lib/test/fixtures";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
 import type { Category } from "@peated/server/types";
 import { and, eq, ne, sql } from "drizzle-orm";
-import { readFile, readdir } from "fs/promises";
 
 const TASTING_IMAGES_DIR = path.join(
   __dirname,
@@ -315,7 +315,7 @@ subcommand
         random(1, 2) === 1
           ? await storeFile({
               data: await pickTastingImage(),
-              namespace: `tastings`,
+              namespace: "tastings",
               urlPrefix: "/uploads",
               onProcess: (...args) =>
                 compressAndResizeImage(...args, undefined, 1024),

@@ -122,7 +122,7 @@ subcommand
   .command("create-missing")
   .description("Create missing bottles")
   .action(async (options) => {
-    console.log(`Pushing job [CreateMissingBottles].`);
+    console.log("Pushing job [CreateMissingBottles].");
     await runJob("CreateMissingBottles");
   });
 

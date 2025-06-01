@@ -26,7 +26,7 @@ function QueueStats() {
         {Object.entries(data.stats).map(([name, count]) => {
           return (
             <div className="mr-4 pr-3 text-center" key={name}>
-              <span className="block text-xl font-bold uppercase tracking-wide text-white">
+              <span className="block font-bold text-white text-xl uppercase tracking-wide">
                 {count.toLocaleString()}
               </span>
               <span className="text-muted text-sm">{name}</span>

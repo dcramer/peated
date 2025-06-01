@@ -11,19 +11,19 @@ export default function AdminSidebar() {
   return (
     <>
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-slate-800 bg-slate-950 px-6 pb-4">
-          <div className="text-highlight flex h-16 shrink-0 items-center hover:text-white">
+        <div className="flex grow flex-col gap-y-5 overflow-y-auto border-slate-800 border-r bg-slate-950 px-6 pb-4">
+          <div className="flex h-16 shrink-0 items-center text-highlight hover:text-white">
             <HeaderLogo />
           </div>
           <nav className="flex flex-1 flex-col">
-            <ul role="list" className="flex flex-1 flex-col gap-y-7">
+            <ul className="flex flex-1 flex-col gap-y-7">
               <li>
                 <Button href="/" fullWidth color="primary">
                   Return Home
                 </Button>
               </li>
               <li>
-                <ul role="list" className="-mx-2 space-y-1">
+                <ul className="-mx-2 space-y-1">
                   <SidebarLink
                     href="/admin/queue"
                     active={pathname.startsWith("/admin/queue")}
@@ -33,7 +33,7 @@ export default function AdminSidebar() {
                 </ul>
               </li>
               <li>
-                <ul role="list" className="-mx-2 space-y-1">
+                <ul className="-mx-2 space-y-1">
                   <SidebarLink
                     href="/admin/badges"
                     active={pathname.startsWith("/admin/badges")}

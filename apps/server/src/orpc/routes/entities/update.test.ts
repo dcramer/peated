@@ -20,7 +20,7 @@ describe("PATCH /entities/:entity", () => {
         { context: { user: null } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("requires mod", async ({ defaults }) => {
@@ -32,7 +32,7 @@ describe("PATCH /entities/:entity", () => {
         { context: { user: defaults.user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("no changes", async ({ fixtures }) => {

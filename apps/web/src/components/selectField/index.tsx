@@ -134,8 +134,10 @@ export default function SelectField<T extends Option>({
 
   const toggleOption = (option: T) => {
     setPreviousValues(filterDupes([option], previousValues));
-    if (value.find((i) => i.id == option.id && i.name == option.name)) {
-      setValue(value.filter((i) => i.id != option.id || i.name != option.name));
+    if (value.find((i) => i.id === option.id && i.name === option.name)) {
+      setValue(
+        value.filter((i) => i.id !== option.id || i.name !== option.name)
+      );
       return false;
     }
 
@@ -212,7 +214,7 @@ export default function SelectField<T extends Option>({
         )}
         {visibleValues.length > 0 &&
           value.length < targetOptions &&
-          (!options.length || visibleValues.length != options.length) &&
+          (!options.length || visibleValues.length !== options.length) &&
           multiple && (
             <Chip
               as="button"
@@ -226,7 +228,7 @@ export default function SelectField<T extends Option>({
                     }
               }
             >
-              <PlusIcon className="text-peated h-6 w-6" />
+              <PlusIcon className="h-6 w-6 text-peated" />
             </Chip>
           )}
       </div>

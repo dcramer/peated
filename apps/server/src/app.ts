@@ -1,5 +1,6 @@
+import { open } from "node:fs/promises";
+import { format } from "node:path";
 import { setTimeout } from "node:timers/promises";
-import { format } from "path";
 import { Storage } from "@google-cloud/storage";
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
@@ -17,7 +18,6 @@ import {
   setUser,
   startSpan,
 } from "@sentry/core";
-import { open } from "fs/promises";
 import { Hono } from "hono";
 import { cache } from "hono/cache";
 import { cors } from "hono/cors";
@@ -145,7 +145,7 @@ export const app = new Hono()
   .get("/uploads/:filename", async (c) => {
     const filename = c.req.param("filename");
 
-    let stream;
+    let stream: any;
     if (process.env.USE_GCS_STORAGE) {
       const bucketName = process.env.GCS_BUCKET_NAME as string;
       const bucketPath = process.env.GCS_BUCKET_PATH

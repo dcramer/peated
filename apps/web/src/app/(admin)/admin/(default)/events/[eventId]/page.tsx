@@ -74,7 +74,7 @@ export default function Page({
         <DefinitionList.Term>Dates</DefinitionList.Term>
         <DefinitionList.Details>
           <DateRange start={event.dateStart} end={event.dateEnd} />
-          {event.repeats && <> (repeats annually)</>}
+          {event.repeats && "(repeats annually)"}
         </DefinitionList.Details>
         <DefinitionList.Term>Country</DefinitionList.Term>
         <DefinitionList.Details>

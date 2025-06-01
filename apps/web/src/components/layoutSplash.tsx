@@ -12,7 +12,7 @@ export default function LayoutSplash({ children }: { children: ReactNode }) {
               <div className="px-8 py-8 lg:px-6 lg:py-24">
                 <div className="max-w-64 lg:mb-8">
                   <Link href="/" className="max-w-xs">
-                    <PeatedLogo className="text-highlight h-auto w-full" />
+                    <PeatedLogo className="h-auto w-full text-highlight" />
                   </Link>
                 </div>
                 <div className="hidden lg:block">
@@ -22,7 +22,7 @@ export default function LayoutSplash({ children }: { children: ReactNode }) {
                   </p>
                   <img
                     src="/assets/splash.png"
-                    alt="image depicting a bunch of folks drinking whisky at a bar"
+                    alt="depicts a bunch of folks drinking whisky at a bar"
                     className="mt-32 max-w-lg"
                   />
                 </div>

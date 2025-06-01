@@ -26,7 +26,7 @@ export default procedure
   )
   .output(AuthSchema)
   .handler(async ({ input, errors }) => {
-    let payload;
+    let payload: any;
     try {
       payload = await verifyPayload(input.token);
     } catch (err) {
@@ -36,7 +36,7 @@ export default procedure
       });
     }
 
-    let parsedPayload;
+    let parsedPayload: any;
     try {
       parsedPayload = MagicLinkSchema.parse(payload);
     } catch (err) {

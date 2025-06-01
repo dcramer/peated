@@ -115,7 +115,7 @@ export default procedure
       data.createdAt = new Date(input.createdAt);
     }
 
-    if (input.friends && input.friends.length) {
+    if (input.friends?.length) {
       const friendUserIds = Array.from(new Set(input.friends));
       const matches = await db
         .select()
@@ -127,7 +127,7 @@ export default procedure
             inArray(follows.toUserId, friendUserIds)
           )
         );
-      if (matches.length != friendUserIds.length) {
+      if (matches.length !== friendUserIds.length) {
         throw errors.BAD_REQUEST({
           message: "Friends must all be active relationships.",
         });

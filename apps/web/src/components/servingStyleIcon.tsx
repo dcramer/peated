@@ -12,7 +12,7 @@ export default function ServingStyleIcon({
   size?: number;
   className?: string;
 }) {
-  let Component;
+  let Component: any = null;
   switch (servingStyle) {
     case "neat":
       Component = SvgServingNeat;
@@ -26,5 +26,5 @@ export default function ServingStyleIcon({
     default:
       return null;
   }
-  return <Component className={`h-${size} w-${size} ${className}`} />;
+  return <Component className={`h-${size}w-${size} ${className}`} />;
 }

@@ -17,7 +17,7 @@ export function SidePanelHeader({
   title: string;
 }) {
   const { onClose } = useContext(SidePanelContext);
-  const blockStyles = `px-0 py-1 sm:py-3`;
+  const blockStyles = "px-0 py-1 sm:py-3";
 
   return (
     <>
@@ -26,6 +26,7 @@ export function SidePanelHeader({
           {!!onClose && (
             <div className="absolute left-2 flex text-white hover:text-white">
               <button
+                type="button"
                 onClick={onClose ?? undefined}
                 className={`-m-1.5 p-1.5 ${blockStyles} pr-3 sm:pr-6`}
               >
@@ -47,7 +48,8 @@ export function SidePanelHeader({
         {children}
         {!!onClose && (
           <button
-            className="hover:bg-highlight hidden cursor-pointer items-center justify-center rounded px-6 py-6 font-mono text-2xl hover:text-black lg:flex"
+            type="button"
+            className="hidden cursor-pointer items-center justify-center rounded px-6 py-6 font-mono text-2xl hover:bg-highlight hover:text-black lg:flex"
             onClick={onClose ?? undefined}
           >
             {"✕"}
@@ -77,9 +79,9 @@ export default function SidePanel({
       <Dialog
         open={open}
         onClose={() => {
-          onClose && onClose();
+          onClose?.();
         }}
-        className="absolute bottom-0 left-0 right-0 top-0 z-50 h-full overflow-auto border-l border-l-slate-800 bg-gradient-to-br from-slate-900 to-slate-950 to-20% lg:fixed lg:left-1/3 lg:px-6 lg:py-4"
+        className="absolute top-0 right-0 bottom-0 left-0 z-50 h-full overflow-auto border-l border-l-slate-800 bg-gradient-to-br from-slate-900 to-20% to-slate-950 lg:fixed lg:left-1/3 lg:px-6 lg:py-4"
         {...props}
       >
         <SidePanelContext.Provider value={context}>

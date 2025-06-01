@@ -35,7 +35,7 @@ export default function PasswordResetForm() {
   const [result, formAction] = useFormState(passwordResetForm, undefined);
 
   return (
-    <div className="min-w-sm flex flex-auto flex-col gap-y-4">
+    <div className="flex min-w-sm flex-auto flex-col gap-y-4">
       {result?.error && <Alert>{result.error}</Alert>}
       {result?.ok ? (
         <p className="mb-8 text-center">

@@ -188,7 +188,6 @@ export default procedure
       case "-rating":
         orderBy = sql`${bottles.avgRating} DESC NULLS LAST`;
         break;
-      case "-tastings":
       default:
         orderBy = desc(bottles.totalTastings);
     }

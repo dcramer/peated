@@ -14,7 +14,7 @@ export const TemplateStruct = object({
 export type TemplateProps = Infer<typeof TemplateStruct>;
 
 export const Template = ({ verifyUrl, baseUrl }: TemplateProps) => {
-  const previewText = `Your email address requires verification.`;
+  const previewText = "Your email address requires verification.";
 
   return (
     <Layout baseUrl={baseUrl}>

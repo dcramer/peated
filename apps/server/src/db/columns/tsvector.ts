@@ -27,7 +27,7 @@ export function tsvector<TData extends TSVectorType = string>(name: string) {
 
     toDriver(value: TData) {
       if (typeof value === "string") return sql`to_tsvector(${value})`;
-      else if (Array.isArray(value))
+      if (Array.isArray(value))
         return sql.join(
           value.map((v) => v.mapToDriverValue()),
           sql` || ' ' || `

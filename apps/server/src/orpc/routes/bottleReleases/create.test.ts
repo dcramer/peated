@@ -228,7 +228,7 @@ describe("POST /bottle-releases", () => {
         context: { user: defaults.user },
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Bottle not found.]");
   });
 
   it("throws error if release with same attributes exists", async ({
@@ -266,7 +266,7 @@ describe("POST /bottle-releases", () => {
       })
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: A release with these attributes already exists.]`
+      "[Error: A release with these attributes already exists.]"
     );
 
     // Verify numReleases was not incremented
@@ -308,7 +308,7 @@ describe("POST /bottle-releases", () => {
       })
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: A release with these attributes already exists.]`
+      "[Error: A release with these attributes already exists.]"
     );
 
     // Verify numReleases was not incremented

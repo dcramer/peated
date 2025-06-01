@@ -62,7 +62,7 @@ export default function Verify() {
   return (
     <LayoutSplash>
       <div className="mb-16 flex flex-col items-center">
-        <h1 className="mb-4 text-2xl font-semibold">Account Verification</h1>
+        <h1 className="mb-4 font-semibold text-2xl">Account Verification</h1>
         {loading ? (
           <Spinner />
         ) : error ? (

@@ -38,7 +38,7 @@ describe("GET /bottles/:bottle/releases", () => {
         bottle: 1,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Bottle not found.]");
   });
 
   it("filters by bottle", async ({ fixtures }) => {

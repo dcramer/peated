@@ -77,7 +77,7 @@ export default function FlashMessages({ children }: { children: ReactNode }) {
         },
       }}
     >
-      <div className="fixed right-0 top-0 z-50 flex max-w-xl flex-col gap-y-4 p-4">
+      <div className="fixed top-0 right-0 z-50 flex max-w-xl flex-col gap-y-4 p-4">
         {messages.map((m) => (
           <Message {...m} key={m.id} />
         ))}

@@ -18,7 +18,7 @@ describe("GET /external-sites/:site/config/:key", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("get missing value", async ({ fixtures }) => {

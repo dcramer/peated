@@ -23,11 +23,11 @@ export default function LayoutEmpty({
         {withHeader && (
           <div className="flex flex-grow items-center justify-center px-4">
             <Link href="/" className="max-w-xs">
-              <PeatedLogo className="text-highlight h-auto w-full" />
+              <PeatedLogo className="h-auto w-full text-highlight" />
             </Link>
           </div>
         )}
-        <div className="min-w-sm mt-8 flex flex-auto flex-col gap-y-4 rounded px-4 py-6">
+        <div className="mt-8 flex min-w-sm flex-auto flex-col gap-y-4 rounded px-4 py-6">
           {children}
         </div>
       </div>

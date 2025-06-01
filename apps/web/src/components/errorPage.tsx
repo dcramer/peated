@@ -78,10 +78,10 @@ export default function ErrorPage({
       <div className="h-full flex-auto">
         <main className="self-justify-center inline self-center p-3">
           <div className="text-center">
-            <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-5xl">
+            <h1 className="mt-4 font-bold text-3xl text-white tracking-tight sm:text-5xl">
               {title || DEFAULT_TITLE}
             </h1>
-            <div className="mt-6 leading-7 text-white">
+            <div className="mt-6 text-white leading-7">
               {subtitle ? subtitle : !title && DEFAULT_SUBTITLE}
             </div>
 

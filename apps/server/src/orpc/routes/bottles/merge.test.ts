@@ -12,7 +12,7 @@ describe("POST /bottles/:bottle/merge-targets", () => {
         { context: { user: null } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("requires mod", async ({ fixtures }) => {
@@ -26,7 +26,7 @@ describe("POST /bottles/:bottle/merge-targets", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   // TODO: test call to pushJob

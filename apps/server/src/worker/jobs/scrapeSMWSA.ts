@@ -15,7 +15,7 @@ import type { z } from "zod";
 
 export default async function scrapeSMWSA() {
   await scrapeBottles(
-    `https://newmake.smwsa.com/collections/all-products`,
+    "https://newmake.smwsa.com/collections/all-products",
     handleBottle
   );
 
@@ -76,10 +76,9 @@ export async function scrapeBottles(
       .first()
       .text()
       .trim();
-    const price =
-      rawPrice && rawPrice.startsWith("$")
-        ? Math.floor(Number(rawPrice.substring(1)) * 100)
-        : null;
+    const price = rawPrice?.startsWith("$")
+      ? Math.floor(Number(rawPrice.substring(1)) * 100)
+      : null;
 
     const url = $("a.product-collection-module__grid-item-gallery", el)
       .first()
@@ -111,7 +110,8 @@ export async function scrapeBottles(
     }
 
     let name = details.name;
-    let vintageYear, releaseYear;
+    let vintageYear;
+    let releaseYear;
 
     ({ name, statedAge, vintageYear, releaseYear } = normalizeBottle({
       name,

@@ -19,7 +19,7 @@ export default function ConfirmationDialog({
           <DialogPanel className="w-full max-w-md transform overflow-hidden rounded bg-slate-900 p-6 text-left align-middle shadow-xl transition-all">
             <DialogTitle
               as="h3"
-              className="text-highlight text-lg font-medium leading-6"
+              className="font-medium text-highlight text-lg leading-6"
             >
               Warning
             </DialogTitle>

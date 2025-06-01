@@ -14,7 +14,7 @@ describe("PUT /badges/:badge", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("updates badge", async ({ fixtures }) => {

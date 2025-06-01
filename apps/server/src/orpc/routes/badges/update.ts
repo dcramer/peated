@@ -47,7 +47,7 @@ export default procedure
     if (data.checks) {
       const checks: BadgeCheck[] = [];
       for (const check of data.checks) {
-        let config;
+        let config: any;
         try {
           config = await checkBadgeConfig(check.type as any, check.config);
         } catch (err) {

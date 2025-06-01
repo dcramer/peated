@@ -5,7 +5,7 @@ describe("parseConfig", () => {
   test("valid params", async () => {
     const badgeImpl = new EveryTastingCheck();
     const config = {};
-    expect(await badgeImpl.parseConfig(config)).toMatchInlineSnapshot(`{}`);
+    expect(await badgeImpl.parseConfig(config)).toMatchInlineSnapshot("{}");
   });
 });
 

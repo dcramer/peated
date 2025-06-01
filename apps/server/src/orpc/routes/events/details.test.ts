@@ -19,6 +19,6 @@ describe("GET /events/:event", () => {
         event: 12345,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Event not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Event not found.]");
   });
 });

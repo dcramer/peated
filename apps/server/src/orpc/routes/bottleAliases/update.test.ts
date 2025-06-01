@@ -17,7 +17,7 @@ describe("PUT /bottle-aliases/:name", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("updates alias", async ({ fixtures }) => {

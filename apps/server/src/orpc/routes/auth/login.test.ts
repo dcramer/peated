@@ -29,6 +29,6 @@ describe("POST /auth/login", () => {
         password: "example2",
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Invalid credentials.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Invalid credentials.]");
   });
 });

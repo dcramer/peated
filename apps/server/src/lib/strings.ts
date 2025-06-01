@@ -11,7 +11,7 @@ export function humanizeBytes(bytes: number, si = false, dp = 1) {
   const thresh = si ? 1000 : 1024;
 
   if (Math.abs(bytes) < thresh) {
-    return bytes + " B";
+    return `${bytes} B`;
   }
 
   const units = si
@@ -19,16 +19,17 @@ export function humanizeBytes(bytes: number, si = false, dp = 1) {
     : ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
   let u = -1;
   const r = 10 ** dp;
+  let currentBytes = bytes;
 
   do {
-    bytes /= thresh;
+    currentBytes /= thresh;
     ++u;
   } while (
-    Math.round(Math.abs(bytes) * r) / r >= thresh &&
+    Math.round(Math.abs(currentBytes) * r) / r >= thresh &&
     u < units.length - 1
   );
 
-  return bytes.toFixed(dp) + " " + units[u];
+  return `${currentBytes.toFixed(dp)} ${units[u]}`;
 }
 
 export function stripSuffix(value: string, suffix: string) {

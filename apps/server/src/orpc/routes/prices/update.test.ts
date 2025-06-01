@@ -16,7 +16,7 @@ describe("PATCH /prices/:price", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("updates hidden status", async ({ fixtures }) => {
@@ -44,7 +44,7 @@ describe("PATCH /prices/:price", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Price not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Price not found.]");
   });
 
   test("returns existing price if no data is sent", async ({ fixtures }) => {

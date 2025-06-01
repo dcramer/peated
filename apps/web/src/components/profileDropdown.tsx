@@ -30,8 +30,8 @@ export function ProfileDropdown() {
             className={classNames(
               "relative flex max-w-xs items-center p-2 text-sm hover:bg-slate-800 hover:text-white focus:outline-none",
               open
-                ? "rounded-b-none rounded-t bg-slate-800 text-white"
-                : "text-muted rounded"
+                ? "rounded-t rounded-b-none bg-slate-800 text-white"
+                : "rounded text-muted"
             )}
             as={Link}
             href={`/users/${user.username}`}
@@ -66,7 +66,7 @@ export function ProfileDropdown() {
               {user.admin && (
                 <div>
                   <MenuItem>
-                    <Link href={`/admin`}>Admin</Link>
+                    <Link href={"/admin"}>Admin</Link>
                   </MenuItem>
                 </div>
               )}

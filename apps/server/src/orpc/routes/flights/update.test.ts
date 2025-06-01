@@ -12,7 +12,7 @@ describe("PATCH /flights/:flight", () => {
         flight: "1",
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("requires mod", async ({ fixtures }) => {

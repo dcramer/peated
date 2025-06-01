@@ -24,12 +24,12 @@ function parseAbv(value: string | number | null | undefined): number | null {
   const floatValue = Number.parseFloat(cleanValue);
 
   // Return null if the conversion failed
-  return isNaN(floatValue) ? null : floatValue;
+  return Number.isNaN(floatValue) ? null : floatValue;
 }
 
 export default async function scrapeSMWS() {
   await scrapeBottles(
-    `https://api.smws.com/api/v1/bottles?store_id=uk&parent_id=61&page=1&sortBy=featured&minPrice=0&maxPrice=0&perPage=128`,
+    "https://api.smws.com/api/v1/bottles?store_id=uk&parent_id=61&page=1&sortBy=featured&minPrice=0&maxPrice=0&perPage=128",
     handleBottle
   );
 
@@ -74,7 +74,7 @@ export async function scrapeBottles(
       items.map(async (item) => {
         const caskName = item.name;
         if (!caskName) {
-          console.warn(`Cannot find cask name for product`);
+          console.warn("Cannot find cask name for product");
           return;
         }
         const details = parseDetailsFromName(`${item.cask_no} ${caskName}`);

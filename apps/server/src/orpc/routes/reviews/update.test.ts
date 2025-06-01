@@ -16,7 +16,7 @@ describe("PATCH /reviews/:review", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("updates hidden status to true", async ({ fixtures }) => {
@@ -60,7 +60,7 @@ describe("PATCH /reviews/:review", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Review not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Review not found.]");
   });
 
   test("returns existing review if no data is sent", async ({ fixtures }) => {

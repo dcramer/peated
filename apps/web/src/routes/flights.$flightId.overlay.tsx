@@ -33,11 +33,11 @@ function Page() {
       <div className="w-full max-w-3xl flex-1 self-center">
         <div className="mb-8 flex min-w-full flex-wrap gap-x-3 gap-y-4 p-3 sm:flex-nowrap sm:py-0">
           <div className="w-full flex-auto flex-col items-center space-y-1 sm:w-auto sm:items-start">
-            <h1 className="mb-2 text-center text-4xl font-semibold sm:text-left">
+            <h1 className="mb-2 text-center font-semibold text-4xl sm:text-left">
               {flight.name}
             </h1>
             {flight.description && (
-              <div className="text-muted text-center sm:text-left">
+              <div className="text-center text-muted sm:text-left">
                 {flight.description}
               </div>
             )}
@@ -49,8 +49,8 @@ function Page() {
               <tbody>
                 {bottleList.results.map((bottle) => {
                   return (
-                    <tr key={bottle.id} className="border-b border-slate-800">
-                      <td className="group relative max-w-0 py-4 pl-4 pr-3 sm:pl-3">
+                    <tr key={bottle.id} className="border-slate-800 border-b">
+                      <td className="group relative max-w-0 py-4 pr-3 pl-4 sm:pl-3">
                         <BottleLink
                           bottle={bottle}
                           flightId={flight.id}
@@ -60,7 +60,7 @@ function Page() {
                         <div className="flex items-center gap-x-1 text-2xl group-hover:underline">
                           <div className="font-semibold">{bottle.fullName}</div>
                         </div>
-                        <div className="text-muted flex flex-row items-start space-x-1 truncate">
+                        <div className="flex flex-row items-start space-x-1 truncate text-muted">
                           <Distillers data={bottle} />
                         </div>
                         {bottle.description}

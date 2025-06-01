@@ -20,6 +20,6 @@ describe("GET /friends", () => {
 
   test("requires authentication", async () => {
     const err = await waitError(() => routerClient.friends.list());
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 });

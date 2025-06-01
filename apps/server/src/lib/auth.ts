@@ -60,7 +60,7 @@ export async function getUserFromHeader(
 
   const { id } = (await verifyPayload(token)) as any;
   if (!id) {
-    logger.warn(`Invalid Bearer token`);
+    logger.warn("Invalid Bearer token");
     return null;
   }
   const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -70,7 +70,7 @@ export async function getUserFromHeader(
   }
 
   if (!user.active) {
-    logger.warn(`Inactive user found for token`);
+    logger.warn("Inactive user found for token");
     return null;
   }
 

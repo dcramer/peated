@@ -63,7 +63,7 @@ export default procedure
         data: {
           file: fileStream,
         },
-        namespace: `tastings`,
+        namespace: "tastings",
         urlPrefix: "/uploads",
         onProcess: (...args) =>
           compressAndResizeImage(...args, undefined, 1024),

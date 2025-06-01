@@ -34,6 +34,6 @@ describe("GET /bottle-series/:series", () => {
         series: 999999,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Series not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Series not found.]");
   });
 });

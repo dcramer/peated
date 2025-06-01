@@ -17,10 +17,7 @@ export default function SearchResults({
   directToTasting?: boolean;
 }) {
   return (
-    <ul
-      role="list"
-      className="divide-y divide-slate-800 border-slate-800 lg:border-b lg:border-r"
-    >
+    <ul className="divide-y divide-slate-800 border-slate-800 lg:border-r lg:border-b">
       {query && canSuggestAdd && (
         <ListItem color="highlight">
           <PlusIcon className="hidden h-12 w-12 flex-none rounded p-2 sm:block" />
@@ -30,13 +27,13 @@ export default function SearchResults({
               <Link
                 href={`/addBottle?name=${encodeURIComponent(toTitleCase(query))}`}
               >
-                <span className="absolute inset-x-0 -top-px bottom-0" />
+                <span className="-top-px absolute inset-x-0 bottom-0" />
                 {results.length === 0
                   ? "We couldn't find anything matching your search query."
                   : "Can't find a bottle?"}
               </Link>
             </div>
-            <div className="text-highlight-dark mt-1 flex gap-x-1 leading-5">
+            <div className="mt-1 flex gap-x-1 text-highlight-dark leading-5">
               {query !== "" ? (
                 <span>
                   Tap here to add{" "}
@@ -59,7 +56,7 @@ export default function SearchResults({
       })}
       {!canSuggestAdd && results.length === 0 && query !== "" && (
         <ListItem noHover>
-          <p className="text-muted p-5">
+          <p className="p-5 text-muted">
             We couldn't find anything matching your search query.
           </p>
         </ListItem>

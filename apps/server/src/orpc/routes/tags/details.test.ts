@@ -20,14 +20,14 @@ describe("GET /tags/:tag", () => {
       routerClient.tags.details({ tag: "NonExistentTag" })
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Tag not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Tag not found.]");
   });
 
   test("is case-sensitive", async ({ fixtures }) => {
     await fixtures.Tag({ name: "TestTag" });
     const err = await waitError(routerClient.tags.details({ tag: "testtag" }));
 
-    expect(err).toMatchInlineSnapshot(`[Error: Tag not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Tag not found.]");
   });
 
   test("returns serialized tag data", async ({ fixtures }) => {

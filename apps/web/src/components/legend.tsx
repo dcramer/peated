@@ -14,12 +14,13 @@ export default function Legend({
 }) {
   return (
     <legend
-      className="relative -mb-1 flex w-full items-center bg-slate-800 px-4 py-6 font-bold text-white"
+      className="-mb-1 relative flex w-full items-center bg-slate-800 px-4 py-6 font-bold text-white"
       {...props}
     >
       <div className="flex-grow text-lg">{title}</div>
       {isCollapsed !== undefined && onCollapse && (
         <button
+          type="button"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();

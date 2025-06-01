@@ -562,7 +562,7 @@ describe("GET /bottles", () => {
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: Cannot sort by brand without entity filter.]`
+      "[Error: Cannot sort by brand without entity filter.]"
     );
   });
 
@@ -736,7 +736,7 @@ describe("GET /bottles", () => {
       })
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+    expect(err).toMatchInlineSnapshot("[Error: Input validation failed]");
   });
 
   test("validates cursor parameter", async () => {
@@ -746,6 +746,6 @@ describe("GET /bottles", () => {
       })
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+    expect(err).toMatchInlineSnapshot("[Error: Input validation failed]");
   });
 });

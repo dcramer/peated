@@ -83,7 +83,7 @@ export default function SelectDialog<T extends Option>({
 
   const selectOption = async (option: T) => {
     setPreviousValues(filterDupes([option], previousValues));
-    onSelect && onSelect(option);
+    onSelect?.(option);
   };
 
   useEffect(() => {
@@ -94,7 +94,8 @@ export default function SelectDialog<T extends Option>({
     JSON.stringify(previousValues),
   ]);
 
-  const listItemClasses = `px-3 group relative border-b border-slate-800 bg-slate-950 hover:bg-slate-900`;
+  const listItemClasses =
+    "px-3 group relative border-b border-slate-800 bg-slate-950 hover:bg-slate-900";
 
   return (
     <>
@@ -115,10 +116,7 @@ export default function SelectDialog<T extends Option>({
             />
           }
         >
-          <ul
-            role="list"
-            className="divide-y divide-slate-800 border-slate-800 lg:border-x lg:border-b"
-          >
+          <ul className="divide-y divide-slate-800 border-slate-800 lg:border-x lg:border-b">
             {initialState === "loading" ? (
               [...Array(25).keys()].map((i) => <SkeletonItem key={i} />)
             ) : (
@@ -134,21 +132,22 @@ export default function SelectDialog<T extends Option>({
                         className={classNames(
                           "-ml-2 h-10 w-10 flex-none rounded p-2",
                           selectedValues.find(
-                            (i) => i.id == option.id && i.name == option.name
+                            (i) => i.id === option.id && i.name === option.name
                           )
                             ? "bg-highlight text-black"
-                            : "text-muted bg-slate-900 group-hover:bg-slate-700"
+                            : "bg-slate-900 text-muted group-hover:bg-slate-700"
                         )}
                       />
 
                       <div className="flex min-w-0 flex-auto items-center">
                         <div className="font-semibold text-white">
                           <button
+                            type="button"
                             onClick={() => {
                               selectOption(option);
                             }}
                           >
-                            <span className="absolute inset-x-0 -top-px bottom-0" />
+                            <span className="-top-px absolute inset-x-0 bottom-0" />
                             {onRenderOption
                               ? onRenderOption(option)
                               : option.name}
@@ -168,8 +167,11 @@ export default function SelectDialog<T extends Option>({
 
                         <div className="min-w-0 flex-auto">
                           <div className="font-semibold">
-                            <button onClick={() => setCreateOpen(true)}>
-                              <span className="absolute inset-x-0 -top-px bottom-0" />
+                            <button
+                              type="button"
+                              onClick={() => setCreateOpen(true)}
+                            >
+                              <span className="-top-px absolute inset-x-0 bottom-0" />
                               Can't find what you're looking for?
                             </button>
                           </div>
@@ -201,7 +203,7 @@ export default function SelectDialog<T extends Option>({
                               target="_blank"
                               rel="noreferrer"
                             >
-                              <span className="absolute inset-x-0 -top-px bottom-0" />
+                              <span className="-top-px absolute inset-x-0 bottom-0" />
                               Can't find what you're looking for?
                             </a>
                           </div>

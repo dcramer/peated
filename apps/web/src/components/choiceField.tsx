@@ -62,13 +62,13 @@ export default function ChoiceField<T extends FieldValues>({
                       <div
                         className={classNames(
                           "h-6 w-6 shrink-0 border",
-                          checked ? "text-highlight border-highlight" : ""
+                          checked ? "border-highlight text-highlight" : ""
                         )}
                       >
                         <CheckIcon
                           className={classNames(
                             "h-full w-full group-hover:block",
-                            checked ? "block" : "text-muted hidden"
+                            checked ? "block" : "hidden text-muted"
                           )}
                         />
                       </div>
@@ -76,7 +76,7 @@ export default function ChoiceField<T extends FieldValues>({
                         <div className="text-sm">
                           <Label
                             as="p"
-                            className={`font-mediumbold  ${
+                            className={`font-mediumbold ${
                               checked
                                 ? "text-highlight"
                                 : "text-muted hover:text-white"

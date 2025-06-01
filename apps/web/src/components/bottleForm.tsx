@@ -176,7 +176,7 @@ export default function BottleForm({
       footer={null}
     >
       <div className="border-slate-700 p-4 lg:mb-8 lg:border">
-        <div className="prose prose-invert text-muted max-w-full text-sm leading-6">
+        <div className="prose prose-invert max-w-full text-muted text-sm leading-6">
           <p>
             It can be tricky to find the right information, so if you&apos;re
             struggling, just try to fill in the components that you're confident
@@ -626,7 +626,7 @@ export default function BottleForm({
                           >
                             {option.name}
                           </h4>
-                          <div className="text-muted text-sm font-normal">
+                          <div className="font-normal text-muted text-sm">
                             {notesForProfile(option.id as FlavorProfile)}
                           </div>
                         </div>

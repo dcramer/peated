@@ -10,7 +10,7 @@ import { getSession } from "./session.server";
 const SESSION_REFRESH = 60 * 60; // 1 hour
 
 export async function logoutForm(
-  prevState: void | undefined,
+  prevState: undefined | undefined,
   formData: FormData
 ) {
   "use server";
@@ -73,7 +73,8 @@ export async function authenticate(
         magicLink: false,
         error: error.message,
       };
-    } else if (error) {
+    }
+    if (error) {
       return {
         magicLink: false,
         error: "Internal server error.",
@@ -102,7 +103,8 @@ export async function authenticate(
       magicLink: false,
       error: error.message,
     };
-  } else if (error) {
+  }
+  if (error) {
     return {
       magicLink: false,
       error: "Internal server error.",
@@ -158,7 +160,8 @@ export async function register(formData: FormData) {
 
   if (isDefined) {
     return { ok: false, error: error.message };
-  } else if (error) {
+  }
+  if (error) {
     return { ok: false, error: "Internal server error." };
   }
 
@@ -196,7 +199,8 @@ export async function resendVerificationForm(
 
   if (isDefined && error.name === "CONFLICT") {
     return { ok: true, alreadyVerified: true };
-  } else if (error) {
+  }
+  if (error) {
     return { ok: false, error: "Internal server error." };
   }
 
@@ -220,7 +224,8 @@ export async function passwordResetForm(
 
   if (isDefined) {
     return { ok: false, error: error.message };
-  } else if (error) {
+  }
+  if (error) {
     return { ok: false, error: "Internal server error." };
   }
 
@@ -245,7 +250,8 @@ export async function passwordResetConfirmForm(
 
   if (isDefined) {
     return { ok: false, error: error.message };
-  } else if (error) {
+  }
+  if (error) {
     return { ok: false, error: "Internal server error." };
   }
 

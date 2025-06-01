@@ -23,12 +23,12 @@ function Page() {
       {tastingList.results.length ? (
         <TastingList values={tastingList.results} />
       ) : (
-        <EmptyActivity href={`/search?tasting`}>
+        <EmptyActivity href={"/search?tasting"}>
           <span className="mt-2 block font-semibold ">
             Are you enjoying a dram?
           </span>
 
-          <span className="font-muted mt-2 block">
+          <span className="mt-2 block font-muted">
             Looks like no ones recorded any related spirit. You could be the
             first!
           </span>

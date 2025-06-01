@@ -16,7 +16,7 @@ test("simple", async ({ axiosMock }) => {
 
   await fn;
 
-  expect(items.length).toMatchInlineSnapshot(`12`);
+  expect(items.length).toMatchInlineSnapshot("12");
   expect(items[0]).toMatchInlineSnapshot(`
     {
       "currency": "usd",

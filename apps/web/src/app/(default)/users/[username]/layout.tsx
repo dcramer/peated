@@ -78,10 +78,10 @@ export default async function Layout({
           <UserAvatar user={user} size={150} />
         </div>
         <div className="flex w-full flex-col justify-center gap-y-4 px-4 lg:w-auto lg:flex-auto lg:gap-y-2">
-          <h3 className="self-center text-4xl font-semibold leading-normal text-white lg:self-start">
+          <h3 className="self-center font-semibold text-4xl text-white leading-normal lg:self-start">
             {user.username}
           </h3>
-          <div className="text-muted flex flex-col items-center gap-x-2 gap-y-2 self-center lg:flex-row lg:self-start">
+          <div className="flex flex-col items-center gap-x-2 gap-y-2 self-center text-muted lg:flex-row lg:self-start">
             <div>
               {user.admin ? (
                 <Chip size="small" color="highlight">
@@ -96,25 +96,25 @@ export default async function Layout({
           </div>
           <div className="flex justify-center lg:justify-start">
             <div className="mr-4 pr-3 text-center">
-              <span className="block text-xl font-bold uppercase tracking-wide text-white">
+              <span className="block font-bold text-white text-xl uppercase tracking-wide">
                 {user.stats.tastings.toLocaleString()}
               </span>
               <span className="text-muted text-sm">Tastings</span>
             </div>
             <div className="mb-4 px-3 text-center">
-              <span className="block text-xl font-bold uppercase tracking-wide text-white">
+              <span className="block font-bold text-white text-xl uppercase tracking-wide">
                 {user.stats.bottles.toLocaleString()}
               </span>
               <span className="text-muted text-sm">Bottles</span>
             </div>
             <div className="mb-4 px-3 text-center">
-              <span className="block text-xl font-bold uppercase tracking-wide text-white">
+              <span className="block font-bold text-white text-xl uppercase tracking-wide">
                 {user.stats.collected.toLocaleString()}
               </span>
               <span className="text-muted text-sm">Collected</span>
             </div>
             <div className="mb-4 pl-3 text-center">
-              <span className="block text-xl font-bold uppercase tracking-wide text-white">
+              <span className="block font-bold text-white text-xl uppercase tracking-wide">
                 {user.stats.contributions.toLocaleString()}
               </span>
               <span className="text-muted text-sm">Contributions</span>

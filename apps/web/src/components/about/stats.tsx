@@ -17,7 +17,7 @@ function SkeletonStat({ name }: { name: string }) {
   return (
     <div>
       <div className="text-muted leading-7">{name}</div>
-      <div className="order-first animate-pulse text-3xl font-semibold tracking-tight sm:text-5xl">
+      <div className="order-first animate-pulse font-semibold text-3xl tracking-tight sm:text-5xl">
         ?
       </div>
     </div>
@@ -43,7 +43,7 @@ export default function Stats() {
       {stats.map((stat) => (
         <div key={stat.name}>
           <div className="text-muted leading-7">{stat.name}</div>
-          <div className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
+          <div className="order-first font-semibold text-3xl tracking-tight sm:text-5xl">
             {stat.value}
           </div>
         </div>

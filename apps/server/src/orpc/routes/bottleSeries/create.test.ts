@@ -74,7 +74,7 @@ describe("POST /bottle-series", () => {
 
     const error = await waitError(() => routerClient.bottleSeries.create(data));
 
-    expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(error).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   it("validates brand exists", async ({ fixtures, defaults }) => {
@@ -90,6 +90,6 @@ describe("POST /bottle-series", () => {
       })
     );
 
-    expect(error).toMatchInlineSnapshot(`[Error: Brand not found.]`);
+    expect(error).toMatchInlineSnapshot("[Error: Brand not found.]");
   });
 });

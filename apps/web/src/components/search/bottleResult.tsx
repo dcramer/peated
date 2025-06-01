@@ -47,7 +47,7 @@ export default function BottleResultRow({
                 : `/bottles/${bottle.id}`
             }
           >
-            <span className="absolute inset-x-0 -top-px bottom-0" />
+            <span className="-top-px absolute inset-x-0 bottom-0" />
             <div className="flex flex-col gap-x-2 sm:flex-row sm:items-center">
               <span>{bottle.fullName}</span>
               {bottle.numReleases > 0 && (
@@ -65,7 +65,7 @@ export default function BottleResultRow({
             <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
           )}
         </div>
-        <div className="text-muted mt-1 flex gap-x-1 truncate text-sm leading-5">
+        <div className="mt-1 flex gap-x-1 truncate text-muted text-sm leading-5">
           {metadata.length ? (
             <Join divider={<>&middot;</>}>{metadata}</Join>
           ) : null}
@@ -76,7 +76,7 @@ export default function BottleResultRow({
           <div className="text-muted leading-6">
             {bottle.category && formatCategoryName(bottle.category)}
           </div>
-          <div className="text-muted mt-1 text-sm leading-5">
+          <div className="mt-1 text-muted text-sm leading-5">
             {bottle.statedAge ? `${bottle.statedAge} years` : null}
           </div>
         </div>

@@ -12,7 +12,7 @@ const ChangeAuthor = ({ user }: { user?: User | null }) => {
     <div className="flex items-center gap-x-2">
       <Link
         href={`/users/${user.username}`}
-        className="text-highlight font-medium hover:underline"
+        className="font-medium text-highlight hover:underline"
       >
         {user.username}
       </Link>
@@ -49,7 +49,7 @@ const ObjectDesc = ({
           <div>the entity</div>
           <Link
             href={`/entities/${objectId}`}
-            className="text-highlight font-medium hover:underline"
+            className="font-medium text-highlight hover:underline"
           >
             {displayName}
           </Link>
@@ -61,7 +61,7 @@ const ObjectDesc = ({
           <div>the bottle</div>
           <Link
             href={`/bottles/${objectId}`}
-            className="text-highlight font-medium hover:underline"
+            className="font-medium text-highlight hover:underline"
           >
             {displayName}
           </Link>
@@ -81,7 +81,7 @@ export default function ChangeList({
 }) {
   return (
     <>
-      <ul role="list" className="divide-y divide-slate-800 sm:rounded">
+      <ul className="divide-y divide-slate-800 sm:rounded">
         <AnimatePresence>
           {values.map((change) => (
             <ListItem key={change.id}>

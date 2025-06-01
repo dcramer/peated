@@ -16,9 +16,9 @@ export function buildEntitySearchVector(
     new TSVector(entity.name, "A"),
     ...(entity.shortName ? [new TSVector(entity.shortName, "A")] : []),
   ];
-  aliasList
-    ?.filter((a) => a.name !== entity.name)
-    .forEach((a) => values.push(new TSVector(a.name, "B")));
+  for (const alias of aliasList?.filter((a) => a.name !== entity.name) || []) {
+    values.push(new TSVector(alias.name, "B"));
+  }
   return values;
 }
 
@@ -39,10 +39,13 @@ export function buildBottleSearchVector(
   if (bottle.category)
     values.push(new TSVector(formatCategoryName(bottle.category), "C"));
   if (bottler) values.push(new TSVector(bottler.name, "C"));
-  aliasList
-    ?.filter((a) => a.name !== bottle.fullName)
-    .forEach((a) => values.push(new TSVector(a.name, "A")));
-  distillerList?.forEach((a) => values.push(new TSVector(a.name, "B")));
+  for (const alias of aliasList?.filter((a) => a.name !== bottle.fullName) ||
+    []) {
+    values.push(new TSVector(alias.name, "A"));
+  }
+  for (const distiller of distillerList || []) {
+    values.push(new TSVector(distiller.name, "B"));
+  }
   return values;
 }
 

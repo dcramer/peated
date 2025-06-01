@@ -317,7 +317,7 @@ export default procedure
       //
       // in all of these scenarios we need to run constraint checks
 
-      let alias;
+      let alias: any;
       if (bottleData.fullName) {
         alias = await upsertBottleAlias(tx, bottleData.fullName, bottle.id);
         // alias.bottleId is always set, but I don't want to deal w/ TS

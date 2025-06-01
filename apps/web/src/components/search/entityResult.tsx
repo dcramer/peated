@@ -19,11 +19,11 @@ export default function EntityResultRow({
       <div className="min-w-0 flex-auto">
         <div className="flex items-center space-x-1 font-semibold leading-6">
           <Link href={`/entities/${entity.id}`}>
-            <span className="absolute inset-x-0 -top-px bottom-0" />
+            <span className="-top-px absolute inset-x-0 bottom-0" />
             {entity.name}
           </Link>
         </div>
-        <div className="text-muted mt-1 flex gap-x-1 truncate text-sm leading-5">
+        <div className="mt-1 flex gap-x-1 truncate text-muted text-sm leading-5">
           {entity.shortName}
         </div>
       </div>

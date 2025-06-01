@@ -20,7 +20,7 @@ export default function UserAvatar({
   user?: User | null;
   size?: number;
 }) {
-  if (user && user.pictureUrl) {
+  if (user?.pictureUrl) {
     return (
       <img
         src={user.pictureUrl}
@@ -36,7 +36,7 @@ export default function UserAvatar({
 
   return (
     <DefaultAvatar
-      className="text-muted h-full w-full rounded bg-slate-900"
+      className="h-full w-full rounded bg-slate-900 text-muted"
       style={{
         width: size,
         height: size,

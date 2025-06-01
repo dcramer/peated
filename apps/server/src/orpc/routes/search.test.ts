@@ -123,6 +123,6 @@ describe("GET /search", () => {
       })
     );
     expect(err).toBeDefined();
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+    expect(err).toMatchInlineSnapshot("[Error: Input validation failed]");
   });
 });

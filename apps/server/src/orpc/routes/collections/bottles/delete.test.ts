@@ -14,7 +14,7 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
         bottle: 1,
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("delete bottle from default", async ({ fixtures, defaults }) => {

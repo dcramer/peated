@@ -13,7 +13,7 @@ describe("DELETE /countries/:country/regions/:region", () => {
         region: "test-region",
       })
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("requires admin", async ({ fixtures }) => {
@@ -28,7 +28,7 @@ describe("DELETE /countries/:country/regions/:region", () => {
         { context: { user } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Unauthorized.]");
   });
 
   test("deletes region by country id and slug", async ({ fixtures }) => {
@@ -85,7 +85,7 @@ describe("DELETE /countries/:country/regions/:region", () => {
         { context: { user: adminUser } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Invalid country.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Invalid country.]");
   });
 
   test("throws NOT_FOUND for non-existent region", async ({ fixtures }) => {
@@ -101,7 +101,7 @@ describe("DELETE /countries/:country/regions/:region", () => {
         { context: { user: adminUser } }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Region not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Region not found.]");
   });
 
   test("is case-insensitive for country and region slugs", async ({

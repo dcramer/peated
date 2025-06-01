@@ -124,6 +124,6 @@ describe("DELETE /bottle-releases/:release", () => {
         }
       )
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Release not found.]`);
+    expect(err).toMatchInlineSnapshot("[Error: Release not found.]");
   });
 });

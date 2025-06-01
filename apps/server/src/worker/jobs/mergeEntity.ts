@@ -58,7 +58,7 @@ export default async function mergeEntity({
           .from(bottles)
           .where(eq(bottles.id, alias.bottleId));
         // the only way this can conflict is via brand
-        if (existingBottle.brandId != toEntity.id) {
+        if (existingBottle.brandId !== toEntity.id) {
           throw new ConflictError(
             existingBottle,
             undefined,

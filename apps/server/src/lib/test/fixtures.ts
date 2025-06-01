@@ -1,4 +1,5 @@
-import path from "path";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { faker } from "@faker-js/faker";
 import type { AnyDatabase } from "@peated/server/db";
 import { db as dbConn } from "@peated/server/db";
@@ -30,7 +31,6 @@ import { generatePublicId } from "@peated/server/lib/publicId";
 import type { ExternalSiteType } from "@peated/server/types";
 import slugify from "@sindresorhus/slugify";
 import { eq, inArray, or, sql } from "drizzle-orm";
-import { readFile } from "fs/promises";
 import {
   EXTERNAL_SITE_TYPE_LIST,
   FLAVOR_PROFILES,
@@ -52,7 +52,7 @@ function getDistilleryNames() {
   const distilleryNames = [];
 
   for (
-    let i = 1, distilleryName;
+    let i = 1, distilleryName: string;
     (distilleryName = SMWS_DISTILLERY_CODES[i]);
     i++
   ) {

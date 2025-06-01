@@ -11,7 +11,7 @@ import scheduleScrapers from "./jobs/scheduleScrapers";
 import registry from "./registry";
 import type { JobName } from "./types";
 
-import { createHash } from "crypto";
+import { createHash } from "node:crypto";
 import { Queue } from "bullmq";
 
 export function generateUniqIdentifier(
@@ -41,13 +41,13 @@ export async function pushUniqueJob(
   args?: any,
   opts?: JobsOptions
 ) {
-  opts = {
+  const jobOptions = {
     delay: 5000,
     ...(opts || {}),
     jobId: generateUniqIdentifier(jobName, args),
   };
 
-  return await pushJob(jobName, args, opts);
+  return await pushJob(jobName, args, jobOptions);
 }
 
 export async function pushJob(
