@@ -3,8 +3,7 @@
 
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/forms";
-@plugin "tailwind-scrollbar"
-
+@plugin "tailwind-scrollbar";
 
 @theme {
   --color-muted: #94a3b8; /* slate-400 */

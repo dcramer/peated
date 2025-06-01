@@ -9,7 +9,7 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsdown",
     "create": "email create",
     "dev": "email preview --port=5000 ./src/templates --no-open",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
@@ -22,6 +22,7 @@
     "@types/react": "catalog:",
     "react": "catalog:",
     "superstruct": "^2.0.2",
+    "tsdown": "^0.12.6",
     "typescript": "catalog:"
   },
   "volta": {

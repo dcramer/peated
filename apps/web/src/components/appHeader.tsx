@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import useAuth from "@peated/web/hooks/useAuth";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useLocation, useNavigate, useSearch } from "@tanstack/react-router";
 import { getAuthRedirect } from "../lib/auth";
 import { Modal } from "./modal";
 import NavLink from "./navLink";
@@ -15,9 +15,9 @@ import UserAvatar from "./userAvatar";
 
 export default function AppHeader() {
   const { user } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = useSearch();
 
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -25,7 +25,7 @@ export default function AppHeader() {
 
   useEffect(() => {
     setSearchOpen(false);
-  }, [pathname]);
+  }, [location.pathname]);
 
   return (
     <div className="flex flex-auto items-center gap-x-2">
@@ -33,7 +33,7 @@ export default function AppHeader() {
         placeholder="Search for bottles, brands, and people"
         value={query}
         onSubmit={(value) => {
-          router.push(`/search?q=${encodeURIComponent(value)}`);
+          navigate({ to: "/search", search: { q: value } });
         }}
         onChange={(value) => {
           setQuery(value);
@@ -76,7 +76,7 @@ export default function AppHeader() {
         <div className="mflex items-center gap-x-2">
           <NavLink
             href={getAuthRedirect({
-              pathname,
+              pathname: location.pathname,
               searchParams,
             })}
           >

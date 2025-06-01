@@ -582,6 +582,9 @@ importers:
       superstruct:
         specifier: ^2.0.2
         version: 2.0.2
+      tsdown:
+        specifier: ^0.12.6
+        version: 0.12.6(typescript@5.5.4)
       typescript:
         specifier: 'catalog:'
         version: 5.5.4
@@ -19177,6 +19180,23 @@ snapshots:
       hash-base: 3.0.5
       inherits: 2.0.4
 
+  rolldown-plugin-dts@0.13.6(rolldown@1.0.0-beta.10-commit.87188ed)(typescript@5.5.4):
+    dependencies:
+      '@babel/generator': 7.27.3
+      '@babel/parser': 7.27.4
+      '@babel/types': 7.27.3
+      ast-kit: 2.1.0
+      birpc: 2.3.0
+      debug: 4.4.1
+      dts-resolver: 2.1.0
+      get-tsconfig: 4.10.1
+      rolldown: 1.0.0-beta.10-commit.87188ed
+    optionalDependencies:
+      typescript: 5.5.4
+    transitivePeerDependencies:
+      - oxc-resolver
+      - supports-color
+
   rolldown-plugin-dts@0.13.6(rolldown@1.0.0-beta.10-commit.87188ed)(typescript@5.8.3):
     dependencies:
       '@babel/generator': 7.27.3
@@ -19958,6 +19978,28 @@ snapshots:
   tsconfck@3.1.5(typescript@5.5.4):
     optionalDependencies:
       typescript: 5.5.4
+
+  tsdown@0.12.6(typescript@5.5.4):
+    dependencies:
+      ansis: 4.1.0
+      cac: 6.7.14
+      chokidar: 4.0.3
+      debug: 4.4.1
+      diff: 8.0.2
+      empathic: 1.1.0
+      hookable: 5.5.3
+      rolldown: 1.0.0-beta.10-commit.87188ed
+      rolldown-plugin-dts: 0.13.6(rolldown@1.0.0-beta.10-commit.87188ed)(typescript@5.5.4)
+      semver: 7.7.2
+      tinyexec: 1.0.1
+      tinyglobby: 0.2.14
+      unconfig: 7.3.2
+    optionalDependencies:
+      typescript: 5.5.4
+    transitivePeerDependencies:
+      - oxc-resolver
+      - supports-color
+      - vue-tsc
 
   tsdown@0.12.6(typescript@5.8.3):
     dependencies:

@@ -1,5 +1,5 @@
 {
-  "extends": "@peated/tsconfig/base.jsonc",
+  "extends": "@peated/tsconfig/base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "types": ["node", "vitest/globals", "./src/global.d.ts"],

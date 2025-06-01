@@ -3,6 +3,7 @@ import React from "react";
 import { type Infer, defaulted, object, string } from "superstruct";
 import { Button, Section, Text } from "../components/core";
 import Layout from "../components/layout";
+import { colors } from "../constants";
 
 export const TemplateName = "PasswordResetEmail";
 
@@ -30,7 +31,7 @@ export const Template = ({ magicLinkUrl, baseUrl }: TemplateProps) => {
       <Section>
         <Text
           style={{
-            color: theme.colors.muted,
+            color: colors.muted,
           }}
         >
           If you don't recognize this action, you should ignore this email.

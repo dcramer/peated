@@ -11,25 +11,17 @@
     "isolatedModules": true,
     "jsx": "react",
 
-    /** Keep TSC performant in monorepos */
     "incremental": true,
     "disableSourceOfProjectReferenceRedirect": true,
 
-    /** Strictness */
     "strict": true,
-    // XXX: I find this quite tedious as things like SQL queries
-    // or other network interfaces you know the upstream makes
-    // guarantees.
-    // "noUncheckedIndexedAccess": true,
     "checkJs": true,
 
-    /* Linting */
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
 
-    /** Transpile using Bundler (not tsc) */
     "module": "Preserve",
     "moduleResolution": "Bundler",
     "noEmit": true

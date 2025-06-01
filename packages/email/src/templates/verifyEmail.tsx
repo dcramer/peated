@@ -1,4 +1,5 @@
 import { Preview } from "jsx-email";
+import React from "react";
 import { type Infer, defaulted, object, string } from "superstruct";
 import { Button, Link, Section, Text } from "../components/core";
 import Layout from "../components/layout";
