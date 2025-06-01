@@ -1,42 +1,50 @@
-"use client";
-
 import Button from "@peated/web/components/button";
-import { resendVerificationForm } from "@peated/web/lib/auth.actions";
-import type { ComponentProps } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { resendVerification } from "@peated/web/lib/auth.actions";
+import { useState } from "react";
+import Alert from "../alert";
 
 export default function ResendVerificationForm() {
-  const [state, resendVerificationAction] = useFormState(
-    resendVerificationForm,
-    undefined
-  );
+  const [result, setResult] = useState<{
+    ok?: boolean;
+    alreadyVerified?: boolean;
+    error?: string;
+  } | null>(null);
+  const [loading, setLoading] = useState(false);
 
   return (
-    <form action={resendVerificationAction}>
-      {state?.ok ? (
-        state.alreadyVerified ? (
-          <p className="mb-8 text-center">
-            Oops, it looks like you already verified your account. Nothing to
-            see here!
+    <div className="flex flex-col gap-y-4">
+      {result?.error && <Alert>{result.error}</Alert>}
+
+      {result?.ok ? (
+        result.alreadyVerified ? (
+          <p className="mb-8 text-center font-bold">
+            Your email has already been verified.
           </p>
         ) : (
-          <p className="mb-8 text-center">
-            Follow the instructions in your inbox to continue.
+          <p className="mb-8 text-center font-bold">
+            Please check your email again to continue.
           </p>
         )
       ) : (
-        <ResendVerificationButton />
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setLoading(true);
+            try {
+              const response = await resendVerification();
+              setResult(response);
+            } catch (error) {
+              setResult({ ok: false, error: "An error occurred" });
+            } finally {
+              setLoading(false);
+            }
+          }}
+        >
+          <Button type="submit" color="primary" fullWidth disabled={loading}>
+            {loading ? "Sending..." : "Resend Verification Email"}
+          </Button>
+        </form>
       )}
-    </form>
-  );
-}
-
-function ResendVerificationButton(props: ComponentProps<typeof Button>) {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button type="submit" color="highlight" loading={pending} {...props}>
-      Resend Verification Email
-    </Button>
+    </div>
   );
 }

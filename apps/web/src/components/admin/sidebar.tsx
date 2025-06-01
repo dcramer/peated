@@ -19,7 +19,7 @@ export default function AdminSidebar() {
           <nav className="flex flex-1 flex-col">
             <ul className="flex flex-1 flex-col gap-y-7">
               <li>
-                <Button href="/" fullWidth color="primary">
+                <Button to="/" fullWidth color="primary">
                   Return Home
                 </Button>
               </li>

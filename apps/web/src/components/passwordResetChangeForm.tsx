@@ -2,41 +2,16 @@
 
 import Button from "@peated/web/components/button";
 import TextField from "@peated/web/components/textField";
-import { passwordResetConfirmForm } from "@peated/web/lib/auth.actions";
-import { useFormState, useFormStatus } from "react-dom";
+import { passwordResetConfirm } from "@peated/web/lib/auth.actions";
+import { useState } from "react";
 import Alert from "./alert";
 
-function FormComponent({ token }: { token: string }) {
-  const { pending } = useFormStatus();
-
-  return (
-    <>
-      <div className="-mx-4 -mt-4">
-        <input type="hidden" name="token" value={token} />
-        <TextField
-          name="password"
-          label="Password"
-          type="password"
-          autoComplete="password"
-          required
-          placeholder="************"
-          autoFocus
-        />
-      </div>
-      <div className="flex justify-center gap-x-2">
-        <Button type="submit" color="highlight" fullWidth loading={pending}>
-          Continue
-        </Button>
-      </div>
-    </>
-  );
-}
-
 export default function PasswordResetChangeForm({ token }: { token: string }) {
-  const [result, formAction] = useFormState(
-    passwordResetConfirmForm,
-    undefined
-  );
+  const [result, setResult] = useState<{
+    ok?: boolean;
+    error?: string;
+  } | null>(null);
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className="flex min-w-sm flex-auto flex-col gap-y-4">
@@ -44,13 +19,52 @@ export default function PasswordResetChangeForm({ token }: { token: string }) {
       {result?.ok ? (
         <>
           <p className="mb-8 text-center">Your password has been changed.</p>
-          <Button href="/" color="highlight">
+          <Button to="/" color="highlight">
             Return to Peated
           </Button>
         </>
       ) : (
-        <form action={formAction}>
-          <FormComponent token={token} />
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setLoading(true);
+            const formData = new FormData(e.target as HTMLFormElement);
+            try {
+              const response = await passwordResetConfirm({
+                data: {
+                  token,
+                  password: formData.get("password") as string,
+                },
+              });
+              setResult(response);
+            } catch (error) {
+              setResult({ ok: false, error: "An error occurred" });
+            } finally {
+              setLoading(false);
+            }
+          }}
+        >
+          <div className="-mx-4 -mt-4">
+            <TextField
+              name="password"
+              label="Password"
+              type="password"
+              autoComplete="new-password"
+              required
+              placeholder="************"
+              autoFocus
+            />
+          </div>
+          <div className="flex justify-center gap-x-2">
+            <Button
+              type="submit"
+              color="highlight"
+              fullWidth
+              disabled={loading}
+            >
+              {loading ? "Updating..." : "Continue"}
+            </Button>
+          </div>
         </form>
       )}
     </div>

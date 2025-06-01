@@ -1,52 +1,54 @@
 "use client";
 
-import {
-  resendVerificationForm,
-  updateSession,
-} from "@peated/web/lib/auth.actions";
-import { useEffect } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { resendVerification } from "@peated/web/lib/auth.actions";
+import { useState } from "react";
 import Alert from "./alert";
-import { useFlashMessages } from "./flash";
+import Button from "./button";
 
 export default function PendingVerificationAlert() {
-  const [state, resendVerificationAction] = useFormState(
-    resendVerificationForm,
-    undefined
-  );
-
-  const { flash } = useFlashMessages();
-
-  useEffect(() => {
-    if (state?.alreadyVerified) {
-      flash("Oops, looks like you already verified your account.", "success");
-      updateSession();
-    }
-  }, [state?.alreadyVerified]);
+  const [result, setResult] = useState<{
+    ok?: boolean;
+    alreadyVerified?: boolean;
+    error?: string;
+  } | null>(null);
+  const [loading, setLoading] = useState(false);
 
   return (
-    <Alert type="default" noMargin>
-      <form
-        action={resendVerificationAction}
-        className="flex items-center gap-x-4 text-sm"
-      >
-        Your account is pending verification.
-        {state?.ok ? <div /> : <ResendVerificationButton />}
-      </form>
+    <Alert>
+      <div className="text-center">
+        <p className="mb-4 font-bold">Please verify your email address.</p>
+        {result?.error && <p className="mb-4 text-red-500">{result.error}</p>}
+        {result?.ok ? (
+          result.alreadyVerified ? (
+            <p className="text-green-500">
+              Your email has already been verified.
+            </p>
+          ) : (
+            <p className="text-green-500">
+              Please check your email again to continue.
+            </p>
+          )
+        ) : (
+          <Button
+            onClick={async () => {
+              setLoading(true);
+              try {
+                const response = await resendVerification();
+                setResult(response);
+              } catch (error) {
+                setResult({ ok: false, error: "An error occurred" });
+              } finally {
+                setLoading(false);
+              }
+            }}
+            disabled={loading}
+            color="primary"
+            size="small"
+          >
+            {loading ? "Sending..." : "Resend Verification Email"}
+          </Button>
+        )}
+      </div>
     </Alert>
-  );
-}
-
-function ResendVerificationButton() {
-  const { pending } = useFormStatus();
-
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="cursor-pointer text-white underline"
-    >
-      Resend Verification Email
-    </button>
   );
 }

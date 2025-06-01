@@ -1,14 +1,25 @@
-"use client";
-
-import { logoutForm } from "@peated/web/lib/auth.actions";
-import { useFormState } from "react-dom";
+import { logout } from "@peated/web/lib/auth.actions";
+import { useState } from "react";
+import Button from "./button";
 
 export default function LogoutButton() {
-  // TODO: this needs to show some kind of loading state
-  const [, formAction] = useFormState(logoutForm, undefined);
+  const [loading, setLoading] = useState(false);
+
   return (
-    <form action={formAction}>
-      <button type="submit">Sign out</button>
-    </form>
+    <Button
+      onClick={async () => {
+        setLoading(true);
+        try {
+          await logout({ data: { redirectTo: "/" } });
+        } catch (error) {
+          console.error("Logout failed:", error);
+        } finally {
+          setLoading(false);
+        }
+      }}
+      disabled={loading}
+    >
+      {loading ? "Logging out..." : "Sign Out"}
+    </Button>
   );
 }

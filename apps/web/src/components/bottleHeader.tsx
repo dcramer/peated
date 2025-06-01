@@ -10,15 +10,15 @@ export default function BottleHeader({
   to,
 }: {
   bottle: Bottle;
-  href?: string;
+  to?: string;
 }) {
   return (
     <PageHeader
       icon={BottleIcon}
       title={
         <div className="flex gap-x-2">
-          {href ? (
-            <Link to={href} className="hover:underline">
+          {to ? (
+            <Link to={to} className="hover:underline">
               {bottle.fullName}
             </Link>
           ) : (
