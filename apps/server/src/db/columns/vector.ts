@@ -8,7 +8,7 @@ type VectorType = Array<number>;
 
 export function vector<TData extends VectorType>(
   name: string,
-  options: VectorOptions,
+  options: VectorOptions
 ) {
   return customType<{ data: TData; driverData: string }>({
     // this should be sql``, otherwise it outputs as a string

@@ -16,7 +16,7 @@ export default function UserProfilePage({
   const { data: tastings } = useSuspenseQuery(
     orpc.tastings.list.queryOptions({
       input: { user: username, limit: 10 },
-    }),
+    })
   );
 
   if (!tastings.results.length) {

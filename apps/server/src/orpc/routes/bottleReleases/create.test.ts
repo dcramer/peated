@@ -6,10 +6,10 @@ import { and, eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
 describe("POST /bottle-releases", () => {
-  it("creates a new release for a bottle without statedAge", async function ({
+  it("creates a new release for a bottle without statedAge", async ({
     fixtures,
     defaults,
-  }) {
+  }) => {
     const bottle = await fixtures.Bottle({
       name: "Urquhart",
       statedAge: null,
@@ -65,10 +65,10 @@ describe("POST /bottle-releases", () => {
     expect(release.releaseYear).toBe(2023);
     expect(release.vintageYear).toBe(2013);
     expect(release.fullName).toBe(
-      "Ardbeg Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV",
+      "Ardbeg Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV"
     );
     expect(release.name).toBe(
-      "Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV",
+      "Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV"
     );
 
     // Verify numReleases was incremented
@@ -86,8 +86,8 @@ describe("POST /bottle-releases", () => {
         and(
           eq(changes.objectType, "bottle_release"),
           eq(changes.objectId, release.id),
-          eq(changes.createdById, defaults.user.id),
-        ),
+          eq(changes.createdById, defaults.user.id)
+        )
       );
 
     expect(change).toBeDefined();
@@ -95,10 +95,10 @@ describe("POST /bottle-releases", () => {
     expect(change.displayName).toBe(release.fullName);
   });
 
-  it("creates a new release for a bottle with statedAge", async function ({
+  it("creates a new release for a bottle with statedAge", async ({
     fixtures,
     defaults,
-  }) {
+  }) => {
     const bottle = await fixtures.Bottle({
       name: "10",
       brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
@@ -152,10 +152,10 @@ describe("POST /bottle-releases", () => {
     expect(release.releaseYear).toBe(2023);
     expect(release.vintageYear).toBe(2013);
     expect(release.fullName).toBe(
-      "Ardbeg 10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV", // No age in name since it's in bottle
+      "Ardbeg 10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV" // No age in name since it's in bottle
     );
     expect(release.name).toBe(
-      "10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV", // No age in name since it's in bottle
+      "10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV" // No age in name since it's in bottle
     );
 
     // Verify numReleases was incremented
@@ -173,8 +173,8 @@ describe("POST /bottle-releases", () => {
         and(
           eq(changes.objectType, "bottle_release"),
           eq(changes.objectId, release.id),
-          eq(changes.createdById, defaults.user.id),
-        ),
+          eq(changes.createdById, defaults.user.id)
+        )
       );
 
     expect(change).toBeDefined();
@@ -182,10 +182,10 @@ describe("POST /bottle-releases", () => {
     expect(change.displayName).toBe(release.fullName);
   });
 
-  it("throws error if release statedAge differs from bottle statedAge", async function ({
+  it("throws error if release statedAge differs from bottle statedAge", async ({
     fixtures,
     defaults,
-  }) {
+  }) => {
     const bottle = await fixtures.Bottle({
       name: "10",
       statedAge: 10,
@@ -201,10 +201,10 @@ describe("POST /bottle-releases", () => {
     const err = await waitError(() =>
       routerClient.bottleReleases.create(data, {
         context: { user: defaults.user },
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Release statedAge must match bottle's statedAge.]`,
+      `[Error: Release statedAge must match bottle's statedAge.]`
     );
 
     // Verify numReleases was not incremented
@@ -215,7 +215,7 @@ describe("POST /bottle-releases", () => {
     expect(updatedBottle.numReleases).toBe(0);
   });
 
-  it("throws error if bottle not found", async function ({ defaults }) {
+  it("throws error if bottle not found", async ({ defaults }) => {
     const data = {
       bottle: 999999,
       edition: "Batch 1",
@@ -226,15 +226,15 @@ describe("POST /bottle-releases", () => {
     const err = await waitError(() =>
       routerClient.bottleReleases.create(data, {
         context: { user: defaults.user },
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
   });
 
-  it("throws error if release with same attributes exists", async function ({
+  it("throws error if release with same attributes exists", async ({
     fixtures,
     defaults,
-  }) {
+  }) => {
     const bottle = await fixtures.Bottle({
       name: "10",
       statedAge: null,
@@ -263,10 +263,10 @@ describe("POST /bottle-releases", () => {
     const err = await waitError(() =>
       routerClient.bottleReleases.create(data, {
         context: { user: defaults.user },
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: A release with these attributes already exists.]`,
+      `[Error: A release with these attributes already exists.]`
     );
 
     // Verify numReleases was not incremented
@@ -277,10 +277,10 @@ describe("POST /bottle-releases", () => {
     expect(updatedBottle.numReleases).toBe(1);
   });
 
-  it("handles null values in uniqueness check", async function ({
+  it("handles null values in uniqueness check", async ({
     fixtures,
     defaults,
-  }) {
+  }) => {
     const bottle = await fixtures.Bottle({
       statedAge: null,
       numReleases: 1,
@@ -305,10 +305,10 @@ describe("POST /bottle-releases", () => {
     const err = await waitError(() =>
       routerClient.bottleReleases.create(data, {
         context: { user: defaults.user },
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: A release with these attributes already exists.]`,
+      `[Error: A release with these attributes already exists.]`
     );
 
     // Verify numReleases was not incremented

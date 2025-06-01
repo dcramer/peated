@@ -173,7 +173,7 @@ describe("normalizeBottle", () => {
       name: "Traigh Bhan 19-year-old Scotch Batch No. 5",
     });
     expect(name).toMatchInlineSnapshot(
-      `"Traigh Bhan 19-year-old Scotch (Batch 5)"`,
+      `"Traigh Bhan 19-year-old Scotch (Batch 5)"`
     );
     expect(statedAge).toEqual(19);
   });
@@ -183,7 +183,7 @@ describe("normalizeBottle", () => {
       name: "Traigh Bhan 19-year-old Scotch (Batch No. 5)",
     });
     expect(name).toMatchInlineSnapshot(
-      `"Traigh Bhan 19-year-old Scotch (Batch 5)"`,
+      `"Traigh Bhan 19-year-old Scotch (Batch 5)"`
     );
     expect(statedAge).toEqual(19);
   });
@@ -193,7 +193,7 @@ describe("normalizeBottle", () => {
       name: "Traigh Bhan 19-year-old Scotch Batch #5",
     });
     expect(name).toMatchInlineSnapshot(
-      `"Traigh Bhan 19-year-old Scotch (Batch 5)"`,
+      `"Traigh Bhan 19-year-old Scotch (Batch 5)"`
     );
     expect(statedAge).toEqual(19);
   });
@@ -203,7 +203,7 @@ describe("normalizeBottle", () => {
       name: "Traigh Bhan 19-year-old Scotch Batch 5",
     });
     expect(name).toMatchInlineSnapshot(
-      `"Traigh Bhan 19-year-old Scotch (Batch 5)"`,
+      `"Traigh Bhan 19-year-old Scotch (Batch 5)"`
     );
     expect(statedAge).toEqual(19);
   });
@@ -213,7 +213,7 @@ describe("normalizeBottle", () => {
       name: "Traigh Bhan 19-year-old Scotch Batch A",
     });
     expect(name).toMatchInlineSnapshot(
-      `"Traigh Bhan 19-year-old Scotch (Batch A)"`,
+      `"Traigh Bhan 19-year-old Scotch (Batch A)"`
     );
     expect(statedAge).toEqual(19);
   });
@@ -223,7 +223,7 @@ describe("normalizeBottle", () => {
       name: "Traigh Bhan 19-year-old Scotch, Batch A",
     });
     expect(name).toMatchInlineSnapshot(
-      `"Traigh Bhan 19-year-old Scotch (Batch A)"`,
+      `"Traigh Bhan 19-year-old Scotch (Batch A)"`
     );
     expect(statedAge).toEqual(19);
   });
@@ -475,7 +475,7 @@ describe("normalizeBottle", () => {
         isFullName: false,
       });
       expect(name).toMatchInlineSnapshot(
-        `"Black Art 1992 Edition 9.1 29-year-old Single Malt"`,
+        `"Black Art 1992 Edition 9.1 29-year-old Single Malt"`
       );
       expect(statedAge).toEqual(29);
     });

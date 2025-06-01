@@ -65,8 +65,8 @@ describe("GET /price-changes", () => {
     const site = await fixtures.ExternalSiteOrExisting();
     const bottles = await Promise.all(
       Array.from({ length: 3 }).map((_, i) =>
-        fixtures.Bottle({ name: `Bottle ${i}` }),
-      ),
+        fixtures.Bottle({ name: `Bottle ${i}` })
+      )
     );
 
     await Promise.all(
@@ -82,7 +82,7 @@ describe("GET /price-changes", () => {
           price: 5000,
           date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
         });
-      }),
+      })
     );
 
     const { results, rel } = await routerClient.prices.changeList({

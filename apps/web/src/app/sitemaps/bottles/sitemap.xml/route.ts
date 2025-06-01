@@ -21,8 +21,8 @@ export async function GET() {
   const { totalBottles } = await client.stats();
   const sitemapIndexXML = await buildSitemapIndex(
     range(1, Math.ceil(totalBottles / PAGE_LIMIT)).map(
-      (i) => `/sitemaps/bottles/${i}/sitemap.xml`,
-    ),
+      (i) => `/sitemaps/bottles/${i}/sitemap.xml`
+    )
   );
 
   return new Response(sitemapIndexXML, {

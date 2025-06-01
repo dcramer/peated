@@ -20,7 +20,7 @@ const Tabs = ({ fullWidth, border, noMargin, ...props }: Props) => {
           ? "[&>*]:flex-auto [&>*]:justify-center"
           : "max-lg:[&>*]:flex-auto max-lg:[&>*]:justify-center",
         border ? "border-b border-slate-700" : "",
-        noMargin ? "-mb-px" : "mb-4",
+        noMargin ? "-mb-px" : "mb-4"
       )}
       aria-label="Tabs"
       {...props}
@@ -61,7 +61,7 @@ export function TabItem<E extends ElementType = typeof defaultElement>({
   const className = classNames(
     active ? activeStyles : inactiveStyles,
     "whitespace-nowrap border-b-4 px-3 py-4 text-sm font-medium",
-    desktopOnly ? "hidden lg:flex" : "flex",
+    desktopOnly ? "hidden lg:flex" : "flex"
   );
 
   return (
@@ -71,7 +71,7 @@ export function TabItem<E extends ElementType = typeof defaultElement>({
         <span
           className={classNames(
             "text-muted bg-slate-700",
-            "ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block",
+            "ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block"
           )}
         >
           {count}

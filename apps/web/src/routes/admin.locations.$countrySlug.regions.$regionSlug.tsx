@@ -6,7 +6,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 
 export const Route = createFileRoute(
-  "/admin/locations/$countrySlug/regions/$regionSlug",
+  "/admin/locations/$countrySlug/regions/$regionSlug"
 )({
   component: Page,
 });
@@ -19,7 +19,7 @@ function Page() {
       input: {
         country: countrySlug,
       },
-    }),
+    })
   );
 
   const { data: region } = useSuspenseQuery(
@@ -28,7 +28,7 @@ function Page() {
         country: countrySlug,
         region: regionSlug,
       },
-    }),
+    })
   );
 
   return (

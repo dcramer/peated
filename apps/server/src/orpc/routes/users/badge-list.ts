@@ -21,7 +21,7 @@ export default procedure
       user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
-    }),
+    })
   )
   .output(
     z.object({
@@ -30,13 +30,9 @@ export default procedure
         nextCursor: z.number().nullable(),
         prevCursor: z.number().nullable(),
       }),
-    }),
+    })
   )
-  .handler(async function ({
-    input: { cursor, limit, ...input },
-    context,
-    errors,
-  }) {
+  .handler(async ({ input: { cursor, limit, ...input }, context, errors }) => {
     const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
       throw errors.NOT_FOUND({
@@ -60,14 +56,14 @@ export default procedure
       .offset(offset)
       .orderBy(
         sql`CASE WHEN ${badgeAwards.level} = 0 THEN 1 ELSE 0 END`,
-        desc(badgeAwards.createdAt),
+        desc(badgeAwards.createdAt)
       );
 
     return {
       results: await serialize(
         BadgeAwardSerializer,
         results.slice(0, limit),
-        context.user,
+        context.user
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

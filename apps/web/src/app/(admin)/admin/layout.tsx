@@ -1,8 +1,8 @@
 import { ErrorPageForbidden } from "@peated/web/components/errorPage";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { getSession } from "@peated/web/lib/session.server";
-import { type Metadata } from "next";
-import React from "react";
+import type { Metadata } from "next";
+import type React from "react";
 
 export const metadata: Metadata = {
   title: "Admin",

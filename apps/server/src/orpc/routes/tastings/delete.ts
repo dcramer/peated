@@ -24,7 +24,7 @@ export default procedure
   })
   .input(z.object({ tasting: z.coerce.number() }))
   .output(z.object({}))
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const [tasting] = await db
       .select()
       .from(tastings)
@@ -51,9 +51,9 @@ export default procedure
               eq(notifications.type, "toast"),
               inArray(
                 notifications.objectId,
-                sql`(SELECT ${toasts.id} FROM ${toasts} WHERE ${toasts.tastingId} = ${tasting.id})`,
-              ),
-            ),
+                sql`(SELECT ${toasts.id} FROM ${toasts} WHERE ${toasts.tastingId} = ${tasting.id})`
+              )
+            )
           ),
 
         tx.delete(toasts).where(eq(toasts.tastingId, tasting.id)),
@@ -72,9 +72,9 @@ export default procedure
               and(
                 eq(bottleTags.bottleId, tasting.bottleId),
                 eq(bottleTags.tag, tag),
-                gt(bottleTags.count, 0),
-              ),
-            ),
+                gt(bottleTags.count, 0)
+              )
+            )
         ),
 
         tx

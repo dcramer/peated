@@ -18,13 +18,13 @@ export default function Page({
   const { data: flight } = useSuspenseQuery(
     orpc.flights.details.queryOptions({
       input: { flight: flightId },
-    }),
+    })
   );
 
   const { data: bottles } = useSuspenseQuery(
     orpc.bottles.list.queryOptions({
       input: { flight: flightId },
-    }),
+    })
   );
 
   const router = useRouter();
@@ -45,10 +45,10 @@ export default function Page({
                   ...oldData,
                   ...data,
                 }
-              : oldData,
+              : oldData
         );
       },
-    }),
+    })
   );
 
   return (
@@ -61,7 +61,7 @@ export default function Page({
           },
           {
             onSuccess: () => router.push(`/flights/${flight.id}`),
-          },
+          }
         );
       }}
       initialData={{ ...flight, bottles: bottles.results }}

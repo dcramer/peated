@@ -12,8 +12,8 @@ describe("POST /external-sites/:site/trigger", () => {
     const err = await waitError(
       routerClient.externalSites.triggerJob(
         { site: site.type },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -24,7 +24,7 @@ describe("POST /external-sites/:site/trigger", () => {
 
     const result = await routerClient.externalSites.triggerJob(
       { site: site.type },
-      { context: { user: adminUser } },
+      { context: { user: adminUser } }
     );
 
     expect(result.success).toBe(true);

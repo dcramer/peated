@@ -12,7 +12,7 @@ describe("POST /tastings/:tasting/comments", () => {
         tasting: 1,
         comment: "Hello world!",
         createdAt: new Date().toISOString(),
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -26,7 +26,7 @@ describe("POST /tastings/:tasting/comments", () => {
         comment: "Hello world!",
         createdAt: new Date().toISOString(),
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();

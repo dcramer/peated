@@ -20,7 +20,7 @@ export default function Page() {
   const { data: entityList } = useSuspenseQuery(
     orpc.entities.list.queryOptions({
       input: queryParams,
-    }),
+    })
   );
 
   return (

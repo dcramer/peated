@@ -1,4 +1,4 @@
-import { type Currency } from "@peated/server/types";
+import type { Currency } from "@peated/server/types";
 
 export default function Price({
   value,

@@ -9,7 +9,7 @@ import {
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute(
-  "/admin/locations/$countrySlug/regions/$regionSlug/edit",
+  "/admin/locations/$countrySlug/regions/$regionSlug/edit"
 )({
   component: Page,
   validateSearch: (search: Record<string, unknown>) => ({
@@ -30,7 +30,7 @@ function Page() {
         country: countrySlug,
         region: regionSlug,
       },
-    }),
+    })
   );
 
   const queryClient = useQueryClient();
@@ -53,10 +53,10 @@ function Page() {
                   ...oldData,
                   ...data,
                 }
-              : oldData,
+              : oldData
         );
       },
-    }),
+    })
   );
 
   return (
@@ -78,7 +78,7 @@ function Page() {
                 });
               }
             },
-          },
+          }
         );
       }}
       edit

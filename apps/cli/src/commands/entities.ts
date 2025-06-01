@@ -21,7 +21,7 @@ subcommand
           ? inArray(entities.id, entityIds)
           : options.onlyMissing
             ? isNull(entities.description)
-            : undefined,
+            : undefined
       )
       .orderBy(asc(entities.id));
 
@@ -53,15 +53,15 @@ subcommand
         and(
           or(
             sql`${"distiller"} = ANY(${entities.type})`,
-            sql`${"bottler"} = ANY(${entities.type})`,
+            sql`${"bottler"} = ANY(${entities.type})`
           ),
           isNotNull(entities.countryId),
           entityIds.length
             ? inArray(entities.id, entityIds)
             : options.onlyMissing
               ? isNull(entities.location)
-              : undefined,
-        ),
+              : undefined
+        )
       )
       .orderBy(asc(entities.id));
 
@@ -119,7 +119,7 @@ subcommand
           ? inArray(entities.id, entityIds)
           : options.onlyMissing
             ? isNull(entities.location)
-            : undefined,
+            : undefined
       )
       .orderBy(asc(entities.id));
 

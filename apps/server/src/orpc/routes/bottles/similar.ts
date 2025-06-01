@@ -31,16 +31,16 @@ export default procedure
     z.object({
       bottle: z.coerce.number(),
       limit: z.coerce.number().gte(1).lte(100).default(25),
-    }),
+    })
   )
   .output(
     z.object({
       // TODO: variable output isnt great here
       results: z.array(BottleSchema),
       rel: CursorSchema,
-    }),
+    })
   )
-  .handler(async function ({ input: { limit, ...input }, context, errors }) {
+  .handler(async ({ input: { limit, ...input }, context, errors }) => {
     // maxAge caching for 5 minutes would be handled by oRPC server settings
 
     const [bottle] = await db
@@ -62,8 +62,8 @@ export default procedure
         and(
           eq(bottles.brandId, bottle.brandId),
           eq(bottles.name, bottle.name),
-          ne(bottles.id, bottle.id),
-        ),
+          ne(bottles.id, bottle.id)
+        )
       )
       .limit(limit)
       .orderBy(asc(bottles.fullName));
@@ -80,7 +80,7 @@ export default procedure
       where.push(
         gte(bottles.statedAge, bottle.statedAge - 5),
         lte(bottles.statedAge, bottle.statedAge + 5),
-        isNotNull(bottles.statedAge),
+        isNotNull(bottles.statedAge)
       );
 
     const d1 = alias(bottlesToDistillers, "d1");
@@ -91,7 +91,7 @@ export default procedure
         INNER JOIN ${bottlesToDistillers} as d2
           ON ${d1.distillerId} = ${d2.distillerId}
         WHERE ${d1.bottleId} = ${bottles.id}
-          AND ${d2.bottleId} = ${bottle.id})`,
+          AND ${d2.bottleId} = ${bottle.id})`
     );
 
     results.push(
@@ -100,7 +100,7 @@ export default procedure
         .from(bottles)
         .where(and(...where))
         .limit(limit - results.length)
-        .orderBy(asc(bottles.fullName))),
+        .orderBy(asc(bottles.fullName)))
     );
 
     return {
@@ -108,7 +108,7 @@ export default procedure
         BottleSerializer,
         results.slice(0, limit),
         context.user,
-        ["description", "tastingNotes"],
+        ["description", "tastingNotes"]
       ),
       rel: {
         nextCursor: null,

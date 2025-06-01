@@ -32,9 +32,9 @@ export const users = pgTable(
     uniqueIndex("user_email_unq").using("btree", sql`LOWER(${table.email})`),
     uniqueIndex("user_username_unq").using(
       "btree",
-      sql`LOWER(${table.username})`,
+      sql`LOWER(${table.username})`
     ),
-  ],
+  ]
 );
 
 export type User = typeof users.$inferSelect;

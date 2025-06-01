@@ -4,7 +4,7 @@ import { procedure } from "@peated/server/orpc";
 import { TagSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TagSerializer } from "@peated/server/serializers/tag";
-import { and, asc, ilike, type SQL } from "drizzle-orm";
+import { type SQL, and, asc, ilike } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -26,7 +26,7 @@ export default procedure
         query: "",
         cursor: 1,
         limit: 100,
-      }),
+      })
   )
   .output(
     z.object({
@@ -35,37 +35,35 @@ export default procedure
         nextCursor: z.number().nullable(),
         prevCursor: z.number().nullable(),
       }),
-    }),
+    })
   )
-  .handler(async function ({
-    input: { cursor, query, limit, ...input },
-    context,
-    errors,
-  }) {
-    const where: (SQL<unknown> | undefined)[] = [];
+  .handler(
+    async ({ input: { cursor, query, limit, ...input }, context, errors }) => {
+      const where: (SQL<unknown> | undefined)[] = [];
 
-    const offset = (cursor - 1) * limit;
-    if (query) {
-      where.push(ilike(tags.name, `%${query}%`));
+      const offset = (cursor - 1) * limit;
+      if (query) {
+        where.push(ilike(tags.name, `%${query}%`));
+      }
+
+      const results = await db
+        .select()
+        .from(tags)
+        .where(where ? and(...where) : undefined)
+        .limit(limit + 1)
+        .offset(offset)
+        .orderBy(asc(tags.name));
+
+      return {
+        results: await serialize(
+          TagSerializer,
+          results.slice(0, limit),
+          context.user
+        ),
+        rel: {
+          nextCursor: results.length > limit ? cursor + 1 : null,
+          prevCursor: cursor > 1 ? cursor - 1 : null,
+        },
+      };
     }
-
-    const results = await db
-      .select()
-      .from(tags)
-      .where(where ? and(...where) : undefined)
-      .limit(limit + 1)
-      .offset(offset)
-      .orderBy(asc(tags.name));
-
-    return {
-      results: await serialize(
-        TagSerializer,
-        results.slice(0, limit),
-        context.user,
-      ),
-      rel: {
-        nextCursor: results.length > limit ? cursor + 1 : null,
-        prevCursor: cursor > 1 ? cursor - 1 : null,
-      },
-    };
-  });
+  );

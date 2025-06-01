@@ -20,7 +20,7 @@ function Page() {
   const { data: country } = useSuspenseQuery(
     orpc.countries.details.queryOptions({
       input: { country: countrySlug },
-    }),
+    })
   );
 
   const navigate = useNavigate();
@@ -44,10 +44,10 @@ function Page() {
                   ...oldData,
                   ...data,
                 }
-              : oldData,
+              : oldData
         );
       },
-    }),
+    })
   );
 
   return (
@@ -63,7 +63,7 @@ function Page() {
               if (returnTo) navigate({ to: returnTo });
               else navigate({ to: `/locations/${result.slug}` });
             },
-          },
+          }
         );
       }}
       edit

@@ -15,8 +15,8 @@ describe("POST /badges", () => {
           formula: "default",
           checks: [{ type: "category", config: { category: ["single_malt"] } }],
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -30,7 +30,7 @@ describe("POST /badges", () => {
         formula: "default",
         checks: [{ type: "category", config: { category: ["single_malt"] } }],
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(data.id).toBeDefined();

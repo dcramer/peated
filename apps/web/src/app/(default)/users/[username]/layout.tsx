@@ -8,7 +8,7 @@ import UserFlavorDistributionChart from "@peated/web/components/userFlavorDistri
 import UserLocationChart from "@peated/web/components/userLocationChart";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { createServerClient } from "@peated/web/lib/orpc/client.server";
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { ProfilePage, WithContext } from "schema-dts";
 import FriendButton from "./friendButton";
 import LogoutButton from "./logoutButton";

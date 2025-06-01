@@ -15,7 +15,7 @@ function Page() {
   const orpc = useORPC();
   const badgeCreateMutation = useMutation(orpc.badges.create.mutationOptions());
   const badgeImageUpdateMutation = useMutation(
-    orpc.badges.imageUpdate.mutationOptions(),
+    orpc.badges.imageUpdate.mutationOptions()
   );
   const { flash } = useFlashMessages();
 
@@ -37,7 +37,7 @@ function Page() {
             logError(err);
             flash(
               "There was an error uploading your image, but we saved the badge.",
-              "error",
+              "error"
             );
           }
         }

@@ -14,12 +14,12 @@ function Page() {
   const { entityId } = Route.useParams();
   const orpc = useORPC();
   const { data: entity } = useSuspenseQuery(
-    orpc.entities.details.queryOptions({ input: { entity: Number(entityId) } }),
+    orpc.entities.details.queryOptions({ input: { entity: Number(entityId) } })
   );
   const navigate = useNavigate();
 
   const entityUpdateMutation = useMutation(
-    orpc.entities.update.mutationOptions(),
+    orpc.entities.update.mutationOptions()
   );
 
   return (
@@ -34,7 +34,7 @@ function Page() {
             onSuccess: () => {
               navigate({ to: `/entities/${entity.id}` });
             },
-          },
+          }
         );
       }}
       initialData={entity}

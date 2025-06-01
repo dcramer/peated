@@ -1,7 +1,7 @@
 import LayoutSplash from "@peated/web/components/layoutSplash";
 import PasswordResetChangeForm from "@peated/web/components/passwordResetChangeForm";
 import PasswordResetForm from "@peated/web/components/passwordResetForm";
-import { type Metadata } from "next";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Password Reset",

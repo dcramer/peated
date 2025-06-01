@@ -5,7 +5,7 @@ import { getSession } from "@peated/web/lib/session.server";
 import "@peated/web/styles/index.css";
 import * as Sentry from "@sentry/nextjs";
 import type { Metadata, Viewport } from "next";
-import React from "react";
+import type React from "react";
 import Providers from "./providers/providers";
 
 // default behavior is to disable cache, as it breaks quite a few flows
@@ -57,7 +57,7 @@ export default async function RootLayout({
           username: session.user.username,
           email: session.user.email,
         }
-      : null,
+      : null
   );
 
   return (

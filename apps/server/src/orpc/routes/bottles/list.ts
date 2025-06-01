@@ -63,16 +63,16 @@ export default procedure
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
       sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
-    }),
+    })
   )
   .output(
     z.object({
       // TODO: variable output isnt great here
       results: z.array(BottleSchema),
       rel: CursorSchema,
-    }),
+    })
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { query, cursor, limit, ...rest } = input;
     const offset = (cursor - 1) * limit;
 
@@ -80,7 +80,7 @@ export default procedure
 
     if (query) {
       where.push(
-        sql`${bottles.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
+        sql`${bottles.searchVector} @@ websearch_to_tsquery ('english', ${query})`
       );
     }
     if (rest.brand) {
@@ -88,7 +88,7 @@ export default procedure
     }
     if (rest.distiller) {
       where.push(
-        sql`EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${rest.distiller} AND ${bottlesToDistillers.bottleId} = ${bottles.id})`,
+        sql`EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${rest.distiller} AND ${bottlesToDistillers.bottleId} = ${bottles.id})`
       );
     }
     if (rest.bottler) {
@@ -99,8 +99,8 @@ export default procedure
         or(
           eq(bottles.brandId, rest.entity),
           eq(bottles.bottlerId, rest.entity),
-          sql`EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${rest.entity} AND ${bottlesToDistillers.bottleId} = ${bottles.id})`,
-        ),
+          sql`EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${rest.entity} AND ${bottlesToDistillers.bottleId} = ${bottles.id})`
+        )
       );
     }
     if (rest.series) {
@@ -120,7 +120,7 @@ export default procedure
     }
     if (rest.tag) {
       where.push(
-        sql`EXISTS(SELECT FROM ${tastings} WHERE ${rest.tag} = ANY(${tastings.tags}) AND ${tastings.bottleId} = ${bottles.id})`,
+        sql`EXISTS(SELECT FROM ${tastings} WHERE ${rest.tag} = ANY(${tastings.tags}) AND ${tastings.bottleId} = ${bottles.id})`
       );
     }
 
@@ -140,7 +140,7 @@ export default procedure
         };
       }
       where.push(
-        sql`EXISTS(SELECT FROM ${flightBottles} WHERE ${flightBottles.flightId} = ${flight.id} AND ${flightBottles.bottleId} = ${bottles.id})`,
+        sql`EXISTS(SELECT FROM ${flightBottles} WHERE ${flightBottles.flightId} = ${flight.id} AND ${flightBottles.bottleId} = ${bottles.id})`
       );
     }
 
@@ -210,7 +210,7 @@ export default procedure
         ["description", "tastingNotes"],
         {
           flight,
-        },
+        }
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

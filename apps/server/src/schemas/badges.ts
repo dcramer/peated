@@ -31,25 +31,25 @@ export const BadgeCheckSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("entity").describe("Entity-based badge check"),
     config: EntityCheckConfigSchema.describe(
-      "Configuration for entity-based checks",
+      "Configuration for entity-based checks"
     ),
   }),
   z.object({
     type: z.literal("bottle").describe("Bottle-based badge check"),
     config: BottleCheckConfigSchema.describe(
-      "Configuration for bottle-based checks",
+      "Configuration for bottle-based checks"
     ),
   }),
   z.object({
     type: z.literal("region").describe("Region-based badge check"),
     config: RegionCheckConfigSchema.describe(
-      "Configuration for region-based checks",
+      "Configuration for region-based checks"
     ),
   }),
   z.object({
     type: z.literal("category").describe("Category-based badge check"),
     config: CategoryCheckConfigSchema.describe(
-      "Configuration for category-based checks",
+      "Configuration for category-based checks"
     ),
   }),
   z.object({
@@ -112,10 +112,10 @@ export const BadgeSchema = z.object({
     .optional()
     .describe("Array of checks that determine badge progression"),
   tracker: BadgeTrackerEnum.optional().describe(
-    "Type of tracker used for this badge",
+    "Type of tracker used for this badge"
   ),
   formula: BadgeFormulaEnum.optional().describe(
-    "Formula used to calculate badge progression",
+    "Formula used to calculate badge progression"
   ),
 });
 

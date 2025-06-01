@@ -18,10 +18,10 @@ describe("GET /search", () => {
 
     expect(results.length).toBe(2);
     expect(
-      results.some((r) => r.type === "bottle" && r.ref.id === bottle.id),
+      results.some((r) => r.type === "bottle" && r.ref.id === bottle.id)
     ).toBeTruthy();
     expect(
-      results.some((r) => r.type === "entity" && r.ref.id === entity.id),
+      results.some((r) => r.type === "entity" && r.ref.id === entity.id)
     ).toBeTruthy();
   });
 
@@ -40,18 +40,18 @@ describe("GET /search", () => {
       },
       {
         context: { user: defaults.user },
-      },
+      }
     );
 
     expect(results.length).toBe(3);
     expect(
-      results.some((r) => r.type === "bottle" && r.ref.id === bottle.id),
+      results.some((r) => r.type === "bottle" && r.ref.id === bottle.id)
     ).toBeTruthy();
     expect(
-      results.some((r) => r.type === "entity" && r.ref.id === entity.id),
+      results.some((r) => r.type === "entity" && r.ref.id === entity.id)
     ).toBeTruthy();
     expect(
-      results.some((r) => r.type === "user" && r.ref.id === user.id),
+      results.some((r) => r.type === "user" && r.ref.id === user.id)
     ).toBeTruthy();
   });
 
@@ -120,7 +120,7 @@ describe("GET /search", () => {
         query: "test",
         include: ["invalidtype" as any],
         limit: 10,
-      }),
+      })
     );
     expect(err).toBeDefined();
     expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);

@@ -10,7 +10,7 @@ describe("POST /tastings/:tasting/toast", () => {
     const err = await waitError(() =>
       routerClient.toasts.create({
         tasting: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -25,11 +25,11 @@ describe("POST /tastings/:tasting/toast", () => {
         {
           tasting: tasting.id,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Cannot toast your own tasting.]`,
+      `[Error: Cannot toast your own tasting.]`
     );
   });
 
@@ -40,7 +40,7 @@ describe("POST /tastings/:tasting/toast", () => {
       {
         tasting: tasting.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     const toastList = await db
@@ -69,7 +69,7 @@ describe("POST /tastings/:tasting/toast", () => {
       {
         tasting: tasting.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     const toastList = await db

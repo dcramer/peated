@@ -46,7 +46,7 @@ export default function EntityCheckConfigForm({
           id: initialData.entity,
           name: `(Entity ID: ${initialData.entity})`,
         }
-      : undefined,
+      : undefined
   );
   return (
     <>

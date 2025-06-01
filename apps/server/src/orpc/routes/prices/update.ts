@@ -24,7 +24,7 @@ export default procedure
   })
   .input(InputSchema)
   .output(StorePriceSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { price: priceId, ...data } = input;
 
     const [price] = await db

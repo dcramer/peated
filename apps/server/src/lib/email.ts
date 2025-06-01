@@ -1,10 +1,10 @@
+import { createHash } from "crypto";
 import cuid2 from "@paralleldrive/cuid2";
 import { Template as MagicLinkEmailTemplate } from "@peated/email/templates/magicLinkEmail";
 import { Template as NewCommentTemplate } from "@peated/email/templates/newCommentEmail";
 import { Template as PasswordResetEmailTemplate } from "@peated/email/templates/passwordResetEmail";
 import { Template as VerifyEmailTemplate } from "@peated/email/templates/verifyEmail";
 import config from "@peated/server/config";
-import { createHash } from "crypto";
 import { and, eq, inArray, ne } from "drizzle-orm";
 import { render } from "jsx-email";
 import type { Transporter } from "nodemailer";
@@ -13,12 +13,12 @@ import type SMTPTransport from "nodemailer/lib/smtp-transport";
 import type { z } from "zod";
 import { db } from "../db";
 import {
-  comments,
-  users,
   type Bottle,
   type Comment,
   type Tasting,
   type User,
+  comments,
+  users,
 } from "../db/schema";
 import type { EmailVerifySchema, PasswordResetSchema } from "../schemas";
 import { generateMagicLink, signPayload } from "./auth";
@@ -91,10 +91,10 @@ export async function notifyComment({
           and(
             eq(comments.tastingId, comment.tasting.id),
             ne(comments.createdById, comment.tasting.createdById),
-            ne(comments.createdById, comment.createdById),
-          ),
+            ne(comments.createdById, comment.createdById)
+          )
         )
-    ).map((r) => r.id),
+    ).map((r) => r.id)
   );
 
   const emailList = (
@@ -105,8 +105,8 @@ export async function notifyComment({
         and(
           inArray(users.id, Array.from(new Set(userIds))),
           eq(users.notifyComments, true),
-          eq(users.verified, true),
-        ),
+          eq(users.verified, true)
+        )
       )
   ).map((r) => r.email);
 
@@ -118,11 +118,11 @@ export async function notifyComment({
   const commentUrl = `${config.URL_PREFIX}/tastings/${comment.tasting.id}#c_${comment.id}`;
 
   const html = await render(
-    NewCommentTemplate({ baseUrl: config.URL_PREFIX, comment }),
+    NewCommentTemplate({ baseUrl: config.URL_PREFIX, comment })
   );
 
   console.log(
-    `Sending email notification for comment ${comment.id} to ${comment.tasting.createdBy.email}`,
+    `Sending email notification for comment ${comment.id} to ${comment.tasting.createdBy.email}`
   );
 
   for (const email of emailList) {
@@ -163,7 +163,7 @@ export async function sendVerificationEmail({
   const verifyUrl = `${config.URL_PREFIX}/verify?token=${token}`;
 
   const html = await render(
-    VerifyEmailTemplate({ baseUrl: config.URL_PREFIX, verifyUrl }),
+    VerifyEmailTemplate({ baseUrl: config.URL_PREFIX, verifyUrl })
   );
 
   try {
@@ -208,7 +208,7 @@ export async function sendPasswordResetEmail({
   const resetUrl = `${config.URL_PREFIX}/password-reset?token=${token}`;
 
   const html = await render(
-    PasswordResetEmailTemplate({ baseUrl: config.URL_PREFIX, resetUrl }),
+    PasswordResetEmailTemplate({ baseUrl: config.URL_PREFIX, resetUrl })
   );
 
   await transport.sendMail({
@@ -245,7 +245,7 @@ export async function sendMagicLinkEmail({
     MagicLinkEmailTemplate({
       baseUrl: config.URL_PREFIX,
       magicLinkUrl: magicLink.url,
-    }),
+    })
   );
 
   await transport.sendMail({

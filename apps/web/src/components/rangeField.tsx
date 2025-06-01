@@ -42,7 +42,7 @@ export default forwardRef<HTMLInputElement, Props>(
       onChange,
       ...props
     },
-    ref,
+    ref
   ) => {
     const [value, setValue] = useState<number>(initialValue ?? 0);
     return (
@@ -77,14 +77,14 @@ export default forwardRef<HTMLInputElement, Props>(
           className="range range-sm mb-6 block h-1 w-full cursor-pointer"
           {...props}
           onInput={(e) => {
-            setValue(parseFloat((e as InputEvent).target.value));
+            setValue(Number.parseFloat((e as InputEvent).target.value));
           }}
           onChange={(e) => {
-            setValue(parseFloat(e.target.value));
+            setValue(Number.parseFloat(e.target.value));
             onChange && onChange(e);
           }}
         />
       </FormField>
     );
-  },
+  }
 );

@@ -16,15 +16,15 @@ function Page() {
   const { data: badge } = useSuspenseQuery(
     orpc.badges.details.queryOptions({
       input: {
-        badge: parseInt(badgeId, 10),
+        badge: Number.parseInt(badgeId, 10),
       },
-    }),
+    })
   );
 
   const navigate = useNavigate();
   const badgeUpdateMutation = useMutation(orpc.badges.update.mutationOptions());
   const badgeImageUpdateMutation = useMutation(
-    orpc.badges.imageUpdate.mutationOptions(),
+    orpc.badges.imageUpdate.mutationOptions()
   );
   const { flash } = useFlashMessages();
 
@@ -48,7 +48,7 @@ function Page() {
             logError(err);
             flash(
               "There was an error uploading your image, but we saved the badge.",
-              "error",
+              "error"
             );
           }
         }

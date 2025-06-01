@@ -10,7 +10,7 @@ describe("GET /reviews", () => {
 
     const { results } = await routerClient.reviews.list(
       {},
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(results.length).toBe(2);
@@ -20,10 +20,10 @@ describe("GET /reviews", () => {
     const user = await fixtures.User();
 
     const err = await waitError(
-      routerClient.reviews.list({}, { context: { user } }),
+      routerClient.reviews.list({}, { context: { user } })
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Must be a moderator to list all reviews.]`,
+      `[Error: Must be a moderator to list all reviews.]`
     );
   });
 
@@ -39,7 +39,7 @@ describe("GET /reviews", () => {
       {
         site: astorwine.type,
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(results.length).toBe(1);
@@ -55,11 +55,11 @@ describe("GET /reviews", () => {
         {
           site: site.type,
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Must be a moderator to list all reviews.]`,
+      `[Error: Must be a moderator to list all reviews.]`
     );
   });
 });

@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { bottles, bottleSeries, changes } from "@peated/server/db/schema";
+import { bottleSeries, bottles, changes } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq } from "drizzle-orm";
@@ -10,7 +10,7 @@ describe("DELETE /bottle-series/:series", () => {
     const err = await waitError(() =>
       routerClient.bottleSeries.delete({
         series: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -21,15 +21,13 @@ describe("DELETE /bottle-series/:series", () => {
         {
           series: 1,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("deletes a series and updates related bottles", async function ({
-    fixtures,
-  }) {
+  test("deletes a series and updates related bottles", async ({ fixtures }) => {
     const user = await fixtures.User({ admin: true });
     const brand = await fixtures.Entity({ name: "Ardbeg" });
     const series = await fixtures.BottleSeries({
@@ -53,7 +51,7 @@ describe("DELETE /bottle-series/:series", () => {
       {
         series: series.id,
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     // Verify series is deleted
@@ -68,7 +66,7 @@ describe("DELETE /bottle-series/:series", () => {
       .select()
       .from(bottles)
       .where(
-        and(eq(bottles.brandId, brand.id), eq(bottles.name, bottle1.name)),
+        and(eq(bottles.brandId, brand.id), eq(bottles.name, bottle1.name))
       );
     expect(updatedBottles[0].seriesId).toBeNull();
 
@@ -79,8 +77,8 @@ describe("DELETE /bottle-series/:series", () => {
       .where(
         and(
           eq(changes.objectId, series.id),
-          eq(changes.objectType, "bottle_series"),
-        ),
+          eq(changes.objectType, "bottle_series")
+        )
       );
     expect(change).toBeDefined();
     expect(change?.type).toBe("delete");
@@ -92,7 +90,7 @@ describe("DELETE /bottle-series/:series", () => {
     });
   });
 
-  test("returns 404 for non-existent series", async function ({ fixtures }) {
+  test("returns 404 for non-existent series", async ({ fixtures }) => {
     const user = await fixtures.User({ admin: true });
 
     const err = await waitError(() =>
@@ -100,8 +98,8 @@ describe("DELETE /bottle-series/:series", () => {
         {
           series: 12345,
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Series not found.]`);
   });

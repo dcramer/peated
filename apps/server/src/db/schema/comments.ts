@@ -29,9 +29,9 @@ export const comments = pgTable(
     uniqueIndex("comment_unq").on(
       table.tastingId,
       table.createdById,
-      table.createdAt,
+      table.createdAt
     ),
-  ],
+  ]
 );
 
 export const commentsRelations = relations(comments, ({ one }) => ({

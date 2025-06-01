@@ -10,7 +10,7 @@ describe("PUT /notifications/:notification", () => {
     const err = await waitError(() =>
       routerClient.notifications.update({
         notification: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -32,7 +32,7 @@ describe("PUT /notifications/:notification", () => {
         notification: notification.id,
         read: true,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.read).toBe(true);
@@ -62,11 +62,11 @@ describe("PUT /notifications/:notification", () => {
           notification: notification.id,
           read: true,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Cannot edit another user's notification.]`,
+      `[Error: Cannot edit another user's notification.]`
     );
   });
 });

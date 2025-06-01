@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { isDefinedError } from "@orpc/client";
 import { EXTERNAL_SITE_TYPE_LIST } from "@peated/server/constants";
 import { ExternalSiteInputSchema } from "@peated/server/schemas";
-import { type ExternalSite } from "@peated/server/types";
+import type { ExternalSite } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
 import FormHeader from "@peated/web/components/formHeader";
@@ -14,7 +14,7 @@ import SelectField from "@peated/web/components/selectField";
 import TextField from "@peated/web/components/textField";
 import { logError } from "@peated/web/lib/log";
 import { useState } from "react";
-import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 import type { z } from "zod";
 import Form from "../form";
 import AdminSidebar from "./sidebar";
@@ -109,7 +109,8 @@ export default function SiteForm({
 
           <TextField
             {...register("runEvery", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              setValueAs: (v) =>
+                v === "" || !v ? null : Number.parseInt(v, 10),
             })}
             label="Frequency"
             type="number"

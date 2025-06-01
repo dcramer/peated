@@ -20,7 +20,7 @@ export default procedure
   })
   .input(ExternalSiteInputSchema)
   .output(ExternalSiteSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const site = await db.transaction(async (tx) => {
       try {
         const [site] = await tx.insert(externalSites).values(input).returning();

@@ -3,8 +3,8 @@
 import type { ReactNode } from "react";
 import { forwardRef, useEffect, useRef, useState } from "react";
 
-import { PhotoIcon } from "@heroicons/react/20/solid";
 import { rejects } from "assert";
+import { PhotoIcon } from "@heroicons/react/20/solid";
 import setRef from "../lib/setRef";
 import Button from "./button";
 import FormField from "./formField";
@@ -51,11 +51,11 @@ function fileDataToCanvas(file: File): Promise<HTMLCanvasElement> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onloadend = function (e) {
+    reader.onloadend = (e) => {
       if (!e.target?.result) return reject(new Error("Unable to read file"));
       const image = new Image();
       image.src = e.target.result as any;
-      image.onload = function (ev) {
+      image.onload = (ev) => {
         const canvas = document.createElement("canvas");
         canvas.width = image.width;
         canvas.height = image.height;
@@ -83,7 +83,7 @@ export default forwardRef<HTMLInputElement, Props>(
       imageHeight = 600,
       noEditor,
     },
-    ref,
+    ref
   ) => {
     const fileRef = useRef<HTMLInputElement>(null);
     const imageRef = useRef<HTMLImageElement>(null);
@@ -247,5 +247,5 @@ export default forwardRef<HTMLInputElement, Props>(
         )}
       </FormField>
     );
-  },
+  }
 );

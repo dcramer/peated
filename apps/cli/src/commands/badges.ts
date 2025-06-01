@@ -40,13 +40,13 @@ subcommand
       const level = formula(award.xp, award.badge.maxLevel) ?? award.level;
       if (award.level !== level) {
         console.log(
-          `Updating level on award ${award.id} from ${award.level} to ${level}`,
+          `Updating level on award ${award.id} from ${award.level} to ${level}`
         );
         await db
           .update(badgeAwards)
           .set({ level })
           .where(
-            and(eq(badgeAwards.id, award.id), eq(badgeAwards.xp, award.xp)),
+            and(eq(badgeAwards.id, award.id), eq(badgeAwards.xp, award.xp))
           );
       }
     }

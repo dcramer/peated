@@ -35,7 +35,7 @@ function Page() {
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const { data: bottle } = useSuspenseQuery(
-    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
+    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } })
   );
   const { flash } = useFlashMessages();
 
@@ -77,11 +77,11 @@ function Page() {
           flash(
             <div>
               Performing merge asynchronously. Updates may take a few minutes.
-            </div>,
+            </div>
           );
           navigate({ to: `/bottles/${newBottle.id}` });
         },
-      },
+      }
     );
   };
 

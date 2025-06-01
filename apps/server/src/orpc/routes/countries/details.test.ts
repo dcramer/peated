@@ -15,7 +15,7 @@ describe("GET /countries/:country", () => {
     const err = await waitError(
       routerClient.countries.details({
         country: "nochance",
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Country not found.]`);
   });

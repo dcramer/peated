@@ -44,5 +44,5 @@ type JobContext = { traceContext?: TraceContext };
 
 export type JobFunction = (
   args?: any,
-  context?: JobContext,
+  context?: JobContext
 ) => Promise<unknown>;

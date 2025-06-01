@@ -32,7 +32,7 @@ describe("POST /auth/password-reset", () => {
     const err = await waitError(
       routerClient.auth.passwordReset.create({
         email: nonExistentEmail,
-      }),
+      })
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Account not found.]`);
@@ -45,7 +45,7 @@ describe("POST /auth/password-reset", () => {
     const err = await waitError(
       routerClient.auth.passwordReset.create({
         email: invalidEmail,
-      }),
+      })
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);

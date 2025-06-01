@@ -9,7 +9,7 @@ export const ReviewSchema = z.object({
   rating: z.number().describe("Rating given in the review"),
   url: z.string().describe("URL to the original review"),
   site: ExternalSiteSchema.optional().describe(
-    "External site where the review was published",
+    "External site where the review was published"
   ),
   bottle: BottleSchema.nullish()
     .default(null)

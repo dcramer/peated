@@ -1,4 +1,4 @@
-import { db as defaultDb, type AnyDatabase } from "@peated/server/db";
+import { type AnyDatabase, db as defaultDb } from "@peated/server/db";
 import {
   bottleAliases,
   bottleReleases,
@@ -28,7 +28,7 @@ export default async function mergeBottle({
   db?: AnyDatabase;
 }) {
   console.log(
-    `Merging bottles ${fromBottleIds.join(", ")} into ${toBottleId}.`,
+    `Merging bottles ${fromBottleIds.join(", ")} into ${toBottleId}.`
   );
 
   // Get the target bottle to get its name for release updates
@@ -121,7 +121,7 @@ export default async function mergeBottle({
             fullName: newFullName,
           })
           .where(eq(bottleReleases.id, release.id));
-      }),
+      })
     );
 
     await Promise.all(
@@ -129,8 +129,8 @@ export default async function mergeBottle({
         tx.insert(bottleTombstones).values({
           bottleId: id,
           newBottleId: toBottleId,
-        }),
-      ),
+        })
+      )
     );
 
     const existingTags = await tx.query.bottleTags.findMany({
@@ -151,8 +151,8 @@ export default async function mergeBottle({
             set: {
               count: sql<string>`${bottleTags.count} + 1`,
             },
-          }),
-      ),
+          })
+      )
     );
 
     // wipe old bottles
@@ -170,7 +170,7 @@ export default async function mergeBottle({
     await pushUniqueJob(
       "OnBottleChange",
       { bottleId: toBottleId },
-      { delay: 5000 },
+      { delay: 5000 }
     );
   } catch (err) {
     logError(err, {

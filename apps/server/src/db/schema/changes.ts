@@ -29,7 +29,7 @@ export const changes = pgTable(
       .references(() => users.id)
       .notNull(),
   },
-  (table) => [index("change_created_by_idx").on(table.createdById)],
+  (table) => [index("change_created_by_idx").on(table.createdById)]
 );
 
 export const changesRelations = relations(changes, ({ one }) => ({

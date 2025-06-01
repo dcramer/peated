@@ -37,7 +37,7 @@ export default function FormField({
         `relative block px-4 py-4 text-white focus-within:z-10`,
         className,
         onClick ? "cursor-pointer" : "",
-        error ? "border border-red-500" : "",
+        error ? "border border-red-500" : ""
       )}
       onClick={onClick}
     >

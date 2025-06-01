@@ -4,14 +4,14 @@ import {
   normalizeCategory,
 } from "@peated/server/lib/normalize";
 import { orpcClient } from "@peated/server/lib/orpc-client/server";
-import { getUrl, type BottleReview } from "@peated/server/lib/scraper";
+import { type BottleReview, getUrl } from "@peated/server/lib/scraper";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { logger } from "@sentry/node";
 import { load as cheerio } from "cheerio";
 
 export default async function scrapeWhiskeyAdvocate() {
   const issueList = await scrapeIssueList(
-    "https://whiskyadvocate.com/ratings-reviews",
+    "https://whiskyadvocate.com/ratings-reviews"
   );
   if (issueList.length === 0) {
     logError("[Whisky Advocate] No issues found");
@@ -19,7 +19,7 @@ export default async function scrapeWhiskeyAdvocate() {
   }
 
   logger.info(
-    logger.fmt`[Whisky Advocate] Found ${String(issueList.length)} issues`,
+    logger.fmt`[Whisky Advocate] Found ${String(issueList.length)} issues`
   );
 
   const processedIssues = process.env.ACCESS_TOKEN
@@ -37,16 +37,16 @@ export default async function scrapeWhiskeyAdvocate() {
   }
 
   logger.info(
-    logger.fmt`[Whisky Advocate] Found ${String(newIssues.length)} new issues`,
+    logger.fmt`[Whisky Advocate] Found ${String(newIssues.length)} new issues`
   );
 
   for (const issueName of newIssues) {
     logger.info(
-      logger.fmt`[Whisky Advocate] Fetching reviews for issue [${issueName}]`,
+      logger.fmt`[Whisky Advocate] Fetching reviews for issue [${issueName}]`
     );
     await scrapeReviews(
       `https://whiskyadvocate.com/ratings-reviews?custom_rating_issue%5B0%5D=${encodeURIComponent(
-        issueName,
+        issueName
       )}&order_by=published_desc`,
       async (item) => {
         if (process.env.ACCESS_TOKEN) {
@@ -63,12 +63,12 @@ export default async function scrapeWhiskeyAdvocate() {
         } else {
           logger.info(logger.fmt`[Whisky Advocate] Dry Run [${item.name}]`);
         }
-      },
+      }
     );
 
     processedIssues.push(issueName);
     logger.info(
-      logger.fmt`[Whisky Advocate] Done processing issue [${issueName}]`,
+      logger.fmt`[Whisky Advocate] Done processing issue [${issueName}]`
     );
 
     if (process.env.ACCESS_TOKEN) {
@@ -82,7 +82,7 @@ export default async function scrapeWhiskeyAdvocate() {
 }
 
 export async function scrapeIssueList(
-  url = "https://whiskyadvocate.com/ratings-reviews",
+  url = "https://whiskyadvocate.com/ratings-reviews"
 ) {
   const data = await getUrl(url);
   const $ = cheerio(data);
@@ -102,7 +102,7 @@ export async function scrapeIssueList(
 
 export async function scrapeReviews(
   url: string,
-  cb: (review: BottleReview) => Promise<void>,
+  cb: (review: BottleReview) => Promise<void>
 ) {
   const data = await getUrl(url);
   const $ = cheerio(data);
@@ -124,7 +124,7 @@ export async function scrapeReviews(
     const reviewUrl = $("a.postsItemLink", el).first().attr("href");
     if (!reviewUrl) {
       logger.warn(
-        logger.fmt`[Whisky Advocate] Unable to identify review URL: ${rawName}`,
+        logger.fmt`[Whisky Advocate] Unable to identify review URL: ${rawName}`
       );
       continue;
     }
@@ -132,7 +132,7 @@ export async function scrapeReviews(
     const rawRating = $(".postsItemRanking > h2", el).first().text().trim();
     if (!rawRating || Number(rawRating) < 1 || Number(rawRating) > 100) {
       logger.warn(
-        logger.fmt`[Whisky Advocate] Unable to identify valid rating: ${rawName} (${rawRating})`,
+        logger.fmt`[Whisky Advocate] Unable to identify valid rating: ${rawName} (${rawRating})`
       );
       continue;
     }
@@ -141,7 +141,7 @@ export async function scrapeReviews(
     const issue = $(".postsItemIssue", el).first().text().trim();
     if (!issue) {
       logger.warn(
-        logger.fmt`[Whisky Advocate] Unable to identify issue name: ${rawName}`,
+        logger.fmt`[Whisky Advocate] Unable to identify issue name: ${rawName}`
       );
       continue;
     }

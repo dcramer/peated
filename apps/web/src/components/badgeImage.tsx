@@ -1,4 +1,4 @@
-import { type Badge } from "@peated/server/types";
+import type { Badge } from "@peated/server/types";
 import classNames from "../lib/classNames";
 
 export function PlaceholderBadgeImage({
@@ -12,7 +12,7 @@ export function PlaceholderBadgeImage({
     <div
       className={classNames(
         "rounded ring-2 ring-inset",
-        isMaxLevel ? "ring-highlight" : "ring-slate-800",
+        isMaxLevel ? "ring-highlight" : "ring-slate-800"
       )}
       style={{
         width: size,
@@ -41,7 +41,7 @@ export default function BadgeImage({
       alt={badge.name}
       className={classNames(
         "rounded",
-        isMaxLevel ? "ring-highlight ring-1 ring-inset" : "",
+        isMaxLevel ? "ring-highlight ring-1 ring-inset" : ""
       )}
       style={{
         width: size,

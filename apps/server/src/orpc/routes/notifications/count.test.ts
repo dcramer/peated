@@ -8,7 +8,7 @@ describe("GET /notifications/count", () => {
     const err = await waitError(
       routerClient.notifications.count(undefined, {
         context: { user: null },
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -55,7 +55,7 @@ describe("GET /notifications/count", () => {
       { filter: "all" },
       {
         context: { user },
-      },
+      }
     );
     expect(count).toBe(2);
   });
@@ -90,7 +90,7 @@ describe("GET /notifications/count", () => {
       { filter: "unread" },
       {
         context: { user },
-      },
+      }
     );
     expect(count).toBe(2);
   });
@@ -126,7 +126,7 @@ describe("GET /notifications/count", () => {
       { filter: "unread" },
       {
         context: { user },
-      },
+      }
     );
     expect(count).toBe(0);
   });

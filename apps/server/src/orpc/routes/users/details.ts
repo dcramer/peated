@@ -24,7 +24,7 @@ export default procedure
   .input(
     z.object({
       user: z.union([z.coerce.number(), z.literal("me"), z.string()]),
-    }),
+    })
   )
   .output(
     UserSchema.extend({
@@ -34,9 +34,9 @@ export default procedure
         collected: z.number(),
         contributions: z.number(),
       }),
-    }),
+    })
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const user = await getUserFromId(db, input.user, context.user);
 
     if (!user) {
@@ -64,7 +64,7 @@ export default procedure
       .from(collections)
       .innerJoin(
         collectionBottles,
-        eq(collections.id, collectionBottles.collectionId),
+        eq(collections.id, collectionBottles.collectionId)
       )
       .where(eq(collections.createdById, user.id))
       .limit(1);

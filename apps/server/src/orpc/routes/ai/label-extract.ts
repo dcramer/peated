@@ -36,7 +36,7 @@ export default procedure
   })
   .input(InputSchema)
   .output(OutputSchema)
-  .handler(async function ({ input, errors }) {
+  .handler(async ({ input, errors }) => {
     try {
       if (input.imageUrl) {
         return await extractFromImage(input.imageUrl);

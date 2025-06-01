@@ -1,10 +1,10 @@
 import { inArray } from "drizzle-orm";
-import { type z } from "zod";
+import type { z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
-import { countries, regions, type Entity, type User } from "../db/schema";
+import { type Entity, type User, countries, regions } from "../db/schema";
 import { notEmpty } from "../lib/filter";
-import { type EntitySchema } from "../schemas";
+import type { EntitySchema } from "../schemas";
 import { CountrySerializer } from "./country";
 import { RegionSerializer } from "./region";
 
@@ -22,8 +22,8 @@ export const EntitySerializer = serializer({
     const countriesById = countryList.length
       ? Object.fromEntries(
           (await serialize(CountrySerializer, countryList, currentUser)).map(
-            (data, index) => [countryList[index].id, data],
-          ),
+            (data, index) => [countryList[index].id, data]
+          )
         )
       : {};
 
@@ -35,8 +35,8 @@ export const EntitySerializer = serializer({
     const regionsById = regionList.length
       ? Object.fromEntries(
           (await serialize(RegionSerializer, regionList, currentUser)).map(
-            (data, index) => [regionList[index].id, data],
-          ),
+            (data, index) => [regionList[index].id, data]
+          )
         )
       : {};
 
@@ -49,13 +49,13 @@ export const EntitySerializer = serializer({
             region: item.regionId ? regionsById[item.regionId] : null,
           },
         ];
-      }),
+      })
     );
   },
   item: (
     item: Entity,
     attrs: Record<string, any>,
-    currentUser?: User,
+    currentUser?: User
   ): z.infer<typeof EntitySchema> => {
     return {
       id: item.id,

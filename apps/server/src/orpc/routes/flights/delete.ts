@@ -16,10 +16,10 @@ export default procedure
   .input(
     z.object({
       flight: z.string(),
-    }),
+    })
   )
   .output(z.object({}))
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { flight: flightId } = input;
 
     const [flight] = await db

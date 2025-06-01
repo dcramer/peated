@@ -30,7 +30,7 @@ export default async ({ bottleId }: { bottleId: number }) => {
     .from(entities)
     .innerJoin(
       bottlesToDistillers,
-      eq(bottlesToDistillers.distillerId, entities.id),
+      eq(bottlesToDistillers.distillerId, entities.id)
     )
     .where(eq(bottlesToDistillers.bottleId, bottle.id));
 
@@ -49,7 +49,7 @@ export default async ({ bottleId }: { bottleId: number }) => {
       brand!,
       aliasList,
       bottler,
-      distillerList,
+      distillerList
     ) || null;
 
   console.log(`Updating searchVector for Bottle ${bottle.id}`);

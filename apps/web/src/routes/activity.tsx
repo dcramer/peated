@@ -11,7 +11,7 @@ function Page() {
   const filter = "global";
   const orpc = useORPC();
   const { data: tastingList } = useSuspenseQuery(
-    orpc.tastings.list.queryOptions({ input: { limit: 10, filter } }),
+    orpc.tastings.list.queryOptions({ input: { limit: 10, filter } })
   );
 
   return <ActivityFeed tastingList={tastingList} filter={filter} />;

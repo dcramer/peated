@@ -54,7 +54,7 @@ describe("BatchQueue", () => {
     expect(processBatchMock).toHaveBeenCalledTimes(1);
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       "Error processing batch:",
-      expect.any(Error),
+      expect.any(Error)
     );
 
     consoleErrorSpy.mockRestore();

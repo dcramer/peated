@@ -1,7 +1,7 @@
 import Link from "@peated/web/components/link";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export default async function Layout({
   params: { entityId },

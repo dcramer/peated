@@ -8,7 +8,7 @@ export const scheduler = new ToadScheduler();
 export function scheduledJob(
   schedule: string,
   jobName: string,
-  cb: () => Promise<void>,
+  cb: () => Promise<void>
 ) {
   const task = new AsyncTask(jobName, async () => {
     Sentry.withIsolationScope(async (scope) => {
@@ -29,7 +29,7 @@ export function scheduledJob(
               type: "crontab",
               value: schedule,
             },
-          },
+          }
         );
 
         return await Sentry.startSpan(
@@ -74,9 +74,9 @@ export function scheduledJob(
             console.log(
               `Job ${
                 success ? "succeeded" : "failed"
-              } [${jobName} - ${jobId}] in ${(duration / 1000).toFixed(3)}s`,
+              } [${jobName} - ${jobId}] in ${(duration / 1000).toFixed(3)}s`
             );
-          },
+          }
         );
       });
     });
@@ -89,7 +89,7 @@ export function scheduledJob(
     task,
     {
       preventOverrun: true,
-    },
+    }
   );
 
   scheduler.addCronJob(job);

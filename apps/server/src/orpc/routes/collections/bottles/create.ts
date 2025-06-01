@@ -26,10 +26,10 @@ export default procedure
     CollectionBottleInputSchema.extend({
       collection: z.union([z.literal("default"), z.coerce.number()]),
       user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
-    }),
+    })
   )
   .output(z.object({}))
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
       throw errors.NOT_FOUND({
@@ -77,7 +77,7 @@ export default procedure
       const release = await db.query.bottleReleases.findFirst({
         where: and(
           eq(bottleReleases.id, input.release),
-          eq(bottleReleases.bottleId, bottle.id),
+          eq(bottleReleases.bottleId, bottle.id)
         ),
       });
       if (!release) {

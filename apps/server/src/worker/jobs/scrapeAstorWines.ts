@@ -53,7 +53,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
         volume,
         url: absoluteUrl(url, productUrl),
         imageUrl: imageUrl ? absoluteUrl(url, imageUrl) : null,
-      }),
+      })
     );
   });
 
@@ -65,13 +65,13 @@ export default async function scrapeAstorWines() {
     "astorwines",
     (page) =>
       `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=3_41&srt=1&instockonly=True&Page=${page}`,
-    scrapeProducts,
+    scrapeProducts
   );
 
   await scrapePrices(
     "astorwines",
     (page) =>
       `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=2_32&srt=1&instockonly=True&Page=${page}`,
-    scrapeProducts,
+    scrapeProducts
   );
 }

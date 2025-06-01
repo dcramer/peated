@@ -17,10 +17,10 @@ export default procedure
   .input(
     z.object({
       tasting: z.coerce.number(),
-    }),
+    })
   )
   .output(TastingSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const [tasting] = await db
       .select()
       .from(tastings)

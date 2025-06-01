@@ -12,8 +12,8 @@ describe("POST /countries/:country/regions", () => {
           name: "Test Region",
           country: "test-country",
         },
-        { context: { user: null } },
-      ),
+        { context: { user: null } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -25,8 +25,8 @@ describe("POST /countries/:country/regions", () => {
           name: "Test Region",
           country: "test-country",
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -41,7 +41,7 @@ describe("POST /countries/:country/regions", () => {
         country: country.slug,
         description: "A test region",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -67,8 +67,8 @@ describe("POST /countries/:country/regions", () => {
           name: "Test Region",
           country: "nonexistent-country",
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Country not found.]`);
@@ -85,12 +85,12 @@ describe("POST /countries/:country/regions", () => {
           name: existingRegion.name,
           country: country.slug,
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: Conflicting object already exists (ID=1).]`,
+      `[Error: Conflicting object already exists (ID=1).]`
     );
   });
 
@@ -103,7 +103,7 @@ describe("POST /countries/:country/regions", () => {
         name: "Minimal Region",
         country: country.slug,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();

@@ -1,3 +1,5 @@
+import path, { basename } from "path";
+import { Readable } from "stream";
 import program from "@peated/cli/program";
 import { MAJOR_COUNTRIES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
@@ -19,11 +21,9 @@ import { createNotification } from "@peated/server/lib/notifications";
 import { choose, random, sample } from "@peated/server/lib/rand";
 import * as Fixtures from "@peated/server/lib/test/fixtures";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
-import { type Category } from "@peated/server/types";
+import type { Category } from "@peated/server/types";
 import { and, eq, ne, sql } from "drizzle-orm";
-import { readdir, readFile } from "fs/promises";
-import path, { basename } from "path";
-import { Readable } from "stream";
+import { readFile, readdir } from "fs/promises";
 
 const TASTING_IMAGES_DIR = path.join(
   __dirname,
@@ -32,7 +32,7 @@ const TASTING_IMAGES_DIR = path.join(
   "..",
   "server",
   "__fixtures__",
-  "tasting-images",
+  "tasting-images"
 );
 
 let _tasting_images: string[] | null = null;
@@ -45,7 +45,7 @@ const pickTastingImage = async () => {
   return {
     filename: basename(filename),
     file: Readable.from(
-      await readFile(path.join(TASTING_IMAGES_DIR, filename)),
+      await readFile(path.join(TASTING_IMAGES_DIR, filename))
     ),
   };
 };
@@ -90,7 +90,7 @@ const loadDefaultEntities = async () => {
     where: (countries, { inArray }) =>
       inArray(
         sql`LOWER(${countries.name})`,
-        MAJOR_COUNTRIES.map(([name]) => name.toLowerCase()),
+        MAJOR_COUNTRIES.map(([name]) => name.toLowerCase())
       ),
   });
 
@@ -109,7 +109,7 @@ const loadDefaultEntities = async () => {
         (await Fixtures.EntityOrExisting({
           ...data,
           countryId: sample(majorCountries, 1)[0].id,
-        })),
+        }))
     );
   }
 
@@ -173,7 +173,7 @@ const BOTTLE_META: {
 
 const loadDefaultBottles = async (
   entityList: Entity[],
-  siteList: ExternalSite[],
+  siteList: ExternalSite[]
 ) => {
   const mocks: (Pick<Bottle, "name" | "brandId" | "category" | "statedAge"> & {
     distillerIds?: number[];
@@ -185,7 +185,7 @@ const loadDefaultBottles = async (
 
   sample(
     entityList.filter((e) => e.type.includes("brand")),
-    5,
+    5
   ).forEach((brand) => {
     mocks.push(
       ...sample(BOTTLE_META, random(1, 8)).map((data) => ({
@@ -196,7 +196,7 @@ const loadDefaultBottles = async (
         distillerIds: brand.type.includes("distiller")
           ? [brand.id]
           : sample(distilleryIdList, random(0, 2)),
-      })),
+      }))
     );
   });
 
@@ -224,7 +224,7 @@ const loadDefaultBottles = async (
           where: (storePrices, { eq, and }) =>
             and(
               eq(storePrices.externalSiteId, site.id),
-              eq(storePrices.bottleId, bottle.id),
+              eq(storePrices.bottleId, bottle.id)
             ),
         })) ||
         (await Fixtures.StorePrice({
@@ -236,7 +236,7 @@ const loadDefaultBottles = async (
         where: (reviews, { eq, and }) =>
           and(
             eq(reviews.externalSiteId, site.id),
-            eq(reviews.bottleId, bottle.id),
+            eq(reviews.bottleId, bottle.id)
           ),
       })) ||
         (await Fixtures.Review({
@@ -276,7 +276,7 @@ const loadDefaultBottles = async (
           where: (storePriceHistories, { eq }) =>
             and(
               eq(storePriceHistories.priceId, price.id),
-              eq(storePriceHistories.date, dates[i].toDateString()),
+              eq(storePriceHistories.date, dates[i].toDateString())
             ),
         })) ||
           (await Fixtures.StorePriceHistory({
@@ -302,7 +302,7 @@ subcommand
     "--tastings <number>",
     "number of tastings",
     (v: string) => Number(v),
-    5,
+    5
   )
   .action(async (email, options) => {
     // load some realistic entities
@@ -325,11 +325,7 @@ subcommand
       const tasting = await Fixtures.Tasting({
         imageUrl,
         bottleId: (
-          await db
-            .select()
-            .from(bottles)
-            .orderBy(sql`RANDOM()`)
-            .limit(1)
+          await db.select().from(bottles).orderBy(sql`RANDOM()`).limit(1)
         )[0].id,
       });
       await db.insert(collectionBottles).values({
@@ -371,11 +367,7 @@ subcommand
         .insert(tastings)
         .values({
           bottleId: (
-            await db
-              .select()
-              .from(bottles)
-              .orderBy(sql`RANDOM()`)
-              .limit(1)
+            await db.select().from(bottles).orderBy(sql`RANDOM()`).limit(1)
           )[0].id,
           rating: 4.5,
           createdById: toUserId,

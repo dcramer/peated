@@ -13,7 +13,7 @@ export function UserBadgeList({ userId }: { userId: number }) {
       input: {
         user: userId,
       },
-    }),
+    })
   );
 
   if (!awardList.results) return null;
@@ -28,7 +28,7 @@ export function UserBadgeList({ userId }: { userId: number }) {
               title={award.badge.name}
               className={classNames(
                 "group relative flex flex-shrink-0 flex-col items-center gap-y-1 rounded p-1 text-sm hover:bg-slate-800",
-                award.level === 0 ? "grayscale" : "",
+                award.level === 0 ? "grayscale" : ""
               )}
             >
               <Link

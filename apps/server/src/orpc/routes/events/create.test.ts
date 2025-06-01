@@ -11,8 +11,8 @@ describe("POST /events", () => {
           name: "International Whiskey Day",
           dateStart: "2024-03-27",
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -25,7 +25,7 @@ describe("POST /events", () => {
         name: "International Whiskey Day",
         dateStart: "2024-03-27",
       },
-      { context: { user: adminUser } },
+      { context: { user: adminUser } }
     );
 
     expect(newEvent.name).toEqual("International Whiskey Day");

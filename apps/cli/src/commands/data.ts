@@ -254,7 +254,7 @@ subcommand.command("load-default-tags").action(async (options) => {
             flavorProfiles: Object.entries(PROFILES)
               .filter(([profileName, tagList]) => tagList.includes(tagName))
               .map<FlavorProfile>(
-                ([profileName]) => profileName as FlavorProfile,
+                ([profileName]) => profileName as FlavorProfile
               ),
           })
           .onConflictDoNothing();

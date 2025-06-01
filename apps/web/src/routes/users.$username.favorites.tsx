@@ -17,7 +17,7 @@ function Page() {
         user: username,
         collection: "favorites",
       },
-    }),
+    })
   );
 
   return bottles.results.length ? (

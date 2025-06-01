@@ -30,13 +30,13 @@ export default function AddTasting({
   const releaseId = params.get("release");
 
   const { data: bottle } = useSuspenseQuery(
-    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
+    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } })
   );
 
   const { data: suggestedTags } = useSuspenseQuery(
     orpc.bottles.suggestedTags.queryOptions({
       input: { bottle: Number(bottleId) },
-    }),
+    })
   );
 
   // TODO: we want this to be suspense, but skipToken wont work
@@ -45,7 +45,7 @@ export default function AddTasting({
       ? orpc.bottleReleases.details.queryOptions({
           input: { release: Number(releaseId) },
         })
-      : { queryFn: skipToken, queryKey: ["release", ""] },
+      : { queryFn: skipToken, queryKey: ["release", ""] }
   );
   const release = releaseId ? releaseQuery.data : null;
 
@@ -56,15 +56,15 @@ export default function AddTasting({
       ? orpc.flights.details.queryOptions({
           input: { flight: flightId },
         })
-      : { queryFn: skipToken, queryKey: ["flight", ""] },
+      : { queryFn: skipToken, queryKey: ["flight", ""] }
   );
   const flight = flightId ? flightQuery.data : null;
 
   const tastingCreateMutation = useMutation(
-    orpc.tastings.create.mutationOptions(),
+    orpc.tastings.create.mutationOptions()
   );
   const tastingImageUpdateMutation = useMutation(
-    orpc.tastings.imageUpdate.mutationOptions(),
+    orpc.tastings.imageUpdate.mutationOptions()
   );
 
   // capture this on initial load as its utilized to prevent
@@ -97,7 +97,7 @@ export default function AddTasting({
               logError(err);
               flash(
                 "There was an error uploading your image, but the tasting was saved.",
-                "error",
+                "error"
               );
             }
           }
@@ -123,7 +123,7 @@ export default function AddTasting({
                     </p>
                   </div>
                 </div>,
-                "info",
+                "info"
               );
             }
           }

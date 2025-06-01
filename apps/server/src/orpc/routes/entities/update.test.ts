@@ -17,8 +17,8 @@ describe("PATCH /entities/:entity", () => {
         {
           entity: 1,
         },
-        { context: { user: null } },
-      ),
+        { context: { user: null } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -29,8 +29,8 @@ describe("PATCH /entities/:entity", () => {
         {
           entity: 1,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -43,7 +43,7 @@ describe("PATCH /entities/:entity", () => {
       {
         entity: entity.id,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -65,7 +65,7 @@ describe("PATCH /entities/:entity", () => {
         entity: entity.id,
         name: "Delicious Wood",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -76,7 +76,7 @@ describe("PATCH /entities/:entity", () => {
       .where(eq(entities.id, data.id));
 
     expect(omit(entity, "name", "searchVector", "updatedAt")).toEqual(
-      omit(newEntity, "name", "searchVector", "updatedAt"),
+      omit(newEntity, "name", "searchVector", "updatedAt")
     );
     expect(newEntity.name).toBe("Delicious Wood");
 
@@ -100,7 +100,7 @@ describe("PATCH /entities/:entity", () => {
         entity: entity.id,
         country: country.id,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -111,7 +111,7 @@ describe("PATCH /entities/:entity", () => {
       .where(eq(entities.id, data.id));
 
     expect(omit(entity, "countryId", "searchVector", "updatedAt")).toEqual(
-      omit(newEntity, "countryId", "searchVector", "updatedAt"),
+      omit(newEntity, "countryId", "searchVector", "updatedAt")
     );
     expect(newEntity.countryId).toBe(country.id);
   });
@@ -129,7 +129,7 @@ describe("PATCH /entities/:entity", () => {
         entity: entity.id,
         country: null,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -154,7 +154,7 @@ describe("PATCH /entities/:entity", () => {
         country: region.countryId,
         region: region.id,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -165,9 +165,9 @@ describe("PATCH /entities/:entity", () => {
       .where(eq(entities.id, data.id));
 
     expect(
-      omit(entity, "countryId", "regionId", "searchVector", "updatedAt"),
+      omit(entity, "countryId", "regionId", "searchVector", "updatedAt")
     ).toEqual(
-      omit(newEntity, "countryId", "regionId", "searchVector", "updatedAt"),
+      omit(newEntity, "countryId", "regionId", "searchVector", "updatedAt")
     );
     expect(newEntity.regionId).toBe(region.id);
   });
@@ -186,7 +186,7 @@ describe("PATCH /entities/:entity", () => {
         country: region.countryId,
         region: null,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -208,7 +208,7 @@ describe("PATCH /entities/:entity", () => {
         entity: entity.id,
         type: ["distiller"],
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -219,7 +219,7 @@ describe("PATCH /entities/:entity", () => {
       .where(eq(entities.id, data.id));
 
     expect(omit(entity, "type", "searchVector", "updatedAt")).toEqual(
-      omit(newEntity, "type", "searchVector", "updatedAt"),
+      omit(newEntity, "type", "searchVector", "updatedAt")
     );
     expect(newEntity.type).toEqual(["distiller"]);
   });
@@ -245,7 +245,7 @@ describe("PATCH /entities/:entity", () => {
         entity: entity.id,
         name: "Bar",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -256,7 +256,7 @@ describe("PATCH /entities/:entity", () => {
       .where(eq(entities.id, data.id));
 
     expect(omit(entity, "name", "searchVector", "updatedAt")).toEqual(
-      omit(newEntity, "name", "searchVector", "updatedAt"),
+      omit(newEntity, "name", "searchVector", "updatedAt")
     );
     expect(newEntity.name).toBe("Bar");
 
@@ -303,7 +303,7 @@ describe("PATCH /entities/:entity", () => {
         entity: entity.id,
         shortName: "F",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -314,7 +314,7 @@ describe("PATCH /entities/:entity", () => {
       .where(eq(entities.id, data.id));
 
     expect(omit(entity, "shortName", "searchVector", "updatedAt")).toEqual(
-      omit(newEntity, "shortName", "searchVector", "updatedAt"),
+      omit(newEntity, "shortName", "searchVector", "updatedAt")
     );
     expect(newEntity.shortName).toBe("F");
 
@@ -349,7 +349,7 @@ describe("PATCH /entities/:entity", () => {
         entity: entity.id,
         description: "Delicious Wood",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -360,21 +360,15 @@ describe("PATCH /entities/:entity", () => {
       .where(eq(entities.id, data.id));
 
     expect(
-      omit(
-        entity,
-        "description",
-        "descriptionSrc",
-        "searchVector",
-        "updatedAt",
-      ),
+      omit(entity, "description", "descriptionSrc", "searchVector", "updatedAt")
     ).toEqual(
       omit(
         newEntity,
         "description",
         "descriptionSrc",
         "searchVector",
-        "updatedAt",
-      ),
+        "updatedAt"
+      )
     );
     expect(newEntity.description).toBe("Delicious Wood");
     expect(newEntity.descriptionSrc).toEqual("user");
@@ -411,7 +405,7 @@ describe("PATCH /entities/:entity", () => {
         entity: entity.id,
         name: "Cool Cats",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();

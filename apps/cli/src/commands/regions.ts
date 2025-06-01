@@ -158,7 +158,7 @@ subcommand
           ? inArray(regions.id, regionIds)
           : options.onlyMissing
             ? isNull(regions.description)
-            : undefined,
+            : undefined
       )
       .orderBy(asc(regions.id));
 
@@ -220,10 +220,7 @@ subcommand
           .select()
           .from(regions)
           .where(
-            and(
-              eq(regions.countryId, country.id),
-              eq(regions.name, regionName),
-            ),
+            and(eq(regions.countryId, country.id), eq(regions.name, regionName))
           );
         if (!region) {
           await db.insert(regions).values({

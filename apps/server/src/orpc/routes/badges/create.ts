@@ -20,7 +20,7 @@ export default procedure
   })
   .input(BadgeInputSchema)
   .output(BadgeSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const checks: BadgeCheck[] = [];
     for (const check of input.checks) {
       let config;

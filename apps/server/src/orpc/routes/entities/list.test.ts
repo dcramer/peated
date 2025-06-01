@@ -457,7 +457,7 @@ describe("GET /entities", () => {
       await expect(
         routerClient.entities.list({
           country: "invalid-country",
-        }),
+        })
       ).rejects.toThrow("Invalid country");
     });
 
@@ -471,7 +471,7 @@ describe("GET /entities", () => {
         routerClient.entities.list({
           country: "scotland",
           region: "invalid-region",
-        }),
+        })
       ).rejects.toThrow("Invalid region");
     });
 
@@ -479,7 +479,7 @@ describe("GET /entities", () => {
       await expect(
         routerClient.entities.list({
           region: "some-region",
-        }),
+        })
       ).rejects.toThrow("Region requires country");
     });
   });

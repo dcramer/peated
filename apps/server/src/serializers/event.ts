@@ -1,10 +1,10 @@
 import { inArray } from "drizzle-orm";
-import { type z } from "zod";
+import type { z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
-import { countries, type Event, type User } from "../db/schema";
+import { type Event, type User, countries } from "../db/schema";
 import { notEmpty } from "../lib/filter";
-import { type EventSchema } from "../schemas";
+import type { EventSchema } from "../schemas";
 import { CountrySerializer } from "./country";
 
 export const EventSerializer = serializer({
@@ -20,8 +20,8 @@ export const EventSerializer = serializer({
 
     const countriesById = Object.fromEntries(
       (await serialize(CountrySerializer, countryList, currentUser)).map(
-        (data, index) => [countryList[index].id, data],
-      ),
+        (data, index) => [countryList[index].id, data]
+      )
     );
 
     return Object.fromEntries(
@@ -32,13 +32,13 @@ export const EventSerializer = serializer({
             country: item.countryId ? countriesById[item.countryId] : null,
           },
         ];
-      }),
+      })
     );
   },
   item: (
     item: Event,
     attrs: Record<string, any>,
-    currentUser?: User,
+    currentUser?: User
   ): z.infer<typeof EventSchema> => {
     return {
       id: item.id,

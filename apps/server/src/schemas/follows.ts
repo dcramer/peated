@@ -12,6 +12,6 @@ export const FollowSchema = z.object({
     .optional()
     .describe("Timestamp when the follow was created"),
   followsBack: FollowStatusEnum.describe(
-    "Whether the followed user follows back",
+    "Whether the followed user follows back"
   ),
 });

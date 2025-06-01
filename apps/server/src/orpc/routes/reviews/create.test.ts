@@ -18,8 +18,8 @@ describe("POST /reviews", () => {
           url: "https://example.com",
           category: "single_malt",
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -37,7 +37,7 @@ describe("POST /reviews", () => {
         url: "https://example.com",
         category: "single_malt",
       },
-      { context: { user: adminUser } },
+      { context: { user: adminUser } }
     );
 
     const review = await db.query.reviews.findFirst({
@@ -65,7 +65,7 @@ describe("POST /reviews", () => {
         url: "https://example.com",
         category: "single_malt",
       },
-      { context: { user: adminUser } },
+      { context: { user: adminUser } }
     );
 
     const review = await db.query.reviews.findFirst({
@@ -106,7 +106,7 @@ describe("POST /reviews", () => {
         url: "https://example.com",
         category: bottle.category,
       },
-      { context: { user: adminUser } },
+      { context: { user: adminUser } }
     );
 
     const review = await db.query.reviews.findFirst({
@@ -133,8 +133,8 @@ describe("POST /reviews", () => {
           url: "https://example.com",
           category: "single_malt",
         },
-        { context: { user: adminUser } },
-      ),
+        { context: { user: adminUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });

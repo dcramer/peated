@@ -54,7 +54,7 @@ export default function Chip<E extends ElementType = typeof defaultElement>({
           : colorClass,
         size === "small"
           ? "min-h-[24px] px-[6px] text-sm"
-          : "min-h-[32px] px-[12px]",
+          : "min-h-[32px] px-[12px]"
       )}
       onClick={onClick || defaultOnClick}
       {...props}

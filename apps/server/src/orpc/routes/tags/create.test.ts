@@ -11,8 +11,8 @@ describe("POST /tags", () => {
           name: "Peated",
           tagCategory: "peaty",
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -24,7 +24,7 @@ describe("POST /tags", () => {
         name: "Peated",
         tagCategory: "peaty",
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(tag.name).toEqual("peated");

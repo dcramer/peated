@@ -24,7 +24,7 @@ export default procedure
   })
   .input(InputSchema)
   .output(RegionSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     let countryId: number;
     if (typeof input.country === "number") {
       countryId = input.country;
@@ -48,8 +48,8 @@ export default procedure
       .where(
         and(
           eq(regions.countryId, countryId),
-          eq(sql`LOWER(${regions.slug})`, input.region.toLowerCase()),
-        ),
+          eq(sql`LOWER(${regions.slug})`, input.region.toLowerCase())
+        )
       );
 
     if (!region) {
@@ -80,8 +80,8 @@ export default procedure
       .where(
         and(
           eq(regions.countryId, countryId),
-          eq(sql`LOWER(${regions.slug})`, region.slug.toLowerCase()),
-        ),
+          eq(sql`LOWER(${regions.slug})`, region.slug.toLowerCase())
+        )
       )
       .returning();
 

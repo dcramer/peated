@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type MouseEvent } from "react";
+import { type MouseEvent, useState } from "react";
 
 import Bar from "./bar";
 import type { ChartDimensions, DataPoint } from "./types";

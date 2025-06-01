@@ -2,7 +2,7 @@ import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { regions } from "@peated/server/db/schema";
 import { getStructuredResponse } from "@peated/server/lib/openai";
-import { type Region } from "@peated/server/types";
+import type { Region } from "@peated/server/types";
 import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -28,7 +28,7 @@ export const OpenAIRegionDetailsSchema = z.object({
 export type GeneratedRegionDetails = z.infer<typeof OpenAIRegionDetailsSchema>;
 
 export async function getGeneratedRegionDetails(
-  region: InputRegion,
+  region: InputRegion
 ): Promise<GeneratedRegionDetails | null> {
   return await startSpan(
     {
@@ -53,9 +53,9 @@ export async function getGeneratedRegionDetails(
             slug: region.country.slug,
             name: region.country.slug,
           },
-        },
+        }
       );
-    },
+    }
   );
 }
 

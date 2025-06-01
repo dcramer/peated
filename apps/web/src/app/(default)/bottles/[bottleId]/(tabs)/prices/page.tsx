@@ -18,7 +18,7 @@ export default function BottlePrices({
       input: {
         bottle: Number(bottleId),
       },
-    }),
+    })
   );
 
   return (

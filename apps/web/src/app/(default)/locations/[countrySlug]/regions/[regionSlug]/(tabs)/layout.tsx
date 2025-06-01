@@ -7,7 +7,7 @@ import Tabs, { TabItem } from "@peated/web/components/tabs";
 import UsStateMapIcon from "@peated/web/components/usStateMapIcon";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export async function generateMetadata({
   params: { countrySlug, regionSlug },

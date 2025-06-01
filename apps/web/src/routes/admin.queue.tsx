@@ -1,5 +1,5 @@
 import type { Outputs } from "@peated/server/orpc/router";
-import { type Bottle } from "@peated/server/types";
+import type { Bottle } from "@peated/server/types";
 import BottleSelector from "@peated/web/components/admin/queue/bottleSelector";
 import Button from "@peated/web/components/button";
 import { useFlashMessages } from "@peated/web/components/flash";
@@ -31,7 +31,7 @@ function Page() {
   const { data: aliasList } = useSuspenseQuery(
     orpc.bottles.unmatched.queryOptions({
       input: queryParams,
-    }),
+    })
   );
 
   const [unmatchedBottle, setUnmatchedBottle] = useState<
@@ -42,10 +42,10 @@ function Page() {
   const [assignments, setAssignments] = useState<Record<string, Bottle>>({});
 
   const bottleAliasUpdateMutation = useMutation(
-    orpc.bottleAliases.update.mutationOptions(),
+    orpc.bottleAliases.update.mutationOptions()
   );
   const bottleAliasUpsertMutation = useMutation(
-    orpc.bottleAliases.upsert.mutationOptions(),
+    orpc.bottleAliases.upsert.mutationOptions()
   );
 
   const { flash } = useFlashMessages();
@@ -102,7 +102,7 @@ function Page() {
                         Marked{" "}
                         <strong className="font-bold">{item.name}</strong> as
                         hidden
-                      </div>,
+                      </div>
                     );
                   }}
                   className="hover:underline"
@@ -137,7 +137,7 @@ function Page() {
               <Link href={`/bottles/${bottle.id}`} className="underline">
                 {bottle.fullName}
               </Link>
-            </div>,
+            </div>
           );
           setAssignments((value) => ({
             ...value,

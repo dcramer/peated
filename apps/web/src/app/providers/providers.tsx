@@ -6,7 +6,7 @@ import { AuthProvider } from "@peated/web/hooks/useAuth";
 import { OnlineStatusProvider } from "@peated/web/hooks/useOnlineStatus";
 import { ensureSessionSynced } from "@peated/web/lib/auth.actions";
 import ORPCProvider from "@peated/web/lib/orpc/provider";
-import { type SessionData } from "@peated/web/lib/session.server";
+import type { SessionData } from "@peated/web/lib/session.server";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { setUser } from "@sentry/nextjs";
 import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
@@ -26,7 +26,7 @@ export default function Providers({
           username: user?.username,
           email: user?.email,
         }
-      : null,
+      : null
   );
 
   useInterval(async () => {

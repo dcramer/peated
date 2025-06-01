@@ -49,7 +49,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
         currency: "usd",
         volume,
         url: absoluteUrl(url, productUrl),
-      }),
+      })
     );
   });
 
@@ -61,13 +61,13 @@ export default async function scrapeTotalWine() {
     "totalwine",
     (page) =>
       `https://www.totalwine.com/spirits/scotch/c/000887?viewall=true&pageSize=120&aty=0,0,0,0&page=${page}`,
-    scrapeProducts,
+    scrapeProducts
   );
 
   await scrapePrices(
     "totalwine",
     (page) =>
       `https://www.totalwine.com/spirits/whiskey/c/9238919?viewall=true&pageSize=120&aty=0,0,0,0&page=${page}`,
-    scrapeProducts,
+    scrapeProducts
   );
 }

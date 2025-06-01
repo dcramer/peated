@@ -28,15 +28,15 @@ export default procedure
       .default({
         cursor: 1,
         limit: 100,
-      }),
+      })
   )
   .output(
     z.object({
       results: z.array(NotificationSchema),
       rel: CursorSchema,
-    }),
+    })
   )
-  .handler(async function ({ input: { cursor, limit, ...input }, context }) {
+  .handler(async ({ input: { cursor, limit, ...input }, context }) => {
     const offset = (cursor - 1) * limit;
 
     const where: (SQL<unknown> | undefined)[] = [
@@ -58,7 +58,7 @@ export default procedure
       results: await serialize(
         NotificationSerializer,
         results.slice(0, limit),
-        context.user,
+        context.user
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

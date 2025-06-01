@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { forwardRef, useEffect, useState } from "react";
 
-import { type Point } from "@peated/server/types";
+import type { Point } from "@peated/server/types";
 import { ClientOnly } from "./clientOnly";
 import FormField from "./formField";
 import Map from "./map";
@@ -28,7 +28,7 @@ type Props = Omit<
 export default forwardRef<HTMLInputElement, Props>(
   (
     { name, label, helpText, required, className, value, error, onChange },
-    ref,
+    ref
   ) => {
     const [position, setPosition] = useState<Point | null>(null);
 
@@ -55,7 +55,7 @@ export default forwardRef<HTMLInputElement, Props>(
               const value = e.target.value;
               if (!value) setPosition(null);
               else {
-                const [lat, lng] = value.split(",", 2).map(parseFloat);
+                const [lat, lng] = value.split(",", 2).map(Number.parseFloat);
                 if (lat && lng) setPosition([lat, lng]);
                 else setPosition(null);
               }
@@ -65,7 +65,7 @@ export default forwardRef<HTMLInputElement, Props>(
         </div>
       </FormField>
     );
-  },
+  }
 );
 
 const LocationMap = ({ position }: { position: Point | null }) => {

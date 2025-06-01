@@ -20,10 +20,10 @@ export default procedure
       site: ExternalSiteTypeEnum,
       key: z.string(),
       default: z.any().default(null),
-    }),
+    })
   )
   .output(z.any())
-  .handler(async function ({ input, errors }) {
+  .handler(async ({ input, errors }) => {
     const [site] = await db
       .select()
       .from(externalSites)
@@ -40,8 +40,8 @@ export default procedure
       .where(
         and(
           eq(externalSiteConfig.externalSiteId, site.id),
-          eq(externalSiteConfig.key, input.key),
-        ),
+          eq(externalSiteConfig.key, input.key)
+        )
       );
 
     return result?.value ?? input.default;

@@ -46,16 +46,16 @@ export default function Page() {
         }
         throw error;
       },
-    }),
+    })
   );
 
   const userUpdateMutation = useMutation(orpc.users.update.mutationOptions());
 
   const [picture, setPicture] = useState<HTMLCanvasElement | null | undefined>(
-    undefined,
+    undefined
   );
   const userAvatarUpdateMutation = useMutation(
-    orpc.users.avatarUpdate.mutationOptions(),
+    orpc.users.avatarUpdate.mutationOptions()
   );
   const {
     control,

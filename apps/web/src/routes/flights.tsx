@@ -15,7 +15,7 @@ function Page() {
   const orpc = useORPC();
 
   const { data: flightList } = useSuspenseQuery(
-    orpc.flights.list.queryOptions(),
+    orpc.flights.list.queryOptions()
   );
 
   return (

@@ -11,7 +11,7 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import type { BadgeCheckInputSchema } from "@peated/server/schemas";
 import { BadgeCheckSchema, BadgeInputSchema } from "@peated/server/schemas";
 import type { BadgeCheck, BadgeCheckType } from "@peated/server/types";
-import { type Badge } from "@peated/server/types";
+import type { Badge } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
 import FormHeader from "@peated/web/components/formHeader";
@@ -20,7 +20,7 @@ import Layout from "@peated/web/components/layout";
 import TextField from "@peated/web/components/textField";
 import { logError } from "@peated/web/lib/log";
 import { useState } from "react";
-import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 import type { z } from "zod";
 import Button from "../button";
 import Form from "../form";
@@ -137,7 +137,8 @@ export default function BadgeForm({
 
           <TextField
             {...register("maxLevel", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              setValueAs: (v) =>
+                v === "" || !v ? null : Number.parseInt(v, 10),
             })}
             label="Max Level"
             type="number"
@@ -290,14 +291,14 @@ export default function BadgeForm({
                               "checks",
                               checks.items
                                 .filter((v) => v.id !== check.id)
-                                .map(({ type, config }) => ({ type, config })),
+                                .map(({ type, config }) => ({ type, config }))
                             );
 
                             setChecks((value) => {
                               return {
                                 ...value,
                                 items: value.items.filter(
-                                  (v) => v.id !== check.id,
+                                  (v) => v.id !== check.id
                                 ),
                               };
                             });
@@ -317,7 +318,7 @@ export default function BadgeForm({
                               return { type: c.type, config: data };
                             }
                             return { type: c.type, config: c.config };
-                          }),
+                          })
                         );
                         setChecks((value) => {
                           return {

@@ -14,7 +14,7 @@ export default function EntitySpiritDistribution({
   const { data } = useSuspenseQuery(
     orpc.entities.categories.list.queryOptions({
       input: { entity: entityId },
-    }),
+    })
   );
 
   const { results, totalCount } = data;
@@ -31,7 +31,7 @@ export default function EntitySpiritDistribution({
       totalCount={totalCount}
       href={(item) =>
         `/bottles?entity=${entityId}&category=${encodeURIComponent(
-          item.category,
+          item.category
         )}`
       }
     />

@@ -19,7 +19,7 @@ describe("GET /countries", () => {
 
     expect(results.length).toBe(2);
     expect(results.every((country) => country.name.includes("United"))).toBe(
-      true,
+      true
     );
   });
 

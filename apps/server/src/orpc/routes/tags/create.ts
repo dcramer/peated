@@ -18,7 +18,7 @@ export default procedure
   })
   .input(TagInputSchema)
   .output(TagSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const tag = await db.transaction(async (tx) => {
       try {
         const [tag] = await tx

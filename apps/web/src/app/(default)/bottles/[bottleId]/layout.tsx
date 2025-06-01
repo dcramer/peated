@@ -8,7 +8,7 @@ import SkeletonButton from "@peated/web/components/skeletonButton";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { redirect } from "next/navigation";
-import { Suspense, type ReactNode } from "react";
+import { type ReactNode, Suspense } from "react";
 import type { Product, WithContext } from "schema-dts";
 import ModActions from "./modActions";
 

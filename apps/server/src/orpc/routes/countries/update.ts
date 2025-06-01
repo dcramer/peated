@@ -23,7 +23,7 @@ export default procedure
   })
   .input(InputSchema)
   .output(CountrySchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const [country] = await db
       .select()
       .from(countries)

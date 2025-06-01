@@ -22,7 +22,7 @@ export default procedure
   .input(
     z.object({
       user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
-    }),
+    })
   )
   .output(
     z.object({
@@ -39,12 +39,12 @@ export default procedure
             })
             .nullable(),
           count: z.number(),
-        }),
+        })
       ),
       totalCount: z.number(),
-    }),
+    })
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
       throw errors.NOT_FOUND({
@@ -73,11 +73,11 @@ export default procedure
       WHERE ${tastings.createdById} = ${user.id}
       GROUP BY country_id, region_id
       ORDER BY COUNT(*) DESC
-      LIMIT 25`,
+      LIMIT 25`
     );
 
     const countryIds = Array.from(
-      new Set(results.rows.map((r) => r.country_id)),
+      new Set(results.rows.map((r) => r.country_id))
     );
     const countriesById = countryIds.length
       ? Object.fromEntries(
@@ -92,7 +92,7 @@ export default procedure
               name: r.name,
               slug: r.slug,
             },
-          ]),
+          ])
         )
       : {};
 
@@ -110,7 +110,7 @@ export default procedure
               name: r.name,
               slug: r.slug,
             },
-          ]),
+          ])
         )
       : {};
 
@@ -120,9 +120,9 @@ export default procedure
           sql<{ count: number }>`SELECT COUNT(*) as count
         FROM ${tastings}
         WHERE ${tastings.createdById} = ${user.id}
-      `,
+      `
         )
-      ).rows[0]!.count,
+      ).rows[0]!.count
     );
 
     return {

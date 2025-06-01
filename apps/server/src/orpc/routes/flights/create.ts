@@ -19,7 +19,7 @@ export default procedure
   .use(requireAuth)
   .input(FlightInputSchema)
   .output(FlightSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const data: NewFlight = {
       ...input,
       publicId: generatePublicId(),

@@ -23,7 +23,7 @@ export const toasts = pgTable(
       .references(() => users.id)
       .notNull(),
   },
-  (table) => [uniqueIndex("toast_unq").on(table.tastingId, table.createdById)],
+  (table) => [uniqueIndex("toast_unq").on(table.tastingId, table.createdById)]
 );
 
 export const toastsRelations = relations(toasts, ({ one }) => ({

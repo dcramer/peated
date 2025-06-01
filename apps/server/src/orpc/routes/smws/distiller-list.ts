@@ -25,7 +25,7 @@ export default procedure
       "Retrieve distillers that are part of the Scotch Malt Whisky Society (SMWS) system",
   })
   .output(OutputSchema)
-  .handler(async function ({ context }) {
+  .handler(async ({ context }) => {
     const results = await db
       .select()
       .from(entities)
@@ -33,7 +33,7 @@ export default procedure
         sql`${entities.id} IN (
           SELECT ${entityAliases.entityId} FROM ${entityAliases}
           WHERE LOWER(${entityAliases.name}) IN ${Object.values(SMWS_DISTILLERY_CODES).map((s) => s.toLowerCase())}
-        )`,
+        )`
       );
 
     return {

@@ -12,7 +12,7 @@ import FormHeader from "./formHeader";
 import LayoutModal from "./layoutModal";
 import Legend from "./legend";
 import SelectField from "./selectField";
-import { type CreateFormOptions, type Option } from "./selectField/types";
+import type { CreateFormOptions, Option } from "./selectField/types";
 import TextField from "./textField";
 
 type FormSchemaType = z.infer<typeof BottleReleaseInputSchema>;
@@ -138,7 +138,8 @@ function CreateForm({
 
           <TextField
             {...register("statedAge", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              setValueAs: (v) =>
+                v === "" || !v ? null : Number.parseInt(v, 10),
             })}
             error={errors.statedAge}
             type="number"
@@ -150,7 +151,7 @@ function CreateForm({
 
           <TextField
             {...register("abv", {
-              setValueAs: (v) => (v === "" || !v ? null : parseFloat(v)),
+              setValueAs: (v) => (v === "" || !v ? null : Number.parseFloat(v)),
             })}
             error={errors.abv}
             type="number"
@@ -165,7 +166,8 @@ function CreateForm({
 
           <TextField
             {...register("releaseYear", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              setValueAs: (v) =>
+                v === "" || !v ? null : Number.parseInt(v, 10),
             })}
             error={errors.releaseYear}
             type="number"
@@ -178,7 +180,8 @@ function CreateForm({
 
           <TextField
             {...register("vintageYear", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              setValueAs: (v) =>
+                v === "" || !v ? null : Number.parseInt(v, 10),
             })}
             error={errors.vintageYear}
             type="number"

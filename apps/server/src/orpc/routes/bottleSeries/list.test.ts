@@ -2,7 +2,7 @@ import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, it } from "vitest";
 
 describe("GET /bottle-series", () => {
-  it("lists series for a brand", async function ({ fixtures, defaults }) {
+  it("lists series for a brand", async ({ fixtures, defaults }) => {
     const brand = await fixtures.Entity({ name: "Ardbeg" });
 
     const series1 = await fixtures.BottleSeries({
@@ -50,11 +50,11 @@ describe("GET /bottle-series", () => {
             name: brand.name,
           }),
         }),
-      ]),
+      ])
     );
   });
 
-  it("filters series by query", async function ({ fixtures, defaults }) {
+  it("filters series by query", async ({ fixtures, defaults }) => {
     const brand = await fixtures.Entity({ name: "Ardbeg" });
 
     const series1 = await fixtures.BottleSeries({
@@ -84,10 +84,10 @@ describe("GET /bottle-series", () => {
     });
   });
 
-  it("returns empty list for non-existent brand", async function ({
+  it("returns empty list for non-existent brand", async ({
     fixtures,
     defaults,
-  }) {
+  }) => {
     const { results } = await routerClient.bottleSeries.list({
       brand: 12345,
     });

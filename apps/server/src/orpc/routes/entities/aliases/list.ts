@@ -15,7 +15,7 @@ export default procedure
   .input(
     z.object({
       entity: z.coerce.number(),
-    }),
+    })
   )
   .output(
     z.object({
@@ -24,11 +24,11 @@ export default procedure
           name: z.string(),
           isCanonical: z.boolean(),
           createdAt: z.string(),
-        }),
+        })
       ),
-    }),
+    })
   )
-  .handler(async function ({ input, errors }) {
+  .handler(async ({ input, errors }) => {
     const [entity] = await db
       .select()
       .from(entities)

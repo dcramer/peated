@@ -39,19 +39,15 @@ export default procedure
         filter: "global",
         cursor: 1,
         limit: 25,
-      }),
+      })
   )
   .output(
     z.object({
       results: z.array(TastingSchema),
       rel: CursorSchema,
-    }),
+    })
   )
-  .handler(async function ({
-    input: { cursor, limit, ...input },
-    context,
-    errors,
-  }) {
+  .handler(async ({ input: { cursor, limit, ...input }, context, errors }) => {
     const offset = (cursor - 1) * limit;
 
     const where: (SQL<unknown> | undefined)[] = [];
@@ -70,7 +66,7 @@ export default procedure
               WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
                 AND ${bottlesToDistillers.distillerId} = ${input.entity}
              )) AND ${bottles.id} = ${tastings.bottleId}
-          )`,
+          )`
       );
     }
 
@@ -96,7 +92,7 @@ export default procedure
         throw errors.UNAUTHORIZED();
       }
       where.push(
-        sql`${tastings.createdById} IN (SELECT ${follows.toUserId} FROM ${follows} WHERE ${follows.fromUserId} = ${context.user.id} AND ${follows.status} = 'following')`,
+        sql`${tastings.createdById} IN (SELECT ${follows.toUserId} FROM ${follows} WHERE ${follows.fromUserId} = ${context.user.id} AND ${follows.status} = 'following')`
       );
     }
 
@@ -111,8 +107,8 @@ export default procedure
                   SELECT ${follows.toUserId} FROM ${follows} WHERE ${follows.fromUserId} = ${context.user.id} AND ${follows.status} = 'following'
                 )`,
               ]
-            : []),
-        ),
+            : [])
+        )
       );
     }
 
@@ -129,7 +125,7 @@ export default procedure
       results: await serialize(
         TastingSerializer,
         results.map((t) => t.tastings).slice(0, limit),
-        context.user,
+        context.user
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

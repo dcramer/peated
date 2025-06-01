@@ -22,16 +22,16 @@ export default procedure
       brand: z.coerce.number(),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
-    }),
+    })
   )
   .output(
     z.object({
       results: z.array(BottleSeriesSchema),
       total: z.number(),
       rel: CursorSchema,
-    }),
+    })
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { query, brand, cursor, limit } = input;
     const offset = (cursor - 1) * limit;
 
@@ -41,7 +41,7 @@ export default procedure
 
     if (query) {
       where.push(
-        sql`${bottleSeries.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
+        sql`${bottleSeries.searchVector} @@ websearch_to_tsquery ('english', ${query})`
       );
     }
 

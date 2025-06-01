@@ -8,7 +8,7 @@ import Form from "./form";
 import FormHeader from "./formHeader";
 import LayoutModal from "./layoutModal";
 import SelectField from "./selectField";
-import { type CreateFormOptions, type Option } from "./selectField/types";
+import type { CreateFormOptions, Option } from "./selectField/types";
 import TextField from "./textField";
 
 type FormSchemaType = z.infer<typeof BottleSeriesInputSchema>;

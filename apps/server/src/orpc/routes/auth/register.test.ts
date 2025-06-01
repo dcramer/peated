@@ -35,10 +35,10 @@ describe("POST /auth/register", () => {
         username: "foo",
         email: "foo@example.com",
         password: "example",
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Conflicting object already exists (ID=2).]`,
+      `[Error: Conflicting object already exists (ID=2).]`
     );
   });
 
@@ -50,10 +50,10 @@ describe("POST /auth/register", () => {
         username: "foobar",
         email: "foo@example.com",
         password: "example",
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Conflicting object already exists (ID=2).]`,
+      `[Error: Conflicting object already exists (ID=2).]`
     );
   });
 });

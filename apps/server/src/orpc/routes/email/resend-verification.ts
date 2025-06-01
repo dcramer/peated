@@ -14,7 +14,7 @@ export default procedure
   })
   .input(z.void())
   .output(z.object({}))
-  .handler(async function ({ context: { user }, errors }) {
+  .handler(async ({ context: { user }, errors }) => {
     if (user.verified) {
       throw errors.CONFLICT({
         message: "Account already verified.",

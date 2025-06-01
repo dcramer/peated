@@ -13,7 +13,7 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
         user: "me",
         collection: "default",
         bottle: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -27,7 +27,7 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
         collection: "default",
         bottle: bottle.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     const bottleList = await db
@@ -52,7 +52,7 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
         collection: "default",
         bottle: bottle1.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     // Add second bottle
@@ -62,7 +62,7 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
         collection: "default",
         bottle: bottle2.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     // Get the actual default collection that was used
@@ -79,7 +79,7 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
 
     expect(bottleList.length).toBe(2);
     expect(bottleList.map((b) => b.bottleId).sort()).toEqual(
-      [bottle1.id, bottle2.id].sort(),
+      [bottle1.id, bottle2.id].sort()
     );
     expect(bottleList.every((b) => b.releaseId === null)).toBe(true);
   });
@@ -98,7 +98,7 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
         bottle: bottle.id,
         release: release.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     const bottleList = await db
@@ -123,8 +123,8 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
           bottle: bottle.id,
           release: release.id,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Cannot identify release.]`);
   });
@@ -140,8 +140,8 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
           bottle: bottle.id,
           release: 12345,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Cannot identify release.]`);
   });
@@ -154,8 +154,8 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
           collection: "default",
           bottle: 99999,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Cannot find bottle.]`);
   });
@@ -175,11 +175,11 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
           collection: collection.id,
           bottle: bottle.id,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Cannot modify another user's collection.]`,
+      `[Error: Cannot modify another user's collection.]`
     );
   });
 });

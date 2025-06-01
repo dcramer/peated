@@ -19,7 +19,7 @@ function Page() {
         filter,
         limit: 10,
       },
-    }),
+    })
   );
 
   return <ActivityFeed tastingList={tastingList} filter={filter} />;

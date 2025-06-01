@@ -1,13 +1,13 @@
 import cuid2 from "@paralleldrive/cuid2";
 import { logError } from "@peated/server/lib/log";
 import * as Sentry from "@sentry/node";
-import { type JobFunction } from "./types";
+import type { JobFunction } from "./types";
 
 // instrument a job with Sentry
 function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
   const wrappedJob: JobFunction = async function wrappedJob(
     params,
-    context = {},
+    context = {}
   ) {
     const jobId = cuid2.createId();
 
@@ -19,7 +19,7 @@ function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
         baggage: traceContext?.baggage,
       },
       async () => {
-        return Sentry.withScope(async function (scope) {
+        return Sentry.withScope(async (scope) => {
           scope.setContext("job", {
             name: jobName,
             id: jobId,
@@ -62,12 +62,12 @@ function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
               console.log(
                 `Job ${
                   success ? "succeeded" : "failed"
-                } [${jobName} - ${jobId}] in ${(duration / 1000).toFixed(3)}s`,
+                } [${jobName} - ${jobId}] in ${(duration / 1000).toFixed(3)}s`
               );
-            },
+            }
           );
         });
-      },
+      }
     );
     await Sentry.flush(2000);
     return rv;

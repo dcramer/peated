@@ -1,6 +1,6 @@
 import PeatedLogo from "@peated/web/assets/logo.svg";
 import Link from "@peated/web/components/link";
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 import classNames from "../lib/classNames";
 
 export default function LayoutEmpty({
@@ -16,7 +16,7 @@ export default function LayoutEmpty({
     <main
       className={classNames(
         "mx-auto flex h-screen items-center justify-center p-4 lg:p-8",
-        fullWidth ? "" : "max-w-xl",
+        fullWidth ? "" : "max-w-xl"
       )}
     >
       <div className="flex-auto">

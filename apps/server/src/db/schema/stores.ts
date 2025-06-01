@@ -27,7 +27,7 @@ export const storePrices = pgTable(
     name: text("name").notNull(),
     imageUrl: text("image_url"),
     bottleId: bigint("bottle_id", { mode: "number" }).references(
-      () => bottles.id,
+      () => bottles.id
     ),
     hidden: boolean("hidden").default(false),
     price: integer("price").notNull(),
@@ -42,10 +42,10 @@ export const storePrices = pgTable(
       "btree",
       table.externalSiteId,
       sql`LOWER(${table.name})`,
-      table.volume,
+      table.volume
     ),
     index("store_price_bottle_idx").on(table.bottleId),
-  ],
+  ]
 );
 
 export const storePricesRelations = relations(storePrices, ({ one }) => ({
@@ -78,9 +78,9 @@ export const storePriceHistories = pgTable(
     uniqueIndex("store_price_history_unq").on(
       table.priceId,
       table.volume,
-      table.date,
+      table.date
     ),
-  ],
+  ]
 );
 
 export const storePriceHistoriesRelations = relations(
@@ -90,7 +90,7 @@ export const storePriceHistoriesRelations = relations(
       fields: [storePriceHistories.priceId],
       references: [storePrices.id],
     }),
-  }),
+  })
 );
 
 export type StorePriceHistory = typeof storePriceHistories.$inferSelect;

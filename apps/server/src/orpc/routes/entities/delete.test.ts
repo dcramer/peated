@@ -12,7 +12,7 @@ describe("DELETE /entities/:entity", () => {
 
     const data = await routerClient.entities.delete(
       { entity: entity.id },
-      { context: { user } },
+      { context: { user } }
     );
     expect(data).toEqual({});
 
@@ -28,10 +28,7 @@ describe("DELETE /entities/:entity", () => {
     const entity = await fixtures.Entity({ createdById: user.id });
 
     const err = await waitError(() =>
-      routerClient.entities.delete(
-        { entity: entity.id },
-        { context: { user } },
-      ),
+      routerClient.entities.delete({ entity: entity.id }, { context: { user } })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });

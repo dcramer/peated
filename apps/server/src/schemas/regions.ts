@@ -17,7 +17,7 @@ export const RegionSchema = z.object({
     .nullish()
     .describe("Detailed description of the region's whisky characteristics"),
   location: PointSchema.nullish().describe(
-    "Geographic coordinates of the region",
+    "Geographic coordinates of the region"
   ),
   totalBottles: z.number().describe("Total number of bottles from this region"),
   totalDistillers: z
@@ -34,6 +34,6 @@ export const RegionInputSchema = z.object({
     .nullish()
     .describe("Detailed description of the region's whisky characteristics"),
   descriptionSrc: ContentSourceEnum.nullish().describe(
-    "Source of the region description",
+    "Source of the region description"
   ),
 });

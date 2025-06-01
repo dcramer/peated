@@ -34,15 +34,15 @@ export const regions = pgTable(
     uniqueIndex("region_name_unq").using(
       "btree",
       table.countryId,
-      sql`LOWER(${table.name})`,
+      sql`LOWER(${table.name})`
     ),
     uniqueIndex("region_slug_unq").using(
       "btree",
       table.countryId,
-      sql`LOWER(${table.slug})`,
+      sql`LOWER(${table.slug})`
     ),
     index("region_country_idx").on(table.countryId),
-  ],
+  ]
 );
 
 export const regionsRelations = relations(regions, ({ one, many }) => ({

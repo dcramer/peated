@@ -18,14 +18,14 @@ export default function Page({
 
   const orpc = useORPC();
   const { data: bottle } = useSuspenseQuery(
-    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
+    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } })
   );
   const router = useRouter();
   const bottleUpdateMutation = useMutation(
-    orpc.bottles.update.mutationOptions(),
+    orpc.bottles.update.mutationOptions()
   );
   const bottleImageUpdateMutation = useMutation(
-    orpc.bottles.imageUpdate.mutationOptions(),
+    orpc.bottles.imageUpdate.mutationOptions()
   );
   const { flash } = useFlashMessages();
 
@@ -48,7 +48,7 @@ export default function Page({
             logError(err);
             flash(
               "There was an error uploading your image, but the bottle was saved.",
-              "error",
+              "error"
             );
           }
         }

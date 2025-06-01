@@ -21,14 +21,14 @@ export default procedure
   .input(
     z.object({
       user: z.coerce.number(),
-    }),
+    })
   )
   .output(
     z.object({
       status: FriendStatusEnum,
-    }),
+    })
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { user: userId } = input;
 
     if (context.user.id === userId) {
@@ -56,8 +56,8 @@ export default procedure
             and(
               eq(follows.fromUserId, user.id),
               eq(follows.toUserId, context.user.id),
-              inArray(follows.status, ["pending", "following"]),
-            ),
+              inArray(follows.status, ["pending", "following"])
+            )
           )
       ).length === 1;
 
@@ -73,8 +73,8 @@ export default procedure
             .where(
               and(
                 eq(follows.fromUserId, currentUser.id),
-                eq(follows.toUserId, user.id),
-              ),
+                eq(follows.toUserId, user.id)
+              )
             )
         )
           .map((n) => n.status)

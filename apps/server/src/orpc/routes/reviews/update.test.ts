@@ -13,8 +13,8 @@ describe("PATCH /reviews/:review", () => {
     const err = await waitError(
       routerClient.reviews.update(
         { review: review.id, hidden: true },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -25,7 +25,7 @@ describe("PATCH /reviews/:review", () => {
 
     const newReviewData = await routerClient.reviews.update(
       { review: review.id, hidden: true },
-      { context: { user } },
+      { context: { user } }
     );
 
     const [updatedReview] = await db
@@ -41,7 +41,7 @@ describe("PATCH /reviews/:review", () => {
 
     const newReviewData = await routerClient.reviews.update(
       { review: review.id, hidden: false },
-      { context: { user } },
+      { context: { user } }
     );
 
     const [updatedReview] = await db
@@ -57,8 +57,8 @@ describe("PATCH /reviews/:review", () => {
     const err = await waitError(
       routerClient.reviews.update(
         { review: 999999, hidden: true },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Review not found.]`);
   });
@@ -69,7 +69,7 @@ describe("PATCH /reviews/:review", () => {
 
     const newReviewData = await routerClient.reviews.update(
       { review: review.id }, // no actual update data (hidden is optional)
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(newReviewData.id).toBe(review.id);

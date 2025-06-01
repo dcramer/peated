@@ -17,7 +17,7 @@ export default procedure
   })
   .input(EventInputSchema)
   .output(EventSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const event = await db.transaction(async (tx) => {
       try {
         const [event] = await tx.insert(events).values(input).returning();

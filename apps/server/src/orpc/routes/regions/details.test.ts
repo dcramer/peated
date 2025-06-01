@@ -35,7 +35,7 @@ describe("GET /countries/:country/regions/:region", () => {
       routerClient.regions.details({
         country: "nonexistent-country",
         region: "some-region",
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Invalid country.]`);
   });
@@ -47,7 +47,7 @@ describe("GET /countries/:country/regions/:region", () => {
       routerClient.regions.details({
         country: country.slug,
         region: "nonexistent-region",
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Region not found.]`);
   });

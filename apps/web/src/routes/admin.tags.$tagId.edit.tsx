@@ -15,7 +15,7 @@ function Page() {
       input: {
         tag: tagId,
       },
-    }),
+    })
   );
 
   const navigate = useNavigate();

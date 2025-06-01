@@ -29,7 +29,7 @@ export abstract class Check {
 
   track(
     config: CheckConfigSchema,
-    tasting: TastingWithRelations,
+    tasting: TastingWithRelations
   ): TrackedObject[] {
     return [{ type: "bottle", id: tasting.bottle.id }];
   }
@@ -38,7 +38,7 @@ export abstract class Check {
 
   abstract test(
     config: CheckConfigSchema,
-    tasting: TastingWithRelations,
+    tasting: TastingWithRelations
   ): boolean;
 
   async parseConfig(config: unknown) {
@@ -49,7 +49,7 @@ export abstract class Check {
 // TODO: use math here so perf is better
 export function defaultFormula(
   totalXp: number,
-  maxLevel: number,
+  maxLevel: number
 ): number | null {
   const a = 0.02;
   const b = 0.5;

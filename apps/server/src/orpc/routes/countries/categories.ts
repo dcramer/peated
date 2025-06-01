@@ -20,7 +20,7 @@ export default procedure
   .input(
     z.object({
       country: z.union([z.string(), z.coerce.number()]),
-    }),
+    })
   )
   .output(
     z.object({
@@ -28,12 +28,12 @@ export default procedure
         z.object({
           count: z.number(),
           category: z.string().nullable(),
-        }),
+        })
       ),
       totalCount: z.number(),
-    }),
+    })
   )
-  .handler(async function ({ input, errors }) {
+  .handler(async ({ input, errors }) => {
     let countryId: number;
 
     if (typeof input.country === "number") {
@@ -67,7 +67,7 @@ export default procedure
                   WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
                     AND ${entities.countryId} = ${countryId}
                  )
-              GROUP BY ${bottles.category}`,
+              GROUP BY ${bottles.category}`
       )
     ).rows;
 
@@ -76,7 +76,7 @@ export default procedure
       .from(bottles)
       .innerJoin(
         bottlesToDistillers,
-        eq(bottlesToDistillers.bottleId, bottles.id),
+        eq(bottlesToDistillers.bottleId, bottles.id)
       )
       .innerJoin(entities, eq(bottlesToDistillers.distillerId, entities.id))
       .where(and(eq(entities.countryId, countryId)));

@@ -23,10 +23,10 @@ export default procedure
       entity: z.coerce.number(),
       other: z.number(),
       direction: z.enum(["mergeInto", "mergeFrom"]).default("mergeInto"),
-    }),
+    })
   )
   .output(EntitySchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     if (input.entity === input.other) {
       throw errors.BAD_REQUEST({
         message: "Cannot merge an entity into itself.",

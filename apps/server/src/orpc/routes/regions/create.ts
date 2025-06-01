@@ -1,6 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
-import { countries, regions, type NewRegion } from "@peated/server/db/schema";
+import { type NewRegion, countries, regions } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { ConflictError } from "@peated/server/orpc/errors";
 import { requireMod } from "@peated/server/orpc/middleware/auth";
@@ -22,7 +22,7 @@ export default procedure
   })
   .input(RegionInputSchema.extend({ country: z.string() }))
   .output(RegionSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const [country] = await db
       .select({ id: countries.id })
       .from(countries)
@@ -57,8 +57,8 @@ export default procedure
             .where(
               and(
                 eq(sql`LOWER(${regions.slug})`, data.slug.toLowerCase()),
-                eq(regions.countryId, data.countryId),
-              ),
+                eq(regions.countryId, data.countryId)
+              )
             );
           throw new ConflictError(existingRegion, err);
         } else if (
@@ -71,8 +71,8 @@ export default procedure
             .where(
               and(
                 eq(sql`LOWER(${regions.name})`, data.name.toLowerCase()),
-                eq(regions.countryId, data.countryId),
-              ),
+                eq(regions.countryId, data.countryId)
+              )
             );
           throw new ConflictError(existingRegion, err);
         }

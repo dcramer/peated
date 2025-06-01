@@ -17,7 +17,7 @@ export default procedure
   })
   .input(InputSchema)
   .output(z.any())
-  .handler(async function ({ input, context }) {
+  .handler(async ({ input, context }) => {
     const result = await getGeneratedCountryDetails(input);
     return result;
   });

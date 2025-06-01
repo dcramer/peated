@@ -115,7 +115,8 @@ export default function ReleaseForm({
 
           <TextField
             {...register("statedAge", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              setValueAs: (v) =>
+                v === "" || !v ? null : Number.parseInt(v, 10),
             })}
             error={errors.statedAge}
             type="number"
@@ -127,7 +128,7 @@ export default function ReleaseForm({
 
           <TextField
             {...register("abv", {
-              setValueAs: (v) => (v === "" || !v ? null : parseFloat(v)),
+              setValueAs: (v) => (v === "" || !v ? null : Number.parseFloat(v)),
             })}
             error={errors.abv}
             type="number"
@@ -142,7 +143,8 @@ export default function ReleaseForm({
 
           <TextField
             {...register("releaseYear", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              setValueAs: (v) =>
+                v === "" || !v ? null : Number.parseInt(v, 10),
             })}
             error={errors.releaseYear}
             type="number"
@@ -155,7 +157,8 @@ export default function ReleaseForm({
 
           <TextField
             {...register("vintageYear", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              setValueAs: (v) =>
+                v === "" || !v ? null : Number.parseInt(v, 10),
             })}
             error={errors.vintageYear}
             type="number"

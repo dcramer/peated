@@ -24,7 +24,7 @@ describe("GET /prices", () => {
 
     const result = await routerClient.prices.list(
       {},
-      { context: { user: admin } },
+      { context: { user: admin } }
     );
 
     expect(result.results.length).toBe(2);
@@ -47,7 +47,7 @@ describe("GET /prices", () => {
 
     const result = await routerClient.prices.list(
       { site: "whiskyadvocate" },
-      { context: { user: admin } },
+      { context: { user: admin } }
     );
 
     expect(result.results.length).toBe(1);
@@ -66,7 +66,7 @@ describe("GET /prices", () => {
 
     const result = await routerClient.prices.list(
       { onlyUnknown: true },
-      { context: { user: admin } },
+      { context: { user: admin } }
     );
 
     expect(result.results.length).toBe(1);
@@ -87,7 +87,7 @@ describe("GET /prices", () => {
 
     const result = await routerClient.prices.list(
       { query: "Unique" },
-      { context: { user: admin } },
+      { context: { user: admin } }
     );
 
     expect(result.results.length).toBe(1);
@@ -112,7 +112,7 @@ describe("GET /prices", () => {
     const user = await fixtures.User({ admin: false });
 
     const err = await waitError(
-      routerClient.prices.list({}, { context: { user } }),
+      routerClient.prices.list({}, { context: { user } })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -128,7 +128,7 @@ describe("GET /prices", () => {
 
     const result = await routerClient.prices.list(
       {},
-      { context: { user: admin } },
+      { context: { user: admin } }
     );
 
     expect(result.results.length).toBe(1);
@@ -155,7 +155,7 @@ describe("GET /prices", () => {
 
     const result = await routerClient.prices.list(
       {},
-      { context: { user: admin } },
+      { context: { user: admin } }
     );
 
     expect(result.results.length).toBe(2);
@@ -185,7 +185,7 @@ describe("GET /prices", () => {
 
     const result = await routerClient.prices.list(
       { onlyValid: true },
-      { context: { user: admin } },
+      { context: { user: admin } }
     );
 
     expect(result.results.length).toBe(1);

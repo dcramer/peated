@@ -5,10 +5,10 @@ import { getSession } from "@peated/web/lib/session.server";
 import "@peated/web/styles/index.css";
 import * as Sentry from "@sentry/react";
 import {
-  createRootRoute,
   HeadContent,
   Outlet,
   Scripts,
+  createRootRoute,
 } from "@tanstack/react-router";
 import React from "react";
 import Providers from "../app/providers/providers";
@@ -38,7 +38,7 @@ export const Route = createRootRoute({
             username: session.user.username,
             email: session.user.email,
           }
-        : null,
+        : null
     );
 
     return {

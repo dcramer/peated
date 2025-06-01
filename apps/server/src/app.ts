@@ -1,7 +1,9 @@
+import { setTimeout } from "node:timers/promises";
+import { format } from "path";
 import { Storage } from "@google-cloud/storage";
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
-import { onError, ORPCError, ValidationError } from "@orpc/server";
+import { ORPCError, ValidationError, onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { BatchHandlerPlugin } from "@orpc/server/plugins";
 import { ZodSmartCoercionPlugin, ZodToJsonSchemaConverter } from "@orpc/zod";
@@ -22,8 +24,6 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import { contentType } from "mime-types";
-import { setTimeout } from "node:timers/promises";
-import { format } from "path";
 import type { ZodIssue } from "zod";
 import { ZodError } from "zod";
 import config from "./config";
@@ -109,14 +109,14 @@ export const app = new Hono()
       credentials: true,
       origin: config.CORS_HOST.split(","),
       maxAge: 600,
-    }),
+    })
   )
   .use(
     "*",
     cache({
       cacheName: "default",
       cacheControl: "private, no-cache, no-store, max-age=0, must-revalidate",
-    }),
+    })
   )
 
   .use(
@@ -124,7 +124,7 @@ export const app = new Hono()
     secureHeaders({
       crossOriginResourcePolicy: "same-site",
       // contentSecurityPolicy: false,
-    }),
+    })
   )
   .use("*", async (c, next) => {
     if (config.ENV === "development") {
@@ -178,7 +178,7 @@ export const app = new Hono()
     c.header("Cache-Control", `public, max-age=${ONE_DAY}`);
     c.header(
       "Content-Type",
-      contentType(filename) || "application/octet-stream",
+      contentType(filename) || "application/octet-stream"
     );
 
     // Return the stream
@@ -224,7 +224,7 @@ export const app = new Hono()
           description: "The Peated API",
         },
         servers: [{ url: "/v1" } /** Should use absolute URLs in production */],
-      }),
+      })
     );
   })
   .use("/v1/*", async (c, next) => {

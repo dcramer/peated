@@ -1,7 +1,7 @@
 "use client";
 
 import { toTitleCase } from "@peated/server/lib/strings";
-import { type EntityType } from "@peated/server/types";
+import type { EntityType } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import FilterSidebarSection from "@peated/web/components/filterListSection";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -18,7 +18,7 @@ export default function EntityListSidebar({ type }: { type: EntityType }) {
         onlyMajor: true,
         sort: "-bottles",
       },
-    }),
+    })
   );
 
   const { results: majorCountryList } = data;

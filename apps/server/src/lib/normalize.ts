@@ -1,5 +1,5 @@
 import { CATEGORY_LIST } from "../constants";
-import { type Category } from "../types";
+import type { Category } from "../types";
 import { formatCategoryName } from "./format";
 import { stripSuffix } from "./strings";
 
@@ -105,7 +105,7 @@ export function normalizeBottle({
   // identify age from [number]-year-old
   const match = name.match(/\b(\d{1,2})-year-old($|\s|,)/i);
   if (!statedAge && match) {
-    statedAge = parseInt(match[1], 10);
+    statedAge = Number.parseInt(match[1], 10);
   }
 
   // detect vintage - always keep this in the bottle name as its key to the identity
@@ -113,7 +113,10 @@ export function normalizeBottle({
   const vintageYearMatch = name.match(/\((\d{4}) vintage\)|(\d{4}) vintage/i);
   if (vintageYearMatch) {
     if (!vintageYear) {
-      vintageYear = parseInt(vintageYearMatch[1] || vintageYearMatch[2], 10);
+      vintageYear = Number.parseInt(
+        vintageYearMatch[1] || vintageYearMatch[2],
+        10
+      );
       if (vintageYear < 1900 || vintageYear > currentYear) vintageYear = null;
     }
   }
@@ -122,7 +125,10 @@ export function normalizeBottle({
   const releaseYearMatch = name.match(/\((\d{4}) release\)|(\d{4}) release/i);
   if (releaseYearMatch) {
     if (!releaseYear) {
-      releaseYear = parseInt(releaseYearMatch[1] || releaseYearMatch[2], 10);
+      releaseYear = Number.parseInt(
+        releaseYearMatch[1] || releaseYearMatch[2],
+        10
+      );
       if (releaseYear < 1900 || releaseYear > currentYear) releaseYear = null;
     }
   }
@@ -131,9 +137,9 @@ export function normalizeBottle({
       name.replace(
         new RegExp(
           `(\\s${releaseYear}$|\\(${releaseYear}\\)($|\\s)|\\(${releaseYear} release\\)($|\\s)|${releaseYear} release($|\\s))`,
-          "i",
+          "i"
         ),
-        "",
+        ""
       ) || name;
   }
 
@@ -141,7 +147,7 @@ export function normalizeBottle({
   if (statedAge && vintageYear && vintageYear + statedAge > currentYear) {
     // invalid vintage - probably confused w/ release
     console.warn(
-      "Invalid vintageYear (vintageYear must be less than the currentYear - statedAge).",
+      "Invalid vintageYear (vintageYear must be less than the currentYear - statedAge)."
     );
     vintageYear = null;
   }
@@ -156,7 +162,7 @@ export function normalizeBottle({
 
   if (
     name.match(
-      /\bCask Strength|Barrel Strength|Barrel Proof|Full Proof|Natural Strength|Original Strength|Undiluted|Cask Bottling\b/i,
+      /\bCask Strength|Barrel Strength|Barrel Proof|Full Proof|Natural Strength|Original Strength|Undiluted|Cask Bottling\b/i
     )
   ) {
     caskStrength = true;
@@ -166,7 +172,7 @@ export function normalizeBottle({
   // except when its the only descriptor
   if (
     name.match(
-      /\Single Cask|Single Barrel|Cask No.?|Cask Number|Barrel No.?|Barrel Number|Selected Cask\b/i,
+      /\Single Cask|Single Barrel|Cask No.?|Cask Number|Barrel No.?|Barrel Number|Selected Cask\b/i
     )
   ) {
     singleCask = true;
@@ -205,12 +211,12 @@ function convertWordToNumber(word: string) {
 
 const AGE_NORM_REGEXP = new RegExp(
   `\\b(\\d{1,2}|${Object.keys(NUMBERS).join("|")})(?:[\\s-]?(?:years?|yrs?.?))(?:[\\s-]old)?($|[\\s,])`,
-  "i",
+  "i"
 );
 
 const AGE_EXTRACT_REGEXP = new RegExp(
   `(${Object.keys(NUMBERS).join("|")})-year-old`,
-  "i",
+  "i"
 );
 
 export function normalizeBottleAge({
@@ -232,14 +238,14 @@ export function normalizeBottleAge({
   if (statedAge) {
     name = name.replace(
       new RegExp(`(^|\\s)(${statedAge})($|\\s)`),
-      `$1${statedAge}${ageSuffix}$3`,
+      `$1${statedAge}${ageSuffix}$3`
     );
   }
 
   // identify age from [number]-year-old
   const match = name.match(/\b(\d{1,2})-year-old($|\s|,)/i);
   if (!statedAge && match) {
-    statedAge = parseInt(match[1], 10);
+    statedAge = Number.parseInt(match[1], 10);
   }
 
   // move age to the beginning of the bottle name if brandPrefix is available,
@@ -271,7 +277,7 @@ export function normalizeBottleBatchNumber(name: string) {
         return `${match[0] || ""}(Batch ${convertWordToNumber(match[2])})${match[5] || ""}`;
       else
         return `${match[0] || ""}(Batch ${convertWordToNumber(match[4])})${match[5] || ""}`;
-    },
+    }
   );
 }
 
@@ -284,9 +290,9 @@ export function normalizeVolume(volume: string): number | null {
 
   switch (measure.toLowerCase()) {
     case "l":
-      return parseFloat(amount) * 1000;
+      return Number.parseFloat(amount) * 1000;
     case "ml":
-      return parseInt(amount, 10);
+      return Number.parseInt(amount, 10);
     default:
       return null;
   }

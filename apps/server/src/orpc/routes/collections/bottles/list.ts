@@ -28,15 +28,15 @@ export default procedure
       user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
-    }),
+    })
   )
   .output(
     z.object({
       results: z.array(CollectionBottleSchema),
       rel: CursorSchema,
-    }),
+    })
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { cursor, limit } = input;
 
     const user = await getUserFromId(db, input.user, context.user);
@@ -59,7 +59,7 @@ export default procedure
             where: (collections, { and, eq }) =>
               and(
                 eq(collections.createdById, user.id),
-                eq(collections.id, input.collection as number),
+                eq(collections.id, input.collection as number)
               ),
           });
 
@@ -82,7 +82,7 @@ export default procedure
       .innerJoin(bottles, eq(bottles.id, collectionBottles.bottleId))
       .leftJoin(
         bottleReleases,
-        eq(bottleReleases.id, collectionBottles.releaseId),
+        eq(bottleReleases.id, collectionBottles.releaseId)
       )
       .limit(limit + 1)
       .offset(offset)
@@ -98,7 +98,7 @@ export default procedure
             release,
             bottle,
           })),
-        context.user,
+        context.user
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

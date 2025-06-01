@@ -1,6 +1,6 @@
 "use client";
 
-import { type PagingRel } from "@peated/server/types";
+import type { PagingRel } from "@peated/server/types";
 import { useSearchParams } from "next/navigation";
 import { buildQueryString } from "../lib/urls";
 import Button from "./button";

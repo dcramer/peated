@@ -3,16 +3,16 @@ import config from "@peated/server/config";
 import { DEFAULT_CREATED_BY_ID } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
-  changes,
-  entities,
   type Country,
   type Entity,
   type Region,
+  changes,
+  entities,
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 
 async function locateAddress(
-  entity: Entity & { country: Country | null; region: Region | null },
+  entity: Entity & { country: Country | null; region: Region | null }
 ) {
   if (!config.GOOGLE_MAPS_API_KEY) {
     throw new Error("GOOGLE_MAPS_API_KEY is not configured");
@@ -39,7 +39,7 @@ async function locateAddress(
 }
 
 async function geocodeAddress(
-  entity: Entity & { country: Country | null; region: Region | null },
+  entity: Entity & { country: Country | null; region: Region | null }
 ) {
   if (!config.GOOGLE_MAPS_API_KEY) {
     throw new Error("GOOGLE_MAPS_API_KEY is not configured");
@@ -122,7 +122,7 @@ export default async ({
   }
 
   console.log(
-    `Updating location for Entity ${entity.id}: ${match.formatted_address} (${match.geometry.location.lat}, ${match.geometry.location.lng})`,
+    `Updating location for Entity ${entity.id}: ${match.formatted_address} (${match.geometry.location.lat}, ${match.geometry.location.lng})`
   );
 
   const data: Partial<Entity> = {

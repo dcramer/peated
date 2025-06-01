@@ -21,9 +21,9 @@ function Page() {
   const { data: event } = useSuspenseQuery(
     orpc.events.details.queryOptions({
       input: {
-        event: parseInt(eventId, 10),
+        event: Number.parseInt(eventId, 10),
       },
-    }),
+    })
   );
 
   return (

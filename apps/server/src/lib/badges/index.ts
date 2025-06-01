@@ -1,14 +1,14 @@
-import { db, type AnyDatabase } from "@peated/server/db";
+import { type AnyDatabase, db } from "@peated/server/db";
 import type { BadgeAward } from "@peated/server/db/schema";
 import {
-  badgeAwards,
+  type Badge,
   badgeAwardTrackedObjects,
+  badgeAwards,
   bottles,
   bottlesToDistillers,
   entities,
   tastingBadgeAwards,
   tastings,
-  type Badge,
 } from "@peated/server/db/schema";
 import type { SQL } from "drizzle-orm";
 import { and, eq, inArray, sql } from "drizzle-orm";
@@ -17,13 +17,13 @@ import type { BadgeCheckType } from "../../types";
 import { getCheck } from "./checks";
 import { getFormula } from "./formula";
 import { getTracker } from "./trackers";
-import { type TastingWithRelations, type TrackedObject } from "./types";
+import type { TastingWithRelations, TrackedObject } from "./types";
 
 // TODO(dcramer): at some point we'll want to cache this/optimize the db layer
 // but for now its probably fine
 export async function awardAllBadgeXp(
   db: AnyDatabase,
-  tasting: TastingWithRelations,
+  tasting: TastingWithRelations
 ) {
   const results: (BadgeAward & {
     prevLevel: number;
@@ -55,7 +55,7 @@ export async function rescanBadge(badge: Badge) {
         type,
         config: await impl.parseConfig(config),
       };
-    }),
+    })
   );
 
   const where: SQL[] = [];
@@ -96,8 +96,8 @@ export async function rescanBadge(badge: Badge) {
     const distillerQuery = await baseDistillerQuery.where(
       inArray(
         bottlesToDistillers.bottleId,
-        results.map(({ bottle }) => bottle.id),
-      ),
+        results.map(({ bottle }) => bottle.id)
+      )
     );
 
     offset += results.length;
@@ -115,7 +115,7 @@ export async function rescanBadge(badge: Badge) {
             bottlesToDistillers: distillerQuery
               .filter(
                 ({ bottle_distiller }) =>
-                  bottle_distiller.bottleId === bottle.id,
+                  bottle_distiller.bottleId === bottle.id
               )
               .map(({ bottle_distiller, distiller }) => ({
                 ...bottle_distiller,
@@ -123,7 +123,7 @@ export async function rescanBadge(badge: Badge) {
               })),
           },
         },
-        badge,
+        badge
       );
     }
   }
@@ -138,7 +138,7 @@ export async function checkBadgeConfig(type: BadgeCheckType, config: unknown) {
 async function awardXp(
   db: AnyDatabase,
   tasting: TastingWithRelations,
-  badge: Badge,
+  badge: Badge
 ) {
   console.info(`[badges] Checking badge ${badge.id} for ${tasting.id}`);
 
@@ -150,7 +150,7 @@ async function awardXp(
         type,
         config: await impl.parseConfig(config),
       };
-    }),
+    })
   );
 
   const trackedObjects: TrackedObject[] = [];
@@ -238,7 +238,7 @@ async function awardXp(
           level: newLevel,
         })
         .where(
-          and(eq(badgeAwards.id, award.id), eq(badgeAwards.level, award.level)),
+          and(eq(badgeAwards.id, award.id), eq(badgeAwards.level, award.level))
         );
       if (!result.rowCount) {
         throw new Error("We seemed to have hit a db race condition");

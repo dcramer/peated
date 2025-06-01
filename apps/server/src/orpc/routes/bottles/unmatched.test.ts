@@ -12,7 +12,7 @@ describe("GET /bottles/unmatched", () => {
     const user = await fixtures.User();
 
     const err = await waitError(() =>
-      routerClient.bottles.unmatched({}, { context: { user } }),
+      routerClient.bottles.unmatched({}, { context: { user } })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -22,7 +22,7 @@ describe("GET /bottles/unmatched", () => {
 
     const result = await routerClient.bottles.unmatched(
       {},
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(result.results).toEqual([]);
@@ -61,20 +61,20 @@ describe("GET /bottles/unmatched", () => {
 
     const result = await routerClient.bottles.unmatched(
       {},
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(result.results).toHaveLength(2);
     expect(result.results.map((r) => r.name)).toEqual(
-      expect.arrayContaining(["Test Unmatched 1", "Test Unmatched 2"]),
+      expect.arrayContaining(["Test Unmatched 1", "Test Unmatched 2"])
     );
 
     // Verify matched and ignored aliases are not included
     expect(
-      result.results.find((r) => r.name === "Test Matched"),
+      result.results.find((r) => r.name === "Test Matched")
     ).toBeUndefined();
     expect(
-      result.results.find((r) => r.name === "Test Ignored"),
+      result.results.find((r) => r.name === "Test Ignored")
     ).toBeUndefined();
   });
 
@@ -88,7 +88,7 @@ describe("GET /bottles/unmatched", () => {
 
     const result = await routerClient.bottles.unmatched(
       { query: "Apple" },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(result.results).toHaveLength(1);
@@ -109,7 +109,7 @@ describe("GET /bottles/unmatched", () => {
     // Get first page with limit 2
     const firstPage = await routerClient.bottles.unmatched(
       { limit: 2 },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(firstPage.results).toHaveLength(2);
@@ -119,7 +119,7 @@ describe("GET /bottles/unmatched", () => {
     // Get second page
     const secondPage = await routerClient.bottles.unmatched(
       { limit: 2, cursor: 2 },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(secondPage.results).toHaveLength(1);

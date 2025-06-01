@@ -60,7 +60,7 @@ function BottleScaffold({
             ? "hover:bg-highlight-dark"
             : "hover:bg-slate-900"
           : "",
-        onClick ? "cursor-pointer" : "",
+        onClick ? "cursor-pointer" : ""
       )}
       onClick={onClick}
     >
@@ -69,7 +69,7 @@ function BottleScaffold({
         <div
           className={classNames(
             "flex flex-row gap-x-1 text-sm",
-            color === "highlight" ? "" : "text-muted",
+            color === "highlight" ? "" : "text-muted"
           )}
         >
           {release}
@@ -80,7 +80,7 @@ function BottleScaffold({
       <div
         className={classNames(
           color === "highlight" ? "" : "text-muted",
-          "hidden w-[200px] flex-col items-end justify-center whitespace-nowrap text-sm sm:flex",
+          "hidden w-[200px] flex-col items-end justify-center whitespace-nowrap text-sm sm:flex"
         )}
       >
         <div className="max-w-full truncate">{category}</div>

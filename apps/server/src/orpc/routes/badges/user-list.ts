@@ -14,14 +14,14 @@ export const Serializer = serializer({
   name: "badgeAwardUser",
   attrs: async (
     itemList: (BadgeAward & { user: User })[],
-    currentUser?: User,
+    currentUser?: User
   ) => {
     const userList = itemList.map((i) => i.user).filter(notEmpty);
 
     const usersById = Object.fromEntries(
       (await serialize(UserSerializer, userList, currentUser)).map(
-        (data, index) => [userList[index].id, data],
-      ),
+        (data, index) => [userList[index].id, data]
+      )
     );
 
     return Object.fromEntries(
@@ -32,13 +32,13 @@ export const Serializer = serializer({
             user: usersById[item.userId],
           },
         ];
-      }),
+      })
     );
   },
   item: (
     item: BadgeAward & { user: User },
     attrs: Record<string, any>,
-    currentUser?: User,
+    currentUser?: User
   ) => {
     return {
       id: item.id,
@@ -64,7 +64,7 @@ const OutputSchema = z.object({
       level: z.number(),
       user: UserSchema,
       createdAt: z.string(),
-    }),
+    })
   ),
   rel: z.object({
     nextCursor: z.number().nullable(),
@@ -83,11 +83,7 @@ export default procedure
   .use(requireAuth)
   .input(InputSchema)
   .output(OutputSchema)
-  .handler(async function ({
-    input: { cursor, limit, ...input },
-    context,
-    errors,
-  }) {
+  .handler(async ({ input: { cursor, limit, ...input }, context, errors }) => {
     const [badge] = await db
       .select()
       .from(badges)
@@ -111,8 +107,8 @@ export default procedure
         and(
           eq(users.private, false),
           eq(badgeAwards.badgeId, badge.id),
-          ne(badgeAwards.level, 0),
-        ),
+          ne(badgeAwards.level, 0)
+        )
       )
       .limit(limit + 1)
       .offset(offset)
@@ -127,7 +123,7 @@ export default procedure
             user: i.user,
           }))
           .slice(0, limit),
-        context.user,
+        context.user
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

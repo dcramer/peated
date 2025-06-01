@@ -1,11 +1,11 @@
 import { and, eq, inArray } from "drizzle-orm";
-import { type z } from "zod";
+import type { z } from "zod";
 import { serializer } from ".";
 import config from "../config";
 import { db } from "../db";
-import { tastings, type BottleRelease, type User } from "../db/schema";
+import { type BottleRelease, type User, tastings } from "../db/schema";
 import { absoluteUrl } from "../lib/urls";
-import { type BottleReleaseSchema } from "../schemas";
+import type { BottleReleaseSchema } from "../schemas";
 
 type Attrs = {
   hasTasted: boolean;
@@ -16,7 +16,7 @@ export const BottleReleaseSerializer = serializer({
   name: "bottleRelease",
   attrs: async (
     itemList: BottleRelease[],
-    currentUser?: User,
+    currentUser?: User
   ): Promise<Record<number, Attrs>> => {
     const tastedSet = currentUser
       ? new Set(
@@ -28,12 +28,12 @@ export const BottleReleaseSerializer = serializer({
                 and(
                   inArray(
                     tastings.releaseId,
-                    itemList.map((i) => i.id),
+                    itemList.map((i) => i.id)
                   ),
-                  eq(tastings.createdById, currentUser.id),
-                ),
+                  eq(tastings.createdById, currentUser.id)
+                )
               )
-          ).map((r) => r.id),
+          ).map((r) => r.id)
         )
       : new Set();
 
@@ -44,13 +44,13 @@ export const BottleReleaseSerializer = serializer({
           hasTasted: tastedSet.has(item.id),
           isFavorite: false, // TODO
         },
-      ]),
+      ])
     );
   },
 
   item: (
     item: BottleRelease,
-    attrs: Attrs,
+    attrs: Attrs
   ): z.infer<typeof BottleReleaseSchema> => {
     return {
       id: item.id,

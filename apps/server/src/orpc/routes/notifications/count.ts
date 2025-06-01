@@ -20,10 +20,10 @@ export default procedure
       .object({
         filter: z.enum(["unread", "all"]).nullish(),
       })
-      .default({}),
+      .default({})
   )
   .output(z.object({ count: z.number() }))
-  .handler(async function ({ input, context }) {
+  .handler(async ({ input, context }) => {
     const where: (SQL<unknown> | undefined)[] = [
       eq(notifications.userId, context.user.id),
     ];

@@ -10,7 +10,7 @@ describe("GET /changes", () => {
       {},
       {
         context: { user: defaults.user },
-      },
+      }
     );
 
     expect(results.length).toBe(2);

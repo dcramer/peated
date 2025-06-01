@@ -69,7 +69,7 @@ export default procedure
       query: z.coerce.string(),
       include: z.array(z.enum(INCLUDE_LIST)).default([...INCLUDE_LIST]),
       limit: z.coerce.number().lte(100),
-    }),
+    })
   )
   .output(
     z.object({
@@ -88,11 +88,11 @@ export default procedure
             type: z.literal("user"),
             ref: UserSchema,
           }),
-        ]),
+        ])
       ),
-    }),
+    })
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { query, include, limit } = input;
     const promises = [];
 
@@ -106,12 +106,12 @@ export default procedure
               limit,
               sort: "rank",
             },
-            { context },
+            { context }
           )
           .then((data: any) =>
-            data.results.map((b: any) => ({ type: "bottle", ref: b })),
+            data.results.map((b: any) => ({ type: "bottle", ref: b }))
           )
-          .catch(() => []),
+          .catch(() => [])
       );
     }
 
@@ -125,12 +125,12 @@ export default procedure
               sort: "name",
               limit,
             },
-            { context },
+            { context }
           )
           .then((data: any) =>
-            data.results.map((b: any) => ({ type: "user", ref: b })),
+            data.results.map((b: any) => ({ type: "user", ref: b }))
           )
-          .catch(() => []),
+          .catch(() => [])
       );
     }
 
@@ -144,12 +144,12 @@ export default procedure
               limit,
               sort: "rank",
             },
-            { context },
+            { context }
           )
           .then((data: any) =>
-            data.results.map((b: any) => ({ type: "entity", ref: b })),
+            data.results.map((b: any) => ({ type: "entity", ref: b }))
           )
-          .catch(() => []),
+          .catch(() => [])
       );
     }
 
@@ -157,7 +157,7 @@ export default procedure
 
     const sortedResults = sortResults(
       query,
-      results.reduce((prev: any[], cur: any[]) => [...prev, ...cur], []),
+      results.reduce((prev: any[], cur: any[]) => [...prev, ...cur], [])
     );
 
     return {

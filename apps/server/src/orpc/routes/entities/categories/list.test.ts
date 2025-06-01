@@ -26,7 +26,7 @@ describe("GET /entities/:entity/categories", () => {
     const { results, totalCount } = await routerClient.entities.categories.list(
       {
         entity: entity.id,
-      },
+      }
     );
 
     expect(results).toHaveLength(2);
@@ -40,7 +40,7 @@ describe("GET /entities/:entity/categories", () => {
           category: "single_malt",
           count: 1,
         },
-      ]),
+      ])
     );
     expect(totalCount).toBe(3);
   });
@@ -55,7 +55,7 @@ describe("GET /entities/:entity/categories", () => {
     const { results, totalCount } = await routerClient.entities.categories.list(
       {
         entity: distiller.id,
-      },
+      }
     );
 
     expect(results).toHaveLength(1);
@@ -73,7 +73,7 @@ describe("GET /entities/:entity/categories", () => {
     const { results, totalCount } = await routerClient.entities.categories.list(
       {
         entity: entity.id,
-      },
+      }
     );
 
     expect(results).toHaveLength(0);
@@ -84,7 +84,7 @@ describe("GET /entities/:entity/categories", () => {
     const err = await waitError(() =>
       routerClient.entities.categories.list({
         entity: 999999,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Entity not found.]`);
   });

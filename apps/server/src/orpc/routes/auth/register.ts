@@ -26,10 +26,10 @@ export default procedure
       username: z.string().toLowerCase(),
       email: z.string(),
       password: z.string(),
-    }),
+    })
   )
   .output(AuthSchema)
-  .handler(async function ({ input: { username, email, password }, errors }) {
+  .handler(async ({ input: { username, email, password }, errors }) => {
     const [user] = await db.transaction(async (tx) => {
       try {
         return await tx
@@ -53,7 +53,7 @@ export default procedure
             .where(
               err.constraint === "user_username_unq"
                 ? eq(sql`LOWER(${users.username})`, username.toLowerCase())
-                : eq(sql`LOWER(${users.email})`, email.toLowerCase()),
+                : eq(sql`LOWER(${users.email})`, email.toLowerCase())
             );
           throw errors.CONFLICT({
             message: `Conflicting object already exists (ID=${existingUser.id}).`,

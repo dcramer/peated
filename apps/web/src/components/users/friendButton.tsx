@@ -1,6 +1,6 @@
 "use client";
 
-import { type User } from "@peated/server/types";
+import type { User } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -23,7 +23,7 @@ export default function FriendButton({ user }: { user: User }) {
                 ...oldData,
                 friendStatus: data.status,
               }
-            : oldData,
+            : oldData
       );
       setFriendStatus(data.status);
     },
@@ -40,7 +40,7 @@ export default function FriendButton({ user }: { user: User }) {
                 ...oldData,
                 friendStatus: data.status,
               }
-            : oldData,
+            : oldData
       );
       setFriendStatus("none");
     },

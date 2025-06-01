@@ -26,7 +26,7 @@ describe("DELETE /bottle-aliases/:name", () => {
       { alias: alias.name },
       {
         context: { user },
-      },
+      }
     );
     expect(data).toEqual({});
 
@@ -60,8 +60,8 @@ describe("DELETE /bottle-aliases/:name", () => {
         { alias: alias.name },
         {
           context: { user },
-        },
-      ),
+        }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });

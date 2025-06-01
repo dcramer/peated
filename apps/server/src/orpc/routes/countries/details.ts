@@ -19,10 +19,10 @@ export default procedure
   .input(
     z.object({
       country: z.string(),
-    }),
+    })
   )
   .output(CountrySchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const [country] = await db
       .select()
       .from(countries)

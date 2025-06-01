@@ -47,7 +47,7 @@ describe("GET /users/:user/regions", () => {
       {
         user: "me",
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(totalCount).toEqual(2);
@@ -82,7 +82,7 @@ describe("GET /users/:user/regions", () => {
     const err = await waitError(() =>
       routerClient.users.regionList({
         user: otherUser.id,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: User's profile is not public.]`);
   });
@@ -99,7 +99,7 @@ describe("GET /users/:user/regions", () => {
       {
         user: otherUser.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toEqual(0);
@@ -112,7 +112,7 @@ describe("GET /users/:user/regions", () => {
       {
         user: otherUser.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toEqual(0);

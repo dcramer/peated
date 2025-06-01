@@ -33,7 +33,7 @@ function Verify() {
         setSuccess(true);
         await updateSession();
       },
-    }),
+    })
   );
 
   // Handle redirect logic in useEffect to avoid hook ordering issues
@@ -63,7 +63,7 @@ function Verify() {
         onSuccess: () => {
           setLoading(false);
         },
-      },
+      }
     );
   }, [token]);
 

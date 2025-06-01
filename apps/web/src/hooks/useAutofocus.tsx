@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 export default function useAutofocus<ElementType extends HTMLElement>(
-  condition?: () => boolean,
+  condition?: () => boolean
 ) {
   const ref = useRef<ElementType>(null);
   useEffect(() => {

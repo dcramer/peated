@@ -1,6 +1,6 @@
 "use client";
 
-import { type ExternalSiteType } from "@peated/server/types";
+import type { ExternalSiteType } from "@peated/server/types";
 import SiteForm from "@peated/web/components/admin/siteForm";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
@@ -17,12 +17,12 @@ export default function Page({
       input: {
         site: siteId as any,
       },
-    }),
+    })
   );
 
   const router = useRouter();
   const siteUpdateMutation = useMutation(
-    orpc.externalSites.update.mutationOptions(),
+    orpc.externalSites.update.mutationOptions()
   );
 
   return (

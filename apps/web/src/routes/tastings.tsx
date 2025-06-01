@@ -49,7 +49,7 @@ function TastingList() {
 
   const orpc = useORPC();
   const { data } = useSuspenseQuery(
-    orpc.tastings.list.queryOptions(queryParams),
+    orpc.tastings.list.queryOptions(queryParams)
   );
 
   return (

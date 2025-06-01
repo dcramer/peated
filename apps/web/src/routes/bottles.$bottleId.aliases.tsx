@@ -18,10 +18,10 @@ function Page() {
   const { data: aliasList } = useSuspenseQuery(
     orpc.bottleAliases.list.queryOptions({
       input: { bottle: Number(bottleId) },
-    }),
+    })
   );
   const deleteAliasMutation = useMutation(
-    orpc.bottleAliases.delete.mutationOptions(),
+    orpc.bottleAliases.delete.mutationOptions()
   );
 
   return (

@@ -65,7 +65,7 @@ export default function ImageEditorModal({
                     value={scale}
                     className="range range-sm mb-6 block h-1 w-full cursor-pointer"
                     onInput={(e) => {
-                      setScale(parseFloat((e as any).target.value));
+                      setScale(Number.parseFloat((e as any).target.value));
                     }}
                   />
                   <div className="flex gap-x-2">

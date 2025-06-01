@@ -12,7 +12,7 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
         user: "me",
         collection: "default",
         bottle: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -34,7 +34,7 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
         collection: collection.id,
         bottle: bottle.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     const bottleList = await db
@@ -72,7 +72,7 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
         bottle: bottle.id,
         release: release.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     const bottleList = await db
@@ -81,8 +81,8 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
       .where(
         and(
           eq(collectionBottles.bottleId, bottle.id),
-          eq(collectionBottles.releaseId, release.id),
-        ),
+          eq(collectionBottles.releaseId, release.id)
+        )
       );
 
     expect(bottleList.length).toBe(0);
@@ -130,7 +130,7 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
         bottle: bottle.id,
         release: release1.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     // Should only delete release1, leaving release2
@@ -166,7 +166,7 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
         collection: collection.id,
         bottle: bottle.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     // Verify totalBottles hasn't changed

@@ -1,10 +1,10 @@
+import { Readable } from "stream";
 import { defaultHeaders } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { bottles, storePrices } from "@peated/server/db/schema";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
 import { logger } from "@sentry/node";
 import { eq } from "drizzle-orm";
-import { Readable } from "stream";
 
 async function fetchAndStoreImage(imageUrl: string): Promise<string | null> {
   const filename = imageUrl.split("/").pop() || "image";

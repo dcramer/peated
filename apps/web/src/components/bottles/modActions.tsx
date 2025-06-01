@@ -2,7 +2,7 @@
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import { type Bottle } from "@peated/server/types";
+import type { Bottle } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
 import Link from "@peated/web/components/link";
@@ -17,7 +17,7 @@ export default function ModActions({ bottle }: { bottle: Bottle }) {
   const orpc = useORPC();
 
   const deleteBottleMutation = useMutation(
-    orpc.bottles.delete.mutationOptions(),
+    orpc.bottles.delete.mutationOptions()
   );
 
   if (!user?.mod) return null;

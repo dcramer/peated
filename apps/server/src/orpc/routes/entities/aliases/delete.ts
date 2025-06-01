@@ -18,10 +18,10 @@ export default procedure
   .input(
     z.object({
       name: z.string(),
-    }),
+    })
   )
   .output(z.object({}))
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const alias = await db.query.entityAliases.findFirst({
       where: eq(sql`LOWER(${entityAliases.name})`, input.name.toLowerCase()),
       with: {

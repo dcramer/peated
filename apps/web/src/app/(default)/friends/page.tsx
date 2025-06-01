@@ -16,7 +16,7 @@ export default function Page() {
   const { data: friendList } = useSuspenseQuery(
     orpc.friends.list.queryOptions({
       input: {},
-    }),
+    })
   );
 
   const { results, rel } = friendList;

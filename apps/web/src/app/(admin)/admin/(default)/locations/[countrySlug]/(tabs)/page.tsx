@@ -27,7 +27,7 @@ export default function Page({
         country: countrySlug,
         ...queryParams,
       },
-    }),
+    })
   );
 
   return (

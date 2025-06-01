@@ -14,7 +14,7 @@ function AddFlight() {
   const navigate = useNavigate();
   const orpc = useORPC();
   const flightCreateMutation = useMutation(
-    orpc.flights.create.mutationOptions(),
+    orpc.flights.create.mutationOptions()
   );
 
   return (

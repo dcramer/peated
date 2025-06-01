@@ -20,7 +20,7 @@ export default function EntityDetails({
       input: {
         entity: Number(entityId),
       },
-    }),
+    })
   );
 
   return (

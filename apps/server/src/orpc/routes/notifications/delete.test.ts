@@ -10,7 +10,7 @@ describe("DELETE /notifications/:notification", () => {
     const err = await waitError(() =>
       routerClient.notifications.delete({
         notification: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -21,8 +21,8 @@ describe("DELETE /notifications/:notification", () => {
         {
           notification: 1,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Notification not found.]`);
   });
@@ -43,7 +43,7 @@ describe("DELETE /notifications/:notification", () => {
       {
         notification: notification.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     const [newNotification] = await db
@@ -70,11 +70,11 @@ describe("DELETE /notifications/:notification", () => {
         {
           notification: notification.id,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Cannot delete another user's notification.]`,
+      `[Error: Cannot delete another user's notification.]`
     );
   });
 });

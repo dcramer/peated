@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isDefinedError } from "@orpc/client";
 import { EventInputSchema } from "@peated/server/schemas";
-import { type Event } from "@peated/server/types";
+import type { Event } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
 import FormHeader from "@peated/web/components/formHeader";
@@ -12,7 +12,7 @@ import Layout from "@peated/web/components/layout";
 import TextField from "@peated/web/components/textField";
 import { logError } from "@peated/web/lib/log";
 import { useState } from "react";
-import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 import type { z } from "zod";
 import BooleanField from "../booleanField";
 import CountryField from "../countryField";
@@ -57,7 +57,7 @@ export default function EventForm({
           id: country.id,
           name: country.name,
         }
-      : undefined,
+      : undefined
   );
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {

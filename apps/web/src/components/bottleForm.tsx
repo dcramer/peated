@@ -121,13 +121,13 @@ export default function BottleForm({
 
   const [error, setError] = useState<string | undefined>();
   const [image, setImage] = useState<HTMLCanvasElement | null | undefined>(
-    undefined,
+    undefined
   );
   const router = useRouter();
   const orpc = useORPC();
 
   const generateDataMutation = useMutation(
-    orpc.ai.bottleLookup.mutationOptions(),
+    orpc.ai.bottleLookup.mutationOptions()
   );
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
@@ -144,18 +144,18 @@ export default function BottleForm({
   };
 
   const [brandValue, setBrandValue] = useState<Option | undefined>(
-    initialData.brand ? entityToOption(initialData.brand) : undefined,
+    initialData.brand ? entityToOption(initialData.brand) : undefined
   );
   const [distillersValue, setDistillersValue] = useState<Option[]>(
-    initialData.distillers ? initialData.distillers.map(entityToOption) : [],
+    initialData.distillers ? initialData.distillers.map(entityToOption) : []
   );
   const [bottlerValue, setBottlerValue] = useState<Option | undefined>(
-    initialData.bottler ? entityToOption(initialData.bottler) : undefined,
+    initialData.bottler ? entityToOption(initialData.bottler) : undefined
   );
   const [seriesValue, setSeriesValue] = useState<Option | undefined>(
     initialData.series
       ? { id: initialData.series.id, name: initialData.series.name }
-      : undefined,
+      : undefined
   );
 
   const [showCaskDetails, setShowCaskDetails] = useState(true);
@@ -346,7 +346,8 @@ export default function BottleForm({
 
           <TextField
             {...register("statedAge", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              setValueAs: (v) =>
+                v === "" || !v ? null : Number.parseInt(v, 10),
             })}
             error={errors.statedAge}
             type="number"
@@ -358,7 +359,7 @@ export default function BottleForm({
 
           <TextField
             {...register("abv", {
-              setValueAs: (v) => (v === "" || !v ? null : parseFloat(v)),
+              setValueAs: (v) => (v === "" || !v ? null : Number.parseFloat(v)),
             })}
             error={errors.abv}
             type="number"
@@ -426,7 +427,8 @@ export default function BottleForm({
 
           <TextField
             {...register("releaseYear", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              setValueAs: (v) =>
+                v === "" || !v ? null : Number.parseInt(v, 10),
             })}
             error={errors.releaseYear}
             type="number"
@@ -437,7 +439,8 @@ export default function BottleForm({
 
           <TextField
             {...register("vintageYear", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              setValueAs: (v) =>
+                v === "" || !v ? null : Number.parseInt(v, 10),
             })}
             error={errors.vintageYear}
             type="number"
@@ -578,8 +581,9 @@ export default function BottleForm({
               <Button
                 color="primary"
                 onClick={async () => {
-                  const result =
-                    await generateDataMutation.mutateAsync(getValues());
+                  const result = await generateDataMutation.mutateAsync(
+                    getValues()
+                  );
 
                   if (!result) return;
                   const currentValues = getValues();
@@ -591,7 +595,7 @@ export default function BottleForm({
                   if (result.flavorProfile && !currentValues.flavorProfile)
                     setValue(
                       "flavorProfile",
-                      result.flavorProfile as FlavorProfile,
+                      result.flavorProfile as FlavorProfile
                     );
                 }}
                 disabled={generateDataMutation.isPending}
@@ -613,7 +617,7 @@ export default function BottleForm({
                     label="Flavor Profile"
                     onRenderOption={(option) => {
                       const classes = classesForProfile(
-                        option.id as FlavorProfile,
+                        option.id as FlavorProfile
                       );
                       return (
                         <div className="flex flex-col items-start justify-start gap-y-2 text-left">

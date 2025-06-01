@@ -3,8 +3,8 @@ import type { Entity } from "@peated/server/db/schema";
 import {
   bottleAliases,
   bottleReleases,
-  bottles,
   bottleSeries,
+  bottles,
   bottlesToDistillers,
   changes,
   entities,
@@ -23,7 +23,7 @@ import { requireMod } from "@peated/server/orpc/middleware/auth";
 import { BottleInputSchema, BottleSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
-import { type BottlePreviewResult } from "@peated/server/types";
+import type { BottlePreviewResult } from "@peated/server/types";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -44,7 +44,7 @@ export default procedure
   })
   .input(InputSchema)
   .output(BottleSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const user = context.user;
 
     const bottle = await db.query.bottles.findFirst({
@@ -203,7 +203,7 @@ export default procedure
       const newDistillerIds: number[] = [];
       const removedDistillerIds: number[] = [];
       const currentDistillers = bottle.bottlesToDistillers.map(
-        (d) => d.distiller,
+        (d) => d.distiller
       );
 
       // find newly added distillers and connect them
@@ -212,7 +212,7 @@ export default procedure
           const distiller = currentDistillers.find((d2) =>
             typeof distData === "number"
               ? distData === d2.id
-              : distData.name === d2.name,
+              : distData.name === d2.name
           );
 
           if (!distiller) {
@@ -245,7 +245,7 @@ export default procedure
 
         // find existing distillers which should no longer exist and remove them
         const removedDistillers = currentDistillers.filter(
-          (d) => !distillerIds.includes(d.id),
+          (d) => !distillerIds.includes(d.id)
         );
         for (const distiller of removedDistillers) {
           removedDistillerIds.push(distiller.id);
@@ -254,8 +254,8 @@ export default procedure
             .where(
               and(
                 eq(bottlesToDistillers.distillerId, distiller.id),
-                eq(bottlesToDistillers.bottleId, bottle.id),
-              ),
+                eq(bottlesToDistillers.bottleId, bottle.id)
+              )
             );
         }
       }
@@ -353,8 +353,8 @@ export default procedure
           .where(
             and(
               eq(sql`LOWER(${bottleAliases.name})`, alias.name.toLowerCase()),
-              isNull(bottleAliases.bottleId),
-            ),
+              isNull(bottleAliases.bottleId)
+            )
           )
           .returning();
 
@@ -395,7 +395,7 @@ export default procedure
       await pushUniqueJob(
         "OnBottleChange",
         { bottleId: bottle.id },
-        { delay: 5000 },
+        { delay: 5000 }
       );
     } catch (err) {
       logError(err, {
@@ -410,7 +410,7 @@ export default procedure
         await pushUniqueJob(
           "OnBottleAliasChange",
           { name: aliasName },
-          { delay: 5000 },
+          { delay: 5000 }
         );
       } catch (err) {
         logError(err, {

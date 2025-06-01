@@ -2,7 +2,7 @@ import Link from "@peated/web/components/link";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import type { Metadata } from "next";
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "Major Whisky Regions",

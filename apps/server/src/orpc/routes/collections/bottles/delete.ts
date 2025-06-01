@@ -21,10 +21,10 @@ export default procedure
     CollectionBottleInputSchema.extend({
       collection: z.union([z.coerce.number(), z.literal("default")]),
       user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
-    }),
+    })
   )
   .output(z.object({}))
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
       throw errors.NOT_FOUND({
@@ -67,8 +67,8 @@ export default procedure
             eq(collectionBottles.collectionId, collection.id),
             input.release
               ? eq(collectionBottles.releaseId, input.release)
-              : undefined,
-          ),
+              : undefined
+          )
         )
         .returning();
       if (cb) {

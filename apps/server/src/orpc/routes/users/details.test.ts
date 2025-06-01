@@ -8,7 +8,7 @@ describe("GET /users/:user", () => {
 
     const data = await routerClient.users.details(
       { user: user.id },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
     expect(data.id).toEqual(user.id);
     expect(data.friendStatus).toBe("none");
@@ -17,7 +17,7 @@ describe("GET /users/:user", () => {
   test("get user:me", async ({ defaults }) => {
     const data = await routerClient.users.details(
       { user: "me" },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
     expect(data.id).toBe(defaults.user.id);
   });
@@ -25,7 +25,7 @@ describe("GET /users/:user", () => {
   test("get user by username", async ({ defaults }) => {
     const data = await routerClient.users.details(
       { user: defaults.user.username },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
     expect(data.id).toBe(defaults.user.id);
   });
@@ -39,7 +39,7 @@ describe("GET /users/:user", () => {
 
     const data = await routerClient.users.details(
       { user: user.id },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
     expect(data.id).toBe(user.id);
     expect(data.friendStatus).toBe("friends");
@@ -47,7 +47,7 @@ describe("GET /users/:user", () => {
 
   test("errors on invalid username", async () => {
     const err = await waitError(() =>
-      routerClient.users.details({ user: "notauser" }),
+      routerClient.users.details({ user: "notauser" })
     );
     expect(err).toMatchInlineSnapshot(`[Error: User not found]`);
   });

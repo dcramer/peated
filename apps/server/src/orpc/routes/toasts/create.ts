@@ -17,7 +17,7 @@ export default procedure
   .input(z.object({ tasting: z.coerce.number() }))
   .output(z.object({}))
   .use(requireAuth)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { tasting: tastingId } = input;
 
     const [targetTasting] = await db

@@ -35,7 +35,6 @@ export default function CategoryCheckConfigForm({
 
   useEffect(() => {
     // Cant be asked to fix this right now.
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const subscription = watch((value, { name, type }) => onChange(value));
     return () => subscription.unsubscribe();

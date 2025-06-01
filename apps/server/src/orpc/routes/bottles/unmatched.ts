@@ -10,6 +10,7 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { StorePriceWithSiteSerializer } from "@peated/server/serializers/storePrice";
 import {
+  type SQL,
   and,
   asc,
   eq,
@@ -17,7 +18,6 @@ import {
   ilike,
   inArray,
   isNull,
-  type SQL,
 } from "drizzle-orm";
 import { z } from "zod";
 
@@ -31,7 +31,7 @@ const OutputSchema = z.object({
       exampleListing: StorePriceSchema.extend({
         site: ExternalSiteSchema,
       }).nullable(),
-    }),
+    })
   ),
   rel: CursorSchema,
 });
@@ -57,10 +57,10 @@ export default procedure
         query: "",
         cursor: 1,
         limit: 100,
-      }),
+      })
   )
   .output(OutputSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { cursor, query, limit, ...rest } = input;
 
     const where: (SQL<unknown> | undefined)[] = [
@@ -88,7 +88,7 @@ export default procedure
     const exampleListings = await db.query.storePrices.findMany({
       where: inArray(
         storePrices.name,
-        results.map((a) => a.name),
+        results.map((a) => a.name)
       ),
       with: {
         externalSite: true,
@@ -100,9 +100,9 @@ export default procedure
         await serialize(
           StorePriceWithSiteSerializer,
           exampleListings,
-          context.user,
+          context.user
         )
-      ).map((data, index) => [exampleListings[index].name, data]),
+      ).map((data, index) => [exampleListings[index].name, data])
     );
 
     return {

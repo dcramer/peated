@@ -1,7 +1,7 @@
+import path from "path";
 import config from "@peated/server/config";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import path from "path";
 import sharp from "sharp";
 
 describe("POST /badges/:badge/image", () => {
@@ -17,8 +17,8 @@ describe("POST /badges/:badge/image", () => {
         },
         {
           context: { user },
-        },
-      ),
+        }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -34,7 +34,7 @@ describe("POST /badges/:badge/image", () => {
       },
       {
         context: { user },
-      },
+      }
     );
 
     expect(response.imageUrl).toBeDefined();

@@ -2,7 +2,7 @@ import config from "@peated/server/config";
 import { logError } from "@peated/server/lib/log";
 import { startSpan } from "@sentry/node";
 import OpenAI from "openai";
-import { type ZodSchema, type z } from "zod";
+import type { ZodSchema, z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
 // type Model = "gpt-3.5-turbo" | "gpt-4";
@@ -20,7 +20,7 @@ export async function getStructuredResponse<Schema extends ZodSchema<any>>(
   schema: Schema,
   fullSchema?: undefined | null,
   model?: string,
-  logContext?: Record<string, Record<string, any>>,
+  logContext?: Record<string, Record<string, any>>
 ): Promise<z.infer<Schema> | null>;
 export async function getStructuredResponse<
   Schema extends ZodSchema<any>,
@@ -31,7 +31,7 @@ export async function getStructuredResponse<
   schema: Schema,
   fullSchema: FullSchema,
   model?: string,
-  logContext?: Record<string, Record<string, any>>,
+  logContext?: Record<string, Record<string, any>>
 ): Promise<z.infer<FullSchema> | null>;
 export async function getStructuredResponse<
   Schema extends ZodSchema<any>,
@@ -42,7 +42,7 @@ export async function getStructuredResponse<
   schema: Schema,
   fullSchema: FullSchema | null = null,
   model = DEFAULT_MODEL,
-  logContext?: Record<string, Record<string, any>>,
+  logContext?: Record<string, Record<string, any>>
 ): Promise<z.infer<FullSchema> | null> {
   const openai = new OpenAI({
     apiKey: config.OPENAI_API_KEY,
@@ -57,7 +57,7 @@ export async function getStructuredResponse<
       content: [
         "Your job is to accurately describe information about the whiskey industry as if you were a whisky sommelier. You do not embellish descriptions, and instead focus on concise, professional responses.",
         `The output format should strictly follow JSON schema:\n${zodToJsonSchema(
-          schema,
+          schema
         )}`,
       ].join("\n"),
     },
@@ -91,7 +91,7 @@ export async function getStructuredResponse<
           },
           messages,
           temperature: 0,
-        },
+        }
         // {
         //   timeout: 300,
         // },
@@ -102,17 +102,16 @@ export async function getStructuredResponse<
         span.setAttribute("ai.prompt_tokens.used", result.usage.prompt_tokens);
         span.setAttribute(
           "ai.completion_tokens.used",
-          result.usage.completion_tokens,
+          result.usage.completion_tokens
         );
       }
 
       span.setAttribute("ai.responses", JSON.stringify(result.choices));
 
       return result;
-    },
+    }
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const output: string = completion.choices[0].message!.content || "";
 
   let structuredResponse: any;
@@ -132,7 +131,7 @@ export async function getStructuredResponse<
       {
         "messages.json": JSON.stringify(messages),
         "output.txt": output,
-      },
+      }
     );
     throw err;
   }
@@ -152,7 +151,7 @@ export async function getStructuredResponse<
       {
         "messages.json": JSON.stringify(messages),
         "output.json": output,
-      },
+      }
     );
 
     throw err;

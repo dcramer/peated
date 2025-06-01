@@ -1,4 +1,4 @@
-import { type z } from "zod";
+import type { z } from "zod";
 import { serializer } from ".";
 import config from "../config";
 import type { Badge, User } from "../db/schema";
@@ -10,7 +10,7 @@ export const BadgeSerializer = serializer({
   item: (
     item: Badge,
     attrs: Record<string, any>,
-    currentUser?: User,
+    currentUser?: User
   ): z.infer<typeof BadgeSchema> => {
     return {
       id: item.id,

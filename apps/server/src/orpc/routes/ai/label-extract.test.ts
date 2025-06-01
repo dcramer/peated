@@ -27,7 +27,7 @@ describe("POST /labels/extract", () => {
     });
 
     expect(labelExtractor.extractFromImage).toHaveBeenCalledWith(
-      "https://example.com/image.jpg",
+      "https://example.com/image.jpg"
     );
     expect(result).toEqual(mockResult);
   });
@@ -49,7 +49,7 @@ describe("POST /labels/extract", () => {
     });
 
     expect(labelExtractor.extractFromText).toHaveBeenCalledWith(
-      "Macallan 12 Year Old Single Malt",
+      "Macallan 12 Year Old Single Malt"
     );
     expect(result).toEqual(mockResult);
   });
@@ -62,17 +62,17 @@ describe("POST /labels/extract", () => {
 
   test("handles extraction errors", async () => {
     vi.mocked(labelExtractor.extractFromImage).mockRejectedValue(
-      new Error("Failed to process image"),
+      new Error("Failed to process image")
     );
 
     const err = await waitError(
       routerClient.ai.labelExtract({
         imageUrl: "https://example.com/image.jpg",
-      }),
+      })
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: Failed to extract label information]`,
+      `[Error: Failed to extract label information]`
     );
   });
 });

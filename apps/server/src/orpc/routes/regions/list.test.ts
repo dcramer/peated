@@ -99,8 +99,8 @@ describe("GET /countries/:country/regions", () => {
     const country = await fixtures.Country();
     const regions = await Promise.all(
       Array.from({ length: 3 }, (_, i) =>
-        fixtures.Region({ countryId: country.id, name: `Region ${i + 1}` }),
-      ),
+        fixtures.Region({ countryId: country.id, name: `Region ${i + 1}` })
+      )
     );
 
     const { results, rel } = await routerClient.regions.list({
@@ -137,7 +137,7 @@ describe("GET /countries/:country/regions", () => {
     const err = await waitError(
       routerClient.regions.list({
         country: "nonexistent-country",
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Invalid country.]`);
   });

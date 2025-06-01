@@ -28,7 +28,7 @@ export default procedure
   })
   .input(InputSchema)
   .output(BottleSeriesSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const user = context.user;
 
     const updatedSeries = await db.transaction(async (tx) => {
@@ -76,17 +76,17 @@ export default procedure
           and(
             eq(
               sql`LOWER(${bottleSeries.fullName})`,
-              (newData.fullName ?? series.fullName).toLowerCase(),
+              (newData.fullName ?? series.fullName).toLowerCase()
             ),
-            ne(bottleSeries.id, series.id),
-          ),
+            ne(bottleSeries.id, series.id)
+          )
         );
 
       if (existingSeries) {
         throw new ConflictError(
           existingSeries,
           undefined,
-          "A series with this name already exists.",
+          "A series with this name already exists."
         );
       }
 
@@ -127,7 +127,7 @@ export default procedure
       {
         seriesId: updatedSeries.id,
       },
-      { delay: 5000 },
+      { delay: 5000 }
     );
 
     return await serialize(BottleSeriesSerializer, updatedSeries, context.user);

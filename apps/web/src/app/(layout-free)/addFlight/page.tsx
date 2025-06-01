@@ -12,7 +12,7 @@ export default function AddFlight() {
   const router = useRouter();
   const orpc = useORPC();
   const flightCreateMutation = useMutation(
-    orpc.flights.create.mutationOptions(),
+    orpc.flights.create.mutationOptions()
   );
 
   return (

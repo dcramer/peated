@@ -25,7 +25,7 @@ export default function NotificationEntry({
       className={classNames(
         "bg-slate-950 p-3",
         notification.read ? "text-muted" : "text-white",
-        link ? "group cursor-pointer rounded hover:bg-slate-700" : "",
+        link ? "group cursor-pointer rounded hover:bg-slate-700" : ""
       )}
       onClick={
         link

@@ -23,10 +23,10 @@ export default procedure
   .input(
     BadgeInputSchema.partial().extend({
       badge: z.coerce.number(),
-    }),
+    })
   )
   .output(BadgeSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const [badge] = await db
       .select()
       .from(badges)

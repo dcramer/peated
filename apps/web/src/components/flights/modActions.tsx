@@ -2,7 +2,7 @@
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import { type Flight } from "@peated/server/types";
+import type { Flight } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
 import Link from "@peated/web/components/link";
@@ -17,7 +17,7 @@ export default function ModActions({ flight }: { flight: Flight }) {
   const navigate = useNavigate();
 
   const deleteFlightMutation = useMutation(
-    orpc.flights.delete.mutationOptions(),
+    orpc.flights.delete.mutationOptions()
   );
 
   if (!user?.mod && user?.id !== flight.createdBy?.id) return null;

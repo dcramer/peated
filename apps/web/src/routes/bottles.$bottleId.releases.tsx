@@ -22,7 +22,7 @@ function Page() {
   const { data: releaseList } = useSuspenseQuery(
     orpc.bottleReleases.list.queryOptions({
       input: queryParams,
-    }),
+    })
   );
 
   return (

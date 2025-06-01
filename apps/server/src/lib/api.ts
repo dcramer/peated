@@ -21,7 +21,7 @@ import { follows, users } from "../db/schema";
 export async function getUserFromId(
   db: AnyDatabase,
   userId: string | number | "me",
-  currentUser?: User | null | undefined,
+  currentUser?: User | null | undefined
 ): Promise<User | null> {
   if (userId === "me") {
     return currentUser || null;
@@ -48,7 +48,7 @@ export async function getUserFromId(
 export const profileVisible = async (
   db: AnyDatabase,
   user: User,
-  currentUser?: User | null,
+  currentUser?: User | null
 ) => {
   if (!user.private) return true;
   if (!currentUser) return false;
@@ -61,8 +61,8 @@ export const profileVisible = async (
         and(
           eq(follows.fromUserId, currentUser.id),
           eq(follows.toUserId, user.id),
-          eq(follows.status, "following"),
-        ),
+          eq(follows.status, "following")
+        )
       )
   ).find((d) => !!d);
 };

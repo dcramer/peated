@@ -24,7 +24,7 @@ function Page() {
   const { data: siteList } = useSuspenseQuery(
     orpc.externalSites.list.queryOptions({
       input: queryParams,
-    }),
+    })
   );
 
   return (

@@ -23,7 +23,7 @@ export default procedure
   .use(requireAuth)
   .input(InputSchema)
   .output(FlightSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { flight: flightId, bottles: bottleIds, ...data } = input;
 
     const [flight] = await db
@@ -63,8 +63,8 @@ export default procedure
           .where(
             and(
               eq(flightBottles.flightId, flight.id),
-              notInArray(flightBottles.bottleId, bottleIds),
-            ),
+              notInArray(flightBottles.bottleId, bottleIds)
+            )
           );
 
         for (const bottle of bottleIds) {

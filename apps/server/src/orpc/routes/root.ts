@@ -12,10 +12,8 @@ export default procedure
   .output(
     z.object({
       version: z.string(),
-    }),
+    })
   )
-  .handler(async function () {
-    return {
-      version: config.VERSION,
-    };
-  });
+  .handler(async () => ({
+    version: config.VERSION,
+  }));

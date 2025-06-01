@@ -504,7 +504,7 @@ describe("GET /bottles", () => {
     expect(results.length).toBeGreaterThanOrEqual(1);
     // Verify our bottles are in the results
     const foundBottles = results.filter(
-      (b) => b.id === bottle1.id || b.id === bottle2.id,
+      (b) => b.id === bottle1.id || b.id === bottle2.id
     );
     expect(foundBottles.length).toBeGreaterThanOrEqual(1);
     // Results should be ordered by search relevance
@@ -558,11 +558,11 @@ describe("GET /bottles", () => {
     const err = await waitError(
       routerClient.bottles.list({
         sort: "brand",
-      }),
+      })
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: Cannot sort by brand without entity filter.]`,
+      `[Error: Cannot sort by brand without entity filter.]`
     );
   });
 
@@ -575,7 +575,7 @@ describe("GET /bottles", () => {
         await fixtures.Bottle({
           name: `Bottle ${i}`,
           totalTastings: i, // For consistent ordering
-        }),
+        })
       );
     }
 
@@ -733,7 +733,7 @@ describe("GET /bottles", () => {
     const err = await waitError(
       routerClient.bottles.list({
         limit: 101, // Above max
-      }),
+      })
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
@@ -743,7 +743,7 @@ describe("GET /bottles", () => {
     const err = await waitError(
       routerClient.bottles.list({
         cursor: 0, // Below min
-      }),
+      })
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);

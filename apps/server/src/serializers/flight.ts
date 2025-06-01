@@ -1,14 +1,14 @@
-import { type z } from "zod";
+import type { z } from "zod";
 import { serializer } from ".";
 import type { Flight, User } from "../db/schema";
-import { type FlightSchema } from "../schemas";
+import type { FlightSchema } from "../schemas";
 
 export const FlightSerializer = serializer({
   name: "flight",
   item: (
     item: Flight,
     attrs: Record<string, any>,
-    currentUser?: User,
+    currentUser?: User
   ): z.infer<typeof FlightSchema> => {
     return {
       id: item.publicId,

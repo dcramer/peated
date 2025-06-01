@@ -40,7 +40,7 @@ export default function RegionCheckConfigForm({
           id: initialData.country,
           name: `(Country ID: ${initialData.country})`,
         }
-      : undefined,
+      : undefined
   );
 
   // TODO:
@@ -50,7 +50,7 @@ export default function RegionCheckConfigForm({
           id: initialData.region,
           name: `(Region ID: ${initialData.region})`,
         }
-      : undefined,
+      : undefined
   );
 
   return (

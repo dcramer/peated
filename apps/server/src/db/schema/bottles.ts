@@ -62,12 +62,12 @@ export const bottleSeries = pgTable(
   (table) => [
     uniqueIndex("bottle_series_full_name_key").using(
       "btree",
-      sql`LOWER(${table.fullName})`,
+      sql`LOWER(${table.fullName})`
     ),
     index("bottle_series_search_idx").using("gin", table.searchVector),
     index("bottle_series_brand_idx").on(table.brandId),
     index("bottle_series_created_by_idx").on(table.createdById),
-  ],
+  ]
 );
 
 export type BottleSeries = typeof bottleSeries.$inferSelect;
@@ -112,7 +112,7 @@ export const bottles = pgTable(
 
     // a NULL series represents a "core bottling"
     seriesId: bigint("series_id", { mode: "number" }).references(
-      () => bottleSeries.id,
+      () => bottleSeries.id
     ),
 
     searchVector: tsvector("search_vector"),
@@ -122,7 +122,7 @@ export const bottles = pgTable(
       .references(() => entities.id)
       .notNull(),
     bottlerId: bigint("bottler_id", { mode: "number" }).references(
-      () => entities.id,
+      () => entities.id
     ),
     flavorProfile: flavorProfileEnum("flavor_profile"),
 
@@ -177,9 +177,9 @@ export const bottles = pgTable(
     index("bottle_flavor_profile_idx").on(table.flavorProfile),
     check(
       "bottle_stated_age_check",
-      sql`${table.statedAge} IS NULL OR (${table.statedAge} >= 0 AND ${table.statedAge} <= 100)`,
+      sql`${table.statedAge} IS NULL OR (${table.statedAge} >= 0 AND ${table.statedAge} <= 100)`
     ),
-  ],
+  ]
 );
 
 export type Bottle = typeof bottles.$inferSelect;
@@ -220,7 +220,7 @@ export const bottleSeriesRelations = relations(
       fields: [bottleSeries.createdById],
       references: [users.id],
     }),
-  }),
+  })
 );
 
 /**
@@ -309,9 +309,9 @@ export const bottleReleases = pgTable(
     uniqueIndex("bottle_release_full_name_idx").on(table.fullName),
     check(
       "bottle_release_stated_age_check",
-      sql`${table.statedAge} IS NULL OR (${table.statedAge} >= 0 AND ${table.statedAge} <= 100)`,
+      sql`${table.statedAge} IS NULL OR (${table.statedAge} >= 0 AND ${table.statedAge} <= 100)`
     ),
-  ],
+  ]
 );
 
 export const bottleReleasesRelations = relations(bottleReleases, ({ one }) => ({
@@ -338,7 +338,7 @@ export const bottlesToDistillers = pgTable(
       .references(() => entities.id)
       .notNull(),
   },
-  (table) => [primaryKey({ columns: [table.bottleId, table.distillerId] })],
+  (table) => [primaryKey({ columns: [table.bottleId, table.distillerId] })]
 );
 
 export const bottlesToDistillersRelations = relations(
@@ -352,7 +352,7 @@ export const bottlesToDistillersRelations = relations(
       fields: [bottlesToDistillers.distillerId],
       references: [entities.id],
     }),
-  }),
+  })
 );
 
 export type BottlesToDistillers = typeof bottlesToDistillers.$inferSelect;
@@ -367,7 +367,7 @@ export const bottleTags = pgTable(
     tag: varchar("tag", { length: 64 }).notNull(),
     count: integer("count").default(0).notNull(),
   },
-  (table) => [primaryKey({ columns: [table.bottleId, table.tag] })],
+  (table) => [primaryKey({ columns: [table.bottleId, table.tag] })]
 );
 
 export const bottleTagsRelations = relations(bottleTags, ({ one }) => ({
@@ -384,10 +384,10 @@ export const bottleAliases = pgTable(
   "bottle_alias",
   {
     bottleId: bigint("bottle_id", { mode: "number" }).references(
-      () => bottles.id,
+      () => bottles.id
     ),
     releaseId: bigint("release_id", { mode: "number" }).references(
-      () => bottleReleases.id,
+      () => bottleReleases.id
     ),
     name: varchar("name", { length: 255 }).notNull(),
     embedding: vector("embedding", { length: 3072 }),
@@ -398,11 +398,11 @@ export const bottleAliases = pgTable(
   (table) => [
     uniqueIndex("bottle_alias_name_idx").using(
       "btree",
-      sql`LOWER(${table.name})`,
+      sql`LOWER(${table.name})`
     ),
     index("bottle_alias_bottle_idx").on(table.bottleId),
     index("bottle_alias_release_idx").on(table.releaseId),
-  ],
+  ]
 );
 
 export const bottleAliasesRelations = relations(bottleAliases, ({ one }) => ({
@@ -435,7 +435,7 @@ export const bottleTombstonesRelations = relations(
       fields: [bottleTombstones.newBottleId],
       references: [bottles.id],
     }),
-  }),
+  })
 );
 
 export type BottleTombstone = typeof bottleTombstones.$inferSelect;
@@ -450,7 +450,7 @@ export const bottleFlavorProfiles = pgTable(
     flavorProfile: flavorProfileEnum("flavor_profile").notNull(),
     count: integer("count").default(0).notNull(),
   },
-  (table) => [primaryKey({ columns: [table.bottleId, table.flavorProfile] })],
+  (table) => [primaryKey({ columns: [table.bottleId, table.flavorProfile] })]
 );
 
 export const bottleFlavorProfilesRelations = relations(
@@ -460,7 +460,7 @@ export const bottleFlavorProfilesRelations = relations(
       fields: [bottleFlavorProfiles.bottleId],
       references: [bottles.id],
     }),
-  }),
+  })
 );
 
 export type BottleFlavorProfile = typeof bottleFlavorProfiles.$inferSelect;

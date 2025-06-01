@@ -16,7 +16,7 @@ export default function CountrySpiritDistribution({
       input: {
         country: countrySlug,
       },
-    }),
+    })
   );
 
   const { results, totalCount } = data;

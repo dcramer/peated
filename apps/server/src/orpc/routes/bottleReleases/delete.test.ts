@@ -14,9 +14,9 @@ import { and, eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
 describe("DELETE /bottle-releases/:release", () => {
-  it("deletes a bottle release and updates related records", async function ({
+  it("deletes a bottle release and updates related records", async ({
     fixtures,
-  }) {
+  }) => {
     const admin = await fixtures.User({ admin: true });
 
     const release = await fixtures.BottleRelease();
@@ -56,7 +56,7 @@ describe("DELETE /bottle-releases/:release", () => {
       { release: release.id },
       {
         context: { user: admin },
-      },
+      }
     );
 
     // Verify the release is deleted
@@ -98,8 +98,8 @@ describe("DELETE /bottle-releases/:release", () => {
       .where(
         and(
           eq(changes.objectId, release.id),
-          eq(changes.objectType, "bottle_release"),
-        ),
+          eq(changes.objectType, "bottle_release")
+        )
       );
     expect(change).toBeDefined();
     expect(change.type).toBe("delete");
@@ -113,7 +113,7 @@ describe("DELETE /bottle-releases/:release", () => {
     expect(updatedBottle.numReleases).toBe(0);
   });
 
-  it("throws error if release not found", async function ({ fixtures }) {
+  it("throws error if release not found", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
 
     const err = await waitError(() =>
@@ -121,8 +121,8 @@ describe("DELETE /bottle-releases/:release", () => {
         { release: 999999 },
         {
           context: { user: admin },
-        },
-      ),
+        }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Release not found.]`);
   });

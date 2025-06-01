@@ -11,8 +11,8 @@ describe("PUT /badges/:badge", () => {
           badge: badge.id,
           name: "Foobar",
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -26,7 +26,7 @@ describe("PUT /badges/:badge", () => {
         badge: badge.id,
         name: "Foobar",
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(newBadge).toBeDefined();
@@ -45,7 +45,7 @@ describe("PUT /badges/:badge", () => {
         name: "Single Malts",
         checks: [{ type: "category", config: { category: ["single_malt"] } }],
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(newBadge.checks).toMatchInlineSnapshot(`

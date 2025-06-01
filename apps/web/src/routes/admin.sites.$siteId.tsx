@@ -1,4 +1,4 @@
-import { type ExternalSiteType } from "@peated/server/types";
+import type { ExternalSiteType } from "@peated/server/types";
 import StorePriceTable from "@peated/web/components/admin/storePriceTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
@@ -26,7 +26,7 @@ function Page() {
         ...queryParams,
         site: siteId,
       },
-    }),
+    })
   );
 
   return (

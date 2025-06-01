@@ -1,7 +1,7 @@
 import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
-import { type PolymorphicProps, type PolymorphicRef } from "@peated/web/types";
-import { forwardRef, type ElementType } from "react";
+import type { PolymorphicProps, PolymorphicRef } from "@peated/web/types";
+import { type ElementType, forwardRef } from "react";
 
 type Props = {
   active?: boolean;
@@ -22,7 +22,7 @@ export default forwardRef(function SidebarLink<
     as,
     ...props
   }: PolymorphicProps<E, Props>,
-  ref: PolymorphicRef<E>,
+  ref: PolymorphicRef<E>
 ) {
   const Component = as ?? defaultElement;
   const Icon = icon;
@@ -37,7 +37,7 @@ export default forwardRef(function SidebarLink<
             : "text-muted border-transparent hover:border-slate-400 hover:text-slate-400",
           "relative cursor-pointer border-l-4",
           "group flex gap-x-3 text-sm font-semibold leading-6",
-          size === "default" ? "p-2" : "px-2",
+          size === "default" ? "p-2" : "px-2"
         )}
         ref={ref}
         {...props}
@@ -48,7 +48,7 @@ export default forwardRef(function SidebarLink<
               active
                 ? "text-highlight"
                 : "text-muted group-hover:text-slate-400",
-              "h-6 w-6 shrink-0",
+              "h-6 w-6 shrink-0"
             )}
             aria-hidden="true"
           />

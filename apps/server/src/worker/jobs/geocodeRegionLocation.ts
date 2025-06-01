@@ -24,7 +24,7 @@ export default async ({ regionId }: { regionId: number }) => {
       headers: {
         "User-Agent": BOT_USER_AGENT,
       },
-    },
+    }
   );
 
   const parsed = OSMSchema.parse(data);
@@ -36,12 +36,12 @@ export default async ({ regionId }: { regionId: number }) => {
         f.properties.addresstype === "state" ||
         f.properties.addresstype === "county") &&
       f.properties.type === "administrative" &&
-      f.properties.importance > 0.5,
+      f.properties.importance > 0.5
   );
 
   if (!match) {
     throw new Error(
-      `Failed to geocode region (no valid matches): ${region.id}}`,
+      `Failed to geocode region (no valid matches): ${region.id}}`
     );
   }
 

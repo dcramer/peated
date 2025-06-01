@@ -24,13 +24,13 @@ export default procedure
       "Retrieve job queue statistics including waiting, active, completed, and failed jobs. Requires admin privileges",
   })
   .output(QueueInfoSchema)
-  .handler(async function () {
+  .handler(async () => {
     const queue = await getQueue("default");
     const stats = await queue.getJobCounts(
       "wait",
       "active",
       "completed",
-      "failed",
+      "failed"
     );
 
     return {

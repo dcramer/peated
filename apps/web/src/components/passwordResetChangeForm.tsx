@@ -35,7 +35,7 @@ function FormComponent({ token }: { token: string }) {
 export default function PasswordResetChangeForm({ token }: { token: string }) {
   const [result, formAction] = useFormState(
     passwordResetConfirmForm,
-    undefined,
+    undefined
   );
 
   return (

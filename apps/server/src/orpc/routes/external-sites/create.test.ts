@@ -12,8 +12,8 @@ describe("POST /external-sites", () => {
           name: "Whisky Advocate",
           type: "whiskyadvocate",
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -26,7 +26,7 @@ describe("POST /external-sites", () => {
         name: "Whisky Advocate",
         type: "whiskyadvocate",
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(newSite.name).toEqual("Whisky Advocate");

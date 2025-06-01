@@ -1,5 +1,5 @@
 {
-  "extends": "@peated/tsconfig/internal.json",
+  "extends": "@peated/tsconfig/internal.jsonc",
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "dist",

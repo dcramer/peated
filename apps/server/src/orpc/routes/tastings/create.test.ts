@@ -8,7 +8,7 @@ import { describe, expect, test } from "vitest";
 describe("POST /tastings", () => {
   test("requires auth", async () => {
     const err = await waitError(() =>
-      routerClient.tastings.create({ bottle: 1 }),
+      routerClient.tastings.create({ bottle: 1 })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -28,7 +28,7 @@ describe("POST /tastings", () => {
         bottle: bottle.id,
         rating: 3.5,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.tasting.id).toBeDefined();
@@ -74,7 +74,7 @@ describe("POST /tastings", () => {
         rating: 3.5,
         tags: [tags[0].name, tags[1].name],
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.tasting.id).toBeDefined();
@@ -108,7 +108,7 @@ describe("POST /tastings", () => {
         rating: 3.5,
         notes: "hello world",
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.tasting.id).toBeDefined();
@@ -131,7 +131,7 @@ describe("POST /tastings", () => {
       {
         bottle: bottle.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.tasting.id).toBeDefined();
@@ -157,7 +157,7 @@ describe("POST /tastings", () => {
         bottle: bottle.id,
         friends: [],
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.tasting.id).toBeDefined();
@@ -183,7 +183,7 @@ describe("POST /tastings", () => {
         bottle: bottle.id,
         rating: 0,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.tasting.id).toBeDefined();
@@ -208,8 +208,8 @@ describe("POST /tastings", () => {
           bottle: bottle.id,
           flight: flight.publicId,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Cannot identify flight.]`);
   });
@@ -223,7 +223,7 @@ describe("POST /tastings", () => {
         bottle: bottle.id,
         flight: flight.publicId,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.tasting.id).toBeDefined();
@@ -263,7 +263,7 @@ describe("POST /tastings", () => {
       {
         bottle: bottle.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.tasting.id).toBeDefined();
@@ -297,7 +297,7 @@ describe("POST /tastings", () => {
         bottle: bottle.id,
         release: release.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.tasting.id).toBeDefined();
@@ -321,8 +321,8 @@ describe("POST /tastings", () => {
           bottle: bottle.id,
           release: release.id,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Cannot identify release.]`);
   });
@@ -336,8 +336,8 @@ describe("POST /tastings", () => {
           bottle: bottle.id,
           release: 12345,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Cannot identify release.]`);
   });
@@ -354,7 +354,7 @@ describe("POST /tastings", () => {
         servingStyle: "neat",
         color: 5,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.tasting.id).toBeDefined();
@@ -380,7 +380,7 @@ describe("POST /tastings", () => {
         bottle: bottle.id,
         createdAt: customDate.toISOString(),
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.tasting.id).toBeDefined();
@@ -403,8 +403,8 @@ describe("POST /tastings", () => {
           bottle: bottle.id,
           createdAt: oldDate.toISOString(),
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
@@ -419,8 +419,8 @@ describe("POST /tastings", () => {
           bottle: bottle.id,
           createdAt: futureDate.toISOString(),
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
@@ -435,11 +435,11 @@ describe("POST /tastings", () => {
           bottle: bottle.id,
           friends: [nonFriend.id],
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Friends must all be active relationships.]`,
+      `[Error: Friends must all be active relationships.]`
     );
   });
 
@@ -456,7 +456,7 @@ describe("POST /tastings", () => {
         bottle: bottle.id,
         friends: [friend.id],
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.tasting.id).toBeDefined();
@@ -479,7 +479,7 @@ describe("POST /tastings", () => {
         createdAt,
         rating: 4.0,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.tasting.id).toBeDefined();
@@ -491,8 +491,8 @@ describe("POST /tastings", () => {
           createdAt,
           rating: 4.0,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Tasting already exists.]`);
   });
@@ -513,7 +513,7 @@ describe("POST /tastings", () => {
         bottle: bottle.id,
         rating: 4.5,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     const updatedBrand = await db.query.entities.findFirst({
@@ -553,7 +553,7 @@ describe("POST /tastings", () => {
         flight: flight.publicId,
         rating: 4.0,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.tasting.id).toBeDefined();
@@ -578,7 +578,7 @@ describe("POST /tastings", () => {
         bottle: bottle.id,
         rating: 4.0,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.tasting.id).toBeDefined();
@@ -604,7 +604,7 @@ describe("POST /tastings", () => {
         bottle: bottle.id,
         servingStyle: "neat",
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.tasting.id).toBeDefined();
@@ -627,11 +627,11 @@ describe("POST /tastings", () => {
           bottle: bottle.id,
           friends: [friend.id],
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Friends must all be active relationships.]`,
+      `[Error: Friends must all be active relationships.]`
     );
   });
 });

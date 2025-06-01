@@ -50,7 +50,7 @@ export default function BottleHeader({
               {bottle.category && (
                 <Link
                   href={`/bottles?category=${encodeURIComponent(
-                    bottle.category,
+                    bottle.category
                   )}`}
                   className="hover:underline"
                 >

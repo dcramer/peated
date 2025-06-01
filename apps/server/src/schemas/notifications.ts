@@ -12,7 +12,7 @@ export const NotificationSchema = z.object({
   objectId: z.number().describe("ID of the object this notification refers to"),
   type: NotificationTypeEnum.describe("Type of notification"),
   fromUser: UserSchema.nullable().describe(
-    "User who triggered this notification",
+    "User who triggered this notification"
   ),
   createdAt: z
     .string()

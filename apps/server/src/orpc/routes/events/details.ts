@@ -16,7 +16,7 @@ export default procedure
   })
   .input(z.object({ event: z.coerce.number() }))
   .output(EventSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { event: eventId } = input;
 
     const [event] = await db

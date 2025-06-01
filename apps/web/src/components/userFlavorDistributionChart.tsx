@@ -20,7 +20,7 @@ function UserFlavorDistributionElement({ userId }: { userId: number }) {
       input: {
         user: userId,
       },
-    }),
+    })
   );
 
   const { results, totalCount } = data;
@@ -41,7 +41,7 @@ function UserFlavorDistributionElement({ userId }: { userId: number }) {
 }
 
 export default function UserFlavorDistributionChart(
-  props: ComponentProps<typeof UserFlavorDistributionElement>,
+  props: ComponentProps<typeof UserFlavorDistributionElement>
 ) {
   return (
     <div>

@@ -30,7 +30,7 @@ export default procedure
   })
   .input(InputSchema)
   .output(BottleReleaseSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const user = context.user;
 
     const updatedRelease = await db.transaction(async (tx) => {
@@ -116,7 +116,7 @@ export default procedure
           newData.edition !== null
             ? eq(
                 sql`LOWER(${bottleReleases.edition})`,
-                newData.edition.toLowerCase(),
+                newData.edition.toLowerCase()
               )
             : isNull(bottleReleases.edition),
           // Check vintage year
@@ -132,7 +132,7 @@ export default procedure
             ? eq(bottleReleases.statedAge, newData.statedAge)
             : isNull(bottleReleases.statedAge),
           // Exclude the current release from the check
-          sql`${bottleReleases.id} != ${release.id}`,
+          sql`${bottleReleases.id} != ${release.id}`
         ),
       });
 
@@ -140,7 +140,7 @@ export default procedure
         throw new ConflictError(
           existingRelease,
           undefined,
-          "A release with these attributes already exists.",
+          "A release with these attributes already exists."
         );
       }
 
@@ -204,7 +204,7 @@ export default procedure
               }
               return acc;
             },
-            {} as Record<string, any>,
+            {} as Record<string, any>
           ),
         },
       });
@@ -231,6 +231,6 @@ export default procedure
     return await serialize(
       BottleReleaseSerializer,
       updatedRelease,
-      context.user,
+      context.user
     );
   });

@@ -1,4 +1,4 @@
-import { type ExternalSiteType } from "@peated/server/types";
+import type { ExternalSiteType } from "@peated/server/types";
 import ReviewTable from "@peated/web/components/admin/reviewTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
@@ -22,7 +22,7 @@ function Page() {
   const { data: reviewList } = useSuspenseQuery(
     orpc.reviews.list.queryOptions({
       input: queryParams,
-    }),
+    })
   );
 
   return (

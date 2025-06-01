@@ -15,7 +15,7 @@ describe("GET /flights/:flight", () => {
     const err = await waitError(
       routerClient.flights.details({
         flight: "123",
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Flight not found.]`);
   });

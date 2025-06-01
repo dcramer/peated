@@ -36,7 +36,8 @@ export default function AgeCheckConfigForm({
         <Fieldset>
           <TextField
             {...register("minAge", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              setValueAs: (v) =>
+                v === "" || !v ? null : Number.parseInt(v, 10),
             })}
             label="Min Bottle Age"
             type="number"
@@ -49,7 +50,8 @@ export default function AgeCheckConfigForm({
           />
           <TextField
             {...register("maxAge", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              setValueAs: (v) =>
+                v === "" || !v ? null : Number.parseInt(v, 10),
             })}
             label="Max Bottle Age"
             type="number"

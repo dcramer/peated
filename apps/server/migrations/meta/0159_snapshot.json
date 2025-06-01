@@ -74,13 +74,9 @@
         "badge_award_tracked_object_award_id_badge_award_id_fk": {
           "name": "badge_award_tracked_object_award_id_badge_award_id_fk",
           "tableFrom": "badge_award_tracked_object",
-          "columnsFrom": [
-            "award_id"
-          ],
+          "columnsFrom": ["award_id"],
           "tableTo": "badge_award",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -162,26 +158,18 @@
         "badge_award_badge_id_badges_id_fk": {
           "name": "badge_award_badge_id_badges_id_fk",
           "tableFrom": "badge_award",
-          "columnsFrom": [
-            "badge_id"
-          ],
+          "columnsFrom": ["badge_id"],
           "tableTo": "badges",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "badge_award_user_id_user_id_fk": {
           "name": "badge_award_user_id_user_id_fk",
           "tableFrom": "badge_award",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "user",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -363,26 +351,18 @@
         "bottle_alias_bottle_id_bottle_id_fk": {
           "name": "bottle_alias_bottle_id_bottle_id_fk",
           "tableFrom": "bottle_alias",
-          "columnsFrom": [
-            "bottle_id"
-          ],
+          "columnsFrom": ["bottle_id"],
           "tableTo": "bottle",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "bottle_alias_release_id_bottle_release_id_fk": {
           "name": "bottle_alias_release_id_bottle_release_id_fk",
           "tableFrom": "bottle_alias",
-          "columnsFrom": [
-            "release_id"
-          ],
+          "columnsFrom": ["release_id"],
           "tableTo": "bottle_release",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -423,13 +403,9 @@
         "bottle_flavor_profile_bottle_id_bottle_id_fk": {
           "name": "bottle_flavor_profile_bottle_id_bottle_id_fk",
           "tableFrom": "bottle_flavor_profile",
-          "columnsFrom": [
-            "bottle_id"
-          ],
+          "columnsFrom": ["bottle_id"],
           "tableTo": "bottle",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -437,10 +413,7 @@
       "compositePrimaryKeys": {
         "bottle_flavor_profile_bottle_id_flavor_profile_pk": {
           "name": "bottle_flavor_profile_bottle_id_flavor_profile_pk",
-          "columns": [
-            "bottle_id",
-            "flavor_profile"
-          ]
+          "columns": ["bottle_id", "flavor_profile"]
         }
       },
       "uniqueConstraints": {},
@@ -659,26 +632,18 @@
         "bottle_release_bottle_id_bottle_id_fk": {
           "name": "bottle_release_bottle_id_bottle_id_fk",
           "tableFrom": "bottle_release",
-          "columnsFrom": [
-            "bottle_id"
-          ],
+          "columnsFrom": ["bottle_id"],
           "tableTo": "bottle",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "bottle_release_created_by_id_user_id_fk": {
           "name": "bottle_release_created_by_id_user_id_fk",
           "tableFrom": "bottle_release",
-          "columnsFrom": [
-            "created_by_id"
-          ],
+          "columnsFrom": ["created_by_id"],
           "tableTo": "user",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -823,26 +788,18 @@
         "bottle_series_brand_id_entity_id_fk": {
           "name": "bottle_series_brand_id_entity_id_fk",
           "tableFrom": "bottle_series",
-          "columnsFrom": [
-            "brand_id"
-          ],
+          "columnsFrom": ["brand_id"],
           "tableTo": "entity",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "bottle_series_created_by_id_user_id_fk": {
           "name": "bottle_series_created_by_id_user_id_fk",
           "tableFrom": "bottle_series",
-          "columnsFrom": [
-            "created_by_id"
-          ],
+          "columnsFrom": ["created_by_id"],
           "tableTo": "user",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -882,13 +839,9 @@
         "bottle_tag_bottle_id_bottle_id_fk": {
           "name": "bottle_tag_bottle_id_bottle_id_fk",
           "tableFrom": "bottle_tag",
-          "columnsFrom": [
-            "bottle_id"
-          ],
+          "columnsFrom": ["bottle_id"],
           "tableTo": "bottle",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -896,10 +849,7 @@
       "compositePrimaryKeys": {
         "bottle_tag_bottle_id_tag_pk": {
           "name": "bottle_tag_bottle_id_tag_pk",
-          "columns": [
-            "bottle_id",
-            "tag"
-          ]
+          "columns": ["bottle_id", "tag"]
         }
       },
       "uniqueConstraints": {},
@@ -1227,52 +1177,36 @@
         "bottle_series_id_bottle_series_id_fk": {
           "name": "bottle_series_id_bottle_series_id_fk",
           "tableFrom": "bottle",
-          "columnsFrom": [
-            "series_id"
-          ],
+          "columnsFrom": ["series_id"],
           "tableTo": "bottle_series",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "bottle_brand_id_entity_id_fk": {
           "name": "bottle_brand_id_entity_id_fk",
           "tableFrom": "bottle",
-          "columnsFrom": [
-            "brand_id"
-          ],
+          "columnsFrom": ["brand_id"],
           "tableTo": "entity",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "bottle_bottler_id_entity_id_fk": {
           "name": "bottle_bottler_id_entity_id_fk",
           "tableFrom": "bottle",
-          "columnsFrom": [
-            "bottler_id"
-          ],
+          "columnsFrom": ["bottler_id"],
           "tableTo": "entity",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "bottle_created_by_id_user_id_fk": {
           "name": "bottle_created_by_id_user_id_fk",
           "tableFrom": "bottle",
-          "columnsFrom": [
-            "created_by_id"
-          ],
+          "columnsFrom": ["created_by_id"],
           "tableTo": "user",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -1305,26 +1239,18 @@
         "bottle_distiller_bottle_id_bottle_id_fk": {
           "name": "bottle_distiller_bottle_id_bottle_id_fk",
           "tableFrom": "bottle_distiller",
-          "columnsFrom": [
-            "bottle_id"
-          ],
+          "columnsFrom": ["bottle_id"],
           "tableTo": "bottle",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "bottle_distiller_distiller_id_entity_id_fk": {
           "name": "bottle_distiller_distiller_id_entity_id_fk",
           "tableFrom": "bottle_distiller",
-          "columnsFrom": [
-            "distiller_id"
-          ],
+          "columnsFrom": ["distiller_id"],
           "tableTo": "entity",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -1332,10 +1258,7 @@
       "compositePrimaryKeys": {
         "bottle_distiller_bottle_id_distiller_id_pk": {
           "name": "bottle_distiller_bottle_id_distiller_id_pk",
-          "columns": [
-            "bottle_id",
-            "distiller_id"
-          ]
+          "columns": ["bottle_id", "distiller_id"]
         }
       },
       "uniqueConstraints": {},
@@ -1422,13 +1345,9 @@
         "change_created_by_id_user_id_fk": {
           "name": "change_created_by_id_user_id_fk",
           "tableFrom": "change",
-          "columnsFrom": [
-            "created_by_id"
-          ],
+          "columnsFrom": ["created_by_id"],
           "tableTo": "user",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -1511,39 +1430,27 @@
         "collection_bottle_collection_id_collection_id_fk": {
           "name": "collection_bottle_collection_id_collection_id_fk",
           "tableFrom": "collection_bottle",
-          "columnsFrom": [
-            "collection_id"
-          ],
+          "columnsFrom": ["collection_id"],
           "tableTo": "collection",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "collection_bottle_bottle_id_bottle_id_fk": {
           "name": "collection_bottle_bottle_id_bottle_id_fk",
           "tableFrom": "collection_bottle",
-          "columnsFrom": [
-            "bottle_id"
-          ],
+          "columnsFrom": ["bottle_id"],
           "tableTo": "bottle",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "collection_bottle_release_id_bottle_release_id_fk": {
           "name": "collection_bottle_release_id_bottle_release_id_fk",
           "tableFrom": "collection_bottle",
-          "columnsFrom": [
-            "release_id"
-          ],
+          "columnsFrom": ["release_id"],
           "tableTo": "bottle_release",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -1552,11 +1459,7 @@
       "uniqueConstraints": {
         "collection_bottle_collection_id_bottle_id_release_id_unique": {
           "name": "collection_bottle_collection_id_bottle_id_release_id_unique",
-          "columns": [
-            "collection_id",
-            "bottle_id",
-            "release_id"
-          ],
+          "columns": ["collection_id", "bottle_id", "release_id"],
           "nullsNotDistinct": true
         }
       },
@@ -1637,13 +1540,9 @@
         "collection_created_by_id_user_id_fk": {
           "name": "collection_created_by_id_user_id_fk",
           "tableFrom": "collection",
-          "columnsFrom": [
-            "created_by_id"
-          ],
+          "columnsFrom": ["created_by_id"],
           "tableTo": "user",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -1723,26 +1622,18 @@
         "comments_tasting_id_tasting_id_fk": {
           "name": "comments_tasting_id_tasting_id_fk",
           "tableFrom": "comments",
-          "columnsFrom": [
-            "tasting_id"
-          ],
+          "columnsFrom": ["tasting_id"],
           "tableTo": "tasting",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "comments_created_by_id_user_id_fk": {
           "name": "comments_created_by_id_user_id_fk",
           "tableFrom": "comments",
-          "columnsFrom": [
-            "created_by_id"
-          ],
+          "columnsFrom": ["created_by_id"],
           "tableTo": "user",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -2077,52 +1968,36 @@
         "entity_country_id_country_id_fk": {
           "name": "entity_country_id_country_id_fk",
           "tableFrom": "entity",
-          "columnsFrom": [
-            "country_id"
-          ],
+          "columnsFrom": ["country_id"],
           "tableTo": "country",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "entity_region_id_region_id_fk": {
           "name": "entity_region_id_region_id_fk",
           "tableFrom": "entity",
-          "columnsFrom": [
-            "region_id"
-          ],
+          "columnsFrom": ["region_id"],
           "tableTo": "region",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "entity_created_by_id_user_id_fk": {
           "name": "entity_created_by_id_user_id_fk",
           "tableFrom": "entity",
-          "columnsFrom": [
-            "created_by_id"
-          ],
+          "columnsFrom": ["created_by_id"],
           "tableTo": "user",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "entity_parent_fk": {
           "name": "entity_parent_fk",
           "tableFrom": "entity",
-          "columnsFrom": [
-            "parent_id"
-          ],
+          "columnsFrom": ["parent_id"],
           "tableTo": "entity",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -2193,13 +2068,9 @@
         "entity_alias_entity_id_entity_id_fk": {
           "name": "entity_alias_entity_id_entity_id_fk",
           "tableFrom": "entity_alias",
-          "columnsFrom": [
-            "entity_id"
-          ],
+          "columnsFrom": ["entity_id"],
           "tableTo": "entity",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -2350,13 +2221,9 @@
         "event_country_id_country_id_fk": {
           "name": "event_country_id_country_id_fk",
           "tableFrom": "event",
-          "columnsFrom": [
-            "country_id"
-          ],
+          "columnsFrom": ["country_id"],
           "tableTo": "country",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -2409,13 +2276,9 @@
         "external_site_config_external_site_id_external_site_id_fk": {
           "name": "external_site_config_external_site_id_external_site_id_fk",
           "tableFrom": "external_site_config",
-          "columnsFrom": [
-            "external_site_id"
-          ],
+          "columnsFrom": ["external_site_id"],
           "tableTo": "external_site",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -2423,10 +2286,7 @@
       "compositePrimaryKeys": {
         "external_site_config_external_site_id_key_pk": {
           "name": "external_site_config_external_site_id_key_pk",
-          "columns": [
-            "external_site_id",
-            "key"
-          ]
+          "columns": ["external_site_id", "key"]
         }
       },
       "uniqueConstraints": {},
@@ -2536,39 +2396,27 @@
         "flight_bottle_flight_id_flight_id_fk": {
           "name": "flight_bottle_flight_id_flight_id_fk",
           "tableFrom": "flight_bottle",
-          "columnsFrom": [
-            "flight_id"
-          ],
+          "columnsFrom": ["flight_id"],
           "tableTo": "flight",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "flight_bottle_bottle_id_bottle_id_fk": {
           "name": "flight_bottle_bottle_id_bottle_id_fk",
           "tableFrom": "flight_bottle",
-          "columnsFrom": [
-            "bottle_id"
-          ],
+          "columnsFrom": ["bottle_id"],
           "tableTo": "bottle",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "flight_bottle_release_id_bottle_release_id_fk": {
           "name": "flight_bottle_release_id_bottle_release_id_fk",
           "tableFrom": "flight_bottle",
-          "columnsFrom": [
-            "release_id"
-          ],
+          "columnsFrom": ["release_id"],
           "tableTo": "bottle_release",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -2577,11 +2425,7 @@
       "uniqueConstraints": {
         "flight_bottle_flight_id_bottle_id_release_id_unique": {
           "name": "flight_bottle_flight_id_bottle_id_release_id_unique",
-          "columns": [
-            "flight_id",
-            "bottle_id",
-            "release_id"
-          ],
+          "columns": ["flight_id", "bottle_id", "release_id"],
           "nullsNotDistinct": true
         }
       },
@@ -2659,13 +2503,9 @@
         "flight_created_by_id_user_id_fk": {
           "name": "flight_created_by_id_user_id_fk",
           "tableFrom": "flight",
-          "columnsFrom": [
-            "created_by_id"
-          ],
+          "columnsFrom": ["created_by_id"],
           "tableTo": "user",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -2756,26 +2596,18 @@
         "follow_from_user_id_user_id_fk": {
           "name": "follow_from_user_id_user_id_fk",
           "tableFrom": "follow",
-          "columnsFrom": [
-            "from_user_id"
-          ],
+          "columnsFrom": ["from_user_id"],
           "tableTo": "user",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "follow_to_user_id_user_id_fk": {
           "name": "follow_to_user_id_user_id_fk",
           "tableFrom": "follow",
-          "columnsFrom": [
-            "to_user_id"
-          ],
+          "columnsFrom": ["to_user_id"],
           "tableTo": "user",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -2858,13 +2690,9 @@
         "identity_user_id_user_id_fk": {
           "name": "identity_user_id_user_id_fk",
           "tableFrom": "identity",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "user",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -2963,26 +2791,18 @@
         "notifications_user_id_user_id_fk": {
           "name": "notifications_user_id_user_id_fk",
           "tableFrom": "notifications",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "user",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "notifications_from_user_id_user_id_fk": {
           "name": "notifications_from_user_id_user_id_fk",
           "tableFrom": "notifications",
-          "columnsFrom": [
-            "from_user_id"
-          ],
+          "columnsFrom": ["from_user_id"],
           "tableTo": "user",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -3118,13 +2938,9 @@
         "region_country_id_country_id_fk": {
           "name": "region_country_id_country_id_fk",
           "tableFrom": "region",
-          "columnsFrom": [
-            "country_id"
-          ],
+          "columnsFrom": ["country_id"],
           "tableTo": "country",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -3251,26 +3067,18 @@
         "review_external_site_id_external_site_id_fk": {
           "name": "review_external_site_id_external_site_id_fk",
           "tableFrom": "review",
-          "columnsFrom": [
-            "external_site_id"
-          ],
+          "columnsFrom": ["external_site_id"],
           "tableTo": "external_site",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "review_bottle_id_bottle_id_fk": {
           "name": "review_bottle_id_bottle_id_fk",
           "tableFrom": "review",
-          "columnsFrom": [
-            "bottle_id"
-          ],
+          "columnsFrom": ["bottle_id"],
           "tableTo": "bottle",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -3279,9 +3087,7 @@
       "uniqueConstraints": {
         "review_url_unique": {
           "name": "review_url_unique",
-          "columns": [
-            "url"
-          ],
+          "columns": ["url"],
           "nullsNotDistinct": false
         }
       },
@@ -3366,13 +3172,9 @@
         "store_price_history_price_id_store_price_id_fk": {
           "name": "store_price_history_price_id_store_price_id_fk",
           "tableFrom": "store_price_history",
-          "columnsFrom": [
-            "price_id"
-          ],
+          "columnsFrom": ["price_id"],
           "tableTo": "store_price",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -3512,26 +3314,18 @@
         "store_price_external_site_id_external_site_id_fk": {
           "name": "store_price_external_site_id_external_site_id_fk",
           "tableFrom": "store_price",
-          "columnsFrom": [
-            "external_site_id"
-          ],
+          "columnsFrom": ["external_site_id"],
           "tableTo": "external_site",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "store_price_bottle_id_bottle_id_fk": {
           "name": "store_price_bottle_id_bottle_id_fk",
           "tableFrom": "store_price",
-          "columnsFrom": [
-            "bottle_id"
-          ],
+          "columnsFrom": ["bottle_id"],
           "tableTo": "bottle",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -3540,9 +3334,7 @@
       "uniqueConstraints": {
         "store_price_url_unique": {
           "name": "store_price_url_unique",
-          "columns": [
-            "url"
-          ],
+          "columns": ["url"],
           "nullsNotDistinct": false
         }
       },
@@ -3668,26 +3460,18 @@
         "tasting_badge_award_tasting_id_tasting_id_fk": {
           "name": "tasting_badge_award_tasting_id_tasting_id_fk",
           "tableFrom": "tasting_badge_award",
-          "columnsFrom": [
-            "tasting_id"
-          ],
+          "columnsFrom": ["tasting_id"],
           "tableTo": "tasting",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "tasting_badge_award_award_id_badge_award_id_fk": {
           "name": "tasting_badge_award_award_id_badge_award_id_fk",
           "tableFrom": "tasting_badge_award",
-          "columnsFrom": [
-            "award_id"
-          ],
+          "columnsFrom": ["award_id"],
           "tableTo": "badge_award",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -3865,52 +3649,36 @@
         "tasting_bottle_id_bottle_id_fk": {
           "name": "tasting_bottle_id_bottle_id_fk",
           "tableFrom": "tasting",
-          "columnsFrom": [
-            "bottle_id"
-          ],
+          "columnsFrom": ["bottle_id"],
           "tableTo": "bottle",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "tasting_release_id_bottle_release_id_fk": {
           "name": "tasting_release_id_bottle_release_id_fk",
           "tableFrom": "tasting",
-          "columnsFrom": [
-            "release_id"
-          ],
+          "columnsFrom": ["release_id"],
           "tableTo": "bottle_release",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "tasting_flight_id_flight_id_fk": {
           "name": "tasting_flight_id_flight_id_fk",
           "tableFrom": "tasting",
-          "columnsFrom": [
-            "flight_id"
-          ],
+          "columnsFrom": ["flight_id"],
           "tableTo": "flight",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "tasting_created_by_id_user_id_fk": {
           "name": "tasting_created_by_id_user_id_fk",
           "tableFrom": "tasting",
-          "columnsFrom": [
-            "created_by_id"
-          ],
+          "columnsFrom": ["created_by_id"],
           "tableTo": "user",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -3919,12 +3687,7 @@
       "uniqueConstraints": {
         "tasting_unq": {
           "name": "tasting_unq",
-          "columns": [
-            "bottle_id",
-            "release_id",
-            "created_by_id",
-            "created_at"
-          ],
+          "columns": ["bottle_id", "release_id", "created_by_id", "created_at"],
           "nullsNotDistinct": true
         }
       },
@@ -3989,26 +3752,18 @@
         "toasts_tasting_id_tasting_id_fk": {
           "name": "toasts_tasting_id_tasting_id_fk",
           "tableFrom": "toasts",
-          "columnsFrom": [
-            "tasting_id"
-          ],
+          "columnsFrom": ["tasting_id"],
           "tableTo": "tasting",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "toasts_created_by_id_user_id_fk": {
           "name": "toasts_created_by_id_user_id_fk",
           "tableFrom": "toasts",
-          "columnsFrom": [
-            "created_by_id"
-          ],
+          "columnsFrom": ["created_by_id"],
           "tableTo": "user",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -4147,39 +3902,22 @@
     "public.badge_award_object_type": {
       "name": "badge_award_object_type",
       "schema": "public",
-      "values": [
-        "bottle",
-        "entity",
-        "country",
-        "region"
-      ]
+      "values": ["bottle", "entity", "country", "region"]
     },
     "public.badge_formula": {
       "name": "badge_formula",
       "schema": "public",
-      "values": [
-        "default",
-        "linear",
-        "fibonacci"
-      ]
+      "values": ["default", "linear", "fibonacci"]
     },
     "public.type": {
       "name": "type",
       "schema": "public",
-      "values": [
-        "add",
-        "update",
-        "delete"
-      ]
+      "values": ["add", "update", "delete"]
     },
     "public.entity_type": {
       "name": "entity_type",
       "schema": "public",
-      "values": [
-        "brand",
-        "distiller",
-        "bottler"
-      ]
+      "values": ["brand", "distiller", "bottler"]
     },
     "public.category": {
       "name": "category",
@@ -4197,10 +3935,7 @@
     "public.content_source": {
       "name": "content_source",
       "schema": "public",
-      "values": [
-        "generated",
-        "user"
-      ]
+      "values": ["generated", "user"]
     },
     "public.flavor_profile": {
       "name": "flavor_profile",
@@ -4265,45 +4000,27 @@
     "public.follow_status": {
       "name": "follow_status",
       "schema": "public",
-      "values": [
-        "none",
-        "pending",
-        "following"
-      ]
+      "values": ["none", "pending", "following"]
     },
     "public.identity_provider": {
       "name": "identity_provider",
       "schema": "public",
-      "values": [
-        "google"
-      ]
+      "values": ["google"]
     },
     "public.notification_type": {
       "name": "notification_type",
       "schema": "public",
-      "values": [
-        "comment",
-        "toast",
-        "friend_request"
-      ]
+      "values": ["comment", "toast", "friend_request"]
     },
     "public.currency": {
       "name": "currency",
       "schema": "public",
-      "values": [
-        "usd",
-        "gbp",
-        "eur"
-      ]
+      "values": ["usd", "gbp", "eur"]
     },
     "public.servingStyle": {
       "name": "servingStyle",
       "schema": "public",
-      "values": [
-        "neat",
-        "rocks",
-        "splash"
-      ]
+      "values": ["neat", "rocks", "splash"]
     }
   },
   "schemas": {},

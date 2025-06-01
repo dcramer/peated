@@ -1,4 +1,4 @@
-import { type z } from "zod";
+import type { z } from "zod";
 import { serialize, serializer } from ".";
 import type {
   Bottle,
@@ -7,7 +7,7 @@ import type {
   User,
 } from "../db/schema";
 import { notEmpty } from "../lib/filter";
-import { type CollectionBottleSchema } from "../schemas";
+import type { CollectionBottleSchema } from "../schemas";
 import { BottleSerializer } from "./bottle";
 import { BottleReleaseSerializer } from "./bottleRelease";
 
@@ -23,20 +23,20 @@ export const CollectionBottleSerializer = serializer({
       bottle: Bottle;
       release: BottleRelease;
     })[],
-    currentUser?: User,
+    currentUser?: User
   ): Promise<Record<number, CollectionBottleAttrs>> => {
     const bottleList = itemList.map((i) => i.bottle);
     const bottlesById = Object.fromEntries(
       (await serialize(BottleSerializer, bottleList, currentUser)).map(
-        (data, index) => [bottleList[index].id, data],
-      ),
+        (data, index) => [bottleList[index].id, data]
+      )
     );
 
     const releaseList = itemList.map((i) => i.release).filter(notEmpty);
     const releasesById = Object.fromEntries(
       (await serialize(BottleReleaseSerializer, releaseList, currentUser)).map(
-        (data, index) => [releaseList[index].id, data],
-      ),
+        (data, index) => [releaseList[index].id, data]
+      )
     );
     return Object.fromEntries(
       itemList.map((item) => {
@@ -47,7 +47,7 @@ export const CollectionBottleSerializer = serializer({
             release: item.releaseId ? releasesById[item.releaseId] : null,
           },
         ];
-      }),
+      })
     );
   },
   item: (
@@ -55,7 +55,7 @@ export const CollectionBottleSerializer = serializer({
       bottle: Bottle;
     },
     attrs: CollectionBottleAttrs,
-    currentUser?: User,
+    currentUser?: User
   ): z.infer<typeof CollectionBottleSchema> => {
     return {
       id: item.id,

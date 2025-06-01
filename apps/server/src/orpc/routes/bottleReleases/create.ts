@@ -27,10 +27,10 @@ export default procedure
   .input(
     BottleReleaseInputSchema.extend({
       bottle: z.coerce.number(),
-    }),
+    })
   )
   .output(BottleReleaseSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     // Verify the bottle exists
     const [bottle] = await db
       .select()
@@ -80,7 +80,7 @@ export default procedure
         input.edition
           ? eq(
               sql`LOWER(${bottleReleases.edition})`,
-              input.edition.toLowerCase(),
+              input.edition.toLowerCase()
             )
           : isNull(bottleReleases.edition),
         input.vintageYear
@@ -94,7 +94,7 @@ export default procedure
           : isNull(bottleReleases.statedAge),
         input.abv
           ? eq(bottleReleases.abv, input.abv)
-          : isNull(bottleReleases.abv),
+          : isNull(bottleReleases.abv)
       ),
     });
 
@@ -102,7 +102,7 @@ export default procedure
       throw new ConflictError(
         existingRelease,
         undefined,
-        "A release with these attributes already exists.",
+        "A release with these attributes already exists."
       );
     }
 
@@ -139,16 +139,18 @@ export default procedure
 
       await Promise.all([
         // Create change record
-        tx.insert(changes).values({
-          objectType: "bottle_release",
-          objectId: release.id,
-          createdById: context.user.id,
-          displayName: release.fullName,
-          type: "add",
-          data: {
-            ...release,
-          },
-        }),
+        tx
+          .insert(changes)
+          .values({
+            objectType: "bottle_release",
+            objectId: release.id,
+            createdById: context.user.id,
+            displayName: release.fullName,
+            type: "add",
+            data: {
+              ...release,
+            },
+          }),
 
         // Increment the numReleases counter on the bottle
         tx

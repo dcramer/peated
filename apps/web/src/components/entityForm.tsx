@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { isDefinedError } from "@orpc/client";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { EntityInputSchema } from "@peated/server/schemas";
-import { type Entity } from "@peated/server/types";
+import type { Entity } from "@peated/server/types";
 import CountryField from "@peated/web/components/countryField";
 import Fieldset from "@peated/web/components/fieldset";
 import Form from "@peated/web/components/form";
@@ -69,7 +69,7 @@ export default function EntityForm({
           id: initialData.country.id,
           name: initialData.country.name,
         }
-      : undefined,
+      : undefined
   );
 
   const [regionValue, setRegionValue] = useState<Option | undefined>(
@@ -78,12 +78,12 @@ export default function EntityForm({
           id: initialData.region.id,
           name: initialData.region.name,
         }
-      : undefined,
+      : undefined
   );
 
   const orpc = useORPC();
   const generateDataMutation = useMutation(
-    orpc.ai.entityLookup.mutationOptions(),
+    orpc.ai.entityLookup.mutationOptions()
   );
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
@@ -146,8 +146,9 @@ export default function EntityForm({
               <Button
                 color="default"
                 onClick={async () => {
-                  const result =
-                    await generateDataMutation.mutateAsync(getValues());
+                  const result = await generateDataMutation.mutateAsync(
+                    getValues()
+                  );
 
                   const currentValues = getValues();
                   if (
@@ -252,7 +253,8 @@ export default function EntityForm({
           />
           <TextField
             {...register("yearEstablished", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              setValueAs: (v) =>
+                v === "" || !v ? null : Number.parseInt(v, 10),
             })}
             error={errors.yearEstablished}
             label="Year Established"

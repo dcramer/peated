@@ -16,7 +16,7 @@ export default function Page({
       input: {
         tag: tagId,
       },
-    }),
+    })
   );
 
   const router = useRouter();

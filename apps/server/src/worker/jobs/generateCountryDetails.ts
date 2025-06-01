@@ -2,7 +2,7 @@ import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { countries } from "@peated/server/db/schema";
 import { getStructuredResponse } from "@peated/server/lib/openai";
-import { type Country } from "@peated/server/types";
+import type { Country } from "@peated/server/types";
 import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -37,7 +37,7 @@ export type GeneratedCountryDetails = z.infer<
 >;
 
 export async function getGeneratedCountryDetails(
-  country: InputCountry,
+  country: InputCountry
 ): Promise<GeneratedCountryDetails | null> {
   return await startSpan(
     {
@@ -56,9 +56,9 @@ export async function getGeneratedCountryDetails(
             id: country.slug,
             name: country.name,
           },
-        },
+        }
       );
-    },
+    }
   );
 }
 

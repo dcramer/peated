@@ -32,7 +32,7 @@ export const tastings = pgTable(
       .references(() => bottles.id)
       .notNull(),
     releaseId: bigint("release_id", { mode: "number" }).references(
-      () => bottleReleases.id,
+      () => bottleReleases.id
     ),
     tags: varchar("tags", { length: 64 })
       .array()
@@ -48,7 +48,7 @@ export const tastings = pgTable(
       .default(sql`array[]::bigint[]`)
       .notNull(),
     flightId: bigint("flight_id", { mode: "number" }).references(
-      () => flights.id,
+      () => flights.id
     ),
 
     comments: integer("comments").default(0).notNull(),
@@ -67,7 +67,7 @@ export const tastings = pgTable(
     index("tasting_release_idx").on(table.releaseId),
     index("tasting_flight_idx").on(table.flightId),
     index("tasting_created_by_idx").on(table.createdById),
-  ],
+  ]
 );
 
 export const tastingsRelations = relations(tastings, ({ one }) => ({
@@ -104,7 +104,7 @@ export const tastingBadgeAwards = pgTable(
   (table) => [
     uniqueIndex("tasting_badge_award_key").on(table.tastingId, table.awardId),
     index("tasting_badge_award_award_id").on(table.awardId),
-  ],
+  ]
 );
 
 export const tastingBadgeAwardsRelations = relations(
@@ -114,7 +114,7 @@ export const tastingBadgeAwardsRelations = relations(
       fields: [tastingBadgeAwards.awardId],
       references: [badgeAwards.id],
     }),
-  }),
+  })
 );
 
 export type TastingBadgeAward = typeof tastingBadgeAwards.$inferSelect;

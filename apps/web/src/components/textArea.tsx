@@ -9,7 +9,7 @@ export default forwardRef<
   const baseStyles = classNames(
     "rounded px-4 py-2 sm:leading-6 border-0 focus:ring-0",
     disabled || readOnly ? "bg-slate-900 text-slate-300" : "",
-    "bg-slate-800",
+    "bg-slate-800"
   );
   const inputStyles =
     "block outline-none focus:ring-0 sm:leading-6 placeholder:text-slate-400";

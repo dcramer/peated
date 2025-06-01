@@ -21,7 +21,7 @@ export type OnResults<T extends Option> = (results: any[]) => T[];
 
 export type OnQuery<T extends Option> = (
   query: string,
-  options: T[],
+  options: T[]
 ) => Promise<T[]>;
 
 export type OnRenderOption<T extends Option> = (option: T) => ReactNode;

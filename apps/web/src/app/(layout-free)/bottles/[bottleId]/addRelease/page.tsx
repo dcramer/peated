@@ -21,11 +21,11 @@ export default function AddRelease({
 
   const orpc = useORPC();
   const { data: bottle } = useSuspenseQuery(
-    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
+    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } })
   );
 
   const bottleReleaseCreateMutation = useMutation(
-    orpc.bottleReleases.create.mutationOptions(),
+    orpc.bottleReleases.create.mutationOptions()
   );
 
   if (!bottle) return null;

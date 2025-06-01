@@ -1,6 +1,6 @@
+import { basename } from "path";
 import { startInactiveSpan } from "@sentry/node";
 import { Command } from "commander";
-import { basename } from "path";
 import { gracefulShutdown } from "../../server/src/worker/client";
 
 // const originalAction = Command.prototype.action;

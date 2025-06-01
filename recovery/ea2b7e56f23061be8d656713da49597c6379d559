@@ -1,7 +1,0 @@
-import stats from "./stats";
-import version from "./version";
-
-export default {
-  stats,
-  version,
-};

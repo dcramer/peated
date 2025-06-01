@@ -13,7 +13,7 @@ export async function createTastingForBadge(
     bottler?: Entity | null;
     brand?: Entity;
   } = {},
-  userId: number | null = null,
+  userId: number | null = null
 ) {
   if (!brand) brand = await fixtures.Entity({ type: ["brand"] });
   const bottle = await fixtures.Bottle({

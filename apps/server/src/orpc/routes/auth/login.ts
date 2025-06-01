@@ -28,10 +28,10 @@ export default procedure
       z.object({
         code: z.string(),
       }),
-    ]),
+    ])
   )
   .output(AuthSchema)
-  .handler(async function ({ input, errors }) {
+  .handler(async ({ input, errors }) => {
     const user =
       "code" in input
         ? await authGoogle(input.code)
@@ -79,7 +79,7 @@ async function authGoogle(code: string) {
   const client = new OAuth2Client(
     config.GOOGLE_CLIENT_ID,
     config.GOOGLE_CLIENT_SECRET,
-    "postmessage",
+    "postmessage"
   );
 
   const { tokens } = await client.getToken(code);
@@ -112,8 +112,8 @@ async function authGoogle(code: string) {
     .where(
       and(
         eq(identities.provider, "google"),
-        eq(identities.externalId, payload.sub),
-      ),
+        eq(identities.externalId, payload.sub)
+      )
     );
   let user = result?.user;
   if (user) return user;

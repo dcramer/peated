@@ -23,7 +23,7 @@ function Page() {
       input: {
         ...queryParams,
       },
-    }),
+    })
   );
 
   return (

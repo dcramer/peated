@@ -5,7 +5,7 @@ import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute(
-  "/bottles/$bottleId/releases/$releaseId/edit",
+  "/bottles/$bottleId/releases/$releaseId/edit"
 )({
   component: Page,
 });
@@ -16,16 +16,16 @@ function Page() {
   const { bottleId, releaseId } = Route.useParams();
   const orpc = useORPC();
   const { data: bottle } = useSuspenseQuery(
-    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
+    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } })
   );
   const { data: release } = useSuspenseQuery(
     orpc.bottleReleases.details.queryOptions({
       input: { release: Number(releaseId) },
-    }),
+    })
   );
   const navigate = useNavigate();
   const bottleReleaseUpdateMutation = useMutation(
-    orpc.bottleReleases.update.mutationOptions(),
+    orpc.bottleReleases.update.mutationOptions()
   );
 
   return (

@@ -46,7 +46,7 @@ registry.add("IndexBottleAlias", indexBottleAlias);
 registry.add("IndexBottleSearchVectors", indexBottleSearchVectors);
 registry.add(
   "IndexBottleReleaseSearchVectors",
-  indexBottleReleaseSearchVectors,
+  indexBottleReleaseSearchVectors
 );
 registry.add("IndexBottleSeriesSearchVectors", indexBottleSeriesSearchVectors);
 registry.add("IndexEntitySearchVectors", indexEntitySearchVectors);

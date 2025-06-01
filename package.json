@@ -25,11 +25,12 @@
     "start": "dotenv -e .env.local -- turbo start",
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
+    "lint:fix": "biome check --write",
+    "format": "biome format --write",
     "test": "turbo test",
     "test:ci": "CI=true pnpm -r run test:ci",
     "preinstall": "npx only-allow pnpm",
-    "postinstall": "simple-git-hooks",
-    "format": "prettier --write --cache ."
+    "postinstall": "simple-git-hooks"
   },
   "author": "David Cramer",
   "license": "Apache-2.0",
@@ -41,22 +42,16 @@
     "typescript": "catalog:"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
-    "eslint": "catalog:",
-    "eslint-plugin-react": "^7.37.4",
+    "@biomejs/biome": "^1.9.4",
     "lint-staged": "^14.0.1",
     "prettier": "catalog:",
-    "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-tailwindcss": "catalog:"
   },
   "engines": {
     "node": ">=22.14.0 <23.0.0"
   },
   "pnpm": {
-    "onlyBuiltDependencies": [
-      "bcrypt"
-    ]
+    "onlyBuiltDependencies": ["bcrypt"]
   },
   "packageManager": "pnpm@10.3.0",
   "volta": {
@@ -68,10 +63,7 @@
   },
   "lint-staged": {
     "*": [
-      "prettier --write --cache --ignore-unknown"
-    ],
-    "{apps,packages}/**/*.{ts,tsx}": [
-      "eslint --cache --fix"
+      "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
     ]
   }
 }

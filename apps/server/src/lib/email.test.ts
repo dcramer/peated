@@ -25,7 +25,7 @@ const createEmailTestHarness = () => {
       input.on("readable", () => {
         input.read();
       });
-      input.on("end", function () {
+      input.on("end", () => {
         const info = {
           envelope,
           messageId,

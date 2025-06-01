@@ -1,5 +1,5 @@
-import { type User } from "@peated/server/types";
-import { getIronSession, type SessionOptions } from "iron-session";
+import type { User } from "@peated/server/types";
+import { type SessionOptions, getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 
 if (!process.env.SESSION_SECRET) {

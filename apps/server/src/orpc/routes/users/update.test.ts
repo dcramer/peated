@@ -11,7 +11,7 @@ describe("PATCH /users/:user", () => {
     const err = await waitError(() =>
       routerClient.users.update({
         user: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -25,8 +25,8 @@ describe("PATCH /users/:user", () => {
         {
           user: otherUser.id,
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Cannot edit another user.]`);
   });
@@ -37,7 +37,7 @@ describe("PATCH /users/:user", () => {
         user: defaults.user.id,
         username: "JoeBlow",
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -57,7 +57,7 @@ describe("PATCH /users/:user", () => {
         user: defaults.user.id,
         mod: true,
       },
-      { context: { user: adminUser } },
+      { context: { user: adminUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -77,7 +77,7 @@ describe("PATCH /users/:user", () => {
         user: defaults.user.id,
         admin: true,
       },
-      { context: { user: adminUser } },
+      { context: { user: adminUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -96,11 +96,11 @@ describe("PATCH /users/:user", () => {
           user: defaults.user.id,
           mod: true,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Admin privileges required to modify mod status.]`,
+      `[Error: Admin privileges required to modify mod status.]`
     );
   });
 
@@ -111,11 +111,11 @@ describe("PATCH /users/:user", () => {
           user: defaults.user.id,
           admin: true,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Admin privileges required to modify admin status.]`,
+      `[Error: Admin privileges required to modify admin status.]`
     );
   });
 
@@ -126,7 +126,7 @@ describe("PATCH /users/:user", () => {
         username: "JoeBlow",
         password: "testpassword",
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -145,8 +145,8 @@ describe("PATCH /users/:user", () => {
           user: defaults.user.id,
           username: "me",
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Invalid username.]`);
   });

@@ -14,7 +14,7 @@ function Page() {
   const { data: tasting } = useSuspenseQuery(
     orpc.tastings.details.queryOptions({
       input: { tasting: Number(tastingId) },
-    }),
+    })
   );
 
   return (

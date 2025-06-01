@@ -8,7 +8,7 @@ import { useFormState, useFormStatus } from "react-dom";
 export default function ResendVerificationForm() {
   const [state, resendVerificationAction] = useFormState(
     resendVerificationForm,
-    undefined,
+    undefined
   );
 
   return (

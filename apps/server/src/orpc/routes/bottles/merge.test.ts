@@ -9,8 +9,8 @@ describe("POST /bottles/:bottle/merge-targets", () => {
           bottle: 1,
           other: 2,
         },
-        { context: { user: null } },
-      ),
+        { context: { user: null } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -23,8 +23,8 @@ describe("POST /bottles/:bottle/merge-targets", () => {
           bottle: 1,
           other: 2,
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -42,7 +42,7 @@ describe("POST /bottles/:bottle/merge-targets", () => {
         other: bottleB.id,
         direction: "mergeInto",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toEqual(bottleB.id);
@@ -61,7 +61,7 @@ describe("POST /bottles/:bottle/merge-targets", () => {
         other: bottleB.id,
         direction: "mergeFrom",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toEqual(bottleA.id);

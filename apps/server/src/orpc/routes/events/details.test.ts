@@ -17,7 +17,7 @@ describe("GET /events/:event", () => {
     const err = await waitError(
       routerClient.events.details({
         event: 12345,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Event not found.]`);
   });

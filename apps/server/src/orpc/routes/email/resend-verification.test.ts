@@ -17,7 +17,7 @@ describe("POST /email/resend-verification", () => {
     const err = await waitError(() =>
       routerClient.email.resendVerification(undefined, {
         context: { user },
-      }),
+      })
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Account already verified.]`);

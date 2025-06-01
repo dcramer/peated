@@ -1,8 +1,4 @@
-import {
-  type CaskFill,
-  type CaskSize,
-  type CaskType,
-} from "@peated/server/types";
+import type { CaskFill, CaskSize, CaskType } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import type { ComponentPropsWithoutRef } from "react";
 import Join from "./join";

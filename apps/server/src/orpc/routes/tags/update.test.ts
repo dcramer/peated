@@ -8,7 +8,7 @@ describe("PATCH /tags/:name", () => {
     const err = await waitError(() =>
       routerClient.tags.update({
         tag: tag.name,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -22,8 +22,8 @@ describe("PATCH /tags/:name", () => {
         {
           tag: tag.name,
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -36,8 +36,8 @@ describe("PATCH /tags/:name", () => {
         {
           tag: "non-existent-tag",
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Tag not found.]`);
   });
@@ -51,7 +51,7 @@ describe("PATCH /tags/:name", () => {
         tag: tag.name,
         tagCategory: "fruity",
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(newTag).toBeDefined();
@@ -67,7 +67,7 @@ describe("PATCH /tags/:name", () => {
         tag: tag.name,
         synonyms: ["new-synonym"],
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(newTag).toBeDefined();
@@ -82,7 +82,7 @@ describe("PATCH /tags/:name", () => {
       {
         tag: tag.name,
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(newTag).toBeDefined();

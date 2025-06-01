@@ -22,7 +22,7 @@ export const TastingSchema = z.object({
   release: BottleReleaseSchema.nullable()
     .default(null)
     .describe(
-      "The release of the bottle, if applicable. e.g. 'Ardbeg Supernova 2023'",
+      "The release of the bottle, if applicable. e.g. 'Ardbeg Supernova 2023'"
     ),
   rating: z
     .number()
@@ -91,7 +91,7 @@ export const TastingInputSchema = TastingSchema.omit({
     .number()
     .nullish()
     .describe(
-      "The release of the bottle, if applicable. e.g. 'Ardbeg Supernova 2023'",
+      "The release of the bottle, if applicable. e.g. 'Ardbeg Supernova 2023'"
     ),
   flight: z
     .string()

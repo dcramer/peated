@@ -12,7 +12,7 @@ export default function Page() {
 
   const orpc = useORPC();
   const regionCreateMutation = useMutation(
-    orpc.regions.create.mutationOptions(),
+    orpc.regions.create.mutationOptions()
   );
 
   return (
@@ -23,7 +23,7 @@ export default function Page() {
           country: countrySlug,
         });
         router.push(
-          `/admin/locations/${region.country.slug}/regions/${region.slug}`,
+          `/admin/locations/${region.country.slug}/regions/${region.slug}`
         );
       }}
     />

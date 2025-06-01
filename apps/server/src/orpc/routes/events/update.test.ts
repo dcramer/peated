@@ -12,8 +12,8 @@ describe("PATCH /events/:event", () => {
           event: event.id,
           name: "Foobar",
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -27,7 +27,7 @@ describe("PATCH /events/:event", () => {
         event: event.id,
         name: "Foobar",
       },
-      { context: { user: adminUser } },
+      { context: { user: adminUser } }
     );
 
     expect(newEvent).toBeDefined();

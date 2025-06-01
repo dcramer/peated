@@ -13,7 +13,7 @@ describe("DELETE /flights/:flight", () => {
       {
         flight: flight.publicId,
       },
-      { context: { user } },
+      { context: { user } }
     );
     expect(data).toEqual({});
 
@@ -33,8 +33,8 @@ describe("DELETE /flights/:flight", () => {
         {
           flight: flight.publicId,
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });

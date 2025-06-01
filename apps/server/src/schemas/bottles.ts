@@ -21,13 +21,13 @@ export const BottleSchema = z.object({
     .string()
     .trim()
     .describe(
-      "Expression name for the bottle (e.g., Supernova for Ardbeg Supernova)",
+      "Expression name for the bottle (e.g., Supernova for Ardbeg Supernova)"
     ),
 
   series: BottleSeriesSchema.nullable()
     .default(null)
     .describe(
-      "Series name for this bottling (e.g. Supernova for Ardbeg Supernova)",
+      "Series name for this bottling (e.g. Supernova for Ardbeg Supernova)"
     ),
 
   category: CategoryEnum.nullable()
@@ -197,7 +197,7 @@ export const BottleInputSchema = BottleSchema.omit({
     .trim()
     .min(1)
     .describe(
-      "Expression name for the bottle (e.g., Supernova for Ardbeg Supernova)",
+      "Expression name for the bottle (e.g., Supernova for Ardbeg Supernova)"
     ),
   series: z
     .union([

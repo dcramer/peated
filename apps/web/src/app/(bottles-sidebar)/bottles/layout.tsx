@@ -1,6 +1,6 @@
 import Layout from "@peated/web/components/layout";
-import { type Metadata } from "next";
-import { type ReactNode } from "react";
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import BottleListSidebar from "./rightSidebar";
 
 export const metadata: Metadata = {

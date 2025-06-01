@@ -15,6 +15,6 @@ export const OSMSchema = z.object({
         type: z.enum(["Point"]),
         coordinates: z.tuple([z.number(), z.number()]),
       }),
-    }),
+    })
   ),
 });

@@ -21,7 +21,7 @@ export default function TastingCommentForm({
 }) {
   const orpc = useORPC();
   const commentCreateMutation = useMutation(
-    orpc.comments.create.mutationOptions(),
+    orpc.comments.create.mutationOptions()
   );
 
   const [formData, setFormData] = useState({

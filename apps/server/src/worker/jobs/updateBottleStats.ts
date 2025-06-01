@@ -33,7 +33,7 @@ export default async ({ bottleId }: { bottleId: number }) => {
   ).map((d) => d.distillerId);
 
   const allEntityIds = uniq(
-    [...distillerIds, bottle.brandId, bottle.bottlerId].filter(notEmpty),
+    [...distillerIds, bottle.brandId, bottle.bottlerId].filter(notEmpty)
   );
 
   for (const entityId of allEntityIds) {

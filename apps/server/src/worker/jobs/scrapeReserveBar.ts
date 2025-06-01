@@ -64,7 +64,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
         volume,
         // image,
         url: absoluteUrl(url, productUrl),
-      }),
+      })
     );
   });
 
@@ -78,6 +78,6 @@ export default async function scrapeReserveBar() {
     "reservebar",
     (page) =>
       `https://www.reservebar.com/collections/whiskey?start=${page * limit}&sz=${limit}`,
-    scrapeProducts,
+    scrapeProducts
   );
 }

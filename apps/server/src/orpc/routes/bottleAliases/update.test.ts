@@ -14,8 +14,8 @@ describe("PUT /bottle-aliases/:name", () => {
         {
           alias: alias.name,
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -29,7 +29,7 @@ describe("PUT /bottle-aliases/:name", () => {
         alias: alias.name,
         ignored: true,
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     const [newAlias] = await db

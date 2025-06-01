@@ -36,7 +36,7 @@ describe("GET /bottles/:bottle/releases", () => {
     const err = await waitError(
       routerClient.bottleReleases.list({
         bottle: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
   });

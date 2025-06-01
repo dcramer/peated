@@ -22,7 +22,7 @@ export const reviews = pgTable(
       .notNull(),
     name: text("name").notNull(),
     bottleId: bigint("bottle_id", { mode: "number" }).references(
-      () => bottles.id,
+      () => bottles.id
     ),
     hidden: boolean("hidden").default(false),
     // ratings are 0-100
@@ -37,10 +37,10 @@ export const reviews = pgTable(
       "btree",
       table.externalSiteId,
       sql`LOWER(${table.name})`,
-      table.issue,
+      table.issue
     ),
     index("review_bottle_idx").on(table.bottleId),
-  ],
+  ]
 );
 
 export const reviewsRelations = relations(reviews, ({ one }) => ({

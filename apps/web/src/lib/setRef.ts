@@ -40,7 +40,7 @@ export default function setRef<T>(
     | ((instance: T | null) => void)
     | null
     | undefined,
-  value: T | null,
+  value: T | null
 ): void {
   if (typeof ref === "function") {
     ref(value);

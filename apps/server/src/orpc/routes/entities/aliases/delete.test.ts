@@ -15,7 +15,7 @@ describe("DELETE /entity-aliases/:name", () => {
       {
         name: alias.name,
       },
-      { context: { user } },
+      { context: { user } }
     );
     expect(data).toEqual({});
 
@@ -31,7 +31,7 @@ describe("DELETE /entity-aliases/:name", () => {
     const err = await waitError(() =>
       routerClient.entities.aliases.delete({
         name: "test-alias",
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -46,8 +46,8 @@ describe("DELETE /entity-aliases/:name", () => {
         {
           name: alias.name,
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -60,8 +60,8 @@ describe("DELETE /entity-aliases/:name", () => {
         {
           name: "non-existent-alias",
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Alias not found.]`);
   });
@@ -81,8 +81,8 @@ describe("DELETE /entity-aliases/:name", () => {
         {
           name: entity.name,
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Cannot delete canonical name.]`);
   });

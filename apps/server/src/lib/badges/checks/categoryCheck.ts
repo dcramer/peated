@@ -18,7 +18,7 @@ export class CategoryCheck extends Check {
 
   test(
     config: z.infer<typeof CategoryCheckConfigSchema>,
-    tasting: TastingWithRelations,
+    tasting: TastingWithRelations
   ) {
     if (!tasting.bottle.category) return false;
     return config.category.includes(tasting.bottle.category);

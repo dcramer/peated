@@ -10,7 +10,7 @@ export abstract class Check {
 
   abstract test(
     config: CheckConfigSchema,
-    tasting: TastingWithRelations,
+    tasting: TastingWithRelations
   ): boolean;
 
   async parseConfig(config: unknown) {

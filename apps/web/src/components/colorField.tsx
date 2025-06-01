@@ -33,7 +33,7 @@ export default forwardRef<HTMLInputElement, Props>(
       onChange,
       ...props
     },
-    ref,
+    ref
   ) => {
     const [value, setValue] = useState<number>(initialValue ?? -1);
     return (
@@ -58,7 +58,7 @@ export default forwardRef<HTMLInputElement, Props>(
           <button
             className={classNames(
               "pointer text-muted h-8 flex-1 border border-slate-700",
-              value === -1 ? "h-12 px-2" : "",
+              value === -1 ? "h-12 px-2" : ""
             )}
             onClick={(e) => {
               e.preventDefault();
@@ -74,7 +74,7 @@ export default forwardRef<HTMLInputElement, Props>(
                 key={num}
                 className={classNames(
                   "pointer h-8 flex-1",
-                  num === value ? "h-12 px-2" : "",
+                  num === value ? "h-12 px-2" : ""
                 )}
                 onClick={(e) => {
                   e.preventDefault();
@@ -93,7 +93,7 @@ export default forwardRef<HTMLInputElement, Props>(
             id={`f-${name}`}
             value={value}
             onChange={(e) => {
-              const value = parseInt(e.target.value, 10);
+              const value = Number.parseInt(e.target.value, 10);
               setValue(value);
               onChange && onChange(value);
             }}
@@ -101,5 +101,5 @@ export default forwardRef<HTMLInputElement, Props>(
         </div>
       </FormField>
     );
-  },
+  }
 );

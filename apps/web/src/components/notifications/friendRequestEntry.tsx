@@ -19,7 +19,7 @@ export default function FriendRequestEntry({
   const friendCreateMutation = useMutation(
     orpc.friends.create.mutationOptions({
       onSuccess: () => onArchive(),
-    }),
+    })
   );
 
   const actionLabel = (status: FriendStatus) => {

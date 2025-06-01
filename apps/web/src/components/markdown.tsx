@@ -4,7 +4,7 @@ import { marked } from "marked";
 const renderer = new marked.Renderer();
 
 // add captions to images
-renderer.image = function (href, title, text) {
+renderer.image = (href, title, text) => {
   const html = `<figure><img src="${href}" title="${title}" alt="${text}" /></figure>`;
   if (title) {
     return `<figure>

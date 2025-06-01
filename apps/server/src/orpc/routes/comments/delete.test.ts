@@ -8,7 +8,7 @@ import { describe, expect, test } from "vitest";
 describe("DELETE comments/:comment", () => {
   test("requires authentication", async () => {
     const err = await waitError(() =>
-      routerClient.comments.delete({ comment: 1 }),
+      routerClient.comments.delete({ comment: 1 })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -22,7 +22,7 @@ describe("DELETE comments/:comment", () => {
       { comment: comment.id },
       {
         context: { user: defaults.user },
-      },
+      }
     );
 
     const [newComment] = await db
@@ -43,11 +43,11 @@ describe("DELETE comments/:comment", () => {
         { comment: comment.id },
         {
           context: { user: defaults.user },
-        },
-      ),
+        }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Cannot delete another user's comment.]`,
+      `[Error: Cannot delete another user's comment.]`
     );
   });
 });

@@ -21,9 +21,9 @@ export default function Page({
   const { data: badge } = useSuspenseQuery(
     orpc.badges.details.queryOptions({
       input: {
-        badge: parseInt(badgeId, 10),
+        badge: Number.parseInt(badgeId, 10),
       },
-    }),
+    })
   );
 
   return (

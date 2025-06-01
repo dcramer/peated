@@ -11,7 +11,7 @@ describe("DELETE /countries/:country/regions/:region", () => {
       routerClient.regions.delete({
         country: "test-country",
         region: "test-region",
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -25,8 +25,8 @@ describe("DELETE /countries/:country/regions/:region", () => {
           country: "test-country",
           region: "test-region",
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -41,7 +41,7 @@ describe("DELETE /countries/:country/regions/:region", () => {
         country: country.slug,
         region: region.slug,
       },
-      { context: { user: adminUser } },
+      { context: { user: adminUser } }
     );
 
     const deletedRegion = await db
@@ -63,7 +63,7 @@ describe("DELETE /countries/:country/regions/:region", () => {
         country: country.slug,
         region: region.slug,
       },
-      { context: { user: adminUser } },
+      { context: { user: adminUser } }
     );
 
     const deletedRegion = await db
@@ -82,8 +82,8 @@ describe("DELETE /countries/:country/regions/:region", () => {
           country: "nonexistent-country",
           region: "some-region",
         },
-        { context: { user: adminUser } },
-      ),
+        { context: { user: adminUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Invalid country.]`);
   });
@@ -98,8 +98,8 @@ describe("DELETE /countries/:country/regions/:region", () => {
           country: country.slug,
           region: "nonexistent-region",
         },
-        { context: { user: adminUser } },
-      ),
+        { context: { user: adminUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Region not found.]`);
   });
@@ -119,7 +119,7 @@ describe("DELETE /countries/:country/regions/:region", () => {
         country: "united-states",
         region: "california",
       },
-      { context: { user: adminUser } },
+      { context: { user: adminUser } }
     );
 
     const deletedRegion = await db

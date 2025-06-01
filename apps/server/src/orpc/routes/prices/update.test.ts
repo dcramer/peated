@@ -13,8 +13,8 @@ describe("PATCH /prices/:price", () => {
     const err = await waitError(
       routerClient.prices.update(
         { price: price.id, hidden: true },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -25,7 +25,7 @@ describe("PATCH /prices/:price", () => {
 
     const newPriceData = await routerClient.prices.update(
       { price: price.id, hidden: true },
-      { context: { user } },
+      { context: { user } }
     );
 
     const [updatedPrice] = await db
@@ -41,8 +41,8 @@ describe("PATCH /prices/:price", () => {
     const err = await waitError(
       routerClient.prices.update(
         { price: 999999, hidden: true },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Price not found.]`);
   });
@@ -56,7 +56,7 @@ describe("PATCH /prices/:price", () => {
 
     const newPriceData = await routerClient.prices.update(
       { price: price.id }, // no actual update data
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(newPriceData.id).toBe(price.id);

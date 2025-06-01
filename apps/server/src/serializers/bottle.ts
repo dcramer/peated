@@ -1,5 +1,5 @@
 import { and, eq, inArray, sql } from "drizzle-orm";
-import { type z } from "zod";
+import type { z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
 import { db } from "../db";
@@ -14,7 +14,7 @@ import {
 } from "../db/schema";
 import { notEmpty } from "../lib/filter";
 import { absoluteUrl } from "../lib/urls";
-import { type BottleSchema } from "../schemas";
+import type { BottleSchema } from "../schemas";
 import { BottleSeriesSerializer } from "./bottleSeries";
 import { EntitySerializer } from "./entity";
 
@@ -38,7 +38,7 @@ export const BottleSerializer = serializer({
   attrs: async (
     itemList: Bottle[],
     currentUser?: User,
-    context?: Context,
+    context?: Context
   ): Promise<Record<number, Attrs>> => {
     const itemIds = itemList.map((t) => t.id);
 
@@ -53,8 +53,8 @@ export const BottleSerializer = serializer({
           ...itemList.map((i) => i.brandId),
           ...itemList.map((i) => i.bottlerId),
           ...distillerList.map((d) => d.distillerId),
-        ].filter(notEmpty),
-      ),
+        ].filter(notEmpty)
+      )
     );
 
     const entityList = await db
@@ -66,11 +66,11 @@ export const BottleSerializer = serializer({
         await serialize(EntitySerializer, entityList, currentUser, [
           "description",
         ])
-      ).map((data, index) => [entityList[index].id, data]),
+      ).map((data, index) => [entityList[index].id, data])
     );
 
     const seriesIds = Array.from(
-      new Set(itemList.map((i) => i.seriesId).filter(notEmpty)),
+      new Set(itemList.map((i) => i.seriesId).filter(notEmpty))
     );
     const seriesList = await db
       .select()
@@ -78,8 +78,8 @@ export const BottleSerializer = serializer({
       .where(inArray(bottleSeries.id, seriesIds));
     const seriesById = Object.fromEntries(
       (await serialize(BottleSeriesSerializer, seriesList, currentUser)).map(
-        (data, index) => [seriesList[index].id, data],
-      ),
+        (data, index) => [seriesList[index].id, data]
+      )
     );
 
     const distillersByBottleId: {
@@ -99,16 +99,16 @@ export const BottleSerializer = serializer({
               .from(collectionBottles)
               .innerJoin(
                 collections,
-                eq(collectionBottles.collectionId, collections.id),
+                eq(collectionBottles.collectionId, collections.id)
               )
               .where(
                 and(
                   inArray(collectionBottles.bottleId, itemIds),
                   sql`LOWER(${collections.name}) = 'default'`,
-                  eq(collections.createdById, currentUser.id),
-                ),
+                  eq(collections.createdById, currentUser.id)
+                )
               )
-          ).map((r) => r.bottleId),
+          ).map((r) => r.bottleId)
         )
       : new Set();
 
@@ -126,8 +126,8 @@ export const BottleSerializer = serializer({
                   and(
                     inArray(tastings.bottleId, itemIds),
                     eq(tastings.flightId, context.flight.id),
-                    eq(tastings.createdById, currentUser.id),
-                  ),
+                    eq(tastings.createdById, currentUser.id)
+                  )
                 )
             : await db
                 .selectDistinct({ bottleId: tastings.bottleId })
@@ -135,10 +135,10 @@ export const BottleSerializer = serializer({
                 .where(
                   and(
                     inArray(tastings.bottleId, itemIds),
-                    eq(tastings.createdById, currentUser.id),
-                  ),
+                    eq(tastings.createdById, currentUser.id)
+                  )
                 )
-          ).map((r) => r.bottleId),
+          ).map((r) => r.bottleId)
         )
       : new Set();
 
@@ -155,7 +155,7 @@ export const BottleSerializer = serializer({
             series: item.seriesId ? seriesById[item.seriesId] : null,
           },
         ];
-      }),
+      })
     );
   },
 
@@ -163,7 +163,7 @@ export const BottleSerializer = serializer({
     item: Bottle,
     attrs: Attrs,
     currentUser?: User,
-    context?: Context,
+    context?: Context
   ): z.infer<typeof BottleSchema> => {
     return {
       id: item.id,

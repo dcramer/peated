@@ -17,7 +17,7 @@ describe("GET /smws/distillers", () => {
     const user = await fixtures.User({ mod: true });
     const { results } = await routerClient.smws.distillerList(
       {},
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(results.length).toBe(2);

@@ -40,7 +40,7 @@ export default function Bar({
             ? "fill-green-400 stroke-green-400"
             : down
               ? "fill-red-400 stroke-red-400"
-              : "fill-muted stroke-muted",
+              : "fill-muted stroke-muted"
         )}
       />
     </>

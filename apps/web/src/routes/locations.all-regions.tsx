@@ -16,7 +16,7 @@ function Page() {
         onlyMajor: true,
         sort: "-bottles",
       },
-    }),
+    })
   );
 
   return (

@@ -46,7 +46,7 @@ ${entity.name}
 ${
   infoLines.length
     ? `\nOther information we already know about this entity:\n- ${infoLines.join(
-        "\n- ",
+        "\n- "
       )}\n`
     : ""
 }
@@ -71,8 +71,8 @@ Its valid to include all three values in 'type' if they are accurate, but at lea
 export const OpenAIEntityDetailsSchema = z.object({
   description: z.string().nullable().optional(),
   yearEstablished: z.preprocess(
-    (val) => (typeof val === "string" && val ? parseInt(val, 10) : val),
-    z.number().nullable().optional(),
+    (val) => (typeof val === "string" && val ? Number.parseInt(val, 10) : val),
+    z.number().nullable().optional()
   ),
   website: z.string().url().nullable().optional(),
   type: z.array(z.string()).optional(),
@@ -88,7 +88,7 @@ const OpenAIEntityDetailsValidationSchema = z.object({
 export type GeneratedEntityDetails = z.infer<typeof OpenAIEntityDetailsSchema>;
 
 export async function getGeneratedEntityDetails(
-  entity: InputEntity,
+  entity: InputEntity
 ): Promise<GeneratedEntityDetails | null> {
   return await startSpan(
     {
@@ -107,9 +107,9 @@ export async function getGeneratedEntityDetails(
             id: entity.id,
             name: entity.name,
           },
-        },
+        }
       );
-    },
+    }
   );
 }
 
@@ -183,7 +183,7 @@ export default async ({
     } catch (err) {
       console.error(
         `Discarded website (${data.website}) as possible hallucination`,
-        err,
+        err
       );
       // dont allow LLMs to hallucinate fake URLs
       data.website = null;

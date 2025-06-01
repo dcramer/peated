@@ -13,7 +13,7 @@ subcommand.command("dump-unmatched").action(async (options) => {
     .select(columns)
     .from(bottleAliases)
     .where(
-      and(eq(bottleAliases.ignored, false), isNull(bottleAliases.bottleId)),
+      and(eq(bottleAliases.ignored, false), isNull(bottleAliases.bottleId))
     )
     .orderBy(asc(bottleAliases.name));
 

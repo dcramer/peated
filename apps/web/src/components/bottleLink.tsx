@@ -1,8 +1,8 @@
 "use client";
 
-import { type Bottle } from "@peated/server/types";
+import type { Bottle } from "@peated/server/types";
 import Link from "@peated/web/components/link";
-import { useState, type ComponentPropsWithoutRef } from "react";
+import { type ComponentPropsWithoutRef, useState } from "react";
 import BottlePanel from "./bottlePanel";
 import { ClientOnly } from "./clientOnly";
 

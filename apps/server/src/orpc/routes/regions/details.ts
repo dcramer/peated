@@ -20,10 +20,10 @@ export default procedure
     z.object({
       region: z.string(),
       country: z.string(),
-    }),
+    })
   )
   .output(RegionSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     let countryId: number;
     if (Number.isFinite(+input.country)) {
       countryId = Number(input.country);
@@ -47,8 +47,8 @@ export default procedure
       .where(
         and(
           eq(regions.countryId, countryId),
-          eq(sql`LOWER(${regions.slug})`, input.region.toLowerCase()),
-        ),
+          eq(sql`LOWER(${regions.slug})`, input.region.toLowerCase())
+        )
       );
 
     if (!region) {

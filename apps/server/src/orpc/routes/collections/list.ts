@@ -24,19 +24,15 @@ export default procedure
       bottle: z.coerce.number().optional(),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
-    }),
+    })
   )
   .output(
     z.object({
       results: z.array(CollectionSchema),
       rel: CursorSchema,
-    }),
+    })
   )
-  .handler(async function ({
-    input: { cursor, limit, ...input },
-    context,
-    errors,
-  }) {
+  .handler(async ({ input: { cursor, limit, ...input }, context, errors }) => {
     const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
       throw errors.NOT_FOUND({
@@ -55,7 +51,7 @@ export default procedure
     const where = [sql`${collections.createdById} = ${user.id}`];
     if (input.bottle) {
       where.push(
-        sql`EXISTS(SELECT 1 FROM ${collectionBottles} WHERE ${collectionBottles.bottleId} = ${input.bottle} AND ${collectionBottles.collectionId} = ${collections.id})`,
+        sql`EXISTS(SELECT 1 FROM ${collectionBottles} WHERE ${collectionBottles.bottleId} = ${input.bottle} AND ${collectionBottles.collectionId} = ${collections.id})`
       );
     }
 
@@ -71,7 +67,7 @@ export default procedure
       results: await serialize(
         CollectionSerializer,
         results.slice(0, limit),
-        context.user,
+        context.user
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

@@ -33,7 +33,7 @@ export const countries = pgTable(
   (table) => [
     uniqueIndex("country_name_unq").using("btree", sql`LOWER(${table.name})`),
     uniqueIndex("country_slug_unq").using("btree", sql`LOWER(${table.slug})`),
-  ],
+  ]
 );
 
 export type Country = typeof countries.$inferSelect;

@@ -2,7 +2,7 @@
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import { type Entity } from "@peated/server/types";
+import type { Entity } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
 import Link from "@peated/web/components/link";
@@ -17,7 +17,7 @@ export default function ModActions({ entity }: { entity: Entity }) {
   const orpc = useORPC();
 
   const deleteEntityMutation = useMutation(
-    orpc.entities.delete.mutationOptions(),
+    orpc.entities.delete.mutationOptions()
   );
 
   if (!user?.mod) return null;

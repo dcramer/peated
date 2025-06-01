@@ -1,6 +1,6 @@
 import { eq, sql } from "drizzle-orm";
 import { db } from "../db";
-import { bottleAliases, entities, type Entity } from "../db/schema";
+import { type Entity, bottleAliases, entities } from "../db/schema";
 
 export async function findBottleId(name: string): Promise<number | null> {
   let result: { id: number | null } | null | undefined;

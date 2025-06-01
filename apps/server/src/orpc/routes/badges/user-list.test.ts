@@ -9,7 +9,7 @@ describe("GET /badges/:badge/users", () => {
     const err = await waitError(
       routerClient.badges.userList({
         badge: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -35,7 +35,7 @@ describe("GET /badges/:badge/users", () => {
       {
         badge: badge.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toBe(2);
@@ -52,7 +52,7 @@ describe("GET /badges/:badge/users", () => {
   test("paginates results", async ({ defaults, fixtures, expect }) => {
     const badge = await fixtures.Badge();
     const users = await Promise.all(
-      Array.from({ length: 3 }, () => fixtures.User()),
+      Array.from({ length: 3 }, () => fixtures.User())
     );
     for (let i = 0; i < users.length; i++) {
       await fixtures.BadgeAward({
@@ -69,7 +69,7 @@ describe("GET /badges/:badge/users", () => {
         limit: 2,
         cursor: 1,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toBe(2);
@@ -100,7 +100,7 @@ describe("GET /badges/:badge/users", () => {
       {
         badge: badge.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toBe(1);
@@ -132,7 +132,7 @@ describe("GET /badges/:badge/users", () => {
       {
         badge: badge.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toBe(1);
@@ -164,7 +164,7 @@ describe("GET /badges/:badge/users", () => {
       {
         badge: badge.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toBe(2);
@@ -181,8 +181,8 @@ describe("GET /badges/:badge/users", () => {
         {
           badge: 9999, // Non-existent badge ID
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Badge not found.]`);
   });

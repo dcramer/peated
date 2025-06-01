@@ -23,7 +23,7 @@ export default procedure
   .use(requireAuth)
   .input(BottleSeriesInputSchema)
   .output(BottleSeriesSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const user = context.user;
 
     const series = await db.transaction(async (tx) => {

@@ -15,16 +15,16 @@ export default function Page({
 
   const orpc = useORPC();
   const { data: bottle } = useSuspenseQuery(
-    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
+    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } })
   );
   const { data: release } = useSuspenseQuery(
     orpc.bottleReleases.details.queryOptions({
       input: { release: Number(releaseId) },
-    }),
+    })
   );
   const router = useRouter();
   const bottleReleaseUpdateMutation = useMutation(
-    orpc.bottleReleases.update.mutationOptions(),
+    orpc.bottleReleases.update.mutationOptions()
   );
 
   return (

@@ -241,10 +241,10 @@ test("updates bottle releases when merging entities", async ({ fixtures }) => {
     .where(eq(bottleReleases.id, release2.id));
 
   expect(updatedRelease1.fullName).toBe(
-    `${entityB.name} Test Bottle - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 43.0% ABV`,
+    `${entityB.name} Test Bottle - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 43.0% ABV`
   );
   expect(updatedRelease2.fullName).toBe(
-    `${entityB.name} Test Bottle - Limited Edition - 2021 Release - 46.0% ABV`,
+    `${entityB.name} Test Bottle - Limited Edition - 2021 Release - 46.0% ABV`
   );
 
   // Verify tombstone was created
@@ -309,7 +309,7 @@ test("handles duplicate bottles during entity merge", async ({ fixtures }) => {
     .where(eq(bottleReleases.id, release.id));
   expect(updatedRelease.bottleId).toBe(bottleB.id);
   expect(updatedRelease.fullName).toBe(
-    `${entityB.name} Duplicate - Batch 1 - 43.0% ABV`,
+    `${entityB.name} Duplicate - Batch 1 - 43.0% ABV`
   );
 });
 
@@ -398,16 +398,16 @@ describe("mergeEntity", () => {
 
     expect(updatedReleases).toHaveLength(2);
     expect(updatedReleases[0].name).toBe(
-      "Test Bottle A - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 46.0% ABV",
+      "Test Bottle A - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 46.0% ABV"
     );
     expect(updatedReleases[0].fullName).toBe(
-      "Test Entity B Test Bottle A - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 46.0% ABV",
+      "Test Entity B Test Bottle A - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 46.0% ABV"
     );
     expect(updatedReleases[1].name).toBe(
-      "Test Bottle A - Batch 2 - 12-year-old",
+      "Test Bottle A - Batch 2 - 12-year-old"
     );
     expect(updatedReleases[1].fullName).toBe(
-      "Test Entity B Test Bottle A - Batch 2 - 12-year-old",
+      "Test Entity B Test Bottle A - Batch 2 - 12-year-old"
     );
   });
 
@@ -451,10 +451,10 @@ describe("mergeEntity", () => {
 
     expect(updatedReleases).toHaveLength(1);
     expect(updatedReleases[0].name).toBe(
-      "Test Bottle A - Batch 1 - 2020 Release - 2008 Vintage - 46.0% ABV",
+      "Test Bottle A - Batch 1 - 2020 Release - 2008 Vintage - 46.0% ABV"
     );
     expect(updatedReleases[0].fullName).toBe(
-      "Test Entity B Test Bottle A - Batch 1 - 2020 Release - 2008 Vintage - 46.0% ABV",
+      "Test Entity B Test Bottle A - Batch 1 - 2020 Release - 2008 Vintage - 46.0% ABV"
     );
   });
 });

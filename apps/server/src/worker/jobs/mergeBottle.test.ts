@@ -1,8 +1,8 @@
 import { db } from "@peated/server/db";
 import {
   bottleReleases,
-  bottles,
   bottleTombstones,
+  bottles,
   entities,
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
@@ -271,18 +271,18 @@ describe("mergeBottle", () => {
 
     expect(updatedRelease1.bottleId).toBe(bottleB.id);
     expect(updatedRelease1.name).toBe(
-      "Test Bottle B - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 43.0% ABV",
+      "Test Bottle B - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 43.0% ABV"
     );
     expect(updatedRelease1.fullName).toBe(
-      "Entity B Test Bottle B - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 43.0% ABV",
+      "Entity B Test Bottle B - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 43.0% ABV"
     );
 
     expect(updatedRelease2.bottleId).toBe(bottleB.id);
     expect(updatedRelease2.name).toBe(
-      "Test Bottle B - Limited Edition - 2021 Release - 46.0% ABV",
+      "Test Bottle B - Limited Edition - 2021 Release - 46.0% ABV"
     );
     expect(updatedRelease2.fullName).toBe(
-      "Entity B Test Bottle B - Limited Edition - 2021 Release - 46.0% ABV",
+      "Entity B Test Bottle B - Limited Edition - 2021 Release - 46.0% ABV"
     );
 
     // Verify tombstone was created
@@ -351,7 +351,7 @@ describe("mergeBottle", () => {
     expect(updatedRelease.bottleId).toBe(bottleB.id);
     expect(updatedRelease.name).toBe("Duplicate - Batch 1 - 43.0% ABV");
     expect(updatedRelease.fullName).toBe(
-      "Entity B Duplicate - Batch 1 - 43.0% ABV",
+      "Entity B Duplicate - Batch 1 - 43.0% ABV"
     );
   });
 });

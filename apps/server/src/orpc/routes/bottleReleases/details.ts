@@ -17,7 +17,7 @@ export default procedure
   })
   .input(z.object({ release: z.coerce.number() }))
   .output(BottleReleaseSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const release = await db.query.bottleReleases.findFirst({
       where: eq(bottleReleases.id, input.release),
       with: {

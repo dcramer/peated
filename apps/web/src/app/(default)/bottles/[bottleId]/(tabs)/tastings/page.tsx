@@ -16,7 +16,7 @@ export default function BottleTastings({
       input: {
         bottle: Number(bottleId),
       },
-    }),
+    })
   );
 
   return (

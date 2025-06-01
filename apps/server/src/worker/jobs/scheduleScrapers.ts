@@ -12,10 +12,10 @@ export default async function scheduleScrapers() {
       and(
         or(
           isNull(externalSites.nextRunAt),
-          lte(externalSites.nextRunAt, sql`NOW()`),
+          lte(externalSites.nextRunAt, sql`NOW()`)
         ),
-        isNotNull(externalSites.runEvery),
-      ),
+        isNotNull(externalSites.runEvery)
+      )
     );
 
   await db.transaction(async (tx) => {
@@ -27,7 +27,7 @@ export default async function scheduleScrapers() {
         .set({
           lastRunAt: sql`NOW()`,
           nextRunAt: sql`NOW() + INTERVAL '${sql.raw(
-            `${site.runEvery} minutes`,
+            `${site.runEvery} minutes`
           )}'`,
         })
         .where(eq(externalSites.id, site.id));

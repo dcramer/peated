@@ -1,10 +1,10 @@
+import { createHash } from "crypto";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { signPayload } from "@peated/server/lib/auth";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { compareSync } from "bcrypt";
-import { createHash } from "crypto";
 import { eq } from "drizzle-orm";
 
 describe("POST /auth/password-reset/confirm", () => {
@@ -46,7 +46,7 @@ describe("POST /auth/password-reset/confirm", () => {
       routerClient.auth.passwordReset.confirm({
         token,
         password: "testpassword",
-      }),
+      })
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Invalid verification token.]`);
@@ -74,7 +74,7 @@ describe("POST /auth/password-reset/confirm", () => {
       routerClient.auth.passwordReset.confirm({
         token,
         password: "testpassword",
-      }),
+      })
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Invalid verification token.]`);

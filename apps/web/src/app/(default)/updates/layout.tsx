@@ -1,6 +1,6 @@
 import SimpleHeader from "@peated/web/components/simpleHeader";
-import { type Metadata } from "next";
-import { type ReactNode } from "react";
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "Updates",

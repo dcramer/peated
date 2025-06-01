@@ -16,7 +16,7 @@ function QueueStats() {
   const { data } = useSuspenseQuery(
     orpc.admin.queueInfo.queryOptions({
       refetchInterval: 5000,
-    }),
+    })
   );
 
   return (
@@ -87,7 +87,7 @@ function LabelTester() {
           } catch (err) {
             console.error(err);
             setError(
-              err instanceof Error ? err.message : "Failed to extract label",
+              err instanceof Error ? err.message : "Failed to extract label"
             );
           } finally {
             setImage(null);

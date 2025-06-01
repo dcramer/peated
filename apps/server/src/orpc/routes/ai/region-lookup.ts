@@ -24,7 +24,7 @@ export default procedure
   })
   .input(InputSchema)
   .output(OutputSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const country = input.country
       ? await db.query.countries.findFirst({
           where: (table, { eq }) => eq(table.id, input.country),

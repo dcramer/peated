@@ -11,8 +11,8 @@ describe("GET /users/:user/collections", () => {
         {
           user: otherUser.id,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: User's profile is private.]`);
   });
@@ -29,7 +29,7 @@ describe("GET /users/:user/collections", () => {
       {
         user: otherUser.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toEqual(0);
@@ -42,7 +42,7 @@ describe("GET /users/:user/collections", () => {
       {
         user: otherUser.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toEqual(0);
@@ -70,7 +70,7 @@ describe("GET /users/:user/collections", () => {
       {
         user: otherUser.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toEqual(1);

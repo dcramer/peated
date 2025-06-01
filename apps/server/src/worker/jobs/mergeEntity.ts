@@ -23,7 +23,7 @@ export default async function mergeEntity({
   fromEntityIds: number[];
 }) {
   console.log(
-    `Merging entities ${fromEntityIds.join(", ")} into ${toEntityId}.`,
+    `Merging entities ${fromEntityIds.join(", ")} into ${toEntityId}.`
   );
 
   const [toEntity] = await db
@@ -62,7 +62,7 @@ export default async function mergeEntity({
           throw new ConflictError(
             existingBottle,
             undefined,
-            "An error occurred while trying to merge duplicate bottles.",
+            "An error occurred while trying to merge duplicate bottles."
           );
         }
         await runJob("MergeBottle", {
@@ -110,7 +110,7 @@ export default async function mergeEntity({
                 fullName: newFullName,
               })
               .where(eq(bottleReleases.id, release.id));
-          }),
+          })
         );
         updatedReleaseIds.push(...releases.map((r) => r.id));
       }
@@ -145,8 +145,8 @@ export default async function mergeEntity({
         tx.insert(entityTombstones).values({
           entityId: id,
           newEntityId: toEntity.id,
-        }),
-      ),
+        })
+      )
     );
 
     await tx.delete(entities).where(inArray(entities.id, fromEntityIds));
@@ -157,7 +157,7 @@ export default async function mergeEntity({
       await pushUniqueJob(
         "IndexBottleSearchVectors",
         { bottleId: bottleId },
-        { delay: 5000 },
+        { delay: 5000 }
       );
     } catch (err) {
       logError(err, {
@@ -173,7 +173,7 @@ export default async function mergeEntity({
       await pushUniqueJob(
         "IndexBottleReleaseSearchVectors",
         { releaseId: releaseId },
-        { delay: 5000 },
+        { delay: 5000 }
       );
     } catch (err) {
       logError(err, {
@@ -188,7 +188,7 @@ export default async function mergeEntity({
     await pushUniqueJob(
       "OnEntityChange",
       { entityId: toEntityId },
-      { delay: 5000 },
+      { delay: 5000 }
     );
   } catch (err) {
     logError(err, {

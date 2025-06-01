@@ -1,8 +1,8 @@
-import { call, ORPCError } from "@orpc/server";
+import { ORPCError, call } from "@orpc/server";
 import type { User } from "@peated/server/db/schema";
 import {
-  normalizeBottle,
   type NormalizedBottle,
+  normalizeBottle,
 } from "@peated/server/lib/normalize";
 import { parseDetailsFromName } from "@peated/server/lib/smws";
 import { stripPrefix } from "@peated/server/lib/strings";
@@ -10,13 +10,13 @@ import { procedure } from "@peated/server/orpc";
 import type { Context } from "@peated/server/orpc/context";
 import { requireAuth } from "@peated/server/orpc/middleware";
 import { BottleInputSchema, EntityInputSchema } from "@peated/server/schemas";
-import { type BottlePreviewResult } from "@peated/server/types";
+import type { BottlePreviewResult } from "@peated/server/types";
 import { z } from "zod";
 import details from "../entities/details";
 
 async function getEntity(
   input: number | z.input<typeof EntityInputSchema>,
-  context: Context,
+  context: Context
 ) {
   if (typeof input === "number") {
     try {
@@ -65,7 +65,7 @@ export async function bottleNormalize({
             {
               name: details.distiller,
             },
-            context,
+            context
           );
           if (distiller) rv.distillers = [distiller];
         }
@@ -79,7 +79,7 @@ export async function bottleNormalize({
 
   if (!rv.distillers && input.distillers) {
     rv.distillers = await Promise.all(
-      input.distillers.map((d) => getEntity(d, context)),
+      input.distillers.map((d) => getEntity(d, context))
     );
   }
 
@@ -131,7 +131,7 @@ export default procedure
   })
   .input(BottleInputSchema)
   .output(BottlePreviewResultSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async ({ input, context }) => {
     const normalized = await bottleNormalize({
       input,
       context,

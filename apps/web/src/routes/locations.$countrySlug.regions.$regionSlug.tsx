@@ -7,7 +7,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute(
-  "/locations/$countrySlug/regions/$regionSlug",
+  "/locations/$countrySlug/regions/$regionSlug"
 )({
   component: Page,
 });
@@ -29,7 +29,7 @@ function Page() {
   const { data: topEntityList } = useSuspenseQuery(
     orpc.entities.list.queryOptions({
       input: queryParams,
-    }),
+    })
   );
 
   return (

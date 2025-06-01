@@ -29,7 +29,7 @@ export default procedure
   })
   .input(EntityInputSchema)
   .output(EntitySchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const data: NewEntity = {
       ...input,
       name: normalizeEntityName(input.name),
@@ -89,7 +89,7 @@ export default procedure
           .from(entities)
           .where(eq(entities.name, data.name));
         const missingTypes = data.type.filter(
-          (x) => !existing.type.includes(x),
+          (x) => !existing.type.includes(x)
         );
         if (missingTypes) {
           const [updated] = await tx
@@ -128,7 +128,7 @@ export default procedure
             entityId: entity.id,
             name: entity.shortName,
             createdAt: entity.createdAt,
-          }),
+          })
         );
       }
 
@@ -138,7 +138,7 @@ export default procedure
             entityId: entity.id,
             name: entity.name.substring(4),
             createdAt: entity.createdAt,
-          }),
+          })
         );
       }
 

@@ -1,8 +1,8 @@
 import { db } from "@peated/server/db";
 import {
   bottleReleases,
-  bottles,
   bottleSeries,
+  bottles,
   bottlesToDistillers,
   changes,
   entities,
@@ -18,7 +18,7 @@ describe("PUT /bottles/:bottle", () => {
     const err = await waitError(
       routerClient.bottles.update({
         bottle: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -29,8 +29,8 @@ describe("PUT /bottles/:bottle", () => {
         {
           bottle: 1,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -43,8 +43,8 @@ describe("PUT /bottles/:bottle", () => {
         {
           bottle: 999999,
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
   });
@@ -62,7 +62,7 @@ describe("PUT /bottles/:bottle", () => {
       {
         bottle: bottle.id,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -92,7 +92,7 @@ describe("PUT /bottles/:bottle", () => {
         name: "Delicious Wood",
         statedAge: null,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -115,7 +115,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         category: null,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -146,7 +146,7 @@ describe("PUT /bottles/:bottle", () => {
         name: "Delicious 10",
         statedAge: 10,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     const [bottle2] = await db
@@ -173,7 +173,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         name: "Delicious 10-year-old",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     const [bottle2] = await db
@@ -196,7 +196,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         statedAge: null,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     const [bottle2] = await db
@@ -222,7 +222,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         brand: newBrand.id,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     const [bottle2] = await db
@@ -247,7 +247,7 @@ describe("PUT /bottles/:bottle", () => {
           name: "New Brand Name",
         },
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     const [bottle2] = await db
@@ -268,7 +268,7 @@ describe("PUT /bottles/:bottle", () => {
     const brandChange = await db.query.changes.findFirst({
       where: and(
         eq(changes.objectId, newBrand.id),
-        eq(changes.objectType, "entity"),
+        eq(changes.objectType, "entity")
       ),
     });
     expect(brandChange).toBeDefined();
@@ -289,7 +289,7 @@ describe("PUT /bottles/:bottle", () => {
           name: existingBrand.name,
         },
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     const [bottle2] = await db
@@ -307,8 +307,8 @@ describe("PUT /bottles/:bottle", () => {
         and(
           eq(changes.objectId, existingBrand.id),
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, modUser.id),
-        ),
+          eq(changes.createdById, modUser.id)
+        )
       );
     expect(brandChanges.length).toBe(0);
   });
@@ -326,7 +326,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         distillers: [distillerA.id],
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     const results = await db
@@ -353,7 +353,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         distillers: [distillerB.id],
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
   });
 
@@ -369,7 +369,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         distillers: [distillerA.id],
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     const distillers = await db
@@ -377,7 +377,7 @@ describe("PUT /bottles/:bottle", () => {
       .from(entities)
       .innerJoin(
         bottlesToDistillers,
-        eq(bottlesToDistillers.distillerId, entities.id),
+        eq(bottlesToDistillers.distillerId, entities.id)
       )
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
     expect(distillers.length).toBe(1);
@@ -400,7 +400,7 @@ describe("PUT /bottles/:bottle", () => {
           },
         ],
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     const distillers = await db
@@ -408,7 +408,7 @@ describe("PUT /bottles/:bottle", () => {
       .from(entities)
       .innerJoin(
         bottlesToDistillers,
-        eq(bottlesToDistillers.distillerId, entities.id),
+        eq(bottlesToDistillers.distillerId, entities.id)
       )
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
     expect(distillers.length).toBe(1);
@@ -420,7 +420,7 @@ describe("PUT /bottles/:bottle", () => {
     const distillerChange = await db.query.changes.findFirst({
       where: and(
         eq(changes.objectId, distiller.id),
-        eq(changes.objectType, "entity"),
+        eq(changes.objectType, "entity")
       ),
     });
     expect(distillerChange).toBeDefined();
@@ -443,7 +443,7 @@ describe("PUT /bottles/:bottle", () => {
           },
         ],
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     const distillers = await db
@@ -451,7 +451,7 @@ describe("PUT /bottles/:bottle", () => {
       .from(entities)
       .innerJoin(
         bottlesToDistillers,
-        eq(bottlesToDistillers.distillerId, entities.id),
+        eq(bottlesToDistillers.distillerId, entities.id)
       )
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
     expect(distillers.length).toBe(1);
@@ -466,8 +466,8 @@ describe("PUT /bottles/:bottle", () => {
         and(
           eq(changes.objectId, existingDistiller.id),
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, modUser.id),
-        ),
+          eq(changes.createdById, modUser.id)
+        )
       );
     expect(distillerChanges.length).toBe(0);
   });
@@ -482,8 +482,8 @@ describe("PUT /bottles/:bottle", () => {
           bottle: bottle.id,
           distillers: [999999],
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Entity not found [id: 999999]]`);
   });
@@ -501,7 +501,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         bottler: bottlerB.id,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     const [newBottle] = await db
@@ -522,7 +522,7 @@ describe("PUT /bottles/:bottle", () => {
           name: "New Bottler",
         },
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     const [newBottle] = await db
@@ -542,7 +542,7 @@ describe("PUT /bottles/:bottle", () => {
     const bottlerChange = await db.query.changes.findFirst({
       where: and(
         eq(changes.objectId, bottler.id),
-        eq(changes.objectType, "entity"),
+        eq(changes.objectType, "entity")
       ),
     });
     expect(bottlerChange).toBeDefined();
@@ -561,7 +561,7 @@ describe("PUT /bottles/:bottle", () => {
           name: existingBottler.name,
         },
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     const [newBottle] = await db
@@ -579,8 +579,8 @@ describe("PUT /bottles/:bottle", () => {
         and(
           eq(changes.objectId, existingBottler.id),
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, modUser.id),
-        ),
+          eq(changes.createdById, modUser.id)
+        )
       );
     expect(bottlerChanges.length).toBe(0);
   });
@@ -595,8 +595,8 @@ describe("PUT /bottles/:bottle", () => {
           bottle: bottle.id,
           bottler: 999999,
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Entity not found [id: 999999]]`);
   });
@@ -618,7 +618,7 @@ describe("PUT /bottles/:bottle", () => {
         brand: entityA.id,
         distillers: [entityB.id],
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     // TODO:
@@ -640,7 +640,7 @@ describe("PUT /bottles/:bottle", () => {
         name: "1.54",
         brand: brand.id,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -664,7 +664,7 @@ describe("PUT /bottles/:bottle", () => {
         caskSize: "hogshead",
         caskFill: "1st_fill",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -693,7 +693,7 @@ describe("PUT /bottles/:bottle", () => {
         statedAge: null,
         vintageYear: 2023,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -715,7 +715,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         releaseYear: 2024,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -737,7 +737,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         abv: 43.0,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -759,7 +759,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         abv: null,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -782,8 +782,8 @@ describe("PUT /bottles/:bottle", () => {
           bottle: bottle.id,
           abv: 101, // Invalid: above 100
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
@@ -797,7 +797,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         flavorProfile: "peated",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -819,7 +819,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         flavorProfile: null,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -842,7 +842,7 @@ describe("PUT /bottles/:bottle", () => {
         description: "A wonderful whisky with complex flavors.",
         descriptionSrc: "user",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -853,7 +853,7 @@ describe("PUT /bottles/:bottle", () => {
       .where(eq(bottles.id, bottle.id));
 
     expect(newBottle.description).toEqual(
-      "A wonderful whisky with complex flavors.",
+      "A wonderful whisky with complex flavors."
     );
     expect(newBottle.descriptionSrc).toEqual("user");
   });
@@ -867,7 +867,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         description: "A wonderful whisky with complex flavors.",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -878,7 +878,7 @@ describe("PUT /bottles/:bottle", () => {
       .where(eq(bottles.id, bottle.id));
 
     expect(newBottle.description).toEqual(
-      "A wonderful whisky with complex flavors.",
+      "A wonderful whisky with complex flavors."
     );
     expect(newBottle.descriptionSrc).toEqual("user");
   });
@@ -895,7 +895,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         description: null,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -920,7 +920,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         image: null,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -944,7 +944,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         image: null,
       },
-      { context: { user: adminUser } },
+      { context: { user: adminUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -969,7 +969,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         image: null,
       },
-      { context: { user: creator } },
+      { context: { user: creator } }
     );
 
     expect(data.id).toBeDefined();
@@ -997,7 +997,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         image: null,
       },
-      { context: { user: otherMod } },
+      { context: { user: otherMod } }
     );
 
     expect(data.id).toBeDefined();
@@ -1048,7 +1048,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         name: "New Name",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     // Verify the releases were updated
@@ -1064,18 +1064,18 @@ describe("PUT /bottles/:bottle", () => {
 
     // Check first release
     expect(updatedRelease1.name).toBe(
-      "New Name - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 43.0% ABV",
+      "New Name - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 43.0% ABV"
     );
     expect(updatedRelease1.fullName).toBe(
-      `${brand.name} New Name - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 43.0% ABV`,
+      `${brand.name} New Name - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 43.0% ABV`
     );
 
     // Check second release
     expect(updatedRelease2.name).toBe(
-      "New Name - Limited Edition - 2021 Release - 46.0% ABV",
+      "New Name - Limited Edition - 2021 Release - 46.0% ABV"
     );
     expect(updatedRelease2.fullName).toBe(
-      `${brand.name} New Name - Limited Edition - 2021 Release - 46.0% ABV`,
+      `${brand.name} New Name - Limited Edition - 2021 Release - 46.0% ABV`
     );
   });
 
@@ -1107,7 +1107,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         brand: newBrand.id,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     // Verify the release was updated
@@ -1117,10 +1117,10 @@ describe("PUT /bottles/:bottle", () => {
       .where(eq(bottleReleases.id, release.id));
 
     expect(updatedRelease.name).toBe(
-      "Test Bottle - Special Edition - 45.0% ABV",
+      "Test Bottle - Special Edition - 45.0% ABV"
     );
     expect(updatedRelease.fullName).toBe(
-      `${newBrand.name} Test Bottle - Special Edition - 45.0% ABV`,
+      `${newBrand.name} Test Bottle - Special Edition - 45.0% ABV`
     );
   });
 
@@ -1159,7 +1159,7 @@ describe("PUT /bottles/:bottle", () => {
     const change = await db.query.changes.findFirst({
       where: and(
         eq(changes.objectId, series.id),
-        eq(changes.objectType, "bottle_series"),
+        eq(changes.objectType, "bottle_series")
       ),
     });
     expect(change).toBeDefined();
@@ -1186,7 +1186,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         series: series.id,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     const [updatedBottle] = await db
@@ -1215,8 +1215,8 @@ describe("PUT /bottles/:bottle", () => {
           bottle: bottle.id,
           series: 999999,
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Series not found.]`);
   });
@@ -1236,7 +1236,7 @@ describe("PUT /bottles/:bottle", () => {
         bottle: bottle.id,
         name: "Delicious Wood Yum Yum",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     const [updatedBottle] = await db
@@ -1275,7 +1275,7 @@ describe("PUT /bottles/:bottle", () => {
         vintageYear: 2010,
         releaseYear: 2022,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     const [updatedBottle] = await db

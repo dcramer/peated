@@ -1,3 +1,4 @@
+import { Readable } from "node:stream";
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
@@ -8,7 +9,6 @@ import { absoluteUrl } from "@peated/server/lib/urls";
 import { procedure } from "@peated/server/orpc";
 import { requireAuth } from "@peated/server/orpc/middleware";
 import { eq } from "drizzle-orm";
-import { Readable } from "node:stream";
 import { z } from "zod";
 
 export default procedure
@@ -24,14 +24,14 @@ export default procedure
     z.object({
       tasting: z.coerce.number(),
       file: z.instanceof(Blob),
-    }),
+    })
   )
   .output(
     z.object({
       imageUrl: z.string(),
-    }),
+    })
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { tasting: tastingId, file } = input;
 
     const [targetTasting] = await db

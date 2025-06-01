@@ -21,22 +21,22 @@ function Page() {
   const { data: tasting } = useSuspenseQuery(
     orpc.tastings.details.queryOptions({
       input: { tasting: Number(tastingId) },
-    }),
+    })
   );
 
   const { data: suggestedTags } = useSuspenseQuery(
     orpc.bottles.suggestedTags.queryOptions({
       input: { bottle: tasting.bottle.id },
-    }),
+    })
   );
 
   const navigate = useNavigate();
 
   const tastingUpdateMutation = useMutation(
-    orpc.tastings.update.mutationOptions(),
+    orpc.tastings.update.mutationOptions()
   );
   const tastingImageUpdateMutation = useMutation(
-    orpc.tastings.imageUpdate.mutationOptions(),
+    orpc.tastings.imageUpdate.mutationOptions()
   );
   const { flash } = useFlashMessages();
 
@@ -63,7 +63,7 @@ function Page() {
             logError(err);
             flash(
               "There was an error uploading your image, but the tasting was saved.",
-              "error",
+              "error"
             );
           }
         }

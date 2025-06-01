@@ -22,8 +22,8 @@ export async function GET() {
   const { totalEntities } = await client.stats();
   const sitemapIndexXML = await buildSitemapIndex(
     range(1, Math.ceil(totalEntities / PAGE_LIMIT)).map(
-      (i) => `/sitemaps/entities/${i}/sitemap.xml`,
-    ),
+      (i) => `/sitemaps/entities/${i}/sitemap.xml`
+    )
   );
 
   return new Response(sitemapIndexXML, {

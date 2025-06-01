@@ -8,7 +8,7 @@ describe("DELETE /tastings/:tasting/image", () => {
     const err = await waitError(() =>
       routerClient.tastings.imageDelete({
         tasting: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -23,11 +23,11 @@ describe("DELETE /tastings/:tasting/image", () => {
         {
           tasting: tasting.id,
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Cannot delete another user's tasting image.]`,
+      `[Error: Cannot delete another user's tasting image.]`
     );
   });
 
@@ -41,7 +41,7 @@ describe("DELETE /tastings/:tasting/image", () => {
       {
         tasting: tasting.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     const newTasting = await db.query.tastings.findFirst({

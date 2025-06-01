@@ -16,7 +16,7 @@ export default procedure
   .input(
     z.object({
       user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
-    }),
+    })
   )
   .output(
     z.object({
@@ -25,13 +25,13 @@ export default procedure
           flavorProfile: z.string(),
           count: z.number(),
           score: z.number(),
-        }),
+        })
       ),
       totalScore: z.number(),
       totalCount: z.number(),
-    }),
+    })
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
       throw errors.NOT_FOUND({
@@ -63,7 +63,7 @@ export default procedure
     ) as t
     GROUP BY flavor
     ORDER BY score DESC, count DESC
-    LIMIT 25`,
+    LIMIT 25`
     );
 
     const { count: totalCount, score: totalScore } = (
@@ -74,7 +74,7 @@ export default procedure
         }>`SELECT COUNT(*) as count, SUM(${tastings.rating}) as score
         FROM ${tastings}
         WHERE ${tastings.createdById} = ${user.id}
-      `,
+      `
       )
     ).rows[0];
 

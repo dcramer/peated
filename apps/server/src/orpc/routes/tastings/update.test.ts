@@ -19,8 +19,8 @@ describe("PUT /tastings/:tasting", () => {
     const err = await waitError(
       routerClient.tastings.update(
         { tasting: tasting.id },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Tasting not found.]`);
   });
@@ -32,7 +32,7 @@ describe("PUT /tastings/:tasting", () => {
 
     const data = await routerClient.tastings.update(
       { tasting: tasting.id },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -55,7 +55,7 @@ describe("PUT /tastings/:tasting", () => {
         tasting: tasting.id,
         rating: 3.5,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -85,7 +85,7 @@ describe("PUT /tastings/:tasting", () => {
         tasting: tasting.id,
         notes: "hello world",
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -110,7 +110,7 @@ describe("PUT /tastings/:tasting", () => {
         tasting: tasting.id,
         tags: [tag.name],
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -129,8 +129,8 @@ describe("PUT /tastings/:tasting", () => {
       .where(
         and(
           eq(bottleTags.bottleId, newTasting.bottleId),
-          gt(bottleTags.count, 0),
-        ),
+          gt(bottleTags.count, 0)
+        )
       );
 
     expect(tagList.length).toEqual(1);

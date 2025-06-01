@@ -30,7 +30,7 @@ export function tsvector<TData extends TSVectorType = string>(name: string) {
       else if (Array.isArray(value))
         return sql.join(
           value.map((v) => v.mapToDriverValue()),
-          sql` || ' ' || `,
+          sql` || ' ' || `
         );
       return value.mapToDriverValue();
     },

@@ -48,7 +48,7 @@ export class RegionCheck extends Check {
 
   test(
     config: z.infer<typeof RegionCheckConfigSchema>,
-    tasting: TastingWithRelations,
+    tasting: TastingWithRelations
   ) {
     const { brand, bottlesToDistillers } = tasting.bottle;
 
@@ -59,7 +59,7 @@ export class RegionCheck extends Check {
     if (
       bottlesToDistillers.find(
         ({ distiller: d }) =>
-          country === d.countryId && (!region || region === d.regionId),
+          country === d.countryId && (!region || region === d.regionId)
       )
     )
       return true;

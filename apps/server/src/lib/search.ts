@@ -10,7 +10,7 @@ import { formatCategoryName } from "./format";
 
 export function buildEntitySearchVector(
   entity: NewEntity,
-  aliasList?: { name: string }[],
+  aliasList?: { name: string }[]
 ): TSVector[] {
   const values: TSVector[] = [
     new TSVector(entity.name, "A"),
@@ -27,7 +27,7 @@ export function buildBottleSearchVector(
   brand: NewEntity,
   aliasList?: NewBottleAlias[],
   bottler?: NewEntity,
-  distillerList?: NewEntity[],
+  distillerList?: NewEntity[]
 ): TSVector[] {
   const values: TSVector[] = [
     new TSVector(bottle.fullName, "A"),
@@ -49,7 +49,7 @@ export function buildBottleSearchVector(
 export function buildBottleReleaseSearchVector(
   bottle: NewBottle,
   release: NewBottleRelease,
-  brand: NewEntity,
+  brand: NewEntity
 ): TSVector[] {
   const values: TSVector[] = [
     new TSVector(bottle.fullName, "A"),
@@ -60,14 +60,14 @@ export function buildBottleReleaseSearchVector(
 
   if (release.edition) {
     values.push(
-      new TSVector(`${brand.name} ${bottle.name} ${release.edition}`, "A"),
+      new TSVector(`${brand.name} ${bottle.name} ${release.edition}`, "A")
     );
     if (brand.shortName)
       values.push(
         new TSVector(
           `${brand.shortName} ${bottle.name} ${release.edition}`,
-          "A",
-        ),
+          "A"
+        )
       );
   }
 
@@ -82,7 +82,7 @@ export function buildBottleReleaseSearchVector(
 
 export function buildBottleSeriesSearchVector(
   series: NewBottleSeries,
-  brand: NewEntity,
+  brand: NewEntity
 ): TSVector[] {
   const values: TSVector[] = [
     new TSVector(series.fullName, "A"),

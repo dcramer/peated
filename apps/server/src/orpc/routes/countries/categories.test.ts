@@ -123,7 +123,7 @@ describe("GET /countries/categories", () => {
 
   test("throws error for invalid country slug", async () => {
     const err = await waitError(() =>
-      routerClient.countries.categories({ country: "nonexistent" }),
+      routerClient.countries.categories({ country: "nonexistent" })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Invalid country.]`);
   });

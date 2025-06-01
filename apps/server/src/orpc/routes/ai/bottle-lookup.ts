@@ -32,7 +32,7 @@ export default procedure
   })
   .input(InputSchema)
   .output(OutputSchema)
-  .handler(async function ({ input }) {
+  .handler(async ({ input }) => {
     const result = await getGeneratedBottleDetails(input, []);
     return {
       description: result?.description,

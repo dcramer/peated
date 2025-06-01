@@ -10,7 +10,7 @@ describe("PUT /bottles", () => {
       routerClient.bottles.upsert({
         name: "Delicious Wood",
         brand: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -24,7 +24,7 @@ describe("PUT /bottles", () => {
         name: "Delicious Wood",
         brand: brand.id,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();
@@ -49,7 +49,7 @@ describe("PUT /bottles", () => {
         name: "Delicious Wood",
         brand: brand.id,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toBeDefined();

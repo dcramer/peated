@@ -33,14 +33,14 @@ export default procedure
   })
   .input(InputSchema)
   .output(TastingSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const user = context.user;
 
     const tasting = await db.query.tastings.findFirst({
       where: (tastings, { eq }) =>
         and(
           eq(tastings.id, input.tasting),
-          eq(tastings.createdById, context.user.id),
+          eq(tastings.createdById, context.user.id)
         ),
       with: {
         bottle: true,
@@ -79,8 +79,8 @@ export default procedure
               and(
                 eq(follows.fromUserId, context.user.id),
                 eq(follows.status, "following"),
-                inArray(follows.toUserId, friendUserIds),
-              ),
+                inArray(follows.toUserId, friendUserIds)
+              )
             )
         : [];
       if (matches.length != friendUserIds.length) {
@@ -151,8 +151,8 @@ export default procedure
               and(
                 eq(bottleTags.bottleId, tasting.bottleId),
                 eq(bottleTags.tag, tag),
-                gt(bottleTags.count, 0),
-              ),
+                gt(bottleTags.count, 0)
+              )
             );
         }
         for (const tag of newTasting.tags) {

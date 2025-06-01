@@ -27,7 +27,7 @@ export default procedure
   })
   .input(z.object({ bottle: z.coerce.number() }))
   .output(z.object({}))
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { bottle: bottleId } = input;
 
     const [bottle] = await db
@@ -47,7 +47,7 @@ export default procedure
         .from(entities)
         .innerJoin(
           bottlesToDistillers,
-          eq(bottlesToDistillers.distillerId, entities.id),
+          eq(bottlesToDistillers.distillerId, entities.id)
         )
         .where(eq(bottlesToDistillers.bottleId, bottle.id))
     ).map(({ id }) => id);
@@ -74,11 +74,11 @@ export default procedure
               inArray(
                 entities.id,
                 Array.from(
-                  new Set([bottle.brandId, ...distillerIds, bottle.bottlerId]),
-                ).filter(notEmpty),
+                  new Set([bottle.brandId, ...distillerIds, bottle.bottlerId])
+                ).filter(notEmpty)
               ),
-              gt(entities.totalBottles, 0),
-            ),
+              gt(entities.totalBottles, 0)
+            )
           ),
 
         tx.delete(bottleTags).where(eq(bottleTags.bottleId, bottle.id)),

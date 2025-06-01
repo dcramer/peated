@@ -1,4 +1,4 @@
-import { type ComponentPropsWithoutRef } from "react";
+import type { ComponentPropsWithoutRef } from "react";
 
 import UsStateAlabamaMap from "./assets/alabama.svg";
 import UsStateAlaskaMap from "./assets/alaska.svg";

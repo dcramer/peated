@@ -25,7 +25,7 @@ function Page() {
       "entity",
     ],
     overrides: {
-      entity: parseInt(entityId, 10),
+      entity: Number.parseInt(entityId, 10),
       limit: 100,
     },
   });
@@ -33,7 +33,7 @@ function Page() {
   const { data: bottleList } = useSuspenseQuery(
     orpc.bottles.list.queryOptions({
       input: queryParams,
-    }),
+    })
   );
 
   // const groupBy = !entity.type.includes("distiller") ? (item) => item.brand : null;

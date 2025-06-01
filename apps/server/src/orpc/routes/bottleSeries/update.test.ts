@@ -10,7 +10,7 @@ describe("PATCH /bottle-series/:series", () => {
     const err = await waitError(
       routerClient.bottleSeries.update({
         series: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -21,13 +21,13 @@ describe("PATCH /bottle-series/:series", () => {
         {
           series: 1,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  it("updates a series with new attributes", async function ({ fixtures }) {
+  it("updates a series with new attributes", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
 
     const brand = await fixtures.Entity({ name: "Ardbeg" });
@@ -64,8 +64,8 @@ describe("PATCH /bottle-series/:series", () => {
       .where(
         and(
           eq(changes.objectId, series.id),
-          eq(changes.objectType, "bottle_series"),
-        ),
+          eq(changes.objectType, "bottle_series")
+        )
       );
 
     expect(change).toBeDefined();
@@ -78,9 +78,9 @@ describe("PATCH /bottle-series/:series", () => {
     });
   });
 
-  it("prevents duplicate series names within the same brand", async function ({
+  it("prevents duplicate series names within the same brand", async ({
     fixtures,
-  }) {
+  }) => {
     const user = await fixtures.User({ mod: true });
 
     const brand = await fixtures.Entity({ name: "Ardbeg" });
@@ -99,16 +99,16 @@ describe("PATCH /bottle-series/:series", () => {
           series: series2.id,
           name: series1.name,
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: A series with this name already exists.]`,
+      `[Error: A series with this name already exists.]`
     );
   });
 
-  it("performs partial updates correctly", async function ({ fixtures }) {
+  it("performs partial updates correctly", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
 
     const brand = await fixtures.Entity({ name: "Ardbeg" });
@@ -124,7 +124,7 @@ describe("PATCH /bottle-series/:series", () => {
         series: series.id,
         name: "Updated Series",
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(result).toMatchObject({
@@ -144,8 +144,8 @@ describe("PATCH /bottle-series/:series", () => {
       .where(
         and(
           eq(changes.objectId, series.id),
-          eq(changes.objectType, "bottle_series"),
-        ),
+          eq(changes.objectType, "bottle_series")
+        )
       );
 
     expect(change).toBeDefined();

@@ -1,7 +1,0 @@
-import confirm from "./confirm";
-import index from "./index";
-
-export default {
-  confirm,
-  index,
-};

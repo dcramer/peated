@@ -100,7 +100,7 @@ subcommand
           ? inArray(bottles.id, bottleIds)
           : options.onlyMissing
             ? isNull(bottles.description)
-            : undefined,
+            : undefined
       )
       .orderBy(asc(bottles.id));
 
@@ -137,8 +137,8 @@ subcommand
         reviews,
         and(
           eq(reviews.bottleId, bottles.id),
-          ne(reviews.name, bottles.fullName),
-        ),
+          ne(reviews.name, bottles.fullName)
+        )
       );
 
     const systemUser = await db.query.users.findFirst({
@@ -151,13 +151,13 @@ subcommand
         const entity = await findEntity(review.name);
         if (!entity) {
           console.warn(
-            `Removing bottle due to unknown entity: ${bottle.fullName}`,
+            `Removing bottle due to unknown entity: ${bottle.fullName}`
           );
           await routerClient.bottles.delete(
             { bottle: bottle.id },
             {
               context: { user: systemUser },
-            },
+            }
           );
         } else {
           // probably mismatched bottle
@@ -171,7 +171,7 @@ subcommand
           if (!newName) newName = formatCategoryName(bottle.category);
 
           console.log(
-            `Updating ${bottle.fullName} to ${entity.name} ${newName} (from ${entity.name})`,
+            `Updating ${bottle.fullName} to ${entity.name} ${newName} (from ${entity.name})`
           );
 
           await routerClient.bottles.update(
@@ -180,7 +180,7 @@ subcommand
               name: newName,
               brand: entity.id,
             },
-            { context: { user: systemUser } },
+            { context: { user: systemUser } }
           );
         }
       }
@@ -243,7 +243,7 @@ subcommand
       .where(
         bottleIds.length
           ? inArray(bottleReleases.bottleId, bottleIds)
-          : undefined,
+          : undefined
       )
       .orderBy(asc(bottleReleases.id));
 
@@ -322,7 +322,7 @@ subcommand
             const alias = await upsertBottleAlias(tx, fullName, bottle.id);
             if (alias.bottleId !== bottle.id) {
               throw new Error(
-                `Alias mismatch: bottle ${bottle.id} != ${alias.bottleId}`,
+                `Alias mismatch: bottle ${bottle.id} != ${alias.bottleId}`
               );
             }
           });

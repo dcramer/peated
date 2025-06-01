@@ -21,7 +21,7 @@ export class AgeCheck extends Check {
 
   test(
     config: z.infer<typeof AgeCheckConfigSchema>,
-    tasting: TastingWithRelations,
+    tasting: TastingWithRelations
   ) {
     if (!tasting.bottle.statedAge) return false;
     return (

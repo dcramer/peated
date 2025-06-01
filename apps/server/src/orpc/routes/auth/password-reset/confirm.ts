@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import {
@@ -9,7 +10,6 @@ import { procedure } from "@peated/server/orpc";
 import { AuthSchema, PasswordResetSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
-import { createHash } from "crypto";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -27,10 +27,10 @@ export default procedure
     z.object({
       token: z.string(),
       password: z.string().trim().min(8, "At least 8 characters."),
-    }),
+    })
   )
   .output(AuthSchema)
-  .handler(async function ({ input, errors }) {
+  .handler(async ({ input, errors }) => {
     let payload;
     try {
       payload = await verifyPayload(input.token);
@@ -56,8 +56,8 @@ export default procedure
       .where(
         and(
           eq(users.id, token.id),
-          eq(sql`LOWER(${users.email})`, token.email.toLowerCase()),
-        ),
+          eq(sql`LOWER(${users.email})`, token.email.toLowerCase())
+        )
       );
     if (!user) {
       throw errors.BAD_REQUEST({

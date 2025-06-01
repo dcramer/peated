@@ -13,7 +13,7 @@ import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useMutation } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, type ComponentPropsWithoutRef } from "react";
+import { type ComponentPropsWithoutRef, useEffect, useState } from "react";
 import { getAuthRedirect } from "../lib/auth";
 import { useORPC } from "../lib/orpc/context";
 import BadgeImage from "./badgeImage";
@@ -89,7 +89,7 @@ export default function TastingListItem({
   const orpc = useORPC();
 
   const tastingDeleteMutation = useMutation(
-    orpc.tastings.delete.mutationOptions(),
+    orpc.tastings.delete.mutationOptions()
   );
   const toastCreateMutation = useMutation(orpc.toasts.create.mutationOptions());
 
@@ -251,7 +251,7 @@ export default function TastingListItem({
                       onSuccess: () => {
                         onToast && onToast(tasting);
                       },
-                    },
+                    }
                   );
                 }
               : () => {

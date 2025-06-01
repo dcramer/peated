@@ -20,14 +20,14 @@ export default function Page({
       input: {
         flight: flightId,
       },
-    }),
+    })
   );
   const { data: bottleList } = useSuspenseQuery(
     orpc.bottles.list.queryOptions({
       input: {
         flight: flightId,
       },
-    }),
+    })
   );
 
   return (

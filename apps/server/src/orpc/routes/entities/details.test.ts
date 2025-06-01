@@ -17,7 +17,7 @@ describe("GET /entities/:entity", () => {
     const err = await waitError(
       routerClient.entities.details({
         entity: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Entity not found.]`);
   });

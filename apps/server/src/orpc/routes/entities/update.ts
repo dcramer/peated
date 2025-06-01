@@ -33,10 +33,10 @@ export default procedure
   .input(
     EntityInputSchema.partial().extend({
       entity: z.number(),
-    }),
+    })
   )
   .output(EntitySchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const [entity] = await db
       .select()
       .from(entities)
@@ -177,7 +177,7 @@ export default procedure
           const existingAlias = await tx.query.entityAliases.findFirst({
             where: eq(
               sql`LOWER(${entityAliases.name})`,
-              aliasName.toLowerCase(),
+              aliasName.toLowerCase()
             ),
           });
 
@@ -190,8 +190,8 @@ export default procedure
                 .where(
                   eq(
                     sql`LOWER(${entityAliases.name})`,
-                    existingAlias.name.toLowerCase(),
-                  ),
+                    existingAlias.name.toLowerCase()
+                  )
                 );
             }
             // we're good - likely renaming to an alias that already existed
@@ -210,12 +210,12 @@ export default procedure
               .where(
                 eq(
                   sql`LOWER(${entityAliases.name})`,
-                  existingAlias.name.toLowerCase(),
-                ),
+                  existingAlias.name.toLowerCase()
+                )
               );
           } else {
             throw new Error(
-              `Duplicate alias found (${existingAlias.entityId}). Not implemented.`,
+              `Duplicate alias found (${existingAlias.entityId}). Not implemented.`
             );
           }
         }
@@ -236,9 +236,9 @@ export default procedure
                 bottles.fullName,
                 sql`${newEntity.shortName || newEntity.name} || ' ' || ${
                   bottles.name
-                }`,
-              ),
-            ),
+                }`
+              )
+            )
           );
 
         // we do insert vs update to handle the ON CONFLICT scenario
@@ -284,7 +284,7 @@ export default procedure
       await pushUniqueJob(
         "OnEntityChange",
         { entityId: entity.id },
-        { delay: 5000 },
+        { delay: 5000 }
       );
     } catch (err) {
       logError(err, {

@@ -33,12 +33,12 @@ describe("GET /flights", () => {
 
     const data = await routerClient.flights.list(
       { filter: "none" },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(data.results).toHaveLength(2);
     expect(data.results.map((f) => f.id).sort()).toEqual(
-      [publicFlight.publicId, privateFlight.publicId].sort(),
+      [publicFlight.publicId, privateFlight.publicId].sort()
     );
   });
 

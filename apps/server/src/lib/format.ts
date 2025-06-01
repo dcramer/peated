@@ -45,14 +45,14 @@ export function formatReleaseName({
 }
 
 export function formatCategoryName(
-  value: Category | string | undefined | null,
+  value: Category | string | undefined | null
 ) {
   if (!value) return "";
   return toTitleCase(`${value}`.replace(/_/g, " "));
 }
 
 export function formatFlavorProfile(
-  value: FlavorProfile | string | undefined | null,
+  value: FlavorProfile | string | undefined | null
 ) {
   if (!value) return "";
   switch (value) {

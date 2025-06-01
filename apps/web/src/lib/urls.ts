@@ -22,7 +22,7 @@ export function getEntityTypeSearchUrl(type: EntityType) {
 
 export function buildQueryString(
   searchParams: URLSearchParams,
-  newParams: Record<string, any>,
+  newParams: Record<string, any>
 ): string {
   const newEntries = Array.from(Object.entries(newParams)).filter(([k, v]) => {
     return k && v !== undefined && v !== null;

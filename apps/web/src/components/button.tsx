@@ -1,7 +1,7 @@
+import type { UrlObject } from "url";
 import Link from "@peated/web/components/link";
 import type { ForwardedRef, ReactNode } from "react";
 import { forwardRef } from "react";
-import { type UrlObject } from "url";
 import classNames from "../lib/classNames";
 
 type ButtonColor = "primary" | "default" | "highlight" | "danger" | undefined;
@@ -51,7 +51,7 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
       active = false,
       ...props
     },
-    ref,
+    ref
   ) => {
     const defaultClassName =
       "inline-flex gap-x-2 justify-center border items-center text-center rounded font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated";
@@ -63,7 +63,7 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
         colorClassName = classNames(
           disabled
             ? "bg-highlight border-highlight"
-            : "bg-highlight border-highlight",
+            : "bg-highlight border-highlight"
         );
         textColor = "text-black";
         break;
@@ -71,7 +71,7 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
         colorClassName = classNames(
           disabled
             ? "bg-red-900 border-red-900"
-            : "bg-red-700 border-red-700 hover:bg-red-600",
+            : "bg-red-700 border-red-700 hover:bg-red-600"
         );
         textColor = "text-black";
         break;
@@ -79,14 +79,14 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
         colorClassName = classNames(
           disabled
             ? "bg-slate-900 border-slate-900"
-            : "bg-slate-800 border-slate-800 hover:bg-slate-700",
+            : "bg-slate-800 border-slate-800 hover:bg-slate-700"
         );
         break;
       default:
         colorClassName = classNames(
           disabled
             ? "bg-slate-900 border-slate-900"
-            : "bg-slate-900 border-slate-900 hover:bg-slate-800",
+            : "bg-slate-900 border-slate-900 hover:bg-slate-800"
         );
     }
 
@@ -111,7 +111,7 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
             fullHeight ? "h-full" : "",
             disabled ? "cursor-auto" : "cursor-pointer",
             loading ? "animate-pulse" : "",
-            textColor,
+            textColor
           )}
           href={href}
           {...props}
@@ -132,7 +132,7 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
           fullWidth ? "w-full" : "",
           disabled ? "cursor-auto" : "cursor-pointer",
           loading ? "animate-pulse" : "",
-          textColor,
+          textColor
         )}
         type={type || "button"}
         ref={ref as ForwardedRef<HTMLButtonElement | null>}
@@ -142,7 +142,7 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
         {children}
       </button>
     );
-  },
+  }
 );
 
 Button.displayName = "Button";

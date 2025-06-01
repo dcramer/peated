@@ -4,13 +4,13 @@ import { bottleAliases, bottles } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { CursorSchema } from "@peated/server/schemas";
 import {
+  type SQL,
   and,
   asc,
   eq,
   getTableColumns,
   ilike,
   isNull,
-  type SQL,
 } from "drizzle-orm";
 import { z } from "zod";
 
@@ -21,7 +21,7 @@ const OutputSchema = z.object({
       createdAt: z.string(),
       bottleId: z.number().nullable(),
       isCanonical: z.boolean().optional(),
-    }),
+    })
   ),
   rel: CursorSchema,
 });
@@ -47,13 +47,10 @@ export default procedure
         query: "",
         cursor: 1,
         limit: 100,
-      }),
+      })
   )
   .output(OutputSchema)
-  .handler(async function ({
-    input: { cursor, query, limit, ...input },
-    errors,
-  }) {
+  .handler(async ({ input: { cursor, query, limit, ...input }, errors }) => {
     const where: (SQL<unknown> | undefined)[] = [
       eq(bottleAliases.ignored, false),
     ];

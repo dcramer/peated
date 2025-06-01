@@ -26,10 +26,10 @@ export default procedure
   .input(
     CommentInputSchema.extend({
       tasting: z.coerce.number(),
-    }),
+    })
   )
   .output(CommentSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const tasting = await db.query.tastings.findFirst({
       where: (tastings, { eq }) => eq(tastings.id, Number(input.tasting)),
       with: {

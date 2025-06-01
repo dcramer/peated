@@ -8,7 +8,7 @@ describe("GET /users", () => {
 
     const { results } = await routerClient.users.list(
       {},
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toBe(0);
@@ -21,7 +21,7 @@ describe("GET /users", () => {
       {
         query: "david",
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toBe(1);

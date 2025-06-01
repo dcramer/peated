@@ -1,11 +1,11 @@
 import { inArray } from "drizzle-orm";
-import { type z } from "zod";
+import type { z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
 import type { BottleSeries, User } from "../db/schema";
 import { entities } from "../db/schema";
 import { notEmpty } from "../lib/filter";
-import { type BottleSeriesSchema } from "../schemas/bottleSeries";
+import type { BottleSeriesSchema } from "../schemas/bottleSeries";
 import { EntitySerializer } from "./entity";
 
 type Attrs = {
@@ -16,10 +16,10 @@ export const BottleSeriesSerializer = serializer({
   name: "bottleSeries",
   attrs: async (
     itemList: BottleSeries[],
-    currentUser?: User,
+    currentUser?: User
   ): Promise<Record<number, Attrs>> => {
     const brandIds = Array.from(new Set(itemList.map((i) => i.brandId))).filter(
-      notEmpty,
+      notEmpty
     );
 
     const brandList = await db
@@ -29,8 +29,8 @@ export const BottleSeriesSerializer = serializer({
 
     const entitiesById = Object.fromEntries(
       (await serialize(EntitySerializer, brandList, currentUser)).map(
-        (data, index) => [brandList[index].id, data],
-      ),
+        (data, index) => [brandList[index].id, data]
+      )
     );
 
     const results: Record<number, Attrs> = {};
@@ -49,7 +49,7 @@ export const BottleSeriesSerializer = serializer({
   item(
     item: BottleSeries,
     attrs: Attrs,
-    currentUser?: User,
+    currentUser?: User
   ): z.infer<typeof BottleSeriesSchema> {
     return {
       id: item.id,

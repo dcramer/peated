@@ -1,7 +1,7 @@
 import { createORPCClient } from "@orpc/client";
 import { createORPCReactQueryUtils } from "@orpc/react-query";
 import type { RouterClient } from "@orpc/server";
-import { type Router } from "@peated/server/orpc/router";
+import type { Router } from "@peated/server/orpc/router";
 import { getTraceData } from "@sentry/core";
 import { QueryClientProvider } from "@tanstack/react-query";
 import type { ComponentProps } from "react";
@@ -31,8 +31,8 @@ export default function ORPCProvider({
           sentryTrace: traceData["sentry-trace"],
           baggage: traceData.baggage,
         },
-      }),
-    ),
+      })
+    )
   );
   const [orpc] = useState(() => createORPCReactQueryUtils(client));
 

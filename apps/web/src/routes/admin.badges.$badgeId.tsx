@@ -4,12 +4,12 @@ import Button from "@peated/web/components/button";
 import DefinitionList from "@peated/web/components/definitionList";
 import Heading from "@peated/web/components/heading";
 import Link from "@peated/web/components/link";
-import { createFileRoute } from "@tanstack/react-router";
 // import Markdown from "@peated/web/components/markdown";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import {} from "@tanstack/react-router";
 
 export const Route = createFileRoute("/admin/badges/$badgeId")({
@@ -22,9 +22,9 @@ function Page() {
   const { data: badge } = useSuspenseQuery(
     orpc.badges.details.queryOptions({
       input: {
-        badge: parseInt(badgeId, 10),
+        badge: Number.parseInt(badgeId, 10),
       },
-    }),
+    })
   );
 
   return (

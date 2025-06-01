@@ -1,10 +1,10 @@
+import path from "path";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { tastings } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
-import path from "path";
 import sharp from "sharp";
 
 describe("POST /tastings/:tasting/image", () => {
@@ -21,11 +21,11 @@ describe("POST /tastings/:tasting/image", () => {
         },
         {
           context: { user },
-        },
-      ),
+        }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: You don't have permission to update this tasting.]`,
+      `[Error: You don't have permission to update this tasting.]`
     );
   });
 
@@ -41,7 +41,7 @@ describe("POST /tastings/:tasting/image", () => {
       },
       {
         context: { user: defaults.user },
-      },
+      }
     );
 
     expect(response.imageUrl).toBeDefined();

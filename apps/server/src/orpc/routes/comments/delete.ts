@@ -30,10 +30,10 @@ export default procedure
       comment: z.coerce.number(),
       // user: z.coerce.number().optional(),
       // tasting: z.coerce.number().optional(),
-    }),
+    })
   )
   .output(z.object({}))
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const [comment] = await db
       .select()
       .from(comments)
@@ -56,7 +56,7 @@ export default procedure
         .update(tastings)
         .set({ comments: sql`${tastings.comments} - 1` })
         .where(
-          and(eq(tastings.id, comment.tastingId), gt(tastings.comments, 0)),
+          and(eq(tastings.id, comment.tastingId), gt(tastings.comments, 0))
         );
 
       await deleteNotification(tx, {

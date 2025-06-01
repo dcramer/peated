@@ -9,7 +9,7 @@ export const OnlineStatusProvider: React.FC<{ children: ReactNode }> = ({
   const ssr = typeof navigator === "undefined";
 
   const [onlineStatus, setOnlineStatus] = useState<boolean>(
-    ssr ? true : navigator.onLine,
+    ssr ? true : navigator.onLine
   );
 
   useEffect(() => {

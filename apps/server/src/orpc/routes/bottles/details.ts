@@ -34,7 +34,7 @@ export default procedure
   })
   .input(z.object({ bottle: z.coerce.number() }))
   .output(OutputSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { bottle: bottleId } = input;
 
     let [bottle] = await db

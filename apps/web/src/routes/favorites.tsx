@@ -17,7 +17,7 @@ function Page() {
         user: "me",
         collection: "default",
       },
-    }),
+    })
   );
 
   return (

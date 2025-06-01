@@ -55,7 +55,7 @@ export default function FormHeader({
           className={classNames(
             `text-muted group hover:text-white`,
             blockStyles,
-            saveDisabled ? "cursor-auto" : "",
+            saveDisabled ? "cursor-auto" : ""
           )}
         >
           <div
@@ -63,7 +63,7 @@ export default function FormHeader({
               "rounded p-3 py-1.5 font-semibold shadow-sm",
               saveDisabled
                 ? "bg-peated-dark text-peated"
-                : "bg-slate-800 group-hover:bg-slate-700",
+                : "bg-slate-800 group-hover:bg-slate-700"
             )}
           >
             {saveLabel}

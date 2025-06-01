@@ -14,10 +14,10 @@ export default function NotificationList({
 
   const orpc = useORPC();
   const deleteNotification = useMutation(
-    orpc.notifications.delete.mutationOptions(),
+    orpc.notifications.delete.mutationOptions()
   );
   const updateNotification = useMutation(
-    orpc.notifications.update.mutationOptions(),
+    orpc.notifications.update.mutationOptions()
   );
 
   const activeValues = values.filter((n) => !archiveList.includes(n.id));

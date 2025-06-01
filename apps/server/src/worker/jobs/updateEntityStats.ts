@@ -78,14 +78,14 @@ export default async ({ entityId }: { entityId: number }) => {
     await pushUniqueJob(
       "UpdateCountryStats",
       { countryId: entity.countryId },
-      { delay: 5000 },
+      { delay: 5000 }
     );
   }
   if (entity.regionId) {
     await pushUniqueJob(
       "UpdateRegionStats",
       { regionId: entity.regionId },
-      { delay: 5000 },
+      { delay: 5000 }
     );
   }
 };

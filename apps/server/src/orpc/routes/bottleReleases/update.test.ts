@@ -15,7 +15,7 @@ describe("PATCH /bottle-releases/:release", () => {
     const err = await waitError(
       routerClient.bottleReleases.update({
         release: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -26,13 +26,13 @@ describe("PATCH /bottle-releases/:release", () => {
         {
           release: 1,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  it("updates a release with new attributes", async function ({ fixtures }) {
+  it("updates a release with new attributes", async ({ fixtures }) => {
     const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle({
@@ -90,10 +90,10 @@ describe("PATCH /bottle-releases/:release", () => {
     expect(updatedRelease.releaseYear).toBe(2021);
     expect(updatedRelease.vintageYear).toBe(2009);
     expect(updatedRelease.fullName).toBe(
-      "Ardbeg Test Bottle - Batch 2 - 12-year-old - 2021 Release - 2009 Vintage - 48.0% ABV",
+      "Ardbeg Test Bottle - Batch 2 - 12-year-old - 2021 Release - 2009 Vintage - 48.0% ABV"
     );
     expect(updatedRelease.name).toBe(
-      "Test Bottle - Batch 2 - 12-year-old - 2021 Release - 2009 Vintage - 48.0% ABV",
+      "Test Bottle - Batch 2 - 12-year-old - 2021 Release - 2009 Vintage - 48.0% ABV"
     );
 
     // Verify change record was created
@@ -103,8 +103,8 @@ describe("PATCH /bottle-releases/:release", () => {
       .where(
         and(
           eq(changes.objectType, "bottle_release"),
-          eq(changes.objectId, release.id),
-        ),
+          eq(changes.objectId, release.id)
+        )
       );
 
     expect(change).toBeDefined();
@@ -112,7 +112,7 @@ describe("PATCH /bottle-releases/:release", () => {
     expect(change.displayName).toBe(updatedRelease.fullName);
   });
 
-  it("throws error if release not found", async function ({ fixtures }) {
+  it("throws error if release not found", async ({ fixtures }) => {
     const modUser = await fixtures.User({ mod: true });
 
     const err = await waitError(
@@ -120,15 +120,15 @@ describe("PATCH /bottle-releases/:release", () => {
         {
           release: 999999,
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Release not found.]`);
   });
 
-  it("throws error if release statedAge differs from bottle statedAge", async function ({
+  it("throws error if release statedAge differs from bottle statedAge", async ({
     fixtures,
-  }) {
+  }) => {
     const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle({
@@ -149,17 +149,17 @@ describe("PATCH /bottle-releases/:release", () => {
           release: release.id,
           statedAge: 12, // Different from bottle's statedAge
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Release statedAge must match bottle's statedAge.]`,
+      `[Error: Release statedAge must match bottle's statedAge.]`
     );
   });
 
-  it("throws error if release with same attributes exists", async function ({
+  it("throws error if release with same attributes exists", async ({
     fixtures,
-  }) {
+  }) => {
     const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle({
@@ -198,15 +198,15 @@ describe("PATCH /bottle-releases/:release", () => {
           releaseYear: 2020,
           vintageYear: 2010,
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: A release with these attributes already exists.]`,
+      `[Error: A release with these attributes already exists.]`
     );
   });
 
-  it("updates cask information", async function ({ fixtures }) {
+  it("updates cask information", async ({ fixtures }) => {
     const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle();
@@ -248,7 +248,7 @@ describe("PATCH /bottle-releases/:release", () => {
     expect(updatedRelease.caskStrength).toBe(true);
   });
 
-  it("updates description and tasting notes", async function ({ fixtures }) {
+  it("updates description and tasting notes", async ({ fixtures }) => {
     const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle();
@@ -293,9 +293,9 @@ describe("PATCH /bottle-releases/:release", () => {
     });
   });
 
-  it("throws error if release name matches bottle name", async function ({
+  it("throws error if release name matches bottle name", async ({
     fixtures,
-  }) {
+  }) => {
     const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle({
@@ -316,15 +316,15 @@ describe("PATCH /bottle-releases/:release", () => {
           releaseYear: null,
           vintageYear: null,
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Release name cannot be the same as the bottle name.]`,
+      `[Error: Release name cannot be the same as the bottle name.]`
     );
   });
 
-  it("performs partial updates correctly", async function ({ fixtures }) {
+  it("performs partial updates correctly", async ({ fixtures }) => {
     const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle({
@@ -374,7 +374,7 @@ describe("PATCH /bottle-releases/:release", () => {
     expect(updatedRelease.vintageYear).toBe(2010);
   });
 
-  it("updates image URL", async function ({ fixtures }) {
+  it("updates image URL", async ({ fixtures }) => {
     const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle();
@@ -407,7 +407,7 @@ describe("PATCH /bottle-releases/:release", () => {
     expect(updatedRelease.imageUrl).toBe("https://example.com/new-image.jpg");
   });
 
-  it("rolls back transaction on error", async function ({ fixtures }) {
+  it("rolls back transaction on error", async ({ fixtures }) => {
     const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle({
@@ -436,11 +436,11 @@ describe("PATCH /bottle-releases/:release", () => {
           abv: 46.0, // Same as existing
           // This should trigger the duplicate check
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: A release with these attributes already exists.]`,
+      `[Error: A release with these attributes already exists.]`
     );
 
     // Verify the release was not changed

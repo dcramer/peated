@@ -28,7 +28,7 @@ describe("POST /bottle-aliases", () => {
         bottle: bottle.id,
         name: "New Alias",
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(result).toEqual({});
@@ -54,7 +54,7 @@ describe("POST /bottle-aliases", () => {
         bottle: bottle.id,
         name: "Test Alias",
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     const updatedStorePrice = await db.query.storePrices.findFirst({
@@ -77,7 +77,7 @@ describe("POST /bottle-aliases", () => {
         bottle: bottle.id,
         name: "Test Alias",
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     const updatedReview = await db.query.reviews.findFirst({
@@ -103,7 +103,7 @@ describe("POST /bottle-aliases", () => {
         bottle: bottle.id,
         name: "Test Alias",
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     const updatedBottle = await db.query.bottles.findFirst({
@@ -122,8 +122,8 @@ describe("POST /bottle-aliases", () => {
           bottle: 9999,
           name: "Test Alias",
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
@@ -139,8 +139,8 @@ describe("POST /bottle-aliases", () => {
           bottle: bottle.id,
           name: "Test Alias",
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
@@ -163,12 +163,12 @@ describe("POST /bottle-aliases", () => {
           bottle: bottle2.id,
           name: "Duplicate Alias",
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: Duplicate alias found (1). Not implemented.]`,
+      `[Error: Duplicate alias found (1). Not implemented.]`
     );
   });
 });

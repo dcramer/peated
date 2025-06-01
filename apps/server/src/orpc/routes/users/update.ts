@@ -22,10 +22,10 @@ export default procedure
   .input(
     UserInputSchema.partial().extend({
       user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
-    }),
+    })
   )
   .output(UserSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const user = await getUserFromId(db, input.user, context.user);
 
     if (!user) {

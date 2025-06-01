@@ -12,10 +12,10 @@ import Button from "./button";
 function CollectionActionAuthenticated({ bottle }: { bottle: Bottle }) {
   const orpc = useORPC();
   const favoriteBottleMutation = useMutation(
-    orpc.collections.bottles.create.mutationOptions(),
+    orpc.collections.bottles.create.mutationOptions()
   );
   const unfavoriteBottleMutation = useMutation(
-    orpc.collections.bottles.delete.mutationOptions(),
+    orpc.collections.bottles.delete.mutationOptions()
   );
 
   let isCollected = false;
@@ -28,7 +28,7 @@ function CollectionActionAuthenticated({ bottle }: { bottle: Bottle }) {
           user: "me",
         },
         select: (data) => data.results.length > 0,
-      }),
+      })
     );
     isCollected = result.data;
     isLoading = result.isLoading;

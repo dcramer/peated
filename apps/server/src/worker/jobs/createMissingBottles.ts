@@ -35,7 +35,7 @@ export default async function createMissingBottles() {
               name: review.name,
               brand: entity.id,
             },
-            { context: { user: systemUser } },
+            { context: { user: systemUser } }
           );
           bottleId = result.id;
         }

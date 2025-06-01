@@ -24,7 +24,7 @@ export const StorePriceSerializer = serializer({
   item: (
     item: StorePrice,
     attrs: Record<string, any>,
-    currentUser?: User,
+    currentUser?: User
   ): z.infer<typeof StorePriceSchema> => {
     return {
       id: item.id,
@@ -46,16 +46,16 @@ export const StorePriceWithSiteSerializer = serializer({
   name: "storePriceWithSite",
   attrs: async (
     itemList: (StorePrice & { externalSite: ExternalSite })[],
-    currentUser?: User,
+    currentUser?: User
   ) => {
     const sitesByRef = Object.fromEntries(
       (
         await serialize(
           ExternalSiteSerializer,
           itemList.map((r) => r.externalSite),
-          currentUser,
+          currentUser
         )
-      ).map((data, index) => [itemList[index].id, data]),
+      ).map((data, index) => [itemList[index].id, data])
     );
 
     return Object.fromEntries(
@@ -66,14 +66,14 @@ export const StorePriceWithSiteSerializer = serializer({
             site: sitesByRef[item.id] || null,
           },
         ];
-      }),
+      })
     );
   },
 
   item: (
     item: StorePrice & { externalSite: ExternalSite },
     attrs: Record<string, any>,
-    currentUser?: User,
+    currentUser?: User
   ): z.infer<typeof StorePriceSchema> & {
     site: z.infer<typeof ExternalSiteSchema>;
   } => {
@@ -117,13 +117,13 @@ export const BottlePriceChangeSerializer = serializer({
       where: (bottles, { inArray }) =>
         inArray(
           bottles.id,
-          itemList.map((b) => Number(b.id)),
+          itemList.map((b) => Number(b.id))
         ),
     });
     const bottlesById = Object.fromEntries(
       (await serialize(BottleSerializer, bottleList, currentUser)).map(
-        (data, index) => [bottleList[index].id, data],
-      ),
+        (data, index) => [bottleList[index].id, data]
+      )
     );
 
     return Object.fromEntries(
@@ -134,14 +134,14 @@ export const BottlePriceChangeSerializer = serializer({
             bottle: bottlesById[Number(item.id)],
           },
         ];
-      }),
+      })
     );
   },
 
   item: (
     item: BottlePriceChange,
     attrs: Record<string, any>,
-    currentUser?: User,
+    currentUser?: User
   ): z.infer<typeof BottlePriceChangeSchema> => {
     return {
       id: Number(item.id),

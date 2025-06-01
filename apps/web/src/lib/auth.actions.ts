@@ -11,7 +11,7 @@ const SESSION_REFRESH = 60 * 60; // 1 hour
 
 export async function logoutForm(
   prevState: void | undefined,
-  formData: FormData,
+  formData: FormData
 ) {
   "use server";
 
@@ -22,7 +22,7 @@ export async function logout(formData?: FormData) {
   "use server";
 
   const redirectTo = getSafeRedirect(
-    formData ? ((formData.get("redirectTo") || "/") as string) : null,
+    formData ? ((formData.get("redirectTo") || "/") as string) : null
   );
 
   const session = await getSession();
@@ -37,7 +37,7 @@ type AuthenticateFormResult = {
 
 export async function authenticateForm(
   prevState: AuthenticateFormResult | undefined,
-  formData: FormData,
+  formData: FormData
 ) {
   "use server";
 
@@ -45,7 +45,7 @@ export async function authenticateForm(
 }
 
 export async function authenticate(
-  formData: FormData,
+  formData: FormData
 ): Promise<AuthenticateFormResult | undefined> {
   "use server";
 
@@ -59,14 +59,14 @@ export async function authenticate(
   const password = (formData.get("password") || "") as string;
   const code = formData.get("code") as string;
   const redirectTo = getSafeRedirect(
-    (formData.get("redirectTo") || "/") as string,
+    (formData.get("redirectTo") || "/") as string
   );
 
   const { client } = await createServerClient();
 
   if (email && !password) {
     const { error, isDefined } = await safe(
-      client.auth.magicLink.create({ email }),
+      client.auth.magicLink.create({ email })
     );
     if (isDefined) {
       return {
@@ -94,7 +94,7 @@ export async function authenticate(
       : client.auth.login({
           email,
           password,
-        }),
+        })
   );
 
   if (isDefined) {
@@ -126,7 +126,7 @@ export async function authenticate(
 
 export async function registerForm(
   prevState: GenericResult | undefined,
-  formData: FormData,
+  formData: FormData
 ) {
   "use server";
 
@@ -153,7 +153,7 @@ export async function register(formData: FormData) {
       email,
       password,
       username,
-    }),
+    })
   );
 
   if (isDefined) {
@@ -185,7 +185,7 @@ export async function resendVerificationForm(
         alreadyVerified?: boolean;
       })
     | undefined,
-  formData?: FormData,
+  formData?: FormData
 ) {
   "use server";
 
@@ -205,7 +205,7 @@ export async function resendVerificationForm(
 
 export async function passwordResetForm(
   prevState: GenericResult | undefined,
-  formData: FormData,
+  formData: FormData
 ) {
   "use server";
 
@@ -215,7 +215,7 @@ export async function passwordResetForm(
   const { client } = await createServerClient();
 
   const { error, isDefined } = await safe(
-    client.auth.passwordReset.create({ email }),
+    client.auth.passwordReset.create({ email })
   );
 
   if (isDefined) {
@@ -229,7 +229,7 @@ export async function passwordResetForm(
 
 export async function passwordResetConfirmForm(
   prevState: GenericResult | undefined,
-  formData: FormData,
+  formData: FormData
 ) {
   "use server";
 
@@ -240,7 +240,7 @@ export async function passwordResetConfirmForm(
   const { client } = await createServerClient();
 
   const { error, isDefined, data } = await safe(
-    client.auth.passwordReset.confirm({ token, password }),
+    client.auth.passwordReset.confirm({ token, password })
   );
 
   if (isDefined) {

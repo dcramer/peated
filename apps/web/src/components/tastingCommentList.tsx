@@ -20,11 +20,11 @@ export default function TastingCommentList({
   const { data } = useSuspenseQuery(
     orpc.comments.list.queryOptions({
       input: { tasting: tastingId },
-    }),
+    })
   );
 
   const commentDeleteMutation = useMutation(
-    orpc.comments.delete.mutationOptions(),
+    orpc.comments.delete.mutationOptions()
   );
 
   const [deleted, setDeleted] = useState<number[]>([]);

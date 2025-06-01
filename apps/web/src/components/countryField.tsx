@@ -6,7 +6,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import SelectField from "./selectField";
 
 export default function CountryField(
-  props: React.ComponentProps<typeof SelectField>,
+  props: React.ComponentProps<typeof SelectField>
 ) {
   const orpc = useORPC();
   const { data } = useSuspenseQuery(
@@ -15,7 +15,7 @@ export default function CountryField(
         onlyMajor: true,
         sort: "-bottles",
       },
-    }),
+    })
   );
 
   MAJOR_COUNTRIES.map(([name, slug]) => ({

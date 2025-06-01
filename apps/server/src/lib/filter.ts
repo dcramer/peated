@@ -13,7 +13,7 @@ export function notEmpty<T>(value: T | null | undefined): value is T {
 
 // https://johnnyreilly.com/bulletproof-uniq-with-typescript
 export function uniq<T extends string | number | bigint | boolean | symbol>(
-  iterable: Iterable<T>,
+  iterable: Iterable<T>
 ) {
   return [...new Set(iterable)];
 }

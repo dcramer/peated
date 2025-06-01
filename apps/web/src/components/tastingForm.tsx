@@ -91,15 +91,15 @@ export default function TastingForm({
 
   const [error, setError] = useState<string | undefined>();
   const [image, setImage] = useState<HTMLCanvasElement | null | undefined>(
-    null,
+    null
   );
   const [friendsValue, setFriendsValue] = useState<Option[]>(
-    initialData.friends ? initialData.friends.map(userToOption) : [],
+    initialData.friends ? initialData.friends.map(userToOption) : []
   );
   const [releaseValue, setReleaseValue] = useState<Option | undefined>(
     initialData.release
       ? { id: initialData.release.id, name: initialData.release.name }
-      : undefined,
+      : undefined
   );
 
   const orpc = useORPC();
@@ -164,7 +164,7 @@ export default function TastingForm({
                   onChange(
                     e.target.value === ""
                       ? undefined
-                      : parseFloat(e.target.value),
+                      : Number.parseFloat(e.target.value)
                   )
                 }
                 error={errors.rating}
@@ -190,7 +190,7 @@ export default function TastingForm({
                       o.name.toLowerCase().includes(query.toLowerCase()) ||
                       o.tag.tagCategory
                         .toLowerCase()
-                        .includes(query.toLowerCase()),
+                        .includes(query.toLowerCase())
                   );
                 }}
                 onRenderOption={(option) => {

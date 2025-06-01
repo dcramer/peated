@@ -33,10 +33,10 @@ export default procedure
     z.object({
       site: ExternalSiteTypeEnum,
       prices: z.array(StorePriceInputSchema),
-    }),
+    })
   )
   .output(z.object({}))
-  .handler(async function ({ input, errors }) {
+  .handler(async ({ input, errors }) => {
     const site = await db.query.externalSites.findFirst({
       where: eq(externalSites.type, input.site),
     });
@@ -84,7 +84,7 @@ export default procedure
               .onConflictDoNothing();
 
             const ignored = !!name.match(
-              / (bundle|gifting set|gift set|\d+ pack)$/i,
+              / (bundle|gifting set|gift set|\d+ pack)$/i
             );
 
             // TODO: sync image
@@ -109,7 +109,7 @@ export default procedure
               imageUrl: sp.imageUrl,
             });
           }
-        }),
+        })
       );
     });
 

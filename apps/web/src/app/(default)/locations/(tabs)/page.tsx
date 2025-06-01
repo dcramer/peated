@@ -13,7 +13,7 @@ export default function Page() {
         onlyMajor: true,
         sort: "-bottles",
       },
-    }),
+    })
   );
 
   return (

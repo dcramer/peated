@@ -31,7 +31,7 @@ describe("GET /users/:user/tags", () => {
 
     const { results, totalCount } = await routerClient.users.tagList(
       { user: "me" },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(totalCount).toEqual(2);
@@ -47,7 +47,7 @@ describe("GET /users/:user/tags", () => {
     const err = await waitError(() =>
       routerClient.users.tagList({
         user: otherUser.id,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: User's profile is not public.]`);
   });
@@ -62,7 +62,7 @@ describe("GET /users/:user/tags", () => {
 
     const { results } = await routerClient.users.tagList(
       { user: otherUser.id },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toEqual(0);
@@ -73,7 +73,7 @@ describe("GET /users/:user/tags", () => {
 
     const { results } = await routerClient.users.tagList(
       { user: otherUser.id },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toEqual(0);

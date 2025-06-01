@@ -11,7 +11,7 @@ describe("PATCH /countries/:country", () => {
       const err = await waitError(
         routerClient.countries.update({
           country: "test-country",
-        }),
+        })
       );
       expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
     });
@@ -22,8 +22,8 @@ describe("PATCH /countries/:country", () => {
           {
             country: "test-country",
           },
-          { context: { user: defaults.user } },
-        ),
+          { context: { user: defaults.user } }
+        )
       );
       expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
     });
@@ -38,7 +38,7 @@ describe("PATCH /countries/:country", () => {
         {
           country: country.slug,
         },
-        { context: { user: modUser } },
+        { context: { user: modUser } }
       );
 
       expect(data.id).toBeDefined();
@@ -60,7 +60,7 @@ describe("PATCH /countries/:country", () => {
           country: country.slug,
           description: "New description",
         },
-        { context: { user: modUser } },
+        { context: { user: modUser } }
       );
 
       expect(data.id).toBeDefined();
@@ -71,7 +71,7 @@ describe("PATCH /countries/:country", () => {
         .where(eq(countries.id, data.id));
 
       expect(
-        omit(country, "description", "descriptionSrc", "updatedAt"),
+        omit(country, "description", "descriptionSrc", "updatedAt")
       ).toEqual(omit(newCountry, "description", "descriptionSrc", "updatedAt"));
       expect(newCountry.description).toBe("New description");
       expect(newCountry.descriptionSrc).toBe("user");
@@ -86,7 +86,7 @@ describe("PATCH /countries/:country", () => {
           country: country.slug,
           summary: "New summary",
         },
-        { context: { user: modUser } },
+        { context: { user: modUser } }
       );
 
       expect(data.id).toBeDefined();
@@ -97,7 +97,7 @@ describe("PATCH /countries/:country", () => {
         .where(eq(countries.id, data.id));
 
       expect(omit(country, "summary", "updatedAt")).toEqual(
-        omit(newCountry, "summary", "updatedAt"),
+        omit(newCountry, "summary", "updatedAt")
       );
       expect(newCountry.summary).toBe("New summary");
     });
@@ -111,8 +111,8 @@ describe("PATCH /countries/:country", () => {
             country: "nonexistent-country",
             description: "New description",
           },
-          { context: { user: modUser } },
-        ),
+          { context: { user: modUser } }
+        )
       );
       expect(err).toMatchInlineSnapshot(`[Error: Country not found.]`);
     });

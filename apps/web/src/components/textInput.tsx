@@ -7,13 +7,13 @@ type Props = React.ComponentPropsWithoutRef<"input"> & {
 
 export default forwardRef<HTMLInputElement, Props>(function TextInput(
   { suffixLabel, className, ...props },
-  ref,
+  ref
 ) {
   const { disabled, readOnly } = props;
   const baseStyles = classNames(
     "rounded px-4 py-2 sm:leading-6 border-0 focus:ring-0",
     disabled || readOnly ? "bg-slate-900 text-slate-300" : "",
-    "bg-slate-800",
+    "bg-slate-800"
   );
   const inputStyles =
     "block outline-none focus:ring-0 sm:leading-6 placeholder:text-slate-400";
@@ -24,7 +24,7 @@ export default forwardRef<HTMLInputElement, Props>(function TextInput(
           className={classNames(
             "flex-auto border-0 bg-transparent p-0",
             inputStyles,
-            className,
+            className
           )}
           ref={ref}
           {...props}
@@ -42,7 +42,7 @@ export default forwardRef<HTMLInputElement, Props>(function TextInput(
         "min-w-full",
         baseStyles,
         inputStyles,
-        className || "",
+        className || ""
       )}
       ref={ref}
       {...props}

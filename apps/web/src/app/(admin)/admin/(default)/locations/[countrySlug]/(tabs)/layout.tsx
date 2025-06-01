@@ -7,7 +7,7 @@ import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export default function Page({
   params: { countrySlug },
@@ -22,7 +22,7 @@ export default function Page({
       input: {
         country: countrySlug,
       },
-    }),
+    })
   );
 
   return (

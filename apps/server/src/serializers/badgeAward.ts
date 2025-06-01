@@ -1,8 +1,8 @@
 import { inArray } from "drizzle-orm";
-import { type z } from "zod";
+import type { z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
-import { badges, type BadgeAward, type User } from "../db/schema";
+import { type BadgeAward, type User, badges } from "../db/schema";
 import { notEmpty } from "../lib/filter";
 import type { BadgeAwardSchema } from "../schemas";
 import type { Badge } from "../types";
@@ -14,7 +14,7 @@ export const BadgeAwardSerializer = serializer({
     itemList: (BadgeAward & {
       badge?: Badge;
     })[],
-    currentUser?: User,
+    currentUser?: User
   ) => {
     const hasBadge = itemList.length && "badge" in itemList[0];
 
@@ -27,8 +27,8 @@ export const BadgeAwardSerializer = serializer({
 
     const badgesById = Object.fromEntries(
       (await serialize(BadgeSerializer, badgeList, currentUser)).map(
-        (data, index) => [badgeList[index].id, data],
-      ),
+        (data, index) => [badgeList[index].id, data]
+      )
     );
 
     return Object.fromEntries(
@@ -39,7 +39,7 @@ export const BadgeAwardSerializer = serializer({
             badge: badgesById[item.badgeId],
           },
         ];
-      }),
+      })
     );
   },
   item: (
@@ -48,7 +48,7 @@ export const BadgeAwardSerializer = serializer({
       prevLevel?: number;
     },
     attrs: Record<string, any>,
-    currentUser?: User,
+    currentUser?: User
   ): z.infer<typeof BadgeAwardSchema> => {
     return {
       id: item.id,

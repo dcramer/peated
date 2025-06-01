@@ -29,7 +29,7 @@ export default async function processNotification({
 
     if (!comment) {
       throw new Error(
-        `Unable to find comment for notification: ${notificationId}`,
+        `Unable to find comment for notification: ${notificationId}`
       );
     }
 

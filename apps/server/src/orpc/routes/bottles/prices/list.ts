@@ -5,12 +5,12 @@ import { ExternalSiteSchema, StorePriceSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { StorePriceWithSiteSerializer } from "@peated/server/serializers/storePrice";
 import {
+  type SQL,
   and,
   asc,
   desc,
   eq,
   getTableColumns,
-  type SQL,
   sql,
 } from "drizzle-orm";
 import { z } from "zod";
@@ -27,18 +27,18 @@ export default procedure
     z.object({
       bottle: z.coerce.number(),
       onlyValid: z.coerce.boolean().optional(),
-    }),
+    })
   )
   .output(
     z.object({
       results: z.array(
         StorePriceSchema.extend({
           site: ExternalSiteSchema,
-        }),
+        })
       ),
-    }),
+    })
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const [bottle] = await db
       .select()
       .from(bottles)
@@ -67,19 +67,19 @@ export default procedure
       .from(storePrices)
       .innerJoin(
         externalSites,
-        eq(storePrices.externalSiteId, externalSites.id),
+        eq(storePrices.externalSiteId, externalSites.id)
       )
       .where(and(...where))
       .orderBy(
         desc(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`),
-        asc(storePrices.name),
+        asc(storePrices.name)
       );
 
     return {
       results: await serialize(
         StorePriceWithSiteSerializer,
         results,
-        context.user,
+        context.user
       ),
     };
   });

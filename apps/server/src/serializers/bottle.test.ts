@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { serialize } from ".";
 import { db } from "../db";
 import {
-  bottles,
   bottleSeries,
+  bottles,
   bottlesToDistillers,
   collectionBottles,
   collections,
@@ -70,9 +70,7 @@ describe("BottleSerializer", () => {
     });
   });
 
-  it("serializes a bottle with and without a series", async function ({
-    fixtures,
-  }) {
+  it("serializes a bottle with and without a series", async ({ fixtures }) => {
     const brand = await fixtures.Entity({ name: "Ardbeg" });
     const series = await fixtures.BottleSeries({
       name: "Supernova",

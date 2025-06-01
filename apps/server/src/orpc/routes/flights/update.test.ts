@@ -10,7 +10,7 @@ describe("PATCH /flights/:flight", () => {
     const err = await waitError(
       routerClient.flights.update({
         flight: "1",
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -24,11 +24,11 @@ describe("PATCH /flights/:flight", () => {
         {
           flight: flight.publicId,
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Cannot update another user's flight.]`,
+      `[Error: Cannot update another user's flight.]`
     );
   });
 
@@ -40,7 +40,7 @@ describe("PATCH /flights/:flight", () => {
       {
         flight: flight.publicId,
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(data.id).toBeDefined();
@@ -62,7 +62,7 @@ describe("PATCH /flights/:flight", () => {
         flight: flight.publicId,
         name: "Delicious Wood",
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(data.id).toBeDefined();
@@ -88,7 +88,7 @@ describe("PATCH /flights/:flight", () => {
         flight: flight.publicId,
         bottles: [bottle1.id, bottle3.id],
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(data.id).toBeDefined();

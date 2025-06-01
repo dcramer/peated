@@ -1,12 +1,12 @@
 import type { InferSelectModel, Table } from "drizzle-orm";
 import { and, eq, getTableColumns, sql } from "drizzle-orm";
 import type { PgTableWithColumns, TableConfig } from "drizzle-orm/pg-core";
-import { type z } from "zod";
+import type { z } from "zod";
 import type { AnyDatabase } from "../db";
 import type { BottleAlias, Entity, EntityType } from "../db/schema";
 import { bottleAliases, changes, collections, entities } from "../db/schema";
-import { type EntityInputSchema, type EntitySchema } from "../schemas";
-import { type EntityInput } from "../types";
+import type { EntityInputSchema, EntitySchema } from "../schemas";
+import type { EntityInput } from "../types";
 
 export type UpsertOutcome<T> =
   | {
@@ -72,7 +72,7 @@ export const upsertEntity = async ({
     .values({
       ...data,
       type: Array.from(
-        new Set([...(type ? [type] : []), ...(data.type || [])]),
+        new Set([...(type ? [type] : []), ...(data.type || [])])
       ),
       createdById: userId,
     })
@@ -121,7 +121,7 @@ export const getDefaultCollection = async (db: AnyDatabase, userId: number) => {
       where: (collections, { eq }) =>
         and(
           eq(collections.createdById, userId),
-          sql`LOWER(${collections.name}) = 'default'`,
+          sql`LOWER(${collections.name}) = 'default'`
         ),
     }))
   );
@@ -130,7 +130,7 @@ export const getDefaultCollection = async (db: AnyDatabase, userId: number) => {
 export async function upsertBottleAlias(
   db: AnyDatabase,
   name: string,
-  bottleId: number | null = null,
+  bottleId: number | null = null
 ) {
   // both of these force a useless update so RETURNING works
   const query = bottleId
@@ -143,14 +143,14 @@ export async function upsertBottleAlias(
           THEN EXCLUDED.bottle_id
           ELSE ${bottleAliases.bottleId}
         END
-      RETURNING *`,
+      RETURNING *`
       )
     : await db.execute<BottleAlias>(
         sql`INSERT INTO ${bottleAliases} (bottle_id, name)
       VALUES (${bottleId}, ${name})
       ON CONFLICT (LOWER(name))
       DO UPDATE SET name = ${bottleAliases.name}
-      RETURNING *`,
+      RETURNING *`
       );
 
   return mapRows(query.rows, bottleAliases)[0];
@@ -175,13 +175,13 @@ export async function upsertBottleAlias(
 
 export function mapRows<T extends TableConfig>(
   rows: Record<string, unknown>[],
-  table: PgTableWithColumns<T>,
+  table: PgTableWithColumns<T>
 ): InferSelectModel<Table<T>>[] {
   const cols = Object.fromEntries(
     Object.entries(getTableColumns(table)).map(([attr, col]) => [
       col.name,
       { col, attr },
-    ]),
+    ])
   );
 
   return rows.map((r) =>
@@ -192,7 +192,7 @@ export function mapRows<T extends TableConfig>(
           r ? r.attr : k,
           r ? (v !== null ? r.col.mapFromDriverValue(v) : v) : v,
         ];
-      }),
-    ),
+      })
+    )
   ) as unknown as InferSelectModel<Table<T>>[];
 }

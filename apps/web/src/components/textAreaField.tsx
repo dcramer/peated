@@ -17,7 +17,7 @@ type Props = {
 
 export default forwardRef<HTMLTextAreaElement, Props>(function TextAreaField(
   { name, helpText, label, required, error, className, children, ...props },
-  ref,
+  ref
 ) {
   return (
     <FormField

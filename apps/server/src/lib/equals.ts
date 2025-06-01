@@ -8,7 +8,7 @@ export function arraysEqual<T>(one: T[], two: T[]) {
 
 export function objectsShallowEqual(
   object1: Record<any, any>,
-  object2: Record<any, any>,
+  object2: Record<any, any>
 ) {
   const keys1 = Object.keys(object1);
   const keys2 = Object.keys(object2);

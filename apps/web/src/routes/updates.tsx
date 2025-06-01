@@ -13,7 +13,7 @@ function Page() {
   const { data: changeList } = useSuspenseQuery(
     orpc.changes.list.queryOptions({
       input: {},
-    }),
+    })
   );
 
   return (

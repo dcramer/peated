@@ -67,12 +67,12 @@ subcommand
                       and(
                         eq(
                           sql`LOWER(${storePrices.name})`,
-                          values.name.toLowerCase(),
+                          values.name.toLowerCase()
                         ),
                         eq(storePrices.externalSiteId, price.externalSiteId),
                         eq(storePrices.volume, price.volume),
-                        ne(storePrices.id, price.id),
-                      ),
+                        ne(storePrices.id, price.id)
+                      )
                     )
                     .limit(1);
                   const histories = await tx

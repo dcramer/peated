@@ -1,6 +1,6 @@
 "use client";
 
-import { type Outputs } from "@peated/server/orpc/router";
+import type { Outputs } from "@peated/server/orpc/router";
 import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";

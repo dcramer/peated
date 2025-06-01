@@ -48,7 +48,7 @@ function removeNoise(value: string) {
   // removing categories is a misnomer, so maybe we should add them instead????
   const categoryRe = new RegExp(
     `\\b(${CATEGORY_LIST.map(formatCategoryName).map(escapeRegex).join("|")})\\b`,
-    "i",
+    "i"
   );
   newValue = newValue.replace(categoryRe, "");
 
@@ -74,7 +74,7 @@ function removeNoise(value: string) {
 function match(
   inputName: string,
   possibleEntities: string[],
-  possibleBottles: string[],
+  possibleBottles: string[]
 ) {
   const commonTokens = /\b(the|of)\b/i;
 
@@ -85,7 +85,7 @@ function match(
   const brand = possibleEntities
     .sort((a, b) => b.length - a.length)
     .find((entity) =>
-      inputNameLower.startsWith(entity.toLocaleLowerCase() + " "),
+      inputNameLower.startsWith(entity.toLocaleLowerCase() + " ")
     );
 
   console.log(`  Brand identified as [${brand}]`);

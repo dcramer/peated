@@ -29,7 +29,7 @@ export function signPayload(payload: string | object): Promise<string> {
 }
 
 export function verifyPayload(
-  token: string | undefined,
+  token: string | undefined
 ): Promise<string | JwtPayload | undefined> {
   return new Promise((res, rej) => {
     if (!token) {
@@ -53,7 +53,7 @@ export function verifyPayload(
 export { verifyPayload as verifyToken };
 
 export async function getUserFromHeader(
-  authorizationHeader: string | undefined,
+  authorizationHeader: string | undefined
 ) {
   const token = authorizationHeader?.replace(/^Bearer /i, "");
   if (!token) return null;
@@ -88,7 +88,7 @@ export function generatePasswordHash(password: string) {
 
 export async function createUser(
   db: AnyDatabase,
-  data: NewUser,
+  data: NewUser
 ): Promise<User> {
   let user: User | undefined;
   let attempt = 0;
@@ -142,7 +142,7 @@ export async function generateMagicLink(user: User, redirectTo = "/") {
   const signedToken = await signPayload(token);
   const url = absoluteUrl(
     config.URL_PREFIX,
-    `/auth/magic-link?token=${signedToken}&redirectTo=${encodeURIComponent(redirectTo)}`,
+    `/auth/magic-link?token=${signedToken}&redirectTo=${encodeURIComponent(redirectTo)}`
   );
 
   return {

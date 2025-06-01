@@ -68,8 +68,6 @@
     "@types/react": "catalog:",
     "@types/react-avatar-editor": "^13.0.4",
     "@types/react-dom": "catalog:",
-    "eslint": "catalog:",
-    "eslint-config-next": "14.2.4",
     "postcss": "^8.5.4",
     "tailwind-scrollbar": "catalog:",
     "tailwindcss": "^4.1.8",

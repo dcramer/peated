@@ -9,8 +9,8 @@ describe("POST /entities/:entity/merge", () => {
           entity: 1,
           other: 2,
         },
-        { context: { user: null } },
-      ),
+        { context: { user: null } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -22,8 +22,8 @@ describe("POST /entities/:entity/merge", () => {
           entity: 1,
           other: 2,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -46,7 +46,7 @@ describe("POST /entities/:entity/merge", () => {
         other: entityB.id,
         direction: "mergeInto",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toEqual(entityB.id);
@@ -70,7 +70,7 @@ describe("POST /entities/:entity/merge", () => {
         other: entityB.id,
         direction: "mergeFrom",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(data.id).toEqual(entityA.id);

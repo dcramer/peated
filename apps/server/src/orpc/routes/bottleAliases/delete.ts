@@ -17,7 +17,7 @@ export default procedure
   .use(requireMod)
   .input(z.object({ alias: z.string() }))
   .output(z.object({}))
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const alias = await db.query.bottleAliases.findFirst({
       where: eq(sql`LOWER(${bottleAliases.name})`, input.alias.toLowerCase()),
       with: {
@@ -60,7 +60,7 @@ export default procedure
           .update(bottleAliases)
           .set({ bottleId: null })
           .where(
-            eq(sql`LOWER(${bottleAliases.name})`, alias.name.toLowerCase()),
+            eq(sql`LOWER(${bottleAliases.name})`, alias.name.toLowerCase())
           ),
       ]);
     });

@@ -15,8 +15,8 @@ describe("GET /external-sites/:site/config/:key", () => {
           site: site.type,
           key: "test",
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -30,7 +30,7 @@ describe("GET /external-sites/:site/config/:key", () => {
         site: site.type,
         key: "test",
       },
-      { context: { user } },
+      { context: { user } }
     );
     expect(data).toBeNull();
   });
@@ -45,7 +45,7 @@ describe("GET /external-sites/:site/config/:key", () => {
         key: "test",
         default: [],
       },
-      { context: { user } },
+      { context: { user } }
     );
     expect(data).toEqual([]);
   });
@@ -65,7 +65,7 @@ describe("GET /external-sites/:site/config/:key", () => {
         site: site.type,
         key: "test",
       },
-      { context: { user } },
+      { context: { user } }
     );
     expect(data).toEqual({ foo: "bar" });
   });

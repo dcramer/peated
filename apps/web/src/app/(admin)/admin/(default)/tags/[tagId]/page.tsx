@@ -17,7 +17,7 @@ export default function Page({
       input: {
         tag: tagId,
       },
-    }),
+    })
   );
 
   return (

@@ -10,7 +10,7 @@ describe("POST /entities", () => {
     const err = await waitError(
       routerClient.entities.create({
         name: "Delicious Wood",
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -20,7 +20,7 @@ describe("POST /entities", () => {
       {
         name: "Macallan",
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -63,7 +63,7 @@ describe("POST /entities", () => {
         name: entity.name,
         type: ["brand"],
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();

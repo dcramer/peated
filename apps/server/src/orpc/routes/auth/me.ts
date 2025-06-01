@@ -18,7 +18,7 @@ export default procedure
     description: "Retrieve the authenticated user's profile information",
   })
   .output(z.object({ user: UserSchema }))
-  .handler(async function ({ context, errors }) {
+  .handler(async ({ context, errors }) => {
     // this would be a good place to add refreshTokens (swap to POST for that)
     const [user] = await db
       .select()
@@ -26,7 +26,7 @@ export default procedure
       .where(eq(users.id, context.user.id));
     if (!user) {
       logError(
-        `Authenticated user (${context.user.id}) failed to retrieve details`,
+        `Authenticated user (${context.user.id}) failed to retrieve details`
       );
       throw errors.INTERNAL_SERVER_ERROR();
     }

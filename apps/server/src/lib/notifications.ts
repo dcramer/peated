@@ -33,11 +33,11 @@ export const objectTypeFromSchema = (schema: AnyPgTable) => {
 
 export const createNotification = async (
   db: AnyDatabase,
-  notification: NewNotification,
+  notification: NewNotification
 ) => {
   if (notification.userId === notification.fromUserId) {
     throw new Error(
-      "You should not create notifications to and from the same user.",
+      "You should not create notifications to and from the same user."
     );
   }
   const [notif] = await db
@@ -50,11 +50,7 @@ export const createNotification = async (
 
 export const deleteNotification = async (
   db: AnyDatabase,
-  {
-    type,
-    objectId,
-    userId,
-  }: Pick<Notification, "type" | "objectId" | "userId">,
+  { type, objectId, userId }: Pick<Notification, "type" | "objectId" | "userId">
 ) => {
   await db
     .delete(notifications)
@@ -62,7 +58,7 @@ export const deleteNotification = async (
       and(
         eq(notifications.type, type),
         eq(notifications.objectId, objectId),
-        eq(notifications.userId, userId),
-      ),
+        eq(notifications.userId, userId)
+      )
     );
 };

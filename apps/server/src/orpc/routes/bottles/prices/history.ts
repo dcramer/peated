@@ -21,7 +21,7 @@ export default procedure
     z.object({
       bottle: z.coerce.number(),
       currency: CurrencyEnum.default("usd"),
-    }),
+    })
   )
   .output(
     z.object({
@@ -31,11 +31,11 @@ export default procedure
           avgPrice: z.number(),
           minPrice: z.number(),
           maxPrice: z.number(),
-        }),
+        })
       ),
-    }),
+    })
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const [bottle] = await db
       .select()
       .from(bottles)
@@ -60,8 +60,8 @@ export default procedure
         and(
           eq(storePrices.currency, input.currency),
           eq(storePrices.bottleId, bottle.id),
-          sql`${storePrices.updatedAt} > NOW() - interval '1 year'`,
-        ),
+          sql`${storePrices.updatedAt} > NOW() - interval '1 year'`
+        )
       )
       .groupBy(storePriceHistories.date)
       .orderBy(desc(storePriceHistories.date));
@@ -69,9 +69,9 @@ export default procedure
     return {
       results: results.map((r) => ({
         date: r.date,
-        avgPrice: parseInt(r.avgPrice, 10),
-        minPrice: parseInt(r.minPrice, 10),
-        maxPrice: parseInt(r.maxPrice, 10),
+        avgPrice: Number.parseInt(r.avgPrice, 10),
+        minPrice: Number.parseInt(r.minPrice, 10),
+        maxPrice: Number.parseInt(r.maxPrice, 10),
       })),
     };
   });

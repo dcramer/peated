@@ -29,7 +29,7 @@ export default function BottleList() {
   const { data: bottleList } = useSuspenseQuery(
     orpc.bottles.list.queryOptions({
       input: queryParams,
-    }),
+    })
   );
 
   return (

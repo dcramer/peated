@@ -26,7 +26,7 @@ describe("POST /email/verify", () => {
 
   test("invalid token", async () => {
     const err = await waitError(
-      routerClient.email.verify({ token: "invalid-token" }),
+      routerClient.email.verify({ token: "invalid-token" })
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Invalid verification token.]`);

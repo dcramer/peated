@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { bottles, bottleSeries, changes } from "@peated/server/db/schema";
+import { bottleSeries, bottles, changes } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { eq } from "drizzle-orm";
@@ -16,7 +16,7 @@ export default procedure
   })
   .input(z.object({ series: z.coerce.number() }))
   .output(z.object({}))
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const [series] = await db
       .select()
       .from(bottleSeries)
@@ -31,14 +31,16 @@ export default procedure
     await db.transaction(async (tx) => {
       await Promise.all([
         // Log the deletion in changes table
-        tx.insert(changes).values({
-          objectType: "bottle_series",
-          objectId: series.id,
-          createdById: context.user.id,
-          displayName: series.name,
-          type: "delete",
-          data: series,
-        }),
+        tx
+          .insert(changes)
+          .values({
+            objectType: "bottle_series",
+            objectId: series.id,
+            createdById: context.user.id,
+            displayName: series.name,
+            type: "delete",
+            data: series,
+          }),
 
         // Update bottles to remove series reference
         tx

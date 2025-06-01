@@ -34,7 +34,7 @@ export default function ActivityFeed({
         cursor: pageParam,
       }),
       initialPageParam: undefined,
-      staleTime: Infinity,
+      staleTime: Number.POSITIVE_INFINITY,
       initialData: () => {
         return {
           pages: [tastingList],
@@ -43,7 +43,7 @@ export default function ActivityFeed({
       },
       getNextPageParam: (lastPage) => lastPage.rel?.nextCursor,
       getPreviousPageParam: (firstPage) => firstPage.rel?.prevCursor,
-    }),
+    })
   );
 
   const onScroll = () => {

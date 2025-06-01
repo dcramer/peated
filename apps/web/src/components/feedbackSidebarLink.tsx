@@ -14,7 +14,7 @@ export default function FeedbackSidebarLink() {
 
   const feedback =
     getClient()?.getIntegrationByName?.<ReturnType<typeof feedbackIntegration>>(
-      "Feedback",
+      "Feedback"
     ) ?? null;
 
   const linkRef = useCallback(
@@ -24,7 +24,7 @@ export default function FeedbackSidebarLink() {
       (feedback as any).attachTo(node, {});
       setLoaded(true);
     },
-    [feedback, loaded],
+    [feedback, loaded]
   );
 
   return (

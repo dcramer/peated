@@ -10,7 +10,7 @@ describe("PUT /friends/:user", () => {
     const err = await waitError(() =>
       routerClient.friends.create({
         user: defaults.user.id,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -21,8 +21,8 @@ describe("PUT /friends/:user", () => {
         {
           user: defaults.user.id,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Cannot friend yourself.]`);
   });
@@ -34,7 +34,7 @@ describe("PUT /friends/:user", () => {
       {
         user: otherUser.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.status).toEqual("pending");
@@ -45,8 +45,8 @@ describe("PUT /friends/:user", () => {
       .where(
         and(
           eq(follows.fromUserId, defaults.user.id),
-          eq(follows.toUserId, otherUser.id),
-        ),
+          eq(follows.toUserId, otherUser.id)
+        )
       );
     expect(follow).toBeDefined();
     expect(follow.status).toBe("pending");
@@ -57,8 +57,8 @@ describe("PUT /friends/:user", () => {
       .where(
         and(
           eq(notifications.objectId, follow.id),
-          eq(notifications.type, "friend_request"),
-        ),
+          eq(notifications.type, "friend_request")
+        )
       );
 
     expect(notif).toBeDefined();
@@ -79,7 +79,7 @@ describe("PUT /friends/:user", () => {
       {
         user: otherUser.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.status).toEqual("friends");
@@ -90,8 +90,8 @@ describe("PUT /friends/:user", () => {
       .where(
         and(
           eq(follows.fromUserId, defaults.user.id),
-          eq(follows.toUserId, otherUser.id),
-        ),
+          eq(follows.toUserId, otherUser.id)
+        )
       );
     expect(newFollow).toBeDefined();
     expect(newFollow.status).toEqual(follow.status);
@@ -109,7 +109,7 @@ describe("PUT /friends/:user", () => {
       {
         user: otherUser.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.status).toEqual("friends");
@@ -120,8 +120,8 @@ describe("PUT /friends/:user", () => {
       .where(
         and(
           eq(follows.fromUserId, defaults.user.id),
-          eq(follows.toUserId, otherUser.id),
-        ),
+          eq(follows.toUserId, otherUser.id)
+        )
       );
     expect(follow).toBeDefined();
     expect(follow.status).toEqual("following");
@@ -132,8 +132,8 @@ describe("PUT /friends/:user", () => {
       .where(
         and(
           eq(notifications.objectId, follow.id),
-          eq(notifications.type, "friend_request"),
-        ),
+          eq(notifications.type, "friend_request")
+        )
       );
 
     expect(notif).toBeUndefined();

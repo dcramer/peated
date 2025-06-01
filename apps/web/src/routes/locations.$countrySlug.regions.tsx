@@ -23,7 +23,7 @@ function Page() {
   const { data: regionList } = useSuspenseQuery(
     orpc.regions.list.queryOptions({
       input: queryParams,
-    }),
+    })
   );
 
   return (

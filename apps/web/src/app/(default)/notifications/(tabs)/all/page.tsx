@@ -21,7 +21,7 @@ export default function Page() {
   const { data: notificationList } = useSuspenseQuery(
     orpc.notifications.list.queryOptions({
       input: queryParams,
-    }),
+    })
   );
 
   return notificationList.results.length ? (

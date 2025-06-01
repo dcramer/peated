@@ -2,8 +2,8 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, it } from "vitest";
 
-describe("GET /bottle-releases/:release", function () {
-  it("returns a bottle release", async function ({ fixtures }) {
+describe("GET /bottle-releases/:release", () => {
+  it("returns a bottle release", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle({
       name: "Test Bottle",
       category: "single_malt",
@@ -24,11 +24,11 @@ describe("GET /bottle-releases/:release", function () {
     expect(result.abv).toBe(40);
   });
 
-  it("errors on invalid release", async function () {
+  it("errors on invalid release", async () => {
     const err = await waitError(
       routerClient.bottleReleases.details({
         release: 1234,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Release not found.]`);
   });

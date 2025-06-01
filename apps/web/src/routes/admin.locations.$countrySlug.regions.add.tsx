@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute(
-  "/admin/locations/$countrySlug/regions/add",
+  "/admin/locations/$countrySlug/regions/add"
 )({
   component: Page,
 });
@@ -15,7 +15,7 @@ function Page() {
 
   const orpc = useORPC();
   const regionCreateMutation = useMutation(
-    orpc.regions.create.mutationOptions(),
+    orpc.regions.create.mutationOptions()
   );
 
   return (

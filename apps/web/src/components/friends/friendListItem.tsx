@@ -1,6 +1,6 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import { type Friend, type FriendStatus } from "@peated/server/types";
+import type { Friend, FriendStatus } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
 import ListItem from "@peated/web/components/listItem";
@@ -31,14 +31,14 @@ export default function FriendListItem({ friend }: { friend: Friend }) {
       onSuccess: ({ status }) => {
         setFriendStatus(status);
       },
-    }),
+    })
   );
   const friendDeleteMutation = useMutation(
     orpc.friends.delete.mutationOptions({
       onSuccess: ({ status }) => {
         setFriendStatus(status);
       },
-    }),
+    })
   );
 
   if (friendStatus === "none") return null;
@@ -53,7 +53,7 @@ export default function FriendListItem({ friend }: { friend: Friend }) {
       <div
         className={classNames(
           "flex flex-auto items-center space-x-4",
-          isPending ? "opacity-50" : "",
+          isPending ? "opacity-50" : ""
         )}
       >
         <UserAvatar size={48} user={user} />

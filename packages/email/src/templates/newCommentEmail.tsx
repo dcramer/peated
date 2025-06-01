@@ -1,12 +1,12 @@
 import { Column, Img, Preview, Row } from "jsx-email";
 import React from "react";
 import {
+  type Infer,
   defaulted,
   nullable,
   number,
   object,
   string,
-  type Infer,
 } from "superstruct";
 import { Button, Heading, Hr, Link, Section, Text } from "../components/core";
 import Layout from "../components/layout";
@@ -44,7 +44,7 @@ export const TemplateStruct = object({
         username: "jane.doe",
         pictureUrl: null,
       },
-    },
+    }
   ),
   baseUrl: defaulted(string(), "https://peated.com"),
 });

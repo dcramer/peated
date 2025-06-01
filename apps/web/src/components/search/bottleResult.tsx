@@ -27,7 +27,7 @@ export default function BottleResultRow({
             <span key={d.id}>{d.name}</span>
           ))}
         </Join>
-      </span>,
+      </span>
     );
   if (bottle.vintageYear)
     metadata.push(<span>{bottle.vintageYear} Vintage</span>);

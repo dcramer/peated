@@ -22,7 +22,7 @@ export default function Page() {
   const { data: eventList } = useSuspenseQuery(
     orpc.events.list.queryOptions({
       input: queryParams,
-    }),
+    })
   );
 
   return (

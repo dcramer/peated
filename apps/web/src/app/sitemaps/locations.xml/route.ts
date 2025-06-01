@@ -1,5 +1,5 @@
 import { createServerClient } from "@peated/web/lib/orpc/client.server";
-import { buildPagesSitemap, type Sitemap } from "@peated/web/lib/sitemaps";
+import { type Sitemap, buildPagesSitemap } from "@peated/web/lib/sitemaps";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +18,7 @@ export async function GET() {
     pages.push(
       ...results.map((country) => ({
         url: `/locations/${country.slug}`,
-      })),
+      }))
     );
 
     cursor = rel?.nextCursor || null;

@@ -6,7 +6,7 @@ export default class BatchQueue<T> {
 
   constructor(
     batchSize: number,
-    processBatchCallback: (batch: T[]) => Promise<void>,
+    processBatchCallback: (batch: T[]) => Promise<void>
   ) {
     this.batchSize = batchSize;
     this.processBatchCallback = processBatchCallback;

@@ -2,7 +2,7 @@
 
 import { PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { toTitleCase } from "@peated/server/lib/strings";
-import { type Bottle } from "@peated/server/types";
+import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
 import Join from "@peated/web/components/join";
 import LayoutModal from "@peated/web/components/layoutModal";
@@ -46,7 +46,7 @@ export default function BottleSelector({
       setResults(results);
       setLoading(false);
     },
-    [orpc],
+    [orpc]
   );
 
   const onSearch = useDebounceCallback(unsafe_onSearch);

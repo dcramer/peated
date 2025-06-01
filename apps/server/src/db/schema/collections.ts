@@ -29,10 +29,10 @@ export const collections = pgTable(
   (table) => [
     uniqueIndex("collection_name_unq").using(
       "btree",
-      sql`LOWER(${table.name}), ${table.createdById}`,
+      sql`LOWER(${table.name}), ${table.createdById}`
     ),
     index("collection_created_by_idx").on(table.createdById),
-  ],
+  ]
 );
 
 export const collectionsRelations = relations(collections, ({ one, many }) => ({
@@ -57,7 +57,7 @@ export const collectionBottles = pgTable(
       .references(() => bottles.id)
       .notNull(),
     releaseId: bigint("release_id", { mode: "number" }).references(
-      () => bottleReleases.id,
+      () => bottleReleases.id
     ),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
@@ -67,7 +67,7 @@ export const collectionBottles = pgTable(
       .nullsNotDistinct(),
     index("collection_bottle_bottle_idx").on(table.bottleId),
     index("collection_bottle_release_idx").on(table.releaseId),
-  ],
+  ]
 );
 
 export const collectionBottlesRelations = relations(
@@ -81,7 +81,7 @@ export const collectionBottlesRelations = relations(
       fields: [collectionBottles.bottleId],
       references: [bottles.id],
     }),
-  }),
+  })
 );
 
 export type CollectionBottle = typeof collectionBottles.$inferSelect;

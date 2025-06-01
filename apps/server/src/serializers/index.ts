@@ -15,14 +15,14 @@ export interface Serializer<
   attrs?(
     itemList: T[],
     currentUser?: User | null,
-    context?: C,
+    context?: C
   ): Promise<Record<number, A>>;
   item(item: T, attrs: A, currentUser?: User | null, context?: C): R;
 }
 
 export async function DefaultAttrs<T extends Item>(
   itemList: T[],
-  currentUser?: User | null,
+  currentUser?: User | null
 ): Promise<Attrs> {
   return Object.fromEntries(itemList.map((i) => [i.id, {}]));
 }
@@ -36,7 +36,7 @@ export async function serialize<
   item: T,
   currentUser?: User | null,
   excludeFields?: string[],
-  context?: C,
+  context?: C
 ): Promise<R>;
 export async function serialize<
   T extends Item,
@@ -47,7 +47,7 @@ export async function serialize<
   itemList: T[],
   currentUser?: User | null,
   excludeFields?: string[],
-  context?: C,
+  context?: C
 ): Promise<R[]>;
 export async function serialize<
   T extends Item,
@@ -58,7 +58,7 @@ export async function serialize<
   itemList: T | T[],
   currentUser?: User | null,
   excludeFields: string[] = [],
-  context?: C,
+  context?: C
 ): Promise<R | R[]> {
   return await Sentry.startSpan(
     {
@@ -74,19 +74,19 @@ export async function serialize<
       const attrs = await (serializer.attrs || DefaultAttrs<T>)(
         Array.isArray(itemList) ? itemList : [itemList],
         currentUser,
-        context,
+        context
       );
 
       const results = (Array.isArray(itemList) ? itemList : [itemList]).map(
         (i: T) =>
           removeAttributes(
             serializer.item(i, attrs[i.id] || {}, currentUser, context),
-            excludeFields,
-          ),
+            excludeFields
+          )
       ) as R[];
 
       return Array.isArray(itemList) ? results : results[0];
-    },
+    }
   );
 }
 
@@ -103,7 +103,7 @@ function removeAttributes(object: Record<string, any>, names: string[]) {
   const nameSet = new Set(names);
   return {
     ...Object.fromEntries(
-      Object.entries(object).filter(([key]) => !nameSet.has(key)),
+      Object.entries(object).filter(([key]) => !nameSet.has(key))
     ),
   };
 }

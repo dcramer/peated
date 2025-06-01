@@ -16,7 +16,7 @@ function Page() {
       input: {
         bottle: Number(bottleId),
       },
-    }),
+    })
   );
 
   return (

@@ -39,7 +39,7 @@ ${bottle.fullName}
 ${
   infoLines.length
     ? `\nOther information we already know about this bottle:\n- ${infoLines.join(
-        "\n- ",
+        "\n- "
       )}\n`
     : ""
 }
@@ -89,7 +89,7 @@ export type GeneratedBottleDetails = z.infer<typeof OpenAIBottleDetailsSchema>;
 
 export async function getGeneratedBottleDetails(
   bottle: Partial<Bottle>,
-  tagList: string[],
+  tagList: string[]
 ): Promise<GeneratedBottleDetails | null> {
   return await startSpan(
     {
@@ -108,9 +108,9 @@ export async function getGeneratedBottleDetails(
             id: bottle.id,
             fullName: bottle.fullName,
           },
-        },
+        }
       );
-    },
+    }
   );
 }
 

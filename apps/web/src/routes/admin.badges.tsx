@@ -23,7 +23,7 @@ function Page() {
   const { data: badgeList } = useSuspenseQuery(
     orpc.badges.list.queryOptions({
       input: queryParams,
-    }),
+    })
   );
 
   return (

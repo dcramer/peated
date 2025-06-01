@@ -26,7 +26,7 @@ export const identities = pgTable(
   (table) => [
     uniqueIndex("identity_unq").on(table.provider, table.externalId),
     index("identity_user_idx").on(table.userId),
-  ],
+  ]
 );
 
 export const identitiesRelations = relations(identities, ({ one }) => ({

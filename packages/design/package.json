@@ -16,7 +16,7 @@
     "build": "tsc",
     "clean": "rm -rf .turbo dist node_modules",
     "dev": "tsc --watch",
-    "lint": "eslint",
+    "lint": "biome check",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
@@ -24,7 +24,6 @@
     "@tailwindcss/forms": "catalog:",
     "@tailwindcss/typography": "catalog:",
     "@types/node": "catalog:",
-    "eslint": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-tailwindcss": "catalog:",
     "tailwind-scrollbar": "^4.0.2",

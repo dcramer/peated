@@ -20,7 +20,7 @@ export default function Spinner({
     const length = Math.floor(path.getTotalLength());
     path.setAttribute(
       "style",
-      `stroke-dasharray:${length / 10}; stroke-dashoffset:${length}; animation: dash 10s linear infinite;`,
+      `stroke-dasharray:${length / 10}; stroke-dashoffset:${length}; animation: dash 10s linear infinite;`
     );
   }, [ref]);
 

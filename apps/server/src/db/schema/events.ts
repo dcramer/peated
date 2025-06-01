@@ -27,7 +27,7 @@ export const events = pgTable(
     website: varchar("website", { length: 255 }),
 
     countryId: bigint("country_id", { mode: "number" }).references(
-      () => countries.id,
+      () => countries.id
     ),
     address: text("address"),
     location: geometry_point("location"),
@@ -40,10 +40,10 @@ export const events = pgTable(
     uniqueIndex("event_name_unq").using(
       "btree",
       table.dateStart,
-      sql`LOWER(${table.name})`,
+      sql`LOWER(${table.name})`
     ),
     index("event_country_id").on(table.countryId),
-  ],
+  ]
 );
 
 export type Event = typeof events.$inferSelect;

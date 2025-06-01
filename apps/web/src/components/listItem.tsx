@@ -24,7 +24,7 @@ export default function ListItem<
       className={classNames(
         "card group relative",
         color === "highlight" ? "bg-highlight text-black" : "",
-        noHover ? "" : color === "highlight" ? "" : "hover:bg-slate-900",
+        noHover ? "" : color === "highlight" ? "" : "hover:bg-slate-900"
       )}
       {...props}
     >

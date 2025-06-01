@@ -1,10 +1,10 @@
 import {
-  domAnimation,
   LazyMotion,
+  type MotionValue,
+  domAnimation,
   m,
   useSpring,
   useTransform,
-  type MotionValue,
 } from "framer-motion";
 import { useEffect } from "react";
 

@@ -10,7 +10,7 @@ export default function Leaderboard({ badgeId }: { badgeId: number }) {
   const { data: awardList } = useSuspenseQuery(
     orpc.badges.userList.queryOptions({
       input: { badge: badgeId },
-    }),
+    })
   );
 
   return (

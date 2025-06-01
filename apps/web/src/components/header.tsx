@@ -17,7 +17,7 @@ export default function Header({
       <header
         className={classNames(
           "h-14 flex-shrink-0 overflow-hidden lg:h-16",
-          mobileOnly ? "block lg:hidden" : "",
+          mobileOnly ? "block lg:hidden" : ""
         )}
       >
         <div
@@ -25,7 +25,7 @@ export default function Header({
             "fixed left-0 right-0 z-30",
             color === "primary"
               ? "main-gradient backdrop-blur"
-              : "border-b border-b-slate-700 bg-slate-950",
+              : "border-b border-b-slate-700 bg-slate-950"
           )}
         >
           <div className="flex h-14 w-full max-w-7xl lg:h-16 lg:pl-64">

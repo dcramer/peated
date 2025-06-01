@@ -23,7 +23,6 @@ const axiosMock = new MockAdapter(axios);
 // TODO: no fucking clue how to just use my mock module anymore and docs
 // are almost non-existant
 vi.mock("../worker/client", async (importOriginal) => {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   const oJobs = await importOriginal<typeof import("../worker/client.js")>();
   return {
     pushJob: vi.fn(() => Promise<void>),
@@ -95,7 +94,7 @@ const clearTables = async () => {
   for (const { relname } of snQuery) {
     if (!relname.startsWith("__drizzle_migrations")) {
       await db.execute(
-        sql.raw(`ALTER SEQUENCE "${schemaname}"."${relname}" RESTART WITH 1;`),
+        sql.raw(`ALTER SEQUENCE "${schemaname}"."${relname}" RESTART WITH 1;`)
       );
     }
   }
@@ -128,7 +127,7 @@ async function setupDatabase() {
 
   const dbQuery = await client.query(
     `SELECT FROM pg_database WHERE datname = $1`,
-    [applicationDatabaseName],
+    [applicationDatabaseName]
   );
   if (dbQuery.rows.length === 0) {
     // database does not exist, make it:

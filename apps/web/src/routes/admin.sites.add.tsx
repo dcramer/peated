@@ -11,7 +11,7 @@ function Page() {
   const navigate = useNavigate();
   const orpc = useORPC();
   const siteCreateMutation = useMutation(
-    orpc.externalSites.create.mutationOptions(),
+    orpc.externalSites.create.mutationOptions()
   );
 
   return (

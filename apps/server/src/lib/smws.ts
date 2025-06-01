@@ -308,7 +308,7 @@ export type SMWSCaskDetails = {
 
 export function parseDetailsFromName(name: string): SMWSCaskDetails | null {
   const caskNumberMatch = name.match(
-    /(Cask No\. )?([A-Z0-9]+\.[0-9]+)\s*(.+)?/i,
+    /(Cask No\. )?([A-Z0-9]+\.[0-9]+)\s*(.+)?/i
   );
 
   if (!caskNumberMatch) {
@@ -403,13 +403,13 @@ function parseType(value: string): CaskType | null {
 }
 
 export function parseCaskType(
-  caskType: string,
+  caskType: string
 ): [CaskFill | null, CaskType | null, CaskSize | null] {
   const caskFillMatch = caskType.match(
-    /(new|first fill|second fill|1st fill|2nd fill|refill)/i,
+    /(new|first fill|second fill|1st fill|2nd fill|refill)/i
   );
   const caskTypeMatch = caskType.match(
-    /(bourbon|oloroso|oak|px|rum|armagnac)/i,
+    /(bourbon|oloroso|oak|px|rum|armagnac)/i
   );
   const caskSizeMatch = caskType.match(/(barrique|barrel|hogshead|butt)/i);
 

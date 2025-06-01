@@ -6,7 +6,7 @@ import Heading from "@peated/web/components/heading";
 import Link from "@peated/web/components/link";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, NotFoundError } from "@tanstack/react-router";
+import { NotFoundError, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/entities/$entityId/codes")({
   component: Page,
@@ -18,7 +18,7 @@ function Page() {
   const { data: entity } = useSuspenseQuery(
     orpc.entities.details.queryOptions({
       input: { entity: Number(entityId) },
-    }),
+    })
   );
 
   const { data } = useSuspenseQuery(orpc.smws.distillerList.queryOptions({}));
@@ -29,7 +29,7 @@ function Page() {
   }
 
   const exampleDistiller = distillerList.find(
-    (d) => d.name.toLowerCase() === SMWS_DISTILLERY_CODES[4].toLowerCase(),
+    (d) => d.name.toLowerCase() === SMWS_DISTILLERY_CODES[4].toLowerCase()
   );
 
   if (!exampleDistiller) {
@@ -138,7 +138,7 @@ function Page() {
                         </td>
                       </tr>
                     );
-                  },
+                  }
                 )}
               </tbody>
             </table>

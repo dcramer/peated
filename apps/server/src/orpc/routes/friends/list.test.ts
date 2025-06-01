@@ -11,7 +11,7 @@ describe("GET /friends", () => {
 
     const { results } = await routerClient.friends.list(
       {},
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toBe(1);

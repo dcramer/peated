@@ -16,7 +16,7 @@ export default procedure
     z.object({
       bottle: z.coerce.number(),
       limit: z.coerce.number().gte(1).lte(100).default(25),
-    }),
+    })
   )
   .output(
     z.object({
@@ -24,12 +24,12 @@ export default procedure
         z.object({
           tag: z.string(),
           count: z.number(),
-        }),
+        })
       ),
       totalCount: z.number(),
-    }),
+    })
   )
-  .handler(async function ({ input, errors }) {
+  .handler(async ({ input, errors }) => {
     const { limit, ...rest } = input;
     const [bottle] = await db
       .select()
@@ -55,7 +55,7 @@ export default procedure
         FROM ${tastings}
         WHERE ${tastings.bottleId} = ${bottle.id}
         AND array_length(${tastings.tags}, 1) > 0
-      `,
+      `
       )
     ).rows[0].count;
 

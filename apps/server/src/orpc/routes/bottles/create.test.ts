@@ -1,8 +1,8 @@
 import { FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
-  bottles,
   bottleSeries,
+  bottles,
   bottlesToDistillers,
   changes,
   entities,
@@ -19,8 +19,8 @@ describe("POST /bottles", () => {
           name: "Delicious Wood",
           brand: 1,
         },
-        { context: { user: null } },
-      ),
+        { context: { user: null } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -35,7 +35,7 @@ describe("POST /bottles", () => {
         name: "Delicious Wood",
         brand: brand.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -70,7 +70,7 @@ describe("POST /bottles", () => {
         statedAge: 12,
         flavorProfile: FLAVOR_PROFILES[0],
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -109,8 +109,8 @@ describe("POST /bottles", () => {
           name: "Delicious Wood",
           brand: 5,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Entity not found [id: 5]]`);
@@ -129,7 +129,7 @@ describe("POST /bottles", () => {
           name: existingBrand.name,
         },
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -150,8 +150,8 @@ describe("POST /bottles", () => {
       .where(
         and(
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, defaults.user.id),
-        ),
+          eq(changes.createdById, defaults.user.id)
+        )
       );
 
     expect(changeList.length).toBe(0);
@@ -176,7 +176,7 @@ describe("POST /bottles", () => {
           region: region.id,
         },
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -201,8 +201,8 @@ describe("POST /bottles", () => {
       .where(
         and(
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, defaults.user.id),
-        ),
+          eq(changes.createdById, defaults.user.id)
+        )
       );
 
     expect(changeList.length).toBe(1);
@@ -220,8 +220,8 @@ describe("POST /bottles", () => {
           },
           distillers: [500000],
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Entity not found [id: 500000]]`);
   });
@@ -244,7 +244,7 @@ describe("POST /bottles", () => {
           },
         ],
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -260,7 +260,7 @@ describe("POST /bottles", () => {
       .from(entities)
       .innerJoin(
         bottlesToDistillers,
-        eq(bottlesToDistillers.distillerId, entities.id),
+        eq(bottlesToDistillers.distillerId, entities.id)
       )
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
 
@@ -274,8 +274,8 @@ describe("POST /bottles", () => {
       .where(
         and(
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, defaults.user.id),
-        ),
+          eq(changes.createdById, defaults.user.id)
+        )
       );
 
     expect(changeList.length).toBe(0);
@@ -297,7 +297,7 @@ describe("POST /bottles", () => {
           },
         ],
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -313,7 +313,7 @@ describe("POST /bottles", () => {
       .from(entities)
       .innerJoin(
         bottlesToDistillers,
-        eq(bottlesToDistillers.distillerId, entities.id),
+        eq(bottlesToDistillers.distillerId, entities.id)
       )
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
 
@@ -330,8 +330,8 @@ describe("POST /bottles", () => {
       .where(
         and(
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, defaults.user.id),
-        ),
+          eq(changes.createdById, defaults.user.id)
+        )
       );
     expect(changeList.length).toBe(1);
   });
@@ -351,7 +351,7 @@ describe("POST /bottles", () => {
           },
         ],
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -367,7 +367,7 @@ describe("POST /bottles", () => {
       .from(entities)
       .innerJoin(
         bottlesToDistillers,
-        eq(bottlesToDistillers.distillerId, entities.id),
+        eq(bottlesToDistillers.distillerId, entities.id)
       )
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
 
@@ -390,8 +390,8 @@ describe("POST /bottles", () => {
       .where(
         and(
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, defaults.user.id),
-        ),
+          eq(changes.createdById, defaults.user.id)
+        )
       );
     expect(changeList.length).toBe(2);
   });
@@ -411,7 +411,7 @@ describe("POST /bottles", () => {
           },
         ],
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -427,7 +427,7 @@ describe("POST /bottles", () => {
       .from(entities)
       .innerJoin(
         bottlesToDistillers,
-        eq(bottlesToDistillers.distillerId, entities.id),
+        eq(bottlesToDistillers.distillerId, entities.id)
       )
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
 
@@ -445,8 +445,8 @@ describe("POST /bottles", () => {
       .where(
         and(
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, defaults.user.id),
-        ),
+          eq(changes.createdById, defaults.user.id)
+        )
       );
     expect(changeList.length).toBe(1);
   });
@@ -464,7 +464,7 @@ describe("POST /bottles", () => {
         brand: brand.id,
         distillers: [distiller.id],
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
     expect(data.id).toBeDefined();
 
@@ -482,7 +482,7 @@ describe("POST /bottles", () => {
         name: "Delicious Wood Yum Yum",
         brand: brand.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -507,7 +507,7 @@ describe("POST /bottles", () => {
         name: "1.54",
         brand: brand.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -531,7 +531,7 @@ describe("POST /bottles", () => {
         caskSize: "hogshead",
         caskFill: "1st_fill",
       },
-      { context: { user: await fixtures.User({ mod: true }) } },
+      { context: { user: await fixtures.User({ mod: true }) } }
     );
 
     expect(data.id).toBeDefined();
@@ -555,7 +555,7 @@ describe("POST /bottles", () => {
         brand: brand.id,
         vintageYear: 2024,
       },
-      { context: { user: await fixtures.User({ mod: true }) } },
+      { context: { user: await fixtures.User({ mod: true }) } }
     );
 
     expect(data.id).toBeDefined();
@@ -577,7 +577,7 @@ describe("POST /bottles", () => {
         brand: brand.id,
         releaseYear: 2024,
       },
-      { context: { user: await fixtures.User({ mod: true }) } },
+      { context: { user: await fixtures.User({ mod: true }) } }
     );
 
     expect(data.id).toBeDefined();
@@ -603,7 +603,7 @@ describe("POST /bottles", () => {
         brand: brand.id,
         series: series.id,
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -636,7 +636,7 @@ describe("POST /bottles", () => {
           description: "Special release series",
         },
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(data.id).toBeDefined();
@@ -666,8 +666,8 @@ describe("POST /bottles", () => {
       .where(
         and(
           eq(changes.objectType, "bottle_series"),
-          eq(changes.objectId, newSeries.id),
-        ),
+          eq(changes.objectId, newSeries.id)
+        )
       );
 
     expect(change).toBeDefined();
@@ -685,8 +685,8 @@ describe("POST /bottles", () => {
           brand: brand.id,
           series: 999999,
         },
-        { context: { user: defaults.user } },
-      ),
+        { context: { user: defaults.user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Series not found.]`);
   });

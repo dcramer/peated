@@ -56,7 +56,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 
     const priceRaw = $(
       "span.grid-product__price--current > span.visually-hidden",
-      el,
+      el
     )
       .first()
       .text();
@@ -88,7 +88,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
         volume,
         // image,
         url: absoluteUrl(url, productUrl),
-      }),
+      })
     );
   });
 
@@ -99,6 +99,6 @@ export default async function scrapeWoodenCork() {
   await scrapePrices(
     "woodencork",
     (page) => `https://woodencork.com/collections/whiskey?cursor=${page}`,
-    scrapeProducts,
+    scrapeProducts
   );
 }

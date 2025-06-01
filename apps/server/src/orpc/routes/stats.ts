@@ -17,9 +17,9 @@ export default procedure
       totalTastings: z.number(),
       totalBottles: z.number(),
       totalEntities: z.number(),
-    }),
+    })
   )
-  .handler(async function () {
+  .handler(async () => {
     const [{ totalTastings }] = await db
       .select({
         totalTastings: sql<string>`COUNT(${tastings.id})`,

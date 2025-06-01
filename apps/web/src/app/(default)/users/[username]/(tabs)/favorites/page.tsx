@@ -17,7 +17,7 @@ export default function UserFavorites({
         user: username,
         collection: "favorites",
       },
-    }),
+    })
   );
 
   return bottles.results.length ? (

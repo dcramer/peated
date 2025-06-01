@@ -9,7 +9,7 @@ describe("POST /flights", () => {
     const err = await waitError(
       routerClient.flights.create({
         name: "Delicious Wood",
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -20,7 +20,7 @@ describe("POST /flights", () => {
       {
         name: "Macallan",
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(data.id).toBeDefined();

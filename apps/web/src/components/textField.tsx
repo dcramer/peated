@@ -9,7 +9,7 @@ type Props = React.ComponentProps<typeof TextInput> &
 
 export default forwardRef<HTMLInputElement, Props>(function TextField(
   { name, helpText, label, required, className, error, ...props },
-  ref,
+  ref
 ) {
   return (
     <FormField

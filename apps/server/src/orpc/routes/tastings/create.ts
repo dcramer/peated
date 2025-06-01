@@ -3,8 +3,8 @@ import { db } from "@peated/server/db";
 import type { Flight, NewTasting, Tasting } from "@peated/server/db/schema";
 import {
   bottleReleases,
-  bottles,
   bottleTags,
+  bottles,
   entities,
   flightBottles,
   flights,
@@ -44,9 +44,9 @@ export default procedure
     z.object({
       tasting: TastingSchema,
       awards: z.array(BadgeAwardSchema),
-    }),
+    })
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const bottle = await db.query.bottles.findFirst({
       where: eq(bottles.id, input.bottle),
       with: {
@@ -69,7 +69,7 @@ export default procedure
       const release = await db.query.bottleReleases.findFirst({
         where: and(
           eq(bottleReleases.id, input.release),
-          eq(bottleReleases.bottleId, bottle.id),
+          eq(bottleReleases.bottleId, bottle.id)
         ),
       });
       if (!release) {
@@ -88,8 +88,8 @@ export default procedure
         .where(
           and(
             eq(flights.publicId, input.flight),
-            eq(flightBottles.bottleId, bottle.id),
-          ),
+            eq(flightBottles.bottleId, bottle.id)
+          )
         )
         .limit(1);
       if (flightResults.length !== 1) {
@@ -124,8 +124,8 @@ export default procedure
           and(
             eq(follows.fromUserId, context.user.id),
             eq(follows.status, "following"),
-            inArray(follows.toUserId, friendUserIds),
-          ),
+            inArray(follows.toUserId, friendUserIds)
+          )
         );
       if (matches.length != friendUserIds.length) {
         throw errors.BAD_REQUEST({
@@ -180,11 +180,11 @@ export default procedure
               Array.from(
                 new Set(
                   [bottle.brandId, ...distillerIds, bottle.bottlerId].filter(
-                    notEmpty,
-                  ),
-                ),
-              ),
-            ),
+                    notEmpty
+                  )
+                )
+              )
+            )
           ),
         ...tasting.tags.map((tag) =>
           tx
@@ -199,7 +199,7 @@ export default procedure
               set: {
                 count: sql<string>`${bottleTags.count} + 1`,
               },
-            }),
+            })
         ),
       ]);
 

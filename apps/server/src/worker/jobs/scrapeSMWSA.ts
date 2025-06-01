@@ -5,18 +5,18 @@ import {
   parseDetailsFromName,
   parseFlavorProfile,
 } from "@peated/server/lib/smws";
-import {
-  type BottleInputSchema,
-  type StorePriceInputSchema,
+import type {
+  BottleInputSchema,
+  StorePriceInputSchema,
 } from "@peated/server/schemas";
 
 import { load as cheerio } from "cheerio";
-import { type z } from "zod";
+import type { z } from "zod";
 
 export default async function scrapeSMWSA() {
   await scrapeBottles(
     `https://newmake.smwsa.com/collections/all-products`,
-    handleBottle,
+    handleBottle
   );
 
   // if (process.env.ACCESS_TOKEN) {
@@ -33,8 +33,8 @@ export async function scrapeBottles(
   cb: (
     bottle: z.input<typeof BottleInputSchema>,
     price?: z.input<typeof StorePriceInputSchema> | null,
-    imageUrl?: string | null,
-  ) => Promise<void>,
+    imageUrl?: string | null
+  ) => Promise<void>
 ) {
   const data = await getUrl(url);
   const $ = cheerio(data);
@@ -57,14 +57,14 @@ export async function scrapeBottles(
     $(".product-collection-module__specs-list li", el).each((_, specEl) => {
       const name = $(
         ".product-collection-module__specs-item-col--title",
-        specEl,
+        specEl
       )
         .first()
         .text()
         .trim();
       const value = $(
         ".product-collection-module__specs-item-col--desc",
-        specEl,
+        specEl
       )
         .first()
         .text()
@@ -153,7 +153,7 @@ export async function scrapeBottles(
             url,
           }
         : null,
-      imageUrl,
+      imageUrl
     );
   }
 }

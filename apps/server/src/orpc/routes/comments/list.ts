@@ -24,15 +24,15 @@ export default procedure
       tasting: z.coerce.number().optional(),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(100),
-    }),
+    })
   )
   .output(
     z.object({
       results: z.array(CommentSchema),
       rel: CursorSchema,
-    }),
+    })
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { cursor, limit, ...rest } = input;
     const offset = (cursor - 1) * limit;
 
@@ -76,7 +76,7 @@ export default procedure
       results: await serialize(
         CommentSerializer,
         results.slice(0, limit),
-        context.user,
+        context.user
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

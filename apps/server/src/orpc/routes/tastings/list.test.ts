@@ -48,7 +48,7 @@ describe("GET /tastings", () => {
     const err = await waitError(() =>
       routerClient.tastings.list({
         filter: "friends",
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -69,7 +69,7 @@ describe("GET /tastings", () => {
       {
         filter: "friends",
       },
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toBe(1);
@@ -96,7 +96,7 @@ describe("GET /tastings", () => {
 
     const { results } = await routerClient.tastings.list(
       {},
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toBe(1);

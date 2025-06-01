@@ -16,7 +16,7 @@ export default procedure
   })
   .input(z.object({ notification: z.coerce.number() }))
   .output(z.object({}))
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { notification: notificationId } = input;
 
     const [notification] = await db

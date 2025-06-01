@@ -36,7 +36,7 @@ export default function MergeBottle({
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const { data: bottle } = useSuspenseQuery(
-    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
+    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } })
   );
   const { flash } = useFlashMessages();
 
@@ -78,11 +78,11 @@ export default function MergeBottle({
           flash(
             <div>
               Performing merge asynchronously. Updates may take a few minutes.
-            </div>,
+            </div>
           );
           router.push(`/bottles/${newBottle.id}`);
         },
-      },
+      }
     );
   };
 

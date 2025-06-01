@@ -15,7 +15,7 @@ describe("GET /tastings/:tasting", () => {
     const err = await waitError(
       routerClient.tastings.details({
         tasting: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Tasting not found.]`);
   });

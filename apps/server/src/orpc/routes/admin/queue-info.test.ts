@@ -31,7 +31,7 @@ describe("GET /admin/queue/info", () => {
     const user = await fixtures.User({ mod: true });
 
     const err = await waitError(() =>
-      routerClient.admin.queueInfo(undefined, { context: { user } }),
+      routerClient.admin.queueInfo(undefined, { context: { user } })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });

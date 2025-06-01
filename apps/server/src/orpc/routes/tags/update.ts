@@ -22,10 +22,10 @@ export default procedure
   .input(
     TagInputSchema.partial().extend({
       tag: z.string(),
-    }),
+    })
   )
   .output(TagSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const [tag] = await db.select().from(tags).where(eq(tags.name, input.tag));
     if (!tag) {
       throw errors.NOT_FOUND({

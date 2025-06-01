@@ -29,13 +29,13 @@ function Page() {
   const releaseId = search.release;
 
   const { data: bottle } = useSuspenseQuery(
-    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
+    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } })
   );
 
   const { data: suggestedTags } = useSuspenseQuery(
     orpc.bottles.suggestedTags.queryOptions({
       input: { bottle: Number(bottleId) },
-    }),
+    })
   );
 
   // TODO: we want this to be suspense, but skipToken wont work
@@ -44,7 +44,7 @@ function Page() {
       ? orpc.bottleReleases.details.queryOptions({
           input: { release: Number(releaseId) },
         })
-      : { queryFn: skipToken, queryKey: ["release", ""] },
+      : { queryFn: skipToken, queryKey: ["release", ""] }
   );
   const release = releaseId ? releaseQuery.data : null;
 
@@ -55,15 +55,15 @@ function Page() {
       ? orpc.flights.details.queryOptions({
           input: { flight: flightId },
         })
-      : { queryFn: skipToken, queryKey: ["flight", ""] },
+      : { queryFn: skipToken, queryKey: ["flight", ""] }
   );
   const flight = flightId ? flightQuery.data : null;
 
   const tastingCreateMutation = useMutation(
-    orpc.tastings.create.mutationOptions(),
+    orpc.tastings.create.mutationOptions()
   );
   const tastingImageUpdateMutation = useMutation(
-    orpc.tastings.imageUpdate.mutationOptions(),
+    orpc.tastings.imageUpdate.mutationOptions()
   );
 
   // capture this on initial load as its utilized to prevent
@@ -96,7 +96,7 @@ function Page() {
               logError(err);
               flash(
                 "There was an error uploading your image, but the tasting was saved.",
-                "error",
+                "error"
               );
             }
           }
@@ -122,7 +122,7 @@ function Page() {
                     </p>
                   </div>
                 </div>,
-                "info",
+                "info"
               );
             }
           }

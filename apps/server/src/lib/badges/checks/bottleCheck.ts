@@ -17,7 +17,7 @@ export class BottleCheck extends Check {
 
   test(
     config: z.infer<typeof BottleCheckConfigSchema>,
-    tasting: TastingWithRelations,
+    tasting: TastingWithRelations
   ) {
     return config.bottle.includes(tasting.bottle.id);
   }

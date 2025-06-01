@@ -13,7 +13,7 @@ describe("POST /ai/region-lookup", () => {
   beforeEach(() => {
     vi.resetAllMocks();
     vi.mocked(
-      generateRegionDetailsModule.getGeneratedRegionDetails,
+      generateRegionDetailsModule.getGeneratedRegionDetails
     ).mockResolvedValue({
       description: "This is a generated description for a region.",
     });
@@ -23,7 +23,7 @@ describe("POST /ai/region-lookup", () => {
     const err = await waitError(() =>
       routerClient.ai.regionLookup({
         country: 1,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -36,8 +36,8 @@ describe("POST /ai/region-lookup", () => {
         {
           country: 1,
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -50,8 +50,8 @@ describe("POST /ai/region-lookup", () => {
         {
           country: 999999, // non-existent country
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Cannot find country]`);
   });
@@ -65,7 +65,7 @@ describe("POST /ai/region-lookup", () => {
         country: country.id,
         name: "Highlands",
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(result).toMatchInlineSnapshot(`
@@ -75,7 +75,7 @@ describe("POST /ai/region-lookup", () => {
     `);
 
     expect(
-      generateRegionDetailsModule.getGeneratedRegionDetails,
+      generateRegionDetailsModule.getGeneratedRegionDetails
     ).toHaveBeenCalledWith({
       country,
       name: "Highlands",

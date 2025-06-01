@@ -4,7 +4,7 @@ import ShareButton from "@peated/web/components/shareButton";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { redirect } from "next/navigation";
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { Organization, WithContext } from "schema-dts";
 import ModActions from "./modActions";
 

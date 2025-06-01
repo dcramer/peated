@@ -17,7 +17,7 @@ function Page() {
       input: {
         tag: tagId,
       },
-    }),
+    })
   );
 
   return (

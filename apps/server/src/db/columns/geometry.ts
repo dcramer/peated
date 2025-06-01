@@ -53,7 +53,7 @@ export function geometry_point(name: string) {
     fromDriver(value: string | GeometryPointGeoJson): LatLng {
       if (typeof value === "string") {
         const parsed = wkx.Geometry.parse(
-          Buffer.from(value, "hex"),
+          Buffer.from(value, "hex")
         ) as unknown as {
           x: number;
           y: number;

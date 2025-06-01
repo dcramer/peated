@@ -67,7 +67,7 @@ export default async function ({ tastingId }: { tastingId: number }) {
         author: {
           name: tasting.createdBy.username,
           url: `${config.URL_PREFIX}/users/${encodeURIComponent(
-            tasting.createdBy.username,
+            tasting.createdBy.username
           )}`,
           icon_url: tasting.createdBy.pictureUrl
             ? absoluteUrl(config.API_SERVER, tasting.createdBy.pictureUrl)
@@ -107,7 +107,7 @@ export default async function ({ tastingId }: { tastingId: number }) {
       },
       {
         "payload.json": body,
-      },
+      }
     );
     console.error({ error: data });
   }

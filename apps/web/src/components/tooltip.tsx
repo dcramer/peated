@@ -29,7 +29,7 @@ export default function Tooltip({
     <div
       className={classNames(
         className || "inline-flex",
-        "group relative cursor-help",
+        "group relative cursor-help"
       )}
       onClick={() => {
         setVisible(!visible);
@@ -43,7 +43,7 @@ export default function Tooltip({
           origin === "right" ? "right-0" : "",
           origin === "left" ? "left-0" : "",
           // origin === "center" ? "-right-1/2" : "",
-          visible ? "scale-100" : "",
+          visible ? "scale-100" : ""
         )}
         ref={ref}
       >

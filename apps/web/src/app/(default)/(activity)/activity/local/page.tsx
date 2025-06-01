@@ -13,7 +13,7 @@ export default function Page() {
     orpc.tastings.list.queryOptions({
       filter,
       limit: 10,
-    }),
+    })
   );
 
   return <ActivityFeed tastingList={tastingList} filter={filter} />;

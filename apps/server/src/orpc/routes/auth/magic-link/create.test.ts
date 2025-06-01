@@ -28,7 +28,7 @@ describe("POST /auth/magic-link", () => {
     const error = await waitError(
       routerClient.auth.magicLink.create({
         email: "nonexistent@example.com",
-      }),
+      })
     );
 
     expect(error).toMatchInlineSnapshot(`[Error: Account not found.]`);
@@ -40,7 +40,7 @@ describe("POST /auth/magic-link", () => {
     const error = await waitError(
       routerClient.auth.magicLink.create({
         email: user.email,
-      }),
+      })
     );
 
     expect(error).toMatchInlineSnapshot(`[Error: Account not found.]`);

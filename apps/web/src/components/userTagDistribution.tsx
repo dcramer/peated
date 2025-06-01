@@ -19,7 +19,7 @@ function UserTagDistributionElement({ userId }: { userId: number }) {
       input: {
         user: userId,
       },
-    }),
+    })
   );
 
   const { results, totalCount } = data;
@@ -38,7 +38,7 @@ function UserTagDistributionElement({ userId }: { userId: number }) {
 }
 
 export default function UserTagDistribution(
-  props: ComponentProps<typeof UserTagDistributionElement>,
+  props: ComponentProps<typeof UserTagDistributionElement>
 ) {
   return (
     <div>

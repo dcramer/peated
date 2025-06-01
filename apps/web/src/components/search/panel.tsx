@@ -34,7 +34,7 @@ export default function SearchPanel({
   const router = useRouter();
 
   const [initialState, setInitialState] = useState<"loading" | "ready">(
-    "loading",
+    "loading"
   );
   const [query, setQuery] = useState(initialValue ?? value ?? "");
   const [state, setState] = useState<"loading" | "ready">("loading");
@@ -66,7 +66,7 @@ export default function SearchPanel({
       setState("ready");
       setInitialState("ready");
     },
-    [directToTasting, user],
+    [directToTasting, user]
   );
 
   // TODO: handle errors
@@ -99,7 +99,7 @@ export default function SearchPanel({
               router.replace(
                 `${location.pathname}?q=${encodeURIComponent(value)}&${
                   directToTasting ? "tasting" : ""
-                }`,
+                }`
               );
             }}
             loading={state === "loading"}

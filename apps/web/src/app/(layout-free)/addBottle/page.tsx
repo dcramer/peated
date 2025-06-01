@@ -78,10 +78,10 @@ export default function AddBottle() {
   }, [queries.map((q) => q.isLoading)]);
 
   const bottleCreateMutation = useMutation(
-    orpc.bottles.create.mutationOptions(),
+    orpc.bottles.create.mutationOptions()
   );
   const bottleImageUpdateMutation = useMutation(
-    orpc.bottles.imageUpdate.mutationOptions(),
+    orpc.bottles.imageUpdate.mutationOptions()
   );
   const { flash } = useFlashMessages();
 
@@ -104,7 +104,7 @@ export default function AddBottle() {
             logError(err);
             flash(
               "There was an error uploading your image, but the bottle was saved.",
-              "error",
+              "error"
             );
           }
         }

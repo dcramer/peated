@@ -1,7 +1,7 @@
 "use client";
 
-import { type ExternalSiteSchema } from "@peated/server/schemas";
-import { type ExternalSiteType } from "@peated/server/types";
+import type { ExternalSiteSchema } from "@peated/server/schemas";
+import type { ExternalSiteType } from "@peated/server/types";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
@@ -10,14 +10,14 @@ import TimeSince from "@peated/web/components/timeSince";
 import { formatDuration } from "@peated/web/lib/format";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { useState, type ReactNode } from "react";
-import { type z } from "zod";
+import { type ReactNode, useState } from "react";
+import type { z } from "zod";
 
 function TriggerJobButton({ siteId }: { siteId: ExternalSiteType }) {
   const [isLoading, setLoading] = useState(false);
   const orpc = useORPC();
   const triggerJobMutation = useMutation(
-    orpc.externalSites.triggerJob.mutationOptions(),
+    orpc.externalSites.triggerJob.mutationOptions()
   );
 
   return (
@@ -50,7 +50,7 @@ export default function Layout({
       input: {
         site: siteId as ExternalSiteType,
       },
-    }),
+    })
   );
 
   const [site, setSite] = useState(initialSite);

@@ -12,8 +12,8 @@ describe("PATCH /countries/:country/regions/:region", () => {
           country: "test-country",
           region: "test-region",
         },
-        { context: { user: null } },
-      ),
+        { context: { user: null } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -26,8 +26,8 @@ describe("PATCH /countries/:country/regions/:region", () => {
           country: "test-country",
           region: "test-region",
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -43,7 +43,7 @@ describe("PATCH /countries/:country/regions/:region", () => {
         region: region.slug,
         description: "New description",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(updatedRegion.id).toBe(region.id);
@@ -68,7 +68,7 @@ describe("PATCH /countries/:country/regions/:region", () => {
         region: region.slug,
         description: "New description",
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(updatedRegion.id).toBe(region.id);
@@ -87,7 +87,7 @@ describe("PATCH /countries/:country/regions/:region", () => {
         country: country.slug,
         region: region.slug,
       },
-      { context: { user: modUser } },
+      { context: { user: modUser } }
     );
 
     expect(result).toEqual(
@@ -96,7 +96,7 @@ describe("PATCH /countries/:country/regions/:region", () => {
         name: region.name,
         slug: region.slug,
         description: region.description,
-      }),
+      })
     );
   });
 
@@ -109,8 +109,8 @@ describe("PATCH /countries/:country/regions/:region", () => {
           country: "nonexistent-country",
           region: "some-region",
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Invalid country.]`);
   });
@@ -125,8 +125,8 @@ describe("PATCH /countries/:country/regions/:region", () => {
           country: country.slug,
           region: "nonexistent-region",
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Region not found.]`);
   });

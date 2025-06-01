@@ -1,7 +1,7 @@
+import path from "path";
 import config from "@peated/server/config";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import path from "path";
 import sharp from "sharp";
 
 describe("POST /bottles/:bottle/image", () => {
@@ -18,11 +18,11 @@ describe("POST /bottles/:bottle/image", () => {
         },
         {
           context: { user },
-        },
-      ),
+        }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: You don't have permission to update this bottle.]`,
+      `[Error: You don't have permission to update this bottle.]`
     );
   });
 
@@ -38,7 +38,7 @@ describe("POST /bottles/:bottle/image", () => {
       },
       {
         context: { user: defaults.user },
-      },
+      }
     );
 
     expect(response.imageUrl).toBeDefined();

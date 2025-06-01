@@ -23,10 +23,10 @@ export default procedure
       bottle: z.coerce.number(),
       other: z.number(),
       direction: z.enum(["mergeInto", "mergeFrom"]).default("mergeInto"),
-    }),
+    })
   )
   .output(BottleSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     if (input.bottle === input.other) {
       throw errors.BAD_REQUEST({
         message: "Cannot merge a bottle into itself.",

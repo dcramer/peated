@@ -8,7 +8,7 @@ describe("POST /bottles/validations", () => {
       routerClient.bottles.validation({
         name: "Test Bottle",
         brand: { name: "Test Brand" },
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -23,7 +23,7 @@ describe("POST /bottles/validations", () => {
         brand: brand.id,
         statedAge: 12,
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(data).toMatchObject({
@@ -50,11 +50,11 @@ describe("POST /bottles/validations", () => {
         name: "Cask No. 33.141 Tarry ropes on a smokehouse roof",
         brand: brand.id,
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(data.name).toMatchInlineSnapshot(
-      `"33.141 Tarry ropes on a smokehouse roof"`,
+      `"33.141 Tarry ropes on a smokehouse roof"`
     );
   });
 
@@ -70,7 +70,7 @@ describe("POST /bottles/validations", () => {
         name: "Macallan 12",
         brand: brand.id,
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(data).toMatchObject({

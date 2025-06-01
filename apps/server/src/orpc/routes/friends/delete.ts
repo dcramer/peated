@@ -22,9 +22,9 @@ export default procedure
   .output(
     z.object({
       status: FriendStatusEnum,
-    }),
+    })
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { user: userId } = input;
 
     if (context.user.id === userId) {
@@ -51,8 +51,8 @@ export default procedure
         .where(
           and(
             eq(follows.fromUserId, currentUser.id),
-            eq(follows.toUserId, user.id),
-          ),
+            eq(follows.toUserId, user.id)
+          )
         )
         .returning();
 
@@ -64,8 +64,8 @@ export default procedure
         .where(
           and(
             eq(follows.fromUserId, user.id),
-            eq(follows.toUserId, currentUser.id),
-          ),
+            eq(follows.toUserId, currentUser.id)
+          )
         );
 
       if (follow)

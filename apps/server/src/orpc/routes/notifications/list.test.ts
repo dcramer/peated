@@ -19,7 +19,7 @@ describe("GET /notifications", () => {
 
     const { results } = await routerClient.notifications.list(
       {},
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toBe(1);
@@ -44,7 +44,7 @@ describe("GET /notifications", () => {
 
     const { results } = await routerClient.notifications.list(
       {},
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toBe(1);
@@ -69,7 +69,7 @@ describe("GET /notifications", () => {
 
     const { results } = await routerClient.notifications.list(
       {},
-      { context: { user: defaults.user } },
+      { context: { user: defaults.user } }
     );
 
     expect(results.length).toBe(1);

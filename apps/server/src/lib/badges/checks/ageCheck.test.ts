@@ -15,7 +15,7 @@ describe("parseConfig", () => {
         "maxAge": 10,
         "minAge": 5,
       }
-    `,
+    `
     );
   });
 

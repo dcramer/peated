@@ -19,10 +19,10 @@ export default function useApiQueryParams({
       [...searchParams.entries()]
         .map(([k, v]) =>
           nFields.has(k)
-            ? [k, v === "" ? null : parseInt(v, 10)]
-            : [k, v === "" ? null : v],
+            ? [k, v === "" ? null : Number.parseInt(v, 10)]
+            : [k, v === "" ? null : v]
         )
-        .filter(([k, v]) => !!v),
+        .filter(([k, v]) => !!v)
     ),
     ...overrides,
   };

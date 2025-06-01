@@ -51,7 +51,7 @@ describe("scrapePrices", () => {
         } else {
           // No more products
         }
-      },
+      }
     );
 
     await scrapePrices(mockSite, mockUrlFn, mockScrapeProducts);
@@ -108,7 +108,7 @@ describe("scrapePrices", () => {
         } else {
           // No more products
         }
-      },
+      }
     );
 
     await scrapePrices(mockSite, mockUrlFn, mockScrapeProducts);
@@ -136,11 +136,11 @@ describe("scrapePrices", () => {
     });
 
     const error = await waitError(() =>
-      scrapePrices(mockSite, mockUrlFn, mockScrapeProducts),
+      scrapePrices(mockSite, mockUrlFn, mockScrapeProducts)
     );
 
     expect(error).toMatchInlineSnapshot(
-      `[Error: Failed to scrape any products.]`,
+      `[Error: Failed to scrape any products.]`
     );
   });
 });

@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EntityInputSchema } from "@peated/server/schemas";
-import { type EntityType } from "@peated/server/types";
+import type { EntityType } from "@peated/server/types";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -12,7 +12,7 @@ import FormHeader from "./formHeader";
 import LayoutModal from "./layoutModal";
 import RegionField from "./regionField";
 import SelectField from "./selectField";
-import { type CreateFormOptions, type Option } from "./selectField/types";
+import type { CreateFormOptions, Option } from "./selectField/types";
 import TextField from "./textField";
 
 type FormSchemaType = z.infer<typeof EntityInputSchema>;

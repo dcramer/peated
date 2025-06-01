@@ -16,7 +16,7 @@ export default procedure
   .input(
     z.object({
       user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
-    }),
+    })
   )
   .output(
     z.object({
@@ -24,12 +24,12 @@ export default procedure
         z.object({
           tag: z.string(),
           count: z.number(),
-        }),
+        })
       ),
       totalCount: z.number(),
-    }),
+    })
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
       throw errors.NOT_FOUND({
@@ -52,7 +52,7 @@ export default procedure
     ) as t
     GROUP BY tag
     ORDER BY count DESC
-    LIMIT 25`,
+    LIMIT 25`
     );
 
     const totalCount = Number(
@@ -62,9 +62,9 @@ export default procedure
         FROM ${tastings}
         WHERE ${tastings.createdById} = ${user.id}
         AND array_length(${tastings.tags}, 1) > 0
-      `,
+      `
         )
-      ).rows[0]!.count,
+      ).rows[0]!.count
     );
 
     return {

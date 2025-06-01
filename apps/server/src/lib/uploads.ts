@@ -1,18 +1,18 @@
+import { createWriteStream } from "node:fs";
 import { Storage } from "@google-cloud/storage";
 import { createId } from "@paralleldrive/cuid2";
-import { createWriteStream } from "node:fs";
 import sharp from "sharp";
 
-import { startSpan } from "@sentry/node";
 import type { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
+import { startSpan } from "@sentry/node";
 import config from "../config";
 
 export const compressAndResizeImage = (
   stream: Readable,
   filename: string,
   maxWidth?: number,
-  maxHeight?: number,
+  maxHeight?: number
 ) => {
   const transformer = sharp()
     .resize({
@@ -36,7 +36,7 @@ export const compressAndResizeImage = (
 
 type ProcessCallback = (
   stream: Readable,
-  filename: string,
+  filename: string
 ) => { stream: Readable; filename: string };
 
 // New MultipartFile type to replace the Fastify one
@@ -114,7 +114,7 @@ export async function copyFile({
       }
 
       return `${urlPrefix}/${output}`;
-    },
+    }
   );
 }
 
@@ -182,9 +182,9 @@ export const storeFile = async ({
               async () => {
                 const writeStream = file.createWriteStream();
                 await pipeline(stream, writeStream);
-              },
+              }
             );
-          },
+          }
         );
       } else {
         const uploadPath = `${config.UPLOAD_PATH}/${newFilename}`;
@@ -197,13 +197,13 @@ export const storeFile = async ({
           async () => {
             const writeStream = createWriteStream(uploadPath);
             await pipeline(stream, writeStream);
-          },
+          }
         );
 
         console.info(`File written to ${uploadPath}`);
       }
 
       return `${urlPrefix}/${newFilename}`;
-    },
+    }
   );
 };

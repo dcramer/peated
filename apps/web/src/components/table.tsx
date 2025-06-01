@@ -65,7 +65,7 @@ export default function Table<
               <col
                 key={col.name}
                 className={classNames(
-                  col.className ?? (colN !== 0 ? "w-32" : ""),
+                  col.className ?? (colN !== 0 ? "w-32" : "")
                 )}
               />
             );
@@ -96,7 +96,7 @@ export default function Table<
                         ? "text-left"
                         : colAlign === "center"
                           ? "text-center"
-                          : "text-right",
+                          : "text-right"
                     )}
                   >
                     {col.sort ? (
@@ -166,7 +166,7 @@ export default function Table<
                           ? "text-left"
                           : colAlign === "center"
                             ? "text-center"
-                            : "text-right",
+                            : "text-right"
                       )}
                     >
                       {colN === 0 && urlPath && (

@@ -20,7 +20,7 @@ function Page() {
   const { data: tagList } = useSuspenseQuery(
     orpc.tags.list.queryOptions({
       input: queryParams,
-    }),
+    })
   );
 
   return (

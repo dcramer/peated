@@ -16,7 +16,7 @@ export const CountrySchema = z.object({
     .describe("Detailed description of the country's whisky heritage"),
   summary: z.string().trim().nullish().describe("Brief summary of the country"),
   location: PointSchema.nullish().describe(
-    "Geographic coordinates of the country",
+    "Geographic coordinates of the country"
   ),
   totalBottles: z
     .number()
@@ -34,7 +34,7 @@ export const CountryInputSchema = z.object({
     .nullish()
     .describe("Detailed description of the country's whisky heritage"),
   descriptionSrc: ContentSourceEnum.nullish().describe(
-    "Source of the country description",
+    "Source of the country description"
   ),
   summary: z.string().trim().nullish().describe("Brief summary of the country"),
 });

@@ -21,7 +21,7 @@ export default function Page({
   const { data: entity } = useSuspenseQuery(
     orpc.entities.details.queryOptions({
       input: { entity: Number(entityId) },
-    }),
+    })
   );
 
   const { data } = useSuspenseQuery(orpc.smws.distillerList.queryOptions({}));
@@ -32,7 +32,7 @@ export default function Page({
   }
 
   const exampleDistiller = distillerList.find(
-    (d) => d.name.toLowerCase() === SMWS_DISTILLERY_CODES[4].toLowerCase(),
+    (d) => d.name.toLowerCase() === SMWS_DISTILLERY_CODES[4].toLowerCase()
   );
 
   if (!exampleDistiller) {
@@ -141,7 +141,7 @@ export default function Page({
                         </td>
                       </tr>
                     );
-                  },
+                  }
                 )}
               </tbody>
             </table>

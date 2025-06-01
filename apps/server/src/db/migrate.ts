@@ -2,7 +2,7 @@ import { sql } from "drizzle-orm";
 import { readMigrationFiles } from "drizzle-orm/migrator";
 import type { AnyConnection } from ".";
 
-export const migrate = async function ({
+export const migrate = async ({
   db,
   fake = false,
   migrationsFolder = __dirname + "/../../migrations",
@@ -10,12 +10,12 @@ export const migrate = async function ({
   db: AnyConnection;
   fake?: boolean;
   migrationsFolder?: string;
-}) {
+}) => {
   const migrations = readMigrationFiles({
     migrationsFolder,
   });
   console.log(
-    `Found ${migrations.length} total migrations in ${migrationsFolder}`,
+    `Found ${migrations.length} total migrations in ${migrationsFolder}`
   );
 
   const migrationTableCreate = sql`
@@ -35,12 +35,12 @@ export const migrate = async function ({
     hash: string;
     created_at: string;
   }>(
-    sql`select id, hash, created_at from "__drizzle_migrations" order by created_at desc limit 1`,
+    sql`select id, hash, created_at from "__drizzle_migrations" order by created_at desc limit 1`
   );
 
   const migrationsToApply = migrations.filter(
     (m) =>
-      !lastDbMigration || Number(lastDbMigration.created_at) < m.folderMillis,
+      !lastDbMigration || Number(lastDbMigration.created_at) < m.folderMillis
   );
   if (migrationsToApply.length === 0) {
     console.log("No migrations need applied.");
@@ -50,7 +50,7 @@ export const migrate = async function ({
   console.log(
     `Migrating to ${migrationsToApply[migrationsToApply.length - 1].hash} (${
       migrationsToApply.length
-    } to apply)`,
+    } to apply)`
   );
 
   for (const migration of migrationsToApply) {
@@ -63,14 +63,14 @@ export const migrate = async function ({
           console.log(`Faking migration ${migration.hash}`);
         } else {
           console.log(
-            `Applying migration ${migration.hash} (${migration.sql.length} statement(s))`,
+            `Applying migration ${migration.hash} (${migration.sql.length} statement(s))`
           );
           for (const stmt of migration.sql) {
             await tx.execute(sql.raw(stmt));
           }
         }
         await tx.execute(
-          sql`insert into "__drizzle_migrations" ("hash", "created_at") values(${migration.hash}, ${migration.folderMillis})`,
+          sql`insert into "__drizzle_migrations" ("hash", "created_at") values(${migration.hash}, ${migration.folderMillis})`
         );
       }
     });

@@ -19,7 +19,7 @@ function UserLocationChartElement({ userId }: { userId: number }) {
       input: {
         user: userId,
       },
-    }),
+    })
   );
 
   const { results, totalCount } = data;
@@ -40,7 +40,7 @@ function UserLocationChartElement({ userId }: { userId: number }) {
 }
 
 export default function UserLocationChart(
-  props: ComponentProps<typeof UserLocationChartElement>,
+  props: ComponentProps<typeof UserLocationChartElement>
 ) {
   return (
     <div>

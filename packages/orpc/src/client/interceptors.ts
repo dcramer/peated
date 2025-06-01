@@ -25,7 +25,7 @@ type Options = {
  * ```
  */
 const sentryInterceptor = (
-  options: Options = {},
+  options: Options = {}
 ): Interceptor<InterceptableOptions, Promise<unknown>> =>
   async function sentryInterceptor({ next, path, input }) {
     return await Sentry.startSpan(
@@ -52,7 +52,7 @@ const sentryInterceptor = (
           // Re-throw the error so it can be handled by the error handler
           throw error;
         }
-      },
+      }
     );
   };
 

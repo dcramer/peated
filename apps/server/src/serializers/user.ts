@@ -1,12 +1,12 @@
 import { and, eq, inArray } from "drizzle-orm";
-import { type z } from "zod";
+import type { z } from "zod";
 import { serializer } from ".";
 import config from "../config";
 import { db } from "../db";
 import type { User } from "../db/schema";
 import { follows } from "../db/schema";
 import { absoluteUrl } from "../lib/urls";
-import { type UserSchema } from "../schemas";
+import type { UserSchema } from "../schemas";
 
 export const UserSerializer = serializer({
   name: "user",
@@ -21,12 +21,12 @@ export const UserSerializer = serializer({
                 and(
                   inArray(
                     follows.toUserId,
-                    itemList.map((i) => i.id),
+                    itemList.map((i) => i.id)
                   ),
-                  eq(follows.fromUserId, currentUser.id),
-                ),
+                  eq(follows.fromUserId, currentUser.id)
+                )
               )
-          ).map((f) => [f.toUserId, f]),
+          ).map((f) => [f.toUserId, f])
         )
       : {};
 
@@ -38,7 +38,7 @@ export const UserSerializer = serializer({
             friendStatus: followsByRef[item.id]?.status || "none",
           },
         ];
-      }),
+      })
     );
   },
   item: (item: User, attrs, currentUser): z.infer<typeof UserSchema> => {

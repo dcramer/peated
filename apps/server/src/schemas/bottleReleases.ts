@@ -33,7 +33,7 @@ export const BottleReleaseSchema = z.object({
     .nullable()
     .default(null)
     .describe(
-      "Whether this spirit is bottled at Cask Strength (usually ranging from 55-65% abv). May be inferred from abv.",
+      "Whether this spirit is bottled at Cask Strength (usually ranging from 55-65% abv). May be inferred from abv."
     ),
   singleCask: z
     .boolean()

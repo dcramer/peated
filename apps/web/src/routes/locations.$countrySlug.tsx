@@ -26,7 +26,7 @@ function Page() {
   const { data: topEntityList } = useSuspenseQuery(
     orpc.entities.list.queryOptions({
       input: queryParams,
-    }),
+    })
   );
 
   return (

@@ -9,14 +9,14 @@ import { logError } from "../lib/log";
 import "./jobs";
 import scheduleScrapers from "./jobs/scheduleScrapers";
 import registry from "./registry";
-import { type JobName } from "./types";
+import type { JobName } from "./types";
 
-import { Queue } from "bullmq";
 import { createHash } from "crypto";
+import { Queue } from "bullmq";
 
 export function generateUniqIdentifier(
   name: string,
-  args?: Record<string, any>,
+  args?: Record<string, any>
 ) {
   let hash = createHash("md5");
   if (args) {
@@ -39,7 +39,7 @@ export async function runJob<T>(jobName: JobName, args?: Record<string, any>) {
 export async function pushUniqueJob(
   jobName: JobName,
   args?: any,
-  opts?: JobsOptions,
+  opts?: JobsOptions
 ) {
   opts = {
     delay: 5000,
@@ -53,7 +53,7 @@ export async function pushUniqueJob(
 export async function pushJob(
   jobName: JobName,
   args?: Record<string, any>,
-  opts?: JobsOptions,
+  opts?: JobsOptions
 ) {
   await Sentry.startSpan(
     {
@@ -82,7 +82,7 @@ export async function pushJob(
             args,
             context: { traceContext: activeContext },
           },
-          opts,
+          opts
         );
       } catch (e) {
         span.setStatus({
@@ -90,7 +90,7 @@ export async function pushJob(
         });
         throw e;
       }
-    },
+    }
   );
 }
 
@@ -98,7 +98,7 @@ let connection: IORedis | null = null;
 
 export async function getQueue(
   name = "default",
-  connection: Awaited<ReturnType<typeof getConnection>> | null = null,
+  connection: Awaited<ReturnType<typeof getConnection>> | null = null
 ) {
   return new Queue(name, {
     connection: connection || (await getConnection()),
@@ -115,7 +115,7 @@ export async function getConnection() {
 
 export async function gracefulShutdown(
   signal?: string | undefined,
-  worker?: Worker | undefined,
+  worker?: Worker | undefined
 ) {
   scheduler.stop();
   if (connection) connection.disconnect();
@@ -137,7 +137,7 @@ export async function runWorker() {
       const { args, context } = job.data;
       jobFn(args, context);
     },
-    { connection, autorun: false },
+    { connection, autorun: false }
   );
 
   worker.on("failed", (job, error) => {

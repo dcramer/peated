@@ -24,7 +24,7 @@ export default procedure
   })
   .input(z.object({ release: z.coerce.number() }))
   .output(z.object({}))
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const [release] = await db
       .select()
       .from(bottleReleases)
@@ -39,14 +39,16 @@ export default procedure
     await db.transaction(async (tx) => {
       await Promise.all([
         // Log the deletion in changes table
-        tx.insert(changes).values({
-          objectType: "bottle_release",
-          objectId: release.bottleId,
-          createdById: context.user.id,
-          displayName: release.fullName,
-          type: "delete",
-          data: release,
-        }),
+        tx
+          .insert(changes)
+          .values({
+            objectType: "bottle_release",
+            objectId: release.bottleId,
+            createdById: context.user.id,
+            displayName: release.fullName,
+            type: "delete",
+            data: release,
+          }),
 
         // Update bottle aliases to remove release reference
         tx

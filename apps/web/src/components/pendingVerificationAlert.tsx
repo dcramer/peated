@@ -12,7 +12,7 @@ import { useFlashMessages } from "./flash";
 export default function PendingVerificationAlert() {
   const [state, resendVerificationAction] = useFormState(
     resendVerificationForm,
-    undefined,
+    undefined
   );
 
   const { flash } = useFlashMessages();

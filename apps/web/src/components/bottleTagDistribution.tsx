@@ -19,7 +19,7 @@ function BottleTagDistributionElement({ bottleId }: { bottleId: number }) {
       input: {
         bottle: bottleId,
       },
-    }),
+    })
   );
 
   const { results, totalCount } = data;
@@ -37,7 +37,7 @@ function BottleTagDistributionElement({ bottleId }: { bottleId: number }) {
 }
 
 export default function BottleTagDistribution(
-  props: ComponentProps<typeof BottleTagDistributionElement>,
+  props: ComponentProps<typeof BottleTagDistributionElement>
 ) {
   return (
     <div>

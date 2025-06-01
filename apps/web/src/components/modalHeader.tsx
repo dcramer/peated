@@ -17,7 +17,7 @@ export default function ModalHeader({ children, color = "default" }: Props) {
             "fixed left-0 right-0 z-30",
             color === "primary"
               ? "main-gradient backdrop-blur"
-              : "border-b border-b-slate-700 bg-slate-950",
+              : "border-b border-b-slate-700 bg-slate-950"
           )}
         >
           <div className="mx-auto flex h-14 w-full max-w-7xl lg:h-16">

@@ -36,7 +36,7 @@ export default function Page({
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const { data: entity } = useSuspenseQuery(
-    orpc.entities.details.queryOptions({ input: { entity: Number(entityId) } }),
+    orpc.entities.details.queryOptions({ input: { entity: Number(entityId) } })
   );
   const { flash } = useFlashMessages();
 
@@ -78,11 +78,11 @@ export default function Page({
           flash(
             <div>
               Performing merge asynchronously. Updates may take a few minutes.
-            </div>,
+            </div>
           );
           router.push(`/entities/${newEntity.id}`);
         },
-      },
+      }
     );
   };
 

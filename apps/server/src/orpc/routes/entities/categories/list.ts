@@ -19,7 +19,7 @@ export default procedure
   .input(
     z.object({
       entity: z.coerce.number(),
-    }),
+    })
   )
   .output(
     z.object({
@@ -27,12 +27,12 @@ export default procedure
         z.object({
           count: z.number(),
           category: z.string().nullable(),
-        }),
+        })
       ),
       totalCount: z.number(),
-    }),
+    })
   )
-  .handler(async function ({ input, errors }) {
+  .handler(async ({ input, errors }) => {
     const [entity] = await db
       .select()
       .from(entities)
@@ -55,7 +55,7 @@ export default procedure
               WHERE ${bottles.brandId} = ${entity.id}
                  OR ${bottles.bottlerId} = ${entity.id}
                  OR EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.bottleId} = ${bottles.id} AND ${bottlesToDistillers.distillerId} = ${entity.id})
-              GROUP BY ${bottles.category}`,
+              GROUP BY ${bottles.category}`
       )
     ).rows;
 

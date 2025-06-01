@@ -2,8 +2,8 @@ import "@fontsource/raleway/index.css";
 import Link from "@peated/web/components/link";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import "@peated/web/styles/index.css";
-import { type Metadata } from "next";
-import React from "react";
+import type { Metadata } from "next";
+import type React from "react";
 export const metadata: Metadata = {
   title: "Notifications",
 };

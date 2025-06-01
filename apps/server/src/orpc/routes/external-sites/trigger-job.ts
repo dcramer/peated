@@ -20,10 +20,10 @@ export default procedure
   .input(
     z.object({
       site: ExternalSiteTypeEnum,
-    }),
+    })
   )
   .output(z.object({ success: z.boolean() }))
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const [site] = await db
       .select()
       .from(externalSites)

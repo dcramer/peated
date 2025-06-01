@@ -53,7 +53,7 @@ const sentryMiddleware = (options: Options = {}) =>
           // Re-throw the error so it can be handled by the error handler
           throw error;
         }
-      },
+      }
     );
   });
 

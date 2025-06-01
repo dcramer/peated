@@ -1,6 +1,6 @@
 "use client";
 
-import { type Comment } from "@peated/server/types";
+import type { Comment } from "@peated/server/types";
 import { Suspense, useState } from "react";
 import useAuth from "../hooks/useAuth";
 import EmbeddedLogin from "./embeddedLogin";

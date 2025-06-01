@@ -1,7 +1,7 @@
+import path from "path";
 import config from "@peated/server/config";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import path from "path";
 import sharp from "sharp";
 
 describe("POST /users/:user/avatar", () => {
@@ -17,11 +17,11 @@ describe("POST /users/:user/avatar", () => {
         },
         {
           context: { user },
-        },
-      ),
+        }
+      )
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Cannot update another user's avatar.]`,
+      `[Error: Cannot update another user's avatar.]`
     );
   });
 
@@ -33,7 +33,7 @@ describe("POST /users/:user/avatar", () => {
       },
       {
         context: { user: defaults.user },
-      },
+      }
     );
 
     expect(response.pictureUrl).toBeDefined();

@@ -48,7 +48,7 @@ describe("GET /bottles/:bottle/similar", () => {
 
     expect(results.length).toBe(2);
     expect(results.map((r) => r.id).sort()).toEqual(
-      [bottle2.id, bottle3.id].sort(),
+      [bottle2.id, bottle3.id].sort()
     );
   });
 
@@ -70,7 +70,7 @@ describe("GET /bottles/:bottle/similar", () => {
     const err = await waitError(
       routerClient.bottles.similar({
         bottle: 999999,
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
   });

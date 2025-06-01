@@ -31,7 +31,7 @@ export default procedure
   })
   .input(ReviewInputSchema)
   .output(ReviewSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const site = await db.query.externalSites.findFirst({
       where: eq(externalSites.type, input.site),
     });
@@ -56,7 +56,7 @@ export default procedure
             brand: entity.id,
             category: input.category,
           }),
-          { context },
+          { context }
         );
         bottleId = result.id;
       }
@@ -72,7 +72,7 @@ export default procedure
                 rating = excluded.rating,
                 url = excluded.url,
                 updated_at = NOW()
-            RETURNING *`,
+            RETURNING *`
       );
 
       const [review] = mapRows(rows, reviews);

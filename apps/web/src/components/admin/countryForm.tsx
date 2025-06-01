@@ -4,7 +4,7 @@ import { BoltIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isDefinedError } from "@orpc/client";
 import { CountryInputSchema } from "@peated/server/schemas";
-import { type Country } from "@peated/server/types";
+import type { Country } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
 import FormHeader from "@peated/web/components/formHeader";
@@ -15,7 +15,7 @@ import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { type SubmitHandler, useForm } from "react-hook-form";
 import type { z } from "zod";
 import Button from "../button";
 import Form from "../form";
@@ -49,7 +49,7 @@ export default function CountryForm({
 
   const orpc = useORPC();
   const generateDataMutation = useMutation(
-    orpc.ai.countryLookup.mutationOptions(),
+    orpc.ai.countryLookup.mutationOptions()
   );
 
   const [error, setError] = useState<string | undefined>();
@@ -103,8 +103,9 @@ export default function CountryForm({
             <Button
               color="default"
               onClick={async () => {
-                const result =
-                  await generateDataMutation.mutateAsync(getValues());
+                const result = await generateDataMutation.mutateAsync(
+                  getValues()
+                );
 
                 const currentValues = getValues();
                 if (result && result.description && !currentValues.description)

@@ -1,7 +1,7 @@
 import type { BadgeFormula } from "@peated/server/types";
 
 export function getFormula(
-  type: BadgeFormula,
+  type: BadgeFormula
 ): (totalXp: number, maxLevel: number) => number | null {
   switch (type) {
     case "default":
@@ -21,7 +21,7 @@ export function getFormula(
  */
 export function defaultFormula(
   totalXp: number,
-  maxLevel: number,
+  maxLevel: number
 ): number | null {
   const a = 0.02;
   const b = 0.5;
@@ -42,7 +42,7 @@ export function defaultFormula(
  */
 export function linearFormula(
   totalXp: number,
-  maxLevel: number,
+  maxLevel: number
 ): number | null {
   const xpPerLevel = 5;
   return Math.min(Math.floor(totalXp / xpPerLevel), maxLevel);
@@ -54,7 +54,7 @@ export function linearFormula(
  */
 export function fibonacciFormula(
   totalXp: number,
-  maxLevel: number,
+  maxLevel: number
 ): number | null {
   let level = 0;
   let requiredXp = 0;

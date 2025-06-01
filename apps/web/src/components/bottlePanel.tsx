@@ -1,9 +1,9 @@
 "use client";
 
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
-import { type Bottle } from "@peated/server/types";
+import type { Bottle } from "@peated/server/types";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Suspense, type ComponentPropsWithoutRef } from "react";
+import { type ComponentPropsWithoutRef, Suspense } from "react";
 import { useORPC } from "../lib/orpc/context";
 import BottleHeader from "./bottleHeader";
 import BottleOverview from "./bottleOverview";
@@ -26,7 +26,7 @@ export default function BottlePanel({
 } & Omit<ComponentPropsWithoutRef<typeof SidePanel>, "children">) {
   const orpc = useORPC();
   const { data } = useSuspenseQuery(
-    orpc.bottles.details.queryOptions({ input: { bottle: bottle.id } }),
+    orpc.bottles.details.queryOptions({ input: { bottle: bottle.id } })
   );
 
   return (

@@ -31,7 +31,7 @@ export default async function waitError<TError extends Error = Error>(
    * Force error constructor to be of specific type
    * @default Error
    **/
-  errorConstructor?: Constructor<TError>,
+  errorConstructor?: Constructor<TError>
 ): Promise<TError> {
   let res;
   try {
@@ -48,7 +48,6 @@ export default async function waitError<TError extends Error = Error>(
     return cause as TError;
   }
 
-  // eslint-disable-next-line no-console
   console.warn("Expected function to throw, but it did not. Result:", res);
   throw new Error("Function did not throw");
 }

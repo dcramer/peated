@@ -41,7 +41,7 @@ export function NewBottlesSkeleton() {
 export default function NewBottles() {
   const orpc = useORPC();
   const { data: newBottleList } = useSuspenseQuery(
-    orpc.bottles.list.queryOptions({ input: { limit: 10, sort: "-created" } }),
+    orpc.bottles.list.queryOptions({ input: { limit: 10, sort: "-created" } })
   );
 
   return (

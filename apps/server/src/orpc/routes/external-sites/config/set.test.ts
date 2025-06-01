@@ -12,7 +12,7 @@ describe("PUT /external-sites/:site/config/:key", () => {
         site: "test" as any,
         key: "test",
         value: "test",
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -28,8 +28,8 @@ describe("PUT /external-sites/:site/config/:key", () => {
           key: "test",
           value: "test",
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -44,8 +44,8 @@ describe("PUT /external-sites/:site/config/:key", () => {
           key: "test",
           value: "test",
         },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
@@ -60,7 +60,7 @@ describe("PUT /external-sites/:site/config/:key", () => {
         key: "test",
         value: "bar",
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     const results = await db
@@ -88,7 +88,7 @@ describe("PUT /external-sites/:site/config/:key", () => {
         key: "test",
         value: "bar",
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     const results = await db

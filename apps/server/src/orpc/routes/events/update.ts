@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import type { Event } from "@peated/server/db/schema";
-import { countries, events } from "@peated/server/db/schema";
+import { events, countries } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { EventInputSchema, EventSchema } from "@peated/server/schemas";
@@ -20,7 +20,7 @@ export default procedure
   })
   .input(EventInputSchema.partial().extend({ event: z.coerce.number() }))
   .output(EventSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { event: eventId } = input;
 
     const [event] = await db

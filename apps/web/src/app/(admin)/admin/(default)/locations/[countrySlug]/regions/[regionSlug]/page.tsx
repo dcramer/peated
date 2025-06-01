@@ -17,7 +17,7 @@ export default function Page({
       input: {
         country: countrySlug,
       },
-    }),
+    })
   );
 
   const { data: region } = useSuspenseQuery(
@@ -26,7 +26,7 @@ export default function Page({
         country: countrySlug,
         region: regionSlug,
       },
-    }),
+    })
   );
 
   return (

@@ -42,13 +42,10 @@ export default procedure
         sort: DEFAULT_SORT,
         cursor: 1,
         limit: 100,
-      }),
+      })
   )
   .output(OutputSchema)
-  .handler(async function ({
-    input: { query, cursor, limit, ...input },
-    context,
-  }) {
+  .handler(async ({ input: { query, cursor, limit, ...input }, context }) => {
     const offset = (cursor - 1) * limit;
 
     const where: (SQL<unknown> | undefined)[] = [];
@@ -61,10 +58,7 @@ export default procedure
     } else {
       if (context.user) {
         where.push(
-          or(
-            eq(flights.public, true),
-            eq(flights.createdById, context.user.id),
-          ),
+          or(eq(flights.public, true), eq(flights.createdById, context.user.id))
         );
       } else {
         where.push(eq(flights.public, true));
@@ -101,7 +95,7 @@ export default procedure
       results: await serialize(
         FlightSerializer,
         results.slice(0, limit),
-        context.user,
+        context.user
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

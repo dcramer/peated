@@ -19,7 +19,7 @@ export default function BottleReviews({ bottleId }: { bottleId: number }) {
       input: {
         bottle: bottleId,
       },
-    }),
+    })
   );
 
   if (!results.length) return null;

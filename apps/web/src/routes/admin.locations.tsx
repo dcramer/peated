@@ -21,7 +21,7 @@ function Page() {
   const { data: countryList } = useSuspenseQuery(
     orpc.countries.list.queryOptions({
       input: queryParams,
-    }),
+    })
   );
 
   return (

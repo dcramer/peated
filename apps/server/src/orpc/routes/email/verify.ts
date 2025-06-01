@@ -16,7 +16,7 @@ export default procedure
   })
   .input(z.object({ token: z.string() }))
   .output(z.object({}))
-  .handler(async function ({ input, errors }) {
+  .handler(async ({ input, errors }) => {
     let payload;
     try {
       payload = await verifyPayload(input.token);
@@ -36,8 +36,8 @@ export default procedure
       .where(
         and(
           eq(users.id, token.id),
-          eq(sql`LOWER(${users.email})`, token.email.toLowerCase()),
-        ),
+          eq(sql`LOWER(${users.email})`, token.email.toLowerCase())
+        )
       );
 
     return {};

@@ -16,10 +16,10 @@ export default procedure
   .input(
     z.object({
       email: z.string().email(),
-    }),
+    })
   )
   .output(z.object({}))
-  .handler(async function ({ input: { email }, errors }) {
+  .handler(async ({ input: { email }, errors }) => {
     const [user] = await db
       .select()
       .from(users)

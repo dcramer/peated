@@ -1,4 +1,4 @@
-import { type ComponentPropsWithoutRef } from "react";
+import type { ComponentPropsWithoutRef } from "react";
 
 export function DefinitionTerm(props: ComponentPropsWithoutRef<"dt">) {
   return <dt className="font-semibold" {...props} />;

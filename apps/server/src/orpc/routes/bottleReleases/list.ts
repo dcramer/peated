@@ -4,7 +4,7 @@ import { procedure } from "@peated/server/orpc";
 import { BottleReleaseSchema, CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
-import { and, asc, desc, eq, type SQL, sql } from "drizzle-orm";
+import { type SQL, and, asc, desc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const SORT_OPTIONS = [
@@ -41,15 +41,15 @@ export default procedure
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
       sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
-    }),
+    })
   )
   .output(
     z.object({
       results: z.array(BottleReleaseSchema),
       rel: CursorSchema,
-    }),
+    })
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { query, cursor, limit, sort, ...rest } = input;
     const offset = (cursor - 1) * limit;
 
@@ -70,7 +70,7 @@ export default procedure
 
     if (query) {
       where.push(
-        sql`${bottleReleases.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
+        sql`${bottleReleases.searchVector} @@ websearch_to_tsquery ('english', ${query})`
       );
     }
 
@@ -134,7 +134,7 @@ export default procedure
       results: await serialize(
         BottleReleaseSerializer,
         results.slice(0, limit),
-        context.user ?? undefined,
+        context.user ?? undefined
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

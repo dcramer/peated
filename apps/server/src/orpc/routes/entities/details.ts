@@ -27,7 +27,7 @@ export default procedure
   })
   .input(z.object({ entity: z.coerce.number() }))
   .output(OutputSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { entity: entityId } = input;
 
     let [entity] = await db

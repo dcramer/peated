@@ -1,7 +1,7 @@
 "use client";
 
 import { LazyMotion, domAnimation, m } from "framer-motion";
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export default function Collapsable({
   open,

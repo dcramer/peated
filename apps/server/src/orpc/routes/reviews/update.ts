@@ -25,10 +25,10 @@ export default procedure
   .input(
     InputSchema.partial().extend({
       review: z.coerce.number(),
-    }),
+    })
   )
   .output(ReviewSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { review: reviewId, ...data } = input;
 
     const [targetReview] = await db

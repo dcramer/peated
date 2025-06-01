@@ -23,10 +23,10 @@ export default procedure
   .input(
     NotificationInputSchema.partial().extend({
       notification: z.coerce.number(),
-    }),
+    })
   )
   .output(NotificationSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { notification: notificationId, read } = input;
 
     const [notification] = await db
@@ -60,6 +60,6 @@ export default procedure
     return await serialize(
       NotificationSerializer,
       newNotification,
-      context.user,
+      context.user
     );
   });

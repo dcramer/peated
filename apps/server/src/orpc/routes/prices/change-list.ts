@@ -35,7 +35,7 @@ export default procedure
   })
   .input(InputSchema)
   .output(OutputSchema)
-  .handler(async function ({ input: { query, cursor, limit }, context }) {
+  .handler(async ({ input: { query, cursor, limit }, context }) => {
     const offset = (cursor - 1) * limit;
 
     const minChange = 500; // $5
@@ -63,15 +63,15 @@ export default procedure
       .from(storePrices)
       .innerJoin(
         storePriceHistories,
-        eq(storePriceHistories.priceId, storePrices.id),
+        eq(storePriceHistories.priceId, storePrices.id)
       )
       .where(and(...where))
       .groupBy(storePrices.bottleId, storePrices.currency)
       .having(
-        sql`ABS(AVG(${storePriceHistories.price}) - AVG(${storePrices.price})) > ${minChange}`,
+        sql`ABS(AVG(${storePriceHistories.price}) - AVG(${storePrices.price})) > ${minChange}`
       )
       .orderBy(
-        sql`ABS(AVG(${storePriceHistories.price}) - AVG(${storePrices.price})) DESC`,
+        sql`ABS(AVG(${storePriceHistories.price}) - AVG(${storePrices.price})) DESC`
       )
       .limit(limit + 1)
       .offset(offset);
@@ -80,7 +80,7 @@ export default procedure
       results: await serialize(
         BottlePriceChangeSerializer,
         results.slice(0, limit),
-        context.user,
+        context.user
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

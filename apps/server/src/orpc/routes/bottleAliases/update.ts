@@ -26,7 +26,7 @@ export default procedure
   .use(requireMod)
   .input(InputSchema)
   .output(OutputSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const { alias: aliasName, ...data } = input;
 
     const [alias] = await db

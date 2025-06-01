@@ -1,4 +1,4 @@
-import { type Outputs } from "@peated/server/orpc/router";
+import type { Outputs } from "@peated/server/orpc/router";
 import Price from "./price";
 
 export default function BottleStats({
@@ -23,6 +23,7 @@ export default function BottleStats({
           href={bottle.lastPrice.url}
           className="hover:underline"
           target="_blank"
+          rel="noreferrer"
         >
           <Price
             value={bottle.lastPrice.price}

@@ -2,8 +2,8 @@ import { db } from "@peated/server/db";
 import type { Bottle, Entity, NewBottle } from "@peated/server/db/schema";
 import {
   bottleAliases,
-  bottles,
   bottleSeries,
+  bottles,
   bottlesToDistillers,
   changes,
 } from "@peated/server/db/schema";
@@ -38,7 +38,7 @@ export default procedure
   })
   .input(BottleInputSchema)
   .output(BottleSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const user = context.user;
 
     const bottleData: BottlePreviewResult & Record<string, any> =
@@ -185,8 +185,8 @@ export default procedure
         .where(
           and(
             eq(sql`LOWER(${bottleAliases.name})`, alias.name.toLowerCase()),
-            isNull(bottleAliases.bottleId),
-          ),
+            isNull(bottleAliases.bottleId)
+          )
         )
         .returning();
 
@@ -222,7 +222,7 @@ export default procedure
           tx.insert(bottlesToDistillers).values({
             bottleId: bottle.id,
             distillerId,
-          }),
+          })
         );
       }
 

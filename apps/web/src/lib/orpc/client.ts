@@ -21,7 +21,7 @@ export function createBrowserClient(context: ClientContext = {}): {
       userAgent: "@peated/web (orpc/client)",
       accessToken: context.accessToken,
       traceContext: context.traceContext,
-    }),
+    })
   );
   return { client };
 }

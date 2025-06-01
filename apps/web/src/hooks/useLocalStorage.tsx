@@ -16,7 +16,7 @@ export default function useLocalStorage<T>(key: string, initialValue: T) {
     } catch (error) {
       // If error also return initialValue
       logger.error(
-        logger.fmt`Error getting local storage value for key [${key}]: ${error}`,
+        logger.fmt`Error getting local storage value for key [${key}]: ${error}`
       );
       return initialValue;
     }
@@ -37,7 +37,7 @@ export default function useLocalStorage<T>(key: string, initialValue: T) {
     } catch (error) {
       // A more advanced implementation would handle the error case
       logger.error(
-        logger.fmt`Error setting local storage value for key [${key}]: ${error}`,
+        logger.fmt`Error setting local storage value for key [${key}]: ${error}`
       );
     }
   };

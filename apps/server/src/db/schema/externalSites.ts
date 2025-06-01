@@ -15,7 +15,7 @@ import { EXTERNAL_SITE_TYPE_LIST } from "../../constants";
 
 export const externalSiteTypeEnum = pgEnum(
   "external_site_type",
-  EXTERNAL_SITE_TYPE_LIST,
+  EXTERNAL_SITE_TYPE_LIST
 );
 
 export const externalSites = pgTable(
@@ -30,7 +30,7 @@ export const externalSites = pgTable(
     runEvery: integer("run_every").default(60),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => [uniqueIndex("external_site_type").on(table.type)],
+  (table) => [uniqueIndex("external_site_type").on(table.type)]
 );
 
 export type ExternalSite = typeof externalSites.$inferSelect;
@@ -47,7 +47,7 @@ export const externalSiteConfig = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (table) => [primaryKey({ columns: [table.externalSiteId, table.key] })],
+  (table) => [primaryKey({ columns: [table.externalSiteId, table.key] })]
 );
 
 export type ExternalSiteConfig = typeof externalSiteConfig.$inferSelect;

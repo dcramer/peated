@@ -1,4 +1,4 @@
-import { call, ORPCError } from "@orpc/server";
+import { ORPCError, call } from "@orpc/server";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { BottleInputSchema, BottleSchema } from "@peated/server/schemas";
@@ -19,7 +19,7 @@ export default procedure
   })
   .input(BottleInputSchema)
   .output(BottleSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const bottleData: BottlePreviewResult & Record<string, any> =
       await bottleNormalize({ input, context });
 
@@ -39,7 +39,7 @@ export default procedure
             ...input,
             bottle: err.data.bottle,
           },
-          { context },
+          { context }
         );
       }
       throw err;

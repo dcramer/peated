@@ -1,7 +1,7 @@
-import { countries, type Region, type User } from "@peated/server/db/schema";
-import { type RegionSchema } from "@peated/server/schemas";
+import { type Region, type User, countries } from "@peated/server/db/schema";
+import type { RegionSchema } from "@peated/server/schemas";
 import { inArray } from "drizzle-orm";
-import { type z } from "zod";
+import type { z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
 import { CountrySerializer } from "./country";
@@ -19,8 +19,8 @@ export const RegionSerializer = serializer({
 
     const countriesById = Object.fromEntries(
       (await serialize(CountrySerializer, countryList, currentUser)).map(
-        (data, index) => [countryList[index].id, data],
-      ),
+        (data, index) => [countryList[index].id, data]
+      )
     );
 
     return Object.fromEntries(
@@ -31,13 +31,13 @@ export const RegionSerializer = serializer({
             country: item.countryId ? countriesById[item.countryId] : null,
           },
         ];
-      }),
+      })
     );
   },
   item: (
     item: Region,
     attrs: Record<string, any>,
-    currentUser?: User,
+    currentUser?: User
   ): z.infer<typeof RegionSchema> => {
     return {
       id: item.id,

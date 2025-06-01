@@ -1,9 +1,9 @@
 "use client";
 
-import { isDefinedError, ORPCError } from "@orpc/client";
+import { ORPCError, isDefinedError } from "@orpc/client";
 import Button from "@peated/web/components/button";
 import config from "@peated/web/config";
-import { type ComponentProps, type ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { useOnlineStatus } from "../hooks/useOnlineStatus";
 
 const DEFAULT_TITLE = "Error";
@@ -26,7 +26,7 @@ export function ErrorPageForbidden({
 }
 
 function getTypedError<T>(
-  error: T,
+  error: T
 ): Error | Extract<T, ORPCError<any, any>> | undefined {
   if (error instanceof Error) return error;
   if (isDefinedError(error)) return error;

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { type ReactNode, createContext, useContext, useState } from "react";
 import { useInterval } from "usehooks-ts";
 import classNames from "../lib/classNames";
 
@@ -39,7 +39,7 @@ export function Message({
         "rounded-md p-3 font-semibold opacity-90",
         type === "success" ? "bg-green-700 text-green-50" : "",
         type === "error" ? "bg-red-700 text-red-50" : "",
-        type === "info" ? "bg-slate-700 text-slate-50" : "",
+        type === "info" ? "bg-slate-700 text-slate-50" : ""
       )}
     >
       {message}

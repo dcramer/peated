@@ -29,7 +29,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
       normalizeBottle({
         name: toTitleCase(`${bottle}`),
         isFullName: false,
-      }).name,
+      }).name
     );
 
     const volume = volumeRaw ? normalizeVolume(volumeRaw) : null;
@@ -66,7 +66,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
         currency: "usd",
         volume,
         url: absoluteUrl(url, productUrl),
-      }),
+      })
     );
   });
 
@@ -78,6 +78,6 @@ export default async function scrapeHealthySpirits() {
     "healthyspirits",
     (page) =>
       `https://www.healthyspirits.com/spirits/whiskey/page${page}.html?limit=72`,
-    scrapeProducts,
+    scrapeProducts
   );
 }

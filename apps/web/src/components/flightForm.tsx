@@ -74,7 +74,7 @@ export default function FlightForm({
   const orpc = useORPC();
 
   const [bottlesValue, setBottlesValue] = useState<Option[]>(
-    initialData.bottles ? initialData.bottles.map(bottleToOption) : [],
+    initialData.bottles ? initialData.bottles.map(bottleToOption) : []
   );
 
   return (

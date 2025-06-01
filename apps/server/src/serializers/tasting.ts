@@ -1,5 +1,5 @@
 import { and, eq, inArray } from "drizzle-orm";
-import { type z } from "zod";
+import type { z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
 import { db } from "../db";
@@ -14,7 +14,7 @@ import {
 } from "../db/schema";
 import { notEmpty } from "../lib/filter";
 import { absoluteUrl } from "../lib/urls";
-import { type TastingSchema } from "../schemas";
+import type { TastingSchema } from "../schemas";
 import { BadgeAwardSerializer } from "./badgeAward";
 import { BottleSerializer } from "./bottle";
 import { BottleReleaseSerializer } from "./bottleRelease";
@@ -33,7 +33,7 @@ export const TastingSerializer = serializer({
   name: "tasting",
   attrs: async (
     itemList: Tasting[],
-    currentUser?: User,
+    currentUser?: User
   ): Promise<Record<string, TastingAttrs>> => {
     const itemIds = itemList.map((t) => t.id);
     const results = await db
@@ -57,8 +57,8 @@ export const TastingSerializer = serializer({
             .where(
               and(
                 inArray(toasts.tastingId, itemIds),
-                eq(toasts.createdById, currentUser.id),
-              ),
+                eq(toasts.createdById, currentUser.id)
+              )
             )
         ).map((t) => t.tastingId)
       : [];
@@ -68,18 +68,18 @@ export const TastingSerializer = serializer({
         await serialize(
           BottleSerializer,
           results.map((r) => r.bottle),
-          currentUser,
+          currentUser
         )
-      ).map((data, index) => [results[index].id, data]),
+      ).map((data, index) => [results[index].id, data])
     );
 
     const releaseList = Array.from(
-      new Set(results.map((r) => r.release).filter(notEmpty)),
+      new Set(results.map((r) => r.release).filter(notEmpty))
     );
     const releasesById = Object.fromEntries(
       (await serialize(BottleReleaseSerializer, releaseList, currentUser)).map(
-        (data, index) => [releaseList[index].id, data],
-      ),
+        (data, index) => [releaseList[index].id, data]
+      )
     );
 
     // TODO: combine friends + createdBy
@@ -88,13 +88,13 @@ export const TastingSerializer = serializer({
         await serialize(
           UserSerializer,
           results.map((r) => r.createdBy),
-          currentUser,
+          currentUser
         )
-      ).map((data, index) => [results[index].id, data]),
+      ).map((data, index) => [results[index].id, data])
     );
 
     const friendIds = Array.from(
-      new Set<number>(itemList.map((r) => r.friends).flat()),
+      new Set<number>(itemList.flatMap((r) => r.friends))
     );
     const usersById = friendIds.length
       ? Object.fromEntries(
@@ -102,9 +102,9 @@ export const TastingSerializer = serializer({
             await serialize(
               UserSerializer,
               await db.select().from(users).where(inArray(users.id, friendIds)),
-              currentUser,
+              currentUser
             )
-          ).map((data) => [data.id, data]),
+          ).map((data) => [data.id, data])
         )
       : {};
 
@@ -125,9 +125,9 @@ export const TastingSerializer = serializer({
         await serialize(
           BadgeAwardSerializer,
           tastingAwardList.map((t) => t.award),
-          currentUser,
+          currentUser
         )
-      ).map((data, index) => [tastingAwardList[index].award.id, data]),
+      ).map((data, index) => [tastingAwardList[index].award.id, data])
     );
 
     const awardsByTasting: Record<
@@ -138,7 +138,7 @@ export const TastingSerializer = serializer({
       if (!awardsByTasting[tastingAward.tastingId])
         awardsByTasting[tastingAward.tastingId] = [];
       awardsByTasting[tastingAward.tastingId].push(
-        awardsByRef[tastingAward.award.id],
+        awardsByRef[tastingAward.award.id]
       );
     }
 
@@ -157,14 +157,14 @@ export const TastingSerializer = serializer({
             awards: awardsByTasting[item.id] || [],
           },
         ];
-      }),
+      })
     );
   },
 
   item: (
     item: Tasting,
     attrs: TastingAttrs,
-    currentUser?: User,
+    currentUser?: User
   ): z.infer<typeof TastingSchema> => {
     return {
       id: item.id,

@@ -20,7 +20,7 @@ function Page() {
       input: {
         entity: Number(entityId),
       },
-    }),
+    })
   );
 
   return (

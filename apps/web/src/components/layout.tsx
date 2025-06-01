@@ -1,4 +1,4 @@
-import { Suspense, type ReactNode } from "react";
+import { type ReactNode, Suspense } from "react";
 import classNames from "../lib/classNames";
 import AppFooter from "./appFooter";
 import AppHeader from "./appHeader";

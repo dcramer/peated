@@ -18,7 +18,7 @@ import { users } from "./users";
 
 export const badgeAwardTrackedObjectType = pgEnum(
   "badge_award_object_type",
-  BADGE_TRACKER_LIST,
+  BADGE_TRACKER_LIST
 );
 
 export const badgeFormulaEnum = pgEnum("badge_formula", BADGE_FORMULA_LIST);
@@ -36,7 +36,7 @@ export const badges = pgTable(
   },
   (table) => [
     uniqueIndex("badge_name_unq").using("btree", sql`LOWER(${table.name})`),
-  ],
+  ]
 );
 
 export type Badge = typeof badges.$inferSelect;
@@ -56,7 +56,7 @@ export const badgeAwards = pgTable(
     level: smallint("level").default(0).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => [uniqueIndex("badge_award_unq").on(table.badgeId, table.userId)],
+  (table) => [uniqueIndex("badge_award_unq").on(table.badgeId, table.userId)]
 );
 
 export const badgeAwardsRelations = relations(badgeAwards, ({ one }) => ({
@@ -88,9 +88,9 @@ export const badgeAwardTrackedObjects = pgTable(
     uniqueIndex("badge_award_tracked_object_unq").on(
       table.awardId,
       table.objectType,
-      table.objectId,
+      table.objectId
     ),
-  ],
+  ]
 );
 
 export const badgeAwardTrackedObjectsRelations = relations(
@@ -100,7 +100,7 @@ export const badgeAwardTrackedObjectsRelations = relations(
       fields: [badgeAwardTrackedObjects.awardId],
       references: [badgeAwards.id],
     }),
-  }),
+  })
 );
 
 export type BadgeAwardTrackedObject = typeof badgeAwards.$inferSelect;

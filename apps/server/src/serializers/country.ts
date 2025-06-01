@@ -1,14 +1,14 @@
-import { type CountrySchema } from "@peated/server/schemas";
-import { type z } from "zod";
+import type { CountrySchema } from "@peated/server/schemas";
+import type { z } from "zod";
 import { serializer } from ".";
-import { type Country, type User } from "../db/schema";
+import type { Country, User } from "../db/schema";
 
 export const CountrySerializer = serializer({
   name: "country",
   item: (
     item: Country,
     attrs: Record<string, any>,
-    currentUser?: User,
+    currentUser?: User
   ): z.infer<typeof CountrySchema> => {
     return {
       id: item.id,

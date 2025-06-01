@@ -17,7 +17,7 @@ describe("GET /tags/:tag", () => {
 
   test("throws NOT_FOUND for non-existent tag", async ({ fixtures }) => {
     const err = await waitError(
-      routerClient.tags.details({ tag: "NonExistentTag" }),
+      routerClient.tags.details({ tag: "NonExistentTag" })
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Tag not found.]`);
@@ -50,7 +50,7 @@ describe("GET /tags/:tag", () => {
 
     const result = await routerClient.tags.details(
       { tag: "TestTag" },
-      { context: { user } },
+      { context: { user } }
     );
 
     expect(result).toBeDefined();

@@ -17,7 +17,7 @@ export default procedure
   .input(
     z.object({
       bottle: z.coerce.number(),
-    }),
+    })
   )
   .output(
     z.object({
@@ -25,11 +25,11 @@ export default procedure
         z.object({
           tag: TagSchema,
           count: z.number(),
-        }),
+        })
       ),
-    }),
+    })
   )
-  .handler(async function ({ input, errors }) {
+  .handler(async ({ input, errors }) => {
     const [bottle] = await db
       .select()
       .from(bottles)
@@ -57,12 +57,12 @@ export default procedure
           .where(
             or(
               eq(bottleTags.bottleId, bottle.id),
-              eq(bottles.brandId, bottle.brandId),
-            ),
+              eq(bottles.brandId, bottle.brandId)
+            )
           )
           .groupBy(bottleTags.tag)
           .orderBy(desc(sql`total`))
-      ).map((t) => [t.tag, t.total]),
+      ).map((t) => [t.tag, t.total])
     );
 
     const defaultTags = await db.select().from(tags);

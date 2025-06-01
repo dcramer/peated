@@ -8,7 +8,7 @@ import { describe, expect, test } from "vitest";
 describe("POST /external-sites/:site/prices", () => {
   test("requires authentication", async () => {
     const err = await waitError(() =>
-      routerClient.prices.createBatch({ site: "healthyspirits", prices: [] }),
+      routerClient.prices.createBatch({ site: "healthyspirits", prices: [] })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -19,8 +19,8 @@ describe("POST /external-sites/:site/prices", () => {
     const err = await waitError(() =>
       routerClient.prices.createBatch(
         { site: "healthyspirits", prices: [] },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -31,8 +31,8 @@ describe("POST /external-sites/:site/prices", () => {
     const err = await waitError(() =>
       routerClient.prices.createBatch(
         { site: "non-existent-site" as any, prices: [] },
-        { context: { user } },
-      ),
+        { context: { user } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
@@ -61,7 +61,7 @@ describe("POST /external-sites/:site/prices", () => {
           },
         ],
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     const prices = await db
@@ -103,7 +103,7 @@ describe("POST /external-sites/:site/prices", () => {
           },
         ],
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     const prices = await db
@@ -136,7 +136,7 @@ describe("POST /external-sites/:site/prices", () => {
           },
         ],
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     const prices = await db
@@ -178,7 +178,7 @@ describe("POST /external-sites/:site/prices", () => {
           },
         ],
       },
-      { context: { user } },
+      { context: { user } }
     );
 
     const prices = await db

@@ -11,7 +11,7 @@ import type { ClientContext } from "./client";
 import { getLink } from "./link";
 
 export async function createServerClient(
-  context: ClientContext = {},
+  context: ClientContext = {}
 ): Promise<{ client: RouterClient<Router, ClientContext> }> {
   const session = await getSession();
   const accessToken = session.accessToken;

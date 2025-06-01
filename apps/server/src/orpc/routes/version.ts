@@ -10,8 +10,6 @@ export default procedure
     description: "Retrieve the current API version",
   })
   .output(z.object({ version: z.string() }))
-  .handler(async function () {
-    return {
-      version: config.VERSION,
-    };
-  });
+  .handler(async () => ({
+    version: config.VERSION,
+  }));

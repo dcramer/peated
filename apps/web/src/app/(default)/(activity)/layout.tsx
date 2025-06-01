@@ -3,7 +3,7 @@ import Link from "@peated/web/components/link";
 import PendingVerificationAlert from "@peated/web/components/pendingVerificationAlert";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
-import { Suspense, type ReactNode } from "react";
+import { type ReactNode, Suspense } from "react";
 import NewBottles, { NewBottlesSkeleton } from "./newBottles";
 import PriceChanges, { PriceChangesSkeleton } from "./priceChanges";
 import UpcomingEvents, { UpcomingEventsSkeleton } from "./upcomingEvents";

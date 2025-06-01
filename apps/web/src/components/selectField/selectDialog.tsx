@@ -58,7 +58,7 @@ export default function SelectDialog<T extends Option>({
   ]);
   const [isLoading, setLoading] = useState(false);
   const [initialState, setInitialState] = useState<"loading" | "ready">(
-    "loading",
+    "loading"
   );
   const [createOpen, setCreateOpen] = useState(false);
 
@@ -68,7 +68,7 @@ export default function SelectDialog<T extends Option>({
       const results = onQuery
         ? await onQuery(query, options)
         : options.filter(
-            (o) => o.name.toLowerCase().indexOf(query.toLowerCase()) !== -1,
+            (o) => o.name.toLowerCase().indexOf(query.toLowerCase()) !== -1
           );
       if (results === undefined) throw new Error("Invalid results returned");
       setResults(onResults ? onResults(results) : results);
@@ -76,7 +76,7 @@ export default function SelectDialog<T extends Option>({
       setLoading(false);
       setInitialState("ready");
     },
-    [onQuery, onResults],
+    [onQuery, onResults]
   );
 
   const onSearch = useDebounceCallback(unsafe_onSearch);
@@ -134,10 +134,10 @@ export default function SelectDialog<T extends Option>({
                         className={classNames(
                           "-ml-2 h-10 w-10 flex-none rounded p-2",
                           selectedValues.find(
-                            (i) => i.id == option.id && i.name == option.name,
+                            (i) => i.id == option.id && i.name == option.name
                           )
                             ? "bg-highlight text-black"
-                            : "text-muted bg-slate-900 group-hover:bg-slate-700",
+                            : "text-muted bg-slate-900 group-hover:bg-slate-700"
                         )}
                       />
 

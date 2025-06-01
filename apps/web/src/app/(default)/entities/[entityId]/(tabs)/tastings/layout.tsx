@@ -1,5 +1,5 @@
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export async function generateMetadata({
   params: { entityId },

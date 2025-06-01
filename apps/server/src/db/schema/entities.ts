@@ -41,11 +41,11 @@ export const entities = pgTable(
 
     _country: text("country"),
     countryId: bigint("country_id", { mode: "number" }).references(
-      () => countries.id,
+      () => countries.id
     ),
     _region: text("region"),
     regionId: bigint("region_id", { mode: "number" }).references(
-      () => regions.id,
+      () => regions.id
     ),
     address: text("address"),
     location: geometry_point("location"),
@@ -81,7 +81,7 @@ export const entities = pgTable(
     index("entity_country_by_idx").on(table.countryId),
     index("entity_region_idx").on(table.regionId),
     index("entity_created_by_idx").on(table.createdById),
-  ],
+  ]
 );
 
 export const entitiesRelations = relations(entities, ({ one, many }) => ({
@@ -108,7 +108,7 @@ export const entityAliases = pgTable(
   "entity_alias",
   {
     entityId: bigint("entity_id", { mode: "number" }).references(
-      () => entities.id,
+      () => entities.id
     ),
     name: varchar("name", { length: 255 }).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -117,9 +117,9 @@ export const entityAliases = pgTable(
     index("entity_alias_entity_idx").on(table.entityId),
     uniqueIndex("entity_alias_name_idx").using(
       "btree",
-      sql`LOWER(${table.name})`,
+      sql`LOWER(${table.name})`
     ),
-  ],
+  ]
 );
 
 export const entityAliasesRelations = relations(entityAliases, ({ one }) => ({
@@ -148,7 +148,7 @@ export const entityTombstonesRelations = relations(
       fields: [entityTombstones.newEntityId],
       references: [entities.id],
     }),
-  }),
+  })
 );
 
 export type EntityTombstone = typeof entityTombstones.$inferSelect;

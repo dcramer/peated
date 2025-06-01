@@ -1,14 +1,14 @@
+import { existsSync, mkdirSync, statSync } from "fs";
 import { safe } from "@orpc/client";
 import {
-  defaultHeaders,
   SCRAPER_PRICE_BATCH_SIZE,
+  defaultHeaders,
 } from "@peated/server/constants";
 import { logError } from "@peated/server/lib/log";
 import { orpcClient } from "@peated/server/lib/orpc-client/server";
 import type { Currency, ExternalSiteType } from "@peated/server/types";
-import { type Category } from "@peated/server/types";
+import type { Category } from "@peated/server/types";
 import axios from "axios";
-import { existsSync, mkdirSync, statSync } from "fs";
 import { open } from "fs/promises";
 import type { z } from "zod";
 import config from "../config";
@@ -33,7 +33,7 @@ export function downloadFileAsBlob(url: string) {
 export async function getUrl(
   url: string,
   noCache = !!process.env.DISABLE_HTTP_CACHE,
-  headers: Record<string, string> = {},
+  headers: Record<string, string> = {}
 ) {
   const filename = `${CACHE}/${encodeURIComponent(url)}`;
 
@@ -62,7 +62,7 @@ export async function getUrl(
 export async function cacheUrl(
   url: string,
   filename: string,
-  headers: Record<string, string> = {},
+  headers: Record<string, string> = {}
 ) {
   let data = "";
   let status = 0;
@@ -87,7 +87,7 @@ export async function cacheUrl(
     JSON.stringify({
       status,
       data: data.toString(),
-    }),
+    })
   );
   await fs.close();
 
@@ -112,7 +112,10 @@ export function parsePrice(value: string) {
   }
 
   const unit = value.substring(0, 1);
-  const price = parseInt(value.substring(1).replaceAll(/[,.]/gi, ""), 10);
+  const price = Number.parseInt(
+    value.substring(1).replaceAll(/[,.]/gi, ""),
+    10
+  );
 
   // only working for USD atm
   if (unit === "$" && value.indexOf(".") !== -1) {
@@ -125,7 +128,7 @@ export function parsePrice(value: string) {
 export async function chunked<T>(
   items: T[],
   count: number,
-  cb: (items: T[]) => Promise<any>,
+  cb: (items: T[]) => Promise<any>
 ) {
   const len = items.length;
   let at = 0;
@@ -155,7 +158,7 @@ export type BottleReview = {
 export async function handleBottle(
   bottle: z.input<typeof BottleInputSchema>,
   price?: z.input<typeof StorePriceInputSchema> | null,
-  imageUrl?: string | null,
+  imageUrl?: string | null
 ) {
   if (process.env.ACCESS_TOKEN) {
     console.log(`Submitting [${formatBottleName(bottle)}]`);
@@ -191,7 +194,7 @@ export async function handleBottle(
         orpcClient.prices.createBatch({
           site: "smws",
           prices: [price],
-        }),
+        })
       );
       if (priceError && (!priceIsDefined || priceError.name !== "CONFLICT")) {
         logError(priceError, { bottle, price });
@@ -203,13 +206,13 @@ export async function handleBottle(
 }
 
 export type ScrapePricesCallback = (
-  product: z.infer<typeof StorePriceInputSchema>,
+  product: z.infer<typeof StorePriceInputSchema>
 ) => Promise<void>;
 
 export default async function scrapePrices(
   site: ExternalSiteType,
   urlFn: (page: number) => string,
-  scrapeProducts: (url: string, cb: ScrapePricesCallback) => Promise<void>,
+  scrapeProducts: (url: string, cb: ScrapePricesCallback) => Promise<void>
 ) {
   const workQueue = new BatchQueue<StorePrice>(
     SCRAPER_PRICE_BATCH_SIZE,
@@ -219,7 +222,7 @@ export default async function scrapePrices(
         site,
         prices,
       });
-    },
+    }
   );
 
   const uniqueProducts = new Set<string>();

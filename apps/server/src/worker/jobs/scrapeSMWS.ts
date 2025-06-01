@@ -5,11 +5,11 @@ import {
   parseDetailsFromName,
   parseFlavorProfile,
 } from "@peated/server/lib/smws";
-import {
-  type BottleInputSchema,
-  type StorePriceInputSchema,
+import type {
+  BottleInputSchema,
+  StorePriceInputSchema,
 } from "@peated/server/schemas";
-import { type z } from "zod";
+import type { z } from "zod";
 
 function parseAbv(value: string | number | null | undefined): number | null {
   if (value === null || value === undefined) return null;
@@ -21,7 +21,7 @@ function parseAbv(value: string | number | null | undefined): number | null {
   const cleanValue = value.replace("%", "").trim();
 
   // Convert to float
-  const floatValue = parseFloat(cleanValue);
+  const floatValue = Number.parseFloat(cleanValue);
 
   // Return null if the conversion failed
   return isNaN(floatValue) ? null : floatValue;
@@ -30,7 +30,7 @@ function parseAbv(value: string | number | null | undefined): number | null {
 export default async function scrapeSMWS() {
   await scrapeBottles(
     `https://api.smws.com/api/v1/bottles?store_id=uk&parent_id=61&page=1&sortBy=featured&minPrice=0&maxPrice=0&perPage=128`,
-    handleBottle,
+    handleBottle
   );
 
   // if (process.env.ACCESS_TOKEN) {
@@ -63,8 +63,8 @@ export async function scrapeBottles(
   cb: (
     bottle: z.input<typeof BottleInputSchema>,
     price?: z.input<typeof StorePriceInputSchema> | null,
-    imageUrl?: string | null,
-  ) => Promise<void>,
+    imageUrl?: string | null
+  ) => Promise<void>
 ) {
   const body = await getUrl(url);
   const data = JSON.parse(body) as SMWSPayload;
@@ -93,8 +93,8 @@ export async function scrapeBottles(
         const flavorProfile = flavorProfileRaw
           ? parseFlavorProfile(
               flavorProfileRaw.split(
-                "All Whisky/Flavour Profiles/",
-              )[1] as unknown as string,
+                "All Whisky/Flavour Profiles/"
+              )[1] as unknown as string
             )
           : null;
 
@@ -144,9 +144,9 @@ export async function scrapeBottles(
             volume: 750,
             url: `https://smws.com${item.url}`,
           },
-          item.image,
+          item.image
         );
-      }),
+      })
     );
   });
 }

@@ -1,6 +1,6 @@
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
-import { createContext, useContext, type ReactNode } from "react";
+import { type ReactNode, createContext, useContext } from "react";
 import Header from "./header";
 
 const SidePanelContext = createContext<{

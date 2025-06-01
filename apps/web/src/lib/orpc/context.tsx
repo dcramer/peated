@@ -1,6 +1,6 @@
 import type { RouterUtils } from "@orpc/react-query";
 import type { RouterClient } from "@orpc/server";
-import { type Router } from "@peated/server/orpc/router";
+import type { Router } from "@peated/server/orpc/router";
 import { createContext, use } from "react";
 
 type ORPCReactUtils = RouterUtils<RouterClient<Router>>;

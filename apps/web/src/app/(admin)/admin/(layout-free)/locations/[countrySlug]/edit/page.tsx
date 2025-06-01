@@ -21,7 +21,7 @@ export default function Page({
   const { data: country } = useSuspenseQuery(
     orpc.countries.details.queryOptions({
       input: { country: countrySlug },
-    }),
+    })
   );
 
   const router = useRouter();
@@ -45,10 +45,10 @@ export default function Page({
                   ...oldData,
                   ...data,
                 }
-              : oldData,
+              : oldData
         );
       },
-    }),
+    })
   );
 
   return (
@@ -64,7 +64,7 @@ export default function Page({
               if (returnTo) router.push(returnTo);
               else router.replace(`/locations/${result.slug}`);
             },
-          },
+          }
         );
       }}
       edit

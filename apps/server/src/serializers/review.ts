@@ -3,14 +3,14 @@ import type { z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
 import {
-  bottles,
-  externalSites,
   type Bottle,
   type Review,
   type User,
+  bottles,
+  externalSites,
 } from "../db/schema";
 import { notEmpty } from "../lib/filter";
-import { type ReviewSchema } from "../schemas";
+import type { ReviewSchema } from "../schemas";
 import { BottleSerializer } from "./bottle";
 import { ExternalSiteSerializer } from "./externalSite";
 
@@ -23,18 +23,18 @@ export const ReviewSerializer = serializer({
   name: "review",
   attrs: async (
     itemList: (Review & { bottle: Bottle })[],
-    currentUser?: User,
+    currentUser?: User
   ): Promise<Record<string, ReviewAttrs>> => {
     const bottleIds = Array.from(
-      new Set(itemList.map((i) => i.bottleId).filter(notEmpty)),
+      new Set(itemList.map((i) => i.bottleId).filter(notEmpty))
     );
     const bottleList = bottleIds.length
       ? await db.select().from(bottles).where(inArray(bottles.id, bottleIds))
       : [];
     const bottlesByRef = Object.fromEntries(
       (await serialize(BottleSerializer, bottleList, currentUser)).map(
-        (data, index) => [bottleList[index].id, data],
-      ),
+        (data, index) => [bottleList[index].id, data]
+      )
     );
 
     const siteIds = Array.from(new Set(itemList.map((i) => i.externalSiteId)));
@@ -46,8 +46,8 @@ export const ReviewSerializer = serializer({
       : [];
     const sitesByRef = Object.fromEntries(
       (await serialize(ExternalSiteSerializer, siteList, currentUser)).map(
-        (data, index) => [siteList[index].id, data],
-      ),
+        (data, index) => [siteList[index].id, data]
+      )
     );
 
     return Object.fromEntries(
@@ -59,14 +59,14 @@ export const ReviewSerializer = serializer({
             site: sitesByRef[item.externalSiteId],
           },
         ];
-      }),
+      })
     );
   },
 
   item: (
     item: Review,
     attrs: ReviewAttrs,
-    currentUser?: User,
+    currentUser?: User
   ): z.infer<typeof ReviewSchema> => {
     return {
       id: item.id,

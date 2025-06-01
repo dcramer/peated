@@ -14,7 +14,7 @@ describe("DELETE /bottles/:bottle", () => {
       { bottle: bottle.id },
       {
         context: { user },
-      },
+      }
     );
     expect(data).toEqual({});
 
@@ -30,7 +30,7 @@ describe("DELETE /bottles/:bottle", () => {
     const bottle = await fixtures.Bottle();
 
     const err = await waitError(
-      routerClient.bottles.delete({ bottle: bottle.id }, { context: { user } }),
+      routerClient.bottles.delete({ bottle: bottle.id }, { context: { user } })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });

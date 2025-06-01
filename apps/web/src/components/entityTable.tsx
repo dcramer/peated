@@ -40,7 +40,7 @@ export default function EntityTable({
             withTastings && withLocations ? "sm:w-1/2" : "",
             withTastings && !withLocations ? "sm:w-4/5" : "",
             !withTastings && withLocations ? "sm:w-3/5" : "",
-            !withTastings && !withLocations ? "sm:w-4/5" : "",
+            !withTastings && !withLocations ? "sm:w-4/5" : ""
           ),
           value: (item) => {
             return (

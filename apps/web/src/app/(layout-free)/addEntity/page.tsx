@@ -1,6 +1,6 @@
 "use client";
 
-import { type EntityType } from "@peated/server/types";
+import type { EntityType } from "@peated/server/types";
 import EntityForm from "@peated/web/components/entityForm";
 import { useVerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -17,7 +17,7 @@ export default function AddEntity() {
   const type = searchParams.getAll("type") as EntityType[];
 
   const entityCreateMutation = useMutation(
-    orpc.entities.create.mutationOptions(),
+    orpc.entities.create.mutationOptions()
   );
 
   return (

@@ -27,7 +27,7 @@ export const notifications = pgTable(
       .references(() => users.id)
       .notNull(),
     fromUserId: bigint("from_user_id", { mode: "number" }).references(
-      () => users.id,
+      () => users.id
     ),
     // tracks ref of what owns the notification
     objectId: bigint("object_id", { mode: "number" }).notNull(),
@@ -41,9 +41,9 @@ export const notifications = pgTable(
       table.userId,
       table.objectId,
       table.type,
-      table.createdAt,
+      table.createdAt
     ),
-  ],
+  ]
 );
 
 export const notificationsRelations = relations(notifications, ({ one }) => ({

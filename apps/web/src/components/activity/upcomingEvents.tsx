@@ -34,7 +34,7 @@ export default function UpcomingEvents() {
   const { data: eventList } = useSuspenseQuery(
     orpc.events.list.queryOptions({
       input: { limit: 3, onlyUpcoming: true, sort: "date" },
-    }),
+    })
   );
 
   return eventList.results.length ? (

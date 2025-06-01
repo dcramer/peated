@@ -17,7 +17,7 @@ export default procedure
   })
   .input(z.object({ series: z.coerce.number() }))
   .output(BottleSeriesSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const [series] = await db
       .select()
       .from(bottleSeries)

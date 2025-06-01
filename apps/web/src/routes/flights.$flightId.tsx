@@ -47,7 +47,7 @@ function Page() {
       input: {
         flight: flight.id,
       },
-    }),
+    })
   );
 
   return (

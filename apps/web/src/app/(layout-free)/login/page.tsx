@@ -1,6 +1,6 @@
 import LayoutSplash from "@peated/web/components/layoutSplash";
 import LoginForm from "@peated/web/components/loginForm";
-import { type Metadata } from "next";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Login",

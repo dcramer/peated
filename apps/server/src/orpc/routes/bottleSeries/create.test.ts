@@ -6,7 +6,7 @@ import { and, eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
 describe("POST /bottle-series", () => {
-  it("creates a new series", async function ({ fixtures, defaults }) {
+  it("creates a new series", async ({ fixtures, defaults }) => {
     const brand = await fixtures.Entity({ name: "Ardbeg" });
 
     const data = {
@@ -45,7 +45,7 @@ describe("POST /bottle-series", () => {
     const change = await db.query.changes.findFirst({
       where: and(
         eq(changes.objectId, result.id),
-        eq(changes.objectType, "bottle_series"),
+        eq(changes.objectType, "bottle_series")
       ),
     });
     expect(change).toMatchObject({
@@ -63,7 +63,7 @@ describe("POST /bottle-series", () => {
     });
   });
 
-  it("requires authentication", async function ({ fixtures }) {
+  it("requires authentication", async ({ fixtures }) => {
     const brand = await fixtures.Entity({ name: "Ardbeg" });
 
     const data = {
@@ -77,7 +77,7 @@ describe("POST /bottle-series", () => {
     expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  it("validates brand exists", async function ({ fixtures, defaults }) {
+  it("validates brand exists", async ({ fixtures, defaults }) => {
     const data = {
       name: "Supernova",
       description: "A series of heavily peated whiskies",
@@ -87,7 +87,7 @@ describe("POST /bottle-series", () => {
     const error = await waitError(() =>
       routerClient.bottleSeries.create(data, {
         context: { user: defaults.user },
-      }),
+      })
     );
 
     expect(error).toMatchInlineSnapshot(`[Error: Brand not found.]`);

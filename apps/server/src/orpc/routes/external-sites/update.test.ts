@@ -11,8 +11,8 @@ describe("PATCH /external-sites/:site", () => {
         {
           site: site.type,
         },
-        { context: { user: modUser } },
-      ),
+        { context: { user: modUser } }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -30,7 +30,7 @@ describe("PATCH /external-sites/:site", () => {
         type: "whiskyadvocate",
         runEvery: 120,
       },
-      { context: { user: adminUser } },
+      { context: { user: adminUser } }
     );
 
     expect(newSite).toBeDefined();

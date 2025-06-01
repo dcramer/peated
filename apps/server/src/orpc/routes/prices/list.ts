@@ -36,68 +36,68 @@ export default procedure
         query: "",
         cursor: 1,
         limit: 100,
-      }),
+      })
   )
   .output(
     z.object({
       results: z.array(StorePriceSchema),
       rel: CursorSchema,
-    }),
+    })
   )
-  .handler(async function ({
-    input: { cursor, query, limit, ...input },
-    context,
-    errors,
-  }) {
-    const where: (SQL<unknown> | undefined)[] = [eq(storePrices.hidden, false)];
+  .handler(
+    async ({ input: { cursor, query, limit, ...input }, context, errors }) => {
+      const where: (SQL<unknown> | undefined)[] = [
+        eq(storePrices.hidden, false),
+      ];
 
-    if (input.site) {
-      const site = await db.query.externalSites.findFirst({
-        where: eq(externalSites.type, input.site),
-      });
-
-      if (!site) {
-        throw errors.NOT_FOUND({
-          message: "Site not found.",
+      if (input.site) {
+        const site = await db.query.externalSites.findFirst({
+          where: eq(externalSites.type, input.site),
         });
+
+        if (!site) {
+          throw errors.NOT_FOUND({
+            message: "Site not found.",
+          });
+        }
+        where.push(eq(storePrices.externalSiteId, site.id));
       }
-      where.push(eq(storePrices.externalSiteId, site.id));
+
+      if (input.onlyValid) {
+        where.push(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`);
+      }
+
+      if (input.onlyUnknown) {
+        where.push(isNull(storePrices.bottleId));
+      }
+
+      if (query) {
+        where.push(ilike(storePrices.name, `%${query}%`));
+      }
+
+      const offset = (cursor - 1) * limit;
+
+      const results = await db
+        .select()
+        .from(storePrices)
+        .where(where ? and(...where) : undefined)
+        .limit(limit + 1)
+        .offset(offset)
+        .orderBy(
+          desc(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`),
+          asc(storePrices.name)
+        );
+
+      return {
+        results: await serialize(
+          StorePriceSerializer,
+          results.slice(0, limit),
+          context.user
+        ),
+        rel: {
+          nextCursor: results.length > limit ? cursor + 1 : null,
+          prevCursor: cursor > 1 ? cursor - 1 : null,
+        },
+      };
     }
-
-    if (input.onlyValid) {
-      where.push(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`);
-    }
-
-    if (input.onlyUnknown) {
-      where.push(isNull(storePrices.bottleId));
-    }
-
-    if (query) {
-      where.push(ilike(storePrices.name, `%${query}%`));
-    }
-
-    const offset = (cursor - 1) * limit;
-
-    const results = await db
-      .select()
-      .from(storePrices)
-      .where(where ? and(...where) : undefined)
-      .limit(limit + 1)
-      .offset(offset)
-      .orderBy(
-        desc(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`),
-        asc(storePrices.name),
-      );
-
-    return {
-      results: await serialize(
-        StorePriceSerializer,
-        results.slice(0, limit),
-        context.user,
-      ),
-      rel: {
-        nextCursor: results.length > limit ? cursor + 1 : null,
-        prevCursor: cursor > 1 ? cursor - 1 : null,
-      },
-    };
-  });
+  );

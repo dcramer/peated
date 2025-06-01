@@ -2,7 +2,7 @@ import Link from "@peated/web/components/link";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export async function generateMetadata({
   params: { bottleId },

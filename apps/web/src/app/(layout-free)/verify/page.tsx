@@ -27,7 +27,7 @@ export default function Verify() {
         setSuccess(true);
         await updateSession();
       },
-    }),
+    })
   );
 
   const token = searchParams.get("token") || "";
@@ -55,7 +55,7 @@ export default function Verify() {
         onSuccess: () => {
           setLoading(false);
         },
-      },
+      }
     );
   }, [token]);
 

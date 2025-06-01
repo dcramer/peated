@@ -2,8 +2,8 @@ import { db } from "@peated/server/db";
 
 import { faker } from "@faker-js/faker";
 import {
-  badgeAwards,
   badgeAwardTrackedObjects,
+  badgeAwards,
 } from "@peated/server/db/schema";
 import { asc } from "drizzle-orm";
 import { awardAllBadgeXp } from ".";
@@ -129,7 +129,7 @@ describe("badge integration test", () => {
           name: faker.word.noun(),
           brand,
         },
-        user.id,
+        user.id
       );
 
       await awardAllBadgeXp(db, tasting);
@@ -150,7 +150,7 @@ describe("badge integration test", () => {
         name: faker.word.noun(),
         brand,
       },
-      user.id,
+      user.id
     );
 
     await awardAllBadgeXp(db, tasting);

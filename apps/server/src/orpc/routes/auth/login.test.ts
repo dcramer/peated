@@ -27,7 +27,7 @@ describe("POST /auth/login", () => {
       routerClient.auth.login({
         email: "foo@example.com",
         password: "example2",
-      }),
+      })
     );
     expect(err).toMatchInlineSnapshot(`[Error: Invalid credentials.]`);
   });

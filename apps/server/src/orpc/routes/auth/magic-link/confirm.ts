@@ -22,10 +22,10 @@ export default procedure
   .input(
     z.object({
       token: z.string(),
-    }),
+    })
   )
   .output(AuthSchema)
-  .handler(async function ({ input, errors }) {
+  .handler(async ({ input, errors }) => {
     let payload;
     try {
       payload = await verifyPayload(input.token);
@@ -61,8 +61,8 @@ export default procedure
       .where(
         and(
           eq(users.id, parsedPayload.id),
-          eq(sql`LOWER(${users.email})`, parsedPayload.email.toLowerCase()),
-        ),
+          eq(sql`LOWER(${users.email})`, parsedPayload.email.toLowerCase())
+        )
       );
     if (!user) {
       throw errors.BAD_REQUEST({

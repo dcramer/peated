@@ -25,7 +25,7 @@ export const CollectionBottleSchema = z.object({
   id: z.number().describe("Unique identifier for the collection bottle entry"),
   bottle: BottleSchema.describe("The bottle in this collection"),
   release: BottleReleaseSchema.nullish().describe(
-    "Specific release of the bottle, if applicable",
+    "Specific release of the bottle, if applicable"
   ),
 });
 

@@ -21,7 +21,7 @@ subcommand
           ? inArray(countries.id, countryIds)
           : options.onlyMissing
             ? or(isNull(countries.description), isNull(countries.summary))
-            : undefined,
+            : undefined
       )
       .orderBy(asc(countries.id));
 

@@ -2,7 +2,7 @@
 
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/lib/format";
-import { type Currency } from "@peated/server/types";
+import type { Currency } from "@peated/server/types";
 import BetaNotice from "@peated/web/components/betaNotice";
 import BottleLink from "@peated/web/components/bottleLink";
 import Link from "@peated/web/components/link";
@@ -38,7 +38,7 @@ export function PriceChangesSkeleton() {
 export default function PriceChanges() {
   const orpc = useORPC();
   const { data } = useSuspenseQuery(
-    orpc.prices.changeList.queryOptions({ input: { limit: 25 } }),
+    orpc.prices.changeList.queryOptions({ input: { limit: 25 } })
   );
 
   return (
@@ -94,7 +94,7 @@ export default function PriceChanges() {
                         className={classNames(
                           price.previousPrice > price.price
                             ? "text-green-500"
-                            : "text-red-500",
+                            : "text-red-500"
                         )}
                       >
                         <PriceDelta

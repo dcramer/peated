@@ -28,7 +28,7 @@ export const flights = pgTable(
       .references(() => users.id)
       .notNull(),
   },
-  (table) => [uniqueIndex("flight_public_id").on(table.publicId)],
+  (table) => [uniqueIndex("flight_public_id").on(table.publicId)]
 );
 
 export const flightsRelations = relations(flights, ({ one, many }) => ({
@@ -52,14 +52,14 @@ export const flightBottles = pgTable(
       .references(() => bottles.id)
       .notNull(),
     releaseId: bigint("release_id", { mode: "number" }).references(
-      () => bottleReleases.id,
+      () => bottleReleases.id
     ),
   },
   (table) => [
     unique()
       .on(table.flightId, table.bottleId, table.releaseId)
       .nullsNotDistinct(),
-  ],
+  ]
 );
 
 export const flightBottlesRelations = relations(flightBottles, ({ one }) => ({

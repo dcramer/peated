@@ -35,7 +35,7 @@ function LocationMarker({
   // const markerRef = useRe(null);
 
   const [position, setPosition] = useState<LatLngTuple>(
-    initialPosition || DEFAULT_POSITION,
+    initialPosition || DEFAULT_POSITION
   );
 
   useMapEvent("click", (e) => {
@@ -114,6 +114,7 @@ export default function MapClient({
                     href={`http://maps.google.com/?q=${encodeURIComponent(`${m.name}, ${m.address}`)}`}
                     target="_blank"
                     className="text-highlight"
+                    rel="noreferrer"
                   >
                     {m.name}
                     <br />

@@ -17,8 +17,8 @@ describe("DELETE /friends/:user", () => {
         { user: defaults.user.id },
         {
           context: { user: defaults.user },
-        },
-      ),
+        }
+      )
     );
     expect(err).toMatchInlineSnapshot(`[Error: Cannot unfriend yourself.]`);
   });
@@ -30,7 +30,7 @@ describe("DELETE /friends/:user", () => {
       { user: otherUser.id },
       {
         context: { user: defaults.user },
-      },
+      }
     );
     expect(data.status).toBe("none");
 
@@ -40,8 +40,8 @@ describe("DELETE /friends/:user", () => {
       .where(
         and(
           eq(follows.fromUserId, defaults.user.id),
-          eq(follows.toUserId, otherUser.id),
-        ),
+          eq(follows.toUserId, otherUser.id)
+        )
       );
     expect(follow).toBeUndefined();
   });
@@ -58,7 +58,7 @@ describe("DELETE /friends/:user", () => {
       { user: otherUser.id },
       {
         context: { user: defaults.user },
-      },
+      }
     );
     expect(data.status).toBe("none");
 
@@ -68,8 +68,8 @@ describe("DELETE /friends/:user", () => {
       .where(
         and(
           eq(follows.fromUserId, defaults.user.id),
-          eq(follows.toUserId, otherUser.id),
-        ),
+          eq(follows.toUserId, otherUser.id)
+        )
       );
     expect(follow).toBeDefined();
     expect(follow.status).toBe("none");

@@ -22,7 +22,7 @@ export class EntityCheck extends Check {
         SELECT FROM ${bottlesToDistillers}
         WHERE ${bottlesToDistillers.distillerId} = ${config.entity}
         AND ${bottlesToDistillers.bottleId} = ${bottles.id}
-      )`,
+      )`
       );
     } else if (config.type === "brand") {
       where.push(eq(bottles.brandId, config.entity));
@@ -36,8 +36,8 @@ export class EntityCheck extends Check {
           sql`EXISTS(
           SELECT FROM ${bottlesToDistillers}
           WHERE ${bottlesToDistillers.distillerId} = ${config.entity}
-          AND ${bottlesToDistillers.bottleId} = ${bottles.id})`,
-        ) as SQL,
+          AND ${bottlesToDistillers.bottleId} = ${bottles.id})`
+        ) as SQL
       );
     }
     return where;
@@ -45,14 +45,14 @@ export class EntityCheck extends Check {
 
   test(
     config: z.infer<typeof EntityCheckConfigSchema>,
-    tasting: TastingWithRelations,
+    tasting: TastingWithRelations
   ) {
     let matches: number[] = [];
     if (config.type === "distiller" || !config.type) {
       matches.push(
         ...tasting.bottle.bottlesToDistillers.map(
-          ({ distillerId }) => distillerId,
-        ),
+          ({ distillerId }) => distillerId
+        )
       );
     }
     if (config.type === "brand" || !config.type) {

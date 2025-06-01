@@ -18,11 +18,11 @@ function Page() {
   const { data: aliasList } = useSuspenseQuery(
     orpc.entities.aliases.list.queryOptions({
       input: { entity: Number(entityId) },
-    }),
+    })
   );
 
   const deleteAliasMutation = useMutation(
-    orpc.entities.aliases.delete.mutationOptions(),
+    orpc.entities.aliases.delete.mutationOptions()
   );
 
   return (

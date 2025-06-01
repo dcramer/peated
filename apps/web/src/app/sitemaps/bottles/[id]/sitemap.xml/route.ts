@@ -1,5 +1,5 @@
 import { createServerClient } from "@peated/web/lib/orpc/client.server";
-import { buildPagesSitemap, type Sitemap } from "@peated/web/lib/sitemaps";
+import { type Sitemap, buildPagesSitemap } from "@peated/web/lib/sitemaps";
 
 export const dynamic = "force-dynamic";
 
@@ -9,7 +9,7 @@ const PAGE_LIMIT = 1000;
 
 export async function GET(
   request: Request,
-  { params: { id } }: { params: { id: string } },
+  { params: { id } }: { params: { id: string } }
 ) {
   const { client } = await createServerClient();
 
@@ -29,7 +29,7 @@ export async function GET(
       ...results.map((bottle) => ({
         url: `/bottles/${bottle.id}`,
         lastModified: bottle.updatedAt,
-      })),
+      }))
     );
 
     cursor = rel.nextCursor;

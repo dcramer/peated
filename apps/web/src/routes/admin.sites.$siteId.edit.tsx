@@ -15,12 +15,12 @@ function Page() {
       input: {
         site: siteId as any,
       },
-    }),
+    })
   );
 
   const navigate = useNavigate();
   const siteUpdateMutation = useMutation(
-    orpc.externalSites.update.mutationOptions(),
+    orpc.externalSites.update.mutationOptions()
   );
 
   return (

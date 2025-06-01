@@ -33,13 +33,10 @@ export default procedure
         sort: "name",
         cursor: 1,
         limit: 100,
-      }),
+      })
   )
   .output(OutputSchema)
-  .handler(async function ({
-    input: { query, cursor, limit, ...input },
-    context,
-  }) {
+  .handler(async ({ input: { query, cursor, limit, ...input }, context }) => {
     const offset = (cursor - 1) * limit;
 
     const where: SQL<unknown>[] = [];
@@ -66,7 +63,7 @@ export default procedure
       results: await serialize(
         BadgeSerializer,
         results.slice(0, limit),
-        context.user,
+        context.user
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

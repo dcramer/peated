@@ -9,7 +9,7 @@ export default function Page() {
   const router = useRouter();
   const orpc = useORPC();
   const siteCreateMutation = useMutation(
-    orpc.externalSites.create.mutationOptions(),
+    orpc.externalSites.create.mutationOptions()
   );
 
   return (

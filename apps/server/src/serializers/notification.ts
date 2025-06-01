@@ -1,11 +1,11 @@
 import { eq, inArray } from "drizzle-orm";
-import { type z } from "zod";
+import type { z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
 import type { Follow, Notification, User } from "../db/schema";
 import { comments, follows, tastings, toasts, users } from "../db/schema";
 import { logError } from "../lib/log";
-import { type NotificationSchema } from "../schemas";
+import type { NotificationSchema } from "../schemas";
 import { TastingSerializer } from "./tasting";
 import { UserSerializer } from "./user";
 
@@ -21,14 +21,14 @@ export const NotificationSerializer = serializer({
   name: "notification",
   attrs: async (
     itemList: Notification[],
-    currentUser: User,
+    currentUser: User
   ): Promise<Record<number, NotificationAttrs>> => {
     const fromUserIds = Array.from(
       new Set(
         itemList
           .filter((i) => Boolean(i.fromUserId))
-          .map<number>((i) => i.fromUserId as number),
-      ),
+          .map<number>((i) => i.fromUserId as number)
+      )
     );
 
     const fromUserList = fromUserIds.length
@@ -36,8 +36,8 @@ export const NotificationSerializer = serializer({
       : [];
     const fromUserById = Object.fromEntries(
       (await serialize(UserSerializer, fromUserList, currentUser)).map(
-        (data, index) => [fromUserList[index].id, data],
-      ),
+        (data, index) => [fromUserList[index].id, data]
+      )
     );
     if (fromUserIds.length !== fromUserList.length) {
       logError("Failed to fetch all fromUser relations for notifications");
@@ -54,9 +54,9 @@ export const NotificationSerializer = serializer({
         await serialize(
           FriendRequestReceipientSerializer,
           followList,
-          currentUser,
+          currentUser
         )
-      ).map((data, index) => [followList[index].id, data]),
+      ).map((data, index) => [followList[index].id, data])
     );
     if (followIdList.length !== followList.length) {
       logError("Failed to fetch all follow relations for notifications");
@@ -80,9 +80,9 @@ export const NotificationSerializer = serializer({
         await serialize(
           TastingSerializer,
           toastTastingList.map(({ tasting }) => tasting),
-          currentUser,
+          currentUser
         )
-      ).map((data, index) => [toastTastingList[index].toastId, data]),
+      ).map((data, index) => [toastTastingList[index].toastId, data])
     );
 
     const commentIdList = itemList
@@ -103,9 +103,9 @@ export const NotificationSerializer = serializer({
         await serialize(
           TastingSerializer,
           commentTastingList.map(({ tasting }) => tasting),
-          currentUser,
+          currentUser
         )
-      ).map((data, index) => [commentTastingList[index].commentId, data]),
+      ).map((data, index) => [commentTastingList[index].commentId, data])
     );
 
     const getRef = (notification: Notification) => {
@@ -130,14 +130,14 @@ export const NotificationSerializer = serializer({
             ref: getRef(item) || null,
           },
         ];
-      }),
+      })
     );
   },
 
   item: (
     item: Notification,
     attrs: NotificationAttrs,
-    currentUser: User,
+    currentUser: User
   ): z.infer<typeof NotificationSchema> => {
     return {
       id: item.id,
@@ -160,13 +160,13 @@ export const FriendRequestReceipientSerializer = serializer({
       .where(
         inArray(
           users.id,
-          itemList.map((i) => i.fromUserId),
-        ),
+          itemList.map((i) => i.fromUserId)
+        )
       );
     const usersById = Object.fromEntries(
       (await serialize(UserSerializer, userList, currentUser)).map(
-        (data, index) => [userList[index].id, data],
-      ),
+        (data, index) => [userList[index].id, data]
+      )
     );
 
     return Object.fromEntries(
@@ -177,7 +177,7 @@ export const FriendRequestReceipientSerializer = serializer({
             user: usersById[item.fromUserId],
           },
         ];
-      }),
+      })
     );
   },
   item: (item: Follow, attrs: Record<string, any>, currentUser?: User) => {

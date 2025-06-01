@@ -14,7 +14,7 @@ export const StorePriceSchema = z.object({
   url: z.string().describe("URL to the product page"),
   volume: z.number().describe("Volume of the bottle in milliliters"),
   site: ExternalSiteSchema.optional().describe(
-    "External site where this price is listed",
+    "External site where this price is listed"
   ),
   updatedAt: z
     .string()

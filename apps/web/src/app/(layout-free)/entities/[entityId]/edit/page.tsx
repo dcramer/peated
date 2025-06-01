@@ -15,12 +15,12 @@ export default function Page({
 
   const orpc = useORPC();
   const { data: entity } = useSuspenseQuery(
-    orpc.entities.details.queryOptions({ input: { entity: Number(entityId) } }),
+    orpc.entities.details.queryOptions({ input: { entity: Number(entityId) } })
   );
   const router = useRouter();
 
   const entityUpdateMutation = useMutation(
-    orpc.entities.update.mutationOptions(),
+    orpc.entities.update.mutationOptions()
   );
 
   return (
@@ -35,7 +35,7 @@ export default function Page({
             onSuccess: () => {
               router.push(`/entities/${entity.id}`);
             },
-          },
+          }
         );
       }}
       initialData={entity}

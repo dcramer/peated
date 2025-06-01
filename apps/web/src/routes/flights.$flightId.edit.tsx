@@ -17,13 +17,13 @@ function Page() {
   const { data: flight } = useSuspenseQuery(
     orpc.flights.details.queryOptions({
       input: { flight: flightId },
-    }),
+    })
   );
 
   const { data: bottles } = useSuspenseQuery(
     orpc.bottles.list.queryOptions({
       input: { flight: flightId },
-    }),
+    })
   );
 
   const navigate = useNavigate();
@@ -44,10 +44,10 @@ function Page() {
                   ...oldData,
                   ...data,
                 }
-              : oldData,
+              : oldData
         );
       },
-    }),
+    })
   );
 
   return (
@@ -60,7 +60,7 @@ function Page() {
           },
           {
             onSuccess: () => navigate({ to: `/flights/${flight.id}` }),
-          },
+          }
         );
       }}
       initialData={{ ...flight, bottles: bottles.results }}

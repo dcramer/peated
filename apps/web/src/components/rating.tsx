@@ -15,7 +15,7 @@ export const StaticRating = ({ value, size, className }: Props) => {
       className={classNames(
         "rating",
         size === "small" ? "rating-sm" : "",
-        className,
+        className
       )}
       title={`Rated ${value} out of 5`}
     >
@@ -25,7 +25,7 @@ export const StaticRating = ({ value, size, className }: Props) => {
             key={item}
             className={classNames(
               "rating-half-2",
-              value >= item ? "text-highlight" : "text-slate-600",
+              value >= item ? "text-highlight" : "text-slate-600"
             )}
           >
             <StarIcon className="h-full" />
@@ -34,7 +34,7 @@ export const StaticRating = ({ value, size, className }: Props) => {
             key={item - 0.5}
             className={classNames(
               "rating-half-1",
-              value >= item - 0.5 ? "text-highlight" : "text-slate-600",
+              value >= item - 0.5 ? "text-highlight" : "text-slate-600"
             )}
           >
             <StarIcon className="h-full" />

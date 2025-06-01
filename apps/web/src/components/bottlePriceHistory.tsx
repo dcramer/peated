@@ -13,7 +13,7 @@ export default function BottlePriceHistory({ bottleId }: { bottleId: number }) {
   const { data } = useSuspenseQuery(
     orpc.bottles.prices.history.queryOptions({
       input: { bottle: bottleId },
-    }),
+    })
   );
 
   if (typeof window === "undefined") {
