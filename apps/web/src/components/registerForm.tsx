@@ -24,12 +24,19 @@ export default function RegisterForm() {
         <>
           <GoogleLoginButton
             action={async (formData) => {
-              const response = await authenticate({
-                data: {
-                  code: formData.get("code") as string,
-                },
-              });
-              setResult(response);
+              try {
+                const response = await authenticate({
+                  data: {
+                    code: formData.get("code") as string,
+                  },
+                });
+                if (response?.error) {
+                  setResult({ ok: false, error: response.error });
+                }
+                // If successful, authenticate will redirect automatically
+              } catch (error) {
+                setResult({ ok: false, error: "Authentication failed" });
+              }
             }}
           />
           <div className="relative my-4 font-bold text-slate-500 opacity-60">
