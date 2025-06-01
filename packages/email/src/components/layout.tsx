@@ -1,7 +1,7 @@
-import theme from "@peated/design";
 import { Body, Container, Head, Html, Img, Section } from "jsx-email";
 import type { ReactNode } from "react";
 import React from "react";
+import { colors } from "../constants";
 
 const styles = `
 body {
@@ -48,7 +48,7 @@ export default function Layout({
       <Body
         style={{
           margin: "auto",
-          backgroundColor: theme.colors.slate[900],
+          backgroundColor: colors.slate[900],
         }}
       >
         <Container
@@ -59,7 +59,7 @@ export default function Layout({
           <Container
             style={{
               borderStyle: "solid",
-              borderColor: theme.colors.slate[800],
+              borderColor: colors.slate[800],
               paddingBottom: "16px",
               borderRadius: "0 0 4px 4px",
             }}
@@ -67,7 +67,7 @@ export default function Layout({
           >
             <Section
               style={{
-                backgroundColor: theme.colors.highlight,
+                backgroundColor: colors.highlight,
                 borderRadius: "4px 4px 0 0",
                 padding: "10px 24px",
                 marginBottom: "16px",

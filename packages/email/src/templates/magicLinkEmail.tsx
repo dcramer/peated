@@ -1,4 +1,3 @@
-import theme from "@peated/design";
 import { Preview } from "jsx-email";
 import React from "react";
 import { type Infer, defaulted, object, string } from "superstruct";

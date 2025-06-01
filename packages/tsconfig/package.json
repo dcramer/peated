@@ -5,7 +5,7 @@
   "peerDependencies": {
     "typescript": "*"
   },
-  "files": ["*.json"],
+  "files": ["*.jsonc", "*.json"],
   "volta": {
     "extends": "../../package.json"
   }

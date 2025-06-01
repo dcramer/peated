@@ -16,7 +16,7 @@
     "@orpc/client": "^1.3.0",
     "@orpc/react-query": "^1.3.0",
     "@orpc/server": "^1.3.0",
-    "@peated/design": "workspace:*",
+
     "@peated/orpc": "workspace:*",
     "@peated/server": "workspace:*",
     "@react-oauth/google": "^0.11.1",

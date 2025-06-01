@@ -2,8 +2,7 @@
   "extends": "@peated/tsconfig/internal.jsonc",
   "compilerOptions": {
     "baseUrl": ".",
-    "outDir": "dist",
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
+    "outDir": "dist"
   },
   "include": ["src"],
   "exclude": ["node_modules"]

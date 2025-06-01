@@ -3,7 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "dist",
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    // "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "paths": {
       "@peated/email": ["src/*"]
     }

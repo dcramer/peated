@@ -1,4 +1,3 @@
-import theme from "@peated/design";
 import {
   Button as DefaultButton,
   Heading as DefaultHeading,
@@ -9,6 +8,7 @@ import {
 } from "jsx-email";
 import type { ComponentProps } from "react";
 import React from "react";
+import { colors } from "../constants";
 
 export function Section({
   style = {},
@@ -34,7 +34,7 @@ export function Hr({ style = {}, ...props }: ComponentProps<typeof DefaultHr>) {
       style={{
         width: "100%",
         margin: 0,
-        border: `1px solid ${theme.colors.slate[700]}`,
+        border: `1px solid ${colors.slate[700]}`,
         ...style,
       }}
       {...props}
@@ -53,7 +53,7 @@ export function Text({
         padding: 0,
         fontSize: "14px",
         lineHeight: "24px",
-        color: theme.colors.white,
+        color: colors.white,
         ...style,
       }}
       {...props}
@@ -68,14 +68,14 @@ export function Button({
   return (
     <DefaultButton
       style={{
-        border: `1px solid ${theme.colors.highlight}`,
-        backgroundColor: theme.colors.highlight,
+        border: `1px solid ${colors.highlight}`,
+        backgroundColor: colors.highlight,
         borderRadius: "4px",
         padding: "12px",
         textAlign: "center",
         fontSize: "14px",
         fontWeight: "500",
-        color: theme.colors.black,
+        color: colors.black,
         textDecoration: "none",
         ...style,
       }}
@@ -92,7 +92,7 @@ export function Link({
     <DefaultLink
       disableDefaultStyle
       style={{
-        color: theme.colors.highlight,
+        color: colors.highlight,
         textDecoration: "underline",
         ...style,
       }}
@@ -111,7 +111,7 @@ export function Heading({
         margin: 0,
         fontSize: "24px",
         fontWeight: "normal",
-        color: theme.colors.white,
+        color: colors.white,
         textAlign: "left",
         ...style,
       }}

@@ -1,5 +1,5 @@
 {
-  "extends": "@peated/tsconfig/base.json",
+  "extends": "@peated/tsconfig/base.jsonc",
   "compilerOptions": {
     "baseUrl": "./",
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",

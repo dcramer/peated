@@ -1,5 +1,5 @@
 {
-  "extends": "@peated/tsconfig/base.json",
+  "extends": "@peated/tsconfig/base.jsonc",
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "compilerOptions": {
     "baseUrl": ".",

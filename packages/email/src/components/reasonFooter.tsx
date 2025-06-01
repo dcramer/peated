@@ -1,6 +1,6 @@
-import theme from "@peated/design";
 import { Link } from "jsx-email";
 import React from "react";
+import { colors } from "../constants";
 import { Section, Text } from "./core";
 
 export enum Reason {
@@ -23,7 +23,7 @@ export default function ReasonFooter({
           padding: 0,
           fontSize: "14px",
           lineHeight: "24px",
-          color: theme.colors.muted,
+          color: colors.muted,
         }}
       >
         {reason}{" "}
@@ -31,7 +31,7 @@ export default function ReasonFooter({
           disableDefaultStyle
           href={`${baseUrl}/settings`}
           style={{
-            color: theme.colors.muted,
+            color: colors.muted,
             textDecoration: "underline",
           }}
         >

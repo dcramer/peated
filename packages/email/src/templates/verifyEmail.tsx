@@ -1,9 +1,8 @@
-import theme from "@peated/design";
 import { Preview } from "jsx-email";
-import React from "react";
 import { type Infer, defaulted, object, string } from "superstruct";
 import { Button, Link, Section, Text } from "../components/core";
 import Layout from "../components/layout";
+import { colors } from "../constants";
 
 export const TemplateName = "VerifyEmail";
 
@@ -27,7 +26,7 @@ export const Template = ({ verifyUrl, baseUrl }: TemplateProps) => {
             href={baseUrl}
             disableDefaultStyle
             style={{
-              color: theme.colors.highlight,
+              color: colors.highlight,
               textDecoration: "underline",
             }}
           >
@@ -44,7 +43,7 @@ export const Template = ({ verifyUrl, baseUrl }: TemplateProps) => {
       <Section>
         <Text
           style={{
-            color: theme.colors.muted,
+            color: colors.muted,
           }}
         >
           If you didn't take this action, you may ignore this email.

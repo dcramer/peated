@@ -1,9 +1,9 @@
-import theme from "@peated/design";
 import { Preview } from "jsx-email";
 import React from "react";
 import { type Infer, defaulted, object, string } from "superstruct";
 import { Button, Link, Section, Text } from "../components/core";
 import Layout from "../components/layout";
+import { colors } from "../constants";
 
 export const TemplateName = "PasswordResetEmail";
 
@@ -27,7 +27,7 @@ export const Template = ({ resetUrl, baseUrl }: TemplateProps) => {
             href={baseUrl}
             disableDefaultStyle
             style={{
-              color: theme.colors.highlight,
+              color: colors.highlight,
               textDecoration: "underline",
             }}
           >
@@ -44,7 +44,7 @@ export const Template = ({ resetUrl, baseUrl }: TemplateProps) => {
       <Section>
         <Text
           style={{
-            color: theme.colors.muted,
+            color: colors.muted,
           }}
         >
           If you don't recognize this action, you should ignore this email.
