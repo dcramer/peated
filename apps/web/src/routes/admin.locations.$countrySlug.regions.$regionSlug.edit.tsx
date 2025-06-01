@@ -6,12 +6,7 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import {
-  createFileRoute,
-  useNavigate,
-  useParams,
-  useSearch,
-} from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute(
   "/admin/locations/$countrySlug/regions/$regionSlug/edit",

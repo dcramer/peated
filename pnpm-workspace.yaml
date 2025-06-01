@@ -16,10 +16,11 @@ catalog:
   "@sentry/node": 9.23.0
   "@spotlightjs/spotlight": ^2.1.1
   superjson: ^2.2.1
-  tailwindcss: ^3.4.1
-  "@tailwindcss/forms": ^0.5.7
-  "@tailwindcss/typography": ^0.5.12
-  "prettier-plugin-tailwindcss": ^0.5.13
+  tailwindcss: ^4.1.8
+  "@tailwindcss/forms": ^0.5.10
+  "@tailwindcss/typography": ^0.5.16
+  "prettier-plugin-tailwindcss": ^0.6.9
+  "tailwind-scrollbar": ^4.0.2
   "@tanstack/react-query": ^5.71.0
   "@tanstack/react-query-next-experimental": ^5.71.0
   // TODO: theres an issue upgrading right now to 11.0.1
