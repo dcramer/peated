@@ -1,11 +1,12 @@
 @import "tailwindcss";
-@import "@tailwindcss/forms";
-@import "@tailwindcss/typography";
-@import "tailwind-scrollbar";
 @import "./rating.css";
 
-:root {
-  --highlight-color: #fbbf24;
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/forms";
+@plugin "tailwind-scrollbar";
+
+@theme {
+  --color-highlight: #fbbf24;
 
   /* These will be available from Tailwind v4's built-in CSS variables */
   --color-amber-100: var(--color-amber-100);
@@ -31,153 +32,155 @@
   --color-slate-950: var(--color-slate-950);
 }
 
-body {
-  @apply min-h-full text-white;
+@layer base {
+  body {
+    @apply min-h-full text-white;
 
-  background-color: var(--color-slate-900);
-  background-image: linear-gradient(
-    to right,
-    var(--color-slate-900),
-    var(--color-slate-950),
-    var(--color-slate-900)
-  );
-}
-
-h1 {
-  @apply text-2xl;
-}
-h2 {
-  @apply text-xl;
-}
-
-.layout {
-  @apply text-white;
-  background-color: var(--color-slate-900);
-  background-image: linear-gradient(
-    to right,
-    var(--color-slate-900),
-    var(--color-slate-950),
-    var(--color-slate-900)
-  );
-}
-
-.main-gradient {
-  background-color: rgba(15, 23, 42, 0.25);
-  background-image: linear-gradient(
-    to right,
-    rgba(15, 23, 42, 0.5),
-    rgba(0, 0, 0, 0.5),
-    rgba(15, 23, 42, 0.5)
-  );
-}
-
-.gradient-top-opaque {
-  background-color: rgba(15, 23, 42, 0.25);
-  background-image: linear-gradient(
-    to bottom,
-    rgba(2, 6, 23, 0),
-    rgba(2, 6, 23, 0.8),
-    var(--color-slate-950)
-  );
-}
-
-.backdrop-blur {
-  -webkit-backdrop-filter: blur(4px);
-  -o-backdrop-filter: blur(4px);
-  -moz-backdrop-filter: blur(4px);
-
-  backdrop-filter: blur(4px);
-}
-
-.menu {
-  @apply relative text-sm;
-}
-
-.menu div[role="menu"] {
-  @apply bg-slate-800 py-1 text-sm text-white shadow-lg focus:outline-none;
-}
-
-.menu div[role="menu"].origin-top-right {
-  @apply rounded-b rounded-tl;
-}
-
-.menu div[role="menu"].origin-bottom-right {
-  @apply rounded;
-}
-
-.menu div[role="menu"] a,
-.menu div[role="menu"] button {
-  @apply block w-full px-4 py-2 text-left hover:bg-slate-500;
-}
-
-.dialog {
-  @apply fixed inset-0 z-50 min-h-screen overflow-y-auto text-center;
-}
-
-.dialog-panel {
-  @apply relative h-screen min-h-full min-w-full overflow-hidden overflow-y-auto text-left backdrop-blur-md;
-
-  background-color: rgba(15, 23, 42, 0.65);
-  background-image: linear-gradient(
-    to right,
-    rgba(15, 23, 42, 0.65),
-    rgba(0, 0, 0, 0.65),
-    rgba(15, 23, 42, 0.65)
-  );
-}
-
-.dialog-panel img {
-  @apply cursor-auto rounded-lg;
-}
-
-.range {
-  @apply my-6 cursor-pointer appearance-none bg-inherit focus:outline-none;
-}
-
-.range::-webkit-slider-runnable-track {
-  @apply h-1 rounded-lg bg-slate-700;
-}
-
-.range::-webkit-slider-thumb {
-  @apply bg-highlight h-8 w-8 appearance-none rounded-lg;
-  margin-top: -15px;
-}
-
-.range:focus::-webkit-slider-thumb {
-  border: 1px solid var(--color-slate-400);
-  outline: 3px solid var(--color-slate-400);
-  outline-offset: 0.125rem;
-}
-
-.range::-moz-range-track {
-  @apply h-1 rounded-lg bg-slate-700;
-}
-
-.range::-moz-range-thumb {
-  @apply bg-highlight h-8 w-8 rounded-none border-0;
-}
-
-.range:focus::-moz-range-thumb {
-  border: 1px solid var(--color-slate-400);
-  outline: 3px solid var(--color-slate-400);
-  outline-offset: 0.125rem;
-}
-
-.svg-animate {
-  path {
-    stroke-dasharray: 1000;
-    stroke-dashoffset: 1000;
-    animation: dash 5s linear infinite;
+    background-color: var(--color-slate-900);
+    background-image: linear-gradient(
+      to right,
+      var(--color-slate-900),
+      var(--color-slate-950),
+      var(--color-slate-900)
+    );
   }
-}
 
-@keyframes dash {
-  to {
-    stroke-dashoffset: 0;
+  h1 {
+    @apply text-2xl;
   }
-}
+  h2 {
+    @apply text-xl;
+  }
 
-.leaflet-popup-content-wrapper,
-.leaflet-popup-tip {
-  @apply bg-slate-900;
+  .layout {
+    @apply text-white;
+    background-color: var(--color-slate-900);
+    background-image: linear-gradient(
+      to right,
+      var(--color-slate-900),
+      var(--color-slate-950),
+      var(--color-slate-900)
+    );
+  }
+
+  .main-gradient {
+    background-color: rgba(15, 23, 42, 0.25);
+    background-image: linear-gradient(
+      to right,
+      rgba(15, 23, 42, 0.5),
+      rgba(0, 0, 0, 0.5),
+      rgba(15, 23, 42, 0.5)
+    );
+  }
+
+  .gradient-top-opaque {
+    background-color: rgba(15, 23, 42, 0.25);
+    background-image: linear-gradient(
+      to bottom,
+      rgba(2, 6, 23, 0),
+      rgba(2, 6, 23, 0.8),
+      var(--color-slate-950)
+    );
+  }
+
+  .backdrop-blur {
+    -webkit-backdrop-filter: blur(4px);
+    -o-backdrop-filter: blur(4px);
+    -moz-backdrop-filter: blur(4px);
+
+    backdrop-filter: blur(4px);
+  }
+
+  .menu {
+    @apply relative text-sm;
+  }
+
+  .menu div[role="menu"] {
+    @apply bg-slate-800 py-1 text-sm text-white shadow-lg focus:outline-none;
+  }
+
+  .menu div[role="menu"].origin-top-right {
+    @apply rounded-b rounded-tl;
+  }
+
+  .menu div[role="menu"].origin-bottom-right {
+    @apply rounded;
+  }
+
+  .menu div[role="menu"] a,
+  .menu div[role="menu"] button {
+    @apply block w-full px-4 py-2 text-left hover:bg-slate-500;
+  }
+
+  .dialog {
+    @apply fixed inset-0 z-50 min-h-screen overflow-y-auto text-center;
+  }
+
+  .dialog-panel {
+    @apply relative h-screen min-h-full min-w-full overflow-hidden overflow-y-auto text-left backdrop-blur-md;
+
+    background-color: rgba(15, 23, 42, 0.65);
+    background-image: linear-gradient(
+      to right,
+      rgba(15, 23, 42, 0.65),
+      rgba(0, 0, 0, 0.65),
+      rgba(15, 23, 42, 0.65)
+    );
+  }
+
+  .dialog-panel img {
+    @apply cursor-auto rounded-lg;
+  }
+
+  .range {
+    @apply my-6 cursor-pointer appearance-none bg-inherit focus:outline-none;
+  }
+
+  .range::-webkit-slider-runnable-track {
+    @apply h-1 rounded-lg bg-slate-700;
+  }
+
+  .range::-webkit-slider-thumb {
+    @apply bg-highlight h-8 w-8 appearance-none rounded-lg;
+    margin-top: -15px;
+  }
+
+  .range:focus::-webkit-slider-thumb {
+    border: 1px solid var(--color-slate-400);
+    outline: 3px solid var(--color-slate-400);
+    outline-offset: 0.125rem;
+  }
+
+  .range::-moz-range-track {
+    @apply h-1 rounded-lg bg-slate-700;
+  }
+
+  .range::-moz-range-thumb {
+    @apply bg-highlight h-8 w-8 rounded-none border-0;
+  }
+
+  .range:focus::-moz-range-thumb {
+    border: 1px solid var(--color-slate-400);
+    outline: 3px solid var(--color-slate-400);
+    outline-offset: 0.125rem;
+  }
+
+  .svg-animate {
+    path {
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      animation: dash 5s linear infinite;
+    }
+  }
+
+  @keyframes dash {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .leaflet-popup-content-wrapper,
+  .leaflet-popup-tip {
+    @apply bg-slate-900;
+  }
 }
