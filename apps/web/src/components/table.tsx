@@ -3,7 +3,7 @@
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { PagingRel } from "@peated/server/types";
 import classNames from "@peated/web/lib/classNames";
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useSearch } from "@tanstack/react-router";
 import type { ReactElement, ReactNode } from "react";
 import PaginationButtons from "./paginationButtons";
 import SearchBar from "./searchBar";
@@ -50,9 +50,8 @@ export default function Table<
   withSearch?: boolean;
   noHeaders?: boolean;
 }) {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const currentSort = searchParams.get("sort") ?? defaultSort;
+  const searchParams = useSearch({ strict: false });
+  const currentSort = (searchParams as any).sort ?? defaultSort;
   let lastGroup: G;
 
   return (

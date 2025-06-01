@@ -1,4 +1,4 @@
-import { useLocation } from "@tanstack/react-router";
+import { useSearch } from "@tanstack/react-router";
 
 export default function useApiQueryParams({
   defaults = {},
@@ -9,15 +9,14 @@ export default function useApiQueryParams({
   numericFields?: string[];
   overrides?: Record<string, any>;
 }) {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
+  const searchParams = useSearch({ strict: false });
 
   const nFields = new Set(numericFields);
 
   return {
     ...defaults,
     ...Object.fromEntries(
-      [...searchParams.entries()]
+      Object.entries(searchParams as Record<string, any>)
         .map(([k, v]) =>
           nFields.has(k)
             ? [k, v === "" ? null : Number.parseInt(v, 10)]

@@ -1,19 +1,14 @@
-"use client";
-
 import Button from "@peated/web/components/button";
 import GoogleLoginButton from "@peated/web/components/googleLoginButton";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
-import { authenticate, authenticateForm } from "@peated/web/lib/auth.actions";
-import { Link, useLocation } from "@tanstack/react-router";
-import { useFormState, useFormStatus } from "react-dom";
+import { authenticate } from "@peated/web/lib/auth.actions";
+import { Link, useSearch } from "@tanstack/react-router";
+import { useState } from "react";
 import Alert from "./alert";
 
 function FormComponent() {
-  const { pending } = useFormStatus();
-
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
+  const searchParams = useSearch({ strict: false });
 
   return (
     <>
@@ -21,7 +16,7 @@ function FormComponent() {
         <input
           type="hidden"
           name="redirectTo"
-          value={searchParams.get("redirectTo") ?? "/"}
+          value={(searchParams as any).redirectTo ?? "/"}
         />
         <TextField
           name="email"
@@ -41,7 +36,7 @@ function FormComponent() {
         />
       </div>
       <div className="flex justify-center gap-x-2">
-        <Button type="submit" color="highlight" fullWidth loading={pending}>
+        <Button type="submit" color="highlight" fullWidth>
           Continue
         </Button>
       </div>
@@ -50,7 +45,10 @@ function FormComponent() {
 }
 
 export default function LoginForm() {
-  const [result, formAction] = useFormState(authenticateForm, undefined);
+  const [result, setResult] = useState<{
+    error?: string;
+    magicLink?: boolean;
+  } | null>(null);
 
   return (
     <div className="flex min-w-sm flex-auto flex-col gap-y-4">
@@ -64,7 +62,16 @@ export default function LoginForm() {
         <>
           {config.GOOGLE_CLIENT_ID && (
             <>
-              <GoogleLoginButton action={authenticate} />
+              <GoogleLoginButton
+                action={async (formData) => {
+                  const result = await authenticate({
+                    data: {
+                      code: formData.get("code") as string,
+                    },
+                  });
+                  setResult(result);
+                }}
+              />
               <div className="relative my-4 font-bold text-slate-500 opacity-60">
                 <div
                   className="absolute inset-0 flex items-center"
@@ -81,7 +88,20 @@ export default function LoginForm() {
             </>
           )}
 
-          <form action={formAction}>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target as HTMLFormElement);
+              const result = await authenticate({
+                data: {
+                  email: formData.get("email") as string,
+                  password: formData.get("password") as string,
+                  redirectTo: formData.get("redirectTo") as string,
+                },
+              });
+              setResult(result);
+            }}
+          >
             <FormComponent />
           </form>
 

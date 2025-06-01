@@ -17,7 +17,7 @@ export default function AppHeader() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
+  const searchParams = useSearch({ strict: false });
 
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -77,7 +77,11 @@ export default function AppHeader() {
           <NavLink
             href={getAuthRedirect({
               pathname: location.pathname,
-              searchParams,
+              searchParams: new URLSearchParams(
+                Object.entries(searchParams as Record<string, string>).filter(
+                  ([_, value]) => value != null
+                )
+              ),
             })}
           >
             <div className="h-8 w-8">

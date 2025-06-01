@@ -46,7 +46,11 @@ function Page() {
         });
 
         if (returnTo) navigate({ to: returnTo });
-        else navigate({ to: `/bottles/${bottleId}/releases` });
+        else
+          navigate({
+            to: "/bottles/$bottleId/releases",
+            params: { bottleId },
+          });
       }}
       initialData={{
         edition: name,
