@@ -7,14 +7,17 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { z } from "zod";
+
+const searchSchema = z.object({
+  returnTo: z.string().default(""),
+});
 
 export const Route = createFileRoute(
   "/admin/locations/$countrySlug/regions/$regionSlug/edit"
 )({
   component: Page,
-  validateSearch: (search: Record<string, unknown>) => ({
-    returnTo: (search.returnTo as string) || "",
-  }),
+  validateSearch: searchSchema,
 });
 
 function Page() {

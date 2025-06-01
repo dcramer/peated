@@ -4,9 +4,16 @@ import { useVerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { z } from "zod";
+
+const searchSchema = z.object({
+  name: z.string().optional(),
+  returnTo: z.string().optional(),
+});
 
 export const Route = createFileRoute("/bottles/$bottleId/addRelease")({
   component: Page,
+  validateSearch: searchSchema,
 });
 
 function Page() {

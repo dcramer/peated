@@ -2,12 +2,15 @@ import LayoutSplash from "@peated/web/components/layoutSplash";
 import PasswordResetChangeForm from "@peated/web/components/passwordResetChangeForm";
 import PasswordResetForm from "@peated/web/components/passwordResetForm";
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
+
+const searchSchema = z.object({
+  token: z.string().optional(),
+});
 
 export const Route = createFileRoute("/password-reset")({
   component: PasswordReset,
-  validateSearch: (search: Record<string, unknown>) => ({
-    token: (search.token as string) || null,
-  }),
+  validateSearch: searchSchema,
 });
 
 function PasswordReset() {

@@ -9,17 +9,20 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useQueries } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { z } from "zod";
+
+const searchSchema = z.object({
+  name: z.string().default(""),
+  returnTo: z.string().optional(),
+  distiller: z.string().optional(),
+  brand: z.string().optional(),
+  bottler: z.string().optional(),
+  series: z.string().optional(),
+});
 
 export const Route = createFileRoute("/addBottle")({
   component: AddBottle,
-  validateSearch: (search: Record<string, unknown>) => ({
-    name: (search.name as string) || "",
-    returnTo: (search.returnTo as string) || null,
-    distiller: (search.distiller as string) || null,
-    brand: (search.brand as string) || null,
-    bottler: (search.bottler as string) || null,
-    series: (search.series as string) || null,
-  }),
+  validateSearch: searchSchema,
   head: () => ({
     meta: [
       {

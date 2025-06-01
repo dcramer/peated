@@ -1,19 +1,22 @@
+import { EntityTypeEnum } from "@peated/server/schemas";
 import type { EntityType } from "@peated/server/types";
 import EntityForm from "@peated/web/components/entityForm";
 import { useVerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { z } from "zod";
+
+const searchSchema = z.object({
+  type: z
+    .union([EntityTypeEnum, z.array(EntityTypeEnum)])
+    .default([])
+    .transform((val) => (Array.isArray(val) ? val : [val])),
+});
 
 export const Route = createFileRoute("/addEntity")({
   component: AddEntity,
-  validateSearch: (search: Record<string, unknown>) => ({
-    type: (Array.isArray(search.type)
-      ? search.type
-      : search.type
-        ? [search.type]
-        : []) as EntityType[],
-  }),
+  validateSearch: searchSchema,
 });
 
 function AddEntity() {

@@ -1,11 +1,14 @@
 import { SearchPanel } from "@peated/web/components/search";
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
+
+const searchSchema = z.object({
+  q: z.string().default(""),
+});
 
 export const Route = createFileRoute("/search")({
   component: Page,
-  validateSearch: (search: Record<string, unknown>) => ({
-    q: (search.q as string) ?? "",
-  }),
+  validateSearch: searchSchema,
 });
 
 function Page() {
