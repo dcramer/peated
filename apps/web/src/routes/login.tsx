@@ -2,7 +2,7 @@ import LayoutSplash from "@peated/web/components/layoutSplash";
 import LoginForm from "@peated/web/components/loginForm";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute({
+export const Route = createFileRoute("/login")({
   component: Login,
 });
 

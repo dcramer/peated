@@ -4,7 +4,7 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute({
+export const Route = createFileRoute("/admin/locations/$countrySlug")({
   component: Page,
 });
 

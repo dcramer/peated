@@ -5,12 +5,14 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 
-export const Route = createFileRoute({
+export const Route = createFileRoute(
+  "/admin/locations/$countrySlug/regions/$regionSlug",
+)({
   component: Page,
 });
 
 function Page() {
-  const { countrySlug, regionSlug } = useParams();
+  const { countrySlug, regionSlug } = Route.useParams();
   const orpc = useORPC();
   const { data: country } = useSuspenseQuery(
     orpc.countries.details.queryOptions({

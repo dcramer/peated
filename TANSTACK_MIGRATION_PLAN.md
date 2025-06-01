@@ -12,11 +12,13 @@ This document tracks the final migration tasks from Next.js to TanStack Start. B
 ## Status Summary
 
 - ✅ Infrastructure setup complete
-- ✅ Basic route structure migrated (83 routes vs 81 original)
-- 🔄 Route mapping verification needed
-- 🔄 Component relocation needed
-- 🔄 API usage fixes needed
+- ✅ Route mapping verification complete (81/81 routes migrated + 3 missing routes created)
+- ✅ API usage fixes complete (Route.useX() patterns are correct)
+- ✅ Component relocation complete (19/19 UI components moved - 100%)
+- ✅ VerboseFileRoutes migration started (fixed import syntax errors)
+- 🔄 VerboseFileRoutes migration in progress (need to add explicit paths to all routes)
 - 🔄 Missing components check needed
+- 🔄 Final verification needed
 
 ## Task 1: Route Mapping Verification
 
@@ -62,67 +64,72 @@ Move route-specific components from `apps/web/src/app/` to proper locations in `
 
 #### Activity Components
 
-- [ ] `(default)/(activity)/priceChanges.tsx` → `components/activity/priceChanges.tsx`
-- [ ] `(default)/(activity)/upcomingEvents.tsx` → `components/activity/upcomingEvents.tsx`
-- [ ] `(default)/(activity)/newBottles.tsx` → `components/activity/newBottles.tsx`
+- [x] `(default)/(activity)/priceChanges.tsx` → `components/activity/priceChanges.tsx` ✅
+- [x] `(default)/(activity)/upcomingEvents.tsx` → `components/activity/upcomingEvents.tsx` ✅
+- [x] `(default)/(activity)/newBottles.tsx` → `components/activity/newBottles.tsx` ✅
 
 #### About Page Components
 
-- [ ] `(default)/about/stats.tsx` → `components/about/stats.tsx`
+- [x] `(default)/about/stats.tsx` → `components/about/stats.tsx` ✅
 
 #### Badge Components
 
-- [ ] `(default)/badges/[badgeId]/leaderboard.tsx` → `components/badges/leaderboard.tsx`
+- [x] `(default)/badges/[badgeId]/leaderboard.tsx` → `components/badges/leaderboard.tsx` ✅
 
 #### Bottle Components
 
-- [ ] `(default)/bottles/[bottleId]/(tabs)/releases/releaseTable.tsx` → `components/bottles/releases/releaseTable.tsx`
-- [ ] `(default)/bottles/[bottleId]/(tabs)/releases/modActions.tsx` → `components/bottles/releases/modActions.tsx`
-- [ ] `(default)/bottles/[bottleId]/modActions.tsx` → `components/bottles/modActions.tsx`
+- [x] `(default)/bottles/[bottleId]/(tabs)/releases/releaseTable.tsx` → `components/bottles/releases/releaseTable.tsx` ✅
+- [x] `(default)/bottles/[bottleId]/(tabs)/releases/modActions.tsx` → `components/bottles/releases/modActions.tsx` ✅
+- [x] `(default)/bottles/[bottleId]/modActions.tsx` → `components/bottles/modActions.tsx` ✅
 
 #### Entity Components
 
-- [ ] `(default)/entities/[entityId]/modActions.tsx` → `components/entities/modActions.tsx`
+- [x] `(default)/entities/[entityId]/modActions.tsx` → `components/entities/modActions.tsx` ✅
 
 #### Flight Components
 
-- [ ] `(default)/flights/[flightId]/modActions.tsx` → `components/flights/modActions.tsx`
+- [x] `(default)/flights/[flightId]/modActions.tsx` → `components/flights/modActions.tsx` ✅
 
 #### Friend Components
 
-- [ ] `(default)/friends/friendListItem.tsx` → `components/friends/friendListItem.tsx`
+- [x] `(default)/friends/friendListItem.tsx` → `components/friends/friendListItem.tsx` ✅
 
 #### User Components
 
-- [ ] `(default)/users/[username]/friendButton.tsx` → `components/users/friendButton.tsx`
-- [ ] `(default)/users/[username]/logoutButton.tsx` → `components/users/logoutButton.tsx`
-- [ ] `(default)/users/[username]/userBadgeList.tsx` → `components/users/userBadgeList.tsx`
-- [ ] `(default)/users/[username]/modActions.tsx` → `components/users/modActions.tsx`
+- [x] `(default)/users/[username]/friendButton.tsx` → `components/users/friendButton.tsx` ✅
+- [x] `(default)/users/[username]/logoutButton.tsx` → `components/users/logoutButton.tsx` ✅
+- [x] `(default)/users/[username]/userBadgeList.tsx` → `components/users/userBadgeList.tsx` ✅
+- [x] `(default)/users/[username]/modActions.tsx` → `components/users/modActions.tsx` ✅
 
 #### Admin Components
 
-- [ ] `(admin)/admin/(default)/queue/bottleSelector.tsx` → `components/admin/queue/bottleSelector.tsx`
+- [x] `(admin)/admin/(default)/queue/bottleSelector.tsx` → `components/admin/queue/bottleSelector.tsx` ✅
 
 #### Sidebar Components
 
-- [ ] `(entities-sidebar)/rightSidebar.tsx` → `components/sidebars/entitiesRightSidebar.tsx`
-- [ ] `(bottles-sidebar)/bottles/rightSidebar.tsx` → `components/sidebars/bottlesRightSidebar.tsx`
+- [x] `(entities-sidebar)/rightSidebar.tsx` → `components/sidebars/entitiesRightSidebar.tsx` ✅
+- [x] `(bottles-sidebar)/bottles/rightSidebar.tsx` → `components/sidebars/bottlesRightSidebar.tsx` ✅
 
 #### Special Components
 
 - [ ] `providers/providers.tsx` → Keep in current location (already properly placed)
 
-#### Route Files (Not Components)
+#### Route Files (API Routes - Not UI Components)
 
-- [ ] `(layout-free)/logout/route.tsx` → Should be API route, verify migration
-- [ ] `%5Fhealth/route.tsx` → Should be API route, verify migration
+- [x] `(layout-free)/logout/route.tsx` → ✅ Confirmed API route (Next.js route handler) - needs separate API migration
+- [x] `%5Fhealth/route.tsx` → ✅ Confirmed API route (Next.js route handler) - needs separate API migration
 
-### Status: 🔄 TODO
+**Note:** These are API route handlers, not UI components. They need to be migrated to TanStack Start API routes or oRPC endpoints as a separate task.
 
-- [ ] Create component directory structure
-- [ ] Move components with proper imports
+### Status: ✅ COMPLETE - UI Components (19/19 complete - 100%)
+
+- [x] Create component directory structure ✅
+- [x] Move UI components (auth, activity, about, badges, bottles, entities, flights, friends, users, admin, sidebars) ✅
+- [x] Verified remaining files are API routes (not UI components) ✅
 - [ ] Update all import references
 - [ ] Test component functionality
+
+**Progress Summary:** 19 out of 19 UI components successfully moved (100% complete). The remaining 2 files are API routes requiring separate migration.
 
 ## Task 3: API Usage Fixes
 
@@ -140,7 +147,41 @@ After scanning all routes, the TanStack Router API usage is **already correct**:
 
 **Key Learning:** TanStack Router APIs are called as methods on the Route object, not as separate imported hooks. The existing code follows the correct patterns.
 
-## Task 4: Missing Component Dependencies
+## Task 4: VerboseFileRoutes Migration
+
+### Objective
+
+Update all TanStack Start routes to use explicit path definitions with `createFileRoute` due to `verboseFileRoutes` being enabled.
+
+### Changes Required
+
+Every route file now needs:
+
+1. Import `createFileRoute` from `@tanstack/react-router`
+2. Define explicit URL path in `createFileRoute` call instead of auto-inference
+
+### Example Pattern
+
+```typescript
+import { createFileRoute } from "@tanstack/react-router";
+
+export const Route = createFileRoute("/")({
+  component: Home,
+  loader: async () => await getCount(),
+});
+```
+
+### Status: 🔄 IN PROGRESS
+
+- [x] Fixed broken import syntax (removed empty commas from imports) ✅
+- [x] Renamed client.ts to client.tsx for JSX support ✅
+- [x] Added createFileRoute import to verify.tsx and admin.queue.tsx ✅
+- [x] Added explicit paths to verify.tsx ('/verify') and admin.queue.tsx ('/admin/queue') ✅
+- [ ] Scan remaining 82 route files for missing `createFileRoute` imports
+- [ ] Add explicit path definitions to remaining routes
+- [ ] Update any route configurations that rely on auto-inference
+
+## Task 5: Missing Component Dependencies
 
 ### Objective
 
@@ -157,7 +198,7 @@ Ensure all components referenced in TanStack routes exist and are properly impor
 - [ ] Fix any missing component references
 - [ ] Update import paths after component moves
 
-## Task 5: Final Verification
+## Task 6: Final Verification
 
 ### Testing Checklist
 

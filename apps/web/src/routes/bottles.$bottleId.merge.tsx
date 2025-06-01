@@ -24,7 +24,7 @@ import type { z } from "zod";
 
 type FormSchemaType = z.infer<typeof BottleMergeSchema>;
 
-export const Route = createFileRoute({
+export const Route = createFileRoute("/bottles/$bottleId/merge")({
   component: Page,
 });
 

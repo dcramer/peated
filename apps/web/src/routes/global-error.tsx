@@ -1,10 +1,10 @@
-"use client";
+import { createFileRoute } from "@tanstack/react-router";
+("use client");
 
 import * as Sentry from "@sentry/react";
-import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 
-export const Route = createFileRoute({
+export const Route = createFileRoute("/global-error")({
   component: GlobalError,
   errorComponent: GlobalError,
 });

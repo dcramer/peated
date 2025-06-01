@@ -27,7 +27,7 @@ import type { z } from "zod";
 
 type FormSchemaType = z.infer<typeof UserInputSchema>;
 
-export const Route = createFileRoute({
+export const Route = createFileRoute("/settings")({
   component: Page,
   head: () => ({
     meta: [

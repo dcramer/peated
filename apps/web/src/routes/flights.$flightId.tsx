@@ -10,7 +10,7 @@ import ModActions from "@peated/web/routes/(default)/flights/[flightId]/modActio
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute({
+export const Route = createFileRoute("/flights/$flightId")({
   component: Page,
   loader: async ({ params }) => {
     const { client } = await getServerClient();

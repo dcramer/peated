@@ -10,7 +10,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-export const Route = createFileRoute({
+export const Route = createFileRoute("/verify")({
   component: Verify,
   validateSearch: (search: Record<string, unknown>) => ({
     token: (search.token as string) || "",
@@ -39,7 +39,7 @@ function Verify() {
   // Handle redirect logic in useEffect to avoid hook ordering issues
   useEffect(() => {
     if (user?.verified || (!user && !token)) {
-      navigate({ to: "/" });
+      navigate({ to: "/activity" });
     }
   }, [user, token, navigate]);
 

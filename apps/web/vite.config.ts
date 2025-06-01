@@ -13,6 +13,7 @@ export default defineConfig({
     tsconfigPaths(),
     tanstackStart({
       tsr: {
+        verboseFileRoutes: true,
         // Specifies the directory TanStack Router uses for your routes.
         routesDirectory: "src/routes", // Defaults to "src/routes"
       },

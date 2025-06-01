@@ -2,8 +2,7 @@ import config from "@peated/web/config";
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
 import Stats, { StatsSkeleton } from "./stats";
-
-export const Route = createFileRoute({
+export const Route = createFileRoute("/about")({
   component: Page,
 });
 

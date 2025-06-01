@@ -1,6 +1,6 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import { type Bottle } from "@peated/server/types";
-import BottleSelector from "@peated/web/components/admin/bottleSelector";
+import BottleSelector from "@peated/web/components/admin/queue/bottleSelector";
 import Button from "@peated/web/components/button";
 import { useFlashMessages } from "@peated/web/components/flash";
 import Link from "@peated/web/components/link";
@@ -12,7 +12,7 @@ import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 
-export const Route = createFileRoute({
+export const Route = createFileRoute("/admin/queue")({
   component: Page,
 });
 
@@ -123,7 +123,7 @@ function Page() {
         onClose={() => {
           setUnmatchedBottle(null);
         }}
-        onSelect={async (bottle) => {
+        onSelect={async (bottle: Bottle) => {
           if (!unmatchedBottle) return;
           const name = unmatchedBottle.name;
           await bottleAliasUpsertMutation.mutateAsync({

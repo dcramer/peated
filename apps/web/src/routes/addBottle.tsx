@@ -10,7 +10,7 @@ import { useMutation, useQueries } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-export const Route = createFileRoute({
+export const Route = createFileRoute("/addBottle")({
   component: AddBottle,
   validateSearch: (search: Record<string, unknown>) => ({
     name: (search.name as string) || "",

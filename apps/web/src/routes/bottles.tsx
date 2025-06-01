@@ -7,7 +7,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 const DEFAULT_SORT = "-tastings";
 
-export const Route = createFileRoute({
+export const Route = createFileRoute("/bottles")({
   component: Page,
 });
 

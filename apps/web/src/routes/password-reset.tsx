@@ -3,7 +3,7 @@ import PasswordResetChangeForm from "@peated/web/components/passwordResetChangeF
 import PasswordResetForm from "@peated/web/components/passwordResetForm";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute({
+export const Route = createFileRoute("/password-reset")({
   component: PasswordReset,
   validateSearch: (search: Record<string, unknown>) => ({
     token: (search.token as string) || null,

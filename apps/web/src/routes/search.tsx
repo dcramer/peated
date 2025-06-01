@@ -1,7 +1,7 @@
 import { SearchPanel } from "@peated/web/components/search";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute({
+export const Route = createFileRoute("/search")({
   component: Page,
   validateSearch: (search: Record<string, unknown>) => ({
     q: (search.q as string) ?? "",

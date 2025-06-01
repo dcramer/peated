@@ -27,7 +27,7 @@ export const Route = createRootRoute({
     ],
     links: [{ rel: "icon", href: "/favicon.ico" }],
   }),
-  beforeLoad: async () => {
+  loader: async () => {
     const session = await getSession();
 
     // Bind the user on the server for Sentry

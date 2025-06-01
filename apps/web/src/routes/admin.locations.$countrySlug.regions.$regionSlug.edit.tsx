@@ -13,7 +13,9 @@ import {
   useSearch,
 } from "@tanstack/react-router";
 
-export const Route = createFileRoute({
+export const Route = createFileRoute(
+  "/admin/locations/$countrySlug/regions/$regionSlug/edit",
+)({
   component: Page,
   validateSearch: (search: Record<string, unknown>) => ({
     returnTo: (search.returnTo as string) || "",
@@ -23,8 +25,8 @@ export const Route = createFileRoute({
 function Page() {
   useModRequired();
 
-  const { countrySlug, regionSlug } = useParams();
-  const { returnTo } = useSearch();
+  const { countrySlug, regionSlug } = Route.useParams();
+  const { returnTo } = Route.useSearch();
   const navigate = useNavigate();
   const orpc = useORPC();
   const { data: region } = useSuspenseQuery(

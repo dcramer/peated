@@ -14,7 +14,7 @@ import {
 } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-export const Route = createFileRoute({
+export const Route = createFileRoute("/bottles/$bottleId/addTasting")({
   component: Page,
 });
 
