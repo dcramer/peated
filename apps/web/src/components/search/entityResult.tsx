@@ -1,6 +1,6 @@
 import type { Entity } from "@peated/server/types";
 import EntityIcon from "@peated/web/assets/entity.svg";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import Chip from "../chip";
 
 export type EntityResult = {
@@ -18,7 +18,7 @@ export default function EntityResultRow({
       <EntityIcon className="m-2 hidden h-10 w-auto sm:block" />
       <div className="min-w-0 flex-auto">
         <div className="flex items-center space-x-1 font-semibold leading-6">
-          <Link href={`/entities/${entity.id}`}>
+          <Link to={`/entities/${entity.id}`}>
             <span className="-top-px absolute inset-x-0 bottom-0" />
             {entity.name}
           </Link>

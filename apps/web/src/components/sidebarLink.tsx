@@ -1,4 +1,4 @@
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import classNames from "@peated/web/lib/classNames";
 import type { PolymorphicProps, PolymorphicRef } from "@peated/web/types";
 import { type ElementType, forwardRef } from "react";
@@ -30,7 +30,7 @@ export default forwardRef(function SidebarLink<
   return (
     <li>
       <Component
-        href=""
+        to="."
         className={classNames(
           active
             ? "border-highlight text-highlight"

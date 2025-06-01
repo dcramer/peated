@@ -1,7 +1,7 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { Outputs } from "@peated/server/orpc/router";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import ListItem from "../listItem";
 import ResultRow from "./result";
 
@@ -25,7 +25,7 @@ export default function SearchResults({
           <div className="min-w-0 flex-auto">
             <div className="font-semibold leading-6">
               <Link
-                href={`/addBottle?name=${encodeURIComponent(toTitleCase(query))}`}
+                to={`/addBottle?name=${encodeURIComponent(toTitleCase(query))}`}
               >
                 <span className="-top-px absolute inset-x-0 bottom-0" />
                 {results.length === 0

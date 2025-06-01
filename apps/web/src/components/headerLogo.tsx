@@ -1,5 +1,4 @@
-import Link from "@peated/web/components/link";
-
+import { Link } from "@tanstack/react-router";
 import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import PeatedLogo from "@peated/web/assets/logo.svg";
 
@@ -7,7 +6,7 @@ export default function HeaderLogo() {
   return (
     <>
       <div className="logo relative hidden sm:block">
-        <Link href="/" className="items-center sm:flex">
+        <Link to="/" className="items-center sm:flex">
           <PeatedLogo className="h-8 w-auto" />
           <div className="mt-2 ml-2 inline-block w-auto rounded bg-slate-700 px-2 py-1 font-medium text-white text-xs lowercase opacity-90">
             Beta
@@ -15,7 +14,7 @@ export default function HeaderLogo() {
         </Link>
       </div>
       <div className="logo flex sm:hidden">
-        <Link href="/">
+        <Link to="/">
           <PeatedGlyph className="h-8 w-auto" />
         </Link>
       </div>

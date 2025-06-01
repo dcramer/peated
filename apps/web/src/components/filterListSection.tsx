@@ -2,8 +2,7 @@
 
 import { toTitleCase } from "@peated/server/lib/strings";
 import SidebarLink from "@peated/web/components/sidebarLink";
-import { buildQueryString } from "@peated/web/lib/urls";
-import { useSearchParams } from "next/navigation";
+import { useSearch } from "@tanstack/react-router";
 
 export default function FilterSidebarSection({
   title,
@@ -18,9 +17,9 @@ export default function FilterSidebarSection({
   options?: [string, string][];
   formatValue?: (key: string) => string;
 }) {
-  const searchParams = useSearchParams();
+  const search = useSearch({ strict: false });
 
-  const currentValue = value === undefined ? searchParams.get(name) : value;
+  const currentValue = value === undefined ? (search as any)[name] : value;
   const titleValue = title ?? toTitleCase(name);
 
   return (
@@ -29,13 +28,12 @@ export default function FilterSidebarSection({
       <ul className="-mx-3 mt-2 space-y-1">
         <SidebarLink
           active={!currentValue}
-          href={{
-            // pathname: location.pathname,
-            search: buildQueryString(searchParams, {
-              [name]: "",
-              cursor: null,
-            }),
-          }}
+          to="."
+          search={(prev: any) => ({
+            ...prev,
+            [name]: undefined,
+            cursor: undefined,
+          })}
           size="small"
         >
           Any {titleValue}
@@ -45,13 +43,12 @@ export default function FilterSidebarSection({
             <SidebarLink
               key={k}
               active={currentValue === k}
-              href={{
-                // pathname: location.pathname,
-                search: buildQueryString(searchParams, {
-                  [name]: k,
-                  cursor: null,
-                }),
-              }}
+              to="."
+              search={(prev: any) => ({
+                ...prev,
+                [name]: k,
+                cursor: undefined,
+              })}
               size="small"
             >
               {formatValue ? formatValue(k) : v}
@@ -61,13 +58,12 @@ export default function FilterSidebarSection({
           <SidebarLink
             key={currentValue}
             active
-            href={{
-              // pathname: location.pathname,
-              search: buildQueryString(searchParams, {
-                [name]: currentValue,
-                cursor: null,
-              }),
-            }}
+            to="."
+            search={(prev: any) => ({
+              ...prev,
+              [name]: currentValue,
+              cursor: undefined,
+            })}
             size="small"
           >
             {formatValue && currentValue

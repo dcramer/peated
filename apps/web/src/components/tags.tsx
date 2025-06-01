@@ -1,4 +1,4 @@
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import Separated from "./separated";
 import Tooltip from "./tooltip";
 
@@ -11,7 +11,7 @@ export default function Tags({ tags }: { tags: string[] }) {
           <Link
             key={item}
             className="hover:underline"
-            href={`/bottles?tag=${encodeURIComponent(item)}`}
+            to={`/bottles?tag=${encodeURIComponent(item)}`}
           >
             {item}
           </Link>

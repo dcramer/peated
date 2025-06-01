@@ -1,10 +1,10 @@
 import { ChevronRightIcon, HomeIcon } from "@heroicons/react/20/solid";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import classNames from "@peated/web/lib/classNames";
 
 type Page = {
   name: string;
-  href: string;
+  to: string;
   current?: boolean;
 };
 
@@ -14,7 +14,7 @@ export function Breadcrumbs({ pages }: { pages: Page[] }) {
       <ol className="flex items-center space-x-2">
         <li className="flex">
           <div className="flex items-center">
-            <Link href="/" className="text-muted hover:text-slate-400">
+            <Link to="/" className="text-muted hover:text-slate-400">
               <HomeIcon className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
               <span className="sr-only">Home</span>
             </Link>
@@ -28,7 +28,7 @@ export function Breadcrumbs({ pages }: { pages: Page[] }) {
                 aria-hidden="true"
               />
               <Link
-                href={page.href}
+                to={page.href}
                 className={classNames("ml-2 text-slate-600 hover:text-muted")}
                 aria-current={page.current ? "page" : undefined}
               >

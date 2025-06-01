@@ -5,7 +5,7 @@ import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { Flight } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
@@ -34,7 +34,7 @@ export default function ModActions({ flight }: { flight: Flight }) {
         <EllipsisVerticalIcon className="h-5 w-5" />
       </MenuButton>
       <MenuItems className="absolute right-0 z-40 mt-2 w-32 origin-top-right lg:left-0 lg:origin-top-left">
-        <MenuItem as={Link} href={`/flights/${flight.id}/edit`}>
+        <MenuItem as={Link} to={`/flights/${flight.id}/edit`}>
           Edit Flight
         </MenuItem>
         {user?.admin && (

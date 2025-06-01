@@ -1,7 +1,7 @@
 "use client";
 
 import type { Entity, EntityType, PagingRel } from "@peated/server/types";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import classNames from "@peated/web/lib/classNames";
 import type { ComponentProps } from "react";
 import { toTitleCase } from "../../../server/src/lib/strings";
@@ -45,7 +45,7 @@ export default function EntityTable({
           value: (item) => {
             return (
               <Link
-                href={`/entities/${item.id}`}
+                to={`/entities/${item.id}`}
                 className="font-medium hover:underline"
               >
                 {item.name}
@@ -78,7 +78,7 @@ export default function EntityTable({
                     {!!item.country && (
                       <div>
                         <Link
-                          href={`/locations/${item.country.slug}`}
+                          to={`/locations/${item.country.slug}`}
                           className="hover:underline"
                         >
                           {item.country.name}
@@ -88,7 +88,7 @@ export default function EntityTable({
                     {item.region && item.country && (
                       <div>
                         <Link
-                          href={`/locations/${item.country.slug}/regions/${item.region.slug}`}
+                          to={`/locations/${item.country.slug}/regions/${item.region.slug}`}
                           className="text-muted hover:underline"
                         >
                           {item.region.name}

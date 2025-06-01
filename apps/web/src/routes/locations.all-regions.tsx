@@ -1,5 +1,5 @@
 import CountryMapIcon from "@peated/web/components/countryMapIcon";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
@@ -28,7 +28,7 @@ function Page() {
             className="group relative border border-transparent text-white hover:border-highlight"
           >
             <Link
-              href={`/locations/${country.slug}`}
+              to={`/locations/${country.slug}`}
               className="absolute inset-0"
             />
             <div className="flex flex-col items-center justify-center">

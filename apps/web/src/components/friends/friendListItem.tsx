@@ -2,7 +2,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { Friend, FriendStatus } from "@peated/server/types";
 import Button from "@peated/web/components/button";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import ListItem from "@peated/web/components/listItem";
 import UserAvatar from "@peated/web/components/userAvatar";
 import classNames from "@peated/web/lib/classNames";
@@ -57,7 +57,7 @@ export default function FriendListItem({ friend }: { friend: Friend }) {
       >
         <UserAvatar size={48} user={user} />
         <div className="flex-auto space-y-1 font-medium">
-          <Link href={`/users/${user.username}`} className="hover:underline">
+          <Link to={`/users/${user.username}`} className="hover:underline">
             {user.username}
           </Link>
         </div>

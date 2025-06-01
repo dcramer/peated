@@ -1,8 +1,8 @@
-import type { UrlObject } from "node:url";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import type { ForwardedRef, ReactNode } from "react";
 import { forwardRef } from "react";
 import classNames from "../lib/classNames";
+import type { ComponentProps } from "react";
 
 type ButtonColor = "primary" | "default" | "highlight" | "danger" | undefined;
 
@@ -25,11 +25,13 @@ type BaseProps = {
 
 type ConditionalProps =
   | {
-      href?: string | UrlObject;
+      to?: ComponentProps<typeof Link>["to"];
+      search?: ComponentProps<typeof Link>["search"];
       onClick?: never;
     }
   | {
-      href?: never;
+      to?: never;
+      search?: never;
       onClick?: (e: any) => void;
     };
 
@@ -41,7 +43,8 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
       icon,
       children,
       type,
-      href,
+      to,
+      search,
       color = "default",
       size = "base",
       fullWidth = false,
@@ -98,7 +101,7 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
       textColor = color === "highlight" ? "text-highlight-dark" : "text-muted";
     }
 
-    if (href) {
+    if (to || search) {
       // TODO: ref doesnt get passed here yet
       return (
         <Link
@@ -113,7 +116,8 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
             loading ? "animate-pulse" : "",
             textColor
           )}
-          href={href}
+          to={to || "."}
+          search={search}
           {...props}
         >
           {icon}

@@ -1,4 +1,4 @@
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 
 import type { PagingRel, Review } from "@peated/server/types";
 import PaginationButtons from "../paginationButtons";
@@ -39,7 +39,7 @@ export default function ReviewTable({
               >
                 <td className="max-w-0 px-3 py-3">
                   <Link
-                    href={review.url}
+                    to={review.url}
                     className="font-semibold hover:underline"
                   >
                     {review.name}
@@ -47,7 +47,7 @@ export default function ReviewTable({
                   <div className="mt-2 space-x-2 text-xs">
                     {review.bottle ? (
                       <Link
-                        href={`/bottles/${review.bottle.id}`}
+                        to={`/bottles/${review.bottle.id}`}
                         className="hover:underline"
                       >
                         [{review.bottle.id}] ({review.bottle.fullName})

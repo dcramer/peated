@@ -5,7 +5,7 @@ import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { BottleRelease } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
@@ -41,7 +41,7 @@ export default function ModActions({ release }: { release: BottleRelease }) {
       >
         <MenuItem
           as={Link}
-          href={`/bottles/${release.bottleId}/releases/${release.id}/edit`}
+          to={`/bottles/${release.bottleId}/releases/${release.id}/edit`}
         >
           Edit
         </MenuItem>

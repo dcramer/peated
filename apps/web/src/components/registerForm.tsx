@@ -1,7 +1,7 @@
 "use client";
 
 import Button from "@peated/web/components/button";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import TextField from "@peated/web/components/textField";
 import { authenticate, registerForm } from "@peated/web/lib/auth.actions";
 import { useFormState, useFormStatus } from "react-dom";
@@ -83,7 +83,7 @@ export default function RegisterForm() {
 
       <p className="mt-4 text-center text-sm">
         Already have an account?{" "}
-        <Link href="/login" className="text-highlight underline">
+        <Link to="/login" className="text-highlight underline">
           Sign In
         </Link>
       </p>

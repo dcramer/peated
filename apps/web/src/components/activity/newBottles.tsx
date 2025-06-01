@@ -3,7 +3,7 @@
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/lib/format";
 import BottleLink from "@peated/web/components/bottleLink";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -68,7 +68,7 @@ export default function NewBottles() {
                 <div className="flex gap-x-1 text-muted text-sm">
                   {bottle.category && (
                     <Link
-                      href={`/bottles/?category=${bottle.category}`}
+                      to={`/bottles/?category=${bottle.category}`}
                       className="hover:underline"
                     >
                       {formatCategoryName(bottle.category)}

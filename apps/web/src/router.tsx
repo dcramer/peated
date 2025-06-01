@@ -6,6 +6,7 @@ import { getQueryClient } from "./lib/orpc/query";
 import { routeTree } from "./routeTree.gen";
 
 export function createRouter() {
+  // TODO: grab access token here?
   const orpcClient = getServerClient();
   const orpc = createORPCReactQueryUtils(orpcClient);
 
@@ -16,6 +17,7 @@ export function createRouter() {
     context: {
       queryClient: getQueryClient(),
       orpc,
+      orpcClient,
     },
     defaultNotFoundComponent: () => <ErrorPage404 />,
   });

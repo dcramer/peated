@@ -3,7 +3,7 @@
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle, CollectionBottle, PagingRel } from "@peated/server/types";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import type { ComponentProps } from "react";
 import BottleLink from "./bottleLink";
 import Table from "./table";
@@ -49,7 +49,7 @@ export default function BottleTable({
                 <div className="flex gap-x-1 text-muted text-sm">
                   {item.category && (
                     <Link
-                      href={`/bottles/?category=${item.category}`}
+                      to={`/bottles/?category=${item.category}`}
                       className="hover:underline"
                     >
                       {formatCategoryName(item.category)}
@@ -79,7 +79,7 @@ export default function BottleTable({
             item.statedAge ? (
               <Link
                 className="hover:underline"
-                href={`/bottles/?age=${item.statedAge}`}
+                to={`/bottles/?age=${item.statedAge}`}
               >{`${item.statedAge} years`}</Link>
             ) : null,
           className: "sm:w-1/6",

@@ -3,7 +3,7 @@ import type { Bottle } from "@peated/server/types";
 import BottleSelector from "@peated/web/components/admin/queue/bottleSelector";
 import Button from "@peated/web/components/button";
 import { useFlashMessages } from "@peated/web/components/flash";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import Table from "@peated/web/components/table";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
@@ -75,7 +75,7 @@ function Page() {
                     <div className="text-muted">
                       {" "}
                       <Link
-                        href={item.exampleListing.url}
+                        to={item.exampleListing.url}
                         target="_blank"
                         className="underline"
                       >
@@ -134,7 +134,7 @@ function Page() {
             <div>
               Assigned{" "}
               <strong className="font-bold">{unmatchedBottle.name}</strong> to{" "}
-              <Link href={`/bottles/${bottle.id}`} className="underline">
+              <Link to={`/bottles/${bottle.id}`} className="underline">
                 {bottle.fullName}
               </Link>
             </div>

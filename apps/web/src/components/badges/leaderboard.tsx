@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import UserAvatar from "@peated/web/components/userAvatar";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -23,7 +23,7 @@ export default function Leaderboard({ badgeId }: { badgeId: number }) {
             className="group relative flex w-full items-center gap-x-4 rounded px-3 py-1 hover:bg-slate-800"
           >
             <Link
-              href={`/users/${user.username}`}
+              to={`/users/${user.username}`}
               className="absolute inset-0"
             />
             <div className="font-mono text-2xl text-muted">#{index + 1}</div>

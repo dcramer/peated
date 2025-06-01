@@ -1,6 +1,6 @@
 import type { Entity } from "@peated/server/types";
 import EntityIcon from "@peated/web/assets/entity.svg";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import { getEntityTypeSearchUrl } from "../lib/urls";
 import Chip from "./chip";
 import PageHeader from "./pageHeader";
@@ -22,7 +22,7 @@ export default function EntityHeader({
             <>
               Located in{" "}
               <Link
-                href={`/locations/${entity.country.slug}`}
+                to={`/locations/${entity.country.slug}`}
                 className="truncate hover:underline"
               >
                 {entity.country.name}
@@ -34,7 +34,7 @@ export default function EntityHeader({
               {" "}
               &middot;{" "}
               <Link
-                href={`/locations/${entity.country.slug}/regions/${entity.region.slug}`}
+                to={`/locations/${entity.country.slug}/regions/${entity.region.slug}`}
                 className="truncate hover:underline"
               >
                 {entity.region.name}
@@ -51,7 +51,7 @@ export default function EntityHeader({
               size="small"
               color="highlight"
               as={Link}
-              href={`${getEntityTypeSearchUrl(t)}`}
+              to={`${getEntityTypeSearchUrl(t)}`}
             >
               {t}
             </Chip>

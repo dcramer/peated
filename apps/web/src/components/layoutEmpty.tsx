@@ -1,5 +1,5 @@
 import PeatedLogo from "@peated/web/assets/logo.svg";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import classNames from "../lib/classNames";
 
@@ -22,7 +22,7 @@ export default function LayoutEmpty({
       <div className="flex-auto">
         {withHeader && (
           <div className="flex flex-grow items-center justify-center px-4">
-            <Link href="/" className="max-w-xs">
+            <Link to="/" className="max-w-xs">
               <PeatedLogo className="h-auto w-full text-highlight" />
             </Link>
           </div>

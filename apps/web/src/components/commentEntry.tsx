@@ -3,7 +3,7 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { User } from "@peated/server/types";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import type { PolymorphicProps } from "@peated/web/types";
 import type { ElementType } from "react";
 import button from "./button";
@@ -45,7 +45,7 @@ export default function CommentEntry<
           <div className="flex-auto">
             <div className="text-sm">
               <Link
-                href={`/users/${createdBy.username}`}
+                to={`/users/${createdBy.username}`}
                 className="font-medium hover:underline"
               >
                 {createdBy.username}

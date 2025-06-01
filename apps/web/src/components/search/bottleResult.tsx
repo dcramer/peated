@@ -2,7 +2,7 @@ import { CheckBadgeIcon, StarIcon } from "@heroicons/react/24/outline";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import { Fragment, type ReactNode } from "react";
 import Join from "../join";
 export type BottleResult = {
@@ -41,7 +41,7 @@ export default function BottleResultRow({
       <div className="min-w-0 flex-auto">
         <div className="flex items-center space-x-1 font-semibold leading-6">
           <Link
-            href={
+            to={
               directToTasting
                 ? `/bottles/${bottle.id}/addTasting`
                 : `/bottles/${bottle.id}`

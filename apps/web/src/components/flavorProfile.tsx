@@ -1,4 +1,4 @@
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import type { ComponentPropsWithoutRef } from "react";
 import { formatFlavorProfile } from "../../../server/src/lib/format";
 import type { FlavorProfile as FlavorProfileType } from "../../../server/src/types";
@@ -14,7 +14,7 @@ export default function FlavorProfile({
       {...props}
     >
       <Link
-        href={{
+        to={{
           pathname: "/bottles",
           search: `?flavorProfile=${encodeURIComponent(profile)}`,
         }}

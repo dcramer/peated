@@ -1,4 +1,4 @@
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { PagingRel, Tag } from "@peated/server/types";
@@ -37,7 +37,7 @@ export default function TagTable({
               <tr key={tag.name} className="border-slate-800 border-b text-sm">
                 <td className="max-w-0 px-3 py-3">
                   <Link
-                    href={`/admin/tags/${tag.name}`}
+                    to={`/admin/tags/${tag.name}`}
                     className="font-medium hover:underline"
                   >
                     {toTitleCase(tag.name)}

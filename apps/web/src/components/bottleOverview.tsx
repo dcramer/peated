@@ -2,7 +2,7 @@
 
 import type { Outputs } from "@peated/server/orpc/router";
 import RobotImage from "@peated/web/assets/robot.png";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import { Suspense } from "react";
 import BottleReviews from "./bottleReviews";
 import BottleTagDistribution from "./bottleTagDistribution";
@@ -62,7 +62,7 @@ export default function BottleOverview({
               <DefinitionList.Details>
                 <Link
                   key={bottle.brand.id}
-                  href={`/entities/${bottle.brand.id}`}
+                  to={`/entities/${bottle.brand.id}`}
                   className="underline"
                 >
                   {bottle.brand.name}
@@ -73,7 +73,7 @@ export default function BottleOverview({
                 {bottle.series ? (
                   <Link
                     key={bottle.series.id}
-                    href={`/bottles?series=${bottle.series.id}`}
+                    to={`/bottles?series=${bottle.series.id}`}
                     className="underline"
                   >
                     {bottle.series.name}
@@ -89,7 +89,7 @@ export default function BottleOverview({
                     {bottle.distillers.map((d) => (
                       <Link
                         key={d.id}
-                        href={`/entities/${d.id}`}
+                        to={`/entities/${d.id}`}
                         className="underline"
                       >
                         {d.name}
@@ -105,7 +105,7 @@ export default function BottleOverview({
                 {bottle.bottler ? (
                   <Link
                     key={bottle.bottler.id}
-                    href={`/entities/${bottle.bottler.id}`}
+                    to={`/entities/${bottle.bottler.id}`}
                     className="underline"
                   >
                     {bottle.bottler.name}
@@ -160,7 +160,7 @@ export default function BottleOverview({
                   {createdBy ? (
                     <>
                       <Link
-                        href={`/users/${createdBy.username}`}
+                        to={`/users/${createdBy.username}`}
                         className="flex items-center gap-x-2 truncate hover:underline"
                       >
                         <UserAvatar size={16} user={createdBy} />

@@ -1,4 +1,4 @@
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import type { ComponentProps } from "react";
 
 type Item = {
@@ -57,7 +57,7 @@ export function DistributionChartLegend(props: ComponentProps<"div">) {
 export default function DistributionChart({
   items,
   totalCount,
-  href,
+  to,
 }: {
   items: Item[];
   totalCount: number;
@@ -91,7 +91,7 @@ export default function DistributionChart({
             key={item.name}
             className={`${colorNames[index]} flex h-6 items-center justify-end rounded-r`}
             style={{ width: `${pct}%` }}
-            href={itemTo}
+            to={itemTo}
           >
             <span className="truncate px-2">{item.name}</span>
           </Link>

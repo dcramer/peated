@@ -1,7 +1,7 @@
 "use client";
 
 import type { Bottle } from "@peated/server/types";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import { type ComponentPropsWithoutRef, useState } from "react";
 import BottlePanel from "./bottlePanel";
 import { ClientOnly } from "./clientOnly";
@@ -36,7 +36,7 @@ export default function BottleLink({
         }}
         title={bottle.fullName}
         className="absolute inset-0"
-        href={`/bottles/${bottle.id}`}
+        to={`/bottles/${bottle.id}`}
         {...props}
       />
       {withPanel && (

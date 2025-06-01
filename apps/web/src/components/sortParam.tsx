@@ -2,9 +2,7 @@
 
 import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/20/solid";
 import { toTitleCase } from "@peated/server/lib/strings";
-import Link from "@peated/web/components/link";
-import { buildQueryString } from "@peated/web/lib/urls";
-import { usePathname, useSearchParams } from "next/navigation";
+import { Link } from "@tanstack/react-router";
 
 export default function SortParam({
   name,
@@ -18,23 +16,21 @@ export default function SortParam({
   defaultOrder?: "asc" | "desc";
 }) {
   const invertSort = `-${name}`;
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
+
   return (
     <Link
-      href={{
-        pathname: pathname,
-        search: buildQueryString(searchParams, {
-          sort:
-            sort === name
-              ? invertSort
-              : sort === invertSort
+      to="."
+      search={(prev) => ({
+        ...prev,
+        sort:
+          sort === name
+            ? invertSort
+            : sort === invertSort
+              ? name
+              : defaultOrder === "asc"
                 ? name
-                : defaultOrder === "asc"
-                  ? name
-                  : invertSort,
-        }),
-      }}
+                : invertSort,
+      })}
       className="inline-flex items-center gap-x hover:underline"
     >
       {label ?? toTitleCase(name)}

@@ -6,7 +6,7 @@ import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
 import Join from "@peated/web/components/join";
 import LayoutModal from "@peated/web/components/layoutModal";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import ListItem from "@peated/web/components/listItem";
 import { Modal } from "@peated/web/components/modal";
 import SearchHeader from "@peated/web/components/searchHeader";
@@ -94,7 +94,7 @@ export default function BottleSelector({
               {source ? (
                 <p>
                   Source:{" "}
-                  <Link href={source} target="_blank">
+                  <Link to={source} target="_blank">
                     {source}
                   </Link>
                 </p>
@@ -148,7 +148,7 @@ export default function BottleSelector({
                 <div className="min-w-0 flex-auto">
                   <div className="font-semibold">
                     <a
-                      href={`/addBottle?name=${encodeURIComponent(toTitleCase(query))}&${returnTo ? `returnTo=${encodeURIComponent(returnTo)}` : ""}`}
+                      to={`/addBottle?name=${encodeURIComponent(toTitleCase(query))}&${returnTo ? `returnTo=${encodeURIComponent(returnTo)}` : ""}`}
                     >
                       <span className="-top-px absolute inset-x-0 bottom-0" />
                       Can't find what you're looking for?

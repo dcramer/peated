@@ -3,24 +3,24 @@ description: oRPC Usage Guidelines for Next.js + TanStack Query
 globs: 
 alwaysApply: false
 ---
-# oRPC Usage Guidelines for Next.js + TanStack Query
+# oRPC Usage Guidelines for TanStack Start + TanStack Query
 
-This guide outlines how to use oRPC effectively within a Next.js application using TanStack Query. It incorporates both official documentation and internal implementation patterns.
+This guide outlines how to use oRPC effectively within a TanStack Start application using TanStack Query. It incorporates both official documentation and internal implementation patterns.
 
 ## Overview
 
-We use the `@peated/server/orpc` package to communicate with our backend API using oRPC. The integration supports both server actions and React client components.
+We use the `@peated/server/orpc` package to communicate with our backend API using oRPC. The integration supports both server-side data loading and React client components.
 
 * Client Docs: [https://orpc.unnoq.com/docs/client/error-handling](mdc:https:/orpc.unnoq.com/docs/client/error-handling)
-* Next.js: [https://orpc.unnoq.com/docs/integrations/next](mdc:https:/orpc.unnoq.com/docs/integrations/next)
 * TanStack Query: [https://orpc.unnoq.com/docs/tanstack-query/react](mdc:https:/orpc.unnoq.com/docs/tanstack-query/react)
+* TanStack Start: [https://tanstack.com/start](mdc:https:/tanstack.com/start)
 
 ## Project Conventions
 
-* Use `createServerClient()` in server actions with the current `accessToken`.
+* Use `context.orpc` in server-side loaders with tanstack-query.
 * Use the `useORPC()` hook in client components to access typed query and mutation helpers.
 * Use `safe()` when calling an oRPC function to extract `{ data, error, isDefined }`.
-* Use `queryOptions()` from `orpc.<namespace>.<method>` to pass directly into `useQuery`.
+* Use `queryOptions()` from `orpc.<namespace>.<method>` to pass directly into `useQuery` or `queryClient.ensureQueryData()`.
 * You only need to spread `queryOptions()` when providing additional fields (e.g., `enabled`).
 * Always handle `error.name` using enum-like string constants like `CONFLICT`, `UNAUTHORIZED`, etc.
 * Do **not** rethrow if the error is expected and user-facing (e.g. form validation), but do rethrow for unexpected ones.
@@ -30,45 +30,160 @@ We use the `@peated/server/orpc` package to communicate with our backend API usi
 oRPC routes are called in the same way they would be with the normal `routerClient` per [orpc-route.mdc](mdc:.cursor/rules/orpc-route.mdc) guidelines. You'll find
 available endpoints defined `@peated/server/orpc/routes` and the typechecker will also ensure you're calling them right.
 
-There are three general ways you're going to obtain an oRPC client to query against it:
+There are four general ways you're going to obtain an oRPC client to query against it:
 
 1. the `useORPC` hook (within React Components)
-2. server-side: `createServerClient` from `@peated/web/lib/orpc/client.server`
-3. client-side: `createBrowserClient` from `@peated/web/lib/orpc/client` when you need to manage the
+2. `context.orpcClient` or `context.orpc` in route loaders (preferred for server-side route loading)
+3. server-side: `getServerClient` from `@peated/web/lib/orpc/client.server` (for server actions)
+4. client-side: `createBrowserClient` from `@peated/web/lib/orpc/client` when you need to manage the
    accessToken.
 
-### Server Components and Server Actions
+## Data Loading Patterns
 
-You'll generally use this in places like `route.ts` or in functions like `generateMetadata`. This
-**should not** be used in components marked `'use client';`.
+### Server-Side Data Loading with TanStack Start
 
+In TanStack Start route loaders, use `context.orpcClient` for server-side data fetching and `context.queryClient.ensureQueryData()` for optimal client-side hydration:
+
+```ts
+import { createFileRoute } from "@tanstack/react-router";
+
+export const Route = createFileRoute("/bottles/$bottleId/")({
+  loader: async ({ params, context }) => {
+    // Preload data for optimal hydration using context
+    await Promise.all([
+      context.queryClient.ensureQueryData(
+        context.orpc.bottles.byId.queryOptions({
+          input: { bottle: parseInt(params.bottleId) },
+        })
+      ),
+      context.queryClient.ensureQueryData(
+        context.orpc.bottles.tastings.queryOptions({
+          input: { bottle: parseInt(params.bottleId) },
+        })
+      ),
+    ]);
+
+    // Return data for meta generation using context client
+    const bottle = await context.orpcClient.bottles.byId({
+      bottle: parseInt(params.bottleId),
+    });
+
+    return { bottle };
+  },
+  head: ({ loaderData }) => ({
+    meta: [
+      { title: `${loaderData.bottle.fullName} - Peated` },
+      { name: "description", content: `Explore ${loaderData.bottle.fullName}...` },
+    ],
+  }),
+  component: BottleDetailsComponent,
+});
+```
+
+### Mixed Pattern (Server + Client)
+
+For simpler cases, you can use server-side loading with client-side queries:
+
+```ts
+export const Route = createFileRoute("/users/$username/")({
+  loader: async ({ params, context }) => {
+    // Use orpcClient from context
+    const user = await context.orpcClient.users.details({
+      user: params.username,
+    });
+
+    return { user };
+  },
+  component: () => {
+    const { user } = Route.useLoaderData();
+    const orpc = useORPC();
+    
+    // Load additional data client-side
+    const { data: tastings } = useQuery(
+      orpc.tastings.list.queryOptions({
+        input: { user: user.id },
+      })
+    );
+
+    return <div>{/* Component JSX */}</div>;
+  },
+});
+```
+
+### Router Context Setup
+
+The router context provides access to orpc utilities. This is configured in `router.tsx` and `__root.tsx`:
+
+```ts
+// router.tsx
+import { createORPCReactQueryUtils } from "@orpc/react-query";
+import { createRouter as createTanStackRouter } from "@tanstack/react-router";
+import { getServerClient } from "./lib/orpc/client.server";
+import { getQueryClient } from "./lib/orpc/query";
+import { routeTree } from "./routeTree.gen";
+
+export function createRouter() {
+  const orpcClient = getServerClient();
+  const orpc = createORPCReactQueryUtils(orpcClient);
+
+  const router = createTanStackRouter({
+    routeTree,
+    scrollRestoration: true,
+    defaultPreload: "intent",
+    context: {
+      queryClient: getQueryClient(),
+      orpc,
+      orpcClient,
+    },
+    defaultNotFoundComponent: () => <ErrorPage404 />,
+  });
+
+  return router;
+}
+```
+
+```ts
+// __root.tsx
+import type { RouterUtils } from "@orpc/react-query";
+import type { QueryClient } from "@tanstack/react-query";
+import { createRootRouteWithContext } from "@tanstack/react-router";
+import type { ServerClient } from "../lib/orpc/client.server";
+
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+  orpc: RouterUtils<ServerClient>;
+  orpcClient: ServerClient;
+}>()({
+  loader: async () => {
+    const session = await useAppSession();
+    const user = session.data.user;
+
+    return {
+      session: {
+        user: user,
+        accessToken: session.data.accessToken,
+        ts: session.data.ts,
+      },
+    };
+  },
+  component: RootComponent,
+});
+```
+
+This setup provides `context.orpc`, `context.queryClient`, and `context.orpcClient` to all route loaders, enabling both the data preloading pattern and direct server client access:
+
+### Server Actions
+
+Use `getServerClient()` in server actions when you need a fresh client with current session:
 
 ```ts
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 
-export async function GET() {
-  // this will create a new client as needed, and use React's cache mechanism
-  // otherwise
-  const { client } = await getServerClient();
-  const { totalBottles } = await client.stats();
-  // ...
-}
-```
-
-If you need control over the access token, such as within a call
-where it might change. You won't need `call()` in this case. **This should be uncommon usage.**
-
-```ts
-import { createServerClient } from "@peated/server/orpc/client.server";
-
 async function registerUser({ email, password, username, session }) {
-  const orpcClient = createServerClient({
-    apiServer: config.API_SERVER,
-    accessToken: session.accessToken,
-  });
+  const { client } = await getServerClient();
 
   const { error, data, isDefined } = await safe(
-    orpcClient.auth.register({ email, password, username })
+    client.auth.register({ email, password, username })
   );
 
   if (isDefined && error?.name === "CONFLICT") {
@@ -79,6 +194,9 @@ async function registerUser({ email, password, username, session }) {
 
   return data;
 }
+```
+
+**Note**: In route loaders, prefer using `context.orpcClient` over creating a new client, as it's already configured and cached. Use `getServerClient()` in server actions or when you need a client with specific session/auth context.
 ```
 
 ### useQuery, useSuspenseQuery
@@ -248,8 +366,176 @@ const queryParams: Inputs["tastings"]["list"] = useApiQueryParams({
 });
 ```
 
+## TanStack Router Search Params Best Practices
+
+TanStack Router provides powerful JSON-first search params that should be leveraged for filtering, pagination, and other stateful URL concerns.
+
+### Search Param Validation
+
+Always validate search params using schemas for type safety:
+
+```ts
+import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
+import { zodValidator } from "@tanstack/zod-adapter";
+
+const searchSchema = z.object({
+  page: z.number().min(1).default(1),
+  limit: z.number().min(10).max(100).default(25),
+  filter: z.string().optional(),
+  sort: z.enum(["name", "date", "rating"]).default("name"),
+  entities: z.array(z.string()).default([]),
+});
+
+export const Route = createFileRoute("/bottles/")({
+  validateSearch: zodValidator(searchSchema),
+  loader: async ({ context, search }) => {
+    // search is fully typed and validated
+    await context.queryClient.ensureQueryData(
+      context.orpc.bottles.list.queryOptions({
+        input: {
+          cursor: search.page > 1 ? (search.page - 1) * search.limit : undefined,
+          limit: search.limit,
+          filter: search.filter,
+          sort: search.sort,
+          entities: search.entities,
+        },
+      })
+    );
+  },
+});
+```
+
+### Reading Search Params in Components
+
+Use `Route.useSearch()` for type-safe access:
+
+```ts
+function BottleFilters() {
+  const search = Route.useSearch();
+  // search is fully typed based on the route's validation schema
+  
+  return (
+    <div>
+      <div>Current page: {search.page}</div>
+      <div>Filter: {search.filter || 'None'}</div>
+      <div>Selected entities: {search.entities.join(', ')}</div>
+    </div>
+  );
+}
+```
+
+### Updating Search Params
+
+Use TanStack Router's built-in methods instead of manual URL manipulation:
+
+```ts
+import { Link, useNavigate } from "@tanstack/react-router";
+
+function PaginationComponent() {
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
+
+  return (
+    <div>
+      {/* Using Link with search function */}
+      <Link
+        search={(prev) => ({ ...prev, page: prev.page + 1 })}
+        disabled={!hasNextPage}
+      >
+        Next Page
+      </Link>
+
+      {/* Using navigate programmatically */}
+      <button
+        onClick={() => {
+          navigate({
+            search: (prev) => ({ ...prev, filter: "whiskey" }),
+          });
+        }}
+      >
+        Filter by Whiskey
+      </button>
+    </div>
+  );
+}
+```
+
+### Search Params in Non-Route Components
+
+For components outside the route tree (like sidebars):
+
+```ts
+import { useSearch } from "@tanstack/react-router";
+
+function FilterSidebar() {
+  const search = useSearch({ strict: false });
+  
+  // Handle the search object directly, no conversion needed
+  return (
+    <div>
+      <Link
+        search={(prev) => ({ ...prev, entities: [...(prev.entities || []), "new-entity"] })}
+      >
+        Add Entity Filter
+      </Link>
+    </div>
+  );
+}
+```
+
+### Search Param Inheritance
+
+Child routes automatically inherit parent search params:
+
+```ts
+// Parent route: /bottles/
+const bottlesSearchSchema = z.object({
+  region: z.string().optional(),
+  category: z.string().optional(),
+});
+
+// Child route: /bottles/$bottleId/
+const bottleDetailsSearchSchema = z.object({
+  tab: z.enum(["details", "reviews", "similar"]).default("details"),
+});
+
+// Child route automatically has access to both region/category AND tab
+export const Route = createFileRoute("/bottles/$bottleId/")({
+  validateSearch: zodValidator(bottleDetailsSearchSchema),
+  component: () => {
+    const search = Route.useSearch();
+    // search contains: { tab, region?, category? }
+  },
+});
+```
+
+### Common Anti-Patterns to Avoid
+
+❌ **Don't convert to URLSearchParams:**
+```ts
+// Avoid this - loses TanStack Router benefits
+const searchParams = new URLSearchParams();
+Object.entries(search).forEach(([key, val]) => {
+  searchParams.set(key, String(val));
+});
+```
+
+❌ **Don't manually build query strings:**
+```ts
+// Avoid this - TanStack Router handles serialization
+const queryString = `?page=${search.page}&filter=${search.filter}`;
+```
+
+✅ **Do use TanStack Router's built-in methods:**
+```ts
+// Use this - leverages TanStack Router's JSON-first approach
+<Link search={(prev) => ({ ...prev, page: prev.page + 1 })} />
+```
+
 ## See Also
 
 * [oRPC Client Docs](mdc:https:/orpc.unnoq.com/docs/client)
 * [oRPC with TanStack Query](mdc:https:/orpc.unnoq.com/docs/tanstack-query/basic)
-* [oRPC in Next.js](mdc:https:/orpc.unnoq.com/docs/integrations/next)
+* [TanStack Start Documentation](mdc:https:/tanstack.com/start/latest/docs/framework/quick-start)
+* [TanStack Router Search Params Guide](mdc:https:/tanstack.com/router/v1/docs/framework/react/guide/search-params)

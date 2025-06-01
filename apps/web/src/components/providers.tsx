@@ -1,5 +1,3 @@
-"use client";
-
 import FlashMessages from "@peated/web/components/flash";
 import { default as config } from "@peated/web/config";
 import { AuthProvider } from "@peated/web/hooks/useAuth";
@@ -8,7 +6,7 @@ import { ensureSessionSynced } from "@peated/web/lib/auth.actions";
 import ORPCProvider from "@peated/web/lib/orpc/provider";
 import type { SessionData } from "@peated/web/lib/session.server";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { setUser } from "@sentry/nextjs";
+import { setUser } from "@sentry/react";
 import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
 import { useInterval } from "usehooks-ts";
 

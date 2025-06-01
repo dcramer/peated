@@ -1,6 +1,6 @@
 import BadgeImage from "@peated/web/components/badgeImage";
 import { useFlashMessages } from "@peated/web/components/flash";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import TastingForm from "@peated/web/components/tastingForm";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
@@ -107,7 +107,7 @@ function Page() {
               flash(
                 <div className="relative flex flex-row items-center gap-x-3">
                   <Link
-                    href={`/badges/${award.badge.id}`}
+                    to={`/badges/${award.badge.id}`}
                     className="absolute inset-0"
                   />
                   <BadgeImage

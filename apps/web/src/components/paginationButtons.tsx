@@ -1,13 +1,9 @@
 "use client";
 
 import type { PagingRel } from "@peated/server/types";
-import { useSearchParams } from "next/navigation";
-import { buildQueryString } from "../lib/urls";
 import Button from "./button";
 
 export default function PaginationButtons({ rel }: { rel?: PagingRel | null }) {
-  const searchParams = useSearchParams();
-
   if (!rel) return null;
 
   return (
@@ -17,13 +13,10 @@ export default function PaginationButtons({ rel }: { rel?: PagingRel | null }) {
     >
       <div className="flex flex-auto justify-between gap-x-2 sm:justify-end">
         <Button
-          href={
+          to="."
+          search={
             rel.prevCursor
-              ? {
-                  search: buildQueryString(searchParams, {
-                    cursor: rel.prevCursor,
-                  }),
-                }
+              ? (prev) => ({ ...prev, cursor: rel.prevCursor })
               : undefined
           }
           disabled={!rel.prevCursor}
@@ -31,13 +24,10 @@ export default function PaginationButtons({ rel }: { rel?: PagingRel | null }) {
           Previous
         </Button>
         <Button
-          href={
+          to="."
+          search={
             rel.nextCursor
-              ? {
-                  search: buildQueryString(searchParams, {
-                    cursor: rel.nextCursor,
-                  }),
-                }
+              ? (prev) => ({ ...prev, cursor: rel.nextCursor })
               : undefined
           }
           disabled={!rel.nextCursor}

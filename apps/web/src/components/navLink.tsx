@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import { useLocation } from "@tanstack/react-router";
 import type { ComponentProps } from "react";
 import classNames from "../lib/classNames";
@@ -14,9 +14,7 @@ export default function NavLink(props: ComponentProps<typeof Link>) {
     <Link
       className={classNames(
         baseClassNames,
-        pathname === props.href
-          ? "text-highlight"
-          : "text-muted hover:text-white"
+        pathname === props.to ? "text-highlight" : "text-muted hover:text-white"
       )}
       {...props}
     />

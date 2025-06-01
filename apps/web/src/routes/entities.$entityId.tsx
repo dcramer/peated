@@ -1,7 +1,7 @@
 import { MapIcon } from "@heroicons/react/24/outline";
 import RobotImage from "@peated/web/assets/robot.png";
 import EntityMap from "@peated/web/components/entityMap";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import Markdown from "@peated/web/components/markdown";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { parseDomain } from "@peated/web/lib/urls";
@@ -46,7 +46,7 @@ function Page() {
             <dt>Website</dt>
             <dd>
               {entity.website ? (
-                <a href={entity.website} className="hover:underline">
+                <a to={entity.website} className="hover:underline">
                   {parseDomain(entity.website)}
                 </a>
               ) : (
@@ -68,7 +68,7 @@ function Page() {
                   <div className="flex flex-row items-center gap-x-2">
                     {entity.address}
                     <Link
-                      href={`http://maps.google.com/?q=${encodeURIComponent(`${entity.name}, ${entity.address}`)}`}
+                      to={`http://maps.google.com/?q=${encodeURIComponent(`${entity.name}, ${entity.address}`)}`}
                       target="_blank"
                       className="text-highlight"
                     >
@@ -80,17 +80,17 @@ function Page() {
                   {entity.region && entity.country ? (
                     <>
                       <Link
-                        href={`/locations/${entity.country.slug}/regions/${entity.region.slug}`}
+                        to={`/locations/${entity.country.slug}/regions/${entity.region.slug}`}
                       >
                         {entity.region.name}
                       </Link>
                       <span>, </span>
-                      <Link href={`/locations/${entity.country.slug}`}>
+                      <Link to={`/locations/${entity.country.slug}`}>
                         {entity.country.name}
                       </Link>
                     </>
                   ) : entity.country ? (
-                    <Link href={`/locations/${entity.country.slug}`}>
+                    <Link to={`/locations/${entity.country.slug}`}>
                       {entity.country.name}
                     </Link>
                   ) : (

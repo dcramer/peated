@@ -3,7 +3,7 @@ import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import DefinitionList from "@peated/web/components/definitionList";
 import Heading from "@peated/web/components/heading";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 // import Markdown from "@peated/web/components/markdown";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
@@ -33,15 +33,15 @@ function Page() {
         pages={[
           {
             name: "Admin",
-            href: "/admin",
+            to: "/admin",
           },
           {
             name: "Badges",
-            href: "/admin/badges",
+            to: "/admin/badges",
           },
           {
             name: badge.name,
-            href: `/admin/badges/${badge.id}`,
+            to: `/admin/badges/${badge.id}`,
             current: true,
           },
         ]}
@@ -50,12 +50,12 @@ function Page() {
       <PageHeader
         title={badge.name}
         metadata={
-          <Button href={`/admin/badges/${badge.id}/edit`}>Edit Badge</Button>
+          <Button to={`/admin/badges/${badge.id}/edit`}>Edit Badge</Button>
         }
       />
 
       <Tabs border>
-        <TabItem as={Link} href={`/admin/badges/${badge.id}`} controlled>
+        <TabItem as={Link} to={`/admin/badges/${badge.id}`} controlled>
           Overview
         </TabItem>
       </Tabs>

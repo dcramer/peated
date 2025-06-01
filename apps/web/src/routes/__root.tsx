@@ -16,12 +16,13 @@ import {
   createRootRouteWithContext,
 } from "@tanstack/react-router";
 import React from "react";
-import Providers from "../app/providers/providers";
+import Providers from "../components/providers";
 import type { ServerClient } from "../lib/orpc/client.server";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
   orpc: RouterUtils<ServerClient>;
+  orpcClient: ServerClient;
 }>()({
   head: () => ({
     meta: [

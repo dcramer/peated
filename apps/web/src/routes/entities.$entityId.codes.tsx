@@ -3,7 +3,7 @@ import {
   SMWS_DISTILLERY_CODES,
 } from "@peated/server/lib/smws";
 import Heading from "@peated/web/components/heading";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { NotFoundError, createFileRoute } from "@tanstack/react-router";
@@ -51,7 +51,7 @@ function Page() {
           system. For example, <strong>Cask No. 4.360 Jangling dram</strong>{" "}
           means it is the <strong>360th cask</strong> from{" "}
           <strong>distillery number 4</strong>. In this case, distillery maps to{" "}
-          <Link href={`/entities/${exampleDistiller.id}`}>
+          <Link to={`/entities/${exampleDistiller.id}`}>
             {exampleDistiller.name}
           </Link>
           .
@@ -115,7 +115,7 @@ function Page() {
                         <td className="border-slate-800 border-b p-3 text-sm">
                           {distiller ? (
                             <Link
-                              href={`/entities/${distiller.id}`}
+                              to={`/entities/${distiller.id}`}
                               className="hover:underline"
                             >
                               {distiller.name}
@@ -127,7 +127,7 @@ function Page() {
                         <td className="hidden border-slate-800 border-b p-3 text-center text-muted text-sm sm:table-cell">
                           {distiller?.country ? (
                             <Link
-                              href={`/countries/${distiller.country.slug}`}
+                              to={`/countries/${distiller.country.slug}`}
                               className="hover:underline"
                             >
                               {distiller.country.name}

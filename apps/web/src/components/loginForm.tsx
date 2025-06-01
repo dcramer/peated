@@ -2,7 +2,7 @@
 
 import Button from "@peated/web/components/button";
 import GoogleLoginButton from "@peated/web/components/googleLoginButton";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
 import { authenticate, authenticateForm } from "@peated/web/lib/auth.actions";
@@ -88,13 +88,13 @@ export default function LoginForm() {
           <div className="mt-4 flex items-center justify-center gap-x-3 text-sm">
             <div>
               Don't have an account yet?{" "}
-              <Link href="/register" className="text-highlight underline">
+              <Link to="/register" className="text-highlight underline">
                 Sign Up
               </Link>
             </div>
             <div>&middot;</div>
             <div>
-              <Link href="/password-reset" className="text-highlight underline">
+              <Link to="/password-reset" className="text-highlight underline">
                 Password Reset
               </Link>
             </div>

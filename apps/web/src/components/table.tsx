@@ -2,7 +2,7 @@
 
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { PagingRel } from "@peated/server/types";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import classNames from "@peated/web/lib/classNames";
 import { useSearchParams } from "next/navigation";
 import type { ReactElement, ReactNode } from "react";
@@ -132,7 +132,7 @@ export default function Table<
                     className="bg-slate-800 py-2 pr-3 pl-4 text-left font-semibold text-sm sm:pl-3"
                   >
                     {groupTo ? (
-                      <Link href={groupTo(group)} className="hover:underline">
+                      <Link to={groupTo(group)} className="hover:underline">
                         {groupItem(group)}
                       </Link>
                     ) : (
@@ -170,7 +170,7 @@ export default function Table<
                       )}
                     >
                       {colN === 0 && urlPath && (
-                        <Link href={urlPath} className="absolute inset-0" />
+                        <Link to={urlPath} className="absolute inset-0" />
                       )}
                       {value}
                     </td>

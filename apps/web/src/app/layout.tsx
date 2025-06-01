@@ -6,7 +6,7 @@ import "@peated/web/styles/index.css";
 import * as Sentry from "@sentry/nextjs";
 import type { Metadata, Viewport } from "next";
 import type React from "react";
-import Providers from "./providers/providers";
+import Providers from "../components/providers";
 
 // default behavior is to disable cache, as it breaks quite a few flows
 // which are fairly dynamic (e.g. add tasting, add bottle, etc)

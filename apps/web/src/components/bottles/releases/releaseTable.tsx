@@ -4,7 +4,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import Table from "@peated/web/components/table";
 import ModActions from "./modActions";
 
@@ -22,7 +22,7 @@ export default function ReleaseTable({
           We're not aware of any named releases of this bottling.
         </div>
         <div className="mt-4">
-          <Button href={`/bottles/${bottleId}/addRelease`} color="primary">
+          <Button to={`/bottles/${bottleId}/addRelease`} color="primary">
             Add Release
           </Button>
         </div>
@@ -44,7 +44,7 @@ export default function ReleaseTable({
             item.statedAge ? (
               <Link
                 className="hover:underline"
-                href={`/bottles/?age=${item.statedAge}`}
+                to={`/bottles/?age=${item.statedAge}`}
               >{`${item.statedAge} years`}</Link>
             ) : null,
           className: "sm:w-1/8",
@@ -78,7 +78,7 @@ export default function ReleaseTable({
             return (
               <div className="flex flex-row justify-end gap-2">
                 <Button
-                  href={`/bottles/${bottleId}/addTasting?release=${item.id}`}
+                  to={`/bottles/${bottleId}/addTasting?release=${item.id}`}
                   size="small"
                   title="Record a Tasting"
                 >

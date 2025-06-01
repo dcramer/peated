@@ -1,5 +1,5 @@
 import type { Change, PagingRel, User } from "@peated/server/types";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import { AnimatePresence } from "framer-motion";
 import ListItem from "./listItem";
 import PaginationButtons from "./paginationButtons";
@@ -11,7 +11,7 @@ const ChangeAuthor = ({ user }: { user?: User | null }) => {
   return (
     <div className="flex items-center gap-x-2">
       <Link
-        href={`/users/${user.username}`}
+        to={`/users/${user.username}`}
         className="font-medium text-highlight hover:underline"
       >
         {user.username}
@@ -48,7 +48,7 @@ const ObjectDesc = ({
         <>
           <div>the entity</div>
           <Link
-            href={`/entities/${objectId}`}
+            to={`/entities/${objectId}`}
             className="font-medium text-highlight hover:underline"
           >
             {displayName}
@@ -60,7 +60,7 @@ const ObjectDesc = ({
         <>
           <div>the bottle</div>
           <Link
-            href={`/bottles/${objectId}`}
+            to={`/bottles/${objectId}`}
             className="font-medium text-highlight hover:underline"
           >
             {displayName}

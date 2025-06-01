@@ -1,7 +1,7 @@
 "use client";
 
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import { useSearchParams } from "next/navigation";
 
 export function SearchTerm({ name, value }: { name: string; value?: string }) {
@@ -15,7 +15,7 @@ export function SearchTerm({ name, value }: { name: string; value?: string }) {
     .join("&");
   return (
     <Link
-      href={`${location.pathname}?${query}`}
+      to={`${location.pathname}?${query}`}
       className="inline-flex items-center rounded border border-slate-600 px-2 text-sm hover:text-white"
     >
       {name} = {value}

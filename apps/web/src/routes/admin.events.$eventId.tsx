@@ -3,7 +3,7 @@ import Button from "@peated/web/components/button";
 import DateRange from "@peated/web/components/dateRange";
 import DefinitionList from "@peated/web/components/definitionList";
 import Heading from "@peated/web/components/heading";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import Markdown from "@peated/web/components/markdown";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
@@ -32,15 +32,15 @@ function Page() {
         pages={[
           {
             name: "Admin",
-            href: "/admin",
+            to: "/admin",
           },
           {
             name: "Events",
-            href: "/admin/events",
+            to: "/admin/events",
           },
           {
             name: event.name,
-            href: `/admin/events/${event.id}`,
+            to: `/admin/events/${event.id}`,
             current: true,
           },
         ]}
@@ -49,12 +49,12 @@ function Page() {
       <PageHeader
         title={event.name}
         metadata={
-          <Button href={`/admin/events/${event.id}/edit`}>Edit Event</Button>
+          <Button to={`/admin/events/${event.id}/edit`}>Edit Event</Button>
         }
       />
 
       <Tabs border>
-        <TabItem as={Link} href={`/admin/events/${event.id}`} controlled>
+        <TabItem as={Link} to={`/admin/events/${event.id}`} controlled>
           Overview
         </TabItem>
       </Tabs>
@@ -83,7 +83,7 @@ function Page() {
         <DefinitionList.Term>Website</DefinitionList.Term>
         <DefinitionList.Details>
           {event.website ? (
-            <a href={event.website}>{event.website}</a>
+            <a to={event.website}>{event.website}</a>
           ) : (
             <em>n/a</em>
           )}

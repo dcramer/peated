@@ -20,6 +20,11 @@ export function getEntityTypeSearchUrl(type: EntityType) {
   return link;
 }
 
+/**
+ * @deprecated Use TanStack Router's built-in search prop with functions instead:
+ * `search={(prev) => ({ ...prev, newParam: value })}`
+ * See: https://tanstack.com/router/v1/docs/framework/react/guide/search-params
+ */
 export function buildQueryString(
   searchParams: URLSearchParams,
   newParams: Record<string, any>

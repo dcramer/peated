@@ -1,4 +1,4 @@
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 
 import type { Badge, PagingRel } from "@peated/server/types";
 import BadgeImage from "../badgeImage";
@@ -34,7 +34,7 @@ export default function BadgeTable({
                     <BadgeImage badge={badge} size={48} />
                     <div>
                       <Link
-                        href={`/admin/badges/${badge.id}`}
+                        to={`/admin/badges/${badge.id}`}
                         className="font-medium hover:underline"
                       >
                         {badge.name}

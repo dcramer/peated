@@ -1,13 +1,13 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import BottleMetadata from "./bottleMetadata";
 import PageHeader from "./pageHeader";
 
 export default function BottleHeader({
   bottle,
-  href,
+  to,
 }: {
   bottle: Bottle;
   href?: string;
@@ -18,13 +18,13 @@ export default function BottleHeader({
       title={
         <div className="flex gap-x-2">
           {href ? (
-            <Link href={href} className="hover:underline">
+            <Link to={href} className="hover:underline">
               {bottle.fullName}
             </Link>
           ) : (
             <div className="flex gap-x-2">
               <Link
-                href={`/entities/${bottle.brand.id}`}
+                to={`/entities/${bottle.brand.id}`}
                 className="hover:underline"
               >
                 {bottle.brand.shortName || bottle.brand.name}
@@ -49,7 +49,7 @@ export default function BottleHeader({
             <div>
               {bottle.category && (
                 <Link
-                  href={`/bottles?category=${encodeURIComponent(
+                  to={`/bottles?category=${encodeURIComponent(
                     bottle.category
                   )}`}
                   className="hover:underline"

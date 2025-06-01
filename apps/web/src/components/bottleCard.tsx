@@ -4,7 +4,7 @@ import {
   formatCategoryName,
 } from "@peated/server/lib/format";
 import type { Bottle, BottleRelease } from "@peated/server/types";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import type { ComponentPropsWithoutRef } from "react";
 import classNames from "../lib/classNames";
 import BottleLink from "./bottleLink";
@@ -165,7 +165,7 @@ export default function BottleCard({
         <div>
           {bottle.category && (
             <Link
-              href={`/bottles?category=${bottle.category}`}
+              to={`/bottles?category=${bottle.category}`}
               className="hover:underline"
             >
               {formatCategoryName(bottle.category)}
@@ -179,7 +179,7 @@ export default function BottleCard({
             {bottle.distillers.map((d) => (
               <Link
                 key={d.id}
-                href={`/entities/${d.id}`}
+                to={`/entities/${d.id}`}
                 className="hover:underline"
               >
                 {d.name}

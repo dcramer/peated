@@ -1,5 +1,5 @@
 import type { User } from "@peated/server/types";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import Chip from "../chip";
 import UserAvatar from "../userAvatar";
 
@@ -22,7 +22,7 @@ export default function UserResultRow({
       <div className="flex min-w-0 flex-auto">
         <div className="flex-auto">
           <Link
-            href={`/users/${user.username}`}
+            to={`/users/${user.username}`}
             className="font-semibold leading-6"
           >
             {user.username}

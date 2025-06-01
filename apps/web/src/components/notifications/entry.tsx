@@ -2,7 +2,7 @@
 
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import type { Notification } from "@peated/server/types";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import classNames from "@peated/web/lib/classNames";
 import type { FriendRequestNotification } from "@peated/web/types";
 import { useNavigate } from "@tanstack/react-router";
@@ -46,7 +46,7 @@ export default function NotificationEntry({
               <div className="text-sm">
                 {notification.fromUser && (
                   <Link
-                    href={`/users/${notification.fromUser.username}`}
+                    to={`/users/${notification.fromUser.username}`}
                     className="mr-1 inline-flex items-center font-semibold hover:underline"
                     onClick={(e: React.MouseEvent) => {
                       e.stopPropagation();
@@ -108,7 +108,7 @@ const getStatusMessage = ({ notification }: { notification: Notification }) => {
           toasted
           {notification.ref && "bottle" in notification.ref ? (
             <Link
-              href={`/tastings/${notification.ref.id}`}
+              to={`/tastings/${notification.ref.id}`}
               className="mx-1 font-semibold"
             >
               {notification.ref.bottle.fullName}
@@ -124,7 +124,7 @@ const getStatusMessage = ({ notification }: { notification: Notification }) => {
           commented on
           {notification.ref && "bottle" in notification.ref ? (
             <Link
-              href={`/tastings/${notification.ref.id}`}
+              to={`/tastings/${notification.ref.id}`}
               className="mx-1 font-semibold"
             >
               {notification.ref.bottle.fullName}

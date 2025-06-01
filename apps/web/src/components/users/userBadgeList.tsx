@@ -1,7 +1,7 @@
 "use client";
 
 import BadgeImage from "@peated/web/components/badgeImage";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import classNames from "@peated/web/lib/classNames";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -32,7 +32,7 @@ export function UserBadgeList({ userId }: { userId: number }) {
               )}
             >
               <Link
-                href={`/badges/${award.badge.id}`}
+                to={`/badges/${award.badge.id}`}
                 className="absolute inset-0"
               />
               <BadgeImage badge={award.badge} level={award.level} />

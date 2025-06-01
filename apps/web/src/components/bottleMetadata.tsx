@@ -1,5 +1,5 @@
 import type { CaskFill, CaskSize, CaskType } from "@peated/server/types";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import type { ComponentPropsWithoutRef } from "react";
 import Join from "./join";
 import Tooltip from "./tooltip";
@@ -30,7 +30,7 @@ export default function BottleMetadata({ data, ...props }: Props) {
             return (
               <Link
                 key={d.id}
-                href={`/entities/${d.id}`}
+                to={`/entities/${d.id}`}
                 className="hover:underline"
               >
                 {d.name}
@@ -48,7 +48,7 @@ export const Brand = ({ data: { brand } }: Props) => {
 
   return (
     <div className="max-w-[200px] space-x-1 truncate">
-      <Link href={`/entities/${brand.id}`} className="hover:underline">
+      <Link to={`/entities/${brand.id}`} className="hover:underline">
         {brandName}
       </Link>
     </div>
@@ -74,7 +74,7 @@ export const Distillers = ({ data: { distillers } }: Props) => {
       <span>Distilled at</span>
       <Link
         key={d.id}
-        href={`/entities/${d.id}`}
+        to={`/entities/${d.id}`}
         className="inline-block max-w-[200px] truncate align-bottom hover:underline"
       >
         {d.name}

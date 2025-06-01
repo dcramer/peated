@@ -5,7 +5,7 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import type { Currency } from "@peated/server/types";
 import BetaNotice from "@peated/web/components/betaNotice";
 import BottleLink from "@peated/web/components/bottleLink";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import Price from "@peated/web/components/price";
 import classNames from "@peated/web/lib/classNames";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -77,7 +77,7 @@ export default function PriceChanges() {
                     {!!bottle.category && (
                       <div className="text-muted text-sm">
                         <Link
-                          href={`/bottles/?category=${bottle.category}`}
+                          to={`/bottles/?category=${bottle.category}`}
                           className="hover:underline"
                         >
                           {formatCategoryName(bottle.category)}

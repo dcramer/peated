@@ -1,5 +1,5 @@
 import type { Bottle, PagingRel, StorePrice } from "@peated/server/types";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import Price from "@peated/web/components/price";
 import PaginationButtons from "../paginationButtons";
 
@@ -49,14 +49,14 @@ export default function StorePriceTable({
                 </td>
                 <td className="max-w-0 px-3 py-3">
                   <Link
-                    href={price.url}
+                    to={price.url}
                     className="font-medium hover:underline"
                   >
                     {price.name}
                   </Link>
                   <div className="mt-2 space-x-2 text-xs">
                     {price.bottle ? (
-                      <Link href={`/bottles/${price.bottle.id}`}>
+                      <Link to={`/bottles/${price.bottle.id}`}>
                         Bottle {price.bottle.id}
                       </Link>
                     ) : (

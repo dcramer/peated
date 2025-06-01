@@ -1,7 +1,7 @@
 "use client";
 
 import DateRange from "@peated/web/components/dateRange";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -46,7 +46,7 @@ export default function UpcomingEvents() {
               <td className="max-w-0 py-2 pr-4 pl-4 text-sm sm:pl-3">
                 <div className="flex items-center space-x-1">
                   {event.website ? (
-                    <Link href={event.website} className="hover:underline">
+                    <Link to={event.website} className="hover:underline">
                       {event.name}
                     </Link>
                   ) : (

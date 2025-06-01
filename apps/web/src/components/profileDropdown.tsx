@@ -7,7 +7,7 @@ import {
   MenuItems,
   Transition,
 } from "@headlessui/react";
-import Link from "@peated/web/components/link";
+import { Link } from "@tanstack/react-router";
 import useAuth from "@peated/web/hooks/useAuth";
 import classNames from "@peated/web/lib/classNames";
 import { Fragment, useRef } from "react";
@@ -34,7 +34,7 @@ export function ProfileDropdown() {
                 : "rounded text-muted"
             )}
             as={Link}
-            href={`/users/${user.username}`}
+            to={`/users/${user.username}`}
           >
             <span className="sr-only">Open user menu</span>
             <div className="h-8 w-8">
@@ -57,7 +57,7 @@ export function ProfileDropdown() {
             >
               <div>
                 <MenuItem>
-                  <Link href={`/users/${user.username}`}>Profile</Link>
+                  <Link to={`/users/${user.username}`}>Profile</Link>
                 </MenuItem>
                 <MenuItem>
                   <LogoutButton />
@@ -66,7 +66,7 @@ export function ProfileDropdown() {
               {user.admin && (
                 <div>
                   <MenuItem>
-                    <Link href={"/admin"}>Admin</Link>
+                    <Link to={"/admin"}>Admin</Link>
                   </MenuItem>
                 </div>
               )}
