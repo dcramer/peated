@@ -3,25 +3,34 @@ import { ArrowsPointingOutIcon, StarIcon } from "@heroicons/react/24/outline";
 import { formatCategoryName } from "@peated/server/lib/format";
 import BottleLink from "@peated/web/components/bottleLink";
 import Button from "@peated/web/components/button";
+import ModActions from "@peated/web/components/flights/modActions";
 import { summarize } from "@peated/web/lib/markdown";
-import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import ModActions from "@peated/web/routes/(default)/flights/[flightId]/modActions";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
+
+const searchSchema = z.object({
+  flight: z.string().optional(),
+});
 
 export const Route = createFileRoute("/flights/$flightId")({
   component: Page,
-  loader: async ({ params }) => {
-    const { client } = await getServerClient();
-
-    const flight = await client.flights.details({
-      flight: params.flightId,
-    });
+  validateSearch: searchSchema,
+  loader: async ({ params, context }) => {
+    const flight = await context.queryClient.ensureQueryData(
+      context.orpc.flights.details.queryOptions({
+        input: {
+          flight: params.flightId,
+        },
+      })
+    );
 
     return { flight };
   },
   head: ({ loaderData }) => {
+    if (!loaderData) return {};
+
     const { flight } = loaderData;
     const description = summarize(flight.description || "", 200);
 
@@ -59,7 +68,7 @@ function Page() {
               {flight.name}
             </h1>
             <div className="flex flex-row gap-2">
-              <Button href={`/flights/${flight.id}/overlay`} color="primary">
+              <Button to={`/flights/${flight.id}/overlay`} color="primary">
                 <ArrowsPointingOutIcon className="h-4 w-4" />
               </Button>
               <ModActions flight={flight} />
@@ -105,7 +114,14 @@ function Page() {
                   <Button
                     color={bottle.hasTasted ? "default" : "highlight"}
                     size="small"
-                    href={`/bottles/${bottle.id}/addTasting?flight=${flight.id}`}
+                    to="/bottles/$bottleId/addTasting"
+                    params={{
+                      bottleId: String(bottle.id),
+                    }}
+                    search={(prev) => ({
+                      ...prev,
+                      flight: flight.id,
+                    })}
                   >
                     Record Tasting
                   </Button>

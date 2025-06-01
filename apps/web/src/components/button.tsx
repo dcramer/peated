@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import type { ForwardedRef, ReactNode } from "react";
 import { forwardRef } from "react";
-import classNames from "../lib/classNames";
 import type { ComponentProps } from "react";
+import classNames from "../lib/classNames";
 
 type ButtonColor = "primary" | "default" | "highlight" | "danger" | undefined;
 
@@ -27,11 +27,13 @@ type ConditionalProps =
   | {
       to?: ComponentProps<typeof Link>["to"];
       search?: ComponentProps<typeof Link>["search"];
+      params?: ComponentProps<typeof Link>["params"];
       onClick?: never;
     }
   | {
       to?: never;
       search?: never;
+      params?: never;
       onClick?: (e: any) => void;
     };
 

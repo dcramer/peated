@@ -30,11 +30,11 @@ function Page() {
         pages={[
           {
             name: "Admin",
-            href: "/admin",
+            to: "/admin",
           },
           {
             name: "Locations",
-            href: "/admin/locations",
+            to: "/admin/locations",
             current: true,
           },
         ]}

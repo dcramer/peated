@@ -26,15 +26,15 @@ function Page() {
         pages={[
           {
             name: "Admin",
-            href: "/admin",
+            to: "/admin",
           },
           {
             name: "Tags",
-            href: "/admin/tags",
+            to: "/admin/tags",
           },
           {
             name: toTitleCase(tag.name),
-            href: `/admin/tags/${tag.name}`,
+            to: `/admin/tags/${tag.name}`,
             current: true,
           },
         ]}
@@ -51,7 +51,9 @@ function Page() {
         </div>
         <div className="flex w-full flex-col items-center justify-center sm:w-auto sm:items-end">
           <div className="flex gap-x-2">
-            <Button href={`/admin/tags/${tag.name}/edit`}>Edit Tag</Button>
+            <Button to="/admin/tags/$tagId/edit" params={{ tagId: tag.name }}>
+              Edit Tag
+            </Button>
           </div>
         </div>
       </div>

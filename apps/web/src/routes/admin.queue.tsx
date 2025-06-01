@@ -3,12 +3,12 @@ import type { Bottle } from "@peated/server/types";
 import BottleSelector from "@peated/web/components/admin/queue/bottleSelector";
 import Button from "@peated/web/components/button";
 import { useFlashMessages } from "@peated/web/components/flash";
-import { Link } from "@tanstack/react-router";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import Table from "@peated/web/components/table";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { createFileRoute, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 
@@ -63,14 +63,15 @@ function Page() {
             value: (item) => {
               return (
                 <div>
-                  <a
+                  <button
+                    type="button"
                     onClick={() => {
                       setUnmatchedBottle(item);
                     }}
                     className="cursor-pointer font-bold hover:underline"
                   >
                     {item.name}
-                  </a>
+                  </button>
                   {item.exampleListing && (
                     <div className="text-muted">
                       {" "}
@@ -134,7 +135,11 @@ function Page() {
             <div>
               Assigned{" "}
               <strong className="font-bold">{unmatchedBottle.name}</strong> to{" "}
-              <Link to={`/bottles/${bottle.id}`} className="underline">
+              <Link
+                to="/bottles/$bottleId"
+                params={{ bottleId: String(bottle.id) }}
+                className="underline"
+              >
                 {bottle.fullName}
               </Link>
             </div>

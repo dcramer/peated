@@ -1,4 +1,4 @@
-import ReleaseTable from "@peated/web/components/bottles/releaseTable";
+import ReleaseTable from "@peated/web/components/bottles/releases/releaseTable";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";

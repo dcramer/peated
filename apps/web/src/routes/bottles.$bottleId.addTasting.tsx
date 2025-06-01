@@ -1,6 +1,5 @@
 import BadgeImage from "@peated/web/components/badgeImage";
 import { useFlashMessages } from "@peated/web/components/flash";
-import { Link } from "@tanstack/react-router";
 import TastingForm from "@peated/web/components/tastingForm";
 import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
@@ -12,10 +11,34 @@ import {
   useQuery,
   useSuspenseQuery,
 } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { z } from "zod";
+
+const searchSchema = z.object({
+  release: z.string().optional(),
+  flight: z.string().optional(),
+});
 
 export const Route = createFileRoute("/bottles/$bottleId/addTasting")({
   component: Page,
+  validateSearch: searchSchema,
+  loader: async ({ params, context }) => {
+    // Preload bottle data and suggested tags
+    const bottle = await context.queryClient.ensureQueryData(
+      context.orpc.bottles.details.queryOptions({
+        input: { bottle: Number(params.bottleId) },
+      })
+    );
+
+    const suggestedTags = await context.queryClient.ensureQueryData(
+      context.orpc.bottles.suggestedTags.queryOptions({
+        input: { bottle: Number(params.bottleId) },
+      })
+    );
+
+    return { bottle, suggestedTags };
+  },
 });
 
 function Page() {
@@ -107,7 +130,8 @@ function Page() {
               flash(
                 <div className="relative flex flex-row items-center gap-x-3">
                   <Link
-                    to={`/badges/${award.badge.id}`}
+                    to="/badges/$badgeId"
+                    params={{ badgeId: String(award.badge.id) }}
                     className="absolute inset-0"
                   />
                   <BadgeImage

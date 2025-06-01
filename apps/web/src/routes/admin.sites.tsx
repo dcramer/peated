@@ -33,17 +33,17 @@ function Page() {
         pages={[
           {
             name: "Admin",
-            href: "/admin",
+            to: "/admin",
           },
           {
             name: "Sites",
-            href: "/admin/sites",
+            to: "/admin/sites",
             current: true,
           },
         ]}
       />
       <div className="flex items-center justify-end">
-        <Button color="primary" href="/admin/sites/add">
+        <Button color="primary" to="/admin/sites/add">
           Add Site
         </Button>
       </div>
@@ -52,16 +52,21 @@ function Page() {
         <Table
           items={siteList.results}
           rel={siteList.rel}
-          defaultSort="-created"
-          primaryKey={(item) => item.type}
-          url={(item) => `/admin/sites/${item.type}`}
+          url={(item) => `/admin/sites/${item.id}`}
           columns={[
             { name: "name", sort: "name", sortDefaultOrder: "asc" },
             {
+              name: "type",
+              sort: "type",
+              sortDefaultOrder: "asc",
+            },
+            {
               name: "lastRunAt",
-              title: "Last Run",
-              value: (v) =>
-                v.lastRunAt ? <TimeSince date={v.lastRunAt} /> : <>&mdash;</>,
+              title: "Last run",
+              value: (item) =>
+                item.lastRunAt ? (
+                  <TimeSince date={new Date(item.lastRunAt)} />
+                ) : null,
             },
           ]}
         />

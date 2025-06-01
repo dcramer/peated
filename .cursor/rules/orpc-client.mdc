@@ -174,13 +174,13 @@ This setup provides `context.orpc`, `context.queryClient`, and `context.orpcClie
 
 ### Server Actions
 
-Use `getServerClient()` in server actions when you need a fresh client with current session:
+Use `createServerClient()` in server actions when you need a fresh client with current session:
 
 ```ts
-import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { createServerClient } from "@peated/web/lib/orpc/client.server";
 
 async function registerUser({ email, password, username, session }) {
-  const { client } = await getServerClient();
+  const { client } = await createServerClient();
 
   const { error, data, isDefined } = await safe(
     client.auth.register({ email, password, username })
@@ -196,7 +196,7 @@ async function registerUser({ email, password, username, session }) {
 }
 ```
 
-**Note**: In route loaders, prefer using `context.orpcClient` over creating a new client, as it's already configured and cached. Use `getServerClient()` in server actions or when you need a client with specific session/auth context.
+**Note**: In route loaders, prefer using `context.orpcClient` over creating a new client, as it's already configured and cached. Use `createServerClient()` in server actions or when you need a client with specific session/auth context.
 ```
 
 ### useQuery, useSuspenseQuery
@@ -531,6 +531,86 @@ const queryString = `?page=${search.page}&filter=${search.filter}`;
 ```ts
 // Use this - leverages TanStack Router's JSON-first approach
 <Link search={(prev) => ({ ...prev, page: prev.page + 1 })} />
+```
+
+## TanStack Router Navigation Best Practices
+
+TanStack Router provides powerful type-safe navigation. Always prefer typed navigation over template literals for better TypeScript inference and validation.
+
+### ✅ Preferred: Typed Route Navigation
+
+For optimal TypeScript support and validation, use the explicit route pattern with `params`:
+
+```ts
+import { Link } from "@tanstack/react-router";
+
+// ✅ Good - TypeScript can validate params and search
+<Button
+  to="/bottles/$bottleId/addTasting"
+  params={{ bottleId: String(bottle.id) }}
+  search={{ flight: flight.id }}
+>
+  Record Tasting
+</Button>
+
+// ✅ Good - Same pattern with Link
+<Link
+  to="/bottles/$bottleId/addTasting"
+  params={{ bottleId: String(bottle.id) }}
+  search={{ flight: flight.id }}
+>
+  Record Tasting
+</Link>
+```
+
+### ⚠️ Use Sparingly: Template Literal Navigation
+
+Template literals work but lose TypeScript validation for search params:
+
+```ts
+// ⚠️ Works but loses type safety - search params won't be validated
+<Button
+  to={`/bottles/${bottle.id}/addTasting`}
+  search={{ flight: flight.id }} // TypeScript can't validate this
+>
+  Record Tasting
+</Button>
+```
+
+**When to use template literals:**
+- Dynamic route generation where the route structure isn't known at compile time
+- When migrating legacy code incrementally
+- When you need to construct complex URLs programmatically
+
+**Always prefer typed navigation when:**
+- The route exists in your route tree
+- You need TypeScript validation for params/search
+- You're building new features
+
+### Navigation with Query Params
+
+When passing query parameters, ensure your target route has proper search validation:
+
+```ts
+// Target route must have search validation
+const searchSchema = z.object({
+  flight: z.string().optional(),
+  release: z.string().optional(),
+});
+
+export const Route = createFileRoute("/bottles/$bottleId/addTasting")({
+  validateSearch: searchSchema,
+  // ... rest of route
+});
+
+// Now this navigation will be properly typed
+<Button
+  to="/bottles/$bottleId/addTasting"
+  params={{ bottleId: String(bottle.id) }}
+  search={{ flight: flight.id }} // ✅ TypeScript validates this
+>
+  Record Tasting
+</Button>
 ```
 
 ## See Also

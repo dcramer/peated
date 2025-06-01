@@ -7,9 +7,15 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { z } from "zod";
+
+const searchSchema = z.object({
+  returnTo: z.string().optional(),
+});
 
 export const Route = createFileRoute("/admin/locations/$countrySlug/edit")({
   component: Page,
+  validateSearch: searchSchema,
 });
 
 function Page() {

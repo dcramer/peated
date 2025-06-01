@@ -39,7 +39,7 @@ function Verify() {
   // Handle redirect logic in useEffect to avoid hook ordering issues
   useEffect(() => {
     if (user?.verified || (!user && !token)) {
-      navigate({ to: "/activity" });
+      navigate({ to: "/" });
     }
   }, [user, token, navigate]);
 
@@ -86,7 +86,7 @@ function Verify() {
         ) : success ? (
           <>
             <p className="mb-8 text-center">Your account has been verified.</p>
-            <Button href="/" color="highlight">
+            <Button to="/" color="highlight">
               Return to Peated
             </Button>
           </>

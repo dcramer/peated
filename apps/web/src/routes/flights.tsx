@@ -23,7 +23,7 @@ function Page() {
       <PageHeader
         title="Flights"
         metadata={
-          <Button color="primary" href="/addFlight">
+          <Button color="primary" to="/addFlight">
             Add Flight
           </Button>
         }

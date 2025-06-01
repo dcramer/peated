@@ -34,17 +34,17 @@ function Page() {
         pages={[
           {
             name: "Admin",
-            href: "/admin",
+            to: "/admin",
           },
           {
             name: "Events",
-            href: "/admin/events",
+            to: "/admin/events",
             current: true,
           },
         ]}
       />
       <div className="flex items-center justify-end">
-        <Button color="primary" href="/admin/events/add">
+        <Button color="primary" to="/admin/events/add">
           Add Event
         </Button>
       </div>

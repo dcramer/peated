@@ -15,14 +15,13 @@ function Page() {
     defaults: {
       sort: "-created",
     },
+    numericFields: ["cursor", "limit"],
   });
 
   const orpc = useORPC();
   const { data: userList } = useSuspenseQuery(
     orpc.users.list.queryOptions({
-      input: {
-        ...queryParams,
-      },
+      input: queryParams,
     })
   );
 
@@ -32,11 +31,11 @@ function Page() {
         pages={[
           {
             name: "Admin",
-            href: "/admin",
+            to: "/admin",
           },
           {
             name: "Users",
-            href: "/admin/users",
+            to: "/admin/users",
             current: true,
           },
         ]}
@@ -56,6 +55,7 @@ function Page() {
             value: (v) => !!v.createdAt && <TimeSince date={v.createdAt} />,
           },
         ]}
+        withSearch
       />
     </div>
   );
