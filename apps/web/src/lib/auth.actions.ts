@@ -1,73 +1,76 @@
 "use server";
 
 import { safe } from "@orpc/client";
-import { createServerClient } from "@peated/web/lib/orpc/client.server";
 import { redirect } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/start";
+import { z } from "zod";
 import { getSafeRedirect } from "./auth";
-import type { SessionData } from "./session.server";
-import { getSession } from "./session.server";
+import { getServerClient } from "./orpc/client.server";
+import { useAppSession } from "./session.server";
 
 const SESSION_REFRESH = 60 * 60; // 1 hour
 
-export async function logoutForm(
-  prevState: undefined | undefined,
-  formData: FormData
-) {
-  "use server";
+export const logout = createServerFn({ method: "POST" })
+  .validator(z.object({ redirectTo: z.string().optional().default("/") }))
+  .handler(async ({ data }) => {
+    const session = await useAppSession();
+    session.clear();
+    redirect({ to: getSafeRedirect(data.redirectTo) });
+  });
 
-  return await logout(formData);
-}
+export const authenticate = createServerFn({ method: "POST" })
+  .validator(
+    z.union([
+      z.object({
+        email: z.string().email(),
+        password: z.string().optional(),
+        redirectTo: z.string().optional().default("/"),
+      }),
+      z.object({
+        code: z.string(),
+        redirectTo: z.string().optional().default("/"),
+      }),
+    ])
+  )
+  .handler(async (ctx) => {
+    const session = await useAppSession();
 
-export async function logout(formData?: FormData) {
-  "use server";
+    const client = getServerClient();
 
-  const redirectTo = getSafeRedirect(
-    formData ? ((formData.get("redirectTo") || "/") as string) : null
-  );
+    if ("email" in ctx.data && !ctx.data.password) {
+      const { error, isDefined } = await safe(
+        client.auth.magicLink.create({ email: ctx.data.email })
+      );
+      if (isDefined) {
+        return {
+          magicLink: false,
+          error: error.message,
+        };
+      }
+      if (error) {
+        return {
+          magicLink: false,
+          error: "Internal server error.",
+        };
+      }
 
-  const session = await getSession();
-  session.destroy();
-  redirect({ to: redirectTo, search: {} });
-}
+      return {
+        magicLink: true,
+        error: null,
+      };
+    }
 
-type AuthenticateFormResult = {
-  magicLink: boolean;
-  error: string | null;
-};
-
-export async function authenticateForm(
-  prevState: AuthenticateFormResult | undefined,
-  formData: FormData
-) {
-  "use server";
-
-  return await authenticate(formData);
-}
-
-export async function authenticate(
-  formData: FormData
-): Promise<AuthenticateFormResult | undefined> {
-  "use server";
-
-  const session = await getSession();
-
-  // const url = new URL(request.url);
-  // const redirectTo = url.searchParams.get("redirectTo");
-  // const form = await request.formData();
-
-  const email = (formData.get("email") || "") as string;
-  const password = (formData.get("password") || "") as string;
-  const code = formData.get("code") as string;
-  const redirectTo = getSafeRedirect(
-    (formData.get("redirectTo") || "/") as string
-  );
-
-  const { client } = await createServerClient();
-
-  if (email && !password) {
-    const { error, isDefined } = await safe(
-      client.auth.magicLink.create({ email })
+    const { error, isDefined, data } = await safe(
+      "code" in ctx.data
+        ? client.auth.login({
+            code: ctx.data.code,
+          })
+        : client.auth.login({
+            email: ctx.data.email,
+            password: ctx.data.password!,
+          })
     );
+
     if (isDefined) {
       return {
         magicLink: false,
@@ -81,222 +84,144 @@ export async function authenticate(
       };
     }
 
-    return {
-      magicLink: true,
-      error: null,
-    };
-  }
+    await session.update({
+      user: data.user,
+      accessToken: data.accessToken ?? null,
+      ts: new Date().getTime(),
+    });
 
-  const { error, isDefined, data } = await safe(
-    code
-      ? client.auth.login({
-          code,
-        })
-      : client.auth.login({
-          email,
-          password,
-        })
-  );
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
+    // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
 
-  if (isDefined) {
-    return {
-      magicLink: false,
-      error: error.message,
-    };
-  }
-  if (error) {
-    return {
-      magicLink: false,
-      error: "Internal server error.",
-    };
-  }
+    if (!data.user.verified) {
+      redirect({ to: "/verify" });
+    } else {
+      redirect({ to: getSafeRedirect(ctx.data.redirectTo) });
+    }
+  });
 
-  session.user = data.user;
-  session.accessToken = data.accessToken ?? null;
-
-  await session.save();
-
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
-  // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
-
-  if (!data.user.verified) {
-    redirect({ to: "/verify" });
-  } else {
-    redirect({ to: redirectTo });
-  }
-}
-
-export async function registerForm(
-  prevState: GenericResult | undefined,
-  formData: FormData
-) {
-  "use server";
-
-  return await register(formData);
-}
-
-export async function register(formData: FormData) {
-  "use server";
-
-  const session = await getSession();
-
-  // const url = new URL(request.url);
-  // const redirectTo = url.searchParams.get("redirectTo");
-  // const form = await request.formData();
-
-  const email = (formData.get("email") || "") as string;
-  const password = (formData.get("password") || "") as string;
-  const username = formData.get("username") as string;
-
-  const { client } = await createServerClient();
-
-  const { error, isDefined, data } = await safe(
-    client.auth.register({
-      email,
-      password,
-      username,
+export const register = createServerFn({ method: "POST" })
+  .validator(
+    z.object({
+      email: z.string().email(),
+      password: z.string(),
+      username: z.string(),
+      redirectTo: z.string().optional().default("/"),
     })
-  );
+  )
+  .handler(async (ctx) => {
+    const session = await useAppSession();
 
-  if (isDefined) {
-    return { ok: false, error: error.message };
-  }
-  if (error) {
-    return { ok: false, error: "Internal server error." };
-  }
+    const client = getServerClient();
 
-  session.user = data.user;
-  session.accessToken = data.accessToken ?? null;
-  session.ts = new Date().getTime();
-
-  await session.save();
-
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
-  // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
-
-  return redirect({ to: "/verify", search: {} });
-}
-
-type GenericResult = {
-  ok: boolean;
-  error?: string;
-};
-
-export async function resendVerificationForm(
-  prevState?:
-    | (GenericResult & {
-        alreadyVerified?: boolean;
+    const { error, isDefined, data } = await safe(
+      client.auth.register({
+        email: ctx.data.email,
+        password: ctx.data.password,
+        username: ctx.data.username,
       })
-    | undefined,
-  formData?: FormData
-) {
-  "use server";
+    );
 
-  const session = await getSession();
+    if (isDefined) {
+      return { ok: false, error: error.message };
+    }
+    if (error) {
+      return { ok: false, error: "Internal server error." };
+    }
 
-  const { client } = await createServerClient();
-  const { isDefined, error } = await safe(client.email.resendVerification());
+    await session.update({
+      user: data.user,
+      accessToken: data.accessToken ?? null,
+      ts: new Date().getTime(),
+    });
 
-  if (isDefined && error.name === "CONFLICT") {
-    return { ok: true, alreadyVerified: true };
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
+    // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
+
+    throw redirect({ to: "/verify" });
+  });
+
+export const resendVerification = createServerFn({ method: "POST" }).handler(
+  async () => {
+    const session = await useAppSession();
+
+    const client = getServerClient({ accessToken: session.data.accessToken! });
+    const { isDefined, error } = await safe(client.email.resendVerification());
+
+    if (isDefined && error.name === "CONFLICT") {
+      return { ok: true, alreadyVerified: true };
+    }
+    if (error) {
+      return { ok: false, error: "Internal server error." };
+    }
+
+    return { ok: true };
   }
-  if (error) {
-    return { ok: false, error: "Internal server error." };
+);
+
+export const passwordReset = createServerFn({ method: "POST" })
+  .validator(z.object({ email: z.string().email() }))
+  .handler(async (ctx) => {
+    const client = getServerClient();
+
+    const { error, isDefined } = await safe(
+      client.auth.passwordReset.create({ email: ctx.data.email })
+    );
+
+    if (isDefined) {
+      return { ok: false, error: error.message };
+    }
+    if (error) {
+      return { ok: false, error: "Internal server error." };
+    }
+
+    return { ok: true };
+  });
+
+export const passwordResetConfirm = createServerFn({ method: "POST" })
+  .validator(z.object({ token: z.string(), password: z.string() }))
+  .handler(async (ctx) => {
+    const token = ctx.data.token;
+    const password = ctx.data.password;
+
+    const session = await useAppSession();
+    const client = getServerClient();
+
+    const { error, isDefined, data } = await safe(
+      client.auth.passwordReset.confirm({ token, password })
+    );
+
+    if (isDefined) {
+      return { ok: false, error: error.message };
+    }
+    if (error) {
+      return { ok: false, error: "Internal server error." };
+    }
+
+    await session.update({
+      user: data.user,
+      accessToken: data.accessToken ?? null,
+      ts: new Date().getTime(),
+    });
+
+    return { ok: true };
+  });
+
+export const updateSession = createServerFn({ method: "POST" }).handler(
+  async () => {
+    const session = await useAppSession();
+    const client = getServerClient({ accessToken: session.data.accessToken! });
+
+    const user = await client.users.details({ user: "me" });
+    await session.update({
+      user: user,
+      ts: new Date().getTime(),
+    });
+
+    return {
+      user: user,
+      accessToken: session.data.accessToken,
+      ts: session.data.ts,
+    };
   }
-
-  return { ok: true };
-}
-
-export async function passwordResetForm(
-  prevState: GenericResult | undefined,
-  formData: FormData
-) {
-  "use server";
-
-  const email = (formData.get("email") || "") as string;
-
-  const session = await getSession();
-  const { client } = await createServerClient();
-
-  const { error, isDefined } = await safe(
-    client.auth.passwordReset.create({ email })
-  );
-
-  if (isDefined) {
-    return { ok: false, error: error.message };
-  }
-  if (error) {
-    return { ok: false, error: "Internal server error." };
-  }
-
-  return { ok: true };
-}
-
-export async function passwordResetConfirmForm(
-  prevState: GenericResult | undefined,
-  formData: FormData
-) {
-  "use server";
-
-  const token = (formData.get("token") || "") as string;
-  const password = (formData.get("password") || "") as string;
-
-  const session = await getSession();
-  const { client } = await createServerClient();
-
-  const { error, isDefined, data } = await safe(
-    client.auth.passwordReset.confirm({ token, password })
-  );
-
-  if (isDefined) {
-    return { ok: false, error: error.message };
-  }
-  if (error) {
-    return { ok: false, error: "Internal server error." };
-  }
-
-  session.user = data.user;
-  session.accessToken = data.accessToken ?? null;
-  session.ts = new Date().getTime();
-
-  await session.save();
-
-  return { ok: true };
-}
-
-export async function updateSession(): Promise<SessionData> {
-  "use server";
-
-  const session = await getSession();
-  const { client } = await createServerClient();
-
-  const user = await client.users.details({ user: "me" });
-  session.user = user;
-  session.ts = new Date().getTime();
-  // should rotate access token too
-  // session.accessToken = data.accessToken;
-  await session.save();
-
-  return {
-    ...session,
-  };
-}
-
-export async function ensureSessionSynced(): Promise<SessionData> {
-  "use server";
-
-  let session: SessionData = { ...(await getSession()) };
-  if (!session.user) return session;
-
-  if (
-    !session.ts ||
-    session.ts < new Date().getTime() / 1000 - SESSION_REFRESH
-  ) {
-    console.log(`Refreshing session for user_id='${session.user.id}'`);
-    session = await updateSession();
-  }
-
-  return {
-    ...session,
-  };
-}
+);

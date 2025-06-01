@@ -9,12 +9,15 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { z } from "zod";
+
+const searchSchema = z.object({
+  token: z.string().optional(),
+});
 
 export const Route = createFileRoute("/verify")({
   component: Verify,
-  validateSearch: (search: Record<string, unknown>) => ({
-    token: (search.token as string) || "",
-  }),
+  validateSearch: searchSchema,
 });
 
 function Verify() {
