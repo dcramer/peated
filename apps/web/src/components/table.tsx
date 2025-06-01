@@ -2,9 +2,8 @@
 
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { PagingRel } from "@peated/server/types";
-import { Link } from "@tanstack/react-router";
 import classNames from "@peated/web/lib/classNames";
-import { useSearchParams } from "next/navigation";
+import { Link, useLocation } from "@tanstack/react-router";
 import type { ReactElement, ReactNode } from "react";
 import PaginationButtons from "./paginationButtons";
 import SearchBar from "./searchBar";
@@ -35,7 +34,7 @@ export default function Table<
   defaultSort,
   groupBy,
   groupTo,
-  groupItem = (item) => item.name,
+  groupItem = (item: G) => item.name,
   withSearch = false,
   noHeaders = false,
 }: {
@@ -51,7 +50,8 @@ export default function Table<
   withSearch?: boolean;
   noHeaders?: boolean;
 }) {
-  const searchParams = useSearchParams();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
   const currentSort = searchParams.get("sort") ?? defaultSort;
   let lastGroup: G;
 

@@ -3,9 +3,6 @@ import {
   defaultShouldDehydrateQuery,
   isServer,
 } from "@tanstack/react-query";
-import { bustAppCache } from "../cache.actions";
-// TODO: only in react 19
-// import { cache } from "react";
 
 // https://tanstack.com/query/latest/docs/framework/react/guides/advanced-ssr
 const createQueryClient = () => {
@@ -28,9 +25,6 @@ const createQueryClient = () => {
         onSuccess: async (data, variables, context) => {
           // Invalidate all queries in the react-query cache:
           await queryClient.invalidateQueries();
-
-          // call a server action to bust our global cache
-          await bustAppCache();
         },
       },
     },

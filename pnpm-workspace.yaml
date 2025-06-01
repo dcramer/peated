@@ -1,7 +1,7 @@
 packages:
-  - 'packages/*'
-  - 'apps/*'
-  - '!**/test/**'
+  - "packages/*"
+  - "apps/*"
+  - "!**/test/**"
 
 catalog:
   drizzle-kit: ^0.30.5
@@ -9,7 +9,6 @@ catalog:
   "@fontsource/raleway": ^5.0.19
   jsx-email: ^1.10.11
   pg: ^8.13.0
-  prettier: ^3.3.2
   "@sentry/core": 9.23.0
   "@sentry/react": 9.23.0
   "@sentry/node": 9.23.0
@@ -18,7 +17,6 @@ catalog:
   tailwindcss: ^4.1.8
   "@tailwindcss/forms": ^0.5.10
   "@tailwindcss/typography": ^0.5.16
-  "prettier-plugin-tailwindcss": ^0.6.9
   "tailwind-scrollbar": ^4.0.2
   "@tanstack/react-query": ^5.71.0
   "@tanstack/react-query-next-experimental": ^5.71.0
@@ -33,7 +31,7 @@ catalog:
   "vite-tsconfig-paths": "^5.0.1"
   zod: ^3.24.4
 
-  react: ^18.2.0
-  react-dom: ^18.2.0
-  "@types/react": ^18.2.0
-  "@types/react-dom": ^18.2.0
+  react: ^19.1.0
+  react-dom: ^19.1.0
+  "@types/react": ^19.1.6
+  "@types/react-dom": ^19.1.5

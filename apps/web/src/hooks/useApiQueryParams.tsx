@@ -1,4 +1,4 @@
-import { useSearchParams } from "next/navigation";
+import { useLocation } from "@tanstack/react-router";
 
 export default function useApiQueryParams({
   defaults = {},
@@ -9,7 +9,8 @@ export default function useApiQueryParams({
   numericFields?: string[];
   overrides?: Record<string, any>;
 }) {
-  const searchParams = useSearchParams();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
 
   const nFields = new Set(numericFields);
 

@@ -43,9 +43,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "lint-staged": "^14.0.1",
-    "prettier": "catalog:",
-    "prettier-plugin-tailwindcss": "catalog:"
+    "lint-staged": "^14.0.1"
   },
   "engines": {
     "node": ">=22.14.0 <23.0.0"

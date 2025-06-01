@@ -1,7 +1,7 @@
 "use client";
 
 import { useGoogleLogin } from "@react-oauth/google";
-import { useSearchParams } from "next/navigation";
+import { useLocation } from "@tanstack/react-router";
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import Button from "./button";
@@ -15,7 +15,8 @@ export default function GoogleLoginButton({
 }) {
   const [loading, setLoading] = useState(false);
   const { pending } = useFormStatus();
-  const searchParams = useSearchParams();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
 
   const googleLogin = useGoogleLogin({
     flow: "auth-code",
