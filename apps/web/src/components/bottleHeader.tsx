@@ -24,7 +24,8 @@ export default function BottleHeader({
           ) : (
             <div className="flex gap-x-2">
               <Link
-                to={`/entities/${bottle.brand.id}`}
+                to="/entities/$entityId"
+                params={{ entityId: String(bottle.brand.id) }}
                 className="hover:underline"
               >
                 {bottle.brand.shortName || bottle.brand.name}

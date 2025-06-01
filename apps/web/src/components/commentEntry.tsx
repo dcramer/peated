@@ -45,8 +45,9 @@ export default function CommentEntry<
           <div className="flex-auto">
             <div className="text-sm">
               <Link
-                to={`/users/${createdBy.username}`}
-                className="font-medium hover:underline"
+                to="/users/$username"
+                params={{ username: createdBy.username }}
+                className="font-semibold hover:underline"
               >
                 {createdBy.username}
               </Link>

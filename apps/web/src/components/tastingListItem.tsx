@@ -109,14 +109,19 @@ export default function TastingListItem({
         <UserAvatar size={32} user={tasting.createdBy} />
         <div className="flex-auto space-y-1 font-semibold">
           <Link
-            to={`/users/${tasting.createdBy.username}`}
+            to="/users/$username"
+            params={{ username: tasting.createdBy.username }}
             className="truncate hover:underline"
           >
             {tasting.createdBy.username}
           </Link>
         </div>
         <div className="flex flex-col items-end">
-          <Link to={`/tastings/${tasting.id}`} className="hover:underline">
+          <Link
+            to="/tastings/$tastingId"
+            params={{ tastingId: String(tasting.id) }}
+            className="hover:underline"
+          >
             <TimeSince
               className="block font-muted text-sm"
               date={tasting.createdAt}
@@ -218,7 +223,8 @@ export default function TastingListItem({
                 className="group relative flex items-center gap-x-1 rounded px-2 py-2 text-sm"
               >
                 <Link
-                  to={`/badges/${award.badge.id}`}
+                  to="/badges/$badgeId"
+                  params={{ badgeId: String(award.badge.id) }}
                   className="absolute inset-0"
                 />
                 <BadgeImage badge={award.badge} level={award.level} size={16} />
@@ -271,7 +277,8 @@ export default function TastingListItem({
                 aria-hidden="true"
               />
             }
-            to={`/tastings/${tasting.id}`}
+            to="/tastings/$tastingId"
+            params={{ tastingId: String(tasting.id) }}
           >
             {tasting.comments.toLocaleString()}
           </Button>

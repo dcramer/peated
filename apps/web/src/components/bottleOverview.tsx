@@ -62,7 +62,8 @@ export default function BottleOverview({
               <DefinitionList.Details>
                 <Link
                   key={bottle.brand.id}
-                  to={`/entities/${bottle.brand.id}`}
+                  to="/entities/$entityId"
+                  params={{ entityId: String(bottle.brand.id) }}
                   className="underline"
                 >
                   {bottle.brand.name}
@@ -73,7 +74,8 @@ export default function BottleOverview({
                 {bottle.series ? (
                   <Link
                     key={bottle.series.id}
-                    to={`/bottles?series=${bottle.series.id}`}
+                    to="/bottles"
+                    search={{ series: String(bottle.series.id) }}
                     className="underline"
                   >
                     {bottle.series.name}
@@ -89,7 +91,8 @@ export default function BottleOverview({
                     {bottle.distillers.map((d) => (
                       <Link
                         key={d.id}
-                        to={`/entities/${d.id}`}
+                        to="/entities/$entityId"
+                        params={{ entityId: String(d.id) }}
                         className="underline"
                       >
                         {d.name}
@@ -105,7 +108,8 @@ export default function BottleOverview({
                 {bottle.bottler ? (
                   <Link
                     key={bottle.bottler.id}
-                    to={`/entities/${bottle.bottler.id}`}
+                    to="/entities/$entityId"
+                    params={{ entityId: String(bottle.bottler.id) }}
                     className="underline"
                   >
                     {bottle.bottler.name}
@@ -160,7 +164,8 @@ export default function BottleOverview({
                   {createdBy ? (
                     <>
                       <Link
-                        to={`/users/${createdBy.username}`}
+                        to="/users/$username"
+                        params={{ username: createdBy.username }}
                         className="flex items-center gap-x-2 truncate hover:underline"
                       >
                         <UserAvatar size={16} user={createdBy} />
@@ -184,11 +189,12 @@ export default function BottleOverview({
                   src={bottle.imageUrl}
                   className="block max-w-full rounded"
                   aria-hidden="true"
+                  alt="image of bottle"
                 />
               </div>
             ) : (
               <img
-                src={RobotImage.src}
+                src={RobotImage}
                 className="block h-64 w-64"
                 alt="peated robot"
                 aria-hidden="true"

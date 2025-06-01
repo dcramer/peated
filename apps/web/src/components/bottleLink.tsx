@@ -36,7 +36,8 @@ export default function BottleLink({
         }}
         title={bottle.fullName}
         className="absolute inset-0"
-        to={`/bottles/${bottle.id}`}
+        to="/bottles/$bottleId"
+        params={{ bottleId: String(bottle.id) }}
         {...props}
       />
       {withPanel && (

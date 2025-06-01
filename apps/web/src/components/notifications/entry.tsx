@@ -46,7 +46,8 @@ export default function NotificationEntry({
               <div className="text-sm">
                 {notification.fromUser && (
                   <Link
-                    to={`/users/${notification.fromUser.username}`}
+                    to="/users/$username"
+                    params={{ username: notification.fromUser.username }}
                     className="mr-1 inline-flex items-center font-semibold hover:underline"
                     onClick={(e: React.MouseEvent) => {
                       e.stopPropagation();
@@ -108,7 +109,8 @@ const getStatusMessage = ({ notification }: { notification: Notification }) => {
           toasted
           {notification.ref && "bottle" in notification.ref ? (
             <Link
-              to={`/tastings/${notification.ref.id}`}
+              to="/tastings/$tastingId"
+              params={{ tastingId: String(notification.ref.id) }}
               className="mx-1 font-semibold"
             >
               {notification.ref.bottle.fullName}
@@ -124,7 +126,8 @@ const getStatusMessage = ({ notification }: { notification: Notification }) => {
           commented on
           {notification.ref && "bottle" in notification.ref ? (
             <Link
-              to={`/tastings/${notification.ref.id}`}
+              to="/tastings/$tastingId"
+              params={{ tastingId: String(notification.ref.id) }}
               className="mx-1 font-semibold"
             >
               {notification.ref.bottle.fullName}

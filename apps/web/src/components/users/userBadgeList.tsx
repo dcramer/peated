@@ -32,7 +32,8 @@ export function UserBadgeList({ userId }: { userId: number }) {
               )}
             >
               <Link
-                to={`/badges/${award.badge.id}`}
+                to="/badges/$badgeId"
+                params={{ badgeId: String(award.badge.id) }}
                 className="absolute inset-0"
               />
               <BadgeImage badge={award.badge} level={award.level} />

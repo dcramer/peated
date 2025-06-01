@@ -23,7 +23,8 @@ export default function Leaderboard({ badgeId }: { badgeId: number }) {
             className="group relative flex w-full items-center gap-x-4 rounded px-3 py-1 hover:bg-slate-800"
           >
             <Link
-              to={`/users/${user.username}`}
+              to="/users/$username"
+              params={{ username: user.username }}
               className="absolute inset-0"
             />
             <div className="font-mono text-2xl text-muted">#{index + 1}</div>

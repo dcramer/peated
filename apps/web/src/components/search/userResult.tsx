@@ -22,7 +22,8 @@ export default function UserResultRow({
       <div className="flex min-w-0 flex-auto">
         <div className="flex-auto">
           <Link
-            to={`/users/${user.username}`}
+            to="/users/$username"
+            params={{ username: user.username }}
             className="font-semibold leading-6"
           >
             {user.username}

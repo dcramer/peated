@@ -47,7 +47,8 @@ export default function ReviewTable({
                   <div className="mt-2 space-x-2 text-xs">
                     {review.bottle ? (
                       <Link
-                        to={`/bottles/${review.bottle.id}`}
+                        to="/bottles/$bottleId"
+                        params={{ bottleId: String(review.bottle.id) }}
                         className="hover:underline"
                       >
                         [{review.bottle.id}] ({review.bottle.fullName})

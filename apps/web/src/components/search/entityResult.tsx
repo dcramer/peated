@@ -18,7 +18,10 @@ export default function EntityResultRow({
       <EntityIcon className="m-2 hidden h-10 w-auto sm:block" />
       <div className="min-w-0 flex-auto">
         <div className="flex items-center space-x-1 font-semibold leading-6">
-          <Link to={`/entities/${entity.id}`}>
+          <Link
+            to="/entities/$entityId"
+            params={{ entityId: String(entity.id) }}
+          >
             <span className="-top-px absolute inset-x-0 bottom-0" />
             {entity.name}
           </Link>

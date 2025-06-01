@@ -44,19 +44,23 @@ export default function StorePriceTable({
               >
                 <td>
                   {price.imageUrl && (
-                    <img src={price.imageUrl} className="max-h-16 max-w-full" />
+                    <img
+                      src={price.imageUrl}
+                      className="max-h-16 max-w-full"
+                      alt="image of bottle"
+                    />
                   )}
                 </td>
                 <td className="max-w-0 px-3 py-3">
-                  <Link
-                    to={price.url}
-                    className="font-medium hover:underline"
-                  >
+                  <Link to={price.url} className="font-medium hover:underline">
                     {price.name}
                   </Link>
                   <div className="mt-2 space-x-2 text-xs">
                     {price.bottle ? (
-                      <Link to={`/bottles/${price.bottle.id}`}>
+                      <Link
+                        to="/bottles/$bottleId"
+                        params={{ bottleId: String(price.bottle.id) }}
+                      >
                         Bottle {price.bottle.id}
                       </Link>
                     ) : (

@@ -131,7 +131,10 @@ export default function Table<
                     className="bg-slate-800 py-2 pr-3 pl-4 text-left font-semibold text-sm sm:pl-3"
                   >
                     {groupTo ? (
-                      <Link to={groupTo(group)} className="hover:underline">
+                      <Link
+                        to={groupTo(group) as any}
+                        className="hover:underline"
+                      >
                         {groupItem(group)}
                       </Link>
                     ) : (
@@ -169,7 +172,10 @@ export default function Table<
                       )}
                     >
                       {colN === 0 && urlPath && (
-                        <Link to={urlPath} className="absolute inset-0" />
+                        <Link
+                          to={urlPath as any}
+                          className="absolute inset-0"
+                        />
                       )}
                       {value}
                     </td>

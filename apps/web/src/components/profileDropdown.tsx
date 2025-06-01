@@ -34,7 +34,8 @@ export function ProfileDropdown() {
                 : "rounded text-muted"
             )}
             as={Link}
-            to={`/users/${user.username}`}
+            to="/users/$username"
+            params={{ username: user.username }}
           >
             <span className="sr-only">Open user menu</span>
             <div className="h-8 w-8">
@@ -57,7 +58,12 @@ export function ProfileDropdown() {
             >
               <div>
                 <MenuItem>
-                  <Link to={`/users/${user.username}`}>Profile</Link>
+                  <Link
+                    to="/users/$username"
+                    params={{ username: user.username }}
+                  >
+                    Profile
+                  </Link>
                 </MenuItem>
                 <MenuItem>
                   <LogoutButton />

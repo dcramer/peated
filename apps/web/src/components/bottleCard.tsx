@@ -165,7 +165,8 @@ export default function BottleCard({
         <div>
           {bottle.category && (
             <Link
-              to={`/bottles?category=${bottle.category}`}
+              to="/bottles"
+              search={{ category: bottle.category }}
               className="hover:underline"
             >
               {formatCategoryName(bottle.category)}
@@ -179,7 +180,8 @@ export default function BottleCard({
             {bottle.distillers.map((d) => (
               <Link
                 key={d.id}
-                to={`/entities/${d.id}`}
+                to="/entities/$entityId"
+                params={{ entityId: String(d.id) }}
                 className="hover:underline"
               >
                 {d.name}

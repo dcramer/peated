@@ -45,7 +45,8 @@ export default function EntityTable({
           value: (item) => {
             return (
               <Link
-                to={`/entities/${item.id}`}
+                to="/entities/$entityId"
+                params={{ entityId: String(item.id) }}
                 className="font-medium hover:underline"
               >
                 {item.name}

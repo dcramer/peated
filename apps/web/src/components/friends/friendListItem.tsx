@@ -57,7 +57,11 @@ export default function FriendListItem({ friend }: { friend: Friend }) {
       >
         <UserAvatar size={48} user={user} />
         <div className="flex-auto space-y-1 font-medium">
-          <Link to={`/users/${user.username}`} className="hover:underline">
+          <Link
+            to="/users/$username"
+            params={{ username: user.username }}
+            className="hover:underline"
+          >
             {user.username}
           </Link>
         </div>

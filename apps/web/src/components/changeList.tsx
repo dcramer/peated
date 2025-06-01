@@ -11,7 +11,8 @@ const ChangeAuthor = ({ user }: { user?: User | null }) => {
   return (
     <div className="flex items-center gap-x-2">
       <Link
-        to={`/users/${user.username}`}
+        to="/users/$username"
+        params={{ username: user.username }}
         className="font-medium text-highlight hover:underline"
       >
         {user.username}
@@ -48,7 +49,8 @@ const ObjectDesc = ({
         <>
           <div>the entity</div>
           <Link
-            to={`/entities/${objectId}`}
+            to="/entities/$entityId"
+            params={{ entityId: String(objectId) }}
             className="font-medium text-highlight hover:underline"
           >
             {displayName}
@@ -60,7 +62,8 @@ const ObjectDesc = ({
         <>
           <div>the bottle</div>
           <Link
-            to={`/bottles/${objectId}`}
+            to="/bottles/$bottleId"
+            params={{ bottleId: String(objectId) }}
             className="font-medium text-highlight hover:underline"
           >
             {displayName}
