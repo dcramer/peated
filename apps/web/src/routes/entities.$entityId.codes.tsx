@@ -3,10 +3,10 @@ import {
   SMWS_DISTILLERY_CODES,
 } from "@peated/server/lib/smws";
 import Heading from "@peated/web/components/heading";
-import { Link } from "@tanstack/react-router";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { NotFoundError, createFileRoute } from "@tanstack/react-router";
+import { Link, notFound } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/entities/$entityId/codes")({
   component: Page,
@@ -25,7 +25,7 @@ function Page() {
   const distillerList = data.results;
 
   if (entity.shortName !== "SMWS") {
-    throw new NotFoundError();
+    throw notFound();
   }
 
   const exampleDistiller = distillerList.find(
@@ -51,7 +51,10 @@ function Page() {
           system. For example, <strong>Cask No. 4.360 Jangling dram</strong>{" "}
           means it is the <strong>360th cask</strong> from{" "}
           <strong>distillery number 4</strong>. In this case, distillery maps to{" "}
-          <Link to={`/entities/${exampleDistiller.id}`}>
+          <Link
+            to="/entities/$entityId"
+            params={{ entityId: String(exampleDistiller.id) }}
+          >
             {exampleDistiller.name}
           </Link>
           .
@@ -115,7 +118,8 @@ function Page() {
                         <td className="border-slate-800 border-b p-3 text-sm">
                           {distiller ? (
                             <Link
-                              to={`/entities/${distiller.id}`}
+                              to="/entities/$entityId"
+                              params={{ entityId: String(distiller.id) }}
                               className="hover:underline"
                             >
                               {distiller.name}
@@ -127,7 +131,8 @@ function Page() {
                         <td className="hidden border-slate-800 border-b p-3 text-center text-muted text-sm sm:table-cell">
                           {distiller?.country ? (
                             <Link
-                              to={`/countries/${distiller.country.slug}`}
+                              to="/locations/$countrySlug"
+                              params={{ countrySlug: distiller.country.slug }}
                               className="hover:underline"
                             >
                               {distiller.country.name}

@@ -34,7 +34,8 @@ export default function BadgeTable({
                     <BadgeImage badge={badge} size={48} />
                     <div>
                       <Link
-                        to={`/admin/badges/${badge.id}`}
+                        to="/admin/badges/$badgeId"
+                        params={{ badgeId: String(badge.id) }}
                         className="font-medium hover:underline"
                       >
                         {badge.name}

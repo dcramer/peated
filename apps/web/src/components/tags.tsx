@@ -11,7 +11,8 @@ export default function Tags({ tags }: { tags: string[] }) {
           <Link
             key={item}
             className="hover:underline"
-            to={`/bottles?tag=${encodeURIComponent(item)}`}
+            to="/bottles"
+            search={{ tag: item }}
           >
             {item}
           </Link>

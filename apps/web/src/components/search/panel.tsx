@@ -19,6 +19,7 @@ export type Props = {
   initialValue?: string;
   onClose?: () => void;
   onQueryChange?: (value: string) => void;
+  directToTasting?: boolean;
 };
 
 export default function SearchPanel({
@@ -26,10 +27,10 @@ export default function SearchPanel({
   initialValue,
   onClose,
   onQueryChange,
+  directToTasting,
 }: Props) {
   const { user } = useAuth();
   const search = useSearch({ strict: false });
-  const directToTasting = "tasting" in search;
 
   const navigate = useNavigate();
 
@@ -96,12 +97,12 @@ export default function SearchPanel({
               onQuery(value);
             }}
             onSubmit={(value) => {
-              const newSearch = { q: value };
-              if (directToTasting) {
-                newSearch.tasting = "";
-              }
               navigate({
-                search: newSearch,
+                to: "/search",
+                search: {
+                  ...(directToTasting && { tasting: "1" }),
+                  q: value,
+                },
                 replace: true,
               });
             }}

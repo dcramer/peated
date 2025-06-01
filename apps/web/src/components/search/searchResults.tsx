@@ -24,9 +24,7 @@ export default function SearchResults({
 
           <div className="min-w-0 flex-auto">
             <div className="font-semibold leading-6">
-              <Link
-                to={`/addBottle?name=${encodeURIComponent(toTitleCase(query))}`}
-              >
+              <Link to="/addBottle" search={{ name: toTitleCase(query) }}>
                 <span className="-top-px absolute inset-x-0 bottom-0" />
                 {results.length === 0
                   ? "We couldn't find anything matching your search query."

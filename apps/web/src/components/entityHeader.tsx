@@ -22,7 +22,8 @@ export default function EntityHeader({
             <>
               Located in{" "}
               <Link
-                to={`/locations/${entity.country.slug}`}
+                to="/locations/$countrySlug"
+                params={{ countrySlug: entity.country.slug }}
                 className="truncate hover:underline"
               >
                 {entity.country.name}
@@ -34,7 +35,11 @@ export default function EntityHeader({
               {" "}
               &middot;{" "}
               <Link
-                to={`/locations/${entity.country.slug}/regions/${entity.region.slug}`}
+                to="/locations/$countrySlug/regions/$regionSlug"
+                params={{
+                  countrySlug: entity.country.slug,
+                  regionSlug: entity.region.slug,
+                }}
                 className="truncate hover:underline"
               >
                 {entity.region.name}

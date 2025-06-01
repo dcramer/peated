@@ -49,7 +49,8 @@ export default function BottleTable({
                 <div className="flex gap-x-1 text-muted text-sm">
                   {item.category && (
                     <Link
-                      to={`/bottles/?category=${item.category}`}
+                      to="/bottles"
+                      search={{ category: item.category }}
                       className="hover:underline"
                     >
                       {formatCategoryName(item.category)}
@@ -79,7 +80,8 @@ export default function BottleTable({
             item.statedAge ? (
               <Link
                 className="hover:underline"
-                to={`/bottles/?age=${item.statedAge}`}
+                to="/bottles"
+                search={{ age: String(item.statedAge) }}
               >{`${item.statedAge} years`}</Link>
             ) : null,
           className: "sm:w-1/6",

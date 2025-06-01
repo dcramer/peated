@@ -43,9 +43,10 @@ export default function BottleResultRow({
           <Link
             to={
               directToTasting
-                ? `/bottles/${bottle.id}/addTasting`
-                : `/bottles/${bottle.id}`
+                ? "/bottles/$bottleId/addTasting"
+                : "/bottles/$bottleId"
             }
+            params={{ bottleId: String(bottle.id) }}
           >
             <span className="-top-px absolute inset-x-0 bottom-0" />
             <div className="flex flex-col gap-x-2 sm:flex-row sm:items-center">

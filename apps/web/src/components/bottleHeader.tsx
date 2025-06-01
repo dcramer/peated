@@ -50,9 +50,8 @@ export default function BottleHeader({
             <div>
               {bottle.category && (
                 <Link
-                  to={`/bottles?category=${encodeURIComponent(
-                    bottle.category
-                  )}`}
+                  to="/bottles"
+                  search={{ category: bottle.category }}
                   className="hover:underline"
                 >
                   {formatCategoryName(bottle.category)}

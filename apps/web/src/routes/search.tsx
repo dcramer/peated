@@ -4,6 +4,10 @@ import { z } from "zod";
 
 const searchSchema = z.object({
   q: z.string().default(""),
+  tasting: z
+    .string()
+    .optional()
+    .transform((v) => v === "1"),
 });
 
 export const Route = createFileRoute("/search")({
@@ -12,7 +16,7 @@ export const Route = createFileRoute("/search")({
 });
 
 function Page() {
-  const { q: query } = Route.useSearch();
+  const { q: query, tasting } = Route.useSearch();
 
-  return <SearchPanel initialValue={query} />;
+  return <SearchPanel initialValue={query} directToTasting={!!tasting} />;
 }

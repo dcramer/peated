@@ -6,12 +6,12 @@ import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
 import Join from "@peated/web/components/join";
 import LayoutModal from "@peated/web/components/layoutModal";
-import { Link } from "@tanstack/react-router";
 import ListItem from "@peated/web/components/listItem";
 import { Modal } from "@peated/web/components/modal";
 import SearchHeader from "@peated/web/components/searchHeader";
 import Spinner from "@peated/web/components/spinner";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
@@ -147,12 +147,16 @@ export default function BottleSelector({
 
                 <div className="min-w-0 flex-auto">
                   <div className="font-semibold">
-                    <a
-                      to={`/addBottle?name=${encodeURIComponent(toTitleCase(query))}&${returnTo ? `returnTo=${encodeURIComponent(returnTo)}` : ""}`}
+                    <Link
+                      to="/addBottle"
+                      search={{
+                        name: toTitleCase(query),
+                        ...(returnTo && { returnTo }),
+                      }}
                     >
                       <span className="-top-px absolute inset-x-0 bottom-0" />
                       Can't find what you're looking for?
-                    </a>
+                    </Link>
                   </div>
                   <div className="mt-1 flex gap-x-1 text-sm">
                     {query !== "" ? (
