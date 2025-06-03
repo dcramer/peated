@@ -24,8 +24,8 @@
     "commander": "^12.1.0",
     "dotenv": "^16.4.5",
     "dotenv-cli": "^7.4.2",
-    "drizzle-kit": "catalog:",
-    "drizzle-orm": "catalog:",
+    "drizzle-kit": "^0.31.1",
+    "drizzle-orm": "^0.44.1",
     "pg": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:"
