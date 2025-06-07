@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
+    "dev": "vite",
     "build": "vite build",
-    "start": "node .output/server/index.mjs",
+    "start": "node dist/server/index.js",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -16,7 +16,6 @@
     "@orpc/client": "^1.3.0",
     "@orpc/react-query": "^1.3.0",
     "@orpc/server": "^1.3.0",
-
     "@peated/orpc": "workspace:*",
     "@peated/server": "workspace:*",
     "@react-oauth/google": "^0.11.1",
@@ -24,15 +23,13 @@
     "@sentry/react": "^9.24.0",
     "@tailwindcss/vite": "^4.1.8",
     "@tanstack/react-query": "catalog:",
-    "@tanstack/react-query-next-experimental": "catalog:",
     "@tanstack/react-router": "1.121.0-alpha.14",
-    "@tanstack/react-start": "1.121.0-alpha.21",
-    "@tanstack/start": "1.120.13",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "fathom-client": "^3.7.2",
     "framer-motion": "^10.18.0",
+    "hono": "^4.6.10",
     "isomorphic-dompurify": "^2.25.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.414.0",
@@ -57,21 +54,25 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@hono/node-server": "^1.12.2",
     "@peated/tsconfig": "workspace:*",
     "@spotlightjs/spotlight": "catalog:",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/forms": "catalog:",
     "@tailwindcss/typography": "catalog:",
+    "@tanstack/router-plugin": "^1.120.18",
     "@types/leaflet": "^1.9.18",
     "@types/node": "catalog:",
     "@types/pica": "^9.0.5",
     "@types/react": "catalog:",
     "@types/react-avatar-editor": "^13.0.4",
     "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "^4.5.1",
     "postcss": "^8.5.4",
     "tailwind-scrollbar": "catalog:",
     "tailwindcss": "^4.1.8",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vite-plugin-svgr": "^4.3.0"
   },
   "volta": {
     "extends": "../../package.json"

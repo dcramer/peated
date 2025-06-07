@@ -1,6 +1,6 @@
 import waitError from "../../test/waitError";
 import { createTastingForBadge } from "../testHelpers";
-import { AgeCheck } from "./ageCheck";
+import { AgeCheck } from "./ageCheck/check";
 
 describe("parseConfig", () => {
   test("valid params", async () => {

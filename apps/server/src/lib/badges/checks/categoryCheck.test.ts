@@ -1,7 +1,7 @@
 import type { z } from "zod";
 import waitError from "../../test/waitError";
 import { createTastingForBadge } from "../testHelpers";
-import { CategoryCheck } from "./categoryCheck";
+import { CategoryCheck } from "./categoryCheck/check";
 
 describe("parseConfig", () => {
   test("valid params", async () => {

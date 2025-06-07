@@ -1,13 +1,9 @@
 import { bottles } from "@peated/server/db/schema";
-import { CategoryEnum } from "@peated/server/schemas/common";
 import { inArray } from "drizzle-orm";
-import { z } from "zod";
-import type { TastingWithRelations } from "../types";
-import { Check } from "./base";
-
-export const CategoryCheckConfigSchema = z.object({
-  category: z.array(CategoryEnum).min(1, "At least one category is required."),
-});
+import type { z } from "zod";
+import type { TastingWithRelations } from "../../types";
+import { Check } from "../base";
+import { CategoryCheckConfigSchema } from "./schema";
 
 export class CategoryCheck extends Check {
   schema = CategoryCheckConfigSchema;

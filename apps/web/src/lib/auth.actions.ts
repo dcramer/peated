@@ -1,46 +1,113 @@
-"use server";
-
 import { safe } from "@orpc/client";
+import { useMutation } from "@tanstack/react-query";
 import { redirect } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/start";
 import { z } from "zod";
 import { getSafeRedirect } from "./auth";
-import { getServerClient } from "./orpc/client.server";
-import { useAppSession } from "./session.server";
+import { createBrowserClient } from "./orpc/client";
 
 const SESSION_REFRESH = 60 * 60; // 1 hour
 
-export const logout = createServerFn({ method: "POST" })
-  .validator(z.object({ redirectTo: z.string().optional().default("/") }))
-  .handler(async ({ data }) => {
-    const session = await useAppSession();
-    session.clear();
-    redirect({ to: getSafeRedirect(data.redirectTo) });
+// Client-side session management
+const SESSION_KEY = "peated_session";
+
+export interface SessionData {
+  user: any | null;
+  accessToken: string | null;
+  ts: number | null;
+}
+
+const defaultSession: SessionData = {
+  user: null,
+  accessToken: null,
+  ts: null,
+};
+
+// Session utilities
+export function getSession(): SessionData {
+  if (typeof window === "undefined") return defaultSession;
+  try {
+    const stored = localStorage.getItem(SESSION_KEY);
+    return stored ? JSON.parse(stored) : defaultSession;
+  } catch {
+    return defaultSession;
+  }
+}
+
+export function setSession(session: SessionData) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+}
+
+export function clearSession() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(SESSION_KEY);
+}
+
+// Auth mutation hooks
+export function useLogout() {
+  return useMutation({
+    mutationFn: async ({ redirectTo = "/" }: { redirectTo?: string } = {}) => {
+      clearSession();
+      redirect({ to: getSafeRedirect(redirectTo) });
+    },
   });
+}
 
-export const authenticate = createServerFn({ method: "POST" })
-  .validator(
-    z.union([
-      z.object({
-        email: z.string().email(),
-        password: z.string().optional(),
-        redirectTo: z.string().optional().default("/"),
-      }),
-      z.object({
-        code: z.string(),
-        redirectTo: z.string().optional().default("/"),
-      }),
-    ])
-  )
-  .handler(async (ctx) => {
-    const session = await useAppSession();
+export function useAuthenticate() {
+  return useMutation({
+    mutationFn: async (
+      data:
+        | {
+            email: string;
+            password?: string;
+            redirectTo?: string;
+          }
+        | {
+            code: string;
+            redirectTo?: string;
+          }
+    ) => {
+      const client = createBrowserClient();
+      const redirectTo = data.redirectTo || "/";
 
-    const client = getServerClient();
+      if ("email" in data && !data.password) {
+        const { error, isDefined } = await safe(
+          client.auth.magicLink.create({ email: data.email })
+        );
+        if (isDefined) {
+          return {
+            magicLink: false,
+            error: error.message,
+          };
+        }
+        if (error) {
+          return {
+            magicLink: false,
+            error: "Internal server error.",
+          };
+        }
 
-    if ("email" in ctx.data && !ctx.data.password) {
-      const { error, isDefined } = await safe(
-        client.auth.magicLink.create({ email: ctx.data.email })
+        return {
+          magicLink: true,
+          error: null,
+        };
+      }
+
+      const {
+        error,
+        isDefined,
+        data: authData,
+      } = await safe(
+        "code" in data
+          ? client.auth.login({
+              code: data.code,
+            })
+          : client.auth.login({
+              email: data.email,
+              password: data.password!,
+            })
       );
+
       if (isDefined) {
         return {
           magicLink: false,
@@ -54,174 +121,207 @@ export const authenticate = createServerFn({ method: "POST" })
         };
       }
 
-      return {
-        magicLink: true,
-        error: null,
-      };
-    }
+      setSession({
+        user: authData.user,
+        accessToken: authData.accessToken ?? null,
+        ts: new Date().getTime(),
+      });
 
-    const { error, isDefined, data } = await safe(
-      "code" in ctx.data
-        ? client.auth.login({
-            code: ctx.data.code,
-          })
-        : client.auth.login({
-            email: ctx.data.email,
-            password: ctx.data.password!,
-          })
-    );
+      if (!authData.user.verified) {
+        redirect({ to: "/verify" });
+      } else {
+        redirect({ to: getSafeRedirect(redirectTo) });
+      }
 
-    if (isDefined) {
-      return {
-        magicLink: false,
-        error: error.message,
-      };
-    }
-    if (error) {
-      return {
-        magicLink: false,
-        error: "Internal server error.",
-      };
-    }
+      return { magicLink: false, error: null };
+    },
+  });
+}
 
-    await session.update({
-      user: data.user,
-      accessToken: data.accessToken ?? null,
-      ts: new Date().getTime(),
-    });
+export function useRegister() {
+  return useMutation({
+    mutationFn: async (data: {
+      email: string;
+      password: string;
+      username: string;
+      redirectTo?: string;
+    }) => {
+      const client = createBrowserClient();
 
-    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
-    // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
+      const {
+        error,
+        isDefined,
+        data: authData,
+      } = await safe(
+        client.auth.register({
+          email: data.email,
+          password: data.password,
+          username: data.username,
+        })
+      );
 
-    if (!data.user.verified) {
+      if (isDefined) {
+        return { ok: false, error: error.message };
+      }
+      if (error) {
+        return { ok: false, error: "Internal server error." };
+      }
+
+      setSession({
+        user: authData.user,
+        accessToken: authData.accessToken ?? null,
+        ts: new Date().getTime(),
+      });
+
       redirect({ to: "/verify" });
-    } else {
-      redirect({ to: getSafeRedirect(ctx.data.redirectTo) });
-    }
+      return { ok: true, error: null };
+    },
   });
+}
 
-export const register = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      email: z.string().email(),
-      password: z.string(),
-      username: z.string(),
-      redirectTo: z.string().optional().default("/"),
-    })
-  )
-  .handler(async (ctx) => {
-    const session = await useAppSession();
+export function useResendVerification() {
+  return useMutation({
+    mutationFn: async () => {
+      const session = getSession();
+      const client = createBrowserClient({ accessToken: session.accessToken! });
 
-    const client = getServerClient();
+      const { isDefined, error } = await safe(
+        client.email.resendVerification()
+      );
 
-    const { error, isDefined, data } = await safe(
-      client.auth.register({
-        email: ctx.data.email,
-        password: ctx.data.password,
-        username: ctx.data.username,
-      })
-    );
+      if (isDefined && error.name === "CONFLICT") {
+        return { ok: true, alreadyVerified: true };
+      }
+      if (error) {
+        return { ok: false, error: "Internal server error." };
+      }
 
-    if (isDefined) {
-      return { ok: false, error: error.message };
-    }
-    if (error) {
-      return { ok: false, error: "Internal server error." };
-    }
-
-    await session.update({
-      user: data.user,
-      accessToken: data.accessToken ?? null,
-      ts: new Date().getTime(),
-    });
-
-    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
-    // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
-
-    throw redirect({ to: "/verify" });
+      return { ok: true };
+    },
   });
+}
 
-export const resendVerification = createServerFn({ method: "POST" }).handler(
-  async () => {
-    const session = await useAppSession();
+export function usePasswordReset() {
+  return useMutation({
+    mutationFn: async (data: { email: string }) => {
+      const client = createBrowserClient();
 
-    const client = getServerClient({ accessToken: session.data.accessToken! });
-    const { isDefined, error } = await safe(client.email.resendVerification());
+      const { error, isDefined } = await safe(
+        client.auth.passwordReset.create({ email: data.email })
+      );
 
-    if (isDefined && error.name === "CONFLICT") {
-      return { ok: true, alreadyVerified: true };
-    }
-    if (error) {
-      return { ok: false, error: "Internal server error." };
-    }
+      if (isDefined) {
+        return { ok: false, error: error.message };
+      }
+      if (error) {
+        return { ok: false, error: "Internal server error." };
+      }
 
-    return { ok: true };
-  }
-);
-
-export const passwordReset = createServerFn({ method: "POST" })
-  .validator(z.object({ email: z.string().email() }))
-  .handler(async (ctx) => {
-    const client = getServerClient();
-
-    const { error, isDefined } = await safe(
-      client.auth.passwordReset.create({ email: ctx.data.email })
-    );
-
-    if (isDefined) {
-      return { ok: false, error: error.message };
-    }
-    if (error) {
-      return { ok: false, error: "Internal server error." };
-    }
-
-    return { ok: true };
+      return { ok: true };
+    },
   });
+}
 
-export const passwordResetConfirm = createServerFn({ method: "POST" })
-  .validator(z.object({ token: z.string(), password: z.string() }))
-  .handler(async (ctx) => {
-    const token = ctx.data.token;
-    const password = ctx.data.password;
+export function usePasswordResetConfirm() {
+  return useMutation({
+    mutationFn: async (data: { token: string; password: string }) => {
+      const client = createBrowserClient();
 
-    const session = await useAppSession();
-    const client = getServerClient();
+      const {
+        error,
+        isDefined,
+        data: authData,
+      } = await safe(
+        client.auth.passwordReset.confirm({
+          token: data.token,
+          password: data.password,
+        })
+      );
 
-    const { error, isDefined, data } = await safe(
-      client.auth.passwordReset.confirm({ token, password })
-    );
+      if (isDefined) {
+        return { ok: false, error: error.message };
+      }
+      if (error) {
+        return { ok: false, error: "Internal server error." };
+      }
 
-    if (isDefined) {
-      return { ok: false, error: error.message };
-    }
-    if (error) {
-      return { ok: false, error: "Internal server error." };
-    }
+      setSession({
+        user: authData.user,
+        accessToken: authData.accessToken ?? null,
+        ts: new Date().getTime(),
+      });
 
-    await session.update({
-      user: data.user,
-      accessToken: data.accessToken ?? null,
-      ts: new Date().getTime(),
-    });
-
-    return { ok: true };
+      return { ok: true };
+    },
   });
+}
 
-export const updateSession = createServerFn({ method: "POST" }).handler(
-  async () => {
-    const session = await useAppSession();
-    const client = getServerClient({ accessToken: session.data.accessToken! });
+export function useUpdateSession() {
+  return useMutation({
+    mutationFn: async () => {
+      const session = getSession();
+      const client = createBrowserClient({ accessToken: session.accessToken! });
 
-    const user = await client.users.details({ user: "me" });
-    await session.update({
-      user: user,
-      ts: new Date().getTime(),
-    });
+      const user = await client.users.details({ user: "me" });
 
-    return {
-      user: user,
-      accessToken: session.data.accessToken,
-      ts: session.data.ts,
-    };
-  }
-);
+      const updatedSession = {
+        user: user,
+        accessToken: session.accessToken,
+        ts: new Date().getTime(),
+      };
+
+      setSession(updatedSession);
+      return updatedSession;
+    },
+  });
+}
+
+// Legacy exports for easier migration - these will use the hooks internally
+export const logout = async (data: { redirectTo?: string } = {}) => {
+  clearSession();
+  redirect({ to: getSafeRedirect(data.redirectTo || "/") });
+};
+
+export const authenticate = async (data: any) => {
+  // This is now handled by useAuthenticate hook
+  console.warn("authenticate() should be replaced with useAuthenticate() hook");
+  throw new Error("Use useAuthenticate() hook instead");
+};
+
+export const register = async (data: any) => {
+  // This is now handled by useRegister hook
+  console.warn("register() should be replaced with useRegister() hook");
+  throw new Error("Use useRegister() hook instead");
+};
+
+export const resendVerification = async () => {
+  // This is now handled by useResendVerification hook
+  console.warn(
+    "resendVerification() should be replaced with useResendVerification() hook"
+  );
+  throw new Error("Use useResendVerification() hook instead");
+};
+
+export const passwordReset = async (data: any) => {
+  // This is now handled by usePasswordReset hook
+  console.warn(
+    "passwordReset() should be replaced with usePasswordReset() hook"
+  );
+  throw new Error("Use usePasswordReset() hook instead");
+};
+
+export const passwordResetConfirm = async (data: any) => {
+  // This is now handled by usePasswordResetConfirm hook
+  console.warn(
+    "passwordResetConfirm() should be replaced with usePasswordResetConfirm() hook"
+  );
+  throw new Error("Use usePasswordResetConfirm() hook instead");
+};
+
+export const updateSession = async () => {
+  // This is now handled by useUpdateSession hook
+  console.warn(
+    "updateSession() should be replaced with useUpdateSession() hook"
+  );
+  throw new Error("Use useUpdateSession() hook instead");
+};

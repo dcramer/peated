@@ -1,62 +1,30 @@
 import "@fontsource/raleway/index.css";
 import Fathom from "@peated/web/components/fathom";
 import config from "@peated/web/config";
-import {
-  type SessionData,
-  useAppSession,
-} from "@peated/web/lib/session.server";
 import "@peated/web/styles/index.css";
 import type { RouterUtils } from "@orpc/react-query";
+import type { RouterClient } from "@orpc/server";
+import type { Router } from "@peated/server/orpc/router";
 import * as Sentry from "@sentry/react";
 import type { QueryClient } from "@tanstack/react-query";
-import {
-  HeadContent,
-  Outlet,
-  Scripts,
-  createRootRouteWithContext,
-} from "@tanstack/react-router";
+import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 import React from "react";
 import Providers from "../components/providers";
-import type { ServerClient } from "../lib/orpc/client.server";
+import type { ClientContext } from "../lib/orpc/client";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
-  orpc: RouterUtils<ServerClient>;
-  orpcClient: ServerClient;
+  orpc: RouterUtils<RouterClient<Router, ClientContext>>;
+  orpcClient: RouterClient<Router, ClientContext>;
 }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      {
-        name: "viewport",
-        content:
-          "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
-      },
-      { name: "theme-color", content: config.THEME_COLOR },
-      { title: "Peated", description: config.DESCRIPTION },
-    ],
-    links: [{ rel: "icon", href: "/favicon.ico" }],
-  }),
   loader: async () => {
-    const session = await useAppSession();
-    const user = session.data.user;
-
-    // Bind the user on the server for Sentry
-    Sentry.setUser(
-      user
-        ? {
-            id: `${user.id}`,
-            username: user.username,
-            email: user.email,
-          }
-        : null
-    );
-
+    // For now, return empty session data
+    // TODO: Implement proper session loading from localStorage/API
     return {
       session: {
-        user: user,
-        accessToken: session.data.accessToken,
-        ts: session.data.ts,
+        user: null,
+        accessToken: null,
+        ts: null,
       },
     };
   },
@@ -66,33 +34,31 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   const { session } = Route.useLoaderData();
 
-  return <RootDocument session={session} />;
-}
+  // Set Sentry user context
+  React.useEffect(() => {
+    Sentry.setUser(
+      session.user
+        ? {
+            id: `${session.user.id}`,
+            username: session.user.username,
+            email: session.user.email,
+          }
+        : null
+    );
+  }, [session.user]);
 
-function RootDocument({
-  session,
-}: {
-  session: SessionData;
-}) {
   return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body className="h-full">
-        <Providers session={session}>
-          <Outlet />
+    <div className="h-full">
+      <Providers session={session}>
+        <Outlet />
 
-          {config.FATHOM_SITE_ID && (
-            <Fathom
-              siteId={config.FATHOM_SITE_ID}
-              includedDomains={["peated.com"]}
-            />
-          )}
-
-          <Scripts />
-        </Providers>
-      </body>
-    </html>
+        {config.FATHOM_SITE_ID && (
+          <Fathom
+            siteId={config.FATHOM_SITE_ID}
+            includedDomains={["peated.com"]}
+          />
+        )}
+      </Providers>
+    </div>
   );
 }

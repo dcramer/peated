@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EntityCheckConfigSchema } from "@peated/server/lib/badges/checks/entityCheck";
+import { EntityCheckConfigSchema } from "@peated/server/lib/badges/checks/entityCheck/schema";
 import { toTitleCase } from "@peated/server/lib/strings";
 import EntityField from "@peated/web/components/entityField";
 import Fieldset from "@peated/web/components/fieldset";

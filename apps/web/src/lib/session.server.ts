@@ -1,5 +1,4 @@
 import type { User } from "@peated/server/types";
-import { useSession } from "@tanstack/react-start/server";
 
 if (!process.env.SESSION_SECRET) {
   console.warn("SESSION_SECRET is not defined.");
@@ -17,17 +16,33 @@ export const defaultSession: SessionData = {
   ts: null,
 };
 
+// Client-side session management
+const SESSION_KEY = "peated_session";
+
 export function useAppSession() {
-  return useSession<SessionData>({
-    password: process.env.SESSION_SECRET || "", // TODO: this should error out
-    // cookieName: "_session",
-    cookie: {
-      // secure only works in `https` environments
-      // if your localhost is not on `https`, then use: `secure: process.env.NODE_ENV === "production"`
-      sameSite: "lax",
-      path: "/",
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // enable this in prod only
-    },
-  });
+  return {
+    data: getSessionData(),
+    update: setSessionData,
+    clear: clearSessionData,
+  };
+}
+
+function getSessionData(): SessionData {
+  if (typeof window === "undefined") return defaultSession;
+  try {
+    const stored = localStorage.getItem(SESSION_KEY);
+    return stored ? JSON.parse(stored) : defaultSession;
+  } catch {
+    return defaultSession;
+  }
+}
+
+function setSessionData(session: SessionData) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+}
+
+function clearSessionData() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(SESSION_KEY);
 }

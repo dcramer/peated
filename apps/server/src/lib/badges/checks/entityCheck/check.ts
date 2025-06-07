@@ -1,15 +1,10 @@
 import { bottles, bottlesToDistillers } from "@peated/server/db/schema";
-import { EntityTypeEnum } from "@peated/server/schemas/common";
 import type { SQL } from "drizzle-orm";
 import { eq, or, sql } from "drizzle-orm";
-import { z } from "zod";
-import type { TastingWithRelations } from "../types";
-import { Check } from "./base";
-
-export const EntityCheckConfigSchema = z.object({
-  entity: z.number(),
-  type: EntityTypeEnum.nullable().default(null),
-});
+import type { z } from "zod";
+import type { TastingWithRelations } from "../../types";
+import { Check } from "../base";
+import { EntityCheckConfigSchema } from "./schema";
 
 export class EntityCheck extends Check {
   schema = EntityCheckConfigSchema;

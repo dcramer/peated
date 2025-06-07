@@ -1,6 +1,6 @@
 import waitError from "../../test/waitError";
 import { createTastingForBadge } from "../testHelpers";
-import { BottleCheck } from "./bottleCheck";
+import { BottleCheck } from "./bottleCheck/check";
 
 describe("parseConfig", () => {
   test("valid params", async () => {

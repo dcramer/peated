@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AgeCheckConfigSchema } from "@peated/server/lib/badges/checks/ageCheck";
+import { AgeCheckConfigSchema } from "@peated/server/lib/badges/checks/ageCheck/schema";
 import Fieldset from "@peated/web/components/fieldset";
 import Form from "@peated/web/components/form";
 import TextField from "@peated/web/components/textField";

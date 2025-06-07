@@ -97,11 +97,6 @@ export const app = new Hono()
       await flush(2000);
     }
   })
-  // TODO: Sentry needs Hono support
-  .onError((err, c) => {
-    logError(err);
-    return c.json({ error: "Internal Server Error" }, 500);
-  })
   .use("*", logger())
   .use(
     "*",

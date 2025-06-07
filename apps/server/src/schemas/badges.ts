@@ -5,11 +5,11 @@ import {
   BADGE_FORMULA_LIST,
   BADGE_TRACKER_LIST,
 } from "../constants";
-import { AgeCheckConfigSchema } from "../lib/badges/checks/ageCheck";
-import { BottleCheckConfigSchema } from "../lib/badges/checks/bottleCheck";
-import { CategoryCheckConfigSchema } from "../lib/badges/checks/categoryCheck";
-import { EntityCheckConfigSchema } from "../lib/badges/checks/entityCheck";
-import { RegionCheckConfigSchema } from "../lib/badges/checks/regionCheck";
+import { AgeCheckConfigSchema } from "../lib/badges/checks/ageCheck/schema";
+import { BottleCheckConfigSchema } from "../lib/badges/checks/bottleCheck/schema";
+import { CategoryCheckConfigSchema } from "../lib/badges/checks/categoryCheck/schema";
+import { EntityCheckConfigSchema } from "../lib/badges/checks/entityCheck/schema";
+import { RegionCheckConfigSchema } from "../lib/badges/checks/regionCheck/schema";
 
 export const BadgeCheckTypeEnum = z.enum(BADGE_CHECK_TYPE_LIST);
 

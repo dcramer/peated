@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CATEGORY_LIST } from "@peated/server/constants";
-import { CategoryCheckConfigSchema } from "@peated/server/lib/badges/checks/categoryCheck";
+import { CategoryCheckConfigSchema } from "@peated/server/lib/badges/checks/categoryCheck/schema";
 import { notEmpty } from "@peated/server/lib/filter";
 import { formatCategoryName } from "@peated/server/lib/format";
 import Fieldset from "@peated/web/components/fieldset";

@@ -2,7 +2,7 @@ import type { z } from "zod";
 import { Region } from "../../test/fixtures";
 import waitError from "../../test/waitError";
 import { createTastingForBadge } from "../testHelpers";
-import { RegionCheck } from "./regionCheck";
+import { RegionCheck } from "./regionCheck/check";
 
 describe("parseConfig", () => {
   test("valid params", async () => {

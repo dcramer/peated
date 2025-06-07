@@ -1,11 +1,11 @@
 import type { BadgeCheckType } from "@peated/server/types";
-import { AgeCheck } from "./ageCheck";
+import { AgeCheck } from "./ageCheck/check";
 import type { Check } from "./base";
-import { BottleCheck } from "./bottleCheck";
-import { CategoryCheck } from "./categoryCheck";
-import { EntityCheck } from "./entityCheck";
+import { BottleCheck } from "./bottleCheck/check";
+import { CategoryCheck } from "./categoryCheck/check";
+import { EntityCheck } from "./entityCheck/check";
 import { EveryTastingCheck } from "./everyTastingCheck";
-import { RegionCheck } from "./regionCheck";
+import { RegionCheck } from "./regionCheck/check";
 
 export function getCheck(type: BadgeCheckType): Check {
   switch (type) {

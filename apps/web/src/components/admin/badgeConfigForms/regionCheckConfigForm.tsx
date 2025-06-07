@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { RegionCheckConfigSchema } from "@peated/server/lib/badges/checks/regionCheck";
+import { RegionCheckConfigSchema } from "@peated/server/lib/badges/checks/regionCheck/schema";
 import CountryField from "@peated/web/components/countryField";
 import Fieldset from "@peated/web/components/fieldset";
 import Form from "@peated/web/components/form";

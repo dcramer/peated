@@ -4,15 +4,10 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { sql } from "drizzle-orm";
-import { z } from "zod";
-import type { TastingWithRelations } from "../types";
-import { Check } from "./base";
-
-// TODO: validate params
-export const RegionCheckConfigSchema = z.object({
-  country: z.number(),
-  region: z.number().nullable().default(null),
-});
+import type { z } from "zod";
+import type { TastingWithRelations } from "../../types";
+import { Check } from "../base";
+import { RegionCheckConfigSchema } from "./schema";
 
 export class RegionCheck extends Check {
   schema = RegionCheckConfigSchema;
