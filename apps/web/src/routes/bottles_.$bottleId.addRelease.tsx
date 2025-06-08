@@ -11,7 +11,7 @@ const searchSchema = z.object({
   returnTo: z.string().optional(),
 });
 
-export const Route = createFileRoute("/bottles/$bottleId/addRelease")({
+export const Route = createFileRoute("/bottles_/$bottleId/addRelease")({
   component: Page,
   validateSearch: searchSchema,
 });

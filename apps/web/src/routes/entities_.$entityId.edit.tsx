@@ -4,7 +4,7 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/entities/$entityId/edit")({
+export const Route = createFileRoute("/entities_/$entityId/edit")({
   component: Page,
 });
 

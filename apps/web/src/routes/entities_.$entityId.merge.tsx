@@ -24,7 +24,7 @@ import type { z } from "zod";
 
 type FormSchemaType = z.infer<typeof EntityMergeSchema>;
 
-export const Route = createFileRoute("/entities/$entityId/merge")({
+export const Route = createFileRoute("/entities_/$entityId/merge")({
   component: Page,
 });
 

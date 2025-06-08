@@ -20,7 +20,7 @@ const searchSchema = z.object({
   flight: z.string().optional(),
 });
 
-export const Route = createFileRoute("/bottles/$bottleId/addTasting")({
+export const Route = createFileRoute("/bottles_/$bottleId/addTasting")({
   component: Page,
   validateSearch: searchSchema,
   loader: async ({ params, context }) => {
