@@ -1,5 +1,5 @@
-import PeatedGlyph from "@peated/web/assets/glyph.svg";
-import PeatedLogo from "@peated/web/assets/logo.svg";
+import PeatedGlyph from "@peated/web/assets/glyph.svg?react";
+import PeatedLogo from "@peated/web/assets/logo.svg?react";
 import { Link } from "@tanstack/react-router";
 
 export default function HeaderLogo() {

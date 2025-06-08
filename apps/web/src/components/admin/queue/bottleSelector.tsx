@@ -3,7 +3,7 @@
 import { PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { Bottle } from "@peated/server/types";
-import BottleIcon from "@peated/web/assets/bottle.svg";
+import BottleIcon from "@peated/web/assets/bottle.svg?react";
 import Join from "@peated/web/components/join";
 import LayoutModal from "@peated/web/components/layoutModal";
 import ListItem from "@peated/web/components/listItem";

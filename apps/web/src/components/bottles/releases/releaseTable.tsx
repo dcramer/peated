@@ -1,7 +1,7 @@
 "use client";
 
 import type { Outputs } from "@peated/server/orpc/router";
-import PeatedGlyph from "@peated/web/assets/glyph.svg";
+import PeatedGlyph from "@peated/web/assets/glyph.svg?react";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Table from "@peated/web/components/table";

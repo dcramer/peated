@@ -1,5 +1,5 @@
 import type { User } from "@peated/server/types";
-import DefaultAvatar from "@peated/web/assets/default-avatar.svg";
+import DefaultAvatar from "@peated/web/assets/default-avatar.svg?react";
 
 export function UserAvatarSkeleton({ size }: { size?: number }) {
   return (

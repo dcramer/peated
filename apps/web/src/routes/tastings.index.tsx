@@ -1,5 +1,5 @@
 import type { Inputs } from "@peated/server/orpc/router";
-import Glyph from "@peated/web/assets/glyph.svg";
+import Glyph from "@peated/web/assets/glyph.svg?react";
 import BottleTable from "@peated/web/components/bottleTable";
 import EmbeddedLogin from "@peated/web/components/embeddedLogin";
 import EmptyActivity from "@peated/web/components/emptyActivity";

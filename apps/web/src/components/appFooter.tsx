@@ -1,6 +1,6 @@
 import { GlobeAmericasIcon, UserGroupIcon } from "@heroicons/react/20/solid";
 import { StarIcon } from "@heroicons/react/24/outline";
-import PeatedGlyph from "@peated/web/assets/glyph.svg";
+import PeatedGlyph from "@peated/web/assets/glyph.svg?react";
 import NavLink from "./navLink";
 import NotificationsPanel from "./notifications/panel";
 

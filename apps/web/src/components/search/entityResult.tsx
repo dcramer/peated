@@ -1,5 +1,5 @@
 import type { Entity } from "@peated/server/types";
-import EntityIcon from "@peated/web/assets/entity.svg";
+import EntityIcon from "@peated/web/assets/entity.svg?react";
 import { Link } from "@tanstack/react-router";
 import Chip from "../chip";
 

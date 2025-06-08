@@ -49,12 +49,7 @@ export default defineConfig(({ command }) => ({
   },
   plugins: [
     // SVG plugin to transform SVG imports into React components
-    svgr({
-      include: "**/*.svg",
-      svgrOptions: {
-        exportType: "default",
-      },
-    }),
+    svgr(),
     // Please make sure that '@tanstack/router-plugin' is passed before '@vitejs/plugin-react'
     TanStackRouterVite({
       target: "react",

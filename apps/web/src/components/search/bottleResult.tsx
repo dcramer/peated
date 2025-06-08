@@ -1,7 +1,7 @@
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/24/outline";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
-import BottleIcon from "@peated/web/assets/bottle.svg";
+import BottleIcon from "@peated/web/assets/bottle.svg?react";
 import { Link } from "@tanstack/react-router";
 import { Fragment, type ReactNode } from "react";
 import Join from "../join";

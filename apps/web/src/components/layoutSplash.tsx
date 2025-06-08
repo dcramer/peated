@@ -1,4 +1,4 @@
-import PeatedLogo from "@peated/web/assets/logo.svg";
+import PeatedLogo from "@peated/web/assets/logo.svg?react";
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 

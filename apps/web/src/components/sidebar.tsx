@@ -8,11 +8,11 @@ import {
   StarIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
-import BottleIcon from "@peated/web/assets/bottle.svg";
-import BottlerIcon from "@peated/web/assets/bottler.svg";
-import BrandIcon from "@peated/web/assets/brand.svg";
-import DistillerIcon from "@peated/web/assets/distiller.svg";
-import PeatedGlyph from "@peated/web/assets/glyph.svg";
+import BottleIcon from "@peated/web/assets/bottle.svg?react";
+import BottlerIcon from "@peated/web/assets/bottler.svg?react";
+import BrandIcon from "@peated/web/assets/brand.svg?react";
+import DistillerIcon from "@peated/web/assets/distiller.svg?react";
+import PeatedGlyph from "@peated/web/assets/glyph.svg?react";
 import { useLocation } from "@tanstack/react-router";
 import Button from "./button";
 import FeedbackSidebarLink from "./feedbackSidebarLink";
@@ -33,7 +33,12 @@ export default function Sidebar() {
           <nav className="flex flex-1 flex-col">
             <ul className="flex flex-1 flex-col gap-y-7">
               <li>
-                <Button href="/search?tasting" fullWidth color="highlight">
+                <Button
+                  to="/search"
+                  search={{ tasting: "1" }}
+                  fullWidth
+                  color="highlight"
+                >
                   Record a Tasting
                 </Button>
               </li>

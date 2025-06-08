@@ -1,5 +1,5 @@
 import type { Outputs } from "@peated/server/orpc/router";
-import Glyph from "@peated/web/assets/glyph.svg";
+import Glyph from "@peated/web/assets/glyph.svg?react";
 import Alert from "@peated/web/components/alert";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Spinner from "@peated/web/components/spinner";

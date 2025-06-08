@@ -1,7 +1,7 @@
 import type { ServingStyle } from "@peated/server/types";
-import SvgServingNeat from "@peated/web/assets/serving-neat.svg";
-import SvgServingRocks from "@peated/web/assets/serving-rocks.svg";
-import SvgServingSplash from "@peated/web/assets/serving-splash.svg";
+import SvgServingNeat from "@peated/web/assets/serving-neat.svg?react";
+import SvgServingRocks from "@peated/web/assets/serving-rocks.svg?react";
+import SvgServingSplash from "@peated/web/assets/serving-splash.svg?react";
 
 export default function ServingStyleIcon({
   servingStyle,
