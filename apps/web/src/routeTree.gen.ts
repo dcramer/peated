@@ -26,9 +26,11 @@ import { Route as AdminEventsImport } from "./routes/admin.events";
 import { Route as AdminEventsEventIdImport } from "./routes/admin.events.$eventId";
 import { Route as AdminEventsEventIdEditImport } from "./routes/admin.events.$eventId.edit";
 import { Route as AdminEventsAddImport } from "./routes/admin.events.add";
+import { Route as AdminIndexImport } from "./routes/admin.index";
 import { Route as AdminLocationsImport } from "./routes/admin.locations";
 import { Route as AdminLocationsCountrySlugImport } from "./routes/admin.locations.$countrySlug";
 import { Route as AdminLocationsCountrySlugEditImport } from "./routes/admin.locations.$countrySlug.edit";
+import { Route as AdminLocationsCountrySlugIndexImport } from "./routes/admin.locations.$countrySlug.index";
 import { Route as AdminLocationsCountrySlugRegionsRegionSlugImport } from "./routes/admin.locations.$countrySlug.regions.$regionSlug";
 import { Route as AdminLocationsCountrySlugRegionsRegionSlugEditImport } from "./routes/admin.locations.$countrySlug.regions.$regionSlug.edit";
 import { Route as AdminLocationsCountrySlugRegionsAddImport } from "./routes/admin.locations.$countrySlug.regions.add";
@@ -36,6 +38,7 @@ import { Route as AdminQueueImport } from "./routes/admin.queue";
 import { Route as AdminSitesImport } from "./routes/admin.sites";
 import { Route as AdminSitesSiteIdImport } from "./routes/admin.sites.$siteId";
 import { Route as AdminSitesSiteIdEditImport } from "./routes/admin.sites.$siteId.edit";
+import { Route as AdminSitesSiteIdIndexImport } from "./routes/admin.sites.$siteId.index";
 import { Route as AdminSitesSiteIdReviewsImport } from "./routes/admin.sites.$siteId.reviews";
 import { Route as AdminSitesAddImport } from "./routes/admin.sites.add";
 import { Route as AdminTagsImport } from "./routes/admin.tags";
@@ -44,38 +47,41 @@ import { Route as AdminTagsTagIdEditImport } from "./routes/admin.tags.$tagId.ed
 import { Route as AdminTagsAddImport } from "./routes/admin.tags.add";
 import { Route as AdminUsersImport } from "./routes/admin.users";
 import { Route as BadgesBadgeIdImport } from "./routes/badges.$badgeId";
-import { Route as BottlersImport } from "./routes/bottlers";
-import { Route as BottlesImport } from "./routes/bottles";
+import { Route as BottlersIndexImport } from "./routes/bottlers.index";
 import { Route as BottlesBottleIdImport } from "./routes/bottles.$bottleId";
 import { Route as BottlesBottleIdAddReleaseImport } from "./routes/bottles.$bottleId.addRelease";
 import { Route as BottlesBottleIdAddTastingImport } from "./routes/bottles.$bottleId.addTasting";
 import { Route as BottlesBottleIdAliasesImport } from "./routes/bottles.$bottleId.aliases";
 import { Route as BottlesBottleIdEditImport } from "./routes/bottles.$bottleId.edit";
+import { Route as BottlesBottleIdIndexImport } from "./routes/bottles.$bottleId.index";
 import { Route as BottlesBottleIdMergeImport } from "./routes/bottles.$bottleId.merge";
 import { Route as BottlesBottleIdPricesImport } from "./routes/bottles.$bottleId.prices";
 import { Route as BottlesBottleIdReleasesImport } from "./routes/bottles.$bottleId.releases";
 import { Route as BottlesBottleIdReleasesReleaseIdEditImport } from "./routes/bottles.$bottleId.releases.$releaseId.edit";
 import { Route as BottlesBottleIdSimilarImport } from "./routes/bottles.$bottleId.similar";
 import { Route as BottlesBottleIdTastingsImport } from "./routes/bottles.$bottleId.tastings";
-import { Route as BrandsImport } from "./routes/brands";
-import { Route as DistillersImport } from "./routes/distillers";
+import { Route as BottlesIndexImport } from "./routes/bottles.index";
+import { Route as BrandsIndexImport } from "./routes/brands.index";
+import { Route as DistillersIndexImport } from "./routes/distillers.index";
 import { Route as EntitiesEntityIdImport } from "./routes/entities.$entityId";
 import { Route as EntitiesEntityIdAliasesImport } from "./routes/entities.$entityId.aliases";
 import { Route as EntitiesEntityIdBottlesImport } from "./routes/entities.$entityId.bottles";
 import { Route as EntitiesEntityIdCodesImport } from "./routes/entities.$entityId.codes";
 import { Route as EntitiesEntityIdEditImport } from "./routes/entities.$entityId.edit";
+import { Route as EntitiesEntityIdIndexImport } from "./routes/entities.$entityId.index";
 import { Route as EntitiesEntityIdMergeImport } from "./routes/entities.$entityId.merge";
 import { Route as EntitiesEntityIdTastingsImport } from "./routes/entities.$entityId.tastings";
 import { Route as FavoritesImport } from "./routes/favorites";
-import { Route as FlightsImport } from "./routes/flights";
 import { Route as FlightsFlightIdImport } from "./routes/flights.$flightId";
 import { Route as FlightsFlightIdEditImport } from "./routes/flights.$flightId.edit";
 import { Route as FlightsFlightIdOverlayImport } from "./routes/flights.$flightId.overlay";
+import { Route as FlightsIndexImport } from "./routes/flights.index";
 import { Route as FriendsImport } from "./routes/friends";
 import { Route as GlobalErrorImport } from "./routes/global-error";
 import { Route as IndexImport } from "./routes/index";
 import { Route as LocationsImport } from "./routes/locations";
 import { Route as LocationsCountrySlugImport } from "./routes/locations.$countrySlug";
+import { Route as LocationsCountrySlugIndexImport } from "./routes/locations.$countrySlug.index";
 import { Route as LocationsCountrySlugRegionsImport } from "./routes/locations.$countrySlug.regions";
 import { Route as LocationsCountrySlugRegionsRegionSlugImport } from "./routes/locations.$countrySlug.regions.$regionSlug";
 import { Route as LocationsAllRegionsImport } from "./routes/locations.all-regions";
@@ -87,12 +93,13 @@ import { Route as PasswordResetImport } from "./routes/password-reset";
 import { Route as RegisterImport } from "./routes/register";
 import { Route as SearchImport } from "./routes/search";
 import { Route as SettingsImport } from "./routes/settings";
-import { Route as TastingsImport } from "./routes/tastings";
 import { Route as TastingsTastingIdImport } from "./routes/tastings.$tastingId";
 import { Route as TastingsTastingIdEditImport } from "./routes/tastings.$tastingId.edit";
+import { Route as TastingsIndexImport } from "./routes/tastings.index";
 import { Route as UpdatesImport } from "./routes/updates";
 import { Route as UsersUsernameImport } from "./routes/users.$username";
 import { Route as UsersUsernameFavoritesImport } from "./routes/users.$username.favorites";
+import { Route as UsersUsernameIndexImport } from "./routes/users.$username.index";
 import { Route as VerifyImport } from "./routes/verify";
 
 // Create/Update Routes
@@ -106,12 +113,6 @@ const VerifyRoute = VerifyImport.update({
 const UpdatesRoute = UpdatesImport.update({
   id: "/updates",
   path: "/updates",
-  getParentRoute: () => rootRoute,
-} as any);
-
-const TastingsRoute = TastingsImport.update({
-  id: "/tastings",
-  path: "/tastings",
   getParentRoute: () => rootRoute,
 } as any);
 
@@ -175,39 +176,9 @@ const FriendsRoute = FriendsImport.update({
   getParentRoute: () => rootRoute,
 } as any);
 
-const FlightsRoute = FlightsImport.update({
-  id: "/flights",
-  path: "/flights",
-  getParentRoute: () => rootRoute,
-} as any);
-
 const FavoritesRoute = FavoritesImport.update({
   id: "/favorites",
   path: "/favorites",
-  getParentRoute: () => rootRoute,
-} as any);
-
-const DistillersRoute = DistillersImport.update({
-  id: "/distillers",
-  path: "/distillers",
-  getParentRoute: () => rootRoute,
-} as any);
-
-const BrandsRoute = BrandsImport.update({
-  id: "/brands",
-  path: "/brands",
-  getParentRoute: () => rootRoute,
-} as any);
-
-const BottlesRoute = BottlesImport.update({
-  id: "/bottles",
-  path: "/bottles",
-  getParentRoute: () => rootRoute,
-} as any);
-
-const BottlersRoute = BottlersImport.update({
-  id: "/bottlers",
-  path: "/bottlers",
   getParentRoute: () => rootRoute,
 } as any);
 
@@ -247,6 +218,48 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any);
 
+const TastingsIndexRoute = TastingsIndexImport.update({
+  id: "/tastings/",
+  path: "/tastings/",
+  getParentRoute: () => rootRoute,
+} as any);
+
+const FlightsIndexRoute = FlightsIndexImport.update({
+  id: "/flights/",
+  path: "/flights/",
+  getParentRoute: () => rootRoute,
+} as any);
+
+const DistillersIndexRoute = DistillersIndexImport.update({
+  id: "/distillers/",
+  path: "/distillers/",
+  getParentRoute: () => rootRoute,
+} as any);
+
+const BrandsIndexRoute = BrandsIndexImport.update({
+  id: "/brands/",
+  path: "/brands/",
+  getParentRoute: () => rootRoute,
+} as any);
+
+const BottlesIndexRoute = BottlesIndexImport.update({
+  id: "/bottles/",
+  path: "/bottles/",
+  getParentRoute: () => rootRoute,
+} as any);
+
+const BottlersIndexRoute = BottlersIndexImport.update({
+  id: "/bottlers/",
+  path: "/bottlers/",
+  getParentRoute: () => rootRoute,
+} as any);
+
+const AdminIndexRoute = AdminIndexImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => AdminRoute,
+} as any);
+
 const UsersUsernameRoute = UsersUsernameImport.update({
   id: "/users/$username",
   path: "/users/$username",
@@ -254,9 +267,9 @@ const UsersUsernameRoute = UsersUsernameImport.update({
 } as any);
 
 const TastingsTastingIdRoute = TastingsTastingIdImport.update({
-  id: "/$tastingId",
-  path: "/$tastingId",
-  getParentRoute: () => TastingsRoute,
+  id: "/tastings/$tastingId",
+  path: "/tastings/$tastingId",
+  getParentRoute: () => rootRoute,
 } as any);
 
 const NotificationsAllRoute = NotificationsAllImport.update({
@@ -278,9 +291,9 @@ const LocationsCountrySlugRoute = LocationsCountrySlugImport.update({
 } as any);
 
 const FlightsFlightIdRoute = FlightsFlightIdImport.update({
-  id: "/$flightId",
-  path: "/$flightId",
-  getParentRoute: () => FlightsRoute,
+  id: "/flights/$flightId",
+  path: "/flights/$flightId",
+  getParentRoute: () => rootRoute,
 } as any);
 
 const EntitiesEntityIdRoute = EntitiesEntityIdImport.update({
@@ -290,9 +303,9 @@ const EntitiesEntityIdRoute = EntitiesEntityIdImport.update({
 } as any);
 
 const BottlesBottleIdRoute = BottlesBottleIdImport.update({
-  id: "/$bottleId",
-  path: "/$bottleId",
-  getParentRoute: () => BottlesRoute,
+  id: "/bottles/$bottleId",
+  path: "/bottles/$bottleId",
+  getParentRoute: () => rootRoute,
 } as any);
 
 const BadgesBadgeIdRoute = BadgesBadgeIdImport.update({
@@ -353,6 +366,30 @@ const ActivityFriendsRoute = ActivityFriendsImport.update({
   id: "/activity/friends",
   path: "/activity/friends",
   getParentRoute: () => rootRoute,
+} as any);
+
+const UsersUsernameIndexRoute = UsersUsernameIndexImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => UsersUsernameRoute,
+} as any);
+
+const LocationsCountrySlugIndexRoute = LocationsCountrySlugIndexImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => LocationsCountrySlugRoute,
+} as any);
+
+const EntitiesEntityIdIndexRoute = EntitiesEntityIdIndexImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => EntitiesEntityIdRoute,
+} as any);
+
+const BottlesBottleIdIndexRoute = BottlesBottleIdIndexImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => BottlesBottleIdRoute,
 } as any);
 
 const UsersUsernameFavoritesRoute = UsersUsernameFavoritesImport.update({
@@ -530,6 +567,19 @@ const AdminBadgesBadgeIdRoute = AdminBadgesBadgeIdImport.update({
   getParentRoute: () => AdminBadgesRoute,
 } as any);
 
+const AdminSitesSiteIdIndexRoute = AdminSitesSiteIdIndexImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => AdminSitesSiteIdRoute,
+} as any);
+
+const AdminLocationsCountrySlugIndexRoute =
+  AdminLocationsCountrySlugIndexImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => AdminLocationsCountrySlugRoute,
+  } as any);
+
 const LocationsCountrySlugRegionsRegionSlugRoute =
   LocationsCountrySlugRegionsRegionSlugImport.update({
     id: "/$regionSlug",
@@ -648,46 +698,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AdminImport;
       parentRoute: typeof rootRoute;
     };
-    "/bottlers": {
-      id: "/bottlers";
-      path: "/bottlers";
-      fullPath: "/bottlers";
-      preLoaderRoute: typeof BottlersImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/bottles": {
-      id: "/bottles";
-      path: "/bottles";
-      fullPath: "/bottles";
-      preLoaderRoute: typeof BottlesImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/brands": {
-      id: "/brands";
-      path: "/brands";
-      fullPath: "/brands";
-      preLoaderRoute: typeof BrandsImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/distillers": {
-      id: "/distillers";
-      path: "/distillers";
-      fullPath: "/distillers";
-      preLoaderRoute: typeof DistillersImport;
-      parentRoute: typeof rootRoute;
-    };
     "/favorites": {
       id: "/favorites";
       path: "/favorites";
       fullPath: "/favorites";
       preLoaderRoute: typeof FavoritesImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/flights": {
-      id: "/flights";
-      path: "/flights";
-      fullPath: "/flights";
-      preLoaderRoute: typeof FlightsImport;
       parentRoute: typeof rootRoute;
     };
     "/friends": {
@@ -758,13 +773,6 @@ declare module "@tanstack/react-router" {
       path: "/settings";
       fullPath: "/settings";
       preLoaderRoute: typeof SettingsImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/tastings": {
-      id: "/tastings";
-      path: "/tastings";
-      fullPath: "/tastings";
-      preLoaderRoute: typeof TastingsImport;
       parentRoute: typeof rootRoute;
     };
     "/updates": {
@@ -853,10 +861,10 @@ declare module "@tanstack/react-router" {
     };
     "/bottles/$bottleId": {
       id: "/bottles/$bottleId";
-      path: "/$bottleId";
+      path: "/bottles/$bottleId";
       fullPath: "/bottles/$bottleId";
       preLoaderRoute: typeof BottlesBottleIdImport;
-      parentRoute: typeof BottlesImport;
+      parentRoute: typeof rootRoute;
     };
     "/entities/$entityId": {
       id: "/entities/$entityId";
@@ -867,10 +875,10 @@ declare module "@tanstack/react-router" {
     };
     "/flights/$flightId": {
       id: "/flights/$flightId";
-      path: "/$flightId";
+      path: "/flights/$flightId";
       fullPath: "/flights/$flightId";
       preLoaderRoute: typeof FlightsFlightIdImport;
-      parentRoute: typeof FlightsImport;
+      parentRoute: typeof rootRoute;
     };
     "/locations/$countrySlug": {
       id: "/locations/$countrySlug";
@@ -895,16 +903,65 @@ declare module "@tanstack/react-router" {
     };
     "/tastings/$tastingId": {
       id: "/tastings/$tastingId";
-      path: "/$tastingId";
+      path: "/tastings/$tastingId";
       fullPath: "/tastings/$tastingId";
       preLoaderRoute: typeof TastingsTastingIdImport;
-      parentRoute: typeof TastingsImport;
+      parentRoute: typeof rootRoute;
     };
     "/users/$username": {
       id: "/users/$username";
       path: "/users/$username";
       fullPath: "/users/$username";
       preLoaderRoute: typeof UsersUsernameImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/admin/": {
+      id: "/admin/";
+      path: "/";
+      fullPath: "/admin/";
+      preLoaderRoute: typeof AdminIndexImport;
+      parentRoute: typeof AdminImport;
+    };
+    "/bottlers/": {
+      id: "/bottlers/";
+      path: "/bottlers";
+      fullPath: "/bottlers";
+      preLoaderRoute: typeof BottlersIndexImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/bottles/": {
+      id: "/bottles/";
+      path: "/bottles";
+      fullPath: "/bottles";
+      preLoaderRoute: typeof BottlesIndexImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/brands/": {
+      id: "/brands/";
+      path: "/brands";
+      fullPath: "/brands";
+      preLoaderRoute: typeof BrandsIndexImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/distillers/": {
+      id: "/distillers/";
+      path: "/distillers";
+      fullPath: "/distillers";
+      preLoaderRoute: typeof DistillersIndexImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/flights/": {
+      id: "/flights/";
+      path: "/flights";
+      fullPath: "/flights";
+      preLoaderRoute: typeof FlightsIndexImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/tastings/": {
+      id: "/tastings/";
+      path: "/tastings";
+      fullPath: "/tastings";
+      preLoaderRoute: typeof TastingsIndexImport;
       parentRoute: typeof rootRoute;
     };
     "/admin/badges/$badgeId": {
@@ -1110,6 +1167,34 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof UsersUsernameFavoritesImport;
       parentRoute: typeof UsersUsernameImport;
     };
+    "/bottles/$bottleId/": {
+      id: "/bottles/$bottleId/";
+      path: "/";
+      fullPath: "/bottles/$bottleId/";
+      preLoaderRoute: typeof BottlesBottleIdIndexImport;
+      parentRoute: typeof BottlesBottleIdImport;
+    };
+    "/entities/$entityId/": {
+      id: "/entities/$entityId/";
+      path: "/";
+      fullPath: "/entities/$entityId/";
+      preLoaderRoute: typeof EntitiesEntityIdIndexImport;
+      parentRoute: typeof EntitiesEntityIdImport;
+    };
+    "/locations/$countrySlug/": {
+      id: "/locations/$countrySlug/";
+      path: "/";
+      fullPath: "/locations/$countrySlug/";
+      preLoaderRoute: typeof LocationsCountrySlugIndexImport;
+      parentRoute: typeof LocationsCountrySlugImport;
+    };
+    "/users/$username/": {
+      id: "/users/$username/";
+      path: "/";
+      fullPath: "/users/$username/";
+      preLoaderRoute: typeof UsersUsernameIndexImport;
+      parentRoute: typeof UsersUsernameImport;
+    };
     "/admin/badges/$badgeId/edit": {
       id: "/admin/badges/$badgeId/edit";
       path: "/edit";
@@ -1158,6 +1243,20 @@ declare module "@tanstack/react-router" {
       fullPath: "/locations/$countrySlug/regions/$regionSlug";
       preLoaderRoute: typeof LocationsCountrySlugRegionsRegionSlugImport;
       parentRoute: typeof LocationsCountrySlugRegionsImport;
+    };
+    "/admin/locations/$countrySlug/": {
+      id: "/admin/locations/$countrySlug/";
+      path: "/";
+      fullPath: "/admin/locations/$countrySlug/";
+      preLoaderRoute: typeof AdminLocationsCountrySlugIndexImport;
+      parentRoute: typeof AdminLocationsCountrySlugImport;
+    };
+    "/admin/sites/$siteId/": {
+      id: "/admin/sites/$siteId/";
+      path: "/";
+      fullPath: "/admin/sites/$siteId/";
+      preLoaderRoute: typeof AdminSitesSiteIdIndexImport;
+      parentRoute: typeof AdminSitesSiteIdImport;
     };
     "/admin/locations/$countrySlug/regions/$regionSlug": {
       id: "/admin/locations/$countrySlug/regions/$regionSlug";
@@ -1259,6 +1358,7 @@ const AdminLocationsCountrySlugRegionsRegionSlugRouteWithChildren =
 
 interface AdminLocationsCountrySlugRouteChildren {
   AdminLocationsCountrySlugEditRoute: typeof AdminLocationsCountrySlugEditRoute;
+  AdminLocationsCountrySlugIndexRoute: typeof AdminLocationsCountrySlugIndexRoute;
   AdminLocationsCountrySlugRegionsRegionSlugRoute: typeof AdminLocationsCountrySlugRegionsRegionSlugRouteWithChildren;
   AdminLocationsCountrySlugRegionsAddRoute: typeof AdminLocationsCountrySlugRegionsAddRoute;
 }
@@ -1266,6 +1366,7 @@ interface AdminLocationsCountrySlugRouteChildren {
 const AdminLocationsCountrySlugRouteChildren: AdminLocationsCountrySlugRouteChildren =
   {
     AdminLocationsCountrySlugEditRoute: AdminLocationsCountrySlugEditRoute,
+    AdminLocationsCountrySlugIndexRoute: AdminLocationsCountrySlugIndexRoute,
     AdminLocationsCountrySlugRegionsRegionSlugRoute:
       AdminLocationsCountrySlugRegionsRegionSlugRouteWithChildren,
     AdminLocationsCountrySlugRegionsAddRoute:
@@ -1292,11 +1393,13 @@ const AdminLocationsRouteWithChildren = AdminLocationsRoute._addFileChildren(
 interface AdminSitesSiteIdRouteChildren {
   AdminSitesSiteIdEditRoute: typeof AdminSitesSiteIdEditRoute;
   AdminSitesSiteIdReviewsRoute: typeof AdminSitesSiteIdReviewsRoute;
+  AdminSitesSiteIdIndexRoute: typeof AdminSitesSiteIdIndexRoute;
 }
 
 const AdminSitesSiteIdRouteChildren: AdminSitesSiteIdRouteChildren = {
   AdminSitesSiteIdEditRoute: AdminSitesSiteIdEditRoute,
   AdminSitesSiteIdReviewsRoute: AdminSitesSiteIdReviewsRoute,
+  AdminSitesSiteIdIndexRoute: AdminSitesSiteIdIndexRoute,
 };
 
 const AdminSitesSiteIdRouteWithChildren =
@@ -1350,6 +1453,7 @@ interface AdminRouteChildren {
   AdminSitesRoute: typeof AdminSitesRouteWithChildren;
   AdminTagsRoute: typeof AdminTagsRouteWithChildren;
   AdminUsersRoute: typeof AdminUsersRoute;
+  AdminIndexRoute: typeof AdminIndexRoute;
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -1360,88 +1464,10 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSitesRoute: AdminSitesRouteWithChildren,
   AdminTagsRoute: AdminTagsRouteWithChildren,
   AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
 };
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren);
-
-interface BottlesBottleIdReleasesRouteChildren {
-  BottlesBottleIdReleasesReleaseIdEditRoute: typeof BottlesBottleIdReleasesReleaseIdEditRoute;
-}
-
-const BottlesBottleIdReleasesRouteChildren: BottlesBottleIdReleasesRouteChildren =
-  {
-    BottlesBottleIdReleasesReleaseIdEditRoute:
-      BottlesBottleIdReleasesReleaseIdEditRoute,
-  };
-
-const BottlesBottleIdReleasesRouteWithChildren =
-  BottlesBottleIdReleasesRoute._addFileChildren(
-    BottlesBottleIdReleasesRouteChildren
-  );
-
-interface BottlesBottleIdRouteChildren {
-  BottlesBottleIdAddReleaseRoute: typeof BottlesBottleIdAddReleaseRoute;
-  BottlesBottleIdAddTastingRoute: typeof BottlesBottleIdAddTastingRoute;
-  BottlesBottleIdAliasesRoute: typeof BottlesBottleIdAliasesRoute;
-  BottlesBottleIdEditRoute: typeof BottlesBottleIdEditRoute;
-  BottlesBottleIdMergeRoute: typeof BottlesBottleIdMergeRoute;
-  BottlesBottleIdPricesRoute: typeof BottlesBottleIdPricesRoute;
-  BottlesBottleIdReleasesRoute: typeof BottlesBottleIdReleasesRouteWithChildren;
-  BottlesBottleIdSimilarRoute: typeof BottlesBottleIdSimilarRoute;
-  BottlesBottleIdTastingsRoute: typeof BottlesBottleIdTastingsRoute;
-}
-
-const BottlesBottleIdRouteChildren: BottlesBottleIdRouteChildren = {
-  BottlesBottleIdAddReleaseRoute: BottlesBottleIdAddReleaseRoute,
-  BottlesBottleIdAddTastingRoute: BottlesBottleIdAddTastingRoute,
-  BottlesBottleIdAliasesRoute: BottlesBottleIdAliasesRoute,
-  BottlesBottleIdEditRoute: BottlesBottleIdEditRoute,
-  BottlesBottleIdMergeRoute: BottlesBottleIdMergeRoute,
-  BottlesBottleIdPricesRoute: BottlesBottleIdPricesRoute,
-  BottlesBottleIdReleasesRoute: BottlesBottleIdReleasesRouteWithChildren,
-  BottlesBottleIdSimilarRoute: BottlesBottleIdSimilarRoute,
-  BottlesBottleIdTastingsRoute: BottlesBottleIdTastingsRoute,
-};
-
-const BottlesBottleIdRouteWithChildren = BottlesBottleIdRoute._addFileChildren(
-  BottlesBottleIdRouteChildren
-);
-
-interface BottlesRouteChildren {
-  BottlesBottleIdRoute: typeof BottlesBottleIdRouteWithChildren;
-}
-
-const BottlesRouteChildren: BottlesRouteChildren = {
-  BottlesBottleIdRoute: BottlesBottleIdRouteWithChildren,
-};
-
-const BottlesRouteWithChildren =
-  BottlesRoute._addFileChildren(BottlesRouteChildren);
-
-interface FlightsFlightIdRouteChildren {
-  FlightsFlightIdEditRoute: typeof FlightsFlightIdEditRoute;
-  FlightsFlightIdOverlayRoute: typeof FlightsFlightIdOverlayRoute;
-}
-
-const FlightsFlightIdRouteChildren: FlightsFlightIdRouteChildren = {
-  FlightsFlightIdEditRoute: FlightsFlightIdEditRoute,
-  FlightsFlightIdOverlayRoute: FlightsFlightIdOverlayRoute,
-};
-
-const FlightsFlightIdRouteWithChildren = FlightsFlightIdRoute._addFileChildren(
-  FlightsFlightIdRouteChildren
-);
-
-interface FlightsRouteChildren {
-  FlightsFlightIdRoute: typeof FlightsFlightIdRouteWithChildren;
-}
-
-const FlightsRouteChildren: FlightsRouteChildren = {
-  FlightsFlightIdRoute: FlightsFlightIdRouteWithChildren,
-};
-
-const FlightsRouteWithChildren =
-  FlightsRoute._addFileChildren(FlightsRouteChildren);
 
 interface LocationsCountrySlugRegionsRouteChildren {
   LocationsCountrySlugRegionsRegionSlugRoute: typeof LocationsCountrySlugRegionsRegionSlugRoute;
@@ -1460,11 +1486,13 @@ const LocationsCountrySlugRegionsRouteWithChildren =
 
 interface LocationsCountrySlugRouteChildren {
   LocationsCountrySlugRegionsRoute: typeof LocationsCountrySlugRegionsRouteWithChildren;
+  LocationsCountrySlugIndexRoute: typeof LocationsCountrySlugIndexRoute;
 }
 
 const LocationsCountrySlugRouteChildren: LocationsCountrySlugRouteChildren = {
   LocationsCountrySlugRegionsRoute:
     LocationsCountrySlugRegionsRouteWithChildren,
+  LocationsCountrySlugIndexRoute: LocationsCountrySlugIndexRoute,
 };
 
 const LocationsCountrySlugRouteWithChildren =
@@ -1496,6 +1524,88 @@ const NotificationsRouteWithChildren = NotificationsRoute._addFileChildren(
   NotificationsRouteChildren
 );
 
+interface BottlesBottleIdReleasesRouteChildren {
+  BottlesBottleIdReleasesReleaseIdEditRoute: typeof BottlesBottleIdReleasesReleaseIdEditRoute;
+}
+
+const BottlesBottleIdReleasesRouteChildren: BottlesBottleIdReleasesRouteChildren =
+  {
+    BottlesBottleIdReleasesReleaseIdEditRoute:
+      BottlesBottleIdReleasesReleaseIdEditRoute,
+  };
+
+const BottlesBottleIdReleasesRouteWithChildren =
+  BottlesBottleIdReleasesRoute._addFileChildren(
+    BottlesBottleIdReleasesRouteChildren
+  );
+
+interface BottlesBottleIdRouteChildren {
+  BottlesBottleIdAddReleaseRoute: typeof BottlesBottleIdAddReleaseRoute;
+  BottlesBottleIdAddTastingRoute: typeof BottlesBottleIdAddTastingRoute;
+  BottlesBottleIdAliasesRoute: typeof BottlesBottleIdAliasesRoute;
+  BottlesBottleIdEditRoute: typeof BottlesBottleIdEditRoute;
+  BottlesBottleIdMergeRoute: typeof BottlesBottleIdMergeRoute;
+  BottlesBottleIdPricesRoute: typeof BottlesBottleIdPricesRoute;
+  BottlesBottleIdReleasesRoute: typeof BottlesBottleIdReleasesRouteWithChildren;
+  BottlesBottleIdSimilarRoute: typeof BottlesBottleIdSimilarRoute;
+  BottlesBottleIdTastingsRoute: typeof BottlesBottleIdTastingsRoute;
+  BottlesBottleIdIndexRoute: typeof BottlesBottleIdIndexRoute;
+}
+
+const BottlesBottleIdRouteChildren: BottlesBottleIdRouteChildren = {
+  BottlesBottleIdAddReleaseRoute: BottlesBottleIdAddReleaseRoute,
+  BottlesBottleIdAddTastingRoute: BottlesBottleIdAddTastingRoute,
+  BottlesBottleIdAliasesRoute: BottlesBottleIdAliasesRoute,
+  BottlesBottleIdEditRoute: BottlesBottleIdEditRoute,
+  BottlesBottleIdMergeRoute: BottlesBottleIdMergeRoute,
+  BottlesBottleIdPricesRoute: BottlesBottleIdPricesRoute,
+  BottlesBottleIdReleasesRoute: BottlesBottleIdReleasesRouteWithChildren,
+  BottlesBottleIdSimilarRoute: BottlesBottleIdSimilarRoute,
+  BottlesBottleIdTastingsRoute: BottlesBottleIdTastingsRoute,
+  BottlesBottleIdIndexRoute: BottlesBottleIdIndexRoute,
+};
+
+const BottlesBottleIdRouteWithChildren = BottlesBottleIdRoute._addFileChildren(
+  BottlesBottleIdRouteChildren
+);
+
+interface EntitiesEntityIdRouteChildren {
+  EntitiesEntityIdAliasesRoute: typeof EntitiesEntityIdAliasesRoute;
+  EntitiesEntityIdBottlesRoute: typeof EntitiesEntityIdBottlesRoute;
+  EntitiesEntityIdCodesRoute: typeof EntitiesEntityIdCodesRoute;
+  EntitiesEntityIdEditRoute: typeof EntitiesEntityIdEditRoute;
+  EntitiesEntityIdMergeRoute: typeof EntitiesEntityIdMergeRoute;
+  EntitiesEntityIdTastingsRoute: typeof EntitiesEntityIdTastingsRoute;
+  EntitiesEntityIdIndexRoute: typeof EntitiesEntityIdIndexRoute;
+}
+
+const EntitiesEntityIdRouteChildren: EntitiesEntityIdRouteChildren = {
+  EntitiesEntityIdAliasesRoute: EntitiesEntityIdAliasesRoute,
+  EntitiesEntityIdBottlesRoute: EntitiesEntityIdBottlesRoute,
+  EntitiesEntityIdCodesRoute: EntitiesEntityIdCodesRoute,
+  EntitiesEntityIdEditRoute: EntitiesEntityIdEditRoute,
+  EntitiesEntityIdMergeRoute: EntitiesEntityIdMergeRoute,
+  EntitiesEntityIdTastingsRoute: EntitiesEntityIdTastingsRoute,
+  EntitiesEntityIdIndexRoute: EntitiesEntityIdIndexRoute,
+};
+
+const EntitiesEntityIdRouteWithChildren =
+  EntitiesEntityIdRoute._addFileChildren(EntitiesEntityIdRouteChildren);
+
+interface FlightsFlightIdRouteChildren {
+  FlightsFlightIdEditRoute: typeof FlightsFlightIdEditRoute;
+  FlightsFlightIdOverlayRoute: typeof FlightsFlightIdOverlayRoute;
+}
+
+const FlightsFlightIdRouteChildren: FlightsFlightIdRouteChildren = {
+  FlightsFlightIdEditRoute: FlightsFlightIdEditRoute,
+  FlightsFlightIdOverlayRoute: FlightsFlightIdOverlayRoute,
+};
+
+const FlightsFlightIdRouteWithChildren = FlightsFlightIdRoute._addFileChildren(
+  FlightsFlightIdRouteChildren
+);
+
 interface TastingsTastingIdRouteChildren {
   TastingsTastingIdEditRoute: typeof TastingsTastingIdEditRoute;
 }
@@ -1507,45 +1617,14 @@ const TastingsTastingIdRouteChildren: TastingsTastingIdRouteChildren = {
 const TastingsTastingIdRouteWithChildren =
   TastingsTastingIdRoute._addFileChildren(TastingsTastingIdRouteChildren);
 
-interface TastingsRouteChildren {
-  TastingsTastingIdRoute: typeof TastingsTastingIdRouteWithChildren;
-}
-
-const TastingsRouteChildren: TastingsRouteChildren = {
-  TastingsTastingIdRoute: TastingsTastingIdRouteWithChildren,
-};
-
-const TastingsRouteWithChildren = TastingsRoute._addFileChildren(
-  TastingsRouteChildren
-);
-
-interface EntitiesEntityIdRouteChildren {
-  EntitiesEntityIdAliasesRoute: typeof EntitiesEntityIdAliasesRoute;
-  EntitiesEntityIdBottlesRoute: typeof EntitiesEntityIdBottlesRoute;
-  EntitiesEntityIdCodesRoute: typeof EntitiesEntityIdCodesRoute;
-  EntitiesEntityIdEditRoute: typeof EntitiesEntityIdEditRoute;
-  EntitiesEntityIdMergeRoute: typeof EntitiesEntityIdMergeRoute;
-  EntitiesEntityIdTastingsRoute: typeof EntitiesEntityIdTastingsRoute;
-}
-
-const EntitiesEntityIdRouteChildren: EntitiesEntityIdRouteChildren = {
-  EntitiesEntityIdAliasesRoute: EntitiesEntityIdAliasesRoute,
-  EntitiesEntityIdBottlesRoute: EntitiesEntityIdBottlesRoute,
-  EntitiesEntityIdCodesRoute: EntitiesEntityIdCodesRoute,
-  EntitiesEntityIdEditRoute: EntitiesEntityIdEditRoute,
-  EntitiesEntityIdMergeRoute: EntitiesEntityIdMergeRoute,
-  EntitiesEntityIdTastingsRoute: EntitiesEntityIdTastingsRoute,
-};
-
-const EntitiesEntityIdRouteWithChildren =
-  EntitiesEntityIdRoute._addFileChildren(EntitiesEntityIdRouteChildren);
-
 interface UsersUsernameRouteChildren {
   UsersUsernameFavoritesRoute: typeof UsersUsernameFavoritesRoute;
+  UsersUsernameIndexRoute: typeof UsersUsernameIndexRoute;
 }
 
 const UsersUsernameRouteChildren: UsersUsernameRouteChildren = {
   UsersUsernameFavoritesRoute: UsersUsernameFavoritesRoute,
+  UsersUsernameIndexRoute: UsersUsernameIndexRoute,
 };
 
 const UsersUsernameRouteWithChildren = UsersUsernameRoute._addFileChildren(
@@ -1559,12 +1638,7 @@ export interface FileRoutesByFullPath {
   "/addEntity": typeof AddEntityRoute;
   "/addFlight": typeof AddFlightRoute;
   "/admin": typeof AdminRouteWithChildren;
-  "/bottlers": typeof BottlersRoute;
-  "/bottles": typeof BottlesRouteWithChildren;
-  "/brands": typeof BrandsRoute;
-  "/distillers": typeof DistillersRoute;
   "/favorites": typeof FavoritesRoute;
-  "/flights": typeof FlightsRouteWithChildren;
   "/friends": typeof FriendsRoute;
   "/global-error": typeof GlobalErrorRoute;
   "/locations": typeof LocationsRouteWithChildren;
@@ -1575,7 +1649,6 @@ export interface FileRoutesByFullPath {
   "/register": typeof RegisterRoute;
   "/search": typeof SearchRoute;
   "/settings": typeof SettingsRoute;
-  "/tastings": typeof TastingsRouteWithChildren;
   "/updates": typeof UpdatesRoute;
   "/verify": typeof VerifyRoute;
   "/activity/friends": typeof ActivityFriendsRoute;
@@ -1596,6 +1669,13 @@ export interface FileRoutesByFullPath {
   "/notifications/all": typeof NotificationsAllRoute;
   "/tastings/$tastingId": typeof TastingsTastingIdRouteWithChildren;
   "/users/$username": typeof UsersUsernameRouteWithChildren;
+  "/admin/": typeof AdminIndexRoute;
+  "/bottlers": typeof BottlersIndexRoute;
+  "/bottles": typeof BottlesIndexRoute;
+  "/brands": typeof BrandsIndexRoute;
+  "/distillers": typeof DistillersIndexRoute;
+  "/flights": typeof FlightsIndexRoute;
+  "/tastings": typeof TastingsIndexRoute;
   "/admin/badges/$badgeId": typeof AdminBadgesBadgeIdRouteWithChildren;
   "/admin/badges/add": typeof AdminBadgesAddRoute;
   "/admin/events/$eventId": typeof AdminEventsEventIdRouteWithChildren;
@@ -1625,6 +1705,10 @@ export interface FileRoutesByFullPath {
   "/locations/$countrySlug/regions": typeof LocationsCountrySlugRegionsRouteWithChildren;
   "/tastings/$tastingId/edit": typeof TastingsTastingIdEditRoute;
   "/users/$username/favorites": typeof UsersUsernameFavoritesRoute;
+  "/bottles/$bottleId/": typeof BottlesBottleIdIndexRoute;
+  "/entities/$entityId/": typeof EntitiesEntityIdIndexRoute;
+  "/locations/$countrySlug/": typeof LocationsCountrySlugIndexRoute;
+  "/users/$username/": typeof UsersUsernameIndexRoute;
   "/admin/badges/$badgeId/edit": typeof AdminBadgesBadgeIdEditRoute;
   "/admin/events/$eventId/edit": typeof AdminEventsEventIdEditRoute;
   "/admin/locations/$countrySlug/edit": typeof AdminLocationsCountrySlugEditRoute;
@@ -1632,6 +1716,8 @@ export interface FileRoutesByFullPath {
   "/admin/sites/$siteId/reviews": typeof AdminSitesSiteIdReviewsRoute;
   "/admin/tags/$tagId/edit": typeof AdminTagsTagIdEditRoute;
   "/locations/$countrySlug/regions/$regionSlug": typeof LocationsCountrySlugRegionsRegionSlugRoute;
+  "/admin/locations/$countrySlug/": typeof AdminLocationsCountrySlugIndexRoute;
+  "/admin/sites/$siteId/": typeof AdminSitesSiteIdIndexRoute;
   "/admin/locations/$countrySlug/regions/$regionSlug": typeof AdminLocationsCountrySlugRegionsRegionSlugRouteWithChildren;
   "/admin/locations/$countrySlug/regions/add": typeof AdminLocationsCountrySlugRegionsAddRoute;
   "/bottles/$bottleId/releases/$releaseId/edit": typeof BottlesBottleIdReleasesReleaseIdEditRoute;
@@ -1644,13 +1730,7 @@ export interface FileRoutesByTo {
   "/addBottle": typeof AddBottleRoute;
   "/addEntity": typeof AddEntityRoute;
   "/addFlight": typeof AddFlightRoute;
-  "/admin": typeof AdminRouteWithChildren;
-  "/bottlers": typeof BottlersRoute;
-  "/bottles": typeof BottlesRouteWithChildren;
-  "/brands": typeof BrandsRoute;
-  "/distillers": typeof DistillersRoute;
   "/favorites": typeof FavoritesRoute;
-  "/flights": typeof FlightsRouteWithChildren;
   "/friends": typeof FriendsRoute;
   "/global-error": typeof GlobalErrorRoute;
   "/locations": typeof LocationsRouteWithChildren;
@@ -1661,7 +1741,6 @@ export interface FileRoutesByTo {
   "/register": typeof RegisterRoute;
   "/search": typeof SearchRoute;
   "/settings": typeof SettingsRoute;
-  "/tastings": typeof TastingsRouteWithChildren;
   "/updates": typeof UpdatesRoute;
   "/verify": typeof VerifyRoute;
   "/activity/friends": typeof ActivityFriendsRoute;
@@ -1674,20 +1753,21 @@ export interface FileRoutesByTo {
   "/admin/tags": typeof AdminTagsRouteWithChildren;
   "/admin/users": typeof AdminUsersRoute;
   "/badges/$badgeId": typeof BadgesBadgeIdRoute;
-  "/bottles/$bottleId": typeof BottlesBottleIdRouteWithChildren;
-  "/entities/$entityId": typeof EntitiesEntityIdRouteWithChildren;
   "/flights/$flightId": typeof FlightsFlightIdRouteWithChildren;
-  "/locations/$countrySlug": typeof LocationsCountrySlugRouteWithChildren;
   "/locations/all-regions": typeof LocationsAllRegionsRoute;
   "/notifications/all": typeof NotificationsAllRoute;
   "/tastings/$tastingId": typeof TastingsTastingIdRouteWithChildren;
-  "/users/$username": typeof UsersUsernameRouteWithChildren;
+  "/admin": typeof AdminIndexRoute;
+  "/bottlers": typeof BottlersIndexRoute;
+  "/bottles": typeof BottlesIndexRoute;
+  "/brands": typeof BrandsIndexRoute;
+  "/distillers": typeof DistillersIndexRoute;
+  "/flights": typeof FlightsIndexRoute;
+  "/tastings": typeof TastingsIndexRoute;
   "/admin/badges/$badgeId": typeof AdminBadgesBadgeIdRouteWithChildren;
   "/admin/badges/add": typeof AdminBadgesAddRoute;
   "/admin/events/$eventId": typeof AdminEventsEventIdRouteWithChildren;
   "/admin/events/add": typeof AdminEventsAddRoute;
-  "/admin/locations/$countrySlug": typeof AdminLocationsCountrySlugRouteWithChildren;
-  "/admin/sites/$siteId": typeof AdminSitesSiteIdRouteWithChildren;
   "/admin/sites/add": typeof AdminSitesAddRoute;
   "/admin/tags/$tagId": typeof AdminTagsTagIdRouteWithChildren;
   "/admin/tags/add": typeof AdminTagsAddRoute;
@@ -1711,6 +1791,10 @@ export interface FileRoutesByTo {
   "/locations/$countrySlug/regions": typeof LocationsCountrySlugRegionsRouteWithChildren;
   "/tastings/$tastingId/edit": typeof TastingsTastingIdEditRoute;
   "/users/$username/favorites": typeof UsersUsernameFavoritesRoute;
+  "/bottles/$bottleId": typeof BottlesBottleIdIndexRoute;
+  "/entities/$entityId": typeof EntitiesEntityIdIndexRoute;
+  "/locations/$countrySlug": typeof LocationsCountrySlugIndexRoute;
+  "/users/$username": typeof UsersUsernameIndexRoute;
   "/admin/badges/$badgeId/edit": typeof AdminBadgesBadgeIdEditRoute;
   "/admin/events/$eventId/edit": typeof AdminEventsEventIdEditRoute;
   "/admin/locations/$countrySlug/edit": typeof AdminLocationsCountrySlugEditRoute;
@@ -1718,6 +1802,8 @@ export interface FileRoutesByTo {
   "/admin/sites/$siteId/reviews": typeof AdminSitesSiteIdReviewsRoute;
   "/admin/tags/$tagId/edit": typeof AdminTagsTagIdEditRoute;
   "/locations/$countrySlug/regions/$regionSlug": typeof LocationsCountrySlugRegionsRegionSlugRoute;
+  "/admin/locations/$countrySlug": typeof AdminLocationsCountrySlugIndexRoute;
+  "/admin/sites/$siteId": typeof AdminSitesSiteIdIndexRoute;
   "/admin/locations/$countrySlug/regions/$regionSlug": typeof AdminLocationsCountrySlugRegionsRegionSlugRouteWithChildren;
   "/admin/locations/$countrySlug/regions/add": typeof AdminLocationsCountrySlugRegionsAddRoute;
   "/bottles/$bottleId/releases/$releaseId/edit": typeof BottlesBottleIdReleasesReleaseIdEditRoute;
@@ -1732,12 +1818,7 @@ export interface FileRoutesById {
   "/addEntity": typeof AddEntityRoute;
   "/addFlight": typeof AddFlightRoute;
   "/admin": typeof AdminRouteWithChildren;
-  "/bottlers": typeof BottlersRoute;
-  "/bottles": typeof BottlesRouteWithChildren;
-  "/brands": typeof BrandsRoute;
-  "/distillers": typeof DistillersRoute;
   "/favorites": typeof FavoritesRoute;
-  "/flights": typeof FlightsRouteWithChildren;
   "/friends": typeof FriendsRoute;
   "/global-error": typeof GlobalErrorRoute;
   "/locations": typeof LocationsRouteWithChildren;
@@ -1748,7 +1829,6 @@ export interface FileRoutesById {
   "/register": typeof RegisterRoute;
   "/search": typeof SearchRoute;
   "/settings": typeof SettingsRoute;
-  "/tastings": typeof TastingsRouteWithChildren;
   "/updates": typeof UpdatesRoute;
   "/verify": typeof VerifyRoute;
   "/activity/friends": typeof ActivityFriendsRoute;
@@ -1769,6 +1849,13 @@ export interface FileRoutesById {
   "/notifications/all": typeof NotificationsAllRoute;
   "/tastings/$tastingId": typeof TastingsTastingIdRouteWithChildren;
   "/users/$username": typeof UsersUsernameRouteWithChildren;
+  "/admin/": typeof AdminIndexRoute;
+  "/bottlers/": typeof BottlersIndexRoute;
+  "/bottles/": typeof BottlesIndexRoute;
+  "/brands/": typeof BrandsIndexRoute;
+  "/distillers/": typeof DistillersIndexRoute;
+  "/flights/": typeof FlightsIndexRoute;
+  "/tastings/": typeof TastingsIndexRoute;
   "/admin/badges/$badgeId": typeof AdminBadgesBadgeIdRouteWithChildren;
   "/admin/badges/add": typeof AdminBadgesAddRoute;
   "/admin/events/$eventId": typeof AdminEventsEventIdRouteWithChildren;
@@ -1798,6 +1885,10 @@ export interface FileRoutesById {
   "/locations/$countrySlug/regions": typeof LocationsCountrySlugRegionsRouteWithChildren;
   "/tastings/$tastingId/edit": typeof TastingsTastingIdEditRoute;
   "/users/$username/favorites": typeof UsersUsernameFavoritesRoute;
+  "/bottles/$bottleId/": typeof BottlesBottleIdIndexRoute;
+  "/entities/$entityId/": typeof EntitiesEntityIdIndexRoute;
+  "/locations/$countrySlug/": typeof LocationsCountrySlugIndexRoute;
+  "/users/$username/": typeof UsersUsernameIndexRoute;
   "/admin/badges/$badgeId/edit": typeof AdminBadgesBadgeIdEditRoute;
   "/admin/events/$eventId/edit": typeof AdminEventsEventIdEditRoute;
   "/admin/locations/$countrySlug/edit": typeof AdminLocationsCountrySlugEditRoute;
@@ -1805,6 +1896,8 @@ export interface FileRoutesById {
   "/admin/sites/$siteId/reviews": typeof AdminSitesSiteIdReviewsRoute;
   "/admin/tags/$tagId/edit": typeof AdminTagsTagIdEditRoute;
   "/locations/$countrySlug/regions/$regionSlug": typeof LocationsCountrySlugRegionsRegionSlugRoute;
+  "/admin/locations/$countrySlug/": typeof AdminLocationsCountrySlugIndexRoute;
+  "/admin/sites/$siteId/": typeof AdminSitesSiteIdIndexRoute;
   "/admin/locations/$countrySlug/regions/$regionSlug": typeof AdminLocationsCountrySlugRegionsRegionSlugRouteWithChildren;
   "/admin/locations/$countrySlug/regions/add": typeof AdminLocationsCountrySlugRegionsAddRoute;
   "/bottles/$bottleId/releases/$releaseId/edit": typeof BottlesBottleIdReleasesReleaseIdEditRoute;
@@ -1820,12 +1913,7 @@ export interface FileRouteTypes {
     | "/addEntity"
     | "/addFlight"
     | "/admin"
-    | "/bottlers"
-    | "/bottles"
-    | "/brands"
-    | "/distillers"
     | "/favorites"
-    | "/flights"
     | "/friends"
     | "/global-error"
     | "/locations"
@@ -1836,7 +1924,6 @@ export interface FileRouteTypes {
     | "/register"
     | "/search"
     | "/settings"
-    | "/tastings"
     | "/updates"
     | "/verify"
     | "/activity/friends"
@@ -1857,6 +1944,13 @@ export interface FileRouteTypes {
     | "/notifications/all"
     | "/tastings/$tastingId"
     | "/users/$username"
+    | "/admin/"
+    | "/bottlers"
+    | "/bottles"
+    | "/brands"
+    | "/distillers"
+    | "/flights"
+    | "/tastings"
     | "/admin/badges/$badgeId"
     | "/admin/badges/add"
     | "/admin/events/$eventId"
@@ -1886,6 +1980,10 @@ export interface FileRouteTypes {
     | "/locations/$countrySlug/regions"
     | "/tastings/$tastingId/edit"
     | "/users/$username/favorites"
+    | "/bottles/$bottleId/"
+    | "/entities/$entityId/"
+    | "/locations/$countrySlug/"
+    | "/users/$username/"
     | "/admin/badges/$badgeId/edit"
     | "/admin/events/$eventId/edit"
     | "/admin/locations/$countrySlug/edit"
@@ -1893,6 +1991,8 @@ export interface FileRouteTypes {
     | "/admin/sites/$siteId/reviews"
     | "/admin/tags/$tagId/edit"
     | "/locations/$countrySlug/regions/$regionSlug"
+    | "/admin/locations/$countrySlug/"
+    | "/admin/sites/$siteId/"
     | "/admin/locations/$countrySlug/regions/$regionSlug"
     | "/admin/locations/$countrySlug/regions/add"
     | "/bottles/$bottleId/releases/$releaseId/edit"
@@ -1904,13 +2004,7 @@ export interface FileRouteTypes {
     | "/addBottle"
     | "/addEntity"
     | "/addFlight"
-    | "/admin"
-    | "/bottlers"
-    | "/bottles"
-    | "/brands"
-    | "/distillers"
     | "/favorites"
-    | "/flights"
     | "/friends"
     | "/global-error"
     | "/locations"
@@ -1921,7 +2015,6 @@ export interface FileRouteTypes {
     | "/register"
     | "/search"
     | "/settings"
-    | "/tastings"
     | "/updates"
     | "/verify"
     | "/activity/friends"
@@ -1934,20 +2027,21 @@ export interface FileRouteTypes {
     | "/admin/tags"
     | "/admin/users"
     | "/badges/$badgeId"
-    | "/bottles/$bottleId"
-    | "/entities/$entityId"
     | "/flights/$flightId"
-    | "/locations/$countrySlug"
     | "/locations/all-regions"
     | "/notifications/all"
     | "/tastings/$tastingId"
-    | "/users/$username"
+    | "/admin"
+    | "/bottlers"
+    | "/bottles"
+    | "/brands"
+    | "/distillers"
+    | "/flights"
+    | "/tastings"
     | "/admin/badges/$badgeId"
     | "/admin/badges/add"
     | "/admin/events/$eventId"
     | "/admin/events/add"
-    | "/admin/locations/$countrySlug"
-    | "/admin/sites/$siteId"
     | "/admin/sites/add"
     | "/admin/tags/$tagId"
     | "/admin/tags/add"
@@ -1971,6 +2065,10 @@ export interface FileRouteTypes {
     | "/locations/$countrySlug/regions"
     | "/tastings/$tastingId/edit"
     | "/users/$username/favorites"
+    | "/bottles/$bottleId"
+    | "/entities/$entityId"
+    | "/locations/$countrySlug"
+    | "/users/$username"
     | "/admin/badges/$badgeId/edit"
     | "/admin/events/$eventId/edit"
     | "/admin/locations/$countrySlug/edit"
@@ -1978,6 +2076,8 @@ export interface FileRouteTypes {
     | "/admin/sites/$siteId/reviews"
     | "/admin/tags/$tagId/edit"
     | "/locations/$countrySlug/regions/$regionSlug"
+    | "/admin/locations/$countrySlug"
+    | "/admin/sites/$siteId"
     | "/admin/locations/$countrySlug/regions/$regionSlug"
     | "/admin/locations/$countrySlug/regions/add"
     | "/bottles/$bottleId/releases/$releaseId/edit"
@@ -1990,12 +2090,7 @@ export interface FileRouteTypes {
     | "/addEntity"
     | "/addFlight"
     | "/admin"
-    | "/bottlers"
-    | "/bottles"
-    | "/brands"
-    | "/distillers"
     | "/favorites"
-    | "/flights"
     | "/friends"
     | "/global-error"
     | "/locations"
@@ -2006,7 +2101,6 @@ export interface FileRouteTypes {
     | "/register"
     | "/search"
     | "/settings"
-    | "/tastings"
     | "/updates"
     | "/verify"
     | "/activity/friends"
@@ -2027,6 +2121,13 @@ export interface FileRouteTypes {
     | "/notifications/all"
     | "/tastings/$tastingId"
     | "/users/$username"
+    | "/admin/"
+    | "/bottlers/"
+    | "/bottles/"
+    | "/brands/"
+    | "/distillers/"
+    | "/flights/"
+    | "/tastings/"
     | "/admin/badges/$badgeId"
     | "/admin/badges/add"
     | "/admin/events/$eventId"
@@ -2056,6 +2157,10 @@ export interface FileRouteTypes {
     | "/locations/$countrySlug/regions"
     | "/tastings/$tastingId/edit"
     | "/users/$username/favorites"
+    | "/bottles/$bottleId/"
+    | "/entities/$entityId/"
+    | "/locations/$countrySlug/"
+    | "/users/$username/"
     | "/admin/badges/$badgeId/edit"
     | "/admin/events/$eventId/edit"
     | "/admin/locations/$countrySlug/edit"
@@ -2063,6 +2168,8 @@ export interface FileRouteTypes {
     | "/admin/sites/$siteId/reviews"
     | "/admin/tags/$tagId/edit"
     | "/locations/$countrySlug/regions/$regionSlug"
+    | "/admin/locations/$countrySlug/"
+    | "/admin/sites/$siteId/"
     | "/admin/locations/$countrySlug/regions/$regionSlug"
     | "/admin/locations/$countrySlug/regions/add"
     | "/bottles/$bottleId/releases/$releaseId/edit"
@@ -2077,12 +2184,7 @@ export interface RootRouteChildren {
   AddEntityRoute: typeof AddEntityRoute;
   AddFlightRoute: typeof AddFlightRoute;
   AdminRoute: typeof AdminRouteWithChildren;
-  BottlersRoute: typeof BottlersRoute;
-  BottlesRoute: typeof BottlesRouteWithChildren;
-  BrandsRoute: typeof BrandsRoute;
-  DistillersRoute: typeof DistillersRoute;
   FavoritesRoute: typeof FavoritesRoute;
-  FlightsRoute: typeof FlightsRouteWithChildren;
   FriendsRoute: typeof FriendsRoute;
   GlobalErrorRoute: typeof GlobalErrorRoute;
   LocationsRoute: typeof LocationsRouteWithChildren;
@@ -2093,14 +2195,22 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute;
   SearchRoute: typeof SearchRoute;
   SettingsRoute: typeof SettingsRoute;
-  TastingsRoute: typeof TastingsRouteWithChildren;
   UpdatesRoute: typeof UpdatesRoute;
   VerifyRoute: typeof VerifyRoute;
   ActivityFriendsRoute: typeof ActivityFriendsRoute;
   ActivityLocalRoute: typeof ActivityLocalRoute;
   BadgesBadgeIdRoute: typeof BadgesBadgeIdRoute;
+  BottlesBottleIdRoute: typeof BottlesBottleIdRouteWithChildren;
   EntitiesEntityIdRoute: typeof EntitiesEntityIdRouteWithChildren;
+  FlightsFlightIdRoute: typeof FlightsFlightIdRouteWithChildren;
+  TastingsTastingIdRoute: typeof TastingsTastingIdRouteWithChildren;
   UsersUsernameRoute: typeof UsersUsernameRouteWithChildren;
+  BottlersIndexRoute: typeof BottlersIndexRoute;
+  BottlesIndexRoute: typeof BottlesIndexRoute;
+  BrandsIndexRoute: typeof BrandsIndexRoute;
+  DistillersIndexRoute: typeof DistillersIndexRoute;
+  FlightsIndexRoute: typeof FlightsIndexRoute;
+  TastingsIndexRoute: typeof TastingsIndexRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -2110,12 +2220,7 @@ const rootRouteChildren: RootRouteChildren = {
   AddEntityRoute: AddEntityRoute,
   AddFlightRoute: AddFlightRoute,
   AdminRoute: AdminRouteWithChildren,
-  BottlersRoute: BottlersRoute,
-  BottlesRoute: BottlesRouteWithChildren,
-  BrandsRoute: BrandsRoute,
-  DistillersRoute: DistillersRoute,
   FavoritesRoute: FavoritesRoute,
-  FlightsRoute: FlightsRouteWithChildren,
   FriendsRoute: FriendsRoute,
   GlobalErrorRoute: GlobalErrorRoute,
   LocationsRoute: LocationsRouteWithChildren,
@@ -2126,14 +2231,22 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   SearchRoute: SearchRoute,
   SettingsRoute: SettingsRoute,
-  TastingsRoute: TastingsRouteWithChildren,
   UpdatesRoute: UpdatesRoute,
   VerifyRoute: VerifyRoute,
   ActivityFriendsRoute: ActivityFriendsRoute,
   ActivityLocalRoute: ActivityLocalRoute,
   BadgesBadgeIdRoute: BadgesBadgeIdRoute,
+  BottlesBottleIdRoute: BottlesBottleIdRouteWithChildren,
   EntitiesEntityIdRoute: EntitiesEntityIdRouteWithChildren,
+  FlightsFlightIdRoute: FlightsFlightIdRouteWithChildren,
+  TastingsTastingIdRoute: TastingsTastingIdRouteWithChildren,
   UsersUsernameRoute: UsersUsernameRouteWithChildren,
+  BottlersIndexRoute: BottlersIndexRoute,
+  BottlesIndexRoute: BottlesIndexRoute,
+  BrandsIndexRoute: BrandsIndexRoute,
+  DistillersIndexRoute: DistillersIndexRoute,
+  FlightsIndexRoute: FlightsIndexRoute,
+  TastingsIndexRoute: TastingsIndexRoute,
 };
 
 export const routeTree = rootRoute
@@ -2152,12 +2265,7 @@ export const routeTree = rootRoute
         "/addEntity",
         "/addFlight",
         "/admin",
-        "/bottlers",
-        "/bottles",
-        "/brands",
-        "/distillers",
         "/favorites",
-        "/flights",
         "/friends",
         "/global-error",
         "/locations",
@@ -2168,14 +2276,22 @@ export const routeTree = rootRoute
         "/register",
         "/search",
         "/settings",
-        "/tastings",
         "/updates",
         "/verify",
         "/activity/friends",
         "/activity/local",
         "/badges/$badgeId",
+        "/bottles/$bottleId",
         "/entities/$entityId",
-        "/users/$username"
+        "/flights/$flightId",
+        "/tastings/$tastingId",
+        "/users/$username",
+        "/bottlers/",
+        "/bottles/",
+        "/brands/",
+        "/distillers/",
+        "/flights/",
+        "/tastings/"
       ]
     },
     "/": {
@@ -2202,32 +2318,12 @@ export const routeTree = rootRoute
         "/admin/queue",
         "/admin/sites",
         "/admin/tags",
-        "/admin/users"
+        "/admin/users",
+        "/admin/"
       ]
-    },
-    "/bottlers": {
-      "filePath": "bottlers.tsx"
-    },
-    "/bottles": {
-      "filePath": "bottles.tsx",
-      "children": [
-        "/bottles/$bottleId"
-      ]
-    },
-    "/brands": {
-      "filePath": "brands.tsx"
-    },
-    "/distillers": {
-      "filePath": "distillers.tsx"
     },
     "/favorites": {
       "filePath": "favorites.tsx"
-    },
-    "/flights": {
-      "filePath": "flights.tsx",
-      "children": [
-        "/flights/$flightId"
-      ]
     },
     "/friends": {
       "filePath": "friends.tsx"
@@ -2265,12 +2361,6 @@ export const routeTree = rootRoute
     },
     "/settings": {
       "filePath": "settings.tsx"
-    },
-    "/tastings": {
-      "filePath": "tastings.tsx",
-      "children": [
-        "/tastings/$tastingId"
-      ]
     },
     "/updates": {
       "filePath": "updates.tsx"
@@ -2336,7 +2426,6 @@ export const routeTree = rootRoute
     },
     "/bottles/$bottleId": {
       "filePath": "bottles.$bottleId.tsx",
-      "parent": "/bottles",
       "children": [
         "/bottles/$bottleId/addRelease",
         "/bottles/$bottleId/addTasting",
@@ -2346,7 +2435,8 @@ export const routeTree = rootRoute
         "/bottles/$bottleId/prices",
         "/bottles/$bottleId/releases",
         "/bottles/$bottleId/similar",
-        "/bottles/$bottleId/tastings"
+        "/bottles/$bottleId/tastings",
+        "/bottles/$bottleId/"
       ]
     },
     "/entities/$entityId": {
@@ -2357,12 +2447,12 @@ export const routeTree = rootRoute
         "/entities/$entityId/codes",
         "/entities/$entityId/edit",
         "/entities/$entityId/merge",
-        "/entities/$entityId/tastings"
+        "/entities/$entityId/tastings",
+        "/entities/$entityId/"
       ]
     },
     "/flights/$flightId": {
       "filePath": "flights.$flightId.tsx",
-      "parent": "/flights",
       "children": [
         "/flights/$flightId/edit",
         "/flights/$flightId/overlay"
@@ -2372,7 +2462,8 @@ export const routeTree = rootRoute
       "filePath": "locations.$countrySlug.tsx",
       "parent": "/locations",
       "children": [
-        "/locations/$countrySlug/regions"
+        "/locations/$countrySlug/regions",
+        "/locations/$countrySlug/"
       ]
     },
     "/locations/all-regions": {
@@ -2385,7 +2476,6 @@ export const routeTree = rootRoute
     },
     "/tastings/$tastingId": {
       "filePath": "tastings.$tastingId.tsx",
-      "parent": "/tastings",
       "children": [
         "/tastings/$tastingId/edit"
       ]
@@ -2393,8 +2483,31 @@ export const routeTree = rootRoute
     "/users/$username": {
       "filePath": "users.$username.tsx",
       "children": [
-        "/users/$username/favorites"
+        "/users/$username/favorites",
+        "/users/$username/"
       ]
+    },
+    "/admin/": {
+      "filePath": "admin.index.tsx",
+      "parent": "/admin"
+    },
+    "/bottlers/": {
+      "filePath": "bottlers.index.tsx"
+    },
+    "/bottles/": {
+      "filePath": "bottles.index.tsx"
+    },
+    "/brands/": {
+      "filePath": "brands.index.tsx"
+    },
+    "/distillers/": {
+      "filePath": "distillers.index.tsx"
+    },
+    "/flights/": {
+      "filePath": "flights.index.tsx"
+    },
+    "/tastings/": {
+      "filePath": "tastings.index.tsx"
     },
     "/admin/badges/$badgeId": {
       "filePath": "admin.badges.$badgeId.tsx",
@@ -2423,6 +2536,7 @@ export const routeTree = rootRoute
       "parent": "/admin/locations",
       "children": [
         "/admin/locations/$countrySlug/edit",
+        "/admin/locations/$countrySlug/",
         "/admin/locations/$countrySlug/regions/$regionSlug",
         "/admin/locations/$countrySlug/regions/add"
       ]
@@ -2432,7 +2546,8 @@ export const routeTree = rootRoute
       "parent": "/admin/sites",
       "children": [
         "/admin/sites/$siteId/edit",
-        "/admin/sites/$siteId/reviews"
+        "/admin/sites/$siteId/reviews",
+        "/admin/sites/$siteId/"
       ]
     },
     "/admin/sites/add": {
@@ -2536,6 +2651,22 @@ export const routeTree = rootRoute
       "filePath": "users.$username.favorites.tsx",
       "parent": "/users/$username"
     },
+    "/bottles/$bottleId/": {
+      "filePath": "bottles.$bottleId.index.tsx",
+      "parent": "/bottles/$bottleId"
+    },
+    "/entities/$entityId/": {
+      "filePath": "entities.$entityId.index.tsx",
+      "parent": "/entities/$entityId"
+    },
+    "/locations/$countrySlug/": {
+      "filePath": "locations.$countrySlug.index.tsx",
+      "parent": "/locations/$countrySlug"
+    },
+    "/users/$username/": {
+      "filePath": "users.$username.index.tsx",
+      "parent": "/users/$username"
+    },
     "/admin/badges/$badgeId/edit": {
       "filePath": "admin.badges.$badgeId.edit.tsx",
       "parent": "/admin/badges/$badgeId"
@@ -2563,6 +2694,14 @@ export const routeTree = rootRoute
     "/locations/$countrySlug/regions/$regionSlug": {
       "filePath": "locations.$countrySlug.regions.$regionSlug.tsx",
       "parent": "/locations/$countrySlug/regions"
+    },
+    "/admin/locations/$countrySlug/": {
+      "filePath": "admin.locations.$countrySlug.index.tsx",
+      "parent": "/admin/locations/$countrySlug"
+    },
+    "/admin/sites/$siteId/": {
+      "filePath": "admin.sites.$siteId.index.tsx",
+      "parent": "/admin/sites/$siteId"
     },
     "/admin/locations/$countrySlug/regions/$regionSlug": {
       "filePath": "admin.locations.$countrySlug.regions.$regionSlug.tsx",

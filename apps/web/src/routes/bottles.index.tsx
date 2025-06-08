@@ -1,48 +1,54 @@
+import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import EntityTable from "@peated/web/components/entityTable";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { EntitiesSidebarLayout } from "../layouts";
+import { BottlesSidebarLayout } from "../layouts";
 
 const DEFAULT_SORT = "-tastings";
 
-export const Route = createFileRoute("/distillers")({
+export const Route = createFileRoute("/bottles/")({
   component: Page,
 });
 
 function Page() {
+  const orpc = useORPC();
   const queryParams = useApiQueryParams({
-    numericFields: ["cursor", "limit", "country", "region"],
+    numericFields: [
+      "cursor",
+      "limit",
+      "age",
+      "entity",
+      "distiller",
+      "bottler",
+      "series",
+      "entity",
+    ],
     overrides: {
-      type: "distiller",
+      limit: 100,
     },
   });
 
-  const orpc = useORPC();
-  const { data: entityList } = useSuspenseQuery(
-    orpc.entities.list.queryOptions({
+  const { data: bottleList } = useSuspenseQuery(
+    orpc.bottles.list.queryOptions({
       input: queryParams,
     })
   );
 
   return (
-    <EntitiesSidebarLayout entityType="distiller">
-      {entityList.results.length > 0 ? (
-        <EntityTable
-          entityList={entityList.results}
-          rel={entityList.rel}
+    <BottlesSidebarLayout>
+      {bottleList.results.length > 0 ? (
+        <BottleTable
+          bottleList={bottleList.results}
+          rel={bottleList.rel}
           defaultSort={DEFAULT_SORT}
-          type="distiller"
-          withLocations
-          withSearch
         />
       ) : (
         <EmptyActivity>
           {"Looks like there's nothing in the database yet. Weird."}
         </EmptyActivity>
       )}
-    </EntitiesSidebarLayout>
+    </BottlesSidebarLayout>
   );
 }

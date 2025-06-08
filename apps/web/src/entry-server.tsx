@@ -35,6 +35,7 @@ export async function render(url: string, context: any = {}) {
       orpc,
       orpcClient,
     },
+    defaultPendingMinMs: 0,
     defaultNotFoundComponent: () => <ErrorPage404 />,
   });
 

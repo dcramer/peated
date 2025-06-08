@@ -8,7 +8,7 @@ import { EntitiesSidebarLayout } from "../layouts";
 
 const DEFAULT_SORT = "-tastings";
 
-export const Route = createFileRoute("/brands")({
+export const Route = createFileRoute("/brands/")({
   component: Page,
 });
 

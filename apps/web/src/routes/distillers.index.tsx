@@ -1,54 +1,48 @@
-import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
+import EntityTable from "@peated/web/components/entityTable";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { BottlesSidebarLayout } from "../layouts";
+import { EntitiesSidebarLayout } from "../layouts";
 
 const DEFAULT_SORT = "-tastings";
 
-export const Route = createFileRoute("/bottles")({
+export const Route = createFileRoute("/distillers/")({
   component: Page,
 });
 
 function Page() {
-  const orpc = useORPC();
   const queryParams = useApiQueryParams({
-    numericFields: [
-      "cursor",
-      "limit",
-      "age",
-      "entity",
-      "distiller",
-      "bottler",
-      "series",
-      "entity",
-    ],
+    numericFields: ["cursor", "limit", "country", "region"],
     overrides: {
-      limit: 100,
+      type: "distiller",
     },
   });
 
-  const { data: bottleList } = useSuspenseQuery(
-    orpc.bottles.list.queryOptions({
+  const orpc = useORPC();
+  const { data: entityList } = useSuspenseQuery(
+    orpc.entities.list.queryOptions({
       input: queryParams,
     })
   );
 
   return (
-    <BottlesSidebarLayout>
-      {bottleList.results.length > 0 ? (
-        <BottleTable
-          bottleList={bottleList.results}
-          rel={bottleList.rel}
+    <EntitiesSidebarLayout entityType="distiller">
+      {entityList.results.length > 0 ? (
+        <EntityTable
+          entityList={entityList.results}
+          rel={entityList.rel}
           defaultSort={DEFAULT_SORT}
+          type="distiller"
+          withLocations
+          withSearch
         />
       ) : (
         <EmptyActivity>
           {"Looks like there's nothing in the database yet. Weird."}
         </EmptyActivity>
       )}
-    </BottlesSidebarLayout>
+    </EntitiesSidebarLayout>
   );
 }

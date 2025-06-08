@@ -1,5 +1,3 @@
-"use client";
-
 import type { Outputs } from "@peated/server/orpc/router";
 import Glyph from "@peated/web/assets/glyph.svg";
 import Alert from "@peated/web/components/alert";
@@ -78,7 +76,7 @@ export default function ActivityFeed({
           </Fragment>
         ))
       ) : (
-        <EmptyActivity href="/search?tasting">
+        <EmptyActivity to="/search" search={{ tasting: "1" }}>
           <Glyph className="h-16 w-16" />
 
           <div className="mt-4 font-semibold">What are you drinking?</div>

@@ -19,6 +19,7 @@ function createBrowserRouter(queryClient: QueryClient) {
       orpc,
       orpcClient,
     },
+    defaultPendingMinMs: 0,
     defaultNotFoundComponent: () => <ErrorPage404 />,
   });
 }

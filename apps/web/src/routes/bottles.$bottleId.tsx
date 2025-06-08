@@ -1,4 +1,4 @@
-import PeatedGlyph from "@peated/web/assets/glyph.svg?react";
+import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import BottleHeader from "@peated/web/components/bottleHeader";
 import Button from "@peated/web/components/button";
 import CollectionAction from "@peated/web/components/collectionAction";
