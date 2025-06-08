@@ -3,8 +3,8 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { User } from "@peated/server/types";
-import { Link } from "@tanstack/react-router";
 import type { PolymorphicProps } from "@peated/web/types";
+import { Link } from "@tanstack/react-router";
 import type { ElementType } from "react";
 import button from "./button";
 import TimeSince from "./timeSince";

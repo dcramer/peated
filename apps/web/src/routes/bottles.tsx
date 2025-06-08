@@ -4,6 +4,7 @@ import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { BottlesSidebarLayout } from "../layouts";
 
 const DEFAULT_SORT = "-tastings";
 
@@ -36,7 +37,7 @@ function Page() {
   );
 
   return (
-    <>
+    <BottlesSidebarLayout>
       {bottleList.results.length > 0 ? (
         <BottleTable
           bottleList={bottleList.results}
@@ -48,6 +49,6 @@ function Page() {
           {"Looks like there's nothing in the database yet. Weird."}
         </EmptyActivity>
       )}
-    </>
+    </BottlesSidebarLayout>
   );
 }

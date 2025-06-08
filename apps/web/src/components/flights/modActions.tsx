@@ -5,10 +5,10 @@ import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { Flight } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
-import { Link } from "@tanstack/react-router";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { useNavigate } from "@tanstack/react-router";
 
 export default function ModActions({ flight }: { flight: Flight }) {

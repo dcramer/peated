@@ -1,5 +1,5 @@
 import type { Inputs } from "@peated/server/orpc/router";
-import Glyph from "@peated/web/assets/glyph.svg";
+import Glyph from "@peated/web/assets/glyph.svg?react";
 import BottleTable from "@peated/web/components/bottleTable";
 import EmbeddedLogin from "@peated/web/components/embeddedLogin";
 import EmptyActivity from "@peated/web/components/emptyActivity";
@@ -9,6 +9,7 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { DefaultLayout } from "../layouts";
 
 export const Route = createFileRoute("/tastings")({
   component: Page,
@@ -18,7 +19,7 @@ function Page() {
   const { user } = useAuth();
 
   return (
-    <>
+    <DefaultLayout>
       {user ? (
         <TastingList />
       ) : (
@@ -27,7 +28,7 @@ function Page() {
           <EmbeddedLogin />
         </>
       )}
-    </>
+    </DefaultLayout>
   );
 }
 
@@ -62,7 +63,7 @@ function TastingList() {
           rel={data.rel}
         />
       ) : (
-        <EmptyActivity href="/search?tasting">
+        <EmptyActivity to="/search?tasting">
           <Glyph className="h-16 w-16" />
 
           <div className="mt-4 font-semibold">What are you drinking?</div>

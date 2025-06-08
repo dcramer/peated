@@ -1,6 +1,6 @@
 import { ChevronRightIcon, HomeIcon } from "@heroicons/react/20/solid";
-import { Link } from "@tanstack/react-router";
 import classNames from "@peated/web/lib/classNames";
+import { Link } from "@tanstack/react-router";
 
 type Page = {
   name: string;

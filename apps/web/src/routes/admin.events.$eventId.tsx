@@ -3,12 +3,12 @@ import Button from "@peated/web/components/button";
 import DateRange from "@peated/web/components/dateRange";
 import DefinitionList from "@peated/web/components/definitionList";
 import Heading from "@peated/web/components/heading";
-import { Link } from "@tanstack/react-router";
 import Markdown from "@peated/web/components/markdown";
 import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/admin/events/$eventId")({
@@ -83,7 +83,7 @@ function Page() {
         <DefinitionList.Term>Website</DefinitionList.Term>
         <DefinitionList.Details>
           {event.website ? (
-            <a to={event.website}>{event.website}</a>
+            <a href={event.website}>{event.website}</a>
           ) : (
             <em>n/a</em>
           )}

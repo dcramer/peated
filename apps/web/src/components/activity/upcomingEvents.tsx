@@ -1,9 +1,9 @@
 "use client";
 
 import DateRange from "@peated/web/components/dateRange";
-import { Link } from "@tanstack/react-router";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 
 export function UpcomingEventsSkeleton() {
   const Row = () => (

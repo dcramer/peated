@@ -1,10 +1,10 @@
 "use client";
 
 import BadgeImage from "@peated/web/components/badgeImage";
-import { Link } from "@tanstack/react-router";
 import classNames from "@peated/web/lib/classNames";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 
 export function UserBadgeList({ userId }: { userId: number }) {
   const orpc = useORPC();

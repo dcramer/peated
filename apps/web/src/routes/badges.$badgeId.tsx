@@ -7,6 +7,7 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
+import { DefaultLayout } from "../layouts";
 
 export const Route = createFileRoute("/badges/$badgeId")({
   component: Page,
@@ -29,7 +30,7 @@ function Page() {
   }
 
   return (
-    <>
+    <DefaultLayout>
       <div className="my-4 flex w-full flex-wrap justify-center gap-x-3 gap-y-4 lg:flex-nowrap lg:justify-start">
         <div className="hidden lg:block">
           <BadgeImage badge={badge} />
@@ -47,6 +48,6 @@ function Page() {
       <Suspense>
         <Leaderboard badgeId={badge.id} />
       </Suspense>
-    </>
+    </DefaultLayout>
   );
 }

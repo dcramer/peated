@@ -39,15 +39,13 @@ function Page() {
   // const groupBy = !entity.type.includes("distiller") ? (item) => item.brand : null;
 
   return (
-    <>
-      <BottleTable
-        bottleList={bottleList.results}
-        rel={bottleList.rel}
-        groupBy={(item) => item.brand}
-        groupItem={(item) => item.shortName || item.name}
-        groupTo={(group) => `/entities/${group.id}`}
-        withSearch
-      />
-    </>
+    <BottleTable
+      bottleList={bottleList.results}
+      rel={bottleList.rel}
+      groupBy={(item) => item.brand}
+      groupItem={(item) => item.shortName || item.name}
+      groupTo={(group) => `/entities/${group.id}`}
+      withSearch
+    />
   );
 }

@@ -21,7 +21,8 @@ export default function BottleListSidebar() {
       <ul className="flex flex-auto flex-col gap-y-7">
         <li>
           <Button
-            href={`/addBottle?returnTo=${encodeURIComponent("/bottles")}`}
+            to="/addBottle"
+            search={{ returnTo: "/bottles" }}
             fullWidth
             color="highlight"
           >

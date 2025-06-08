@@ -2,13 +2,14 @@ import Stats, { StatsSkeleton } from "@peated/web/components/about/stats";
 import config from "@peated/web/config";
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
+import { DefaultLayout } from "../layouts";
 export const Route = createFileRoute("/about")({
   component: Page,
 });
 
 function Page() {
   return (
-    <>
+    <DefaultLayout>
       <div className="flex gap-4 px-2 sm:px-0">
         <div className="prose prose-invert w-9/12 py-6">
           <h1>The Mission</h1>
@@ -53,6 +54,6 @@ function Page() {
           </Suspense>
         </div>
       </div>
-    </>
+    </DefaultLayout>
   );
 }

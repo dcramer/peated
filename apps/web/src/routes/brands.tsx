@@ -4,6 +4,7 @@ import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { EntitiesSidebarLayout } from "../layouts";
 
 const DEFAULT_SORT = "-tastings";
 
@@ -27,7 +28,7 @@ function Page() {
   );
 
   return (
-    <>
+    <EntitiesSidebarLayout entityType="brand">
       {entityList.results.length > 0 ? (
         <EntityTable
           entityList={entityList.results}
@@ -42,6 +43,6 @@ function Page() {
           {"Looks like there's nothing in the database yet. Weird."}
         </EmptyActivity>
       )}
-    </>
+    </EntitiesSidebarLayout>
   );
 }

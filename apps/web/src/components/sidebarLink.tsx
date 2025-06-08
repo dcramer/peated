@@ -1,6 +1,6 @@
-import { Link } from "@tanstack/react-router";
 import classNames from "@peated/web/lib/classNames";
 import type { PolymorphicProps, PolymorphicRef } from "@peated/web/types";
+import { Link } from "@tanstack/react-router";
 import { type ElementType, forwardRef } from "react";
 
 type Props = {

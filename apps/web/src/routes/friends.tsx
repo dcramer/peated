@@ -5,6 +5,7 @@ import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { DefaultLayout } from "../layouts";
 
 export const Route = createFileRoute("/friends")({
   component: Page,
@@ -23,7 +24,7 @@ function Page() {
   const { results, rel } = friendList;
 
   return (
-    <>
+    <DefaultLayout>
       <ul className="divide-y divide-slate-800 sm:rounded">
         {results.length ? (
           results.map((friend) => {
@@ -38,6 +39,6 @@ function Page() {
         )}
       </ul>
       <PaginationButtons rel={rel} />
-    </>
+    </DefaultLayout>
   );
 }

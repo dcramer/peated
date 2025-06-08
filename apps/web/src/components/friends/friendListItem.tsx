@@ -2,12 +2,12 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { Friend, FriendStatus } from "@peated/server/types";
 import Button from "@peated/web/components/button";
-import { Link } from "@tanstack/react-router";
 import ListItem from "@peated/web/components/listItem";
 import UserAvatar from "@peated/web/components/userAvatar";
 import classNames from "@peated/web/lib/classNames";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 
 function actionLabel(status: FriendStatus) {

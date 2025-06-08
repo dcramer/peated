@@ -7,9 +7,9 @@ import {
   MenuItems,
   Transition,
 } from "@headlessui/react";
-import { Link } from "@tanstack/react-router";
 import useAuth from "@peated/web/hooks/useAuth";
 import classNames from "@peated/web/lib/classNames";
+import { Link } from "@tanstack/react-router";
 import { Fragment, useRef } from "react";
 import LogoutButton from "./logoutButton";
 import UserAvatar from "./userAvatar";

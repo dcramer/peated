@@ -1,48 +1,50 @@
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import EntityTable from "@peated/web/components/entityTable";
+import PaginationButtons from "@peated/web/components/paginationButtons";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { EntitiesSidebarLayout } from "../layouts";
 
-const DEFAULT_SORT = "-tastings";
-
-export const Route = createFileRoute("/bottlers")({
+export const Route = createFileRoute("/locations/$countrySlug/")({
   component: Page,
 });
 
 function Page() {
+  const { countrySlug } = Route.useParams();
+  const orpc = useORPC();
   const queryParams = useApiQueryParams({
-    numericFields: ["cursor", "limit", "country", "region"],
+    numericFields: ["cursor", "limit"],
     overrides: {
-      type: "bottler",
+      country: countrySlug,
+      type: "distiller",
+      sort: "-bottles",
+      limit: 20,
     },
   });
 
-  const orpc = useORPC();
-  const { data: entityList } = useSuspenseQuery(
+  const { data: topEntityList } = useSuspenseQuery(
     orpc.entities.list.queryOptions({
       input: queryParams,
     })
   );
 
   return (
-    <EntitiesSidebarLayout entityType="bottler">
-      {entityList.results.length > 0 ? (
+    <>
+      {topEntityList.results.length ? (
         <EntityTable
-          entityList={entityList.results}
-          rel={entityList.rel}
-          defaultSort={DEFAULT_SORT}
-          type="bottler"
-          withLocations
+          entityList={topEntityList.results}
+          type="distiller"
+          defaultSort="-bottles"
           withSearch
         />
       ) : (
         <EmptyActivity>
-          {"Looks like there's nothing in the database yet. Weird."}
+          {"It looks like we don't know of any distilleries in the area."}
         </EmptyActivity>
       )}
-    </EntitiesSidebarLayout>
+
+      <PaginationButtons rel={topEntityList.rel} />
+    </>
   );
 }

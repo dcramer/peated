@@ -1,9 +1,9 @@
 "use client";
 
-import { Link } from "@tanstack/react-router";
 import UserAvatar from "@peated/web/components/userAvatar";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 
 export default function Leaderboard({ badgeId }: { badgeId: number }) {
   const orpc = useORPC();

@@ -1,6 +1,6 @@
 import type { Bottle, PagingRel, StorePrice } from "@peated/server/types";
-import { Link } from "@tanstack/react-router";
 import Price from "@peated/web/components/price";
+import { Link } from "@tanstack/react-router";
 import PaginationButtons from "../paginationButtons";
 
 export default function StorePriceTable({
@@ -47,7 +47,7 @@ export default function StorePriceTable({
                     <img
                       src={price.imageUrl}
                       className="max-h-16 max-w-full"
-                      alt="image of bottle"
+                      alt="bottle"
                     />
                   )}
                 </td>

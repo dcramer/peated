@@ -5,6 +5,7 @@ import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { DefaultLayout } from "../layouts";
 
 export const Route = createFileRoute("/flights")({
   component: Page,
@@ -19,7 +20,7 @@ function Page() {
   );
 
   return (
-    <>
+    <DefaultLayout>
       <PageHeader
         title="Flights"
         metadata={
@@ -49,6 +50,6 @@ function Page() {
           },
         ]}
       />
-    </>
+    </DefaultLayout>
   );
 }

@@ -2,9 +2,9 @@
 
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import type { Notification } from "@peated/server/types";
-import { Link } from "@tanstack/react-router";
 import classNames from "@peated/web/lib/classNames";
 import type { FriendRequestNotification } from "@peated/web/types";
+import { Link } from "@tanstack/react-router";
 import { useNavigate } from "@tanstack/react-router";
 import UserAvatar from "../userAvatar";
 import FriendRequestEntry from "./friendRequestEntry";

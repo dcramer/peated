@@ -9,9 +9,9 @@ import {
 import { COLOR_SCALE } from "@peated/server/constants";
 import { formatColor, formatServingStyle } from "@peated/server/lib/format";
 import type { Tasting } from "@peated/server/types";
-import { Link } from "@tanstack/react-router";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useMutation } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { type ComponentPropsWithoutRef, useEffect, useState } from "react";
 import { getAuthRedirect } from "../lib/auth";
