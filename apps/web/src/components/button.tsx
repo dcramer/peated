@@ -1,14 +1,13 @@
-import { Link } from "@tanstack/react-router";
-import type { ForwardedRef, ReactNode } from "react";
-import { forwardRef } from "react";
-import type { ComponentProps } from "react";
+import type React from "react";
+import { type ReactNode, forwardRef } from "react";
 import classNames from "../lib/classNames";
+import { Slot } from "./slot";
 
 type ButtonColor = "primary" | "default" | "highlight" | "danger" | undefined;
 
 type ButtonSize = "small" | "base";
 
-type BaseProps = {
+type Props = {
   color?: ButtonColor;
   icon?: ReactNode;
   size?: ButtonSize;
@@ -21,32 +20,16 @@ type BaseProps = {
   fullHeight?: boolean;
   className?: string;
   title?: string;
-};
+  asChild?: boolean;
+  onClick?: (e: any) => void;
+} & React.ComponentPropsWithoutRef<"button">;
 
-type ConditionalProps =
-  | {
-      to?: ComponentProps<typeof Link>["to"];
-      search?: ComponentProps<typeof Link>["search"];
-      params?: ComponentProps<typeof Link>["params"];
-      onClick?: never;
-    }
-  | {
-      to?: never;
-      search?: never;
-      params?: never;
-      onClick?: (e: any) => void;
-    };
-
-type Props = BaseProps & ConditionalProps;
-
-const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
+const Button = forwardRef<HTMLButtonElement, Props>(
   (
     {
       icon,
       children,
       type,
-      to,
-      search,
       color = "default",
       size = "base",
       fullWidth = false,
@@ -54,10 +37,14 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
       disabled = false,
       loading = false,
       active = false,
+      asChild = false,
+      className,
       ...props
     },
     ref
   ) => {
+    const Component = asChild ? Slot : "button";
+
     const defaultClassName =
       "inline-flex gap-x-2 justify-center border items-center text-center rounded font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated";
 
@@ -103,50 +90,36 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
       textColor = color === "highlight" ? "text-highlight-dark" : "text-muted";
     }
 
-    if (to || search) {
-      // TODO: ref doesnt get passed here yet
-      return (
-        <Link
-          className={classNames(
-            defaultClassName,
-            colorClassName,
-            icon ? "inline-flex items-center gap-x-1.5" : "",
-            size === "small" ? "px-3 py-2 text-xs" : "px-3 py-2 text-sm",
-            fullWidth ? "w-full" : "",
-            fullHeight ? "h-full" : "",
-            disabled ? "cursor-auto" : "cursor-pointer",
-            loading ? "animate-pulse" : "",
-            textColor
-          )}
-          to={to || "."}
-          search={search}
-          {...props}
-        >
-          {icon}
-          {children}
-        </Link>
-      );
-    }
+    const buttonClassName = classNames(
+      defaultClassName,
+      colorClassName,
+      icon ? "inline-flex items-center gap-x-1.5" : "",
+      size === "small" ? "px-3 py-2 text-xs" : "px-3 py-2 text-sm",
+      fullWidth ? "w-full" : "",
+      fullHeight ? "h-full" : "",
+      disabled ? "cursor-auto" : "cursor-pointer",
+      loading ? "animate-pulse" : "",
+      textColor,
+      className
+    );
 
     return (
-      <button
-        className={classNames(
-          defaultClassName,
-          colorClassName,
-          icon ? "inline-flex items-center gap-x-1.5" : "",
-          size === "small" ? "px-2 py-1 text-xs" : "px-3 py-2 text-sm",
-          fullWidth ? "w-full" : "",
-          disabled ? "cursor-auto" : "cursor-pointer",
-          loading ? "animate-pulse" : "",
-          textColor
-        )}
-        type={type || "button"}
-        ref={ref as ForwardedRef<HTMLButtonElement | null>}
+      <Component
+        className={buttonClassName}
+        type={asChild ? undefined : type || "button"}
+        disabled={disabled}
+        ref={ref}
         {...props}
       >
-        {icon}
-        {children}
-      </button>
+        {asChild ? (
+          children
+        ) : (
+          <>
+            {icon}
+            {children}
+          </>
+        )}
+      </Component>
     );
   }
 );

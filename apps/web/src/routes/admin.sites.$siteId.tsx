@@ -65,7 +65,8 @@ function AdminSiteLayoutPage() {
           },
           {
             name: site.name,
-            to: `/admin/sites/${site.type}`,
+            to: "/admin/sites/$siteId",
+            params: { siteId: site.type },
             current: true,
           },
         ]}
@@ -121,11 +122,18 @@ function AdminSiteLayoutPage() {
       </div>
 
       <Tabs border>
-        <TabItem as={Link} to={`/admin/sites/${site.type}`} controlled>
-          Prices
+        <TabItem asChild controlled>
+          <Link to="/admin/sites/$siteId" params={{ siteId: site.type }}>
+            Prices
+          </Link>
         </TabItem>
-        <TabItem as={Link} to={`/admin/sites/${site.type}/reviews`} controlled>
-          Reviews
+        <TabItem asChild controlled>
+          <Link
+            to="/admin/sites/$siteId/reviews"
+            params={{ siteId: site.type }}
+          >
+            Reviews
+          </Link>
         </TabItem>
       </Tabs>
 

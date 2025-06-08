@@ -51,14 +51,8 @@ export default function EntityHeader({
       metadata={
         <div className="flex gap-x-1">
           {entity.type.sort().map((t) => (
-            <Chip
-              key={t}
-              size="small"
-              color="highlight"
-              as={Link}
-              to={`${getEntityTypeSearchUrl(t)}`}
-            >
-              {t}
+            <Chip key={t} size="small" color="highlight" asChild>
+              <Link to={`${getEntityTypeSearchUrl(t)}`}>{t}</Link>
             </Chip>
           ))}
         </div>

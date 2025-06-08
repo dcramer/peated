@@ -89,8 +89,8 @@ function UserLayoutPage() {
                 <div>Friend actions will be implemented</div>
               ) : (
                 <>
-                  <Button to="/settings" color="primary">
-                    Edit Profile
+                  <Button asChild color="primary">
+                    <Link to="/settings">Edit Profile</Link>
                   </Button>
                   <div>Logout button will be implemented</div>
                 </>
@@ -113,15 +113,21 @@ function UserLayoutPage() {
           </div>
           <div className="hidden lg:block">
             <Tabs fullWidth border>
-              <TabItem as={Link} to={`/users/${user.username}`} controlled>
-                Activity
+              <TabItem asChild controlled>
+                <Link
+                  to="/users/$username"
+                  params={{ username: user.username }}
+                >
+                  Activity
+                </Link>
               </TabItem>
-              <TabItem
-                as={Link}
-                to={`/users/${user.username}/favorites`}
-                controlled
-              >
-                Favorites
+              <TabItem asChild controlled>
+                <Link
+                  to="/users/$username/favorites"
+                  params={{ username: user.username }}
+                >
+                  Favorites
+                </Link>
               </TabItem>
             </Tabs>
           </div>

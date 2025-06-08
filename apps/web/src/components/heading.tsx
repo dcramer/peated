@@ -1,13 +1,11 @@
-import type { PolymorphicProps } from "@peated/web/types";
-import type { ElementType } from "react";
+import { Slot } from "./slot";
 
-const defaultElement = "h1";
+type Props = {
+  asChild?: boolean;
+} & React.ComponentPropsWithoutRef<"h1">;
 
-export default function Heading<E extends ElementType = typeof defaultElement>({
-  as,
-  ...props
-}: PolymorphicProps<E>) {
-  const Component = as ?? defaultElement;
+export default function Heading({ asChild = false, ...props }: Props) {
+  const Component = asChild ? Slot : "h1";
 
   return (
     <Component className="mb-4 font-bold text-highlight text-lg" {...props} />

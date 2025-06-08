@@ -1,24 +1,21 @@
-import type { PolymorphicProps } from "@peated/web/types";
-import type { ElementType, ReactNode } from "react";
+import type { ReactNode } from "react";
+import { Slot } from "./slot";
 
 type Props = {
   required?: boolean;
   labelNote?: ReactNode;
+  asChild?: boolean;
 } & React.ComponentPropsWithoutRef<"label">;
 
-const defaultElement = "label";
-
-export default function FormLabel<
-  E extends ElementType = typeof defaultElement,
->({
+export default function FormLabel({
   className,
-  as,
+  asChild = false,
   required,
   labelNote,
   children,
   ...props
-}: PolymorphicProps<E, Props>) {
-  const Component = as ?? defaultElement;
+}: Props) {
+  const Component = asChild ? Slot : "label";
 
   return (
     <Component

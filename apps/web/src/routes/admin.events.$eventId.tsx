@@ -49,13 +49,22 @@ function Page() {
       <PageHeader
         title={event.name}
         metadata={
-          <Button to={`/admin/events/${event.id}/edit`}>Edit Event</Button>
+          <Button asChild>
+            <Link
+              to="/admin/events/$eventId/edit"
+              params={{ eventId: event.id }}
+            >
+              Edit Event
+            </Link>
+          </Button>
         }
       />
 
       <Tabs border>
-        <TabItem as={Link} to={`/admin/events/${event.id}`} controlled>
-          Overview
+        <TabItem asChild controlled>
+          <Link to="/admin/events/$eventId" params={{ eventId: event.id }}>
+            Overview
+          </Link>
         </TabItem>
       </Tabs>
 

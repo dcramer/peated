@@ -50,13 +50,22 @@ function Page() {
       <PageHeader
         title={badge.name}
         metadata={
-          <Button to={`/admin/badges/${badge.id}/edit`}>Edit Badge</Button>
+          <Button asChild>
+            <Link
+              to="/admin/badges/$badgeId/edit"
+              params={{ badgeId: badge.id }}
+            >
+              Edit Badge
+            </Link>
+          </Button>
         }
       />
 
       <Tabs border>
-        <TabItem as={Link} to={`/admin/badges/${badge.id}`} controlled>
-          Overview
+        <TabItem asChild controlled>
+          <Link to="/admin/badges/$badgeId" params={{ badgeId: badge.id }}>
+            Overview
+          </Link>
         </TabItem>
       </Tabs>
       {/* 

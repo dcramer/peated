@@ -1,24 +1,20 @@
-import type { PolymorphicProps } from "@peated/web/types";
-import type { ElementType } from "react";
 import classNames from "../lib/classNames";
+import { Slot } from "./slot";
 
 type Props = {
   noHover?: boolean;
   color?: "default" | "highlight";
-};
+  asChild?: boolean;
+} & React.ComponentPropsWithoutRef<"div">;
 
-const defaultElement = "div";
-
-export default function ListItem<
-  E extends ElementType = typeof defaultElement,
->({
+export default function ListItem({
   children,
   noHover = false,
   color = "default",
-  as,
+  asChild = false,
   ...props
-}: PolymorphicProps<E, Props>) {
-  const Component = as ?? defaultElement;
+}: Props) {
+  const Component = asChild ? Slot : "div";
   return (
     <Component
       className={classNames(

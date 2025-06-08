@@ -1,7 +1,7 @@
-import type { PolymorphicProps } from "@peated/web/types";
 import { useLocation } from "@tanstack/react-router";
-import type { ElementType } from "react";
+import React from "react";
 import classNames from "../lib/classNames";
+import { Slot } from "./slot";
 
 type Props = {
   fullWidth?: boolean;
@@ -31,21 +31,20 @@ type ItemProps = {
   count?: number;
   controlled?: boolean;
   desktopOnly?: boolean;
-};
+  asChild?: boolean;
+  children: React.ReactNode;
+} & React.ComponentPropsWithoutRef<"button">;
 
-const defaultElement = "button";
-
-export function TabItem<E extends ElementType = typeof defaultElement>({
-  as,
+export function TabItem({
   active,
   count,
   children,
   controlled,
   desktopOnly,
+  asChild,
   ...props
-}: PolymorphicProps<E, ItemProps>) {
-  const Component = as ?? defaultElement;
-
+}: ItemProps) {
+  const Component = asChild ? Slot : "button";
   const location = useLocation();
   const pathname = location.pathname;
 
@@ -53,8 +52,16 @@ export function TabItem<E extends ElementType = typeof defaultElement>({
   const inactiveStyles =
     "border-transparent text-muted hover:border-muted hover:text-slate-400";
 
-  if ("href" in props) {
-    if (controlled) active = pathname === props.href;
+  // For controlled tabs with asChild, we need to check if the child is a Link
+  // and extract its 'to' prop to determine active state
+  if (controlled && asChild && React.isValidElement(children)) {
+    const childProps = children.props as any;
+    if (childProps.to) {
+      // Handle TanStack Router Link with 'to' prop
+      const linkPath =
+        typeof childProps.to === "string" ? childProps.to : childProps.to;
+      active = pathname === linkPath;
+    }
   }
 
   const className = classNames(
@@ -65,16 +72,22 @@ export function TabItem<E extends ElementType = typeof defaultElement>({
 
   return (
     <Component className={className} {...props}>
-      {children}
-      {count !== undefined && (
-        <span
-          className={classNames(
-            "bg-slate-700 text-muted",
-            "ml-3 hidden rounded-full px-2.5 py-0.5 font-medium text-xs md:inline-block"
+      {asChild ? (
+        children
+      ) : (
+        <>
+          {children}
+          {count !== undefined && (
+            <span
+              className={classNames(
+                "bg-slate-700 text-muted",
+                "ml-3 hidden rounded-full px-2.5 py-0.5 font-medium text-xs md:inline-block"
+              )}
+            >
+              {count}
+            </span>
           )}
-        >
-          {count}
-        </span>
+        </>
       )}
     </Component>
   );

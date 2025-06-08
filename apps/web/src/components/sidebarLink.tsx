@@ -1,30 +1,21 @@
 import classNames from "@peated/web/lib/classNames";
-import type { PolymorphicProps, PolymorphicRef } from "@peated/web/types";
 import { Link } from "@tanstack/react-router";
-import { type ElementType, forwardRef } from "react";
+import { type ElementType, type ReactNode, forwardRef } from "react";
+import { Slot } from "./slot";
 
 type Props = {
   active?: boolean;
   icon?: ElementType;
   size?: "small" | "default";
-};
+  asChild?: boolean;
+  children?: ReactNode;
+} & React.ComponentPropsWithoutRef<typeof Link>;
 
-const defaultElement = Link;
-
-export default forwardRef(function SidebarLink<
-  E extends ElementType = typeof defaultElement,
->(
-  {
-    children,
-    active,
-    icon,
-    size = "default",
-    as,
-    ...props
-  }: PolymorphicProps<E, Props>,
-  ref: PolymorphicRef<E>
+export default forwardRef<HTMLAnchorElement, Props>(function SidebarLink(
+  { children, active, icon, size = "default", asChild = false, ...props },
+  ref
 ) {
-  const Component = as ?? defaultElement;
+  const Component = asChild ? Slot : Link;
   const Icon = icon;
 
   return (

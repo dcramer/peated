@@ -3,10 +3,9 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { User } from "@peated/server/types";
-import type { PolymorphicProps } from "@peated/web/types";
 import { Link } from "@tanstack/react-router";
-import type { ElementType } from "react";
 import button from "./button";
+import { Slot } from "./slot";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
 
@@ -16,22 +15,19 @@ type Props = {
   text: string;
   canDelete?: boolean;
   onDelete?: () => void;
-};
+  asChild?: boolean;
+} & React.ComponentPropsWithoutRef<"li">;
 
-const defaultElement = "li";
-
-export default function CommentEntry<
-  E extends ElementType = typeof defaultElement,
->({
-  as,
+export default function CommentEntry({
+  asChild = false,
   createdAt,
   createdBy,
   text,
   canDelete,
   onDelete,
   ...props
-}: PolymorphicProps<E, Props>) {
-  const Component = as ?? defaultElement;
+}: Props) {
+  const Component = asChild ? Slot : "li";
 
   const showMenu = canDelete;
 

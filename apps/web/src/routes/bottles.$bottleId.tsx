@@ -38,8 +38,13 @@ function BottleLayoutPage() {
               <CollectionAction bottle={bottle} />
             </Suspense>
 
-            <Button to={`/bottles/${bottle.id}/addTasting`} color="primary">
-              <PeatedGlyph className="h-4 w-4" /> Record a Tasting
+            <Button asChild color="primary">
+              <Link
+                to="/bottles/$bottleId/addTasting"
+                params={{ bottleId: bottle.id }}
+              >
+                <PeatedGlyph className="h-4 w-4" /> Record a Tasting
+              </Link>
             </Button>
 
             <ShareButton
@@ -56,47 +61,39 @@ function BottleLayoutPage() {
       </div>
 
       <Tabs border>
-        <TabItem
-          as={Link}
-          to="/bottles/$bottleId"
-          params={{ bottleId: bottle.id }}
-          controlled
-        >
-          Overview
+        <TabItem asChild controlled>
+          <Link to="/bottles/$bottleId" params={{ bottleId: bottle.id }}>
+            Overview
+          </Link>
         </TabItem>
-        <TabItem
-          as={Link}
-          to="/bottles/$bottleId/tastings"
-          params={{ bottleId: bottle.id }}
-          controlled
-        >
-          Tastings ({bottle.totalTastings.toLocaleString()})
+        <TabItem asChild controlled>
+          <Link
+            to="/bottles/$bottleId/tastings"
+            params={{ bottleId: bottle.id }}
+          >
+            Tastings ({bottle.totalTastings.toLocaleString()})
+          </Link>
         </TabItem>
-        <TabItem
-          as={Link}
-          to="/bottles/$bottleId/releases"
-          params={{ bottleId: bottle.id }}
-          controlled
-        >
-          Releases ({bottle.numReleases.toLocaleString()})
+        <TabItem asChild controlled>
+          <Link
+            to="/bottles/$bottleId/releases"
+            params={{ bottleId: bottle.id }}
+          >
+            Releases ({bottle.numReleases.toLocaleString()})
+          </Link>
         </TabItem>
-        <TabItem
-          as={Link}
-          to="/bottles/$bottleId/prices"
-          params={{ bottleId: bottle.id }}
-          controlled
-          desktopOnly
-        >
-          Prices
+        <TabItem asChild controlled desktopOnly>
+          <Link to="/bottles/$bottleId/prices" params={{ bottleId: bottle.id }}>
+            Prices
+          </Link>
         </TabItem>
-        <TabItem
-          as={Link}
-          to="/bottles/$bottleId/similar"
-          params={{ bottleId: bottle.id }}
-          controlled
-          desktopOnly
-        >
-          Similar
+        <TabItem asChild controlled desktopOnly>
+          <Link
+            to="/bottles/$bottleId/similar"
+            params={{ bottleId: bottle.id }}
+          >
+            Similar
+          </Link>
         </TabItem>
       </Tabs>
 

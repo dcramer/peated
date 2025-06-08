@@ -30,19 +30,24 @@ function EntityLayoutPage() {
         <div className="flex flex-col gap-4 lg:flex-row">
           <div className="flex-auto">
             <div className="my-8 flex justify-center gap-4 lg:justify-start">
-              <Button
-                to={`/addBottle?returnTo=${encodeURIComponent(`/entities/${entityId}`)}&${
-                  entity.type.includes("brand") ? `brand=${entity.id}&` : ""
-                }${
-                  entity.type.includes("distiller")
-                    ? `distiller=${entity.id}&`
-                    : ""
-                }${
-                  entity.type.includes("bottler") ? `bottler=${entity.id}&` : ""
-                }`}
-                color="primary"
-              >
-                Add a Bottle
+              <Button color="primary" asChild>
+                <Link
+                  to="/addBottle"
+                  search={{
+                    returnTo: `/entities/${entityId}`,
+                    brand: entity.type.includes("brand")
+                      ? entity.id
+                      : undefined,
+                    distiller: entity.type.includes("distiller")
+                      ? entity.id
+                      : undefined,
+                    bottler: entity.type.includes("bottler")
+                      ? entity.id
+                      : undefined,
+                  }}
+                >
+                  Add a Bottle
+                </Link>
               </Button>
 
               <ShareButton title={entity.name} url={`/entities/${entity.id}`} />
@@ -52,39 +57,35 @@ function EntityLayoutPage() {
       </div>
 
       <Tabs border>
-        <TabItem
-          as={Link}
-          to="/entities/$entityId"
-          params={{ entityId: entity.id }}
-          controlled
-        >
-          Overview
+        <TabItem asChild controlled>
+          <Link to="/entities/$entityId" params={{ entityId: entity.id }}>
+            Overview
+          </Link>
         </TabItem>
-        <TabItem
-          as={Link}
-          to="/entities/$entityId/bottles"
-          params={{ entityId: entity.id }}
-          controlled
-        >
-          Bottles ({entity.totalBottles.toLocaleString()})
+        <TabItem asChild controlled>
+          <Link
+            to="/entities/$entityId/bottles"
+            params={{ entityId: entity.id }}
+          >
+            Bottles ({entity.totalBottles.toLocaleString()})
+          </Link>
         </TabItem>
-        <TabItem
-          as={Link}
-          to="/entities/$entityId/tastings"
-          params={{ entityId: entity.id }}
-          controlled
-        >
-          Tastings ({entity.totalTastings.toLocaleString()})
+        <TabItem asChild controlled>
+          <Link
+            to="/entities/$entityId/tastings"
+            params={{ entityId: entity.id }}
+          >
+            Tastings ({entity.totalTastings.toLocaleString()})
+          </Link>
         </TabItem>
         {entity.shortName === "SMWS" && (
-          <TabItem
-            as={Link}
-            to="/entities/$entityId/codes"
-            params={{ entityId: entity.id }}
-            controlled
-            desktopOnly
-          >
-            Distillery Codes
+          <TabItem asChild controlled desktopOnly>
+            <Link
+              to="/entities/$entityId/codes"
+              params={{ entityId: entity.id }}
+            >
+              Distillery Codes
+            </Link>
           </TabItem>
         )}
       </Tabs>

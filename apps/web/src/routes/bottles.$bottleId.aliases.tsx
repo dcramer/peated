@@ -34,7 +34,7 @@ function Page() {
             <>
               <div>{item.name}</div>
               {item.isCanonical && (
-                <Chip as="div" size="small" color="highlight">
+                <Chip size="small" color="highlight">
                   Canonical
                 </Chip>
               )}

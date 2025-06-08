@@ -1,9 +1,7 @@
-"use client";
-
-import type { PolymorphicProps } from "@peated/web/types";
 import { motion } from "framer-motion";
-import type { ElementType, MouseEventHandler } from "react";
+import type React from "react";
 import classNames from "../lib/classNames";
+import { Slot } from "./slot";
 
 type ChipSize = "small" | "base";
 
@@ -13,21 +11,21 @@ type Props = {
   active?: boolean;
   color?: ChipColor;
   size?: ChipSize;
-};
+  asChild?: boolean;
+  children?: React.ReactNode;
+  onClick?: (e: any) => void;
+} & React.ComponentPropsWithoutRef<"li">;
 
-const defaultElement = motion.li;
-
-export default function Chip<E extends ElementType = typeof defaultElement>({
+export default function Chip({
   children,
   active,
   onClick,
   size = "base",
   color = "default",
-  as,
+  asChild = false,
+  className,
   ...props
-}: PolymorphicProps<E, Props>) {
-  const Component = as ?? defaultElement;
-
+}: Props) {
   const defaultOnClick = (e: any) => {
     e.preventDefault();
   };
@@ -41,25 +39,33 @@ export default function Chip<E extends ElementType = typeof defaultElement>({
       colorClass = " border-slate-700 text-muted";
   }
 
-  const moreProps = Component === defaultElement ? { layout: true } : {};
+  const chipClassName = classNames(
+    "break-word] hover:!shadow-none inline-flex items-center justify-between truncate rounded border py-0 font-normal normal-case leading-loose shadow-none transition-[opacity] duration-300 ease-linear [word-wrap:",
+    onClick ? "cursor-pointer hover:bg-slate-800" : "",
+    active
+      ? "border-slate-700 bg-slate-700 text-white hover:bg-slate-700"
+      : colorClass,
+    size === "small"
+      ? "min-h-[24px] px-[6px] text-sm"
+      : "min-h-[32px] px-[12px]",
+    className
+  );
+
+  if (asChild) {
+    return (
+      <Slot className={chipClassName} {...props}>
+        {children}
+      </Slot>
+    );
+  }
 
   return (
-    <Component
-      className={classNames(
-        "break-word] hover:!shadow-none inline-flex items-center justify-between truncate rounded border py-0 font-normal normal-case leading-loose shadow-none transition-[opacity] duration-300 ease-linear [word-wrap:",
-        onClick ? "cursor-pointer hover:bg-slate-800" : "",
-        active
-          ? "border-slate-700 bg-slate-700 text-white hover:bg-slate-700"
-          : colorClass,
-        size === "small"
-          ? "min-h-[24px] px-[6px] text-sm"
-          : "min-h-[32px] px-[12px]"
-      )}
+    <motion.li
+      layout
+      className={chipClassName}
       onClick={onClick || defaultOnClick}
-      {...props}
-      {...moreProps}
     >
       {children}
-    </Component>
+    </motion.li>
   );
 }

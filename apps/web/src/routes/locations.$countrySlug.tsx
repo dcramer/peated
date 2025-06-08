@@ -37,11 +37,14 @@ function LocationLayoutPage() {
         title={country.name}
         metadata={
           user?.mod && (
-            <Button
-              color="primary"
-              to={`/admin/locations/${country.slug}/edit?returnTo=/locations/${country.slug}`}
-            >
-              Edit Location
+            <Button asChild color="primary">
+              <Link
+                to="/admin/locations/$countrySlug/edit"
+                params={{ countrySlug: country.slug }}
+                search={{ returnTo: `/locations/${country.slug}` }}
+              >
+                Edit Location
+              </Link>
             </Button>
           )
         }
@@ -74,11 +77,15 @@ function LocationLayoutPage() {
       )}
 
       <Tabs border>
-        <TabItem as={Link} to={`/locations/${countrySlug}`} controlled>
-          Distilleries
+        <TabItem asChild controlled>
+          <Link to="/locations/$countrySlug" params={{ countrySlug }}>
+            Distilleries
+          </Link>
         </TabItem>
-        <TabItem as={Link} to={`/locations/${countrySlug}/regions`} controlled>
-          Regions
+        <TabItem asChild controlled>
+          <Link to="/locations/$countrySlug/regions" params={{ countrySlug }}>
+            Regions
+          </Link>
         </TabItem>
       </Tabs>
 

@@ -45,19 +45,34 @@ function AdminLocationLayoutPage() {
         title={country.name}
         metadata={
           <div className="flex gap-x-1">
-            <Button to={`/admin/locations/${country.slug}/regions/add`}>
-              Add Region
+            <Button asChild>
+              <Link
+                to="/admin/locations/$countrySlug/regions/add"
+                params={{ countrySlug: country.slug }}
+              >
+                Add Region
+              </Link>
             </Button>
-            <Button to={`/admin/locations/${country.slug}/edit`}>
-              Edit Location
+            <Button asChild>
+              <Link
+                to="/admin/locations/$countrySlug/edit"
+                params={{ countrySlug: country.slug }}
+              >
+                Edit Location
+              </Link>
             </Button>
           </div>
         }
       />
 
       <Tabs border>
-        <TabItem as={Link} to={`/admin/locations/${country.slug}`} controlled>
-          Regions
+        <TabItem asChild controlled>
+          <Link
+            to="/admin/locations/$countrySlug"
+            params={{ countrySlug: country.slug }}
+          >
+            Regions
+          </Link>
         </TabItem>
       </Tabs>
 
