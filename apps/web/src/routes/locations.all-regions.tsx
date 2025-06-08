@@ -1,8 +1,8 @@
 import CountryMapIcon from "@peated/web/components/countryMapIcon";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
 import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/locations/all-regions")({
   component: Page,

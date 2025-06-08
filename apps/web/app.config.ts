@@ -14,8 +14,8 @@ export default defineConfig({
     svgr(),
     tanstackStart({
       tsr: {
-        routesDirectory: "src/routes",
         verboseFileRoutes: true,
+        routesDirectory: "src/routes",
       },
     }),
   ],

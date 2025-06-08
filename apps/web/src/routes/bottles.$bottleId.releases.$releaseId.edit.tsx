@@ -2,7 +2,8 @@ import ReleaseForm from "@peated/web/components/releaseForm";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute(
   "/bottles/$bottleId/releases/$releaseId/edit"

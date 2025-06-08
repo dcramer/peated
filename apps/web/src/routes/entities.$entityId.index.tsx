@@ -5,7 +5,8 @@ import Markdown from "@peated/web/components/markdown";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { parseDomain } from "@peated/web/lib/urls";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/entities/$entityId/")({
   component: EntityIndexPage,

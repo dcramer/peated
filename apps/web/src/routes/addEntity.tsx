@@ -4,7 +4,8 @@ import EntityForm from "@peated/web/components/entityForm";
 import { useVerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 
 const searchSchema = z.object({

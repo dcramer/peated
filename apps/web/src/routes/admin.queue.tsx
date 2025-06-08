@@ -8,8 +8,9 @@ import Table from "@peated/web/components/table";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import { createFileRoute, useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 
 export const Route = createFileRoute("/admin/queue")({

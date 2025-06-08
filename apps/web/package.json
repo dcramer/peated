@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite dev",
     "build": "vite build",
-    "start": "node dist/server/index.js",
+    "start": "node .output/server/index.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -24,7 +24,8 @@
     "@sentry/react": "^9.24.0",
     "@tailwindcss/vite": "^4.1.8",
     "@tanstack/react-query": "catalog:",
-    "@tanstack/react-router": "1.121.0-alpha.14",
+    "@tanstack/react-router": "1.121.0-alpha.25",
+    "@tanstack/react-start": "1.121.0-alpha.25",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
@@ -52,6 +53,7 @@
     "usehooks-ts": "^2.16.0",
     "vite": "^6.3.5",
     "vite-tsconfig-paths": "catalog:",
+    "vinxi": "^0.4.3",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -61,7 +63,6 @@
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/forms": "catalog:",
     "@tailwindcss/typography": "catalog:",
-    "@tanstack/router-plugin": "^1.120.18",
     "@types/leaflet": "^1.9.18",
     "@types/node": "catalog:",
     "@types/pica": "^9.0.5",

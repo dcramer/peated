@@ -11,642 +11,647 @@
 // Import Routes
 
 import { Route as rootRoute } from "./routes/__root";
-import { Route as AboutImport } from "./routes/about";
-import { Route as ActivityFriendsImport } from "./routes/activity.friends";
-import { Route as ActivityLocalImport } from "./routes/activity.local";
-import { Route as AddBottleImport } from "./routes/addBottle";
-import { Route as AddEntityImport } from "./routes/addEntity";
-import { Route as AddFlightImport } from "./routes/addFlight";
-import { Route as AdminImport } from "./routes/admin";
-import { Route as AdminBadgesImport } from "./routes/admin.badges";
-import { Route as AdminBadgesBadgeIdImport } from "./routes/admin.badges.$badgeId";
-import { Route as AdminBadgesBadgeIdEditImport } from "./routes/admin.badges.$badgeId.edit";
-import { Route as AdminBadgesAddImport } from "./routes/admin.badges.add";
-import { Route as AdminEventsImport } from "./routes/admin.events";
-import { Route as AdminEventsEventIdImport } from "./routes/admin.events.$eventId";
-import { Route as AdminEventsEventIdEditImport } from "./routes/admin.events.$eventId.edit";
-import { Route as AdminEventsAddImport } from "./routes/admin.events.add";
-import { Route as AdminIndexImport } from "./routes/admin.index";
-import { Route as AdminLocationsImport } from "./routes/admin.locations";
-import { Route as AdminLocationsCountrySlugImport } from "./routes/admin.locations.$countrySlug";
-import { Route as AdminLocationsCountrySlugEditImport } from "./routes/admin.locations.$countrySlug.edit";
-import { Route as AdminLocationsCountrySlugIndexImport } from "./routes/admin.locations.$countrySlug.index";
-import { Route as AdminLocationsCountrySlugRegionsRegionSlugImport } from "./routes/admin.locations.$countrySlug.regions.$regionSlug";
-import { Route as AdminLocationsCountrySlugRegionsRegionSlugEditImport } from "./routes/admin.locations.$countrySlug.regions.$regionSlug.edit";
-import { Route as AdminLocationsCountrySlugRegionsAddImport } from "./routes/admin.locations.$countrySlug.regions.add";
-import { Route as AdminQueueImport } from "./routes/admin.queue";
-import { Route as AdminSitesImport } from "./routes/admin.sites";
-import { Route as AdminSitesSiteIdImport } from "./routes/admin.sites.$siteId";
-import { Route as AdminSitesSiteIdEditImport } from "./routes/admin.sites.$siteId.edit";
-import { Route as AdminSitesSiteIdIndexImport } from "./routes/admin.sites.$siteId.index";
-import { Route as AdminSitesSiteIdReviewsImport } from "./routes/admin.sites.$siteId.reviews";
-import { Route as AdminSitesAddImport } from "./routes/admin.sites.add";
-import { Route as AdminTagsImport } from "./routes/admin.tags";
-import { Route as AdminTagsTagIdImport } from "./routes/admin.tags.$tagId";
-import { Route as AdminTagsTagIdEditImport } from "./routes/admin.tags.$tagId.edit";
-import { Route as AdminTagsAddImport } from "./routes/admin.tags.add";
-import { Route as AdminUsersImport } from "./routes/admin.users";
-import { Route as BadgesBadgeIdImport } from "./routes/badges.$badgeId";
-import { Route as BottlersIndexImport } from "./routes/bottlers.index";
-import { Route as BottlesBottleIdImport } from "./routes/bottles.$bottleId";
-import { Route as BottlesBottleIdAliasesImport } from "./routes/bottles.$bottleId.aliases";
-import { Route as BottlesBottleIdEditImport } from "./routes/bottles.$bottleId.edit";
-import { Route as BottlesBottleIdIndexImport } from "./routes/bottles.$bottleId.index";
-import { Route as BottlesBottleIdMergeImport } from "./routes/bottles.$bottleId.merge";
-import { Route as BottlesBottleIdPricesImport } from "./routes/bottles.$bottleId.prices";
-import { Route as BottlesBottleIdReleasesImport } from "./routes/bottles.$bottleId.releases";
-import { Route as BottlesBottleIdReleasesReleaseIdEditImport } from "./routes/bottles.$bottleId.releases.$releaseId.edit";
-import { Route as BottlesBottleIdSimilarImport } from "./routes/bottles.$bottleId.similar";
-import { Route as BottlesBottleIdTastingsImport } from "./routes/bottles.$bottleId.tastings";
-import { Route as BottlesIndexImport } from "./routes/bottles.index";
-import { Route as BottlesBottleIdAddReleaseImport } from "./routes/bottles_.$bottleId.addRelease";
-import { Route as BottlesBottleIdAddTastingImport } from "./routes/bottles_.$bottleId.addTasting";
-import { Route as BrandsIndexImport } from "./routes/brands.index";
-import { Route as DistillersIndexImport } from "./routes/distillers.index";
-import { Route as EntitiesEntityIdImport } from "./routes/entities.$entityId";
-import { Route as EntitiesEntityIdAliasesImport } from "./routes/entities.$entityId.aliases";
-import { Route as EntitiesEntityIdBottlesImport } from "./routes/entities.$entityId.bottles";
-import { Route as EntitiesEntityIdCodesImport } from "./routes/entities.$entityId.codes";
-import { Route as EntitiesEntityIdIndexImport } from "./routes/entities.$entityId.index";
-import { Route as EntitiesEntityIdTastingsImport } from "./routes/entities.$entityId.tastings";
-import { Route as EntitiesEntityIdEditImport } from "./routes/entities_.$entityId.edit";
-import { Route as EntitiesEntityIdMergeImport } from "./routes/entities_.$entityId.merge";
-import { Route as FavoritesImport } from "./routes/favorites";
-import { Route as FlightsFlightIdImport } from "./routes/flights.$flightId";
-import { Route as FlightsFlightIdEditImport } from "./routes/flights.$flightId.edit";
-import { Route as FlightsFlightIdOverlayImport } from "./routes/flights.$flightId.overlay";
-import { Route as FlightsIndexImport } from "./routes/flights.index";
-import { Route as FriendsImport } from "./routes/friends";
-import { Route as GlobalErrorImport } from "./routes/global-error";
-import { Route as IndexImport } from "./routes/index";
-import { Route as LocationsImport } from "./routes/locations";
-import { Route as LocationsCountrySlugImport } from "./routes/locations.$countrySlug";
-import { Route as LocationsCountrySlugIndexImport } from "./routes/locations.$countrySlug.index";
-import { Route as LocationsCountrySlugRegionsImport } from "./routes/locations.$countrySlug.regions";
-import { Route as LocationsCountrySlugRegionsRegionSlugImport } from "./routes/locations.$countrySlug.regions.$regionSlug";
-import { Route as LocationsAllRegionsImport } from "./routes/locations.all-regions";
-import { Route as LoginImport } from "./routes/login";
-import { Route as NotFoundImport } from "./routes/not-found";
-import { Route as NotificationsImport } from "./routes/notifications";
-import { Route as NotificationsAllImport } from "./routes/notifications.all";
-import { Route as PasswordResetImport } from "./routes/password-reset";
-import { Route as RegisterImport } from "./routes/register";
-import { Route as SearchImport } from "./routes/search";
-import { Route as SettingsImport } from "./routes/settings";
-import { Route as TastingsTastingIdImport } from "./routes/tastings.$tastingId";
-import { Route as TastingsTastingIdEditImport } from "./routes/tastings.$tastingId.edit";
-import { Route as TastingsIndexImport } from "./routes/tastings.index";
-import { Route as UpdatesImport } from "./routes/updates";
-import { Route as UsersUsernameImport } from "./routes/users.$username";
-import { Route as UsersUsernameFavoritesImport } from "./routes/users.$username.favorites";
-import { Route as UsersUsernameIndexImport } from "./routes/users.$username.index";
-import { Route as VerifyImport } from "./routes/verify";
+import { Route as AboutRouteImport } from "./routes/about";
+import { Route as ActivityFriendsRouteImport } from "./routes/activity.friends";
+import { Route as ActivityLocalRouteImport } from "./routes/activity.local";
+import { Route as AddBottleRouteImport } from "./routes/addBottle";
+import { Route as AddEntityRouteImport } from "./routes/addEntity";
+import { Route as AddFlightRouteImport } from "./routes/addFlight";
+import { Route as AdminRouteImport } from "./routes/admin";
+import { Route as AdminBadgesRouteImport } from "./routes/admin.badges";
+import { Route as AdminBadgesBadgeIdRouteImport } from "./routes/admin.badges.$badgeId";
+import { Route as AdminBadgesBadgeIdEditRouteImport } from "./routes/admin.badges.$badgeId.edit";
+import { Route as AdminBadgesAddRouteImport } from "./routes/admin.badges.add";
+import { Route as AdminEventsRouteImport } from "./routes/admin.events";
+import { Route as AdminEventsEventIdRouteImport } from "./routes/admin.events.$eventId";
+import { Route as AdminEventsEventIdEditRouteImport } from "./routes/admin.events.$eventId.edit";
+import { Route as AdminEventsAddRouteImport } from "./routes/admin.events.add";
+import { Route as AdminIndexRouteImport } from "./routes/admin.index";
+import { Route as AdminLocationsRouteImport } from "./routes/admin.locations";
+import { Route as AdminLocationsCountrySlugRouteImport } from "./routes/admin.locations.$countrySlug";
+import { Route as AdminLocationsCountrySlugEditRouteImport } from "./routes/admin.locations.$countrySlug.edit";
+import { Route as AdminLocationsCountrySlugIndexRouteImport } from "./routes/admin.locations.$countrySlug.index";
+import { Route as AdminLocationsCountrySlugRegionsRegionSlugRouteImport } from "./routes/admin.locations.$countrySlug.regions.$regionSlug";
+import { Route as AdminLocationsCountrySlugRegionsRegionSlugEditRouteImport } from "./routes/admin.locations.$countrySlug.regions.$regionSlug.edit";
+import { Route as AdminLocationsCountrySlugRegionsAddRouteImport } from "./routes/admin.locations.$countrySlug.regions.add";
+import { Route as AdminQueueRouteImport } from "./routes/admin.queue";
+import { Route as AdminSitesRouteImport } from "./routes/admin.sites";
+import { Route as AdminSitesSiteIdRouteImport } from "./routes/admin.sites.$siteId";
+import { Route as AdminSitesSiteIdEditRouteImport } from "./routes/admin.sites.$siteId.edit";
+import { Route as AdminSitesSiteIdIndexRouteImport } from "./routes/admin.sites.$siteId.index";
+import { Route as AdminSitesSiteIdReviewsRouteImport } from "./routes/admin.sites.$siteId.reviews";
+import { Route as AdminSitesAddRouteImport } from "./routes/admin.sites.add";
+import { Route as AdminTagsRouteImport } from "./routes/admin.tags";
+import { Route as AdminTagsTagIdRouteImport } from "./routes/admin.tags.$tagId";
+import { Route as AdminTagsTagIdEditRouteImport } from "./routes/admin.tags.$tagId.edit";
+import { Route as AdminTagsAddRouteImport } from "./routes/admin.tags.add";
+import { Route as AdminUsersRouteImport } from "./routes/admin.users";
+import { Route as BadgesBadgeIdRouteImport } from "./routes/badges.$badgeId";
+import { Route as BottlersIndexRouteImport } from "./routes/bottlers.index";
+import { Route as BottlesBottleIdRouteImport } from "./routes/bottles.$bottleId";
+import { Route as BottlesBottleIdAliasesRouteImport } from "./routes/bottles.$bottleId.aliases";
+import { Route as BottlesBottleIdEditRouteImport } from "./routes/bottles.$bottleId.edit";
+import { Route as BottlesBottleIdIndexRouteImport } from "./routes/bottles.$bottleId.index";
+import { Route as BottlesBottleIdMergeRouteImport } from "./routes/bottles.$bottleId.merge";
+import { Route as BottlesBottleIdPricesRouteImport } from "./routes/bottles.$bottleId.prices";
+import { Route as BottlesBottleIdReleasesRouteImport } from "./routes/bottles.$bottleId.releases";
+import { Route as BottlesBottleIdReleasesReleaseIdEditRouteImport } from "./routes/bottles.$bottleId.releases.$releaseId.edit";
+import { Route as BottlesBottleIdSimilarRouteImport } from "./routes/bottles.$bottleId.similar";
+import { Route as BottlesBottleIdTastingsRouteImport } from "./routes/bottles.$bottleId.tastings";
+import { Route as BottlesIndexRouteImport } from "./routes/bottles.index";
+import { Route as BottlesBottleIdAddReleaseRouteImport } from "./routes/bottles_.$bottleId.addRelease";
+import { Route as BottlesBottleIdAddTastingRouteImport } from "./routes/bottles_.$bottleId.addTasting";
+import { Route as BrandsIndexRouteImport } from "./routes/brands.index";
+import { Route as DistillersIndexRouteImport } from "./routes/distillers.index";
+import { Route as EntitiesEntityIdRouteImport } from "./routes/entities.$entityId";
+import { Route as EntitiesEntityIdAliasesRouteImport } from "./routes/entities.$entityId.aliases";
+import { Route as EntitiesEntityIdBottlesRouteImport } from "./routes/entities.$entityId.bottles";
+import { Route as EntitiesEntityIdCodesRouteImport } from "./routes/entities.$entityId.codes";
+import { Route as EntitiesEntityIdIndexRouteImport } from "./routes/entities.$entityId.index";
+import { Route as EntitiesEntityIdTastingsRouteImport } from "./routes/entities.$entityId.tastings";
+import { Route as EntitiesEntityIdEditRouteImport } from "./routes/entities_.$entityId.edit";
+import { Route as EntitiesEntityIdMergeRouteImport } from "./routes/entities_.$entityId.merge";
+import { Route as FavoritesRouteImport } from "./routes/favorites";
+import { Route as FlightsFlightIdRouteImport } from "./routes/flights.$flightId";
+import { Route as FlightsFlightIdEditRouteImport } from "./routes/flights.$flightId.edit";
+import { Route as FlightsFlightIdOverlayRouteImport } from "./routes/flights.$flightId.overlay";
+import { Route as FlightsIndexRouteImport } from "./routes/flights.index";
+import { Route as FriendsRouteImport } from "./routes/friends";
+import { Route as GlobalErrorRouteImport } from "./routes/global-error";
+import { Route as IndexRouteImport } from "./routes/index";
+import { Route as LocationsRouteImport } from "./routes/locations";
+import { Route as LocationsCountrySlugRouteImport } from "./routes/locations.$countrySlug";
+import { Route as LocationsCountrySlugIndexRouteImport } from "./routes/locations.$countrySlug.index";
+import { Route as LocationsCountrySlugRegionsRouteImport } from "./routes/locations.$countrySlug.regions";
+import { Route as LocationsCountrySlugRegionsRegionSlugRouteImport } from "./routes/locations.$countrySlug.regions.$regionSlug";
+import { Route as LocationsAllRegionsRouteImport } from "./routes/locations.all-regions";
+import { Route as LoginRouteImport } from "./routes/login";
+import { Route as NotFoundRouteImport } from "./routes/not-found";
+import { Route as NotificationsRouteImport } from "./routes/notifications";
+import { Route as NotificationsAllRouteImport } from "./routes/notifications.all";
+import { Route as PasswordResetRouteImport } from "./routes/password-reset";
+import { Route as RegisterRouteImport } from "./routes/register";
+import { Route as SearchRouteImport } from "./routes/search";
+import { Route as SettingsRouteImport } from "./routes/settings";
+import { Route as TastingsTastingIdRouteImport } from "./routes/tastings.$tastingId";
+import { Route as TastingsTastingIdEditRouteImport } from "./routes/tastings.$tastingId.edit";
+import { Route as TastingsIndexRouteImport } from "./routes/tastings.index";
+import { Route as UpdatesRouteImport } from "./routes/updates";
+import { Route as UsersUsernameRouteImport } from "./routes/users.$username";
+import { Route as UsersUsernameFavoritesRouteImport } from "./routes/users.$username.favorites";
+import { Route as UsersUsernameIndexRouteImport } from "./routes/users.$username.index";
+import { Route as VerifyRouteImport } from "./routes/verify";
 
 // Create/Update Routes
 
-const VerifyRoute = VerifyImport.update({
+const VerifyRoute = VerifyRouteImport.update({
   id: "/verify",
   path: "/verify",
   getParentRoute: () => rootRoute,
 } as any);
 
-const UpdatesRoute = UpdatesImport.update({
+const UpdatesRoute = UpdatesRouteImport.update({
   id: "/updates",
   path: "/updates",
   getParentRoute: () => rootRoute,
 } as any);
 
-const SettingsRoute = SettingsImport.update({
+const SettingsRoute = SettingsRouteImport.update({
   id: "/settings",
   path: "/settings",
   getParentRoute: () => rootRoute,
 } as any);
 
-const SearchRoute = SearchImport.update({
+const SearchRoute = SearchRouteImport.update({
   id: "/search",
   path: "/search",
   getParentRoute: () => rootRoute,
 } as any);
 
-const RegisterRoute = RegisterImport.update({
+const RegisterRoute = RegisterRouteImport.update({
   id: "/register",
   path: "/register",
   getParentRoute: () => rootRoute,
 } as any);
 
-const PasswordResetRoute = PasswordResetImport.update({
+const PasswordResetRoute = PasswordResetRouteImport.update({
   id: "/password-reset",
   path: "/password-reset",
   getParentRoute: () => rootRoute,
 } as any);
 
-const NotificationsRoute = NotificationsImport.update({
+const NotificationsRoute = NotificationsRouteImport.update({
   id: "/notifications",
   path: "/notifications",
   getParentRoute: () => rootRoute,
 } as any);
 
-const NotFoundRoute = NotFoundImport.update({
+const NotFoundRoute = NotFoundRouteImport.update({
   id: "/not-found",
   path: "/not-found",
   getParentRoute: () => rootRoute,
 } as any);
 
-const LoginRoute = LoginImport.update({
+const LoginRoute = LoginRouteImport.update({
   id: "/login",
   path: "/login",
   getParentRoute: () => rootRoute,
 } as any);
 
-const LocationsRoute = LocationsImport.update({
+const LocationsRoute = LocationsRouteImport.update({
   id: "/locations",
   path: "/locations",
   getParentRoute: () => rootRoute,
 } as any);
 
-const GlobalErrorRoute = GlobalErrorImport.update({
+const GlobalErrorRoute = GlobalErrorRouteImport.update({
   id: "/global-error",
   path: "/global-error",
   getParentRoute: () => rootRoute,
 } as any);
 
-const FriendsRoute = FriendsImport.update({
+const FriendsRoute = FriendsRouteImport.update({
   id: "/friends",
   path: "/friends",
   getParentRoute: () => rootRoute,
 } as any);
 
-const FavoritesRoute = FavoritesImport.update({
+const FavoritesRoute = FavoritesRouteImport.update({
   id: "/favorites",
   path: "/favorites",
   getParentRoute: () => rootRoute,
 } as any);
 
-const AdminRoute = AdminImport.update({
+const AdminRoute = AdminRouteImport.update({
   id: "/admin",
   path: "/admin",
   getParentRoute: () => rootRoute,
 } as any);
 
-const AddFlightRoute = AddFlightImport.update({
+const AddFlightRoute = AddFlightRouteImport.update({
   id: "/addFlight",
   path: "/addFlight",
   getParentRoute: () => rootRoute,
 } as any);
 
-const AddEntityRoute = AddEntityImport.update({
+const AddEntityRoute = AddEntityRouteImport.update({
   id: "/addEntity",
   path: "/addEntity",
   getParentRoute: () => rootRoute,
 } as any);
 
-const AddBottleRoute = AddBottleImport.update({
+const AddBottleRoute = AddBottleRouteImport.update({
   id: "/addBottle",
   path: "/addBottle",
   getParentRoute: () => rootRoute,
 } as any);
 
-const AboutRoute = AboutImport.update({
+const AboutRoute = AboutRouteImport.update({
   id: "/about",
   path: "/about",
   getParentRoute: () => rootRoute,
 } as any);
 
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => rootRoute,
 } as any);
 
-const TastingsIndexRoute = TastingsIndexImport.update({
+const TastingsIndexRoute = TastingsIndexRouteImport.update({
   id: "/tastings/",
   path: "/tastings/",
   getParentRoute: () => rootRoute,
 } as any);
 
-const FlightsIndexRoute = FlightsIndexImport.update({
+const FlightsIndexRoute = FlightsIndexRouteImport.update({
   id: "/flights/",
   path: "/flights/",
   getParentRoute: () => rootRoute,
 } as any);
 
-const DistillersIndexRoute = DistillersIndexImport.update({
+const DistillersIndexRoute = DistillersIndexRouteImport.update({
   id: "/distillers/",
   path: "/distillers/",
   getParentRoute: () => rootRoute,
 } as any);
 
-const BrandsIndexRoute = BrandsIndexImport.update({
+const BrandsIndexRoute = BrandsIndexRouteImport.update({
   id: "/brands/",
   path: "/brands/",
   getParentRoute: () => rootRoute,
 } as any);
 
-const BottlesIndexRoute = BottlesIndexImport.update({
+const BottlesIndexRoute = BottlesIndexRouteImport.update({
   id: "/bottles/",
   path: "/bottles/",
   getParentRoute: () => rootRoute,
 } as any);
 
-const BottlersIndexRoute = BottlersIndexImport.update({
+const BottlersIndexRoute = BottlersIndexRouteImport.update({
   id: "/bottlers/",
   path: "/bottlers/",
   getParentRoute: () => rootRoute,
 } as any);
 
-const AdminIndexRoute = AdminIndexImport.update({
+const AdminIndexRoute = AdminIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => AdminRoute,
 } as any);
 
-const UsersUsernameRoute = UsersUsernameImport.update({
+const UsersUsernameRoute = UsersUsernameRouteImport.update({
   id: "/users/$username",
   path: "/users/$username",
   getParentRoute: () => rootRoute,
 } as any);
 
-const TastingsTastingIdRoute = TastingsTastingIdImport.update({
+const TastingsTastingIdRoute = TastingsTastingIdRouteImport.update({
   id: "/tastings/$tastingId",
   path: "/tastings/$tastingId",
   getParentRoute: () => rootRoute,
 } as any);
 
-const NotificationsAllRoute = NotificationsAllImport.update({
+const NotificationsAllRoute = NotificationsAllRouteImport.update({
   id: "/all",
   path: "/all",
   getParentRoute: () => NotificationsRoute,
 } as any);
 
-const LocationsAllRegionsRoute = LocationsAllRegionsImport.update({
+const LocationsAllRegionsRoute = LocationsAllRegionsRouteImport.update({
   id: "/all-regions",
   path: "/all-regions",
   getParentRoute: () => LocationsRoute,
 } as any);
 
-const LocationsCountrySlugRoute = LocationsCountrySlugImport.update({
+const LocationsCountrySlugRoute = LocationsCountrySlugRouteImport.update({
   id: "/$countrySlug",
   path: "/$countrySlug",
   getParentRoute: () => LocationsRoute,
 } as any);
 
-const FlightsFlightIdRoute = FlightsFlightIdImport.update({
+const FlightsFlightIdRoute = FlightsFlightIdRouteImport.update({
   id: "/flights/$flightId",
   path: "/flights/$flightId",
   getParentRoute: () => rootRoute,
 } as any);
 
-const EntitiesEntityIdRoute = EntitiesEntityIdImport.update({
+const EntitiesEntityIdRoute = EntitiesEntityIdRouteImport.update({
   id: "/entities/$entityId",
   path: "/entities/$entityId",
   getParentRoute: () => rootRoute,
 } as any);
 
-const BottlesBottleIdRoute = BottlesBottleIdImport.update({
+const BottlesBottleIdRoute = BottlesBottleIdRouteImport.update({
   id: "/bottles/$bottleId",
   path: "/bottles/$bottleId",
   getParentRoute: () => rootRoute,
 } as any);
 
-const BadgesBadgeIdRoute = BadgesBadgeIdImport.update({
+const BadgesBadgeIdRoute = BadgesBadgeIdRouteImport.update({
   id: "/badges/$badgeId",
   path: "/badges/$badgeId",
   getParentRoute: () => rootRoute,
 } as any);
 
-const AdminUsersRoute = AdminUsersImport.update({
+const AdminUsersRoute = AdminUsersRouteImport.update({
   id: "/users",
   path: "/users",
   getParentRoute: () => AdminRoute,
 } as any);
 
-const AdminTagsRoute = AdminTagsImport.update({
+const AdminTagsRoute = AdminTagsRouteImport.update({
   id: "/tags",
   path: "/tags",
   getParentRoute: () => AdminRoute,
 } as any);
 
-const AdminSitesRoute = AdminSitesImport.update({
+const AdminSitesRoute = AdminSitesRouteImport.update({
   id: "/sites",
   path: "/sites",
   getParentRoute: () => AdminRoute,
 } as any);
 
-const AdminQueueRoute = AdminQueueImport.update({
+const AdminQueueRoute = AdminQueueRouteImport.update({
   id: "/queue",
   path: "/queue",
   getParentRoute: () => AdminRoute,
 } as any);
 
-const AdminLocationsRoute = AdminLocationsImport.update({
+const AdminLocationsRoute = AdminLocationsRouteImport.update({
   id: "/locations",
   path: "/locations",
   getParentRoute: () => AdminRoute,
 } as any);
 
-const AdminEventsRoute = AdminEventsImport.update({
+const AdminEventsRoute = AdminEventsRouteImport.update({
   id: "/events",
   path: "/events",
   getParentRoute: () => AdminRoute,
 } as any);
 
-const AdminBadgesRoute = AdminBadgesImport.update({
+const AdminBadgesRoute = AdminBadgesRouteImport.update({
   id: "/badges",
   path: "/badges",
   getParentRoute: () => AdminRoute,
 } as any);
 
-const ActivityLocalRoute = ActivityLocalImport.update({
+const ActivityLocalRoute = ActivityLocalRouteImport.update({
   id: "/activity/local",
   path: "/activity/local",
   getParentRoute: () => rootRoute,
 } as any);
 
-const ActivityFriendsRoute = ActivityFriendsImport.update({
+const ActivityFriendsRoute = ActivityFriendsRouteImport.update({
   id: "/activity/friends",
   path: "/activity/friends",
   getParentRoute: () => rootRoute,
 } as any);
 
-const UsersUsernameIndexRoute = UsersUsernameIndexImport.update({
+const UsersUsernameIndexRoute = UsersUsernameIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => UsersUsernameRoute,
 } as any);
 
-const LocationsCountrySlugIndexRoute = LocationsCountrySlugIndexImport.update({
-  id: "/",
-  path: "/",
-  getParentRoute: () => LocationsCountrySlugRoute,
-} as any);
+const LocationsCountrySlugIndexRoute =
+  LocationsCountrySlugIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => LocationsCountrySlugRoute,
+  } as any);
 
-const EntitiesEntityIdIndexRoute = EntitiesEntityIdIndexImport.update({
+const EntitiesEntityIdIndexRoute = EntitiesEntityIdIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => EntitiesEntityIdRoute,
 } as any);
 
-const BottlesBottleIdIndexRoute = BottlesBottleIdIndexImport.update({
+const BottlesBottleIdIndexRoute = BottlesBottleIdIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => BottlesBottleIdRoute,
 } as any);
 
-const UsersUsernameFavoritesRoute = UsersUsernameFavoritesImport.update({
+const UsersUsernameFavoritesRoute = UsersUsernameFavoritesRouteImport.update({
   id: "/favorites",
   path: "/favorites",
   getParentRoute: () => UsersUsernameRoute,
 } as any);
 
-const TastingsTastingIdEditRoute = TastingsTastingIdEditImport.update({
+const TastingsTastingIdEditRoute = TastingsTastingIdEditRouteImport.update({
   id: "/edit",
   path: "/edit",
   getParentRoute: () => TastingsTastingIdRoute,
 } as any);
 
 const LocationsCountrySlugRegionsRoute =
-  LocationsCountrySlugRegionsImport.update({
+  LocationsCountrySlugRegionsRouteImport.update({
     id: "/regions",
     path: "/regions",
     getParentRoute: () => LocationsCountrySlugRoute,
   } as any);
 
-const FlightsFlightIdOverlayRoute = FlightsFlightIdOverlayImport.update({
+const FlightsFlightIdOverlayRoute = FlightsFlightIdOverlayRouteImport.update({
   id: "/overlay",
   path: "/overlay",
   getParentRoute: () => FlightsFlightIdRoute,
 } as any);
 
-const FlightsFlightIdEditRoute = FlightsFlightIdEditImport.update({
+const FlightsFlightIdEditRoute = FlightsFlightIdEditRouteImport.update({
   id: "/edit",
   path: "/edit",
   getParentRoute: () => FlightsFlightIdRoute,
 } as any);
 
-const EntitiesEntityIdMergeRoute = EntitiesEntityIdMergeImport.update({
+const EntitiesEntityIdMergeRoute = EntitiesEntityIdMergeRouteImport.update({
   id: "/entities_/$entityId/merge",
   path: "/entities/$entityId/merge",
   getParentRoute: () => rootRoute,
 } as any);
 
-const EntitiesEntityIdEditRoute = EntitiesEntityIdEditImport.update({
+const EntitiesEntityIdEditRoute = EntitiesEntityIdEditRouteImport.update({
   id: "/entities_/$entityId/edit",
   path: "/entities/$entityId/edit",
   getParentRoute: () => rootRoute,
 } as any);
 
-const EntitiesEntityIdTastingsRoute = EntitiesEntityIdTastingsImport.update({
-  id: "/tastings",
-  path: "/tastings",
-  getParentRoute: () => EntitiesEntityIdRoute,
-} as any);
+const EntitiesEntityIdTastingsRoute =
+  EntitiesEntityIdTastingsRouteImport.update({
+    id: "/tastings",
+    path: "/tastings",
+    getParentRoute: () => EntitiesEntityIdRoute,
+  } as any);
 
-const EntitiesEntityIdCodesRoute = EntitiesEntityIdCodesImport.update({
+const EntitiesEntityIdCodesRoute = EntitiesEntityIdCodesRouteImport.update({
   id: "/codes",
   path: "/codes",
   getParentRoute: () => EntitiesEntityIdRoute,
 } as any);
 
-const EntitiesEntityIdBottlesRoute = EntitiesEntityIdBottlesImport.update({
+const EntitiesEntityIdBottlesRoute = EntitiesEntityIdBottlesRouteImport.update({
   id: "/bottles",
   path: "/bottles",
   getParentRoute: () => EntitiesEntityIdRoute,
 } as any);
 
-const EntitiesEntityIdAliasesRoute = EntitiesEntityIdAliasesImport.update({
+const EntitiesEntityIdAliasesRoute = EntitiesEntityIdAliasesRouteImport.update({
   id: "/aliases",
   path: "/aliases",
   getParentRoute: () => EntitiesEntityIdRoute,
 } as any);
 
-const BottlesBottleIdAddTastingRoute = BottlesBottleIdAddTastingImport.update({
-  id: "/bottles_/$bottleId/addTasting",
-  path: "/bottles/$bottleId/addTasting",
-  getParentRoute: () => rootRoute,
-} as any);
+const BottlesBottleIdAddTastingRoute =
+  BottlesBottleIdAddTastingRouteImport.update({
+    id: "/bottles_/$bottleId/addTasting",
+    path: "/bottles/$bottleId/addTasting",
+    getParentRoute: () => rootRoute,
+  } as any);
 
-const BottlesBottleIdAddReleaseRoute = BottlesBottleIdAddReleaseImport.update({
-  id: "/bottles_/$bottleId/addRelease",
-  path: "/bottles/$bottleId/addRelease",
-  getParentRoute: () => rootRoute,
-} as any);
+const BottlesBottleIdAddReleaseRoute =
+  BottlesBottleIdAddReleaseRouteImport.update({
+    id: "/bottles_/$bottleId/addRelease",
+    path: "/bottles/$bottleId/addRelease",
+    getParentRoute: () => rootRoute,
+  } as any);
 
-const BottlesBottleIdTastingsRoute = BottlesBottleIdTastingsImport.update({
+const BottlesBottleIdTastingsRoute = BottlesBottleIdTastingsRouteImport.update({
   id: "/tastings",
   path: "/tastings",
   getParentRoute: () => BottlesBottleIdRoute,
 } as any);
 
-const BottlesBottleIdSimilarRoute = BottlesBottleIdSimilarImport.update({
+const BottlesBottleIdSimilarRoute = BottlesBottleIdSimilarRouteImport.update({
   id: "/similar",
   path: "/similar",
   getParentRoute: () => BottlesBottleIdRoute,
 } as any);
 
-const BottlesBottleIdReleasesRoute = BottlesBottleIdReleasesImport.update({
+const BottlesBottleIdReleasesRoute = BottlesBottleIdReleasesRouteImport.update({
   id: "/releases",
   path: "/releases",
   getParentRoute: () => BottlesBottleIdRoute,
 } as any);
 
-const BottlesBottleIdPricesRoute = BottlesBottleIdPricesImport.update({
+const BottlesBottleIdPricesRoute = BottlesBottleIdPricesRouteImport.update({
   id: "/prices",
   path: "/prices",
   getParentRoute: () => BottlesBottleIdRoute,
 } as any);
 
-const BottlesBottleIdMergeRoute = BottlesBottleIdMergeImport.update({
+const BottlesBottleIdMergeRoute = BottlesBottleIdMergeRouteImport.update({
   id: "/merge",
   path: "/merge",
   getParentRoute: () => BottlesBottleIdRoute,
 } as any);
 
-const BottlesBottleIdEditRoute = BottlesBottleIdEditImport.update({
+const BottlesBottleIdEditRoute = BottlesBottleIdEditRouteImport.update({
   id: "/edit",
   path: "/edit",
   getParentRoute: () => BottlesBottleIdRoute,
 } as any);
 
-const BottlesBottleIdAliasesRoute = BottlesBottleIdAliasesImport.update({
+const BottlesBottleIdAliasesRoute = BottlesBottleIdAliasesRouteImport.update({
   id: "/aliases",
   path: "/aliases",
   getParentRoute: () => BottlesBottleIdRoute,
 } as any);
 
-const AdminTagsAddRoute = AdminTagsAddImport.update({
+const AdminTagsAddRoute = AdminTagsAddRouteImport.update({
   id: "/add",
   path: "/add",
   getParentRoute: () => AdminTagsRoute,
 } as any);
 
-const AdminTagsTagIdRoute = AdminTagsTagIdImport.update({
+const AdminTagsTagIdRoute = AdminTagsTagIdRouteImport.update({
   id: "/$tagId",
   path: "/$tagId",
   getParentRoute: () => AdminTagsRoute,
 } as any);
 
-const AdminSitesAddRoute = AdminSitesAddImport.update({
+const AdminSitesAddRoute = AdminSitesAddRouteImport.update({
   id: "/add",
   path: "/add",
   getParentRoute: () => AdminSitesRoute,
 } as any);
 
-const AdminSitesSiteIdRoute = AdminSitesSiteIdImport.update({
+const AdminSitesSiteIdRoute = AdminSitesSiteIdRouteImport.update({
   id: "/$siteId",
   path: "/$siteId",
   getParentRoute: () => AdminSitesRoute,
 } as any);
 
-const AdminLocationsCountrySlugRoute = AdminLocationsCountrySlugImport.update({
-  id: "/$countrySlug",
-  path: "/$countrySlug",
-  getParentRoute: () => AdminLocationsRoute,
-} as any);
+const AdminLocationsCountrySlugRoute =
+  AdminLocationsCountrySlugRouteImport.update({
+    id: "/$countrySlug",
+    path: "/$countrySlug",
+    getParentRoute: () => AdminLocationsRoute,
+  } as any);
 
-const AdminEventsAddRoute = AdminEventsAddImport.update({
+const AdminEventsAddRoute = AdminEventsAddRouteImport.update({
   id: "/add",
   path: "/add",
   getParentRoute: () => AdminEventsRoute,
 } as any);
 
-const AdminEventsEventIdRoute = AdminEventsEventIdImport.update({
+const AdminEventsEventIdRoute = AdminEventsEventIdRouteImport.update({
   id: "/$eventId",
   path: "/$eventId",
   getParentRoute: () => AdminEventsRoute,
 } as any);
 
-const AdminBadgesAddRoute = AdminBadgesAddImport.update({
+const AdminBadgesAddRoute = AdminBadgesAddRouteImport.update({
   id: "/add",
   path: "/add",
   getParentRoute: () => AdminBadgesRoute,
 } as any);
 
-const AdminBadgesBadgeIdRoute = AdminBadgesBadgeIdImport.update({
+const AdminBadgesBadgeIdRoute = AdminBadgesBadgeIdRouteImport.update({
   id: "/$badgeId",
   path: "/$badgeId",
   getParentRoute: () => AdminBadgesRoute,
 } as any);
 
-const AdminSitesSiteIdIndexRoute = AdminSitesSiteIdIndexImport.update({
+const AdminSitesSiteIdIndexRoute = AdminSitesSiteIdIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => AdminSitesSiteIdRoute,
 } as any);
 
 const AdminLocationsCountrySlugIndexRoute =
-  AdminLocationsCountrySlugIndexImport.update({
+  AdminLocationsCountrySlugIndexRouteImport.update({
     id: "/",
     path: "/",
     getParentRoute: () => AdminLocationsCountrySlugRoute,
   } as any);
 
 const LocationsCountrySlugRegionsRegionSlugRoute =
-  LocationsCountrySlugRegionsRegionSlugImport.update({
+  LocationsCountrySlugRegionsRegionSlugRouteImport.update({
     id: "/$regionSlug",
     path: "/$regionSlug",
     getParentRoute: () => LocationsCountrySlugRegionsRoute,
   } as any);
 
-const AdminTagsTagIdEditRoute = AdminTagsTagIdEditImport.update({
+const AdminTagsTagIdEditRoute = AdminTagsTagIdEditRouteImport.update({
   id: "/edit",
   path: "/edit",
   getParentRoute: () => AdminTagsTagIdRoute,
 } as any);
 
-const AdminSitesSiteIdReviewsRoute = AdminSitesSiteIdReviewsImport.update({
+const AdminSitesSiteIdReviewsRoute = AdminSitesSiteIdReviewsRouteImport.update({
   id: "/reviews",
   path: "/reviews",
   getParentRoute: () => AdminSitesSiteIdRoute,
 } as any);
 
-const AdminSitesSiteIdEditRoute = AdminSitesSiteIdEditImport.update({
+const AdminSitesSiteIdEditRoute = AdminSitesSiteIdEditRouteImport.update({
   id: "/edit",
   path: "/edit",
   getParentRoute: () => AdminSitesSiteIdRoute,
 } as any);
 
 const AdminLocationsCountrySlugEditRoute =
-  AdminLocationsCountrySlugEditImport.update({
+  AdminLocationsCountrySlugEditRouteImport.update({
     id: "/edit",
     path: "/edit",
     getParentRoute: () => AdminLocationsCountrySlugRoute,
   } as any);
 
-const AdminEventsEventIdEditRoute = AdminEventsEventIdEditImport.update({
+const AdminEventsEventIdEditRoute = AdminEventsEventIdEditRouteImport.update({
   id: "/edit",
   path: "/edit",
   getParentRoute: () => AdminEventsEventIdRoute,
 } as any);
 
-const AdminBadgesBadgeIdEditRoute = AdminBadgesBadgeIdEditImport.update({
+const AdminBadgesBadgeIdEditRoute = AdminBadgesBadgeIdEditRouteImport.update({
   id: "/edit",
   path: "/edit",
   getParentRoute: () => AdminBadgesBadgeIdRoute,
 } as any);
 
 const BottlesBottleIdReleasesReleaseIdEditRoute =
-  BottlesBottleIdReleasesReleaseIdEditImport.update({
+  BottlesBottleIdReleasesReleaseIdEditRouteImport.update({
     id: "/$releaseId/edit",
     path: "/$releaseId/edit",
     getParentRoute: () => BottlesBottleIdReleasesRoute,
   } as any);
 
 const AdminLocationsCountrySlugRegionsAddRoute =
-  AdminLocationsCountrySlugRegionsAddImport.update({
+  AdminLocationsCountrySlugRegionsAddRouteImport.update({
     id: "/regions/add",
     path: "/regions/add",
     getParentRoute: () => AdminLocationsCountrySlugRoute,
   } as any);
 
 const AdminLocationsCountrySlugRegionsRegionSlugRoute =
-  AdminLocationsCountrySlugRegionsRegionSlugImport.update({
+  AdminLocationsCountrySlugRegionsRegionSlugRouteImport.update({
     id: "/regions/$regionSlug",
     path: "/regions/$regionSlug",
     getParentRoute: () => AdminLocationsCountrySlugRoute,
   } as any);
 
 const AdminLocationsCountrySlugRegionsRegionSlugEditRoute =
-  AdminLocationsCountrySlugRegionsRegionSlugEditImport.update({
+  AdminLocationsCountrySlugRegionsRegionSlugEditRouteImport.update({
     id: "/edit",
     path: "/edit",
     getParentRoute: () => AdminLocationsCountrySlugRegionsRegionSlugRoute,
@@ -660,631 +665,631 @@ declare module "@tanstack/react-router" {
       id: "/";
       path: "/";
       fullPath: "/";
-      preLoaderRoute: typeof IndexImport;
+      preLoaderRoute: typeof IndexRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/about": {
       id: "/about";
       path: "/about";
       fullPath: "/about";
-      preLoaderRoute: typeof AboutImport;
+      preLoaderRoute: typeof AboutRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/addBottle": {
       id: "/addBottle";
       path: "/addBottle";
       fullPath: "/addBottle";
-      preLoaderRoute: typeof AddBottleImport;
+      preLoaderRoute: typeof AddBottleRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/addEntity": {
       id: "/addEntity";
       path: "/addEntity";
       fullPath: "/addEntity";
-      preLoaderRoute: typeof AddEntityImport;
+      preLoaderRoute: typeof AddEntityRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/addFlight": {
       id: "/addFlight";
       path: "/addFlight";
       fullPath: "/addFlight";
-      preLoaderRoute: typeof AddFlightImport;
+      preLoaderRoute: typeof AddFlightRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/admin": {
       id: "/admin";
       path: "/admin";
       fullPath: "/admin";
-      preLoaderRoute: typeof AdminImport;
+      preLoaderRoute: typeof AdminRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/favorites": {
       id: "/favorites";
       path: "/favorites";
       fullPath: "/favorites";
-      preLoaderRoute: typeof FavoritesImport;
+      preLoaderRoute: typeof FavoritesRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/friends": {
       id: "/friends";
       path: "/friends";
       fullPath: "/friends";
-      preLoaderRoute: typeof FriendsImport;
+      preLoaderRoute: typeof FriendsRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/global-error": {
       id: "/global-error";
       path: "/global-error";
       fullPath: "/global-error";
-      preLoaderRoute: typeof GlobalErrorImport;
+      preLoaderRoute: typeof GlobalErrorRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/locations": {
       id: "/locations";
       path: "/locations";
       fullPath: "/locations";
-      preLoaderRoute: typeof LocationsImport;
+      preLoaderRoute: typeof LocationsRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/login": {
       id: "/login";
       path: "/login";
       fullPath: "/login";
-      preLoaderRoute: typeof LoginImport;
+      preLoaderRoute: typeof LoginRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/not-found": {
       id: "/not-found";
       path: "/not-found";
       fullPath: "/not-found";
-      preLoaderRoute: typeof NotFoundImport;
+      preLoaderRoute: typeof NotFoundRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/notifications": {
       id: "/notifications";
       path: "/notifications";
       fullPath: "/notifications";
-      preLoaderRoute: typeof NotificationsImport;
+      preLoaderRoute: typeof NotificationsRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/password-reset": {
       id: "/password-reset";
       path: "/password-reset";
       fullPath: "/password-reset";
-      preLoaderRoute: typeof PasswordResetImport;
+      preLoaderRoute: typeof PasswordResetRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/register": {
       id: "/register";
       path: "/register";
       fullPath: "/register";
-      preLoaderRoute: typeof RegisterImport;
+      preLoaderRoute: typeof RegisterRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/search": {
       id: "/search";
       path: "/search";
       fullPath: "/search";
-      preLoaderRoute: typeof SearchImport;
+      preLoaderRoute: typeof SearchRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/settings": {
       id: "/settings";
       path: "/settings";
       fullPath: "/settings";
-      preLoaderRoute: typeof SettingsImport;
+      preLoaderRoute: typeof SettingsRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/updates": {
       id: "/updates";
       path: "/updates";
       fullPath: "/updates";
-      preLoaderRoute: typeof UpdatesImport;
+      preLoaderRoute: typeof UpdatesRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/verify": {
       id: "/verify";
       path: "/verify";
       fullPath: "/verify";
-      preLoaderRoute: typeof VerifyImport;
+      preLoaderRoute: typeof VerifyRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/activity/friends": {
       id: "/activity/friends";
       path: "/activity/friends";
       fullPath: "/activity/friends";
-      preLoaderRoute: typeof ActivityFriendsImport;
+      preLoaderRoute: typeof ActivityFriendsRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/activity/local": {
       id: "/activity/local";
       path: "/activity/local";
       fullPath: "/activity/local";
-      preLoaderRoute: typeof ActivityLocalImport;
+      preLoaderRoute: typeof ActivityLocalRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/admin/badges": {
       id: "/admin/badges";
       path: "/badges";
       fullPath: "/admin/badges";
-      preLoaderRoute: typeof AdminBadgesImport;
-      parentRoute: typeof AdminImport;
+      preLoaderRoute: typeof AdminBadgesRouteImport;
+      parentRoute: typeof AdminRouteImport;
     };
     "/admin/events": {
       id: "/admin/events";
       path: "/events";
       fullPath: "/admin/events";
-      preLoaderRoute: typeof AdminEventsImport;
-      parentRoute: typeof AdminImport;
+      preLoaderRoute: typeof AdminEventsRouteImport;
+      parentRoute: typeof AdminRouteImport;
     };
     "/admin/locations": {
       id: "/admin/locations";
       path: "/locations";
       fullPath: "/admin/locations";
-      preLoaderRoute: typeof AdminLocationsImport;
-      parentRoute: typeof AdminImport;
+      preLoaderRoute: typeof AdminLocationsRouteImport;
+      parentRoute: typeof AdminRouteImport;
     };
     "/admin/queue": {
       id: "/admin/queue";
       path: "/queue";
       fullPath: "/admin/queue";
-      preLoaderRoute: typeof AdminQueueImport;
-      parentRoute: typeof AdminImport;
+      preLoaderRoute: typeof AdminQueueRouteImport;
+      parentRoute: typeof AdminRouteImport;
     };
     "/admin/sites": {
       id: "/admin/sites";
       path: "/sites";
       fullPath: "/admin/sites";
-      preLoaderRoute: typeof AdminSitesImport;
-      parentRoute: typeof AdminImport;
+      preLoaderRoute: typeof AdminSitesRouteImport;
+      parentRoute: typeof AdminRouteImport;
     };
     "/admin/tags": {
       id: "/admin/tags";
       path: "/tags";
       fullPath: "/admin/tags";
-      preLoaderRoute: typeof AdminTagsImport;
-      parentRoute: typeof AdminImport;
+      preLoaderRoute: typeof AdminTagsRouteImport;
+      parentRoute: typeof AdminRouteImport;
     };
     "/admin/users": {
       id: "/admin/users";
       path: "/users";
       fullPath: "/admin/users";
-      preLoaderRoute: typeof AdminUsersImport;
-      parentRoute: typeof AdminImport;
+      preLoaderRoute: typeof AdminUsersRouteImport;
+      parentRoute: typeof AdminRouteImport;
     };
     "/badges/$badgeId": {
       id: "/badges/$badgeId";
       path: "/badges/$badgeId";
       fullPath: "/badges/$badgeId";
-      preLoaderRoute: typeof BadgesBadgeIdImport;
+      preLoaderRoute: typeof BadgesBadgeIdRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/bottles/$bottleId": {
       id: "/bottles/$bottleId";
       path: "/bottles/$bottleId";
       fullPath: "/bottles/$bottleId";
-      preLoaderRoute: typeof BottlesBottleIdImport;
+      preLoaderRoute: typeof BottlesBottleIdRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/entities/$entityId": {
       id: "/entities/$entityId";
       path: "/entities/$entityId";
       fullPath: "/entities/$entityId";
-      preLoaderRoute: typeof EntitiesEntityIdImport;
+      preLoaderRoute: typeof EntitiesEntityIdRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/flights/$flightId": {
       id: "/flights/$flightId";
       path: "/flights/$flightId";
       fullPath: "/flights/$flightId";
-      preLoaderRoute: typeof FlightsFlightIdImport;
+      preLoaderRoute: typeof FlightsFlightIdRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/locations/$countrySlug": {
       id: "/locations/$countrySlug";
       path: "/$countrySlug";
       fullPath: "/locations/$countrySlug";
-      preLoaderRoute: typeof LocationsCountrySlugImport;
-      parentRoute: typeof LocationsImport;
+      preLoaderRoute: typeof LocationsCountrySlugRouteImport;
+      parentRoute: typeof LocationsRouteImport;
     };
     "/locations/all-regions": {
       id: "/locations/all-regions";
       path: "/all-regions";
       fullPath: "/locations/all-regions";
-      preLoaderRoute: typeof LocationsAllRegionsImport;
-      parentRoute: typeof LocationsImport;
+      preLoaderRoute: typeof LocationsAllRegionsRouteImport;
+      parentRoute: typeof LocationsRouteImport;
     };
     "/notifications/all": {
       id: "/notifications/all";
       path: "/all";
       fullPath: "/notifications/all";
-      preLoaderRoute: typeof NotificationsAllImport;
-      parentRoute: typeof NotificationsImport;
+      preLoaderRoute: typeof NotificationsAllRouteImport;
+      parentRoute: typeof NotificationsRouteImport;
     };
     "/tastings/$tastingId": {
       id: "/tastings/$tastingId";
       path: "/tastings/$tastingId";
       fullPath: "/tastings/$tastingId";
-      preLoaderRoute: typeof TastingsTastingIdImport;
+      preLoaderRoute: typeof TastingsTastingIdRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/users/$username": {
       id: "/users/$username";
       path: "/users/$username";
       fullPath: "/users/$username";
-      preLoaderRoute: typeof UsersUsernameImport;
+      preLoaderRoute: typeof UsersUsernameRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/admin/": {
       id: "/admin/";
       path: "/";
       fullPath: "/admin/";
-      preLoaderRoute: typeof AdminIndexImport;
-      parentRoute: typeof AdminImport;
+      preLoaderRoute: typeof AdminIndexRouteImport;
+      parentRoute: typeof AdminRouteImport;
     };
     "/bottlers/": {
       id: "/bottlers/";
       path: "/bottlers";
       fullPath: "/bottlers";
-      preLoaderRoute: typeof BottlersIndexImport;
+      preLoaderRoute: typeof BottlersIndexRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/bottles/": {
       id: "/bottles/";
       path: "/bottles";
       fullPath: "/bottles";
-      preLoaderRoute: typeof BottlesIndexImport;
+      preLoaderRoute: typeof BottlesIndexRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/brands/": {
       id: "/brands/";
       path: "/brands";
       fullPath: "/brands";
-      preLoaderRoute: typeof BrandsIndexImport;
+      preLoaderRoute: typeof BrandsIndexRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/distillers/": {
       id: "/distillers/";
       path: "/distillers";
       fullPath: "/distillers";
-      preLoaderRoute: typeof DistillersIndexImport;
+      preLoaderRoute: typeof DistillersIndexRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/flights/": {
       id: "/flights/";
       path: "/flights";
       fullPath: "/flights";
-      preLoaderRoute: typeof FlightsIndexImport;
+      preLoaderRoute: typeof FlightsIndexRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/tastings/": {
       id: "/tastings/";
       path: "/tastings";
       fullPath: "/tastings";
-      preLoaderRoute: typeof TastingsIndexImport;
+      preLoaderRoute: typeof TastingsIndexRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/admin/badges/$badgeId": {
       id: "/admin/badges/$badgeId";
       path: "/$badgeId";
       fullPath: "/admin/badges/$badgeId";
-      preLoaderRoute: typeof AdminBadgesBadgeIdImport;
-      parentRoute: typeof AdminBadgesImport;
+      preLoaderRoute: typeof AdminBadgesBadgeIdRouteImport;
+      parentRoute: typeof AdminBadgesRouteImport;
     };
     "/admin/badges/add": {
       id: "/admin/badges/add";
       path: "/add";
       fullPath: "/admin/badges/add";
-      preLoaderRoute: typeof AdminBadgesAddImport;
-      parentRoute: typeof AdminBadgesImport;
+      preLoaderRoute: typeof AdminBadgesAddRouteImport;
+      parentRoute: typeof AdminBadgesRouteImport;
     };
     "/admin/events/$eventId": {
       id: "/admin/events/$eventId";
       path: "/$eventId";
       fullPath: "/admin/events/$eventId";
-      preLoaderRoute: typeof AdminEventsEventIdImport;
-      parentRoute: typeof AdminEventsImport;
+      preLoaderRoute: typeof AdminEventsEventIdRouteImport;
+      parentRoute: typeof AdminEventsRouteImport;
     };
     "/admin/events/add": {
       id: "/admin/events/add";
       path: "/add";
       fullPath: "/admin/events/add";
-      preLoaderRoute: typeof AdminEventsAddImport;
-      parentRoute: typeof AdminEventsImport;
+      preLoaderRoute: typeof AdminEventsAddRouteImport;
+      parentRoute: typeof AdminEventsRouteImport;
     };
     "/admin/locations/$countrySlug": {
       id: "/admin/locations/$countrySlug";
       path: "/$countrySlug";
       fullPath: "/admin/locations/$countrySlug";
-      preLoaderRoute: typeof AdminLocationsCountrySlugImport;
-      parentRoute: typeof AdminLocationsImport;
+      preLoaderRoute: typeof AdminLocationsCountrySlugRouteImport;
+      parentRoute: typeof AdminLocationsRouteImport;
     };
     "/admin/sites/$siteId": {
       id: "/admin/sites/$siteId";
       path: "/$siteId";
       fullPath: "/admin/sites/$siteId";
-      preLoaderRoute: typeof AdminSitesSiteIdImport;
-      parentRoute: typeof AdminSitesImport;
+      preLoaderRoute: typeof AdminSitesSiteIdRouteImport;
+      parentRoute: typeof AdminSitesRouteImport;
     };
     "/admin/sites/add": {
       id: "/admin/sites/add";
       path: "/add";
       fullPath: "/admin/sites/add";
-      preLoaderRoute: typeof AdminSitesAddImport;
-      parentRoute: typeof AdminSitesImport;
+      preLoaderRoute: typeof AdminSitesAddRouteImport;
+      parentRoute: typeof AdminSitesRouteImport;
     };
     "/admin/tags/$tagId": {
       id: "/admin/tags/$tagId";
       path: "/$tagId";
       fullPath: "/admin/tags/$tagId";
-      preLoaderRoute: typeof AdminTagsTagIdImport;
-      parentRoute: typeof AdminTagsImport;
+      preLoaderRoute: typeof AdminTagsTagIdRouteImport;
+      parentRoute: typeof AdminTagsRouteImport;
     };
     "/admin/tags/add": {
       id: "/admin/tags/add";
       path: "/add";
       fullPath: "/admin/tags/add";
-      preLoaderRoute: typeof AdminTagsAddImport;
-      parentRoute: typeof AdminTagsImport;
+      preLoaderRoute: typeof AdminTagsAddRouteImport;
+      parentRoute: typeof AdminTagsRouteImport;
     };
     "/bottles/$bottleId/aliases": {
       id: "/bottles/$bottleId/aliases";
       path: "/aliases";
       fullPath: "/bottles/$bottleId/aliases";
-      preLoaderRoute: typeof BottlesBottleIdAliasesImport;
-      parentRoute: typeof BottlesBottleIdImport;
+      preLoaderRoute: typeof BottlesBottleIdAliasesRouteImport;
+      parentRoute: typeof BottlesBottleIdRouteImport;
     };
     "/bottles/$bottleId/edit": {
       id: "/bottles/$bottleId/edit";
       path: "/edit";
       fullPath: "/bottles/$bottleId/edit";
-      preLoaderRoute: typeof BottlesBottleIdEditImport;
-      parentRoute: typeof BottlesBottleIdImport;
+      preLoaderRoute: typeof BottlesBottleIdEditRouteImport;
+      parentRoute: typeof BottlesBottleIdRouteImport;
     };
     "/bottles/$bottleId/merge": {
       id: "/bottles/$bottleId/merge";
       path: "/merge";
       fullPath: "/bottles/$bottleId/merge";
-      preLoaderRoute: typeof BottlesBottleIdMergeImport;
-      parentRoute: typeof BottlesBottleIdImport;
+      preLoaderRoute: typeof BottlesBottleIdMergeRouteImport;
+      parentRoute: typeof BottlesBottleIdRouteImport;
     };
     "/bottles/$bottleId/prices": {
       id: "/bottles/$bottleId/prices";
       path: "/prices";
       fullPath: "/bottles/$bottleId/prices";
-      preLoaderRoute: typeof BottlesBottleIdPricesImport;
-      parentRoute: typeof BottlesBottleIdImport;
+      preLoaderRoute: typeof BottlesBottleIdPricesRouteImport;
+      parentRoute: typeof BottlesBottleIdRouteImport;
     };
     "/bottles/$bottleId/releases": {
       id: "/bottles/$bottleId/releases";
       path: "/releases";
       fullPath: "/bottles/$bottleId/releases";
-      preLoaderRoute: typeof BottlesBottleIdReleasesImport;
-      parentRoute: typeof BottlesBottleIdImport;
+      preLoaderRoute: typeof BottlesBottleIdReleasesRouteImport;
+      parentRoute: typeof BottlesBottleIdRouteImport;
     };
     "/bottles/$bottleId/similar": {
       id: "/bottles/$bottleId/similar";
       path: "/similar";
       fullPath: "/bottles/$bottleId/similar";
-      preLoaderRoute: typeof BottlesBottleIdSimilarImport;
-      parentRoute: typeof BottlesBottleIdImport;
+      preLoaderRoute: typeof BottlesBottleIdSimilarRouteImport;
+      parentRoute: typeof BottlesBottleIdRouteImport;
     };
     "/bottles/$bottleId/tastings": {
       id: "/bottles/$bottleId/tastings";
       path: "/tastings";
       fullPath: "/bottles/$bottleId/tastings";
-      preLoaderRoute: typeof BottlesBottleIdTastingsImport;
-      parentRoute: typeof BottlesBottleIdImport;
+      preLoaderRoute: typeof BottlesBottleIdTastingsRouteImport;
+      parentRoute: typeof BottlesBottleIdRouteImport;
     };
     "/bottles_/$bottleId/addRelease": {
       id: "/bottles_/$bottleId/addRelease";
       path: "/bottles/$bottleId/addRelease";
       fullPath: "/bottles/$bottleId/addRelease";
-      preLoaderRoute: typeof BottlesBottleIdAddReleaseImport;
+      preLoaderRoute: typeof BottlesBottleIdAddReleaseRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/bottles_/$bottleId/addTasting": {
       id: "/bottles_/$bottleId/addTasting";
       path: "/bottles/$bottleId/addTasting";
       fullPath: "/bottles/$bottleId/addTasting";
-      preLoaderRoute: typeof BottlesBottleIdAddTastingImport;
+      preLoaderRoute: typeof BottlesBottleIdAddTastingRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/entities/$entityId/aliases": {
       id: "/entities/$entityId/aliases";
       path: "/aliases";
       fullPath: "/entities/$entityId/aliases";
-      preLoaderRoute: typeof EntitiesEntityIdAliasesImport;
-      parentRoute: typeof EntitiesEntityIdImport;
+      preLoaderRoute: typeof EntitiesEntityIdAliasesRouteImport;
+      parentRoute: typeof EntitiesEntityIdRouteImport;
     };
     "/entities/$entityId/bottles": {
       id: "/entities/$entityId/bottles";
       path: "/bottles";
       fullPath: "/entities/$entityId/bottles";
-      preLoaderRoute: typeof EntitiesEntityIdBottlesImport;
-      parentRoute: typeof EntitiesEntityIdImport;
+      preLoaderRoute: typeof EntitiesEntityIdBottlesRouteImport;
+      parentRoute: typeof EntitiesEntityIdRouteImport;
     };
     "/entities/$entityId/codes": {
       id: "/entities/$entityId/codes";
       path: "/codes";
       fullPath: "/entities/$entityId/codes";
-      preLoaderRoute: typeof EntitiesEntityIdCodesImport;
-      parentRoute: typeof EntitiesEntityIdImport;
+      preLoaderRoute: typeof EntitiesEntityIdCodesRouteImport;
+      parentRoute: typeof EntitiesEntityIdRouteImport;
     };
     "/entities/$entityId/tastings": {
       id: "/entities/$entityId/tastings";
       path: "/tastings";
       fullPath: "/entities/$entityId/tastings";
-      preLoaderRoute: typeof EntitiesEntityIdTastingsImport;
-      parentRoute: typeof EntitiesEntityIdImport;
+      preLoaderRoute: typeof EntitiesEntityIdTastingsRouteImport;
+      parentRoute: typeof EntitiesEntityIdRouteImport;
     };
     "/entities_/$entityId/edit": {
       id: "/entities_/$entityId/edit";
       path: "/entities/$entityId/edit";
       fullPath: "/entities/$entityId/edit";
-      preLoaderRoute: typeof EntitiesEntityIdEditImport;
+      preLoaderRoute: typeof EntitiesEntityIdEditRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/entities_/$entityId/merge": {
       id: "/entities_/$entityId/merge";
       path: "/entities/$entityId/merge";
       fullPath: "/entities/$entityId/merge";
-      preLoaderRoute: typeof EntitiesEntityIdMergeImport;
+      preLoaderRoute: typeof EntitiesEntityIdMergeRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/flights/$flightId/edit": {
       id: "/flights/$flightId/edit";
       path: "/edit";
       fullPath: "/flights/$flightId/edit";
-      preLoaderRoute: typeof FlightsFlightIdEditImport;
-      parentRoute: typeof FlightsFlightIdImport;
+      preLoaderRoute: typeof FlightsFlightIdEditRouteImport;
+      parentRoute: typeof FlightsFlightIdRouteImport;
     };
     "/flights/$flightId/overlay": {
       id: "/flights/$flightId/overlay";
       path: "/overlay";
       fullPath: "/flights/$flightId/overlay";
-      preLoaderRoute: typeof FlightsFlightIdOverlayImport;
-      parentRoute: typeof FlightsFlightIdImport;
+      preLoaderRoute: typeof FlightsFlightIdOverlayRouteImport;
+      parentRoute: typeof FlightsFlightIdRouteImport;
     };
     "/locations/$countrySlug/regions": {
       id: "/locations/$countrySlug/regions";
       path: "/regions";
       fullPath: "/locations/$countrySlug/regions";
-      preLoaderRoute: typeof LocationsCountrySlugRegionsImport;
-      parentRoute: typeof LocationsCountrySlugImport;
+      preLoaderRoute: typeof LocationsCountrySlugRegionsRouteImport;
+      parentRoute: typeof LocationsCountrySlugRouteImport;
     };
     "/tastings/$tastingId/edit": {
       id: "/tastings/$tastingId/edit";
       path: "/edit";
       fullPath: "/tastings/$tastingId/edit";
-      preLoaderRoute: typeof TastingsTastingIdEditImport;
-      parentRoute: typeof TastingsTastingIdImport;
+      preLoaderRoute: typeof TastingsTastingIdEditRouteImport;
+      parentRoute: typeof TastingsTastingIdRouteImport;
     };
     "/users/$username/favorites": {
       id: "/users/$username/favorites";
       path: "/favorites";
       fullPath: "/users/$username/favorites";
-      preLoaderRoute: typeof UsersUsernameFavoritesImport;
-      parentRoute: typeof UsersUsernameImport;
+      preLoaderRoute: typeof UsersUsernameFavoritesRouteImport;
+      parentRoute: typeof UsersUsernameRouteImport;
     };
     "/bottles/$bottleId/": {
       id: "/bottles/$bottleId/";
       path: "/";
       fullPath: "/bottles/$bottleId/";
-      preLoaderRoute: typeof BottlesBottleIdIndexImport;
-      parentRoute: typeof BottlesBottleIdImport;
+      preLoaderRoute: typeof BottlesBottleIdIndexRouteImport;
+      parentRoute: typeof BottlesBottleIdRouteImport;
     };
     "/entities/$entityId/": {
       id: "/entities/$entityId/";
       path: "/";
       fullPath: "/entities/$entityId/";
-      preLoaderRoute: typeof EntitiesEntityIdIndexImport;
-      parentRoute: typeof EntitiesEntityIdImport;
+      preLoaderRoute: typeof EntitiesEntityIdIndexRouteImport;
+      parentRoute: typeof EntitiesEntityIdRouteImport;
     };
     "/locations/$countrySlug/": {
       id: "/locations/$countrySlug/";
       path: "/";
       fullPath: "/locations/$countrySlug/";
-      preLoaderRoute: typeof LocationsCountrySlugIndexImport;
-      parentRoute: typeof LocationsCountrySlugImport;
+      preLoaderRoute: typeof LocationsCountrySlugIndexRouteImport;
+      parentRoute: typeof LocationsCountrySlugRouteImport;
     };
     "/users/$username/": {
       id: "/users/$username/";
       path: "/";
       fullPath: "/users/$username/";
-      preLoaderRoute: typeof UsersUsernameIndexImport;
-      parentRoute: typeof UsersUsernameImport;
+      preLoaderRoute: typeof UsersUsernameIndexRouteImport;
+      parentRoute: typeof UsersUsernameRouteImport;
     };
     "/admin/badges/$badgeId/edit": {
       id: "/admin/badges/$badgeId/edit";
       path: "/edit";
       fullPath: "/admin/badges/$badgeId/edit";
-      preLoaderRoute: typeof AdminBadgesBadgeIdEditImport;
-      parentRoute: typeof AdminBadgesBadgeIdImport;
+      preLoaderRoute: typeof AdminBadgesBadgeIdEditRouteImport;
+      parentRoute: typeof AdminBadgesBadgeIdRouteImport;
     };
     "/admin/events/$eventId/edit": {
       id: "/admin/events/$eventId/edit";
       path: "/edit";
       fullPath: "/admin/events/$eventId/edit";
-      preLoaderRoute: typeof AdminEventsEventIdEditImport;
-      parentRoute: typeof AdminEventsEventIdImport;
+      preLoaderRoute: typeof AdminEventsEventIdEditRouteImport;
+      parentRoute: typeof AdminEventsEventIdRouteImport;
     };
     "/admin/locations/$countrySlug/edit": {
       id: "/admin/locations/$countrySlug/edit";
       path: "/edit";
       fullPath: "/admin/locations/$countrySlug/edit";
-      preLoaderRoute: typeof AdminLocationsCountrySlugEditImport;
-      parentRoute: typeof AdminLocationsCountrySlugImport;
+      preLoaderRoute: typeof AdminLocationsCountrySlugEditRouteImport;
+      parentRoute: typeof AdminLocationsCountrySlugRouteImport;
     };
     "/admin/sites/$siteId/edit": {
       id: "/admin/sites/$siteId/edit";
       path: "/edit";
       fullPath: "/admin/sites/$siteId/edit";
-      preLoaderRoute: typeof AdminSitesSiteIdEditImport;
-      parentRoute: typeof AdminSitesSiteIdImport;
+      preLoaderRoute: typeof AdminSitesSiteIdEditRouteImport;
+      parentRoute: typeof AdminSitesSiteIdRouteImport;
     };
     "/admin/sites/$siteId/reviews": {
       id: "/admin/sites/$siteId/reviews";
       path: "/reviews";
       fullPath: "/admin/sites/$siteId/reviews";
-      preLoaderRoute: typeof AdminSitesSiteIdReviewsImport;
-      parentRoute: typeof AdminSitesSiteIdImport;
+      preLoaderRoute: typeof AdminSitesSiteIdReviewsRouteImport;
+      parentRoute: typeof AdminSitesSiteIdRouteImport;
     };
     "/admin/tags/$tagId/edit": {
       id: "/admin/tags/$tagId/edit";
       path: "/edit";
       fullPath: "/admin/tags/$tagId/edit";
-      preLoaderRoute: typeof AdminTagsTagIdEditImport;
-      parentRoute: typeof AdminTagsTagIdImport;
+      preLoaderRoute: typeof AdminTagsTagIdEditRouteImport;
+      parentRoute: typeof AdminTagsTagIdRouteImport;
     };
     "/locations/$countrySlug/regions/$regionSlug": {
       id: "/locations/$countrySlug/regions/$regionSlug";
       path: "/$regionSlug";
       fullPath: "/locations/$countrySlug/regions/$regionSlug";
-      preLoaderRoute: typeof LocationsCountrySlugRegionsRegionSlugImport;
-      parentRoute: typeof LocationsCountrySlugRegionsImport;
+      preLoaderRoute: typeof LocationsCountrySlugRegionsRegionSlugRouteImport;
+      parentRoute: typeof LocationsCountrySlugRegionsRouteImport;
     };
     "/admin/locations/$countrySlug/": {
       id: "/admin/locations/$countrySlug/";
       path: "/";
       fullPath: "/admin/locations/$countrySlug/";
-      preLoaderRoute: typeof AdminLocationsCountrySlugIndexImport;
-      parentRoute: typeof AdminLocationsCountrySlugImport;
+      preLoaderRoute: typeof AdminLocationsCountrySlugIndexRouteImport;
+      parentRoute: typeof AdminLocationsCountrySlugRouteImport;
     };
     "/admin/sites/$siteId/": {
       id: "/admin/sites/$siteId/";
       path: "/";
       fullPath: "/admin/sites/$siteId/";
-      preLoaderRoute: typeof AdminSitesSiteIdIndexImport;
-      parentRoute: typeof AdminSitesSiteIdImport;
+      preLoaderRoute: typeof AdminSitesSiteIdIndexRouteImport;
+      parentRoute: typeof AdminSitesSiteIdRouteImport;
     };
     "/admin/locations/$countrySlug/regions/$regionSlug": {
       id: "/admin/locations/$countrySlug/regions/$regionSlug";
       path: "/regions/$regionSlug";
       fullPath: "/admin/locations/$countrySlug/regions/$regionSlug";
-      preLoaderRoute: typeof AdminLocationsCountrySlugRegionsRegionSlugImport;
-      parentRoute: typeof AdminLocationsCountrySlugImport;
+      preLoaderRoute: typeof AdminLocationsCountrySlugRegionsRegionSlugRouteImport;
+      parentRoute: typeof AdminLocationsCountrySlugRouteImport;
     };
     "/admin/locations/$countrySlug/regions/add": {
       id: "/admin/locations/$countrySlug/regions/add";
       path: "/regions/add";
       fullPath: "/admin/locations/$countrySlug/regions/add";
-      preLoaderRoute: typeof AdminLocationsCountrySlugRegionsAddImport;
-      parentRoute: typeof AdminLocationsCountrySlugImport;
+      preLoaderRoute: typeof AdminLocationsCountrySlugRegionsAddRouteImport;
+      parentRoute: typeof AdminLocationsCountrySlugRouteImport;
     };
     "/bottles/$bottleId/releases/$releaseId/edit": {
       id: "/bottles/$bottleId/releases/$releaseId/edit";
       path: "/$releaseId/edit";
       fullPath: "/bottles/$bottleId/releases/$releaseId/edit";
-      preLoaderRoute: typeof BottlesBottleIdReleasesReleaseIdEditImport;
-      parentRoute: typeof BottlesBottleIdReleasesImport;
+      preLoaderRoute: typeof BottlesBottleIdReleasesReleaseIdEditRouteImport;
+      parentRoute: typeof BottlesBottleIdReleasesRouteImport;
     };
     "/admin/locations/$countrySlug/regions/$regionSlug/edit": {
       id: "/admin/locations/$countrySlug/regions/$regionSlug/edit";
       path: "/edit";
       fullPath: "/admin/locations/$countrySlug/regions/$regionSlug/edit";
-      preLoaderRoute: typeof AdminLocationsCountrySlugRegionsRegionSlugEditImport;
-      parentRoute: typeof AdminLocationsCountrySlugRegionsRegionSlugImport;
+      preLoaderRoute: typeof AdminLocationsCountrySlugRegionsRegionSlugEditRouteImport;
+      parentRoute: typeof AdminLocationsCountrySlugRegionsRegionSlugRouteImport;
     };
   }
 }

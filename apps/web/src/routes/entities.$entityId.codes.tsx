@@ -5,8 +5,8 @@ import {
 import Heading from "@peated/web/components/heading";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Link, notFound } from "@tanstack/react-router";
 import { createFileRoute } from "@tanstack/react-router";
+import { Link, notFound } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/entities/$entityId/codes")({
   component: Page,

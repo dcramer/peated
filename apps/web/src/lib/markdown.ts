@@ -1,4 +1,5 @@
-import { sanitize } from "isomorphic-dompurify";
+import DOMPurify from "isomorphic-dompurify";
+const { sanitize } = DOMPurify;
 import { marked } from "marked";
 
 export const summarize = (content: string, maxLength = 256): string => {

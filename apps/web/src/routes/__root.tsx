@@ -7,7 +7,12 @@ import type { RouterClient } from "@orpc/server";
 import type { Router } from "@peated/server/orpc/router";
 import * as Sentry from "@sentry/react";
 import type { QueryClient } from "@tanstack/react-query";
-import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
+import {
+  HeadContent,
+  Outlet,
+  Scripts,
+  createRootRouteWithContext,
+} from "@tanstack/react-router";
 import React from "react";
 import Providers from "../components/providers";
 import type { ClientContext } from "../lib/orpc/client";
@@ -17,6 +22,16 @@ export const Route = createRootRouteWithContext<{
   orpc: RouterUtils<RouterClient<Router, ClientContext>>;
   orpcClient: RouterClient<Router, ClientContext>;
 }>()({
+  head: () => ({
+    meta: [
+      { charSet: "utf-8" },
+      {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
+      },
+      { title: "Peated" },
+    ],
+  }),
   loader: async () => {
     // For now, return empty session data
     // TODO: Implement proper session loading from localStorage/API
@@ -33,23 +48,24 @@ export const Route = createRootRouteWithContext<{
 
 function RootComponent() {
   const { session } = Route.useLoaderData();
+  const { queryClient } = Route.useRouteContext();
 
   // Set Sentry user context
   React.useEffect(() => {
-    Sentry.setUser(
-      session.user
-        ? {
-            id: `${session.user.id}`,
-            username: session.user.username,
-            email: session.user.email,
-          }
-        : null
-    );
+    if (session.user) {
+      Sentry.setUser({
+        id: `${session.user.id}`,
+        username: session.user.username,
+        email: session.user.email,
+      });
+    } else {
+      Sentry.setUser(null);
+    }
   }, [session.user]);
 
   return (
-    <div className="h-full">
-      <Providers session={session}>
+    <RootDocument>
+      <Providers session={session} queryClient={queryClient}>
         <Outlet />
 
         {config.FATHOM_SITE_ID && (
@@ -59,6 +75,20 @@ function RootComponent() {
           />
         )}
       </Providers>
-    </div>
+    </RootDocument>
+  );
+}
+
+function RootDocument({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        <HeadContent />
+      </head>
+      <body className="h-full">
+        {children}
+        <Scripts />
+      </body>
+    </html>
   );
 }

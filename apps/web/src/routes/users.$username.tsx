@@ -8,7 +8,8 @@ import UserLocationChart from "@peated/web/components/userLocationChart";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { Link, Outlet } from "@tanstack/react-router";
 import { DefaultLayout } from "../layouts";
 
 export const Route = createFileRoute("/users/$username")({

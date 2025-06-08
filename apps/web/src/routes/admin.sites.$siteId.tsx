@@ -6,8 +6,9 @@ import TimeSince from "@peated/web/components/timeSince";
 import { formatDuration } from "@peated/web/lib/format";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import { Outlet, createFileRoute } from "@tanstack/react-router";
+import { Outlet } from "@tanstack/react-router";
 import { useState } from "react";
 
 export const Route = createFileRoute("/admin/sites/$siteId")({
