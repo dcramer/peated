@@ -1,5 +1,3 @@
-"use client";
-
 import type { PolymorphicProps } from "@peated/web/types";
 import { useLocation } from "@tanstack/react-router";
 import type { ElementType } from "react";

@@ -5,9 +5,10 @@ import CollectionAction from "@peated/web/components/collectionAction";
 import FlavorProfile from "@peated/web/components/flavorProfile";
 import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
+import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Outlet, createFileRoute } from "@tanstack/react-router";
+import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
 import { DefaultLayout } from "../layouts";
 
@@ -53,6 +54,51 @@ function BottleLayoutPage() {
           </div>
         </div>
       </div>
+
+      <Tabs border>
+        <TabItem
+          as={Link}
+          to="/bottles/$bottleId"
+          params={{ bottleId: bottle.id }}
+          controlled
+        >
+          Overview
+        </TabItem>
+        <TabItem
+          as={Link}
+          to="/bottles/$bottleId/tastings"
+          params={{ bottleId: bottle.id }}
+          controlled
+        >
+          Tastings ({bottle.totalTastings.toLocaleString()})
+        </TabItem>
+        <TabItem
+          as={Link}
+          to="/bottles/$bottleId/releases"
+          params={{ bottleId: bottle.id }}
+          controlled
+        >
+          Releases ({bottle.numReleases.toLocaleString()})
+        </TabItem>
+        <TabItem
+          as={Link}
+          to="/bottles/$bottleId/prices"
+          params={{ bottleId: bottle.id }}
+          controlled
+          desktopOnly
+        >
+          Prices
+        </TabItem>
+        <TabItem
+          as={Link}
+          to="/bottles/$bottleId/similar"
+          params={{ bottleId: bottle.id }}
+          controlled
+          desktopOnly
+        >
+          Similar
+        </TabItem>
+      </Tabs>
 
       <Outlet />
     </DefaultLayout>

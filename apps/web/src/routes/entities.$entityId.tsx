@@ -1,9 +1,10 @@
 import Button from "@peated/web/components/button";
 import EntityHeader from "@peated/web/components/entityHeader";
 import ShareButton from "@peated/web/components/shareButton";
+import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Outlet, createFileRoute } from "@tanstack/react-router";
+import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { DefaultLayout } from "../layouts";
 
 export const Route = createFileRoute("/entities/$entityId")({
@@ -49,6 +50,44 @@ function EntityLayoutPage() {
           </div>
         </div>
       </div>
+
+      <Tabs border>
+        <TabItem
+          as={Link}
+          to="/entities/$entityId"
+          params={{ entityId: entity.id }}
+          controlled
+        >
+          Overview
+        </TabItem>
+        <TabItem
+          as={Link}
+          to="/entities/$entityId/bottles"
+          params={{ entityId: entity.id }}
+          controlled
+        >
+          Bottles ({entity.totalBottles.toLocaleString()})
+        </TabItem>
+        <TabItem
+          as={Link}
+          to="/entities/$entityId/tastings"
+          params={{ entityId: entity.id }}
+          controlled
+        >
+          Tastings ({entity.totalTastings.toLocaleString()})
+        </TabItem>
+        {entity.shortName === "SMWS" && (
+          <TabItem
+            as={Link}
+            to="/entities/$entityId/codes"
+            params={{ entityId: entity.id }}
+            controlled
+            desktopOnly
+          >
+            Distillery Codes
+          </TabItem>
+        )}
+      </Tabs>
 
       <Outlet />
     </DefaultLayout>
