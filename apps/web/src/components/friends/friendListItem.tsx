@@ -48,52 +48,54 @@ export default function FriendListItem({ friend }: { friend: Friend }) {
   const { user } = friend;
 
   return (
-    <ListItem as="li">
-      <div
-        className={classNames(
-          "flex flex-auto items-center space-x-4",
-          isPending ? "opacity-50" : ""
-        )}
-      >
-        <UserAvatar size={48} user={user} />
-        <div className="flex-auto space-y-1 font-medium">
-          <Link
-            to="/users/$username"
-            params={{ username: user.username }}
-            className="hover:underline"
-          >
-            {user.username}
-          </Link>
+    <ListItem asChild>
+      <li>
+        <div
+          className={classNames(
+            "flex flex-auto items-center space-x-4",
+            isPending ? "opacity-50" : ""
+          )}
+        >
+          <UserAvatar size={48} user={user} />
+          <div className="flex-auto space-y-1 font-medium">
+            <Link
+              to="/users/$username"
+              params={{ username: user.username }}
+              className="hover:underline"
+            >
+              {user.username}
+            </Link>
+          </div>
+          <div className="flex items-center gap-x-4">
+            <Menu as="div" className="menu">
+              <MenuButton as={Button}>
+                <EllipsisVerticalIcon className="h-5 w-5" />
+              </MenuButton>
+              <MenuItems className="absolute right-0 z-40 mt-2 w-48 origin-top-right">
+                <MenuItem
+                  as="button"
+                  color="primary"
+                  disabled={isPending}
+                  onClick={() => {
+                    if (isPending) return;
+                    if (friendStatus === "friends") {
+                      friendDeleteMutation.mutate({
+                        user: user.id,
+                      });
+                    } else {
+                      friendCreateMutation.mutate({
+                        user: user.id,
+                      });
+                    }
+                  }}
+                >
+                  {actionLabel(friendStatus)}
+                </MenuItem>
+              </MenuItems>
+            </Menu>
+          </div>
         </div>
-        <div className="flex items-center gap-x-4">
-          <Menu as="div" className="menu">
-            <MenuButton as={Button}>
-              <EllipsisVerticalIcon className="h-5 w-5" />
-            </MenuButton>
-            <MenuItems className="absolute right-0 z-40 mt-2 w-48 origin-top-right">
-              <MenuItem
-                as="button"
-                color="primary"
-                disabled={isPending}
-                onClick={() => {
-                  if (isPending) return;
-                  if (friendStatus === "friends") {
-                    friendDeleteMutation.mutate({
-                      user: user.id,
-                    });
-                  } else {
-                    friendCreateMutation.mutate({
-                      user: user.id,
-                    });
-                  }
-                }}
-              >
-                {actionLabel(friendStatus)}
-              </MenuItem>
-            </MenuItems>
-          </Menu>
-        </div>
-      </div>
+      </li>
     </ListItem>
   );
 }

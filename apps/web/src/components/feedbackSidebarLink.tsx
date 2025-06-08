@@ -28,13 +28,14 @@ export default function FeedbackSidebarLink() {
   );
 
   return (
-    <SidebarLink
-      as="a"
-      ref={linkRef}
-      href={loaded ? undefined : "https://github.com/dcramer/peated/issues"}
-      icon={BugAntIcon}
-    >
-      Report Issue
+    <SidebarLink asChild>
+      <a
+        ref={linkRef}
+        href={loaded ? undefined : "https://github.com/dcramer/peated/issues"}
+      >
+        <BugAntIcon className="h-6 w-6 shrink-0" aria-hidden="true" />
+        Report Issue
+      </a>
     </SidebarLink>
   );
 }

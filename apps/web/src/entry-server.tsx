@@ -1,5 +1,5 @@
 import { createORPCReactQueryUtils } from "@orpc/react-query";
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, dehydrate } from "@tanstack/react-query";
 import {
   RouterProvider,
   createMemoryHistory,
@@ -8,19 +8,13 @@ import {
 import { renderToString } from "react-dom/server";
 import { ErrorPage404 } from "./components/errorPage";
 import { getServerClient } from "./lib/orpc/client.server";
+import { getQueryClient } from "./lib/queryClient";
 import { routeTree } from "./routeTree.gen";
 
 export async function render(url: string, context: any = {}) {
   const orpcClient = getServerClient(context);
   const orpc = createORPCReactQueryUtils(orpcClient);
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-        staleTime: Number.POSITIVE_INFINITY,
-      },
-    },
-  });
+  const queryClient = getQueryClient();
 
   // Create memory history for server-side routing
   const memoryHistory = createMemoryHistory({
@@ -35,8 +29,13 @@ export async function render(url: string, context: any = {}) {
       orpc,
       orpcClient,
     },
-    defaultPendingMinMs: 0,
+    defaultPendingMinMs: 16,
     defaultNotFoundComponent: () => <ErrorPage404 />,
+    dehydrate: () => {
+      return {
+        dehydratedState: dehydrate(queryClient),
+      };
+    },
   });
 
   // Load the route and execute loaders
@@ -45,12 +44,8 @@ export async function render(url: string, context: any = {}) {
   // Render the app
   const html = renderToString(<RouterProvider router={router} />);
 
-  // Serialize the query client state for hydration
-  const dehydratedState = queryClient.getQueryCache().getAll();
-
   return {
     html,
-    state: dehydratedState,
     statusCode: router.hasNotFoundMatch?.() ? 404 : 200,
   };
 }

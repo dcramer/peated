@@ -33,18 +33,24 @@ export default forwardRef<HTMLAnchorElement, Props>(function SidebarLink(
         ref={ref}
         {...props}
       >
-        {Icon && (
-          <Icon
-            className={classNames(
-              active
-                ? "text-highlight"
-                : "text-muted group-hover:text-slate-400",
-              "h-6 w-6 shrink-0"
+        {asChild ? (
+          children
+        ) : (
+          <>
+            {Icon && (
+              <Icon
+                className={classNames(
+                  active
+                    ? "text-highlight"
+                    : "text-muted group-hover:text-slate-400",
+                  "h-6 w-6 shrink-0"
+                )}
+                aria-hidden="true"
+              />
             )}
-            aria-hidden="true"
-          />
+            {children}
+          </>
         )}
-        {children}
       </Component>
     </li>
   );

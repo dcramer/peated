@@ -26,7 +26,9 @@ export default function BottleReviews({ bottleId }: { bottleId: number }) {
 
   return (
     <>
-      <Heading as="h3">The Critics</Heading>
+      <Heading asChild>
+        <h3>The Critics</h3>
+      </Heading>
       <ul className="-mx-2 -mt-2 mb-4 grid grid-cols-2 sm:w-2/3 md:w-1/2">
         {results.map((r) => {
           if (!r.site) return null;

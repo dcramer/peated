@@ -125,94 +125,99 @@ export default function SelectDialog<T extends Option>({
                   return (
                     <ListItem
                       key={`${option.id}-${option.name}`}
-                      as={motion.li}
+                      asChild
                       className={listItemClasses}
                     >
-                      <CheckIcon
-                        className={classNames(
-                          "-ml-2 h-10 w-10 flex-none rounded p-2",
-                          selectedValues.find(
-                            (i) => i.id === option.id && i.name === option.name
-                          )
-                            ? "bg-highlight text-black"
-                            : "bg-slate-900 text-muted group-hover:bg-slate-700"
-                        )}
-                      />
+                      <motion.li>
+                        <CheckIcon
+                          className={classNames(
+                            "-ml-2 h-10 w-10 flex-none rounded p-2",
+                            selectedValues.find(
+                              (i) =>
+                                i.id === option.id && i.name === option.name
+                            )
+                              ? "bg-highlight text-black"
+                              : "bg-slate-900 text-muted group-hover:bg-slate-700"
+                          )}
+                        />
 
-                      <div className="flex min-w-0 flex-auto items-center">
-                        <div className="font-semibold text-white">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              selectOption(option);
-                            }}
-                          >
-                            <span className="-top-px absolute inset-x-0 bottom-0" />
-                            {onRenderOption
-                              ? onRenderOption(option)
-                              : option.name}
-                          </button>
+                        <div className="flex min-w-0 flex-auto items-center">
+                          <div className="font-semibold text-white">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                selectOption(option);
+                              }}
+                            >
+                              <span className="-top-px absolute inset-x-0 bottom-0" />
+                              {onRenderOption
+                                ? onRenderOption(option)
+                                : option.name}
+                            </button>
+                          </div>
                         </div>
-                      </div>
+                      </motion.li>
                     </ListItem>
                   );
                 })}
                 {(results.length < 10 || query !== "") && !isLoading && (
-                  <ListItem as={motion.li} className={listItemClasses}>
-                    {emptyListItem ? (
-                      emptyListItem(query)
-                    ) : canCreate && createForm ? (
-                      <>
-                        <PlusIcon className="-ml-2 h-10 w-10 flex-none rounded bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
+                  <ListItem asChild className={listItemClasses}>
+                    <motion.li>
+                      {emptyListItem ? (
+                        emptyListItem(query)
+                      ) : canCreate && createForm ? (
+                        <>
+                          <PlusIcon className="-ml-2 h-10 w-10 flex-none rounded bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
 
-                        <div className="min-w-0 flex-auto">
-                          <div className="font-semibold">
-                            <button
-                              type="button"
-                              onClick={() => setCreateOpen(true)}
-                            >
-                              <span className="-top-px absolute inset-x-0 bottom-0" />
-                              Can't find what you're looking for?
-                            </button>
+                          <div className="min-w-0 flex-auto">
+                            <div className="font-semibold">
+                              <button
+                                type="button"
+                                onClick={() => setCreateOpen(true)}
+                              >
+                                <span className="-top-px absolute inset-x-0 bottom-0" />
+                                Can't find what you're looking for?
+                              </button>
+                            </div>
+                            <div className="mt-1 flex gap-x-1 text-sm">
+                              {query !== "" ? (
+                                <span>
+                                  Tap here to add{" "}
+                                  <strong className="truncate font-bold">
+                                    {toTitleCase(query)}
+                                  </strong>{" "}
+                                  to the database.
+                                </span>
+                              ) : (
+                                <span>
+                                  Tap here to add a new entry to the database.
+                                </span>
+                              )}
+                            </div>
                           </div>
-                          <div className="mt-1 flex gap-x-1 text-sm">
-                            {query !== "" ? (
-                              <span>
-                                Tap here to add{" "}
-                                <strong className="truncate font-bold">
-                                  {toTitleCase(query)}
-                                </strong>{" "}
-                                to the database.
-                              </span>
-                            ) : (
-                              <span>
-                                Tap here to add a new entry to the database.
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <PlusIcon className="-ml-2 h-10 w-10 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
+                        </>
+                      ) : (
+                        <>
+                          <PlusIcon className="-ml-2 h-10 w-10 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
 
-                        <div className="min-w-0 flex-auto">
-                          <div className="font-semibold">
-                            <a
-                              href={config.GITHUB_REPO}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              <span className="-top-px absolute inset-x-0 bottom-0" />
-                              Can't find what you're looking for?
-                            </a>
+                          <div className="min-w-0 flex-auto">
+                            <div className="font-semibold">
+                              <a
+                                href={config.GITHUB_REPO}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                <span className="-top-px absolute inset-x-0 bottom-0" />
+                                Can't find what you're looking for?
+                              </a>
+                            </div>
+                            <div className="mt-1 flex gap-x-1 text-sm">
+                              Well, that stinks. Maybe open an issue on GitHub?
+                            </div>
                           </div>
-                          <div className="mt-1 flex gap-x-1 text-sm">
-                            Well, that stinks. Maybe open an issue on GitHub?
-                          </div>
-                        </div>
-                      </>
-                    )}
+                        </>
+                      )}
+                    </motion.li>
                   </ListItem>
                 )}
               </>

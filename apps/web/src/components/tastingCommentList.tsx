@@ -40,8 +40,7 @@ export default function TastingCommentList({
         const isAuthor = user?.id === c.createdBy.id;
         return (
           <CommentEntry
-            as={motion.li}
-            layout
+            asChild
             key={c.id}
             className="relative flex items-start space-x-2 text-white"
             createdAt={c.createdAt}
@@ -52,7 +51,9 @@ export default function TastingCommentList({
               commentDeleteMutation.mutate({ comment: c.id });
               setDeleted((a) => [...a, c.id]);
             }}
-          />
+          >
+            <motion.li layout />
+          </CommentEntry>
         );
       })}
     </AnimatePresence>

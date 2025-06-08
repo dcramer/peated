@@ -94,8 +94,10 @@ function Page() {
 
         return (
           <div className="mt-4 mb-8" key={catCode}>
-            <Heading as="h3">
-              {catTitle} {catCode && <>({catCode})</>}
+            <Heading asChild>
+              <h3>
+                {catTitle} {catCode && <>({catCode})</>}
+              </h3>
             </Heading>
             <table className="min-w-full table-auto">
               <colgroup>

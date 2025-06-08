@@ -28,7 +28,9 @@ export default function BottleOverview({
             </Suspense>
             {bottle.description && (
               <>
-                <Heading as="h3">Summary</Heading>
+                <Heading asChild>
+                  <h3>Summary</h3>
+                </Heading>
                 <div className="prose prose-invert -mt-1 max-w-none flex-auto">
                   <Markdown content={bottle.description} />
                 </div>
@@ -39,7 +41,9 @@ export default function BottleOverview({
             </div>
             {bottle.tastingNotes && (
               <>
-                <Heading as="h3">Tasting Notes</Heading>
+                <Heading asChild>
+                  <h3>Tasting Notes</h3>
+                </Heading>
                 <DefinitionList>
                   <DefinitionList.Term>Nose</DefinitionList.Term>
                   <DefinitionList.Details>
@@ -56,7 +60,9 @@ export default function BottleOverview({
                 </DefinitionList>
               </>
             )}
-            <Heading as="h3">Additional Details</Heading>
+            <Heading asChild>
+              <h3>Additional Details</h3>
+            </Heading>
             <DefinitionList>
               <DefinitionList.Term>Brand</DefinitionList.Term>
               <DefinitionList.Details>

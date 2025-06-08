@@ -193,7 +193,7 @@ export default function SelectField<T extends Option>({
       <div className="mt-1 flex flex-wrap gap-2 overflow-x-auto sm:leading-6">
         {visibleValues.map((option) => (
           <Chip
-            as="button"
+            asChild
             key={`${option.id}-${option.name}`}
             active={value.includes(option)}
             onClick={
@@ -206,7 +206,9 @@ export default function SelectField<T extends Option>({
                   }
             }
           >
-            {onRenderChip ? onRenderChip(option) : option.name}
+            <button type="button">
+              {onRenderChip ? onRenderChip(option) : option.name}
+            </button>
           </Chip>
         ))}
         {visibleValues.length === 0 && placeholder && (
@@ -217,7 +219,7 @@ export default function SelectField<T extends Option>({
           (!options.length || visibleValues.length !== options.length) &&
           multiple && (
             <Chip
-              as="button"
+              asChild
               onClick={
                 readOnly || disabled
                   ? undefined
@@ -228,7 +230,9 @@ export default function SelectField<T extends Option>({
                     }
               }
             >
-              <PlusIcon className="h-6 w-6 text-peated" />
+              <button type="button">
+                <PlusIcon className="h-6 w-6 text-peated" />
+              </button>
             </Chip>
           )}
       </div>

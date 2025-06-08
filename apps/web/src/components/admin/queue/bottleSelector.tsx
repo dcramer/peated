@@ -111,67 +111,71 @@ export default function BottleSelector({
           <ul className="divide-y divide-slate-800">
             {results.map((bottle) => {
               return (
-                <ListItem
-                  key={bottle.id}
-                  as={motion.li}
-                  className={listItemClasses}
-                >
-                  <div className="-ml-2 h-10 w-10 flex-none p-2 group-hover:text-white">
-                    <BottleIcon />
-                  </div>
+                <ListItem key={bottle.id} asChild className={listItemClasses}>
+                  <motion.li>
+                    <div className="-ml-2 h-10 w-10 flex-none p-2 group-hover:text-white">
+                      <BottleIcon />
+                    </div>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      selectOption(bottle);
-                    }}
-                    className="flex min-w-0 flex-auto flex-col justify-center text-left font-semibold text-white"
-                  >
-                    <div className="flex items-center gap-x-1 font-bold">
-                      {bottle.fullName}
-                    </div>
-                    <div className="flex space-x-2 text-muted">
-                      {bottle.distillers.length ? (
-                        <Join divider=", ">
-                          {bottle.distillers.map((distiller) => distiller.name)}
-                        </Join>
-                      ) : null}
-                    </div>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        selectOption(bottle);
+                      }}
+                      className="flex min-w-0 flex-auto flex-col justify-center text-left font-semibold text-white"
+                    >
+                      <div className="flex items-center gap-x-1 font-bold">
+                        {bottle.fullName}
+                      </div>
+                      <div className="flex space-x-2 text-muted">
+                        {bottle.distillers.length ? (
+                          <Join divider=", ">
+                            {bottle.distillers.map(
+                              (distiller) => distiller.name
+                            )}
+                          </Join>
+                        ) : null}
+                      </div>
+                    </button>
+                  </motion.li>
                 </ListItem>
               );
             })}
             {(results.length < 10 || query !== "") && (
-              <ListItem as={motion.li} className={listItemClasses}>
-                <PlusIcon className="-ml-2 h-10 w-10 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
+              <ListItem asChild className={listItemClasses}>
+                <motion.li>
+                  <PlusIcon className="-ml-2 h-10 w-10 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
 
-                <div className="min-w-0 flex-auto">
-                  <div className="font-semibold">
-                    <Link
-                      to="/addBottle"
-                      search={{
-                        name: toTitleCase(query),
-                        ...(returnTo && { returnTo }),
-                      }}
-                    >
-                      <span className="-top-px absolute inset-x-0 bottom-0" />
-                      Can't find what you're looking for?
-                    </Link>
+                  <div className="min-w-0 flex-auto">
+                    <div className="font-semibold">
+                      <Link
+                        to="/addBottle"
+                        search={{
+                          name: toTitleCase(query),
+                          ...(returnTo && { returnTo }),
+                        }}
+                      >
+                        <span className="-top-px absolute inset-x-0 bottom-0" />
+                        Can't find what you're looking for?
+                      </Link>
+                    </div>
+                    <div className="mt-1 flex gap-x-1 text-sm">
+                      {query !== "" ? (
+                        <span>
+                          Tap here to add{" "}
+                          <strong className="truncate font-bold">
+                            {toTitleCase(query)}
+                          </strong>{" "}
+                          to the database.
+                        </span>
+                      ) : (
+                        <span>
+                          Tap here to add a new entry to the database.
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="mt-1 flex gap-x-1 text-sm">
-                    {query !== "" ? (
-                      <span>
-                        Tap here to add{" "}
-                        <strong className="truncate font-bold">
-                          {toTitleCase(query)}
-                        </strong>{" "}
-                        to the database.
-                      </span>
-                    ) : (
-                      <span>Tap here to add a new entry to the database.</span>
-                    )}
-                  </div>
-                </div>
+                </motion.li>
               </ListItem>
             )}
           </ul>

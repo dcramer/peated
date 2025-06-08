@@ -63,7 +63,9 @@ function LocationLayoutPage() {
 
       {country.description && (
         <>
-          <Heading as="h3">Whisky in {country.name}</Heading>
+          <Heading asChild>
+            <h3>Whisky in {country.name}</h3>
+          </Heading>
           <div className="flex">
             <div className="-mt-1 prose prose-invert max-w-none flex-auto">
               <Markdown content={country.description} />

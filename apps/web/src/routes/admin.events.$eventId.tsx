@@ -70,14 +70,18 @@ function Page() {
 
       {event.description && (
         <>
-          <Heading as="h3">Description</Heading>
+          <Heading asChild>
+            <h3>Description</h3>
+          </Heading>
           <div className="prose prose-invert -mt-1 max-w-none flex-auto">
             <Markdown content={event.description} />
           </div>
         </>
       )}
 
-      <Heading as="h3">Additional Information</Heading>
+      <Heading asChild>
+        <h3>Additional Information</h3>
+      </Heading>
 
       <DefinitionList>
         <DefinitionList.Term>Dates</DefinitionList.Term>

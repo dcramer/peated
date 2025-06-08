@@ -78,7 +78,9 @@ function Page() {
         </>
       )} */}
 
-      <Heading as="h3">Basics</Heading>
+      <Heading asChild>
+        <h3>Basics</h3>
+      </Heading>
 
       <DefinitionList>
         <DefinitionList.Term>Max Level</DefinitionList.Term>
@@ -89,7 +91,9 @@ function Page() {
         </DefinitionList.Details>
       </DefinitionList>
 
-      <Heading as="h3">Implementation</Heading>
+      <Heading asChild>
+        <h3>Implementation</h3>
+      </Heading>
 
       <DefinitionList>
         <DefinitionList.Term>Tracker</DefinitionList.Term>

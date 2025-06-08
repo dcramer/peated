@@ -5,13 +5,13 @@ import {
 } from "@tanstack/react-query";
 
 // https://tanstack.com/query/latest/docs/framework/react/guides/advanced-ssr
-const createQueryClient = () => {
+const createQueryClient = ({ isServer }: { isServer: boolean }) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
         refetchOnMount: false,
         networkMode: "offlineFirst",
-        retry: false,
+        retry: !isServer,
         staleTime: 5 * 60 * 1000, // 5 minutes
       },
       dehydrate: {
@@ -34,16 +34,11 @@ const createQueryClient = () => {
 
 let browserQueryClient: QueryClient | undefined = undefined;
 
-// isServerComponent must be true for any server component
-// and false for any client component (even if server rendered)
-export function getQueryClient(isServerComponent = true) {
-  // react.cache only works for server components
-  if (isServerComponent) return createQueryClient();
-
-  if (isServer) return createQueryClient();
+export function getQueryClient() {
+  if (isServer) return createQueryClient({ isServer: true });
 
   if (!browserQueryClient) {
-    browserQueryClient = createQueryClient();
+    browserQueryClient = createQueryClient({ isServer: false });
   }
   return browserQueryClient;
 }
