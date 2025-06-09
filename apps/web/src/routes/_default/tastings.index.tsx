@@ -1,0 +1,77 @@
+import type { Inputs } from "@peated/server/orpc/router";
+import Glyph from "@peated/web/assets/glyph.svg?react";
+import BottleTable from "@peated/web/components/bottleTable";
+import EmbeddedLogin from "@peated/web/components/embeddedLogin";
+import EmptyActivity from "@peated/web/components/emptyActivity";
+import SimpleHeader from "@peated/web/components/simpleHeader";
+import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
+import useAuth from "@peated/web/hooks/useAuth";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { DefaultLayout } from "../../layouts";
+
+export const Route = createFileRoute("/_default/tastings/")({
+  component: Page,
+});
+
+function Page() {
+  const { user } = useAuth();
+
+  return (
+    <DefaultLayout>
+      {user ? (
+        <TastingList />
+      ) : (
+        <>
+          <SimpleHeader>Tastings</SimpleHeader>
+          <EmbeddedLogin />
+        </>
+      )}
+    </DefaultLayout>
+  );
+}
+
+function TastingList() {
+  const queryParams: Inputs["tastings"]["list"] = useApiQueryParams({
+    numericFields: [
+      "cursor",
+      "limit",
+      "age",
+      "entity",
+      "distiller",
+      "bottler",
+      "entity",
+    ],
+    overrides: {
+      user: "me",
+    },
+  });
+
+  const orpc = useORPC();
+  const { data } = useSuspenseQuery(
+    orpc.tastings.list.queryOptions(queryParams)
+  );
+
+  return (
+    <>
+      <SimpleHeader>Tastings</SimpleHeader>
+
+      {data.results.length > 0 ? (
+        <BottleTable
+          bottleList={data.results.map((t) => t.bottle)}
+          rel={data.rel}
+        />
+      ) : (
+        <EmptyActivity to="/search?tasting">
+          <Glyph className="h-16 w-16" />
+
+          <div className="mt-4 font-semibold">What are you drinking?</div>
+          <div className="mt-2 block">
+            Get started by recording your first tasting notes.
+          </div>
+        </EmptyActivity>
+      )}
+    </>
+  );
+}

@@ -1,0 +1,144 @@
+import type { ExternalSiteType } from "@peated/server/types";
+import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
+import Button from "@peated/web/components/button";
+import Tabs, { TabItem } from "@peated/web/components/tabs";
+import TimeSince from "@peated/web/components/timeSince";
+import { formatDuration } from "@peated/web/lib/format";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
+import { Outlet } from "@tanstack/react-router";
+import { useState } from "react";
+
+export const Route = createFileRoute("/_default/admin/sites/$siteId")({
+  component: AdminSiteLayoutPage,
+});
+
+function TriggerJobButton({ siteId }: { siteId: ExternalSiteType }) {
+  const [isLoading, setLoading] = useState(false);
+  const orpc = useORPC();
+  const triggerJobMutation = useMutation(
+    orpc.externalSites.triggerJob.mutationOptions()
+  );
+
+  return (
+    <Button
+      disabled={isLoading}
+      loading={isLoading}
+      onClick={async () => {
+        setLoading(true);
+        await triggerJobMutation.mutateAsync({
+          site: siteId,
+        });
+        setLoading(false);
+      }}
+    >
+      Run Scraper Now
+    </Button>
+  );
+}
+
+function AdminSiteLayoutPage() {
+  const { siteId } = Route.useParams() as { siteId: ExternalSiteType };
+  const orpc = useORPC();
+  const { data: initialSite } = useSuspenseQuery(
+    orpc.externalSites.details.queryOptions({
+      input: {
+        site: siteId,
+      },
+    })
+  );
+
+  const [site, setSite] = useState(initialSite);
+
+  return (
+    <div className="w-full p-3 lg:py-0">
+      <Breadcrumbs
+        pages={[
+          {
+            name: "Admin",
+            to: "/admin",
+          },
+          {
+            name: "External Sites",
+            to: "/admin/sites",
+          },
+          {
+            name: site.name,
+            to: "/admin/sites/$siteId",
+            params: { siteId: site.type },
+            current: true,
+          },
+        ]}
+      />
+
+      <div className="my-8 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap">
+        <div className="flex w-full flex-col justify-center gap-y-4 px-4 sm:w-auto sm:flex-auto sm:gap-y-2">
+          <h3 className="self-center font-semibold text-4xl text-white sm:self-start">
+            {site.name}
+          </h3>
+          <div className="flex flex-col items-center self-center text-muted sm:flex-row sm:self-start lg:mb-8">
+            {site.type}
+          </div>
+          <div className="flex justify-center sm:justify-start">
+            <div className="mr-4 pr-3 text-center">
+              <span className="racking-wide block font-bold text-white text-xl">
+                {site.lastRunAt ? (
+                  <TimeSince date={site.lastRunAt} />
+                ) : (
+                  <>&mdash;</>
+                )}
+              </span>
+              <span className="text-muted text-sm">Last Run</span>
+            </div>
+            <div className="mb-4 px-3 text-center">
+              <span className="block font-bold text-white text-xl tracking-wide">
+                {site.nextRunAt ? (
+                  <TimeSince date={site.nextRunAt} />
+                ) : (
+                  <>&mdash;</>
+                )}
+              </span>
+              <span className="text-muted text-sm">Next Run</span>
+            </div>
+            <div className="mb-4 px-3 text-center">
+              <span className="block font-bold text-white text-xl tracking-wide">
+                {site.runEvery ? (
+                  formatDuration(site.runEvery * 60 * 1000)
+                ) : (
+                  <>&mdash;</>
+                )}
+              </span>
+              <span className="text-muted text-sm">Schedule</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex w-full flex-col items-center justify-center sm:w-auto sm:items-end">
+          <div className="flex gap-x-2">
+            <Button to={`/admin/sites/${site.type}/edit`}>Edit Site</Button>
+            <TriggerJobButton siteId={site.type} />
+          </div>
+        </div>
+      </div>
+
+      <Tabs border>
+        <TabItem asChild controlled>
+          <Link to="/admin/sites/$siteId" params={{ siteId: site.type }}>
+            Prices
+          </Link>
+        </TabItem>
+        <TabItem asChild controlled>
+          <Link
+            to="/admin/sites/$siteId/reviews"
+            params={{ siteId: site.type }}
+          >
+            Reviews
+          </Link>
+        </TabItem>
+      </Tabs>
+
+      <Outlet />
+    </div>
+  );
+}
