@@ -2,7 +2,6 @@ import ActivityFeed from "@peated/web/components/activityFeed";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { DefaultLayout } from "../../layouts";
 
 export const Route = createFileRoute("/_default/")({
   component: Page,
