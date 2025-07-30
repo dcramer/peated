@@ -130,6 +130,14 @@ async function authGoogle(code: string) {
     .from(users)
     .where(eq(sql`LOWER(${users.email})`, payload.email.toLowerCase()));
   if (foundUser) {
+    // TODO: Only associate if account is verified to prevent attackers
+    // from claiming unverified accounts by using any email address
+    if (!foundUser.verified) {
+      throw new ORPCError("UNAUTHORIZED", {
+        message:
+          "Cannot link to unverified account. Please verify your email first.",
+      });
+    }
     // TODO: handle race condition
     await db.insert(identities).values({
       provider: "google",
@@ -244,6 +252,14 @@ async function authGoogleIdToken(idToken: string) {
     .from(users)
     .where(eq(sql`LOWER(${users.email})`, payload.email.toLowerCase()));
   if (foundUser) {
+    // TODO: Only associate if account is verified to prevent attackers
+    // from claiming unverified accounts by using any email address
+    if (!foundUser.verified) {
+      throw new ORPCError("UNAUTHORIZED", {
+        message:
+          "Cannot link to unverified account. Please verify your email first.",
+      });
+    }
     // TODO: handle race condition
     await db.insert(identities).values({
       provider: "google",
