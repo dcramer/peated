@@ -17,16 +17,20 @@ export default procedure
     method: "POST",
     path: "/auth/login",
     summary: "User login",
-    description: "Authenticate user with email/password or Google OAuth code",
+    description:
+      "Authenticate user with email/password, Google OAuth code, or Google ID token",
   })
   .input(
     z.union([
       z.object({
-        email: z.string(),
-        password: z.string(),
+        email: z.string().describe("User email address"),
+        password: z.string().describe("User password"),
       }),
       z.object({
-        code: z.string(),
+        code: z.string().describe("Google OAuth authorization code"),
+      }),
+      z.object({
+        idToken: z.string().describe("Google ID token (for mobile apps)"),
       }),
     ]),
   )
@@ -35,7 +39,9 @@ export default procedure
     const user =
       "code" in input
         ? await authGoogle(input.code)
-        : await authBasic(input.email, input.password);
+        : "idToken" in input
+          ? await authGoogleIdToken(input.idToken)
+          : await authBasic(input.email, input.password);
 
     if (!user.active) {
       throw errors.UNAUTHORIZED({
@@ -124,6 +130,136 @@ async function authGoogle(code: string) {
     .from(users)
     .where(eq(sql`LOWER(${users.email})`, payload.email.toLowerCase()));
   if (foundUser) {
+    // TODO: Only associate if account is verified to prevent attackers
+    // from claiming unverified accounts by using any email address
+    if (!foundUser.verified) {
+      throw new ORPCError("UNAUTHORIZED", {
+        message:
+          "Cannot link to unverified account. Please verify your email first.",
+      });
+    }
+    // TODO: handle race condition
+    await db.insert(identities).values({
+      provider: "google",
+      externalId: payload.sub,
+      userId: foundUser.id,
+    });
+    user = foundUser;
+
+    // create new account
+  } else {
+    const userData = {
+      // displayName: payload.given_name,
+      // TODO: handle conflicts on username
+      username: payload.email.split("@", 1)[0].toLowerCase(),
+      email: payload.email,
+      verified: true, // emails are verified when coming from Google
+    };
+
+    user = await db.transaction(async (tx) => {
+      const user = await createUser(tx, userData);
+
+      await tx.insert(identities).values({
+        provider: "google",
+        externalId: payload.sub,
+        userId: user.id,
+      });
+
+      return user;
+    });
+  }
+
+  return user;
+}
+
+async function authGoogleIdToken(idToken: string) {
+  // Build array of valid client IDs
+  const validClientIds = [
+    config.GOOGLE_CLIENT_ID,
+    config.GOOGLE_IOS_CLIENT_ID,
+  ].filter((id): id is string => Boolean(id));
+
+  if (validClientIds.length === 0) {
+    throw new ORPCError("INTERNAL_SERVER_ERROR", {
+      message: "No Google client IDs configured.",
+    });
+  }
+
+  const client = new OAuth2Client();
+
+  let ticket;
+  try {
+    ticket = await client.verifyIdToken({
+      idToken: idToken,
+      audience: validClientIds, // Can be string or array
+    });
+  } catch (error) {
+    throw new ORPCError("UNAUTHORIZED", {
+      message: "Invalid ID token.",
+    });
+  }
+
+  const payload = ticket?.getPayload();
+  if (!payload || !payload.email) {
+    throw new ORPCError("UNAUTHORIZED", {
+      message: "Unable to validate credentials.",
+    });
+  }
+
+  // Validate issued-at time to prevent old token replay
+  if (!payload.iat) {
+    throw new ORPCError("UNAUTHORIZED", {
+      message: "Token missing issued-at claim.",
+    });
+  }
+
+  const currentTime = Math.floor(Date.now() / 1000);
+
+  // Reject tokens older than 5 minutes (300 seconds) to limit replay window
+  const maxTokenAge = 300;
+  if (currentTime - payload.iat > maxTokenAge) {
+    throw new ORPCError("UNAUTHORIZED", {
+      message: "Token is too old.",
+    });
+  }
+
+  // Reject tokens issued in the future (allow 30 second clock skew)
+  const clockSkewTolerance = 30;
+  if (payload.iat > currentTime + clockSkewTolerance) {
+    throw new ORPCError("UNAUTHORIZED", {
+      message: "Token issued in the future.",
+    });
+  }
+
+  const [result] = await db
+    .select({
+      user: users,
+    })
+    .from(users)
+    .innerJoin(identities, eq(users.id, identities.userId))
+    .where(
+      and(
+        eq(identities.provider, "google"),
+        eq(identities.externalId, payload.sub),
+      ),
+    );
+  let user = result?.user;
+  if (user) return user;
+
+  // try to associate w/ existing user
+  const [foundUser] = await db
+    .select()
+    .from(users)
+    .where(eq(sql`LOWER(${users.email})`, payload.email.toLowerCase()));
+  if (foundUser) {
+    // TODO: Only associate if account is verified to prevent attackers
+    // from claiming unverified accounts by using any email address
+    if (!foundUser.verified) {
+      throw new ORPCError("UNAUTHORIZED", {
+        message:
+          "Cannot link to unverified account. Please verify your email first.",
+      });
+    }
     // TODO: handle race condition
     await db.insert(identities).values({
       provider: "google",
