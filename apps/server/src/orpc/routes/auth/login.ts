@@ -22,16 +22,22 @@ export default procedure
   })
   .input(
     z.union([
-      z.object({
-        email: z.string().describe("User email address"),
-        password: z.string().describe("User password"),
-      }),
-      z.object({
-        code: z.string().describe("Google OAuth authorization code"),
-      }),
-      z.object({
-        idToken: z.string().describe("Google ID token (for mobile apps)"),
-      }),
+      z
+        .object({
+          email: z.string().describe("User email address"),
+          password: z.string().describe("User password"),
+        })
+        .describe("Basic authentication "),
+      z
+        .object({
+          code: z.string().describe("Google OAuth authorization code"),
+        })
+        .describe("Google OAuth (code)"),
+      z
+        .object({
+          idToken: z.string().describe("Google idToken"),
+        })
+        .describe("Google OAuth (idToken)"),
     ]),
   )
   .output(AuthSchema)
