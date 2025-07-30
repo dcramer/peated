@@ -202,7 +202,7 @@ export const Country = async (
       .from(dbSchema.countries)
       .where(
         or(
-          eq(sql`LOWER(${dbSchema.countries.name})`, data.name.toLowerCase()),
+          eq(sql`LOWER(${dbSchema.countries.name})`, data.name!.toLowerCase()),
           eq(sql`LOWER(${dbSchema.countries.slug})`, data.slug),
         ),
       );
@@ -235,7 +235,7 @@ export const Region = async (
     [result] = await db
       .select()
       .from(dbSchema.regions)
-      .where(eq(dbSchema.regions.name, data.name));
+      .where(eq(dbSchema.regions.name, data.name!));
   }
   if (!result) throw new Error("Unable to create Region fixture");
   return result;

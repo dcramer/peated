@@ -166,10 +166,10 @@ async function authGoogle(code: string) {
 
 async function authGoogleIdToken(idToken: string) {
   // Build array of valid client IDs
-  const validClientIds = [config.GOOGLE_CLIENT_ID].filter(Boolean);
-  if (config.GOOGLE_IOS_CLIENT_ID) {
-    validClientIds.push(config.GOOGLE_IOS_CLIENT_ID);
-  }
+  const validClientIds = [
+    config.GOOGLE_CLIENT_ID,
+    config.GOOGLE_IOS_CLIENT_ID,
+  ].filter((id): id is string => Boolean(id));
 
   if (validClientIds.length === 0) {
     throw new ORPCError("INTERNAL_SERVER_ERROR", {
@@ -191,7 +191,7 @@ async function authGoogleIdToken(idToken: string) {
     });
   }
 
-  const payload = ticket.getPayload();
+  const payload = ticket?.getPayload();
   if (!payload || !payload.email) {
     throw new ORPCError("UNAUTHORIZED", {
       message: "Unable to validate credentials.",
