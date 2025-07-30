@@ -27,7 +27,7 @@ export default procedure
           email: z.string().describe("User email address"),
           password: z.string().describe("User password"),
         })
-        .describe("Basic authentication "),
+        .describe("Basic authentication"),
       z
         .object({
           code: z.string().describe("Google OAuth authorization code"),
