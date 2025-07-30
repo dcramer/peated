@@ -33,6 +33,7 @@ export default {
 
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+  GOOGLE_IOS_CLIENT_ID: process.env.GOOGLE_IOS_CLIENT_ID,
 
   UPLOAD_PATH: process.env.UPLOAD_PATH || tmpdir(),
 
