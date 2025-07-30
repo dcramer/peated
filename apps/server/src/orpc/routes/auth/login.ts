@@ -182,7 +182,7 @@ async function authGoogleIdToken(idToken: string) {
   // Build array of valid client IDs
   const validClientIds = [
     config.GOOGLE_CLIENT_ID,
-    config.GOOGLE_IOS_CLIENT_ID,
+    ...config.GOOGLE_CLIENT_IDS,
   ].filter((id): id is string => Boolean(id));
 
   if (validClientIds.length === 0) {
