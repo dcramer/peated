@@ -25,6 +25,9 @@ export default procedure
     method: "GET",
     path: "/flights",
     summary: "List flights",
+    spec: {
+      operationId: "listFlights",
+    },
     description:
       "Retrieve tasting flights with filtering by visibility and search. Respects user permissions for private flights",
   })

@@ -70,6 +70,9 @@ export default procedure
     method: "GET",
     path: "/entities",
     summary: "List entities",
+    spec: {
+      operationId: "listEntities",
+    },
     description:
       "Search and filter entities (brands, distilleries, bottlers) with advanced filtering by location, type, and search context",
   })

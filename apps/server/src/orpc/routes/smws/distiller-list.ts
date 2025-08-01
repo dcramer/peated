@@ -21,6 +21,9 @@ export default procedure
     method: "GET",
     path: "/smws/distillers",
     summary: "List SMWS distillers",
+    spec: {
+      operationId: "listSMWSDistillers",
+    },
     description:
       "Retrieve distillers that are part of the Scotch Malt Whisky Society (SMWS) system",
   })

@@ -19,6 +19,9 @@ export default procedure
     method: "GET",
     path: "/users/{user}/collections/{collection}/bottles",
     summary: "List collection bottles",
+    spec: {
+      operationId: "listCollectionBottles",
+    },
     description:
       "Retrieve bottles in a user's collection with pagination support. Respects privacy settings",
   })

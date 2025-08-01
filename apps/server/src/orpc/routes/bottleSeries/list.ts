@@ -13,6 +13,9 @@ export default procedure
     method: "GET",
     path: "/bottle-series",
     summary: "List bottle series",
+    spec: {
+      operationId: "listBottleSeries",
+    },
     description:
       "Retrieve bottle series for a specific brand with search and pagination support",
   })

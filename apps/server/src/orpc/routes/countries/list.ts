@@ -22,6 +22,9 @@ export default procedure
     method: "GET",
     path: "/countries",
     summary: "List countries",
+    spec: {
+      operationId: "listCountries",
+    },
     description:
       "Retrieve countries with filtering by major whisky regions, bottle counts, and search support",
   })

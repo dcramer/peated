@@ -9,6 +9,9 @@ export default procedure
     method: "POST",
     path: "/email/resend-verification",
     summary: "Resend verification email",
+    spec: {
+      operationId: "resendVerificationEmail",
+    },
     description:
       "Resend email verification to the authenticated user's email address",
   })

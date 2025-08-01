@@ -12,6 +12,9 @@ export default procedure
     method: "GET",
     path: "/badges/{badge}",
     summary: "Get badge details",
+    spec: {
+      operationId: "getBadgeDetails",
+    },
     description:
       "Retrieve detailed information about a specific achievement badge",
   })

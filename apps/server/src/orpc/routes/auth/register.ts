@@ -18,6 +18,9 @@ export default procedure
     method: "POST",
     path: "/auth/register",
     summary: "User registration",
+    spec: {
+      operationId: "registerUser",
+    },
     description:
       "Register a new user account with username, email, and password",
   })

@@ -33,6 +33,9 @@ export default procedure
     method: "POST",
     path: "/bottles",
     summary: "Create bottle",
+    spec: {
+      operationId: "createBottle",
+    },
     description:
       "Create a new bottle entry with brand, distillery, and whisky details",
   })

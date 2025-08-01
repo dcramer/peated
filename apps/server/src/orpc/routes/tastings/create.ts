@@ -36,6 +36,9 @@ export default procedure
     method: "POST",
     path: "/tastings",
     summary: "Create tasting",
+    spec: {
+      operationId: "createTasting",
+    },
     description:
       "Create a new tasting entry for a bottle with notes, rating, and optional metadata like flight and friends",
   })

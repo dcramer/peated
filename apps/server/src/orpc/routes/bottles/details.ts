@@ -29,6 +29,9 @@ export default procedure
     method: "GET",
     path: "/bottles/{bottle}",
     summary: "Get bottle details",
+    spec: {
+      operationId: "getBottleDetails",
+    },
     description:
       "Retrieve detailed information about a specific bottle including creator, pricing, and tasting statistics",
   })

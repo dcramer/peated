@@ -12,6 +12,9 @@ export default procedure
     method: "GET",
     path: "/external-sites/{site}/config/{key}",
     summary: "Get external site config",
+    spec: {
+      operationId: "getExternalSiteConfig",
+    },
     description:
       "Retrieve a configuration value for an external site. Returns default if not set. Requires admin privileges",
   })

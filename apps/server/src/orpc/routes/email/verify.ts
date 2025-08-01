@@ -11,6 +11,9 @@ export default procedure
     method: "POST",
     path: "/email/verify",
     summary: "Verify email",
+    spec: {
+      operationId: "verifyEmail",
+    },
     description:
       "Verify user email address using verification token from email",
   })

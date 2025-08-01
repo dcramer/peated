@@ -9,6 +9,9 @@ export default procedure
     method: "GET",
     path: "/stats",
     summary: "Get platform statistics",
+    spec: {
+      operationId: "getPlatformStatistics",
+    },
     description:
       "Retrieve overall platform statistics including total tastings, bottles, and entities",
   })

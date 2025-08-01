@@ -20,6 +20,9 @@ export default procedure
     method: "GET",
     path: "/bottles/{bottle}/prices",
     summary: "List bottle prices",
+    spec: {
+      operationId: "listBottlePrices",
+    },
     description:
       "Retrieve current and historical prices for a specific bottle from various external sites",
   })

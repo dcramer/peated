@@ -12,6 +12,9 @@ export default procedure
     method: "GET",
     path: "/bottle-releases/{release}",
     summary: "Get bottle release details",
+    spec: {
+      operationId: "getBottleReleaseDetails",
+    },
     description:
       "Retrieve detailed information about a specific bottle release including bottle and creator information",
   })

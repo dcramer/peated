@@ -10,6 +10,9 @@ export default procedure
     method: "GET",
     path: "/users/{user}/flavors",
     summary: "List user flavor profiles",
+    spec: {
+      operationId: "listUserFlavorProfiles",
+    },
     description:
       "Retrieve flavor profiles from bottles tasted by a user with counts and scores. Respects privacy settings",
   })

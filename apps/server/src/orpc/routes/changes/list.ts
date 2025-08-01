@@ -13,6 +13,9 @@ export default procedure
     method: "GET",
     path: "/changes",
     summary: "List changes",
+    spec: {
+      operationId: "listChanges",
+    },
     description:
       "Retrieve change history for bottles and entities with filtering by user and object type",
   })

@@ -12,6 +12,9 @@ export default procedure
     method: "POST",
     path: "/events",
     summary: "Create event",
+    spec: {
+      operationId: "createEvent",
+    },
     description:
       "Create a new whisky event with dates and details. Requires admin privileges",
   })

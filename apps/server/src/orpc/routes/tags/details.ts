@@ -12,6 +12,9 @@ export default procedure
     method: "GET",
     path: "/tags/{tag}",
     summary: "Get tag details",
+    spec: {
+      operationId: "getTagDetails",
+    },
     description:
       "Retrieve detailed information about a specific tag by its name",
   })

@@ -17,6 +17,9 @@ export default procedure
     method: "POST",
     path: "/tastings/{tasting}/image",
     summary: "Update tasting image",
+    spec: {
+      operationId: "updateTastingImage",
+    },
     description:
       "Upload and update the image for a tasting with automatic compression and resizing. Requires authentication and ownership or admin privileges",
   })

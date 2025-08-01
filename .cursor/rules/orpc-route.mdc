@@ -1,6 +1,6 @@
 ---
 description: Instructions when working on OpenAPI routes in Hono.
-globs: 
+globs:
 alwaysApply: false
 ---
 # oRPC Route Implementation Conventions
@@ -92,13 +92,81 @@ Always chain in the following order—LLMs need the cue sequence:
 ```ts
 export default procedure
   .use(requireAuth)
-  .route({ method: "GET", path: "/ping", summary: "Health check" })
+  .route({ method: "GET", path: "/ping", operationId: "healthCheck", summary: "Health check" })
   .input(z.object({}))
   .output(z.object({ ping: z.literal("pong") }))
   .handler(() => ({ ping: "pong" }));
 ```
 
-## 4. HTTP Method Semantics
+## 4. OpenAPI OperationId Convention
+
+**All routes MUST include an `operationId` field** in the `.route()` configuration. This is critical for:
+- **Client SDK Generation**: The `operationId` becomes the method name in generated clients
+- **iOS Client Compatibility**: Prevents encoded periods (`users_period_details`) in function names
+- **API Documentation**: Provides unique anchors and readable method references
+
+### 4.1 Naming Convention: Verb + Noun
+
+Follow the industry-standard **verb + noun** pattern for operationIds:
+
+| Pattern | Example | Generated Method |
+| ------- | ------- | ---------------- |
+| ✅ **Correct** | `getUserDetails` | `getUserDetails()` |
+| ❌ **Incorrect** | `userDetails` | `userDetails()` |
+| ❌ **Incorrect** | `user.details` | `user_period_details()` |
+
+### 4.2 Standard Verbs
+
+| Action | Verb | Example |
+| ------ | ---- | ------- |
+| **List/Search** | `list` | `listBottles`, `listUsers` |
+| **Get Details** | `get` | `getBottleDetails`, `getUserDetails` |
+| **Create** | `create` | `createBottle`, `createTasting` |
+| **Update** | `update` | `updateBottle`, `updateUser` |
+| **Delete** | `delete` | `deleteBottle`, `deleteTasting` |
+| **Special Actions** | Descriptive | `loginUser`, `mergeBottles`, `uploadBottleImage` |
+
+### 4.3 Implementation Examples
+
+```ts
+// ✅ List endpoint
+export default procedure
+  .route({
+    method: "GET",
+    path: "/bottles",
+    operationId: "listBottles",
+    summary: "List bottles",
+  })
+
+// ✅ Details endpoint
+export default procedure
+  .route({
+    method: "GET",
+    path: "/bottles/{bottle}",
+    operationId: "getBottleDetails",
+    summary: "Get bottle details",
+  })
+
+// ✅ Special action endpoint
+export default procedure
+  .route({
+    method: "POST",
+    path: "/bottles/{bottle}/image",
+    operationId: "updateBottleImage",
+    summary: "Update bottle image",
+  })
+```
+
+### 4.4 File Structure vs OperationId
+
+Our file structure and operationIds serve different purposes:
+
+- **File Structure**: `bottle/details.ts` (noun/verb - for code organization)
+- **OperationId**: `getBottleDetails` (verb + noun - for generated client methods)
+
+This gives us logical file organization AND clean generated client code.
+
+## 5. HTTP Method Semantics
 
 | Method | Meaning        | Typical file             |
 | ------ | -------------- | ------------------------ |
@@ -129,14 +197,14 @@ export default procedure
   });
 ```
 
-## 5. Path & Query Parameters
+## 6. Path & Query Parameters
 
-### 5.1 Naming
+### 6.1 Naming
 
 * Use descriptive nouns (`bottle`, `tasting`).
 * Never reuse a path param name for a body/query field.
 
-### 5.2 Coercion & Validation
+### 6.2 Coercion & Validation
 
 * Provide sensible defaults.
 * Every path/query value is a string → wrap with `z.coerce.*`.
@@ -166,7 +234,7 @@ if (Number.isFinite(+input.country)) {
 }
 ```
 
-## 6. Error Handling
+## 7. Error Handling
 
 `procedure` injects an **`errors`** helper exposing canonical REST errors (`NOT_FOUND`, `CONFLICT`, `UNAUTHORIZED`, etc.).  Prefer these over manual `ORPCError` construction—consistency matters for clients.
 
@@ -191,7 +259,7 @@ export default procedure
 
 If you truly need custom behaviour, fall back to `new ORPCError(code, { message })` after wrapping the DB call in `try/catch`.
 
-## 7. Authentication Middleware
+## 8. Authentication Middleware
 
 ```ts
 export default procedure
@@ -201,7 +269,7 @@ export default procedure
   .handler(({ context }) => ({ user: serialize(UserSerializer, context.user, context.user) }));
 ```
 
-## 8. Testing Conventions
+## 9. Testing Conventions
 
 * Test file: **`<routeFile>.test.ts`**.
 * `describe` label: `METHOD /path`.
@@ -230,9 +298,9 @@ const err = await waitError(
 expect(err).toMatchInlineSnapshot();
 ```
 
-## 9. Response Design
+## 10. Response Design
 
-### 9.1 Cursor Pagination
+### 10.1 Cursor Pagination
 
 ```ts
 .output(

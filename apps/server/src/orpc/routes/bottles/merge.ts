@@ -15,6 +15,9 @@ export default procedure
     method: "POST",
     path: "/bottles/{bottle}/merge-targets",
     summary: "Merge bottles",
+    spec: {
+      operationId: "mergeBottles",
+    },
     description:
       "Merge two bottles together, combining their data and references. Requires moderator privileges",
   })

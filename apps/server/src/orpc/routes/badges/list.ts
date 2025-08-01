@@ -18,6 +18,9 @@ export default procedure
     method: "GET",
     path: "/badges",
     summary: "List badges",
+    spec: {
+      operationId: "listBadges",
+    },
     description: "Retrieve available badges with search and pagination support",
   })
   .input(

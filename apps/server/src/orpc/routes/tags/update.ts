@@ -16,6 +16,9 @@ export default procedure
     method: "PATCH",
     path: "/tags/{tag}",
     summary: "Update tag",
+    spec: {
+      operationId: "updateTag",
+    },
     description:
       "Update tag properties including category, flavor profiles, and synonyms. Requires moderator privileges",
   })

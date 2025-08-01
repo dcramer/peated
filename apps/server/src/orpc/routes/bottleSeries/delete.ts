@@ -11,6 +11,9 @@ export default procedure
     method: "DELETE",
     path: "/bottle-series/{series}",
     summary: "Delete bottle series",
+    spec: {
+      operationId: "deleteBottleSeries",
+    },
     description:
       "Delete a bottle series and remove its reference from associated bottles. Requires moderator privileges",
   })

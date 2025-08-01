@@ -12,6 +12,9 @@ export default procedure
     method: "GET",
     path: "/tags",
     summary: "List tags",
+    spec: {
+      operationId: "listTags",
+    },
     description: "Retrieve available tags with search and pagination support",
   })
   .input(

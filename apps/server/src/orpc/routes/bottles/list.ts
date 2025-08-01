@@ -43,6 +43,9 @@ export default procedure
     method: "GET",
     path: "/bottles",
     summary: "List bottles",
+    spec: {
+      operationId: "listBottles",
+    },
     description:
       "Search and filter bottles with pagination support. Supports filtering by brand, distillery, category, age, and more",
   })

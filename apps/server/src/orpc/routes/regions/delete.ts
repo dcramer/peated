@@ -17,6 +17,9 @@ export default procedure
     method: "DELETE",
     path: "/countries/{country}/regions/{region}",
     summary: "Delete region",
+    spec: {
+      operationId: "deleteRegion",
+    },
     description: "Delete a region from a country. Requires admin privileges",
   })
   .input(InputSchema)

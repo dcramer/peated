@@ -11,6 +11,9 @@ export default procedure
     method: "DELETE",
     path: "/tastings/{tasting}/image",
     summary: "Delete tasting image",
+    spec: {
+      operationId: "deleteTastingImage",
+    },
     description:
       "Remove the image from a tasting. Requires authentication and ownership or admin privileges",
   })

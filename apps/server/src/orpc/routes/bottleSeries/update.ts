@@ -23,6 +23,9 @@ export default procedure
     method: "PATCH",
     path: "/bottle-series/{series}",
     summary: "Update bottle series",
+    spec: {
+      operationId: "updateBottleSeries",
+    },
     description:
       "Update bottle series information including name and description. Requires moderator privileges",
   })

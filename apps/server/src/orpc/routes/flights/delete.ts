@@ -10,6 +10,9 @@ export default procedure
     method: "DELETE",
     path: "/flights/{flight}",
     summary: "Delete flight",
+    spec: {
+      operationId: "deleteFlight",
+    },
     description: "Delete a tasting flight. Requires admin privileges",
   })
   .use(requireAdmin)

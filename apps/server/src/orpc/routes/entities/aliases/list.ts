@@ -9,6 +9,9 @@ export default procedure
     method: "GET",
     path: "/entities/{entity}/aliases",
     summary: "List entity aliases",
+    spec: {
+      operationId: "listEntityAliases",
+    },
     description:
       "Retrieve all aliases for a specific entity, indicating which is canonical",
   })

@@ -24,6 +24,9 @@ export default procedure
     method: "POST",
     path: "/entities",
     summary: "Create entity",
+    spec: {
+      operationId: "createEntity",
+    },
     description:
       "Create a new entity (brand, distillery, or bottler) with location and type information",
   })

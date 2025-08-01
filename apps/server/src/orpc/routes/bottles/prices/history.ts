@@ -14,6 +14,9 @@ export default procedure
     method: "GET",
     path: "/bottles/{bottle}/price-history",
     summary: "Get bottle price history",
+    spec: {
+      operationId: "getBottlePriceHistory",
+    },
     description:
       "Retrieve historical price data for a bottle including average, minimum, and maximum prices over time",
   })

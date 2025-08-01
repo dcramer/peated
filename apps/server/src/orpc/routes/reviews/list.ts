@@ -37,6 +37,9 @@ export default procedure
     method: "GET",
     path: "/reviews",
     summary: "List reviews",
+    spec: {
+      operationId: "listReviews",
+    },
     description:
       "Retrieve reviews with filtering by site, bottle, and unknown status. Requires moderator privileges for full access",
   })

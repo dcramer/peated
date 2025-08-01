@@ -24,6 +24,9 @@ export default procedure
     method: "GET",
     path: "/friends",
     summary: "List friends",
+    spec: {
+      operationId: "listFriends",
+    },
     description:
       "Retrieve user's friend relationships with filtering by status (pending/active) and search support",
   })

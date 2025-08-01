@@ -77,6 +77,9 @@ export default procedure
     method: "GET",
     path: "/badges/{badge}/users",
     summary: "List badge users",
+    spec: {
+      operationId: "listBadgeRecipients",
+    },
     description:
       "Retrieve users who have earned a specific badge, ordered by XP. Requires authentication",
   })
