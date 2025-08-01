@@ -26,25 +26,31 @@ export default function ActivityFeed({
     hasNextPage,
     isFetching,
     isFetchingNextPage,
-  } = useSuspenseInfiniteQuery(
-    orpc.tastings.list.infiniteOptions({
-      input: (pageParam: number | undefined) => ({
+  } = useSuspenseInfiniteQuery({
+    queryKey: orpc.tastings.list.key({
+      input: {
+        filter,
+        limit: 10,
+      },
+    }),
+    queryFn: async ({ pageParam }) => {
+      return await orpc.tastings.list.call({
         filter,
         limit: 10,
         cursor: pageParam,
-      }),
-      initialPageParam: undefined,
-      staleTime: Infinity,
-      initialData: () => {
-        return {
-          pages: [tastingList],
-          pageParams: [undefined],
-        };
-      },
-      getNextPageParam: (lastPage) => lastPage.rel?.nextCursor,
-      getPreviousPageParam: (firstPage) => firstPage.rel?.prevCursor,
-    }),
-  );
+      });
+    },
+    initialPageParam: undefined as number | undefined,
+    staleTime: Infinity,
+    initialData: () => {
+      return {
+        pages: [tastingList],
+        pageParams: [undefined],
+      };
+    },
+    getNextPageParam: (lastPage) => lastPage.rel?.nextCursor,
+    getPreviousPageParam: (firstPage) => firstPage.rel?.prevCursor,
+  });
 
   const onScroll = () => {
     if (!hasNextPage) return;
