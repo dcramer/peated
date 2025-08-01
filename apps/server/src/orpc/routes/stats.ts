@@ -8,6 +8,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/stats",
+    operationId: "getPlatformStatistics",
     summary: "Get platform statistics",
     description:
       "Retrieve overall platform statistics including total tastings, bottles, and entities",

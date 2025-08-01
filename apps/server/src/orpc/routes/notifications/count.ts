@@ -11,6 +11,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/notifications/count",
+    operationId: "countNotifications",
     summary: "Count notifications",
     description:
       "Get the count of user notifications with optional filtering by read status",

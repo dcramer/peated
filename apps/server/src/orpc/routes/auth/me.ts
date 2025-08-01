@@ -14,6 +14,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/auth/me",
+    operationId: "getCurrentUser",
     summary: "Get current user",
     description: "Retrieve the authenticated user's profile information",
   })

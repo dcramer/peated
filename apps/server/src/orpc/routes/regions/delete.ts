@@ -16,6 +16,7 @@ export default procedure
   .route({
     method: "DELETE",
     path: "/countries/{country}/regions/{region}",
+    operationId: "deleteRegion",
     summary: "Delete region",
     description: "Delete a region from a country. Requires admin privileges",
   })

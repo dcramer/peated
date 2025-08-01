@@ -10,6 +10,7 @@ export default procedure
   .route({
     method: "DELETE",
     path: "/notifications/{notification}",
+    operationId: "deleteNotification",
     summary: "Delete notification",
     description:
       "Delete a notification. Requires authentication and ownership or admin privileges",

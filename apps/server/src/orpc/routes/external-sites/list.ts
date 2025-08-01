@@ -12,6 +12,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/external-sites",
+    operationId: "listExternalSites",
     summary: "List external sites",
     description: "Retrieve external sites with search and sorting options",
   })

@@ -8,6 +8,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/bottles/{bottle}/tags",
+    operationId: "getBottleTags",
     summary: "Get bottle tags",
     description:
       "Retrieve tags associated with a bottle and their usage counts from tastings",

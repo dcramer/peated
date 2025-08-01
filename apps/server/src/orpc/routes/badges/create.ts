@@ -14,6 +14,7 @@ export default procedure
   .route({
     method: "POST",
     path: "/badges",
+    operationId: "createBadge",
     summary: "Create badge",
     description:
       "Create a new achievement badge with validation checks and configuration. Requires admin privileges",

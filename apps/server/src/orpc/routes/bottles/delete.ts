@@ -21,6 +21,7 @@ export default procedure
   .route({
     method: "DELETE",
     path: "/bottles/{bottle}",
+    operationId: "deleteBottle",
     summary: "Delete bottle",
     description:
       "Permanently delete a bottle and create a tombstone record. Requires admin privileges",

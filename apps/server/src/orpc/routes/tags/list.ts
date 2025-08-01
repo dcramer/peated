@@ -11,6 +11,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/tags",
+    operationId: "listTags",
     summary: "List tags",
     description: "Retrieve available tags with search and pagination support",
   })

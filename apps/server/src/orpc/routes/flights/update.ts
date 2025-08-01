@@ -16,6 +16,7 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/flights/{flight}",
+    operationId: "updateFlight",
     summary: "Update flight",
     description:
       "Update flight information including name, description, and bottle list. Only the flight creator or moderator can update",

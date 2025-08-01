@@ -10,6 +10,7 @@ export default procedure
   .route({
     method: "POST",
     path: "/email/verify",
+    operationId: "verifyEmail",
     summary: "Verify email",
     description:
       "Verify user email address using verification token from email",

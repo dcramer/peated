@@ -18,6 +18,7 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/countries/{country}/regions/{region}",
+    operationId: "updateRegion",
     summary: "Update region",
     description:
       "Update region information including description. Requires moderator privileges",

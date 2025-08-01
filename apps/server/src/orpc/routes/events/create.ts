@@ -11,6 +11,7 @@ export default procedure
   .route({
     method: "POST",
     path: "/events",
+    operationId: "createEvent",
     summary: "Create event",
     description:
       "Create a new whisky event with dates and details. Requires admin privileges",

@@ -11,6 +11,7 @@ export default procedure
   .route({
     method: "PUT",
     path: "/external-sites/{site}/config/{key}",
+    operationId: "setExternalSiteConfig",
     summary: "Set external site config",
     description:
       "Set or update a configuration value for an external site. Requires admin privileges",

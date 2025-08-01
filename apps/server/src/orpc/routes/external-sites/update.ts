@@ -17,6 +17,7 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/external-sites/{site}",
+    operationId: "updateExternalSite",
     summary: "Update external site",
     description:
       "Update external site configuration including name, type, and run frequency. Requires admin privileges",

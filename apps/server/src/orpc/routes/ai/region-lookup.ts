@@ -18,6 +18,7 @@ export default procedure
   .route({
     method: "POST",
     path: "/ai/region-lookup",
+    operationId: "lookupRegionWithAI",
     summary: "AI region lookup",
     description:
       "Use AI to generate region details and descriptions for a specific country. Requires moderator privileges",

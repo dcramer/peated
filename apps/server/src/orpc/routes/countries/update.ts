@@ -17,6 +17,7 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/countries/{country}",
+    operationId: "updateCountry",
     summary: "Update country",
     description:
       "Update country information including description and summary. Requires moderator privileges",

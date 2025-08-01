@@ -42,6 +42,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/bottles",
+    operationId: "listBottles",
     summary: "List bottles",
     description:
       "Search and filter bottles with pagination support. Supports filtering by brand, distillery, category, age, and more",

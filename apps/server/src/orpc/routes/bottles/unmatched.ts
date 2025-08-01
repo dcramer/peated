@@ -41,6 +41,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/bottles/unmatched",
+    operationId: "listUnmatchedBottles",
     summary: "List unmatched bottles",
     description:
       "Retrieve bottle aliases that haven't been matched to existing bottles, with example store listings. Requires moderator privileges",

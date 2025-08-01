@@ -17,6 +17,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/users/{user}",
+    operationId: "getUserDetails",
     summary: "Get user details",
     description:
       "Retrieve user profile information including statistics for tastings, bottles, and contributions",

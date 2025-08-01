@@ -19,6 +19,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/tastings",
+    operationId: "listTastings",
     summary: "List tastings",
     description:
       "Retrieve tastings with filtering by bottle, entity, user, and privacy settings. Supports pagination",

@@ -20,6 +20,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/smws/distillers",
+    operationId: "listSMWSDistillers",
     summary: "List SMWS distillers",
     description:
       "Retrieve distillers that are part of the Scotch Malt Whisky Society (SMWS) system",

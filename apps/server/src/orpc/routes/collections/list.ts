@@ -14,6 +14,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/users/{user}/collections",
+    operationId: "listUserCollections",
     summary: "List user collections",
     description:
       "Retrieve collections for a specific user with optional bottle filtering. Respects user privacy settings",

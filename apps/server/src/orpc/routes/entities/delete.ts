@@ -15,6 +15,7 @@ export default procedure
   .route({
     method: "DELETE",
     path: "/entities/{entity}",
+    operationId: "deleteEntity",
     summary: "Delete entity",
     description:
       "Delete an entity and create a tombstone record. Removes associated aliases. Requires admin privileges",

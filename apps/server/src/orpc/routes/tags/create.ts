@@ -12,6 +12,7 @@ export default procedure
   .route({
     method: "POST",
     path: "/tags",
+    operationId: "createTag",
     summary: "Create tag",
     description:
       "Create a new tag with synonyms, category, and flavor profiles. Requires moderator privileges",

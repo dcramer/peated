@@ -60,6 +60,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/search",
+    operationId: "globalSearch",
     summary: "Global search",
     description:
       "Search across bottles, entities, and users with configurable result types and limits",

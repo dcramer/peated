@@ -9,6 +9,7 @@ export default procedure
   .route({
     method: "DELETE",
     path: "/flights/{flight}",
+    operationId: "deleteFlight",
     summary: "Delete flight",
     description: "Delete a tasting flight. Requires admin privileges",
   })

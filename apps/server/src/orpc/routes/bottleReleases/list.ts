@@ -30,6 +30,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/bottles/{bottle}/releases",
+    operationId: "listBottleReleases",
     summary: "List bottle releases",
     description:
       "Retrieve releases for a specific bottle with search, sorting, and pagination support",

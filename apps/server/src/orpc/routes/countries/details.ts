@@ -12,6 +12,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/countries/{country}",
+    operationId: "getCountryDetails",
     summary: "Get country details",
     description:
       "Retrieve detailed information about a specific country using its slug",

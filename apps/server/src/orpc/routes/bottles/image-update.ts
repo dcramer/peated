@@ -16,6 +16,7 @@ export default procedure
   .route({
     method: "POST",
     path: "/bottles/{bottle}/image",
+    operationId: "updateBottleImage",
     summary: "Update bottle image",
     description:
       "Upload and update the image for a bottle with automatic compression and resizing. Requires authentication and ownership or admin privileges",

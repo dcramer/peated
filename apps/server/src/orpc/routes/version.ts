@@ -6,6 +6,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/version",
+    operationId: "getApiVersion",
     summary: "Get API version",
     description: "Retrieve the current API version",
   })

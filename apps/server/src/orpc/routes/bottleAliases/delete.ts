@@ -10,6 +10,7 @@ export default procedure
   .route({
     method: "DELETE",
     path: "/bottle-aliases/{alias}",
+    operationId: "deleteBottleAlias",
     summary: "Delete bottle alias",
     description:
       "Remove bottle alias association and clear related references. Cannot delete canonical names. Requires moderator privileges",

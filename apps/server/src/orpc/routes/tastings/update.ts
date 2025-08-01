@@ -27,6 +27,7 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/tastings/{tasting}",
+    operationId: "updateTasting",
     summary: "Update tasting",
     description:
       "Update tasting information including notes, rating, tags, and friends. Only the tasting creator can update",

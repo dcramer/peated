@@ -12,6 +12,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/changes",
+    operationId: "listChanges",
     summary: "List changes",
     description:
       "Retrieve change history for bottles and entities with filtering by user and object type",

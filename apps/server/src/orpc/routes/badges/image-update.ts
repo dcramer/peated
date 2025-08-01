@@ -16,6 +16,7 @@ export default procedure
   .route({
     method: "POST",
     path: "/badges/{badge}/image",
+    operationId: "updateBadgeImage",
     summary: "Update badge image",
     description:
       "Upload and update the image for a badge with automatic compression and resizing. Requires admin privileges",

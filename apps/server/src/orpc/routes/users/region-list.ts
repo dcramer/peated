@@ -15,6 +15,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/users/{user}/regions",
+    operationId: "listUserRegions",
     summary: "List user regions",
     description:
       "Retrieve regions from bottles tasted by a user with tasting counts. Respects privacy settings",

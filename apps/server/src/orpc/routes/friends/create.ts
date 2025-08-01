@@ -14,6 +14,7 @@ export default procedure
   .route({
     method: "PUT",
     path: "/friends/{user}",
+    operationId: "sendFriendRequest",
     summary: "Send friend request",
     description:
       "Send a friend request to another user or accept a pending request. Creates mutual following relationship when accepted",

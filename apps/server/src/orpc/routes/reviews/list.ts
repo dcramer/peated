@@ -36,6 +36,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/reviews",
+    operationId: "listReviews",
     summary: "List reviews",
     description:
       "Retrieve reviews with filtering by site, bottle, and unknown status. Requires moderator privileges for full access",

@@ -38,6 +38,7 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/bottles/{bottle}",
+    operationId: "updateBottle",
     summary: "Update bottle",
     description:
       "Update bottle information including name, brand, distillers, and other metadata. Requires moderator privileges",

@@ -26,6 +26,7 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/entities/{entity}",
+    operationId: "updateEntity",
     summary: "Update entity",
     description:
       "Update entity information including name, location, type, and description. Automatically updates related bottles and aliases. Requires moderator privileges",

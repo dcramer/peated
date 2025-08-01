@@ -9,6 +9,7 @@ export default procedure
   .route({
     method: "POST",
     path: "/auth/password-reset",
+    operationId: "requestPasswordReset",
     summary: "Request password reset",
     description: "Send a password reset email to the specified email address",
   })

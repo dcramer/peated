@@ -8,6 +8,7 @@ export default procedure
   .route({
     method: "POST",
     path: "/email/resend-verification",
+    operationId: "resendVerificationEmail",
     summary: "Resend verification email",
     description:
       "Resend email verification to the authenticated user's email address",

@@ -24,6 +24,7 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/bottle-releases/{release}",
+    operationId: "updateBottleRelease",
     summary: "Update bottle release",
     description:
       "Update bottle release information including edition, vintage, and cask details. Requires moderator privileges",

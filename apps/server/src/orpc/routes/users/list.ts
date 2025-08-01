@@ -16,6 +16,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/users",
+    operationId: "listUsers",
     summary: "List users",
     description:
       "Search and list users with pagination support. Requires authentication",

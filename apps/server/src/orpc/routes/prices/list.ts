@@ -18,6 +18,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/prices",
+    operationId: "listStorePrices",
     summary: "List store prices",
     description:
       "Retrieve store prices with filtering by site, validity, and unknown bottles. Requires admin privileges",

@@ -13,6 +13,7 @@ export default procedure
   .route({
     method: "PUT",
     path: "/bottles",
+    operationId: "upsertBottle",
     summary: "Upsert bottle",
     description:
       "Create a new bottle or update existing one if it already exists. Requires moderator privileges",

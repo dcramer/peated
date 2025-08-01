@@ -14,6 +14,7 @@ export default procedure
   .route({
     method: "POST",
     path: "/external-sites",
+    operationId: "createExternalSite",
     summary: "Create external site",
     description:
       "Create a new external site configuration for price scraping or data integration. Requires admin privileges",

@@ -11,6 +11,7 @@ export default procedure
   .route({
     method: "DELETE",
     path: "/comments/{comment}",
+    operationId: "deleteComment",
     summary: "Delete comment",
     description:
       "Delete a comment and update related counters. Requires authentication and ownership or admin privileges",

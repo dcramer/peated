@@ -16,6 +16,7 @@ export default procedure
   .route({
     method: "POST",
     path: "/tastings/{tasting}/image",
+    operationId: "updateTastingImage",
     summary: "Update tasting image",
     description:
       "Upload and update the image for a tasting with automatic compression and resizing. Requires authentication and ownership or admin privileges",

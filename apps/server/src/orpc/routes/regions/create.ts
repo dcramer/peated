@@ -16,6 +16,7 @@ export default procedure
   .route({
     method: "POST",
     path: "/countries/{country}/regions",
+    operationId: "createRegion",
     summary: "Create region",
     description:
       "Create a new region within a country with automatic slug generation. Requires moderator privileges",

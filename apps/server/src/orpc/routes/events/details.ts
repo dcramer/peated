@@ -11,6 +11,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/events/{event}",
+    operationId: "getEventDetails",
     summary: "Get event details",
     description: "Retrieve detailed information about a specific whisky event",
   })

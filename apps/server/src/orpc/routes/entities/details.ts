@@ -21,6 +21,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/entities/{entity}",
+    operationId: "getEntityDetails",
     summary: "Get entity details",
     description:
       "Retrieve detailed information about a specific entity (brand, distillery, or bottler) including creator information",

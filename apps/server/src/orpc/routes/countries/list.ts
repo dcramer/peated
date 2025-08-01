@@ -21,6 +21,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/countries",
+    operationId: "listCountries",
     summary: "List countries",
     description:
       "Retrieve countries with filtering by major whisky regions, bottle counts, and search support",

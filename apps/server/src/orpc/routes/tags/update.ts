@@ -15,6 +15,7 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/tags/{tag}",
+    operationId: "updateTag",
     summary: "Update tag",
     description:
       "Update tag properties including category, flavor profiles, and synonyms. Requires moderator privileges",

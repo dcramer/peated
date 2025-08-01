@@ -13,6 +13,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/flights/{flight}",
+    operationId: "getFlightDetails",
     summary: "Get flight details",
     description:
       "Retrieve detailed information about a specific tasting flight using its public ID",

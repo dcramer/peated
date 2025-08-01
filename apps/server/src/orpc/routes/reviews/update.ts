@@ -18,6 +18,7 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/reviews/{review}",
+    operationId: "updateReview",
     summary: "Update review",
     description:
       "Update review properties such as visibility. Requires moderator privileges",

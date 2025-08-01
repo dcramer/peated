@@ -9,6 +9,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/users/{user}/flavors",
+    operationId: "listUserFlavorProfiles",
     summary: "List user flavor profiles",
     description:
       "Retrieve flavor profiles from bottles tasted by a user with counts and scores. Respects privacy settings",

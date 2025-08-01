@@ -11,6 +11,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/tastings/{tasting}",
+    operationId: "getTastingDetails",
     summary: "Get tasting details",
     description: "Retrieve detailed information about a specific tasting",
   })

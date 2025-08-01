@@ -15,6 +15,7 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/users/{user}",
+    operationId: "updateUser",
     summary: "Update user",
     description:
       "Update user profile information including username, privacy settings, and admin status. Users can only edit their own profile unless they are admin",

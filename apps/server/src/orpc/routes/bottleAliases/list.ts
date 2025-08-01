@@ -30,6 +30,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/bottle-aliases",
+    operationId: "listBottleAliases",
     summary: "List bottle aliases",
     description:
       "Retrieve bottle aliases with filtering by bottle, unknown status, and search support",
