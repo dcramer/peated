@@ -125,8 +125,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/bottles/validations",
-    operationId: "validateBottleData",
     summary: "Validate bottle data",
+    spec: {
+      operationId: "validateBottleData",
+    },
     description:
       "Validate and normalize bottle information including name parsing, entity resolution, and data standardization",
   })

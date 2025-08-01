@@ -12,8 +12,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/entities/{entity}/categories",
-    operationId: "listEntityCategories",
     summary: "List entity categories",
+    spec: {
+      operationId: "listEntityCategories",
+    },
     description:
       "Retrieve whisky categories and their counts for bottles associated with a specific entity",
   })

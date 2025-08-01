@@ -18,8 +18,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/users/{user}/collections/{collection}/bottles",
-    operationId: "addBottleToCollection",
     summary: "Add bottle to collection",
+    spec: {
+      operationId: "addBottleToCollection",
+    },
     description:
       "Add a bottle (and optionally a specific release) to a user's collection. Requires authentication and ownership",
   })

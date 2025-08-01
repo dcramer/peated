@@ -19,8 +19,10 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/bottle-aliases/{alias}",
-    operationId: "updateBottleAlias",
     summary: "Update bottle alias",
+    spec: {
+      operationId: "updateBottleAlias",
+    },
     description:
       "Update bottle alias properties such as ignored status. Requires moderator privileges",
   })

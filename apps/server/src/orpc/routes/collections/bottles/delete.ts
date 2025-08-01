@@ -13,8 +13,10 @@ export default procedure
   .route({
     method: "DELETE",
     path: "/users/{user}/collections/{collection}/bottles",
-    operationId: "removeBottleFromCollection",
     summary: "Remove bottle from collection",
+    spec: {
+      operationId: "removeBottleFromCollection",
+    },
     description:
       "Remove a bottle (and optionally a specific release) from a user's collection. Requires authentication and ownership",
   })

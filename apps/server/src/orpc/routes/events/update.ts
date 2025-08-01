@@ -14,8 +14,10 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/events/{event}",
-    operationId: "updateEvent",
     summary: "Update event",
+    spec: {
+      operationId: "updateEvent",
+    },
     description:
       "Update event information including dates, location, and details. Requires admin privileges",
   })

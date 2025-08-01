@@ -14,8 +14,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/external-sites/{site}",
-    operationId: "getExternalSiteDetails",
     summary: "Get external site details",
+    spec: {
+      operationId: "getExternalSiteDetails",
+    },
     description:
       "Retrieve detailed information about a specific external site by its type",
   })

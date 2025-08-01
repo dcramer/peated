@@ -11,8 +11,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/tags",
-    operationId: "listTags",
     summary: "List tags",
+    spec: {
+      operationId: "listTags",
+    },
     description: "Retrieve available tags with search and pagination support",
   })
   .input(

@@ -19,8 +19,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/auth/password-reset/confirm",
-    operationId: "confirmPasswordReset",
     summary: "Confirm password reset",
+    spec: {
+      operationId: "confirmPasswordReset",
+    },
     description:
       "Confirm password reset using token from email and set new password. Automatically verifies the user account",
   })

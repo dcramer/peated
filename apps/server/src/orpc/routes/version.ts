@@ -6,8 +6,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/version",
-    operationId: "getApiVersion",
     summary: "Get API version",
+    spec: {
+      operationId: "getApiVersion",
+    },
     description: "Retrieve the current API version",
   })
   .output(z.object({ version: z.string() }))

@@ -11,8 +11,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/events/{event}",
-    operationId: "getEventDetails",
     summary: "Get event details",
+    spec: {
+      operationId: "getEventDetails",
+    },
     description: "Retrieve detailed information about a specific whisky event",
   })
   .input(z.object({ event: z.coerce.number() }))

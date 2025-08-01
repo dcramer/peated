@@ -32,8 +32,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/bottles",
-    operationId: "createBottle",
     summary: "Create bottle",
+    spec: {
+      operationId: "createBottle",
+    },
     description:
       "Create a new bottle entry with brand, distillery, and whisky details",
   })

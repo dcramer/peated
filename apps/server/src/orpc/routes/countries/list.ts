@@ -21,8 +21,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/countries",
-    operationId: "listCountries",
     summary: "List countries",
+    spec: {
+      operationId: "listCountries",
+    },
     description:
       "Retrieve countries with filtering by major whisky regions, bottle counts, and search support",
   })

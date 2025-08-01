@@ -12,8 +12,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/flights",
-    operationId: "createFlight",
     summary: "Create flight",
+    spec: {
+      operationId: "createFlight",
+    },
     description:
       "Create a new tasting flight with bottles and visibility settings",
   })

@@ -21,8 +21,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/tastings/{tasting}/comments",
-    operationId: "createComment",
     summary: "Create comment",
+    spec: {
+      operationId: "createComment",
+    },
     description: "Add a comment to a tasting. Requires authentication",
     tags: ["tastings"],
   })

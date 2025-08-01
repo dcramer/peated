@@ -11,8 +11,10 @@ export default procedure
   .route({
     method: "DELETE",
     path: "/entity-aliases/{name}",
-    operationId: "deleteEntityAlias",
     summary: "Delete entity alias",
+    spec: {
+      operationId: "deleteEntityAlias",
+    },
     description:
       "Remove entity alias association. Cannot delete canonical names. Requires moderator privileges",
   })

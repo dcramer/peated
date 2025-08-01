@@ -15,8 +15,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/auth/magic-link/confirm",
-    operationId: "confirmMagicLink",
     summary: "Confirm magic link",
+    spec: {
+      operationId: "confirmMagicLink",
+    },
     description:
       "Confirm magic link authentication and return access token. Automatically verifies the user account",
   })

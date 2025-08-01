@@ -10,8 +10,10 @@ export default procedure
   .route({
     method: "DELETE",
     path: "/tastings/{tasting}/image",
-    operationId: "deleteTastingImage",
     summary: "Delete tasting image",
+    spec: {
+      operationId: "deleteTastingImage",
+    },
     description:
       "Remove the image from a tasting. Requires authentication and ownership or admin privileges",
   })

@@ -18,8 +18,10 @@ export default procedure
   .route({
     method: "DELETE",
     path: "/bottle-releases/{release}",
-    operationId: "deleteBottleRelease",
     summary: "Delete bottle release",
+    spec: {
+      operationId: "deleteBottleRelease",
+    },
     description:
       "Delete a bottle release and remove its references from related entities. Requires admin privileges",
   })

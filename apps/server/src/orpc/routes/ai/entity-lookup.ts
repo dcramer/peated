@@ -21,8 +21,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/ai/entity-lookup",
-    operationId: "lookupEntityWithAI",
     summary: "AI entity lookup",
+    spec: {
+      operationId: "lookupEntityWithAI",
+    },
     description:
       "Use AI to generate entity details including description, establishment year, type, and website. Requires moderator privileges",
   })

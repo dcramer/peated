@@ -23,8 +23,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/friends",
-    operationId: "listFriends",
     summary: "List friends",
+    spec: {
+      operationId: "listFriends",
+    },
     description:
       "Retrieve user's friend relationships with filtering by status (pending/active) and search support",
   })

@@ -10,8 +10,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/tastings/{tasting}/toast",
-    operationId: "createToast",
     summary: "Create toast",
+    spec: {
+      operationId: "createToast",
+    },
     description:
       "Toast a tasting to show appreciation. Cannot toast your own tastings. Requires authentication",
   })

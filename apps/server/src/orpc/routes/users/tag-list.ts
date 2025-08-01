@@ -9,8 +9,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/users/{user}/tags",
-    operationId: "listUserTags",
     summary: "List user tags",
+    spec: {
+      operationId: "listUserTags",
+    },
     description:
       "Retrieve tags used by a user in their tastings with usage counts. Respects privacy settings",
   })

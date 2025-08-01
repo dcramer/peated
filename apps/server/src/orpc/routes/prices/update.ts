@@ -18,8 +18,10 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/prices/{price}",
-    operationId: "updatePrice",
     summary: "Update price",
+    spec: {
+      operationId: "updatePrice",
+    },
     description:
       "Update store price properties such as visibility. Requires moderator privileges",
   })

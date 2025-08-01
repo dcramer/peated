@@ -16,8 +16,10 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/notifications/{notification}",
-    operationId: "updateNotification",
     summary: "Update notification",
+    spec: {
+      operationId: "updateNotification",
+    },
     description:
       "Update notification properties such as read status. Requires authentication and ownership",
   })

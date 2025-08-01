@@ -19,8 +19,10 @@ export default procedure
   .route({
     method: "PUT",
     path: "/bottle-aliases",
-    operationId: "upsertBottleAlias",
     summary: "Upsert bottle alias",
+    spec: {
+      operationId: "upsertBottleAlias",
+    },
     description:
       "Create or update a bottle alias and associate it with a bottle. Updates related prices and reviews. Requires moderator privileges",
   })

@@ -22,8 +22,10 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/bottle-series/{series}",
-    operationId: "updateBottleSeries",
     summary: "Update bottle series",
+    spec: {
+      operationId: "updateBottleSeries",
+    },
     description:
       "Update bottle series information including name and description. Requires moderator privileges",
   })

@@ -38,8 +38,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/events",
-    operationId: "listEvents",
     summary: "List events",
+    spec: {
+      operationId: "listEvents",
+    },
     description:
       "Retrieve whisky events with filtering by upcoming dates, search, and sorting options",
   })

@@ -25,8 +25,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/reviews",
-    operationId: "createReview",
     summary: "Create review",
+    spec: {
+      operationId: "createReview",
+    },
     description:
       "Create a new review from external site data with automatic bottle matching and alias creation. Requires admin privileges",
   })

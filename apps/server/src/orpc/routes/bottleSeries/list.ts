@@ -12,8 +12,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/bottle-series",
-    operationId: "listBottleSeries",
     summary: "List bottle series",
+    spec: {
+      operationId: "listBottleSeries",
+    },
     description:
       "Retrieve bottle series for a specific brand with search and pagination support",
   })

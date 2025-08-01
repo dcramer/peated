@@ -11,8 +11,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/badges/{badge}",
-    operationId: "getBadgeDetails",
     summary: "Get badge details",
+    spec: {
+      operationId: "getBadgeDetails",
+    },
     description:
       "Retrieve detailed information about a specific achievement badge",
   })

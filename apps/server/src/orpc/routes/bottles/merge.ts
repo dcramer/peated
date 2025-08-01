@@ -14,8 +14,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/bottles/{bottle}/merge-targets",
-    operationId: "mergeBottles",
     summary: "Merge bottles",
+    spec: {
+      operationId: "mergeBottles",
+    },
     description:
       "Merge two bottles together, combining their data and references. Requires moderator privileges",
   })

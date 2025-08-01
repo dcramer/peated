@@ -16,8 +16,10 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/badges/{badge}",
-    operationId: "updateBadge",
     summary: "Update badge",
+    spec: {
+      operationId: "updateBadge",
+    },
     description:
       "Update badge information including name, description, and validation checks. Requires admin privileges",
   })

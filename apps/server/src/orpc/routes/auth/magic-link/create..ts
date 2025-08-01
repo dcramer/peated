@@ -9,8 +9,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/auth/magic-link",
-    operationId: "createMagicLink",
     summary: "Create magic link",
+    spec: {
+      operationId: "createMagicLink",
+    },
     description:
       "Send a magic link authentication email to the specified email address",
   })

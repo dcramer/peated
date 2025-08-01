@@ -26,8 +26,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/ai/bottle-lookup",
-    operationId: "lookupBottleWithAI",
     summary: "AI bottle lookup",
+    spec: {
+      operationId: "lookupBottleWithAI",
+    },
     description:
       "Use AI to generate bottle details including description, category, flavor profile, tasting notes, and suggested tags. Requires moderator privileges",
   })

@@ -23,8 +23,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/entities",
-    operationId: "createEntity",
     summary: "Create entity",
+    spec: {
+      operationId: "createEntity",
+    },
     description:
       "Create a new entity (brand, distillery, or bottler) with location and type information",
   })

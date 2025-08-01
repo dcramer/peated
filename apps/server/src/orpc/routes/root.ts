@@ -6,9 +6,11 @@ export default procedure
   .route({
     method: "GET",
     path: "/",
-    operationId: "getApiRoot",
     summary: "API root",
     description: "Get basic API information including version",
+    spec: {
+      operationId: "getApiRoot",
+    },
   })
   .output(
     z.object({

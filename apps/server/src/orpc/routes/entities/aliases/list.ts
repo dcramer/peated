@@ -8,8 +8,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/entities/{entity}/aliases",
-    operationId: "listEntityAliases",
     summary: "List entity aliases",
+    spec: {
+      operationId: "listEntityAliases",
+    },
     description:
       "Retrieve all aliases for a specific entity, indicating which is canonical",
   })

@@ -31,8 +31,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/countries/{country}/regions",
-    operationId: "listRegions",
     summary: "List regions",
+    spec: {
+      operationId: "listRegions",
+    },
     description:
       "Retrieve regions within a specific country with filtering by bottle counts and search support",
   })

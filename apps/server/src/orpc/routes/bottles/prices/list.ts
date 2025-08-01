@@ -19,8 +19,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/bottles/{bottle}/prices",
-    operationId: "listBottlePrices",
     summary: "List bottle prices",
+    spec: {
+      operationId: "listBottlePrices",
+    },
     description:
       "Retrieve current and historical prices for a specific bottle from various external sites",
   })

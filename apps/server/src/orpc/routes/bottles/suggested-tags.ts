@@ -10,8 +10,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/bottles/{bottle}/suggested-tags",
-    operationId: "getBottleSuggestedTags",
     summary: "Get suggested tags for bottle",
+    spec: {
+      operationId: "getBottleSuggestedTags",
+    },
     description:
       "Retrieve suggested tags for a bottle based on usage patterns for the bottle, brand, and category",
   })

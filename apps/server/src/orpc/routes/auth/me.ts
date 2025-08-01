@@ -14,8 +14,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/auth/me",
-    operationId: "getCurrentUser",
     summary: "Get current user",
+    spec: {
+      operationId: "getCurrentUser",
+    },
     description: "Retrieve the authenticated user's profile information",
   })
   .output(z.object({ user: UserSchema }))

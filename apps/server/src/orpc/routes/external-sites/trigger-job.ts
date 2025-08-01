@@ -13,8 +13,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/external-sites/{site}/trigger",
-    operationId: "triggerExternalSiteJob",
     summary: "Trigger external site job",
+    spec: {
+      operationId: "triggerExternalSiteJob",
+    },
     description:
       "Manually trigger a scraping job for an external site. Requires admin privileges",
   })

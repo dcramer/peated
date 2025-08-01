@@ -14,8 +14,10 @@ export default procedure
   .route({
     method: "DELETE",
     path: "/friends/{user}",
-    operationId: "removeFriend",
     summary: "Remove friend",
+    spec: {
+      operationId: "removeFriend",
+    },
     description:
       "Remove a friend relationship and cancel any pending friend requests. Requires authentication",
   })

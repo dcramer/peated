@@ -14,8 +14,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/notifications",
-    operationId: "listNotifications",
     summary: "List notifications",
+    spec: {
+      operationId: "listNotifications",
+    },
     description:
       "Retrieve user notifications with filtering by read status and pagination support",
   })

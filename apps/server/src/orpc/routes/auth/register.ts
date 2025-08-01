@@ -17,8 +17,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/auth/register",
-    operationId: "registerUser",
     summary: "User registration",
+    spec: {
+      operationId: "registerUser",
+    },
     description:
       "Register a new user account with username, email, and password",
   })

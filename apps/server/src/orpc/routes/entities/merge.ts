@@ -14,8 +14,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/entities/{entity}/merge",
-    operationId: "mergeEntities",
     summary: "Merge entities",
+    spec: {
+      operationId: "mergeEntities",
+    },
     description:
       "Merge two entities together, combining their data and references. Requires moderator privileges",
   })

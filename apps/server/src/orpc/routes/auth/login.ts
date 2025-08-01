@@ -16,10 +16,12 @@ export default procedure
   .route({
     method: "POST",
     path: "/auth/login",
-    operationId: "loginUser",
     summary: "User login",
     description:
       "Authenticate user with email/password, Google OAuth code, or Google ID token",
+    spec: {
+      operationId: "loginUser",
+    },
   })
   .input(
     z.union([

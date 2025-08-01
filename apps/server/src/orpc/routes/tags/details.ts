@@ -11,8 +11,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/tags/{tag}",
-    operationId: "getTagDetails",
     summary: "Get tag details",
+    spec: {
+      operationId: "getTagDetails",
+    },
     description:
       "Retrieve detailed information about a specific tag by its name",
   })

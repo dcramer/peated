@@ -12,8 +12,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/users/{user}/badges",
-    operationId: "listUserBadges",
     summary: "List user badges",
+    spec: {
+      operationId: "listUserBadges",
+    },
     description:
       "Retrieve badges earned by a user with pagination support. Respects privacy settings",
   })

@@ -19,8 +19,10 @@ export default procedure
   .route({
     method: "GET",
     path: "/admin/queue/info",
-    operationId: "getQueueInfo",
     summary: "Get queue information",
+    spec: {
+      operationId: "getQueueInfo",
+    },
     description:
       "Retrieve job queue statistics including waiting, active, completed, and failed jobs. Requires admin privileges",
   })

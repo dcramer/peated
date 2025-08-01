@@ -30,8 +30,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/ai/extract-labels",
-    operationId: "extractBottleInfoFromLabel",
     summary: "Extract bottle information from labels",
+    spec: {
+      operationId: "extractBottleInfoFromLabel",
+    },
     description:
       "Use AI to extract bottle details from image URLs or text labels including brand, expression, age, and other metadata",
   })

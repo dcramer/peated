@@ -18,8 +18,10 @@ export default procedure
   .route({
     method: "DELETE",
     path: "/tastings/{tasting}",
-    operationId: "deleteTasting",
     summary: "Delete tasting",
+    spec: {
+      operationId: "deleteTasting",
+    },
     description:
       "Delete a tasting and update related statistics. Only the tasting creator or admin can delete",
   })
