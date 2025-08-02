@@ -126,7 +126,6 @@ export default procedure
     method: "POST",
     path: "/bottles/validations",
     summary: "Validate bottle data",
-    spec: {},
     description:
       "Validate and normalize bottle information including name parsing, entity resolution, and data standardization",
   })

@@ -18,7 +18,6 @@ export default procedure
     method: "GET",
     path: "/badges",
     summary: "List badges",
-    spec: {},
     description: "Retrieve available badges with search and pagination support",
   })
   .input(

@@ -15,7 +15,6 @@ export default procedure
     method: "POST",
     path: "/external-sites",
     summary: "Create external site",
-    spec: {},
     description:
       "Create a new external site configuration for price scraping or data integration. Requires admin privileges",
   })

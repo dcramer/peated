@@ -25,7 +25,6 @@ export default procedure
     method: "PATCH",
     path: "/bottle-releases/{release}",
     summary: "Update bottle release",
-    spec: {},
     description:
       "Update bottle release information including edition, vintage, and cask details. Requires moderator privileges",
   })

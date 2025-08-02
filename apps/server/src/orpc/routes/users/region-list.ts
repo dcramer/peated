@@ -16,7 +16,6 @@ export default procedure
     method: "GET",
     path: "/users/{user}/regions",
     summary: "List user regions",
-    spec: {},
     description:
       "Retrieve regions from bottles tasted by a user with tasting counts. Respects privacy settings",
   })

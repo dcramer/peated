@@ -10,7 +10,6 @@ export default procedure
     method: "GET",
     path: "/users/{user}/tags",
     summary: "List user tags",
-    spec: {},
     description:
       "Retrieve tags used by a user in their tastings with usage counts. Respects privacy settings",
   })

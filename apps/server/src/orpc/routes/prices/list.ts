@@ -19,7 +19,6 @@ export default procedure
     method: "GET",
     path: "/prices",
     summary: "List store prices",
-    spec: {},
     description:
       "Retrieve store prices with filtering by site, validity, and unknown bottles. Requires admin privileges",
   })

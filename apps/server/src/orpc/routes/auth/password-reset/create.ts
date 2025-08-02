@@ -10,7 +10,6 @@ export default procedure
     method: "POST",
     path: "/auth/password-reset",
     summary: "Request password reset",
-    spec: {},
     description: "Send a password reset email to the specified email address",
   })
   .input(

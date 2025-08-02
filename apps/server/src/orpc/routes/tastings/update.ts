@@ -28,7 +28,6 @@ export default procedure
     method: "PATCH",
     path: "/tastings/{tasting}",
     summary: "Update tasting",
-    spec: {},
     description:
       "Update tasting information including notes, rating, tags, and friends. Only the tasting creator can update",
   })

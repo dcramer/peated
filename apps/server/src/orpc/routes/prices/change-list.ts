@@ -30,7 +30,6 @@ export default procedure
     method: "GET",
     path: "/price-changes",
     summary: "List price changes",
-    spec: {},
     description:
       "Retrieve significant bottle price changes from the past week with search and pagination support",
   })

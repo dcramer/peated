@@ -15,7 +15,6 @@ export default procedure
     method: "DELETE",
     path: "/friends/{user}",
     summary: "Remove friend",
-    spec: {},
     description:
       "Remove a friend relationship and cancel any pending friend requests. Requires authentication",
   })

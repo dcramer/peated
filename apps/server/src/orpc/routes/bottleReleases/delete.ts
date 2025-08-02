@@ -19,7 +19,6 @@ export default procedure
     method: "DELETE",
     path: "/bottle-releases/{release}",
     summary: "Delete bottle release",
-    spec: {},
     description:
       "Delete a bottle release and remove its references from related entities. Requires admin privileges",
   })

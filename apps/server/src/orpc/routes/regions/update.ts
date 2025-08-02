@@ -19,7 +19,6 @@ export default procedure
     method: "PATCH",
     path: "/countries/{country}/regions/{region}",
     summary: "Update region",
-    spec: {},
     description:
       "Update region information including description. Requires moderator privileges",
   })

@@ -22,7 +22,6 @@ export default procedure
     method: "GET",
     path: "/entities/{entity}",
     summary: "Get entity details",
-    spec: {},
     description:
       "Retrieve detailed information about a specific entity (brand, distillery, or bottler) including creator information",
   })
