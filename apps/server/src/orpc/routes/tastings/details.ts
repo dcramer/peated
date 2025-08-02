@@ -12,9 +12,7 @@ export default procedure
     method: "GET",
     path: "/tastings/{tasting}",
     summary: "Get tasting details",
-    spec: {
-      operationId: "getTastingDetails",
-    },
+    spec: {},
     description: "Retrieve detailed information about a specific tasting",
   })
   .input(

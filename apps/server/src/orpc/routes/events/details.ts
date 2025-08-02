@@ -12,9 +12,7 @@ export default procedure
     method: "GET",
     path: "/events/{event}",
     summary: "Get event details",
-    spec: {
-      operationId: "getEventDetails",
-    },
+    spec: {},
     description: "Retrieve detailed information about a specific whisky event",
   })
   .input(z.object({ event: z.coerce.number() }))

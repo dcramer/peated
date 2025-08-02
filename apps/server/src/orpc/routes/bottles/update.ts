@@ -39,9 +39,7 @@ export default procedure
     method: "PATCH",
     path: "/bottles/{bottle}",
     summary: "Update bottle",
-    spec: {
-      operationId: "updateBottle",
-    },
+    spec: {},
     description:
       "Update bottle information including name, brand, distillers, and other metadata. Requires moderator privileges",
   })

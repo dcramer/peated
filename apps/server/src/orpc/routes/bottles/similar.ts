@@ -24,9 +24,7 @@ export default procedure
     method: "GET",
     path: "/bottles/{bottle}/similar",
     summary: "Get similar bottles",
-    spec: {
-      operationId: "getSimilarBottles",
-    },
+    spec: {},
     description:
       "Find bottles similar to the specified bottle based on brand, category, age, and distillery",
   })

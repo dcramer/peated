@@ -17,9 +17,7 @@ export default procedure
     method: "POST",
     path: "/bottle-series",
     summary: "Create bottle series",
-    spec: {
-      operationId: "createBottleSeries",
-    },
+    spec: {},
     description:
       "Create a new bottle series for a brand with name and description",
   })

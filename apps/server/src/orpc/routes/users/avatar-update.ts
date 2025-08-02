@@ -17,9 +17,7 @@ export default procedure
     method: "POST",
     path: "/users/{user}/avatar",
     summary: "Update user avatar",
-    spec: {
-      operationId: "updateUserAvatar",
-    },
+    spec: {},
     description:
       "Upload and update a user's avatar image with automatic compression and resizing. Requires authentication and ownership or admin privileges",
   })

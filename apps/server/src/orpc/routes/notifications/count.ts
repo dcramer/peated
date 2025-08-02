@@ -12,9 +12,7 @@ export default procedure
     method: "GET",
     path: "/notifications/count",
     summary: "Count notifications",
-    spec: {
-      operationId: "countNotifications",
-    },
+    spec: {},
     description:
       "Get the count of user notifications with optional filtering by read status",
   })

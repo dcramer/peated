@@ -20,9 +20,7 @@ export default procedure
     method: "PATCH",
     path: "/bottle-aliases/{alias}",
     summary: "Update bottle alias",
-    spec: {
-      operationId: "updateBottleAlias",
-    },
+    spec: {},
     description:
       "Update bottle alias properties such as ignored status. Requires moderator privileges",
   })

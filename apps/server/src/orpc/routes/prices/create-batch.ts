@@ -26,9 +26,7 @@ export default procedure
     method: "POST",
     path: "/external-sites/{site}/prices",
     summary: "Create batch prices",
-    spec: {
-      operationId: "createBatchPrices",
-    },
+    spec: {},
     description:
       "Bulk create or update store prices for an external site with automatic bottle matching and alias creation. Requires admin privileges",
   })

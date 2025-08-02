@@ -100,71 +100,80 @@ export default procedure
 
 ## 4. OpenAPI OperationId Convention
 
-**All routes MUST include an `operationId` field** in the `.route()` configuration. This is critical for:
-- **Client SDK Generation**: The `operationId` becomes the method name in generated clients
-- **iOS Client Compatibility**: Prevents encoded periods (`users_period_details`) in function names
-- **API Documentation**: Provides unique anchors and readable method references
+**Routes use oRPC's automatic operationId generation** - do NOT manually specify `operationId` fields as this breaks auto-generated OpenAPI specifications.
 
-### 4.1 Naming Convention: Verb + Noun
+### 4.1 Automatic Generation
 
-Follow the industry-standard **verb + noun** pattern for operationIds:
+oRPC automatically generates operationIds based on the route path structure:
 
-| Pattern | Example | Generated Method |
-| ------- | ------- | ---------------- |
-| ✅ **Correct** | `getUserDetails` | `getUserDetails()` |
-| ❌ **Incorrect** | `userDetails` | `userDetails()` |
-| ❌ **Incorrect** | `user.details` | `user_period_details()` |
+| Route Path | Auto-Generated OperationId |
+| ---------- | -------------------------- |
+| `GET /bottles` | `bottles.list` |
+| `GET /bottles/{bottle}` | `bottles.details` |
+| `POST /bottles` | `bottles.create` |
+| `PUT /bottles/{bottle}` | `bottles.update` |
+| `DELETE /bottles/{bottle}` | `bottles.delete` |
+| `POST /auth/login` | `auth.login` |
+| `GET /users/{user}` | `users.details` |
 
-### 4.2 Standard Verbs
+### 4.2 Why Automatic Generation?
 
-| Action | Verb | Example |
-| ------ | ---- | ------- |
-| **List/Search** | `list` | `listBottles`, `listUsers` |
-| **Get Details** | `get` | `getBottleDetails`, `getUserDetails` |
-| **Create** | `create` | `createBottle`, `createTasting` |
-| **Update** | `update` | `updateBottle`, `updateUser` |
-| **Delete** | `delete` | `deleteBottle`, `deleteTasting` |
-| **Special Actions** | Descriptive | `loginUser`, `mergeBottles`, `uploadBottleImage` |
+| ✅ **Auto-Generated** | ❌ **Manual `operationId`** |
+| -------------------- | --------------------------- |
+| Full OpenAPI specs preserved | Breaks parameters, responses, schemas |
+| Zero maintenance overhead | Requires manual updates across 100+ files |
+| Consistent across all endpoints | Prone to inconsistencies |
+| Complete parameter definitions | Missing request/response schemas |
+| Rich error response schemas | Incomplete error handling definitions |
 
 ### 4.3 Implementation Examples
 
 ```ts
-// ✅ List endpoint
+// ✅ Auto-generated operationId: "bottles.list"
 export default procedure
   .route({
     method: "GET",
     path: "/bottles",
-    operationId: "listBottles",
     summary: "List bottles",
+    // No operationId needed - auto-generated!
   })
 
-// ✅ Details endpoint
+// ✅ Auto-generated operationId: "bottles.details"
 export default procedure
   .route({
     method: "GET",
     path: "/bottles/{bottle}",
-    operationId: "getBottleDetails",
     summary: "Get bottle details",
+    // No operationId needed - auto-generated!
   })
 
-// ✅ Special action endpoint
+// ❌ NEVER manually specify operationId - breaks OpenAPI generation
 export default procedure
   .route({
     method: "POST",
     path: "/bottles/{bottle}/image",
-    operationId: "updateBottleImage",
+    operationId: "updateBottleImage", // ❌ Breaks full spec generation!
     summary: "Update bottle image",
   })
 ```
 
-### 4.4 File Structure vs OperationId
+### 4.4 Generated OpenAPI Benefits
 
-Our file structure and operationIds serve different purposes:
+With automatic generation, each route gets:
+- ✅ **Complete parameter schemas** (path, query, body)
+- ✅ **Full response definitions** with typed schemas
+- ✅ **Comprehensive error responses** (400, 401, 403, 404, 500)
+- ✅ **Rich validation rules** from Zod schemas
+- ✅ **Proper tags and descriptions**
 
-- **File Structure**: `bottle/details.ts` (noun/verb - for code organization)
-- **OperationId**: `getBottleDetails` (verb + noun - for generated client methods)
+### 4.5 File Structure Independence
 
-This gives us logical file organization AND clean generated client code.
+File structure serves code organization, while operationIds serve API consumers:
+
+- **File Structure**: `bottles/details.ts` (noun/verb - for logical organization)
+- **Auto-Generated OperationId**: `bottles.details` (consistent dot notation)
+
+This gives us both logical file organization AND complete OpenAPI specifications automatically.
 
 ## 5. HTTP Method Semantics
 

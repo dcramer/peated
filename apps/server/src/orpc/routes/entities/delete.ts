@@ -16,9 +16,7 @@ export default procedure
     method: "DELETE",
     path: "/entities/{entity}",
     summary: "Delete entity",
-    spec: {
-      operationId: "deleteEntity",
-    },
+    spec: {},
     description:
       "Delete an entity and create a tombstone record. Removes associated aliases. Requires admin privileges",
   })

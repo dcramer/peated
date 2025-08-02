@@ -16,9 +16,7 @@ export default procedure
     method: "POST",
     path: "/auth/magic-link/confirm",
     summary: "Confirm magic link",
-    spec: {
-      operationId: "confirmMagicLink",
-    },
+    spec: {},
     description:
       "Confirm magic link authentication and return access token. Automatically verifies the user account",
   })

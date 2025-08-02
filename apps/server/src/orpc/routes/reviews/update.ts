@@ -19,9 +19,7 @@ export default procedure
     method: "PATCH",
     path: "/reviews/{review}",
     summary: "Update review",
-    spec: {
-      operationId: "updateReview",
-    },
+    spec: {},
     description:
       "Update review properties such as visibility. Requires moderator privileges",
   })

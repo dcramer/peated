@@ -13,9 +13,7 @@ export default procedure
     method: "POST",
     path: "/tags",
     summary: "Create tag",
-    spec: {
-      operationId: "createTag",
-    },
+    spec: {},
     description:
       "Create a new tag with synonyms, category, and flavor profiles. Requires moderator privileges",
   })

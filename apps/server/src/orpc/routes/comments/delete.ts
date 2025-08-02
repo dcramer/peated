@@ -12,9 +12,7 @@ export default procedure
     method: "DELETE",
     path: "/comments/{comment}",
     summary: "Delete comment",
-    spec: {
-      operationId: "deleteComment",
-    },
+    spec: {},
     description:
       "Delete a comment and update related counters. Requires authentication and ownership or admin privileges",
   })

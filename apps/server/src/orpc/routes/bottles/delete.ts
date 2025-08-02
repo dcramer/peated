@@ -22,9 +22,7 @@ export default procedure
     method: "DELETE",
     path: "/bottles/{bottle}",
     summary: "Delete bottle",
-    spec: {
-      operationId: "deleteBottle",
-    },
+    spec: {},
     description:
       "Permanently delete a bottle and create a tombstone record. Requires admin privileges",
   })

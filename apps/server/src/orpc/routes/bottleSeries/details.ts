@@ -12,9 +12,7 @@ export default procedure
     method: "GET",
     path: "/bottle-series/{series}",
     summary: "Get bottle series details",
-    spec: {
-      operationId: "getBottleSeriesDetails",
-    },
+    spec: {},
     description:
       "Retrieve detailed information about a specific bottle series by its ID",
   })

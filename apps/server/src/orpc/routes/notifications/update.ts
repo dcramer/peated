@@ -17,9 +17,7 @@ export default procedure
     method: "PATCH",
     path: "/notifications/{notification}",
     summary: "Update notification",
-    spec: {
-      operationId: "updateNotification",
-    },
+    spec: {},
     description:
       "Update notification properties such as read status. Requires authentication and ownership",
   })

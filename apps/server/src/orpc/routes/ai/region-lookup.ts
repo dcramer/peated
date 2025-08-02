@@ -19,9 +19,7 @@ export default procedure
     method: "POST",
     path: "/ai/region-lookup",
     summary: "AI region lookup",
-    spec: {
-      operationId: "lookupRegionWithAI",
-    },
+    spec: {},
     description:
       "Use AI to generate region details and descriptions for a specific country. Requires moderator privileges",
   })

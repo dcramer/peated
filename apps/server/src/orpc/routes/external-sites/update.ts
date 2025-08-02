@@ -18,9 +18,7 @@ export default procedure
     method: "PATCH",
     path: "/external-sites/{site}",
     summary: "Update external site",
-    spec: {
-      operationId: "updateExternalSite",
-    },
+    spec: {},
     description:
       "Update external site configuration including name, type, and run frequency. Requires admin privileges",
   })

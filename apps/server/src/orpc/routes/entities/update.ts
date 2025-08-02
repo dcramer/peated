@@ -27,9 +27,7 @@ export default procedure
     method: "PATCH",
     path: "/entities/{entity}",
     summary: "Update entity",
-    spec: {
-      operationId: "updateEntity",
-    },
+    spec: {},
     description:
       "Update entity information including name, location, type, and description. Automatically updates related bottles and aliases. Requires moderator privileges",
   })

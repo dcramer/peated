@@ -22,9 +22,7 @@ export default procedure
     method: "POST",
     path: "/tastings/{tasting}/comments",
     summary: "Create comment",
-    spec: {
-      operationId: "createComment",
-    },
+    spec: {},
     description: "Add a comment to a tasting. Requires authentication",
     tags: ["tastings"],
   })

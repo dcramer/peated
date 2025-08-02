@@ -17,9 +17,7 @@ export default procedure
     method: "POST",
     path: "/countries/{country}/regions",
     summary: "Create region",
-    spec: {
-      operationId: "createRegion",
-    },
+    spec: {},
     description:
       "Create a new region within a country with automatic slug generation. Requires moderator privileges",
   })

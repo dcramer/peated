@@ -31,9 +31,7 @@ export default procedure
     method: "GET",
     path: "/bottle-aliases",
     summary: "List bottle aliases",
-    spec: {
-      operationId: "listBottleAliases",
-    },
+    spec: {},
     description:
       "Retrieve bottle aliases with filtering by bottle, unknown status, and search support",
   })

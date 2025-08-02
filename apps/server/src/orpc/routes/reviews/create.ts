@@ -26,9 +26,7 @@ export default procedure
     method: "POST",
     path: "/reviews",
     summary: "Create review",
-    spec: {
-      operationId: "createReview",
-    },
+    spec: {},
     description:
       "Create a new review from external site data with automatic bottle matching and alias creation. Requires admin privileges",
   })

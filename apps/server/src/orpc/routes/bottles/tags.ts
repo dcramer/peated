@@ -9,9 +9,7 @@ export default procedure
     method: "GET",
     path: "/bottles/{bottle}/tags",
     summary: "Get bottle tags",
-    spec: {
-      operationId: "getBottleTags",
-    },
+    spec: {},
     description:
       "Retrieve tags associated with a bottle and their usage counts from tastings",
   })

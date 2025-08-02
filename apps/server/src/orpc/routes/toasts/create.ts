@@ -11,9 +11,7 @@ export default procedure
     method: "POST",
     path: "/tastings/{tasting}/toast",
     summary: "Create toast",
-    spec: {
-      operationId: "createToast",
-    },
+    spec: {},
     description:
       "Toast a tasting to show appreciation. Cannot toast your own tastings. Requires authentication",
   })
