@@ -11,6 +11,7 @@ export default procedure
     summary: "Resend verification email",
     description:
       "Resend email verification to the authenticated user's email address",
+    operationId: "resendVerificationEmail",
   })
   .input(z.void())
   .output(z.object({}))

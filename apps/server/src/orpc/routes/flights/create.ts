@@ -15,6 +15,7 @@ export default procedure
     summary: "Create flight",
     description:
       "Create a new tasting flight with bottles and visibility settings",
+    operationId: "createFlight",
   })
   .use(requireAuth)
   .input(FlightInputSchema)

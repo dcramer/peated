@@ -17,6 +17,7 @@ export default procedure
     summary: "Remove friend",
     description:
       "Remove a friend relationship and cancel any pending friend requests. Requires authentication",
+    operationId: "removeFriend",
   })
   .input(z.object({ user: z.coerce.number() }))
   .output(

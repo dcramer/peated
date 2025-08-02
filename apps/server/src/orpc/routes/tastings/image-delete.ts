@@ -13,6 +13,7 @@ export default procedure
     summary: "Delete tasting image",
     description:
       "Remove the image from a tasting. Requires authentication and ownership or admin privileges",
+    operationId: "deleteTastingImage",
   })
   .input(z.object({ tasting: z.coerce.number() }))
   .output(z.object({}))

@@ -19,6 +19,7 @@ export default procedure
     summary: "Update user avatar",
     description:
       "Upload and update a user's avatar image with automatic compression and resizing. Requires authentication and ownership or admin privileges",
+    operationId: "updateUserAvatar",
   })
   .input(
     z.object({

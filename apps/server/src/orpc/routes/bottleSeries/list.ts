@@ -15,6 +15,7 @@ export default procedure
     summary: "List bottle series",
     description:
       "Retrieve bottle series for a specific brand with search and pagination support",
+    operationId: "listBottleSeries",
   })
   .input(
     z.object({

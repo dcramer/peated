@@ -18,6 +18,7 @@ export default procedure
     summary: "List user regions",
     description:
       "Retrieve regions from bottles tasted by a user with tasting counts. Respects privacy settings",
+    operationId: "listUserRegions",
   })
   .input(
     z.object({

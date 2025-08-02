@@ -19,6 +19,7 @@ export default procedure
     summary: "Update badge",
     description:
       "Update badge information including name, description, and validation checks. Requires admin privileges",
+    operationId: "updateBadge",
   })
   .input(
     BadgeInputSchema.partial().extend({

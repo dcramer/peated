@@ -30,6 +30,7 @@ export default procedure
     summary: "Update tasting",
     description:
       "Update tasting information including notes, rating, tags, and friends. Only the tasting creator can update",
+    operationId: "updateTasting",
   })
   .input(InputSchema)
   .output(TastingSchema)

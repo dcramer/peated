@@ -18,6 +18,7 @@ export default procedure
     summary: "Update tag",
     description:
       "Update tag properties including category, flavor profiles, and synonyms. Requires moderator privileges",
+    operationId: "updateTag",
   })
   .input(
     TagInputSchema.partial().extend({

@@ -24,6 +24,7 @@ export default procedure
     summary: "AI entity lookup",
     description:
       "Use AI to generate entity details including description, establishment year, type, and website. Requires moderator privileges",
+    operationId: "aiEntityLookup",
   })
   .input(InputSchema)
   .output(OutputSchema)

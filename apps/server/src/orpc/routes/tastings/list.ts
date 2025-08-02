@@ -22,6 +22,7 @@ export default procedure
     summary: "List tastings",
     description:
       "Retrieve tastings with filtering by bottle, entity, user, and privacy settings. Supports pagination",
+    operationId: "listTastings",
   })
   .input(
     z

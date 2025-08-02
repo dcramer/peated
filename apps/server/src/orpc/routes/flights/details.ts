@@ -16,6 +16,7 @@ export default procedure
     summary: "Get flight details",
     description:
       "Retrieve detailed information about a specific tasting flight using its public ID",
+    operationId: "getFlight",
   })
   .input(z.object({ flight: z.string() }))
   .output(FlightSchema)

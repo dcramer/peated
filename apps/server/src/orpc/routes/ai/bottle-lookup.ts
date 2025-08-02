@@ -29,6 +29,7 @@ export default procedure
     summary: "AI bottle lookup",
     description:
       "Use AI to generate bottle details including description, category, flavor profile, tasting notes, and suggested tags. Requires moderator privileges",
+    operationId: "aiBottleLookup",
   })
   .input(InputSchema)
   .output(OutputSchema)

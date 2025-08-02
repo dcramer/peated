@@ -34,6 +34,7 @@ export default procedure
     summary: "List regions",
     description:
       "Retrieve regions within a specific country with filtering by bottle counts and search support",
+    operationId: "listRegions",
   })
   .input(InputSchema)
   .output(OutputSchema)

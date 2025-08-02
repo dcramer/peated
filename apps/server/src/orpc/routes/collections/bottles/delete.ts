@@ -16,6 +16,7 @@ export default procedure
     summary: "Remove bottle from collection",
     description:
       "Remove a bottle (and optionally a specific release) from a user's collection. Requires authentication and ownership",
+    operationId: "removeBottleFromCollection",
   })
   .input(
     CollectionBottleInputSchema.extend({

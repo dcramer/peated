@@ -21,6 +21,7 @@ export default procedure
     summary: "Add bottle to collection",
     description:
       "Add a bottle (and optionally a specific release) to a user's collection. Requires authentication and ownership",
+    operationId: "addBottleToCollection",
   })
   .input(
     CollectionBottleInputSchema.extend({

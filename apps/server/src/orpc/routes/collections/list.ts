@@ -17,6 +17,7 @@ export default procedure
     summary: "List user collections",
     description:
       "Retrieve collections for a specific user with optional bottle filtering. Respects user privacy settings",
+    operationId: "listCollections",
   })
   .input(
     z.object({

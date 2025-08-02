@@ -26,6 +26,7 @@ export default procedure
     summary: "List friends",
     description:
       "Retrieve user's friend relationships with filtering by status (pending/active) and search support",
+    operationId: "listFriends",
   })
   .input(
     z

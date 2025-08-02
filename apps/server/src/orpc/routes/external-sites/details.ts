@@ -17,6 +17,7 @@ export default procedure
     summary: "Get external site details",
     description:
       "Retrieve detailed information about a specific external site by its type",
+    operationId: "getExternalSite",
   })
   .input(
     z.object({

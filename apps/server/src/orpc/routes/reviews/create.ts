@@ -28,6 +28,7 @@ export default procedure
     summary: "Create review",
     description:
       "Create a new review from external site data with automatic bottle matching and alias creation. Requires admin privileges",
+    operationId: "createReview",
   })
   .input(ReviewInputSchema)
   .output(ReviewSchema)

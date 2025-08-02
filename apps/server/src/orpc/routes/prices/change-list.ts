@@ -32,6 +32,7 @@ export default procedure
     summary: "List price changes",
     description:
       "Retrieve significant bottle price changes from the past week with search and pagination support",
+    operationId: "listPriceChanges",
   })
   .input(InputSchema)
   .output(OutputSchema)

@@ -13,6 +13,7 @@ export default procedure
     path: "/tastings/{tasting}",
     summary: "Get tasting details",
     description: "Retrieve detailed information about a specific tasting",
+    operationId: "getTasting",
   })
   .input(
     z.object({

@@ -12,6 +12,7 @@ export default procedure
     summary: "List user tags",
     description:
       "Retrieve tags used by a user in their tastings with usage counts. Respects privacy settings",
+    operationId: "listUserTags",
   })
   .input(
     z.object({

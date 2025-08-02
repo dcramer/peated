@@ -14,6 +14,7 @@ export default procedure
     summary: "AI country lookup",
     description:
       "Use AI to generate country details and information. Requires moderator privileges",
+    operationId: "aiCountryLookup",
   })
   .input(InputSchema)
   .output(z.any())

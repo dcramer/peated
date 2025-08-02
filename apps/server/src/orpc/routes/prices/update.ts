@@ -21,6 +21,7 @@ export default procedure
     summary: "Update price",
     description:
       "Update store price properties such as visibility. Requires moderator privileges",
+    operationId: "updatePrice",
   })
   .input(InputSchema)
   .output(StorePriceSchema)

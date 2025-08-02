@@ -14,6 +14,7 @@ export default procedure
     summary: "Delete entity alias",
     description:
       "Remove entity alias association. Cannot delete canonical names. Requires moderator privileges",
+    operationId: "deleteEntityAlias",
   })
   .input(
     z.object({

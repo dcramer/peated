@@ -19,6 +19,7 @@ export default procedure
     path: "/badges",
     summary: "List badges",
     description: "Retrieve available badges with search and pagination support",
+    operationId: "listBadges",
   })
   .input(
     z

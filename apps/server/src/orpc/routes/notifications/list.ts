@@ -17,6 +17,7 @@ export default procedure
     summary: "List notifications",
     description:
       "Retrieve user notifications with filtering by read status and pagination support",
+    operationId: "listNotifications",
   })
   .input(
     z

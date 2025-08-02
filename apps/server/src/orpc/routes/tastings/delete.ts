@@ -21,6 +21,7 @@ export default procedure
     summary: "Delete tasting",
     description:
       "Delete a tasting and update related statistics. Only the tasting creator or admin can delete",
+    operationId: "deleteTasting",
   })
   .input(z.object({ tasting: z.coerce.number() }))
   .output(z.object({}))

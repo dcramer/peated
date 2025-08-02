@@ -11,6 +11,7 @@ export default procedure
     path: "/flights/{flight}",
     summary: "Delete flight",
     description: "Delete a tasting flight. Requires admin privileges",
+    operationId: "deleteFlight",
   })
   .use(requireAdmin)
   .input(

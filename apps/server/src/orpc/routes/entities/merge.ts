@@ -17,6 +17,7 @@ export default procedure
     summary: "Merge entities",
     description:
       "Merge two entities together, combining their data and references. Requires moderator privileges",
+    operationId: "mergeEntities",
   })
   .input(
     z.object({

@@ -13,6 +13,7 @@ export default procedure
     summary: "Delete bottle alias",
     description:
       "Remove bottle alias association and clear related references. Cannot delete canonical names. Requires moderator privileges",
+    operationId: "deleteBottleAlias",
   })
   .use(requireMod)
   .input(z.object({ alias: z.string() }))

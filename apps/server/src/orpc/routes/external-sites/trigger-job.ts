@@ -16,6 +16,7 @@ export default procedure
     summary: "Trigger external site job",
     description:
       "Manually trigger a scraping job for an external site. Requires admin privileges",
+    operationId: "triggerExternalSiteJob",
   })
   .input(
     z.object({

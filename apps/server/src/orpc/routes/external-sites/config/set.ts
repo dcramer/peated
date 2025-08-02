@@ -14,6 +14,7 @@ export default procedure
     summary: "Set external site config",
     description:
       "Set or update a configuration value for an external site. Requires admin privileges",
+    operationId: "setExternalSiteConfig",
   })
   .input(
     z.object({

@@ -19,6 +19,7 @@ export default procedure
     summary: "List users",
     description:
       "Search and list users with pagination support. Requires authentication",
+    operationId: "listUsers",
   })
   .input(
     z

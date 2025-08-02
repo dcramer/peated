@@ -14,6 +14,7 @@ export default procedure
     summary: "Count notifications",
     description:
       "Get the count of user notifications with optional filtering by read status",
+    operationId: "countNotifications",
   })
   .input(
     z

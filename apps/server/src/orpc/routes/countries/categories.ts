@@ -16,6 +16,7 @@ export default procedure
     summary: "Get country categories",
     description:
       "Retrieve whisky categories and their counts for a specific country based on distillery locations",
+    operationId: "listCountryCategories",
   })
   .input(
     z.object({

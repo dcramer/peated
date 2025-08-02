@@ -14,6 +14,7 @@ export default procedure
     summary: "Get bottle series details",
     description:
       "Retrieve detailed information about a specific bottle series by its ID",
+    operationId: "getBottleSeries",
   })
   .input(z.object({ series: z.coerce.number() }))
   .output(BottleSeriesSchema)

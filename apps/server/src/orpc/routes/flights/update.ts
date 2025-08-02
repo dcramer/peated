@@ -19,6 +19,7 @@ export default procedure
     summary: "Update flight",
     description:
       "Update flight information including name, description, and bottle list. Only the flight creator or moderator can update",
+    operationId: "updateFlight",
   })
   .use(requireAuth)
   .input(InputSchema)

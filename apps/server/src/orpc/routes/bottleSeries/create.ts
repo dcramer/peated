@@ -19,6 +19,7 @@ export default procedure
     summary: "Create bottle series",
     description:
       "Create a new bottle series for a brand with name and description",
+    operationId: "createBottleSeries",
   })
   .use(requireAuth)
   .input(BottleSeriesInputSchema)

@@ -17,6 +17,7 @@ export default procedure
     summary: "Create badge",
     description:
       "Create a new achievement badge with validation checks and configuration. Requires admin privileges",
+    operationId: "createBadge",
   })
   .input(BadgeInputSchema)
   .output(BadgeSchema)

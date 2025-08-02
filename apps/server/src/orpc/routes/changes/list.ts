@@ -15,6 +15,7 @@ export default procedure
     summary: "List changes",
     description:
       "Retrieve change history for bottles and entities with filtering by user and object type",
+    operationId: "listChanges",
   })
   .input(
     z.object({

@@ -20,6 +20,7 @@ export default procedure
     summary: "Update external site",
     description:
       "Update external site configuration including name, type, and run frequency. Requires admin privileges",
+    operationId: "updateExternalSite",
   })
   .input(
     ExternalSiteInputSchema.partial().extend({

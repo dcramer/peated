@@ -14,6 +14,7 @@ export default procedure
     path: "/external-sites",
     summary: "List external sites",
     description: "Retrieve external sites with search and sorting options",
+    operationId: "listExternalSites",
   })
   .input(
     z.object({

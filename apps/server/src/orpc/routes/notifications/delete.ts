@@ -13,6 +13,7 @@ export default procedure
     summary: "Delete notification",
     description:
       "Delete a notification. Requires authentication and ownership or admin privileges",
+    operationId: "deleteNotification",
   })
   .input(z.object({ notification: z.coerce.number() }))
   .output(z.object({}))

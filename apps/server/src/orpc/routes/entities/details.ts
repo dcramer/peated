@@ -24,6 +24,7 @@ export default procedure
     summary: "Get entity details",
     description:
       "Retrieve detailed information about a specific entity (brand, distillery, or bottler) including creator information",
+    operationId: "getEntity",
   })
   .input(z.object({ entity: z.coerce.number() }))
   .output(OutputSchema)

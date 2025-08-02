@@ -26,6 +26,7 @@ export default procedure
     summary: "Create entity",
     description:
       "Create a new entity (brand, distillery, or bottler) with location and type information",
+    operationId: "createEntity",
   })
   .input(EntityInputSchema)
   .output(EntitySchema)

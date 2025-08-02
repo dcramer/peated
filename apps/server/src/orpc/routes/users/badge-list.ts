@@ -15,6 +15,7 @@ export default procedure
     summary: "List user badges",
     description:
       "Retrieve badges earned by a user with pagination support. Respects privacy settings",
+    operationId: "listUserBadges",
   })
   .input(
     z.object({

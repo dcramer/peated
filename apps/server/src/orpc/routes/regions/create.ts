@@ -19,6 +19,7 @@ export default procedure
     summary: "Create region",
     description:
       "Create a new region within a country with automatic slug generation. Requires moderator privileges",
+    operationId: "createRegion",
   })
   .input(RegionInputSchema.extend({ country: z.string() }))
   .output(RegionSchema)

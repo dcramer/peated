@@ -15,6 +15,7 @@ export default procedure
     summary: "Get region details",
     description:
       "Retrieve detailed information about a specific region within a country using their slugs",
+    operationId: "getRegion",
   })
   .input(
     z.object({

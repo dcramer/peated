@@ -12,6 +12,7 @@ export default procedure
     summary: "List user flavor profiles",
     description:
       "Retrieve flavor profiles from bottles tasted by a user with counts and scores. Respects privacy settings",
+    operationId: "listUserFlavors",
   })
   .input(
     z.object({

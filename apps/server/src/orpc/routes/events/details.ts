@@ -13,6 +13,7 @@ export default procedure
     path: "/events/{event}",
     summary: "Get event details",
     description: "Retrieve detailed information about a specific whisky event",
+    operationId: "getEvent",
   })
   .input(z.object({ event: z.coerce.number() }))
   .output(EventSchema)

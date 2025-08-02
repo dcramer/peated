@@ -13,6 +13,7 @@ export default procedure
     summary: "Create toast",
     description:
       "Toast a tasting to show appreciation. Cannot toast your own tastings. Requires authentication",
+    operationId: "createToast",
   })
   .input(z.object({ tasting: z.coerce.number() }))
   .output(z.object({}))

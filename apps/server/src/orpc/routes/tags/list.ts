@@ -13,6 +13,7 @@ export default procedure
     path: "/tags",
     summary: "List tags",
     description: "Retrieve available tags with search and pagination support",
+    operationId: "listTags",
   })
   .input(
     z

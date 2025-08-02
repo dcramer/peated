@@ -24,6 +24,7 @@ export default procedure
     summary: "List countries",
     description:
       "Retrieve countries with filtering by major whisky regions, bottle counts, and search support",
+    operationId: "listCountries",
   })
   .input(
     z

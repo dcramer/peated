@@ -22,6 +22,7 @@ export default procedure
     summary: "Upsert bottle alias",
     description:
       "Create or update a bottle alias and associate it with a bottle. Updates related prices and reviews. Requires moderator privileges",
+    operationId: "upsertBottleAlias",
   })
   .input(BottleAliasSchema)
   .output(z.object({}))

@@ -21,6 +21,7 @@ export default procedure
     summary: "List collection bottles",
     description:
       "Retrieve bottles in a user's collection with pagination support. Respects privacy settings",
+    operationId: "listCollectionBottles",
   })
   .input(
     z.object({

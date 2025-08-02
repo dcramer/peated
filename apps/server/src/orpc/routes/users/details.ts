@@ -20,6 +20,7 @@ export default procedure
     summary: "Get user details",
     description:
       "Retrieve user profile information including statistics for tastings, bottles, and contributions",
+    operationId: "getUser",
   })
   .input(
     z.object({

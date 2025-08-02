@@ -15,6 +15,7 @@ export default procedure
     summary: "List entity categories",
     description:
       "Retrieve whisky categories and their counts for bottles associated with a specific entity",
+    operationId: "listEntityCategories",
   })
   .input(
     z.object({

@@ -14,6 +14,7 @@ export default procedure
     summary: "Get external site config",
     description:
       "Retrieve a configuration value for an external site. Returns default if not set. Requires admin privileges",
+    operationId: "getExternalSiteConfig",
   })
   .input(
     z.object({

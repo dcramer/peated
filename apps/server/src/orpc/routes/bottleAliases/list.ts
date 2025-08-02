@@ -33,6 +33,7 @@ export default procedure
     summary: "List bottle aliases",
     description:
       "Retrieve bottle aliases with filtering by bottle, unknown status, and search support",
+    operationId: "listBottleAliases",
   })
   .input(
     z

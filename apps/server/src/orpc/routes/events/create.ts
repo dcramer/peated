@@ -14,6 +14,7 @@ export default procedure
     summary: "Create event",
     description:
       "Create a new whisky event with dates and details. Requires admin privileges",
+    operationId: "createEvent",
   })
   .input(EventInputSchema)
   .output(EventSchema)

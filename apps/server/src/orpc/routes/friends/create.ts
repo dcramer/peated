@@ -17,6 +17,7 @@ export default procedure
     summary: "Send friend request",
     description:
       "Send a friend request to another user or accept a pending request. Creates mutual following relationship when accepted",
+    operationId: "addFriend",
   })
   .input(
     z.object({

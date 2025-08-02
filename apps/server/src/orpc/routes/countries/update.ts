@@ -20,6 +20,7 @@ export default procedure
     summary: "Update country",
     description:
       "Update country information including description and summary. Requires moderator privileges",
+    operationId: "updateCountry",
   })
   .input(InputSchema)
   .output(CountrySchema)

@@ -11,6 +11,7 @@ export default procedure
     summary: "List entity aliases",
     description:
       "Retrieve all aliases for a specific entity, indicating which is canonical",
+    operationId: "listEntityAliases",
   })
   .input(
     z.object({

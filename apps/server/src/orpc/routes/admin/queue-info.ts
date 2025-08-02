@@ -22,6 +22,7 @@ export default procedure
     summary: "Get queue information",
     description:
       "Retrieve job queue statistics including waiting, active, completed, and failed jobs. Requires admin privileges",
+    operationId: "getAdminQueueInfo",
   })
   .output(QueueInfoSchema)
   .handler(async function () {

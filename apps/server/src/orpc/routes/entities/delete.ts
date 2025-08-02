@@ -18,6 +18,7 @@ export default procedure
     summary: "Delete entity",
     description:
       "Delete an entity and create a tombstone record. Removes associated aliases. Requires admin privileges",
+    operationId: "deleteEntity",
   })
   .input(z.object({ entity: z.coerce.number() }))
   .output(z.object({}))

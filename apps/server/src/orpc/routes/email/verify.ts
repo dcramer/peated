@@ -13,6 +13,7 @@ export default procedure
     summary: "Verify email",
     description:
       "Verify user email address using verification token from email",
+    operationId: "verifyEmail",
   })
   .input(z.object({ token: z.string() }))
   .output(z.object({}))

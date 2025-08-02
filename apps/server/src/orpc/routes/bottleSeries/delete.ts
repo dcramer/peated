@@ -13,6 +13,7 @@ export default procedure
     summary: "Delete bottle series",
     description:
       "Delete a bottle series and remove its reference from associated bottles. Requires moderator privileges",
+    operationId: "deleteBottleSeries",
   })
   .input(z.object({ series: z.coerce.number() }))
   .output(z.object({}))

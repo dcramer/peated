@@ -22,6 +22,7 @@ export default procedure
     summary: "Update bottle alias",
     description:
       "Update bottle alias properties such as ignored status. Requires moderator privileges",
+    operationId: "updateBottleAlias",
   })
   .use(requireMod)
   .input(InputSchema)

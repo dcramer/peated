@@ -41,6 +41,7 @@ export default procedure
     summary: "List events",
     description:
       "Retrieve whisky events with filtering by upcoming dates, search, and sorting options",
+    operationId: "listEvents",
   })
   .input(InputSchema)
   .output(OutputSchema)

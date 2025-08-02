@@ -33,6 +33,7 @@ export default procedure
     summary: "Extract bottle information from labels",
     description:
       "Use AI to extract bottle details from image URLs or text labels including brand, expression, age, and other metadata",
+    operationId: "aiExtractLabels",
   })
   .input(InputSchema)
   .output(OutputSchema)

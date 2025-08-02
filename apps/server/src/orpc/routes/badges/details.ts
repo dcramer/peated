@@ -14,6 +14,7 @@ export default procedure
     summary: "Get badge details",
     description:
       "Retrieve detailed information about a specific achievement badge",
+    operationId: "getBadge",
   })
   .input(z.object({ badge: z.coerce.number() }))
   .output(BadgeSchema)

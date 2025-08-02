@@ -21,6 +21,7 @@ export default procedure
     summary: "AI region lookup",
     description:
       "Use AI to generate region details and descriptions for a specific country. Requires moderator privileges",
+    operationId: "aiRegionLookup",
   })
   .input(InputSchema)
   .output(OutputSchema)

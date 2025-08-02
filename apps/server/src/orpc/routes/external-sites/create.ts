@@ -17,6 +17,7 @@ export default procedure
     summary: "Create external site",
     description:
       "Create a new external site configuration for price scraping or data integration. Requires admin privileges",
+    operationId: "createExternalSite",
   })
   .input(ExternalSiteInputSchema)
   .output(ExternalSiteSchema)

@@ -21,6 +21,7 @@ export default procedure
     summary: "Update review",
     description:
       "Update review properties such as visibility. Requires moderator privileges",
+    operationId: "updateReview",
   })
   .input(
     InputSchema.partial().extend({

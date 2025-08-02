@@ -27,6 +27,7 @@ export default procedure
     summary: "List flights",
     description:
       "Retrieve tasting flights with filtering by visibility and search. Respects user permissions for private flights",
+    operationId: "listFlights",
   })
   .input(
     z

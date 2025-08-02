@@ -18,6 +18,7 @@ export default procedure
     path: "/countries/{country}/regions/{region}",
     summary: "Delete region",
     description: "Delete a region from a country. Requires admin privileges",
+    operationId: "deleteRegion",
   })
   .input(InputSchema)
   .output(z.object({}))

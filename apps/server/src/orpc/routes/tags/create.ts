@@ -15,6 +15,7 @@ export default procedure
     summary: "Create tag",
     description:
       "Create a new tag with synonyms, category, and flavor profiles. Requires moderator privileges",
+    operationId: "createTag",
   })
   .input(TagInputSchema)
   .output(TagSchema)

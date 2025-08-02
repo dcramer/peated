@@ -21,6 +21,7 @@ export default procedure
     summary: "Update region",
     description:
       "Update region information including description. Requires moderator privileges",
+    operationId: "updateRegion",
   })
   .input(InputSchema)
   .output(RegionSchema)

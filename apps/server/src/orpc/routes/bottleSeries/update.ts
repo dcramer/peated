@@ -25,6 +25,7 @@ export default procedure
     summary: "Update bottle series",
     description:
       "Update bottle series information including name and description. Requires moderator privileges",
+    operationId: "updateBottleSeries",
   })
   .input(InputSchema)
   .output(BottleSeriesSchema)

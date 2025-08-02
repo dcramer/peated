@@ -19,6 +19,7 @@ export default procedure
     summary: "Update badge image",
     description:
       "Upload and update the image for a badge with automatic compression and resizing. Requires admin privileges",
+    operationId: "updateBadgeImage",
   })
   .input(
     z.object({

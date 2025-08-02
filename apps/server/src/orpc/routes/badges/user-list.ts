@@ -79,6 +79,7 @@ export default procedure
     summary: "List badge users",
     description:
       "Retrieve users who have earned a specific badge, ordered by XP. Requires authentication",
+    operationId: "listBadgeUsers",
   })
   .use(requireAuth)
   .input(InputSchema)

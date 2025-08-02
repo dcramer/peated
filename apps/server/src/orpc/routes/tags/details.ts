@@ -14,6 +14,7 @@ export default procedure
     summary: "Get tag details",
     description:
       "Retrieve detailed information about a specific tag by its name",
+    operationId: "getTag",
   })
   .input(z.object({ tag: z.string() }))
   .output(TagSchema)

@@ -15,6 +15,7 @@ export default procedure
     summary: "Get country details",
     description:
       "Retrieve detailed information about a specific country using its slug",
+    operationId: "getCountry",
   })
   .input(
     z.object({

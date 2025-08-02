@@ -17,6 +17,7 @@ export default procedure
     summary: "Update event",
     description:
       "Update event information including dates, location, and details. Requires admin privileges",
+    operationId: "updateEvent",
   })
   .input(EventInputSchema.partial().extend({ event: z.coerce.number() }))
   .output(EventSchema)

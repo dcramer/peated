@@ -38,6 +38,7 @@ export default procedure
     summary: "Create tasting",
     description:
       "Create a new tasting entry for a bottle with notes, rating, and optional metadata like flight and friends",
+    operationId: "createTasting",
   })
   .input(TastingInputSchema)
   .output(
