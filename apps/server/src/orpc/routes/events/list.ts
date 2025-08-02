@@ -39,7 +39,6 @@ export default procedure
     method: "GET",
     path: "/events",
     summary: "List events",
-    spec: {},
     description:
       "Retrieve whisky events with filtering by upcoming dates, search, and sorting options",
   })

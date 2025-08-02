@@ -17,7 +17,6 @@ export default procedure
     method: "PATCH",
     path: "/badges/{badge}",
     summary: "Update badge",
-    spec: {},
     description:
       "Update badge information including name, description, and validation checks. Requires admin privileges",
   })

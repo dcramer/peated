@@ -19,7 +19,6 @@ export default procedure
     method: "DELETE",
     path: "/tastings/{tasting}",
     summary: "Delete tasting",
-    spec: {},
     description:
       "Delete a tasting and update related statistics. Only the tasting creator or admin can delete",
   })

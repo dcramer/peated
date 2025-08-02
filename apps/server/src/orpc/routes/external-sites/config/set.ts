@@ -12,7 +12,6 @@ export default procedure
     method: "PUT",
     path: "/external-sites/{site}/config/{key}",
     summary: "Set external site config",
-    spec: {},
     description:
       "Set or update a configuration value for an external site. Requires admin privileges",
   })

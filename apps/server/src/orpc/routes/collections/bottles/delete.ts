@@ -14,7 +14,6 @@ export default procedure
     method: "DELETE",
     path: "/users/{user}/collections/{collection}/bottles",
     summary: "Remove bottle from collection",
-    spec: {},
     description:
       "Remove a bottle (and optionally a specific release) from a user's collection. Requires authentication and ownership",
   })

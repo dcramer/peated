@@ -20,7 +20,6 @@ export default procedure
     method: "POST",
     path: "/auth/password-reset/confirm",
     summary: "Confirm password reset",
-    spec: {},
     description:
       "Confirm password reset using token from email and set new password. Automatically verifies the user account",
   })

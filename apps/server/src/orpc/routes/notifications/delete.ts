@@ -11,7 +11,6 @@ export default procedure
     method: "DELETE",
     path: "/notifications/{notification}",
     summary: "Delete notification",
-    spec: {},
     description:
       "Delete a notification. Requires authentication and ownership or admin privileges",
   })

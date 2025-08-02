@@ -13,7 +13,6 @@ export default procedure
     method: "GET",
     path: "/countries/{country}",
     summary: "Get country details",
-    spec: {},
     description:
       "Retrieve detailed information about a specific country using its slug",
   })

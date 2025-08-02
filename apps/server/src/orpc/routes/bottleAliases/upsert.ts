@@ -20,7 +20,6 @@ export default procedure
     method: "PUT",
     path: "/bottle-aliases",
     summary: "Upsert bottle alias",
-    spec: {},
     description:
       "Create or update a bottle alias and associate it with a bottle. Updates related prices and reviews. Requires moderator privileges",
   })

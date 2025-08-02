@@ -11,7 +11,6 @@ export default procedure
     method: "GET",
     path: "/bottles/{bottle}/suggested-tags",
     summary: "Get suggested tags for bottle",
-    spec: {},
     description:
       "Retrieve suggested tags for a bottle based on usage patterns for the bottle, brand, and category",
   })

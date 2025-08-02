@@ -27,7 +27,6 @@ export default procedure
     method: "POST",
     path: "/ai/bottle-lookup",
     summary: "AI bottle lookup",
-    spec: {},
     description:
       "Use AI to generate bottle details including description, category, flavor profile, tasting notes, and suggested tags. Requires moderator privileges",
   })

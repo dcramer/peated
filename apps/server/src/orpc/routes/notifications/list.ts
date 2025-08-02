@@ -15,7 +15,6 @@ export default procedure
     method: "GET",
     path: "/notifications",
     summary: "List notifications",
-    spec: {},
     description:
       "Retrieve user notifications with filtering by read status and pagination support",
   })

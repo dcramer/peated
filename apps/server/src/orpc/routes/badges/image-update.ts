@@ -17,7 +17,6 @@ export default procedure
     method: "POST",
     path: "/badges/{badge}/image",
     summary: "Update badge image",
-    spec: {},
     description:
       "Upload and update the image for a badge with automatic compression and resizing. Requires admin privileges",
   })

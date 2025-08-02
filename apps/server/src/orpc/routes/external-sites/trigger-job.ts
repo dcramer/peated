@@ -14,7 +14,6 @@ export default procedure
     method: "POST",
     path: "/external-sites/{site}/trigger",
     summary: "Trigger external site job",
-    spec: {},
     description:
       "Manually trigger a scraping job for an external site. Requires admin privileges",
   })

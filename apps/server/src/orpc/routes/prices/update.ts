@@ -19,7 +19,6 @@ export default procedure
     method: "PATCH",
     path: "/prices/{price}",
     summary: "Update price",
-    spec: {},
     description:
       "Update store price properties such as visibility. Requires moderator privileges",
   })
