@@ -63,6 +63,10 @@ export default procedure
     summary: "Global search",
     description:
       "Search across bottles, entities, and users with configurable result types and limits",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "search",
+    }),
   })
   .input(
     z.object({

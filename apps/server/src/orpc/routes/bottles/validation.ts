@@ -128,6 +128,10 @@ export default procedure
     summary: "Validate bottle data",
     description:
       "Validate and normalize bottle information including name parsing, entity resolution, and data standardization",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "validateBottle",
+    }),
   })
   .input(BottleInputSchema)
   .output(BottlePreviewResultSchema)

@@ -12,6 +12,10 @@ export default procedure
     summary: "Create magic link",
     description:
       "Send a magic link authentication email to the specified email address",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "createMagicLink",
+    }),
   })
   .input(
     z.object({

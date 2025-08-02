@@ -16,6 +16,10 @@ export default procedure
     summary: "Get bottle price history",
     description:
       "Retrieve historical price data for a bottle including average, minimum, and maximum prices over time",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "getBottlePriceHistory",
+    }),
   })
   .input(
     z.object({

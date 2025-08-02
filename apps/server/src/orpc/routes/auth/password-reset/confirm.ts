@@ -22,6 +22,10 @@ export default procedure
     summary: "Confirm password reset",
     description:
       "Confirm password reset using token from email and set new password. Automatically verifies the user account",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "confirmPasswordReset",
+    }),
   })
   .input(
     z.object({

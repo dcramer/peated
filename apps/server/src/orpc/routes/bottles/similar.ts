@@ -26,6 +26,10 @@ export default procedure
     summary: "Get similar bottles",
     description:
       "Find bottles similar to the specified bottle based on brand, category, age, and distillery",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "getBottleSimilar",
+    }),
   })
   .input(
     z.object({

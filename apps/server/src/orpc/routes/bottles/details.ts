@@ -31,6 +31,10 @@ export default procedure
     summary: "Get bottle details",
     description:
       "Retrieve detailed information about a specific bottle including creator, pricing, and tasting statistics",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "getBottle",
+    }),
   })
   .input(z.object({ bottle: z.coerce.number() }))
   .output(OutputSchema)

@@ -20,6 +20,10 @@ export default procedure
     summary: "User registration",
     description:
       "Register a new user account with username, email, and password",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "register",
+    }),
   })
   .input(
     z.object({

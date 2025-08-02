@@ -16,6 +16,10 @@ export default procedure
     path: "/auth/me",
     summary: "Get current user",
     description: "Retrieve the authenticated user's profile information",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "getMe",
+    }),
   })
   .output(z.object({ user: UserSchema }))
   .handler(async function ({ context, errors }) {

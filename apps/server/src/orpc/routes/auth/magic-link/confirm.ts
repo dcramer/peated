@@ -18,6 +18,10 @@ export default procedure
     summary: "Confirm magic link",
     description:
       "Confirm magic link authentication and return access token. Automatically verifies the user account",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "confirmMagicLink",
+    }),
   })
   .input(
     z.object({

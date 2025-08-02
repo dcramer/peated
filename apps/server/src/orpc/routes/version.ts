@@ -8,6 +8,10 @@ export default procedure
     path: "/version",
     summary: "Get API version",
     description: "Retrieve the current API version",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "getVersion",
+    }),
   })
   .output(z.object({ version: z.string() }))
   .handler(async function () {

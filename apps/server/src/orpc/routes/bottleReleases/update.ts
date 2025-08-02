@@ -27,6 +27,10 @@ export default procedure
     summary: "Update bottle release",
     description:
       "Update bottle release information including edition, vintage, and cask details. Requires moderator privileges",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "updateBottleRelease",
+    }),
   })
   .input(InputSchema)
   .output(BottleReleaseSchema)

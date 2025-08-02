@@ -35,6 +35,10 @@ export default procedure
     summary: "Create bottle",
     description:
       "Create a new bottle entry with brand, distillery, and whisky details",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "createBottle",
+    }),
   })
   .input(BottleInputSchema)
   .output(BottleSchema)

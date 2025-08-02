@@ -21,6 +21,10 @@ export default procedure
     summary: "Delete bottle release",
     description:
       "Delete a bottle release and remove its references from related entities. Requires admin privileges",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "deleteBottleRelease",
+    }),
   })
   .input(z.object({ release: z.coerce.number() }))
   .output(z.object({}))

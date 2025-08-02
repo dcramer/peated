@@ -41,6 +41,10 @@ export default procedure
     summary: "Update bottle",
     description:
       "Update bottle information including name, brand, distillers, and other metadata. Requires moderator privileges",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "updateBottle",
+    }),
   })
   .input(InputSchema)
   .output(BottleSchema)

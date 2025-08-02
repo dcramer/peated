@@ -11,6 +11,10 @@ export default procedure
     summary: "Get bottle tags",
     description:
       "Retrieve tags associated with a bottle and their usage counts from tastings",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "getBottleTags",
+    }),
   })
   .input(
     z.object({

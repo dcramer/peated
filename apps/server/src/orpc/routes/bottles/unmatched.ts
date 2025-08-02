@@ -44,6 +44,10 @@ export default procedure
     summary: "List unmatched bottles",
     description:
       "Retrieve bottle aliases that haven't been matched to existing bottles, with example store listings. Requires moderator privileges",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "listUnmatchedBottles",
+    }),
   })
   .input(
     z

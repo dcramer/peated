@@ -13,6 +13,10 @@ export default procedure
     summary: "Get suggested tags for bottle",
     description:
       "Retrieve suggested tags for a bottle based on usage patterns for the bottle, brand, and category",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "getBottleSuggestedTags",
+    }),
   })
   .input(
     z.object({

@@ -14,6 +14,10 @@ export default procedure
     summary: "Delete comment",
     description:
       "Delete a comment and update related counters. Requires authentication and ownership or admin privileges",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "deleteComment",
+    }),
   })
   // .route({
   //   method: "DELETE",

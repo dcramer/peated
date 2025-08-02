@@ -16,6 +16,10 @@ export default procedure
     summary: "Upsert bottle",
     description:
       "Create a new bottle or update existing one if it already exists. Requires moderator privileges",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "upsertBottle",
+    }),
   })
   .input(BottleInputSchema)
   .output(BottleSchema)

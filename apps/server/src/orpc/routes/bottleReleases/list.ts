@@ -33,6 +33,10 @@ export default procedure
     summary: "List bottle releases",
     description:
       "Retrieve releases for a specific bottle with search, sorting, and pagination support",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "listBottleReleases",
+    }),
   })
   .input(
     z.object({

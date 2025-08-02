@@ -100,80 +100,97 @@ export default procedure
 
 ## 4. OpenAPI OperationId Convention
 
-**Routes use oRPC's automatic operationId generation** - do NOT manually specify `operationId` fields as this breaks auto-generated OpenAPI specifications.
+**Routes must explicitly specify operationIds** using the `spec` callback function in oRPC 1.7.8+. This ensures language-friendly, consistent operation identifiers for code generation and documentation.
 
-### 4.1 Automatic Generation
+### 4.1 Naming Convention
 
-oRPC automatically generates operationIds based on the route path structure:
+We use **camelCase** operationIds following the pattern: `{verb}{Resource}`.
 
-| Route Path | Auto-Generated OperationId |
-| ---------- | -------------------------- |
-| `GET /bottles` | `bottles.list` |
-| `GET /bottles/{bottle}` | `bottles.details` |
-| `POST /bottles` | `bottles.create` |
-| `PUT /bottles/{bottle}` | `bottles.update` |
-| `DELETE /bottles/{bottle}` | `bottles.delete` |
-| `POST /auth/login` | `auth.login` |
-| `GET /users/{user}` | `users.details` |
+| Standard Verbs | Usage |
+| ------------- | ----- |
+| `list` | GET operations returning multiple resources |
+| `get` | GET operations returning a single resource |
+| `create` | POST operations creating a new resource |
+| `update` | PUT/PATCH operations modifying a resource |
+| `delete` | DELETE operations removing a resource |
+| `search` | Complex search operations |
+| `add` | Adding a resource to a collection |
+| `remove` | Removing a resource from a collection |
 
-### 4.2 Why Automatic Generation?
+### 4.2 Naming Examples
 
-| ✅ **Auto-Generated** | ❌ **Manual `operationId`** |
-| -------------------- | --------------------------- |
-| Full OpenAPI specs preserved | Breaks parameters, responses, schemas |
-| Zero maintenance overhead | Requires manual updates across 100+ files |
-| Consistent across all endpoints | Prone to inconsistencies |
-| Complete parameter definitions | Missing request/response schemas |
-| Rich error response schemas | Incomplete error handling definitions |
+| Route Path | OperationId |
+| ---------- | ----------- |
+| `GET /bottles` | `listBottles` |
+| `GET /bottles/{bottle}` | `getBottle` |
+| `POST /bottles` | `createBottle` |
+| `PUT /bottles/{bottle}` | `updateBottle` |
+| `DELETE /bottles/{bottle}` | `deleteBottle` |
+| `GET /bottles/{bottle}/prices` | `listBottlePrices` |
+| `POST /collections/{collection}/bottles` | `addBottleToCollection` |
+| `DELETE /collections/{collection}/bottles/{bottle}` | `removeBottleFromCollection` |
+| `POST /auth/login` | `login` |
+| `POST /auth/logout` | `logout` |
+| `GET /search` | `search` |
 
-### 4.3 Implementation Examples
+### 4.3 Implementation Pattern
+
+Use the `spec` callback to override the auto-generated operationId:
 
 ```ts
-// ✅ Auto-generated operationId: "bottles.list"
+// ✅ Correct: Explicit operationId using spec callback
 export default procedure
   .route({
     method: "GET",
     path: "/bottles",
     summary: "List bottles",
-    // No operationId needed - auto-generated!
+    spec: (spec) => ({
+      ...spec,
+      operationId: "listBottles",
+    }),
   })
 
-// ✅ Auto-generated operationId: "bottles.details"
+// ✅ Correct: Single resource with parameter
 export default procedure
   .route({
     method: "GET",
     path: "/bottles/{bottle}",
     summary: "Get bottle details",
-    // No operationId needed - auto-generated!
+    spec: (spec) => ({
+      ...spec,
+      operationId: "getBottle",
+    }),
   })
 
-// ❌ NEVER manually specify operationId - breaks OpenAPI generation
+// ✅ Correct: Nested resource operation
 export default procedure
   .route({
     method: "POST",
-    path: "/bottles/{bottle}/image",
-    operationId: "updateBottleImage", // ❌ Breaks full spec generation!
-    summary: "Update bottle image",
+    path: "/collections/{collection}/bottles",
+    summary: "Add bottle to collection",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "addBottleToCollection",
+    }),
   })
 ```
 
-### 4.4 Generated OpenAPI Benefits
+### 4.4 Rules
 
-With automatic generation, each route gets:
-- ✅ **Complete parameter schemas** (path, query, body)
-- ✅ **Full response definitions** with typed schemas
-- ✅ **Comprehensive error responses** (400, 401, 403, 404, 500)
-- ✅ **Rich validation rules** from Zod schemas
-- ✅ **Proper tags and descriptions**
+1. **Uniqueness**: Each operationId must be unique across the entire API
+2. **Length**: Keep operationIds under 30 characters
+3. **Format**: Use camelCase without spaces or special characters
+4. **Clarity**: The operationId should clearly indicate the operation's purpose
+5. **Consistency**: Use the same verb for similar operations across resources
+6. **Language-Agnostic**: Avoid programming language reserved words
 
-### 4.5 File Structure Independence
+### 4.5 Benefits
 
-File structure serves code organization, while operationIds serve API consumers:
-
-- **File Structure**: `bottles/details.ts` (noun/verb - for logical organization)
-- **Auto-Generated OperationId**: `bottles.details` (consistent dot notation)
-
-This gives us both logical file organization AND complete OpenAPI specifications automatically.
+- ✅ **Code Generation**: Clean method names in generated SDKs
+- ✅ **Documentation**: Intuitive operation names in API docs
+- ✅ **Testing**: Clear test method names
+- ✅ **Consistency**: Predictable naming across all endpoints
+- ✅ **Developer Experience**: Easy to understand and use
 
 ## 5. HTTP Method Semantics
 

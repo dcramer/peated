@@ -24,6 +24,10 @@ export default procedure
     summary: "Create comment",
     description: "Add a comment to a tasting. Requires authentication",
     tags: ["tastings"],
+    spec: (spec) => ({
+      ...spec,
+      operationId: "createComment",
+    }),
   })
   .input(
     CommentInputSchema.extend({

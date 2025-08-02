@@ -11,6 +11,10 @@ export default procedure
     path: "/auth/password-reset",
     summary: "Request password reset",
     description: "Send a password reset email to the specified email address",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "createPasswordReset",
+    }),
   })
   .input(
     z.object({

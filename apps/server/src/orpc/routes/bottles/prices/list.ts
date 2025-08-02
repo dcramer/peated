@@ -22,6 +22,10 @@ export default procedure
     summary: "List bottle prices",
     description:
       "Retrieve current and historical prices for a specific bottle from various external sites",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "listBottlePrices",
+    }),
   })
   .input(
     z.object({

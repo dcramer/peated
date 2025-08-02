@@ -19,6 +19,10 @@ export default procedure
     summary: "User login",
     description:
       "Authenticate user with email/password, Google OAuth code, or Google ID token",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "login",
+    }),
   })
   .input(
     z.union([

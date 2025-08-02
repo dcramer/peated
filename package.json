@@ -34,6 +34,10 @@
   "author": "David Cramer",
   "license": "Apache-2.0",
   "dependencies": {
+    "@orpc/client": "1.7.8",
+    "@orpc/openapi": "1.7.8",
+    "@orpc/server": "1.7.8",
+    "@orpc/zod": "1.7.8",
     "dotenv": "^16.4.7",
     "dotenv-cli": "^7.4.4",
     "simple-git-hooks": "^2.11.1",

@@ -45,6 +45,10 @@ export default procedure
     summary: "List bottles",
     description:
       "Search and filter bottles with pagination support. Supports filtering by brand, distillery, category, age, and more",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "listBottles",
+    }),
   })
   .input(
     z.object({

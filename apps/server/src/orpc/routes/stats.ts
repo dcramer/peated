@@ -11,6 +11,10 @@ export default procedure
     summary: "Get platform statistics",
     description:
       "Retrieve overall platform statistics including total tastings, bottles, and entities",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "getStats",
+    }),
   })
   .output(
     z.object({

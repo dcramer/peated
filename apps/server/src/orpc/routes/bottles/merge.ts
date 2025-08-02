@@ -17,6 +17,10 @@ export default procedure
     summary: "Merge bottles",
     description:
       "Merge two bottles together, combining their data and references. Requires moderator privileges",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "mergeBottle",
+    }),
   })
   .input(
     z.object({
