@@ -13,9 +13,7 @@ export default procedure
     method: "GET",
     path: "/entities/{entity}/categories",
     summary: "List entity categories",
-    spec: {
-      operationId: "listEntityCategories",
-    },
+    spec: {},
     description:
       "Retrieve whisky categories and their counts for bottles associated with a specific entity",
   })

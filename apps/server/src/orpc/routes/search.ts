@@ -61,9 +61,7 @@ export default procedure
     method: "GET",
     path: "/search",
     summary: "Global search",
-    spec: {
-      operationId: "globalSearch",
-    },
+    spec: {},
     description:
       "Search across bottles, entities, and users with configurable result types and limits",
   })

@@ -17,9 +17,7 @@ export default procedure
     method: "GET",
     path: "/users",
     summary: "List users",
-    spec: {
-      operationId: "listUsers",
-    },
+    spec: {},
     description:
       "Search and list users with pagination support. Requires authentication",
   })

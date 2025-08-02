@@ -10,9 +10,7 @@ export default procedure
     method: "POST",
     path: "/auth/magic-link",
     summary: "Create magic link",
-    spec: {
-      operationId: "createMagicLink",
-    },
+    spec: {},
     description:
       "Send a magic link authentication email to the specified email address",
   })

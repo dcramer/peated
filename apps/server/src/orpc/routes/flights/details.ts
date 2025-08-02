@@ -14,9 +14,7 @@ export default procedure
     method: "GET",
     path: "/flights/{flight}",
     summary: "Get flight details",
-    spec: {
-      operationId: "getFlightDetails",
-    },
+    spec: {},
     description:
       "Retrieve detailed information about a specific tasting flight using its public ID",
   })

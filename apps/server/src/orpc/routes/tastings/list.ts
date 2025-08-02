@@ -20,9 +20,7 @@ export default procedure
     method: "GET",
     path: "/tastings",
     summary: "List tastings",
-    spec: {
-      operationId: "listTastings",
-    },
+    spec: {},
     description:
       "Retrieve tastings with filtering by bottle, entity, user, and privacy settings. Supports pagination",
   })

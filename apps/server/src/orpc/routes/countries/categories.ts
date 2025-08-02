@@ -14,9 +14,7 @@ export default procedure
     method: "GET",
     path: "/countries/categories",
     summary: "Get country categories",
-    spec: {
-      operationId: "getCountryCategories",
-    },
+    spec: {},
     description:
       "Retrieve whisky categories and their counts for a specific country based on distillery locations",
   })

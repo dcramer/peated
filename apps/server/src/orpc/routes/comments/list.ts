@@ -12,9 +12,7 @@ export default procedure
     method: "GET",
     path: "/comments",
     summary: "List comments",
-    spec: {
-      operationId: "listComments",
-    },
+    spec: {},
     description: "Retrieve comments with filtering by user and tasting",
   })
   // .route({

@@ -11,9 +11,7 @@ export default procedure
     method: "DELETE",
     path: "/bottle-aliases/{alias}",
     summary: "Delete bottle alias",
-    spec: {
-      operationId: "deleteBottleAlias",
-    },
+    spec: {},
     description:
       "Remove bottle alias association and clear related references. Cannot delete canonical names. Requires moderator privileges",
   })

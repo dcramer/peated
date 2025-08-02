@@ -20,9 +20,7 @@ export default procedure
     method: "GET",
     path: "/admin/queue/info",
     summary: "Get queue information",
-    spec: {
-      operationId: "getQueueInfo",
-    },
+    spec: {},
     description:
       "Retrieve job queue statistics including waiting, active, completed, and failed jobs. Requires admin privileges",
   })

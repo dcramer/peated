@@ -15,9 +15,7 @@ export default procedure
     method: "POST",
     path: "/entities/{entity}/merge",
     summary: "Merge entities",
-    spec: {
-      operationId: "mergeEntities",
-    },
+    spec: {},
     description:
       "Merge two entities together, combining their data and references. Requires moderator privileges",
   })

@@ -32,9 +32,7 @@ export default procedure
     method: "GET",
     path: "/countries/{country}/regions",
     summary: "List regions",
-    spec: {
-      operationId: "listRegions",
-    },
+    spec: {},
     description:
       "Retrieve regions within a specific country with filtering by bottle counts and search support",
   })

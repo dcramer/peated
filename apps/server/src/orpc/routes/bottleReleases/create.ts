@@ -21,9 +21,7 @@ export default procedure
     method: "POST",
     path: "/bottle-releases",
     summary: "Create bottle release",
-    spec: {
-      operationId: "createBottleRelease",
-    },
+    spec: {},
     description:
       "Create a new bottle release with specific edition, vintage, and cask details. Requires authentication",
   })

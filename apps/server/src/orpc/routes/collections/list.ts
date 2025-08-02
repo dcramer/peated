@@ -15,9 +15,7 @@ export default procedure
     method: "GET",
     path: "/users/{user}/collections",
     summary: "List user collections",
-    spec: {
-      operationId: "listUserCollections",
-    },
+    spec: {},
     description:
       "Retrieve collections for a specific user with optional bottle filtering. Respects user privacy settings",
   })

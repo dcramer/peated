@@ -42,9 +42,7 @@ export default procedure
     method: "GET",
     path: "/bottles/unmatched",
     summary: "List unmatched bottles",
-    spec: {
-      operationId: "listUnmatchedBottles",
-    },
+    spec: {},
     description:
       "Retrieve bottle aliases that haven't been matched to existing bottles, with example store listings. Requires moderator privileges",
   })

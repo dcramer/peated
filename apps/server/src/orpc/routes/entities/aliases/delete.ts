@@ -12,9 +12,7 @@ export default procedure
     method: "DELETE",
     path: "/entity-aliases/{name}",
     summary: "Delete entity alias",
-    spec: {
-      operationId: "deleteEntityAlias",
-    },
+    spec: {},
     description:
       "Remove entity alias association. Cannot delete canonical names. Requires moderator privileges",
   })

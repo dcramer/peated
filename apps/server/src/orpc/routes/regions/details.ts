@@ -13,9 +13,7 @@ export default procedure
     method: "GET",
     path: "/countries/{country}/regions/{region}",
     summary: "Get region details",
-    spec: {
-      operationId: "getRegionDetails",
-    },
+    spec: {},
     description:
       "Retrieve detailed information about a specific region within a country using their slugs",
   })

@@ -13,9 +13,7 @@ export default procedure
     method: "POST",
     path: "/flights",
     summary: "Create flight",
-    spec: {
-      operationId: "createFlight",
-    },
+    spec: {},
     description:
       "Create a new tasting flight with bottles and visibility settings",
   })

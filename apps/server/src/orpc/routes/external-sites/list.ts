@@ -13,9 +13,7 @@ export default procedure
     method: "GET",
     path: "/external-sites",
     summary: "List external sites",
-    spec: {
-      operationId: "listExternalSites",
-    },
+    spec: {},
     description: "Retrieve external sites with search and sorting options",
   })
   .input(

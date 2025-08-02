@@ -15,9 +15,7 @@ export default procedure
     method: "GET",
     path: "/external-sites/{site}",
     summary: "Get external site details",
-    spec: {
-      operationId: "getExternalSiteDetails",
-    },
+    spec: {},
     description:
       "Retrieve detailed information about a specific external site by its type",
   })

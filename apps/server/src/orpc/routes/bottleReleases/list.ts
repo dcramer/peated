@@ -31,9 +31,7 @@ export default procedure
     method: "GET",
     path: "/bottles/{bottle}/releases",
     summary: "List bottle releases",
-    spec: {
-      operationId: "listBottleReleases",
-    },
+    spec: {},
     description:
       "Retrieve releases for a specific bottle with search, sorting, and pagination support",
   })

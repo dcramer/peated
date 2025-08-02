@@ -15,9 +15,7 @@ export default procedure
     method: "POST",
     path: "/badges",
     summary: "Create badge",
-    spec: {
-      operationId: "createBadge",
-    },
+    spec: {},
     description:
       "Create a new achievement badge with validation checks and configuration. Requires admin privileges",
   })

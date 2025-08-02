@@ -17,9 +17,7 @@ export default procedure
     method: "PATCH",
     path: "/flights/{flight}",
     summary: "Update flight",
-    spec: {
-      operationId: "updateFlight",
-    },
+    spec: {},
     description:
       "Update flight information including name, description, and bottle list. Only the flight creator or moderator can update",
   })
