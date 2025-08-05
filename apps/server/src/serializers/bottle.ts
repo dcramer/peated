@@ -201,7 +201,18 @@ export const BottleSerializer = serializer({
         : null,
 
       avgRating: item.avgRating,
-      ratingStats: item.ratingStats,
+      ratingStats: {
+        pass: item.ratingStats?.pass ?? 0,
+        sip: item.ratingStats?.sip ?? 0,
+        savor: item.ratingStats?.savor ?? 0,
+        total: item.ratingStats?.total ?? 0,
+        avg: item.ratingStats?.avg ?? null,
+        percentage: {
+          pass: item.ratingStats?.percentage?.pass ?? 0,
+          sip: item.ratingStats?.percentage?.sip ?? 0,
+          savor: item.ratingStats?.percentage?.savor ?? 0,
+        },
+      },
       totalTastings: item.totalTastings,
       numReleases: item.numReleases,
 

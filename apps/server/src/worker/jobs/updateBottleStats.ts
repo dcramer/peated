@@ -28,13 +28,14 @@ export default async ({ bottleId }: { bottleId: number }) => {
     WHERE ${tastings.bottleId} = ${bottle.id}
   `;
 
-  const [stats] = await db.execute<{
+  const result = await db.execute<{
     pass: number;
     sip: number;
     savor: number;
     total: number;
     avg: number | null;
   }>(ratingStatsQuery);
+  const stats = result.rows[0];
 
   const ratingStats = {
     pass: Number(stats.pass) || 0,

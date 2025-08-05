@@ -87,7 +87,8 @@ const sentryInterceptor = (
               Sentry.captureException(error);
             } catch (sentryError) {
               // Log Sentry errors but don't let them interfere with the original error
-              console.warn("Sentry interceptor error:", sentryError);
+              // eslint-disable-next-line no-console
+              console.warn("Sentry span instrumentation failed:", sentryError);
             }
 
             // Re-throw the original error
@@ -97,10 +98,8 @@ const sentryInterceptor = (
       );
     } catch (sentryError) {
       // If Sentry itself fails, log the error and continue with the original call
-      console.warn(
-        "Sentry interceptor failed, continuing without instrumentation:",
-        sentryError,
-      );
+      // eslint-disable-next-line no-console
+      console.error("Sentry interceptor failed:", sentryError);
       return await next();
     }
   };

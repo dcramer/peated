@@ -7,7 +7,7 @@ type RatingLevel = "pass" | "sip" | "savor" | null;
 
 const ratingLevels = [
   {
-    value: null as const,
+    value: null,
     label: "All",
     description: "Show all bottles",
   },
