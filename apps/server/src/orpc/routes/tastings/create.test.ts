@@ -26,7 +26,7 @@ describe("POST /tastings", () => {
     const data = await routerClient.tastings.create(
       {
         bottle: bottle.id,
-        rating: 3.5,
+        rating: 1,
       },
       { context: { user: defaults.user } },
     );
@@ -40,7 +40,7 @@ describe("POST /tastings", () => {
 
     expect(tasting.bottleId).toEqual(bottle.id);
     expect(tasting.createdById).toEqual(defaults.user.id);
-    expect(tasting.rating).toEqual(3.5);
+    expect(tasting.rating).toEqual(1);
     expect(tasting.notes).toBeNull();
 
     const [newBottle] = await db
@@ -71,7 +71,7 @@ describe("POST /tastings", () => {
     const data = await routerClient.tastings.create(
       {
         bottle: bottle.id,
-        rating: 3.5,
+        rating: 1,
         tags: [tags[0].name, tags[1].name],
       },
       { context: { user: defaults.user } },
@@ -105,7 +105,7 @@ describe("POST /tastings", () => {
     const data = await routerClient.tastings.create(
       {
         bottle: bottle.id,
-        rating: 3.5,
+        rating: 1,
         notes: "hello world",
       },
       { context: { user: defaults.user } },
@@ -172,7 +172,7 @@ describe("POST /tastings", () => {
     expect(tasting.friends).toEqual([]);
   });
 
-  test("creates a new tasting with zero rating", async ({
+  test("creates a new tasting with pass rating", async ({
     defaults,
     fixtures,
   }) => {
@@ -181,7 +181,7 @@ describe("POST /tastings", () => {
     const data = await routerClient.tastings.create(
       {
         bottle: bottle.id,
-        rating: 0,
+        rating: -1,
       },
       { context: { user: defaults.user } },
     );
@@ -195,7 +195,7 @@ describe("POST /tastings", () => {
 
     expect(tasting.bottleId).toEqual(bottle.id);
     expect(tasting.createdById).toEqual(defaults.user.id);
-    expect(tasting.rating).toBeNull();
+    expect(tasting.rating).toEqual(-1);
   });
 
   test("flight requires valid bottle", async ({ defaults, fixtures }) => {
@@ -477,7 +477,7 @@ describe("POST /tastings", () => {
       {
         bottle: bottle.id,
         createdAt,
-        rating: 4.0,
+        rating: 2,
       },
       { context: { user: defaults.user } },
     );
@@ -489,7 +489,7 @@ describe("POST /tastings", () => {
         {
           bottle: bottle.id,
           createdAt,
-          rating: 4.0,
+          rating: 2,
         },
         { context: { user: defaults.user } },
       ),
@@ -511,7 +511,7 @@ describe("POST /tastings", () => {
     await routerClient.tastings.create(
       {
         bottle: bottle.id,
-        rating: 4.5,
+        rating: 2,
       },
       { context: { user: defaults.user } },
     );
@@ -535,7 +535,7 @@ describe("POST /tastings", () => {
       .from(bottles)
       .where(eq(bottles.id, bottle.id));
     expect(updatedBottle.totalTastings).toBe(1);
-    expect(updatedBottle.avgRating).toBe(4.5);
+    expect(updatedBottle.avgRating).toBe(2);
   });
 
   test("creates a new tasting with both flight and release", async ({
@@ -551,7 +551,7 @@ describe("POST /tastings", () => {
         bottle: bottle.id,
         release: release.id,
         flight: flight.publicId,
-        rating: 4.0,
+        rating: 2,
       },
       { context: { user: defaults.user } },
     );
@@ -567,7 +567,7 @@ describe("POST /tastings", () => {
     expect(tasting.releaseId).toEqual(release.id);
     expect(tasting.flightId).toEqual(flight.id);
     expect(tasting.createdById).toEqual(defaults.user.id);
-    expect(tasting.rating).toEqual(4.0);
+    expect(tasting.rating).toEqual(2);
   });
 
   test("creates a new tasting with color", async ({ defaults, fixtures }) => {
@@ -576,7 +576,7 @@ describe("POST /tastings", () => {
     const data = await routerClient.tastings.create(
       {
         bottle: bottle.id,
-        rating: 4.0,
+        rating: 2,
       },
       { context: { user: defaults.user } },
     );
@@ -590,7 +590,7 @@ describe("POST /tastings", () => {
 
     expect(tasting.bottleId).toEqual(bottle.id);
     expect(tasting.createdById).toEqual(defaults.user.id);
-    expect(tasting.rating).toEqual(4.0);
+    expect(tasting.rating).toEqual(2);
   });
 
   test("creates a new tasting with serving style", async ({

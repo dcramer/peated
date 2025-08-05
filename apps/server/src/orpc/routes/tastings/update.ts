@@ -13,6 +13,7 @@ import { validateTags } from "@peated/server/orpc/validators/tags";
 import { TastingInputSchema, TastingSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
+import { pushJob } from "@peated/server/worker/client";
 import { and, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -180,6 +181,11 @@ export default procedure
       throw errors.INTERNAL_SERVER_ERROR({
         message: "Unable to update tasting.",
       });
+    }
+
+    // Update bottle stats if rating changed
+    if (tastingData.rating !== undefined) {
+      await pushJob("UpdateBottleStats", { bottleId: tasting.bottleId });
     }
 
     return await serialize(TastingSerializer, newTasting, context.user);

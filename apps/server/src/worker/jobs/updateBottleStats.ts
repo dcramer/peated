@@ -1,3 +1,4 @@
+import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottles,
@@ -16,11 +17,54 @@ export default async ({ bottleId }: { bottleId: number }) => {
     throw new Error(`Unknown bottle: ${bottleId}`);
   }
 
+  // Calculate rating stats
+  const ratingStatsQuery = sql`
+    SELECT 
+      COUNT(*) FILTER (WHERE rating = ${SIMPLE_RATING_VALUES.PASS}) as pass,
+      COUNT(*) FILTER (WHERE rating = ${SIMPLE_RATING_VALUES.SIP}) as sip,
+      COUNT(*) FILTER (WHERE rating = ${SIMPLE_RATING_VALUES.SAVOR}) as savor,
+      COUNT(*) FILTER (WHERE rating IS NOT NULL) as total,
+      AVG(rating) FILTER (WHERE rating IS NOT NULL) as avg
+    FROM ${tastings}
+    WHERE ${tastings.bottleId} = ${bottle.id}
+  `;
+
+  const result = await db.execute<{
+    pass: number;
+    sip: number;
+    savor: number;
+    total: number;
+    avg: number | null;
+  }>(ratingStatsQuery);
+  const stats = result.rows[0];
+
+  const ratingStats = {
+    pass: Number(stats.pass) || 0,
+    sip: Number(stats.sip) || 0,
+    savor: Number(stats.savor) || 0,
+    total: Number(stats.total) || 0,
+    avg: stats.avg ? Number(stats.avg) : null,
+    percentage: {
+      pass: 0,
+      sip: 0,
+      savor: 0,
+    },
+  };
+
+  if (ratingStats.total > 0) {
+    ratingStats.percentage = {
+      pass: (ratingStats.pass / ratingStats.total) * 100,
+      sip: (ratingStats.sip / ratingStats.total) * 100,
+      savor: (ratingStats.savor / ratingStats.total) * 100,
+    };
+  }
+
   await db
     .update(bottles)
     .set({
       totalTastings: sql`(SELECT COUNT(*) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId})`,
-      avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId})`,
+      avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId} AND ${tastings.rating} IS NOT NULL)`,
+      ratingStats,
       updatedAt: sql`NOW()`,
     })
     .where(eq(bottles.id, bottle.id));

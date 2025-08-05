@@ -155,6 +155,32 @@ export const bottles = pgTable(
       .default(sql`array[]::varchar[]`)
       .notNull(),
     avgRating: doublePrecision("avg_rating"),
+    ratingStats: jsonb("rating_stats")
+      .default({
+        pass: 0,
+        sip: 0,
+        savor: 0,
+        total: 0,
+        avg: null,
+        percentage: {
+          pass: 0,
+          sip: 0,
+          savor: 0,
+        },
+      })
+      .notNull()
+      .$type<{
+        pass: number;
+        sip: number;
+        savor: number;
+        total: number;
+        avg: number | null;
+        percentage: {
+          pass: number;
+          sip: number;
+          savor: number;
+        };
+      }>(),
     totalTastings: bigint("total_tastings", { mode: "number" })
       .default(0)
       .notNull(),

@@ -23,9 +23,9 @@ import Counter from "./counter";
 import DefinitionList from "./definitionList";
 import { ImageModal } from "./imageModal";
 import Markdown from "./markdown";
-import { StaticRating } from "./rating";
 import ServingStyleIcon from "./servingStyleIcon";
 import ShareButton from "./shareButton";
+import SimpleRatingDisplay from "./simpleRatingDisplay";
 import Tags from "./tags";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
@@ -167,7 +167,11 @@ export default function TastingListItem({
               <div>
                 <DefinitionList.Term>Rating</DefinitionList.Term>
                 <DefinitionList.Details>
-                  <StaticRating value={tasting.rating} size="small" />
+                  <SimpleRatingDisplay
+                    value={tasting.rating}
+                    size="small"
+                    showLabel
+                  />
                 </DefinitionList.Details>
               </div>
             )}

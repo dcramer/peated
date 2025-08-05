@@ -29,6 +29,15 @@ export default function BottleListSidebar() {
           </Button>
         </li>
         <FilterSidebarSection
+          name="minRating"
+          title="Rating"
+          options={[
+            ["2", "Savor"],
+            ["1", "Sip or Better"],
+            ["-1", "Any Rating"],
+          ]}
+        />
+        <FilterSidebarSection
           name="category"
           options={CATEGORY_LIST.map((k) => [k, formatCategoryName(k)])}
         />

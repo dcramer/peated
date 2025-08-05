@@ -20,9 +20,9 @@ import FormHeader from "@peated/web/components/formHeader";
 import Header from "@peated/web/components/header";
 import ImageField from "@peated/web/components/imageField";
 import Layout from "@peated/web/components/layout";
-import RangeField from "@peated/web/components/rangeField";
 import type { Option } from "@peated/web/components/selectField";
 import SelectField from "@peated/web/components/selectField";
+import SimpleRatingInput from "@peated/web/components/simpleRatingInput";
 import TextAreaField from "@peated/web/components/textAreaField";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -157,18 +157,12 @@ export default function TastingForm({
           <Controller
             name="rating"
             control={control}
-            render={({ field: { ref, onChange, ...field } }) => (
-              <RangeField
+            render={({ field: { onChange, ...field } }) => (
+              <SimpleRatingInput
                 {...field}
-                onChange={(e) =>
-                  onChange(
-                    e.target.value === ""
-                      ? undefined
-                      : parseFloat(e.target.value),
-                  )
-                }
+                onChange={onChange}
                 error={errors.rating}
-                label="Rating"
+                label="How was it?"
               />
             )}
           />

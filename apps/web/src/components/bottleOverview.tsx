@@ -10,6 +10,7 @@ import CaskDetails from "./caskDetails";
 import DefinitionList from "./definitionList";
 import Heading from "./heading";
 import Markdown from "./markdown";
+import SimpleRatingStats from "./simpleRatingStats";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
 
@@ -34,7 +35,12 @@ export default function BottleOverview({
                 </div>
               </>
             )}
-            <div className="mb-4 hidden px-3 md:px-0 lg:block">
+            {bottle.ratingStats && bottle.ratingStats.total > 0 && (
+              <div className="my-6">
+                <SimpleRatingStats stats={bottle.ratingStats} />
+              </div>
+            )}
+            <div className="my-6">
               <BottleTagDistribution bottleId={bottle.id} />
             </div>
             {bottle.tastingNotes && (

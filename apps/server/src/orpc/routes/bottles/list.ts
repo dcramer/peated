@@ -64,6 +64,7 @@ export default procedure
       category: z.enum(CATEGORY_LIST).nullish(),
       age: z.coerce.number().nullish(),
       caskType: CaskTypeEnum.nullish(),
+      minRating: z.coerce.number().min(-1).max(2).nullish(),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
       sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
@@ -125,6 +126,16 @@ export default procedure
     if (rest.tag) {
       where.push(
         sql`EXISTS(SELECT FROM ${tastings} WHERE ${rest.tag} = ANY(${tastings.tags}) AND ${tastings.bottleId} = ${bottles.id})`,
+      );
+    }
+    if (rest.minRating !== null && rest.minRating !== undefined) {
+      // Filter by minimum average rating
+      // This ensures bottles have at least some ratings and meet the minimum threshold
+      where.push(
+        and(
+          sql`${bottles.avgRating} IS NOT NULL`,
+          sql`${bottles.avgRating} >= ${rest.minRating}`,
+        ),
       );
     }
 

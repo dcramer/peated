@@ -453,11 +453,11 @@ describe("GET /bottles", () => {
   test("sorts bottles by rating ascending", async ({ fixtures }) => {
     const bottle1 = await fixtures.Bottle({
       name: "High Rated",
-      avgRating: 4.5,
+      avgRating: 2,
     });
     const bottle2 = await fixtures.Bottle({
       name: "Low Rated",
-      avgRating: 3.0,
+      avgRating: 1,
     });
     const bottle3 = await fixtures.Bottle({ name: "No Rating" }); // null rating
 
@@ -474,11 +474,11 @@ describe("GET /bottles", () => {
   test("sorts bottles by rating descending", async ({ fixtures }) => {
     const bottle1 = await fixtures.Bottle({
       name: "High Rated",
-      avgRating: 4.5,
+      avgRating: 2,
     });
     const bottle2 = await fixtures.Bottle({
       name: "Low Rated",
-      avgRating: 3.0,
+      avgRating: 1,
     });
     const bottle3 = await fixtures.Bottle({ name: "No Rating" }); // null rating
 

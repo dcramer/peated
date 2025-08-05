@@ -174,7 +174,7 @@ export const TastingSerializer = serializer({
       notes: item.notes,
       tags: item.tags || [],
       color: item.color,
-      rating: item.rating,
+      rating: item.rating as -1 | 1 | 2 | null,
       servingStyle: item.servingStyle,
       friends: attrs.friends,
 

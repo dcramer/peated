@@ -6,6 +6,17 @@ For more details, take a look at <https://peated.com/about>
 
 A Discord is available if you want to contribute: <https://discord.gg/d7GFPfy88Z>
 
+## Features
+
+### Rating Systems
+
+Peated is transitioning to a new simplified rating system:
+
+- **Simple Rating**: Whisky-themed Pass/Sip/Savor system for quick, meaningful ratings
+- **Traditional 5-Star Rating (Deprecated)**: Legacy ratings from 0-5 will remain viewable but are being phased out
+
+See [Simple Rating System Documentation](./docs/features/simple-rating-system.md) for more details.
+
 ## Dev
 
 Setup the required frameworks:

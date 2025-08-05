@@ -7,13 +7,6 @@ export default function BottleStats({
   bottle: Outputs["bottles"]["details"];
 }) {
   const stats = [
-    {
-      name: "Avg Rating",
-      value:
-        bottle.avgRating !== null
-          ? (Math.round(bottle.avgRating * 100) / 100).toFixed(2)
-          : "",
-    },
     { name: "Tastings", value: bottle.totalTastings.toLocaleString() },
     { name: "People", value: bottle.people.toLocaleString() },
     {
@@ -35,7 +28,7 @@ export default function BottleStats({
   ];
 
   return (
-    <div className="my-6 grid grid-cols-2 items-center gap-3 text-center lg:grid-cols-4 lg:text-left">
+    <div className="my-6 grid grid-cols-2 items-center gap-3 text-center lg:grid-cols-3 lg:text-left">
       {stats.map((stat) => (
         <div key={stat.name}>
           <div className="text-muted leading-7">{stat.name}</div>

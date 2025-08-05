@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SIMPLE_RATING_VALUES } from "../constants";
 import { BadgeAwardSchema } from "./badges";
 import { BottleReleaseSchema } from "./bottleReleases";
 import { BottleSchema } from "./bottles";
@@ -25,12 +26,14 @@ export const TastingSchema = z.object({
       "The release of the bottle, if applicable. e.g. 'Ardbeg Supernova 2023'",
     ),
   rating: z
-    .number()
-    .gte(0)
-    .lte(5)
+    .union([
+      z.literal(SIMPLE_RATING_VALUES.PASS),
+      z.literal(SIMPLE_RATING_VALUES.SIP),
+      z.literal(SIMPLE_RATING_VALUES.SAVOR),
+    ])
     .nullable()
     .default(null)
-    .describe("User's rating from 0-5 stars"),
+    .describe("Simple rating: -1 (Pass), 1 (Sip), 2 (Savor)"),
   tags: z
     .array(z.string())
     .default([])

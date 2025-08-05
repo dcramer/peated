@@ -155,7 +155,7 @@ export default procedure
         .update(bottles)
         .set({
           totalTastings: sql`${bottles.totalTastings} + 1`,
-          avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId})`,
+          avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId} AND ${tastings.rating} IS NOT NULL)`,
         })
         .where(eq(bottles.id, bottle.id));
 
@@ -164,7 +164,6 @@ export default procedure
           .update(bottleReleases)
           .set({
             totalTastings: sql`${bottleReleases.totalTastings} + 1`,
-            avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottleReleases.id} = ${tastings.releaseId})`,
           })
           .where(eq(bottleReleases.id, tasting.releaseId));
       }
@@ -235,6 +234,9 @@ export default procedure
         });
       }
     }
+
+    // Update bottle rating stats
+    await pushJob("UpdateBottleStats", { bottleId: bottle.id });
 
     return {
       tasting: await serialize(TastingSerializer, tasting, context.user),

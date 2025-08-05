@@ -18,24 +18,24 @@ describe("GET /users/:user/flavors", () => {
     // Create tastings for the default user
     await fixtures.Tasting({
       bottleId: bottle1.id,
-      rating: 5,
+      rating: 2,
       createdById: defaults.user.id,
     });
     await fixtures.Tasting({
       bottleId: bottle2.id,
-      rating: 4,
+      rating: 2,
       createdById: defaults.user.id,
     });
     await fixtures.Tasting({
       bottleId: bottle3.id,
-      rating: 3,
+      rating: 1,
       createdById: defaults.user.id,
     });
 
     // Create a tasting by another user (should not be counted)
     await fixtures.Tasting({
       bottleId: bottle1.id,
-      rating: 5,
+      rating: 2,
     });
 
     const { results, totalCount, totalScore } =
@@ -47,18 +47,18 @@ describe("GET /users/:user/flavors", () => {
       );
 
     expect(totalCount).toEqual(3);
-    expect(totalScore).toEqual(12);
+    expect(totalScore).toEqual(5);
     expect(results).toMatchInlineSnapshot(`
       [
         {
           "count": 2,
           "flavorProfile": "peated",
-          "score": 8,
+          "score": 3,
         },
         {
           "count": 1,
           "flavorProfile": "juicy_oak_vanilla",
-          "score": 4,
+          "score": 2,
         },
       ]
     `);
@@ -117,12 +117,12 @@ describe("GET /users/:user/flavors", () => {
     // Create tastings for the default user
     await fixtures.Tasting({
       bottleId: bottle1.id,
-      rating: 5,
+      rating: 2,
       createdById: defaults.user.id,
     });
     await fixtures.Tasting({
       bottleId: bottle2.id,
-      rating: 4,
+      rating: 2,
       createdById: defaults.user.id,
     });
 
@@ -135,14 +135,14 @@ describe("GET /users/:user/flavors", () => {
       );
 
     expect(totalCount).toEqual(2);
-    expect(totalScore).toEqual(9);
+    expect(totalScore).toEqual(4);
     // Only the non-null flavor profile should be counted
     expect(results).toMatchInlineSnapshot(`
       [
         {
           "count": 1,
           "flavorProfile": "lightly_peated",
-          "score": 5,
+          "score": 2,
         },
       ]
     `);
