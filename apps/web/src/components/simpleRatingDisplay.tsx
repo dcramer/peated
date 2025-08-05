@@ -48,7 +48,6 @@ export default function SimpleRatingDisplay({
   const config = ratingConfig[value];
 
   if (!config) {
-    console.error(`Invalid rating value: ${value}`);
     return null;
   }
 

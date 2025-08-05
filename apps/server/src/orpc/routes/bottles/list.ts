@@ -66,7 +66,7 @@ export default procedure
       category: z.enum(CATEGORY_LIST).nullish(),
       age: z.coerce.number().nullish(),
       caskType: CaskTypeEnum.nullish(),
-      ratingLevel: z.enum(["pass", "sip", "savor"]).nullish(),
+      minRating: z.coerce.number().min(-1).max(2).nullish(),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
       sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
@@ -130,27 +130,15 @@ export default procedure
         sql`EXISTS(SELECT FROM ${tastings} WHERE ${rest.tag} = ANY(${tastings.tags}) AND ${tastings.bottleId} = ${bottles.id})`,
       );
     }
-    if (rest.ratingLevel) {
-      // Filter by rating level based on average simple rating
-      // Pass: avg <= 0 (between -1 and 1, but closer to -1)
-      // Sip: avg > 0 and avg <= 1.5 (between 1 and 2, but closer to 1)
-      // Savor: avg > 1.5 (close to 2)
-      switch (rest.ratingLevel) {
-        case "pass":
-          where.push(sql`(${bottles.ratingStats}->>'avg')::float <= 0`);
-          break;
-        case "sip":
-          where.push(
-            and(
-              sql`(${bottles.ratingStats}->>'avg')::float > 0`,
-              sql`(${bottles.ratingStats}->>'avg')::float <= 1.5`,
-            ),
-          );
-          break;
-        case "savor":
-          where.push(sql`(${bottles.ratingStats}->>'avg')::float > 1.5`);
-          break;
-      }
+    if (rest.minRating !== null && rest.minRating !== undefined) {
+      // Filter by minimum average rating
+      // This ensures bottles have at least some ratings and meet the minimum threshold
+      where.push(
+        and(
+          sql`(${bottles.ratingStats}->>'total')::int > 0`,
+          sql`(${bottles.ratingStats}->>'avg')::float >= ${rest.minRating}`,
+        ),
+      );
     }
 
     let flight: Flight | null = null;

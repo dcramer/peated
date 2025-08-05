@@ -1,9 +1,10 @@
 "use client";
 
+import { HandThumbDownIcon, HandThumbUpIcon } from "@heroicons/react/20/solid";
 import { useRouter, useSearchParams } from "next/navigation";
 import classNames from "../lib/classNames";
 
-type RatingLevel = "pass" | "sip" | "savor" | null;
+type MinRating = -1 | 1 | 2 | null;
 
 const ratingLevels = [
   {
@@ -12,40 +13,43 @@ const ratingLevels = [
     description: "Show all bottles",
   },
   {
-    value: "pass" as const,
-    label: "Pass",
-    icon: "🚫",
-    description: "Not recommended",
-    className: "hover:bg-red-50 data-[active=true]:bg-red-100",
+    value: -1 as const,
+    label: "Any Rating",
+    icon: HandThumbDownIcon,
+    description: "Rated bottles only",
+    className: "hover:bg-slate-800 data-[active=true]:bg-slate-700",
   },
   {
-    value: "sip" as const,
-    label: "Sip",
-    icon: "🥃",
+    value: 1 as const,
+    label: "Sip or Better",
+    icon: HandThumbUpIcon,
     description: "Worth trying",
-    className: "hover:bg-yellow-50 data-[active=true]:bg-yellow-100",
+    className: "hover:bg-slate-800 data-[active=true]:bg-slate-700",
   },
   {
-    value: "savor" as const,
+    value: 2 as const,
     label: "Savor",
-    icon: "🥃🥃",
+    icon: HandThumbUpIcon,
+    isDouble: true,
     description: "Highly recommended",
-    className: "hover:bg-green-50 data-[active=true]:bg-green-100",
+    className: "hover:bg-slate-800 data-[active=true]:bg-slate-700",
   },
 ];
 
 export default function SimpleRatingFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentLevel = searchParams.get("ratingLevel") as RatingLevel;
+  const currentMinRating = searchParams.get("minRating")
+    ? Number(searchParams.get("minRating"))
+    : null;
 
-  const handleSelect = (level: RatingLevel) => {
+  const handleSelect = (minRating: MinRating) => {
     const params = new URLSearchParams(searchParams);
 
-    if (level === null) {
-      params.delete("ratingLevel");
+    if (minRating === null) {
+      params.delete("minRating");
     } else {
-      params.set("ratingLevel", level);
+      params.set("minRating", String(minRating));
     }
 
     // Reset to first page when changing filters
@@ -60,20 +64,25 @@ export default function SimpleRatingFilter() {
         <button
           key={level.value ?? "all"}
           onClick={() => handleSelect(level.value)}
-          data-active={currentLevel === level.value}
+          data-active={currentMinRating === level.value}
           className={classNames(
             "rounded-lg border px-3 py-2 transition-all",
             "flex items-center gap-2 text-sm",
             level.value === null
-              ? "hover:bg-slate-50 data-[active=true]:bg-slate-100"
+              ? "hover:bg-slate-800 data-[active=true]:bg-slate-700"
               : level.className,
-            currentLevel === level.value
-              ? "border-slate-300 font-semibold"
-              : "border-slate-200",
+            currentMinRating === level.value
+              ? "border-slate-600 font-semibold"
+              : "border-slate-700",
           )}
           title={level.description}
         >
-          {level.icon && <span>{level.icon}</span>}
+          {level.icon && (
+            <div className="flex items-center">
+              <level.icon className="h-4 w-4" />
+              {level.isDouble && <level.icon className="h-4 w-4" />}
+            </div>
+          )}
           <span>{level.label}</span>
         </button>
       ))}

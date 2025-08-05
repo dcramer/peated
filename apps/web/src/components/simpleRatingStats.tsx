@@ -1,3 +1,4 @@
+import { HandThumbDownIcon, HandThumbUpIcon } from "@heroicons/react/20/solid";
 import classNames from "../lib/classNames";
 
 type RatingStats = {
@@ -37,18 +38,18 @@ export default function SimpleRatingStats({ stats, className }: Props) {
   const dominantConfig = {
     pass: {
       label: "would pass",
-      color: "text-red-600",
-      bgColor: "bg-red-100",
+      color: "text-slate-600",
+      bgColor: "bg-slate-100",
     },
     sip: {
       label: "would sip",
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-100",
+      color: "text-slate-600",
+      bgColor: "bg-slate-100",
     },
     savor: {
       label: "would savor",
-      color: "text-green-600",
-      bgColor: "bg-green-100",
+      color: "text-slate-600",
+      bgColor: "bg-slate-100",
     },
   };
 
@@ -58,10 +59,10 @@ export default function SimpleRatingStats({ stats, className }: Props) {
     <div className={className}>
       {/* Summary */}
       <div className="mb-3">
-        <span className={classNames("text-lg font-semibold", config.color)}>
+        <span className="text-lg font-semibold">
           {Math.round(percentage[dominant])}%
         </span>
-        <span className="text-muted ml-1">{config.label}</span>
+        <span className="ml-1">{config.label}</span>
         <span className="text-muted ml-2 text-sm">
           ({total} {total === 1 ? "rating" : "ratings"})
         </span>
@@ -70,28 +71,23 @@ export default function SimpleRatingStats({ stats, className }: Props) {
       {/* Distribution bars */}
       <div className="space-y-2">
         <RatingBar
-          label="Pass"
-          icon="🚫"
-          count={stats.pass}
-          percentage={percentage.pass}
-          color="bg-red-500"
-          bgColor="bg-red-100"
+          label="Savor"
+          icon={HandThumbUpIcon}
+          isDouble={true}
+          count={stats.savor}
+          percentage={percentage.savor}
         />
         <RatingBar
           label="Sip"
-          icon="🥃"
+          icon={HandThumbUpIcon}
           count={stats.sip}
           percentage={percentage.sip}
-          color="bg-yellow-500"
-          bgColor="bg-yellow-100"
         />
         <RatingBar
-          label="Savor"
-          icon="🥃🥃"
-          count={stats.savor}
-          percentage={percentage.savor}
-          color="bg-green-500"
-          bgColor="bg-green-100"
+          label="Pass"
+          icon={HandThumbDownIcon}
+          count={stats.pass}
+          percentage={percentage.pass}
         />
       </div>
     </div>
@@ -100,32 +96,31 @@ export default function SimpleRatingStats({ stats, className }: Props) {
 
 function RatingBar({
   label,
-  icon,
+  icon: Icon,
+  isDouble = false,
   count,
   percentage,
-  color,
-  bgColor,
 }: {
   label: string;
-  icon: string;
+  icon: React.ComponentType<{ className?: string }>;
+  isDouble?: boolean;
   count: number;
   percentage: number;
-  color: string;
-  bgColor: string;
 }) {
   return (
     <div className="flex items-center gap-3">
       <div className="flex w-20 items-center gap-2">
-        <span>{icon}</span>
+        <div className="flex items-center">
+          <Icon className="h-4 w-4" />
+          {isDouble && <Icon className="h-4 w-4" />}
+        </div>
         <span className="text-sm font-medium">{label}</span>
       </div>
 
-      <div className="flex-1">
-        <div
-          className={classNames("h-6 overflow-hidden rounded-full", bgColor)}
-        >
+      <div className="relative flex-1">
+        <div className="h-6 overflow-hidden rounded border border-slate-700 bg-transparent">
           <div
-            className={classNames("h-full transition-all", color)}
+            className="h-full bg-slate-700 transition-all"
             style={{ width: `${percentage}%` }}
           />
         </div>
