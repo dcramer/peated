@@ -53,12 +53,12 @@ describe("GET /users/:user/flavors", () => {
         {
           "count": 2,
           "flavorProfile": "peated",
-          "score": 8,
+          "score": 3,
         },
         {
           "count": 1,
           "flavorProfile": "juicy_oak_vanilla",
-          "score": 4,
+          "score": 1,
         },
       ]
     `);
@@ -135,14 +135,14 @@ describe("GET /users/:user/flavors", () => {
       );
 
     expect(totalCount).toEqual(2);
-    expect(totalScore).toEqual(9);
+    expect(totalScore).toEqual(4);
     // Only the non-null flavor profile should be counted
     expect(results).toMatchInlineSnapshot(`
       [
         {
           "count": 1,
           "flavorProfile": "lightly_peated",
-          "score": 5,
+          "score": 2,
         },
       ]
     `);

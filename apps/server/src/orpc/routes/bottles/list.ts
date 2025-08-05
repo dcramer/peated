@@ -133,8 +133,8 @@ export default procedure
       // This ensures bottles have at least some ratings and meet the minimum threshold
       where.push(
         and(
-          sql`(${bottles.ratingStats}->>'total')::int > 0`,
-          sql`(${bottles.ratingStats}->>'avg')::float >= ${rest.minRating}`,
+          sql`${bottles.avgRating} IS NOT NULL`,
+          sql`${bottles.avgRating} >= ${rest.minRating}`,
         ),
       );
     }
@@ -198,10 +198,10 @@ export default procedure
         orderBy = asc(bottles.totalTastings);
         break;
       case "rating":
-        orderBy = sql`(${bottles.ratingStats}->>'avg')::float ASC NULLS LAST`;
+        orderBy = sql`${bottles.avgRating} ASC NULLS LAST`;
         break;
       case "-rating":
-        orderBy = sql`(${bottles.ratingStats}->>'avg')::float DESC NULLS LAST`;
+        orderBy = sql`${bottles.avgRating} DESC NULLS LAST`;
         break;
       case "-tastings":
       default:
