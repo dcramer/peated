@@ -6,6 +6,7 @@ import type { Bottle, CollectionBottle, PagingRel } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import type { ComponentProps } from "react";
 import BottleLink from "./bottleLink";
+import SimpleRatingIndicator from "./simpleRatingIndicator";
 import Table from "./table";
 
 export default function BottleTable({
@@ -69,9 +70,10 @@ export default function BottleTable({
         },
         {
           name: "rating",
-          value: (item) => (item.avgRating ? item.avgRating.toFixed(2) : null),
+          value: (item) => <SimpleRatingIndicator avgRating={item.avgRating} />,
           className: "sm:w-1/6",
           sortDefaultOrder: "desc",
+          align: "center",
         },
         {
           name: "age",

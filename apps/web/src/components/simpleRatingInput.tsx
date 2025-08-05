@@ -94,13 +94,6 @@ export default forwardRef<HTMLDivElement, Props>(
     return (
       <FormField
         label={label}
-        labelNote={
-          selectedValue !== null && (
-            <div className="text-highlight text-sm font-medium">
-              {ratingOptions.find((o) => o.value === selectedValue)?.label}
-            </div>
-          )
-        }
         htmlFor={`f-${name}`}
         required={required}
         helpText={helpText}
