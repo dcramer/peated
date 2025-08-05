@@ -155,7 +155,7 @@ export default procedure
         .update(bottles)
         .set({
           totalTastings: sql`${bottles.totalTastings} + 1`,
-          avgRating: sql`(SELECT AVG(${tastings.ratingLegacy}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId})`,
+          avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId} AND ${tastings.rating} IS NOT NULL)`,
         })
         .where(eq(bottles.id, bottle.id));
 

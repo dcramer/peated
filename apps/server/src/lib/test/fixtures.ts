@@ -461,7 +461,7 @@ export const Tasting = async (
       .insert(tastings)
       .values({
         notes: faker.lorem.sentence(),
-        rating: faker.number.float({ min: 1, max: 5 }),
+        rating: faker.helpers.arrayElement([-1, 1, 2]),
         tags: tags,
         createdAt: new Date(),
         ...data,

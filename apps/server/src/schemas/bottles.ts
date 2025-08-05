@@ -136,11 +136,13 @@ export const BottleSchema = z.object({
 
   avgRating: z
     .number()
-    .gte(0)
-    .lte(5)
+    .gte(-1)
+    .lte(2)
     .nullable()
     .readonly()
-    .describe("Average 5-star rating from legacy ratings"),
+    .describe(
+      "Average rating from simple rating system (-1=Pass, 1=Sip, 2=Savor)",
+    ),
   ratingStats: z
     .object({
       pass: z.number().describe("Number of Pass (-1) ratings"),

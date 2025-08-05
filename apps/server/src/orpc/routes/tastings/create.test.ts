@@ -535,7 +535,7 @@ describe("POST /tastings", () => {
       .from(bottles)
       .where(eq(bottles.id, bottle.id));
     expect(updatedBottle.totalTastings).toBe(1);
-    expect(updatedBottle.avgRating).toBe(4.5);
+    expect(updatedBottle.avgRating).toBe(2);
   });
 
   test("creates a new tasting with both flight and release", async ({
