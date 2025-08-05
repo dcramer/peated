@@ -18,24 +18,24 @@ describe("GET /users/:user/flavors", () => {
     // Create tastings for the default user
     await fixtures.Tasting({
       bottleId: bottle1.id,
-      rating: 5,
+      rating: 2,
       createdById: defaults.user.id,
     });
     await fixtures.Tasting({
       bottleId: bottle2.id,
-      rating: 4,
+      rating: 2,
       createdById: defaults.user.id,
     });
     await fixtures.Tasting({
       bottleId: bottle3.id,
-      rating: 3,
+      rating: 1,
       createdById: defaults.user.id,
     });
 
     // Create a tasting by another user (should not be counted)
     await fixtures.Tasting({
       bottleId: bottle1.id,
-      rating: 5,
+      rating: 2,
     });
 
     const { results, totalCount, totalScore } =
@@ -47,7 +47,7 @@ describe("GET /users/:user/flavors", () => {
       );
 
     expect(totalCount).toEqual(3);
-    expect(totalScore).toEqual(12);
+    expect(totalScore).toEqual(5);
     expect(results).toMatchInlineSnapshot(`
       [
         {
@@ -117,12 +117,12 @@ describe("GET /users/:user/flavors", () => {
     // Create tastings for the default user
     await fixtures.Tasting({
       bottleId: bottle1.id,
-      rating: 5,
+      rating: 2,
       createdById: defaults.user.id,
     });
     await fixtures.Tasting({
       bottleId: bottle2.id,
-      rating: 4,
+      rating: 2,
       createdById: defaults.user.id,
     });
 

@@ -53,7 +53,7 @@ describe("PUT /tastings/:tasting", () => {
     const data = await routerClient.tastings.update(
       {
         tasting: tasting.id,
-        rating: 3.5,
+        rating: 1,
       },
       { context: { user: defaults.user } },
     );
@@ -66,13 +66,13 @@ describe("PUT /tastings/:tasting", () => {
       .where(eq(tastings.id, data.id));
 
     expect(omit(tasting, "rating")).toEqual(omit(newTasting, "rating"));
-    expect(newTasting.rating).toEqual(3.5);
+    expect(newTasting.rating).toEqual(1);
 
     const [bottle] = await db
       .select()
       .from(bottles)
       .where(eq(bottles.id, newTasting.bottleId));
-    expect(bottle.avgRating).toEqual(3.5);
+    expect(bottle.avgRating).toEqual(1);
   });
 
   test("updates notes", async ({ defaults, fixtures }) => {

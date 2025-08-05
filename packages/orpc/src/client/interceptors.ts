@@ -62,32 +62,47 @@ const sentryInterceptor = (
   options: Options = {},
 ): Interceptor<InterceptableOptions, Promise<unknown>> =>
   async function sentryInterceptor({ next, path, input }) {
-    return await Sentry.startSpan(
-      {
-        name: `orpc.${path.join("/")}`,
-        attributes: {
-          "span.kind": "CLIENT",
-          "rpc.system": "orpc",
-          "rpc.method": path.join("."),
-          ...(options.captureInputs && {
-            "rpc.arguments": input ? safeJsonStringify(input) : undefined,
-          }),
+    try {
+      return await Sentry.startSpan(
+        {
+          name: `orpc.${path.join("/")}`,
+          attributes: {
+            "span.kind": "CLIENT",
+            "rpc.system": "orpc",
+            "rpc.method": path.join("."),
+            ...(options.captureInputs && {
+              "rpc.arguments": input ? safeJsonStringify(input) : undefined,
+            }),
+          },
         },
-      },
-      async (span) => {
-        try {
-          return await next();
-        } catch (error) {
-          span.setStatus({
-            code: 2,
-          });
-          Sentry.captureException(error);
+        async (span) => {
+          try {
+            const result = await next();
+            return result;
+          } catch (error) {
+            try {
+              span.setStatus({
+                code: 2,
+              });
+              Sentry.captureException(error);
+            } catch (sentryError) {
+              // Log Sentry errors but don't let them interfere with the original error
+              console.warn("Sentry interceptor error:", sentryError);
+            }
 
-          // Re-throw the error so it can be handled by the error handler
-          throw error;
-        }
-      },
-    );
+            // Re-throw the original error
+            throw error;
+          }
+        },
+      );
+    } catch (sentryError) {
+      // If Sentry itself fails, log the error and continue with the original call
+      console.warn(
+        "Sentry interceptor failed, continuing without instrumentation:",
+        sentryError,
+      );
+      return await next();
+    }
   };
 
 export default sentryInterceptor;
