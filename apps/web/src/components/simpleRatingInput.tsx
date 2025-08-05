@@ -28,6 +28,7 @@ const ratingOptions = [
     label: "Pass",
     icon: HandThumbDownIcon,
     description: "Not my thing",
+    isDouble: false,
     className:
       "hover:bg-slate-800 data-[selected=true]:bg-slate-700 data-[selected=true]:border-slate-600",
   },
@@ -36,6 +37,7 @@ const ratingOptions = [
     label: "Sip",
     icon: HandThumbUpIcon,
     description: "Enjoyable, would drink again",
+    isDouble: false,
     className:
       "hover:bg-slate-800 data-[selected=true]:bg-slate-700 data-[selected=true]:border-slate-600",
   },

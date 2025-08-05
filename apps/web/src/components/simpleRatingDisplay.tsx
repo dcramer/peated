@@ -17,17 +17,19 @@ const ratingConfig = {
     label: "Pass",
     icon: HandThumbDownIcon,
     className: "",
+    isDouble: false,
   },
   [1]: {
     label: "Sip",
     icon: HandThumbUpIcon,
     className: "",
+    isDouble: false,
   },
   [2]: {
     label: "Savor",
     icon: HandThumbUpIcon,
-    isDouble: true,
     className: "",
+    isDouble: true,
   },
 };
 
