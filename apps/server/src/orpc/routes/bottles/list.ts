@@ -30,13 +30,11 @@ const SORT_OPTIONS = [
   "name",
   "age",
   "rating",
-  "simpleRating",
   "tastings",
   "-created",
   "-name",
   "-age",
   "-rating",
-  "-simpleRating",
   "-tastings",
 ] as const;
 
@@ -200,15 +198,9 @@ export default procedure
         orderBy = asc(bottles.totalTastings);
         break;
       case "rating":
-        orderBy = sql`${bottles.avgRating} ASC NULLS LAST`;
-        break;
-      case "-rating":
-        orderBy = sql`${bottles.avgRating} DESC NULLS LAST`;
-        break;
-      case "simpleRating":
         orderBy = sql`(${bottles.ratingStats}->>'avg')::float ASC NULLS LAST`;
         break;
-      case "-simpleRating":
+      case "-rating":
         orderBy = sql`(${bottles.ratingStats}->>'avg')::float DESC NULLS LAST`;
         break;
       case "-tastings":

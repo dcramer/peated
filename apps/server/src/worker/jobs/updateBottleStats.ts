@@ -62,7 +62,7 @@ export default async ({ bottleId }: { bottleId: number }) => {
     .update(bottles)
     .set({
       totalTastings: sql`(SELECT COUNT(*) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId})`,
-      avgRating: sql`(SELECT AVG(${tastings.ratingLegacy}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId})`,
+      avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId} AND ${tastings.rating} IS NOT NULL)`,
       ratingStats,
       updatedAt: sql`NOW()`,
     })
