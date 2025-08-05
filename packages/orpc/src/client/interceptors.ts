@@ -1,6 +1,40 @@
 import type { InterceptableOptions, Interceptor } from "@orpc/shared";
 import * as Sentry from "@sentry/core";
 
+/**
+ * Safely stringify an object, handling circular references and other serialization issues
+ */
+function safeJsonStringify(obj: unknown): string {
+  try {
+    const seenObjects = new WeakSet();
+    return JSON.stringify(obj, (key, value) => {
+      // Handle circular references by replacing them with a placeholder
+      if (typeof value === "object" && value !== null) {
+        if (seenObjects.has(value)) {
+          return "[Circular Reference]";
+        }
+        seenObjects.add(value);
+      }
+
+      // Handle functions, symbols, and other non-serializable types
+      if (typeof value === "function") {
+        return "[Function]";
+      }
+      if (typeof value === "symbol") {
+        return "[Symbol]";
+      }
+      if (typeof value === "undefined") {
+        return "[undefined]";
+      }
+
+      return value;
+    });
+  } catch (error) {
+    // If all else fails, return a safe fallback
+    return `[Serialization Error: ${error instanceof Error ? error.message : "Unknown"}]`;
+  }
+}
+
 type Options = {
   captureInputs?: boolean;
 };
@@ -36,7 +70,7 @@ const sentryInterceptor = (
           "rpc.system": "orpc",
           "rpc.method": path.join("."),
           ...(options.captureInputs && {
-            "rpc.arguments": input ? JSON.stringify(input) : undefined,
+            "rpc.arguments": input ? safeJsonStringify(input) : undefined,
           }),
         },
       },
