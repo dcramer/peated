@@ -172,7 +172,7 @@ describe("POST /tastings", () => {
     expect(tasting.friends).toEqual([]);
   });
 
-  test("creates a new tasting with zero rating", async ({
+  test("creates a new tasting with pass rating", async ({
     defaults,
     fixtures,
   }) => {
@@ -195,7 +195,7 @@ describe("POST /tastings", () => {
 
     expect(tasting.bottleId).toEqual(bottle.id);
     expect(tasting.createdById).toEqual(defaults.user.id);
-    expect(tasting.rating).toBeNull();
+    expect(tasting.rating).toEqual(-1);
   });
 
   test("flight requires valid bottle", async ({ defaults, fixtures }) => {
