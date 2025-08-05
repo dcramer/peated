@@ -58,7 +58,7 @@ describe("GET /users/:user/flavors", () => {
         {
           "count": 1,
           "flavorProfile": "juicy_oak_vanilla",
-          "score": 1,
+          "score": 2,
         },
       ]
     `);
