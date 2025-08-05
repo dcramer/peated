@@ -3,7 +3,7 @@
 import { HandThumbDownIcon, HandThumbUpIcon } from "@heroicons/react/20/solid";
 import BottleIcon from "@peated/web/assets/bottle.svg";
 import PeatedGlyph from "@peated/web/assets/glyph.svg";
-import { forwardRef, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import type { FieldError } from "react-hook-form";
 import classNames from "../lib/classNames";
 import FormField from "./formField";
@@ -68,6 +68,11 @@ export default forwardRef<HTMLDivElement, Props>(
     const [selectedValue, setSelectedValue] = useState<RatingValue>(
       value ?? null,
     );
+
+    // Update selectedValue when value prop changes
+    useEffect(() => {
+      setSelectedValue(value ?? null);
+    }, [value]);
 
     const handleSelect = (newValue: RatingValue) => {
       if (disabled) return;

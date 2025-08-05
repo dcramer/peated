@@ -2,54 +2,43 @@
 
 ## Overview
 
-This document outlines the technical architecture for Peated's dual rating system, supporting both the traditional 5-star scale and the new simplified Pass/Sip/Savor system.
+This document outlines the technical architecture for Peated's simple rating system, which has replaced the traditional 5-star scale with a simplified Pass/Sip/Savor system.
 
-## Current Rating System (5-Star)
+## Legacy Rating System (Deprecated)
 
 ### Database Schema
 
 ```sql
 -- tastings table
-rating: doublePrecision("rating") -- 0.0 to 5.0, increments of 0.25
+ratingLegacy: doublePrecision("rating_legacy") -- 0.0 to 5.0, preserved for historical data
 
 -- bottles table
-avgRating: doublePrecision("avg_rating") -- Calculated average
+avgRating: doublePrecision("avg_rating") -- Still used for legacy ratings
 totalTastings: bigint("total_tastings") -- Count of all tastings
 ```
 
-### Data Flow
-
-1. User submits rating via range slider (0-5, step 0.25)
-2. Rating stored in `tastings.rating`
-3. Worker job updates `bottles.avgRating` using AVG() aggregate
-4. Frontend displays stars based on numeric value
-
-## New Simple Rating System
+## Simple Rating System (Current)
 
 ### Database Schema
 
-#### Tastings Table Addition
+#### Tastings Table
 
 ```typescript
-// Schema definition
-ratingSimple: smallint("rating_simple") // -1, 1, 2, or NULL
-
-// Constraint
-CHECK (rating_simple IN (-1, 1, 2) OR rating_simple IS NULL)
+// Schema definition (replaced old rating column)
+rating: smallint("rating"); // -1, 1, 2, or NULL
+ratingLegacy: doublePrecision("rating_legacy"); // Preserved historical data
 ```
 
 #### Bottles Table Additions
 
 ```typescript
-// Simple average for sorting
-avgRatingSimple: doublePrecision("avg_rating_simple");
-
-// Detailed statistics for display
-ratingSimpleStats: jsonb("rating_simple_stats").$type<{
+// Detailed statistics for display and filtering
+ratingStats: jsonb("rating_stats").$type<{
   pass: number; // count of -1 ratings
   sip: number; // count of 1 ratings
   savor: number; // count of 2 ratings
   total: number; // total simple ratings
+  avg: number | null; // average rating for sorting
   percentage: {
     pass: number; // percentage who passed
     sip: number; // percentage who sipped
@@ -60,17 +49,17 @@ ratingSimpleStats: jsonb("rating_simple_stats").$type<{
 
 ### Value Mapping
 
-| Numeric Value | Label     | Description                        | UI Display |
-| ------------- | --------- | ---------------------------------- | ---------- |
-| -1            | Pass      | Would not drink again              | 🚫         |
-| 1             | Sip       | Enjoyable, would have occasionally | 🥃         |
-| 2             | Savor     | Excellent, would seek out          | 🥃🥃       |
-| NULL          | No rating | User hasn't rated                  | -          |
+| Numeric Value | Label     | Description                  | UI Display              |
+| ------------- | --------- | ---------------------------- | ----------------------- |
+| -1            | Pass      | Not my thing                 | 👎 (HandThumbDownIcon)  |
+| 1             | Sip       | Enjoyable, would drink again | 👍 (HandThumbUpIcon)    |
+| 2             | Savor     | Amazing, would seek out      | 👍👍 (Double thumbs up) |
+| NULL          | No rating | User hasn't rated            | -                       |
 
 ### Why Numeric Values?
 
-1. **Sorting**: `ORDER BY rating_simple DESC` works naturally
-2. **Filtering**: `WHERE rating_simple >= 1` for positive ratings
+1. **Sorting**: `ORDER BY rating DESC` works naturally
+2. **Filtering**: `WHERE rating >= 1` for positive ratings
 3. **Aggregation**: Can calculate averages and statistics
 4. **Performance**: Integer comparisons faster than strings
 5. **Storage**: SMALLINT (2 bytes) vs VARCHAR (variable)
