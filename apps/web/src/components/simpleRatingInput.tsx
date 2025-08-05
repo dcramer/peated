@@ -1,5 +1,8 @@
 "use client";
 
+import { HandThumbDownIcon, HandThumbUpIcon } from "@heroicons/react/20/solid";
+import BottleIcon from "@peated/web/assets/bottle.svg";
+import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import { forwardRef, useState } from "react";
 import type { FieldError } from "react-hook-form";
 import classNames from "../lib/classNames";
@@ -23,26 +26,27 @@ const ratingOptions = [
   {
     value: -1 as const,
     label: "Pass",
-    icon: "🚫",
-    description: "Would not drink again",
+    icon: HandThumbDownIcon,
+    description: "Not my thing",
     className:
-      "hover:bg-red-50 data-[selected=true]:bg-red-100 data-[selected=true]:border-red-300",
+      "hover:bg-slate-800 data-[selected=true]:bg-slate-700 data-[selected=true]:border-slate-600",
   },
   {
     value: 1 as const,
     label: "Sip",
-    icon: "🥃",
-    description: "Enjoyable, would have occasionally",
+    icon: HandThumbUpIcon,
+    description: "Enjoyable, would drink again",
     className:
-      "hover:bg-yellow-50 data-[selected=true]:bg-yellow-100 data-[selected=true]:border-yellow-300",
+      "hover:bg-slate-800 data-[selected=true]:bg-slate-700 data-[selected=true]:border-slate-600",
   },
   {
     value: 2 as const,
     label: "Savor",
-    icon: "🥃🥃",
-    description: "Excellent, would seek out",
+    icon: HandThumbUpIcon,
+    description: "Amazing, would seek out",
+    isDouble: true,
     className:
-      "hover:bg-green-50 data-[selected=true]:bg-green-100 data-[selected=true]:border-green-300",
+      "hover:bg-slate-800 data-[selected=true]:bg-slate-700 data-[selected=true]:border-slate-600",
   },
 ];
 
@@ -99,14 +103,17 @@ export default forwardRef<HTMLDivElement, Props>(
               data-selected={selectedValue === option.value}
               onClick={() => handleSelect(option.value)}
               className={classNames(
-                "flex-1 rounded-lg border-2 border-slate-200 p-4 transition-all",
+                "flex-1 rounded border border-slate-700 bg-slate-900 p-4 transition-all",
                 "flex cursor-pointer flex-col items-center gap-2",
                 "disabled:cursor-not-allowed disabled:opacity-50",
                 option.className,
               )}
               title={option.description}
             >
-              <div className="text-2xl">{option.icon}</div>
+              <div className="flex items-center gap-1">
+                <option.icon className="h-8 w-8" />
+                {option.isDouble && <option.icon className="h-8 w-8" />}
+              </div>
               <div className="font-semibold">{option.label}</div>
               <div className="text-muted text-center text-xs">
                 {option.description}

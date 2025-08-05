@@ -1,3 +1,6 @@
+import { HandThumbDownIcon, HandThumbUpIcon } from "@heroicons/react/20/solid";
+import BottleIcon from "@peated/web/assets/bottle.svg";
+import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import classNames from "../lib/classNames";
 
 type RatingValue = -1 | 1 | 2;
@@ -12,25 +15,26 @@ type Props = {
 const ratingConfig = {
   [-1]: {
     label: "Pass",
-    icon: "🚫",
-    className: "text-red-600",
+    icon: HandThumbDownIcon,
+    className: "",
   },
   [1]: {
     label: "Sip",
-    icon: "🥃",
-    className: "text-yellow-600",
+    icon: HandThumbUpIcon,
+    className: "",
   },
   [2]: {
     label: "Savor",
-    icon: "🥃🥃",
-    className: "text-green-600",
+    icon: HandThumbUpIcon,
+    isDouble: true,
+    className: "",
   },
 };
 
 const sizeConfig = {
-  small: "text-base",
-  medium: "text-xl",
-  large: "text-2xl",
+  small: "h-4 w-4",
+  medium: "h-5 w-5",
+  large: "h-6 w-6",
 };
 
 export default function SimpleRatingDisplay({
@@ -55,7 +59,10 @@ export default function SimpleRatingDisplay({
       )}
       title={config.label}
     >
-      <span className={sizeConfig[size]}>{config.icon}</span>
+      <div className="flex items-center gap-1">
+        <config.icon className={sizeConfig[size]} />
+        {config.isDouble && <config.icon className={sizeConfig[size]} />}
+      </div>
       {showLabel && <span className="font-medium">{config.label}</span>}
     </div>
   );
