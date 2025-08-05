@@ -188,3 +188,24 @@ export const BOT_USER_AGENT = "PeatedBot/1.0 (https://peated.com)";
 export const ALLOWED_VOLUMES = [500, 750, 1000, 1500, 1750];
 
 export const SCRAPER_PRICE_BATCH_SIZE = 5;
+
+export const SIMPLE_RATING_VALUES = {
+  PASS: -1,
+  SIP: 1,
+  SAVOR: 2,
+} as const;
+
+export const SIMPLE_RATING_LABELS = {
+  [-1]: "Pass",
+  [1]: "Sip",
+  [2]: "Savor",
+} as const;
+
+export const SIMPLE_RATING_DESCRIPTIONS = {
+  [-1]: "Not my thing",
+  [1]: "Enjoyable, would drink again",
+  [2]: "Amazing, would seek out",
+} as const;
+
+export type SimpleRatingValue =
+  (typeof SIMPLE_RATING_VALUES)[keyof typeof SIMPLE_RATING_VALUES];

@@ -2,8 +2,13 @@ import { HandThumbDownIcon, HandThumbUpIcon } from "@heroicons/react/20/solid";
 import BottleIcon from "@peated/web/assets/bottle.svg";
 import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import classNames from "../lib/classNames";
+import {
+  SIMPLE_RATING_LABELS,
+  SIMPLE_RATING_VALUES,
+  type SimpleRatingValue,
+} from "../lib/constants";
 
-type RatingValue = -1 | 1 | 2;
+type RatingValue = SimpleRatingValue;
 
 type Props = {
   value: RatingValue;
@@ -13,20 +18,20 @@ type Props = {
 };
 
 const ratingConfig = {
-  [-1]: {
-    label: "Pass",
+  [SIMPLE_RATING_VALUES.PASS]: {
+    label: SIMPLE_RATING_LABELS[SIMPLE_RATING_VALUES.PASS],
     icon: HandThumbDownIcon,
     className: "",
     isDouble: false,
   },
-  [1]: {
-    label: "Sip",
+  [SIMPLE_RATING_VALUES.SIP]: {
+    label: SIMPLE_RATING_LABELS[SIMPLE_RATING_VALUES.SIP],
     icon: HandThumbUpIcon,
     className: "",
     isDouble: false,
   },
-  [2]: {
-    label: "Savor",
+  [SIMPLE_RATING_VALUES.SAVOR]: {
+    label: SIMPLE_RATING_LABELS[SIMPLE_RATING_VALUES.SAVOR],
     icon: HandThumbUpIcon,
     className: "",
     isDouble: true,

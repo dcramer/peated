@@ -1,4 +1,5 @@
 import { faker } from "@faker-js/faker";
+import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
 import type { AnyDatabase } from "@peated/server/db";
 import { db as dbConn } from "@peated/server/db";
 import * as dbSchema from "@peated/server/db/schema";
@@ -461,7 +462,7 @@ export const Tasting = async (
       .insert(tastings)
       .values({
         notes: faker.lorem.sentence(),
-        rating: faker.helpers.arrayElement([-1, 1, 2]),
+        rating: faker.helpers.arrayElement(Object.values(SIMPLE_RATING_VALUES)),
         tags: tags,
         createdAt: new Date(),
         ...data,

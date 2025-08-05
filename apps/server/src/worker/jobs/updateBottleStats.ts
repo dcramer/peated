@@ -1,3 +1,4 @@
+import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottles,
@@ -19,9 +20,9 @@ export default async ({ bottleId }: { bottleId: number }) => {
   // Calculate rating stats
   const ratingStatsQuery = sql`
     SELECT 
-      COUNT(*) FILTER (WHERE rating = -1) as pass,
-      COUNT(*) FILTER (WHERE rating = 1) as sip,
-      COUNT(*) FILTER (WHERE rating = 2) as savor,
+      COUNT(*) FILTER (WHERE rating = ${SIMPLE_RATING_VALUES.PASS}) as pass,
+      COUNT(*) FILTER (WHERE rating = ${SIMPLE_RATING_VALUES.SIP}) as sip,
+      COUNT(*) FILTER (WHERE rating = ${SIMPLE_RATING_VALUES.SAVOR}) as savor,
       COUNT(*) FILTER (WHERE rating IS NOT NULL) as total,
       AVG(rating) FILTER (WHERE rating IS NOT NULL) as avg
     FROM ${tastings}

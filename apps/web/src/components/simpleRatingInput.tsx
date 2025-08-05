@@ -6,9 +6,15 @@ import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import { forwardRef, useEffect, useState } from "react";
 import type { FieldError } from "react-hook-form";
 import classNames from "../lib/classNames";
+import {
+  SIMPLE_RATING_DESCRIPTIONS,
+  SIMPLE_RATING_LABELS,
+  SIMPLE_RATING_VALUES,
+  type SimpleRatingValue,
+} from "../lib/constants";
 import FormField from "./formField";
 
-type RatingValue = -1 | 1 | 2 | null;
+type RatingValue = SimpleRatingValue | null;
 
 type Props = {
   name?: string;
@@ -24,28 +30,28 @@ type Props = {
 
 const ratingOptions = [
   {
-    value: -1 as const,
-    label: "Pass",
+    value: SIMPLE_RATING_VALUES.PASS,
+    label: SIMPLE_RATING_LABELS[SIMPLE_RATING_VALUES.PASS],
     icon: HandThumbDownIcon,
-    description: "Not my thing",
+    description: SIMPLE_RATING_DESCRIPTIONS[SIMPLE_RATING_VALUES.PASS],
     isDouble: false,
     className:
       "hover:bg-slate-800 data-[selected=true]:bg-slate-700 data-[selected=true]:border-slate-600",
   },
   {
-    value: 1 as const,
-    label: "Sip",
+    value: SIMPLE_RATING_VALUES.SIP,
+    label: SIMPLE_RATING_LABELS[SIMPLE_RATING_VALUES.SIP],
     icon: HandThumbUpIcon,
-    description: "Enjoyable, would drink again",
+    description: SIMPLE_RATING_DESCRIPTIONS[SIMPLE_RATING_VALUES.SIP],
     isDouble: false,
     className:
       "hover:bg-slate-800 data-[selected=true]:bg-slate-700 data-[selected=true]:border-slate-600",
   },
   {
-    value: 2 as const,
-    label: "Savor",
+    value: SIMPLE_RATING_VALUES.SAVOR,
+    label: SIMPLE_RATING_LABELS[SIMPLE_RATING_VALUES.SAVOR],
     icon: HandThumbUpIcon,
-    description: "Amazing, would seek out",
+    description: SIMPLE_RATING_DESCRIPTIONS[SIMPLE_RATING_VALUES.SAVOR],
     isDouble: true,
     className:
       "hover:bg-slate-800 data-[selected=true]:bg-slate-700 data-[selected=true]:border-slate-600",
