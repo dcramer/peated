@@ -25,12 +25,10 @@ export const TastingSchema = z.object({
       "The release of the bottle, if applicable. e.g. 'Ardbeg Supernova 2023'",
     ),
   rating: z
-    .number()
-    .gte(0)
-    .lte(5)
+    .union([z.literal(-1), z.literal(1), z.literal(2)])
     .nullable()
     .default(null)
-    .describe("User's rating from 0-5 stars"),
+    .describe("Simple rating: -1 (Pass), 1 (Sip), 2 (Savor)"),
   tags: z
     .array(z.string())
     .default([])

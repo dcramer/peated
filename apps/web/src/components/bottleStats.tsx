@@ -1,5 +1,6 @@
 import { type Outputs } from "@peated/server/orpc/router";
 import Price from "./price";
+import SimpleRatingStats from "./simpleRatingStats";
 
 export default function BottleStats({
   bottle,
@@ -35,15 +36,24 @@ export default function BottleStats({
   ];
 
   return (
-    <div className="my-6 grid grid-cols-2 items-center gap-3 text-center lg:grid-cols-4 lg:text-left">
-      {stats.map((stat) => (
-        <div key={stat.name}>
-          <div className="text-muted leading-7">{stat.name}</div>
-          <div className="order-first text-3xl font-semibold tracking-tight lg:text-5xl">
-            {stat.value || "-"}
+    <>
+      <div className="my-6 grid grid-cols-2 items-center gap-3 text-center lg:grid-cols-4 lg:text-left">
+        {stats.map((stat) => (
+          <div key={stat.name}>
+            <div className="text-muted leading-7">{stat.name}</div>
+            <div className="order-first text-3xl font-semibold tracking-tight lg:text-5xl">
+              {stat.value || "-"}
+            </div>
           </div>
+        ))}
+      </div>
+
+      {bottle.ratingStats && bottle.ratingStats.total > 0 && (
+        <div className="my-6 border-t pt-6">
+          <h3 className="mb-4 text-lg font-semibold">Community Rating</h3>
+          <SimpleRatingStats stats={bottle.ratingStats} />
         </div>
-      ))}
-    </div>
+      )}
+    </>
   );
 }

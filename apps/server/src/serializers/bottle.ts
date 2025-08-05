@@ -201,6 +201,7 @@ export const BottleSerializer = serializer({
         : null,
 
       avgRating: item.avgRating,
+      ratingStats: item.ratingStats,
       totalTastings: item.totalTastings,
       numReleases: item.numReleases,
 

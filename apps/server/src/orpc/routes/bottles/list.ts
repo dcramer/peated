@@ -30,11 +30,13 @@ const SORT_OPTIONS = [
   "name",
   "age",
   "rating",
+  "simpleRating",
   "tastings",
   "-created",
   "-name",
   "-age",
   "-rating",
+  "-simpleRating",
   "-tastings",
 ] as const;
 
@@ -64,6 +66,7 @@ export default procedure
       category: z.enum(CATEGORY_LIST).nullish(),
       age: z.coerce.number().nullish(),
       caskType: CaskTypeEnum.nullish(),
+      ratingLevel: z.enum(["pass", "sip", "savor"]).nullish(),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
       sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
@@ -126,6 +129,28 @@ export default procedure
       where.push(
         sql`EXISTS(SELECT FROM ${tastings} WHERE ${rest.tag} = ANY(${tastings.tags}) AND ${tastings.bottleId} = ${bottles.id})`,
       );
+    }
+    if (rest.ratingLevel) {
+      // Filter by rating level based on average simple rating
+      // Pass: avg <= 0 (between -1 and 1, but closer to -1)
+      // Sip: avg > 0 and avg <= 1.5 (between 1 and 2, but closer to 1)
+      // Savor: avg > 1.5 (close to 2)
+      switch (rest.ratingLevel) {
+        case "pass":
+          where.push(sql`(${bottles.ratingStats}->>'avg')::float <= 0`);
+          break;
+        case "sip":
+          where.push(
+            and(
+              sql`(${bottles.ratingStats}->>'avg')::float > 0`,
+              sql`(${bottles.ratingStats}->>'avg')::float <= 1.5`,
+            ),
+          );
+          break;
+        case "savor":
+          where.push(sql`(${bottles.ratingStats}->>'avg')::float > 1.5`);
+          break;
+      }
     }
 
     let flight: Flight | null = null;
@@ -191,6 +216,12 @@ export default procedure
         break;
       case "-rating":
         orderBy = sql`${bottles.avgRating} DESC NULLS LAST`;
+        break;
+      case "simpleRating":
+        orderBy = sql`(${bottles.ratingStats}->>'avg')::float ASC NULLS LAST`;
+        break;
+      case "-simpleRating":
+        orderBy = sql`(${bottles.ratingStats}->>'avg')::float DESC NULLS LAST`;
         break;
       case "-tastings":
       default:

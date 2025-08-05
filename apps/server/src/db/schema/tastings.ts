@@ -39,7 +39,8 @@ export const tastings = pgTable(
       .default(sql`array[]::varchar[]`)
       .notNull(),
     color: integer("color"),
-    rating: doublePrecision("rating"),
+    ratingLegacy: doublePrecision("rating_legacy"),
+    rating: smallint("rating"),
     imageUrl: text("image_url"),
     notes: text("notes"),
     servingStyle: servingStyleEnum("serving_style"),

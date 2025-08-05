@@ -10,6 +10,7 @@ import {
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAuth } from "@peated/server/orpc/middleware";
+import { pushJob } from "@peated/server/worker/client";
 import { and, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -91,7 +92,6 @@ export default procedure
               .update(bottleReleases)
               .set({
                 totalTastings: sql`${bottleReleases.totalTastings} - 1`,
-                avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottleReleases.id} = ${tastings.releaseId})`,
               })
               .where(eq(bottleReleases.id, tasting.releaseId))
           : undefined,
@@ -102,6 +102,9 @@ export default procedure
       // TODO: update entities.totalTastings
       await tx.delete(tastings).where(eq(tastings.id, tasting.id));
     });
+
+    // Update bottle stats after deletion
+    await pushJob("UpdateBottleStats", { bottleId: tasting.bottleId });
 
     return {};
   });

@@ -140,7 +140,22 @@ export const BottleSchema = z.object({
     .lte(5)
     .nullable()
     .readonly()
-    .describe("Average user rating for this bottle"),
+    .describe("Average 5-star rating from legacy ratings"),
+  ratingStats: z
+    .object({
+      pass: z.number().describe("Number of Pass (-1) ratings"),
+      sip: z.number().describe("Number of Sip (1) ratings"),
+      savor: z.number().describe("Number of Savor (2) ratings"),
+      total: z.number().describe("Total number of simple ratings"),
+      avg: z.number().nullable().describe("Average simple rating (-1 to 2)"),
+      percentage: z.object({
+        pass: z.number().describe("Percentage of Pass ratings"),
+        sip: z.number().describe("Percentage of Sip ratings"),
+        savor: z.number().describe("Percentage of Savor ratings"),
+      }),
+    })
+    .readonly()
+    .describe("Distribution statistics for simple ratings"),
   totalTastings: z
     .number()
     .gte(0)
@@ -185,6 +200,7 @@ export const BottleInputSchema = BottleSchema.omit({
   fullName: true,
   suggestedTags: true,
   avgRating: true,
+  ratingStats: true,
   totalTastings: true,
   createdAt: true,
   updatedAt: true,
