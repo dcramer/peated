@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { comments } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { CommentSchema, CursorSchema } from "@peated/server/schemas";
+import { CommentSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CommentSerializer } from "@peated/server/serializers/comment";
 import { and, asc, eq } from "drizzle-orm";
@@ -32,12 +32,8 @@ export default procedure
       limit: z.coerce.number().gte(1).lte(100).default(100),
     }),
   )
-  .output(
-    z.object({
-      results: z.array(CommentSchema),
-      rel: CursorSchema,
-    }),
-  )
+  // TODO(response-envelope): helper enables later switch to { data, meta }
+  .output(listResponse(CommentSchema))
   .handler(async function ({ input, context, errors }) {
     const { cursor, limit, ...rest } = input;
     const offset = (cursor - 1) * limit;

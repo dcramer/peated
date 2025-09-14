@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { flights } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { FlightSchema } from "@peated/server/schemas";
+import { FlightSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { FlightSerializer } from "@peated/server/serializers/flight";
 import type { SQL } from "drizzle-orm";
@@ -12,13 +12,7 @@ const DEFAULT_SORT = "name";
 
 const SORT_OPTIONS = ["name", "-name"] as const;
 
-const OutputSchema = z.object({
-  results: z.array(FlightSchema),
-  rel: z.object({
-    nextCursor: z.number().nullable(),
-    prevCursor: z.number().nullable(),
-  }),
-});
+const OutputSchema = listResponse(FlightSchema);
 
 export default procedure
   .route({

@@ -7,7 +7,7 @@ import {
 } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import { procedure } from "@peated/server/orpc";
-import { UserSchema } from "@peated/server/schemas";
+import { UserSchema, detailsResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { eq, sql } from "drizzle-orm";
@@ -27,15 +27,18 @@ export default procedure
       user: z.union([z.coerce.number(), z.literal("me"), z.string()]),
     }),
   )
+  // TODO(response-envelope): wrap in { data } by updating detailsResponse() at cutover
   .output(
-    UserSchema.extend({
-      stats: z.object({
-        tastings: z.number(),
-        bottles: z.number(),
-        collected: z.number(),
-        contributions: z.number(),
+    detailsResponse(
+      UserSchema.extend({
+        stats: z.object({
+          tastings: z.number(),
+          bottles: z.number(),
+          collected: z.number(),
+          contributions: z.number(),
+        }),
       }),
-    }),
+    ),
   )
   .handler(async function ({ input, context, errors }) {
     const user = await getUserFromId(db, input.user, context.user);

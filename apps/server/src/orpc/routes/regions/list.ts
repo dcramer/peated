@@ -3,7 +3,7 @@ import { db } from "@peated/server/db";
 import { countries } from "@peated/server/db/schema";
 import { regions } from "@peated/server/db/schema/regions";
 import { procedure } from "@peated/server/orpc";
-import { CursorSchema, RegionSchema } from "@peated/server/schemas";
+import { RegionSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { RegionSerializer } from "@peated/server/serializers/region";
 import { and, asc, desc, eq, ilike, ne, sql, type SQL } from "drizzle-orm";
@@ -22,10 +22,7 @@ const InputSchema = z.object({
   hasBottles: z.coerce.boolean().default(false),
 });
 
-const OutputSchema = z.object({
-  results: z.array(RegionSchema),
-  rel: CursorSchema,
-});
+const OutputSchema = listResponse(RegionSchema);
 
 export default procedure
   .route({

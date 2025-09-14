@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import { follows, users } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAuth } from "@peated/server/orpc/middleware";
-import { CursorSchema, FriendSchema } from "@peated/server/schemas";
+import { FriendSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { FriendSerializer } from "@peated/server/serializers/friend";
 import {
@@ -42,12 +42,8 @@ export default procedure
         limit: 100,
       }),
   )
-  .output(
-    z.object({
-      results: z.array(FriendSchema),
-      rel: CursorSchema,
-    }),
-  )
+  // TODO(response-envelope): helper enables later switch to { data, meta }
+  .output(listResponse(FriendSchema))
   .handler(async function ({
     input: { query, cursor, limit, ...input },
     context,

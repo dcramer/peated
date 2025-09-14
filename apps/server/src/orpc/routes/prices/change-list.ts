@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { storePriceHistories, storePrices } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { BottlePriceChangeSchema, CursorSchema } from "@peated/server/schemas";
+import { BottlePriceChangeSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottlePriceChangeSerializer } from "@peated/server/serializers/storePrice";
 import type { SQL } from "drizzle-orm";
@@ -20,10 +20,7 @@ const InputSchema = z
     limit: 100,
   });
 
-const OutputSchema = z.object({
-  results: z.array(BottlePriceChangeSchema),
-  rel: CursorSchema,
-});
+const OutputSchema = listResponse(BottlePriceChangeSchema);
 
 export default procedure
   .route({

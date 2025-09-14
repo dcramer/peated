@@ -3,7 +3,7 @@ import { collectionBottles, collections } from "@peated/server/db/schema";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
 import { procedure } from "@peated/server/orpc";
 import { requireAuth } from "@peated/server/orpc/middleware";
-import { CollectionSchema, CursorSchema } from "@peated/server/schemas";
+import { CollectionSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CollectionSerializer } from "@peated/server/serializers/collection";
 import { and, asc, sql } from "drizzle-orm";
@@ -27,12 +27,8 @@ export default procedure
       limit: z.coerce.number().gte(1).lte(100).default(25),
     }),
   )
-  .output(
-    z.object({
-      results: z.array(CollectionSchema),
-      rel: CursorSchema,
-    }),
-  )
+  // TODO(response-envelope): use helper to enable later switch to { data, meta }
+  .output(listResponse(CollectionSchema))
   .handler(async function ({
     input: { cursor, limit, ...input },
     context,

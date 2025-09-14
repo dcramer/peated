@@ -30,6 +30,32 @@ import config from "./config";
 import { getUserFromHeader } from "./lib/auth";
 import { logError } from "./lib/log";
 import router from "./orpc/router";
+import {
+  AuthSchema,
+  BadgeAwardSchema,
+  BadgeSchema,
+  BottlePriceChangeSchema,
+  BottleReleaseSchema,
+  // Core domain
+  BottleSchema,
+  BottleSeriesSchema,
+  CollectionBottleSchema,
+  CollectionSchema,
+  CommentSchema,
+  CountrySchema,
+  // Shared
+  CursorSchema,
+  EntitySchema,
+  ExternalSiteSchema,
+  FlightSchema,
+  NotificationSchema,
+  RegionSchema,
+  ReviewSchema,
+  StorePriceSchema,
+  TagSchema,
+  TastingSchema,
+  UserSchema,
+} from "./schemas";
 
 const openapiHandler = new OpenAPIHandler(router, {
   plugins: [new ZodSmartCoercionPlugin()],
@@ -224,6 +250,41 @@ export const app = new Hono()
           description: "The Peated API",
         },
         servers: [{ url: "/v1" } /** Should use absolute URLs in production */],
+        // Promote shared schemas into OpenAPI components and enable $ref reuse.
+        // Note: If a schema differs between input/output, set strategy accordingly.
+        // Common component schemas for reuse via $ref across the spec
+        commonSchemas: {
+          // Core
+          Bottle: { schema: BottleSchema, strategy: "output" },
+          User: { schema: UserSchema, strategy: "output" },
+          Entity: { schema: EntitySchema, strategy: "output" },
+          Country: { schema: CountrySchema, strategy: "output" },
+          Region: { schema: RegionSchema, strategy: "output" },
+          Tag: { schema: TagSchema, strategy: "output" },
+          Review: { schema: ReviewSchema, strategy: "output" },
+          Tasting: { schema: TastingSchema, strategy: "output" },
+          Notification: { schema: NotificationSchema, strategy: "output" },
+          Comment: { schema: CommentSchema, strategy: "output" },
+          Collection: { schema: CollectionSchema, strategy: "output" },
+          CollectionBottle: {
+            schema: CollectionBottleSchema,
+            strategy: "output",
+          },
+          BottleRelease: { schema: BottleReleaseSchema, strategy: "output" },
+          BottleSeries: { schema: BottleSeriesSchema, strategy: "output" },
+          Badge: { schema: BadgeSchema, strategy: "output" },
+          BadgeAward: { schema: BadgeAwardSchema, strategy: "output" },
+          Flight: { schema: FlightSchema, strategy: "output" },
+          ExternalSite: { schema: ExternalSiteSchema, strategy: "output" },
+          StorePrice: { schema: StorePriceSchema, strategy: "output" },
+          BottlePriceChange: {
+            schema: BottlePriceChangeSchema,
+            strategy: "output",
+          },
+          // Shared
+          Cursor: { schema: CursorSchema, strategy: "output" },
+          Auth: { schema: AuthSchema, strategy: "output" },
+        },
       }),
     );
   })

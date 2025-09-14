@@ -35,3 +35,20 @@ export const CursorSchema = z.object({
     .nullable()
     .describe("Cursor for the previous page of results"),
 });
+
+// Generic HTTP response helpers shared across endpoints
+// TODO(response-envelope): During the coordinated response migration,
+// change listResponse from { results, rel } to:
+//   { data: T[], meta: { cursor: Cursor } }
+// and update all callers in one pass.
+export const listResponse = <T extends z.ZodTypeAny>(item: T) =>
+  z.object({
+    results: z.array(item),
+    rel: CursorSchema,
+  });
+
+// TODO(response-envelope): During the coordinated response migration,
+// change detailsResponse (identity) to wrap in:
+//   z.object({ data: schema })
+// and update all callers in one pass.
+export const detailsResponse = <T extends z.ZodTypeAny>(schema: T) => schema;

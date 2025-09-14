@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { changes } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { ChangeSchema, CursorSchema } from "@peated/server/schemas";
+import { ChangeSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ChangeSerializer } from "@peated/server/serializers/change";
 import type { SQL } from "drizzle-orm";
@@ -25,12 +25,8 @@ export default procedure
       limit: z.coerce.number().gte(1).lte(100).default(100),
     }),
   )
-  .output(
-    z.object({
-      results: z.array(ChangeSchema),
-      rel: CursorSchema,
-    }),
-  )
+  // TODO(response-envelope): helper enables later switch to { data, meta }
+  .output(listResponse(ChangeSchema))
   .handler(async function ({ input, context, errors }) {
     const { cursor, limit, ...rest } = input;
     const offset = (cursor - 1) * limit;

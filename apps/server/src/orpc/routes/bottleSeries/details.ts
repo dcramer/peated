@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { bottleSeries } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { BottleSeriesSchema } from "@peated/server/schemas";
+import { BottleSeriesSchema, detailsResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSeriesSerializer } from "@peated/server/serializers/bottleSeries";
 import { eq } from "drizzle-orm";
@@ -17,7 +17,8 @@ export default procedure
     operationId: "getBottleSeries",
   })
   .input(z.object({ series: z.coerce.number() }))
-  .output(BottleSeriesSchema)
+  // TODO(response-envelope): wrap in { data } by updating detailsResponse() at cutover
+  .output(detailsResponse(BottleSeriesSchema))
   .handler(async function ({ input, context, errors }) {
     const [series] = await db
       .select()

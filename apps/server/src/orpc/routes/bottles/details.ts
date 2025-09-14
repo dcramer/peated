@@ -10,6 +10,7 @@ import {
   BottleSchema,
   StorePriceSchema,
   UserSchema,
+  detailsResponse,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
@@ -18,11 +19,15 @@ import { UserSerializer } from "@peated/server/serializers/user";
 import { and, desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { z } from "zod";
 
-const OutputSchema = BottleSchema.extend({
-  createdBy: UserSchema.nullable(),
-  people: z.number(),
-  lastPrice: StorePriceSchema.nullable(),
-});
+// Compose details as Bottle schema + extra fields to allow OpenAPI $ref via allOf
+const OutputSchema = z.intersection(
+  BottleSchema,
+  z.object({
+    createdBy: UserSchema.nullable(),
+    people: z.number(),
+    lastPrice: StorePriceSchema.nullable(),
+  }),
+);
 
 export default procedure
   .route({
@@ -37,7 +42,9 @@ export default procedure
     }),
   })
   .input(z.object({ bottle: z.coerce.number() }))
-  .output(OutputSchema)
+  // TODO(response-envelope): switch to wrapping the details payload as
+  // { data: ... } by updating detailsResponse() when we migrate envelopes.
+  .output(detailsResponse(OutputSchema))
   .handler(async function ({ input, context, errors }) {
     const { bottle: bottleId } = input;
 

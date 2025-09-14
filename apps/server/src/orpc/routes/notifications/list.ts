@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import { notifications } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAuth } from "@peated/server/orpc/middleware";
-import { CursorSchema, NotificationSchema } from "@peated/server/schemas";
+import { NotificationSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { NotificationSerializer } from "@peated/server/serializers/notification";
 import type { SQL } from "drizzle-orm";
@@ -31,12 +31,8 @@ export default procedure
         limit: 100,
       }),
   )
-  .output(
-    z.object({
-      results: z.array(NotificationSchema),
-      rel: CursorSchema,
-    }),
-  )
+  // TODO(response-envelope): use helper to enable later switch to { data, meta }
+  .output(listResponse(NotificationSchema))
   .handler(async function ({ input: { cursor, limit, ...input }, context }) {
     const offset = (cursor - 1) * limit;
 

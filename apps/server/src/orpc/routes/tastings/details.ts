@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { tastings } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { TastingSchema } from "@peated/server/schemas";
+import { TastingSchema, detailsResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
 import { eq } from "drizzle-orm";
@@ -20,7 +20,8 @@ export default procedure
       tasting: z.coerce.number(),
     }),
   )
-  .output(TastingSchema)
+  // TODO(response-envelope): wrap in { data } by updating detailsResponse() at cutover
+  .output(detailsResponse(TastingSchema))
   .handler(async function ({ input, context, errors }) {
     const [tasting] = await db
       .select()

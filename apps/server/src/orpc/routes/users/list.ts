@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAuth } from "@peated/server/orpc/middleware/auth";
-import { CursorSchema, UserSchema } from "@peated/server/schemas";
+import { UserSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import type { SQL } from "drizzle-orm";
@@ -35,12 +35,8 @@ export default procedure
         limit: 100,
       }),
   )
-  .output(
-    z.object({
-      results: z.array(UserSchema),
-      rel: CursorSchema,
-    }),
-  )
+  // TODO(response-envelope): helper enables later switch to { data, meta }
+  .output(listResponse(UserSchema))
   .handler(async function ({
     input: { query, cursor, limit, sort, ...input },
     context,

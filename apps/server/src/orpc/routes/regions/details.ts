@@ -2,7 +2,7 @@ import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { countries, regions } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { RegionSchema } from "@peated/server/schemas";
+import { RegionSchema, detailsResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { RegionSerializer } from "@peated/server/serializers/region";
 import { and, eq, sql } from "drizzle-orm";
@@ -23,7 +23,8 @@ export default procedure
       country: z.string(),
     }),
   )
-  .output(RegionSchema)
+  // TODO(response-envelope): wrap in { data } by updating detailsResponse() at cutover
+  .output(detailsResponse(RegionSchema))
   .handler(async function ({ input, context, errors }) {
     let countryId: number;
     if (Number.isFinite(+input.country)) {

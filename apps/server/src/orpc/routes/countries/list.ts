@@ -2,7 +2,7 @@ import { MAJOR_COUNTRIES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { countries } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { CountrySchema, CursorSchema } from "@peated/server/schemas";
+import { CountrySchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CountrySerializer } from "@peated/server/serializers/country";
 import { and, asc, desc, ilike, inArray, ne, sql, type SQL } from "drizzle-orm";
@@ -12,10 +12,8 @@ const DEFAULT_SORT = "name";
 
 const SORT_OPTIONS = ["name", "bottles", "-name", "-bottles"] as const;
 
-const OutputSchema = z.object({
-  results: z.array(CountrySchema),
-  rel: CursorSchema,
-});
+// Standardized paginated list response
+const OutputSchema = listResponse(CountrySchema);
 
 export default procedure
   .route({
@@ -43,6 +41,7 @@ export default procedure
         sort: DEFAULT_SORT,
       }),
   )
+  // TODO(response-envelope): helper enables later switch to { data, meta }
   .output(OutputSchema)
   .handler(async function ({
     input: { cursor, query, limit, ...input },

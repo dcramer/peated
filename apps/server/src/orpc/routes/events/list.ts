@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { events } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { EventSchema } from "@peated/server/schemas";
+import { EventSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EventSerializer } from "@peated/server/serializers/event";
 import type { SQL } from "drizzle-orm";
@@ -26,13 +26,7 @@ const InputSchema = z
     limit: 100,
   });
 
-const OutputSchema = z.object({
-  results: z.array(EventSchema),
-  rel: z.object({
-    nextCursor: z.number().nullable(),
-    prevCursor: z.number().nullable(),
-  }),
-});
+const OutputSchema = listResponse(EventSchema);
 
 export default procedure
   .route({

@@ -2,19 +2,13 @@ import { db } from "@peated/server/db";
 import { entities, entityAliases } from "@peated/server/db/schema";
 import { SMWS_DISTILLERY_CODES } from "@peated/server/lib/smws";
 import { procedure } from "@peated/server/orpc";
-import { EntitySchema } from "@peated/server/schemas";
+import { EntitySchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { sql } from "drizzle-orm";
 import { z } from "zod";
 
-const OutputSchema = z.object({
-  results: z.array(EntitySchema),
-  rel: z.object({
-    nextCursor: z.number().nullable(),
-    prevCursor: z.number().nullable(),
-  }),
-});
+const OutputSchema = listResponse(EntitySchema);
 
 export default procedure
   .route({

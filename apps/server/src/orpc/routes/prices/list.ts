@@ -3,9 +3,9 @@ import { externalSites, storePrices } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import {
-  CursorSchema,
   ExternalSiteTypeEnum,
   StorePriceSchema,
+  listResponse,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { StorePriceSerializer } from "@peated/server/serializers/storePrice";
@@ -39,12 +39,8 @@ export default procedure
         limit: 100,
       }),
   )
-  .output(
-    z.object({
-      results: z.array(StorePriceSchema),
-      rel: CursorSchema,
-    }),
-  )
+  // TODO(response-envelope): helper enables later switch to { data, meta }
+  .output(listResponse(StorePriceSchema))
   .handler(async function ({
     input: { cursor, query, limit, ...input },
     context,

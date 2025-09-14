@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { bottles, bottlesToDistillers } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { BottleSchema, CursorSchema } from "@peated/server/schemas";
+import { BottleSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { SQL } from "drizzle-orm";
@@ -37,13 +37,8 @@ export default procedure
       limit: z.coerce.number().gte(1).lte(100).default(25),
     }),
   )
-  .output(
-    z.object({
-      // TODO: variable output isnt great here
-      results: z.array(BottleSchema),
-      rel: CursorSchema,
-    }),
-  )
+  // TODO(response-envelope): helper enables later switch to { data, meta }
+  .output(listResponse(BottleSchema))
   .handler(async function ({ input: { limit, ...input }, context, errors }) {
     // maxAge caching for 5 minutes would be handled by oRPC server settings
 
