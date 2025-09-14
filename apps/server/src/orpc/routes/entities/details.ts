@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { entities, entityTombstones } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { EntitySchema } from "@peated/server/schemas";
+import { EntitySchema, detailsResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { UserSerializer } from "@peated/server/serializers/user";
@@ -27,7 +27,8 @@ export default procedure
     operationId: "getEntity",
   })
   .input(z.object({ entity: z.coerce.number() }))
-  .output(OutputSchema)
+  // TODO(response-envelope): wrap in { data } by updating detailsResponse() at cutover
+  .output(detailsResponse(OutputSchema))
   .handler(async function ({ input, context, errors }) {
     const { entity: entityId } = input;
 

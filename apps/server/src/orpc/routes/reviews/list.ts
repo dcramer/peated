@@ -2,9 +2,9 @@ import { db } from "@peated/server/db";
 import { externalSites, reviews } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import {
-  CursorSchema,
   ExternalSiteTypeEnum,
   ReviewSchema,
+  listResponse,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
@@ -27,11 +27,6 @@ const InputSchema = z
     limit: 100,
   });
 
-const OutputSchema = z.object({
-  results: z.array(ReviewSchema),
-  rel: CursorSchema,
-});
-
 export default procedure
   .route({
     method: "GET",
@@ -42,7 +37,8 @@ export default procedure
     operationId: "listReviews",
   })
   .input(InputSchema)
-  .output(OutputSchema)
+  // TODO(response-envelope): use helper to enable later switch to { data, meta }
+  .output(listResponse(ReviewSchema))
   .handler(async function ({
     input: { cursor, query, limit, ...input },
     context,

@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { bottleReleases, bottles } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { BottleReleaseSchema, CursorSchema } from "@peated/server/schemas";
+import { BottleReleaseSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
 import { and, asc, desc, eq, type SQL, sql } from "drizzle-orm";
@@ -47,12 +47,8 @@ export default procedure
       sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
     }),
   )
-  .output(
-    z.object({
-      results: z.array(BottleReleaseSchema),
-      rel: CursorSchema,
-    }),
-  )
+  // TODO(response-envelope): helper enables later switch to { data, meta }
+  .output(listResponse(BottleReleaseSchema))
   .handler(async function ({ input, context, errors }) {
     const { query, cursor, limit, sort, ...rest } = input;
     const offset = (cursor - 1) * limit;

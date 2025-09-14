@@ -10,7 +10,7 @@ import {
 } from "@peated/server/db/schema";
 import { parseDetailsFromName } from "@peated/server/lib/smws";
 import { procedure } from "@peated/server/orpc";
-import { EntitySchema } from "@peated/server/schemas";
+import { EntitySchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import type { SQL } from "drizzle-orm";
@@ -57,13 +57,7 @@ const InputSchema = z
     limit: 100,
   });
 
-const OutputSchema = z.object({
-  results: z.array(EntitySchema),
-  rel: z.object({
-    nextCursor: z.number().nullable(),
-    prevCursor: z.number().nullable(),
-  }),
-});
+const OutputSchema = listResponse(EntitySchema);
 
 export default procedure
   .route({

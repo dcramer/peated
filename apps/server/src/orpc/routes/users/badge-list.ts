@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import { badgeAwards } from "@peated/server/db/schema";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
 import { procedure } from "@peated/server/orpc";
-import { BadgeAwardSchema } from "@peated/server/schemas";
+import { BadgeAwardSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BadgeAwardSerializer } from "@peated/server/serializers/badgeAward";
 import { and, desc, eq, gte, sql } from "drizzle-orm";
@@ -24,15 +24,8 @@ export default procedure
       limit: z.coerce.number().gte(1).lte(100).default(25),
     }),
   )
-  .output(
-    z.object({
-      results: z.array(BadgeAwardSchema),
-      rel: z.object({
-        nextCursor: z.number().nullable(),
-        prevCursor: z.number().nullable(),
-      }),
-    }),
-  )
+  // TODO(response-envelope): helper enables later switch to { data, meta }
+  .output(listResponse(BadgeAwardSchema))
   .handler(async function ({
     input: { cursor, limit, ...input },
     context,

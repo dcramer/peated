@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { badges } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { BadgeSchema } from "@peated/server/schemas";
+import { BadgeSchema, detailsResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BadgeSerializer } from "@peated/server/serializers/badge";
 import { eq } from "drizzle-orm";
@@ -17,7 +17,8 @@ export default procedure
     operationId: "getBadge",
   })
   .input(z.object({ badge: z.coerce.number() }))
-  .output(BadgeSchema)
+  // TODO(response-envelope): wrap in { data } by updating detailsResponse() at cutover
+  .output(detailsResponse(BadgeSchema))
   .handler(async function ({ input, context, errors }) {
     const [badge] = await db
       .select()

@@ -4,6 +4,7 @@ import { procedure } from "@peated/server/orpc";
 import {
   ExternalSiteSchema,
   ExternalSiteTypeEnum,
+  detailsResponse,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ExternalSiteSerializer } from "@peated/server/serializers/externalSite";
@@ -24,7 +25,8 @@ export default procedure
       site: ExternalSiteTypeEnum,
     }),
   )
-  .output(ExternalSiteSchema)
+  // TODO(response-envelope): wrap in { data } by updating detailsResponse() at cutover
+  .output(detailsResponse(ExternalSiteSchema))
   .handler(async function ({ input, context, errors }) {
     const [site] = await db
       .select()

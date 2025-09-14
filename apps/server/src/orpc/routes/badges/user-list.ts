@@ -4,7 +4,7 @@ import { badgeAwards, badges, users } from "@peated/server/db/schema";
 import { notEmpty } from "@peated/server/lib/filter";
 import { procedure } from "@peated/server/orpc";
 import { requireAuth } from "@peated/server/orpc/middleware";
-import { UserSchema } from "@peated/server/schemas";
+import { UserSchema, listResponse } from "@peated/server/schemas";
 import { serialize, serializer } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { and, desc, eq, ne } from "drizzle-orm";
@@ -56,21 +56,15 @@ const InputSchema = z.object({
   limit: z.coerce.number().gte(1).lte(100).default(25),
 });
 
-const OutputSchema = z.object({
-  results: z.array(
-    z.object({
-      id: z.number(),
-      xp: z.number(),
-      level: z.number(),
-      user: UserSchema,
-      createdAt: z.string(),
-    }),
-  ),
-  rel: z.object({
-    nextCursor: z.number().nullable(),
-    prevCursor: z.number().nullable(),
+const OutputSchema = listResponse(
+  z.object({
+    id: z.number(),
+    xp: z.number(),
+    level: z.number(),
+    user: UserSchema,
+    createdAt: z.string(),
   }),
-});
+);
 
 export default procedure
   .route({

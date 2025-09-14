@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
 import { bottleAliases, bottles } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { CursorSchema } from "@peated/server/schemas";
+import { listResponse } from "@peated/server/schemas";
 import {
   and,
   asc,
@@ -14,17 +14,14 @@ import {
 } from "drizzle-orm";
 import { z } from "zod";
 
-const OutputSchema = z.object({
-  results: z.array(
-    z.object({
-      name: z.string(),
-      createdAt: z.string(),
-      bottleId: z.number().nullable(),
-      isCanonical: z.boolean().optional(),
-    }),
-  ),
-  rel: CursorSchema,
-});
+const OutputSchema = listResponse(
+  z.object({
+    name: z.string(),
+    createdAt: z.string(),
+    bottleId: z.number().nullable(),
+    isCanonical: z.boolean().optional(),
+  }),
+);
 
 export default procedure
   .route({

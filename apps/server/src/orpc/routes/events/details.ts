@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { events } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { EventSchema } from "@peated/server/schemas";
+import { EventSchema, detailsResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EventSerializer } from "@peated/server/serializers/event";
 import { eq } from "drizzle-orm";
@@ -16,7 +16,8 @@ export default procedure
     operationId: "getEvent",
   })
   .input(z.object({ event: z.coerce.number() }))
-  .output(EventSchema)
+  // TODO(response-envelope): wrap in { data } by updating detailsResponse() at cutover
+  .output(detailsResponse(EventSchema))
   .handler(async function ({ input, context, errors }) {
     const { event: eventId } = input;
 

@@ -13,7 +13,7 @@ import { procedure } from "@peated/server/orpc";
 import {
   BottleSchema,
   CaskTypeEnum,
-  CursorSchema,
+  listResponse,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
@@ -70,13 +70,9 @@ export default procedure
       sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
     }),
   )
-  .output(
-    z.object({
-      // TODO: variable output isnt great here
-      results: z.array(BottleSchema),
-      rel: CursorSchema,
-    }),
-  )
+  // TODO(response-envelope): switch to { data, meta } by changing
+  // listResponse() implementation once we migrate envelopes globally.
+  .output(listResponse(BottleSchema))
   .handler(async function ({ input, context, errors }) {
     const { query, cursor, limit, ...rest } = input;
     const offset = (cursor - 1) * limit;

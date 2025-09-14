@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { bottleReleases } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { BottleReleaseSchema } from "@peated/server/schemas";
+import { BottleReleaseSchema, detailsResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
 import { eq } from "drizzle-orm";
@@ -20,7 +20,8 @@ export default procedure
     }),
   })
   .input(z.object({ release: z.coerce.number() }))
-  .output(BottleReleaseSchema)
+  // TODO(response-envelope): wrap in { data } by updating detailsResponse() at cutover
+  .output(detailsResponse(BottleReleaseSchema))
   .handler(async function ({ input, context, errors }) {
     const release = await db.query.bottleReleases.findFirst({
       where: eq(bottleReleases.id, input.release),

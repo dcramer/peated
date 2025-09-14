@@ -2,7 +2,7 @@ import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { countries } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { CountrySchema } from "@peated/server/schemas";
+import { CountrySchema, detailsResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CountrySerializer } from "@peated/server/serializers/country";
 import { eq, sql } from "drizzle-orm";
@@ -22,7 +22,8 @@ export default procedure
       country: z.string(),
     }),
   )
-  .output(CountrySchema)
+  // TODO(response-envelope): wrap in { data } by updating detailsResponse() at cutover
+  .output(detailsResponse(CountrySchema))
   .handler(async function ({ input, context, errors }) {
     const [country] = await db
       .select()

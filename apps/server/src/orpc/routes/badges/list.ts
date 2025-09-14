@@ -1,17 +1,12 @@
 import { db } from "@peated/server/db";
 import { badges } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { BadgeSchema, CursorSchema } from "@peated/server/schemas";
+import { BadgeSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BadgeSerializer } from "@peated/server/serializers/badge";
 import type { SQL } from "drizzle-orm";
 import { and, asc, ilike } from "drizzle-orm";
 import { z } from "zod";
-
-const OutputSchema = z.object({
-  results: z.array(BadgeSchema),
-  rel: CursorSchema,
-});
 
 export default procedure
   .route({
@@ -36,7 +31,8 @@ export default procedure
         limit: 100,
       }),
   )
-  .output(OutputSchema)
+  // TODO(response-envelope): central helper enables one-pass switch to { data, meta }
+  .output(listResponse(BadgeSchema))
   .handler(async function ({
     input: { query, cursor, limit, ...input },
     context,

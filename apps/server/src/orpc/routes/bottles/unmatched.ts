@@ -3,9 +3,9 @@ import { bottleAliases, storePrices } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
-  CursorSchema,
   ExternalSiteSchema,
   StorePriceSchema,
+  listResponse,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { StorePriceWithSiteSerializer } from "@peated/server/serializers/storePrice";
@@ -21,20 +21,17 @@ import {
 } from "drizzle-orm";
 import { z } from "zod";
 
-const OutputSchema = z.object({
-  results: z.array(
-    z.object({
-      name: z.string(),
-      createdAt: z.string(),
-      bottleId: z.number().nullable(),
-      bestMatch: z.null(),
-      exampleListing: StorePriceSchema.extend({
-        site: ExternalSiteSchema,
-      }).nullable(),
-    }),
-  ),
-  rel: CursorSchema,
-});
+const OutputSchema = listResponse(
+  z.object({
+    name: z.string(),
+    createdAt: z.string(),
+    bottleId: z.number().nullable(),
+    bestMatch: z.null(),
+    exampleListing: StorePriceSchema.extend({
+      site: ExternalSiteSchema,
+    }).nullable(),
+  }),
+);
 
 export default procedure
   .use(requireMod)

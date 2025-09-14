@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { CursorSchema, ExternalSiteSchema } from "@peated/server/schemas";
+import { ExternalSiteSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ExternalSiteSerializer } from "@peated/server/serializers/externalSite";
 import type { SQL } from "drizzle-orm";
@@ -24,12 +24,8 @@ export default procedure
       limit: z.coerce.number().gte(1).lte(100).default(100),
     }),
   )
-  .output(
-    z.object({
-      results: z.array(ExternalSiteSchema),
-      rel: CursorSchema,
-    }),
-  )
+  // TODO(response-envelope): helper enables later switch to { data, meta }
+  .output(listResponse(ExternalSiteSchema))
   .handler(async function ({ input, context, errors }) {
     const { cursor, sort, limit, query } = input;
     const offset = (cursor - 1) * limit;

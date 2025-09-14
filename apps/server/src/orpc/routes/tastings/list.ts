@@ -8,7 +8,7 @@ import {
 } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import { procedure } from "@peated/server/orpc";
-import { CursorSchema, TastingSchema } from "@peated/server/schemas";
+import { TastingSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
 import type { SQL } from "drizzle-orm";
@@ -42,12 +42,8 @@ export default procedure
         limit: 25,
       }),
   )
-  .output(
-    z.object({
-      results: z.array(TastingSchema),
-      rel: CursorSchema,
-    }),
-  )
+  // TODO(response-envelope): helper enables later switch to { data, meta }
+  .output(listResponse(TastingSchema))
   .handler(async function ({
     input: { cursor, limit, ...input },
     context,
