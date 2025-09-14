@@ -14,7 +14,9 @@ export default function EntityTastings({
 
   const { data: tastingList } = useSuspenseQuery(
     orpc.tastings.list.queryOptions({
-      entity: Number(entityId),
+      input: {
+        entity: Number(entityId),
+      },
     }),
   );
 

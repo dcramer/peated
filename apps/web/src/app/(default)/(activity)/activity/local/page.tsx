@@ -11,8 +11,10 @@ export default function Page() {
   const orpc = useORPC();
   const { data: tastingList } = useSuspenseQuery(
     orpc.tastings.list.queryOptions({
-      filter,
-      limit: 10,
+      input: {
+        filter,
+        limit: 10,
+      },
     }),
   );
 
