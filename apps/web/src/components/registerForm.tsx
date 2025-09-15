@@ -58,10 +58,7 @@ function FormComponent() {
           />
           <span>
             I agree to the{" "}
-            <Link
-              href="https://peated.com/terms"
-              className="text-highlight underline"
-            >
+            <Link href="/terms" className="text-highlight underline">
               Terms of Service
             </Link>
             .

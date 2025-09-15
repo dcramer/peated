@@ -90,7 +90,8 @@ export async function authenticate(
     code
       ? client.auth.login({
           code,
-          tosAccepted: formData.get("tosAccepted") ? true : undefined,
+          // Explicit boolean: true if present, else false
+          tosAccepted: Boolean(formData.get("tosAccepted")),
         })
       : client.auth.login({
           email,

@@ -22,10 +22,7 @@ export default async function TosPage({
         <h1 className="mb-2 text-xl font-semibold">Terms of Service</h1>
         <p className="mb-4 text-sm text-slate-300">
           You must agree to our{" "}
-          <Link
-            href="https://peated.com/terms"
-            className="text-highlight underline"
-          >
+          <Link href="/terms" className="text-highlight underline">
             Terms of Service
           </Link>{" "}
           to continue.

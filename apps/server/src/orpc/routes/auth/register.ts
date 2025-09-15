@@ -30,10 +30,7 @@ export default procedure
       username: z.string().toLowerCase(),
       email: z.string(),
       password: z.string(),
-      tosAccepted: z
-        .boolean()
-        .optional()
-        .describe("User accepted Terms of Service"),
+      tosAccepted: z.boolean().describe("User accepted Terms of Service"),
     }),
   )
   .output(AuthSchema)

@@ -33,9 +33,17 @@ Schema: `apps/server/src/db/schema/users.ts`
 
 ## Server enforcement
 
-Currently, the server does NOT hard‑gate API access for users without ToS acceptance. Enforcement is done via UI flows (signup checkbox, Google interstitial, post‑login redirect to `/tos`) and banners.
+There is no blanket ToS‑gate middleware applied to all routes.
 
-If we need stricter enforcement later, we can add a small oRPC middleware in `apps/server/src/orpc/index.ts` to block most RPCs for users missing `tosAcceptedAt`, with an allowlist for `auth` and `email` routes.
+Enforcement happens in two places:
+
+- At the edge of authentication flows:
+  - Register requires `tosAccepted=true` and sets `tosAcceptedAt`.
+  - Google (code/idToken) requires `tosAccepted=true` when the user has not yet accepted; existing accepted users may omit it.
+- In the web app UX:
+  - After any successful login, if `tosAcceptedAt` is null the client redirects to `/tos` to collect acceptance before proceeding.
+
+If we decide to hard‑gate API usage later, add a middleware in `apps/server/src/orpc/index.ts` that checks `context.user?.tosAcceptedAt` and allowlist `auth/*`, `email/*`, and other public reads as needed.
 
 ## Web behavior and flows
 
@@ -59,7 +67,7 @@ UI code: `apps/web/src/components/googleLoginButton.tsx`.
 
 1. After a successful login, `authenticate()` checks `user.tosAcceptedAt`.
 2. If missing, it redirects to `/tos?redirectTo=…` where the user can Accept or Log out.
-3. Until accepted, the server middleware blocks most API calls (even if the UI tries), while `auth`/`email` routes remain usable.
+3. There is no API hard‑gate; the UI flow ensures acceptance before normal navigation.
 
 UI code: `/tos` page at `apps/web/src/app/(layout-free)/tos/page.tsx`.
 
@@ -72,23 +80,21 @@ UI code: `/tos` page at `apps/web/src/app/(layout-free)/tos/page.tsx`.
 
 ## User experience summary
 
-- You cannot fully log in without accepting ToS:
-  - Email signup requires a checkbox.
-  - Google flow requires pre‑acceptance and the server enforces it.
-  - Existing accounts are redirected to `/tos` post‑login, and most API calls are blocked via middleware until acceptance.
-- Email verification is still encouraged but not hard‑blocked:
-  - Banner prompts to verify; app continues to work.
+- You cannot complete signup/sign‑in without accepting ToS:
+  - Email signup requires a checkbox (server enforced).
+  - Google flow requires pre‑acceptance and the server enforces it for new/unaccepted users.
+  - Existing accounts are redirected to `/tos` post‑login to accept before continuing.
+- Email verification is encouraged but not hard‑blocked:
+  - Banner prompts to verify; the app continues to work.
 
 ## Limitations and configuration
 
-- Allowlist scope: Adjust in `tosGateMiddleware()` if some read‑only modules (e.g., `search`, `version`, `stats`) should be available pre‑acceptance.
-- ToS link target: UI links point to `https://peated.com/terms`. The static in‑app `/terms` page was removed in favor of the canonical URL.
+- ToS link target: UI links use the relative path `/terms` to work in all environments (dev/staging/prod). The in‑app static Terms page lives at `apps/web/src/app/(layout-free)/terms/page.tsx` and includes an Effective Date.
 - Tests: default fixtures set `tosAcceptedAt` to avoid breaking unrelated tests. Create targeted tests with `tosAcceptedAt: null` when needed.
 
 ## How to test locally
 
 1. Run server migrations to add `tos_accepted_at`.
 2. Create a user with `tosAcceptedAt = null` (override the fixture default) and log in.
-3. Observe redirect to `/tos` and that typical RPCs (e.g., bottles, tastings) return `FORBIDDEN` until acceptance.
-4. Hit `Accept and continue` on `/tos`, verify the session refreshes and normal navigation/API usage resumes.
-5. For Google, test that the modal requires acceptance before proceeding and that the server accepts with `tosAccepted=true`.
+3. Observe redirect to `/tos`. Accept and verify the session refreshes and normal navigation/API usage resumes.
+4. For Google, test that the modal requires acceptance before proceeding and that the server accepts with `tosAccepted=true`.

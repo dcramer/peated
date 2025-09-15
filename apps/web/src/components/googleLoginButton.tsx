@@ -78,10 +78,7 @@ export default function GoogleLoginButton({
             <h2 className="mb-2 text-lg font-semibold">Terms of Service</h2>
             <p className="mb-3 text-sm text-slate-300">
               You must agree to our{" "}
-              <Link
-                href="https://peated.com/terms"
-                className="text-highlight underline"
-              >
+              <Link href="/terms" className="text-highlight underline">
                 Terms of Service
               </Link>{" "}
               to continue with Google.

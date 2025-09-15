@@ -18,7 +18,7 @@ export default function PendingTosAlert() {
       <form action={acceptAction} className="flex items-center gap-x-4 text-sm">
         You must accept our Terms of Service.
         <AcceptButton />
-        <Link href="https://peated.com/terms" className="text-white underline">
+        <Link href="/terms" className="text-white underline">
           Review Terms
         </Link>
       </form>
