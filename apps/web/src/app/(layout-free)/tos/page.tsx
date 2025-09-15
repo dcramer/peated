@@ -1,10 +1,8 @@
-import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
 import { getSafeRedirect } from "@peated/web/lib/auth";
-import { acceptTosForm, logoutForm } from "@peated/web/lib/auth.actions";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { redirect } from "next/navigation";
-import { useFormState } from "react-dom";
+import Actions from "./actions";
 
 export default async function TosPage({
   searchParams,
@@ -34,21 +32,6 @@ export default async function TosPage({
         </p>
         <Actions />
       </div>
-    </div>
-  );
-}
-
-function Actions() {
-  const [acceptState, acceptAction] = useFormState(acceptTosForm, undefined);
-  const [logoutState, logoutAction] = useFormState(logoutForm, undefined);
-  return (
-    <div className="flex justify-between">
-      <form action={logoutAction}>
-        <Button color="default">Log out</Button>
-      </form>
-      <form action={acceptAction}>
-        <Button color="highlight">Accept and continue</Button>
-      </form>
     </div>
   );
 }

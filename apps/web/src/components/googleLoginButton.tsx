@@ -3,7 +3,6 @@
 import { useGoogleLogin } from "@react-oauth/google";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { useFormStatus } from "react-dom";
 import Button from "./button";
 import Link from "./link";
 
@@ -19,7 +18,6 @@ export default function GoogleLoginButton({
   const [loading, setLoading] = useState(false);
   const [showTos, setShowTos] = useState(false);
   const [tosAccepted, setTosAccepted] = useState(false);
-  const { pending } = useFormStatus();
   const searchParams = useSearchParams();
 
   const googleLogin = useGoogleLogin({
@@ -54,7 +52,7 @@ export default function GoogleLoginButton({
             googleLogin();
           }
         }}
-        disabled={loading || pending}
+        disabled={loading}
       >
         <svg
           className="-ml-1 mr-2 h-4 w-4"
