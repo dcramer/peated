@@ -30,5 +30,6 @@ export default procedure
       .where(and(eq(users.id, user.id), sql`${users.tosAcceptedAt} IS NULL`))
       .returning();
 
-    return await serialize(UserSerializer, updated, updated);
+    const row = updated ?? user;
+    return await serialize(UserSerializer, row, user);
   });
