@@ -2,17 +2,8 @@ import { type User } from "@peated/server/types";
 import { getIronSession, type SessionOptions } from "iron-session";
 import { cookies } from "next/headers";
 
-const SESSION_SECRET = process.env.SESSION_SECRET;
-if (!SESSION_SECRET) {
-  if (process.env.NODE_ENV === "production") {
-    throw new Error(
-      "SESSION_SECRET must be set in production. Set it in the environment.",
-    );
-  } else {
-    console.warn(
-      "SESSION_SECRET is not defined; using insecure development secret.",
-    );
-  }
+if (!process.env.SESSION_SECRET) {
+  console.warn("SESSION_SECRET is not defined.");
 }
 
 export interface SessionData {
@@ -28,8 +19,7 @@ export const defaultSession: SessionData = {
 };
 
 export const sessionOptions: SessionOptions = {
-  password:
-    SESSION_SECRET || "insecure-development-session-secret-do-not-use-in-prod",
+  password: process.env.SESSION_SECRET || "", // TODO: this should error out
   cookieName: "_session",
   cookieOptions: {
     // secure only works in `https` environments
