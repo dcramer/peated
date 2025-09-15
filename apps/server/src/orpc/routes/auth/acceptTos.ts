@@ -1,12 +1,15 @@
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
+import { requireAuth } from "@peated/server/orpc/middleware";
 import { UserSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { and, eq, sql } from "drizzle-orm";
+import { z } from "zod";
 
 export default procedure
+  .use(requireAuth)
   .route({
     method: "POST",
     path: "/auth/tos/accept",
@@ -18,12 +21,9 @@ export default procedure
       operationId: "acceptTos",
     }),
   })
-  .input(undefined)
+  .input(z.void())
   .output(UserSchema)
-  .handler(async function ({ ctx, errors }) {
-    const user = ctx.user;
-    if (!user) throw errors.UNAUTHORIZED();
-
+  .handler(async function ({ context: { user } }) {
     const [updated] = await db
       .update(users)
       .set({ tosAcceptedAt: sql`NOW()` as unknown as Date })

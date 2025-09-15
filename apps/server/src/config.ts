@@ -1,17 +1,19 @@
 import { tmpdir } from "node:os";
 
+const NODE_ENV = process.env.NODE_ENV;
+const isProd = NODE_ENV === "production";
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET && isProd) {
+  throw new Error("JWT_SECRET must be set in production.");
+}
+
 export default {
-  ENV:
-    process.env.NODE_ENV === "production"
-      ? "production"
-      : process.env.NODE_ENV !== "test"
-        ? "development"
-        : "test",
+  ENV: isProd ? "production" : NODE_ENV !== "test" ? "development" : "test",
   DEBUG: !!process.env.DEBUG,
   PORT: process.env.PORT || 4000,
   HOST: process.env.HOST || "localhost",
   CORS_HOST: process.env.CORS_HOST || "http://localhost:3000",
-  JWT_SECRET: process.env.JWT_SECRET || "",
+  JWT_SECRET: JWT_SECRET || "dev-insecure-jwt-secret",
   API_SERVER: process.env.API_SERVER || "http://localhost:4000",
   URL_PREFIX: process.env.URL_PREFIX || "http://localhost:3000",
   REDIS_URL: process.env.REDIS_URL || "redis://@localhost:6379",
@@ -34,7 +36,9 @@ export default {
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
   GOOGLE_CLIENT_IDS: process.env.GOOGLE_CLIENT_IDS
-    ? process.env.GOOGLE_CLIENT_IDS.split(",").map((id) => id.trim()).filter((id) => id.length > 0)
+    ? process.env.GOOGLE_CLIENT_IDS.split(",")
+        .map((id) => id.trim())
+        .filter((id) => id.length > 0)
     : [],
 
   UPLOAD_PATH: process.env.UPLOAD_PATH || tmpdir(),

@@ -6,7 +6,7 @@ export default function TermsPage() {
       <header className="mb-8 text-center">
         <h1 className="text-2xl font-semibold">Terms of Service</h1>
         <p className="mt-2 text-sm text-slate-300">
-          Effective Date: [Effective Date]
+          Effective Date: September 15, 2025
         </p>
       </header>
 

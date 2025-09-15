@@ -13,10 +13,9 @@ describe("POST /auth/tos/accept", () => {
   test("sets tosAcceptedAt", async ({ fixtures }) => {
     const user = await fixtures.User({ verified: true });
 
-    // auth headers
-    const headers = await fixtures.AuthenticatedHeaders({ user });
-
-    const data = await routerClient.auth.acceptTos({}, { headers });
+    const data = await routerClient.auth.acceptTos(undefined, {
+      context: { user },
+    });
 
     const [updated] = await db
       .select()

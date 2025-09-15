@@ -44,9 +44,7 @@ function Actions() {
   return (
     <div className="flex justify-between">
       <form action={logoutAction}>
-        <Button color="default" variant="outline">
-          Log out
-        </Button>
+        <Button color="default">Log out</Button>
       </form>
       <form action={acceptAction}>
         <Button color="highlight">Accept and continue</Button>
