@@ -35,11 +35,19 @@ export default procedure
       z
         .object({
           code: z.string().describe("Google OAuth authorization code"),
+          tosAccepted: z
+            .boolean()
+            .optional()
+            .describe("User accepted Terms of Service"),
         })
         .describe("Google OAuth (code)"),
       z
         .object({
           idToken: z.string().describe("Google idToken"),
+          tosAccepted: z
+            .boolean()
+            .optional()
+            .describe("User accepted Terms of Service"),
         })
         .describe("Google OAuth (idToken)"),
     ]),
@@ -48,9 +56,9 @@ export default procedure
   .handler(async function ({ input, errors }) {
     const user =
       "code" in input
-        ? await authGoogle(input.code)
+        ? await authGoogle(input.code, input.tosAccepted)
         : "idToken" in input
-          ? await authGoogleIdToken(input.idToken)
+          ? await authGoogleIdToken(input.idToken, input.tosAccepted)
           : await authBasic(input.email, input.password);
 
     if (!user.active) {
@@ -90,7 +98,7 @@ async function authBasic(email: string, password: string) {
   return user;
 }
 
-async function authGoogle(code: string) {
+async function authGoogle(code: string, tosAccepted?: boolean) {
   // https://stackoverflow.com/questions/74132586/authentication-using-node-js-oauthclient-auth-code-flow
   const client = new OAuth2Client(
     config.GOOGLE_CLIENT_ID,
@@ -132,7 +140,25 @@ async function authGoogle(code: string) {
       ),
     );
   let user = result?.user;
-  if (user) return user;
+  if (user) {
+    // If user exists but hasn't accepted ToS, require acceptance
+    if (!user.tosAcceptedAt) {
+      if (tosAccepted) {
+        const [updated] = await db
+          .update(users)
+          .set({ tosAcceptedAt: sql`NOW()` as unknown as Date })
+          .where(
+            and(eq(users.id, user.id), sql`${users.tosAcceptedAt} IS NULL`),
+          )
+          .returning();
+        return updated;
+      }
+      throw new ORPCError("FORBIDDEN", {
+        message: "You must accept the Terms of Service.",
+      });
+    }
+    return user;
+  }
 
   // try to associate w/ existing user
   const [foundUser] = await db
@@ -154,7 +180,28 @@ async function authGoogle(code: string) {
       externalId: payload.sub,
       userId: foundUser.id,
     });
-    user = foundUser;
+    // mark ToS acceptance if needed
+    if (!foundUser.tosAcceptedAt) {
+      if (tosAccepted) {
+        const [updated] = await db
+          .update(users)
+          .set({ tosAcceptedAt: sql`NOW()` as unknown as Date })
+          .where(
+            and(
+              eq(users.id, foundUser.id),
+              sql`${users.tosAcceptedAt} IS NULL`,
+            ),
+          )
+          .returning();
+        user = updated;
+      } else {
+        throw new ORPCError("FORBIDDEN", {
+          message: "You must accept the Terms of Service.",
+        });
+      }
+    } else {
+      user = foundUser;
+    }
 
     // create new account
   } else {
@@ -166,6 +213,12 @@ async function authGoogle(code: string) {
       verified: true, // emails are verified when coming from Google
     };
 
+    if (!tosAccepted) {
+      throw new ORPCError("FORBIDDEN", {
+        message: "You must accept the Terms of Service.",
+      });
+    }
+
     user = await db.transaction(async (tx) => {
       const user = await createUser(tx, userData);
 
@@ -175,14 +228,20 @@ async function authGoogle(code: string) {
         userId: user.id,
       });
 
-      return user;
+      const [updated] = await tx
+        .update(users)
+        .set({ tosAcceptedAt: sql`NOW()` as unknown as Date })
+        .where(and(eq(users.id, user.id), sql`${users.tosAcceptedAt} IS NULL`))
+        .returning();
+
+      return updated;
     });
   }
 
   return user;
 }
 
-async function authGoogleIdToken(idToken: string) {
+async function authGoogleIdToken(idToken: string, tosAccepted?: boolean) {
   // Build array of valid client IDs
   const validClientIds = [
     config.GOOGLE_CLIENT_ID,
@@ -254,7 +313,24 @@ async function authGoogleIdToken(idToken: string) {
       ),
     );
   let user = result?.user;
-  if (user) return user;
+  if (user) {
+    if (!user.tosAcceptedAt) {
+      if (tosAccepted) {
+        const [updated] = await db
+          .update(users)
+          .set({ tosAcceptedAt: sql`NOW()` as unknown as Date })
+          .where(
+            and(eq(users.id, user.id), sql`${users.tosAcceptedAt} IS NULL`),
+          )
+          .returning();
+        return updated;
+      }
+      throw new ORPCError("FORBIDDEN", {
+        message: "You must accept the Terms of Service.",
+      });
+    }
+    return user;
+  }
 
   // try to associate w/ existing user
   const [foundUser] = await db
@@ -276,7 +352,27 @@ async function authGoogleIdToken(idToken: string) {
       externalId: payload.sub,
       userId: foundUser.id,
     });
-    user = foundUser;
+    if (!foundUser.tosAcceptedAt) {
+      if (tosAccepted) {
+        const [updated] = await db
+          .update(users)
+          .set({ tosAcceptedAt: sql`NOW()` as unknown as Date })
+          .where(
+            and(
+              eq(users.id, foundUser.id),
+              sql`${users.tosAcceptedAt} IS NULL`,
+            ),
+          )
+          .returning();
+        user = updated;
+      } else {
+        throw new ORPCError("FORBIDDEN", {
+          message: "You must accept the Terms of Service.",
+        });
+      }
+    } else {
+      user = foundUser;
+    }
 
     // create new account
   } else {
@@ -288,6 +384,12 @@ async function authGoogleIdToken(idToken: string) {
       verified: true, // emails are verified when coming from Google
     };
 
+    if (!tosAccepted) {
+      throw new ORPCError("FORBIDDEN", {
+        message: "You must accept the Terms of Service.",
+      });
+    }
+
     user = await db.transaction(async (tx) => {
       const user = await createUser(tx, userData);
 
@@ -297,7 +399,13 @@ async function authGoogleIdToken(idToken: string) {
         userId: user.id,
       });
 
-      return user;
+      const [updated] = await tx
+        .update(users)
+        .set({ tosAcceptedAt: sql`NOW()` as unknown as Date })
+        .where(and(eq(users.id, user.id), sql`${users.tosAcceptedAt} IS NULL`))
+        .returning();
+
+      return updated;
     });
   }
 

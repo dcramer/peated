@@ -30,10 +30,22 @@ export default procedure
       username: z.string().toLowerCase(),
       email: z.string(),
       password: z.string(),
+      tosAccepted: z
+        .boolean()
+        .optional()
+        .describe("User accepted Terms of Service"),
     }),
   )
   .output(AuthSchema)
-  .handler(async function ({ input: { username, email, password }, errors }) {
+  .handler(async function ({
+    input: { username, email, password, tosAccepted },
+    errors,
+  }) {
+    if (!tosAccepted) {
+      throw errors.UNPROCESSABLE_ENTITY({
+        message: "You must accept the Terms of Service.",
+      });
+    }
     const [user] = await db.transaction(async (tx) => {
       try {
         return await tx
@@ -43,6 +55,7 @@ export default procedure
             email,
             passwordHash: generatePasswordHash(password),
             verified: !!config.SKIP_EMAIL_VERIFICATION,
+            tosAcceptedAt: sql`NOW()` as unknown as Date,
           })
           .returning();
       } catch (err: any) {

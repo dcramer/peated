@@ -90,6 +90,7 @@ export async function authenticate(
     code
       ? client.auth.login({
           code,
+          tosAccepted: formData.get("tosAccepted") ? true : undefined,
         })
       : client.auth.login({
           email,
@@ -117,7 +118,9 @@ export async function authenticate(
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
   // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
 
-  if (!data.user.verified) {
+  if (!data.user.tosAcceptedAt) {
+    redirect(`/tos?redirectTo=${encodeURIComponent(redirectTo)}`);
+  } else if (!data.user.verified) {
     redirect("/verify");
   } else {
     redirect(redirectTo);
@@ -153,6 +156,7 @@ export async function register(formData: FormData) {
       email,
       password,
       username,
+      tosAccepted: formData.get("tosAccepted") ? true : false,
     }),
   );
 
@@ -201,6 +205,35 @@ export async function resendVerificationForm(
   }
 
   return { ok: true };
+}
+
+export async function acceptTosForm(
+  prevState: GenericResult | undefined,
+  formData: FormData,
+) {
+  "use server";
+
+  return await acceptTos();
+}
+
+export async function acceptTos() {
+  "use server";
+
+  const session = await getSession();
+  const { client } = await createServerClient();
+
+  const { error, isDefined, data } = await safe(client.auth.acceptTos());
+
+  if (isDefined) {
+    return { ok: false, error: error.message } as GenericResult;
+  } else if (error) {
+    return { ok: false, error: "Internal server error." } as GenericResult;
+  }
+
+  session.user = data;
+  await session.save();
+
+  return { ok: true } as GenericResult;
 }
 
 export async function passwordResetForm(
