@@ -33,6 +33,8 @@ export async function logout(formData?: FormData) {
 type AuthenticateFormResult = {
   magicLink: boolean;
   error: string | null;
+  requestId?: string;
+  expiresIn?: number;
 };
 
 export async function authenticateForm(
@@ -57,16 +59,17 @@ export async function authenticate(
 
   const email = (formData.get("email") || "") as string;
   const password = (formData.get("password") || "") as string;
-  const code = formData.get("code") as string;
+  const code = (formData.get("code") || "") as string;
+  const requestId = (formData.get("requestId") || "") as string;
   const redirectTo = getSafeRedirect(
     (formData.get("redirectTo") || "/") as string,
   );
 
   const { client } = await createServerClient();
 
-  if (email && !password) {
-    const { error, isDefined } = await safe(
-      client.auth.magicLink.create({ email }),
+  if (email && !password && !code) {
+    const { error, isDefined, data } = await safe(
+      client.auth.magicLink.start({ email }),
     );
     if (isDefined) {
       return {
@@ -83,16 +86,14 @@ export async function authenticate(
     return {
       magicLink: true,
       error: null,
+      requestId: data.requestId,
+      expiresIn: data.expiresIn,
     };
   }
 
   const { error, isDefined, data } = await safe(
-    code
-      ? client.auth.login({
-          code,
-          // Explicit boolean: true if present, else false
-          tosAccepted: Boolean(formData.get("tosAccepted")),
-        })
+    code && requestId
+      ? client.auth.magicLink.verify({ requestId, code })
       : client.auth.login({
           email,
           password,
@@ -100,15 +101,24 @@ export async function authenticate(
   );
 
   if (isDefined) {
-    return {
-      magicLink: false,
-      error: error.message,
-    };
+    // If we were in code flow, keep the magicLink UI open
+    if (code && requestId) {
+      return {
+        magicLink: true,
+        error: error.message,
+        requestId,
+      };
+    }
+    return { magicLink: false, error: error.message };
   } else if (error) {
-    return {
-      magicLink: false,
-      error: "Internal server error.",
-    };
+    if (code && requestId) {
+      return {
+        magicLink: true,
+        error: "Internal server error.",
+        requestId,
+      };
+    }
+    return { magicLink: false, error: "Internal server error." };
   }
 
   session.user = data.user;
@@ -119,8 +129,8 @@ export async function authenticate(
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
   // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
 
-  if (!data.user.tosAcceptedAt) {
-    redirect(`/tos?redirectTo=${encodeURIComponent(redirectTo)}`);
+  if (!data.user.termsAcceptedAt) {
+    redirect(`/auth/tos-required?redirectTo=${encodeURIComponent(redirectTo)}`);
   } else if (!data.user.verified) {
     redirect("/verify");
   } else {
@@ -214,25 +224,31 @@ export async function acceptTosForm(
 ) {
   "use server";
 
-  return await acceptTos();
+  const redirectTo = getSafeRedirect(
+    (formData.get("redirectTo") || "/") as string,
+  );
+
+  return await acceptTos(redirectTo);
 }
 
-export async function acceptTos() {
+export async function acceptTos(redirectTo?: string) {
   "use server";
 
   const session = await getSession();
   const { client } = await createServerClient();
 
-  const { error, isDefined, data } = await safe(client.auth.acceptTos());
+  const { error, data } = await safe(client.auth.acceptTos());
 
-  if (isDefined) {
+  if (error) {
     return { ok: false, error: error.message } as GenericResult;
-  } else if (error) {
-    return { ok: false, error: "Internal server error." } as GenericResult;
   }
 
   session.user = data;
   await session.save();
+
+  if (redirectTo) {
+    redirect(redirectTo);
+  }
 
   return { ok: true } as GenericResult;
 }
@@ -259,6 +275,25 @@ export async function passwordResetForm(
   }
 
   return { ok: true };
+}
+
+type ResendResult = { ok: boolean; error?: string };
+export async function resendMagicLinkForm(
+  prevState: ResendResult | undefined,
+  formData: FormData,
+): Promise<ResendResult> {
+  "use server";
+
+  const requestId = (formData.get("requestId") || "") as string;
+  if (!requestId) return { ok: false, error: "Missing requestId." };
+
+  const { client } = await createServerClient();
+  const { error, isDefined, data } = await safe(
+    client.auth.magicLink.resend({ requestId }),
+  );
+  if (isDefined) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: "Internal server error." };
+  return { ok: true, expiresIn: data.expiresIn } as any;
 }
 
 export async function passwordResetConfirmForm(

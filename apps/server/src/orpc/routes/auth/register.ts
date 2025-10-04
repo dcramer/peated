@@ -52,7 +52,7 @@ export default procedure
             email,
             passwordHash: generatePasswordHash(password),
             verified: !!config.SKIP_EMAIL_VERIFICATION,
-            tosAcceptedAt: sql`NOW()` as unknown as Date,
+            termsAcceptedAt: sql`NOW()` as unknown as Date,
           })
           .returning();
       } catch (err: any) {

@@ -19,7 +19,7 @@ export default async function Layout({
 
   return (
     <>
-      {user && !user.tosAcceptedAt && <PendingTosAlert />}
+      {user && !user.termsAcceptedAt && <PendingTosAlert />}
       {user && !user.verified && <PendingVerificationAlert />}
       <div className="flex w-full">
         <div className="flex-1 overflow-hidden lg:w-8/12">

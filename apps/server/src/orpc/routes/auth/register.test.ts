@@ -26,7 +26,7 @@ describe("POST /auth/register", () => {
     expect(user.passwordHash).not.toBeNull();
     expect(user.verified).toBe(false);
     expect(compareSync("example", user.passwordHash as string)).toBeTruthy();
-    expect(user.tosAcceptedAt).not.toBeNull();
+    expect(user.termsAcceptedAt).not.toBeNull();
   });
 
   test("duplicate username", async ({ fixtures }) => {

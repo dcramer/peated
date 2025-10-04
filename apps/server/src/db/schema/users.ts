@@ -26,8 +26,7 @@ export const users = pgTable(
 
     notifyComments: boolean("notify_comments").default(true),
 
-    // NULL until user agrees to Terms of Service
-    tosAcceptedAt: timestamp("tos_accepted_at"),
+    termsAcceptedAt: timestamp("terms_accepted_at"),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },

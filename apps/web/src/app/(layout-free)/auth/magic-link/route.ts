@@ -11,12 +11,19 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const redirectTo = searchParams.get("redirectTo");
   const token = searchParams.get("token");
-  if (!token) {
-    throw new Error("No token provided");
-  }
+  const requestId = searchParams.get("r");
+  const code = searchParams.get("c");
 
   const session = await getSession();
-  const { data, error } = await safe(client.auth.magicLink.confirm({ token }));
+  const { data, error } = await (async () => {
+    if (requestId && code) {
+      return await safe(client.auth.magicLink.verify({ requestId, code }));
+    }
+    if (token) {
+      return await safe(client.auth.magicLink.confirm({ token }));
+    }
+    throw new Error("No token or code provided");
+  })();
 
   if (error) {
     logError(error);

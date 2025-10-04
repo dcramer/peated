@@ -29,6 +29,7 @@ import { ZodError } from "zod";
 import config from "./config";
 import { getUserFromHeader } from "./lib/auth";
 import { logError } from "./lib/log";
+import { getClientIP } from "./lib/request";
 import router from "./orpc/router";
 import {
   AuthSchema,
@@ -299,9 +300,27 @@ export const app = new Hono()
         })
       : setUser(null);
 
+    const ip = getClientIP(c);
+
+    // Enforce ToS acceptance for authenticated users except reserved auth paths
+    if (user && !user.termsAcceptedAt) {
+      const path = new URL(c.req.url).pathname;
+      const allowed = path.startsWith("/v1/auth/");
+      if (!allowed) {
+        return c.json(
+          {
+            message: "Terms acceptance required.",
+            error: "Forbidden",
+            statusCode: 403,
+          },
+          403,
+        );
+      }
+    }
+
     const { matched, response } = await openapiHandler.handle(c.req.raw, {
       prefix: "/v1",
-      context: { user }, // Provide initial context if needed
+      context: { user, clientIP: ip },
     });
 
     if (matched) {
@@ -321,9 +340,27 @@ export const app = new Hono()
         })
       : setUser(null);
 
+    const ip = getClientIP(c);
+
+    // Enforce ToS acceptance for authenticated users except reserved auth paths
+    if (user && !user.termsAcceptedAt) {
+      const path = new URL(c.req.url).pathname;
+      const allowed = path.startsWith("/rpc/auth/");
+      if (!allowed) {
+        return c.json(
+          {
+            message: "Terms acceptance required.",
+            error: "Forbidden",
+            statusCode: 403,
+          },
+          403,
+        );
+      }
+    }
+
     const { matched, response } = await rpcHandler.handle(c.req.raw, {
       prefix: "/rpc",
-      context: { user }, // Provide initial context if needed
+      context: { user, clientIP: ip },
     });
 
     if (matched) {

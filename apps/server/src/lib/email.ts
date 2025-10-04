@@ -21,8 +21,9 @@ import {
   type User,
 } from "../db/schema";
 import type { EmailVerifySchema, PasswordResetSchema } from "../schemas";
-import { generateMagicLink, signPayload } from "./auth";
+import { signPayload } from "./auth";
 import { logError } from "./log";
+import { createLoginRequestForUser } from "./magicLinkCode";
 
 let mailTransport: Transporter<SMTPTransport.SentMessageInfo>;
 
@@ -239,21 +240,41 @@ export async function sendMagicLinkEmail({
     transport = mailTransport;
   }
 
-  const magicLink = await generateMagicLink(user);
+  const req = await createLoginRequestForUser(user);
+  await sendMagicLinkEmailForRequest({ user, request: req, transport });
+}
+
+export async function sendMagicLinkEmailForRequest({
+  user,
+  request,
+  transport = mailTransport,
+}: {
+  user: User;
+  request: Awaited<ReturnType<typeof createLoginRequestForUser>>;
+  transport?: Transporter<SMTPTransport.SentMessageInfo>;
+}) {
+  if (!hasEmailSupport()) return;
+
+  if (!transport) {
+    if (!mailTransport) mailTransport = createMailTransport();
+    transport = mailTransport;
+  }
 
   const html = await render(
     MagicLinkEmailTemplate({
       baseUrl: config.URL_PREFIX,
-      magicLinkUrl: magicLink.url,
+      magicLinkUrl: request.url,
+      code: request.code,
+      expiresInMins: 10,
     }),
   );
 
   await transport.sendMail({
     ...getMailDefaults(),
     to: user.email,
-    subject: "Magic Link for Peated",
-    text: `Click the following link to log in to Peated: ${magicLink.url}`,
-    html: html,
+    subject: "Your Peated sign-in code",
+    text: `Use this code to sign in (expires in 10 minutes): ${request.code}\n\nOr tap: ${request.url}`,
+    html,
   });
 }
 

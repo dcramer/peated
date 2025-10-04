@@ -112,7 +112,7 @@ export default function Page() {
         </Header>
       }
     >
-      {!user.tosAcceptedAt && (
+      {!user.termsAcceptedAt && (
         <div className="p-3 lg:mb-8 lg:p-0">
           <PendingTosAlert />
         </div>

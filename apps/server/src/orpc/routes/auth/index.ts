@@ -11,6 +11,6 @@ export default base.tag("auth").router({
   me,
   register,
   magicLink,
-  passwordReset,
   acceptTos,
+  passwordReset,
 });

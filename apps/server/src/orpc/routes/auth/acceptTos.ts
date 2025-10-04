@@ -24,12 +24,29 @@ export default procedure
   .input(z.void())
   .output(UserSchema)
   .handler(async function ({ context: { user } }) {
+    // If already accepted, fetch current user data
+    if (user.termsAcceptedAt) {
+      const [current] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, user.id));
+      return await serialize(UserSerializer, current ?? user, user);
+    }
+
     const [updated] = await db
       .update(users)
-      .set({ tosAcceptedAt: sql`NOW()` as unknown as Date })
-      .where(and(eq(users.id, user.id), sql`${users.tosAcceptedAt} IS NULL`))
+      .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
+      .where(and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`))
       .returning();
 
-    const row = updated ?? user;
-    return await serialize(UserSerializer, row, user);
+    // If update returned nothing, someone else updated it concurrently
+    if (!updated) {
+      const [current] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, user.id));
+      return await serialize(UserSerializer, current ?? user, user);
+    }
+
+    return await serialize(UserSerializer, updated, user);
   });

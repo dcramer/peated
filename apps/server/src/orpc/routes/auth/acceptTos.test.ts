@@ -10,7 +10,7 @@ describe("POST /auth/tos/accept", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("sets tosAcceptedAt", async ({ fixtures }) => {
+  test("sets termsAcceptedAt", async ({ fixtures }) => {
     const user = await fixtures.User({ verified: true });
 
     const data = await routerClient.auth.acceptTos(undefined, {
@@ -22,7 +22,7 @@ describe("POST /auth/tos/accept", () => {
       .from(users)
       .where(eq(users.id, user.id));
 
-    expect(updated.tosAcceptedAt).not.toBeNull();
+    expect(updated.termsAcceptedAt).not.toBeNull();
     expect(data.id).toEqual(user.id);
   });
 });

@@ -153,7 +153,7 @@ export const User = async (
       mod: false,
       active: true,
       verified: true,
-      tosAcceptedAt: new Date(),
+      termsAcceptedAt: new Date(),
       createdAt: new Date(),
       ...(data as Record<string, any>),
     })

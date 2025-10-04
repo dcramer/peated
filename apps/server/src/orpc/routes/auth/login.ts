@@ -142,13 +142,13 @@ async function authGoogle(code: string, tosAccepted?: boolean) {
   let user = result?.user;
   if (user) {
     // If user exists but hasn't accepted ToS, require acceptance
-    if (!user.tosAcceptedAt) {
+    if (!user.termsAcceptedAt) {
       if (tosAccepted) {
         const [updated] = await db
           .update(users)
-          .set({ tosAcceptedAt: sql`NOW()` as unknown as Date })
+          .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
           .where(
-            and(eq(users.id, user.id), sql`${users.tosAcceptedAt} IS NULL`),
+            and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`),
           )
           .returning();
         return updated;
@@ -181,15 +181,15 @@ async function authGoogle(code: string, tosAccepted?: boolean) {
       userId: foundUser.id,
     });
     // mark ToS acceptance if needed
-    if (!foundUser.tosAcceptedAt) {
+    if (!foundUser.termsAcceptedAt) {
       if (tosAccepted) {
         const [updated] = await db
           .update(users)
-          .set({ tosAcceptedAt: sql`NOW()` as unknown as Date })
+          .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
           .where(
             and(
               eq(users.id, foundUser.id),
-              sql`${users.tosAcceptedAt} IS NULL`,
+              sql`${users.termsAcceptedAt} IS NULL`,
             ),
           )
           .returning();
@@ -230,8 +230,10 @@ async function authGoogle(code: string, tosAccepted?: boolean) {
 
       const [updated] = await tx
         .update(users)
-        .set({ tosAcceptedAt: sql`NOW()` as unknown as Date })
-        .where(and(eq(users.id, user.id), sql`${users.tosAcceptedAt} IS NULL`))
+        .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
+        .where(
+          and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`),
+        )
         .returning();
 
       return updated;
@@ -314,13 +316,13 @@ async function authGoogleIdToken(idToken: string, tosAccepted?: boolean) {
     );
   let user = result?.user;
   if (user) {
-    if (!user.tosAcceptedAt) {
+    if (!user.termsAcceptedAt) {
       if (tosAccepted) {
         const [updated] = await db
           .update(users)
-          .set({ tosAcceptedAt: sql`NOW()` as unknown as Date })
+          .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
           .where(
-            and(eq(users.id, user.id), sql`${users.tosAcceptedAt} IS NULL`),
+            and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`),
           )
           .returning();
         return updated;
@@ -352,15 +354,15 @@ async function authGoogleIdToken(idToken: string, tosAccepted?: boolean) {
       externalId: payload.sub,
       userId: foundUser.id,
     });
-    if (!foundUser.tosAcceptedAt) {
+    if (!foundUser.termsAcceptedAt) {
       if (tosAccepted) {
         const [updated] = await db
           .update(users)
-          .set({ tosAcceptedAt: sql`NOW()` as unknown as Date })
+          .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
           .where(
             and(
               eq(users.id, foundUser.id),
-              sql`${users.tosAcceptedAt} IS NULL`,
+              sql`${users.termsAcceptedAt} IS NULL`,
             ),
           )
           .returning();
@@ -401,8 +403,10 @@ async function authGoogleIdToken(idToken: string, tosAccepted?: boolean) {
 
       const [updated] = await tx
         .update(users)
-        .set({ tosAcceptedAt: sql`NOW()` as unknown as Date })
-        .where(and(eq(users.id, user.id), sql`${users.tosAcceptedAt} IS NULL`))
+        .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
+        .where(
+          and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`),
+        )
         .returning();
 
       return updated;

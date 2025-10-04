@@ -11,6 +11,7 @@ export * from "./externalSites";
 export * from "./flights";
 export * from "./follows";
 export * from "./identities";
+export * from "./loginRequests";
 export * from "./notifications";
 export * from "./regions";
 export * from "./reviews";
