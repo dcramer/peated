@@ -1,6 +1,5 @@
 import registry from "../registry";
 import capturePriceImage from "./capturePriceImage";
-import cleanupLoginRequests from "./cleanupLoginRequests";
 import createMissingBottles from "./createMissingBottles";
 import generateBottleDetails from "./generateBottleDetails";
 import generateCountryDetails from "./generateCountryDetails";
@@ -36,7 +35,6 @@ import updateEntityStats from "./updateEntityStats";
 import updateRegionStats from "./updateRegionStats";
 
 registry.add("CapturePriceImage", capturePriceImage);
-registry.add("CleanupLoginRequests", cleanupLoginRequests);
 registry.add("GenerateBottleDetails", generateBottleDetails);
 registry.add("GenerateCountryDetails", generateCountryDetails);
 registry.add("GenerateEntityDetails", generateEntityDetails);

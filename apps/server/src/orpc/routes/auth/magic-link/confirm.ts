@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { createAccessToken, verifyPayload } from "@peated/server/lib/auth";
-import { assertRateLimit } from "@peated/server/lib/ratelimit";
 import { procedure } from "@peated/server/orpc";
 import { AuthSchema } from "@peated/server/schemas";
 import { MagicLinkSchema } from "@peated/server/schemas/magicLink";
@@ -30,24 +29,7 @@ export default procedure
     }),
   )
   .output(AuthSchema)
-  .handler(async function ({ input, errors, context }) {
-    if (!context.clientIP) {
-      throw errors.INTERNAL_SERVER_ERROR({
-        message: "Unable to determine client IP address.",
-      });
-    }
-    await assertRateLimit(
-      {
-        key: `rl:magic:confirm:ip:${context.clientIP}`,
-        windowSec: 3600,
-        max: 60,
-      },
-      () => {
-        throw errors.TOO_MANY_REQUESTS({
-          message: "Too many attempts. Try later.",
-        });
-      },
-    );
+  .handler(async function ({ input, errors }) {
     let payload;
     try {
       payload = await verifyPayload(input.token);

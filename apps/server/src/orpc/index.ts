@@ -16,7 +16,6 @@ interface ErrorShape {
 export const base = os
   .$context<{
     user: User | null;
-    clientIP?: string;
   }>()
   /**
    * All errors should adhere to the ErrorShape interface
@@ -67,11 +66,6 @@ export const base = os
       message: "Unprocessable entity.",
       statusCode: 422,
       error: "Unprocessable Entity",
-    },
-    TOO_MANY_REQUESTS: {
-      message: "Too many requests.",
-      statusCode: 429,
-      error: "Too Many Requests",
     },
   });
 

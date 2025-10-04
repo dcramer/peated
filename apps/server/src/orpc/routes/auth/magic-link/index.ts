@@ -1,13 +1,7 @@
 import confirm from "./confirm";
-import create from "./create";
-import resend from "./resend";
-import start from "./start";
-import verify from "./verify";
+import create from "./create.";
 
 export default {
   confirm,
   create,
-  start,
-  resend,
-  verify,
 };
