@@ -128,12 +128,6 @@ export async function runWorker() {
     scheduledJob("*/5 * * * *", "schedule-scrapers", scheduleScrapers);
   }
 
-  // Cleanup old login requests daily at 3am
-  scheduledJob("0 3 * * *", "cleanup-login-requests", async () => {
-    const { runJob } = await import("./client");
-    await runJob("CleanupLoginRequests");
-  });
-
   const connection = await getConnection();
   const defaultQueue = await getQueue("default", connection);
   const worker = new Worker(

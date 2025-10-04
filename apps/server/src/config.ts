@@ -1,19 +1,17 @@
 import { tmpdir } from "node:os";
 
-const NODE_ENV = process.env.NODE_ENV;
-const isProd = NODE_ENV === "production";
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET && isProd) {
-  throw new Error("JWT_SECRET must be set in production.");
-}
-
 export default {
-  ENV: isProd ? "production" : NODE_ENV !== "test" ? "development" : "test",
+  ENV:
+    process.env.NODE_ENV === "production"
+      ? "production"
+      : process.env.NODE_ENV !== "test"
+        ? "development"
+        : "test",
   DEBUG: !!process.env.DEBUG,
   PORT: process.env.PORT || 4000,
   HOST: process.env.HOST || "localhost",
   CORS_HOST: process.env.CORS_HOST || "http://localhost:3000",
-  JWT_SECRET: JWT_SECRET || "dev-insecure-jwt-secret",
+  JWT_SECRET: process.env.JWT_SECRET || "",
   API_SERVER: process.env.API_SERVER || "http://localhost:4000",
   URL_PREFIX: process.env.URL_PREFIX || "http://localhost:3000",
   REDIS_URL: process.env.REDIS_URL || "redis://@localhost:6379",
