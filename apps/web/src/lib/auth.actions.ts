@@ -117,7 +117,9 @@ export async function authenticate(
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
   // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
 
-  if (!data.user.verified) {
+  if (!data.user.termsAcceptedAt) {
+    redirect(`/auth/tos-required?redirectTo=${encodeURIComponent(redirectTo)}`);
+  } else if (!data.user.verified) {
     redirect("/verify");
   } else {
     redirect(redirectTo);
@@ -153,6 +155,7 @@ export async function register(formData: FormData) {
       email,
       password,
       username,
+      tosAccepted: formData.get("tosAccepted") ? true : false,
     }),
   );
 
@@ -201,6 +204,41 @@ export async function resendVerificationForm(
   }
 
   return { ok: true };
+}
+
+export async function acceptTosForm(
+  prevState: GenericResult | undefined,
+  formData: FormData,
+) {
+  "use server";
+
+  const redirectTo = getSafeRedirect(
+    (formData.get("redirectTo") || "/") as string,
+  );
+
+  return await acceptTos(redirectTo);
+}
+
+export async function acceptTos(redirectTo?: string) {
+  "use server";
+
+  const session = await getSession();
+  const { client } = await createServerClient();
+
+  const { error, data } = await safe(client.auth.acceptTos());
+
+  if (error) {
+    return { ok: false, error: error.message } as GenericResult;
+  }
+
+  session.user = data;
+  await session.save();
+
+  if (redirectTo) {
+    redirect(redirectTo);
+  }
+
+  return { ok: true } as GenericResult;
 }
 
 export async function passwordResetForm(

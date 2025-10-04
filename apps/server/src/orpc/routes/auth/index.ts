@@ -1,4 +1,5 @@
 import { base } from "@peated/server/orpc";
+import acceptTos from "./acceptTos";
 import login from "./login";
 import magicLink from "./magic-link";
 import me from "./me";
@@ -10,5 +11,6 @@ export default base.tag("auth").router({
   me,
   register,
   magicLink,
+  acceptTos,
   passwordReset,
 });

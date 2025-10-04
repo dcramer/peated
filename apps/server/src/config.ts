@@ -34,7 +34,9 @@ export default {
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
   GOOGLE_CLIENT_IDS: process.env.GOOGLE_CLIENT_IDS
-    ? process.env.GOOGLE_CLIENT_IDS.split(",").map((id) => id.trim()).filter((id) => id.length > 0)
+    ? process.env.GOOGLE_CLIENT_IDS.split(",")
+        .map((id) => id.trim())
+        .filter((id) => id.length > 0)
     : [],
 
   UPLOAD_PATH: process.env.UPLOAD_PATH || tmpdir(),

@@ -299,9 +299,25 @@ export const app = new Hono()
         })
       : setUser(null);
 
+    // Enforce ToS acceptance for authenticated users except reserved auth paths
+    if (user && !user.termsAcceptedAt) {
+      const path = new URL(c.req.url).pathname;
+      const allowed = path.startsWith("/v1/auth/");
+      if (!allowed) {
+        return c.json(
+          {
+            message: "Terms acceptance required.",
+            error: "Forbidden",
+            statusCode: 403,
+          },
+          403,
+        );
+      }
+    }
+
     const { matched, response } = await openapiHandler.handle(c.req.raw, {
       prefix: "/v1",
-      context: { user }, // Provide initial context if needed
+      context: { user },
     });
 
     if (matched) {
@@ -321,9 +337,25 @@ export const app = new Hono()
         })
       : setUser(null);
 
+    // Enforce ToS acceptance for authenticated users except reserved auth paths
+    if (user && !user.termsAcceptedAt) {
+      const path = new URL(c.req.url).pathname;
+      const allowed = path.startsWith("/rpc/auth/");
+      if (!allowed) {
+        return c.json(
+          {
+            message: "Terms acceptance required.",
+            error: "Forbidden",
+            statusCode: 403,
+          },
+          403,
+        );
+      }
+    }
+
     const { matched, response } = await rpcHandler.handle(c.req.raw, {
       prefix: "/rpc",
-      context: { user }, // Provide initial context if needed
+      context: { user },
     });
 
     if (matched) {

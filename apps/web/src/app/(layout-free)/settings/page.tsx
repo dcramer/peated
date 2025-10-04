@@ -13,6 +13,7 @@ import Header from "@peated/web/components/header";
 import ImageField from "@peated/web/components/imageField";
 import Layout from "@peated/web/components/layout";
 import Legend from "@peated/web/components/legend";
+import PendingTosAlert from "@peated/web/components/pendingTosAlert";
 import PendingVerificationAlert from "@peated/web/components/pendingVerificationAlert";
 import TextField from "@peated/web/components/textField";
 import useAuth from "@peated/web/hooks/useAuth";
@@ -111,6 +112,12 @@ export default function Page() {
         </Header>
       }
     >
+      {!user.termsAcceptedAt && (
+        <div className="p-3 lg:mb-8 lg:p-0">
+          <PendingTosAlert />
+        </div>
+      )}
+
       {!user.verified && (
         <div className="p-3 lg:mb-8 lg:p-0">
           <PendingVerificationAlert />

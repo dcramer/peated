@@ -26,6 +26,8 @@ export const users = pgTable(
 
     notifyComments: boolean("notify_comments").default(true),
 
+    termsAcceptedAt: timestamp("terms_accepted_at"),
+
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [

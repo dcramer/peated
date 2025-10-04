@@ -1163,6 +1163,13 @@
       "when": 1754363200000,
       "tag": "0165_backfill_avg_rating",
       "breakpoints": false
+    },
+    {
+      "idx": 166,
+      "version": "7",
+      "when": 1757947960062,
+      "tag": "0166_user_terms_accepted",
+      "breakpoints": false
     }
   ]
 }

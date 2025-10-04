@@ -11,6 +11,7 @@ describe("POST /auth/register", () => {
       username: "foo",
       email: "foo@example.com",
       password: "example",
+      tosAccepted: true,
     });
 
     expect(data.user.id).toBeDefined();
@@ -25,6 +26,7 @@ describe("POST /auth/register", () => {
     expect(user.passwordHash).not.toBeNull();
     expect(user.verified).toBe(false);
     expect(compareSync("example", user.passwordHash as string)).toBeTruthy();
+    expect(user.termsAcceptedAt).not.toBeNull();
   });
 
   test("duplicate username", async ({ fixtures }) => {
@@ -35,6 +37,7 @@ describe("POST /auth/register", () => {
         username: "foo",
         email: "foo@example.com",
         password: "example",
+        tosAccepted: true,
       }),
     );
     expect(err).toMatchInlineSnapshot(
@@ -50,6 +53,7 @@ describe("POST /auth/register", () => {
         username: "foobar",
         email: "foo@example.com",
         password: "example",
+        tosAccepted: true,
       }),
     );
     expect(err).toMatchInlineSnapshot(

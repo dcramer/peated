@@ -60,6 +60,9 @@ export const UserSerializer = serializer({
             admin: item.admin,
             mod: item.admin || item.mod,
             notifyComments: item.notifyComments,
+            termsAcceptedAt: item.termsAcceptedAt
+              ? item.termsAcceptedAt.toISOString()
+              : undefined,
           }
         : {}),
     };

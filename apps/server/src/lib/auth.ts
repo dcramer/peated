@@ -54,7 +54,7 @@ export { verifyPayload as verifyToken };
 
 export async function getUserFromHeader(
   authorizationHeader: string | undefined,
-) {
+): Promise<User | null> {
   const token = authorizationHeader?.replace(/^Bearer /i, "");
   if (!token) return null;
 

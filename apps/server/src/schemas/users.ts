@@ -42,6 +42,12 @@ export const UserSchema = z.object({
     .optional()
     .readonly()
     .describe("Timestamp when the user account was created"),
+  termsAcceptedAt: z
+    .string()
+    .datetime()
+    .optional()
+    .readonly()
+    .describe("Timestamp when user accepted the Terms of Service"),
   friendStatus: FriendStatusEnum.optional()
     .readonly()
     .describe("Friendship status with the current user"),

@@ -1,0 +1,100 @@
+# Account Policies: Terms of Service (ToS) and Email Verification
+
+This doc explains how ToS acceptance and email verification work across the API and web app, what they gate, and where to change behavior.
+
+## Data model
+
+- `users.tosAcceptedAt: timestamp | null` — set when a user agrees to the Terms of Service. `NULL` means not accepted.
+- `users.verified: boolean` — email address verified state.
+
+Schema: `apps/server/src/db/schema/users.ts`
+
+## API surface
+
+- Register: `POST /rpc/auth/register`
+
+  - Input includes `tosAccepted: boolean` — required. If false/missing, returns 422.
+  - On success sets `users.tosAcceptedAt = NOW()`.
+
+- Login (Google): `POST /rpc/auth/login` (code or idToken)
+
+  - Input accepts optional `tosAccepted: boolean`.
+  - Behavior:
+    - Existing Google user without `tosAcceptedAt`: requires `tosAccepted=true` and will set `tosAcceptedAt`.
+    - New Google user: refuses to create unless `tosAccepted=true`.
+
+- Accept ToS: `POST /rpc/auth/tos/accept`
+
+  - Auth required. Sets `users.tosAcceptedAt = NOW()` and returns updated user.
+
+- Email verification:
+  - `POST /rpc/email/verify` — verifies token from email.
+  - `POST /rpc/email/resend-verification` — resends verification email.
+
+## Server enforcement
+
+There is no blanket ToS‑gate middleware applied to all routes.
+
+Enforcement happens in two places:
+
+- At the edge of authentication flows:
+  - Register requires `tosAccepted=true` and sets `tosAcceptedAt`.
+  - Google (code/idToken) requires `tosAccepted=true` when the user has not yet accepted; existing accepted users may omit it.
+- In the web app UX:
+  - After any successful login, if `tosAcceptedAt` is null the client redirects to `/tos` to collect acceptance before proceeding.
+
+If we decide to hard‑gate API usage later, add a middleware in `apps/server/src/orpc/index.ts` that checks `context.user?.tosAcceptedAt` and allowlist `auth/*`, `email/*`, and other public reads as needed.
+
+## Web behavior and flows
+
+### 1) Email/password registration
+
+1. Register form includes a required checkbox. The client passes `tosAccepted=true`.
+2. Server validates and sets `tosAcceptedAt`.
+3. New users are created with `verified=false` (unless configured to skip) and are redirected to `/verify` (existing flow).
+
+UI code: `apps/web/src/components/registerForm.tsx`, action in `apps/web/src/lib/auth.actions.ts`.
+
+### 2) Google sign in/up
+
+1. We show an interstitial modal that requires accepting ToS before triggering Google.
+2. The client includes `tosAccepted=true` in the subsequent `/auth/login` call.
+3. Server enforces acceptance for both existing and new Google users.
+
+UI code: `apps/web/src/components/googleLoginButton.tsx`.
+
+### 3) Existing users without ToS (backfill case)
+
+1. After a successful login, `authenticate()` checks `user.tosAcceptedAt`.
+2. If missing, it redirects to `/tos?redirectTo=…` where the user can Accept or Log out.
+3. There is no API hard‑gate; the UI flow ensures acceptance before normal navigation.
+
+UI code: `/tos` page at `apps/web/src/app/(layout-free)/tos/page.tsx`.
+
+### 4) Banners (“nag”)
+
+- To mirror “pending verification,” we display a thin banner when logged‑in and ToS is not accepted:
+  - `PendingTosAlert`: `apps/web/src/components/pendingTosAlert.tsx`.
+  - Added to: `apps/web/src/app/(default)/(activity)/layout.tsx` and settings page.
+- The existing `PendingVerificationAlert` remains for the email flow.
+
+## User experience summary
+
+- You cannot complete signup/sign‑in without accepting ToS:
+  - Email signup requires a checkbox (server enforced).
+  - Google flow requires pre‑acceptance and the server enforces it for new/unaccepted users.
+  - Existing accounts are redirected to `/tos` post‑login to accept before continuing.
+- Email verification is encouraged but not hard‑blocked:
+  - Banner prompts to verify; the app continues to work.
+
+## Limitations and configuration
+
+- ToS link target: UI links use the relative path `/terms` to work in all environments (dev/staging/prod). The in‑app static Terms page lives at `apps/web/src/app/(layout-free)/terms/page.tsx` and includes an Effective Date.
+- Tests: default fixtures set `tosAcceptedAt` to avoid breaking unrelated tests. Create targeted tests with `tosAcceptedAt: null` when needed.
+
+## How to test locally
+
+1. Run server migrations to add `tos_accepted_at`.
+2. Create a user with `tosAcceptedAt = null` (override the fixture default) and log in.
+3. Observe redirect to `/tos`. Accept and verify the session refreshes and normal navigation/API usage resumes.
+4. For Google, test that the modal requires acceptance before proceeding and that the server accepts with `tosAccepted=true`.
