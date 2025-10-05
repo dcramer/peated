@@ -18,7 +18,7 @@ describe("POST /auth/password-reset", () => {
   }) => {
     const user = await fixtures.User();
 
-    await routerClient.auth.passwordReset.create({
+    await routerClient.auth.recovery.create({
       email: user.email,
     });
 
@@ -30,7 +30,7 @@ describe("POST /auth/password-reset", () => {
     const nonExistentEmail = "nonexistent@example.com";
 
     const err = await waitError(
-      routerClient.auth.passwordReset.create({
+      routerClient.auth.recovery.create({
         email: nonExistentEmail,
       }),
     );
@@ -43,7 +43,7 @@ describe("POST /auth/password-reset", () => {
     const invalidEmail = "invalid-email";
 
     const err = await waitError(
-      routerClient.auth.passwordReset.create({
+      routerClient.auth.recovery.create({
         email: invalidEmail,
       }),
     );

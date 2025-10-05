@@ -4,9 +4,11 @@
       "type": "http",
       "url": "https://mcp.sentry.dev/mcp"
     },
-    "spotlight": {
-      "type": "http",
-      "url": "http://localhost:8969/mcp"
+    "sentry-spotlight": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@spotlightjs/spotlight", "--stdio-mcp"],
+      "env": {}
     }
   }
 }

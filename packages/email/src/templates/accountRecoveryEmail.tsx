@@ -5,16 +5,16 @@ import { defaulted, object, string, type Infer } from "superstruct";
 import { Button, Link, Section, Text } from "../components/core";
 import Layout from "../components/layout";
 
-export const TemplateName = "PasswordResetEmail";
+export const TemplateName = "AccountRecoveryEmail";
 
 export const TemplateStruct = object({
-  resetUrl: defaulted(string(), "https://peated.com/reset-password"),
+  resetUrl: defaulted(string(), "https://peated.com/recover-account"),
   baseUrl: defaulted(string(), "https://peated.com"),
 });
 export type TemplateProps = Infer<typeof TemplateStruct>;
 
 export const Template = ({ resetUrl, baseUrl }: TemplateProps) => {
-  const previewText = `A password reset was requested.`;
+  const previewText = `Account recovery was requested for your account.`;
 
   return (
     <Layout baseUrl={baseUrl}>
@@ -22,7 +22,7 @@ export const Template = ({ resetUrl, baseUrl }: TemplateProps) => {
 
       <Section>
         <Text>
-          A password reset was requested for your account on{" "}
+          An account recovery was requested for your account on{" "}
           <Link
             href={baseUrl}
             disableDefaultStyle
@@ -38,7 +38,7 @@ export const Template = ({ resetUrl, baseUrl }: TemplateProps) => {
       </Section>
 
       <Section>
-        <Button href={resetUrl}>Reset Password</Button>
+        <Button href={resetUrl}>Recover Account</Button>
       </Section>
 
       <Section>
@@ -47,7 +47,7 @@ export const Template = ({ resetUrl, baseUrl }: TemplateProps) => {
             color: theme.colors.muted,
           }}
         >
-          If you don't recognize this action, you should ignore this email.
+          If you don't recognize this request, you can ignore this email.
         </Text>
       </Section>
     </Layout>

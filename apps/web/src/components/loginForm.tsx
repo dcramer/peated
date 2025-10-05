@@ -3,16 +3,19 @@
 import Button from "@peated/web/components/button";
 import GoogleLoginButton from "@peated/web/components/googleLoginButton";
 import Link from "@peated/web/components/link";
+import PasskeyLoginButton from "@peated/web/components/passkeyLoginButton";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
 import { authenticate, authenticateForm } from "@peated/web/lib/auth.actions";
+import { Mail } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import Alert from "./alert";
 
-function FormComponent() {
+function FormComponent({ showPassword }: { showPassword: boolean }) {
   const { pending } = useFormStatus();
-
+  const [showPasswordField, setShowPasswordField] = useState(showPassword);
   const searchParams = useSearchParams();
 
   return (
@@ -32,13 +35,25 @@ function FormComponent() {
           placeholder="you@example.com"
           autoFocus
         />
-        <TextField
-          name="password"
-          label="Password"
-          type="password"
-          autoComplete="current-password"
-          helpText="Enter your password, or alternatively continue without and we'll email you a magic link."
-        />
+        {showPasswordField && (
+          <TextField
+            name="password"
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+          />
+        )}
+        {!showPasswordField && (
+          <div className="px-4 pb-3">
+            <button
+              type="button"
+              onClick={() => setShowPasswordField(true)}
+              className="text-highlight text-sm underline"
+            >
+              Or sign in with a password
+            </button>
+          </div>
+        )}
       </div>
       <div className="flex justify-center gap-x-2">
         <Button type="submit" color="highlight" fullWidth loading={pending}>
@@ -51,6 +66,7 @@ function FormComponent() {
 
 export default function LoginForm() {
   const [result, formAction] = useFormState(authenticateForm, undefined);
+  const [showEmailForm, setShowEmailForm] = useState(false);
 
   return (
     <div className="min-w-sm flex flex-auto flex-col gap-y-4">
@@ -60,11 +76,46 @@ export default function LoginForm() {
         <p className="mb-8 text-center font-bold">
           Please check your email to continue.
         </p>
+      ) : showEmailForm ? (
+        <>
+          <div className="mb-4 text-center">
+            <button
+              type="button"
+              onClick={() => setShowEmailForm(false)}
+              className="text-highlight text-sm underline"
+            >
+              ← Back to other options
+            </button>
+          </div>
+
+          <form action={formAction}>
+            <FormComponent showPassword={false} />
+          </form>
+
+          <div className="mt-4 flex items-center justify-center gap-x-3 text-center text-sm">
+            <div>
+              Don't have an account yet?{" "}
+              <Link href="/register" className="text-highlight underline">
+                Sign Up
+              </Link>
+            </div>
+            <div>&middot;</div>
+            <div>
+              <Link
+                href="/recover-account"
+                className="text-highlight underline"
+              >
+                Account Recovery
+              </Link>
+            </div>
+          </div>
+        </>
       ) : (
         <>
+          <PasskeyLoginButton action={authenticate} />
+
           {config.GOOGLE_CLIENT_ID && (
             <>
-              <GoogleLoginButton action={authenticate} />
               <div className="relative my-4 font-bold text-slate-500 opacity-60">
                 <div
                   className="absolute inset-0 flex items-center"
@@ -78,12 +129,31 @@ export default function LoginForm() {
                   </span>
                 </div>
               </div>
+
+              <GoogleLoginButton action={authenticate} />
             </>
           )}
 
-          <form action={formAction}>
-            <FormComponent />
-          </form>
+          <div className="relative my-4 font-bold text-slate-500 opacity-60">
+            <div
+              className="absolute inset-0 flex items-center"
+              aria-hidden="true"
+            >
+              <div className="min-w-full border-t-2 border-slate-700" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-slate-900 px-2 text-lg uppercase">Or</span>
+            </div>
+          </div>
+
+          <Button
+            fullWidth
+            color="primary"
+            onClick={() => setShowEmailForm(true)}
+          >
+            <Mail className="mr-2 h-4 w-4" />
+            Sign in with Email
+          </Button>
 
           <div className="mt-4 flex items-center justify-center gap-x-3 text-sm">
             <div>
@@ -94,8 +164,11 @@ export default function LoginForm() {
             </div>
             <div>&middot;</div>
             <div>
-              <Link href="/password-reset" className="text-highlight underline">
-                Password Reset
+              <Link
+                href="/recover-account"
+                className="text-highlight underline"
+              >
+                Account Recovery
               </Link>
             </div>
           </div>

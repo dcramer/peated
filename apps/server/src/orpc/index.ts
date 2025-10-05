@@ -16,6 +16,8 @@ interface ErrorShape {
 export const base = os
   .$context<{
     user: User | null;
+    ip?: string;
+    userAgent?: string;
   }>()
   /**
    * All errors should adhere to the ErrorShape interface

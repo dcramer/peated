@@ -12,6 +12,7 @@ export * from "./flights";
 export * from "./follows";
 export * from "./identities";
 export * from "./notifications";
+export * from "./passkeys";
 export * from "./regions";
 export * from "./reviews";
 export * from "./stores";

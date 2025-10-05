@@ -150,3 +150,49 @@ export async function generateMagicLink(user: User, redirectTo = "/") {
     url,
   };
 }
+
+/**
+ * Sign a WebAuthn challenge to prevent tampering and replay attacks
+ * The signed token includes the challenge and creation timestamp
+ */
+export async function signChallenge(challenge: string): Promise<string> {
+  const payload = {
+    challenge,
+    createdAt: new Date().toISOString(),
+  };
+  return await signPayload(payload);
+}
+
+/**
+ * Verify a signed WebAuthn challenge
+ * Ensures the challenge hasn't been tampered with and is recent (within 5 minutes)
+ * Returns the original challenge value if valid
+ */
+export async function verifyChallenge(
+  signedChallenge: string,
+  expectedChallenge: string,
+): Promise<void> {
+  let payload;
+  try {
+    payload = (await verifyPayload(signedChallenge)) as any;
+  } catch (err) {
+    throw new Error("Challenge signature is invalid or has expired");
+  }
+
+  if (!payload?.challenge || !payload?.createdAt) {
+    throw new Error("Challenge is malformed");
+  }
+
+  // Verify the challenge matches what we expect
+  if (payload.challenge !== expectedChallenge) {
+    throw new Error("Challenge does not match");
+  }
+
+  // Verify challenge is recent (within 5 minutes)
+  const CHALLENGE_TTL = 5 * 60 * 1000; // 5 minutes
+  const createdAt = new Date(payload.createdAt).getTime();
+  const now = new Date().getTime();
+  if (now - createdAt > CHALLENGE_TTL) {
+    throw new Error("Challenge expired");
+  }
+}

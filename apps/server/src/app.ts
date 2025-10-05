@@ -57,6 +57,17 @@ import {
   UserSchema,
 } from "./schemas";
 
+function getClientIp(req: Request): string | undefined {
+  // Check common headers for client IP
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) {
+    // x-forwarded-for can be comma-separated list, take first
+    return forwarded.split(",")[0].trim();
+  }
+
+  return req.headers.get("x-real-ip") ?? undefined;
+}
+
 const openapiHandler = new OpenAPIHandler(router, {
   plugins: [new ZodSmartCoercionPlugin()],
 });
@@ -317,7 +328,11 @@ export const app = new Hono()
 
     const { matched, response } = await openapiHandler.handle(c.req.raw, {
       prefix: "/v1",
-      context: { user },
+      context: {
+        user,
+        ip: getClientIp(c.req.raw),
+        userAgent: c.req.header("user-agent"),
+      },
     });
 
     if (matched) {
@@ -355,7 +370,11 @@ export const app = new Hono()
 
     const { matched, response } = await rpcHandler.handle(c.req.raw, {
       prefix: "/rpc",
-      context: { user },
+      context: {
+        user,
+        ip: getClientIp(c.req.raw),
+        userAgent: c.req.header("user-agent"),
+      },
     });
 
     if (matched) {

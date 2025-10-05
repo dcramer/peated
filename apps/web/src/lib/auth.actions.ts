@@ -58,11 +58,44 @@ export async function authenticate(
   const email = (formData.get("email") || "") as string;
   const password = (formData.get("password") || "") as string;
   const code = formData.get("code") as string;
+  const passkeyResponse = formData.get("passkeyResponse") as string | null;
+  const signedChallenge = formData.get("signedChallenge") as string | null;
   const redirectTo = getSafeRedirect(
     (formData.get("redirectTo") || "/") as string,
   );
 
   const { client } = await createServerClient();
+
+  // Handle passkey authentication
+  if (passkeyResponse && signedChallenge) {
+    const { error, isDefined, data } = await safe(
+      client.auth.passkey.authenticateVerify({
+        response: JSON.parse(passkeyResponse),
+        signedChallenge,
+      }),
+    );
+
+    if (error) {
+      return {
+        magicLink: false,
+        error: isDefined ? error.message : "Internal server error.",
+      };
+    }
+
+    session.user = data.user;
+    session.accessToken = data.accessToken ?? null;
+    await session.save();
+
+    if (!data.user.termsAcceptedAt) {
+      redirect(
+        `/auth/tos-required?redirectTo=${encodeURIComponent(redirectTo)}`,
+      );
+    } else if (!data.user.verified) {
+      redirect("/verify");
+    } else {
+      redirect(redirectTo);
+    }
+  }
 
   if (email && !password) {
     const { error, isDefined } = await safe(
@@ -147,9 +180,39 @@ export async function register(formData: FormData) {
   const email = (formData.get("email") || "") as string;
   const password = (formData.get("password") || "") as string;
   const username = formData.get("username") as string;
+  const passkeyResponse = formData.get("passkeyResponse") as string | null;
+  const signedChallenge = formData.get("signedChallenge") as string | null;
 
   const { client } = await createServerClient();
 
+  // Handle passkey registration
+  if (passkeyResponse && signedChallenge) {
+    const { error, isDefined, data } = await safe(
+      client.auth.register({
+        username,
+        email,
+        passkeyResponse: JSON.parse(passkeyResponse),
+        signedChallenge,
+        tosAccepted: formData.get("tosAccepted") ? true : false,
+      }),
+    );
+
+    if (isDefined) {
+      return { ok: false, error: error.message };
+    } else if (error) {
+      return { ok: false, error: "Internal server error." };
+    }
+
+    session.user = data.user;
+    session.accessToken = data.accessToken ?? null;
+    session.ts = new Date().getTime();
+
+    await session.save();
+
+    return redirect("/verify");
+  }
+
+  // Handle password registration
   const { error, isDefined, data } = await safe(
     client.auth.register({
       email,
@@ -225,7 +288,7 @@ export async function acceptTos(redirectTo?: string) {
   const session = await getSession();
   const { client } = await createServerClient();
 
-  const { error, data } = await safe(client.auth.acceptTos());
+  const { error, data } = await safe(client.auth.tos.accept());
 
   if (error) {
     return { ok: false, error: error.message } as GenericResult;
@@ -253,7 +316,7 @@ export async function passwordResetForm(
   const { client } = await createServerClient();
 
   const { error, isDefined } = await safe(
-    client.auth.passwordReset.create({ email }),
+    client.auth.recovery.create({ email }),
   );
 
   if (isDefined) {
@@ -278,7 +341,43 @@ export async function passwordResetConfirmForm(
   const { client } = await createServerClient();
 
   const { error, isDefined, data } = await safe(
-    client.auth.passwordReset.confirm({ token, password }),
+    client.auth.recovery.confirm({ token, password }),
+  );
+
+  if (isDefined) {
+    return { ok: false, error: error.message };
+  } else if (error) {
+    return { ok: false, error: "Internal server error." };
+  }
+
+  session.user = data.user;
+  session.accessToken = data.accessToken ?? null;
+  session.ts = new Date().getTime();
+
+  await session.save();
+
+  return { ok: true };
+}
+
+export async function passwordResetConfirmPasskeyForm(
+  prevState: GenericResult | undefined,
+  formData: FormData,
+) {
+  "use server";
+
+  const token = (formData.get("token") || "") as string;
+  const passkeyResponse = formData.get("passkeyResponse") as string;
+  const signedChallenge = formData.get("signedChallenge") as string;
+
+  const session = await getSession();
+  const { client } = await createServerClient();
+
+  const { error, isDefined, data } = await safe(
+    client.auth.recovery.confirmPasskey({
+      token,
+      passkeyResponse: JSON.parse(passkeyResponse),
+      signedChallenge,
+    }),
   );
 
   if (isDefined) {

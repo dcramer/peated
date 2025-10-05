@@ -1,5 +1,5 @@
 import confirm from "./confirm";
-import create from "./create.";
+import create from "./create";
 
 export default {
   confirm,

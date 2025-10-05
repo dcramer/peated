@@ -6,14 +6,14 @@ import { eq } from "drizzle-orm";
 
 describe("POST /auth/tos/accept", () => {
   test("requires auth", async () => {
-    const err = await waitError(routerClient.auth.acceptTos());
+    const err = await waitError(routerClient.auth.tos.accept());
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("sets termsAcceptedAt", async ({ fixtures }) => {
     const user = await fixtures.User({ verified: true });
 
-    const data = await routerClient.auth.acceptTos(undefined, {
+    const data = await routerClient.auth.tos.accept(undefined, {
       context: { user },
     });
 
