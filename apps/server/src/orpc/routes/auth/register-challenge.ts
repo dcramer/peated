@@ -8,7 +8,7 @@ export default procedure
   .use(authRateLimit)
   .route({
     method: "POST",
-    path: "/auth/register-challenge",
+    path: "/auth/register/challenge",
     summary: "Generate registration challenge for new user",
     description:
       "Generate WebAuthn challenge for passkey registration when creating a new account",

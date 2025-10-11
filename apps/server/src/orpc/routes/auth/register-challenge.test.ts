@@ -1,6 +1,6 @@
 import { routerClient } from "@peated/server/orpc/router";
 
-describe("POST /auth/register-challenge", () => {
+describe("POST /auth/register/challenge", () => {
   test("generates challenge for new user", async () => {
     const data = await routerClient.auth.registerChallenge({
       username: "testuser",

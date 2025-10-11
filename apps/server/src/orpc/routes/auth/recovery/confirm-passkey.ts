@@ -28,7 +28,7 @@ export default procedure
   .use(authRateLimit)
   .route({
     method: "POST",
-    path: "/auth/recovery/confirm-passkey",
+    path: "/auth/recovery/passkey/confirm",
     summary: "Confirm account recovery with passkey",
     description:
       "Confirm account recovery using token from email and add a new passkey. Automatically verifies the user account",

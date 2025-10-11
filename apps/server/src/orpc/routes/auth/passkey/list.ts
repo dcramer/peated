@@ -17,7 +17,7 @@ export default procedure
   .use(requireAuth)
   .route({
     method: "GET",
-    path: "/auth/passkey/list",
+    path: "/auth/passkey",
     summary: "List user's passkeys",
     description: "Get all passkeys registered for the current user",
     spec: (spec) => ({
