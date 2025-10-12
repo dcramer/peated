@@ -1,6 +1,7 @@
 import { generatePasskeyChallenge } from "@peated/server/lib/passkey";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit } from "@peated/server/orpc/middleware";
+import type { PublicKeyCredentialCreationOptionsJSON } from "@simplewebauthn/server";
 import { createHash } from "crypto";
 import { z } from "zod";
 
@@ -29,7 +30,7 @@ export default procedure
   )
   .output(
     z.object({
-      options: z.any(),
+      options: z.custom<PublicKeyCredentialCreationOptionsJSON>(),
       signedChallenge: z.string(),
     }),
   )

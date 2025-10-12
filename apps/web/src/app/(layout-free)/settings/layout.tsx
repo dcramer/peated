@@ -6,14 +6,12 @@ import Layout from "@peated/web/components/layout";
 import Link from "@peated/web/components/link";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import useAuth from "@peated/web/hooks/useAuth";
-import { useRouter } from "next/navigation";
 
 export default function SettingsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
   const { user } = useAuth();
 
   return (

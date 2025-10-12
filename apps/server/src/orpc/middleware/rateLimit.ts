@@ -1,22 +1,6 @@
 import { base } from "..";
+import { getConnection } from "../../worker/client";
 import type { Context } from "../context";
-
-// Simple in-memory rate limiting store
-// In production, this should use Redis or similar
-const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
-
-// Cleanup old entries every 5 minutes
-setInterval(
-  () => {
-    const now = Date.now();
-    for (const [key, value] of rateLimitStore.entries()) {
-      if (value.resetAt < now) {
-        rateLimitStore.delete(key);
-      }
-    }
-  },
-  5 * 60 * 1000,
-);
 
 interface RateLimitOptions {
   windowMs: number; // Time window in milliseconds
@@ -27,33 +11,32 @@ interface RateLimitOptions {
 export function createRateLimit(options: RateLimitOptions) {
   const { windowMs, maxRequests, keyPrefix = "rl" } = options;
 
-  return base.$context<Context>().middleware(({ context, next, errors }) => {
-    // Use user ID as the rate limit key (IP would require context extension)
-    const identifier = context.user?.id?.toString() || "anonymous";
-    const key = `${keyPrefix}:${identifier}`;
+  return base
+    .$context<Context>()
+    .middleware(async ({ context, next, errors }) => {
+      // Use user ID for authenticated users, IP for anonymous
+      const identifier =
+        context.user?.id?.toString() || context.ip || "anonymous";
+      const key = `${keyPrefix}:${identifier}`;
 
-    const now = Date.now();
-    const record = rateLimitStore.get(key);
+      const redis = await getConnection();
 
-    if (!record || record.resetAt < now) {
-      // Start new window
-      rateLimitStore.set(key, {
-        count: 1,
-        resetAt: now + windowMs,
-      });
+      // Increment the counter and get the current count
+      const count = await redis.incr(key);
+
+      // If this is the first request, set the expiration
+      if (count === 1) {
+        await redis.pexpire(key, windowMs);
+      }
+
+      if (count > maxRequests) {
+        throw errors.FORBIDDEN({
+          message: "Too many requests. Please try again later.",
+        });
+      }
+
       return next({ context });
-    }
-
-    if (record.count >= maxRequests) {
-      throw errors.FORBIDDEN({
-        message: "Too many requests. Please try again later.",
-      });
-    }
-
-    // Increment count
-    record.count++;
-    return next({ context });
-  });
+    });
 }
 
 // Preset rate limiters for auth endpoints

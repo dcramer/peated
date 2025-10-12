@@ -30,6 +30,7 @@ vi.mock("../worker/client", async (importOriginal) => {
     pushUniqueJob: vi.fn(() => Promise<void>),
     runJob: oJobs.runJob,
     gracefulShutdown: vi.fn(() => Promise<void>),
+    getConnection: oJobs.getConnection,
   };
 });
 
@@ -167,6 +168,17 @@ beforeEach(async (ctx) => {
 
 beforeEach(async (ctx) => {
   await clearTables();
+
+  // Clear rate limit keys from Redis
+  const oJobs = await import("../worker/client");
+  const redis = await oJobs.getConnection();
+  const rateLimitPrefixes = ["rl:*", "auth:*", "auth-strict:*"];
+  for (const prefix of rateLimitPrefixes) {
+    const keys = await redis.keys(prefix);
+    if (keys.length > 0) {
+      await redis.del(...keys);
+    }
+  }
 
   const user = await createDefaultUser();
 

@@ -1,4 +1,3 @@
-import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
 describe("POST /auth/passkey/authenticate/challenge", () => {

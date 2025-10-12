@@ -3,7 +3,10 @@ import { passkeys } from "@peated/server/db/schema";
 import { generatePasskeyChallenge } from "@peated/server/lib/passkey";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit, requireAuth } from "@peated/server/orpc/middleware";
-import type { AuthenticatorTransportFuture } from "@simplewebauthn/server";
+import type {
+  AuthenticatorTransportFuture,
+  PublicKeyCredentialCreationOptionsJSON,
+} from "@simplewebauthn/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -23,7 +26,7 @@ export default procedure
   .input(z.object({}))
   .output(
     z.object({
-      options: z.any(),
+      options: z.custom<PublicKeyCredentialCreationOptionsJSON>(),
       signedChallenge: z.string(),
     }),
   )

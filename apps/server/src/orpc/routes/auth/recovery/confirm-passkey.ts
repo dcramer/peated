@@ -18,6 +18,7 @@ import { authRateLimit } from "@peated/server/orpc/middleware";
 import { AuthSchema, PasswordResetSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
+import type { RegistrationResponseJSON } from "@simplewebauthn/server";
 import { createHash, timingSafeEqual } from "crypto";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -40,7 +41,9 @@ export default procedure
   .input(
     z.object({
       token: z.string(),
-      passkeyResponse: z.any().describe("WebAuthn registration response"),
+      passkeyResponse: z
+        .custom<RegistrationResponseJSON>()
+        .describe("WebAuthn registration response"),
       signedChallenge: z
         .string()
         .describe("Signed challenge from passkey options"),

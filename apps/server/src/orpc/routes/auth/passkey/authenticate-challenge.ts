@@ -2,7 +2,10 @@ import { signChallenge } from "@peated/server/lib/auth";
 import { rpID } from "@peated/server/lib/passkey";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit } from "@peated/server/orpc/middleware";
-import { generateAuthenticationOptions } from "@simplewebauthn/server";
+import {
+  generateAuthenticationOptions,
+  type PublicKeyCredentialRequestOptionsJSON,
+} from "@simplewebauthn/server";
 import { z } from "zod";
 
 export default procedure
@@ -24,7 +27,7 @@ export default procedure
   )
   .output(
     z.object({
-      options: z.any(),
+      options: z.custom<PublicKeyCredentialRequestOptionsJSON>(),
       signedChallenge: z.string(),
     }),
   )

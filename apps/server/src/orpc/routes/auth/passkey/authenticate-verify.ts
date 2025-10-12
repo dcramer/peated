@@ -15,6 +15,7 @@ import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import {
   verifyAuthenticationResponse,
+  type AuthenticationResponseJSON,
   type VerifyAuthenticationResponseOpts,
 } from "@simplewebauthn/server";
 import { and, eq, sql } from "drizzle-orm";
@@ -34,7 +35,9 @@ export default procedure
   })
   .input(
     z.object({
-      response: z.any().describe("WebAuthn authentication response"),
+      response: z
+        .custom<AuthenticationResponseJSON>()
+        .describe("WebAuthn authentication response"),
       signedChallenge: z.string().describe("Signed challenge from options"),
       tosAccepted: z
         .boolean()
