@@ -21,13 +21,16 @@ export function createRateLimit(options: RateLimitOptions) {
 
       const redis = await getConnection();
 
-      // Increment the counter and get the current count
-      const count = await redis.incr(key);
-
-      // If this is the first request, set the expiration
-      if (count === 1) {
-        await redis.pexpire(key, windowMs);
-      }
+      // Atomically increment and set expiration if this is the first request
+      // This Lua script prevents race conditions
+      const lua = `
+        local count = redis.call('INCR', KEYS[1])
+        if count == 1 then
+          redis.call('PEXPIRE', KEYS[1], ARGV[1])
+        end
+        return count
+      `;
+      const count = (await redis.eval(lua, 1, key, windowMs)) as number;
 
       if (count > maxRequests) {
         throw errors.FORBIDDEN({
