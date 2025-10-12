@@ -29,7 +29,7 @@ export default procedure
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(sql`LOWER(${users.email})`, email.toLowerCase()));
+      .where(eq(sql`LOWER(${users.email})`, email));
 
     if (!user) {
       throw errors.NOT_FOUND({

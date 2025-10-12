@@ -6,6 +6,7 @@ import { signChallenge, verifyChallenge } from "@peated/server/lib/auth";
 import {
   generateRegistrationOptions,
   verifyRegistrationResponse,
+  type AuthenticatorTransportFuture,
   type PublicKeyCredentialCreationOptionsJSON,
 } from "@simplewebauthn/server";
 import { z } from "zod";
@@ -28,6 +29,12 @@ export const ClientDataJSONSchema = z.object({
   crossOrigin: z.boolean().optional(),
 });
 
+// Type for credentials to exclude during registration (string-based IDs from our database)
+export interface ExcludeCredential {
+  id: string;
+  transports?: AuthenticatorTransportFuture[] | null;
+}
+
 /**
  * Generate WebAuthn registration options with a signed challenge
  * This is used for all passkey registration flows (new user, add passkey, recovery)
@@ -36,18 +43,7 @@ export async function generatePasskeyChallenge(options: {
   username: string;
   userDisplayName?: string;
   userID?: Uint8Array | string | number;
-  excludeCredentials?: Array<{
-    id: string;
-    transports?: (
-      | "ble"
-      | "cable"
-      | "hybrid"
-      | "internal"
-      | "nfc"
-      | "smart-card"
-      | "usb"
-    )[];
-  }>;
+  excludeCredentials?: ExcludeCredential[];
 }): Promise<{
   options: PublicKeyCredentialCreationOptionsJSON;
   signedChallenge: string;
@@ -62,13 +58,19 @@ export async function generatePasskeyChallenge(options: {
     }
   }
 
+  // Map credentials for the library (filter out null transports)
+  const excludeCredentials = options.excludeCredentials?.map((cred) => ({
+    id: cred.id,
+    transports: cred.transports ?? undefined,
+  }));
+
   const registrationOptions = await generateRegistrationOptions({
     rpName,
     rpID,
     userName: options.username,
     userDisplayName: options.userDisplayName || options.username,
     userID,
-    excludeCredentials: options.excludeCredentials as any,
+    excludeCredentials,
     attestationType: "none",
     authenticatorSelection: {
       residentKey: "preferred",

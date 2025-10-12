@@ -16,7 +16,7 @@ export const passkeys = pgTable(
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     userId: bigint("user_id", { mode: "number" })
-      .references(() => users.id)
+      .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
     credentialId: text("credential_id").notNull(),
     publicKey: text("public_key").notNull(),

@@ -3,6 +3,7 @@ import { passkeys } from "@peated/server/db/schema";
 import { generatePasskeyChallenge } from "@peated/server/lib/passkey";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit, requireAuth } from "@peated/server/orpc/middleware";
+import type { AuthenticatorTransportFuture } from "@simplewebauthn/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -41,7 +42,7 @@ export default procedure
       userID: user.id,
       excludeCredentials: existingPasskeys.map((passkey) => ({
         id: passkey.credentialId,
-        transports: passkey.transports as any,
+        transports: passkey.transports as AuthenticatorTransportFuture[] | null,
       })),
     });
   });

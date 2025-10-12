@@ -1,11 +1,8 @@
-import { db } from "@peated/server/db";
-import { passkeys } from "@peated/server/db/schema";
 import { signChallenge } from "@peated/server/lib/auth";
 import { rpID } from "@peated/server/lib/passkey";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit } from "@peated/server/orpc/middleware";
 import { generateAuthenticationOptions } from "@simplewebauthn/server";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure

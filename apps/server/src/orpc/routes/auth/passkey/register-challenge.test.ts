@@ -19,20 +19,8 @@ describe("POST /auth/passkey/register/challenge", () => {
 
     expect(data.options).toBeDefined();
     expect(data.options.challenge).toBeDefined();
-    expect(data.options.user.name).toEqual(user.username);
-    expect(data.signedChallenge).toBeDefined();
-  });
-
-  test("challenge includes user context", async ({ fixtures }) => {
-    const user = await fixtures.User();
-
-    const data = await routerClient.auth.passkey.registerChallenge(
-      {},
-      { context: { user } },
-    );
-
-    expect(data.options).toBeDefined();
     expect(data.options.user.id).toBeDefined();
+    expect(data.options.user.name).toEqual(user.username);
     expect(data.signedChallenge).toBeDefined();
   });
 });
