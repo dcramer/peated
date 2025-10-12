@@ -108,9 +108,11 @@ export async function getQueue(
 export async function getConnection() {
   if (connection) return connection;
 
-  return new IORedis(config.REDIS_URL, {
+  connection = new IORedis(config.REDIS_URL, {
     maxRetriesPerRequest: null,
   });
+
+  return connection;
 }
 
 export async function gracefulShutdown(
