@@ -3,7 +3,10 @@ import { users } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import { generatePasswordHash } from "@peated/server/lib/auth";
 import { procedure } from "@peated/server/orpc";
-import { requireAuth } from "@peated/server/orpc/middleware";
+import {
+  requireAuth,
+  requireTosAccepted,
+} from "@peated/server/orpc/middleware";
 import { UserInputSchema, UserSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
@@ -12,6 +15,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
+  .use(requireTosAccepted)
   .route({
     method: "PATCH",
     path: "/users/{user}",

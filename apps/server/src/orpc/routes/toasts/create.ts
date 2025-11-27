@@ -2,7 +2,10 @@ import { db } from "@peated/server/db";
 import { tastings, toasts } from "@peated/server/db/schema";
 import { createNotification } from "@peated/server/lib/notifications";
 import { procedure } from "@peated/server/orpc";
-import { requireAuth } from "@peated/server/orpc/middleware";
+import {
+  requireAuth,
+  requireTosAccepted,
+} from "@peated/server/orpc/middleware";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -18,6 +21,7 @@ export default procedure
   .input(z.object({ tasting: z.coerce.number() }))
   .output(z.object({}))
   .use(requireAuth)
+  .use(requireTosAccepted)
   .handler(async function ({ input, context, errors }) {
     const { tasting: tastingId } = input;
 

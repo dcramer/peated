@@ -141,21 +141,17 @@ async function authGoogle(code: string, tosAccepted?: boolean) {
     );
   let user = result?.user;
   if (user) {
-    // If user exists but hasn't accepted ToS, require acceptance
-    if (!user.termsAcceptedAt) {
-      if (tosAccepted) {
-        const [updated] = await db
-          .update(users)
-          .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
-          .where(
-            and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`),
-          )
-          .returning();
-        return updated;
-      }
-      throw new ORPCError("FORBIDDEN", {
-        message: "You must accept the Terms of Service.",
-      });
+    // If user exists but hasn't accepted ToS, accept if provided
+    if (!user.termsAcceptedAt && tosAccepted) {
+      const [updated] = await db
+        .update(users)
+        .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
+        .where(
+          and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`),
+        )
+        .returning();
+      // Handle race condition: if another request already accepted ToS, updated is undefined
+      return updated || user;
     }
     return user;
   }
@@ -180,25 +176,20 @@ async function authGoogle(code: string, tosAccepted?: boolean) {
       externalId: payload.sub,
       userId: foundUser.id,
     });
-    // mark ToS acceptance if needed
-    if (!foundUser.termsAcceptedAt) {
-      if (tosAccepted) {
-        const [updated] = await db
-          .update(users)
-          .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
-          .where(
-            and(
-              eq(users.id, foundUser.id),
-              sql`${users.termsAcceptedAt} IS NULL`,
-            ),
-          )
-          .returning();
-        user = updated;
-      } else {
-        throw new ORPCError("FORBIDDEN", {
-          message: "You must accept the Terms of Service.",
-        });
-      }
+    // mark ToS acceptance if provided
+    if (!foundUser.termsAcceptedAt && tosAccepted) {
+      const [updated] = await db
+        .update(users)
+        .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
+        .where(
+          and(
+            eq(users.id, foundUser.id),
+            sql`${users.termsAcceptedAt} IS NULL`,
+          ),
+        )
+        .returning();
+      // Handle race condition: if another request already accepted ToS, updated is undefined
+      user = updated || foundUser;
     } else {
       user = foundUser;
     }
@@ -213,30 +204,32 @@ async function authGoogle(code: string, tosAccepted?: boolean) {
       verified: true, // emails are verified when coming from Google
     };
 
-    if (!tosAccepted) {
-      throw new ORPCError("FORBIDDEN", {
-        message: "You must accept the Terms of Service.",
-      });
-    }
-
     user = await db.transaction(async (tx) => {
-      const user = await createUser(tx, userData);
+      const newUser = await createUser(tx, userData);
 
       await tx.insert(identities).values({
         provider: "google",
         externalId: payload.sub,
-        userId: user.id,
+        userId: newUser.id,
       });
 
-      const [updated] = await tx
-        .update(users)
-        .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
-        .where(
-          and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`),
-        )
-        .returning();
+      // Accept ToS if provided during signup
+      if (tosAccepted) {
+        const [updated] = await tx
+          .update(users)
+          .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
+          .where(
+            and(
+              eq(users.id, newUser.id),
+              sql`${users.termsAcceptedAt} IS NULL`,
+            ),
+          )
+          .returning();
+        // Handle race condition: if another request already accepted ToS, updated is undefined
+        return updated || newUser;
+      }
 
-      return updated;
+      return newUser;
     });
   }
 
@@ -316,20 +309,17 @@ async function authGoogleIdToken(idToken: string, tosAccepted?: boolean) {
     );
   let user = result?.user;
   if (user) {
-    if (!user.termsAcceptedAt) {
-      if (tosAccepted) {
-        const [updated] = await db
-          .update(users)
-          .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
-          .where(
-            and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`),
-          )
-          .returning();
-        return updated;
-      }
-      throw new ORPCError("FORBIDDEN", {
-        message: "You must accept the Terms of Service.",
-      });
+    // If user exists but hasn't accepted ToS, accept if provided
+    if (!user.termsAcceptedAt && tosAccepted) {
+      const [updated] = await db
+        .update(users)
+        .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
+        .where(
+          and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`),
+        )
+        .returning();
+      // Handle race condition: if another request already accepted ToS, updated is undefined
+      return updated || user;
     }
     return user;
   }
@@ -354,24 +344,20 @@ async function authGoogleIdToken(idToken: string, tosAccepted?: boolean) {
       externalId: payload.sub,
       userId: foundUser.id,
     });
-    if (!foundUser.termsAcceptedAt) {
-      if (tosAccepted) {
-        const [updated] = await db
-          .update(users)
-          .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
-          .where(
-            and(
-              eq(users.id, foundUser.id),
-              sql`${users.termsAcceptedAt} IS NULL`,
-            ),
-          )
-          .returning();
-        user = updated;
-      } else {
-        throw new ORPCError("FORBIDDEN", {
-          message: "You must accept the Terms of Service.",
-        });
-      }
+    // mark ToS acceptance if provided
+    if (!foundUser.termsAcceptedAt && tosAccepted) {
+      const [updated] = await db
+        .update(users)
+        .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
+        .where(
+          and(
+            eq(users.id, foundUser.id),
+            sql`${users.termsAcceptedAt} IS NULL`,
+          ),
+        )
+        .returning();
+      // Handle race condition: if another request already accepted ToS, updated is undefined
+      user = updated || foundUser;
     } else {
       user = foundUser;
     }
@@ -386,30 +372,32 @@ async function authGoogleIdToken(idToken: string, tosAccepted?: boolean) {
       verified: true, // emails are verified when coming from Google
     };
 
-    if (!tosAccepted) {
-      throw new ORPCError("FORBIDDEN", {
-        message: "You must accept the Terms of Service.",
-      });
-    }
-
     user = await db.transaction(async (tx) => {
-      const user = await createUser(tx, userData);
+      const newUser = await createUser(tx, userData);
 
       await tx.insert(identities).values({
         provider: "google",
         externalId: payload.sub,
-        userId: user.id,
+        userId: newUser.id,
       });
 
-      const [updated] = await tx
-        .update(users)
-        .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
-        .where(
-          and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`),
-        )
-        .returning();
+      // Accept ToS if provided during signup
+      if (tosAccepted) {
+        const [updated] = await tx
+          .update(users)
+          .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
+          .where(
+            and(
+              eq(users.id, newUser.id),
+              sql`${users.termsAcceptedAt} IS NULL`,
+            ),
+          )
+          .returning();
+        // Handle race condition: if another request already accepted ToS, updated is undefined
+        return updated || newUser;
+      }
 
-      return updated;
+      return newUser;
     });
   }
 

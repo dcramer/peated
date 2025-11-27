@@ -2,7 +2,10 @@ import { db } from "@peated/server/db";
 import { follows, users } from "@peated/server/db/schema";
 import { createNotification } from "@peated/server/lib/notifications";
 import { procedure } from "@peated/server/orpc";
-import { requireAuth } from "@peated/server/orpc/middleware/auth";
+import {
+  requireAuth,
+  requireTosAccepted,
+} from "@peated/server/orpc/middleware/auth";
 import { FriendStatusEnum } from "@peated/server/schemas";
 import type { FriendStatus } from "@peated/server/types";
 import { and, eq, inArray } from "drizzle-orm";
@@ -10,6 +13,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
+  .use(requireTosAccepted)
   // TODO: better path
   .route({
     method: "PUT",
