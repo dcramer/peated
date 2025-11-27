@@ -1,10 +1,12 @@
 "use client";
 
 import Button from "@peated/web/components/button";
+import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { startRegistration } from "@simplewebauthn/browser";
 import { useMutation } from "@tanstack/react-query";
 import { KeyRound } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function PasskeyRegisterButton({
@@ -21,6 +23,7 @@ export default function PasskeyRegisterButton({
   onError?: (error: string) => void;
 }) {
   const orpc = useORPC();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const registerChallengeMutation = useMutation(
@@ -30,6 +33,16 @@ export default function PasskeyRegisterButton({
   const handlePasskeyRegister = async () => {
     // Validate inputs before proceeding
     if (!username.trim() || !email.trim() || !tosAccepted) {
+      return;
+    }
+
+    // Check for WebAuthn support
+    if (
+      typeof window === "undefined" ||
+      !window.PublicKeyCredential ||
+      typeof window.PublicKeyCredential !== "function"
+    ) {
+      router.push("/browser-not-supported");
       return;
     }
 
@@ -44,7 +57,7 @@ export default function PasskeyRegisterButton({
         });
 
       // Start WebAuthn registration
-      const response = await startRegistration(options);
+      const response = await startRegistration({ optionsJSON: options });
 
       // Prepare form data for server action
       const formData = new FormData();
@@ -63,7 +76,7 @@ export default function PasskeyRegisterButton({
       }
       // If no error, the action will redirect, so we don't need to do anything
     } catch (err: any) {
-      console.error("Passkey registration error:", err);
+      logError(err, { context: "passkey_registration" });
 
       // Check if user cancelled the passkey prompt
       if (err.name === "NotAllowedError" || err.message?.includes("cancel")) {

@@ -2,7 +2,10 @@ import { routerClient } from "@peated/server/orpc/router";
 
 describe("POST /auth/passkey/authenticate/challenge", () => {
   test("generates challenge and signed token", async () => {
-    const data = await routerClient.auth.passkey.authenticateChallenge({});
+    const data = await routerClient.auth.passkey.authenticateChallenge(
+      {},
+      { context: { ip: "127.0.0.1" } },
+    );
 
     expect(data.options).toBeDefined();
     expect(data.options.challenge).toBeDefined();
@@ -10,8 +13,14 @@ describe("POST /auth/passkey/authenticate/challenge", () => {
   });
 
   test("challenge is unique per request", async () => {
-    const data1 = await routerClient.auth.passkey.authenticateChallenge({});
-    const data2 = await routerClient.auth.passkey.authenticateChallenge({});
+    const data1 = await routerClient.auth.passkey.authenticateChallenge(
+      {},
+      { context: { ip: "127.0.0.1" } },
+    );
+    const data2 = await routerClient.auth.passkey.authenticateChallenge(
+      {},
+      { context: { ip: "127.0.0.1" } },
+    );
 
     expect(data1.options.challenge).not.toEqual(data2.options.challenge);
     expect(data1.signedChallenge).not.toEqual(data2.signedChallenge);

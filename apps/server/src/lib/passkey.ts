@@ -8,6 +8,7 @@ import {
   verifyRegistrationResponse,
   type AuthenticatorTransportFuture,
   type PublicKeyCredentialCreationOptionsJSON,
+  type RegistrationResponseJSON,
 } from "@simplewebauthn/server";
 import { z } from "zod";
 
@@ -91,7 +92,7 @@ export async function generatePasskeyChallenge(options: {
  * Extracts and validates the signed challenge, then verifies the WebAuthn response
  */
 export async function verifyPasskeyRegistration(
-  passkeyResponse: any,
+  passkeyResponse: RegistrationResponseJSON,
   signedChallenge: string,
 ): Promise<{
   verified: boolean;
@@ -169,7 +170,7 @@ export async function verifyPasskeyRegistration(
  */
 export async function createPasskeyRecord(
   userId: number,
-  passkeyResponse: any,
+  passkeyResponse: RegistrationResponseJSON,
   credential: {
     publicKey: Uint8Array;
     counter: number;

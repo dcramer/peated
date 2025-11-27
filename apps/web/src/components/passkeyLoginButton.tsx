@@ -1,11 +1,12 @@
 "use client";
 
 import Button from "@peated/web/components/button";
+import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { useMutation } from "@tanstack/react-query";
 import { KeyRound } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 export default function PasskeyLoginButton({
@@ -14,6 +15,7 @@ export default function PasskeyLoginButton({
   action: (formData: FormData) => Promise<any>;
 }) {
   const orpc = useORPC();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
@@ -23,6 +25,16 @@ export default function PasskeyLoginButton({
   );
 
   const handlePasskeyLogin = async () => {
+    // Check for WebAuthn support
+    if (
+      typeof window === "undefined" ||
+      !window.PublicKeyCredential ||
+      typeof window.PublicKeyCredential !== "function"
+    ) {
+      router.push("/browser-not-supported");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -32,7 +44,7 @@ export default function PasskeyLoginButton({
         await authenticateChallengeMutation.mutateAsync({});
 
       // Start WebAuthn authentication
-      const response = await startAuthentication(options);
+      const response = await startAuthentication({ optionsJSON: options });
 
       // Prepare form data for server action
       const formData = new FormData();
@@ -51,7 +63,7 @@ export default function PasskeyLoginButton({
       }
       // If no error, the action will redirect, so we don't need to do anything
     } catch (err: any) {
-      console.error("Passkey authentication error:", err);
+      logError(err, { context: "passkey_authentication" });
 
       // Check if user cancelled the passkey prompt
       if (err.name === "NotAllowedError" || err.message?.includes("cancel")) {

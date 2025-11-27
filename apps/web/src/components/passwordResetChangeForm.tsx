@@ -6,10 +6,12 @@ import {
   passwordResetConfirmForm,
   passwordResetConfirmPasskeyForm,
 } from "@peated/web/lib/auth.actions";
+import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { startRegistration } from "@simplewebauthn/browser";
 import { useMutation } from "@tanstack/react-query";
 import { KeyRound, Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import Alert from "./alert";
@@ -42,6 +44,7 @@ function PasswordFormComponent({ token }: { token: string }) {
 
 export default function PasswordResetChangeForm({ token }: { token: string }) {
   const orpc = useORPC();
+  const router = useRouter();
   const [result, formAction] = useFormState(
     passwordResetConfirmForm,
     undefined,
@@ -59,6 +62,16 @@ export default function PasswordResetChangeForm({ token }: { token: string }) {
   );
 
   const handlePasskeyRecovery = async () => {
+    // Check for WebAuthn support
+    if (
+      typeof window === "undefined" ||
+      !window.PublicKeyCredential ||
+      typeof window.PublicKeyCredential !== "function"
+    ) {
+      router.push("/browser-not-supported");
+      return;
+    }
+
     setPasskeyLoading(true);
     setPasskeyError(null);
 
@@ -69,7 +82,7 @@ export default function PasswordResetChangeForm({ token }: { token: string }) {
       });
 
       // Start WebAuthn registration
-      const response = await startRegistration(options);
+      const response = await startRegistration({ optionsJSON: options });
 
       // Prepare form data for server action
       const formData = new FormData();
@@ -79,7 +92,7 @@ export default function PasswordResetChangeForm({ token }: { token: string }) {
 
       await passkeyFormAction(formData);
     } catch (err: any) {
-      console.error("Passkey recovery error:", err);
+      logError(err, { context: "passkey_recovery" });
 
       // Check if user cancelled the passkey prompt
       if (err.name === "NotAllowedError" || err.message?.includes("cancel")) {

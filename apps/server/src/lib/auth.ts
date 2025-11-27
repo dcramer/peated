@@ -82,8 +82,11 @@ export async function createAccessToken(user: User): Promise<string> {
   return await signPayload(payload);
 }
 
+// OWASP recommends 10+ rounds for bcrypt
+const BCRYPT_ROUNDS = 10;
+
 export function generatePasswordHash(password: string) {
-  return hashSync(password, 8);
+  return hashSync(password, BCRYPT_ROUNDS);
 }
 
 export async function createUser(

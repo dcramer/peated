@@ -15,8 +15,15 @@ export function createRateLimit(options: RateLimitOptions) {
     .$context<Context>()
     .middleware(async ({ context, next, errors }) => {
       // Use user ID for authenticated users, IP for anonymous
-      const identifier =
-        context.user?.id?.toString() || context.ip || "anonymous";
+      const identifier = context.user?.id?.toString() || context.ip;
+
+      // If we can't identify the client, reject the request to prevent rate limit bypass
+      if (!identifier) {
+        throw errors.FORBIDDEN({
+          message: "Unable to process request.",
+        });
+      }
+
       const key = `${keyPrefix}:${identifier}`;
 
       const redis = await getConnection();

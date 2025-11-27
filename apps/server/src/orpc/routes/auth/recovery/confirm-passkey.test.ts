@@ -65,11 +65,14 @@ describe("POST /auth/recovery/passkey/confirm", () => {
       },
     });
 
-    const result = await routerClient.auth.recovery.confirmPasskey({
-      token: "valid-recovery-token",
-      passkeyResponse: mockResponse,
-      signedChallenge: "signed-challenge",
-    });
+    const result = await routerClient.auth.recovery.confirmPasskey(
+      {
+        token: "valid-recovery-token",
+        passkeyResponse: mockResponse,
+        signedChallenge: "signed-challenge",
+      },
+      { context: { ip: "127.0.0.1" } },
+    );
 
     expect(result.user.id).toBe(user.id);
     expect(result.user.verified).toBe(true);
@@ -105,20 +108,23 @@ describe("POST /auth/recovery/passkey/confirm", () => {
     });
 
     const err = await waitError(
-      routerClient.auth.recovery.confirmPasskey({
-        token: "expired-token",
-        passkeyResponse: {
-          id: "test-id",
-          rawId: "test-id",
-          type: "public-key" as const,
-          clientExtensionResults: {},
-          response: {
-            clientDataJSON: "mock-client-data",
-            attestationObject: "mock-attestation",
+      routerClient.auth.recovery.confirmPasskey(
+        {
+          token: "expired-token",
+          passkeyResponse: {
+            id: "test-id",
+            rawId: "test-id",
+            type: "public-key" as const,
+            clientExtensionResults: {},
+            response: {
+              clientDataJSON: "mock-client-data",
+              attestationObject: "mock-attestation",
+            },
           },
+          signedChallenge: "signed-challenge",
         },
-        signedChallenge: "signed-challenge",
-      }),
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Token has expired.]`);
@@ -128,20 +134,23 @@ describe("POST /auth/recovery/passkey/confirm", () => {
     vi.mocked(verifyPayload).mockRejectedValue(new Error("Invalid token"));
 
     const err = await waitError(
-      routerClient.auth.recovery.confirmPasskey({
-        token: "invalid-token",
-        passkeyResponse: {
-          id: "test-id",
-          rawId: "test-id",
-          type: "public-key" as const,
-          clientExtensionResults: {},
-          response: {
-            clientDataJSON: "mock-client-data",
-            attestationObject: "mock-attestation",
+      routerClient.auth.recovery.confirmPasskey(
+        {
+          token: "invalid-token",
+          passkeyResponse: {
+            id: "test-id",
+            rawId: "test-id",
+            type: "public-key" as const,
+            clientExtensionResults: {},
+            response: {
+              clientDataJSON: "mock-client-data",
+              attestationObject: "mock-attestation",
+            },
           },
+          signedChallenge: "signed-challenge",
         },
-        signedChallenge: "signed-challenge",
-      }),
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Invalid verification token.]`);
@@ -156,20 +165,23 @@ describe("POST /auth/recovery/passkey/confirm", () => {
     });
 
     const err = await waitError(
-      routerClient.auth.recovery.confirmPasskey({
-        token: "valid-token",
-        passkeyResponse: {
-          id: "test-id",
-          rawId: "test-id",
-          type: "public-key" as const,
-          clientExtensionResults: {},
-          response: {
-            clientDataJSON: "mock-client-data",
-            attestationObject: "mock-attestation",
+      routerClient.auth.recovery.confirmPasskey(
+        {
+          token: "valid-token",
+          passkeyResponse: {
+            id: "test-id",
+            rawId: "test-id",
+            type: "public-key" as const,
+            clientExtensionResults: {},
+            response: {
+              clientDataJSON: "mock-client-data",
+              attestationObject: "mock-attestation",
+            },
           },
+          signedChallenge: "signed-challenge",
         },
-        signedChallenge: "signed-challenge",
-      }),
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Invalid verification token.]`);
@@ -212,11 +224,14 @@ describe("POST /auth/recovery/passkey/confirm", () => {
     });
 
     const err = await waitError(
-      routerClient.auth.recovery.confirmPasskey({
-        token: "valid-token",
-        passkeyResponse: mockResponse,
-        signedChallenge: "signed-challenge",
-      }),
+      routerClient.auth.recovery.confirmPasskey(
+        {
+          token: "valid-token",
+          passkeyResponse: mockResponse,
+          signedChallenge: "signed-challenge",
+        },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
     expect(err).toMatchInlineSnapshot(

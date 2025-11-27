@@ -57,6 +57,11 @@ import {
   UserSchema,
 } from "./schemas";
 
+// Fail fast if JWT_SECRET is not set in production
+if (config.ENV === "production" && !config.JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable must be set in production");
+}
+
 function getClientIp(req: Request): string | undefined {
   // Check common headers for client IP
   const forwarded = req.headers.get("x-forwarded-for");

@@ -3,15 +3,18 @@
 import Alert from "@peated/web/components/alert";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
+import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { startRegistration } from "@simplewebauthn/browser";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { KeyRound, Pencil, Smartphone, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function PasskeyManager() {
   const orpc = useORPC();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
@@ -38,6 +41,16 @@ export default function PasskeyManager() {
   );
 
   const handleAddPasskey = async () => {
+    // Check for WebAuthn support
+    if (
+      typeof window === "undefined" ||
+      !window.PublicKeyCredential ||
+      typeof window.PublicKeyCredential !== "function"
+    ) {
+      router.push("/browser-not-supported");
+      return;
+    }
+
     setError(null);
     setIsRegistering(true);
 
@@ -47,7 +60,7 @@ export default function PasskeyManager() {
         await registerChallengeMutation.mutateAsync({});
 
       // Start WebAuthn registration
-      const response = await startRegistration(options);
+      const response = await startRegistration({ optionsJSON: options });
 
       // Verify registration with server
       await registerVerifyMutation.mutateAsync({
@@ -61,7 +74,7 @@ export default function PasskeyManager() {
         queryKey: orpc.auth.passkey.list.key({ input: undefined }),
       });
     } catch (err: any) {
-      console.error("Passkey registration error:", err);
+      logError(err, { context: "passkey_add" });
       setError(err.message || "Failed to add passkey. Please try again.");
     } finally {
       setIsRegistering(false);
@@ -69,11 +82,12 @@ export default function PasskeyManager() {
   };
 
   const handleDeletePasskey = async (passkeyId: number) => {
-    if (
-      !confirm(
-        "Are you sure you want to delete this passkey? You won't be able to use it to sign in anymore.",
-      )
-    ) {
+    const isLastPasskey = passkeys?.results?.length === 1;
+    const confirmMessage = isLastPasskey
+      ? "Warning: This is your last passkey. If you don't have a password set, you may lose access to your account. Are you sure you want to delete it?"
+      : "Are you sure you want to delete this passkey? You won't be able to use it to sign in anymore.";
+
+    if (!confirm(confirmMessage)) {
       return;
     }
 
@@ -123,11 +137,7 @@ export default function PasskeyManager() {
 
   return (
     <>
-      {error && (
-        <Alert className="mb-4" type="error">
-          {error}
-        </Alert>
-      )}
+      {error && <Alert type="error">{error}</Alert>}
 
       <div className="space-y-3">
         {isLoading ? (

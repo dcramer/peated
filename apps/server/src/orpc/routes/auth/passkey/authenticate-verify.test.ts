@@ -61,10 +61,13 @@ describe("POST /auth/passkey/authenticate/verify", () => {
       },
     });
 
-    const result = await routerClient.auth.passkey.authenticateVerify({
-      response: mockResponse,
-      signedChallenge: "signed-challenge-token",
-    });
+    const result = await routerClient.auth.passkey.authenticateVerify(
+      {
+        response: mockResponse,
+        signedChallenge: "signed-challenge-token",
+      },
+      { context: { ip: "127.0.0.1" } },
+    );
 
     expect(result.user.id).toBe(user.id);
     expect(result.accessToken).toBeDefined();
@@ -114,10 +117,13 @@ describe("POST /auth/passkey/authenticate/verify", () => {
     });
 
     const err = await waitError(
-      routerClient.auth.passkey.authenticateVerify({
-        response: mockResponse,
-        signedChallenge: "signed-challenge-token",
-      }),
+      routerClient.auth.passkey.authenticateVerify(
+        {
+          response: mockResponse,
+          signedChallenge: "signed-challenge-token",
+        },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
     expect(err).toMatchInlineSnapshot(
@@ -147,13 +153,16 @@ describe("POST /auth/passkey/authenticate/verify", () => {
     vi.mocked(verifyChallenge).mockResolvedValue();
 
     const err = await waitError(
-      routerClient.auth.passkey.authenticateVerify({
-        response: mockResponse,
-        signedChallenge: "signed-challenge-token",
-      }),
+      routerClient.auth.passkey.authenticateVerify(
+        {
+          response: mockResponse,
+          signedChallenge: "signed-challenge-token",
+        },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Passkey not found]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Invalid credentials.]`);
   });
 
   test("rejects inactive user", async ({ fixtures }) => {
@@ -193,10 +202,13 @@ describe("POST /auth/passkey/authenticate/verify", () => {
     });
 
     const err = await waitError(
-      routerClient.auth.passkey.authenticateVerify({
-        response: mockResponse,
-        signedChallenge: "signed-challenge-token",
-      }),
+      routerClient.auth.passkey.authenticateVerify(
+        {
+          response: mockResponse,
+          signedChallenge: "signed-challenge-token",
+        },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Invalid credentials.]`);
@@ -229,10 +241,13 @@ describe("POST /auth/passkey/authenticate/verify", () => {
     );
 
     const err = await waitError(
-      routerClient.auth.passkey.authenticateVerify({
-        response: mockResponse,
-        signedChallenge: "invalid-challenge",
-      }),
+      routerClient.auth.passkey.authenticateVerify(
+        {
+          response: mockResponse,
+          signedChallenge: "invalid-challenge",
+        },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Invalid challenge]`);

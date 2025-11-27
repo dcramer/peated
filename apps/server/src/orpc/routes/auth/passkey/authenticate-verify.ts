@@ -108,7 +108,7 @@ export default procedure
 
     if (!passkey) {
       throw errors.UNAUTHORIZED({
-        message: "Passkey not found",
+        message: "Invalid credentials.",
       });
     }
 
@@ -120,7 +120,7 @@ export default procedure
 
     if (!user) {
       throw errors.UNAUTHORIZED({
-        message: "User not found",
+        message: "Invalid credentials.",
       });
     }
 

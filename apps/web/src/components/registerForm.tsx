@@ -128,7 +128,9 @@ export default function RegisterForm() {
           placeholder="you@example.com"
           autoFocus
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
         />
         <TextField
           className="py-3"
@@ -138,7 +140,9 @@ export default function RegisterForm() {
           required
           placeholder="you99"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setUsername(e.target.value)
+          }
         />
         <label className="relative mb-3 block flex items-start gap-2 px-4 py-3 text-sm">
           <input

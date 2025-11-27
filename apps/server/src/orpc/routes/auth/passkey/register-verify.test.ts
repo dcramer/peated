@@ -22,19 +22,22 @@ describe("POST /auth/passkey/register/verify", () => {
 
   test("requires authentication", async () => {
     const err = await waitError(
-      routerClient.auth.passkey.registerVerify({
-        response: {
-          id: "test-id",
-          rawId: "test-id",
-          type: "public-key" as const,
-          clientExtensionResults: {},
+      routerClient.auth.passkey.registerVerify(
+        {
           response: {
-            clientDataJSON: "mock-client-data",
-            attestationObject: "mock-attestation",
+            id: "test-id",
+            rawId: "test-id",
+            type: "public-key" as const,
+            clientExtensionResults: {},
+            response: {
+              clientDataJSON: "mock-client-data",
+              attestationObject: "mock-attestation",
+            },
           },
+          signedChallenge: "test",
         },
-        signedChallenge: "test",
-      }),
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });

@@ -4,7 +4,10 @@ import { routerClient } from "@peated/server/orpc/router";
 describe("POST /auth/passkey/register/challenge", () => {
   test("requires authentication", async () => {
     const err = await waitError(
-      routerClient.auth.passkey.registerChallenge({}),
+      routerClient.auth.passkey.registerChallenge(
+        {},
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });

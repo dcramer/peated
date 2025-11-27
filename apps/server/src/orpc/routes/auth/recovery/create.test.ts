@@ -18,9 +18,12 @@ describe("POST /auth/password-reset", () => {
   }) => {
     const user = await fixtures.User();
 
-    await routerClient.auth.recovery.create({
-      email: user.email,
-    });
+    await routerClient.auth.recovery.create(
+      {
+        email: user.email,
+      },
+      { context: { ip: "127.0.0.1" } },
+    );
 
     expect(sendPasswordResetEmail).toHaveBeenCalledTimes(1);
     expect(sendPasswordResetEmail).toHaveBeenCalledWith({ user });
@@ -29,13 +32,15 @@ describe("POST /auth/password-reset", () => {
   test("does not leak information for non-existent user", async () => {
     const nonExistentEmail = "nonexistent@example.com";
 
-    const err = await waitError(
-      routerClient.auth.recovery.create({
+    // Should return success even for non-existent users (prevents user enumeration)
+    await routerClient.auth.recovery.create(
+      {
         email: nonExistentEmail,
-      }),
+      },
+      { context: { ip: "127.0.0.1" } },
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Account not found.]`);
+    // Email should not be sent for non-existent user
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
   });
 
@@ -43,9 +48,12 @@ describe("POST /auth/password-reset", () => {
     const invalidEmail = "invalid-email";
 
     const err = await waitError(
-      routerClient.auth.recovery.create({
-        email: invalidEmail,
-      }),
+      routerClient.auth.recovery.create(
+        {
+          email: invalidEmail,
+        },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
