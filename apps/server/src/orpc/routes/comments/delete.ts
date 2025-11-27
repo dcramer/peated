@@ -2,12 +2,16 @@ import { db } from "@peated/server/db";
 import { comments, tastings } from "@peated/server/db/schema";
 import { deleteNotification } from "@peated/server/lib/notifications";
 import { procedure } from "@peated/server/orpc";
-import { requireAuth } from "@peated/server/orpc/middleware";
+import {
+  requireAuth,
+  requireTosAccepted,
+} from "@peated/server/orpc/middleware";
 import { and, eq, gt, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
+  .use(requireTosAccepted)
   .route({
     method: "DELETE",
     path: "/comments/{comment}",

@@ -8,7 +8,10 @@ import {
 } from "@peated/server/db/schema";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { procedure } from "@peated/server/orpc";
-import { requireAuth } from "@peated/server/orpc/middleware/auth";
+import {
+  requireAuth,
+  requireTosAccepted,
+} from "@peated/server/orpc/middleware/auth";
 import { validateTags } from "@peated/server/orpc/validators/tags";
 import { TastingInputSchema, TastingSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -25,6 +28,7 @@ const InputSchema = TastingInputSchema.partial()
 
 export default procedure
   .use(requireAuth)
+  .use(requireTosAccepted)
   .route({
     method: "PATCH",
     path: "/tastings/{tasting}",

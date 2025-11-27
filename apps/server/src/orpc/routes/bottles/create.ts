@@ -17,7 +17,10 @@ import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { ConflictError } from "@peated/server/orpc/errors";
-import { requireVerified } from "@peated/server/orpc/middleware/auth";
+import {
+  requireTosAccepted,
+  requireVerified,
+} from "@peated/server/orpc/middleware/auth";
 // TODO: we should probably move this code?
 import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
 import { BottleInputSchema, BottleSchema } from "@peated/server/schemas";
@@ -29,6 +32,7 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 
 export default procedure
   .use(requireVerified)
+  .use(requireTosAccepted)
   .route({
     method: "POST",
     path: "/bottles",

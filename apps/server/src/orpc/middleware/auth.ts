@@ -57,3 +57,23 @@ export const requireMod = base
       },
     });
   });
+
+export const requireTosAccepted = base
+  .$context<Context>()
+  .middleware(({ context, next, errors }) => {
+    // Explicit auth check for safety (this middleware should always be used with requireAuth)
+    if (!context.user) {
+      throw errors.UNAUTHORIZED();
+    }
+    if (!context.user.termsAcceptedAt) {
+      throw errors.FORBIDDEN({
+        message: "You must accept the Terms of Service to perform this action.",
+      });
+    }
+    return next({
+      context: {
+        ...context,
+        user: context.user,
+      },
+    });
+  });

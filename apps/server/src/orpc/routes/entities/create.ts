@@ -11,7 +11,10 @@ import { logError } from "@peated/server/lib/log";
 import { normalizeEntityName } from "@peated/server/lib/normalize";
 import { buildEntitySearchVector } from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
-import { requireVerified } from "@peated/server/orpc/middleware/auth";
+import {
+  requireTosAccepted,
+  requireVerified,
+} from "@peated/server/orpc/middleware/auth";
 import { EntityInputSchema, EntitySchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
@@ -20,6 +23,7 @@ import { eq } from "drizzle-orm";
 
 export default procedure
   .use(requireVerified)
+  .use(requireTosAccepted)
   .route({
     method: "POST",
     path: "/entities",

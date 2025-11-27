@@ -8,7 +8,10 @@ import { comments, tastings } from "@peated/server/db/schema";
 import { logError } from "@peated/server/lib/log";
 import { createNotification } from "@peated/server/lib/notifications";
 import { procedure } from "@peated/server/orpc";
-import { requireAuth } from "@peated/server/orpc/middleware";
+import {
+  requireAuth,
+  requireTosAccepted,
+} from "@peated/server/orpc/middleware";
 import { CommentInputSchema, CommentSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CommentSerializer } from "@peated/server/serializers/comment";
@@ -18,6 +21,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
+  .use(requireTosAccepted)
   .route({
     method: "POST",
     path: "/tastings/{tasting}/comments",

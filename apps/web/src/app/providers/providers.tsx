@@ -11,7 +11,6 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { setUser } from "@sentry/nextjs";
 import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
 import { useInterval } from "usehooks-ts";
-import TermsGate from "./termsGate";
 
 export default function Providers({
   children,
@@ -44,9 +43,7 @@ export default function Providers({
         <ReactQueryStreamedHydration>
           <OnlineStatusProvider>
             <AuthProvider user={user}>
-              <TermsGate>
-                <FlashMessages>{children}</FlashMessages>
-              </TermsGate>
+              <FlashMessages>{children}</FlashMessages>
             </AuthProvider>
           </OnlineStatusProvider>
         </ReactQueryStreamedHydration>

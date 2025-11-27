@@ -15,7 +15,10 @@ import { awardAllBadgeXp } from "@peated/server/lib/badges";
 import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
-import { requireAuth } from "@peated/server/orpc/middleware/auth";
+import {
+  requireAuth,
+  requireTosAccepted,
+} from "@peated/server/orpc/middleware/auth";
 import { validateTags } from "@peated/server/orpc/validators/tags";
 import {
   BadgeAwardSchema,
@@ -32,6 +35,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
+  .use(requireTosAccepted)
   .route({
     method: "POST",
     path: "/tastings",
