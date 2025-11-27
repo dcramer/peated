@@ -3,7 +3,10 @@ import type { NewFlight } from "@peated/server/db/schema";
 import { flightBottles, flights } from "@peated/server/db/schema";
 import { generatePublicId } from "@peated/server/lib/publicId";
 import { procedure } from "@peated/server/orpc";
-import { requireAuth } from "@peated/server/orpc/middleware";
+import {
+  requireAuth,
+  requireTosAccepted,
+} from "@peated/server/orpc/middleware";
 import { FlightInputSchema, FlightSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { FlightSerializer } from "@peated/server/serializers/flight";
@@ -18,6 +21,7 @@ export default procedure
     operationId: "createFlight",
   })
   .use(requireAuth)
+  .use(requireTosAccepted)
   .input(FlightInputSchema)
   .output(FlightSchema)
   .handler(async function ({ input, context, errors }) {

@@ -1,7 +1,10 @@
 import { db } from "@peated/server/db";
 import { notifications } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { requireAuth } from "@peated/server/orpc/middleware";
+import {
+  requireAuth,
+  requireTosAccepted,
+} from "@peated/server/orpc/middleware";
 import {
   NotificationInputSchema,
   NotificationSchema,
@@ -13,6 +16,7 @@ import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
+  .use(requireTosAccepted)
   .route({
     method: "PATCH",
     path: "/notifications/{notification}",

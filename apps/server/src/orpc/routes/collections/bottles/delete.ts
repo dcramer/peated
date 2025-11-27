@@ -3,13 +3,17 @@ import { collectionBottles, collections } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import { getDefaultCollection } from "@peated/server/lib/db";
 import { procedure } from "@peated/server/orpc";
-import { requireAuth } from "@peated/server/orpc/middleware";
+import {
+  requireAuth,
+  requireTosAccepted,
+} from "@peated/server/orpc/middleware";
 import { CollectionBottleInputSchema } from "@peated/server/schemas";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
+  .use(requireTosAccepted)
   .route({
     method: "DELETE",
     path: "/users/{user}/collections/{collection}/bottles",

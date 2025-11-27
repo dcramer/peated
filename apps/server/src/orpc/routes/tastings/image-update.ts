@@ -6,13 +6,17 @@ import { humanizeBytes } from "@peated/server/lib/strings";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { procedure } from "@peated/server/orpc";
-import { requireAuth } from "@peated/server/orpc/middleware";
+import {
+  requireAuth,
+  requireTosAccepted,
+} from "@peated/server/orpc/middleware";
 import { eq } from "drizzle-orm";
 import { Readable } from "node:stream";
 import { z } from "zod";
 
 export default procedure
   .use(requireAuth)
+  .use(requireTosAccepted)
   .route({
     method: "POST",
     path: "/tastings/{tasting}/image",

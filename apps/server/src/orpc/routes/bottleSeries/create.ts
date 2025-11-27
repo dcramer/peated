@@ -2,7 +2,10 @@ import { db } from "@peated/server/db";
 import { bottleSeries, changes, entities } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { ConflictError } from "@peated/server/orpc/errors";
-import { requireAuth } from "@peated/server/orpc/middleware/auth";
+import {
+  requireAuth,
+  requireTosAccepted,
+} from "@peated/server/orpc/middleware/auth";
 import {
   BottleSeriesInputSchema,
   BottleSeriesSchema,
@@ -13,6 +16,8 @@ import { pushJob } from "@peated/server/worker/client";
 import { eq, sql } from "drizzle-orm";
 
 export default procedure
+  .use(requireAuth)
+  .use(requireTosAccepted)
   .route({
     method: "POST",
     path: "/bottle-series",
@@ -21,7 +26,6 @@ export default procedure
       "Create a new bottle series for a brand with name and description",
     operationId: "createBottleSeries",
   })
-  .use(requireAuth)
   .input(BottleSeriesInputSchema)
   .output(BottleSeriesSchema)
   .handler(async function ({ input, context, errors }) {
