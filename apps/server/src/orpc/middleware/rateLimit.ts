@@ -44,8 +44,8 @@ export function createRateLimit(options: RateLimitOptions) {
 
 // Preset rate limiters for auth endpoints
 export const authRateLimit = createRateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 5, // 5 attempts per 15 minutes
+  windowMs: 60 * 60 * 1000, // 60 minutes
+  maxRequests: 15, // 15 attempts per hour
   keyPrefix: "auth",
 });
 

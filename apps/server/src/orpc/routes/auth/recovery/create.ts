@@ -34,25 +34,18 @@ export default procedure
         .select()
         .from(users)
         .where(eq(sql`LOWER(${users.email})`, input.email.toLowerCase()));
-      if (!user) {
-        throw errors.NOT_FOUND({
-          message: "Account not found.",
+
+      // Only send email if user exists and is active
+      // Always return success to prevent user enumeration
+      if (user && user.active) {
+        await sendPasswordResetEmail({ user });
+
+        auditLog({
+          event: AuditEvent.RECOVERY_REQUESTED,
+          userId: user.id,
+          metadata: { email: input.email },
         });
       }
-
-      if (!user.active) {
-        throw errors.NOT_FOUND({
-          message: "Account not found.",
-        });
-      }
-
-      await sendPasswordResetEmail({ user });
-
-      auditLog({
-        event: AuditEvent.RECOVERY_REQUESTED,
-        userId: user.id,
-        metadata: { email: input.email },
-      });
 
       return {};
     } catch (error) {
@@ -67,8 +60,7 @@ export default procedure
         },
       });
 
-      throw errors.INTERNAL_SERVER_ERROR({
-        message: "Failed to send password reset email.",
-      });
+      // Still return success to prevent user enumeration via timing attacks
+      return {};
     }
   });

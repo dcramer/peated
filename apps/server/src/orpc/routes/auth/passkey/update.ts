@@ -26,6 +26,10 @@ export default procedure
         .trim()
         .min(1, "Nickname must not be empty")
         .max(100, "Nickname must be 100 characters or less")
+        .regex(
+          /^[^<>]*$/,
+          "Nickname cannot contain HTML tags or script content",
+        )
         .nullish(),
     }),
   )

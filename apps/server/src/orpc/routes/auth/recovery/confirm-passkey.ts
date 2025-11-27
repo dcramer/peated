@@ -12,14 +12,13 @@ import {
   createPasskeyRecord,
   verifyPasskeyRegistration,
 } from "@peated/server/lib/passkey";
-import { random } from "@peated/server/lib/rand";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit } from "@peated/server/orpc/middleware";
 import { AuthSchema, PasswordResetSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import type { RegistrationResponseJSON } from "@simplewebauthn/server";
-import { createHash, timingSafeEqual } from "crypto";
+import { createHash, randomBytes, timingSafeEqual } from "crypto";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -131,14 +130,14 @@ export default procedure
           );
 
           // Mark user as verified and invalidate the recovery token
-          // Set passwordHash to a random value to ensure token digest changes
+          // Set passwordHash to a crypto-secure random value to ensure token digest changes
           // This prevents token reuse even if user had no password before
           const [updated] = await tx
             .update(users)
             .set({
               verified: true,
               passwordHash: generatePasswordHash(
-                `INVALIDATED_${random(1000000, 9999999)}`,
+                `INVALIDATED_${randomBytes(32).toString("hex")}`,
               ),
             })
             .where(eq(users.id, user.id))

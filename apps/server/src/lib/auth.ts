@@ -188,8 +188,8 @@ export async function verifyChallenge(
     throw new Error("Challenge does not match");
   }
 
-  // Verify challenge is recent (within 5 minutes)
-  const CHALLENGE_TTL = 5 * 60 * 1000; // 5 minutes
+  // Verify challenge is recent (within 10 minutes)
+  const CHALLENGE_TTL = 10 * 60 * 1000; // 10 minutes
   const createdAt = new Date(payload.createdAt).getTime();
   const now = new Date().getTime();
   if (now - createdAt > CHALLENGE_TTL) {

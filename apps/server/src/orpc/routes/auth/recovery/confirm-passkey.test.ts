@@ -40,6 +40,9 @@ describe("POST /auth/recovery/passkey/confirm", () => {
 
     const mockResponse = {
       id: "recovery-credential-id",
+      rawId: "recovery-credential-id",
+      type: "public-key" as const,
+      clientExtensionResults: {},
       response: {
         clientDataJSON: "mock-client-data",
         attestationObject: "mock-attestation",
@@ -104,7 +107,16 @@ describe("POST /auth/recovery/passkey/confirm", () => {
     const err = await waitError(
       routerClient.auth.recovery.confirmPasskey({
         token: "expired-token",
-        passkeyResponse: {},
+        passkeyResponse: {
+          id: "test-id",
+          rawId: "test-id",
+          type: "public-key" as const,
+          clientExtensionResults: {},
+          response: {
+            clientDataJSON: "mock-client-data",
+            attestationObject: "mock-attestation",
+          },
+        },
         signedChallenge: "signed-challenge",
       }),
     );
@@ -118,7 +130,16 @@ describe("POST /auth/recovery/passkey/confirm", () => {
     const err = await waitError(
       routerClient.auth.recovery.confirmPasskey({
         token: "invalid-token",
-        passkeyResponse: {},
+        passkeyResponse: {
+          id: "test-id",
+          rawId: "test-id",
+          type: "public-key" as const,
+          clientExtensionResults: {},
+          response: {
+            clientDataJSON: "mock-client-data",
+            attestationObject: "mock-attestation",
+          },
+        },
         signedChallenge: "signed-challenge",
       }),
     );
@@ -137,7 +158,16 @@ describe("POST /auth/recovery/passkey/confirm", () => {
     const err = await waitError(
       routerClient.auth.recovery.confirmPasskey({
         token: "valid-token",
-        passkeyResponse: {},
+        passkeyResponse: {
+          id: "test-id",
+          rawId: "test-id",
+          type: "public-key" as const,
+          clientExtensionResults: {},
+          response: {
+            clientDataJSON: "mock-client-data",
+            attestationObject: "mock-attestation",
+          },
+        },
         signedChallenge: "signed-challenge",
       }),
     );
@@ -156,6 +186,9 @@ describe("POST /auth/recovery/passkey/confirm", () => {
 
     const mockResponse = {
       id: existingPasskey.credentialId,
+      rawId: existingPasskey.credentialId,
+      type: "public-key" as const,
+      clientExtensionResults: {},
       response: {
         clientDataJSON: "mock-client-data",
         attestationObject: "mock-attestation",

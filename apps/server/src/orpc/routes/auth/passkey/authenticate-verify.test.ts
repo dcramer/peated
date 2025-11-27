@@ -31,6 +31,9 @@ describe("POST /auth/passkey/authenticate/verify", () => {
 
     const mockResponse = {
       id: passkey.credentialId,
+      rawId: passkey.credentialId,
+      type: "public-key" as const,
+      clientExtensionResults: {},
       response: {
         clientDataJSON: Buffer.from(
           JSON.stringify({
@@ -80,6 +83,9 @@ describe("POST /auth/passkey/authenticate/verify", () => {
 
     const mockResponse = {
       id: passkey.credentialId,
+      rawId: passkey.credentialId,
+      type: "public-key" as const,
+      clientExtensionResults: {},
       response: {
         clientDataJSON: Buffer.from(
           JSON.stringify({
@@ -122,6 +128,9 @@ describe("POST /auth/passkey/authenticate/verify", () => {
   test("rejects passkey not found", async ({ fixtures }) => {
     const mockResponse = {
       id: "non-existent-credential",
+      rawId: "non-existent-credential",
+      type: "public-key" as const,
+      clientExtensionResults: {},
       response: {
         clientDataJSON: Buffer.from(
           JSON.stringify({
@@ -153,6 +162,9 @@ describe("POST /auth/passkey/authenticate/verify", () => {
 
     const mockResponse = {
       id: passkey.credentialId,
+      rawId: passkey.credentialId,
+      type: "public-key" as const,
+      clientExtensionResults: {},
       response: {
         clientDataJSON: Buffer.from(
           JSON.stringify({
@@ -196,6 +208,9 @@ describe("POST /auth/passkey/authenticate/verify", () => {
 
     const mockResponse = {
       id: passkey.credentialId,
+      rawId: passkey.credentialId,
+      type: "public-key" as const,
+      clientExtensionResults: {},
       response: {
         clientDataJSON: Buffer.from(
           JSON.stringify({
@@ -204,6 +219,8 @@ describe("POST /auth/passkey/authenticate/verify", () => {
             origin: "http://localhost:3000",
           }),
         ).toString("base64") as any,
+        authenticatorData: "mock-auth-data",
+        signature: "mock-signature",
       },
     };
 

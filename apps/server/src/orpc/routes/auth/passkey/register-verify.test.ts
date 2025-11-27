@@ -23,7 +23,16 @@ describe("POST /auth/passkey/register/verify", () => {
   test("requires authentication", async () => {
     const err = await waitError(
       routerClient.auth.passkey.registerVerify({
-        response: {},
+        response: {
+          id: "test-id",
+          rawId: "test-id",
+          type: "public-key" as const,
+          clientExtensionResults: {},
+          response: {
+            clientDataJSON: "mock-client-data",
+            attestationObject: "mock-attestation",
+          },
+        },
         signedChallenge: "test",
       }),
     );
@@ -35,6 +44,9 @@ describe("POST /auth/passkey/register/verify", () => {
 
     const mockResponse = {
       id: "new-credential-id",
+      rawId: "new-credential-id",
+      type: "public-key" as const,
+      clientExtensionResults: {},
       response: {
         clientDataJSON: "mock-client-data",
         attestationObject: "mock-attestation",
@@ -77,6 +89,9 @@ describe("POST /auth/passkey/register/verify", () => {
 
     const mockResponse = {
       id: "new-credential-id-2",
+      rawId: "new-credential-id-2",
+      type: "public-key" as const,
+      clientExtensionResults: {},
       response: {
         clientDataJSON: "mock-client-data",
         attestationObject: "mock-attestation",
@@ -116,6 +131,9 @@ describe("POST /auth/passkey/register/verify", () => {
 
     const mockResponse = {
       id: existingPasskey.credentialId,
+      rawId: existingPasskey.credentialId,
+      type: "public-key" as const,
+      clientExtensionResults: {},
       response: {
         clientDataJSON: "mock-client-data",
         attestationObject: "mock-attestation",
@@ -151,6 +169,9 @@ describe("POST /auth/passkey/register/verify", () => {
 
     const mockResponse = {
       id: "new-credential-id",
+      rawId: "new-credential-id",
+      type: "public-key" as const,
+      clientExtensionResults: {},
       response: {
         clientDataJSON: "mock-client-data",
         attestationObject: "mock-attestation",
