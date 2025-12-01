@@ -46,8 +46,11 @@ describe("PUT /tastings/:tasting", () => {
   });
 
   test("updates rating", async ({ defaults, fixtures }) => {
+    // Use rating: 2 to ensure the update to rating: 1 actually triggers a change
+    // This avoids flakiness when the fixture randomly picks the same rating
     const tasting = await fixtures.Tasting({
       createdById: defaults.user.id,
+      rating: 2,
     });
 
     const data = await routerClient.tastings.update(
