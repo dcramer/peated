@@ -4,7 +4,7 @@ import { routerClient } from "@peated/server/orpc/router";
 describe("GET /reviews", () => {
   test("lists reviews", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
-    const site = await fixtures.ExternalSite();
+    const site = await fixtures.ExternalSiteOrExisting();
     await fixtures.Review({ externalSiteId: site.id });
     await fixtures.Review({ externalSiteId: site.id });
 
@@ -29,8 +29,12 @@ describe("GET /reviews", () => {
 
   test("lists reviews by site", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
-    const astorwine = await fixtures.ExternalSite({ type: "astorwines" });
-    const totalwine = await fixtures.ExternalSite({ type: "totalwine" });
+    const astorwine = await fixtures.ExternalSiteOrExisting({
+      type: "astorwines",
+    });
+    const totalwine = await fixtures.ExternalSiteOrExisting({
+      type: "totalwine",
+    });
 
     const review = await fixtures.Review({ externalSiteId: astorwine.id });
     await fixtures.Review({ externalSiteId: totalwine.id });
@@ -48,7 +52,7 @@ describe("GET /reviews", () => {
 
   test("errors on site without mod", async ({ fixtures }) => {
     const user = await fixtures.User();
-    const site = await fixtures.ExternalSite();
+    const site = await fixtures.ExternalSiteOrExisting();
 
     const err = await waitError(
       routerClient.reviews.list(

@@ -6,7 +6,9 @@ vi.mock("@peated/server/worker/client");
 
 describe("POST /external-sites/:site/trigger", () => {
   test("requires admin", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    const site = await fixtures.ExternalSiteOrExisting({
+      type: "whiskyadvocate",
+    });
     const modUser = await fixtures.User({ mod: true });
 
     const err = await waitError(
@@ -19,7 +21,9 @@ describe("POST /external-sites/:site/trigger", () => {
   });
 
   test("triggers job", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    const site = await fixtures.ExternalSiteOrExisting({
+      type: "whiskyadvocate",
+    });
     const adminUser = await fixtures.User({ admin: true });
 
     const result = await routerClient.externalSites.triggerJob(

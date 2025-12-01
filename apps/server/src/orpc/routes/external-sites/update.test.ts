@@ -3,7 +3,7 @@ import { routerClient } from "@peated/server/orpc/router";
 
 describe("PATCH /external-sites/:site", () => {
   test("requires admin", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite();
+    const site = await fixtures.ExternalSiteOrExisting();
     const modUser = await fixtures.User({ mod: true });
 
     const err = await waitError(
@@ -18,7 +18,7 @@ describe("PATCH /external-sites/:site", () => {
   });
 
   test("updates site", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite({
+    const site = await fixtures.ExternalSiteOrExisting({
       type: "healthyspirits",
     });
     const adminUser = await fixtures.User({ admin: true });

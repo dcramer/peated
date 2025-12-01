@@ -6,7 +6,7 @@ import { describe, expect, test } from "vitest";
 
 describe("GET /external-sites/:site/config/:key", () => {
   test("requires admin", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite();
+    const site = await fixtures.ExternalSiteOrExisting();
     const user = await fixtures.User({ mod: true });
 
     const err = await waitError(() =>
@@ -22,7 +22,7 @@ describe("GET /external-sites/:site/config/:key", () => {
   });
 
   test("get missing value", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite();
+    const site = await fixtures.ExternalSiteOrExisting();
     const user = await fixtures.User({ admin: true });
 
     const data = await routerClient.externalSites.config.get(
@@ -36,7 +36,7 @@ describe("GET /external-sites/:site/config/:key", () => {
   });
 
   test("get missing value with default", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite();
+    const site = await fixtures.ExternalSiteOrExisting();
     const user = await fixtures.User({ admin: true });
 
     const data = await routerClient.externalSites.config.get(
@@ -51,7 +51,7 @@ describe("GET /external-sites/:site/config/:key", () => {
   });
 
   test("get present value", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite();
+    const site = await fixtures.ExternalSiteOrExisting();
     await db.insert(externalSiteConfig).values({
       externalSiteId: site.id,
       key: "test",

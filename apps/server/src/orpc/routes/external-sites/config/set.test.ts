@@ -18,7 +18,7 @@ describe("PUT /external-sites/:site/config/:key", () => {
   });
 
   test("requires admin", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite();
+    const site = await fixtures.ExternalSiteOrExisting();
     const user = await fixtures.User({ mod: true });
 
     const err = await waitError(() =>
@@ -51,7 +51,7 @@ describe("PUT /external-sites/:site/config/:key", () => {
   });
 
   test("set new value", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite();
+    const site = await fixtures.ExternalSiteOrExisting();
     const user = await fixtures.User({ admin: true });
 
     await routerClient.externalSites.config.set(
@@ -73,7 +73,7 @@ describe("PUT /external-sites/:site/config/:key", () => {
   });
 
   test("update existing value", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite();
+    const site = await fixtures.ExternalSiteOrExisting();
     await db.insert(externalSiteConfig).values({
       externalSiteId: site.id,
       key: "test",
