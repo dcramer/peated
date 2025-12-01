@@ -16,9 +16,12 @@ describe("POST /auth/magic-link", () => {
   test("sends magic link for active user", async ({ fixtures }) => {
     const user = await fixtures.User({ active: true });
 
-    const result = await routerClient.auth.magicLink.create({
-      email: user.email,
-    });
+    const result = await routerClient.auth.magicLink.create(
+      {
+        email: user.email,
+      },
+      { context: { ip: "127.0.0.1" } },
+    );
 
     expect(result).toEqual({});
     expect(sendMagicLinkEmail).toHaveBeenCalledWith({ user });
@@ -26,9 +29,12 @@ describe("POST /auth/magic-link", () => {
 
   test("throws error when user is not found", async ({ fixtures }) => {
     const error = await waitError(
-      routerClient.auth.magicLink.create({
-        email: "nonexistent@example.com",
-      }),
+      routerClient.auth.magicLink.create(
+        {
+          email: "nonexistent@example.com",
+        },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
     expect(error).toMatchInlineSnapshot(`[Error: Account not found.]`);
@@ -38,9 +44,12 @@ describe("POST /auth/magic-link", () => {
     const user = await fixtures.User({ active: false });
 
     const error = await waitError(
-      routerClient.auth.magicLink.create({
-        email: user.email,
-      }),
+      routerClient.auth.magicLink.create(
+        {
+          email: user.email,
+        },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
     expect(error).toMatchInlineSnapshot(`[Error: Account not found.]`);
@@ -52,9 +61,12 @@ describe("POST /auth/magic-link", () => {
       email: "User@Example.com",
     });
 
-    const result = await routerClient.auth.magicLink.create({
-      email: "uSER@eXAMPLE.COM",
-    });
+    const result = await routerClient.auth.magicLink.create(
+      {
+        email: "uSER@eXAMPLE.COM",
+      },
+      { context: { ip: "127.0.0.1" } },
+    );
 
     expect(result).toEqual({});
     expect(sendMagicLinkEmail).toHaveBeenCalledWith({ user });

@@ -8,10 +8,13 @@ describe("POST /auth/login", () => {
       password: "example",
     });
 
-    const data = await routerClient.auth.login({
-      email: "foo@example.com",
-      password: "example",
-    });
+    const data = await routerClient.auth.login(
+      {
+        email: "foo@example.com",
+        password: "example",
+      },
+      { context: { ip: "127.0.0.1" } },
+    );
 
     expect(data.user.id).toEqual(user.id);
     expect(data.accessToken).toBeDefined();
@@ -24,10 +27,13 @@ describe("POST /auth/login", () => {
     });
 
     const err = await waitError(
-      routerClient.auth.login({
-        email: "foo@example.com",
-        password: "example2",
-      }),
+      routerClient.auth.login(
+        {
+          email: "foo@example.com",
+          password: "example2",
+        },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Invalid credentials.]`);
   });

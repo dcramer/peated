@@ -170,14 +170,20 @@ beforeEach(async (ctx) => {
   await clearTables();
 
   // Clear rate limit keys from Redis
-  const oJobs = await import("../worker/client");
-  const redis = await oJobs.getConnection();
-  const rateLimitPrefixes = ["rl:*", "auth:*", "auth-strict:*"];
-  for (const prefix of rateLimitPrefixes) {
-    const keys = await redis.keys(prefix);
-    if (keys.length > 0) {
-      await redis.del(...keys);
+  try {
+    const oJobs = await import("../worker/client");
+    const redis = await oJobs.getConnection();
+    if (redis) {
+      const rateLimitPrefixes = ["rl:*", "auth:*", "auth-strict:*"];
+      for (const prefix of rateLimitPrefixes) {
+        const keys = await redis.keys(prefix);
+        if (keys.length > 0) {
+          await redis.del(...keys);
+        }
+      }
     }
+  } catch {
+    // Redis not available in test environment - continue without clearing rate limits
   }
 
   const user = await createDefaultUser();
