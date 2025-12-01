@@ -107,8 +107,10 @@ export default procedure
       .where(eq(passkeys.credentialId, credentialId));
 
     if (!passkey) {
-      throw errors.UNAUTHORIZED({
-        message: "Invalid credentials.",
+      throw new ORPCError("NOT_FOUND", {
+        message:
+          "No account found for this passkey. The passkey may have been registered with a different account, or the account may have been deleted.",
+        data: { code: "PASSKEY_NOT_FOUND" },
       });
     }
 
@@ -159,15 +161,23 @@ export default procedure
     }
 
     // Validate counter to prevent replay attacks
-    // The new counter should always be greater than the stored counter
-    if (authenticationInfo.newCounter <= passkey.counter) {
+    // Some authenticators (especially platform/synced passkeys) don't support counters
+    // and always return 0. We only validate when both counters are meaningful.
+    const storedCounter = Number(passkey.counter);
+    const newCounter = authenticationInfo.newCounter;
+
+    // Skip counter validation if authenticator doesn't support counters (returns 0)
+    // or if this is the first use of a passkey that was registered with counter 0
+    const shouldValidateCounter = newCounter > 0 || storedCounter > 0;
+
+    if (shouldValidateCounter && newCounter <= storedCounter) {
       auditLog({
         event: AuditEvent.REPLAY_ATTACK_DETECTED,
         userId: user.id,
         metadata: {
           passkeyId: passkey.id,
-          oldCounter: passkey.counter,
-          newCounter: authenticationInfo.newCounter,
+          oldCounter: storedCounter,
+          newCounter: newCounter,
         },
       });
       throw errors.UNAUTHORIZED({
@@ -176,23 +186,25 @@ export default procedure
       });
     }
 
-    // Update the counter and last used time atomically
-    // Also re-check the counter in the WHERE clause to prevent race conditions
+    // Update the counter and last used time
+    // For authenticators without counter support (counter=0), we still update lastUsedAt
+    const updateCondition = shouldValidateCounter
+      ? and(
+          eq(passkeys.id, passkey.id),
+          sql`${passkeys.counter} < ${newCounter}`,
+        )
+      : eq(passkeys.id, passkey.id);
+
     const [updated] = await db
       .update(passkeys)
       .set({
-        counter: authenticationInfo.newCounter,
+        counter: newCounter,
         lastUsedAt: sql`NOW()` as unknown as Date,
       })
-      .where(
-        and(
-          eq(passkeys.id, passkey.id),
-          sql`${passkeys.counter} < ${authenticationInfo.newCounter}`,
-        ),
-      )
+      .where(updateCondition)
       .returning();
 
-    if (!updated) {
+    if (!updated && shouldValidateCounter) {
       // Counter was updated by another request between our check and update
       auditLog({
         event: AuditEvent.REPLAY_ATTACK_DETECTED,

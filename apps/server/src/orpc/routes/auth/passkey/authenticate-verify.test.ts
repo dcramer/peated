@@ -162,7 +162,9 @@ describe("POST /auth/passkey/authenticate/verify", () => {
       ),
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Invalid credentials.]`);
+    expect(err).toMatchInlineSnapshot(
+      `[Error: No account found for this passkey. The passkey may have been registered with a different account, or the account may have been deleted.]`,
+    );
   });
 
   test("rejects inactive user", async ({ fixtures }) => {

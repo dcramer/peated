@@ -1,13 +1,16 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
-import { users } from "@peated/server/db/schema";
+import { passkeys, users } from "@peated/server/db/schema";
 import { verifyPayload } from "@peated/server/lib/auth";
 import { logError } from "@peated/server/lib/log";
 import { generatePasskeyChallenge } from "@peated/server/lib/passkey";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit } from "@peated/server/orpc/middleware";
 import { PasswordResetSchema } from "@peated/server/schemas";
-import type { PublicKeyCredentialCreationOptionsJSON } from "@simplewebauthn/server";
+import type {
+  AuthenticatorTransportFuture,
+  PublicKeyCredentialCreationOptionsJSON,
+} from "@simplewebauthn/server";
 import { createHash, timingSafeEqual } from "crypto";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -90,10 +93,23 @@ export default procedure
         });
       }
 
+      // Get existing passkeys for this user to exclude them
+      // This prevents the browser from showing already-registered passkeys
+      const existingPasskeys = await db
+        .select()
+        .from(passkeys)
+        .where(eq(passkeys.userId, user.id));
+
       // Generate WebAuthn registration options
       return await generatePasskeyChallenge({
         username: user.username,
         userID: user.id,
+        excludeCredentials: existingPasskeys.map((passkey) => ({
+          id: passkey.credentialId,
+          transports: passkey.transports as
+            | AuthenticatorTransportFuture[]
+            | null,
+        })),
       });
     } catch (error) {
       if (error instanceof ORPCError) {
