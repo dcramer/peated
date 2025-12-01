@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 
 describe("GET /external-sites/:site", () => {
   test("get site by type", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite();
+    const site = await fixtures.ExternalSiteOrExisting();
 
     const data = await routerClient.externalSites.details({
       site: site.type,

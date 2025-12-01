@@ -38,7 +38,7 @@ describe("POST /external-sites/:site/prices", () => {
   });
 
   test("processes new price", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite({ type: "totalwine" });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const bottle = await fixtures.Bottle({
       name: "10-year-old",
       brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
@@ -76,7 +76,7 @@ describe("POST /external-sites/:site/prices", () => {
   });
 
   test("processes existing price", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite({ type: "totalwine" });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const bottle = await fixtures.Bottle({
       name: "10-year-old",
       brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
@@ -120,7 +120,7 @@ describe("POST /external-sites/:site/prices", () => {
   });
 
   test("processes new price without bottle", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite({ type: "totalwine" });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const user = await fixtures.User({ admin: true });
 
     await routerClient.prices.createBatch(
@@ -151,7 +151,7 @@ describe("POST /external-sites/:site/prices", () => {
   });
 
   test("does not unset bottle for existing price", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite({ type: "totalwine" });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const bottle = await fixtures.Bottle({
       name: "10-year-old",
       brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,

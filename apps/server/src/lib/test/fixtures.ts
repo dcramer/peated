@@ -671,7 +671,7 @@ export const StorePrice = async (
     if (!data.url) data.url = faker.internet.url();
 
     if (!data.externalSiteId)
-      data.externalSiteId = (await ExternalSite({}, tx)).id;
+      data.externalSiteId = (await ExternalSiteOrExisting({}, tx)).id;
 
     if (!data.volume) data.volume = 750;
 

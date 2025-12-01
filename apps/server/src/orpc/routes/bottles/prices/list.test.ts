@@ -5,7 +5,7 @@ describe("GET /bottles/:bottle/prices", () => {
     const bottle = await fixtures.Bottle();
     const recentPrice = await fixtures.StorePrice({
       externalSiteId: (
-        await fixtures.ExternalSite({
+        await fixtures.ExternalSiteOrExisting({
           type: "astorwines",
         })
       ).id,
@@ -13,7 +13,7 @@ describe("GET /bottles/:bottle/prices", () => {
     });
     const oldPrice = await fixtures.StorePrice({
       externalSiteId: (
-        await fixtures.ExternalSite({
+        await fixtures.ExternalSiteOrExisting({
           type: "totalwine",
         })
       ).id,
@@ -36,7 +36,7 @@ describe("GET /bottles/:bottle/prices", () => {
     const bottle = await fixtures.Bottle();
     const recentPrice = await fixtures.StorePrice({
       externalSiteId: (
-        await fixtures.ExternalSite({
+        await fixtures.ExternalSiteOrExisting({
           type: "astorwines",
         })
       ).id,
@@ -44,7 +44,7 @@ describe("GET /bottles/:bottle/prices", () => {
     });
     const oldPrice = await fixtures.StorePrice({
       externalSiteId: (
-        await fixtures.ExternalSite({
+        await fixtures.ExternalSiteOrExisting({
           type: "totalwine",
         })
       ).id,
