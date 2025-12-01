@@ -205,7 +205,7 @@ export async function register(formData: FormData) {
 
     session.user = data.user;
     session.accessToken = data.accessToken ?? null;
-    session.ts = new Date().getTime();
+    session.ts = Math.floor(Date.now() / 1000);
 
     await session.save();
 
@@ -230,7 +230,7 @@ export async function register(formData: FormData) {
 
   session.user = data.user;
   session.accessToken = data.accessToken ?? null;
-  session.ts = new Date().getTime();
+  session.ts = Math.floor(Date.now() / 1000);
 
   await session.save();
 
@@ -352,7 +352,7 @@ export async function passwordResetConfirmForm(
 
   session.user = data.user;
   session.accessToken = data.accessToken ?? null;
-  session.ts = new Date().getTime();
+  session.ts = Math.floor(Date.now() / 1000);
 
   await session.save();
 
@@ -388,7 +388,7 @@ export async function passwordResetConfirmPasskeyForm(
 
   session.user = data.user;
   session.accessToken = data.accessToken ?? null;
-  session.ts = new Date().getTime();
+  session.ts = Math.floor(Date.now() / 1000);
 
   await session.save();
 
@@ -403,7 +403,7 @@ export async function updateSession(): Promise<SessionData> {
 
   const user = await client.users.details({ user: "me" });
   session.user = user;
-  session.ts = new Date().getTime();
+  session.ts = Math.floor(Date.now() / 1000);
   // should rotate access token too
   // session.accessToken = data.accessToken;
   await session.save();
@@ -419,10 +419,7 @@ export async function ensureSessionSynced(): Promise<SessionData> {
   let session: SessionData = { ...(await getSession()) };
   if (!session.user) return session;
 
-  if (
-    !session.ts ||
-    session.ts < new Date().getTime() / 1000 - SESSION_REFRESH
-  ) {
+  if (!session.ts || session.ts < Date.now() / 1000 - SESSION_REFRESH) {
     console.log(`Refreshing session for user_id='${session.user.id}'`);
     session = await updateSession();
   }
