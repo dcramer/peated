@@ -5,7 +5,7 @@ import { describe, expect, test } from "vitest";
 
 describe("POST /reviews", () => {
   test("requires admin", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite();
+    const site = await fixtures.ExternalSiteOrExisting();
     const user = await fixtures.User({ mod: true });
 
     const err = await waitError(() =>
@@ -25,7 +25,7 @@ describe("POST /reviews", () => {
   });
 
   test("new review with new bottle no entity", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite();
+    const site = await fixtures.ExternalSiteOrExisting();
     const adminUser = await fixtures.User({ admin: true });
 
     const data = await routerClient.reviews.create(
@@ -52,7 +52,7 @@ describe("POST /reviews", () => {
   });
 
   test("new review with new bottle matching entity", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite();
+    const site = await fixtures.ExternalSiteOrExisting();
     const brand = await fixtures.Entity();
     const adminUser = await fixtures.User({ admin: true });
 
@@ -89,7 +89,7 @@ describe("POST /reviews", () => {
   });
 
   test("new review with existing bottle", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSite();
+    const site = await fixtures.ExternalSiteOrExisting();
     const bottle = await fixtures.Bottle({
       name: "Delicious",
       vintageYear: null,
