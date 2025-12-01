@@ -1170,6 +1170,13 @@
       "when": 1757947960062,
       "tag": "0166_user_terms_accepted",
       "breakpoints": false
+    },
+    {
+      "idx": 167,
+      "version": "7",
+      "when": 1759617415931,
+      "tag": "0167_typical_firelord",
+      "breakpoints": false
     }
   ]
 }

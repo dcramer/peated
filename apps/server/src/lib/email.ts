@@ -1,7 +1,7 @@
 import cuid2 from "@paralleldrive/cuid2";
+import { Template as AccountRecoveryEmailTemplate } from "@peated/email/templates/accountRecoveryEmail";
 import { Template as MagicLinkEmailTemplate } from "@peated/email/templates/magicLinkEmail";
 import { Template as NewCommentTemplate } from "@peated/email/templates/newCommentEmail";
-import { Template as PasswordResetEmailTemplate } from "@peated/email/templates/passwordResetEmail";
 import { Template as VerifyEmailTemplate } from "@peated/email/templates/verifyEmail";
 import config from "@peated/server/config";
 import { createHash } from "crypto";
@@ -194,7 +194,7 @@ export async function sendPasswordResetEmail({
     if (!mailTransport) mailTransport = createMailTransport();
     transport = mailTransport;
   }
-  const digest = createHash("md5")
+  const digest = createHash("sha256")
     .update(user.passwordHash || "")
     .digest("hex");
 
@@ -205,18 +205,17 @@ export async function sendPasswordResetEmail({
     digest,
   } satisfies z.infer<typeof PasswordResetSchema>);
 
-  const resetUrl = `${config.URL_PREFIX}/password-reset?token=${token}`;
+  const resetUrl = `${config.URL_PREFIX}/recover-account?token=${token}`;
 
   const html = await render(
-    PasswordResetEmailTemplate({ baseUrl: config.URL_PREFIX, resetUrl }),
+    AccountRecoveryEmailTemplate({ baseUrl: config.URL_PREFIX, resetUrl }),
   );
 
   await transport.sendMail({
     ...getMailDefaults(),
     to: user.email,
-    subject: "Reset Password",
-    // TODO:
-    text: `A password reset was requested for your account.\n\nIf you don't recognize this request, you can ignore this.\n\nTo continue: ${resetUrl}`,
+    subject: "Account Recovery",
+    text: `An account recovery was requested for your account.\n\nIf you don't recognize this request, you can ignore this.\n\nTo continue: ${resetUrl}`,
     html,
     headers: {
       References: `${cuid2.createId()}@peated.com`,

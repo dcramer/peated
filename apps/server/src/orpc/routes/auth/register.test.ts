@@ -7,12 +7,15 @@ import { eq } from "drizzle-orm";
 
 describe("POST /auth/register", () => {
   test("valid credentials", async ({ fixtures }) => {
-    const data = await routerClient.auth.register({
-      username: "foo",
-      email: "foo@example.com",
-      password: "example",
-      tosAccepted: true,
-    });
+    const data = await routerClient.auth.register(
+      {
+        username: "foo",
+        email: "foo@example.com",
+        password: "example",
+        tosAccepted: true,
+      },
+      { context: { ip: "127.0.0.1" } },
+    );
 
     expect(data.user.id).toBeDefined();
     expect(data.accessToken).toBeDefined();
@@ -33,15 +36,18 @@ describe("POST /auth/register", () => {
     await fixtures.User({ username: "foo" });
 
     const err = await waitError(
-      routerClient.auth.register({
-        username: "foo",
-        email: "foo@example.com",
-        password: "example",
-        tosAccepted: true,
-      }),
+      routerClient.auth.register(
+        {
+          username: "foo",
+          email: "foo@example.com",
+          password: "example",
+          tosAccepted: true,
+        },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Conflicting object already exists (ID=2).]`,
+      `[Error: An account with this username already exists.]`,
     );
   });
 
@@ -49,15 +55,18 @@ describe("POST /auth/register", () => {
     await fixtures.User({ email: "foo@example.com" });
 
     const err = await waitError(
-      routerClient.auth.register({
-        username: "foobar",
-        email: "foo@example.com",
-        password: "example",
-        tosAccepted: true,
-      }),
+      routerClient.auth.register(
+        {
+          username: "foobar",
+          email: "foo@example.com",
+          password: "example",
+          tosAccepted: true,
+        },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Conflicting object already exists (ID=2).]`,
+      `[Error: An account with this email already exists.]`,
     );
   });
 });

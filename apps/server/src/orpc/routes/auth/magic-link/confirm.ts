@@ -1,7 +1,9 @@
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
+import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import { createAccessToken, verifyPayload } from "@peated/server/lib/auth";
 import { procedure } from "@peated/server/orpc";
+import { authRateLimit } from "@peated/server/orpc/middleware";
 import { AuthSchema } from "@peated/server/schemas";
 import { MagicLinkSchema } from "@peated/server/schemas/magicLink";
 import { serialize } from "@peated/server/serializers";
@@ -12,6 +14,7 @@ import { z } from "zod";
 const TOKEN_CUTOFF = 600; // 10 minutes
 
 export default procedure
+  .use(authRateLimit)
   .route({
     method: "POST",
     path: "/auth/magic-link/confirm",
@@ -29,7 +32,7 @@ export default procedure
     }),
   )
   .output(AuthSchema)
-  .handler(async function ({ input, errors }) {
+  .handler(async function ({ input, context, errors }) {
     let payload;
     try {
       payload = await verifyPayload(input.token);
@@ -88,6 +91,14 @@ export default procedure
       })
       .where(eq(users.id, user.id))
       .returning();
+
+    auditLog({
+      event: AuditEvent.LOGIN_SUCCESS,
+      userId: user.id,
+      ip: context.ip,
+      userAgent: context.userAgent,
+      metadata: { method: "magic_link" },
+    });
 
     return {
       user: await serialize(UserSerializer, updatedUser, updatedUser),

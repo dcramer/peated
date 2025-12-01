@@ -2,8 +2,11 @@ import { ORPCError } from "@orpc/server";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { identities, users } from "@peated/server/db/schema";
+import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import { createAccessToken, createUser } from "@peated/server/lib/auth";
+import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
+import { authRateLimit } from "@peated/server/orpc/middleware";
 import { AuthSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
@@ -13,6 +16,7 @@ import { OAuth2Client } from "google-auth-library";
 import { z } from "zod";
 
 export default procedure
+  .use(authRateLimit)
   .route({
     method: "POST",
     path: "/auth/login",
@@ -28,7 +32,11 @@ export default procedure
     z.union([
       z
         .object({
-          email: z.string().describe("User email address"),
+          email: z
+            .string()
+            .email()
+            .toLowerCase()
+            .describe("User email address"),
           password: z.string().describe("User password"),
         })
         .describe("Basic authentication"),
@@ -54,22 +62,51 @@ export default procedure
   )
   .output(AuthSchema)
   .handler(async function ({ input, errors }) {
-    const user =
-      "code" in input
-        ? await authGoogle(input.code, input.tosAccepted)
-        : "idToken" in input
-          ? await authGoogleIdToken(input.idToken, input.tosAccepted)
-          : await authBasic(input.email, input.password);
+    try {
+      const user =
+        "code" in input
+          ? await authGoogle(input.code, input.tosAccepted)
+          : "idToken" in input
+            ? await authGoogleIdToken(input.idToken, input.tosAccepted)
+            : await authBasic(input.email, input.password);
 
-    if (!user.active) {
-      throw errors.UNAUTHORIZED({
-        message: "Invalid credentials.",
+      if (!user.active) {
+        auditLog({
+          event: AuditEvent.LOGIN_FAILED,
+          userId: user.id,
+          metadata: { reason: "inactive_account" },
+        });
+        throw errors.UNAUTHORIZED({
+          message: "Invalid credentials.",
+        });
+      }
+
+      auditLog({
+        event: AuditEvent.LOGIN_SUCCESS,
+        userId: user.id,
+      });
+
+      return {
+        user: await serialize(UserSerializer, user, user),
+        accessToken: await createAccessToken(user),
+      };
+    } catch (error) {
+      // Re-throw ORPC errors as-is (they're already properly formatted)
+      if (error instanceof ORPCError) {
+        throw error;
+      }
+
+      // Log unexpected errors with minimal context
+      logError(error as Error, {
+        context: {
+          name: "auth/login",
+        },
+      });
+
+      throw errors.INTERNAL_SERVER_ERROR({
+        message: "An error occurred during authentication",
       });
     }
-    return {
-      user: await serialize(UserSerializer, user, user),
-      accessToken: await createAccessToken(user),
-    };
   });
 
 async function authBasic(email: string, password: string) {
@@ -78,18 +115,32 @@ async function authBasic(email: string, password: string) {
     .from(users)
     .where(eq(sql`LOWER(${users.email})`, email.toLowerCase()));
   if (!user) {
+    auditLog({
+      event: AuditEvent.LOGIN_FAILED,
+      metadata: { email, reason: "user_not_found" },
+    });
     throw new ORPCError("UNAUTHORIZED", {
       message: "Invalid credentials.",
     });
   }
 
   if (!user.passwordHash) {
+    auditLog({
+      event: AuditEvent.LOGIN_FAILED,
+      userId: user.id,
+      metadata: { reason: "no_password" },
+    });
     throw new ORPCError("UNAUTHORIZED", {
       message: "Invalid credentials.",
     });
   }
 
   if (!compareSync(password, user.passwordHash)) {
+    auditLog({
+      event: AuditEvent.LOGIN_FAILED,
+      userId: user.id,
+      metadata: { reason: "invalid_password" },
+    });
     throw new ORPCError("UNAUTHORIZED", {
       message: "Invalid credentials.",
     });
@@ -170,13 +221,20 @@ async function authGoogle(code: string, tosAccepted?: boolean) {
           "Cannot link to unverified account. Please verify your email first.",
       });
     }
-    // TODO: handle race condition
-    await db.insert(identities).values({
-      provider: "google",
-      externalId: payload.sub,
-      userId: foundUser.id,
-    });
-    // mark ToS acceptance if provided
+    // Handle race condition where identity might already exist
+    try {
+      await db.insert(identities).values({
+        provider: "google",
+        externalId: payload.sub,
+        userId: foundUser.id,
+      });
+    } catch (err: any) {
+      // Ignore duplicate key error (23505) - identity already linked
+      if (err?.code !== "23505" || err?.constraint !== "identity_unq") {
+        throw err;
+      }
+    }
+    // mark ToS acceptance if provided (not required)
     if (!foundUser.termsAcceptedAt && tosAccepted) {
       const [updated] = await db
         .update(users)
@@ -188,7 +246,6 @@ async function authGoogle(code: string, tosAccepted?: boolean) {
           ),
         )
         .returning();
-      // Handle race condition: if another request already accepted ToS, updated is undefined
       user = updated || foundUser;
     } else {
       user = foundUser;
@@ -338,13 +395,20 @@ async function authGoogleIdToken(idToken: string, tosAccepted?: boolean) {
           "Cannot link to unverified account. Please verify your email first.",
       });
     }
-    // TODO: handle race condition
-    await db.insert(identities).values({
-      provider: "google",
-      externalId: payload.sub,
-      userId: foundUser.id,
-    });
-    // mark ToS acceptance if provided
+    // Handle race condition where identity might already exist
+    try {
+      await db.insert(identities).values({
+        provider: "google",
+        externalId: payload.sub,
+        userId: foundUser.id,
+      });
+    } catch (err: any) {
+      // Ignore duplicate key error (23505) - identity already linked
+      if (err?.code !== "23505" || err?.constraint !== "identity_unq") {
+        throw err;
+      }
+    }
+    // mark ToS acceptance if provided (not required)
     if (!foundUser.termsAcceptedAt && tosAccepted) {
       const [updated] = await db
         .update(users)
@@ -356,7 +420,6 @@ async function authGoogleIdToken(idToken: string, tosAccepted?: boolean) {
           ),
         )
         .returning();
-      // Handle race condition: if another request already accepted ToS, updated is undefined
       user = updated || foundUser;
     } else {
       user = foundUser;

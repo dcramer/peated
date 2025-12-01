@@ -1,92 +1,23 @@
 "use client";
 
-import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
+import PasskeyRegisterButton from "@peated/web/components/passkeyRegisterButton";
 import TextField from "@peated/web/components/textField";
-import { authenticate, registerForm } from "@peated/web/lib/auth.actions";
+import { authenticate, register } from "@peated/web/lib/auth.actions";
 import { useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
 import config from "../config";
 import Alert from "./alert";
 import GoogleLoginButton from "./googleLoginButton";
 
-function FormComponent() {
-  const { pending } = useFormStatus();
-  const [checked, setChecked] = useState(false);
-
-  return (
-    <>
-      <div className="-mx-4 -mt-4">
-        <TextField
-          className="py-3"
-          name="email"
-          label="Email"
-          type="email"
-          autoComplete="email"
-          required
-          placeholder="you@example.com"
-          autoFocus
-          disabled={pending}
-        />
-        <TextField
-          className="py-3"
-          name="username"
-          label="Username"
-          autoComplete="username"
-          required
-          placeholder="you99"
-          disabled={pending}
-        />
-        <TextField
-          className="py-3"
-          name="password"
-          label="Password"
-          type="password"
-          autoComplete="current-password"
-          required
-          min={8}
-          placeholder="************"
-          disabled={pending}
-        />
-        <label className="relative mb-3 block flex items-start gap-2 px-4 py-3 text-sm">
-          <input
-            type="checkbox"
-            name="tosAccepted"
-            required
-            onChange={(e) => setChecked(e.target.checked)}
-            disabled={pending}
-          />
-          <span>
-            I agree to the{" "}
-            <Link href="/terms" className="text-highlight underline">
-              Terms of Service
-            </Link>
-            .
-          </span>
-        </label>
-      </div>
-      <div className="flex justify-center gap-x-2">
-        <Button
-          type="submit"
-          color="highlight"
-          fullWidth
-          loading={pending}
-          disabled={!checked || pending}
-          aria-busy={pending}
-        >
-          {pending ? "Signing up..." : "Sign Up"}
-        </Button>
-      </div>
-    </>
-  );
-}
-
 export default function RegisterForm() {
-  const [result, formAction] = useFormState(registerForm, undefined);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [tosAccepted, setTosAccepted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   return (
     <div className="min-w-sm flex flex-auto flex-col gap-y-4">
-      {result?.error ? <Alert>{result.error}</Alert> : null}
+      {error ? <Alert>{error}</Alert> : null}
 
       {config.GOOGLE_CLIENT_ID && (
         <>
@@ -108,9 +39,58 @@ export default function RegisterForm() {
         </>
       )}
 
-      <form action={formAction}>
-        <FormComponent />
-      </form>
+      <div className="-mx-4 -mt-4">
+        <TextField
+          className="py-3"
+          name="email"
+          label="Email"
+          type="email"
+          autoComplete="email"
+          required
+          placeholder="you@example.com"
+          autoFocus
+          value={email}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
+        />
+        <TextField
+          className="py-3"
+          name="username"
+          label="Username"
+          autoComplete="username"
+          required
+          placeholder="you99"
+          value={username}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setUsername(e.target.value)
+          }
+        />
+        <label className="relative mb-3 block flex items-start gap-2 px-4 py-3 text-sm">
+          <input
+            type="checkbox"
+            name="tosAccepted"
+            required
+            checked={tosAccepted}
+            onChange={(e) => setTosAccepted(e.target.checked)}
+          />
+          <span>
+            I agree to the{" "}
+            <Link href="/terms" className="text-highlight underline">
+              Terms of Service
+            </Link>
+            .
+          </span>
+        </label>
+      </div>
+
+      <PasskeyRegisterButton
+        action={register}
+        username={username}
+        email={email}
+        tosAccepted={tosAccepted}
+        onError={setError}
+      />
 
       <p className="mt-4 text-center text-sm">
         Already have an account?{" "}

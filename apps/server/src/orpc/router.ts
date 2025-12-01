@@ -12,8 +12,14 @@ export type Outputs = InferRouterOutputs<Router>;
 
 interface ClientContext {
   user?: User | null;
+  ip?: string;
+  userAgent?: string;
 }
 
 export const routerClient = createRouterClient(router, {
-  context: ({ user }: ClientContext) => ({ user: user ?? null }),
+  context: ({ user, ip, userAgent }: ClientContext) => ({
+    user: user ?? null,
+    ip,
+    userAgent,
+  }),
 });

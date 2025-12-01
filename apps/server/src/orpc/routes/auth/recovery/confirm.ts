@@ -1,30 +1,33 @@
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
+import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import {
   createAccessToken,
   generatePasswordHash,
   verifyPayload,
 } from "@peated/server/lib/auth";
 import { procedure } from "@peated/server/orpc";
+import { authRateLimit } from "@peated/server/orpc/middleware";
 import { AuthSchema, PasswordResetSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
-import { createHash } from "crypto";
+import { createHash, timingSafeEqual } from "crypto";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const TOKEN_CUTOFF = 600; // 10 minutes
 
 export default procedure
+  .use(authRateLimit)
   .route({
     method: "POST",
-    path: "/auth/password-reset/confirm",
-    summary: "Confirm password reset",
+    path: "/auth/recovery/confirm",
+    summary: "Confirm account recovery",
     description:
-      "Confirm password reset using token from email and set new password. Automatically verifies the user account",
+      "Confirm account recovery using token from email and set new password. Automatically verifies the user account",
     spec: (spec) => ({
       ...spec,
-      operationId: "confirmPasswordReset",
+      operationId: "confirmRecovery",
     }),
   })
   .input(
@@ -34,7 +37,7 @@ export default procedure
     }),
   )
   .output(AuthSchema)
-  .handler(async function ({ input, errors }) {
+  .handler(async function ({ input, context, errors }) {
     let payload;
     try {
       payload = await verifyPayload(input.token);
@@ -50,7 +53,7 @@ export default procedure
       new Date().getTime() - TOKEN_CUTOFF * 1000
     ) {
       throw errors.BAD_REQUEST({
-        message: "Invalid verification token.",
+        message: "Token has expired.",
       });
     }
 
@@ -69,11 +72,15 @@ export default procedure
       });
     }
 
+    // Verify password hash digest using SHA-256 and constant-time comparison
+    const expectedDigest = createHash("sha256")
+      .update(user.passwordHash || "")
+      .digest();
+    const providedDigest = Buffer.from(token.digest, "hex");
+
     if (
-      token.digest !==
-      createHash("md5")
-        .update(user.passwordHash || "")
-        .digest("hex")
+      expectedDigest.length !== providedDigest.length ||
+      !timingSafeEqual(expectedDigest, providedDigest)
     ) {
       throw errors.BAD_REQUEST({
         message: "Invalid verification token.",
@@ -88,6 +95,14 @@ export default procedure
       })
       .where(eq(users.id, user.id))
       .returning();
+
+    auditLog({
+      event: AuditEvent.RECOVERY_SUCCESS,
+      userId: user.id,
+      ip: context.ip,
+      userAgent: context.userAgent,
+      metadata: { flow: "password_reset" },
+    });
 
     return {
       user: await serialize(UserSerializer, newUser, newUser),

@@ -60,6 +60,9 @@ export function ProfileDropdown() {
                   <Link href={`/users/${user.username}`}>Profile</Link>
                 </MenuItem>
                 <MenuItem>
+                  <Link href="/settings">Settings</Link>
+                </MenuItem>
+                <MenuItem>
                   <LogoutButton />
                 </MenuItem>
               </div>

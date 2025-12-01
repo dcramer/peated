@@ -19,6 +19,7 @@ import {
   flightBottles,
   flights,
   follows,
+  passkeys,
   reviews,
   storePriceHistories,
   storePrices,
@@ -159,6 +160,27 @@ export const User = async (
     })
     .returning();
   if (!result) throw new Error("Unable to create User fixture");
+  return result;
+};
+
+export const Passkey = async (
+  { ...data }: Partial<Omit<dbSchema.NewPasskey, "id">> = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.Passkey> => {
+  const [result] = await db
+    .insert(passkeys)
+    .values({
+      userId: data.userId || (await User({}, db)).id,
+      credentialId: data.credentialId || `credential_${faker.string.uuid()}`,
+      publicKey: data.publicKey || faker.string.alphanumeric(64),
+      counter: data.counter ?? 0,
+      transports: data.transports || ["internal"],
+      nickname: data.nickname || null,
+      createdAt: data.createdAt || new Date(),
+      lastUsedAt: data.lastUsedAt || null,
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create Passkey fixture");
   return result;
 };
 

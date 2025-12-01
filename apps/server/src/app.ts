@@ -1,4 +1,5 @@
 import { Storage } from "@google-cloud/storage";
+import { getConnInfo } from "@hono/node-server/conninfo";
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { onError, ORPCError, ValidationError } from "@orpc/server";
@@ -56,6 +57,37 @@ import {
   TastingSchema,
   UserSchema,
 } from "./schemas";
+
+// Fail fast if JWT_SECRET is not set in production
+if (config.ENV === "production" && !config.JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable must be set in production");
+}
+
+function getClientIp(
+  req: Request,
+  connInfo?: { remote?: { address?: string } },
+): string | undefined {
+  // Check common headers for client IP (when behind proxy)
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) {
+    // x-forwarded-for can be comma-separated list, take first
+    return forwarded.split(",")[0].trim();
+  }
+
+  const realIp = req.headers.get("x-real-ip");
+  if (realIp) {
+    return realIp;
+  }
+
+  // Fall back to connection remote address (direct connections)
+  if (connInfo?.remote?.address) {
+    // Normalize IPv6 localhost to IPv4
+    const addr = connInfo.remote.address;
+    return addr === "::1" ? "127.0.0.1" : addr;
+  }
+
+  return undefined;
+}
 
 const openapiHandler = new OpenAPIHandler(router, {
   plugins: [new ZodSmartCoercionPlugin()],
@@ -315,9 +347,14 @@ export const app = new Hono()
       }
     }
 
+    const connInfo = getConnInfo(c);
     const { matched, response } = await openapiHandler.handle(c.req.raw, {
       prefix: "/v1",
-      context: { user },
+      context: {
+        user,
+        ip: getClientIp(c.req.raw, connInfo),
+        userAgent: c.req.header("user-agent"),
+      },
     });
 
     if (matched) {
@@ -353,9 +390,14 @@ export const app = new Hono()
       }
     }
 
+    const connInfo = getConnInfo(c);
     const { matched, response } = await rpcHandler.handle(c.req.raw, {
       prefix: "/rpc",
-      context: { user },
+      context: {
+        user,
+        ip: getClientIp(c.req.raw, connInfo),
+        userAgent: c.req.header("user-agent"),
+      },
     });
 
     if (matched) {

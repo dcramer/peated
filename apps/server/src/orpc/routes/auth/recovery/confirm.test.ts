@@ -15,15 +15,18 @@ describe("POST /auth/password-reset/confirm", () => {
       id: user.id,
       email: user.email,
       createdAt: new Date(),
-      digest: createHash("md5")
+      digest: createHash("sha256")
         .update(user.passwordHash || "")
         .digest("hex"),
     });
 
-    await routerClient.auth.passwordReset.confirm({
-      token,
-      password: "testpassword",
-    });
+    await routerClient.auth.recovery.confirm(
+      {
+        token,
+        password: "testpassword",
+      },
+      { context: { ip: "127.0.0.1" } },
+    );
 
     const [newUser] = await db
       .select()
@@ -43,10 +46,13 @@ describe("POST /auth/password-reset/confirm", () => {
     });
 
     const err = await waitError(
-      routerClient.auth.passwordReset.confirm({
-        token,
-        password: "testpassword",
-      }),
+      routerClient.auth.recovery.confirm(
+        {
+          token,
+          password: "testpassword",
+        },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Invalid verification token.]`);
@@ -65,19 +71,22 @@ describe("POST /auth/password-reset/confirm", () => {
       id: user.id,
       email: user.email,
       createdAt: new Date("2023-12-01T12:56:36Z"),
-      digest: createHash("md5")
+      digest: createHash("sha256")
         .update(user.passwordHash || "")
         .digest("hex"),
     });
 
     const err = await waitError(
-      routerClient.auth.passwordReset.confirm({
-        token,
-        password: "testpassword",
-      }),
+      routerClient.auth.recovery.confirm(
+        {
+          token,
+          password: "testpassword",
+        },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Invalid verification token.]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Token has expired.]`);
 
     const [newUser] = await db
       .select()

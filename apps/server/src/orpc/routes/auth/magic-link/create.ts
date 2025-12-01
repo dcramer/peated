@@ -2,10 +2,12 @@ import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { sendMagicLinkEmail } from "@peated/server/lib/email";
 import { procedure } from "@peated/server/orpc";
+import { authRateLimit } from "@peated/server/orpc/middleware";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
+  .use(authRateLimit)
   .route({
     method: "POST",
     path: "/auth/magic-link",
@@ -19,7 +21,7 @@ export default procedure
   })
   .input(
     z.object({
-      email: z.string().email(),
+      email: z.string().email().toLowerCase(),
     }),
   )
   .output(z.object({}))
@@ -27,17 +29,15 @@ export default procedure
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(sql`LOWER(${users.email})`, email.toLowerCase()));
+      .where(eq(sql`LOWER(${users.email})`, email));
 
     if (!user) {
-      console.log("user not found");
       throw errors.NOT_FOUND({
         message: "Account not found.",
       });
     }
 
     if (!user.active) {
-      console.log("user not active");
       throw errors.NOT_FOUND({
         message: "Account not found.",
       });

@@ -11,7 +11,10 @@ import {
 
 import { users } from "./users";
 
-export const identityProviderEnum = pgEnum("identity_provider", ["google"]);
+export const identityProviderEnum = pgEnum("identity_provider", [
+  "google",
+  "passkey",
+]);
 
 export const identities = pgTable(
   "identity",

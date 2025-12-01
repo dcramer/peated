@@ -26,7 +26,10 @@ describe("POST /auth/magic-link/confirm", () => {
 
     vi.mocked(createAccessToken).mockResolvedValue("mocked-access-token");
 
-    const result = await routerClient.auth.magicLink.confirm({ token });
+    const result = await routerClient.auth.magicLink.confirm(
+      { token },
+      { context: { ip: "127.0.0.1" } },
+    );
 
     expect(result.user.id).toBe(user.id);
     expect(result.user.verified).toBe(true);
@@ -42,7 +45,10 @@ describe("POST /auth/magic-link/confirm", () => {
     vi.mocked(verifyPayload).mockRejectedValue(new Error("Invalid token"));
 
     const error = await waitError(
-      routerClient.auth.magicLink.confirm({ token }),
+      routerClient.auth.magicLink.confirm(
+        { token },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
     expect(error).toMatchInlineSnapshot(`[Error: Invalid magic link token.]`);
@@ -62,7 +68,10 @@ describe("POST /auth/magic-link/confirm", () => {
     });
 
     const error = await waitError(
-      routerClient.auth.magicLink.confirm({ token }),
+      routerClient.auth.magicLink.confirm(
+        { token },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
     expect(error).toMatchInlineSnapshot(`[Error: Invalid magic link token.]`);
@@ -79,7 +88,10 @@ describe("POST /auth/magic-link/confirm", () => {
     });
 
     const error = await waitError(
-      routerClient.auth.magicLink.confirm({ token }),
+      routerClient.auth.magicLink.confirm(
+        { token },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
     expect(error).toMatchInlineSnapshot(`[Error: Invalid magic link token.]`);
@@ -95,7 +107,10 @@ describe("POST /auth/magic-link/confirm", () => {
     });
 
     const error = await waitError(
-      routerClient.auth.magicLink.confirm({ token }),
+      routerClient.auth.magicLink.confirm(
+        { token },
+        { context: { ip: "127.0.0.1" } },
+      ),
     );
 
     expect(error).toMatchInlineSnapshot(`[Error: Invalid magic link token.]`);

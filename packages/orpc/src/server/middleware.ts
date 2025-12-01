@@ -48,6 +48,16 @@ const sentryMiddleware = (options: Options = {}) =>
           span.setStatus({
             code: 2,
           });
+
+          // Log error to console for development/debugging
+          console.error(
+            `[ORPC Error] ${path.join("/")}:`,
+            error,
+            options.captureInputs
+              ? `\nInput: ${JSON.stringify(input, null, 2)}`
+              : "",
+          );
+
           Sentry.captureException(error);
 
           // Re-throw the error so it can be handled by the error handler
