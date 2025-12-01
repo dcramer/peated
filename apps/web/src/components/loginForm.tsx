@@ -115,36 +115,8 @@ export default function LoginForm() {
           <PasskeyLoginButton action={authenticate} />
 
           {config.GOOGLE_CLIENT_ID && (
-            <>
-              <div className="relative my-4 font-bold text-slate-500 opacity-60">
-                <div
-                  className="absolute inset-0 flex items-center"
-                  aria-hidden="true"
-                >
-                  <div className="min-w-full border-t-2 border-slate-700" />
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-slate-900 px-2 text-lg uppercase">
-                    Or
-                  </span>
-                </div>
-              </div>
-
-              <GoogleLoginButton action={authenticate} />
-            </>
+            <GoogleLoginButton action={authenticate} />
           )}
-
-          <div className="relative my-4 font-bold text-slate-500 opacity-60">
-            <div
-              className="absolute inset-0 flex items-center"
-              aria-hidden="true"
-            >
-              <div className="min-w-full border-t-2 border-slate-700" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-slate-900 px-2 text-lg uppercase">Or</span>
-            </div>
-          </div>
 
           <Button
             fullWidth
