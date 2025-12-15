@@ -3,15 +3,13 @@
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import EntityTable from "@peated/web/components/entityTable";
 import PaginationButtons from "@peated/web/components/paginationButtons";
+import TableSkeleton from "@peated/web/components/tableSkeleton";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { Suspense } from "react";
 
-export default function Page({
-  params: { countrySlug },
-}: {
-  params: { countrySlug: string };
-}) {
+function EntityList({ countrySlug }: { countrySlug: string }) {
   const orpc = useORPC();
   const queryParams = useApiQueryParams({
     numericFields: ["cursor", "limit"],
@@ -46,5 +44,17 @@ export default function Page({
 
       <PaginationButtons rel={topEntityList.rel} />
     </>
+  );
+}
+
+export default function Page({
+  params: { countrySlug },
+}: {
+  params: { countrySlug: string };
+}) {
+  return (
+    <Suspense fallback={<TableSkeleton rows={20} columns={2} />}>
+      <EntityList countrySlug={countrySlug} />
+    </Suspense>
   );
 }
