@@ -10,39 +10,53 @@ import { type SessionData } from "@peated/web/lib/session.server";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { setUser } from "@sentry/nextjs";
 import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
+import { useEffect, useState } from "react";
 import { useInterval } from "usehooks-ts";
 
 export default function Providers({
   children,
-  session: { user, accessToken },
+  session: initialSession,
 }: {
   children: React.ReactNode;
   session: SessionData;
 }) {
+  const [session, setSession] = useState<SessionData>(initialSession);
+
+  // Sync from server props on navigation
+  useEffect(() => {
+    setSession(initialSession);
+  }, [initialSession.accessToken, initialSession.ts]);
+
+  // Periodic session refresh
+  useInterval(async () => {
+    try {
+      const updated = await ensureSessionSynced();
+      setSession(updated);
+    } catch {
+      // Transient errors: preserve current session state
+    }
+  }, 60000);
+
   setUser(
-    user
+    session.user
       ? {
-          id: `${user?.id}`,
-          username: user?.username,
-          email: user?.email,
+          id: `${session.user.id}`,
+          username: session.user.username,
+          email: session.user.email,
         }
       : null,
   );
-
-  useInterval(async () => {
-    ({ user, accessToken } = await ensureSessionSynced());
-  }, 60000);
 
   return (
     <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
       <ORPCProvider
         apiServer={config.API_SERVER}
-        accessToken={accessToken}
-        key={accessToken}
+        accessToken={session.accessToken}
+        key={session.accessToken}
       >
         <ReactQueryStreamedHydration>
           <OnlineStatusProvider>
-            <AuthProvider user={user}>
+            <AuthProvider user={session.user}>
               <FlashMessages>{children}</FlashMessages>
             </AuthProvider>
           </OnlineStatusProvider>

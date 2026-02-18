@@ -1,5 +1,16 @@
 import { redirect } from "next/navigation";
 
+const AUTH_PATHS = [
+  "/login",
+  "/register",
+  "/verify",
+  "/auth/tos-required",
+  "/auth/magic-link",
+  "/recover-account",
+  "/password-reset",
+  "/logout",
+];
+
 export function getSafeRedirect(value: string | null) {
   if (!value || value?.indexOf("/") !== 0 || value?.indexOf("//") === 0)
     return "/";
@@ -23,7 +34,10 @@ export function getAuthRedirect({
   pathname?: string;
   searchParams?: URLSearchParams;
 }) {
-  const finalPathname = pathname.indexOf("/login") === 0 ? "/" : pathname;
+  const isAuthPath = AUTH_PATHS.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  );
+  const finalPathname = isAuthPath ? "/" : pathname;
   const redirectTo =
     finalPathname + (searchParams ? `?${searchParams.toString()}` : "");
 

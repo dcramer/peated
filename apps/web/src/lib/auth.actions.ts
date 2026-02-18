@@ -84,6 +84,7 @@ export async function authenticate(
 
     session.user = data.user;
     session.accessToken = data.accessToken ?? null;
+    session.ts = Math.floor(Date.now() / 1000);
     await session.save();
 
     if (!data.user.termsAcceptedAt) {
@@ -144,6 +145,7 @@ export async function authenticate(
 
   session.user = data.user;
   session.accessToken = data.accessToken ?? null;
+  session.ts = Math.floor(Date.now() / 1000);
 
   await session.save();
 
@@ -295,6 +297,7 @@ export async function acceptTos(redirectTo?: string) {
   }
 
   session.user = data;
+  session.ts = Math.floor(Date.now() / 1000);
   await session.save();
 
   if (redirectTo) {
@@ -401,12 +404,20 @@ export async function updateSession(): Promise<SessionData> {
   const session = await getSession();
   const { client } = await createServerClient();
 
-  const user = await client.users.details({ user: "me" });
-  session.user = user;
-  session.ts = Math.floor(Date.now() / 1000);
-  // should rotate access token too
-  // session.accessToken = data.accessToken;
-  await session.save();
+  try {
+    const user = await client.users.details({ user: "me" });
+    session.user = user;
+    session.ts = Math.floor(Date.now() / 1000);
+    // should rotate access token too
+    // session.accessToken = data.accessToken;
+    await session.save();
+  } catch (err: any) {
+    if (err?.name === "UNAUTHORIZED" || err?.status === 401) {
+      session.destroy();
+      return { user: null, accessToken: null, ts: null };
+    }
+    console.error("Failed to refresh session:", err);
+  }
 
   return {
     ...session,
@@ -416,15 +427,20 @@ export async function updateSession(): Promise<SessionData> {
 export async function ensureSessionSynced(): Promise<SessionData> {
   "use server";
 
-  let session: SessionData = { ...(await getSession()) };
-  if (!session.user) return session;
+  try {
+    let session: SessionData = { ...(await getSession()) };
+    if (!session.user) return session;
 
-  if (!session.ts || session.ts < Date.now() / 1000 - SESSION_REFRESH) {
-    console.log(`Refreshing session for user_id='${session.user.id}'`);
-    session = await updateSession();
+    if (!session.ts || session.ts < Date.now() / 1000 - SESSION_REFRESH) {
+      console.log(`Refreshing session for user_id='${session.user.id}'`);
+      session = await updateSession();
+    }
+
+    return {
+      ...session,
+    };
+  } catch (err) {
+    console.error("ensureSessionSynced failed:", err);
+    throw err;
   }
-
-  return {
-    ...session,
-  };
 }

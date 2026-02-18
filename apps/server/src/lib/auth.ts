@@ -20,7 +20,7 @@ const { sign, verify } = jsonwebtoken;
 
 export function signPayload(payload: string | object): Promise<string> {
   return new Promise<string>((res, rej) => {
-    sign(payload, config.JWT_SECRET, {}, (err, token) => {
+    sign(payload, config.JWT_SECRET, { expiresIn: "7d" }, (err, token) => {
       if (err) rej(err);
       if (!token) throw new Error("Unknown error signing token.");
       res(token);
