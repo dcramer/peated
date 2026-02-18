@@ -22,15 +22,19 @@ export default function Providers({
 }) {
   const [session, setSession] = useState<SessionData>(initialSession);
 
-  // Sync from server props on navigation (accessToken is a stable identity)
+  // Sync from server props on navigation
   useEffect(() => {
     setSession(initialSession);
-  }, [initialSession.accessToken]);
+  }, [initialSession.accessToken, initialSession.ts]);
 
   // Periodic session refresh
   useInterval(async () => {
-    const updated = await ensureSessionSynced();
-    setSession(updated);
+    try {
+      const updated = await ensureSessionSynced();
+      setSession(updated);
+    } catch {
+      // Transient errors: preserve current session state
+    }
   }, 60000);
 
   setUser(

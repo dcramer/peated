@@ -440,6 +440,6 @@ export async function ensureSessionSynced(): Promise<SessionData> {
     };
   } catch (err) {
     console.error("ensureSessionSynced failed:", err);
-    return { user: null, accessToken: null, ts: null };
+    throw err;
   }
 }
