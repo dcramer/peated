@@ -297,6 +297,7 @@ export async function acceptTos(redirectTo?: string) {
   }
 
   session.user = data;
+  session.ts = Math.floor(Date.now() / 1000);
   await session.save();
 
   if (redirectTo) {
