@@ -71,7 +71,7 @@
     "pre-commit": "pnpm exec lint-staged --concurrent false"
   },
   "lint-staged": {
-    "*": [
+    "!(CLAUDE.md|.claude/**)": [
       "prettier --write --cache --ignore-unknown"
     ],
     "{apps,packages}/**/*.{ts,tsx}": [
