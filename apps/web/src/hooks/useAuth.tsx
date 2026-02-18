@@ -27,20 +27,15 @@ export const AuthProvider = ({
   const [value, setValue] = useState<User | null>(user);
 
   useEffect(() => {
-    setValue(value);
-  }, [value, user]);
+    setValue(user);
+  }, [user]);
 
   return (
     <AuthContext.Provider
       value={{
-        user: user
-          ? {
-              ...user,
-              ...value,
-            }
-          : null,
+        user: value,
         setUser: setValue,
-        isLoggedIn: !!user,
+        isLoggedIn: !!value,
       }}
     >
       {children}

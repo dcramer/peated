@@ -2,19 +2,31 @@ import Button from "@peated/web/components/button";
 import LayoutSplash from "@peated/web/components/layoutSplash";
 import Link from "@peated/web/components/link";
 import { getSafeRedirect } from "@peated/web/lib/auth";
+import { getSession } from "@peated/web/lib/session.server";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import Actions from "./actions";
 
 export const metadata: Metadata = {
   title: "Terms Required",
 };
 
-export default function TOSRequired({
+export default async function TOSRequired({
   searchParams,
 }: {
   searchParams: { redirectTo?: string };
 }) {
   const redirectTo = getSafeRedirect(searchParams?.redirectTo ?? "/");
+  const session = await getSession();
+
+  if (!session.user) {
+    redirect(`/login?redirectTo=${encodeURIComponent(redirectTo)}`);
+  }
+
+  if (session.user.termsAcceptedAt) {
+    redirect(redirectTo);
+  }
+
   return (
     <LayoutSplash>
       <div className="mb-16 flex flex-col items-center">

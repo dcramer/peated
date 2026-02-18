@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   const { client } = await getServerClient();
 
   const { searchParams } = new URL(request.url);
-  const redirectTo = searchParams.get("redirectTo");
+  const redirectTo = getSafeRedirect(searchParams.get("redirectTo") || "/");
   const token = searchParams.get("token");
   if (!token) {
     throw new Error("No token provided");
@@ -20,16 +20,20 @@ export async function GET(request: Request) {
 
   if (error) {
     logError(error);
-    // in an ideal world this would simply render a component with the error,
-    // but Next does not allow us to mutate the session in RSC, and there's no
-    // way to render a component via route handlers afaik.
     return redirect("/login?error=invalid-token");
   }
 
   session.user = data.user;
   session.accessToken = data.accessToken ?? null;
+  session.ts = Math.floor(Date.now() / 1000);
 
   await session.save();
 
-  redirect(getSafeRedirect(redirectTo || "/"));
+  if (!data.user.termsAcceptedAt) {
+    redirect(`/auth/tos-required?redirectTo=${encodeURIComponent(redirectTo)}`);
+  } else if (!data.user.verified) {
+    redirect("/verify");
+  } else {
+    redirect(redirectTo);
+  }
 }
