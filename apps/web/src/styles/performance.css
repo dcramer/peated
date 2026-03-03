@@ -1,0 +1,16 @@
+/**
+ * Performance optimizations for reducing CLS and improving rendering
+ */
+
+/* Improve rendering performance for off-screen content */
+.location-grid-item {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 300px;
+}
+
+/* Reduce reflow for skeleton animations */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse {
+    animation: none;
+  }
+}
