@@ -6,6 +6,7 @@ import {
 } from "@peated/server/lib/smws";
 import Heading from "@peated/web/components/heading";
 import Link from "@peated/web/components/link";
+import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { notFound } from "next/navigation";
@@ -36,7 +37,16 @@ export default function Page({
   );
 
   if (!exampleDistiller) {
-    throw new Error("Unable to find example distiller for SMWS codes.");
+    const error = new Error("Unable to find example distiller for SMWS codes.");
+    logError(error, {
+      entityId: entity.id,
+      entityName: entity.name,
+      entityShortName: entity.shortName,
+      expectedDistillerName: SMWS_DISTILLERY_CODES[4],
+      distillerCount: distillerList.length,
+      distillerNames: distillerList.map((d) => d.name),
+    });
+    throw error;
   }
 
   const distillersByName = Object.fromEntries([
