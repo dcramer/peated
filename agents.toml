@@ -1,33 +1,25 @@
 version = 1
-# Check skills into git so collaborators get them without running 'dotagents install'.
-# Set to true (or remove) to gitignore managed skills instead.
-gitignore = false
-agents = ["claude"]
+# Managed skills are gitignored; collaborators must run 'dotagents install'.
+gitignore = true
+# Skills always fetch the latest version; lockfile tracks names only.
+pin = false
+agents = ["claude", "cursor", "codex"]
+
+[trust]
+allow_all = true
 
 [[skills]]
-name = "find-bugs"
-source = "getsentry/skills"
+name = "dotagents"
+source = "getsentry/dotagents"
 
 [[skills]]
-name = "code-review"
-source = "getsentry/skills"
-
-[[skills]]
-name = "security-review"
-source = "getsentry/skills"
-
-[[skills]]
-name = "commit"
-source = "getsentry/skills"
-
-[[skills]]
-name = "create-pr"
-source = "getsentry/skills"
-
-[[skills]]
-name = "iterate-pr"
+name = "skill-writer"
 source = "getsentry/skills"
 
 [[skills]]
 name = "code-simplifier"
 source = "getsentry/skills"
+
+[[mcp]]
+name = "sentry"
+url = "https://mcp.sentry.dev/mcp/peated/peated?experimental=1"
