@@ -17,15 +17,13 @@ const config = {
 };
 
 export const SharedSentryConfig = {
-  dsn: config.SENTRY_DSN,
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN || config.SENTRY_DSN,
   ignoreTransactions: ["/%2Fhealth"],
   tracePropagationTargets: ["localhost", "api.peated.com", "peated.com"],
   tracesSampleRate: 1,
   debug: false,
   sendDefaultPii: true,
-  _experiments: {
-    enableLogs: true,
-  },
+  enableLogs: true,
 };
 
 export default config;
