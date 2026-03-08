@@ -53,7 +53,7 @@ export default {
 
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   OPENAI_HOST: process.env.OPENAI_HOST || "https://api.openai.com/v1",
-  OPENAI_MODEL: process.env.OPENAI_MODEL || "gpt-4o",
+  OPENAI_MODEL: process.env.OPENAI_MODEL || "gpt-5.4",
   OPENAI_ORGANIZATION:
     process.env.OPENAI_ORGANIZATION || "org-c11AVkF35wixZcGri1YBH9Pq",
   OPENAI_PROJECT: process.env.OPENAI_PROJECT || null,

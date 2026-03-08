@@ -222,7 +222,7 @@ export const extractFromImage = async (imageUrlOrBase64: string) => {
   const client = new OpenAI();
 
   const response = await client.responses.create({
-    model: "gpt-4o-2024-08-06",
+    model: "gpt-5.4",
     input: [
       { role: "system", content: imageInstructions },
       {
@@ -255,7 +255,7 @@ export const extractFromText = async (label: string) => {
   const client = new OpenAI();
 
   const response = await client.responses.create({
-    model: "gpt-4o-2024-08-06",
+    model: "gpt-5.4",
     input: [
       { role: "system", content: textInstructions },
       {
