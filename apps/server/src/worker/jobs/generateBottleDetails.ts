@@ -31,36 +31,37 @@ function generatePrompt(bottle: Partial<Bottle>, tagList: string[]) {
   if (bottle.flavorProfile) {
     infoLines.push(`Flavor Profile: ${bottle.flavorProfile}`);
   }
-  return `
-Describe the following bottle of whisky:
+  const sections = [
+    `Generate structured details for this whisky bottle:\n\n${bottle.fullName}`,
+    infoLines.length ? `Known context:\n- ${infoLines.join("\n- ")}` : null,
+    [
+      "'description' should be a concise overview for a novice whisky drinker.",
+      "Use two or three short paragraphs separated by newlines.",
+      "Use only broadly established facts, and do not repeat the bottle name more than once.",
+    ].join(" "),
+    [
+      "'tastingNotes' should be concise and limited to smell and taste.",
+      "Only include 'tastingNotes' when you can support all of 'nose', 'palate', and 'finish'; otherwise set it to null.",
+    ].join(" "),
+    [
+      "'flavorProfile' must be one of the following values when it is strongly supported; otherwise return null:",
+      `- ${FLAVOR_PROFILES.map((f) => `${f}: ${notesForProfile(f)}`).join("\n- ")}`,
+    ].join("\n"),
+    [
+      "'category' must be one of the following values when it is strongly supported; otherwise return null:",
+      `- ${CATEGORY_LIST.join("\n- ")}`,
+    ].join("\n"),
+    tagList.length
+      ? [
+          "'suggestedTags' may contain up to five items when they are strongly supported by the bottle's style or profile.",
+          "If no tags are well supported, return an empty array or omit the field.",
+          "Values must come from this list:",
+          `- ${tagList.join("\n- ")}`,
+        ].join("\n")
+      : "'suggestedTags' should be omitted or an empty array when no allowed tag list is provided.",
+  ];
 
-${bottle.fullName}
-
-${
-  infoLines.length
-    ? `\nOther information we already know about this bottle:\n- ${infoLines.join(
-        "\n- ",
-      )}\n`
-    : ""
-}
-If the whiskey is made in Scotland, it is always spelled "whisky".
-
-'description' should be a well written description of the spirit, with enough information to inform a novice whisky drinker. It should be three paragraphs in length and include newlines. Do not repeat the spirit name in the description more than once.
-
-'tastingNotes' should be concise, and focus on the smell and taste. If you cannot fill in all three of 'nose', 'palate', and 'finish', you should not fill in any of them.
-
-'flavorProfile' should be one of the following:
-
-- ${FLAVOR_PROFILES.map((f) => `**${f}**: ${notesForProfile(f)}`).join("\n- ")}
-
-'category' should be one of the following:
-
-- ${CATEGORY_LIST.join("\n- ")}
-
-'suggestedTags' should be up to five items that reflect the flavor of this spirit the best. Values MUST be from the following list:
-
-- ${tagList.join("\n- ")}
-`;
+  return sections.filter(Boolean).join("\n\n");
 }
 
 const OpenAIBottleDetailsSchema = z.object({

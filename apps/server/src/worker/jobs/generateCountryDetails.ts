@@ -14,17 +14,18 @@ if (!config.OPENAI_API_KEY) {
 type InputCountry = Partial<Country>;
 
 function generatePrompt(country: InputCountry) {
-  return `
-Tell me about the whisky culture in ${country.name}, and what sets it apart from other regions.
-
-'summary' should be one or two sentences that describe the requirements, if any for whisky produced in the region.
-
-'description' should include two or three sections, formatted as paragraphs using newlines:
-
-The first paragraph should focus on the region's history & origin.
-The second paragraph should describe the region's unique approach, what styles it produces, and any interesting related facts.
-The third paragraph, should describe any requirements to producing whisky in the region.
-`;
+  return [
+    `Generate structured details for whisky production in ${country.name}.`,
+    [
+      "'summary' should be one or two sentences about legal or customary production requirements only when they are well established.",
+      "If there are no clear requirements to mention, return null.",
+    ].join(" "),
+    [
+      "'description' should be two or three short paragraphs separated by newlines.",
+      "Cover the country's whisky history, its distinctive production style or reputation, and legal or regulatory context only when it is well established.",
+      "Avoid filler and unsupported trivia.",
+    ].join(" "),
+  ].join("\n\n");
 }
 
 export const OpenAICountryDetailsSchema = z.object({

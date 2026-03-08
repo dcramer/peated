@@ -14,11 +14,14 @@ if (!config.OPENAI_API_KEY) {
 type InputRegion = Partial<Region> & Pick<Region, "country">;
 
 function generatePrompt(region: InputRegion) {
-  return `
-Tell me about the whisky culture in the region of ${region.name} (in ${region.country.name}), and what sets it apart from other places.
-
-'description' should include two paragraphs formatted using markdown: the first should focus on its history & origin, the second should describe its unique approach, what styles it produces, and any interesting related facts. The description should be at least 100 words, and no more than 200.
-`;
+  return [
+    `Generate structured details for whisky production in ${region.name}, ${region.country.name}.`,
+    [
+      "'description' should be two short paragraphs separated by newlines.",
+      "Cover the region's place in whisky history and the characteristics or reputation that distinguish it today.",
+      "If the region is not widely associated with a formal whisky identity, keep the description high-level and factual.",
+    ].join(" "),
+  ].join("\n\n");
 }
 
 export const OpenAIRegionDetailsSchema = z.object({

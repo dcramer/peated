@@ -39,33 +39,28 @@ function generatePrompt(entity: InputEntity) {
     infoLines.push(`Entity Types: ${entity.type.join(", ")}`);
   }
 
-  return `
-Tell me about the following whiskey brand:
+  const sections = [
+    `Generate structured details for this whisky producer or brand:\n\n${entity.name}`,
+    infoLines.length ? `Known context:\n- ${infoLines.join("\n- ")}` : null,
+    [
+      "'description' should be two short paragraphs separated by newlines.",
+      "Focus on history, origin, and what the producer or brand is broadly known for today.",
+      "Do not call it an entity.",
+      `Mention former names only if a previous name for ${entity.name} is well established.`,
+    ].join(" "),
+    [
+      "'yearEstablished' should be the founding year only when it is confidently known; otherwise return null.",
+    ].join(" "),
+    [
+      "'website' should be the official HTTPS website only when it is confidently known; otherwise return null.",
+    ].join(" "),
+    [
+      "'type' should include every strongly supported value from: brand, distiller, bottler.",
+      "If none can be determined confidently, omit the field.",
+    ].join(" "),
+  ];
 
-${entity.name}
-${
-  infoLines.length
-    ? `\nOther information we already know about this entity:\n- ${infoLines.join(
-        "\n- ",
-      )}\n`
-    : ""
-}
-If the entity is located in Scotland, spell whiskey as "whisky".
-
-Describe the entity as a distiller, bottler, or brand, whichever one it primarily is. Do not describe it as a "entity".
-
-'description' should include two paragraphs formatted using markdown: the first should focus on its history & origin, the second should describe its unique approach, what styles it produces, and any interesting related facts. If the another name was used for ${entity.name} in the past, make sure to note it. The description should be at least 100 words, and no more than 200.
-
-'yearEstablished' should be the year in which the entity was established.
-
-'website' should be the URL to the official website, if one exists. Include the HTTPS protocol in the website value.
-
-The 'type' field must contain every value which is accurate for this entity, describing if the entity operates as brand, a distiller, and/or a bottler.
-If the entity is a distiller, include 'distiller' in the 'type' field.
-If the entity is a brand, include 'brand' in the 'type' field.
-If the entity is a bottler, include 'bottler' in the 'type' field'.
-Its valid to include all three values in 'type' if they are accurate, but at least one must be included.
-`;
+  return sections.filter(Boolean).join("\n\n");
 }
 
 export const OpenAIEntityDetailsSchema = z.object({

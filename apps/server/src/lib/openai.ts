@@ -2,17 +2,31 @@ import config from "@peated/server/config";
 import { logError } from "@peated/server/lib/log";
 import { startSpan } from "@sentry/node";
 import OpenAI from "openai";
+import { zodTextFormat } from "openai/helpers/zod";
 import { type ZodSchema, type z } from "zod";
-import zodToJsonSchema from "zod-to-json-schema";
-
-// type Model = "gpt-3.5-turbo" | "gpt-4";
 
 type Message = {
-  role: "system" | "user";
+  role: "developer" | "system" | "user";
   content: string;
 };
 
 const DEFAULT_MODEL: string = config.OPENAI_MODEL;
+
+export const GENERATION_PERSONA_PROMPT = [
+  "<persona>",
+  "You are a whisky reference editor for a structured spirits database.",
+  "</persona>",
+  "<style>",
+  "Write concise, professional copy grounded in broadly established facts.",
+  "</style>",
+  "<rules>",
+  "Use supplied input as context, but do not present it as an independent discovery.",
+  "Do not invent dates, websites, producer relationships, regulations, cask details, tasting notes, or other specifics.",
+  "If something is uncertain or unsupported, return null or omit the field instead of guessing.",
+  'If the subject is in Scotland, use the spelling "whisky".',
+  "Return only schema-conformant structured data.",
+  "</rules>",
+].join("\n");
 
 export async function getStructuredResponse<Schema extends ZodSchema<any>>(
   pipelineName: string,
@@ -51,69 +65,74 @@ export async function getStructuredResponse<
     project: config.OPENAI_PROJECT,
   });
 
-  const messages: Message[] = [
-    {
-      role: "system",
-      content: [
-        "Your job is to accurately describe information about the whiskey industry as if you were a whisky sommelier. You do not embellish descriptions, and instead focus on concise, professional responses.",
-        `The output format should strictly follow JSON schema:\n${zodToJsonSchema(
-          schema,
-        )}`,
-      ].join("\n"),
-    },
-  ];
-  if (typeof prompt === "string") {
-    messages.push({
-      role: "user",
-      content: prompt,
-    });
-  } else {
-    messages.push(...prompt);
-  }
+  const responseSchema = (fullSchema || schema) as ZodSchema<any>;
+  const input = typeof prompt === "string" ? prompt : prompt;
+  const inputMessages: Message[] =
+    typeof prompt === "string" ? [{ role: "user", content: prompt }] : prompt;
 
-  // https://wundergraph.com/blog/return_json_from_openai
-  const completion = await startSpan(
+  const response = await startSpan(
     {
       op: "ai.run",
       name: "getStructuredResponse",
     },
     async (span) => {
       span.setAttribute("ai.pipeline.name", pipelineName);
-      span.setAttribute("ai.input_messages", JSON.stringify(messages));
+      span.setAttribute("ai.instructions", GENERATION_PERSONA_PROMPT);
+      span.setAttribute("ai.input_messages", JSON.stringify(inputMessages));
       span.setAttribute("ai.model_id", model);
       span.setAttribute("ai.streaming", false);
 
-      const result = await openai.chat.completions.create(
-        {
-          model,
-          response_format: {
-            type: "json_object",
-          },
-          messages,
-          temperature: 0,
+      const result = await openai.responses.create({
+        model,
+        instructions: GENERATION_PERSONA_PROMPT,
+        input,
+        text: {
+          format: zodTextFormat(responseSchema, `${pipelineName}_response`, {
+            description: `Structured output for the ${pipelineName} pipeline.`,
+          }),
         },
-        // {
-        //   timeout: 300,
-        // },
-      );
+        temperature: 0,
+      });
 
       if (result.usage) {
         span.setAttribute("ai.total_tokens.used", result.usage.total_tokens);
-        span.setAttribute("ai.prompt_tokens.used", result.usage.prompt_tokens);
+        span.setAttribute("ai.prompt_tokens.used", result.usage.input_tokens);
         span.setAttribute(
           "ai.completion_tokens.used",
-          result.usage.completion_tokens,
+          result.usage.output_tokens,
+        );
+        span.setAttribute(
+          "ai.reasoning_tokens.used",
+          result.usage.output_tokens_details.reasoning_tokens,
         );
       }
 
-      span.setAttribute("ai.responses", JSON.stringify(result.choices));
+      span.setAttribute("ai.responses", JSON.stringify(result.output));
 
       return result;
     },
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const output: string = completion.choices[0].message!.content || "";
+  const output = response.output_text || "";
+
+  if (!output) {
+    const err = new Error("OpenAI returned empty structured output");
+    logError(
+      err,
+      {
+        ...(logContext || {}),
+        openai: {
+          completionId: response.id,
+          ...response.usage,
+        },
+      },
+      {
+        "messages.json": JSON.stringify(inputMessages),
+        "response.json": JSON.stringify(response.output),
+      },
+    );
+    throw err;
+  }
 
   let structuredResponse: any;
   try {
@@ -125,12 +144,12 @@ export async function getStructuredResponse<
       {
         ...(logContext || {}),
         openai: {
-          completionId: completion.id,
-          ...completion.usage,
+          completionId: response.id,
+          ...response.usage,
         },
       },
       {
-        "messages.json": JSON.stringify(messages),
+        "messages.json": JSON.stringify(inputMessages),
         "output.txt": output,
       },
     );
@@ -138,19 +157,19 @@ export async function getStructuredResponse<
   }
 
   try {
-    return (fullSchema || schema).parse(structuredResponse);
+    return responseSchema.parse(structuredResponse) as z.infer<FullSchema>;
   } catch (err) {
     logError(
       err,
       {
         ...(logContext || {}),
         openai: {
-          completionId: completion.id,
-          ...completion.usage,
+          completionId: response.id,
+          ...response.usage,
         },
       },
       {
-        "messages.json": JSON.stringify(messages),
+        "messages.json": JSON.stringify(inputMessages),
         "output.json": output,
       },
     );
