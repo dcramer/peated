@@ -133,6 +133,68 @@ describe("priceMatching", () => {
     ]);
   });
 
+  test("normalizes fractional classifier confidence before persisting proposals", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+    const bottle = await fixtures.Bottle();
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Fractional Confidence Candidate",
+      imageUrl: null,
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Confidence Brand",
+      expression: "Reserve",
+      series: null,
+      distillery: ["Confidence Distillery"],
+      category: "single_malt",
+      stated_age: 12,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyStorePriceMatch).mockResolvedValue({
+      decision: {
+        action: "match_existing",
+        confidence: 0.88,
+        rationale: "Alias and listing details strongly match.",
+        suggestedBottleId: bottle.id,
+        candidateBottleIds: [bottle.id],
+        proposedBottle: null,
+      },
+      searchEvidence: [],
+      candidateBottles: [
+        {
+          bottleId: bottle.id,
+          alias: "Fractional Confidence Candidate",
+          fullName: bottle.fullName,
+          brand: null,
+          score: 0.95,
+          source: ["exact"],
+        },
+      ],
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(proposal.status).toBe("pending_review");
+    expect(proposal.proposalType).toBe("match_existing");
+    expect(proposal.confidence).toBe(88);
+  });
+
   test("preserves extracted label and candidates when classification fails", async ({
     fixtures,
   }) => {

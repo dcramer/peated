@@ -42,6 +42,12 @@ type StorePriceMatchProposalForReview = StorePriceMatchProposal & {
   price: StorePrice;
 };
 
+function normalizeStorePriceMatchConfidence(confidence: number): number {
+  const percentageConfidence = confidence <= 1 ? confidence * 100 : confidence;
+
+  return Math.min(100, Math.max(0, Math.round(percentageConfidence)));
+}
+
 function sanitizeStorePriceMatchDecision(
   decision: StorePriceMatchDecision,
   {
@@ -89,6 +95,7 @@ function sanitizeStorePriceMatchDecision(
 
   return {
     ...decision,
+    confidence: normalizeStorePriceMatchConfidence(decision.confidence),
     suggestedBottleId:
       decision.action === "create_new" ? null : decision.suggestedBottleId,
     candidateBottleIds: decision.candidateBottleIds.filter((id) =>
