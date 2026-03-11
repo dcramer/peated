@@ -20,11 +20,18 @@ import { pushJob } from "@peated/server/worker/client";
 import { and, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 
-const InputSchema = TastingInputSchema.partial()
-  .extend({
-    tasting: z.coerce.number(),
-  })
-  .omit({ bottle: true, flight: true });
+const InputSchema = z.object({
+  tasting: z.coerce.number(),
+  notes: TastingInputSchema.shape.notes.removeDefault().optional(),
+  rating: TastingInputSchema.shape.rating.removeDefault().optional(),
+  servingStyle: TastingInputSchema.shape.servingStyle
+    .removeDefault()
+    .optional(),
+  color: TastingInputSchema.shape.color.removeDefault().optional(),
+  friends: TastingInputSchema.shape.friends.removeDefault().optional(),
+  tags: TastingInputSchema.shape.tags.removeDefault().optional(),
+  image: TastingInputSchema.shape.image.optional(),
+});
 
 export default procedure
   .use(requireAuth)

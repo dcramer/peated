@@ -13,8 +13,12 @@ import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, eq, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 
-const InputSchema = BottleSeriesInputSchema.partial().extend({
+const InputSchema = z.object({
   series: z.coerce.number(),
+  name: BottleSeriesInputSchema.shape.name.optional(),
+  description: BottleSeriesInputSchema.shape.description
+    .removeDefault()
+    .optional(),
 });
 
 export default procedure

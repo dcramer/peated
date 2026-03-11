@@ -21,6 +21,23 @@ import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, eq, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 
+const InputSchema = z.object({
+  entity: z.number(),
+  name: EntityInputSchema.shape.name.optional(),
+  shortName: EntityInputSchema.shape.shortName.removeDefault().optional(),
+  type: EntityInputSchema.shape.type.removeDefault().optional(),
+  description: EntityInputSchema.shape.description.removeDefault().optional(),
+  descriptionSrc: EntityInputSchema.shape.descriptionSrc.optional(),
+  yearEstablished: EntityInputSchema.shape.yearEstablished
+    .removeDefault()
+    .optional(),
+  website: EntityInputSchema.shape.website.removeDefault().optional(),
+  country: EntityInputSchema.shape.country.removeDefault().optional(),
+  region: EntityInputSchema.shape.region.removeDefault().optional(),
+  address: EntityInputSchema.shape.address.removeDefault().optional(),
+  location: EntityInputSchema.shape.location.removeDefault().optional(),
+});
+
 export default procedure
   .use(requireMod)
   .route({
@@ -31,11 +48,7 @@ export default procedure
       "Update entity information including name, location, type, and description. Automatically updates related bottles and aliases. Requires moderator privileges",
     operationId: "updateEntity",
   })
-  .input(
-    EntityInputSchema.partial().extend({
-      entity: z.number(),
-    }),
-  )
+  .input(InputSchema)
   .output(EntitySchema)
   .handler(async function ({ input, context, errors }) {
     const [entity] = await db

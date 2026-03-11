@@ -1,5 +1,5 @@
 import { OpenAPIGenerator } from "@orpc/openapi";
-import { ZodToJsonSchemaConverter } from "@orpc/zod";
+import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { describe, expect, it } from "vitest";
 import router from "../orpc/router";
 import {
