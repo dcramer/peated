@@ -15,7 +15,7 @@ catalog:
   "@sentry/nextjs": 10.42.0
   "@sentry/node": 10.42.0
   "@spotlightjs/spotlight": ^2.1.1
-  superjson: ^2.2.1
+  superjson: ^2.2.6
   tailwindcss: ^3.4.1
   "@tailwindcss/forms": ^0.5.7
   "@tailwindcss/typography": ^0.5.12
