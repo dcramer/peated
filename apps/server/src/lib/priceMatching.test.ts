@@ -267,6 +267,75 @@ describe("priceMatching", () => {
     );
   });
 
+  test("runs initial local candidate search before classification", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+    const bottle = await fixtures.Bottle();
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Presearch Candidate",
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Presearch Candidate",
+      imageUrl: null,
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: null,
+      expression: null,
+      series: null,
+      distillery: [],
+      category: null,
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyStorePriceMatch).mockRejectedValue(
+      new Error("Classifier blew up before refining candidates"),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(classifyStorePriceMatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        price: expect.objectContaining({ id: price.id }),
+        extractedLabel: expect.objectContaining({
+          brand: null,
+          distillery: [],
+        }),
+        initialCandidates: expect.arrayContaining([
+          expect.objectContaining({
+            bottleId: bottle.id,
+            source: expect.arrayContaining(["exact"]),
+          }),
+        ]),
+      }),
+    );
+    expect(proposal.status).toBe("errored");
+    expect(proposal.candidateBottles).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          bottleId: bottle.id,
+          source: expect.arrayContaining(["exact"]),
+        }),
+      ]),
+    );
+  });
+
   test("does not reevaluate closed proposals during automatic resolution", async ({
     fixtures,
   }) => {

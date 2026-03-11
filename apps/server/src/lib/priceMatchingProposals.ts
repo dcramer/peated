@@ -17,7 +17,10 @@ import {
 } from "@peated/server/lib/bottleAliases";
 import { logError } from "@peated/server/lib/log";
 import { stripDuplicateBrandPrefixFromBottleName } from "@peated/server/lib/normalize";
-import { extractStorePriceBottleDetails } from "@peated/server/lib/priceMatchingCandidates";
+import {
+  extractStorePriceBottleDetails,
+  findStorePriceMatchCandidates,
+} from "@peated/server/lib/priceMatchingCandidates";
 import type {
   ExtractedBottleDetailsSchema,
   PriceMatchCandidateSchema,
@@ -294,9 +297,11 @@ export async function resolveStorePriceMatchProposal(
 
   try {
     extractedLabel = await extractStorePriceBottleDetails(price);
+    candidates = await findStorePriceMatchCandidates(price, extractedLabel);
     const classification = await classifyStorePriceMatch({
       price,
       extractedLabel,
+      initialCandidates: candidates,
     });
     candidates = classification.candidateBottles;
     searchEvidence = classification.searchEvidence;

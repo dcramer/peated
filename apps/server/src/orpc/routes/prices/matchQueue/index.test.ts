@@ -134,6 +134,103 @@ describe("price match queue", () => {
     });
   });
 
+  test("filters queue items by kind and orders ties by newest id", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const currentBottle = await fixtures.Bottle();
+    const firstCreatePrice = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Create Candidate One",
+      bottleId: null,
+    });
+    const secondCreatePrice = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Create Candidate Two",
+      bottleId: null,
+    });
+    const correctionPrice = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Correction Candidate",
+      bottleId: currentBottle.id,
+    });
+    const erroredPrice = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Errored Candidate",
+      bottleId: null,
+    });
+    const sharedUpdatedAt = new Date("2026-03-08T12:00:00.000Z");
+
+    const [firstCreateProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: firstCreatePrice.id,
+        status: "pending_review",
+        proposalType: "create_new",
+        updatedAt: sharedUpdatedAt,
+      })
+      .returning();
+
+    const [secondCreateProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: secondCreatePrice.id,
+        status: "pending_review",
+        proposalType: "create_new",
+        updatedAt: sharedUpdatedAt,
+      })
+      .returning();
+
+    const [correctionProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: correctionPrice.id,
+        status: "pending_review",
+        proposalType: "correction",
+        currentBottleId: currentBottle.id,
+        updatedAt: new Date("2026-03-08T11:00:00.000Z"),
+      })
+      .returning();
+
+    const [erroredProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: erroredPrice.id,
+        status: "errored",
+        proposalType: "no_match",
+        updatedAt: new Date("2026-03-08T10:00:00.000Z"),
+      })
+      .returning();
+
+    const allResults = await routerClient.prices.matchQueue.list(
+      {},
+      { context: { user } },
+    );
+    const createResults = await routerClient.prices.matchQueue.list(
+      { kind: "create_new" },
+      { context: { user } },
+    );
+    const erroredResults = await routerClient.prices.matchQueue.list(
+      { kind: "errored" },
+      { context: { user } },
+    );
+
+    expect(allResults.results.map((item) => item.id)).toEqual([
+      secondCreateProposal.id,
+      firstCreateProposal.id,
+      correctionProposal.id,
+      erroredProposal.id,
+    ]);
+    expect(createResults.results.map((item) => item.id)).toEqual([
+      secondCreateProposal.id,
+      firstCreateProposal.id,
+    ]);
+    expect(erroredResults.results.map((item) => item.id)).toEqual([
+      erroredProposal.id,
+    ]);
+  });
+
   test("returns proposal details", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const site = await fixtures.ExternalSiteOrExisting({ type: "astorwines" });

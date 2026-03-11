@@ -24,16 +24,22 @@ export function buildQueryString(
   searchParams: URLSearchParams,
   newParams: Record<string, any>,
 ): string {
-  const newEntries = Array.from(Object.entries(newParams)).filter(([k, v]) => {
-    return k && v !== undefined && v !== null;
-  });
+  const nextSearchParams = new URLSearchParams(searchParams.toString());
 
-  Array.from(searchParams.entries()).forEach(([k, v]) => {
-    if (!newParams[k]) {
-      newEntries.push([k, v]);
+  for (const [key, value] of Object.entries(newParams)) {
+    if (!key) {
+      continue;
     }
-  });
-  return new URLSearchParams(newEntries).toString();
+
+    if (value === undefined || value === null || value === "") {
+      nextSearchParams.delete(key);
+      continue;
+    }
+
+    nextSearchParams.set(key, String(value));
+  }
+
+  return nextSearchParams.toString();
 }
 
 export function parseDomain(url: string) {

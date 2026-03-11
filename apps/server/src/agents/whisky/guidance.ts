@@ -396,7 +396,8 @@ export function buildStorePriceMatchInstructions({
     "Decision process:",
     renderBulletLines([
       "Prefer local evidence first: current assignment, exact aliases, vector candidates, text candidates, brand candidates, extracted label details, and local search tools.",
-      "When there is no strong direct match in the provided input, start by calling `search_bottles` with the most specific query you can form from the listing and extracted label.",
+      "The input includes `localSearch`, which is the server's initial local bottle search result set. If `localSearch.hasExactAliasMatch` is false, no exact alias match was found for the listing.",
+      "When the provided local candidates are thin, conflicting, or missing obvious near matches, call `search_bottles` with the most specific query you can form from the listing and extracted label.",
       "Compare the listing against candidate bottles component by component in this order: " +
         MATCH_COMPONENT_PRIORITY.join(", ") +
         ".",

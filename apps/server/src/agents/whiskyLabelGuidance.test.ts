@@ -64,6 +64,12 @@ describe("whiskyLabelGuidance", () => {
       "If identity evidence is weak, conflicting, or missing on the decisive components, do not force a match.",
     );
     expect(instructions).toContain(
+      "The input includes `localSearch`, which is the server's initial local bottle search result set.",
+    );
+    expect(instructions).toContain(
+      "If `localSearch.hasExactAliasMatch` is false, no exact alias match was found for the listing.",
+    );
+    expect(instructions).toContain(
       "Before returning `create_new`, use `openai_web_search` to validate that the listing appears to be a real distinct bottling unless local evidence is already decisive.",
     );
     expect(instructions).toContain(

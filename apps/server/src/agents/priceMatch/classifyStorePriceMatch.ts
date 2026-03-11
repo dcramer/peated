@@ -66,9 +66,11 @@ export class StorePriceMatchClassificationError extends Error {
 export async function classifyStorePriceMatch({
   price,
   extractedLabel,
+  initialCandidates = [],
 }: {
   price: StorePrice;
   extractedLabel: ExtractedBottleDetails | null;
+  initialCandidates?: PriceMatchCandidate[];
 }) {
   const client = new OpenAI({
     apiKey: config.OPENAI_API_KEY,
@@ -79,6 +81,13 @@ export async function classifyStorePriceMatch({
 
   const searchEvidence: SearchEvidence[] = [];
   const candidateBottles = new Map<number, PriceMatchCandidate>();
+  const hasExactAliasMatch = initialCandidates.some((candidate) =>
+    candidate.source.includes("exact"),
+  );
+
+  for (const candidate of initialCandidates) {
+    mergeCandidate(candidateBottles, candidate);
+  }
 
   const currentBottle = price.bottleId
     ? await getBottleMatchCandidateById(price.bottleId)
@@ -144,6 +153,10 @@ export async function classifyStorePriceMatch({
       },
       currentBottle,
       extractedLabel,
+      localSearch: {
+        hasExactAliasMatch,
+        candidates: initialCandidates,
+      },
     },
     null,
     2,
