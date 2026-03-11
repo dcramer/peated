@@ -1,6 +1,12 @@
 import { z } from "zod";
 import { CATEGORY_LIST } from "../constants";
-import { BottleInputSchema, BottleSchema } from "./bottles";
+import { BottleSchema } from "./bottles";
+import {
+  CaskFillEnum,
+  CaskSizeEnum,
+  CaskTypeEnum,
+  CategoryEnum,
+} from "./common";
 import { ExternalSiteSchema } from "./externalSites";
 import { listResponse } from "./shared";
 import { StorePriceSchema } from "./stores";
@@ -57,13 +63,53 @@ export const StorePriceMatchProposalTypeEnum = z.enum([
   "no_match",
 ]);
 
+export const ProposedEntityChoiceSchema = z.object({
+  id: z.number().nullable().default(null),
+  name: z.string().trim().min(1),
+});
+
+export const ProposedSeriesChoiceSchema = z.object({
+  id: z.number().nullable().default(null),
+  name: z.string().trim().min(1),
+});
+
+export const ProposedBottleSchema = z.object({
+  name: z.string().trim().min(1),
+  series: ProposedSeriesChoiceSchema.nullable().default(null),
+  category: CategoryEnum.nullable().default(null),
+  edition: z.string().trim().nullable().default(null),
+  statedAge: z.number().min(0).max(100).nullable().default(null),
+  caskStrength: z.boolean().nullable().default(null),
+  singleCask: z.boolean().nullable().default(null),
+  abv: z.number().min(0).max(100).nullable().default(null),
+  vintageYear: z
+    .number()
+    .gte(1800)
+    .lte(new Date().getFullYear())
+    .nullable()
+    .default(null),
+  releaseYear: z
+    .number()
+    .gte(1800)
+    .lte(new Date().getFullYear())
+    .nullable()
+    .default(null),
+  caskType: CaskTypeEnum.nullable().default(null),
+  caskSize: CaskSizeEnum.nullable().default(null),
+  caskFill: CaskFillEnum.nullable().default(null),
+  brand: ProposedEntityChoiceSchema,
+  distillers: z.array(ProposedEntityChoiceSchema).default([]),
+  bottler: ProposedEntityChoiceSchema.nullable().default(null),
+  description: z.string().nullable().default(null),
+});
+
 export const StorePriceMatchDecisionSchema = z.object({
   action: StorePriceMatchProposalTypeEnum,
   confidence: z.number().min(0).max(100),
   rationale: z.string().nullable().default(null),
   suggestedBottleId: z.number().nullable().default(null),
   candidateBottleIds: z.array(z.number()).default([]),
-  proposedBottle: BottleInputSchema.nullable().default(null),
+  proposedBottle: ProposedBottleSchema.nullable().default(null),
 });
 
 export const StorePriceMatchProposalSchema = z.object({
@@ -75,7 +121,7 @@ export const StorePriceMatchProposalSchema = z.object({
   suggestedBottleId: z.number().nullable(),
   candidateBottles: z.array(PriceMatchCandidateSchema),
   extractedLabel: ExtractedBottleDetailsSchema.nullable(),
-  proposedBottle: BottleInputSchema.nullable(),
+  proposedBottle: ProposedBottleSchema.nullable(),
   searchEvidence: z.array(PriceMatchSearchEvidenceSchema),
   rationale: z.string().nullable(),
   model: z.string().nullable(),

@@ -427,7 +427,8 @@ export function buildStorePriceMatchInstructions({
       "If the current bottle assignment is likely correct and confidence is high, return `match_existing` with that bottle id.",
       "If identity evidence is weak, conflicting, or missing on the decisive components, do not force a match.",
       "Only set `suggestedBottleId` to an id from the provided candidates.",
-      "If you return `create_new`, `proposedBottle` must be a valid `BottleInputSchema` payload with `brand` and `name` present.",
+      "If you return `create_new`, `proposedBottle` must include every schema field, using `null` or `[]` when unknown.",
+      "For `brand`, `distillers`, `bottler`, and `series`, return objects with `{ id, name }`. Use `id: null` when you do not know a local id.",
       "Never invent websites, producer relationships, release details, or missing proof numbers.",
     ]),
   ].join("\n");

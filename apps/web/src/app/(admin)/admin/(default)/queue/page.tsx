@@ -86,7 +86,9 @@ export default function Page() {
             value: (item) => (
               <div className="space-y-1">
                 <div className="font-semibold capitalize">
-                  {item.proposalType.replaceAll("_", " ")}
+                  {item.status === "errored"
+                    ? "Errored"
+                    : item.proposalType.replaceAll("_", " ")}
                 </div>
                 {item.suggestedBottle ? (
                   <div className="text-sm">
@@ -101,13 +103,20 @@ export default function Page() {
                   <div className="text-sm">
                     New bottle: {item.proposedBottle.name}
                   </div>
+                ) : item.status === "errored" ? (
+                  <div className="text-sm">Classifier failed</div>
                 ) : (
                   <div className="text-sm">No strong suggestion</div>
                 )}
                 <div className="text-muted text-sm">
-                  Confidence: {item.confidence ?? "?"}
+                  Confidence:{" "}
+                  {item.status === "errored" ? "n/a" : (item.confidence ?? "?")}
                 </div>
-                {item.rationale ? (
+                {item.status === "errored" && item.error ? (
+                  <div className="text-muted line-clamp-3 max-w-md text-sm">
+                    {item.error}
+                  </div>
+                ) : item.rationale ? (
                   <div className="text-muted line-clamp-3 max-w-md text-sm">
                     {item.rationale}
                   </div>
