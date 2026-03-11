@@ -40,7 +40,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/error-cause": "^1.0.4",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/mime-types": "^2.1.4",
+    "@types/mime-types": "^3.0.1",
     "@types/mjml": "^4.7.4",
     "@types/node": "catalog:",
     "@types/nodemailer": "^7.0.11",
