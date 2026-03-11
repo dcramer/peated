@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { isDefinedError } from "@orpc/client";
 import { CASK_FILLS, CASK_SIZES, CASK_TYPES } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { BottleReleaseInputSchema } from "@peated/server/schemas";
@@ -7,16 +6,14 @@ import type { Bottle } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import Form from "@peated/web/components/form";
 import FormError from "@peated/web/components/formError";
-import FormHeader from "@peated/web/components/formHeader";
-import Header from "@peated/web/components/header";
-import Layout from "@peated/web/components/layout";
+import FormScreen from "@peated/web/components/formScreen";
 import SelectField from "@peated/web/components/selectField";
 import TextField from "@peated/web/components/textField";
+import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
-import { logError } from "../lib/log";
 import BooleanField from "./booleanField";
 import BottleCard from "./bottleCard";
 import Legend from "./legend";
@@ -64,28 +61,16 @@ export default function ReleaseForm({
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
       await onSubmit(data);
-    } catch (err: any) {
-      if (isDefinedError(err)) {
-        setError(err.message);
-      } else {
-        logError(err);
-        setError("Internal error");
-      }
+    } catch (err) {
+      setError(getFormErrorMessage(err));
     }
   };
 
   return (
-    <Layout
-      header={
-        <Header>
-          <FormHeader
-            title={title}
-            saveDisabled={isSubmitting}
-            onSave={handleSubmit(onSubmitHandler)}
-          />
-        </Header>
-      }
-      footer={null}
+    <FormScreen
+      title={title}
+      saveDisabled={isSubmitting}
+      onSave={handleSubmit(onSubmitHandler)}
     >
       <div className="lg:mb-8 lg:p-0">
         <BottleCard bottle={bottle} color="highlight" />
@@ -244,6 +229,6 @@ export default function ReleaseForm({
           />
         </Fieldset>
       </Form>
-    </Layout>
+    </FormScreen>
   );
 }

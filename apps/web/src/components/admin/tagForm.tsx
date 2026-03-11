@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { isDefinedError } from "@orpc/client";
 import { FLAVOR_PROFILES, TAG_CATEGORIES } from "@peated/server/constants";
 import { formatFlavorProfile } from "@peated/server/lib/format";
 import { toTitleCase } from "@peated/server/lib/strings";
@@ -9,12 +8,10 @@ import { TagInputSchema } from "@peated/server/schemas";
 import { type Tag } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
-import FormHeader from "@peated/web/components/formHeader";
-import Header from "@peated/web/components/header";
-import Layout from "@peated/web/components/layout";
+import FormScreen from "@peated/web/components/formScreen";
 import SelectField from "@peated/web/components/selectField";
 import TextField from "@peated/web/components/textField";
-import { logError } from "@peated/web/lib/log";
+import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
@@ -59,29 +56,17 @@ export default function TagForm({
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
       await onSubmit(data);
-    } catch (err: any) {
-      if (isDefinedError(err)) {
-        setError(err.message);
-      } else {
-        logError(err);
-        setError("Internal error");
-      }
+    } catch (err) {
+      setError(getFormErrorMessage(err));
     }
   };
 
   return (
-    <Layout
+    <FormScreen
+      title={title}
+      saveDisabled={isSubmitting}
+      onSave={handleSubmit(onSubmitHandler)}
       sidebar={<AdminSidebar />}
-      header={
-        <Header>
-          <FormHeader
-            title={title}
-            saveDisabled={isSubmitting}
-            onSave={handleSubmit(onSubmitHandler)}
-          />
-        </Header>
-      }
-      footer={null}
     >
       {error && <FormError values={[error]} />}
 
@@ -142,6 +127,6 @@ export default function TagForm({
           />
         </Fieldset>
       </Form>
-    </Layout>
+    </FormScreen>
   );
 }

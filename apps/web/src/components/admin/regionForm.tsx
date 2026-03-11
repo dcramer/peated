@@ -2,16 +2,13 @@
 
 import { BoltIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { isDefinedError } from "@orpc/client";
 import { RegionInputSchema } from "@peated/server/schemas";
 import { type Region } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
-import FormHeader from "@peated/web/components/formHeader";
-import Header from "@peated/web/components/header";
-import Layout from "@peated/web/components/layout";
+import FormScreen from "@peated/web/components/formScreen";
 import TextField from "@peated/web/components/textField";
-import { logError } from "@peated/web/lib/log";
+import { getFormErrorMessage, toOption } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -61,40 +58,23 @@ export default function RegionForm({
   const [error, setError] = useState<string | undefined>();
 
   const [countryValue, setCountryValue] = useState<Option | undefined>(
-    initialData.country
-      ? {
-          id: initialData.country.id,
-          name: initialData.country.name,
-        }
-      : undefined,
+    toOption(initialData.country),
   );
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
       await onSubmit(data);
-    } catch (err: any) {
-      if (isDefinedError(err)) {
-        setError(err.message);
-      } else {
-        logError(err);
-        setError("Internal error");
-      }
+    } catch (err) {
+      setError(getFormErrorMessage(err));
     }
   };
 
   return (
-    <Layout
+    <FormScreen
+      title={title}
+      saveDisabled={isSubmitting}
+      onSave={handleSubmit(onSubmitHandler)}
       sidebar={<AdminSidebar />}
-      header={
-        <Header>
-          <FormHeader
-            title={title}
-            saveDisabled={isSubmitting}
-            onSave={handleSubmit(onSubmitHandler)}
-          />
-        </Header>
-      }
-      footer={null}
     >
       {error && <FormError values={[error]} />}
 
@@ -165,6 +145,6 @@ export default function RegionForm({
           />
         </Fieldset>
       </Form>
-    </Layout>
+    </FormScreen>
   );
 }

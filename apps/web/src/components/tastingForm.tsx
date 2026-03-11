@@ -16,15 +16,13 @@ import type {
 import BottleCard from "@peated/web/components/bottleCard";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
-import FormHeader from "@peated/web/components/formHeader";
-import Header from "@peated/web/components/header";
+import FormScreen from "@peated/web/components/formScreen";
 import ImageField from "@peated/web/components/imageField";
-import Layout from "@peated/web/components/layout";
 import type { Option } from "@peated/web/components/selectField";
 import SelectField from "@peated/web/components/selectField";
 import SimpleRatingInput from "@peated/web/components/simpleRatingInput";
 import TextAreaField from "@peated/web/components/textAreaField";
-import { logError } from "@peated/web/lib/log";
+import { getFormErrorMessage, toOption } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
@@ -97,9 +95,7 @@ export default function TastingForm({
     initialData.friends ? initialData.friends.map(userToOption) : [],
   );
   const [releaseValue, setReleaseValue] = useState<Option | undefined>(
-    initialData.release
-      ? { id: initialData.release.id, name: initialData.release.name }
-      : undefined,
+    toOption(initialData.release),
   );
 
   const orpc = useORPC();
@@ -107,13 +103,12 @@ export default function TastingForm({
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
       await onSubmit({ ...data, image });
-    } catch (err: any) {
-      if (err.name === "BAD_REQUEST" || err.name === "CONFLICT") {
-        setError(err.message);
-      } else {
-        logError(err);
-        setError("Internal error");
-      }
+    } catch (err) {
+      setError(
+        getFormErrorMessage(err, {
+          expectedErrorNames: ["BAD_REQUEST", "CONFLICT"],
+        }),
+      );
     }
   };
 
@@ -127,17 +122,10 @@ export default function TastingForm({
   }));
 
   return (
-    <Layout
-      header={
-        <Header>
-          <FormHeader
-            title={title}
-            onSave={handleSubmit(onSubmitHandler)}
-            saveDisabled={isSubmitting}
-          />
-        </Header>
-      }
-      footer={null}
+    <FormScreen
+      title={title}
+      onSave={handleSubmit(onSubmitHandler)}
+      saveDisabled={isSubmitting}
     >
       <div className="lg:mb-8 lg:p-0">
         <BottleCard
@@ -313,6 +301,6 @@ export default function TastingForm({
           />
         </Fieldset>
       </Form>
-    </Layout>
+    </FormScreen>
   );
 }

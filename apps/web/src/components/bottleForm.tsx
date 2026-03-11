@@ -21,15 +21,19 @@ import { PreviewBottleCard } from "@peated/web/components/bottleCard";
 import EntityField from "@peated/web/components/entityField";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
-import FormHeader from "@peated/web/components/formHeader";
+import FormScreen from "@peated/web/components/formScreen";
 import ImageField from "@peated/web/components/imageField";
-import Layout from "@peated/web/components/layout";
 import type { Option } from "@peated/web/components/selectField";
 import SelectField from "@peated/web/components/selectField";
 import SeriesField from "@peated/web/components/seriesField";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
-import { logError } from "@peated/web/lib/log";
+import {
+  getFormErrorMessage,
+  toChoiceValue,
+  toOption,
+  toOptionList,
+} from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -43,7 +47,6 @@ import Button from "./button";
 import Collapsable from "./collapsable";
 import { classesForProfile } from "./flavorProfile";
 import Form from "./form";
-import Header from "./header";
 import Legend from "./legend";
 import TextAreaField from "./textAreaField";
 
@@ -51,45 +54,6 @@ const categoryList = CATEGORY_LIST.map((c) => ({
   id: c,
   name: formatCategoryName(c),
 }));
-
-const entityToOption = (
-  entity:
-    | Entity
-    | Option
-    | {
-        id?: string | number | null;
-        name?: string | null;
-      },
-): Option | undefined => {
-  if (!entity || !entity.name) return undefined;
-  return {
-    id: entity.id,
-    name: entity.name,
-  };
-};
-
-const isOption = (option: Option | undefined): option is Option =>
-  option !== undefined;
-const isDefined = <T,>(value: T | null | undefined): value is T =>
-  value != null;
-const choiceToOption = (
-  value:
-    | number
-    | Entity
-    | Option
-    | {
-        id?: string | number | null;
-        name?: string | null;
-      }
-    | null
-    | undefined,
-) => {
-  if (value == null || typeof value === "number") {
-    return undefined;
-  }
-
-  return entityToOption(value);
-};
 
 const flavorProfileList = FLAVOR_PROFILES.map((c) => ({
   id: c,
@@ -128,33 +92,22 @@ export type BottleFormInitialData = Partial<
 
 const toEntityChoiceValue = (
   value: number | Entity | ChoiceLike | null | undefined,
-): FormSchemaType["brand"] | FormSchemaType["bottler"] => {
-  if (value == null || typeof value === "number") {
-    return value;
-  }
-
-  return value.id ?? (value as Extract<FormSchemaType["brand"], object>);
-};
+): FormSchemaType["brand"] | FormSchemaType["bottler"] =>
+  toChoiceValue(value) as FormSchemaType["brand"] | FormSchemaType["bottler"];
 
 const toSeriesChoiceValue = (
   value: number | ChoiceLike | null | undefined,
-): FormSchemaType["series"] => {
-  if (value == null || typeof value === "number") {
-    return value;
-  }
-
-  return (
-    value.id ??
-    (value as Extract<NonNullable<FormSchemaType["series"]>, object>)
-  );
-};
+): FormSchemaType["series"] => toChoiceValue(value) as FormSchemaType["series"];
 
 const toDistillerChoiceValues = (
   values: Array<number | Entity | ChoiceLike> | null | undefined,
 ): NonNullable<FormSchemaType["distillers"]> =>
   (values
-    ?.map((value) => toEntityChoiceValue(value))
-    .filter(isDefined) as NonNullable<FormSchemaType["distillers"]>) ?? [];
+    ?.map((value) => toChoiceValue(value))
+    .filter(
+      (value): value is NonNullable<FormSchemaType["distillers"]>[number] =>
+        value != null,
+    ) as NonNullable<FormSchemaType["distillers"]>) ?? [];
 
 export default function BottleForm({
   onSubmit,
@@ -207,46 +160,36 @@ export default function BottleForm({
     try {
       await onSubmit({ image, ...data });
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        logError(err);
-        setError("Internal error");
-      }
+      setError(
+        getFormErrorMessage(err, {
+          allowAnyErrorMessage: true,
+        }),
+      );
     }
   };
 
   const [brandValue, setBrandValue] = useState<Option | undefined>(
-    choiceToOption(initialData.brand),
+    toOption(initialData.brand),
   );
   const [distillersValue, setDistillersValue] = useState<Option[]>(
-    initialData.distillers
-      ? initialData.distillers.map(choiceToOption).filter(isOption)
-      : [],
+    toOptionList(initialData.distillers),
   );
   const [bottlerValue, setBottlerValue] = useState<Option | undefined>(
-    choiceToOption(initialData.bottler),
+    toOption(initialData.bottler),
   );
   const [seriesValue, setSeriesValue] = useState<Option | undefined>(
-    choiceToOption(initialData.series),
+    toOption(initialData.series),
   );
 
   const [showCaskDetails, setShowCaskDetails] = useState(true);
   const [showAddDetails, setShowAddDetails] = useState(true);
 
   return (
-    <Layout
-      header={
-        <Header>
-          <FormHeader
-            title={title}
-            saveDisabled={isSubmitting}
-            onSave={handleSubmit(onSubmitHandler)}
-            onClose={() => (returnTo ? router.push(returnTo) : router.back())}
-          />
-        </Header>
-      }
-      footer={null}
+    <FormScreen
+      title={title}
+      saveDisabled={isSubmitting}
+      onSave={handleSubmit(onSubmitHandler)}
+      onClose={() => (returnTo ? router.push(returnTo) : router.back())}
     >
       <div className="border-slate-700 p-4 lg:mb-8 lg:border">
         <div className="prose prose-invert text-muted max-w-full text-sm leading-6">
@@ -742,6 +685,6 @@ export default function BottleForm({
           </Fieldset>
         )}
       </Form>
-    </Layout>
+    </FormScreen>
   );
 }

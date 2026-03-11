@@ -8,6 +8,7 @@ import type { SessionData } from "./session.server";
 import { getSession } from "./session.server";
 
 const SESSION_REFRESH = 60 * 60; // 1 hour
+const INTERNAL_SERVER_ERROR = "Internal server error.";
 
 export async function logoutForm(
   prevState: void | undefined,
@@ -66,51 +67,15 @@ export async function authenticate(
 
   const { client } = await createServerClient();
 
-  // Handle passkey authentication
-  if (passkeyResponse && signedChallenge) {
-    const { error, isDefined, data } = await safe(
-      client.auth.passkey.authenticateVerify({
-        response: JSON.parse(passkeyResponse),
-        signedChallenge,
-      }),
-    );
-
-    if (error) {
-      return {
-        magicLink: false,
-        error: isDefined ? error.message : "Internal server error.",
-      };
-    }
-
-    session.user = data.user;
-    session.accessToken = data.accessToken ?? null;
-    session.ts = Math.floor(Date.now() / 1000);
-    await session.save();
-
-    if (!data.user.termsAcceptedAt) {
-      redirect(
-        `/auth/tos-required?redirectTo=${encodeURIComponent(redirectTo)}`,
-      );
-    } else if (!data.user.verified) {
-      redirect("/verify");
-    } else {
-      redirect(redirectTo);
-    }
-  }
-
   if (email && !password) {
-    const { error, isDefined } = await safe(
+    const result = await safeClientCall(
       client.auth.magicLink.create({ email }),
+      INTERNAL_SERVER_ERROR,
     );
-    if (isDefined) {
+    if (!result.ok) {
       return {
         magicLink: false,
-        error: error.message,
-      };
-    } else if (error) {
-      return {
-        magicLink: false,
-        error: "Internal server error.",
+        error: result.errorMessage,
       };
     }
 
@@ -120,45 +85,32 @@ export async function authenticate(
     };
   }
 
-  const { error, isDefined, data } = await safe(
-    code
-      ? client.auth.login({
-          code,
+  const result = await safeClientCall(
+    passkeyResponse && signedChallenge
+      ? client.auth.passkey.authenticateVerify({
+          response: JSON.parse(passkeyResponse),
+          signedChallenge,
         })
-      : client.auth.login({
-          email,
-          password,
-        }),
+      : code
+        ? client.auth.login({
+            code,
+          })
+        : client.auth.login({
+            email,
+            password,
+          }),
+    INTERNAL_SERVER_ERROR,
   );
 
-  if (isDefined) {
+  if (!result.ok) {
     return {
       magicLink: false,
-      error: error.message,
-    };
-  } else if (error) {
-    return {
-      magicLink: false,
-      error: "Internal server error.",
+      error: result.errorMessage,
     };
   }
 
-  session.user = data.user;
-  session.accessToken = data.accessToken ?? null;
-  session.ts = Math.floor(Date.now() / 1000);
-
-  await session.save();
-
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
-  // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
-
-  if (!data.user.termsAcceptedAt) {
-    redirect(`/auth/tos-required?redirectTo=${encodeURIComponent(redirectTo)}`);
-  } else if (!data.user.verified) {
-    redirect("/verify");
-  } else {
-    redirect(redirectTo);
-  }
+  await saveAuthSession(session, result.data);
+  redirectAfterAuth(result.data.user, redirectTo);
 }
 
 export async function registerForm(
@@ -175,70 +127,36 @@ export async function register(formData: FormData) {
 
   const session = await getSession();
 
-  // const url = new URL(request.url);
-  // const redirectTo = url.searchParams.get("redirectTo");
-  // const form = await request.formData();
-
   const email = (formData.get("email") || "") as string;
   const password = (formData.get("password") || "") as string;
   const username = formData.get("username") as string;
   const passkeyResponse = formData.get("passkeyResponse") as string | null;
   const signedChallenge = formData.get("signedChallenge") as string | null;
+  const tosAccepted = Boolean(formData.get("tosAccepted"));
 
   const { client } = await createServerClient();
 
-  // Handle passkey registration
-  if (passkeyResponse && signedChallenge) {
-    const { error, isDefined, data } = await safe(
-      client.auth.register({
-        username,
-        email,
-        passkeyResponse: JSON.parse(passkeyResponse),
-        signedChallenge,
-        tosAccepted: formData.get("tosAccepted") ? true : false,
-      }),
-    );
-
-    if (isDefined) {
-      return { ok: false, error: error.message };
-    } else if (error) {
-      return { ok: false, error: "Internal server error." };
-    }
-
-    session.user = data.user;
-    session.accessToken = data.accessToken ?? null;
-    session.ts = Math.floor(Date.now() / 1000);
-
-    await session.save();
-
-    return redirect("/verify");
-  }
-
-  // Handle password registration
-  const { error, isDefined, data } = await safe(
+  const result = await safeClientCall(
     client.auth.register({
       email,
       password,
       username,
-      tosAccepted: formData.get("tosAccepted") ? true : false,
+      ...(passkeyResponse && signedChallenge
+        ? {
+            passkeyResponse: JSON.parse(passkeyResponse),
+            signedChallenge,
+          }
+        : {}),
+      tosAccepted,
     }),
+    INTERNAL_SERVER_ERROR,
   );
 
-  if (isDefined) {
-    return { ok: false, error: error.message };
-  } else if (error) {
-    return { ok: false, error: "Internal server error." };
+  if (!result.ok) {
+    return { ok: false, error: result.errorMessage };
   }
 
-  session.user = data.user;
-  session.accessToken = data.accessToken ?? null;
-  session.ts = Math.floor(Date.now() / 1000);
-
-  await session.save();
-
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
-  // not using redirect() yet: https://github.com/vercel/next.js/issues/51592#issuecomment-1810212676
-
+  await saveAuthSession(session, result.data);
   return redirect("/verify");
 }
 
@@ -257,15 +175,18 @@ export async function resendVerificationForm(
 ) {
   "use server";
 
-  const session = await getSession();
-
   const { client } = await createServerClient();
-  const { isDefined, error } = await safe(client.email.resendVerification());
+  const result = await safeClientCall(
+    client.email.resendVerification(),
+    INTERNAL_SERVER_ERROR,
+  );
 
-  if (isDefined && error.name === "CONFLICT") {
+  if (!result.ok && result.isDefined && result.error?.name === "CONFLICT") {
     return { ok: true, alreadyVerified: true };
-  } else if (error) {
-    return { ok: false, error: "Internal server error." };
+  }
+
+  if (!result.ok) {
+    return { ok: false, error: result.errorMessage };
   }
 
   return { ok: true };
@@ -290,15 +211,19 @@ export async function acceptTos(redirectTo?: string) {
   const session = await getSession();
   const { client } = await createServerClient();
 
-  const { error, data } = await safe(client.auth.tos.accept());
+  const result = await safeClientCall(
+    client.auth.tos.accept(),
+    INTERNAL_SERVER_ERROR,
+    true,
+  );
 
-  if (error) {
-    return { ok: false, error: error.message } as GenericResult;
+  if (!result.ok) {
+    return { ok: false, error: result.errorMessage } as GenericResult;
   }
 
-  session.user = data;
-  session.ts = Math.floor(Date.now() / 1000);
-  await session.save();
+  await saveAuthSession(session, {
+    user: result.data,
+  });
 
   if (redirectTo) {
     redirect(redirectTo);
@@ -315,17 +240,15 @@ export async function passwordResetForm(
 
   const email = (formData.get("email") || "") as string;
 
-  const session = await getSession();
   const { client } = await createServerClient();
 
-  const { error, isDefined } = await safe(
+  const result = await safeClientCall(
     client.auth.recovery.create({ email }),
+    INTERNAL_SERVER_ERROR,
   );
 
-  if (isDefined) {
-    return { ok: false, error: error.message };
-  } else if (error) {
-    return { ok: false, error: "Internal server error." };
+  if (!result.ok) {
+    return { ok: false, error: result.errorMessage };
   }
 
   return { ok: true };
@@ -343,21 +266,16 @@ export async function passwordResetConfirmForm(
   const session = await getSession();
   const { client } = await createServerClient();
 
-  const { error, isDefined, data } = await safe(
+  const result = await safeClientCall(
     client.auth.recovery.confirm({ token, password }),
+    INTERNAL_SERVER_ERROR,
   );
 
-  if (isDefined) {
-    return { ok: false, error: error.message };
-  } else if (error) {
-    return { ok: false, error: "Internal server error." };
+  if (!result.ok) {
+    return { ok: false, error: result.errorMessage };
   }
 
-  session.user = data.user;
-  session.accessToken = data.accessToken ?? null;
-  session.ts = Math.floor(Date.now() / 1000);
-
-  await session.save();
+  await saveAuthSession(session, result.data);
 
   return { ok: true };
 }
@@ -375,25 +293,20 @@ export async function passwordResetConfirmPasskeyForm(
   const session = await getSession();
   const { client } = await createServerClient();
 
-  const { error, isDefined, data } = await safe(
+  const result = await safeClientCall(
     client.auth.recovery.confirmPasskey({
       token,
       passkeyResponse: JSON.parse(passkeyResponse),
       signedChallenge,
     }),
+    INTERNAL_SERVER_ERROR,
   );
 
-  if (isDefined) {
-    return { ok: false, error: error.message };
-  } else if (error) {
-    return { ok: false, error: "Internal server error." };
+  if (!result.ok) {
+    return { ok: false, error: result.errorMessage };
   }
 
-  session.user = data.user;
-  session.accessToken = data.accessToken ?? null;
-  session.ts = Math.floor(Date.now() / 1000);
-
-  await session.save();
+  await saveAuthSession(session, result.data);
 
   return { ok: true };
 }
@@ -406,11 +319,9 @@ export async function updateSession(): Promise<SessionData> {
 
   try {
     const user = await client.users.details({ user: "me" });
-    session.user = user;
-    session.ts = Math.floor(Date.now() / 1000);
-    // should rotate access token too
-    // session.accessToken = data.accessToken;
-    await session.save();
+    await saveAuthSession(session, {
+      user,
+    });
   } catch (err: any) {
     if (err?.name === "UNAUTHORIZED" || err?.status === 401) {
       session.destroy();
@@ -443,4 +354,82 @@ export async function ensureSessionSynced(): Promise<SessionData> {
     console.error("ensureSessionSynced failed:", err);
     throw err;
   }
+}
+
+type Session = Awaited<ReturnType<typeof getSession>>;
+
+type SafeClientCallFailure = {
+  error: {
+    message: string;
+    name?: string;
+  };
+  errorMessage: string;
+  isDefined: boolean;
+  ok: false;
+};
+
+type SafeClientCallResult<T> =
+  | {
+      data: T;
+      ok: true;
+    }
+  | SafeClientCallFailure;
+
+async function safeClientCall<T>(
+  promise: Promise<T>,
+  fallbackMessage: string,
+  useMessageForAnyError = false,
+): Promise<SafeClientCallResult<T>> {
+  const { data, error, isDefined } = await safe(promise);
+
+  if (!error) {
+    return {
+      data,
+      ok: true,
+    };
+  }
+
+  return {
+    error,
+    errorMessage:
+      isDefined || useMessageForAnyError ? error.message : fallbackMessage,
+    isDefined,
+    ok: false,
+  };
+}
+
+function getSessionTimestamp(): number {
+  return Math.floor(Date.now() / 1000);
+}
+
+async function saveAuthSession(
+  session: Session,
+  payload: {
+    accessToken?: string | null;
+    user: NonNullable<SessionData["user"]>;
+  },
+): Promise<void> {
+  session.user = payload.user;
+
+  if (payload.accessToken !== undefined) {
+    session.accessToken = payload.accessToken ?? null;
+  }
+
+  session.ts = getSessionTimestamp();
+  await session.save();
+}
+
+function redirectAfterAuth(
+  user: NonNullable<SessionData["user"]>,
+  redirectTo: string,
+): never {
+  if (!user.termsAcceptedAt) {
+    redirect(`/auth/tos-required?redirectTo=${encodeURIComponent(redirectTo)}`);
+  }
+
+  if (!user.verified) {
+    redirect("/verify");
+  }
+
+  redirect(redirectTo);
 }
