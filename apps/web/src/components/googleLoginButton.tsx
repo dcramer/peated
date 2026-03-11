@@ -2,15 +2,17 @@
 
 import { useGoogleLogin } from "@react-oauth/google";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { type ComponentProps, useState } from "react";
 import Button from "./button";
 
 export default function GoogleLoginButton({
   action,
   title = "Sign in with Google",
+  color = "highlight",
 }: {
   action: (formData: FormData) => Promise<any>;
   title?: string;
+  color?: ComponentProps<typeof Button>["color"];
 }) {
   const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
@@ -35,7 +37,7 @@ export default function GoogleLoginButton({
   return (
     <Button
       fullWidth
-      color="highlight"
+      color={color}
       onClick={() => {
         setLoading(true);
         googleLogin();

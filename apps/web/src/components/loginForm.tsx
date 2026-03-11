@@ -115,7 +115,7 @@ export default function LoginForm() {
           <PasskeyLoginButton action={authenticate} />
 
           {config.GOOGLE_CLIENT_ID && (
-            <GoogleLoginButton action={authenticate} />
+            <GoogleLoginButton action={authenticate} color="primary" />
           )}
 
           <Button
