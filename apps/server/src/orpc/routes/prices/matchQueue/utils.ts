@@ -3,6 +3,7 @@ import {
   type StorePrice,
   type StorePriceMatchProposal,
 } from "@peated/server/db/schema";
+import { stripDuplicateBrandPrefixFromBottleName } from "@peated/server/lib/normalize";
 import { type Context } from "@peated/server/orpc/context";
 import {
   StorePriceMatchProposalSchema,
@@ -52,7 +53,7 @@ export async function serializeQueueItems(
 }
 
 export function serializeProposal(proposal: StorePriceMatchProposal) {
-  return StorePriceMatchProposalSchema.parse({
+  const serializedProposal = StorePriceMatchProposalSchema.parse({
     id: proposal.id,
     status: proposal.status,
     proposalType: proposal.proposalType,
@@ -73,4 +74,17 @@ export function serializeProposal(proposal: StorePriceMatchProposal) {
     createdAt: proposal.createdAt.toISOString(),
     updatedAt: proposal.updatedAt.toISOString(),
   });
+
+  return {
+    ...serializedProposal,
+    proposedBottle: serializedProposal.proposedBottle
+      ? {
+          ...serializedProposal.proposedBottle,
+          name: stripDuplicateBrandPrefixFromBottleName(
+            serializedProposal.proposedBottle.name,
+            serializedProposal.proposedBottle.brand.name,
+          ),
+        }
+      : null,
+  };
 }

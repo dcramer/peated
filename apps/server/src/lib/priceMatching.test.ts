@@ -422,7 +422,7 @@ describe("priceMatching", () => {
         suggestedBottleId: null,
         candidateBottleIds: [],
         proposedBottle: {
-          name: "Reserve",
+          name: "Draft Brand Reserve",
           series: {
             id: 42,
             name: "Special Releases",
@@ -464,6 +464,7 @@ describe("priceMatching", () => {
     expect(proposal.status).toBe("pending_review");
     expect(proposal.proposalType).toBe("create_new");
     expect(proposal.proposedBottle).toMatchObject({
+      name: "Reserve",
       series: {
         id: null,
         name: "Special Releases",

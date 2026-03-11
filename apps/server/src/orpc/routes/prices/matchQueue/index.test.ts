@@ -157,7 +157,7 @@ describe("price match queue", () => {
           distillery: ["Ben Nevis"],
         },
         proposedBottle: {
-          name: "Cask Strength",
+          name: "Independent Brand Cask Strength",
           category: "single_malt",
           statedAge: 12,
           brand: {

@@ -16,6 +16,7 @@ import {
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
 import { logError } from "@peated/server/lib/log";
+import { stripDuplicateBrandPrefixFromBottleName } from "@peated/server/lib/normalize";
 import { extractStorePriceBottleDetails } from "@peated/server/lib/priceMatchingCandidates";
 import type {
   ExtractedBottleDetailsSchema,
@@ -104,6 +105,10 @@ function sanitizeStorePriceMatchDecision(
     proposedBottle: decision.proposedBottle
       ? {
           ...decision.proposedBottle,
+          name: stripDuplicateBrandPrefixFromBottleName(
+            decision.proposedBottle.name,
+            decision.proposedBottle.brand.name,
+          ),
           series: decision.proposedBottle.series
             ? {
                 ...decision.proposedBottle.series,

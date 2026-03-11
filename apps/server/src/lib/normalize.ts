@@ -1,7 +1,7 @@
 import { CATEGORY_LIST } from "../constants";
 import { type Category } from "../types";
 import { formatCategoryName } from "./format";
-import { stripSuffix } from "./strings";
+import { stripPrefix, stripSuffix } from "./strings";
 
 const ageSuffix = "-year-old";
 
@@ -46,6 +46,17 @@ export function normalizeCategory(name: string): Category | null {
 export function normalizeEntityName(name: string): string {
   // name = name.replace(/ (distillery|distillerie)$/i, "");
   return name;
+}
+
+export function stripDuplicateBrandPrefixFromBottleName(
+  name: string,
+  brandName: string | null | undefined,
+): string {
+  if (!brandName) {
+    return name;
+  }
+
+  return stripPrefix(name, `${brandName} `);
 }
 
 // TODO: this is no longer normalizing a bottle name, lets rethink this code

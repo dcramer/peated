@@ -2,10 +2,10 @@ import { call, ORPCError } from "@orpc/server";
 import type { User } from "@peated/server/db/schema";
 import {
   normalizeBottle,
+  stripDuplicateBrandPrefixFromBottleName,
   type NormalizedBottle,
 } from "@peated/server/lib/normalize";
 import { parseDetailsFromName } from "@peated/server/lib/smws";
-import { stripPrefix } from "@peated/server/lib/strings";
 import { procedure } from "@peated/server/orpc";
 import type { Context } from "@peated/server/orpc/context";
 import { requireAuth } from "@peated/server/orpc/middleware";
@@ -86,7 +86,7 @@ export async function bottleNormalize({
   // remove duplicate brand name prefix on bottle name
   // e.g. Hibiki 12-year-old => Hibiki
   if (rv.brand) {
-    rv.name = stripPrefix(rv.name, `${rv.brand.name} `);
+    rv.name = stripDuplicateBrandPrefixFromBottleName(rv.name, rv.brand.name);
   }
 
   let normalized: NormalizedBottle = {
