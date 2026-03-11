@@ -102,7 +102,6 @@ export const ProposedBottleSchema = z.object({
   brand: ProposedEntityChoiceSchema,
   distillers: z.array(ProposedEntityChoiceSchema).default([]),
   bottler: ProposedEntityChoiceSchema.nullable().default(null),
-  description: z.string().nullable().default(null),
 });
 
 export const StorePriceMatchDecisionSchema = z.object({

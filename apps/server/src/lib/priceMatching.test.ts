@@ -313,7 +313,6 @@ describe("priceMatching", () => {
             },
           ],
           bottler: null,
-          description: null,
         },
       },
       searchEvidence: [],
@@ -391,7 +390,6 @@ describe("priceMatching", () => {
             },
           ],
           bottler: null,
-          description: null,
         },
       },
       searchEvidence: [
@@ -526,7 +524,6 @@ describe("priceMatching", () => {
             },
           ],
           bottler: null,
-          description: null,
         },
       },
       searchEvidence: [
@@ -991,7 +988,6 @@ describe("priceMatching", () => {
             id: 300,
             name: "Draft Bottler",
           },
-          description: null,
         },
       },
       searchEvidence: [],

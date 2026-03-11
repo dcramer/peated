@@ -107,7 +107,6 @@ describe("StorePriceMatchDecisionSchema", () => {
           },
         ],
         bottler: null,
-        description: null,
       },
     });
 

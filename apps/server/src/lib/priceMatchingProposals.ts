@@ -312,6 +312,8 @@ function buildBottleInputFromProposedBottle(
           region: null,
         })
       : null,
+    description: null,
+    descriptionSrc: null,
     imageUrl: null,
     flavorProfile: null,
   };
