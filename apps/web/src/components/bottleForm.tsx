@@ -16,7 +16,7 @@ import {
 } from "@peated/server/lib/format";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { BottleInputSchema } from "@peated/server/schemas";
-import type { Bottle, Entity, FlavorProfile } from "@peated/server/types";
+import type { Entity, FlavorProfile } from "@peated/server/types";
 import { PreviewBottleCard } from "@peated/web/components/bottleCard";
 import EntityField from "@peated/web/components/entityField";
 import Fieldset from "@peated/web/components/fieldset";
@@ -52,11 +52,43 @@ const categoryList = CATEGORY_LIST.map((c) => ({
   name: formatCategoryName(c),
 }));
 
-const entityToOption = (entity: Entity): Option => {
+const entityToOption = (
+  entity:
+    | Entity
+    | Option
+    | {
+        id?: string | number | null;
+        name?: string | null;
+      },
+): Option | undefined => {
+  if (!entity || !entity.name) return undefined;
   return {
     id: entity.id,
     name: entity.name,
   };
+};
+
+const isOption = (option: Option | undefined): option is Option =>
+  option !== undefined;
+const isDefined = <T,>(value: T | null | undefined): value is T =>
+  value != null;
+const choiceToOption = (
+  value:
+    | number
+    | Entity
+    | Option
+    | {
+        id?: string | number | null;
+        name?: string | null;
+      }
+    | null
+    | undefined,
+) => {
+  if (value == null || typeof value === "number") {
+    return undefined;
+  }
+
+  return entityToOption(value);
 };
 
 const flavorProfileList = FLAVOR_PROFILES.map((c) => ({
@@ -80,6 +112,49 @@ const caskTypeList = CASK_TYPES.map(({ id }) => ({
 }));
 
 type FormSchemaType = z.infer<typeof BottleInputSchema>;
+type ChoiceLike = {
+  id?: number | null;
+  name?: string | null;
+};
+export type BottleFormInitialData = Partial<
+  Omit<FormSchemaType, "brand" | "distillers" | "bottler" | "series" | "image">
+> & {
+  brand?: number | Entity | ChoiceLike | null;
+  distillers?: Array<number | Entity | ChoiceLike>;
+  bottler?: number | Entity | ChoiceLike | null;
+  series?: number | ChoiceLike | null;
+  imageUrl?: string | null;
+};
+
+const toEntityChoiceValue = (
+  value: number | Entity | ChoiceLike | null | undefined,
+): FormSchemaType["brand"] | FormSchemaType["bottler"] => {
+  if (value == null || typeof value === "number") {
+    return value;
+  }
+
+  return value.id ?? (value as Extract<FormSchemaType["brand"], object>);
+};
+
+const toSeriesChoiceValue = (
+  value: number | ChoiceLike | null | undefined,
+): FormSchemaType["series"] => {
+  if (value == null || typeof value === "number") {
+    return value;
+  }
+
+  return (
+    value.id ??
+    (value as Extract<NonNullable<FormSchemaType["series"]>, object>)
+  );
+};
+
+const toDistillerChoiceValues = (
+  values: Array<number | Entity | ChoiceLike> | null | undefined,
+): NonNullable<FormSchemaType["distillers"]> =>
+  (values
+    ?.map((value) => toEntityChoiceValue(value))
+    .filter(isDefined) as NonNullable<FormSchemaType["distillers"]>) ?? [];
 
 export default function BottleForm({
   onSubmit,
@@ -92,7 +167,7 @@ export default function BottleForm({
       image: HTMLCanvasElement | null | undefined;
     }
   >;
-  initialData: Partial<Bottle>;
+  initialData: BottleFormInitialData;
   title: string;
   returnTo?: string | null;
 }) {
@@ -108,12 +183,10 @@ export default function BottleForm({
     resolver: zodResolver(BottleInputSchema),
     defaultValues: {
       ...initialData,
-      bottler: initialData.bottler?.id,
-      brand: initialData.brand?.id,
-      distillers: initialData.distillers
-        ? initialData.distillers.map((d) => d.id)
-        : [],
-      series: initialData.series?.id,
+      bottler: toEntityChoiceValue(initialData.bottler),
+      brand: toEntityChoiceValue(initialData.brand) ?? undefined,
+      distillers: toDistillerChoiceValues(initialData.distillers),
+      series: toSeriesChoiceValue(initialData.series),
     },
   });
 
@@ -144,18 +217,18 @@ export default function BottleForm({
   };
 
   const [brandValue, setBrandValue] = useState<Option | undefined>(
-    initialData.brand ? entityToOption(initialData.brand) : undefined,
+    choiceToOption(initialData.brand),
   );
   const [distillersValue, setDistillersValue] = useState<Option[]>(
-    initialData.distillers ? initialData.distillers.map(entityToOption) : [],
+    initialData.distillers
+      ? initialData.distillers.map(choiceToOption).filter(isOption)
+      : [],
   );
   const [bottlerValue, setBottlerValue] = useState<Option | undefined>(
-    initialData.bottler ? entityToOption(initialData.bottler) : undefined,
+    choiceToOption(initialData.bottler),
   );
   const [seriesValue, setSeriesValue] = useState<Option | undefined>(
-    initialData.series
-      ? { id: initialData.series.id, name: initialData.series.name }
-      : undefined,
+    choiceToOption(initialData.series),
   );
 
   const [showCaskDetails, setShowCaskDetails] = useState(true);
