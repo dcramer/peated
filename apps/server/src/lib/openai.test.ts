@@ -1,5 +1,6 @@
 import { zodTextFormat } from "openai/helpers/zod";
 import { describe, expect, test } from "vitest";
+import { z } from "zod";
 import { OpenAIBottleDetailsValidationSchema } from "../worker/jobs/generateBottleDetails";
 import { OpenAICountryDetailsSchema } from "../worker/jobs/generateCountryDetails";
 import { OpenAIEntityDetailsValidationSchema } from "../worker/jobs/generateEntityDetails";
@@ -25,5 +26,23 @@ describe("openai structured output schemas", () => {
     expect(() =>
       zodTextFormat(OpenAIRegionDetailsSchema, "generate_region_details"),
     ).not.toThrow();
+  });
+
+  test("does not emit unsupported uri formats for generated entity websites", () => {
+    const jsonSchema = z.toJSONSchema(
+      OpenAIEntityDetailsValidationSchema,
+    ) as unknown as {
+      properties?: {
+        website?: {
+          anyOf?: Array<{ format?: string }>;
+        };
+      };
+    };
+
+    expect(
+      jsonSchema.properties?.website?.anyOf?.some(
+        (schema) => schema.format === "uri",
+      ),
+    ).toBe(false);
   });
 });

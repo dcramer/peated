@@ -71,7 +71,7 @@ export const OpenAIEntityDetailsSchema = z.object({
       z.number().nullable(),
     )
     .default(null),
-  website: z.string().url().nullable().default(null),
+  website: z.string().trim().nullable().default(null),
   type: z.array(z.string()).default([]),
 });
 
@@ -83,7 +83,7 @@ export const OpenAIEntityDetailsValidationSchema = z.object({
       z.number().nullable(),
     )
     .default(null),
-  website: z.string().url().nullable().default(null),
+  website: z.string().trim().nullable().default(null),
   type: z.array(EntityTypeEnum).default([]),
 });
 
