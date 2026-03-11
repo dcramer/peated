@@ -33,7 +33,7 @@
     "@peated/tsconfig": "workspace:*",
     "@sentry/core": "catalog:",
     "@sentry/node": "catalog:",
-    "@simplewebauthn/server": "^13.2.2",
+    "@simplewebauthn/server": "^13.3.0",
     "@simplewebauthn/types": "^12.0.0",
     "@sindresorhus/slugify": "^2.2.1",
     "@tanstack/react-query": "catalog:",
