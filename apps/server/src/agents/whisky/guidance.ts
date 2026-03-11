@@ -415,6 +415,8 @@ export function buildStorePriceMatchInstructions({
     "Search policy:",
     renderBulletLines([
       "Use `openai_web_search` only when local evidence is ambiguous, conflicting, or suggests the current assignment is wrong.",
+      "Before returning `create_new`, use `openai_web_search` to validate that the listing appears to be a real distinct bottling unless local evidence is already decisive.",
+      "When you are leaning toward `create_new` or `no_match` because local candidates are weak, do at least one web search while search budget remains.",
       "When searching, prioritize the retailer domain first, then producer or distiller domains, then broader web if still unresolved.",
       `You have a hard limit of ${maxSearchQueries} search calls.`,
     ]),
@@ -423,6 +425,7 @@ export function buildStorePriceMatchInstructions({
     renderBulletLines([
       "A false positive match is worse than returning `no_match` or a lower-confidence review candidate.",
       "Return `create_new` only when the listing clearly represents a bottle that is not already present in the candidate set.",
+      "Do not return `create_new` from sparse local evidence alone when a web search could still confirm or refute the bottle identity.",
       "If the current bottle assignment is likely wrong, return `correction`.",
       "If the current bottle assignment is likely correct and confidence is high, return `match_existing` with that bottle id.",
       "If identity evidence is weak, conflicting, or missing on the decisive components, do not force a match.",

@@ -63,6 +63,15 @@ describe("whiskyLabelGuidance", () => {
     expect(instructions).toContain(
       "If identity evidence is weak, conflicting, or missing on the decisive components, do not force a match.",
     );
+    expect(instructions).toContain(
+      "Before returning `create_new`, use `openai_web_search` to validate that the listing appears to be a real distinct bottling unless local evidence is already decisive.",
+    );
+    expect(instructions).toContain(
+      "When you are leaning toward `create_new` or `no_match` because local candidates are weak, do at least one web search while search budget remains.",
+    );
+    expect(instructions).toContain(
+      "Do not return `create_new` from sparse local evidence alone when a web search could still confirm or refute the bottle identity.",
+    );
     expect(instructions).toContain("You have a hard limit of 5 search calls.");
   });
 });
