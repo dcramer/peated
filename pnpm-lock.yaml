@@ -10,8 +10,8 @@ catalogs:
       specifier: ^5.0.19
       version: 5.0.19
     '@sentry/core':
-      specifier: 10.42.0
-      version: 10.42.0
+      specifier: 10.43.0
+      version: 10.43.0
     '@sentry/nextjs':
       specifier: 10.42.0
       version: 10.42.0
@@ -254,7 +254,7 @@ importers:
         version: link:../../packages/tsconfig
       '@sentry/core':
         specifier: 'catalog:'
-        version: 10.42.0
+        version: 10.43.0
       '@sentry/node':
         specifier: 'catalog:'
         version: 10.42.0
@@ -447,7 +447,7 @@ importers:
         version: 0.11.1(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       '@sentry/core':
         specifier: 'catalog:'
-        version: 10.42.0
+        version: 10.43.0
       '@sentry/nextjs':
         specifier: 'catalog:'
         version: 10.42.0(@opentelemetry/context-async-hooks@2.6.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.6.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.6.0(@opentelemetry/api@1.9.0))(next@14.2.4(@babel/core@7.28.0)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.93.0)
@@ -665,7 +665,7 @@ importers:
         version: link:../tsconfig
       '@sentry/core':
         specifier: '*'
-        version: 9.23.0
+        version: 10.43.0
     devDependencies:
       '@orpc/client':
         specifier: ^1.7.9
@@ -3648,8 +3648,8 @@ packages:
     resolution: {integrity: sha512-L4rMrXMqUKBanpjpMT+TuAVk6xAijz6AWM6RiEYpohAr7SGcCEc1/T0+Ep1eLV8+pwWacfU27OvELIyNeOnGzA==}
     engines: {node: '>=18'}
 
-  '@sentry/core@9.23.0':
-    resolution: {integrity: sha512-9846pn/BvASGgl7WsnKY4xry98WreP9ToeLfCQTQOf+pNfD/qNPn1/0xPInGni3LVMAXRtfHHMPm2Ghz255N7A==}
+  '@sentry/core@10.43.0':
+    resolution: {integrity: sha512-l0SszQAPiQGWl/ferw8GP3ALyHXiGiRKJaOvNmhGO+PrTQyZTZ6OYyPnGijAFRg58dE1V3RCH/zw5d2xSUIiNg==}
     engines: {node: '>=18'}
 
   '@sentry/nextjs@10.42.0':
@@ -12560,7 +12560,7 @@ snapshots:
 
   '@sentry/core@10.42.0': {}
 
-  '@sentry/core@9.23.0': {}
+  '@sentry/core@10.43.0': {}
 
   '@sentry/nextjs@10.42.0(@opentelemetry/context-async-hooks@2.6.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.6.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.6.0(@opentelemetry/api@1.9.0))(next@14.2.4(@babel/core@7.28.0)(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.93.0)':
     dependencies:
