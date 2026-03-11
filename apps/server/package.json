@@ -43,7 +43,7 @@
     "@types/mime-types": "^2.1.4",
     "@types/mjml": "^4.7.4",
     "@types/node": "catalog:",
-    "@types/nodemailer": "^6.4.17",
+    "@types/nodemailer": "^7.0.11",
     "@types/pg": "catalog:",
     "@types/react": "catalog:",
     "@vitest/coverage-v8": "catalog:",
