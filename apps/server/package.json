@@ -50,7 +50,7 @@
     "axios": "~1.6.8",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.40.3",
-    "cheerio": "1.0.0-rc.12",
+    "cheerio": "1.2.0",
     "commander": "^12.1.0",
     "concurrently": "^8.2.2",
     "core-js": "^3.40.0",
