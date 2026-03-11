@@ -27,7 +27,7 @@ catalog:
   tsx: ^4.16.2
   typescript: ^5.5.4
   "@types/node": ^22.13.1
-  "@types/pg": ^8.11.6
+  "@types/pg": ^8.18.0
   vitest: "~3"
   "@vitest/coverage-v8": "~3"
   "vite-tsconfig-paths": "^6.1.1"

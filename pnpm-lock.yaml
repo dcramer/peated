@@ -37,8 +37,8 @@ catalogs:
       specifier: ^22.13.1
       version: 22.13.1
     '@types/pg':
-      specifier: ^8.11.6
-      version: 8.11.6
+      specifier: ^8.18.0
+      version: 8.18.0
     '@types/react':
       specifier: ^18.2.0
       version: 18.3.3
@@ -176,7 +176,7 @@ importers:
         version: 22.13.1
       '@types/pg':
         specifier: 'catalog:'
-        version: 8.11.6
+        version: 8.18.0
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
@@ -194,7 +194,7 @@ importers:
         version: 0.30.5
       drizzle-orm:
         specifier: 'catalog:'
-        version: 0.39.3(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(pg@8.13.0)
+        version: 0.39.3(@opentelemetry/api@1.9.0)(@types/pg@8.18.0)(pg@8.13.0)
       pg:
         specifier: 'catalog:'
         version: 8.13.0
@@ -293,7 +293,7 @@ importers:
         version: 7.0.11
       '@types/pg':
         specifier: 'catalog:'
-        version: 8.11.6
+        version: 8.18.0
       '@types/react':
         specifier: 'catalog:'
         version: 18.3.3
@@ -335,7 +335,7 @@ importers:
         version: 0.30.5
       drizzle-orm:
         specifier: 'catalog:'
-        version: 0.39.3(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(pg@8.13.0)
+        version: 0.39.3(@opentelemetry/api@1.9.0)(@types/pg@8.18.0)(pg@8.13.0)
       error-cause:
         specifier: ^1.0.9
         version: 1.0.9
@@ -4100,11 +4100,11 @@ packages:
   '@types/pg-pool@2.0.7':
     resolution: {integrity: sha512-U4CwmGVQcbEuqpyju8/ptOKg6gEC+Tqsvj2xS9o1g71bUh8twxnC6ZL5rZKCsGN0iyH0CwgUyc9VR5owNQF9Ng==}
 
-  '@types/pg@8.11.6':
-    resolution: {integrity: sha512-/2WmmBXHLsfRqzfHW7BNZ8SbYzE8OSk7i3WjFYvfgRHj7S1xj+16Je5fUKv3lVdVzk/zn9TXOqf+avFCFIE0yQ==}
-
   '@types/pg@8.15.6':
     resolution: {integrity: sha512-NoaMtzhxOrubeL/7UZuNTrejB4MPAJ0RpxZqXQf2qXuVlTPuG6Y8p4u9dKRaue4yjmC7ZhzVO2/Yyyn25znrPQ==}
+
+  '@types/pg@8.18.0':
+    resolution: {integrity: sha512-gT+oueVQkqnj6ajGJXblFR4iavIXWsGAFCk3dP4Kki5+a9R4NMt0JARdk6s8cUKcfUoqP5dAtDSLU8xYUTFV+Q==}
 
   '@types/pica@9.0.4':
     resolution: {integrity: sha512-Wr8bZ53IVjFWMLRsWEiGCfCDWoKORczxC04+XlvQrhn0tF3qDMQoLFHPPzZBcCi2uu5D6+alfrvidpTthFwKbw==}
@@ -7281,9 +7281,6 @@ packages:
     resolution: {integrity: sha512-gXah6aZrcUxjWg2zR2MwouP2eHlCBzdV4pygudehaKXSGW4v2AsRQUK+lwwXhii6KFZcunEnmSUoYp5CXibxtA==}
     engines: {node: '>= 0.4'}
 
-  obuf@1.1.2:
-    resolution: {integrity: sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==}
-
   on-finished@2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}
     engines: {node: '>= 0.8'}
@@ -7464,10 +7461,6 @@ packages:
     resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
     engines: {node: '>=4.0.0'}
 
-  pg-numeric@1.0.2:
-    resolution: {integrity: sha512-BM/Thnrw5jm2kKLE5uJkXqqExRUY/toLHda65XgFTBTFYZyopbKjBe29Ii3RbkvlsMoFwD+tHeGaCjjv0gHlyw==}
-    engines: {node: '>=4'}
-
   pg-pool@3.7.1:
     resolution: {integrity: sha512-xIOsFoh7Vdhojas6q3596mXFsR8nwBQBXX5JiV7p9buEVAGqYL4yFzclON5P9vFrpu1u7Zwl2oriyDa89n0wbw==}
     peerDependencies:
@@ -7479,10 +7472,6 @@ packages:
   pg-types@2.2.0:
     resolution: {integrity: sha512-qTAAlrEsl8s4OiEQY69wDvcMIdQN6wdz5ojQiOy6YRMuynxenON0O5oCpJI6lshc6scgAY8qvJ2On/p+CXY0GA==}
     engines: {node: '>=4'}
-
-  pg-types@4.0.2:
-    resolution: {integrity: sha512-cRL3JpS3lKMGsKaWndugWQoLOCoP+Cic8oseVcbr0qhPzYD5DWXK+RZ9LY9wxRf7RQia4SCwQlXk0q6FCPrVng==}
-    engines: {node: '>=10'}
 
   pg@8.13.0:
     resolution: {integrity: sha512-34wkUTh3SxTClfoHB3pQ7bIMvw9dpFU1audQQeZG837fmHfHpr14n/AELVDoOYVDW2h5RDWU78tFjkD+erSBsw==}
@@ -7619,36 +7608,17 @@ packages:
     resolution: {integrity: sha512-VpZrUqU5A69eQyW2c5CA1jtLecCsN2U/bD6VilrFDWq5+5UIEVO7nazS3TEcHf1zuPYO/sqGvUvW62g86RXZuA==}
     engines: {node: '>=4'}
 
-  postgres-array@3.0.2:
-    resolution: {integrity: sha512-6faShkdFugNQCLwucjPcY5ARoW1SlbnrZjmGl0IrrqewpvxvhSLHimCVzqeuULCbG0fQv7Dtk1yDbG3xv7Veog==}
-    engines: {node: '>=12'}
-
   postgres-bytea@1.0.0:
     resolution: {integrity: sha512-xy3pmLuQqRBZBXDULy7KbaitYqLcmxigw14Q5sj8QBVLqEwXfeybIKVWiqAXTlcvdvb0+xkOtDbfQMOf4lST1w==}
     engines: {node: '>=0.10.0'}
-
-  postgres-bytea@3.0.0:
-    resolution: {integrity: sha512-CNd4jim9RFPkObHSjVHlVrxoVQXz7quwNFpz7RY1okNNme49+sVyiTvTRobiLV548Hx/hb1BG+iE7h9493WzFw==}
-    engines: {node: '>= 6'}
 
   postgres-date@1.0.7:
     resolution: {integrity: sha512-suDmjLVQg78nMK2UZ454hAG+OAW+HQPZ6n++TNDUX+L0+uUlLywnoxJKDou51Zm+zTCjrCl0Nq6J9C5hP9vK/Q==}
     engines: {node: '>=0.10.0'}
 
-  postgres-date@2.1.0:
-    resolution: {integrity: sha512-K7Juri8gtgXVcDfZttFKVmhglp7epKb1K4pgrkLxehjqkrgPhfG6OO8LHLkfaqkbpjNRnra018XwAr1yQFWGcA==}
-    engines: {node: '>=12'}
-
   postgres-interval@1.2.0:
     resolution: {integrity: sha512-9ZhXKM/rw350N1ovuWHbGxnGh/SNJ4cnxHiM0rxE4VN41wsg8P8zWn9hv/buK00RP4WvlOyr/RBDiptyxVbkZQ==}
     engines: {node: '>=0.10.0'}
-
-  postgres-interval@3.0.0:
-    resolution: {integrity: sha512-BSNDnbyZCXSxgA+1f5UU2GmwhoI0aU5yMxRGO8CdFEcY2BQF9xm/7MqKnYoM1nJDk8nONNWDk9WeSmePFhQdlw==}
-    engines: {node: '>=12'}
-
-  postgres-range@1.1.4:
-    resolution: {integrity: sha512-i/hbxIE9803Alj/6ytL7UHQxRvZkI9O4Sy+J3HGc4F4oo/2eQAjTSNJ0bfxyse3bH0nuVesCk+3IRLaMtG3H6w==}
 
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
@@ -13140,17 +13110,17 @@ snapshots:
 
   '@types/pg-pool@2.0.7':
     dependencies:
-      '@types/pg': 8.15.6
-
-  '@types/pg@8.11.6':
-    dependencies:
-      '@types/node': 22.13.1
-      pg-protocol: 1.7.1
-      pg-types: 4.0.2
+      '@types/pg': 8.18.0
 
   '@types/pg@8.15.6':
     dependencies:
       '@types/node': 24.2.0
+      pg-protocol: 1.7.1
+      pg-types: 2.2.0
+
+  '@types/pg@8.18.0':
+    dependencies:
+      '@types/node': 25.4.0
       pg-protocol: 1.7.1
       pg-types: 2.2.0
 
@@ -14634,10 +14604,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.39.3(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(pg@8.13.0):
+  drizzle-orm@0.39.3(@opentelemetry/api@1.9.0)(@types/pg@8.18.0)(pg@8.13.0):
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
-      '@types/pg': 8.11.6
+      '@types/pg': 8.18.0
       pg: 8.13.0
 
   dunder-proto@1.0.1:
@@ -17083,8 +17053,6 @@ snapshots:
       define-properties: 1.2.1
       es-object-atoms: 1.1.1
 
-  obuf@1.1.2: {}
-
   on-finished@2.4.1:
     dependencies:
       ee-first: 1.1.1
@@ -17256,8 +17224,6 @@ snapshots:
 
   pg-int8@1.0.1: {}
 
-  pg-numeric@1.0.2: {}
-
   pg-pool@3.7.1(pg@8.13.0):
     dependencies:
       pg: 8.13.0
@@ -17271,16 +17237,6 @@ snapshots:
       postgres-bytea: 1.0.0
       postgres-date: 1.0.7
       postgres-interval: 1.2.0
-
-  pg-types@4.0.2:
-    dependencies:
-      pg-int8: 1.0.1
-      pg-numeric: 1.0.2
-      postgres-array: 3.0.2
-      postgres-bytea: 3.0.0
-      postgres-date: 2.1.0
-      postgres-interval: 3.0.0
-      postgres-range: 1.1.4
 
   pg@8.13.0:
     dependencies:
@@ -17434,25 +17390,13 @@ snapshots:
 
   postgres-array@2.0.0: {}
 
-  postgres-array@3.0.2: {}
-
   postgres-bytea@1.0.0: {}
 
-  postgres-bytea@3.0.0:
-    dependencies:
-      obuf: 1.1.2
-
   postgres-date@1.0.7: {}
-
-  postgres-date@2.1.0: {}
 
   postgres-interval@1.2.0:
     dependencies:
       xtend: 4.0.2
-
-  postgres-interval@3.0.0: {}
-
-  postgres-range@1.1.4: {}
 
   prelude-ls@1.2.1: {}
 
