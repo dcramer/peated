@@ -34,4 +34,16 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - Backend routes live in `apps/server/src/orpc/routes/<domain>/`; keep one file per operation
 - Serializer pattern: `apps/server/src/serializers/*` with `attrs()` and `item()`, invoked via `serialize(...)`
 - DB schema lives in `apps/server/src/db/schema/`
+- Database migrations must be created with `pnpm db:generate` (Drizzle Kit); never hand-write migration SQL or edit `apps/server/migrations/meta/*` manually
 - Web app uses Next.js App Router in `apps/web/src/app/`
+
+## Docs Index
+
+- Any new doc added under `docs/` must also be added to this index in `AGENTS.md`
+- `docs/architecture/account-policies.md`
+- `docs/architecture/rating-systems.md`
+- `docs/development/backend-testing.md`
+- `docs/development/orpc-client.md`
+- `docs/development/orpc-routes.md`
+- `docs/development/schema-conventions.md`
+- `docs/features/simple-rating-system.md`
