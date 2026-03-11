@@ -56,7 +56,7 @@ function generatePrompt(entity: InputEntity) {
     ].join(" "),
     [
       "'type' should include every strongly supported value from: brand, distiller, bottler.",
-      "If none can be determined confidently, omit the field.",
+      "If none can be determined confidently, return an empty array.",
     ].join(" "),
   ];
 
@@ -64,20 +64,27 @@ function generatePrompt(entity: InputEntity) {
 }
 
 export const OpenAIEntityDetailsSchema = z.object({
-  description: z.string().nullable().optional(),
-  yearEstablished: z.preprocess(
-    (val) => (typeof val === "string" && val ? parseInt(val, 10) : val),
-    z.number().nullable().optional(),
-  ),
-  website: z.string().url().nullable().optional(),
-  type: z.array(z.string()).optional(),
+  description: z.string().nullable().default(null),
+  yearEstablished: z
+    .preprocess(
+      (val) => (typeof val === "string" && val ? parseInt(val, 10) : val),
+      z.number().nullable(),
+    )
+    .default(null),
+  website: z.string().url().nullable().default(null),
+  type: z.array(z.string()).default([]),
 });
 
-const OpenAIEntityDetailsValidationSchema = z.object({
-  description: z.string().nullable().optional(),
-  yearEstablished: z.number().nullable().optional(),
-  website: z.string().url().nullable().optional(),
-  type: z.array(EntityTypeEnum).optional(),
+export const OpenAIEntityDetailsValidationSchema = z.object({
+  description: z.string().nullable().default(null),
+  yearEstablished: z
+    .preprocess(
+      (val) => (typeof val === "string" && val ? parseInt(val, 10) : val),
+      z.number().nullable(),
+    )
+    .default(null),
+  website: z.string().url().nullable().default(null),
+  type: z.array(EntityTypeEnum).default([]),
 });
 
 export type GeneratedEntityDetails = z.infer<typeof OpenAIEntityDetailsSchema>;

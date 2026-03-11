@@ -23,7 +23,6 @@ const CATEGORY_VALUES = [
   "`single_grain`",
   "`single_malt`",
   "`single_pot_still`",
-  "`spirit`",
 ].join(", ");
 
 export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
@@ -72,6 +71,7 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
     guidance: [
       "Use this for batch labels, store-pick codes, release identifiers, or numbered editions such as `Batch 3`, `2021 Release`, or `S2B13`.",
       "Treat short suffix codes as meaningful bottle identity when they look like a batch or store-pick marker.",
+      "If `edition` captures a batch, store-pick, or release label, do not repeat that same text inside `expression` or `proposedBottle.name`.",
     ],
   },
   {
@@ -80,7 +80,7 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
     outputField: "`category`",
     guidance: [
       `Normalize into one of ${CATEGORY_VALUES}.`,
-      "Use `spirit` as a fallback for whiskies that do not map cleanly to the narrower house categories.",
+      "If the whisky category is unclear, return `null` instead of using a broader fallback bucket.",
     ],
   },
   {
@@ -106,7 +106,7 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
     label: "Strength and barrel flags",
     outputField: "`cask_strength`, `single_cask`",
     guidance: [
-      "Set `cask_strength` to true only when the label explicitly says cask strength, barrel proof, full proof, natural strength, or similar.",
+      "Set `cask_strength` to true only when the label explicitly says cask strength, barrel strength, barrel proof, full proof, natural strength, or similar.",
       "Set `single_cask` to true only when the label explicitly says single cask, single barrel, or a specific cask/barrel selection.",
     ],
   },
@@ -190,7 +190,7 @@ export const RETAILER_LABEL_EXAMPLES: RetailerLabelExample[] = [
     label: "Michter's US*1 American Whiskey",
     notes: [
       "Series punctuation is part of the identity and should be preserved.",
-      "The category is broader than bourbon or rye, so `spirit` can be the right normalized fallback.",
+      "If the category is unclear from the title alone, leave it `null` instead of forcing a broader fallback.",
     ],
   },
   {
@@ -365,12 +365,14 @@ export function buildWhiskyLabelExtractorInstructions({
       "For independent bottlings, keep the bottler in `brand` and the producing distillery in `distillery`.",
       "Prefer `[]` over guessing when the producing distillery is unknown.",
       "When a component is ambiguous, leave it `null` or `[]` instead of guessing. Missing data is better than a fabricated identity signal.",
+      "If the listing is clearly for a non-whisky spirit such as vodka, gin, rum, tequila, or mezcal, return `null`.",
       "Age statements should be integers. Normalize age phrases such as `12 Year`, `12 Years Old`, `12 Yr.`, and `12yr` to `stated_age: 12`.",
       "When an age statement belongs in the expression, normalize the phrase to `12-year-old`.",
       "For expression-style fields, follow the bottle's evidenced canonical name. Do not mechanically append retailer style/category words from the title just to make the expression look complete.",
+      "If `edition`, `release_year`, or `vintage_year` is populated, do not also copy that same batch code or year into `expression`.",
       "Use `release_year` only for explicit release or bottling years, not founding dates or warning text.",
       "If both distillation and bottling years are present, use `vintage_year` for the distillation year and `release_year` for the bottling year.",
-      "Set `cask_strength` and `single_cask` only when the label states them explicitly.",
+      "Set `cask_strength` and `single_cask` only when the label states them explicitly. `Barrel Strength`, `Barrel Proof`, `Full Proof`, and `Natural Strength` all count as `cask_strength: true`.",
       "Correct obvious whisky-name typos only when the intended bottle is clear from the input.",
     ]),
     "",
@@ -415,8 +417,8 @@ export function buildStorePriceMatchInstructions({
       "`distillery` is the actual producing distillery or distilleries. For independent bottlings, `brand` and `distillery` often differ.",
       "`expression` is the core release name after removing producer, age, ABV, and generic style words.",
       "`series` is a stable range or family. `edition` is a batch, store-pick code, release code, or numbered variant.",
-      "`category` should be normalized to the house values. `spirit` is a fallback when the whisky style is broader than bourbon, rye, or the Scotch-focused categories.",
-      "`cask_strength` and `single_cask` are true only when the listing states them explicitly.",
+      "`category` should be normalized to the house values. If the whisky type is unclear, leave `category` as `null` instead of using a fallback bucket.",
+      "`cask_strength` and `single_cask` are true only when the listing states them explicitly. `Barrel Strength`, `Barrel Proof`, `Full Proof`, and `Natural Strength` all imply `caskStrength: true`.",
       "If a decisive component is missing or ambiguous, treat that as uncertainty instead of inventing a cleaner canonical label.",
     ]),
     "",
@@ -432,9 +434,9 @@ export function buildStorePriceMatchInstructions({
       "Use `search_entities` when brand, distillery, or bottler identity is unclear and that ambiguity blocks a decision.",
       "For independent bottlings, evaluate `brand` and `distillery` separately because the bottler and producer can differ.",
       "Treat differences in age, edition code, store-pick code, cask finish, single-cask status, or cask-strength status as meaningful bottle identity unless the evidence clearly shows retailer noise.",
-      "Do not reject a candidate solely because the extracted category is `spirit`; that is a coarse fallback category.",
       "Missing generic style words like `single malt` are weak evidence. Conflicting age statements, edition codes, or barrel descriptors are strong evidence.",
       "Ignore volume, gift-set packaging, added glassware, ratings blurbs, and generic retailer SEO words when deciding bottle identity.",
+      "If the listing is clearly another spirit category such as vodka, gin, rum, tequila, or mezcal, return `no_match`. Do not create or assign a whisky bottle for it.",
     ]),
     "",
     "Common retailer failure modes:",
@@ -445,6 +447,7 @@ export function buildStorePriceMatchInstructions({
       "Use `openai_web_search` only when local evidence is ambiguous, conflicting, or suggests the current assignment is wrong.",
       "Before returning `create_new`, use `openai_web_search` to validate that the listing appears to be a real distinct bottling unless local evidence is already decisive.",
       "When you are leaning toward `create_new` or `no_match` because local candidates are weak, do at least one web search while search budget remains.",
+      "If `localSearch.hasExactAliasMatch` is false and you do not have web evidence, keep `create_new` confidence below 90.",
       "When searching, prioritize the retailer domain first, then producer or distiller domains, then broader web if still unresolved.",
       `You have a hard limit of ${maxSearchQueries} search calls.`,
     ]),
@@ -461,6 +464,7 @@ export function buildStorePriceMatchInstructions({
       "Only set `suggestedBottleId` to an id from the provided candidates.",
       "If you return `create_new`, `proposedBottle` must include every schema field, using `null` or `[]` when unknown.",
       "For `proposedBottle.name`, follow the bottle's evidenced canonical name, not a mechanically copied retailer title. Do not append extra style/category words just because they appeared in the store listing.",
+      "If `proposedBottle.edition`, `proposedBottle.releaseYear`, or `proposedBottle.vintageYear` is set, do not repeat that same batch code or year in `proposedBottle.name` unless it is part of the evidenced canonical series name.",
       "For `brand`, `distillers`, `bottler`, and `series`, return objects with `{ id, name }`. Use `id: null` when you do not know a local id.",
       "Never invent websites, producer relationships, release details, or missing proof numbers.",
     ]),

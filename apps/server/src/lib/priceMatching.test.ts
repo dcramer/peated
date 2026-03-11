@@ -124,6 +124,8 @@ describe("priceMatching", () => {
       cask_strength: null,
       single_cask: null,
       edition: null,
+      vintage_year: null,
+      release_year: null,
       currentBottleId: null,
       limit: 15,
     });
@@ -171,6 +173,8 @@ describe("priceMatching", () => {
       cask_strength: null,
       single_cask: null,
       edition: null,
+      vintage_year: null,
+      release_year: null,
       currentBottleId: null,
       limit: 15,
     });
@@ -243,6 +247,213 @@ describe("priceMatching", () => {
     expect(proposal.status).toBe("pending_review");
     expect(proposal.proposalType).toBe("match_existing");
     expect(proposal.confidence).toBe(88);
+  });
+
+  test("caps local-only create_new confidence below the auto-create threshold", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Local Only Create Candidate",
+      imageUrl: null,
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Local Only Brand",
+      expression: "Reserve",
+      series: null,
+      distillery: ["Local Only Distillery"],
+      category: "single_malt",
+      stated_age: 12,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyStorePriceMatch).mockResolvedValue({
+      decision: {
+        action: "create_new",
+        confidence: 95,
+        rationale: "Looks like a distinct bottle from local evidence.",
+        suggestedBottleId: null,
+        candidateBottleIds: [],
+        proposedBottle: {
+          name: "Reserve",
+          series: null,
+          category: "single_malt",
+          edition: null,
+          statedAge: 12,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          brand: {
+            id: null,
+            name: "Local Only Brand",
+          },
+          distillers: [
+            {
+              id: null,
+              name: "Local Only Distillery",
+            },
+          ],
+          bottler: null,
+          description: null,
+        },
+      },
+      searchEvidence: [],
+      candidateBottles: [],
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(proposal.status).toBe("pending_review");
+    expect(proposal.proposalType).toBe("create_new");
+    expect(proposal.confidence).toBe(89);
+  });
+
+  test("treats unknown or spirit create_new categories as review-only", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Spirit Category Candidate",
+      imageUrl: null,
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Spirit Brand",
+      expression: "Reserve",
+      series: null,
+      distillery: ["Spirit Distillery"],
+      category: "spirit",
+      stated_age: 12,
+      abv: null,
+      release_year: 2024,
+      vintage_year: 2010,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: "Batch 1",
+    });
+    vi.mocked(classifyStorePriceMatch).mockResolvedValue({
+      decision: {
+        action: "create_new",
+        confidence: 96,
+        rationale: "Web evidence suggests this is a real release.",
+        suggestedBottleId: null,
+        candidateBottleIds: [],
+        proposedBottle: {
+          name: "Reserve Batch 1 2024",
+          series: null,
+          category: "spirit",
+          edition: "Batch 1",
+          statedAge: 12,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: 2010,
+          releaseYear: 2024,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          brand: {
+            id: null,
+            name: "Spirit Brand",
+          },
+          distillers: [
+            {
+              id: null,
+              name: "Spirit Distillery",
+            },
+          ],
+          bottler: null,
+          description: null,
+        },
+      },
+      searchEvidence: [
+        {
+          query: 'site:woodencork.com "Spirit Category Candidate"',
+          results: [
+            {
+              title: "Spirit Category Candidate",
+              url: "https://woodencork.example/spirit-category-candidate",
+              description: "Retailer listing",
+              extraSnippets: [],
+            },
+          ],
+        },
+      ],
+      candidateBottles: [],
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+
+    expect(proposal.status).toBe("pending_review");
+    expect(proposal.confidence).toBe(89);
+    expect(proposal.extractedLabel).toMatchObject({
+      category: null,
+      edition: "Batch 1",
+      release_year: 2024,
+      vintage_year: 2010,
+    });
+    expect(proposal.proposedBottle).toMatchObject({
+      category: null,
+      edition: "Batch 1",
+      releaseYear: 2024,
+      vintageYear: 2010,
+    });
+    expect(updatedPrice?.bottleId).toBeNull();
+  });
+
+  test("auto ignores clearly non-whisky listings", async ({ fixtures }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Tito's Handmade Vodka",
+      imageUrl: null,
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue(null);
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(classifyStorePriceMatch).not.toHaveBeenCalled();
+    expect(proposal.status).toBe("ignored");
+    expect(proposal.proposalType).toBe("no_match");
   });
 
   test("auto creates high-confidence web-validated new bottles", async ({
@@ -430,6 +641,100 @@ describe("priceMatching", () => {
         }),
       ]),
     );
+  });
+
+  test("includes release and vintage years in structured candidate search text", async () => {
+    config.OPENAI_API_KEY = "test-openai-key";
+
+    const { getOpenAIEmbedding } = await import(
+      "@peated/server/lib/openaiEmbeddings"
+    );
+    vi.mocked(getOpenAIEmbedding).mockResolvedValue([0.1, 0.2, 0.3]);
+
+    const executeSpy = vi.spyOn(db, "execute") as any;
+    executeSpy.mockResolvedValue({ rows: [] });
+
+    await findBottleMatchCandidates({
+      query: "Springbank Local Barley",
+      brand: "Springbank",
+      expression: "Local Barley",
+      series: null,
+      distillery: ["Springbank"],
+      category: "single_malt",
+      stated_age: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: "Batch 1",
+      vintage_year: 2010,
+      release_year: 2024,
+      currentBottleId: null,
+      limit: 15,
+    });
+
+    expect(getOpenAIEmbedding).toHaveBeenCalledWith(
+      expect.stringContaining("2010 vintage"),
+    );
+    expect(getOpenAIEmbedding).toHaveBeenCalledWith(
+      expect.stringContaining("2024 release"),
+    );
+  });
+
+  test("filters out different-brand local candidates when a same-brand option exists", async () => {
+    config.OPENAI_API_KEY = undefined;
+
+    const executeSpy = vi.spyOn(db, "execute") as any;
+    executeSpy
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            bottleId: 1,
+            fullName: "Shibui Pure Malt",
+            brand: "Shibui",
+            score: 0.82,
+          },
+          {
+            bottleId: 2,
+            fullName: "Ichiro's Malt & Grain Single Cask",
+            brand: "Ichiro's",
+            score: 0.81,
+          },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            bottleId: 1,
+            fullName: "Shibui Pure Malt",
+            brand: "Shibui",
+          },
+        ],
+      });
+
+    const candidates = await findBottleMatchCandidates({
+      query: "Shibui Pure Malt Whisky 750ml",
+      brand: "Shibui",
+      expression: "Pure Malt",
+      series: null,
+      distillery: [],
+      category: null,
+      stated_age: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+      vintage_year: null,
+      release_year: null,
+      currentBottleId: null,
+      limit: 15,
+    });
+
+    expect(candidates).toEqual([
+      expect.objectContaining({
+        bottleId: 1,
+        brand: "Shibui",
+      }),
+    ]);
   });
 
   test("runs initial local candidate search before classification", async ({

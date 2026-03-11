@@ -21,7 +21,10 @@ import {
   finalizeCreatedBottle,
 } from "@peated/server/lib/createBottle";
 import { logError } from "@peated/server/lib/log";
-import { stripDuplicateBrandPrefixFromBottleName } from "@peated/server/lib/normalize";
+import {
+  normalizeString,
+  stripDuplicateBrandPrefixFromBottleName,
+} from "@peated/server/lib/normalize";
 import {
   extractStorePriceBottleDetails,
   findStorePriceMatchCandidates,
@@ -39,6 +42,10 @@ import type { z } from "zod";
 
 const VERIFIED_MATCH_CONFIDENCE_THRESHOLD = 80;
 const AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD = 90;
+const NON_WHISKY_KEYWORDS =
+  /\b(vodka|gin|rum|tequila|mezcal|sotol|soju|baijiu|sake|shochu|brandy|cognac|armagnac|liqueur)\b/i;
+const WHISKY_KEYWORDS =
+  /\b(whisk(?:e)?y|single malt|single grain|single pot still|bourbon|rye|scotch|malt whisky|malt whiskey)\b/i;
 const REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES = [
   "pending_review",
   "errored",
@@ -105,9 +112,22 @@ function sanitizeStorePriceMatchDecision(
     );
   }
 
+  const hasConcreteWhiskyCategory =
+    decision.action !== "create_new" ||
+    (decision.proposedBottle?.category !== null &&
+      decision.proposedBottle?.category !== "spirit");
+  const normalizedConfidence = normalizeStorePriceMatchConfidence(
+    decision.confidence,
+  );
+  const boundedConfidence =
+    decision.action === "create_new" &&
+    (searchEvidence.length === 0 || !hasConcreteWhiskyCategory)
+      ? Math.min(normalizedConfidence, AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD - 1)
+      : normalizedConfidence;
+
   return {
     ...decision,
-    confidence: normalizeStorePriceMatchConfidence(decision.confidence),
+    confidence: boundedConfidence,
     suggestedBottleId:
       decision.action === "create_new" ? null : decision.suggestedBottleId,
     candidateBottleIds: decision.candidateBottleIds.filter((id) =>
@@ -120,6 +140,10 @@ function sanitizeStorePriceMatchDecision(
             decision.proposedBottle.name,
             decision.proposedBottle.brand.name,
           ),
+          category:
+            decision.proposedBottle.category === "spirit"
+              ? null
+              : decision.proposedBottle.category,
           series: decision.proposedBottle.series
             ? {
                 ...decision.proposedBottle.series,
@@ -143,6 +167,21 @@ function sanitizeStorePriceMatchDecision(
         }
       : null,
   };
+}
+
+function shouldAutoIgnoreStorePriceListing(
+  priceName: string,
+  extractedLabel: ExtractedBottleDetails | null,
+) {
+  if (extractedLabel) {
+    return false;
+  }
+
+  const normalizedName = normalizeString(priceName).toLowerCase();
+  return (
+    NON_WHISKY_KEYWORDS.test(normalizedName) &&
+    !WHISKY_KEYWORDS.test(normalizedName)
+  );
 }
 
 export class UnknownStorePriceMatchProposalError extends Error {
@@ -446,6 +485,16 @@ export async function resolveStorePriceMatchProposal(
 
   try {
     extractedLabel = await extractStorePriceBottleDetails(price);
+    if (shouldAutoIgnoreStorePriceListing(price.name, extractedLabel)) {
+      return await upsertStorePriceMatchProposal({
+        price,
+        extractedLabel,
+        candidates: [],
+        searchEvidence: [],
+        statusOverride: "ignored",
+      });
+    }
+
     candidates = await findStorePriceMatchCandidates(price, extractedLabel);
     const classification = await classifyStorePriceMatch({
       price,

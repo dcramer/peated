@@ -54,37 +54,39 @@ function generatePrompt(bottle: Partial<Bottle>, tagList: string[]) {
     tagList.length
       ? [
           "'suggestedTags' may contain up to five items when they are strongly supported by the bottle's style or profile.",
-          "If no tags are well supported, return an empty array or omit the field.",
+          "If no tags are well supported, return an empty array.",
           "Values must come from this list:",
           `- ${tagList.join("\n- ")}`,
         ].join("\n")
-      : "'suggestedTags' should be omitted or an empty array when no allowed tag list is provided.",
+      : "'suggestedTags' should be an empty array when no allowed tag list is provided.",
   ];
 
   return sections.filter(Boolean).join("\n\n");
 }
 
-const OpenAIBottleDetailsSchema = z.object({
-  description: z.string().nullish(),
+export const OpenAIBottleDetailsSchema = z.object({
+  description: z.string().nullable().default(null),
   tastingNotes: z
     .object({
       nose: z.string(),
       palate: z.string(),
       finish: z.string(),
     })
-    .nullish(),
-  category: z.string().nullish(),
-  suggestedTags: z.array(z.string()).optional(),
-  flavorProfile: z.string().nullish(),
+    .nullable()
+    .default(null),
+  category: z.string().nullable().default(null),
+  suggestedTags: z.array(z.string()).default([]),
+  flavorProfile: z.string().nullable().default(null),
 });
 
 // we dont send enums to openai as they dont get used
-const OpenAIBottleDetailsValidationSchema = OpenAIBottleDetailsSchema.extend({
-  category: CategoryEnum.nullish(),
-  flavorProfile: FlavorProfileEnum.nullish(),
-  // TODO: ChatGPT is ignoring this shit, so lets validate later and throw away if invalid
-  // suggestedTags: z.array(DefaultTagEnum).optional(),
-});
+export const OpenAIBottleDetailsValidationSchema =
+  OpenAIBottleDetailsSchema.extend({
+    category: CategoryEnum.nullable().default(null),
+    flavorProfile: FlavorProfileEnum.nullable().default(null),
+    // TODO: ChatGPT is ignoring this shit, so lets validate later and throw away if invalid
+    // suggestedTags: z.array(DefaultTagEnum).default([]),
+  });
 
 export type GeneratedBottleDetails = z.infer<typeof OpenAIBottleDetailsSchema>;
 

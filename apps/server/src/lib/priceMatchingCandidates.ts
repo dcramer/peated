@@ -12,7 +12,7 @@ import {
   type StorePrice,
 } from "@peated/server/db/schema";
 import { logError } from "@peated/server/lib/log";
-import { normalizeBottle } from "@peated/server/lib/normalize";
+import { normalizeBottle, normalizeString } from "@peated/server/lib/normalize";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import {
   ExtractedBottleDetailsSchema,
@@ -37,6 +37,12 @@ type RawPriceMatchCandidateRow = {
   score?: number | string | null;
 };
 
+function normalizeMatchCategory<
+  T extends null | z.infer<typeof ExtractedBottleDetailsSchema>["category"],
+>(category: T) {
+  return category === "spirit" ? null : category;
+}
+
 export const BottleCandidateSearchInputSchema = z.object({
   query: z.string().trim().nullable().default(null),
   brand: z.string().trim().nullable().default(null),
@@ -49,6 +55,8 @@ export const BottleCandidateSearchInputSchema = z.object({
   cask_strength: z.boolean().nullable().default(null),
   single_cask: z.boolean().nullable().default(null),
   edition: z.string().trim().nullable().default(null),
+  vintage_year: z.number().int().nullable().default(null),
+  release_year: z.number().int().nullable().default(null),
   currentBottleId: z.number().nullable().default(null),
   limit: z.number().int().min(1).max(25).default(MATCH_CANDIDATE_LIMIT),
 });
@@ -77,7 +85,9 @@ function buildSearchLabel(
     !input.cask_type &&
     input.cask_strength === null &&
     input.single_cask === null &&
-    !input.edition
+    !input.edition &&
+    !input.vintage_year &&
+    !input.release_year
   ) {
     return null;
   }
@@ -87,11 +97,11 @@ function buildSearchLabel(
     expression: input.expression,
     series: input.series,
     distillery: input.distillery,
-    category: input.category,
+    category: normalizeMatchCategory(input.category),
     stated_age: input.stated_age,
     abv: null,
-    release_year: null,
-    vintage_year: null,
+    release_year: input.release_year,
+    vintage_year: input.vintage_year,
     cask_type: input.cask_type,
     cask_strength: input.cask_strength,
     single_cask: input.single_cask,
@@ -107,6 +117,8 @@ function buildRawSearchName(input: BottleCandidateSearchInput) {
     input.edition,
     input.stated_age ? `${input.stated_age}` : null,
     input.cask_type,
+    input.vintage_year ? `${input.vintage_year} vintage` : null,
+    input.release_year ? `${input.release_year} release` : null,
     input.distillery.length ? input.distillery.join(" ") : null,
   ];
 
@@ -117,6 +129,8 @@ function buildRawSearchName(input: BottleCandidateSearchInput) {
       input.edition ||
       input.stated_age ||
       input.cask_type ||
+      input.vintage_year ||
+      input.release_year ||
       input.distillery.length ||
       input.cask_strength !== null ||
       input.single_cask !== null,
@@ -174,14 +188,20 @@ export async function extractStorePriceBottleDetails(
   price: Pick<StorePrice, "name" | "imageUrl">,
 ): Promise<ExtractedBottleDetails | null> {
   try {
-    if (price.imageUrl) {
-      return ExtractedBottleDetailsSchema.parse(
-        await extractFromImage(absoluteUrl(config.API_SERVER, price.imageUrl)),
-      );
+    const extractedDetails = await (price.imageUrl
+      ? extractFromImage(absoluteUrl(config.API_SERVER, price.imageUrl))
+      : extractFromText(price.name));
+
+    if (!extractedDetails) {
+      return null;
     }
-    return ExtractedBottleDetailsSchema.parse(
-      await extractFromText(price.name),
-    );
+
+    const parsedDetails = ExtractedBottleDetailsSchema.parse(extractedDetails);
+
+    return {
+      ...parsedDetails,
+      category: normalizeMatchCategory(parsedDetails.category),
+    };
   } catch (err) {
     logError(err, {
       price: {
@@ -208,10 +228,64 @@ function buildQueryText(
   if (extractedLabel?.cask_type) parts.push(extractedLabel.cask_type);
   if (extractedLabel?.cask_strength) parts.push("cask strength");
   if (extractedLabel?.single_cask) parts.push("single cask");
+  if (extractedLabel?.vintage_year)
+    parts.push(`${extractedLabel.vintage_year} vintage`);
+  if (extractedLabel?.release_year)
+    parts.push(`${extractedLabel.release_year} release`);
   if (extractedLabel?.distillery?.length)
     parts.push(extractedLabel.distillery.join(" "));
 
   return Array.from(new Set(parts.filter(Boolean))).join(" ");
+}
+
+function normalizeIdentityText(value: string | null | undefined) {
+  if (!value) {
+    return "";
+  }
+
+  return normalizeString(value).toLowerCase().trim();
+}
+
+function candidateMatchesKnownBrand(
+  candidate: PriceMatchCandidate,
+  brandName: string,
+) {
+  const normalizedBrand = normalizeIdentityText(brandName);
+  if (!normalizedBrand) {
+    return false;
+  }
+
+  return [candidate.brand, candidate.fullName, candidate.alias].some((value) =>
+    normalizeIdentityText(value).includes(normalizedBrand),
+  );
+}
+
+function filterCandidatesByKnownBrand(
+  candidates: PriceMatchCandidate[],
+  extractedLabel: ExtractedBottleDetails | null,
+) {
+  if (!extractedLabel?.brand) {
+    return candidates;
+  }
+
+  const sameBrandCandidateIds = new Set(
+    candidates
+      .filter((candidate) =>
+        candidateMatchesKnownBrand(candidate, extractedLabel.brand!),
+      )
+      .map((candidate) => candidate.bottleId),
+  );
+
+  if (!sameBrandCandidateIds.size) {
+    return candidates;
+  }
+
+  return candidates.filter(
+    (candidate) =>
+      sameBrandCandidateIds.has(candidate.bottleId) ||
+      candidate.source.includes("exact") ||
+      candidate.source.includes("current"),
+  );
 }
 
 async function runCandidateLookupSafely<T>(
@@ -411,12 +485,14 @@ export async function findStorePriceMatchCandidates(
     expression: extractedLabel?.expression ?? null,
     series: extractedLabel?.series ?? null,
     distillery: extractedLabel?.distillery ?? [],
-    category: extractedLabel?.category ?? null,
+    category: normalizeMatchCategory(extractedLabel?.category ?? null),
     stated_age: extractedLabel?.stated_age ?? null,
     cask_type: extractedLabel?.cask_type ?? null,
     cask_strength: extractedLabel?.cask_strength ?? null,
     single_cask: extractedLabel?.single_cask ?? null,
     edition: extractedLabel?.edition ?? null,
+    vintage_year: extractedLabel?.vintage_year ?? null,
+    release_year: extractedLabel?.release_year ?? null,
     currentBottleId: price.bottleId ?? null,
     limit: MATCH_CANDIDATE_LIMIT,
   });
@@ -493,7 +569,10 @@ export async function findBottleMatchCandidates(
     mergeCandidate(candidates, exactCandidate);
   }
 
-  return Array.from(candidates.values())
+  return filterCandidatesByKnownBrand(
+    Array.from(candidates.values()),
+    extractedLabel,
+  )
     .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
     .slice(0, input.limit);
 }

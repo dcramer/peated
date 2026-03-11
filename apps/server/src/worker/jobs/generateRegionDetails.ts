@@ -25,7 +25,7 @@ function generatePrompt(region: InputRegion) {
 }
 
 export const OpenAIRegionDetailsSchema = z.object({
-  description: z.string().nullable().optional(),
+  description: z.string().nullable().default(null),
 });
 
 export type GeneratedRegionDetails = z.infer<typeof OpenAIRegionDetailsSchema>;

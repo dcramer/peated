@@ -33,21 +33,6 @@ const QUEUE_KIND_OPTIONS: Array<{ id: null | QueueKind; label: string }> = [
   { id: "errored", label: "Errored" },
 ];
 
-function formatQueueKind(kind: null | QueueKind): string {
-  switch (kind) {
-    case "create_new":
-      return "create proposals";
-    case "match_existing":
-      return "match proposals";
-    case "correction":
-      return "correction proposals";
-    case "errored":
-      return "errored proposals";
-    default:
-      return "queue items";
-  }
-}
-
 function getDecisionLabel(item: QueueItem): string {
   if (item.status === "errored") {
     return "Errored";
@@ -180,6 +165,15 @@ function getReturnTo(pathname: string, searchParams: URLSearchParams): string {
   return queryString ? `${pathname}?${queryString}` : pathname;
 }
 
+function buildQueueHref(
+  pathname: string,
+  searchParams: URLSearchParams,
+  nextParams: Record<string, string | number | null | undefined>,
+) {
+  const queryString = buildQueryString(searchParams, nextParams);
+  return queryString ? `${pathname}?${queryString}` : pathname;
+}
+
 export default function Page() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -210,10 +204,6 @@ export default function Page() {
 
   const { flash } = useFlashMessages();
   const isBusy = resolveMutation.isPending || retryMutation.isPending;
-  const webValidatedCount = proposalList.results.filter(
-    (item) => item.searchEvidence.length > 0,
-  ).length;
-
   return (
     <>
       <SimpleHeader>Price Match Queue</SimpleHeader>
@@ -241,12 +231,10 @@ export default function Page() {
               </Button>
               {currentQuery ? (
                 <Button
-                  href={{
-                    search: buildQueryString(searchParams, {
-                      query: null,
-                      cursor: null,
-                    }),
-                  }}
+                  href={buildQueueHref(pathname, searchParams, {
+                    query: null,
+                    cursor: null,
+                  })}
                 >
                   Clear
                 </Button>
@@ -259,29 +247,16 @@ export default function Page() {
           {QUEUE_KIND_OPTIONS.map((option) => (
             <Button
               key={option.label}
-              href={{
-                search: buildQueryString(searchParams, {
-                  kind: option.id,
-                  cursor: null,
-                }),
-              }}
+              href={buildQueueHref(pathname, searchParams, {
+                kind: option.id,
+                cursor: null,
+              })}
               size="small"
               active={currentKind === option.id}
             >
               {option.label}
             </Button>
           ))}
-        </div>
-
-        <div className="text-muted flex flex-col gap-1 text-sm lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            Showing {proposalList.results.length} {formatQueueKind(currentKind)}
-            {currentQuery ? ` for "${currentQuery}"` : ""}.
-          </div>
-          <div>
-            {webValidatedCount} of {proposalList.results.length} on this page
-            include web evidence.
-          </div>
         </div>
       </div>
 

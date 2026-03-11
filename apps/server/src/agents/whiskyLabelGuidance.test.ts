@@ -70,6 +70,21 @@ describe("whiskyLabelGuidance", () => {
       "For `proposedBottle.name`, follow the bottle's evidenced canonical name, not a mechanically copied retailer title.",
     );
     expect(instructions).toContain(
+      "`category` should be normalized to the house values. If the whisky type is unclear, leave `category` as `null` instead of using a fallback bucket.",
+    );
+    expect(instructions).toContain(
+      "If the listing is clearly another spirit category such as vodka, gin, rum, tequila, or mezcal, return `no_match`.",
+    );
+    expect(instructions).toContain(
+      "If `localSearch.hasExactAliasMatch` is false and you do not have web evidence, keep `create_new` confidence below 90.",
+    );
+    expect(instructions).toContain(
+      "`Barrel Strength`, `Barrel Proof`, `Full Proof`, and `Natural Strength` all imply `caskStrength: true`.",
+    );
+    expect(instructions).toContain(
+      "If `proposedBottle.edition`, `proposedBottle.releaseYear`, or `proposedBottle.vintageYear` is set, do not repeat that same batch code or year in `proposedBottle.name`",
+    );
+    expect(instructions).toContain(
       "A false positive match is worse than returning `no_match` or a lower-confidence review candidate.",
     );
     expect(instructions).toContain(

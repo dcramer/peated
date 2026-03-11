@@ -8,7 +8,7 @@ This document captures the whisky schema terminology and normalization rules use
 - **distillery**: An array of distilleries where the whiskey was produced. For example, `[ "Macallan", "Highland Park" ]` for a blend, or `[ "Lagavulin" ]` for a single distillery release. If the distilleries are unknown, use `[]`.
 - **expression**: The specific name or expression of the whiskey.
 - **series**: The series or collection name, or `null`.
-- **category**: One of `blend`, `bourbon`, `rye`, `single_grain`, `single_malt`, `single_pot_still`, or `spirit`.
+- **category**: One of `blend`, `bourbon`, `rye`, `single_grain`, `single_malt`, or `single_pot_still`.
 - **stated_age**: The age in years as an integer, or `null` if there is no age statement.
 - **abv**: Alcohol by volume as a percentage, for example `43.0`.
 - **release_year**: The bottled or release year.
@@ -27,7 +27,7 @@ Treat a label or retailer title as a bundle of bottle-identity components:
 - **expression**: The core release name after removing producer, age, ABV, and generic style words.
 - **series**: The stable collection or range, such as `Private Selection` or `Distillers Edition`.
 - **edition**: A batch number, store-pick code, release code, or numbered edition such as `Batch 3`, `2021 Release`, or `S2B13`.
-- **category**: The normalized house category. Use `spirit` when the whisky is real but does not map cleanly to the narrower categories.
+- **category**: The normalized house category. If the whisky type is unclear, leave it `null` instead of forcing a broader fallback.
 - **age statement**: Numeric age, including abbreviations such as `12 Yr.` or `16yr`.
 - **cask descriptor**: Primary cask or finish wording such as `First Fill Bourbon` or `PX Cask Finish`.
 - **technical details**: ABV, vintage year, release year, plus explicit cask-strength and single-cask flags.

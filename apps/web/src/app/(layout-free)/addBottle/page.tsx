@@ -11,7 +11,12 @@ import { useVerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -21,6 +26,7 @@ export default function AddBottle() {
   const { user } = useAuth();
   const router = useRouter();
   const orpc = useORPC();
+  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const name = toTitleCase(searchParams.get("name") || "");
   const returnTo = searchParams.get("returnTo");
@@ -154,6 +160,8 @@ export default function AddBottle() {
             );
           }
         }
+
+        await queryClient.invalidateQueries();
 
         if (returnTo) router.push(returnTo);
         else router.replace(`/bottles/${newBottle.id}/addTasting`);

@@ -29,8 +29,8 @@ function generatePrompt(country: InputCountry) {
 }
 
 export const OpenAICountryDetailsSchema = z.object({
-  description: z.string().nullable().optional(),
-  summary: z.string().nullable().optional(),
+  description: z.string().nullable().default(null),
+  summary: z.string().nullable().default(null),
 });
 
 export type GeneratedCountryDetails = z.infer<
