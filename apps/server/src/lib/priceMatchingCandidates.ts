@@ -149,7 +149,8 @@ function buildPriceMatchCandidate(
     alias: row.alias ?? null,
     fullName: row.fullName,
     brand: row.brand ?? null,
-    score: row.score === undefined || row.score === null ? null : Number(row.score),
+    score:
+      row.score === undefined || row.score === null ? null : Number(row.score),
     source: [source],
   });
 }
@@ -252,9 +253,7 @@ async function getVectorCandidates(
     LIMIT ${VECTOR_CANDIDATE_LIMIT}
   `);
 
-  return result.rows.map((row) =>
-    buildPriceMatchCandidate(row, "vector"),
-  );
+  return result.rows.map((row) => buildPriceMatchCandidate(row, "vector"));
 }
 
 async function getTextCandidates(
@@ -283,9 +282,7 @@ async function getTextCandidates(
     LIMIT ${TEXT_CANDIDATE_LIMIT}
   `);
 
-  return result.rows.map((row) =>
-    buildPriceMatchCandidate(row, "text"),
-  );
+  return result.rows.map((row) => buildPriceMatchCandidate(row, "text"));
 }
 
 async function getBrandCandidates(
@@ -319,9 +316,7 @@ async function getBrandCandidates(
     LIMIT ${BRAND_CANDIDATE_LIMIT}
   `);
 
-  return result.rows.map((row) =>
-    buildPriceMatchCandidate(row, "brand"),
-  );
+  return result.rows.map((row) => buildPriceMatchCandidate(row, "brand"));
 }
 
 export async function getBottleMatchCandidateById(

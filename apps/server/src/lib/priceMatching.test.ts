@@ -1,11 +1,11 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { storePriceMatchProposals } from "@peated/server/db/schema";
-import { findBottleMatchCandidates } from "@peated/server/lib/priceMatchingCandidates";
 import {
   findStorePriceMatchCandidates,
   resolveStorePriceMatchProposal,
 } from "@peated/server/lib/priceMatching";
+import { findBottleMatchCandidates } from "@peated/server/lib/priceMatchingCandidates";
 import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
