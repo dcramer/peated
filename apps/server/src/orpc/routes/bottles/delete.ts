@@ -8,12 +8,13 @@ import {
   changes,
   entities,
   reviews,
+  storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
 import { notEmpty } from "@peated/server/lib/filter";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { and, eq, gt, inArray, sql } from "drizzle-orm";
+import { and, eq, gt, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -105,6 +106,35 @@ export default procedure
           .update(storePrices)
           .set({ bottleId: null })
           .where(eq(storePrices.bottleId, bottle.id)),
+
+        tx
+          .update(storePriceMatchProposals)
+          .set({
+            currentBottleId: sql`CASE WHEN ${storePriceMatchProposals.currentBottleId} = ${bottle.id} THEN NULL ELSE ${storePriceMatchProposals.currentBottleId} END`,
+            suggestedBottleId: sql`CASE WHEN ${storePriceMatchProposals.suggestedBottleId} = ${bottle.id} THEN NULL ELSE ${storePriceMatchProposals.suggestedBottleId} END`,
+            status: sql`CASE
+              WHEN ${storePriceMatchProposals.status} IN ('approved', 'verified')
+                THEN 'pending_review'::store_price_match_proposal_status
+              ELSE ${storePriceMatchProposals.status}
+            END`,
+            reviewedById: sql`CASE
+              WHEN ${storePriceMatchProposals.status} IN ('approved', 'verified')
+                THEN NULL
+              ELSE ${storePriceMatchProposals.reviewedById}
+            END`,
+            reviewedAt: sql`CASE
+              WHEN ${storePriceMatchProposals.status} IN ('approved', 'verified')
+                THEN NULL
+              ELSE ${storePriceMatchProposals.reviewedAt}
+            END`,
+            updatedAt: sql`NOW()`,
+          })
+          .where(
+            or(
+              eq(storePriceMatchProposals.currentBottleId, bottle.id),
+              eq(storePriceMatchProposals.suggestedBottleId, bottle.id),
+            ),
+          ),
 
         tx.insert(bottleTombstones).values({
           bottleId: bottle.id,
