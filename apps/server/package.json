@@ -60,7 +60,7 @@
     "drizzle-kit": "catalog:",
     "drizzle-orm": "catalog:",
     "error-cause": "^1.0.9",
-    "google-auth-library": "^8.9.0",
+    "google-auth-library": "^10.6.1",
     "hono": "^4.7.9",
     "ioredis": "^5.5.0",
     "jsonwebtoken": "^9.0.3",
