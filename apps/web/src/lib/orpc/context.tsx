@@ -1,13 +1,13 @@
-import type { RouterUtils } from "@orpc/react-query";
 import type { RouterClient } from "@orpc/server";
+import type { RouterUtils } from "@orpc/tanstack-query";
 import { type Router } from "@peated/server/orpc/router";
 import { createContext, use } from "react";
 
-type ORPCReactUtils = RouterUtils<RouterClient<Router>>;
+type ORPCQueryUtils = RouterUtils<RouterClient<Router>>;
 
-export const ORPCContext = createContext<ORPCReactUtils | undefined>(undefined);
+export const ORPCContext = createContext<ORPCQueryUtils | undefined>(undefined);
 
-export function useORPC(): ORPCReactUtils {
+export function useORPC(): ORPCQueryUtils {
   const orpc = use(ORPCContext);
   if (!orpc) {
     throw new Error("ORPCContext is not set up properly");

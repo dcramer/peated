@@ -20,9 +20,9 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "devDependencies": {
-    "@orpc/client": "^1.7.9",
-    "@orpc/server": "^1.7.9",
-    "@orpc/shared": "^1.7.9"
+    "@orpc/client": "^1.13.6",
+    "@orpc/server": "^1.13.6",
+    "@orpc/shared": "^1.13.6"
   },
   "dependencies": {
     "@peated/tsconfig": "workspace:*",
