@@ -2,6 +2,7 @@ import { defaultHeaders } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { bottles, storePrices } from "@peated/server/db/schema";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
+import { pushUniqueJob } from "@peated/server/worker/client";
 import { logger } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { Readable } from "stream";
@@ -71,4 +72,8 @@ export default async ({
         .where(eq(bottles.id, price.bottleId));
     }
   }
+
+  await pushUniqueJob("ResolveStorePriceBottle", {
+    priceId,
+  });
 };

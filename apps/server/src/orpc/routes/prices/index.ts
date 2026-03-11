@@ -2,6 +2,7 @@ import { base } from "@peated/server/orpc";
 import changeList from "./change-list";
 import createBatch from "./create-batch";
 import list from "./list";
+import matchQueue from "./matchQueue";
 import update from "./update";
 
 export default base.tag("prices").router({
@@ -9,4 +10,5 @@ export default base.tag("prices").router({
   update,
   createBatch,
   changeList,
+  matchQueue,
 });

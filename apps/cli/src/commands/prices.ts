@@ -1,7 +1,6 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
   bottles,
   storePriceHistories,
   storePrices,
@@ -9,6 +8,7 @@ import {
 import { findBottleId } from "@peated/server/lib/bottleFinder";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { normalizeBottle } from "@peated/server/lib/normalize";
+import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, asc, eq, isNotNull, isNull, ne, sql } from "drizzle-orm";
 
 const subcommand = program.command("prices");
@@ -117,14 +117,6 @@ subcommand.command("backfill-aliases").action(async (options) => {
     for (const price of query) {
       if (price.bottleId) {
         await upsertBottleAlias(db, price.name, price.bottleId);
-      } else {
-        await db
-          .insert(bottleAliases)
-          .values({
-            name: price.name,
-            ignored: price.hidden,
-          })
-          .onConflictDoNothing();
       }
       hasResults = true;
     }
@@ -140,3 +132,29 @@ subcommand.command("backfill-images").action(async (options) => {
     })
     .where(isNull(bottles.imageUrl));
 });
+
+subcommand
+  .command("backfill-match-proposals")
+  .option("--only-unmatched")
+  .action(async (options) => {
+    const step = 1000;
+    const baseQuery = db
+      .select({ id: storePrices.id })
+      .from(storePrices)
+      .where(options.onlyUnmatched ? isNull(storePrices.bottleId) : undefined)
+      .orderBy(asc(storePrices.id));
+
+    let hasResults = true;
+    let offset = 0;
+    while (hasResults) {
+      hasResults = false;
+      const query = await baseQuery.offset(offset).limit(step);
+      for (const { id } of query) {
+        await pushUniqueJob("ResolveStorePriceBottle", {
+          priceId: id,
+        });
+        hasResults = true;
+      }
+      offset += step;
+    }
+  });

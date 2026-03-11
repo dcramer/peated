@@ -21,6 +21,7 @@ export type JobName =
   | "OnBottleAliasChange"
   | "OnEntityChange"
   | "ProcessNotification"
+  | "ResolveStorePriceBottle"
   | "ScrapeAstorWines"
   | "ScrapeHealthySpirits"
   | "ScrapeReserveBar"

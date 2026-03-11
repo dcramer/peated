@@ -1,11 +1,21 @@
 import { db } from "@peated/server/db";
-import { storePrices } from "@peated/server/db/schema";
+import { bottleAliases, storePrices } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import * as workerClient from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+
+vi.mock("@peated/server/worker/client", () => ({
+  pushJob: vi.fn(),
+  pushUniqueJob: vi.fn(),
+}));
 
 describe("POST /external-sites/:site/prices", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
   test("requires authentication", async () => {
     const err = await waitError(() =>
       routerClient.prices.createBatch({ site: "healthyspirits", prices: [] }),
@@ -73,6 +83,16 @@ describe("POST /external-sites/:site/prices", () => {
     expect(prices[0].price).toBe(9999);
     expect(prices[0].name).toBe("Ardbeg 10-year-old");
     expect(prices[0].url).toBe("http://example.com");
+    expect(workerClient.pushJob).toHaveBeenCalledWith("CapturePriceImage", {
+      priceId: prices[0].id,
+      imageUrl: "http://example.com/foo.jpg",
+    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      {
+        priceId: prices[0].id,
+      },
+    );
   });
 
   test("processes existing price", async ({ fixtures }) => {
@@ -148,6 +168,18 @@ describe("POST /external-sites/:site/prices", () => {
     expect(prices[0].price).toBe(2999);
     expect(prices[0].name).toBe("Ardbeg 10-year-old");
     expect(prices[0].url).toBe("http://example.com");
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, "Ardbeg 10-year-old"),
+      }),
+    ).toBeUndefined();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      {
+        priceId: prices[0].id,
+      },
+    );
   });
 
   test("does not unset bottle for existing price", async ({ fixtures }) => {

@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import type { StorePrice } from "@peated/server/db/schema";
 import {
-  bottleAliases,
   externalSites,
   storePriceHistories,
   storePrices,
@@ -16,7 +15,7 @@ import {
   ExternalSiteTypeEnum,
   StorePriceInputSchema,
 } from "@peated/server/schemas";
-import { pushJob } from "@peated/server/worker/client";
+import { pushJob, pushUniqueJob } from "@peated/server/worker/client";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -59,8 +58,8 @@ export default procedure
 
             // XXX: maybe we should constrain on URL?
             const {
-              rows: [{ id: priceId, imageUrl }],
-            } = await db.execute<Pick<StorePrice, "id" | "imageUrl">>(sql`
+              rows: [{ id: rawPriceId, imageUrl }],
+            } = await tx.execute<Pick<StorePrice, "id" | "imageUrl">>(sql`
               INSERT INTO ${storePrices} (bottle_id, external_site_id, name, volume, price, currency, url)
               VALUES (${bottleId}, ${site.id}, ${name}, ${sp.volume}, ${sp.price}, ${sp.currency}, ${sp.url})
               ON CONFLICT (external_site_id, LOWER(name), volume)
@@ -72,6 +71,7 @@ export default procedure
                   updated_at = NOW()
               RETURNING id, image_url as imageUrl
             `);
+            const priceId = Number(rawPriceId);
 
             await tx
               .insert(storePriceHistories)
@@ -84,21 +84,8 @@ export default procedure
               })
               .onConflictDoNothing();
 
-            const ignored = !!name.match(
-              / (bundle|gifting set|gift set|\d+ pack)$/i,
-            );
-
-            // TODO: sync image
             if (bottleId) {
               await upsertBottleAlias(tx, name, bottleId);
-            } else {
-              await tx
-                .insert(bottleAliases)
-                .values({
-                  name,
-                  ignored,
-                })
-                .onConflictDoNothing();
             }
 
             return [{ id: priceId, imageUrl }];
@@ -110,6 +97,10 @@ export default procedure
               imageUrl: sp.imageUrl,
             });
           }
+
+          await pushUniqueJob("ResolveStorePriceBottle", {
+            priceId: price.id,
+          });
         }),
       );
     });

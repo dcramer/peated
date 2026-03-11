@@ -1,0 +1,276 @@
+import config from "@peated/server/config";
+import { db } from "@peated/server/db";
+import { storePriceMatchProposals } from "@peated/server/db/schema";
+import {
+  findStorePriceMatchCandidates,
+  resolveStorePriceMatchProposal,
+} from "@peated/server/lib/priceMatching";
+import { eq } from "drizzle-orm";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+
+vi.mock("@peated/server/agents/whisky/labelExtractor", () => ({
+  extractFromImage: vi.fn(),
+  extractFromText: vi.fn(),
+}));
+
+vi.mock("@peated/server/agents/priceMatch", () => ({
+  classifyStorePriceMatch: vi.fn(),
+  StorePriceMatchClassificationError: class StorePriceMatchClassificationError extends Error {
+    searchEvidence: unknown[];
+    candidateBottles: unknown[];
+
+    constructor(
+      message: string,
+      searchEvidence: unknown[] = [],
+      candidateBottles: unknown[] = [],
+    ) {
+      super(message);
+      this.name = "StorePriceMatchClassificationError";
+      this.searchEvidence = searchEvidence;
+      this.candidateBottles = candidateBottles;
+    }
+  },
+}));
+
+vi.mock("@peated/server/lib/openaiEmbeddings", async () => {
+  const actual = await vi.importActual("@peated/server/lib/openaiEmbeddings");
+  return {
+    ...actual,
+    getOpenAIEmbedding: vi.fn(),
+  };
+});
+
+describe("priceMatching", () => {
+  const originalOpenAIApiKey = config.OPENAI_API_KEY;
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+    config.OPENAI_API_KEY = originalOpenAIApiKey;
+  });
+
+  afterEach(() => {
+    config.OPENAI_API_KEY = originalOpenAIApiKey;
+  });
+
+  test("falls back to exact candidates when embeddings fail", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = "test-openai-key";
+    const { getOpenAIEmbedding } = await import(
+      "@peated/server/lib/openaiEmbeddings"
+    );
+    vi.mocked(getOpenAIEmbedding).mockRejectedValue(
+      new Error("Embeddings unavailable"),
+    );
+
+    const bottle = await fixtures.Bottle();
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Fallback Candidate",
+    });
+
+    const candidates = await findStorePriceMatchCandidates(
+      {
+        name: "Fallback Candidate",
+        bottleId: null,
+      },
+      null,
+    );
+
+    expect(candidates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          bottleId: bottle.id,
+          source: expect.arrayContaining(["exact"]),
+        }),
+      ]),
+    );
+  });
+
+  test("preserves extracted label and candidates when classification fails", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch, StorePriceMatchClassificationError } =
+      await import("@peated/server/agents/priceMatch");
+    const bottle = await fixtures.Bottle();
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Classifier Failure Candidate",
+    });
+    const price = await fixtures.StorePrice({
+      name: "Classifier Failure Candidate",
+      imageUrl: null,
+    });
+
+    const candidateBottles = [
+      {
+        bottleId: bottle.id,
+        alias: "Classifier Failure Candidate",
+        fullName: bottle.fullName,
+        brand: null,
+        score: 1,
+        source: ["exact"],
+      },
+    ];
+
+    vi.mocked(classifyStorePriceMatch).mockRejectedValue(
+      new StorePriceMatchClassificationError(
+        "Classifier blew up",
+        [],
+        candidateBottles,
+      ),
+    );
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Failure Brand",
+      expression: "Reserve",
+      series: null,
+      distillery: ["Failure Distillery"],
+      category: "single_malt",
+      stated_age: 12,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      edition: null,
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(proposal.status).toBe("errored");
+    expect(proposal.error).toBe("Classifier blew up");
+    expect(proposal.extractedLabel).toMatchObject({
+      brand: "Failure Brand",
+      expression: "Reserve",
+      stated_age: 12,
+    });
+    expect(proposal.candidateBottles).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          bottleId: bottle.id,
+          source: expect.arrayContaining(["exact"]),
+        }),
+      ]),
+    );
+  });
+
+  test("does not reevaluate closed proposals during automatic resolution", async ({
+    fixtures,
+  }) => {
+    const reviewer = await fixtures.User();
+    const price = await fixtures.StorePrice({
+      name: "Already Approved Candidate",
+    });
+
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "approved",
+        proposalType: "match_existing",
+        reviewedById: reviewer.id,
+        reviewedAt: new Date("2026-03-10T12:00:00.000Z"),
+      })
+      .returning();
+
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+
+    const result = await resolveStorePriceMatchProposal(price.id);
+
+    expect(classifyStorePriceMatch).not.toHaveBeenCalled();
+    expect(result.id).toBe(proposal.id);
+    expect(result.status).toBe("approved");
+    expect(result.reviewedById).toBe(reviewer.id);
+  });
+
+  test("force reevaluation reopens closed proposals and clears review metadata", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const reviewer = await fixtures.User();
+    const bottle = await fixtures.Bottle();
+    const price = await fixtures.StorePrice({
+      name: "Retry Candidate",
+      imageUrl: null,
+    });
+
+    await db.insert(storePriceMatchProposals).values({
+      priceId: price.id,
+      status: "ignored",
+      proposalType: "no_match",
+      reviewedById: reviewer.id,
+      reviewedAt: new Date("2026-03-10T13:00:00.000Z"),
+    });
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Retry Brand",
+      expression: "Reserve",
+      series: null,
+      distillery: ["Retry Distillery"],
+      category: "single_malt",
+      stated_age: 12,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyStorePriceMatch).mockResolvedValue({
+      decision: {
+        action: "match_existing",
+        confidence: 82,
+        rationale: "Local alias evidence is now sufficient.",
+        suggestedBottleId: bottle.id,
+        candidateBottleIds: [bottle.id],
+        proposedBottle: null,
+      },
+      searchEvidence: [],
+      candidateBottles: [
+        {
+          bottleId: bottle.id,
+          alias: "Retry Candidate",
+          fullName: bottle.fullName,
+          brand: null,
+          score: 1,
+          source: ["exact"],
+        },
+      ],
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id, {
+      force: true,
+    });
+    const storedProposal = await db.query.storePriceMatchProposals.findFirst({
+      where: eq(storePriceMatchProposals.id, proposal.id),
+    });
+
+    expect(classifyStorePriceMatch).toHaveBeenCalledOnce();
+    expect(proposal.status).toBe("pending_review");
+    expect(proposal.reviewedById).toBeNull();
+    expect(proposal.reviewedAt).toBeNull();
+    expect(proposal.suggestedBottleId).toBe(bottle.id);
+    expect(storedProposal).toMatchObject({
+      status: "pending_review",
+      reviewedById: null,
+      reviewedAt: null,
+      suggestedBottleId: bottle.id,
+    });
+  });
+});

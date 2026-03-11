@@ -137,7 +137,7 @@ export async function runWorker() {
     async (job) => {
       const jobFn = registry.get(job.name);
       const { args, context } = job.data;
-      jobFn(args, context);
+      return await jobFn(args, context);
     },
     { connection, autorun: false },
   );
