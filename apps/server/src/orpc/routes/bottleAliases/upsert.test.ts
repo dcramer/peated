@@ -171,4 +171,30 @@ describe("POST /bottle-aliases", () => {
       `[Error: Duplicate alias found (1). Not implemented.]`,
     );
   });
+
+  test("does not fail after commit if search indexing enqueue fails", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const user = await fixtures.User({ mod: true });
+
+    vi.mocked(workerClient.pushUniqueJob).mockRejectedValueOnce(
+      new Error("Queue unavailable"),
+    );
+
+    const result = await routerClient.bottleAliases.upsert(
+      {
+        bottle: bottle.id,
+        name: "Queue Failure Alias",
+      },
+      { context: { user } },
+    );
+
+    const alias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, "Queue Failure Alias"),
+    });
+
+    expect(result).toEqual({});
+    expect(alias?.bottleId).toBe(bottle.id);
+  });
 });
