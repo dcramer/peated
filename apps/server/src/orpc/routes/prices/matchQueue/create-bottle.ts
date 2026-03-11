@@ -1,18 +1,13 @@
-import { db } from "@peated/server/db";
 import {
   DuplicateBottleAliasError,
   FailedToSaveBottleAliasError,
-  finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
 import {
   BottleAlreadyExistsError,
   BottleCreateBadRequestError,
-  createBottleInTransaction,
-  finalizeCreatedBottle,
 } from "@peated/server/lib/createBottle";
 import {
-  applyApprovedStorePriceMatchProposalInTransaction,
-  getStorePriceMatchProposalForReviewInTransaction,
+  createBottleFromStorePriceMatchProposal,
   InvalidStorePriceMatchProposalTypeError,
   StorePriceMatchProposalNotReviewableError,
   UnknownStorePriceMatchProposalError,
@@ -43,44 +38,13 @@ export default procedure
   .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {
     try {
-      const result = await db.transaction(async (tx) => {
-        const proposal = await getStorePriceMatchProposalForReviewInTransaction(
-          tx,
-          {
-            proposalId: input.proposal,
-            expectedProposalType: "create_new",
-            allowedStatuses: ["pending_review"],
-          },
-        );
-        const createResult = await createBottleInTransaction(tx, {
-          input: input.bottle,
-          context,
-        });
-        const aliasResult =
-          await applyApprovedStorePriceMatchProposalInTransaction(tx, {
-            proposal,
-            bottleId: createResult.bottle.id,
-            reviewedById: context.user.id,
-          });
-
-        return {
-          createResult,
-          aliasResult,
-        };
+      const bottle = await createBottleFromStorePriceMatchProposal({
+        proposalId: input.proposal,
+        input: input.bottle,
+        user: context.user,
       });
 
-      await finalizeCreatedBottle(result.createResult);
-      await finalizeBottleAliasAssignment(result.aliasResult, {
-        bottle: {
-          id: result.createResult.bottle.id,
-        },
-      });
-
-      return await serialize(
-        BottleSerializer,
-        result.createResult.bottle,
-        context.user,
-      );
+      return await serialize(BottleSerializer, bottle, context.user);
     } catch (err) {
       if (err instanceof UnknownStorePriceMatchProposalError) {
         throw errors.NOT_FOUND({

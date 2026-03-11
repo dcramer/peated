@@ -1,6 +1,11 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
-import { storePriceMatchProposals } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottles,
+  storePriceMatchProposals,
+  storePrices,
+} from "@peated/server/db/schema";
 import {
   findStorePriceMatchCandidates,
   resolveStorePriceMatchProposal,
@@ -40,6 +45,11 @@ vi.mock("@peated/server/lib/openaiEmbeddings", async () => {
     getOpenAIEmbedding: vi.fn(),
   };
 });
+
+vi.mock("@peated/server/worker/client", () => ({
+  pushJob: vi.fn(),
+  pushUniqueJob: vi.fn(),
+}));
 
 describe("priceMatching", () => {
   const originalOpenAIApiKey = config.OPENAI_API_KEY;
@@ -233,6 +243,121 @@ describe("priceMatching", () => {
     expect(proposal.status).toBe("pending_review");
     expect(proposal.proposalType).toBe("match_existing");
     expect(proposal.confidence).toBe(88);
+  });
+
+  test("auto creates high-confidence web-validated new bottles", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Auto Create Candidate",
+      imageUrl: null,
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Auto Brand",
+      expression: "Web Reserve",
+      series: null,
+      distillery: ["Auto Distillery"],
+      category: "single_malt",
+      stated_age: 12,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyStorePriceMatch).mockResolvedValue({
+      decision: {
+        action: "create_new",
+        confidence: 92,
+        rationale: "Web evidence confirms a distinct release.",
+        suggestedBottleId: null,
+        candidateBottleIds: [],
+        proposedBottle: {
+          name: "Web Reserve",
+          series: null,
+          category: "single_malt",
+          edition: null,
+          statedAge: 12,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          brand: {
+            id: null,
+            name: "Auto Brand",
+          },
+          distillers: [
+            {
+              id: null,
+              name: "Auto Distillery",
+            },
+          ],
+          bottler: null,
+          description: null,
+        },
+      },
+      searchEvidence: [
+        {
+          query: 'site:woodencork.com "Auto Create Candidate"',
+          results: [
+            {
+              title: "Auto Create Candidate",
+              url: "https://woodencork.example/auto-create",
+              description: "Retailer listing",
+              extraSnippets: [],
+            },
+          ],
+        },
+      ],
+      candidateBottles: [],
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+    const createdBottle = await db.query.bottles.findFirst({
+      where: eq(bottles.id, proposal.suggestedBottleId!),
+    });
+    const listingAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, price.name),
+    });
+
+    expect(proposal).toMatchObject({
+      status: "approved",
+      proposalType: "create_new",
+      reviewedById: expect.any(Number),
+      currentBottleId: expect.any(Number),
+      suggestedBottleId: expect.any(Number),
+    });
+    expect(updatedPrice?.bottleId).toBe(proposal.suggestedBottleId);
+    expect(createdBottle).toMatchObject({
+      name: "Web Reserve",
+      fullName: "Auto Brand Web Reserve",
+    });
+    expect(listingAlias?.bottleId).toBe(proposal.suggestedBottleId);
   });
 
   test("preserves extracted label and candidates when classification fails", async ({

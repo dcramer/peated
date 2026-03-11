@@ -1,14 +1,12 @@
 import { db } from "@peated/server/db";
 import { reviews } from "@peated/server/db/schema";
 import { findBottleId, findEntity } from "@peated/server/lib/bottleFinder";
+import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq, isNull } from "drizzle-orm";
 
 export default async function createMissingBottles() {
-  const systemUser = await db.query.users.findFirst({
-    where: (table, { eq }) => eq(table.username, "dcramer"),
-  });
-  if (!systemUser) throw new Error("Unable to identify system user");
+  const systemUser = await getAutomationModeratorUser();
 
   let hasResults = true;
   while (hasResults) {

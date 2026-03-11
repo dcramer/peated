@@ -3,25 +3,32 @@ import {
   StorePriceMatchClassificationError,
 } from "@peated/server/agents/priceMatch";
 import config from "@peated/server/config";
-import { db, type AnyDatabase } from "@peated/server/db";
+import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import {
   bottles,
   storePriceMatchProposals,
   storePrices,
   type StorePrice,
   type StorePriceMatchProposal,
+  type User,
 } from "@peated/server/db/schema";
 import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
+import {
+  createBottleInTransaction,
+  finalizeCreatedBottle,
+} from "@peated/server/lib/createBottle";
 import { logError } from "@peated/server/lib/log";
 import { stripDuplicateBrandPrefixFromBottleName } from "@peated/server/lib/normalize";
 import {
   extractStorePriceBottleDetails,
   findStorePriceMatchCandidates,
 } from "@peated/server/lib/priceMatchingCandidates";
+import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import type {
+  BottleInputSchema,
   ExtractedBottleDetailsSchema,
   PriceMatchCandidateSchema,
   PriceMatchSearchEvidenceSchema,
@@ -31,6 +38,7 @@ import { eq, inArray, sql } from "drizzle-orm";
 import type { z } from "zod";
 
 const VERIFIED_MATCH_CONFIDENCE_THRESHOLD = 80;
+const AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD = 90;
 const REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES = [
   "pending_review",
   "errored",
@@ -198,6 +206,78 @@ function getProposalStatus(
   return "pending_review";
 }
 
+function shouldAutoCreateStorePriceMatchProposal({
+  decision,
+  searchEvidence,
+}: {
+  decision: StorePriceMatchDecision;
+  searchEvidence: SearchEvidence[];
+}) {
+  return (
+    decision.action === "create_new" &&
+    decision.proposedBottle !== null &&
+    decision.confidence >= AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD &&
+    searchEvidence.length > 0
+  );
+}
+
+function buildBottleInputFromProposedBottle(
+  proposedBottle: NonNullable<StorePriceMatchDecision["proposedBottle"]>,
+): z.infer<typeof BottleInputSchema> {
+  return {
+    ...proposedBottle,
+    series: proposedBottle.series
+      ? (proposedBottle.series.id ?? {
+          name: proposedBottle.series.name,
+          description: null,
+        })
+      : null,
+    brand: proposedBottle.brand.id ?? {
+      name: proposedBottle.brand.name,
+      type: ["brand"],
+      description: null,
+      shortName: null,
+      location: null,
+      address: null,
+      yearEstablished: null,
+      website: null,
+      country: null,
+      region: null,
+    },
+    distillers: proposedBottle.distillers.map(
+      (distiller) =>
+        distiller.id ?? {
+          name: distiller.name,
+          type: ["distiller"],
+          description: null,
+          shortName: null,
+          location: null,
+          address: null,
+          yearEstablished: null,
+          website: null,
+          country: null,
+          region: null,
+        },
+    ),
+    bottler: proposedBottle.bottler
+      ? (proposedBottle.bottler.id ?? {
+          name: proposedBottle.bottler.name,
+          type: ["bottler"],
+          description: null,
+          shortName: null,
+          location: null,
+          address: null,
+          yearEstablished: null,
+          website: null,
+          country: null,
+          region: null,
+        })
+      : null,
+    imageUrl: null,
+    flavorProfile: null,
+  };
+}
+
 export async function upsertStorePriceMatchProposal({
   price,
   extractedLabel,
@@ -205,6 +285,7 @@ export async function upsertStorePriceMatchProposal({
   decision,
   searchEvidence,
   error,
+  statusOverride,
 }: {
   price: StorePrice;
   extractedLabel: ExtractedBottleDetails | null;
@@ -212,9 +293,12 @@ export async function upsertStorePriceMatchProposal({
   decision?: StorePriceMatchDecision | null;
   searchEvidence?: SearchEvidence[];
   error?: string | null;
+  statusOverride?: StorePriceMatchProposal["status"] | null;
 }) {
   const proposalType = decision ? getProposalType(price, decision) : "no_match";
-  const status = decision ? getProposalStatus(price, decision) : "errored";
+  const status =
+    statusOverride ??
+    (decision ? getProposalStatus(price, decision) : "errored");
   const [proposal] = await db
     .insert(storePriceMatchProposals)
     .values({
@@ -260,6 +344,71 @@ export async function upsertStorePriceMatchProposal({
     .returning();
 
   return proposal;
+}
+
+async function createBottleFromStorePriceMatchProposalInTransaction(
+  tx: AnyTransaction,
+  {
+    proposalId,
+    input,
+    user,
+  }: {
+    proposalId: number;
+    input: z.infer<typeof BottleInputSchema>;
+    user: User;
+  },
+) {
+  const proposal = await getStorePriceMatchProposalForReviewInTransaction(tx, {
+    proposalId,
+    expectedProposalType: "create_new",
+    allowedStatuses: ["pending_review"],
+  });
+  const createResult = await createBottleInTransaction(tx, {
+    input,
+    context: {
+      user,
+    },
+  });
+  const aliasResult = await applyApprovedStorePriceMatchProposalInTransaction(
+    tx,
+    {
+      proposal,
+      bottleId: createResult.bottle.id,
+      reviewedById: user.id,
+    },
+  );
+
+  return {
+    createResult,
+    aliasResult,
+  };
+}
+
+export async function createBottleFromStorePriceMatchProposal({
+  proposalId,
+  input,
+  user,
+}: {
+  proposalId: number;
+  input: z.infer<typeof BottleInputSchema>;
+  user: User;
+}) {
+  const result = await db.transaction(async (tx) =>
+    createBottleFromStorePriceMatchProposalInTransaction(tx, {
+      proposalId,
+      input,
+      user,
+    }),
+  );
+
+  await finalizeCreatedBottle(result.createResult);
+  await finalizeBottleAliasAssignment(result.aliasResult, {
+    bottle: {
+      id: result.createResult.bottle.id,
+    },
+  });
+
+  return result.createResult.bottle;
 }
 
 export async function resolveStorePriceMatchProposal(
@@ -309,14 +458,67 @@ export async function resolveStorePriceMatchProposal(
       candidateBottles: candidates,
       searchEvidence,
     });
-
-    return await upsertStorePriceMatchProposal({
+    const proposal = await upsertStorePriceMatchProposal({
       price,
       extractedLabel,
       candidates,
       decision,
       searchEvidence,
     });
+
+    if (
+      !shouldAutoCreateStorePriceMatchProposal({ decision, searchEvidence })
+    ) {
+      return proposal;
+    }
+
+    try {
+      const automationUser = await getAutomationModeratorUser();
+      const proposedBottle = decision.proposedBottle;
+      if (!proposedBottle) {
+        throw new Error(
+          `Unable to auto-create price match proposal without a proposed bottle (${proposal.id}).`,
+        );
+      }
+      await createBottleFromStorePriceMatchProposal({
+        proposalId: proposal.id,
+        input: buildBottleInputFromProposedBottle(proposedBottle),
+        user: automationUser,
+      });
+
+      const autoCreatedProposal =
+        await db.query.storePriceMatchProposals.findFirst({
+          where: eq(storePriceMatchProposals.id, proposal.id),
+        });
+
+      if (!autoCreatedProposal) {
+        throw new Error(
+          `Unable to reload auto-created price match proposal (${proposal.id}).`,
+        );
+      }
+
+      return autoCreatedProposal;
+    } catch (err) {
+      logError(err, {
+        price: {
+          id: price.id,
+          name: price.name,
+        },
+        proposal: {
+          id: proposal.id,
+        },
+      });
+
+      return await upsertStorePriceMatchProposal({
+        price,
+        extractedLabel,
+        candidates,
+        decision,
+        searchEvidence,
+        error: err instanceof Error ? err.message : "Unknown auto-create error",
+        statusOverride: "errored",
+      });
+    }
   } catch (err) {
     logError(err, {
       price: {
