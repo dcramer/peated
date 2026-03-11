@@ -395,8 +395,8 @@ importers:
         version: 4.3.6
     devDependencies:
       axios-mock-adapter:
-        specifier: ~1.22.0
-        version: 1.22.0(axios@1.6.8)
+        specifier: ~2.1.0
+        version: 2.1.0(axios@1.6.8)
       form-data-encoder:
         specifier: ^4.0.2
         version: 4.0.2
@@ -4481,8 +4481,8 @@ packages:
     resolution: {integrity: sha512-M0JtH+hlOL5pLQwHOLNYZaXuhqmvS8oExsqB1SBYgA4Dk7u/xx+YdGHXaK5pyUfed5mYXdlYiphWq3G8cRi5JQ==}
     engines: {node: '>=4'}
 
-  axios-mock-adapter@1.22.0:
-    resolution: {integrity: sha512-dmI0KbkyAhntUR05YY96qg2H6gg0XMl2+qTW0xmYg6Up+BFBAJYRLROMXRdDEL06/Wqwa0TJThAYvFtSFdRCZw==}
+  axios-mock-adapter@2.1.0:
+    resolution: {integrity: sha512-AZUe4OjECGCNNssH8SOdtneiQELsqTsat3SQQCWLPjN436/H+L9AjWfV7bF+Zg/YL9cgbhrz5671hoh+Tbn98w==}
     peerDependencies:
       axios: '>= 0.17.0'
 
@@ -13625,7 +13625,7 @@ snapshots:
 
   axe-core@4.7.0: {}
 
-  axios-mock-adapter@1.22.0(axios@1.6.8):
+  axios-mock-adapter@2.1.0(axios@1.6.8):
     dependencies:
       axios: 1.6.8
       fast-deep-equal: 3.1.3

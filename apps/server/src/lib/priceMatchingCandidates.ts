@@ -29,6 +29,13 @@ const MATCH_CANDIDATE_LIMIT = 15;
 
 type ExtractedBottleDetails = z.infer<typeof ExtractedBottleDetailsSchema>;
 type PriceMatchCandidate = z.infer<typeof PriceMatchCandidateSchema>;
+type RawPriceMatchCandidateRow = {
+  bottleId: number | string;
+  alias?: string | null;
+  fullName: string;
+  brand?: string | null;
+  score?: number | string | null;
+};
 
 export const BottleCandidateSearchInputSchema = z.object({
   query: z.string().trim().nullable().default(null),
@@ -133,6 +140,20 @@ function mergeCandidate(
   }
 }
 
+function buildPriceMatchCandidate(
+  row: RawPriceMatchCandidateRow,
+  source: string,
+): PriceMatchCandidate {
+  return PriceMatchCandidateSchema.parse({
+    bottleId: Number(row.bottleId),
+    alias: row.alias ?? null,
+    fullName: row.fullName,
+    brand: row.brand ?? null,
+    score: row.score === undefined || row.score === null ? null : Number(row.score),
+    source: [source],
+  });
+}
+
 export async function extractStorePriceBottleDetails(
   price: Pick<StorePrice, "name" | "imageUrl">,
 ): Promise<ExtractedBottleDetails | null> {
@@ -232,14 +253,7 @@ async function getVectorCandidates(
   `);
 
   return result.rows.map((row) =>
-    PriceMatchCandidateSchema.parse({
-      bottleId: row.bottleId,
-      alias: row.alias,
-      fullName: row.fullName,
-      brand: row.brand,
-      score: row.score === null ? null : Number(row.score),
-      source: ["vector"],
-    }),
+    buildPriceMatchCandidate(row, "vector"),
   );
 }
 
@@ -270,14 +284,7 @@ async function getTextCandidates(
   `);
 
   return result.rows.map((row) =>
-    PriceMatchCandidateSchema.parse({
-      bottleId: row.bottleId,
-      alias: null,
-      fullName: row.fullName,
-      brand: row.brand,
-      score: row.score === null ? null : Number(row.score),
-      source: ["text"],
-    }),
+    buildPriceMatchCandidate(row, "text"),
   );
 }
 
@@ -313,14 +320,7 @@ async function getBrandCandidates(
   `);
 
   return result.rows.map((row) =>
-    PriceMatchCandidateSchema.parse({
-      bottleId: row.bottleId,
-      alias: null,
-      fullName: row.fullName,
-      brand: row.brand,
-      score: null,
-      source: ["brand"],
-    }),
+    buildPriceMatchCandidate(row, "brand"),
   );
 }
 
@@ -342,14 +342,15 @@ export async function getBottleMatchCandidateById(
     return null;
   }
 
-  return PriceMatchCandidateSchema.parse({
-    bottleId: result.bottleId,
-    alias: null,
-    fullName: result.fullName,
-    brand: result.brand,
-    score: 1,
-    source: ["current"],
-  });
+  return buildPriceMatchCandidate(
+    {
+      bottleId: result.bottleId,
+      fullName: result.fullName,
+      brand: result.brand,
+      score: 1,
+    },
+    "current",
+  );
 }
 
 async function getExactBottleCandidate(
@@ -378,14 +379,16 @@ async function getExactBottleCandidate(
     return null;
   }
 
-  return PriceMatchCandidateSchema.parse({
-    bottleId: exactMatch.bottleId,
-    alias: exactMatch.alias,
-    fullName: exactMatch.fullName,
-    brand: exactMatch.brand || null,
-    score: 1,
-    source: ["exact"],
-  });
+  return buildPriceMatchCandidate(
+    {
+      bottleId: exactMatch.bottleId,
+      alias: exactMatch.alias,
+      fullName: exactMatch.fullName,
+      brand: exactMatch.brand || null,
+      score: 1,
+    },
+    "exact",
+  );
 }
 
 export async function findStorePriceMatchCandidates(

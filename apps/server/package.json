@@ -80,7 +80,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "axios-mock-adapter": "~1.22.0",
+    "axios-mock-adapter": "~2.1.0",
     "form-data-encoder": "^4.0.2",
     "formdata-node": "^6.0.3",
     "vite-tsconfig-paths": "catalog:",

@@ -1,6 +1,7 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { storePriceMatchProposals } from "@peated/server/db/schema";
+import { findBottleMatchCandidates } from "@peated/server/lib/priceMatchingCandidates";
 import {
   findStorePriceMatchCandidates,
   resolveStorePriceMatchProposal,
@@ -85,6 +86,51 @@ describe("priceMatching", () => {
         }),
       ]),
     );
+  });
+
+  test("normalizes string bottle ids returned from raw candidate queries", async () => {
+    config.OPENAI_API_KEY = "test-openai-key";
+
+    const { getOpenAIEmbedding } = await import(
+      "@peated/server/lib/openaiEmbeddings"
+    );
+    vi.mocked(getOpenAIEmbedding).mockResolvedValue([0.1, 0.2, 0.3]);
+
+    const executeSpy = vi.spyOn(db, "execute") as any;
+    executeSpy.mockImplementation(async () => ({
+      rows: [
+        {
+          bottleId: "123",
+          alias: "Synthetic Candidate",
+          fullName: "Synthetic Candidate",
+          brand: "Synthetic Brand",
+          score: "0.91",
+        },
+      ],
+    }));
+
+    const candidates = await findBottleMatchCandidates({
+      query: "Synthetic Candidate",
+      brand: null,
+      expression: null,
+      series: null,
+      distillery: [],
+      category: null,
+      stated_age: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+      currentBottleId: null,
+      limit: 15,
+    });
+
+    expect(candidates).toEqual([
+      expect.objectContaining({
+        bottleId: 123,
+        alias: "Synthetic Candidate",
+      }),
+    ]);
   });
 
   test("preserves extracted label and candidates when classification fails", async ({
