@@ -28,13 +28,12 @@ describe("parseConfig", () => {
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
-          "code": "invalid_type",
           "expected": "number",
-          "received": "undefined",
+          "code": "invalid_type",
           "path": [
             "country"
           ],
-          "message": "Required"
+          "message": "Invalid input: expected number, received undefined"
         }
       ]]
     `);

@@ -27,15 +27,14 @@ describe("parseConfig", () => {
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
+          "origin": "array",
           "code": "too_small",
           "minimum": 1,
-          "type": "array",
           "inclusive": true,
-          "exact": false,
-          "message": "At least one category is required.",
           "path": [
             "category"
-          ]
+          ],
+          "message": "At least one category is required."
         }
       ]]
     `);
@@ -50,9 +49,8 @@ describe("parseConfig", () => {
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
-          "received": "foo",
-          "code": "invalid_enum_value",
-          "options": [
+          "code": "invalid_value",
+          "values": [
             "blend",
             "bourbon",
             "rye",
@@ -65,7 +63,7 @@ describe("parseConfig", () => {
             "category",
             0
           ],
-          "message": "Invalid enum value. Expected 'blend' | 'bourbon' | 'rye' | 'single_grain' | 'single_malt' | 'single_pot_still' | 'spirit', received 'foo'"
+          "message": "Invalid option: expected one of \\"blend\\"|\\"bourbon\\"|\\"rye\\"|\\"single_grain\\"|\\"single_malt\\"|\\"single_pot_still\\"|\\"spirit\\""
         }
       ]]
     `);

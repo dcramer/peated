@@ -29,15 +29,14 @@ describe("parseConfig", () => {
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
+          "origin": "number",
           "code": "too_small",
           "minimum": 0,
-          "type": "number",
           "inclusive": true,
-          "exact": false,
-          "message": "Number must be greater than or equal to 0",
           "path": [
             "minAge"
-          ]
+          ],
+          "message": "Too small: expected number to be >=0"
         }
       ]]
     `);
@@ -52,13 +51,12 @@ describe("parseConfig", () => {
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
-          "code": "invalid_type",
           "expected": "number",
-          "received": "undefined",
+          "code": "invalid_type",
           "path": [
             "minAge"
           ],
-          "message": "Required"
+          "message": "Invalid input: expected number, received undefined"
         }
       ]]
     `);
@@ -74,15 +72,14 @@ describe("parseConfig", () => {
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
+          "origin": "number",
           "code": "too_small",
           "minimum": 0,
-          "type": "number",
           "inclusive": true,
-          "exact": false,
-          "message": "Number must be greater than or equal to 0",
           "path": [
             "maxAge"
-          ]
+          ],
+          "message": "Too small: expected number to be >=0"
         }
       ]]
     `);
@@ -97,13 +94,12 @@ describe("parseConfig", () => {
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
-          "code": "invalid_type",
           "expected": "number",
-          "received": "undefined",
+          "code": "invalid_type",
           "path": [
             "maxAge"
           ],
-          "message": "Required"
+          "message": "Invalid input: expected number, received undefined"
         }
       ]]
     `);

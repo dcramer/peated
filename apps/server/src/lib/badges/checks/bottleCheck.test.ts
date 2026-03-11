@@ -26,15 +26,14 @@ describe("parseConfig", () => {
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
+          "origin": "array",
           "code": "too_small",
           "minimum": 1,
-          "type": "array",
           "inclusive": true,
-          "exact": false,
-          "message": "At least one bottle is required.",
           "path": [
             "bottle"
-          ]
+          ],
+          "message": "At least one bottle is required."
         }
       ]]
     `);
