@@ -16,11 +16,11 @@
     "test:ci": "dotenv -e .env.test -- vitest --coverage --reporter=junit --reporter=default --outputFile=junit.xml"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.2.3",
     "@faker-js/faker": "^8.4.1",
     "@google-cloud/storage": "^6.12.0",
     "@googlemaps/google-maps-services-js": "^3.4.0",
     "@hono/node-server": "^1.14.1",
+    "@openai/agents": "^0.6.0",
     "@opentelemetry/api": "^1.9.0",
     "@orpc/client": "^1.7.9",
     "@orpc/openapi": "^1.7.9",
@@ -47,7 +47,6 @@
     "@types/pg": "catalog:",
     "@types/react": "catalog:",
     "@vitest/coverage-v8": "catalog:",
-    "ai": "^4.1.58",
     "axios": "~1.6.8",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.40.3",
@@ -69,7 +68,7 @@
     "mime-types": "^2.1.35",
     "nanoid": "^3.3.8",
     "nodemailer": "^6.10.0",
-    "openai": "^4.87.3",
+    "openai": "^6.27.0",
     "pg": "catalog:",
     "react": "catalog:",
     "sharp": "^0.33.5",
@@ -78,8 +77,7 @@
     "tsx": "catalog:",
     "typescript": "catalog:",
     "wkx": "^0.5.0",
-    "zod": "catalog:",
-    "zod-to-json-schema": "^3.24.5"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "axios-mock-adapter": "~1.22.0",

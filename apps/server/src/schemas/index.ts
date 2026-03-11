@@ -16,6 +16,7 @@ export * from "./follows";
 export * from "./friends";
 export * from "./magicLink";
 export * from "./notifications";
+export * from "./priceMatches";
 export * from "./regions";
 export * from "./reviews";
 export * from "./shared";

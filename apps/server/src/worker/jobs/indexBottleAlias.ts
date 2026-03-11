@@ -1,8 +1,7 @@
-import { openai } from "@ai-sdk/openai";
 import { db } from "@peated/server/db";
 import { bottleAliases } from "@peated/server/db/schema";
 import { formatCategoryName } from "@peated/server/lib/format";
-import { embed } from "ai";
+import { getOpenAIEmbedding } from "@peated/server/lib/openaiEmbeddings";
 import { eq, sql } from "drizzle-orm";
 
 // capture embeddings at an Alias level as they're unique entities and portable
@@ -32,10 +31,7 @@ export default async ({ name }: { name: string }) => {
   if (bottle?.category) bits.push(formatCategoryName(bottle.category));
   // shortName is already present in alias.name
   if (brand && brand?.name !== brand?.shortName) bits.unshift(brand.name);
-  const { embedding } = await embed({
-    model: openai.embedding("text-embedding-3-large"),
-    value: bits.join(" "),
-  });
+  const embedding = await getOpenAIEmbedding(bits.join(" "));
 
   await db
     .update(bottleAliases)

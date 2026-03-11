@@ -39,6 +39,8 @@ export default procedure
         cursor: 1,
         limit: 100,
         sort: DEFAULT_SORT,
+        onlyMajor: false,
+        hasBottles: false,
       }),
   )
   // TODO(response-envelope): helper enables later switch to { data, meta }

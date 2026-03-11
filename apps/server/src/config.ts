@@ -57,6 +57,9 @@ export default {
   OPENAI_ORGANIZATION:
     process.env.OPENAI_ORGANIZATION || "org-c11AVkF35wixZcGri1YBH9Pq",
   OPENAI_PROJECT: process.env.OPENAI_PROJECT || null,
+  PRICE_MATCH_MAX_SEARCH_QUERIES: Number(
+    process.env.PRICE_MATCH_MAX_SEARCH_QUERIES || "5",
+  ),
 
   DISCORD_WEBHOOK: process.env.DISCORD_WEBHOOK,
 };

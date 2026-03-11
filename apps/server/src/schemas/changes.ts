@@ -18,5 +18,7 @@ export const ChangeSchema = z.object({
     .string()
     .datetime()
     .describe("Timestamp when the change was made"),
-  data: z.record(z.any()).describe("Additional data about the change"),
+  data: z
+    .record(z.string(), z.any())
+    .describe("Additional data about the change"),
 });

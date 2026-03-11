@@ -23,8 +23,7 @@ export const zDatetime = z
         code: z.ZodIssueCode.custom,
         message: "Value too far in future.",
       });
-
-      return z.NEVER;
+      return;
     }
 
     if (isDistantPast(newValue, 60 * 60 * 24 * 7)) {
@@ -32,11 +31,8 @@ export const zDatetime = z
         code: z.ZodIssueCode.custom,
         message: "Value too far in the past.",
       });
-
-      return z.NEVER;
+      return;
     }
-
-    return value;
   });
 
 export const ContentSourceEnum = z.enum(["generated", "user"]);

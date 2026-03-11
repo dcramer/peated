@@ -31,6 +31,7 @@ export default procedure
       })
       .default({
         query: "",
+        sort: "name",
         cursor: 1,
         limit: 100,
       }),

@@ -126,7 +126,7 @@ export async function verifyPasskeyRegistration(
   } catch (err) {
     if (err instanceof z.ZodError) {
       throw new Error(
-        `Invalid client data JSON: ${err.errors.map((e) => e.message).join(", ")}`,
+        `Invalid client data JSON: ${err.issues.map((issue) => issue.message).join(", ")}`,
       );
     }
     throw new Error("Invalid client data JSON format");

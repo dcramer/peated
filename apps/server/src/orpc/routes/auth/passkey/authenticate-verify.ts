@@ -67,7 +67,7 @@ export default procedure
     } catch (err) {
       if (err instanceof z.ZodError) {
         throw errors.BAD_REQUEST({
-          message: `Invalid client data: ${err.errors.map((e) => e.message).join(", ")}`,
+          message: `Invalid client data: ${err.issues.map((issue) => issue.message).join(", ")}`,
         });
       }
       throw errors.BAD_REQUEST({
