@@ -28,7 +28,7 @@ export const ExtractedBottleDetailsSchema = z.object({
 });
 
 export const PriceMatchCandidateSchema = z.object({
-  bottleId: z.number(),
+  bottleId: z.number().int(),
   alias: z.string().nullable().default(null),
   fullName: z.string(),
   brand: z.string().nullable().default(null),
@@ -64,12 +64,12 @@ export const StorePriceMatchProposalTypeEnum = z.enum([
 ]);
 
 export const ProposedEntityChoiceSchema = z.object({
-  id: z.number().nullable().default(null),
+  id: z.number().int().nullable().default(null),
   name: z.string().trim().min(1),
 });
 
 export const ProposedSeriesChoiceSchema = z.object({
-  id: z.number().nullable().default(null),
+  id: z.number().int().nullable().default(null),
   name: z.string().trim().min(1),
 });
 
@@ -78,18 +78,20 @@ export const ProposedBottleSchema = z.object({
   series: ProposedSeriesChoiceSchema.nullable().default(null),
   category: CategoryEnum.nullable().default(null),
   edition: z.string().trim().nullable().default(null),
-  statedAge: z.number().min(0).max(100).nullable().default(null),
+  statedAge: z.number().int().min(0).max(100).nullable().default(null),
   caskStrength: z.boolean().nullable().default(null),
   singleCask: z.boolean().nullable().default(null),
   abv: z.number().min(0).max(100).nullable().default(null),
   vintageYear: z
     .number()
+    .int()
     .gte(1800)
     .lte(new Date().getFullYear())
     .nullable()
     .default(null),
   releaseYear: z
     .number()
+    .int()
     .gte(1800)
     .lte(new Date().getFullYear())
     .nullable()
@@ -107,8 +109,8 @@ export const StorePriceMatchDecisionSchema = z.object({
   action: StorePriceMatchProposalTypeEnum,
   confidence: z.number().min(0).max(100),
   rationale: z.string().nullable().default(null),
-  suggestedBottleId: z.number().nullable().default(null),
-  candidateBottleIds: z.array(z.number()).default([]),
+  suggestedBottleId: z.number().int().nullable().default(null),
+  candidateBottleIds: z.array(z.number().int()).default([]),
   proposedBottle: ProposedBottleSchema.nullable().default(null),
 });
 

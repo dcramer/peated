@@ -42,6 +42,86 @@ type StorePriceMatchProposalForReview = StorePriceMatchProposal & {
   price: StorePrice;
 };
 
+function sanitizeStorePriceMatchDecision(
+  decision: StorePriceMatchDecision,
+  {
+    candidateBottles,
+    searchEvidence,
+  }: {
+    candidateBottles: PriceMatchCandidate[];
+    searchEvidence: SearchEvidence[];
+  },
+): StorePriceMatchDecision {
+  const candidateBottleIds = new Set(
+    candidateBottles.map((candidate) => candidate.bottleId),
+  );
+
+  if (
+    (decision.action === "match_existing" ||
+      decision.action === "correction") &&
+    decision.suggestedBottleId === null
+  ) {
+    throw new StorePriceMatchClassificationError(
+      `Classifier returned ${decision.action} without a suggested bottle id.`,
+      searchEvidence,
+      candidateBottles,
+    );
+  }
+
+  if (
+    decision.suggestedBottleId !== null &&
+    !candidateBottleIds.has(decision.suggestedBottleId)
+  ) {
+    throw new StorePriceMatchClassificationError(
+      `Classifier returned unknown suggested bottle id (${decision.suggestedBottleId}).`,
+      searchEvidence,
+      candidateBottles,
+    );
+  }
+
+  if (decision.action === "create_new" && !decision.proposedBottle) {
+    throw new StorePriceMatchClassificationError(
+      "Classifier returned create_new without a proposed bottle.",
+      searchEvidence,
+      candidateBottles,
+    );
+  }
+
+  return {
+    ...decision,
+    suggestedBottleId:
+      decision.action === "create_new" ? null : decision.suggestedBottleId,
+    candidateBottleIds: decision.candidateBottleIds.filter((id) =>
+      candidateBottleIds.has(id),
+    ),
+    proposedBottle: decision.proposedBottle
+      ? {
+          ...decision.proposedBottle,
+          series: decision.proposedBottle.series
+            ? {
+                ...decision.proposedBottle.series,
+                id: null,
+              }
+            : null,
+          brand: {
+            ...decision.proposedBottle.brand,
+            id: null,
+          },
+          distillers: decision.proposedBottle.distillers.map((distiller) => ({
+            ...distiller,
+            id: null,
+          })),
+          bottler: decision.proposedBottle.bottler
+            ? {
+                ...decision.proposedBottle.bottler,
+                id: null,
+              }
+            : null,
+        }
+      : null,
+  };
+}
+
 export class UnknownStorePriceMatchProposalError extends Error {
   constructor(proposalId: number) {
     super(`Price match proposal not found (${proposalId}).`);
@@ -208,12 +288,16 @@ export async function resolveStorePriceMatchProposal(
     });
     candidates = classification.candidateBottles;
     searchEvidence = classification.searchEvidence;
+    const decision = sanitizeStorePriceMatchDecision(classification.decision, {
+      candidateBottles: candidates,
+      searchEvidence,
+    });
 
     return await upsertStorePriceMatchProposal({
       price,
       extractedLabel,
       candidates,
-      decision: classification.decision,
+      decision,
       searchEvidence,
     });
   } catch (err) {
