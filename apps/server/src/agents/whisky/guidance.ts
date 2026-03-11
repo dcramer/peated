@@ -193,6 +193,14 @@ export const RETAILER_LABEL_EXAMPLES: RetailerLabelExample[] = [
       "The category is broader than bourbon or rye, so `spirit` can be the right normalized fallback.",
     ],
   },
+  {
+    source: "Wooden Cork",
+    label: "Gold Bar Black Double Cask Straight Bourbon Whiskey",
+    notes: [
+      "The evidence points to the branded expression `Black Double Cask`.",
+      "Do not mechanically copy every trailing style word from the retailer title into `expression` or `proposedBottle.name` when the bottle is identified more specifically.",
+    ],
+  },
 ];
 
 const EXTRACTION_EXAMPLES: ExtractionExample[] = [
@@ -263,6 +271,24 @@ const EXTRACTION_EXAMPLES: ExtractionExample[] = [
       release_year: null,
       vintage_year: null,
       cask_type: "First Fill Bourbon",
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    },
+  },
+  {
+    input: "Gold Bar Black Double Cask Straight Bourbon Whiskey",
+    output: {
+      brand: "Gold Bar",
+      expression: "Black Double Cask",
+      series: null,
+      distillery: [],
+      category: "bourbon",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
       cask_strength: null,
       single_cask: null,
       edition: null,
@@ -341,6 +367,7 @@ export function buildWhiskyLabelExtractorInstructions({
       "When a component is ambiguous, leave it `null` or `[]` instead of guessing. Missing data is better than a fabricated identity signal.",
       "Age statements should be integers. Normalize age phrases such as `12 Year`, `12 Years Old`, `12 Yr.`, and `12yr` to `stated_age: 12`.",
       "When an age statement belongs in the expression, normalize the phrase to `12-year-old`.",
+      "For expression-style fields, follow the bottle's evidenced canonical name. Do not mechanically append retailer style/category words from the title just to make the expression look complete.",
       "Use `release_year` only for explicit release or bottling years, not founding dates or warning text.",
       "If both distillation and bottling years are present, use `vintage_year` for the distillation year and `release_year` for the bottling year.",
       "Set `cask_strength` and `single_cask` only when the label states them explicitly.",
@@ -433,6 +460,7 @@ export function buildStorePriceMatchInstructions({
       "Set `confidence` as a percentage from 0 to 100, not a 0-1 decimal.",
       "Only set `suggestedBottleId` to an id from the provided candidates.",
       "If you return `create_new`, `proposedBottle` must include every schema field, using `null` or `[]` when unknown.",
+      "For `proposedBottle.name`, follow the bottle's evidenced canonical name, not a mechanically copied retailer title. Do not append extra style/category words just because they appeared in the store listing.",
       "For `brand`, `distillers`, `bottler`, and `series`, return objects with `{ id, name }`. Use `id: null` when you do not know a local id.",
       "Never invent websites, producer relationships, release details, or missing proof numbers.",
     ]),

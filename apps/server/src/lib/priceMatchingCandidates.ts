@@ -100,8 +100,7 @@ function buildSearchLabel(
 }
 
 function buildRawSearchName(input: BottleCandidateSearchInput) {
-  const parts = [
-    input.query,
+  const structuredParts = [
     input.brand,
     input.expression,
     input.series,
@@ -111,7 +110,23 @@ function buildRawSearchName(input: BottleCandidateSearchInput) {
     input.distillery.length ? input.distillery.join(" ") : null,
   ];
 
-  return parts.filter(Boolean).join(" ").trim();
+  const structuredName = structuredParts.filter(Boolean).join(" ").trim();
+  const hasStructuredIdentity = Boolean(
+    input.expression ||
+      input.series ||
+      input.edition ||
+      input.stated_age ||
+      input.cask_type ||
+      input.distillery.length ||
+      input.cask_strength !== null ||
+      input.single_cask !== null,
+  );
+
+  if (structuredName && hasStructuredIdentity) {
+    return structuredName;
+  }
+
+  return [input.query, structuredName].filter(Boolean).join(" ").trim();
 }
 
 function mergeCandidate(

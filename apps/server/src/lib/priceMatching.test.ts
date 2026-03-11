@@ -88,6 +88,46 @@ describe("priceMatching", () => {
     );
   });
 
+  test("prefers structured extracted identity over noisy retailer titles for exact lookup", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const brand = await fixtures.Entity({
+      type: ["brand"],
+      name: "Shibui",
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Pure Malt",
+    });
+
+    const candidates = await findBottleMatchCandidates({
+      query: "Shibui Pure Malt Whisky 750ml",
+      brand: "Shibui",
+      expression: "Pure Malt",
+      series: null,
+      distillery: [],
+      category: null,
+      stated_age: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+      currentBottleId: null,
+      limit: 15,
+    });
+
+    expect(candidates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          bottleId: bottle.id,
+          source: expect.arrayContaining(["exact"]),
+        }),
+      ]),
+    );
+  });
+
   test("normalizes string bottle ids returned from raw candidate queries", async () => {
     config.OPENAI_API_KEY = "test-openai-key";
 

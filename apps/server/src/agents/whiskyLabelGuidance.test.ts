@@ -26,7 +26,12 @@ describe("whiskyLabelGuidance", () => {
 
   test("keeps current retailer failure-mode examples in the prompt source", () => {
     expect(RETAILER_LABEL_EXAMPLES.map((example) => example.source)).toEqual(
-      expect.arrayContaining(["Total Wine", "Astor Wines", "ReserveBar"]),
+      expect.arrayContaining([
+        "Total Wine",
+        "Astor Wines",
+        "ReserveBar",
+        "Wooden Cork",
+      ]),
     );
   });
 
@@ -41,6 +46,10 @@ describe("whiskyLabelGuidance", () => {
     expect(instructions).toContain(
       "Maker's Mark Private Selection Kentucky Bourbon Whisky S2B13",
     );
+    expect(instructions).toContain(
+      "Gold Bar Black Double Cask Straight Bourbon Whiskey",
+    );
+    expect(instructions).toContain('"expression": "Black Double Cask"');
     expect(instructions).toContain("cask_strength");
     expect(instructions).toContain("single_cask");
   });
@@ -56,6 +65,9 @@ describe("whiskyLabelGuidance", () => {
     expect(instructions).toContain("openai_web_search");
     expect(instructions).toContain(
       "`series` is a stable range or family. `edition` is a batch, store-pick code, release code, or numbered variant.",
+    );
+    expect(instructions).toContain(
+      "For `proposedBottle.name`, follow the bottle's evidenced canonical name, not a mechanically copied retailer title.",
     );
     expect(instructions).toContain(
       "A false positive match is worse than returning `no_match` or a lower-confidence review candidate.",
