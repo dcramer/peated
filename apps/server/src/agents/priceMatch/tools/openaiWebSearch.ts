@@ -5,7 +5,13 @@ import type OpenAI from "openai";
 import { z } from "zod";
 
 const OpenAIWebSearchArgsSchema = z.object({
-  query: z.string().trim().min(1),
+  query: z
+    .string()
+    .trim()
+    .min(1)
+    .describe(
+      "A focused web search query for corroborating bottle evidence. Prefer retailer, producer, or distillery terms over broad whisky keywords.",
+    ),
 });
 
 type SearchEvidence = z.infer<typeof PriceMatchSearchEvidenceSchema>;
@@ -56,7 +62,7 @@ export function createOpenAIWebSearchTool({
   return tool({
     name: "openai_web_search",
     description:
-      "Search the live web using OpenAI's native web search capability. Use this only after local bottle and entity search is still ambiguous.",
+      "Search the live web using OpenAI's native web search capability. Use this only after local bottle and entity search are still ambiguous or conflicting. Use it to validate whether a listing is a real distinct bottling, not as the first way to discover candidates. Prefer retailer-domain and producer-domain queries before broad web searches.",
     parameters: OpenAIWebSearchArgsSchema,
     execute: async (args) => {
       if (searchCalls >= maxQueries) {
@@ -87,7 +93,9 @@ export function createOpenAIWebSearchTool({
       });
 
       const evidence = extractEvidence(args.query, response);
-      onEvidence?.(evidence);
+      if (evidence.results.length > 0) {
+        onEvidence?.(evidence);
+      }
       return evidence;
     },
   });

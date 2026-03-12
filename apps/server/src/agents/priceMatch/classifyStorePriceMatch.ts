@@ -1,4 +1,9 @@
-import { Agent, OpenAIProvider, Runner } from "@openai/agents";
+import {
+  Agent,
+  OpenAIProvider,
+  Runner,
+  type JsonSchemaDefinition,
+} from "@openai/agents";
 import { buildStorePriceMatchInstructions } from "@peated/server/agents/whisky/guidance";
 import config from "@peated/server/config";
 import { type StorePrice } from "@peated/server/db/schema";
@@ -10,11 +15,12 @@ import type {
 } from "@peated/server/schemas";
 import { StorePriceMatchDecisionSchema } from "@peated/server/schemas";
 import OpenAI from "openai";
-import type { z } from "zod";
+import { z } from "zod";
 import {
   createOpenAIWebSearchTool,
   createSearchBottlesTool,
   createSearchEntitiesTool,
+  type EntitySearchResult,
 } from "./tools";
 
 const CLASSIFIER_MAX_TURNS = 8;
@@ -22,6 +28,25 @@ const CLASSIFIER_MAX_TURNS = 8;
 type ExtractedBottleDetails = z.infer<typeof ExtractedBottleDetailsSchema>;
 type PriceMatchCandidate = z.infer<typeof PriceMatchCandidateSchema>;
 type SearchEvidence = z.infer<typeof PriceMatchSearchEvidenceSchema>;
+
+export type StorePriceMatchClassification = {
+  decision: z.infer<typeof StorePriceMatchDecisionSchema>;
+  searchEvidence: SearchEvidence[];
+  candidateBottles: PriceMatchCandidate[];
+  resolvedEntities: EntitySearchResult[];
+};
+
+const CANDIDATE_METADATA_FIELDS = [
+  "category",
+  "statedAge",
+  "edition",
+  "caskStrength",
+  "singleCask",
+  "abv",
+  "vintageYear",
+  "releaseYear",
+  "caskType",
+] as const satisfies ReadonlyArray<keyof PriceMatchCandidate>;
 
 function mergeCandidate(
   candidates: Map<number, PriceMatchCandidate>,
@@ -46,6 +71,48 @@ function mergeCandidate(
 
   if (!existing.alias && candidate.alias) {
     existing.alias = candidate.alias;
+  }
+
+  const existingMetadata = existing as Record<
+    (typeof CANDIDATE_METADATA_FIELDS)[number],
+    PriceMatchCandidate[(typeof CANDIDATE_METADATA_FIELDS)[number]]
+  >;
+
+  for (const field of CANDIDATE_METADATA_FIELDS) {
+    const existingValue = existingMetadata[field];
+    const candidateValue = candidate[field];
+
+    if (existingValue === null && candidateValue !== null) {
+      existingMetadata[field] = candidateValue;
+    }
+  }
+}
+
+function mergeResolvedEntity(
+  entities: Map<number, EntitySearchResult>,
+  entity: EntitySearchResult,
+) {
+  const existing = entities.get(entity.entityId);
+  if (!existing) {
+    entities.set(entity.entityId, entity);
+    return;
+  }
+
+  existing.source = Array.from(new Set([...existing.source, ...entity.source]));
+
+  if (
+    entity.score !== null &&
+    (existing.score === null || entity.score > existing.score)
+  ) {
+    existing.score = entity.score;
+  }
+
+  if (!existing.alias && entity.alias) {
+    existing.alias = entity.alias;
+  }
+
+  if (!existing.shortName && entity.shortName) {
+    existing.shortName = entity.shortName;
   }
 }
 
@@ -81,6 +148,7 @@ export async function classifyStorePriceMatch({
 
   const searchEvidence: SearchEvidence[] = [];
   const candidateBottles = new Map<number, PriceMatchCandidate>();
+  const resolvedEntities = new Map<number, EntitySearchResult>();
   const hasExactAliasMatch = initialCandidates.some((candidate) =>
     candidate.source.includes("exact"),
   );
@@ -99,6 +167,14 @@ export async function classifyStorePriceMatch({
   const instructions = buildStorePriceMatchInstructions({
     maxSearchQueries: config.PRICE_MATCH_MAX_SEARCH_QUERIES,
   });
+  const decisionOutputSchema: JsonSchemaDefinition = {
+    type: "json_schema",
+    name: "store_price_match_decision",
+    strict: true,
+    schema: z.toJSONSchema(
+      StorePriceMatchDecisionSchema,
+    ) as unknown as JsonSchemaDefinition["schema"],
+  };
 
   const agent = new Agent({
     name: "store_price_match_classifier",
@@ -108,7 +184,7 @@ export async function classifyStorePriceMatch({
       parallelToolCalls: false,
       temperature: 0,
     },
-    outputType: StorePriceMatchDecisionSchema,
+    outputType: decisionOutputSchema,
     tools: [
       createSearchBottlesTool({
         onResults: (results) => {
@@ -117,7 +193,13 @@ export async function classifyStorePriceMatch({
           }
         },
       }),
-      createSearchEntitiesTool(),
+      createSearchEntitiesTool({
+        onResults: (results) => {
+          for (const result of results) {
+            mergeResolvedEntity(resolvedEntities, result);
+          }
+        },
+      }),
       createOpenAIWebSearchTool({
         client,
         maxQueries: config.PRICE_MATCH_MAX_SEARCH_QUERIES,
@@ -166,16 +248,20 @@ export async function classifyStorePriceMatch({
     const result = await runner.run(agent, input, {
       maxTurns: CLASSIFIER_MAX_TURNS,
     });
-    const decision = result.finalOutput;
 
-    if (!decision) {
+    if (!result.finalOutput) {
       throw new Error("Agent returned empty output");
     }
+
+    const decision = StorePriceMatchDecisionSchema.parse(result.finalOutput);
 
     return {
       decision,
       searchEvidence,
       candidateBottles: Array.from(candidateBottles.values()).sort(
+        (a, b) => (b.score ?? 0) - (a.score ?? 0),
+      ),
+      resolvedEntities: Array.from(resolvedEntities.values()).sort(
         (a, b) => (b.score ?? 0) - (a.score ?? 0),
       ),
     };

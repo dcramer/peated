@@ -1,6 +1,7 @@
 import {
   classifyStorePriceMatch,
   StorePriceMatchClassificationError,
+  type StorePriceMatchClassification,
 } from "@peated/server/agents/priceMatch";
 import config from "@peated/server/config";
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
@@ -57,6 +58,9 @@ type ExtractedBottleDetails = z.infer<typeof ExtractedBottleDetailsSchema>;
 type PriceMatchCandidate = z.infer<typeof PriceMatchCandidateSchema>;
 type SearchEvidence = z.infer<typeof PriceMatchSearchEvidenceSchema>;
 type StorePriceMatchDecision = z.infer<typeof StorePriceMatchDecisionSchema>;
+type ResolvedEntity = NonNullable<
+  StorePriceMatchClassification["resolvedEntities"]
+>[number];
 type StorePriceMatchProposalForReview = StorePriceMatchProposal & {
   price: StorePrice;
 };
@@ -67,31 +71,70 @@ function normalizeStorePriceMatchConfidence(confidence: number): number {
   return Math.min(100, Math.max(0, Math.round(percentageConfidence)));
 }
 
+function normalizeEntityChoiceName(name: string) {
+  return normalizeString(name).toLowerCase();
+}
+
+function sanitizeResolvedEntityChoice(
+  choice: {
+    id: number | null;
+    name: string;
+  },
+  expectedType: "brand" | "distiller" | "bottler",
+  resolvedEntities: Map<number, ResolvedEntity>,
+) {
+  if (choice.id === null) {
+    return choice;
+  }
+
+  const resolvedEntity = resolvedEntities.get(choice.id);
+  if (!resolvedEntity || !resolvedEntity.type.includes(expectedType)) {
+    return {
+      ...choice,
+      id: null,
+    };
+  }
+
+  const normalizedChoiceName = normalizeEntityChoiceName(choice.name);
+  const matchedNames = [
+    resolvedEntity.name,
+    resolvedEntity.shortName,
+    resolvedEntity.alias,
+  ]
+    .filter((name): name is string => !!name)
+    .map(normalizeEntityChoiceName);
+
+  if (!matchedNames.includes(normalizedChoiceName)) {
+    return {
+      ...choice,
+      id: null,
+    };
+  }
+
+  return {
+    id: resolvedEntity.entityId,
+    name: resolvedEntity.name,
+  };
+}
+
 function sanitizeStorePriceMatchDecision(
   decision: StorePriceMatchDecision,
   {
     candidateBottles,
     searchEvidence,
+    resolvedEntities = [],
   }: {
     candidateBottles: PriceMatchCandidate[];
     searchEvidence: SearchEvidence[];
+    resolvedEntities?: ResolvedEntity[];
   },
 ): StorePriceMatchDecision {
   const candidateBottleIds = new Set(
     candidateBottles.map((candidate) => candidate.bottleId),
   );
-
-  if (
-    (decision.action === "match_existing" ||
-      decision.action === "correction") &&
-    decision.suggestedBottleId === null
-  ) {
-    throw new StorePriceMatchClassificationError(
-      `Classifier returned ${decision.action} without a suggested bottle id.`,
-      searchEvidence,
-      candidateBottles,
-    );
-  }
+  const resolvedEntitiesById = new Map(
+    resolvedEntities.map((entity) => [entity.entityId, entity]),
+  );
 
   if (
     decision.suggestedBottleId !== null &&
@@ -104,68 +147,93 @@ function sanitizeStorePriceMatchDecision(
     );
   }
 
-  if (decision.action === "create_new" && !decision.proposedBottle) {
-    throw new StorePriceMatchClassificationError(
-      "Classifier returned create_new without a proposed bottle.",
-      searchEvidence,
-      candidateBottles,
-    );
-  }
-
   const hasConcreteWhiskyCategory =
     decision.action !== "create_new" ||
     (decision.proposedBottle?.category !== null &&
       decision.proposedBottle?.category !== "spirit");
+  const hasCorroboratingSearchEvidence = searchEvidence.some(
+    (evidence) => evidence.results.length > 0,
+  );
   const normalizedConfidence = normalizeStorePriceMatchConfidence(
     decision.confidence,
   );
   const boundedConfidence =
     decision.action === "create_new" &&
-    (searchEvidence.length === 0 || !hasConcreteWhiskyCategory)
+    (!hasCorroboratingSearchEvidence || !hasConcreteWhiskyCategory)
       ? Math.min(normalizedConfidence, AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD - 1)
       : normalizedConfidence;
+
+  const filteredCandidateBottleIds = decision.candidateBottleIds.filter((id) =>
+    candidateBottleIds.has(id),
+  );
+
+  if (decision.action === "create_new") {
+    const brand = sanitizeResolvedEntityChoice(
+      decision.proposedBottle.brand,
+      "brand",
+      resolvedEntitiesById,
+    );
+    const distillers = decision.proposedBottle.distillers.map((distiller) =>
+      sanitizeResolvedEntityChoice(
+        distiller,
+        "distiller",
+        resolvedEntitiesById,
+      ),
+    );
+    const bottler = decision.proposedBottle.bottler
+      ? sanitizeResolvedEntityChoice(
+          decision.proposedBottle.bottler,
+          "bottler",
+          resolvedEntitiesById,
+        )
+      : null;
+
+    return {
+      ...decision,
+      confidence: boundedConfidence,
+      suggestedBottleId: null,
+      candidateBottleIds: filteredCandidateBottleIds,
+      proposedBottle: {
+        ...decision.proposedBottle,
+        name: stripDuplicateBrandPrefixFromBottleName(
+          decision.proposedBottle.name,
+          brand.name,
+        ),
+        category:
+          decision.proposedBottle.category === "spirit"
+            ? null
+            : decision.proposedBottle.category,
+        series: decision.proposedBottle.series
+          ? {
+              ...decision.proposedBottle.series,
+              id: null,
+            }
+          : null,
+        brand,
+        distillers,
+        bottler,
+      },
+    };
+  }
+
+  if (
+    decision.action === "match_existing" ||
+    decision.action === "correction"
+  ) {
+    return {
+      ...decision,
+      confidence: boundedConfidence,
+      candidateBottleIds: filteredCandidateBottleIds,
+      proposedBottle: null,
+    };
+  }
 
   return {
     ...decision,
     confidence: boundedConfidence,
-    suggestedBottleId:
-      decision.action === "create_new" ? null : decision.suggestedBottleId,
-    candidateBottleIds: decision.candidateBottleIds.filter((id) =>
-      candidateBottleIds.has(id),
-    ),
-    proposedBottle: decision.proposedBottle
-      ? {
-          ...decision.proposedBottle,
-          name: stripDuplicateBrandPrefixFromBottleName(
-            decision.proposedBottle.name,
-            decision.proposedBottle.brand.name,
-          ),
-          category:
-            decision.proposedBottle.category === "spirit"
-              ? null
-              : decision.proposedBottle.category,
-          series: decision.proposedBottle.series
-            ? {
-                ...decision.proposedBottle.series,
-                id: null,
-              }
-            : null,
-          brand: {
-            ...decision.proposedBottle.brand,
-            id: null,
-          },
-          distillers: decision.proposedBottle.distillers.map((distiller) => ({
-            ...distiller,
-            id: null,
-          })),
-          bottler: decision.proposedBottle.bottler
-            ? {
-                ...decision.proposedBottle.bottler,
-                id: null,
-              }
-            : null,
-        }
-      : null,
+    suggestedBottleId: null,
+    candidateBottleIds: filteredCandidateBottleIds,
+    proposedBottle: null,
   };
 }
 
@@ -218,6 +286,10 @@ function getProposalType(
   price: StorePrice,
   decision: StorePriceMatchDecision,
 ): StorePriceMatchProposal["proposalType"] {
+  if (decision.action === "create_new") {
+    return "create_new";
+  }
+
   if (price.bottleId) {
     if (
       decision.action === "match_existing" &&
@@ -252,11 +324,15 @@ function shouldAutoCreateStorePriceMatchProposal({
   decision: StorePriceMatchDecision;
   searchEvidence: SearchEvidence[];
 }) {
+  const hasCorroboratingSearchEvidence = searchEvidence.some(
+    (evidence) => evidence.results.length > 0,
+  );
+
   return (
     decision.action === "create_new" &&
     decision.proposedBottle !== null &&
     decision.confidence >= AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD &&
-    searchEvidence.length > 0
+    hasCorroboratingSearchEvidence
   );
 }
 
@@ -508,6 +584,7 @@ export async function resolveStorePriceMatchProposal(
     const decision = sanitizeStorePriceMatchDecision(classification.decision, {
       candidateBottles: candidates,
       searchEvidence,
+      resolvedEntities: classification.resolvedEntities,
     });
     const proposal = await upsertStorePriceMatchProposal({
       price,

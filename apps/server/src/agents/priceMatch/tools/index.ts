@@ -1,3 +1,6 @@
 export { createOpenAIWebSearchTool } from "./openaiWebSearch";
 export { createSearchBottlesTool } from "./searchBottles";
-export { createSearchEntitiesTool } from "./searchEntities";
+export {
+  createSearchEntitiesTool,
+  type EntitySearchResult,
+} from "./searchEntities";

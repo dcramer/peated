@@ -34,6 +34,15 @@ type RawPriceMatchCandidateRow = {
   alias?: string | null;
   fullName: string;
   brand?: string | null;
+  category?: z.infer<typeof ExtractedBottleDetailsSchema>["category"] | null;
+  statedAge?: number | string | null;
+  edition?: string | null;
+  caskStrength?: boolean | null;
+  singleCask?: boolean | null;
+  abv?: number | string | null;
+  vintageYear?: number | string | null;
+  releaseYear?: number | string | null;
+  caskType?: string | null;
   score?: number | string | null;
 };
 
@@ -51,6 +60,7 @@ export const BottleCandidateSearchInputSchema = z.object({
   distillery: z.array(z.string().trim()).default([]),
   category: z.enum(CATEGORY_LIST).nullable().default(null),
   stated_age: z.number().nullable().default(null),
+  abv: z.number().min(0).max(100).nullable().default(null),
   cask_type: z.string().trim().nullable().default(null),
   cask_strength: z.boolean().nullable().default(null),
   single_cask: z.boolean().nullable().default(null),
@@ -64,12 +74,35 @@ export const BottleCandidateSearchInputSchema = z.object({
 type BottleCandidateSearchInput = z.infer<
   typeof BottleCandidateSearchInputSchema
 >;
+type BottleCandidateSearchInputRequest = z.input<
+  typeof BottleCandidateSearchInputSchema
+>;
+
+const CANDIDATE_METADATA_FIELDS = [
+  "category",
+  "statedAge",
+  "edition",
+  "caskStrength",
+  "singleCask",
+  "abv",
+  "vintageYear",
+  "releaseYear",
+  "caskType",
+] as const satisfies ReadonlyArray<keyof PriceMatchCandidate>;
 
 function getNormalizedPriceName(name: string) {
   return normalizeBottle({
     name,
     isFullName: true,
   }).name;
+}
+
+function formatSearchAbv(abv: number | null | undefined) {
+  if (abv === null || abv === undefined) {
+    return null;
+  }
+
+  return `${abv.toFixed(1)}% ABV`;
 }
 
 function buildSearchLabel(
@@ -82,6 +115,7 @@ function buildSearchLabel(
     !input.distillery.length &&
     !input.category &&
     !input.stated_age &&
+    input.abv === null &&
     !input.cask_type &&
     input.cask_strength === null &&
     input.single_cask === null &&
@@ -99,7 +133,7 @@ function buildSearchLabel(
     distillery: input.distillery,
     category: normalizeMatchCategory(input.category),
     stated_age: input.stated_age,
-    abv: null,
+    abv: input.abv,
     release_year: input.release_year,
     vintage_year: input.vintage_year,
     cask_type: input.cask_type,
@@ -116,14 +150,17 @@ function buildRawSearchName(input: BottleCandidateSearchInput) {
     input.series,
     input.edition,
     input.stated_age ? `${input.stated_age}` : null,
+    formatSearchAbv(input.abv),
     input.cask_type,
+    input.cask_strength ? "cask strength" : null,
+    input.single_cask ? "single cask" : null,
     input.vintage_year ? `${input.vintage_year} vintage` : null,
     input.release_year ? `${input.release_year} release` : null,
     input.distillery.length ? input.distillery.join(" ") : null,
   ];
 
   const structuredName = structuredParts.filter(Boolean).join(" ").trim();
-  const hasStructuredIdentity = Boolean(
+  const hasStrongStructuredIdentity = Boolean(
     input.expression ||
       input.series ||
       input.edition ||
@@ -131,16 +168,23 @@ function buildRawSearchName(input: BottleCandidateSearchInput) {
       input.cask_type ||
       input.vintage_year ||
       input.release_year ||
-      input.distillery.length ||
+      input.distillery.length,
+  );
+  const hasStructuredIdentity = Boolean(
+    hasStrongStructuredIdentity ||
+      input.abv !== null ||
       input.cask_strength !== null ||
       input.single_cask !== null,
   );
 
-  if (structuredName && hasStructuredIdentity) {
+  if (structuredName && hasStrongStructuredIdentity) {
     return structuredName;
   }
 
-  return [input.query, structuredName].filter(Boolean).join(" ").trim();
+  return [input.query, hasStructuredIdentity ? structuredName : null]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
 }
 
 function mergeCandidate(
@@ -167,6 +211,28 @@ function mergeCandidate(
   if (!existing.alias && candidate.alias) {
     existing.alias = candidate.alias;
   }
+
+  const existingMetadata = existing as Record<
+    (typeof CANDIDATE_METADATA_FIELDS)[number],
+    PriceMatchCandidate[(typeof CANDIDATE_METADATA_FIELDS)[number]]
+  >;
+
+  for (const field of CANDIDATE_METADATA_FIELDS) {
+    const existingValue = existingMetadata[field];
+    const candidateValue = candidate[field];
+
+    if (existingValue === null && candidateValue !== null) {
+      existingMetadata[field] = candidateValue;
+    }
+  }
+}
+
+function parseNullableNumber(value: number | string | null | undefined) {
+  if (value === undefined || value === null) {
+    return null;
+  }
+
+  return Number(value);
 }
 
 function buildPriceMatchCandidate(
@@ -178,6 +244,15 @@ function buildPriceMatchCandidate(
     alias: row.alias ?? null,
     fullName: row.fullName,
     brand: row.brand ?? null,
+    category: row.category ?? null,
+    statedAge: parseNullableNumber(row.statedAge),
+    edition: row.edition ?? null,
+    caskStrength: row.caskStrength ?? null,
+    singleCask: row.singleCask ?? null,
+    abv: parseNullableNumber(row.abv),
+    vintageYear: parseNullableNumber(row.vintageYear),
+    releaseYear: parseNullableNumber(row.releaseYear),
+    caskType: row.caskType ?? null,
     score:
       row.score === undefined || row.score === null ? null : Number(row.score),
     source: [source],
@@ -225,6 +300,8 @@ function buildQueryText(
   if (extractedLabel?.category) parts.push(extractedLabel.category);
   if (extractedLabel?.stated_age)
     parts.push(`${extractedLabel.stated_age}-year-old`);
+  if (extractedLabel?.abv !== null && extractedLabel?.abv !== undefined)
+    parts.push(formatSearchAbv(extractedLabel.abv)!);
   if (extractedLabel?.cask_type) parts.push(extractedLabel.cask_type);
   if (extractedLabel?.cask_strength) parts.push("cask strength");
   if (extractedLabel?.single_cask) parts.push("single cask");
@@ -244,6 +321,123 @@ function normalizeIdentityText(value: string | null | undefined) {
   }
 
   return normalizeString(value).toLowerCase().trim();
+}
+
+function normalizeComparableText(value: string | null | undefined) {
+  return normalizeIdentityText(value).replace(/_/g, " ");
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function containsComparablePhrase(haystack: string, needle: string) {
+  if (!haystack || !needle) {
+    return false;
+  }
+
+  const pattern = new RegExp(
+    `(^|[^a-z0-9])${escapeRegExp(needle)}($|[^a-z0-9])`,
+  );
+
+  return pattern.test(haystack);
+}
+
+function textsOverlap(
+  left: string | null | undefined,
+  right: string | null | undefined,
+) {
+  const normalizedLeft = normalizeComparableText(left);
+  const normalizedRight = normalizeComparableText(right);
+
+  if (!normalizedLeft || !normalizedRight) {
+    return false;
+  }
+
+  return (
+    normalizedLeft === normalizedRight ||
+    containsComparablePhrase(normalizedLeft, normalizedRight) ||
+    containsComparablePhrase(normalizedRight, normalizedLeft)
+  );
+}
+
+function getStructuredCandidateAdjustment(
+  candidate: PriceMatchCandidate,
+  extractedLabel: ExtractedBottleDetails | null,
+) {
+  if (!extractedLabel) {
+    return 0;
+  }
+
+  let adjustment = 0;
+
+  if (extractedLabel.category && candidate.category) {
+    adjustment +=
+      candidate.category === normalizeMatchCategory(extractedLabel.category)
+        ? 0.03
+        : -0.06;
+  }
+
+  if (extractedLabel.stated_age !== null && candidate.statedAge !== null) {
+    adjustment +=
+      candidate.statedAge === extractedLabel.stated_age ? 0.1 : -0.18;
+  }
+
+  if (extractedLabel.edition && candidate.edition) {
+    adjustment += textsOverlap(candidate.edition, extractedLabel.edition)
+      ? 0.12
+      : -0.2;
+  }
+
+  if (extractedLabel.cask_type && candidate.caskType) {
+    adjustment += textsOverlap(candidate.caskType, extractedLabel.cask_type)
+      ? 0.08
+      : -0.14;
+  }
+
+  if (
+    extractedLabel.cask_strength !== null &&
+    candidate.caskStrength !== null
+  ) {
+    adjustment +=
+      candidate.caskStrength === extractedLabel.cask_strength ? 0.06 : -0.12;
+  }
+
+  if (extractedLabel.single_cask !== null && candidate.singleCask !== null) {
+    adjustment +=
+      candidate.singleCask === extractedLabel.single_cask ? 0.06 : -0.12;
+  }
+
+  if (extractedLabel.vintage_year !== null && candidate.vintageYear !== null) {
+    adjustment +=
+      candidate.vintageYear === extractedLabel.vintage_year ? 0.08 : -0.14;
+  }
+
+  if (extractedLabel.release_year !== null && candidate.releaseYear !== null) {
+    adjustment +=
+      candidate.releaseYear === extractedLabel.release_year ? 0.08 : -0.14;
+  }
+
+  if (extractedLabel.abv !== null && candidate.abv !== null) {
+    const difference = Math.abs(candidate.abv - extractedLabel.abv);
+    if (difference <= 0.3) {
+      adjustment += 0.05;
+    } else if (difference >= 1.0) {
+      adjustment -= 0.08;
+    }
+  }
+
+  return adjustment;
+}
+
+function getCandidateSortScore(
+  candidate: PriceMatchCandidate,
+  extractedLabel: ExtractedBottleDetails | null,
+) {
+  return (
+    (candidate.score ?? 0) +
+    getStructuredCandidateAdjustment(candidate, extractedLabel)
+  );
 }
 
 function candidateMatchesKnownBrand(
@@ -324,6 +518,15 @@ async function getVectorCandidates(
     alias: string | null;
     fullName: string;
     brand: string | null;
+    category: z.infer<typeof ExtractedBottleDetailsSchema>["category"] | null;
+    statedAge: number | null;
+    edition: string | null;
+    caskStrength: boolean | null;
+    singleCask: boolean | null;
+    abv: number | null;
+    vintageYear: number | null;
+    releaseYear: number | null;
+    caskType: string | null;
     score: number | null;
   }>(sql`
     SELECT
@@ -331,6 +534,15 @@ async function getVectorCandidates(
       ${bottleAliases.name} AS alias,
       ${bottles.fullName} AS "fullName",
       ${entities.name} AS brand,
+      ${bottles.category} AS category,
+      ${bottles.statedAge} AS "statedAge",
+      ${bottles.edition} AS edition,
+      ${bottles.caskStrength} AS "caskStrength",
+      ${bottles.singleCask} AS "singleCask",
+      ${bottles.abv} AS abv,
+      ${bottles.vintageYear} AS "vintageYear",
+      ${bottles.releaseYear} AS "releaseYear",
+      ${bottles.caskType} AS "caskType",
       1 - (${bottleAliases.embedding} <=> ${vector}) AS score
     FROM ${bottleAliases}
     INNER JOIN ${bottles} ON ${bottles.id} = ${bottleAliases.bottleId}
@@ -356,12 +568,30 @@ async function getTextCandidates(
     bottleId: number;
     fullName: string;
     brand: string | null;
+    category: z.infer<typeof ExtractedBottleDetailsSchema>["category"] | null;
+    statedAge: number | null;
+    edition: string | null;
+    caskStrength: boolean | null;
+    singleCask: boolean | null;
+    abv: number | null;
+    vintageYear: number | null;
+    releaseYear: number | null;
+    caskType: string | null;
     score: number | null;
   }>(sql`
     SELECT
       ${bottles.id} AS "bottleId",
       ${bottles.fullName} AS "fullName",
       ${entities.name} AS brand,
+      ${bottles.category} AS category,
+      ${bottles.statedAge} AS "statedAge",
+      ${bottles.edition} AS edition,
+      ${bottles.caskStrength} AS "caskStrength",
+      ${bottles.singleCask} AS "singleCask",
+      ${bottles.abv} AS abv,
+      ${bottles.vintageYear} AS "vintageYear",
+      ${bottles.releaseYear} AS "releaseYear",
+      ${bottles.caskType} AS "caskType",
       ts_rank(${bottles.searchVector}, websearch_to_tsquery('english', ${queryText})) AS score
     FROM ${bottles}
     INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
@@ -389,11 +619,29 @@ async function getBrandCandidates(
     bottleId: number;
     fullName: string;
     brand: string | null;
+    category: z.infer<typeof ExtractedBottleDetailsSchema>["category"] | null;
+    statedAge: number | null;
+    edition: string | null;
+    caskStrength: boolean | null;
+    singleCask: boolean | null;
+    abv: number | null;
+    vintageYear: number | null;
+    releaseYear: number | null;
+    caskType: string | null;
   }>(sql`
     SELECT
       ${bottles.id} AS "bottleId",
       ${bottles.fullName} AS "fullName",
       ${entities.name} AS brand
+      , ${bottles.category} AS category
+      , ${bottles.statedAge} AS "statedAge"
+      , ${bottles.edition} AS edition
+      , ${bottles.caskStrength} AS "caskStrength"
+      , ${bottles.singleCask} AS "singleCask"
+      , ${bottles.abv} AS abv
+      , ${bottles.vintageYear} AS "vintageYear"
+      , ${bottles.releaseYear} AS "releaseYear"
+      , ${bottles.caskType} AS "caskType"
     FROM ${bottles}
     INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
     WHERE (
@@ -416,6 +664,15 @@ export async function getBottleMatchCandidateById(
       bottleId: bottles.id,
       fullName: bottles.fullName,
       brand: entities.name,
+      category: bottles.category,
+      statedAge: bottles.statedAge,
+      edition: bottles.edition,
+      caskStrength: bottles.caskStrength,
+      singleCask: bottles.singleCask,
+      abv: bottles.abv,
+      vintageYear: bottles.vintageYear,
+      releaseYear: bottles.releaseYear,
+      caskType: bottles.caskType,
     })
     .from(bottles)
     .innerJoin(entities, eq(entities.id, bottles.brandId))
@@ -431,6 +688,15 @@ export async function getBottleMatchCandidateById(
       bottleId: result.bottleId,
       fullName: result.fullName,
       brand: result.brand,
+      category: result.category,
+      statedAge: result.statedAge,
+      edition: result.edition,
+      caskStrength: result.caskStrength,
+      singleCask: result.singleCask,
+      abv: result.abv,
+      vintageYear: result.vintageYear,
+      releaseYear: result.releaseYear,
+      caskType: result.caskType,
       score: 1,
     },
     "current",
@@ -446,6 +712,15 @@ async function getExactBottleCandidate(
       alias: bottleAliases.name,
       fullName: bottles.fullName,
       brand: entities.name,
+      category: bottles.category,
+      statedAge: bottles.statedAge,
+      edition: bottles.edition,
+      caskStrength: bottles.caskStrength,
+      singleCask: bottles.singleCask,
+      abv: bottles.abv,
+      vintageYear: bottles.vintageYear,
+      releaseYear: bottles.releaseYear,
+      caskType: bottles.caskType,
     })
     .from(bottleAliases)
     .innerJoin(bottles, eq(bottles.id, bottleAliases.bottleId))
@@ -469,6 +744,15 @@ async function getExactBottleCandidate(
       alias: exactMatch.alias,
       fullName: exactMatch.fullName,
       brand: exactMatch.brand || null,
+      category: exactMatch.category,
+      statedAge: exactMatch.statedAge,
+      edition: exactMatch.edition,
+      caskStrength: exactMatch.caskStrength,
+      singleCask: exactMatch.singleCask,
+      abv: exactMatch.abv,
+      vintageYear: exactMatch.vintageYear,
+      releaseYear: exactMatch.releaseYear,
+      caskType: exactMatch.caskType,
       score: 1,
     },
     "exact",
@@ -487,6 +771,7 @@ export async function findStorePriceMatchCandidates(
     distillery: extractedLabel?.distillery ?? [],
     category: normalizeMatchCategory(extractedLabel?.category ?? null),
     stated_age: extractedLabel?.stated_age ?? null,
+    abv: extractedLabel?.abv ?? null,
     cask_type: extractedLabel?.cask_type ?? null,
     cask_strength: extractedLabel?.cask_strength ?? null,
     single_cask: extractedLabel?.single_cask ?? null,
@@ -499,7 +784,7 @@ export async function findStorePriceMatchCandidates(
 }
 
 export async function findBottleMatchCandidates(
-  rawInput: BottleCandidateSearchInput,
+  rawInput: BottleCandidateSearchInputRequest,
 ) {
   const input = BottleCandidateSearchInputSchema.parse(rawInput);
   const searchName = buildRawSearchName(input);
@@ -573,6 +858,11 @@ export async function findBottleMatchCandidates(
     Array.from(candidates.values()),
     extractedLabel,
   )
-    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+    .sort(
+      (a, b) =>
+        getCandidateSortScore(b, extractedLabel) -
+          getCandidateSortScore(a, extractedLabel) ||
+        (b.score ?? 0) - (a.score ?? 0),
+    )
     .slice(0, input.limit);
 }

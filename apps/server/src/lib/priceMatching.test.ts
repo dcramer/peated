@@ -140,6 +140,56 @@ describe("priceMatching", () => {
     );
   });
 
+  test("includes extracted cask flags in exact alias lookup", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const brand = await fixtures.Entity({
+      type: ["brand"],
+      name: "Shibui",
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Pure Malt",
+      singleCask: true,
+    });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Shibui Pure Malt Single Cask",
+    });
+
+    const candidates = await findBottleMatchCandidates({
+      query: "Shibui Pure Malt Whisky 750ml",
+      brand: "Shibui",
+      expression: "Pure Malt",
+      series: null,
+      distillery: [],
+      category: null,
+      stated_age: null,
+      abv: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: true,
+      edition: null,
+      vintage_year: null,
+      release_year: null,
+      currentBottleId: null,
+      limit: 15,
+    });
+
+    expect(candidates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          bottleId: bottle.id,
+          alias: "Shibui Pure Malt Single Cask",
+          source: expect.arrayContaining(["exact"]),
+          singleCask: true,
+        }),
+      ]),
+    );
+  });
+
   test("normalizes string bottle ids returned from raw candidate queries", async () => {
     config.OPENAI_API_KEY = "test-openai-key";
 
@@ -169,6 +219,7 @@ describe("priceMatching", () => {
       distillery: [],
       category: null,
       stated_age: null,
+      abv: null,
       cask_type: null,
       cask_strength: null,
       single_cask: null,
@@ -236,10 +287,20 @@ describe("priceMatching", () => {
           alias: "Fractional Confidence Candidate",
           fullName: bottle.fullName,
           brand: null,
+          category: null,
+          statedAge: null,
+          edition: null,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
           score: 0.95,
           source: ["exact"],
         },
       ],
+      resolvedEntities: [],
     });
 
     const proposal = await resolveStorePriceMatchProposal(price.id);
@@ -317,6 +378,7 @@ describe("priceMatching", () => {
       },
       searchEvidence: [],
       candidateBottles: [],
+      resolvedEntities: [],
     });
 
     const proposal = await resolveStorePriceMatchProposal(price.id);
@@ -406,6 +468,7 @@ describe("priceMatching", () => {
         },
       ],
       candidateBottles: [],
+      resolvedEntities: [],
     });
 
     const proposal = await resolveStorePriceMatchProposal(price.id);
@@ -427,6 +490,91 @@ describe("priceMatching", () => {
       releaseYear: 2024,
       vintageYear: 2010,
     });
+    expect(updatedPrice?.bottleId).toBeNull();
+  });
+
+  test("does not auto-create from empty web evidence", async ({ fixtures }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Empty Evidence Candidate",
+      imageUrl: null,
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Evidence Brand",
+      expression: "Reserve",
+      series: null,
+      distillery: ["Evidence Distillery"],
+      category: "single_malt",
+      stated_age: 12,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyStorePriceMatch).mockResolvedValue({
+      decision: {
+        action: "create_new",
+        confidence: 95,
+        rationale: "A web search was attempted but found nothing useful.",
+        suggestedBottleId: null,
+        candidateBottleIds: [],
+        proposedBottle: {
+          name: "Reserve",
+          series: null,
+          category: "single_malt",
+          edition: null,
+          statedAge: 12,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          brand: {
+            id: null,
+            name: "Evidence Brand",
+          },
+          distillers: [
+            {
+              id: null,
+              name: "Evidence Distillery",
+            },
+          ],
+          bottler: null,
+        },
+      },
+      searchEvidence: [
+        {
+          query: 'site:example.com "Empty Evidence Candidate"',
+          results: [],
+        },
+      ],
+      candidateBottles: [],
+      resolvedEntities: [],
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+
+    expect(proposal.status).toBe("pending_review");
+    expect(proposal.proposalType).toBe("create_new");
+    expect(proposal.confidence).toBe(89);
     expect(updatedPrice?.bottleId).toBeNull();
   });
 
@@ -540,6 +688,7 @@ describe("priceMatching", () => {
         },
       ],
       candidateBottles: [],
+      resolvedEntities: [],
     });
 
     const proposal = await resolveStorePriceMatchProposal(price.id);
@@ -568,6 +717,137 @@ describe("priceMatching", () => {
     expect(listingAlias?.bottleId).toBe(proposal.suggestedBottleId);
   });
 
+  test("auto creates new bottles even when replacing an existing assignment", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+
+    const currentBottle = await fixtures.Bottle();
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+    const price = await fixtures.StorePrice({
+      bottleId: currentBottle.id,
+      name: "Replacement Create Candidate",
+      imageUrl: null,
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Replacement Brand",
+      expression: "Fresh Release",
+      series: null,
+      distillery: ["Replacement Distillery"],
+      category: "single_malt",
+      stated_age: 12,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyStorePriceMatch).mockResolvedValue({
+      decision: {
+        action: "create_new",
+        confidence: 92,
+        rationale: "Web evidence confirms this is a distinct bottling.",
+        suggestedBottleId: null,
+        candidateBottleIds: [currentBottle.id],
+        proposedBottle: {
+          name: "Fresh Release",
+          series: null,
+          category: "single_malt",
+          edition: null,
+          statedAge: 12,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          brand: {
+            id: null,
+            name: "Replacement Brand",
+          },
+          distillers: [
+            {
+              id: null,
+              name: "Replacement Distillery",
+            },
+          ],
+          bottler: null,
+        },
+      },
+      searchEvidence: [
+        {
+          query: 'site:woodencork.com "Replacement Create Candidate"',
+          results: [
+            {
+              title: "Replacement Create Candidate",
+              url: "https://woodencork.example/replacement-create",
+              description: "Retailer listing",
+              extraSnippets: [],
+            },
+          ],
+        },
+      ],
+      candidateBottles: [
+        {
+          bottleId: currentBottle.id,
+          alias: null,
+          fullName: currentBottle.fullName,
+          brand: null,
+          category: null,
+          statedAge: null,
+          edition: null,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          score: 1,
+          source: ["current"],
+        },
+      ],
+      resolvedEntities: [],
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+    const createdBottle = await db.query.bottles.findFirst({
+      where: eq(bottles.id, proposal.suggestedBottleId!),
+    });
+
+    expect(proposal).toMatchObject({
+      status: "approved",
+      proposalType: "create_new",
+      reviewedById: expect.any(Number),
+      currentBottleId: expect.any(Number),
+      suggestedBottleId: expect.any(Number),
+    });
+    expect(proposal.suggestedBottleId).not.toBe(currentBottle.id);
+    expect(updatedPrice?.bottleId).toBe(proposal.suggestedBottleId);
+    expect(createdBottle).toMatchObject({
+      name: "Fresh Release",
+      fullName: "Replacement Brand Fresh Release",
+    });
+  });
+
   test("preserves extracted label and candidates when classification fails", async ({
     fixtures,
   }) => {
@@ -594,6 +874,15 @@ describe("priceMatching", () => {
         alias: "Classifier Failure Candidate",
         fullName: bottle.fullName,
         brand: null,
+        category: null,
+        statedAge: null,
+        edition: null,
+        caskStrength: null,
+        singleCask: null,
+        abv: null,
+        vintageYear: null,
+        releaseYear: null,
+        caskType: null,
         score: 1,
         source: ["exact"],
       },
@@ -640,7 +929,7 @@ describe("priceMatching", () => {
     );
   });
 
-  test("includes release and vintage years in structured candidate search text", async () => {
+  test("includes structured bottle fields in candidate search text", async () => {
     config.OPENAI_API_KEY = "test-openai-key";
 
     const { getOpenAIEmbedding } = await import(
@@ -659,9 +948,10 @@ describe("priceMatching", () => {
       distillery: ["Springbank"],
       category: "single_malt",
       stated_age: null,
+      abv: 59.2,
       cask_type: null,
-      cask_strength: null,
-      single_cask: null,
+      cask_strength: true,
+      single_cask: true,
       edition: "Batch 1",
       vintage_year: 2010,
       release_year: 2024,
@@ -675,6 +965,149 @@ describe("priceMatching", () => {
     expect(getOpenAIEmbedding).toHaveBeenCalledWith(
       expect.stringContaining("2024 release"),
     );
+    expect(getOpenAIEmbedding).toHaveBeenCalledWith(
+      expect.stringContaining("59.2% ABV"),
+    );
+    expect(getOpenAIEmbedding).toHaveBeenCalledWith(
+      expect.stringContaining("cask strength"),
+    );
+    expect(getOpenAIEmbedding).toHaveBeenCalledWith(
+      expect.stringContaining("single cask"),
+    );
+  });
+
+  test("re-ranks local candidates using structured bottle fields", async () => {
+    config.OPENAI_API_KEY = undefined;
+
+    const executeSpy = vi.spyOn(db, "execute") as any;
+    executeSpy
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            bottleId: 1,
+            fullName: "Shibui Pure Malt",
+            brand: "Shibui",
+            category: "single_malt",
+            statedAge: 12,
+            edition: "Batch 1",
+            caskStrength: null,
+            singleCask: null,
+            abv: 46,
+            vintageYear: 2010,
+            releaseYear: 2024,
+            caskType: "bourbon",
+            score: 0.82,
+          },
+          {
+            bottleId: 2,
+            fullName: "Shibui Pure Malt Single Cask",
+            brand: "Shibui",
+            category: "single_malt",
+            statedAge: 12,
+            edition: "Batch 1",
+            caskStrength: true,
+            singleCask: true,
+            abv: 59.2,
+            vintageYear: 2010,
+            releaseYear: 2024,
+            caskType: "bourbon",
+            score: 0.8,
+          },
+        ],
+      })
+      .mockResolvedValueOnce({ rows: [] });
+
+    const candidates = await findBottleMatchCandidates({
+      query: "Shibui Pure Malt Whisky 750ml",
+      brand: "Shibui",
+      expression: "Pure Malt",
+      series: null,
+      distillery: [],
+      category: "single_malt",
+      stated_age: 12,
+      abv: 59.2,
+      cask_type: "bourbon",
+      cask_strength: true,
+      single_cask: true,
+      edition: "Batch 1",
+      vintage_year: 2010,
+      release_year: 2024,
+      currentBottleId: null,
+      limit: 15,
+    });
+
+    expect(candidates[0]).toMatchObject({
+      bottleId: 2,
+      caskStrength: true,
+      singleCask: true,
+      abv: 59.2,
+    });
+  });
+
+  test("does not treat edition substring collisions as matching evidence", async () => {
+    config.OPENAI_API_KEY = undefined;
+
+    const executeSpy = vi.spyOn(db, "execute") as any;
+    executeSpy
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            bottleId: 1,
+            fullName: "Shibui Pure Malt Batch 10",
+            brand: "Shibui",
+            category: "single_malt",
+            statedAge: 12,
+            edition: "Batch 10",
+            caskStrength: null,
+            singleCask: null,
+            abv: 46,
+            vintageYear: null,
+            releaseYear: 2024,
+            caskType: null,
+            score: 0.82,
+          },
+          {
+            bottleId: 2,
+            fullName: "Shibui Pure Malt Batch 1",
+            brand: "Shibui",
+            category: "single_malt",
+            statedAge: 12,
+            edition: "Batch 1",
+            caskStrength: null,
+            singleCask: null,
+            abv: 46,
+            vintageYear: null,
+            releaseYear: 2024,
+            caskType: null,
+            score: 0.8,
+          },
+        ],
+      })
+      .mockResolvedValueOnce({ rows: [] });
+
+    const candidates = await findBottleMatchCandidates({
+      query: "Shibui Pure Malt Batch 1 Whisky 750ml",
+      brand: "Shibui",
+      expression: "Pure Malt",
+      series: null,
+      distillery: [],
+      category: "single_malt",
+      stated_age: 12,
+      abv: 46,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: "Batch 1",
+      vintage_year: null,
+      release_year: 2024,
+      currentBottleId: null,
+      limit: 15,
+    });
+
+    expect(candidates[0]).toMatchObject({
+      bottleId: 2,
+      edition: "Batch 1",
+    });
   });
 
   test("filters out different-brand local candidates when a same-brand option exists", async () => {
@@ -892,10 +1325,20 @@ describe("priceMatching", () => {
           alias: "Retry Candidate",
           fullName: bottle.fullName,
           brand: null,
+          category: null,
+          statedAge: null,
+          edition: null,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
           score: 1,
           source: ["exact"],
         },
       ],
+      resolvedEntities: [],
     });
 
     const proposal = await resolveStorePriceMatchProposal(price.id, {
@@ -992,6 +1435,7 @@ describe("priceMatching", () => {
       },
       searchEvidence: [],
       candidateBottles: [],
+      resolvedEntities: [],
     });
 
     const proposal = await resolveStorePriceMatchProposal(price.id);
@@ -1017,6 +1461,160 @@ describe("priceMatching", () => {
       bottler: {
         id: null,
         name: "Draft Bottler",
+      },
+    });
+  });
+
+  test("preserves validated entity ids and canonical names on create_new proposals", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+    const brand = await fixtures.Entity({
+      name: "Canonical Brand",
+      shortName: "Brand Short",
+      type: ["brand"],
+    });
+    const distiller = await fixtures.Entity({
+      name: "Canonical Distillery",
+      shortName: "Distillery Short",
+      type: ["distiller"],
+    });
+    const bottler = await fixtures.Entity({
+      name: "Canonical Bottler",
+      type: ["bottler"],
+    });
+    await fixtures.EntityAlias({
+      entityId: brand.id,
+      name: "Brand Alias",
+    });
+    await fixtures.EntityAlias({
+      entityId: bottler.id,
+      name: "Bottler Alias",
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Validated Candidate",
+      imageUrl: null,
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Canonical Brand",
+      expression: "Reserve",
+      series: null,
+      distillery: ["Canonical Distillery"],
+      category: "single_malt",
+      stated_age: 12,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyStorePriceMatch).mockResolvedValue({
+      decision: {
+        action: "create_new",
+        confidence: 88,
+        rationale: "This listing looks like a new bottle.",
+        suggestedBottleId: null,
+        candidateBottleIds: [],
+        proposedBottle: {
+          name: "Canonical Brand Reserve",
+          series: {
+            id: 42,
+            name: "Special Releases",
+          },
+          category: "single_malt",
+          edition: null,
+          statedAge: 12,
+          caskStrength: null,
+          singleCask: null,
+          abv: 46,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          brand: {
+            id: brand.id,
+            name: "Brand Alias",
+          },
+          distillers: [
+            {
+              id: distiller.id,
+              name: "Distillery Short",
+            },
+          ],
+          bottler: {
+            id: bottler.id,
+            name: "Bottler Alias",
+          },
+        },
+      },
+      searchEvidence: [],
+      candidateBottles: [],
+      resolvedEntities: [
+        {
+          entityId: brand.id,
+          name: brand.name,
+          shortName: brand.shortName,
+          type: brand.type,
+          alias: "Brand Alias",
+          score: 1,
+          source: ["exact"],
+        },
+        {
+          entityId: distiller.id,
+          name: distiller.name,
+          shortName: distiller.shortName,
+          type: distiller.type,
+          alias: null,
+          score: 1,
+          source: ["exact"],
+        },
+        {
+          entityId: bottler.id,
+          name: bottler.name,
+          shortName: bottler.shortName,
+          type: bottler.type,
+          alias: "Bottler Alias",
+          score: 1,
+          source: ["exact"],
+        },
+      ],
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(proposal.status).toBe("pending_review");
+    expect(proposal.proposalType).toBe("create_new");
+    expect(proposal.proposedBottle).toMatchObject({
+      name: "Reserve",
+      series: {
+        id: null,
+        name: "Special Releases",
+      },
+      brand: {
+        id: brand.id,
+        name: "Canonical Brand",
+      },
+      distillers: [
+        {
+          id: distiller.id,
+          name: "Canonical Distillery",
+        },
+      ],
+      bottler: {
+        id: bottler.id,
+        name: "Canonical Bottler",
       },
     });
   });
@@ -1069,10 +1667,20 @@ describe("priceMatching", () => {
           alias: "Unknown Suggested Candidate",
           fullName: bottle.fullName,
           brand: null,
+          category: null,
+          statedAge: null,
+          edition: null,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
           score: 0.95,
           source: ["exact"],
         },
       ],
+      resolvedEntities: [],
     });
 
     const proposal = await resolveStorePriceMatchProposal(price.id);

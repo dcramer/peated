@@ -6,12 +6,30 @@ import { and, eq, ilike, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const SearchEntitiesArgsSchema = z.object({
-  query: z.string().trim().min(1),
-  type: z.enum(ENTITY_TYPE_LIST).nullable().default(null),
-  limit: z.number().int().min(1).max(25).default(10),
+  query: z
+    .string()
+    .trim()
+    .min(1)
+    .describe(
+      "Producer, distillery, or bottler name to resolve. Use the cleanest entity text you have, without bottle-specific suffixes.",
+    ),
+  type: z
+    .enum(ENTITY_TYPE_LIST)
+    .nullable()
+    .default(null)
+    .describe(
+      "Entity type hint to narrow results. Use when you know whether you need a brand, distillery, or bottler match.",
+    ),
+  limit: z
+    .number()
+    .int()
+    .min(1)
+    .max(25)
+    .default(10)
+    .describe("Maximum number of entity candidates to return."),
 });
 
-const EntitySearchResultSchema = z.object({
+export const EntitySearchResultSchema = z.object({
   entityId: z.number(),
   name: z.string(),
   shortName: z.string().nullable().default(null),
@@ -25,7 +43,7 @@ const SearchEntitiesResultSchema = z.object({
   results: z.array(EntitySearchResultSchema),
 });
 
-type EntitySearchResult = z.infer<typeof EntitySearchResultSchema>;
+export type EntitySearchResult = z.infer<typeof EntitySearchResultSchema>;
 
 function mergeResult(
   results: Map<number, EntitySearchResult>,
@@ -53,11 +71,15 @@ function mergeResult(
   }
 }
 
-export function createSearchEntitiesTool() {
+export function createSearchEntitiesTool({
+  onResults,
+}: {
+  onResults?: (results: EntitySearchResult[]) => void;
+} = {}) {
   return tool({
     name: "search_entities",
     description:
-      "Search the local entity database for brands, distilleries, and bottlers using aliases and full-text search.",
+      "Search the local entity database for brands, distilleries, and bottlers using aliases and full-text search. Use this when producer, bottler, or distillery identity is blocking the decision. Prefer passing a `type` hint when you know what kind of entity you need. Do not use this to search for bottles.",
     parameters: SearchEntitiesArgsSchema,
     execute: async (args) => {
       const results = new Map<number, EntitySearchResult>();
@@ -178,11 +200,14 @@ export function createSearchEntitiesTool() {
         );
       }
 
-      return SearchEntitiesResultSchema.parse({
+      const parsedResults = SearchEntitiesResultSchema.parse({
         results: Array.from(results.values())
           .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
           .slice(0, args.limit),
       });
+
+      onResults?.(parsedResults.results);
+      return parsedResults;
     },
   });
 }
