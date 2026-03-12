@@ -32,6 +32,27 @@ export const PriceMatchCandidateSchema = z.object({
   alias: z.string().nullable().default(null),
   fullName: z.string(),
   brand: z.string().nullable().default(null),
+  category: CategoryEnum.nullable().default(null),
+  statedAge: z.number().min(0).max(100).nullable().default(null),
+  edition: z.string().trim().nullable().default(null),
+  caskStrength: z.boolean().nullable().default(null),
+  singleCask: z.boolean().nullable().default(null),
+  abv: z.number().min(0).max(100).nullable().default(null),
+  vintageYear: z
+    .number()
+    .int()
+    .gte(1800)
+    .lte(new Date().getFullYear())
+    .nullable()
+    .default(null),
+  releaseYear: z
+    .number()
+    .int()
+    .gte(1800)
+    .lte(new Date().getFullYear())
+    .nullable()
+    .default(null),
+  caskType: CaskTypeEnum.nullable().default(null),
   score: z.number().nullable().default(null),
   source: z.array(z.string()).default([]),
 });
@@ -104,14 +125,34 @@ export const ProposedBottleSchema = z.object({
   bottler: ProposedEntityChoiceSchema.nullable().default(null),
 });
 
-export const StorePriceMatchDecisionSchema = z.object({
-  action: StorePriceMatchProposalTypeEnum,
+const StorePriceMatchDecisionBaseSchema = z.object({
   confidence: z.number().min(0).max(100),
   rationale: z.string().nullable().default(null),
-  suggestedBottleId: z.number().int().nullable().default(null),
   candidateBottleIds: z.array(z.number().int()).default([]),
-  proposedBottle: ProposedBottleSchema.nullable().default(null),
 });
+
+export const StorePriceMatchDecisionSchema = z.discriminatedUnion("action", [
+  StorePriceMatchDecisionBaseSchema.extend({
+    action: z.literal("match_existing"),
+    suggestedBottleId: z.number().int(),
+    proposedBottle: z.null().default(null),
+  }),
+  StorePriceMatchDecisionBaseSchema.extend({
+    action: z.literal("correction"),
+    suggestedBottleId: z.number().int(),
+    proposedBottle: z.null().default(null),
+  }),
+  StorePriceMatchDecisionBaseSchema.extend({
+    action: z.literal("create_new"),
+    suggestedBottleId: z.null().default(null),
+    proposedBottle: ProposedBottleSchema,
+  }),
+  StorePriceMatchDecisionBaseSchema.extend({
+    action: z.literal("no_match"),
+    suggestedBottleId: z.null().default(null),
+    proposedBottle: z.null().default(null),
+  }),
+]);
 
 export const StorePriceMatchProposalSchema = z.object({
   id: z.number(),

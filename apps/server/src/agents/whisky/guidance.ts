@@ -426,6 +426,7 @@ export function buildStorePriceMatchInstructions({
     renderBulletLines([
       "Prefer local evidence first: current assignment, exact aliases, vector candidates, text candidates, brand candidates, extracted label details, and local search tools.",
       "The input includes `localSearch`, which is the server's initial local bottle search result set. If `localSearch.hasExactAliasMatch` is false, no exact alias match was found for the listing.",
+      "Local candidates may include structured bottle fields such as category, age, edition, cask type, cask-strength, single-cask, ABV, and release years. Use those fields directly when present instead of inferring everything from the candidate name.",
       "When the provided local candidates are thin, conflicting, or missing obvious near matches, call `search_bottles` with the most specific query you can form from the listing and extracted label.",
       "Compare the listing against candidate bottles component by component in this order: " +
         MATCH_COMPONENT_PRIORITY.join(", ") +

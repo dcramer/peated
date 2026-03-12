@@ -97,6 +97,9 @@ describe("whiskyLabelGuidance", () => {
       "If `localSearch.hasExactAliasMatch` is false, no exact alias match was found for the listing.",
     );
     expect(instructions).toContain(
+      "Local candidates may include structured bottle fields such as category, age, edition, cask type, cask-strength, single-cask, ABV, and release years.",
+    );
+    expect(instructions).toContain(
       "Before returning `create_new`, use `openai_web_search` to validate that the listing appears to be a real distinct bottling unless local evidence is already decisive.",
     );
     expect(instructions).toContain(
