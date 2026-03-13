@@ -52,7 +52,6 @@ export default function Providers({
       <ORPCProvider
         apiServer={config.API_SERVER}
         accessToken={session.accessToken}
-        key={session.accessToken}
       >
         <ReactQueryStreamedHydration>
           <OnlineStatusProvider>

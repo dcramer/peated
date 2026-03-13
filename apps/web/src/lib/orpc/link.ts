@@ -5,12 +5,14 @@ import sentryInterceptor from "@peated/orpc/client/interceptors";
 export function getLink({
   apiServer,
   accessToken,
+  getAccessToken,
   batch,
   userAgent,
   traceContext,
 }: {
   apiServer: string;
   accessToken?: string | null;
+  getAccessToken?: () => string | null | undefined;
   batch?: boolean;
   userAgent: string;
   traceContext?: {
@@ -20,8 +22,10 @@ export function getLink({
 }) {
   return new RPCLink({
     headers() {
+      const token = getAccessToken ? getAccessToken() : accessToken;
+
       return {
-        authorization: accessToken ? `Bearer ${accessToken}` : undefined,
+        authorization: token ? `Bearer ${token}` : undefined,
         "user-agent": userAgent,
         ...(traceContext
           ? {
