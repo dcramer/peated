@@ -72,6 +72,7 @@ export default procedure
       INNER JOIN ${tastings}
         ON ${tastings.bottleId} = ${bottles.id}
       WHERE ${tastings.createdById} = ${user.id}
+      AND ${entities.countryId} IS NOT NULL
       GROUP BY country_id, region_id
       ORDER BY COUNT(*) DESC
       LIMIT 25`,

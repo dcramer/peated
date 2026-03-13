@@ -117,4 +117,70 @@ describe("GET /users/:user/regions", () => {
 
     expect(results.length).toEqual(0);
   });
+
+  test("skips tastings tied to entities without a country", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const country = await fixtures.Country({ name: "Scotland" });
+    const region = await fixtures.Region({
+      countryId: country.id,
+      name: "Highland",
+    });
+    const entityWithCountry = await fixtures.Entity({
+      countryId: country.id,
+      regionId: region.id,
+      name: "Entity With Country",
+    });
+    const entityWithoutCountry = await fixtures.Entity({
+      countryId: null,
+      regionId: null,
+      name: "Entity Without Country",
+    });
+    const bottleWithCountry = await fixtures.Bottle({
+      brandId: entityWithCountry.id,
+      distillerIds: [],
+      bottlerId: null,
+      name: "Bottle With Country",
+    });
+    const bottleWithoutCountry = await fixtures.Bottle({
+      brandId: entityWithoutCountry.id,
+      distillerIds: [],
+      bottlerId: null,
+      name: "Bottle Without Country",
+    });
+
+    await fixtures.Tasting({
+      bottleId: bottleWithCountry.id,
+      createdById: defaults.user.id,
+    });
+    await fixtures.Tasting({
+      bottleId: bottleWithoutCountry.id,
+      createdById: defaults.user.id,
+    });
+
+    const { results, totalCount } = await routerClient.users.regionList(
+      {
+        user: "me",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(totalCount).toEqual(2);
+    expect(results).toMatchInlineSnapshot(`
+      [
+        {
+          "count": 1,
+          "country": {
+            "name": "Scotland",
+            "slug": "scotland",
+          },
+          "region": {
+            "name": "Highland",
+            "slug": "highland",
+          },
+        },
+      ]
+    `);
+  });
 });
