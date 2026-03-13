@@ -8,6 +8,7 @@ import UserFlavorDistributionChart from "@peated/web/components/userFlavorDistri
 import UserLocationChart from "@peated/web/components/userLocationChart";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { createServerClient } from "@peated/web/lib/orpc/client.server";
+import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { type ReactNode } from "react";
 import type { ProfilePage, WithContext } from "schema-dts";
 import FriendButton from "./friendButton";
@@ -23,7 +24,9 @@ export async function generateMetadata({
   params: { username: string };
 }) {
   const { client } = await createServerClient();
-  const user = await client.users.details({ user: username });
+  const user = await resolveOrNotFound(
+    client.users.details({ user: username }),
+  );
 
   return {
     title: `@${user.username}`,
@@ -44,9 +47,11 @@ export default async function Layout({
   children: ReactNode;
 }) {
   const { client } = await createServerClient();
-  const user = await client.users.details({
-    user: username,
-  });
+  const user = await resolveOrNotFound(
+    client.users.details({
+      user: username,
+    }),
+  );
 
   const currentUser = await getCurrentUser();
 

@@ -7,6 +7,7 @@ import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { type ReactNode } from "react";
 
 export async function generateMetadata({
@@ -16,9 +17,11 @@ export async function generateMetadata({
 }) {
   const { client } = await getServerClient();
 
-  const country = await client.countries.details({
-    country: countrySlug,
-  });
+  const country = await resolveOrNotFound(
+    client.countries.details({
+      country: countrySlug,
+    }),
+  );
 
   return {
     title: `Whisky from ${country.name}`,
@@ -35,9 +38,11 @@ export default async function Page({
 }) {
   const { client } = await getServerClient();
 
-  const country = await client.countries.details({
-    country: countrySlug,
-  });
+  const country = await resolveOrNotFound(
+    client.countries.details({
+      country: countrySlug,
+    }),
+  );
   const user = await getCurrentUser();
 
   const stats = [

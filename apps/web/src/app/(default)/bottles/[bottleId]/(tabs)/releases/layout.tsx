@@ -1,4 +1,5 @@
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 
 export { default } from "@peated/web/components/defaultLayout";
 
@@ -9,7 +10,9 @@ export async function generateMetadata({
 }) {
   const { client } = await getServerClient();
 
-  const bottle = await client.bottles.details({ bottle: Number(bottleId) });
+  const bottle = await resolveOrNotFound(
+    client.bottles.details({ bottle: Number(bottleId) }),
+  );
 
   return {
     title: `Releases of ${bottle.fullName}`,

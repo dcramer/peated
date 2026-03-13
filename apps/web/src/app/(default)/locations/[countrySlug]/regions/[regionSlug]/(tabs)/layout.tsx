@@ -7,6 +7,7 @@ import Tabs, { TabItem } from "@peated/web/components/tabs";
 import UsStateMapIcon from "@peated/web/components/usStateMapIcon";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { type ReactNode } from "react";
 
 export async function generateMetadata({
@@ -16,10 +17,12 @@ export async function generateMetadata({
 }) {
   const { client } = await getServerClient();
 
-  const region = await client.regions.details({
-    country: countrySlug,
-    region: regionSlug,
-  });
+  const region = await resolveOrNotFound(
+    client.regions.details({
+      country: countrySlug,
+      region: regionSlug,
+    }),
+  );
 
   return {
     title: `Whisky from ${region.name}, ${region.country.name}`,
@@ -36,10 +39,12 @@ export default async function Page({
 }) {
   const { client } = await getServerClient();
 
-  const region = await client.regions.details({
-    country: countrySlug,
-    region: regionSlug,
-  });
+  const region = await resolveOrNotFound(
+    client.regions.details({
+      country: countrySlug,
+      region: regionSlug,
+    }),
+  );
   const user = await getCurrentUser();
 
   const stats = [

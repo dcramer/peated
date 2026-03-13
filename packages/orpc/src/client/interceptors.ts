@@ -1,5 +1,6 @@
 import type { InterceptableOptions, Interceptor } from "@orpc/shared";
 import * as Sentry from "@sentry/core";
+import { shouldCaptureORPCClientError } from "./errors";
 
 /**
  * Safely stringify an object, handling circular references and other serialization issues
@@ -62,6 +63,8 @@ const sentryInterceptor = (
   options: Options = {},
 ): Interceptor<InterceptableOptions, Promise<unknown>> =>
   async function sentryInterceptor({ next, path, input }) {
+    let originalError: unknown;
+
     try {
       return await Sentry.startSpan(
         {
@@ -80,11 +83,15 @@ const sentryInterceptor = (
             const result = await next();
             return result;
           } catch (error) {
+            originalError = error;
+
             try {
               span.setStatus({
                 code: 2,
               });
-              Sentry.captureException(error);
+              if (shouldCaptureORPCClientError(error)) {
+                Sentry.captureException(error);
+              }
             } catch (sentryError) {
               // Log Sentry errors but don't let them interfere with the original error
               // eslint-disable-next-line no-console
@@ -97,6 +104,10 @@ const sentryInterceptor = (
         },
       );
     } catch (sentryError) {
+      if (sentryError === originalError) {
+        throw sentryError;
+      }
+
       // If Sentry itself fails, log the error and continue with the original call
       // eslint-disable-next-line no-console
       console.error("Sentry interceptor failed:", sentryError);

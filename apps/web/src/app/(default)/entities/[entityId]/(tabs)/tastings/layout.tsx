@@ -1,4 +1,5 @@
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { type ReactNode } from "react";
 
 export async function generateMetadata({
@@ -8,9 +9,11 @@ export async function generateMetadata({
 }) {
   const { client } = await getServerClient();
 
-  const entity = await client.entities.details({
-    entity: Number(entityId),
-  });
+  const entity = await resolveOrNotFound(
+    client.entities.details({
+      entity: Number(entityId),
+    }),
+  );
 
   return {
     title: `Tastings for ${entity.name}`,

@@ -2,6 +2,7 @@ import Link from "@peated/web/components/link";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { type ReactNode } from "react";
 
 export async function generateMetadata({
@@ -11,9 +12,11 @@ export async function generateMetadata({
 }) {
   const { client } = await getServerClient();
 
-  const bottle = await client.bottles.details({
-    bottle: Number(bottleId),
-  });
+  const bottle = await resolveOrNotFound(
+    client.bottles.details({
+      bottle: Number(bottleId),
+    }),
+  );
 
   const description = summarize(bottle.description || "", 200);
 
@@ -43,7 +46,9 @@ export default async function Layout({
   const { client } = await getServerClient();
 
   const bottleId = Number(params.bottleId);
-  const bottle = await client.bottles.details({ bottle: bottleId });
+  const bottle = await resolveOrNotFound(
+    client.bottles.details({ bottle: bottleId }),
+  );
 
   const baseUrl = `/bottles/${bottle.id}`;
 

@@ -7,6 +7,7 @@ import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import type { Product, WithContext } from "schema-dts";
@@ -22,9 +23,11 @@ export default async function Layout({
   const { client } = await getServerClient();
 
   const bottleId = Number(params.bottleId);
-  const bottle = await client.bottles.details({
-    bottle: bottleId,
-  });
+  const bottle = await resolveOrNotFound(
+    client.bottles.details({
+      bottle: bottleId,
+    }),
+  );
 
   // tombstone path - redirect to the absolute url to ensure search engines dont get mad
   if (bottle.id !== bottleId) {
