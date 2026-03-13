@@ -1,9 +1,4 @@
-import {
-  Agent,
-  OpenAIProvider,
-  Runner,
-  type JsonSchemaDefinition,
-} from "@openai/agents";
+import { Agent, OpenAIProvider, Runner } from "@openai/agents";
 import { buildStorePriceMatchInstructions } from "@peated/server/agents/whisky/guidance";
 import config from "@peated/server/config";
 import { type StorePrice } from "@peated/server/db/schema";
@@ -12,10 +7,11 @@ import type {
   ExtractedBottleDetailsSchema,
   PriceMatchCandidateSchema,
   PriceMatchSearchEvidenceSchema,
+  StorePriceMatchDecisionSchema,
 } from "@peated/server/schemas";
-import { StorePriceMatchDecisionSchema } from "@peated/server/schemas";
+import { StorePriceMatchAgentResponseSchema } from "@peated/server/schemas";
 import OpenAI from "openai";
-import { z } from "zod";
+import type { z } from "zod";
 import {
   createOpenAIWebSearchTool,
   createSearchBottlesTool,
@@ -167,14 +163,6 @@ export async function classifyStorePriceMatch({
   const instructions = buildStorePriceMatchInstructions({
     maxSearchQueries: config.PRICE_MATCH_MAX_SEARCH_QUERIES,
   });
-  const decisionOutputSchema: JsonSchemaDefinition = {
-    type: "json_schema",
-    name: "store_price_match_decision",
-    strict: true,
-    schema: z.toJSONSchema(
-      StorePriceMatchDecisionSchema,
-    ) as unknown as JsonSchemaDefinition["schema"],
-  };
 
   const agent = new Agent({
     name: "store_price_match_classifier",
@@ -184,7 +172,7 @@ export async function classifyStorePriceMatch({
       parallelToolCalls: false,
       temperature: 0,
     },
-    outputType: decisionOutputSchema,
+    outputType: StorePriceMatchAgentResponseSchema,
     tools: [
       createSearchBottlesTool({
         onResults: (results) => {
@@ -253,7 +241,9 @@ export async function classifyStorePriceMatch({
       throw new Error("Agent returned empty output");
     }
 
-    const decision = StorePriceMatchDecisionSchema.parse(result.finalOutput);
+    const { decision } = StorePriceMatchAgentResponseSchema.parse(
+      result.finalOutput,
+    );
 
     return {
       decision,

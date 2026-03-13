@@ -154,6 +154,10 @@ export const StorePriceMatchDecisionSchema = z.discriminatedUnion("action", [
   }),
 ]);
 
+export const StorePriceMatchAgentResponseSchema = z.object({
+  decision: StorePriceMatchDecisionSchema,
+});
+
 export const StorePriceMatchProposalSchema = z.object({
   id: z.number(),
   status: StorePriceMatchProposalStatusEnum,

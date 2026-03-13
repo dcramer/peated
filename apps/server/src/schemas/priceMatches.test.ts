@@ -1,9 +1,37 @@
 import { describe, expect, test } from "vitest";
 import { z } from "zod";
 
-import { StorePriceMatchDecisionSchema } from "./priceMatches";
+import {
+  StorePriceMatchAgentResponseSchema,
+  StorePriceMatchDecisionSchema,
+} from "./priceMatches";
 
 describe("StorePriceMatchDecisionSchema", () => {
+  test("wraps classifier output in a root object schema", () => {
+    const jsonSchema = z.toJSONSchema(
+      StorePriceMatchAgentResponseSchema,
+    ) as unknown as {
+      type?: string;
+      properties?: {
+        decision?: {
+          anyOf?: unknown[];
+          oneOf?: unknown[];
+        };
+      };
+      required?: string[];
+      additionalProperties?: boolean;
+    };
+
+    expect(jsonSchema.type).toBe("object");
+    expect(jsonSchema.additionalProperties).toBe(false);
+    expect(jsonSchema.required).toEqual(["decision"]);
+    expect(jsonSchema.properties?.decision).toBeDefined();
+    expect(
+      jsonSchema.properties?.decision?.oneOf ??
+        jsonSchema.properties?.decision?.anyOf,
+    ).toHaveLength(4);
+  });
+
   test("uses fully required proposedBottle fields for structured outputs", () => {
     const jsonSchema = z.toJSONSchema(
       StorePriceMatchDecisionSchema,
