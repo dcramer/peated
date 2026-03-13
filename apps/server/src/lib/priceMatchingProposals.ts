@@ -7,6 +7,8 @@ import config from "@peated/server/config";
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import {
   bottles,
+  entities,
+  externalSites,
   storePriceMatchProposals,
   storePrices,
   type StorePrice,
@@ -23,13 +25,16 @@ import {
 } from "@peated/server/lib/createBottle";
 import { logError } from "@peated/server/lib/log";
 import {
+  normalizeBottle,
   normalizeString,
   stripDuplicateBrandPrefixFromBottleName,
 } from "@peated/server/lib/normalize";
 import {
   extractStorePriceBottleDetails,
   findStorePriceMatchCandidates,
+  getBottleMatchCandidateById,
 } from "@peated/server/lib/priceMatchingCandidates";
+import { parseDetailsFromName } from "@peated/server/lib/smws";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import type {
   BottleInputSchema,
@@ -38,11 +43,13 @@ import type {
   PriceMatchSearchEvidenceSchema,
   StorePriceMatchDecisionSchema,
 } from "@peated/server/schemas";
-import { eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import type { z } from "zod";
 
 const VERIFIED_MATCH_CONFIDENCE_THRESHOLD = 80;
 const AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD = 90;
+const SMWS_EXTERNAL_SITE_TYPE = "smws";
+const SMWS_BRAND_NAME = "The Scotch Malt Whisky Society";
 const NON_WHISKY_KEYWORDS =
   /\b(vodka|gin|rum|tequila|mezcal|sotol|soju|baijiu|sake|shochu|brandy|cognac|armagnac|liqueur)\b/i;
 const WHISKY_KEYWORDS =
@@ -336,6 +343,203 @@ function shouldAutoCreateStorePriceMatchProposal({
   );
 }
 
+async function reloadStorePriceMatchProposal(
+  proposalId: number,
+): Promise<StorePriceMatchProposal> {
+  const proposal = await db.query.storePriceMatchProposals.findFirst({
+    where: eq(storePriceMatchProposals.id, proposalId),
+  });
+
+  if (!proposal) {
+    throw new Error(`Unable to reload price match proposal (${proposalId}).`);
+  }
+
+  return proposal;
+}
+
+async function findEntityChoiceByName(name: string) {
+  const entity = await db.query.entities.findFirst({
+    where: eq(sql`LOWER(${entities.name})`, name.toLowerCase()),
+  });
+
+  return entity
+    ? {
+        id: entity.id,
+        name: entity.name,
+      }
+    : null;
+}
+
+async function findTrustedSmwsBottleId(name: string): Promise<number | null> {
+  const [match] = await db
+    .select({
+      bottleId: bottles.id,
+    })
+    .from(bottles)
+    .innerJoin(entities, eq(entities.id, bottles.brandId))
+    .where(
+      and(
+        eq(sql`LOWER(${entities.name})`, SMWS_BRAND_NAME.toLowerCase()),
+        eq(sql`LOWER(${bottles.name})`, name.toLowerCase()),
+      ),
+    )
+    .limit(1);
+
+  return match?.bottleId ?? null;
+}
+
+async function maybeResolveTrustedSmwsStorePriceMatch(
+  price: StorePrice,
+): Promise<StorePriceMatchProposal | null> {
+  const site = await db.query.externalSites.findFirst({
+    where: eq(externalSites.id, price.externalSiteId),
+  });
+  if (site?.type !== SMWS_EXTERNAL_SITE_TYPE) {
+    return null;
+  }
+
+  const details = parseDetailsFromName(price.name);
+  if (!details?.distiller || !details.category) {
+    return null;
+  }
+
+  const { name } = normalizeBottle({
+    name: details.name,
+    isFullName: false,
+  });
+  const brand = await findEntityChoiceByName(SMWS_BRAND_NAME);
+  const distiller = await findEntityChoiceByName(details.distiller);
+  const existingBottleId = await findTrustedSmwsBottleId(name);
+  const existingBottle = existingBottleId
+    ? await getBottleMatchCandidateById(existingBottleId)
+    : null;
+
+  const extractedLabel: ExtractedBottleDetails = {
+    brand: brand?.name ?? SMWS_BRAND_NAME,
+    expression: name,
+    series: null,
+    distillery: [distiller?.name ?? details.distiller],
+    category: details.category,
+    stated_age: null,
+    abv: null,
+    release_year: null,
+    vintage_year: null,
+    cask_type: null,
+    cask_strength: null,
+    single_cask: true,
+    edition: null,
+  };
+  const candidates = existingBottle ? [existingBottle] : [];
+  const decision: StorePriceMatchDecision = existingBottleId
+    ? {
+        action:
+          price.bottleId !== null && price.bottleId !== existingBottleId
+            ? "correction"
+            : "match_existing",
+        confidence: 100,
+        rationale: "Deterministic SMWS match from trusted source metadata.",
+        suggestedBottleId: existingBottleId,
+        candidateBottleIds: [existingBottleId],
+        proposedBottle: null,
+      }
+    : {
+        action: "create_new",
+        confidence: 100,
+        rationale: "Deterministic SMWS creation from trusted source metadata.",
+        suggestedBottleId: null,
+        candidateBottleIds: [],
+        proposedBottle: {
+          name,
+          series: null,
+          category: details.category,
+          edition: null,
+          statedAge: null,
+          caskStrength: null,
+          singleCask: true,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          brand: {
+            id: brand?.id ?? null,
+            name: brand?.name ?? SMWS_BRAND_NAME,
+          },
+          distillers: [
+            {
+              id: distiller?.id ?? null,
+              name: distiller?.name ?? details.distiller,
+            },
+          ],
+          bottler: {
+            id: brand?.id ?? null,
+            name: brand?.name ?? SMWS_BRAND_NAME,
+          },
+        },
+      };
+
+  const proposal = await upsertStorePriceMatchProposal({
+    price,
+    extractedLabel,
+    candidates,
+    decision,
+    searchEvidence: [],
+  });
+
+  if (existingBottleId && price.bottleId === existingBottleId) {
+    return proposal;
+  }
+
+  try {
+    const automationUser = await getAutomationModeratorUser();
+
+    if (existingBottleId) {
+      await applyApprovedStorePriceMatch({
+        proposalId: proposal.id,
+        bottleId: existingBottleId,
+        reviewedById: automationUser.id,
+      });
+    } else {
+      const proposedBottle =
+        decision.action === "create_new" ? decision.proposedBottle : null;
+      if (!proposedBottle) {
+        throw new Error(
+          `Unable to auto-create trusted SMWS proposal without a proposed bottle (${proposal.id}).`,
+        );
+      }
+
+      await createBottleFromStorePriceMatchProposal({
+        proposalId: proposal.id,
+        input: buildBottleInputFromProposedBottle(proposedBottle),
+        user: automationUser,
+      });
+    }
+
+    return await reloadStorePriceMatchProposal(proposal.id);
+  } catch (err) {
+    logError(err, {
+      price: {
+        id: price.id,
+        name: price.name,
+      },
+      proposal: {
+        id: proposal.id,
+      },
+    });
+
+    return await upsertStorePriceMatchProposal({
+      price,
+      extractedLabel,
+      candidates,
+      decision,
+      searchEvidence: [],
+      error: err instanceof Error ? err.message : "Unknown trusted SMWS error",
+      statusOverride: "errored",
+    });
+  }
+}
+
 function buildBottleInputFromProposedBottle(
   proposedBottle: NonNullable<StorePriceMatchDecision["proposedBottle"]>,
 ): z.infer<typeof BottleInputSchema> {
@@ -562,6 +766,12 @@ export async function resolveStorePriceMatchProposal(
   let searchEvidence: SearchEvidence[] = [];
 
   try {
+    const trustedSmwsProposal =
+      await maybeResolveTrustedSmwsStorePriceMatch(price);
+    if (trustedSmwsProposal) {
+      return trustedSmwsProposal;
+    }
+
     extractedLabel = await extractStorePriceBottleDetails(price);
     if (shouldAutoIgnoreStorePriceListing(price.name, extractedLabel)) {
       return await upsertStorePriceMatchProposal({
@@ -614,18 +824,7 @@ export async function resolveStorePriceMatchProposal(
         user: automationUser,
       });
 
-      const autoCreatedProposal =
-        await db.query.storePriceMatchProposals.findFirst({
-          where: eq(storePriceMatchProposals.id, proposal.id),
-        });
-
-      if (!autoCreatedProposal) {
-        throw new Error(
-          `Unable to reload auto-created price match proposal (${proposal.id}).`,
-        );
-      }
-
-      return autoCreatedProposal;
+      return await reloadStorePriceMatchProposal(proposal.id);
     } catch (err) {
       logError(err, {
         price: {

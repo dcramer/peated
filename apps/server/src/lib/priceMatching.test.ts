@@ -3,6 +3,7 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottles,
+  bottlesToDistillers,
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
@@ -600,6 +601,149 @@ describe("priceMatching", () => {
     expect(classifyStorePriceMatch).not.toHaveBeenCalled();
     expect(proposal.status).toBe("ignored");
     expect(proposal.proposalType).toBe("no_match");
+  });
+
+  test("auto approves trusted SMWS matches without classifier when aliases differ", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+
+    const site = await fixtures.ExternalSiteOrExisting({ type: "smws" });
+    const brand = await fixtures.Entity({
+      name: "The Scotch Malt Whisky Society",
+      shortName: null,
+      type: ["brand", "bottler"],
+    });
+    const distiller = await fixtures.Entity({
+      name: "Kyrö",
+      type: ["distiller"],
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      distillerIds: [distiller.id],
+      name: "RW6.5 Sauna Smoke",
+      category: "rye",
+      singleCask: true,
+    });
+    const price = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      bottleId: null,
+      name: "SMWS RW6.5 Sauna Smoke",
+      imageUrl: null,
+      url: "https://smws.example/rw6-5-existing",
+    });
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+    const listingAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, price.name),
+    });
+
+    expect(extractFromText).not.toHaveBeenCalled();
+    expect(classifyStorePriceMatch).not.toHaveBeenCalled();
+    expect(proposal).toMatchObject({
+      status: "approved",
+      proposalType: "match_existing",
+      currentBottleId: bottle.id,
+      suggestedBottleId: bottle.id,
+      reviewedById: expect.any(Number),
+    });
+    expect(updatedPrice?.bottleId).toBe(bottle.id);
+    expect(listingAlias?.bottleId).toBe(bottle.id);
+  });
+
+  test("auto creates trusted SMWS bottles without classifier", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+
+    const site = await fixtures.ExternalSiteOrExisting({ type: "smws" });
+    const brand = await fixtures.Entity({
+      name: "The Scotch Malt Whisky Society",
+      shortName: "SMWS",
+      type: ["brand", "bottler"],
+    });
+    const distiller = await fixtures.Entity({
+      name: "Kyrö",
+      type: ["distiller"],
+    });
+    const price = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      bottleId: null,
+      name: "SMWS RW6.5 Sauna Smoke",
+      imageUrl: null,
+      url: "https://smws.example/rw6-5-new",
+    });
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+    const createdBottle = await db.query.bottles.findFirst({
+      where: eq(bottles.id, proposal.suggestedBottleId!),
+    });
+    const listingAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, price.name),
+    });
+    const distillerLinks = await db
+      .select()
+      .from(bottlesToDistillers)
+      .where(eq(bottlesToDistillers.bottleId, proposal.suggestedBottleId!));
+
+    expect(extractFromText).not.toHaveBeenCalled();
+    expect(classifyStorePriceMatch).not.toHaveBeenCalled();
+    expect(proposal).toMatchObject({
+      status: "approved",
+      proposalType: "create_new",
+      currentBottleId: expect.any(Number),
+      suggestedBottleId: expect.any(Number),
+      reviewedById: expect.any(Number),
+    });
+    expect(updatedPrice?.bottleId).toBe(proposal.suggestedBottleId);
+    expect(createdBottle).toMatchObject({
+      name: "RW6.5 Sauna Smoke",
+      fullName: "SMWS RW6.5 Sauna Smoke",
+      brandId: brand.id,
+      bottlerId: brand.id,
+      category: "rye",
+      singleCask: true,
+    });
+    expect(listingAlias?.bottleId).toBe(proposal.suggestedBottleId);
+    expect(distillerLinks).toEqual([
+      expect.objectContaining({
+        bottleId: proposal.suggestedBottleId,
+        distillerId: distiller.id,
+      }),
+    ]);
   });
 
   test("auto creates high-confidence web-validated new bottles", async ({
