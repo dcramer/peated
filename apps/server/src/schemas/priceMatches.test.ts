@@ -7,15 +7,18 @@ import {
 } from "./priceMatches";
 
 describe("StorePriceMatchDecisionSchema", () => {
-  test("wraps classifier output in a root object schema", () => {
+  test("uses a flat agent response schema without a decision union", () => {
     const jsonSchema = z.toJSONSchema(
       StorePriceMatchAgentResponseSchema,
     ) as unknown as {
       type?: string;
       properties?: {
         decision?: {
+          type?: string;
+          properties?: Record<string, unknown>;
           anyOf?: unknown[];
           oneOf?: unknown[];
+          required?: string[];
         };
       };
       required?: string[];
@@ -26,10 +29,19 @@ describe("StorePriceMatchDecisionSchema", () => {
     expect(jsonSchema.additionalProperties).toBe(false);
     expect(jsonSchema.required).toEqual(["decision"]);
     expect(jsonSchema.properties?.decision).toBeDefined();
-    expect(
-      jsonSchema.properties?.decision?.oneOf ??
-        jsonSchema.properties?.decision?.anyOf,
-    ).toHaveLength(4);
+    expect(jsonSchema.properties?.decision?.type).toBe("object");
+    expect(jsonSchema.properties?.decision?.oneOf).toBeUndefined();
+    expect(jsonSchema.properties?.decision?.anyOf).toBeUndefined();
+    expect((jsonSchema.properties?.decision?.required ?? []).sort()).toEqual(
+      [
+        "action",
+        "candidateBottleIds",
+        "confidence",
+        "proposedBottle",
+        "rationale",
+        "suggestedBottleId",
+      ].sort(),
+    );
   });
 
   test("uses fully required proposedBottle fields for structured outputs", () => {

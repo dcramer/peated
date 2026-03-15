@@ -7,9 +7,12 @@ import type {
   ExtractedBottleDetailsSchema,
   PriceMatchCandidateSchema,
   PriceMatchSearchEvidenceSchema,
+  StorePriceMatchAgentDecisionSchema,
+} from "@peated/server/schemas";
+import {
+  StorePriceMatchAgentResponseSchema,
   StorePriceMatchDecisionSchema,
 } from "@peated/server/schemas";
-import { StorePriceMatchAgentResponseSchema } from "@peated/server/schemas";
 import OpenAI from "openai";
 import type { z } from "zod";
 import {
@@ -24,6 +27,7 @@ const CLASSIFIER_MAX_TURNS = 8;
 type ExtractedBottleDetails = z.infer<typeof ExtractedBottleDetailsSchema>;
 type PriceMatchCandidate = z.infer<typeof PriceMatchCandidateSchema>;
 type SearchEvidence = z.infer<typeof PriceMatchSearchEvidenceSchema>;
+type AgentDecision = z.infer<typeof StorePriceMatchAgentDecisionSchema>;
 
 export type StorePriceMatchClassification = {
   decision: z.infer<typeof StorePriceMatchDecisionSchema>;
@@ -110,6 +114,10 @@ function mergeResolvedEntity(
   if (!existing.shortName && entity.shortName) {
     existing.shortName = entity.shortName;
   }
+}
+
+function parseClassifierDecision(decision: AgentDecision) {
+  return StorePriceMatchDecisionSchema.parse(decision);
 }
 
 export class StorePriceMatchClassificationError extends Error {
@@ -241,9 +249,9 @@ export async function classifyStorePriceMatch({
       throw new Error("Agent returned empty output");
     }
 
-    const { decision } = StorePriceMatchAgentResponseSchema.parse(
-      result.finalOutput,
-    );
+    const { decision: agentDecision } =
+      StorePriceMatchAgentResponseSchema.parse(result.finalOutput);
+    const decision = parseClassifierDecision(agentDecision);
 
     return {
       decision,

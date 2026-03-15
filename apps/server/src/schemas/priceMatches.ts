@@ -159,8 +159,15 @@ export const StorePriceMatchDecisionSchema = z.discriminatedUnion("action", [
   }),
 ]);
 
+export const StorePriceMatchAgentDecisionSchema =
+  StorePriceMatchDecisionBaseSchema.extend({
+    action: z.enum(["match_existing", "correction", "create_new", "no_match"]),
+    suggestedBottleId: z.number().int().nullable().default(null),
+    proposedBottle: ProposedBottleSchema.nullable().default(null),
+  });
+
 export const StorePriceMatchAgentResponseSchema = z.object({
-  decision: StorePriceMatchDecisionSchema,
+  decision: StorePriceMatchAgentDecisionSchema,
 });
 
 export const StorePriceMatchProposalSchema = z.object({
