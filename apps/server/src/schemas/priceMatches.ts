@@ -8,7 +8,7 @@ import {
   CategoryEnum,
 } from "./common";
 import { ExternalSiteSchema } from "./externalSites";
-import { listResponse } from "./shared";
+import { CursorSchema } from "./shared";
 import { StorePriceSchema } from "./stores";
 
 export const ExtractedBottleDetailsSchema = z.object({
@@ -82,6 +82,11 @@ export const StorePriceMatchProposalTypeEnum = z.enum([
   "create_new",
   "correction",
   "no_match",
+]);
+
+export const StorePriceMatchQueueStateEnum = z.enum([
+  "actionable",
+  "processing",
 ]);
 
 export const ProposedEntityChoiceSchema = z.object({
@@ -174,6 +179,9 @@ export const StorePriceMatchProposalSchema = z.object({
   error: z.string().nullable(),
   lastEvaluatedAt: z.string().datetime().nullable(),
   reviewedAt: z.string().datetime().nullable(),
+  isProcessing: z.boolean(),
+  processingQueuedAt: z.string().datetime().nullable(),
+  processingExpiresAt: z.string().datetime().nullable(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
@@ -187,6 +195,11 @@ export const StorePriceMatchQueueItemSchema =
     suggestedBottle: BottleSchema.nullable(),
   });
 
-export const StorePriceMatchQueueListResponse = listResponse(
-  StorePriceMatchQueueItemSchema,
-);
+export const StorePriceMatchQueueListResponse = z.object({
+  results: z.array(StorePriceMatchQueueItemSchema),
+  rel: CursorSchema,
+  stats: z.object({
+    actionableCount: z.number().int().min(0),
+    processingCount: z.number().int().min(0),
+  }),
+});

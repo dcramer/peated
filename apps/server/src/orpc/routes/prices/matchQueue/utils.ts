@@ -4,6 +4,7 @@ import {
   type StorePriceMatchProposal,
 } from "@peated/server/db/schema";
 import { stripDuplicateBrandPrefixFromBottleName } from "@peated/server/lib/normalize";
+import { hasActiveStorePriceMatchProposalProcessingLease } from "@peated/server/lib/priceMatching";
 import { type Context } from "@peated/server/orpc/context";
 import {
   StorePriceMatchProposalSchema,
@@ -14,6 +15,7 @@ import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { StorePriceWithSiteSerializer } from "@peated/server/serializers/storePrice";
 
 type QueueRow = {
+  isProcessing?: boolean;
   proposal: StorePriceMatchProposal;
   price: StorePrice & { externalSite: ExternalSite };
 };
@@ -40,7 +42,9 @@ export async function serializeQueueItems(
 
   return rows.map((row, index) =>
     StorePriceMatchQueueItemSchema.parse({
-      ...serializeProposal(row.proposal),
+      ...serializeProposal(row.proposal, {
+        isProcessing: row.isProcessing,
+      }),
       price: prices[index],
       currentBottle: row.proposal.currentBottleId
         ? (bottlesById[row.proposal.currentBottleId] ?? null)
@@ -52,7 +56,10 @@ export async function serializeQueueItems(
   );
 }
 
-export function serializeProposal(proposal: StorePriceMatchProposal) {
+export function serializeProposal(
+  proposal: StorePriceMatchProposal,
+  { isProcessing }: { isProcessing?: boolean } = {},
+) {
   const serializedProposal = StorePriceMatchProposalSchema.parse({
     id: proposal.id,
     status: proposal.status,
@@ -71,6 +78,14 @@ export function serializeProposal(proposal: StorePriceMatchProposal) {
       ? proposal.lastEvaluatedAt.toISOString()
       : null,
     reviewedAt: proposal.reviewedAt ? proposal.reviewedAt.toISOString() : null,
+    isProcessing:
+      isProcessing ?? hasActiveStorePriceMatchProposalProcessingLease(proposal),
+    processingQueuedAt: proposal.processingQueuedAt
+      ? proposal.processingQueuedAt.toISOString()
+      : null,
+    processingExpiresAt: proposal.processingExpiresAt
+      ? proposal.processingExpiresAt.toISOString()
+      : null,
     createdAt: proposal.createdAt.toISOString(),
     updatedAt: proposal.updatedAt.toISOString(),
   });

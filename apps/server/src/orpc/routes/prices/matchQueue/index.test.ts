@@ -231,6 +231,97 @@ describe("price match queue", () => {
     ]);
   });
 
+  test("separates actionable and processing queue items and returns counts", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const actionablePrice = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Actionable Candidate",
+    });
+    const processingPrice = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Processing Candidate",
+    });
+    const expiredPrice = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Expired Lease Candidate",
+    });
+    const now = Date.now();
+
+    const [actionableProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: actionablePrice.id,
+        status: "pending_review",
+        proposalType: "create_new",
+        updatedAt: new Date("2026-03-08T10:00:00.000Z"),
+      })
+      .returning();
+
+    const [processingProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: processingPrice.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+        processingToken: "processing-token",
+        processingQueuedAt: new Date(now - 60_000),
+        processingExpiresAt: new Date(now + 15 * 60_000),
+        updatedAt: new Date("2026-03-08T09:00:00.000Z"),
+      })
+      .returning();
+
+    const [expiredProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: expiredPrice.id,
+        status: "errored",
+        proposalType: "no_match",
+        processingToken: "expired-token",
+        processingQueuedAt: new Date(now - 30 * 60_000),
+        processingExpiresAt: new Date(now - 5 * 60_000),
+        updatedAt: new Date("2026-03-08T11:00:00.000Z"),
+      })
+      .returning();
+
+    const actionableResults = await routerClient.prices.matchQueue.list(
+      {},
+      { context: { user } },
+    );
+    const processingResults = await routerClient.prices.matchQueue.list(
+      { state: "processing" },
+      { context: { user } },
+    );
+
+    expect(actionableResults.results.map((item) => item.id)).toEqual([
+      expiredProposal.id,
+      actionableProposal.id,
+    ]);
+    expect(actionableResults.stats).toEqual({
+      actionableCount: 2,
+      processingCount: 1,
+    });
+    expect(actionableResults.results.every((item) => !item.isProcessing)).toBe(
+      true,
+    );
+
+    expect(processingResults.results.map((item) => item.id)).toEqual([
+      processingProposal.id,
+    ]);
+    expect(processingResults.stats).toEqual({
+      actionableCount: 2,
+      processingCount: 1,
+    });
+    expect(processingResults.results[0]).toMatchObject({
+      id: processingProposal.id,
+      isProcessing: true,
+    });
+    expect(processingResults.results[0]?.processingQueuedAt).not.toBeNull();
+    expect(processingResults.results[0]?.processingExpiresAt).not.toBeNull();
+  });
+
   test("returns proposal details", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const site = await fixtures.ExternalSiteOrExisting({ type: "astorwines" });
@@ -770,6 +861,43 @@ describe("price match queue", () => {
     );
   });
 
+  test("rejects resolving proposals that are currently processing", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle();
+    const price = await fixtures.StorePrice({
+      name: "Processing Resolution Candidate",
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+        suggestedBottleId: bottle.id,
+        processingToken: "active-token",
+        processingQueuedAt: new Date(Date.now() - 60_000),
+        processingExpiresAt: new Date(Date.now() + 10 * 60_000),
+      })
+      .returning();
+
+    const err = await waitError(
+      routerClient.prices.matchQueue.resolve(
+        {
+          proposal: proposal.id,
+          action: "match",
+          bottle: bottle.id,
+        },
+        { context: { user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Price match proposal is currently processing (${proposal.id}).]`,
+    );
+  });
+
   test("requeues proposal evaluation", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const price = await fixtures.StorePrice();
@@ -782,17 +910,170 @@ describe("price match queue", () => {
       })
       .returning();
 
-    await routerClient.prices.matchQueue.retry(
+    const result = await routerClient.prices.matchQueue.retry(
       { proposal: proposal.id },
       { context: { user } },
     );
+    const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
+      where: eq(storePriceMatchProposals.id, proposal.id),
+    });
 
+    expect(result).toEqual({
+      status: "queued",
+    });
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       {
         priceId: price.id,
         force: true,
+        processingToken: expect.any(String),
       },
     );
+    expect(updatedProposal?.processingToken).toEqual(expect.any(String));
+    expect(updatedProposal?.processingQueuedAt).not.toBeNull();
+    expect(updatedProposal?.processingExpiresAt).not.toBeNull();
+  });
+
+  test("does not enqueue a retry for proposals already processing", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const price = await fixtures.StorePrice();
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+        processingToken: "active-token",
+        processingQueuedAt: new Date(Date.now() - 60_000),
+        processingExpiresAt: new Date(Date.now() + 10 * 60_000),
+      })
+      .returning();
+
+    const result = await routerClient.prices.matchQueue.retry(
+      { proposal: proposal.id },
+      { context: { user } },
+    );
+
+    expect(result).toEqual({
+      status: "already_processing",
+    });
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  });
+
+  test("bulk requeues all actionable search results", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "smws" });
+    const [firstPrice, secondPrice, ignoredPrice] = await Promise.all([
+      fixtures.StorePrice({
+        externalSiteId: site.id,
+        name: "SMWS Retry One",
+      }),
+      fixtures.StorePrice({
+        externalSiteId: site.id,
+        name: "SMWS Retry Two",
+      }),
+      fixtures.StorePrice({
+        externalSiteId: site.id,
+        name: "Different Search Result",
+      }),
+    ]);
+
+    const [firstProposal, secondProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values([
+        {
+          priceId: firstPrice.id,
+          status: "errored",
+          proposalType: "no_match",
+        },
+        {
+          priceId: secondPrice.id,
+          status: "pending_review",
+          proposalType: "create_new",
+        },
+      ])
+      .returning();
+
+    await db.insert(storePriceMatchProposals).values({
+      priceId: ignoredPrice.id,
+      status: "pending_review",
+      proposalType: "create_new",
+    });
+
+    const result = await routerClient.prices.matchQueue.retryAll(
+      { query: "SMWS Retry" },
+      { context: { user } },
+    );
+    const updatedFirstProposal =
+      await db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, firstProposal.id),
+      });
+    const updatedSecondProposal =
+      await db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, secondProposal.id),
+      });
+
+    expect(result).toEqual({
+      matchedCount: 2,
+      enqueuedCount: 2,
+      alreadyProcessingCount: 0,
+      enqueueFailedCount: 0,
+    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledTimes(2);
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      expect.objectContaining({
+        priceId: firstPrice.id,
+        force: true,
+        processingToken: expect.any(String),
+      }),
+    );
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      expect.objectContaining({
+        priceId: secondPrice.id,
+        force: true,
+        processingToken: expect.any(String),
+      }),
+    );
+    expect(updatedFirstProposal?.processingToken).toEqual(expect.any(String));
+    expect(updatedSecondProposal?.processingToken).toEqual(expect.any(String));
+  });
+
+  test("clears the processing lease if retry enqueue fails", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const price = await fixtures.StorePrice();
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "errored",
+        proposalType: "no_match",
+      })
+      .returning();
+    vi.mocked(workerClient.pushUniqueJob).mockRejectedValueOnce(
+      new Error("queue unavailable"),
+    );
+
+    const err = await waitError(
+      routerClient.prices.matchQueue.retry(
+        { proposal: proposal.id },
+        { context: { user } },
+      ),
+    );
+    const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
+      where: eq(storePriceMatchProposals.id, proposal.id),
+    });
+
+    expect(err).toMatchInlineSnapshot(`[Error: queue unavailable]`);
+    expect(updatedProposal).toMatchObject({
+      processingToken: null,
+      processingQueuedAt: null,
+      processingExpiresAt: null,
+    });
   });
 });

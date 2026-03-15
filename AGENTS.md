@@ -46,4 +46,5 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - `docs/development/orpc-client.md`
 - `docs/development/orpc-routes.md`
 - `docs/development/schema-conventions.md`
+- `docs/features/store-price-matching.md`
 - `docs/features/simple-rating-system.md`

@@ -13,6 +13,7 @@ import {
 } from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { getQueueIsProcessingSql } from "./filters";
 import { serializeQueueItems } from "./utils";
 
 export default procedure
@@ -34,6 +35,7 @@ export default procedure
   .handler(async function ({ input, context, errors }) {
     const [row] = await db
       .select({
+        isProcessing: getQueueIsProcessingSql(),
         proposal: storePriceMatchProposals,
         price: storePrices,
         site: externalSites,
@@ -60,6 +62,7 @@ export default procedure
     const [result] = await serializeQueueItems(
       [
         {
+          isProcessing: row.isProcessing,
           proposal: row.proposal,
           price: {
             ...row.price,

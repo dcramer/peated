@@ -138,6 +138,9 @@ export const storePriceMatchProposals = pgTable(
     model: text("model"),
     error: text("error"),
     lastEvaluatedAt: timestamp("last_evaluated_at"),
+    processingToken: text("processing_token"),
+    processingQueuedAt: timestamp("processing_queued_at"),
+    processingExpiresAt: timestamp("processing_expires_at"),
     reviewedById: bigint("reviewed_by_id", { mode: "number" }).references(
       () => users.id,
     ),
@@ -151,6 +154,9 @@ export const storePriceMatchProposals = pgTable(
     index("store_price_match_proposal_type_idx").on(table.proposalType),
     index("store_price_match_proposal_current_bottle_idx").on(
       table.currentBottleId,
+    ),
+    index("store_price_match_proposal_processing_expires_idx").on(
+      table.processingExpiresAt,
     ),
     index("store_price_match_proposal_suggested_bottle_idx").on(
       table.suggestedBottleId,

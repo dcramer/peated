@@ -1,10 +1,11 @@
 import { db } from "@peated/server/db";
 import { storePriceMatchProposals } from "@peated/server/db/schema";
+import { StorePriceMatchProposalNotReviewableError } from "@peated/server/lib/priceMatching";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { pushUniqueJob } from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { enqueueStorePriceMatchRetry } from "./retry-utils";
 
 export default procedure
   .use(requireMod)
@@ -21,7 +22,11 @@ export default procedure
       proposal: z.coerce.number(),
     }),
   )
-  .output(z.object({}))
+  .output(
+    z.object({
+      status: z.enum(["queued", "already_processing"]),
+    }),
+  )
   .handler(async function ({ input, errors }) {
     const proposal = await db.query.storePriceMatchProposals.findFirst({
       where: eq(storePriceMatchProposals.id, input.proposal),
@@ -33,9 +38,33 @@ export default procedure
       });
     }
 
-    await pushUniqueJob("ResolveStorePriceBottle", {
+    const result = await enqueueStorePriceMatchRetry({
+      proposalId: proposal.id,
       priceId: proposal.priceId,
-      force: true,
     });
-    return {};
+
+    if (result.status === "already_processing") {
+      return {
+        status: "already_processing",
+      };
+    }
+
+    if (result.status === "not_retryable") {
+      throw errors.CONFLICT({
+        message: new StorePriceMatchProposalNotReviewableError(
+          proposal.id,
+          proposal.status,
+        ).message,
+      });
+    }
+
+    if (result.status === "not_found") {
+      throw errors.NOT_FOUND({
+        message: "Price match proposal not found.",
+      });
+    }
+
+    return {
+      status: "queued",
+    };
   });

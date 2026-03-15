@@ -34,6 +34,15 @@ import {
   findStorePriceMatchCandidates,
   getBottleMatchCandidateById,
 } from "@peated/server/lib/priceMatchingCandidates";
+import {
+  hasActiveStorePriceMatchProposalProcessingLease,
+  refreshStorePriceMatchProposalProcessingLease,
+  releaseStorePriceMatchProposalProcessingLease,
+} from "@peated/server/lib/priceMatchingProcessingLease";
+import {
+  CLOSED_STORE_PRICE_MATCH_PROPOSAL_STATUSES,
+  REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES,
+} from "@peated/server/lib/priceMatchingStatus";
 import { parseDetailsFromName } from "@peated/server/lib/smws";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import type {
@@ -54,12 +63,6 @@ const NON_WHISKY_KEYWORDS =
   /\b(vodka|gin|rum|tequila|mezcal|sotol|soju|baijiu|sake|shochu|brandy|cognac|armagnac|liqueur)\b/i;
 const WHISKY_KEYWORDS =
   /\b(whisk(?:e)?y|single malt|single grain|single pot still|bourbon|rye|scotch|malt whisky|malt whiskey)\b/i;
-const REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES = [
-  "pending_review",
-  "errored",
-] as const;
-const CLOSED_STORE_PRICE_MATCH_PROPOSAL_STATUSES: readonly StorePriceMatchProposal["status"][] =
-  ["approved", "ignored"];
 
 type ExtractedBottleDetails = z.infer<typeof ExtractedBottleDetailsSchema>;
 type PriceMatchCandidate = z.infer<typeof PriceMatchCandidateSchema>;
@@ -276,6 +279,13 @@ export class StorePriceMatchProposalNotReviewableError extends Error {
   }
 }
 
+export class StorePriceMatchProposalAlreadyProcessingError extends Error {
+  constructor(readonly proposalId: number) {
+    super(`Price match proposal is currently processing (${proposalId}).`);
+    this.name = "StorePriceMatchProposalAlreadyProcessingError";
+  }
+}
+
 export class InvalidStorePriceMatchProposalTypeError extends Error {
   constructor(
     readonly proposalId: number,
@@ -357,6 +367,34 @@ async function reloadStorePriceMatchProposal(
   return proposal;
 }
 
+async function reloadStorePriceMatchProposalByPriceId(
+  priceId: number,
+): Promise<StorePriceMatchProposal> {
+  const proposal = await db.query.storePriceMatchProposals.findFirst({
+    where: eq(storePriceMatchProposals.priceId, priceId),
+  });
+
+  if (!proposal) {
+    throw new Error(
+      `Unable to reload price match proposal for price (${priceId}).`,
+    );
+  }
+
+  return proposal;
+}
+
+async function canContinueStorePriceMatchProcessing(
+  proposalId: number,
+  processingToken: string,
+) {
+  const proposal = await reloadStorePriceMatchProposal(proposalId);
+
+  return (
+    proposal.processingToken === processingToken &&
+    hasActiveStorePriceMatchProposalProcessingLease(proposal)
+  );
+}
+
 async function findEntityChoiceByName(name: string) {
   const entity = await db.query.entities.findFirst({
     where: eq(sql`LOWER(${entities.name})`, name.toLowerCase()),
@@ -390,6 +428,11 @@ async function findTrustedSmwsBottleId(name: string): Promise<number | null> {
 
 async function maybeResolveTrustedSmwsStorePriceMatch(
   price: StorePrice,
+  {
+    processingToken,
+  }: {
+    processingToken?: string;
+  } = {},
 ): Promise<StorePriceMatchProposal | null> {
   const site = await db.query.externalSites.findFirst({
     where: eq(externalSites.id, price.externalSiteId),
@@ -485,6 +528,7 @@ async function maybeResolveTrustedSmwsStorePriceMatch(
     candidates,
     decision,
     searchEvidence: [],
+    expectedProcessingToken: processingToken,
   });
 
   if (existingBottleId && price.bottleId === existingBottleId) {
@@ -493,6 +537,16 @@ async function maybeResolveTrustedSmwsStorePriceMatch(
 
   try {
     const automationUser = await getAutomationModeratorUser();
+
+    if (
+      processingToken &&
+      !(await canContinueStorePriceMatchProcessing(
+        proposal.id,
+        processingToken,
+      ))
+    ) {
+      return await reloadStorePriceMatchProposal(proposal.id);
+    }
 
     if (existingBottleId) {
       await applyApprovedStorePriceMatch({
@@ -536,6 +590,7 @@ async function maybeResolveTrustedSmwsStorePriceMatch(
       searchEvidence: [],
       error: err instanceof Error ? err.message : "Unknown trusted SMWS error",
       statusOverride: "errored",
+      expectedProcessingToken: processingToken,
     });
   }
 }
@@ -607,6 +662,7 @@ export async function upsertStorePriceMatchProposal({
   searchEvidence,
   error,
   statusOverride,
+  expectedProcessingToken,
 }: {
   price: StorePrice;
   extractedLabel: ExtractedBottleDetails | null;
@@ -615,6 +671,7 @@ export async function upsertStorePriceMatchProposal({
   searchEvidence?: SearchEvidence[];
   error?: string | null;
   statusOverride?: StorePriceMatchProposal["status"] | null;
+  expectedProcessingToken?: string;
 }) {
   const proposalType = decision ? getProposalType(price, decision) : "no_match";
   const status =
@@ -643,6 +700,9 @@ export async function upsertStorePriceMatchProposal({
     })
     .onConflictDoUpdate({
       target: storePriceMatchProposals.priceId,
+      setWhere: expectedProcessingToken
+        ? sql`${storePriceMatchProposals.processingToken} = ${expectedProcessingToken} AND ${storePriceMatchProposals.processingExpiresAt} IS NOT NULL AND ${storePriceMatchProposals.processingExpiresAt} > NOW()`
+        : undefined,
       set: {
         status,
         proposalType,
@@ -663,6 +723,10 @@ export async function upsertStorePriceMatchProposal({
       },
     })
     .returning();
+
+  if (!proposal && expectedProcessingToken) {
+    return await reloadStorePriceMatchProposalByPriceId(price.id);
+  }
 
   return proposal;
 }
@@ -736,8 +800,10 @@ export async function resolveStorePriceMatchProposal(
   priceId: number,
   {
     force = false,
+    processingToken,
   }: {
     force?: boolean;
+    processingToken?: string;
   } = {},
 ) {
   const price = await db.query.storePrices.findFirst({
@@ -761,13 +827,41 @@ export async function resolveStorePriceMatchProposal(
     return existingProposal;
   }
 
+  if (processingToken) {
+    if (!existingProposal) {
+      throw new Error(
+        `Missing price match proposal for retry processing (${price.id}).`,
+      );
+    }
+
+    if (
+      existingProposal.processingToken !== processingToken ||
+      !hasActiveStorePriceMatchProposalProcessingLease(existingProposal)
+    ) {
+      return existingProposal;
+    }
+
+    const refreshedLease = await refreshStorePriceMatchProposalProcessingLease({
+      proposalId: existingProposal.id,
+      processingToken,
+    });
+
+    if (!refreshedLease) {
+      return await reloadStorePriceMatchProposal(existingProposal.id);
+    }
+  }
+
   let extractedLabel: ExtractedBottleDetails | null = null;
   let candidates: PriceMatchCandidate[] = [];
   let searchEvidence: SearchEvidence[] = [];
 
   try {
-    const trustedSmwsProposal =
-      await maybeResolveTrustedSmwsStorePriceMatch(price);
+    const trustedSmwsProposal = await maybeResolveTrustedSmwsStorePriceMatch(
+      price,
+      {
+        processingToken,
+      },
+    );
     if (trustedSmwsProposal) {
       return trustedSmwsProposal;
     }
@@ -780,6 +874,7 @@ export async function resolveStorePriceMatchProposal(
         candidates: [],
         searchEvidence: [],
         statusOverride: "ignored",
+        expectedProcessingToken: processingToken,
       });
     }
 
@@ -802,6 +897,7 @@ export async function resolveStorePriceMatchProposal(
       candidates,
       decision,
       searchEvidence,
+      expectedProcessingToken: processingToken,
     });
 
     if (
@@ -818,6 +914,17 @@ export async function resolveStorePriceMatchProposal(
           `Unable to auto-create price match proposal without a proposed bottle (${proposal.id}).`,
         );
       }
+
+      if (
+        processingToken &&
+        !(await canContinueStorePriceMatchProcessing(
+          proposal.id,
+          processingToken,
+        ))
+      ) {
+        return await reloadStorePriceMatchProposal(proposal.id);
+      }
+
       await createBottleFromStorePriceMatchProposal({
         proposalId: proposal.id,
         input: buildBottleInputFromProposedBottle(proposedBottle),
@@ -844,6 +951,7 @@ export async function resolveStorePriceMatchProposal(
         searchEvidence,
         error: err instanceof Error ? err.message : "Unknown auto-create error",
         statusOverride: "errored",
+        expectedProcessingToken: processingToken,
       });
     }
   } catch (err) {
@@ -866,7 +974,15 @@ export async function resolveStorePriceMatchProposal(
           ? err.searchEvidence
           : searchEvidence,
       error: err instanceof Error ? err.message : "Unknown classifier error",
+      expectedProcessingToken: processingToken,
     });
+  } finally {
+    if (processingToken && existingProposal) {
+      await releaseStorePriceMatchProposalProcessingLease({
+        proposalId: existingProposal.id,
+        processingToken,
+      });
+    }
   }
 }
 
@@ -907,6 +1023,10 @@ export async function getStorePriceMatchProposalForReviewInTransaction(
     );
   }
 
+  if (hasActiveStorePriceMatchProposalProcessingLease(row.proposal)) {
+    throw new StorePriceMatchProposalAlreadyProcessingError(proposalId);
+  }
+
   if (
     expectedProposalType &&
     row.proposal.proposalType !== expectedProposalType
@@ -944,6 +1064,9 @@ async function markApprovedStorePriceMatchProposalsInTransaction(
       status = 'approved',
       current_bottle_id = ${bottleId},
       suggested_bottle_id = ${bottleId},
+      processing_token = NULL,
+      processing_queued_at = NULL,
+      processing_expires_at = NULL,
       proposal_type = CASE
         WHEN ${storePriceMatchProposals.id} = ${proposalId}
           THEN ${storePriceMatchProposals.proposalType}
@@ -957,6 +1080,7 @@ async function markApprovedStorePriceMatchProposalsInTransaction(
     WHERE ${storePrices.id} = ${storePriceMatchProposals.priceId}
       AND LOWER(${storePrices.name}) = LOWER(${name})
       AND ${storePriceMatchProposals.status} IN ('pending_review', 'errored')
+      AND (${storePriceMatchProposals.processingExpiresAt} IS NULL OR ${storePriceMatchProposals.processingExpiresAt} <= NOW())
   `);
 }
 
@@ -1053,6 +1177,9 @@ export async function ignoreStorePriceMatchProposal({
         reviewedById,
         reviewedAt: sql`NOW()`,
         updatedAt: sql`NOW()`,
+        processingToken: null,
+        processingQueuedAt: null,
+        processingExpiresAt: null,
         error: null,
       })
       .where(eq(storePriceMatchProposals.id, proposalId));

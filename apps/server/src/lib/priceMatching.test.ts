@@ -8,6 +8,7 @@ import {
   storePrices,
 } from "@peated/server/db/schema";
 import {
+  applyApprovedStorePriceMatch,
   findStorePriceMatchCandidates,
   resolveStorePriceMatchProposal,
 } from "@peated/server/lib/priceMatching";
@@ -744,6 +745,74 @@ describe("priceMatching", () => {
         distillerId: distiller.id,
       }),
     ]);
+  });
+
+  test("trusted SMWS matching requires the canonical bottle name to preserve the parsed cask code", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+
+    const site = await fixtures.ExternalSiteOrExisting({ type: "smws" });
+    const brand = await fixtures.Entity({
+      name: "The Scotch Malt Whisky Society",
+      shortName: "SMWS",
+      type: ["brand", "bottler"],
+    });
+    const distiller = await fixtures.Entity({
+      name: "Kyrö",
+      type: ["distiller"],
+    });
+    const mismatchedBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      distillerIds: [distiller.id],
+      name: "Sauna Smoke",
+      category: "rye",
+      singleCask: true,
+    });
+    const price = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      bottleId: null,
+      name: "SMWS RW6.5 Sauna Smoke",
+      imageUrl: null,
+      url: "https://smws.example/rw6-5-name-invariant",
+    });
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const createdBottle = await db.query.bottles.findFirst({
+      where: eq(bottles.id, proposal.suggestedBottleId!),
+    });
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+
+    expect(extractFromText).not.toHaveBeenCalled();
+    expect(classifyStorePriceMatch).not.toHaveBeenCalled();
+    expect(proposal).toMatchObject({
+      status: "approved",
+      proposalType: "create_new",
+      suggestedBottleId: expect.any(Number),
+    });
+    expect(proposal.suggestedBottleId).not.toBe(mismatchedBottle.id);
+    expect(createdBottle).toMatchObject({
+      name: "RW6.5 Sauna Smoke",
+      fullName: "SMWS RW6.5 Sauna Smoke",
+      brandId: brand.id,
+    });
+    expect(updatedPrice?.bottleId).toBe(proposal.suggestedBottleId);
   });
 
   test("auto creates high-confidence web-validated new bottles", async ({
@@ -1839,5 +1908,142 @@ describe("priceMatching", () => {
         }),
       ]),
     );
+  });
+
+  test("clears retry processing leases after forced resolution", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+    const price = await fixtures.StorePrice({
+      name: "Retry Lease Candidate",
+      imageUrl: null,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "errored",
+        proposalType: "no_match",
+        processingToken: "lease-token",
+        processingQueuedAt: new Date(Date.now() - 60_000),
+        processingExpiresAt: new Date(Date.now() + 10 * 60_000),
+      })
+      .returning();
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Retry Brand",
+      expression: "Retry Lease Candidate",
+      series: null,
+      distillery: null,
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyStorePriceMatch).mockResolvedValue({
+      decision: {
+        action: "no_match",
+        confidence: 35,
+        rationale: "Still no confident match.",
+        suggestedBottleId: null,
+        candidateBottleIds: [],
+        proposedBottle: null,
+      },
+      searchEvidence: [],
+      candidateBottles: [],
+      resolvedEntities: [],
+    });
+
+    await resolveStorePriceMatchProposal(price.id, {
+      force: true,
+      processingToken: "lease-token",
+    });
+
+    const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
+      where: eq(storePriceMatchProposals.id, proposal.id),
+    });
+
+    expect(updatedProposal).toMatchObject({
+      status: "pending_review",
+      processingToken: null,
+      processingQueuedAt: null,
+      processingExpiresAt: null,
+    });
+  });
+
+  test("approval fanout skips proposals that are currently processing", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User();
+    const bottle = await fixtures.Bottle();
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const firstPrice = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Fanout Candidate",
+      volume: 750,
+    });
+    const secondPrice = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Fanout Candidate",
+      volume: 1000,
+    });
+    const [reviewableProposal, processingProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values([
+        {
+          priceId: firstPrice.id,
+          status: "pending_review",
+          proposalType: "match_existing",
+        },
+        {
+          priceId: secondPrice.id,
+          status: "pending_review",
+          proposalType: "match_existing",
+          processingToken: "lease-token",
+          processingQueuedAt: new Date(Date.now() - 60_000),
+          processingExpiresAt: new Date(Date.now() + 10 * 60_000),
+        },
+      ])
+      .returning();
+
+    await applyApprovedStorePriceMatch({
+      proposalId: reviewableProposal.id,
+      bottleId: bottle.id,
+      reviewedById: user.id,
+    });
+
+    const updatedReviewableProposal =
+      await db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, reviewableProposal.id),
+      });
+    const updatedProcessingProposal =
+      await db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, processingProposal.id),
+      });
+
+    expect(updatedReviewableProposal).toMatchObject({
+      status: "approved",
+      suggestedBottleId: bottle.id,
+      processingToken: null,
+      processingQueuedAt: null,
+      processingExpiresAt: null,
+    });
+    expect(updatedProcessingProposal).toMatchObject({
+      status: "pending_review",
+      suggestedBottleId: null,
+      processingToken: "lease-token",
+    });
   });
 });

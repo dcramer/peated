@@ -9,6 +9,7 @@ import {
 import {
   createBottleFromStorePriceMatchProposal,
   InvalidStorePriceMatchProposalTypeError,
+  StorePriceMatchProposalAlreadyProcessingError,
   StorePriceMatchProposalNotReviewableError,
   UnknownStorePriceMatchProposalError,
 } from "@peated/server/lib/priceMatching";
@@ -53,6 +54,12 @@ export default procedure
       }
 
       if (err instanceof StorePriceMatchProposalNotReviewableError) {
+        throw errors.CONFLICT({
+          message: err.message,
+        });
+      }
+
+      if (err instanceof StorePriceMatchProposalAlreadyProcessingError) {
         throw errors.CONFLICT({
           message: err.message,
         });
