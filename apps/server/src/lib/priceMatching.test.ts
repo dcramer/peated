@@ -747,6 +747,92 @@ describe("priceMatching", () => {
     ]);
   });
 
+  test("trusted SMWS auto approval succeeds while a retry lease is active", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+
+    const site = await fixtures.ExternalSiteOrExisting({ type: "smws" });
+    const brand = await fixtures.Entity({
+      name: "The Scotch Malt Whisky Society",
+      shortName: null,
+      type: ["brand", "bottler"],
+    });
+    const distiller = await fixtures.Entity({
+      name: "Kyrö",
+      type: ["distiller"],
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      distillerIds: [distiller.id],
+      name: "RW6.5 Sauna Smoke",
+      category: "rye",
+      singleCask: true,
+    });
+    const price = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      bottleId: null,
+      name: "SMWS RW6.5 Sauna Smoke",
+      imageUrl: null,
+      url: "https://smws.example/rw6-5-processing",
+    });
+    const [existingProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "errored",
+        proposalType: "no_match",
+        processingToken: "lease-token",
+        processingQueuedAt: new Date(Date.now() - 60_000),
+        processingExpiresAt: new Date(Date.now() + 10 * 60_000),
+      })
+      .returning();
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id, {
+      force: true,
+      processingToken: "lease-token",
+    });
+    const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
+      where: eq(storePriceMatchProposals.id, existingProposal.id),
+    });
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+
+    expect(extractFromText).not.toHaveBeenCalled();
+    expect(classifyStorePriceMatch).not.toHaveBeenCalled();
+    expect(proposal).toMatchObject({
+      status: "approved",
+      proposalType: "match_existing",
+      currentBottleId: bottle.id,
+      suggestedBottleId: bottle.id,
+    });
+    expect(updatedProposal).toMatchObject({
+      status: "approved",
+      proposalType: "match_existing",
+      currentBottleId: bottle.id,
+      suggestedBottleId: bottle.id,
+      processingToken: null,
+      processingQueuedAt: null,
+      processingExpiresAt: null,
+    });
+    expect(updatedPrice?.bottleId).toBe(bottle.id);
+  });
+
   test("trusted SMWS matching requires the canonical bottle name to preserve the parsed cask code", async ({
     fixtures,
   }) => {
@@ -928,6 +1014,140 @@ describe("priceMatching", () => {
       fullName: "Auto Brand Web Reserve",
     });
     expect(listingAlias?.bottleId).toBe(proposal.suggestedBottleId);
+  });
+
+  test("auto creates high-confidence bottles while a retry lease is active", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Retry Auto Create Candidate",
+      imageUrl: null,
+    });
+    const [existingProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "errored",
+        proposalType: "no_match",
+        processingToken: "lease-token",
+        processingQueuedAt: new Date(Date.now() - 60_000),
+        processingExpiresAt: new Date(Date.now() + 10 * 60_000),
+      })
+      .returning();
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Retry Auto Brand",
+      expression: "Lease Reserve",
+      series: null,
+      distillery: ["Retry Auto Distillery"],
+      category: "single_malt",
+      stated_age: 12,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyStorePriceMatch).mockResolvedValue({
+      decision: {
+        action: "create_new",
+        confidence: 92,
+        rationale: "Web evidence confirms a distinct release.",
+        suggestedBottleId: null,
+        candidateBottleIds: [],
+        proposedBottle: {
+          name: "Lease Reserve",
+          series: null,
+          category: "single_malt",
+          edition: null,
+          statedAge: 12,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          brand: {
+            id: null,
+            name: "Retry Auto Brand",
+          },
+          distillers: [
+            {
+              id: null,
+              name: "Retry Auto Distillery",
+            },
+          ],
+          bottler: null,
+        },
+      },
+      searchEvidence: [
+        {
+          query: '"Retry Auto Brand" "Lease Reserve" whisky',
+          results: [
+            {
+              title: "Retry Auto Brand Lease Reserve",
+              url: "https://example.com/retry-auto-create",
+              description: "Retailer listing",
+              extraSnippets: [],
+            },
+          ],
+        },
+      ],
+      candidateBottles: [],
+      resolvedEntities: [],
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id, {
+      force: true,
+      processingToken: "lease-token",
+    });
+    const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
+      where: eq(storePriceMatchProposals.id, existingProposal.id),
+    });
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+    const createdBottle = await db.query.bottles.findFirst({
+      where: eq(bottles.id, proposal.suggestedBottleId!),
+    });
+
+    expect(proposal).toMatchObject({
+      status: "approved",
+      proposalType: "create_new",
+      suggestedBottleId: expect.any(Number),
+    });
+    expect(updatedProposal).toMatchObject({
+      status: "approved",
+      proposalType: "create_new",
+      suggestedBottleId: proposal.suggestedBottleId,
+      processingToken: null,
+      processingQueuedAt: null,
+      processingExpiresAt: null,
+    });
+    expect(updatedPrice?.bottleId).toBe(proposal.suggestedBottleId);
+    expect(createdBottle).toMatchObject({
+      name: "Lease Reserve",
+      fullName: "Retry Auto Brand Lease Reserve",
+    });
   });
 
   test("auto creates new bottles even when replacing an existing assignment", async ({

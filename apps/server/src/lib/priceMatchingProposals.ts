@@ -553,6 +553,7 @@ async function maybeResolveTrustedSmwsStorePriceMatch(
         proposalId: proposal.id,
         bottleId: existingBottleId,
         reviewedById: automationUser.id,
+        expectedProcessingToken: processingToken,
       });
     } else {
       const proposedBottle =
@@ -567,6 +568,7 @@ async function maybeResolveTrustedSmwsStorePriceMatch(
         proposalId: proposal.id,
         input: buildBottleInputFromProposedBottle(proposedBottle),
         user: automationUser,
+        expectedProcessingToken: processingToken,
       });
     }
 
@@ -737,16 +739,19 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     proposalId,
     input,
     user,
+    expectedProcessingToken,
   }: {
     proposalId: number;
     input: z.infer<typeof BottleInputSchema>;
     user: User;
+    expectedProcessingToken?: string;
   },
 ) {
   const proposal = await getStorePriceMatchProposalForReviewInTransaction(tx, {
     proposalId,
     expectedProposalType: "create_new",
     allowedStatuses: ["pending_review"],
+    expectedProcessingToken,
   });
   const createResult = await createBottleInTransaction(tx, {
     input,
@@ -773,16 +778,19 @@ export async function createBottleFromStorePriceMatchProposal({
   proposalId,
   input,
   user,
+  expectedProcessingToken,
 }: {
   proposalId: number;
   input: z.infer<typeof BottleInputSchema>;
   user: User;
+  expectedProcessingToken?: string;
 }) {
   const result = await db.transaction(async (tx) =>
     createBottleFromStorePriceMatchProposalInTransaction(tx, {
       proposalId,
       input,
       user,
+      expectedProcessingToken,
     }),
   );
 
@@ -929,6 +937,7 @@ export async function resolveStorePriceMatchProposal(
         proposalId: proposal.id,
         input: buildBottleInputFromProposedBottle(proposedBottle),
         user: automationUser,
+        expectedProcessingToken: processingToken,
       });
 
       return await reloadStorePriceMatchProposal(proposal.id);
@@ -992,10 +1001,12 @@ export async function getStorePriceMatchProposalForReviewInTransaction(
     proposalId,
     expectedProposalType,
     allowedStatuses = REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES,
+    expectedProcessingToken,
   }: {
     proposalId: number;
     expectedProposalType?: StorePriceMatchProposal["proposalType"];
     allowedStatuses?: readonly StorePriceMatchProposal["status"][];
+    expectedProcessingToken?: string;
   },
 ): Promise<StorePriceMatchProposalForReview> {
   const [row] = await tx
@@ -1023,7 +1034,17 @@ export async function getStorePriceMatchProposalForReviewInTransaction(
     );
   }
 
-  if (hasActiveStorePriceMatchProposalProcessingLease(row.proposal)) {
+  const hasActiveProcessingLease =
+    hasActiveStorePriceMatchProposalProcessingLease(row.proposal);
+
+  if (expectedProcessingToken) {
+    if (
+      !hasActiveProcessingLease ||
+      row.proposal.processingToken !== expectedProcessingToken
+    ) {
+      throw new StorePriceMatchProposalAlreadyProcessingError(proposalId);
+    }
+  } else if (hasActiveProcessingLease) {
     throw new StorePriceMatchProposalAlreadyProcessingError(proposalId);
   }
 
@@ -1058,6 +1079,22 @@ async function markApprovedStorePriceMatchProposalsInTransaction(
     reviewedById: number;
   },
 ) {
+  await tx
+    .update(storePriceMatchProposals)
+    .set({
+      status: "approved",
+      currentBottleId: bottleId,
+      suggestedBottleId: bottleId,
+      processingToken: null,
+      processingQueuedAt: null,
+      processingExpiresAt: null,
+      reviewedById,
+      reviewedAt: sql`NOW()`,
+      updatedAt: sql`NOW()`,
+      error: null,
+    })
+    .where(eq(storePriceMatchProposals.id, proposalId));
+
   await tx.execute(sql`
     UPDATE ${storePriceMatchProposals}
     SET
@@ -1067,17 +1104,14 @@ async function markApprovedStorePriceMatchProposalsInTransaction(
       processing_token = NULL,
       processing_queued_at = NULL,
       processing_expires_at = NULL,
-      proposal_type = CASE
-        WHEN ${storePriceMatchProposals.id} = ${proposalId}
-          THEN ${storePriceMatchProposals.proposalType}
-        ELSE 'match_existing'::store_price_match_proposal_type
-      END,
+      proposal_type = 'match_existing'::store_price_match_proposal_type,
       reviewed_by_id = ${reviewedById},
       reviewed_at = NOW(),
       updated_at = NOW(),
       error = NULL
     FROM ${storePrices}
     WHERE ${storePrices.id} = ${storePriceMatchProposals.priceId}
+      AND ${storePriceMatchProposals.id} <> ${proposalId}
       AND LOWER(${storePrices.name}) = LOWER(${name})
       AND ${storePriceMatchProposals.status} IN ('pending_review', 'errored')
       AND (${storePriceMatchProposals.processingExpiresAt} IS NULL OR ${storePriceMatchProposals.processingExpiresAt} <= NOW())
@@ -1117,14 +1151,17 @@ export async function applyApprovedStorePriceMatchInTransaction(
     proposalId,
     bottleId,
     reviewedById,
+    expectedProcessingToken,
   }: {
     proposalId: number;
     bottleId: number;
     reviewedById: number;
+    expectedProcessingToken?: string;
   },
 ) {
   const proposal = await getStorePriceMatchProposalForReviewInTransaction(tx, {
     proposalId,
+    expectedProcessingToken,
   });
 
   return await applyApprovedStorePriceMatchProposalInTransaction(tx, {
@@ -1138,16 +1175,19 @@ export async function applyApprovedStorePriceMatch({
   proposalId,
   bottleId,
   reviewedById,
+  expectedProcessingToken,
 }: {
   proposalId: number;
   bottleId: number;
   reviewedById: number;
+  expectedProcessingToken?: string;
 }) {
   const aliasResult = await db.transaction(async (tx) =>
     applyApprovedStorePriceMatchInTransaction(tx, {
       proposalId,
       bottleId,
       reviewedById,
+      expectedProcessingToken,
     }),
   );
 

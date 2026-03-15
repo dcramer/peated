@@ -65,7 +65,7 @@ function getEvidenceBadges(item: QueueItem): string[] {
   const badges: string[] = [];
 
   if (item.status === "errored") {
-    badges.push("classifier error");
+    badges.push("evaluation error");
   } else if (item.searchEvidence.length > 0) {
     badges.push("web validated");
   } else {
@@ -120,7 +120,7 @@ function getExtractedLabelSummary(item: QueueItem): string[] {
 
 function getRecommendationTitle(item: QueueItem): string {
   if (item.status === "errored") {
-    return "Review classifier failure";
+    return "No recommendation available";
   }
 
   if (item.suggestedBottle) {
@@ -132,6 +132,14 @@ function getRecommendationTitle(item: QueueItem): string {
   }
 
   return "No strong suggestion";
+}
+
+function getRecommendationHeading(item: QueueItem): string {
+  if (item.status === "errored") {
+    return "Review Status";
+  }
+
+  return "Recommended Outcome";
 }
 
 function getCandidateScoreLabel(candidate: Candidate): string | null {
@@ -312,7 +320,7 @@ export default function QueueItemCard({
         <section className="space-y-4">
           <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
             <div className="text-muted text-xs font-semibold uppercase tracking-wide">
-              Recommended Outcome
+              {getRecommendationHeading(item)}
             </div>
             <div className="mt-2 text-base font-semibold text-white">
               {item.suggestedBottle ? (
