@@ -390,6 +390,89 @@ describe("priceMatching", () => {
     expect(proposal.confidence).toBe(89);
   });
 
+  test("normalizes proposed bottle drafts before persisting create_new proposals", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Normalized Draft Candidate",
+      imageUrl: null,
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Normalized Brand",
+      expression: "8 Year",
+      series: null,
+      distillery: ["Normalized Distillery"],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyStorePriceMatch).mockResolvedValue({
+      decision: {
+        action: "create_new",
+        confidence: 85,
+        rationale: "The listing looks like a distinct release.",
+        suggestedBottleId: null,
+        candidateBottleIds: [],
+        proposedBottle: {
+          name: "Normalized Brand 8 year",
+          series: null,
+          category: "single_malt",
+          edition: null,
+          statedAge: null,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          brand: {
+            id: null,
+            name: "Normalized Brand",
+          },
+          distillers: [
+            {
+              id: null,
+              name: "Normalized Distillery",
+            },
+          ],
+          bottler: null,
+        },
+      },
+      searchEvidence: [],
+      candidateBottles: [],
+      resolvedEntities: [],
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(proposal.status).toBe("pending_review");
+    expect(proposal.proposedBottle).toMatchObject({
+      name: "8-year-old",
+      statedAge: 8,
+      brand: {
+        name: "Normalized Brand",
+      },
+    });
+  });
+
   test("treats unknown or spirit create_new categories as review-only", async ({
     fixtures,
   }) => {

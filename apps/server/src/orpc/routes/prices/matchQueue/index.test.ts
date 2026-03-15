@@ -339,15 +339,15 @@ describe("price match queue", () => {
         confidence: 88,
         extractedLabel: {
           brand: "Independent Brand",
-          expression: "Cask Strength",
+          expression: "8 Year",
           category: "single_malt",
-          stated_age: 12,
+          stated_age: null,
           distillery: ["Ben Nevis"],
         },
         proposedBottle: {
-          name: "Independent Brand Cask Strength",
+          name: "Independent Brand 8 year",
           category: "single_malt",
-          statedAge: 12,
+          statedAge: null,
           brand: {
             name: "Independent Brand",
             type: ["brand"],
@@ -389,12 +389,12 @@ describe("price match queue", () => {
       },
       extractedLabel: {
         brand: "Independent Brand",
-        expression: "Cask Strength",
-        stated_age: 12,
+        expression: "8 Year",
+        stated_age: null,
       },
       proposedBottle: {
-        name: "Cask Strength",
-        statedAge: 12,
+        name: "8-year-old",
+        statedAge: 8,
         brand: {
           name: "Independent Brand",
         },

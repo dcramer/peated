@@ -24,16 +24,13 @@ import {
   finalizeCreatedBottle,
 } from "@peated/server/lib/createBottle";
 import { logError } from "@peated/server/lib/log";
-import {
-  normalizeBottle,
-  normalizeString,
-  stripDuplicateBrandPrefixFromBottleName,
-} from "@peated/server/lib/normalize";
+import { normalizeBottle, normalizeString } from "@peated/server/lib/normalize";
 import {
   extractStorePriceBottleDetails,
   findStorePriceMatchCandidates,
   getBottleMatchCandidateById,
 } from "@peated/server/lib/priceMatchingCandidates";
+import { normalizeProposedBottleDraft } from "@peated/server/lib/priceMatchingDraftNormalization";
 import {
   hasActiveStorePriceMatchProposalProcessingLease,
   refreshStorePriceMatchProposalProcessingLease,
@@ -203,12 +200,8 @@ function sanitizeStorePriceMatchDecision(
       confidence: boundedConfidence,
       suggestedBottleId: null,
       candidateBottleIds: filteredCandidateBottleIds,
-      proposedBottle: {
+      proposedBottle: normalizeProposedBottleDraft({
         ...decision.proposedBottle,
-        name: stripDuplicateBrandPrefixFromBottleName(
-          decision.proposedBottle.name,
-          brand.name,
-        ),
         category:
           decision.proposedBottle.category === "spirit"
             ? null
@@ -222,7 +215,7 @@ function sanitizeStorePriceMatchDecision(
         brand,
         distillers,
         bottler,
-      },
+      }),
     };
   }
 
@@ -600,16 +593,18 @@ async function maybeResolveTrustedSmwsStorePriceMatch(
 function buildBottleInputFromProposedBottle(
   proposedBottle: NonNullable<StorePriceMatchDecision["proposedBottle"]>,
 ): z.infer<typeof BottleInputSchema> {
+  const normalizedProposedBottle = normalizeProposedBottleDraft(proposedBottle);
+
   return {
-    ...proposedBottle,
-    series: proposedBottle.series
-      ? (proposedBottle.series.id ?? {
-          name: proposedBottle.series.name,
+    ...normalizedProposedBottle,
+    series: normalizedProposedBottle.series
+      ? (normalizedProposedBottle.series.id ?? {
+          name: normalizedProposedBottle.series.name,
           description: null,
         })
       : null,
-    brand: proposedBottle.brand.id ?? {
-      name: proposedBottle.brand.name,
+    brand: normalizedProposedBottle.brand.id ?? {
+      name: normalizedProposedBottle.brand.name,
       type: ["brand"],
       description: null,
       shortName: null,
@@ -620,7 +615,7 @@ function buildBottleInputFromProposedBottle(
       country: null,
       region: null,
     },
-    distillers: proposedBottle.distillers.map(
+    distillers: normalizedProposedBottle.distillers.map(
       (distiller) =>
         distiller.id ?? {
           name: distiller.name,
@@ -635,9 +630,9 @@ function buildBottleInputFromProposedBottle(
           region: null,
         },
     ),
-    bottler: proposedBottle.bottler
-      ? (proposedBottle.bottler.id ?? {
-          name: proposedBottle.bottler.name,
+    bottler: normalizedProposedBottle.bottler
+      ? (normalizedProposedBottle.bottler.id ?? {
+          name: normalizedProposedBottle.bottler.name,
           type: ["bottler"],
           description: null,
           shortName: null,
