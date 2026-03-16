@@ -904,7 +904,11 @@ async function enrichPriceMatchCandidates(
     candidate.caskFill ??=
       preferredRelease?.caskFill ?? bottleMetadata.caskFill;
 
-    if (preferredRelease && candidate.releaseId !== null) {
+    if (
+      preferredRelease &&
+      (candidate.releaseId !== null ||
+        hasReleaseSpecificIdentity(extractedLabel))
+    ) {
       candidate.source = Array.from(new Set([...candidate.source, "release"]));
     }
   }
@@ -1325,6 +1329,19 @@ async function getExactBottleCandidate(
   );
 }
 
+async function getExactBottleCandidateByNames(
+  normalizedNames: string[],
+): Promise<PriceMatchCandidate | null> {
+  for (const normalizedName of normalizedNames) {
+    const candidate = await getExactBottleCandidate(normalizedName);
+    if (candidate) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
 export async function findStorePriceMatchCandidates(
   price: Pick<StorePrice, "name" | "bottleId"> & { releaseId?: number | null },
   extractedLabel: ExtractedBottleDetails | null,
@@ -1363,8 +1380,14 @@ export async function findBottleMatchCandidates(
   }
 
   const extractedLabel = buildSearchLabel(input);
-  const exactSearchName = getNormalizedPriceName(input.query ?? searchName);
   const normalizedName = getNormalizedPriceName(searchName);
+  const exactSearchNames = Array.from(
+    new Set(
+      [normalizedName, input.query ? getNormalizedPriceName(input.query) : null]
+        .filter((value): value is string => Boolean(value))
+        .map((value) => value.toLowerCase()),
+    ),
+  );
   const queryText = buildQueryText(normalizedName, extractedLabel);
   const candidates = new Map<string, PriceMatchCandidate>();
 
@@ -1416,7 +1439,7 @@ export async function findBottleMatchCandidates(
       "exact",
       searchName,
       null as PriceMatchCandidate | null,
-      async () => await getExactBottleCandidate(exactSearchName),
+      async () => await getExactBottleCandidateByNames(exactSearchNames),
     ),
   ]);
 
