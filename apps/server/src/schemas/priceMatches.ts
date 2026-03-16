@@ -1,5 +1,10 @@
 import { z } from "zod";
 import { CATEGORY_LIST } from "../constants";
+import { DEFAULT_PRICE_MATCH_CREATION_TARGET } from "../lib/bottleSchemaRules";
+import {
+  BottleReleaseInputSchema,
+  BottleReleaseSchema,
+} from "./bottleReleases";
 import { BottleSchema } from "./bottles";
 import {
   CaskFillEnum,
@@ -13,6 +18,7 @@ import { StorePriceSchema } from "./stores";
 
 export const ExtractedBottleDetailsSchema = z.object({
   brand: z.string().nullable().default(null),
+  bottler: z.string().nullable().default(null),
   expression: z.string().nullable().default(null),
   series: z.string().nullable().default(null),
   distillery: z.array(z.string()).nullable().default(null),
@@ -22,16 +28,24 @@ export const ExtractedBottleDetailsSchema = z.object({
   release_year: z.number().nullable().default(null),
   vintage_year: z.number().nullable().default(null),
   cask_type: z.string().nullable().default(null),
+  cask_size: CaskSizeEnum.nullable().default(null),
+  cask_fill: CaskFillEnum.nullable().default(null),
   cask_strength: z.boolean().nullable().default(null),
   single_cask: z.boolean().nullable().default(null),
   edition: z.string().nullable().default(null),
 });
 
 export const PriceMatchCandidateSchema = z.object({
+  kind: z.enum(["bottle", "release"]).optional(),
   bottleId: z.number().int(),
+  releaseId: z.number().int().nullable().optional(),
   alias: z.string().nullable().default(null),
   fullName: z.string(),
+  bottleFullName: z.string().nullable().optional(),
   brand: z.string().nullable().default(null),
+  bottler: z.string().nullable().default(null),
+  series: z.string().nullable().default(null),
+  distillery: z.array(z.string()).default([]),
   category: CategoryEnum.nullable().default(null),
   statedAge: z.number().min(0).max(100).nullable().default(null),
   edition: z.string().trim().nullable().default(null),
@@ -53,6 +67,8 @@ export const PriceMatchCandidateSchema = z.object({
     .nullable()
     .default(null),
   caskType: CaskTypeEnum.nullable().default(null),
+  caskSize: CaskSizeEnum.nullable().default(null),
+  caskFill: CaskFillEnum.nullable().default(null),
   score: z.number().nullable().default(null),
   source: z.array(z.string()).default([]),
 });
@@ -60,13 +76,52 @@ export const PriceMatchCandidateSchema = z.object({
 export const PriceMatchSearchResultSchema = z.object({
   title: z.string(),
   url: z.string().url(),
+  domain: z.string().nullable().default(null),
   description: z.string().nullable().default(null),
   extraSnippets: z.array(z.string()).default([]),
 });
 
 export const PriceMatchSearchEvidenceSchema = z.object({
   query: z.string(),
+  summary: z.string().nullable().default(null),
   results: z.array(PriceMatchSearchResultSchema).default([]),
+});
+
+export const PriceMatchAttributeEnum = z.enum([
+  "brand",
+  "bottler",
+  "name",
+  "series",
+  "distillery",
+  "category",
+  "statedAge",
+  "edition",
+  "caskType",
+  "caskSize",
+  "caskFill",
+  "caskStrength",
+  "singleCask",
+  "abv",
+  "vintageYear",
+  "releaseYear",
+]);
+
+export const PriceMatchEvidenceSourceTierEnum = z.enum([
+  "official",
+  "critic",
+  "retailer",
+  "origin_retailer",
+  "unknown",
+]);
+
+export const PriceMatchEvidenceCheckSchema = z.object({
+  attribute: PriceMatchAttributeEnum,
+  expectedValue: z.string(),
+  required: z.boolean().default(false),
+  validated: z.boolean().default(false),
+  weaklySupported: z.boolean().default(false),
+  matchedSourceTiers: z.array(PriceMatchEvidenceSourceTierEnum).default([]),
+  matchedSourceUrls: z.array(z.string().url()).default([]),
 });
 
 export const StorePriceMatchProposalStatusEnum = z.enum([
@@ -82,6 +137,11 @@ export const StorePriceMatchProposalTypeEnum = z.enum([
   "create_new",
   "correction",
   "no_match",
+]);
+export const PriceMatchCreationTargetEnum = z.enum([
+  "bottle",
+  "release",
+  "bottle_and_release",
 ]);
 
 export const StorePriceMatchQueueStateEnum = z.enum([
@@ -130,32 +190,143 @@ export const ProposedBottleSchema = z.object({
   bottler: ProposedEntityChoiceSchema.nullable().default(null),
 });
 
+export const ProposedReleaseSchema = BottleReleaseInputSchema.omit({
+  image: true,
+});
+
+function validateCreateNewDecisionShape(
+  value: {
+    creationTarget?: z.infer<typeof PriceMatchCreationTargetEnum> | null;
+    parentBottleId?: number | null;
+    proposedBottle?: z.infer<typeof ProposedBottleSchema> | null;
+    proposedRelease?: z.infer<typeof ProposedReleaseSchema> | null;
+  },
+  ctx: z.RefinementCtx,
+) {
+  const creationTarget =
+    value.creationTarget ?? DEFAULT_PRICE_MATCH_CREATION_TARGET;
+  const parentBottleId = value.parentBottleId ?? null;
+  const proposedRelease = value.proposedRelease ?? null;
+
+  if (creationTarget === "bottle") {
+    if (!value.proposedBottle) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["proposedBottle"],
+        message: "Bottle creation requires a proposed bottle.",
+      });
+    }
+    if (parentBottleId !== null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["parentBottleId"],
+        message: "Bottle-only creation cannot include a parent bottle.",
+      });
+    }
+    if (proposedRelease) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["proposedRelease"],
+        message: "Bottle-only creation cannot include a proposed release.",
+      });
+    }
+    return;
+  }
+
+  if (creationTarget === "release") {
+    if (!parentBottleId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["parentBottleId"],
+        message: "Release creation requires a parent bottle.",
+      });
+    }
+    if (!proposedRelease) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["proposedRelease"],
+        message: "Release creation requires a proposed release.",
+      });
+    }
+    if (value.proposedBottle) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["proposedBottle"],
+        message: "Release-only creation cannot include a proposed bottle.",
+      });
+    }
+    return;
+  }
+
+  if (!value.proposedBottle) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["proposedBottle"],
+      message: "Bottle-and-release creation requires a proposed bottle.",
+    });
+  }
+  if (!proposedRelease) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["proposedRelease"],
+      message: "Bottle-and-release creation requires a proposed release.",
+    });
+  }
+  if (parentBottleId !== null) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["parentBottleId"],
+      message:
+        "Bottle-and-release creation cannot point at an existing parent bottle.",
+    });
+  }
+}
+
 const StorePriceMatchDecisionBaseSchema = z.object({
   confidence: z.number().min(0).max(100),
   rationale: z.string().nullable().default(null),
   candidateBottleIds: z.array(z.number().int()).default([]),
 });
 
+const StorePriceMatchCreateNewDecisionSchema =
+  StorePriceMatchDecisionBaseSchema.extend({
+    action: z.literal("create_new"),
+    suggestedBottleId: z.null().default(null),
+    suggestedReleaseId: z.null().optional(),
+    parentBottleId: z.number().int().nullable().optional(),
+    creationTarget: PriceMatchCreationTargetEnum.optional(),
+    proposedBottle: ProposedBottleSchema.nullable().default(null),
+    proposedRelease: ProposedReleaseSchema.nullable().optional(),
+  }).superRefine(validateCreateNewDecisionShape);
+
 export const StorePriceMatchDecisionSchema = z.discriminatedUnion("action", [
   StorePriceMatchDecisionBaseSchema.extend({
     action: z.literal("match_existing"),
     suggestedBottleId: z.number().int(),
+    suggestedReleaseId: z.number().int().nullable().optional(),
+    parentBottleId: z.null().optional(),
+    creationTarget: z.null().optional(),
     proposedBottle: z.null().default(null),
+    proposedRelease: z.null().optional(),
   }),
   StorePriceMatchDecisionBaseSchema.extend({
     action: z.literal("correction"),
     suggestedBottleId: z.number().int(),
+    suggestedReleaseId: z.number().int().nullable().optional(),
+    parentBottleId: z.null().optional(),
+    creationTarget: z.null().optional(),
     proposedBottle: z.null().default(null),
+    proposedRelease: z.null().optional(),
   }),
-  StorePriceMatchDecisionBaseSchema.extend({
-    action: z.literal("create_new"),
-    suggestedBottleId: z.null().default(null),
-    proposedBottle: ProposedBottleSchema,
-  }),
+  StorePriceMatchCreateNewDecisionSchema,
   StorePriceMatchDecisionBaseSchema.extend({
     action: z.literal("no_match"),
     suggestedBottleId: z.null().default(null),
+    suggestedReleaseId: z.null().optional(),
+    parentBottleId: z.null().optional(),
+    creationTarget: z.null().optional(),
     proposedBottle: z.null().default(null),
+    proposedRelease: z.null().optional(),
   }),
 ]);
 
@@ -163,7 +334,11 @@ export const StorePriceMatchAgentDecisionSchema =
   StorePriceMatchDecisionBaseSchema.extend({
     action: z.enum(["match_existing", "correction", "create_new", "no_match"]),
     suggestedBottleId: z.number().int().nullable().default(null),
+    suggestedReleaseId: z.number().int().nullable().default(null),
+    parentBottleId: z.number().int().nullable().default(null),
+    creationTarget: PriceMatchCreationTargetEnum.nullable().default(null),
     proposedBottle: ProposedBottleSchema.nullable().default(null),
+    proposedRelease: ProposedReleaseSchema.nullable().default(null),
   });
 
 export const StorePriceMatchAgentResponseSchema = z.object({
@@ -175,11 +350,23 @@ export const StorePriceMatchProposalSchema = z.object({
   status: StorePriceMatchProposalStatusEnum,
   proposalType: StorePriceMatchProposalTypeEnum,
   confidence: z.number().nullable(),
+  modelConfidence: z.number().nullable(),
+  automationScore: z.number().nullable(),
+  automationEligible: z.boolean().default(false),
+  automationBlockers: z.array(z.string()).default([]),
+  decisiveMatchAttributes: z.array(PriceMatchAttributeEnum).default([]),
+  differentiatingAttributes: z.array(PriceMatchAttributeEnum).default([]),
+  webEvidenceChecks: z.array(PriceMatchEvidenceCheckSchema).default([]),
   currentBottleId: z.number().nullable(),
+  currentReleaseId: z.number().nullable(),
   suggestedBottleId: z.number().nullable(),
+  suggestedReleaseId: z.number().nullable(),
+  parentBottleId: z.number().nullable(),
+  creationTarget: PriceMatchCreationTargetEnum.nullable(),
   candidateBottles: z.array(PriceMatchCandidateSchema),
   extractedLabel: ExtractedBottleDetailsSchema.nullable(),
   proposedBottle: ProposedBottleSchema.nullable(),
+  proposedRelease: ProposedReleaseSchema.nullable(),
   searchEvidence: z.array(PriceMatchSearchEvidenceSchema),
   rationale: z.string().nullable(),
   model: z.string().nullable(),
@@ -199,7 +386,10 @@ export const StorePriceMatchQueueItemSchema =
       site: ExternalSiteSchema,
     }),
     currentBottle: BottleSchema.nullable(),
+    currentRelease: BottleReleaseSchema.nullable(),
     suggestedBottle: BottleSchema.nullable(),
+    suggestedRelease: BottleReleaseSchema.nullable(),
+    parentBottle: BottleSchema.nullable(),
   });
 
 export const StorePriceMatchQueueListResponse = z.object({

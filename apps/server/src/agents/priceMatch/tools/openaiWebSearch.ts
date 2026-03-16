@@ -10,14 +10,23 @@ const OpenAIWebSearchArgsSchema = z.object({
     .trim()
     .min(1)
     .describe(
-      "A focused web search query for corroborating bottle evidence. Prefer retailer, producer, or distillery terms over broad whisky keywords.",
+      "A focused web search query for corroborating bottle evidence. Prefer producer, distillery, bottler, or importer terms over broad whisky keywords, and search for the exact trait that needs validation.",
     ),
 });
 
 type SearchEvidence = z.infer<typeof PriceMatchSearchEvidenceSchema>;
 
+function getResultDomain(url: string) {
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+    return hostname.startsWith("www.") ? hostname.slice(4) : hostname;
+  } catch {
+    return null;
+  }
+}
+
 function extractEvidence(query: string, response: any): SearchEvidence {
-  const summary = response.output_text?.trim().slice(0, 240) || null;
+  const summary = response.output_text?.trim().slice(0, 600) || null;
   const seen = new Set<string>();
   const results: SearchEvidence["results"] = [];
 
@@ -35,6 +44,7 @@ function extractEvidence(query: string, response: any): SearchEvidence {
         results.push({
           title: annotation.title || annotation.url,
           url: annotation.url,
+          domain: getResultDomain(annotation.url),
           description: summary,
           extraSnippets: [],
         });
@@ -44,6 +54,7 @@ function extractEvidence(query: string, response: any): SearchEvidence {
 
   return PriceMatchSearchEvidenceSchema.parse({
     query,
+    summary,
     results,
   });
 }
@@ -62,7 +73,7 @@ export function createOpenAIWebSearchTool({
   return tool({
     name: "openai_web_search",
     description:
-      "Search the live web using OpenAI's native web search capability. Use this only after local bottle and entity search are still ambiguous or conflicting. Use it to validate whether a listing is a real distinct bottling, not as the first way to discover candidates. Prefer retailer-domain and producer-domain queries before broad web searches.",
+      "Search the live web using OpenAI's native web search capability. Use this only after local bottle and entity search are still ambiguous or conflicting. Use it to validate the bottle or release traits that make a match safe. Prefer official producer, distillery, bottler, or importer domains first, then critics or publications, and treat retailer listings as weak corroboration.",
     parameters: OpenAIWebSearchArgsSchema,
     execute: async (args) => {
       if (searchCalls >= maxQueries) {
@@ -76,7 +87,7 @@ export function createOpenAIWebSearchTool({
       const response = await client.responses.create({
         model: config.OPENAI_MODEL,
         instructions:
-          "Search the web for corroborating evidence about a spirits bottle listing and answer with a short cited summary.",
+          "Search the web for authoritative evidence about a spirits bottle listing. Prefer official producer, distillery, bottler, or importer domains first, then critics or publications. Do not treat the originating retailer as decisive proof. In the cited summary, explicitly mention which bottle or release traits the sources confirm, such as distillery, bottler, cask finish, cask size, cask fill, ABV, age, edition, or release year, and call out any traits the sources do not confirm.",
         input: [
           {
             role: "user",

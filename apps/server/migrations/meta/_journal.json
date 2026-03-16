@@ -1191,6 +1191,13 @@
       "when": 1773517619526,
       "tag": "0169_windy_moon_knight",
       "breakpoints": false
+    },
+    {
+      "idx": 170,
+      "version": "7",
+      "when": 1773617816346,
+      "tag": "0170_old_secret_warriors",
+      "breakpoints": false
     }
   ]
 }

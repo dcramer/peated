@@ -14,13 +14,23 @@ export default async ({ name }: { name: string }) => {
   }
 
   if (alias.bottleId) {
+    const storePriceUpdate = alias.releaseId
+      ? db
+          .update(storePrices)
+          .set({
+            bottleId: alias.bottleId,
+            releaseId: alias.releaseId,
+          })
+          .where(eq(sql`LOWER(${storePrices.name})`, alias.name.toLowerCase()))
+      : db
+          .update(storePrices)
+          .set({
+            bottleId: alias.bottleId,
+          })
+          .where(eq(sql`LOWER(${storePrices.name})`, alias.name.toLowerCase()));
+
     await Promise.all([
-      db
-        .update(storePrices)
-        .set({
-          bottleId: alias.bottleId,
-        })
-        .where(eq(sql`LOWER(${storePrices.name})`, alias.name.toLowerCase())),
+      storePriceUpdate,
       db
         .update(reviews)
         .set({

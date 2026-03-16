@@ -131,27 +131,35 @@ export async function upsertBottleAlias(
   db: AnyDatabase,
   name: string,
   bottleId: number | null = null,
+  releaseId: number | null = null,
 ) {
-  // both of these force a useless update so RETURNING works
-  const query = bottleId
-    ? await db.execute<BottleAlias>(
-        sql`INSERT INTO ${bottleAliases} (bottle_id, name)
-      VALUES (${bottleId}, ${name})
+  // both branches force a harmless update so RETURNING works
+  const query =
+    bottleId || releaseId
+      ? await db.execute<BottleAlias>(
+          sql`INSERT INTO ${bottleAliases} (bottle_id, release_id, name)
+      VALUES (${bottleId}, ${releaseId}, ${name})
       ON CONFLICT (LOWER(name))
-      DO UPDATE SET bottle_id =
-        CASE WHEN ${bottleAliases.bottleId} IS NULL
-          THEN EXCLUDED.bottle_id
-          ELSE ${bottleAliases.bottleId}
-        END
+      DO UPDATE SET
+        bottle_id = CASE
+          WHEN ${bottleAliases.bottleId} IS NULL
+            THEN EXCLUDED.bottle_id
+            ELSE ${bottleAliases.bottleId}
+          END,
+        release_id = CASE
+          WHEN ${bottleAliases.releaseId} IS NULL
+            THEN EXCLUDED.release_id
+            ELSE ${bottleAliases.releaseId}
+          END
       RETURNING *`,
-      )
-    : await db.execute<BottleAlias>(
-        sql`INSERT INTO ${bottleAliases} (bottle_id, name)
-      VALUES (${bottleId}, ${name})
+        )
+      : await db.execute<BottleAlias>(
+          sql`INSERT INTO ${bottleAliases} (bottle_id, release_id, name)
+      VALUES (${bottleId}, ${releaseId}, ${name})
       ON CONFLICT (LOWER(name))
       DO UPDATE SET name = ${bottleAliases.name}
       RETURNING *`,
-      );
+        );
 
   return mapRows(query.rows, bottleAliases)[0];
 

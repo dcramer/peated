@@ -131,6 +131,16 @@ export default function AddBottle() {
   );
   const { flash } = useFlashMessages();
 
+  if (
+    proposalId &&
+    proposalQuery.data?.creationTarget === "release" &&
+    proposalQuery.data.parentBottle
+  ) {
+    redirect(
+      `/bottles/${proposalQuery.data.parentBottle.id}/addRelease?proposal=${proposalId}&returnTo=${encodeURIComponent(returnTo || "/admin/queue")}`,
+    );
+  }
+
   if (loading) {
     return <Spinner />;
   }
@@ -138,18 +148,23 @@ export default function AddBottle() {
   return (
     <BottleForm
       onSubmit={async ({ image, ...data }) => {
-        const newBottle = proposalId
+        const created = proposalId
           ? await proposalBottleCreateMutation.mutateAsync({
               proposal: Number(proposalId),
               bottle: data,
+              release:
+                proposalQuery.data?.creationTarget === "bottle_and_release"
+                  ? proposalQuery.data.proposedRelease || undefined
+                  : undefined,
             })
           : await bottleCreateMutation.mutateAsync(data);
+        const createdBottle = "bottle" in created ? created.bottle : created;
 
         if (image) {
           const blob = await toBlob(image);
           try {
             await bottleImageUpdateMutation.mutateAsync({
-              bottle: newBottle.id,
+              bottle: createdBottle.id,
               file: blob,
             });
           } catch (err) {
@@ -164,7 +179,7 @@ export default function AddBottle() {
         await queryClient.invalidateQueries();
 
         if (returnTo) router.push(returnTo);
-        else router.replace(`/bottles/${newBottle.id}/addTasting`);
+        else router.replace(`/bottles/${createdBottle.id}/addTasting`);
       }}
       initialData={initialData}
       title="Add Bottle"

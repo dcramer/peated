@@ -11,6 +11,7 @@ describe("whiskyLabelGuidance", () => {
     expect(WHISKY_LABEL_COMPONENTS.map((component) => component.id)).toEqual(
       expect.arrayContaining([
         "producer",
+        "bottler",
         "distillery",
         "expression",
         "series",
@@ -50,6 +51,9 @@ describe("whiskyLabelGuidance", () => {
       "Gold Bar Black Double Cask Straight Bourbon Whiskey",
     );
     expect(instructions).toContain('"expression": "Black Double Cask"');
+    expect(instructions).toContain("bottler");
+    expect(instructions).toContain("cask_size");
+    expect(instructions).toContain("cask_fill");
     expect(instructions).toContain("cask_strength");
     expect(instructions).toContain("single_cask");
   });
@@ -76,7 +80,13 @@ describe("whiskyLabelGuidance", () => {
       "If the listing is clearly another spirit category such as vodka, gin, rum, tequila, or mezcal, return `no_match`.",
     );
     expect(instructions).toContain(
-      "If `localSearch.hasExactAliasMatch` is false and you do not have web evidence, keep `create_new` confidence below 90.",
+      "If `localSearch.hasExactAliasMatch` is false and you do not have authoritative web evidence, you can still return `create_new`, but do not assume the server will auto-create it.",
+    );
+    expect(instructions).toContain(
+      "Exact or near-exact ABV is a strong positive signal when the base identity already aligns and competing candidates do not share that ABV.",
+    );
+    expect(instructions).toContain(
+      "When ABV sharply separates one candidate from the others, let that raise confidence materially instead of treating it as a minor tiebreaker.",
     );
     expect(instructions).toContain(
       "`Barrel Strength`, `Barrel Proof`, `Full Proof`, and `Natural Strength` all imply `caskStrength: true`.",
@@ -97,10 +107,19 @@ describe("whiskyLabelGuidance", () => {
       "If `localSearch.hasExactAliasMatch` is false, no exact alias match was found for the listing.",
     );
     expect(instructions).toContain(
-      "Local candidates may include structured bottle fields such as category, age, edition, cask type, cask-strength, single-cask, ABV, and release years.",
+      "Local candidates may include structured bottle fields such as brand, bottler, distillery, series, category, age, edition, cask type, cask size, cask fill, cask-strength, single-cask, ABV, and release years.",
     );
     expect(instructions).toContain(
-      "Before returning `create_new`, use `openai_web_search` to validate that the listing appears to be a real distinct bottling unless local evidence is already decisive.",
+      "Before returning `create_new`, use `openai_web_search` to validate the bottle traits that make the listing distinct unless local evidence is already decisive.",
+    );
+    expect(instructions).toContain(
+      "When searching, prioritize official producer, distillery, bottler, or importer domains first, then critics or publications, then broader web if still unresolved.",
+    );
+    expect(instructions).toContain(
+      "Do not treat the originating retailer as decisive evidence for differentiating traits such as distillery, bottler, cask finish, cask size, cask fill, ABV, edition, or release year.",
+    );
+    expect(instructions).toContain(
+      "If the distinctness of the bottle depends on a trait such as `Port Cask Finished`, `Single Cask`, `Barrel Proof`, a specific ABV, `1st Fill`, or `Port Pipe`, the web evidence should explicitly confirm that trait.",
     );
     expect(instructions).toContain(
       "When you are leaning toward `create_new` or `no_match` because local candidates are weak, do at least one web search while search budget remains.",

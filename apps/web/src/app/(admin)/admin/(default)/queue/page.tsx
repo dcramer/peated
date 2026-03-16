@@ -135,6 +135,7 @@ export default function Page() {
       proposal: item.id,
       action: "match",
       bottle: suggestedBottle.id,
+      release: item.suggestedRelease?.id ?? null,
     });
     await refreshQueueList();
     flash(

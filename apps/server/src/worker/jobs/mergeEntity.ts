@@ -37,6 +37,7 @@ export default async function mergeEntity({
 
   const updatedBottleIds: number[] = [];
   const updatedReleaseIds: number[] = [];
+  const updatedAliasNames = new Set<string>();
   await db.transaction(async (tx) => {
     const bottleList = await tx
       .select()
@@ -83,35 +84,60 @@ export default async function mergeEntity({
           .from(bottleReleases)
           .where(eq(bottleReleases.bottleId, bottle.id));
 
-        await Promise.all(
-          releases.map(async (release) => {
-            const newName = formatReleaseName({
-              name: bottle.name,
-              edition: release.edition,
-              abv: release.abv,
-              statedAge: bottle.statedAge ? null : release.statedAge,
-              releaseYear: release.releaseYear,
-              vintageYear: release.vintageYear,
-            });
+        for (const release of releases) {
+          const newName = formatReleaseName({
+            name: bottle.name,
+            edition: release.edition,
+            abv: release.abv,
+            statedAge: bottle.statedAge ? null : release.statedAge,
+            releaseYear: release.releaseYear,
+            vintageYear: release.vintageYear,
+            singleCask: release.singleCask,
+            caskStrength: release.caskStrength,
+            caskFill: release.caskFill,
+            caskType: release.caskType,
+            caskSize: release.caskSize,
+          });
 
-            const newFullName = formatReleaseName({
-              name: fullName,
-              edition: release.edition,
-              abv: release.abv,
-              statedAge: bottle.statedAge ? null : release.statedAge,
-              releaseYear: release.releaseYear,
-              vintageYear: release.vintageYear,
-            });
+          const newFullName = formatReleaseName({
+            name: fullName,
+            edition: release.edition,
+            abv: release.abv,
+            statedAge: bottle.statedAge ? null : release.statedAge,
+            releaseYear: release.releaseYear,
+            vintageYear: release.vintageYear,
+            singleCask: release.singleCask,
+            caskStrength: release.caskStrength,
+            caskFill: release.caskFill,
+            caskType: release.caskType,
+            caskSize: release.caskSize,
+          });
 
-            return tx
-              .update(bottleReleases)
-              .set({
-                name: newName,
-                fullName: newFullName,
-              })
-              .where(eq(bottleReleases.id, release.id));
-          }),
-        );
+          await tx
+            .update(bottleReleases)
+            .set({
+              name: newName,
+              fullName: newFullName,
+            })
+            .where(eq(bottleReleases.id, release.id));
+
+          const releaseAlias = await upsertBottleAlias(
+            tx,
+            newFullName,
+            bottle.id,
+            release.id,
+          );
+          if (
+            releaseAlias.bottleId !== bottle.id ||
+            (releaseAlias.releaseId ?? null) !== release.id
+          ) {
+            throw new Error(
+              "Release alias already belongs to a different bottle.",
+            );
+          }
+
+          updatedAliasNames.add(newFullName);
+        }
         updatedReleaseIds.push(...releases.map((r) => r.id));
       }
       updatedBottleIds.push(bottle.id);
@@ -179,6 +205,22 @@ export default async function mergeEntity({
       logError(err, {
         release: {
           id: releaseId,
+        },
+      });
+    }
+  }
+
+  for (const aliasName of updatedAliasNames) {
+    try {
+      await pushUniqueJob(
+        "OnBottleAliasChange",
+        { name: aliasName },
+        { delay: 5000 },
+      );
+    } catch (err) {
+      logError(err, {
+        alias: {
+          name: aliasName,
         },
       });
     }

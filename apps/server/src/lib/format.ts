@@ -1,3 +1,7 @@
+import {
+  formatCanonicalReleaseName,
+  type ReleaseIdentityInput,
+} from "@peated/server/lib/bottleSchemaRules";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type {
   Category,
@@ -26,6 +30,11 @@ export function formatReleaseName({
   statedAge,
   releaseYear,
   vintageYear,
+  singleCask,
+  caskStrength,
+  caskFill,
+  caskType,
+  caskSize,
 }: {
   name?: string | null | undefined;
   edition?: string | null | undefined;
@@ -33,15 +42,29 @@ export function formatReleaseName({
   statedAge?: number | null | undefined;
   releaseYear?: number | null | undefined;
   vintageYear?: number | null | undefined;
+  singleCask?: boolean | null | undefined;
+  caskStrength?: boolean | null | undefined;
+  caskFill?: ReleaseIdentityInput["caskFill"] | undefined;
+  caskType?: ReleaseIdentityInput["caskType"] | undefined;
+  caskSize?: ReleaseIdentityInput["caskSize"] | undefined;
 }) {
-  const bits = [];
-  if (name) bits.push(name);
-  if (edition) bits.push(edition);
-  if (statedAge) bits.push(`${statedAge}-year-old`);
-  if (releaseYear) bits.push(`${releaseYear} Release`);
-  if (vintageYear) bits.push(`${vintageYear} Vintage`);
-  if (abv) bits.push(`${abv.toFixed(1)}% ABV`);
-  return bits.join(" - ");
+  return formatCanonicalReleaseName({
+    bottleName: name ?? "",
+    bottleFullName: name ?? "",
+    bottleStatedAge: null,
+    release: {
+      edition: edition ?? null,
+      statedAge: statedAge ?? null,
+      abv: abv ?? null,
+      releaseYear: releaseYear ?? null,
+      vintageYear: vintageYear ?? null,
+      singleCask: singleCask ?? null,
+      caskStrength: caskStrength ?? null,
+      caskFill: caskFill ?? null,
+      caskType: caskType ?? null,
+      caskSize: caskSize ?? null,
+    },
+  }).name;
 }
 
 export function formatCategoryName(

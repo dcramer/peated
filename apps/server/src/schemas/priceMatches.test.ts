@@ -6,6 +6,44 @@ import {
   StorePriceMatchDecisionSchema,
 } from "./priceMatches";
 
+const baseProposedBottle = {
+  name: "Example Bottle",
+  series: null,
+  category: "single_malt" as const,
+  edition: null,
+  statedAge: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  brand: {
+    id: null,
+    name: "Example Brand",
+  },
+  distillers: [],
+  bottler: null,
+};
+
+const baseProposedRelease = {
+  edition: "Batch 1",
+  statedAge: null,
+  abv: 58.4,
+  caskStrength: true,
+  singleCask: null,
+  vintageYear: null,
+  releaseYear: 2024,
+  caskType: "tawny_port" as const,
+  caskSize: null,
+  caskFill: null,
+  description: null,
+  tastingNotes: null,
+  imageUrl: null,
+};
+
 describe("StorePriceMatchDecisionSchema", () => {
   test("uses a flat agent response schema without a decision union", () => {
     const jsonSchema = z.toJSONSchema(
@@ -37,9 +75,13 @@ describe("StorePriceMatchDecisionSchema", () => {
         "action",
         "candidateBottleIds",
         "confidence",
+        "creationTarget",
+        "parentBottleId",
         "proposedBottle",
+        "proposedRelease",
         "rationale",
         "suggestedBottleId",
+        "suggestedReleaseId",
       ].sort(),
     );
   });
@@ -284,5 +326,103 @@ describe("StorePriceMatchDecisionSchema", () => {
         }),
       ]),
     );
+  });
+
+  test("defaults create_new proposals to bottle-only creation", () => {
+    const result = StorePriceMatchDecisionSchema.safeParse({
+      action: "create_new",
+      confidence: 91,
+      rationale: null,
+      suggestedBottleId: null,
+      candidateBottleIds: [],
+      proposedBottle: baseProposedBottle,
+    });
+
+    expect(result.success).toBe(true);
+
+    if (!result.success) {
+      throw new Error("Expected bottle-only proposal to parse");
+    }
+
+    expect(result.data.creationTarget).toBeUndefined();
+    expect(result.data.parentBottleId).toBeUndefined();
+    expect(result.data.proposedRelease).toBeUndefined();
+  });
+
+  test("rejects release creation without a parent bottle", () => {
+    const result = StorePriceMatchDecisionSchema.safeParse({
+      action: "create_new",
+      confidence: 91,
+      rationale: null,
+      suggestedBottleId: null,
+      candidateBottleIds: [],
+      creationTarget: "release",
+      proposedBottle: null,
+      proposedRelease: baseProposedRelease,
+    });
+
+    expect(result.success).toBe(false);
+
+    if (result.success) {
+      throw new Error("Expected release-only proposal validation to fail");
+    }
+
+    expect(result.error.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          path: ["parentBottleId"],
+        }),
+      ]),
+    );
+  });
+
+  test("rejects bottle-only creation when release fields are stuffed into it", () => {
+    const result = StorePriceMatchDecisionSchema.safeParse({
+      action: "create_new",
+      confidence: 91,
+      rationale: null,
+      suggestedBottleId: null,
+      candidateBottleIds: [],
+      creationTarget: "bottle",
+      proposedBottle: baseProposedBottle,
+      proposedRelease: baseProposedRelease,
+    });
+
+    expect(result.success).toBe(false);
+
+    if (result.success) {
+      throw new Error("Expected bottle-only proposal validation to fail");
+    }
+
+    expect(result.error.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          path: ["proposedRelease"],
+        }),
+      ]),
+    );
+  });
+
+  test("accepts bottle and release creation only when both payloads are present", () => {
+    const result = StorePriceMatchDecisionSchema.safeParse({
+      action: "create_new",
+      confidence: 91,
+      rationale: null,
+      suggestedBottleId: null,
+      candidateBottleIds: [],
+      creationTarget: "bottle_and_release",
+      proposedBottle: baseProposedBottle,
+      proposedRelease: baseProposedRelease,
+    });
+
+    expect(result.success).toBe(true);
+
+    if (!result.success) {
+      throw new Error("Expected bottle-and-release proposal to parse");
+    }
+
+    expect(result.data.creationTarget).toBe("bottle_and_release");
+    expect(result.data.proposedBottle).toEqual(baseProposedBottle);
+    expect(result.data.proposedRelease).toEqual(baseProposedRelease);
   });
 });

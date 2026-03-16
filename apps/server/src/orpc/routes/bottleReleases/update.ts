@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleReleases, bottles, changes } from "@peated/server/db/schema";
+import { upsertBottleAlias } from "@peated/server/lib/db";
 import { formatReleaseName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
@@ -84,6 +85,11 @@ export default procedure
           : (input.statedAge ?? release.statedAge),
         releaseYear: input.releaseYear ?? release.releaseYear,
         vintageYear: input.vintageYear ?? release.vintageYear,
+        singleCask: input.singleCask ?? release.singleCask,
+        caskStrength: input.caskStrength ?? release.caskStrength,
+        caskFill: input.caskFill ?? release.caskFill,
+        caskType: input.caskType ?? release.caskType,
+        caskSize: input.caskSize ?? release.caskSize,
       });
 
       const fullName = formatReleaseName({
@@ -95,6 +101,11 @@ export default procedure
           : (input.statedAge ?? release.statedAge),
         releaseYear: input.releaseYear ?? release.releaseYear,
         vintageYear: input.vintageYear ?? release.vintageYear,
+        singleCask: input.singleCask ?? release.singleCask,
+        caskStrength: input.caskStrength ?? release.caskStrength,
+        caskFill: input.caskFill ?? release.caskFill,
+        caskType: input.caskType ?? release.caskType,
+        caskSize: input.caskSize ?? release.caskSize,
       });
 
       // Check for existing release with same attributes
@@ -111,6 +122,20 @@ export default procedure
         statedAge:
           input.statedAge !== undefined ? input.statedAge : release.statedAge,
         abv: input.abv !== undefined ? input.abv : release.abv,
+        singleCask:
+          input.singleCask !== undefined
+            ? input.singleCask
+            : release.singleCask,
+        caskStrength:
+          input.caskStrength !== undefined
+            ? input.caskStrength
+            : release.caskStrength,
+        caskSize:
+          input.caskSize !== undefined ? input.caskSize : release.caskSize,
+        caskType:
+          input.caskType !== undefined ? input.caskType : release.caskType,
+        caskFill:
+          input.caskFill !== undefined ? input.caskFill : release.caskFill,
       };
 
       const existingRelease = await tx.query.bottleReleases.findFirst({
@@ -135,6 +160,24 @@ export default procedure
           newData.statedAge !== null
             ? eq(bottleReleases.statedAge, newData.statedAge)
             : isNull(bottleReleases.statedAge),
+          newData.abv !== null
+            ? eq(bottleReleases.abv, newData.abv)
+            : isNull(bottleReleases.abv),
+          newData.singleCask !== null
+            ? eq(bottleReleases.singleCask, newData.singleCask)
+            : isNull(bottleReleases.singleCask),
+          newData.caskStrength !== null
+            ? eq(bottleReleases.caskStrength, newData.caskStrength)
+            : isNull(bottleReleases.caskStrength),
+          newData.caskSize !== null
+            ? eq(bottleReleases.caskSize, newData.caskSize)
+            : isNull(bottleReleases.caskSize),
+          newData.caskType !== null
+            ? eq(bottleReleases.caskType, newData.caskType)
+            : isNull(bottleReleases.caskType),
+          newData.caskFill !== null
+            ? eq(bottleReleases.caskFill, newData.caskFill)
+            : isNull(bottleReleases.caskFill),
           // Exclude the current release from the check
           sql`${bottleReleases.id} != ${release.id}`,
         ),
@@ -187,6 +230,22 @@ export default procedure
         });
       }
 
+      const releaseAlias = await upsertBottleAlias(
+        tx,
+        fullName,
+        bottle.id,
+        updatedRelease.id,
+      );
+
+      if (
+        releaseAlias.bottleId !== bottle.id ||
+        (releaseAlias.releaseId ?? null) !== updatedRelease.id
+      ) {
+        throw errors.CONFLICT({
+          message: "Release alias already belongs to a different bottle.",
+        });
+      }
+
       // Create change record with both old and new values
       await tx.insert(changes).values({
         objectType: "bottle_release",
@@ -219,6 +278,19 @@ export default procedure
     if (!updatedRelease) {
       throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to update release.",
+      });
+    }
+
+    try {
+      await pushJob("OnBottleAliasChange", { name: updatedRelease.fullName });
+    } catch (err) {
+      logError(err, {
+        release: {
+          id: updatedRelease.id,
+        },
+        alias: {
+          name: updatedRelease.fullName,
+        },
       });
     }
 

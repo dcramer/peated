@@ -7,6 +7,10 @@ import {
   BottleCreateBadRequestError,
 } from "@peated/server/lib/createBottle";
 import {
+  BottleReleaseAlreadyExistsError,
+  BottleReleaseCreateBadRequestError,
+} from "@peated/server/lib/createBottleRelease";
+import {
   createBottleFromStorePriceMatchProposal,
   InvalidStorePriceMatchProposalTypeError,
   StorePriceMatchProposalAlreadyProcessingError,
@@ -15,9 +19,15 @@ import {
 } from "@peated/server/lib/priceMatching";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { BottleInputSchema, BottleSchema } from "@peated/server/schemas";
+import {
+  BottleInputSchema,
+  BottleReleaseInputSchema,
+  BottleReleaseSchema,
+  BottleSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
+import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
 import { z } from "zod";
 
 export default procedure
@@ -31,21 +41,47 @@ export default procedure
     operationId: "createBottleFromPriceMatchQueueItem",
   })
   .input(
+    z
+      .object({
+        proposal: z.coerce.number(),
+        bottle: BottleInputSchema.optional(),
+        release: BottleReleaseInputSchema.optional(),
+      })
+      .superRefine((input, ctx) => {
+        if (!input.bottle && !input.release) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["bottle"],
+            message: "Bottle or release input is required.",
+          });
+        }
+      }),
+  )
+  .output(
     z.object({
-      proposal: z.coerce.number(),
-      bottle: BottleInputSchema,
+      bottle: BottleSchema,
+      release: BottleReleaseSchema.nullable(),
     }),
   )
-  .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {
     try {
-      const bottle = await createBottleFromStorePriceMatchProposal({
+      const result = await createBottleFromStorePriceMatchProposal({
         proposalId: input.proposal,
         input: input.bottle,
+        releaseInput: input.release,
         user: context.user,
       });
 
-      return await serialize(BottleSerializer, bottle, context.user);
+      return {
+        bottle: await serialize(BottleSerializer, result.bottle, context.user),
+        release: result.release
+          ? await serialize(
+              BottleReleaseSerializer,
+              result.release,
+              context.user,
+            )
+          : null,
+      };
     } catch (err) {
       if (err instanceof UnknownStorePriceMatchProposalError) {
         throw errors.NOT_FOUND({
@@ -93,6 +129,18 @@ export default procedure
       }
 
       if (err instanceof BottleCreateBadRequestError) {
+        throw errors.BAD_REQUEST({
+          message: err.message,
+        });
+      }
+
+      if (err instanceof BottleReleaseAlreadyExistsError) {
+        throw errors.CONFLICT({
+          message: err.message,
+        });
+      }
+
+      if (err instanceof BottleReleaseCreateBadRequestError) {
         throw errors.BAD_REQUEST({
           message: err.message,
         });

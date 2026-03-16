@@ -1,295 +1,269 @@
 # Store Price Matching
 
-This document reflects the store-price-to-bottle matching system as implemented on March 14, 2026.
+This document reflects the store-price matcher as implemented on March 15, 2026.
+
+## Core Schema Rules
+
+These rules are the anchor for matching, automation, aliases, and moderator flows.
+
+1. `bottle` is the stable parent product.
+2. `bottle_release` is optional and only exists under a bottle.
+3. `store_price` should follow the same shape as tastings and collections:
+   `bottleId` required when matched, `releaseId` optional.
+4. Bottle identity and release identity are not interchangeable.
+
+Bottle identity lives on the parent bottle:
+
+- brand
+- bottler
+- distillery
+- expression / `name`
+- series
+- category
+
+Release identity lives on the child release:
+
+- edition
+- stated age when release-specific
+- ABV
+- release year
+- vintage year
+- single-cask
+- cask-strength
+- cask fill
+- cask type
+- cask size
+
+Operational rule:
+
+- If bottle identity is clear but release identity is not, match the bottle and leave `releaseId = null`.
+- Do not force a release from weak evidence.
+
+Alias rule:
+
+- Retailer listing aliases are bottle-level evidence unless they exactly match a canonical release alias.
+- Canonical release aliases should come from actual release records, not from arbitrary retailer titles.
 
 ## Goal
 
-Given a `store_price` row from an external retailer, Peated tries to do one of four things:
+For each `store_price`, the matcher should decide one of four outcomes:
 
-1. Confirm the current bottle assignment is already correct.
-2. Suggest a different existing bottle.
-3. Suggest creating a new bottle.
-4. Conclude there is no safe match.
+1. The current assignment is already correct.
+2. The price should match an existing bottle or existing release.
+3. The price should create a new bottle, a new release under an existing bottle, or both.
+4. There is no safe match.
 
-The output of evaluation is a single `store_price_match_proposal` row per `store_price`.
+The system persists one `store_price_match_proposal` row per `store_price`.
 
-## Matching modes
+## Matching Modes
 
-The system has two matching modes:
+There are two matching modes:
 
 1. Deterministic trusted-source matching.
-2. Heuristic matching through extraction, candidate search, and classifier decisioning.
+2. General matching through extraction, local retrieval, classifier decisioning, and automation checks.
 
-The expected rule is:
-
-- If the source gives us enough native identity to determine the bottle safely, we should not use the general matcher.
-- If the source does not give us enough native identity, we fall back to the general matcher.
-
-In other words, the heuristic matcher is the fallback path, not the default for trusted structured sources.
+Trusted structured sources should bypass the general matcher when they already provide enough identity.
 
 ## Scope
 
 This system covers:
 
-- Initial matching during price ingestion.
-- Re-evaluation via the admin match queue.
-- Auto-resolution for trusted SMWS listings.
-- Moderator approval, ignore, and create-bottle flows.
+- initial matching during price ingestion
+- re-evaluation through the admin match queue
+- trusted SMWS auto-resolution
+- moderator approve / ignore / create flows
 
-This system does not maintain a durable per-attempt history. Retrying a proposal overwrites the existing proposal row for that `store_price`.
+This system does not keep a durable per-attempt history. Retrying a proposal overwrites the existing proposal row for that `store_price`.
 
 ## Lifecycle
 
 ### 1. Price ingestion
 
-When prices are created in `POST /external-sites/{site}/prices`:
+`POST /external-sites/{site}/prices`:
 
-- The incoming name is normalized.
-- `findBottleId(name)` does an exact alias lookup only.
-- If that exact alias lookup succeeds, the `store_price` is created with an initial `bottle_id`.
-- A `ResolveStorePriceBottle` worker job is always enqueued afterward.
-- If an image URL is present and the price does not already have an image, `CapturePriceImage` is also enqueued. When the image is later stored, it enqueues `ResolveStorePriceBottle` again.
+- normalizes the incoming listing name
+- does an exact alias lookup with `findBottleTarget(name)`
+- if an exact alias exists, pre-fills `bottleId` and, when the alias is canonical to a release, `releaseId`
+- always enqueues `ResolveStorePriceBottle`
+- optionally enqueues `CapturePriceImage`
 
 ### 2. Matching evaluation
 
 `resolveStorePriceMatchProposal(priceId)` evaluates one `store_price`.
 
-It skips work when:
+Evaluation order:
 
-- The price does not exist.
-- There is already a closed proposal with status `approved` or `ignored`, unless `force: true` is passed.
+1. trusted SMWS fast path
+2. extract structured identity from image or text
+3. auto-ignore obvious non-whisky rows if extraction failed
+4. build local bottle and release candidates
+5. ask the classifier for `match_existing`, `correction`, `create_new`, or `no_match`
+6. sanitize classifier output against real candidates and resolved entities
+7. compute automation eligibility from deterministic checks
+8. upsert the proposal row
+9. auto-create only when the deterministic gate says it is safe
 
-Evaluation order is:
+## Candidate Generation
 
-1. Trusted SMWS fast path.
-2. Extract structured bottle details from image or text.
-3. Auto-ignore obvious non-whisky listings if extraction failed.
-4. Generate local bottle candidates.
-5. Ask the classifier to choose `match_existing`, `correction`, `create_new`, or `no_match`.
-6. Sanitize the classifier output against known candidates and resolved entities.
-7. Upsert the proposal row.
-8. Auto-create a new bottle only for very high-confidence `create_new` decisions.
+Candidate search is release-aware. Results are keyed by `(bottleId, releaseId)` rather than collapsing everything to `bottleId`.
 
-### 3. Moderator queue
+Sources:
 
-The moderator queue only shows proposals with status:
+- `current`
+- `exact`
+- `vector`
+- `text`
+- `release_text`
+- `brand`
 
-- `pending_review`
-- `errored`
+Important behavior:
 
-Queue state is split into:
-
-- `actionable`: no active retry lease
-- `processing`: active retry lease
-
-Retries operate on the full filtered actionable result set, not just the current page.
-
-### 4. Resolution
-
-A moderator can:
-
-- Approve a proposal against an existing bottle.
-- Ignore a proposal.
-- Create a new bottle from a `create_new` proposal.
-
-These actions close the proposal and remove it from the queue.
-
-## Candidate generation
-
-Candidate search combines several local strategies and merges the results by `bottleId`.
-
-Sources today:
-
-- `current`: the currently assigned bottle, if one exists
-- `exact`: exact match against `bottle_aliases.name`
-- `vector`: embedding similarity over bottle aliases
-- `text`: full-text search over bottle search vectors
-- `brand`: exact brand lookup plus `ILIKE` on bottle full name
-
-After merging:
-
-- Candidate metadata is filled opportunistically from the best available source.
-- Candidates are re-ranked with small structured adjustments from extracted label data.
-- If a brand was extracted and at least one candidate matches that brand, candidates from other brands are dropped unless they came from `exact` or `current`.
+- exact alias matches may target a bottle or a release
+- release search vectors can surface sibling releases independently
+- release metadata is used in scoring and automation, not just the candidate name
 
 ## Extraction
 
-Structured extraction comes from:
-
-- OCR / image extraction when the price has an image
-- Text extraction from the retailer title otherwise
-
-Extracted fields include:
+The extractor returns a whisky-specific identity object:
 
 - `brand`
+- `bottler`
 - `expression`
 - `series`
 - `distillery`
 - `category`
 - `stated_age`
 - `abv`
+- `release_year`
+- `vintage_year`
 - `cask_type`
+- `cask_size`
+- `cask_fill`
 - `cask_strength`
 - `single_cask`
 - `edition`
-- `vintage_year`
-- `release_year`
 
-The extraction schema is intentionally whisky-specific. `category: "spirit"` is normalized to `null`.
+The extractor should prefer missing values over invented certainty.
 
-## Classifier contract
+## Classifier Contract
 
 The classifier receives:
 
-- Store price metadata
-- The current bottle, if assigned
-- Extracted label details
-- Initial local candidates
+- store price metadata
+- the current matched bottle / release, if present
+- extracted identity
+- initial local candidates
 
-It can use:
+It may use:
 
 - local bottle search
 - local entity search
-- OpenAI web search
+- web search
 
-It must return exactly one decision:
+It must return one decision:
 
 - `match_existing`
 - `correction`
 - `create_new`
 - `no_match`
 
-The returned `suggestedBottleId` must be one of the known candidate bottle IDs. If it is not, the evaluation is converted into an `errored` proposal.
+Additional rules:
 
-`create_new` is additionally sanitized:
+- `suggestedBottleId` must be a known candidate bottle id
+- `suggestedReleaseId`, when present, must be a known candidate release id
+- `parentBottleId`, when present for release creation, must be a known candidate bottle id
+- `creationTarget` must be explicit for `create_new`
 
-- Proposed entities are kept only if they match resolved entities of the expected type.
-- `proposedBottle.name` has duplicate brand prefixes stripped.
-- `category: "spirit"` is normalized to `null`.
-- `series.id` is always cleared before persistence.
-- Confidence is capped below the auto-create threshold unless the result has both corroborating web evidence and a concrete whisky category.
+## Proposal Types
 
-## Proposal types and statuses
+- `match_existing`
+- `correction`
+- `create_new`
+- `no_match`
 
-### Proposal types
+`create_new` may target:
 
-- `match_existing`: attach to an existing bottle, usually where there was no bottle before
-- `correction`: replace an existing bottle assignment with a different bottle
-- `create_new`: create a new bottle
-- `no_match`: no safe match was found
+- `bottle`
+- `release`
+- `bottle_and_release`
 
-### Statuses
+## Statuses
 
-- `verified`: current bottle already matches and confidence is high enough
-- `pending_review`: needs moderator action
-- `approved`: moderator or automation approved the result
-- `ignored`: intentionally dismissed
-- `errored`: evaluation failed or produced invalid output
+- `verified`
+- `pending_review`
+- `approved`
+- `ignored`
+- `errored`
 
-`verified` is only produced when:
+`verified` is driven by deterministic automation checks, not the model confidence alone.
 
-- the price already has a `bottle_id`
-- the decision is `match_existing`
-- the suggested bottle equals the current bottle
-- confidence is at least `80`
+## Automation
 
-Everything else with a valid decision becomes `pending_review` unless overridden.
+Automation is schema-first:
 
-## Automation rules
+- bottle and release confidence are not the same thing
+- model confidence is advisory
+- release-specific automation requires explicit validation of the release traits
+- originating retailer evidence is never decisive for differentiating traits
+
+Important rule:
+
+- if bottle confidence is high and release confidence is not, persist the bottle and keep `releaseId = null`
 
 ### Trusted SMWS fast path
 
-For external sites with type `smws`:
+SMWS remains a deterministic path:
 
-- The source is treated as trusted structured input, not a fuzzy matching problem.
-- The retailer title is parsed with the SMWS code parser.
-- The SMWS bottle code is the authoritative source identity.
-- A deterministic match only proceeds if the parser can determine both the distillery and a supported category.
-- The brand is forced to `The Scotch Malt Whisky Society`.
-- The bottle identity is derived from SMWS metadata, not the classifier.
+- parse the SMWS listing
+- derive canonical bottle identity from the parsed code
+- match or create under the SMWS brand
+- auto-approve when deterministic resolution succeeds
 
-If a matching SMWS bottle already exists:
+### Auto-create
 
-- The proposal is written with confidence `100`.
-- The decision is `match_existing` or `correction`.
-- The proposal is auto-approved.
+Auto-create may create:
 
-If no SMWS bottle exists yet:
+- a bottle
+- a release under an existing bottle
+- a bottle plus a release
 
-- The proposal is written with confidence `100`.
-- The decision is `create_new`.
-- The bottle is auto-created and the proposal is auto-approved.
+Auto-create only proceeds when:
 
-If trusted SMWS auto-resolution fails, the proposal is persisted as `errored`.
+- the proposed target is schema-valid
+- decisive bottle / release traits are internally consistent
+- high-trust or acceptable medium-trust evidence validates the differentiating traits
+- unsupported or unvalidated identity traits do not remain
 
-Important implementation note:
+## Moderator Flows
 
-- Today the code follows the deterministic SMWS path and bypasses the classifier, but it does not yet persist a first-class SMWS code on bottles.
-- The current implementation parses the SMWS code from the listing title, derives normalized bottle identity from that metadata, and then matches an existing SMWS bottle by normalized bottle name under the SMWS brand.
-- The current invariant is that the parsed SMWS cask code must be preserved in the canonical `bottle.name`.
-- Example: `SMWS RW6.5 Sauna Smoke` must normalize to canonical `bottle.name = "RW6.5 Sauna Smoke"`.
-- If that invariant is broken, deterministic SMWS matching will not find the existing bottle and will create a new one with the correctly normalized name instead.
-- The intended future contract is stricter: SMWS should match by the authoritative SMWS code itself once we store that identifier explicitly.
+Moderators can:
 
-### Non-whisky auto-ignore
+- approve an existing match
+- ignore a proposal
+- create a bottle
+- create a release
+- create a bottle and release together
 
-If structured extraction fails completely and the normalized retailer title contains non-whisky spirit keywords without whisky keywords, the proposal is auto-marked `ignored`.
+Current UI limitation:
 
-### High-confidence auto-create
+- automatic release suggestions are supported
+- manual override is still bottle-first in the queue and does not yet expose a full existing-release picker
 
-A `create_new` proposal is auto-created only when:
+## Alias Behavior
 
-- action is `create_new`
-- `proposedBottle` is present
-- confidence is at least `90`
-- at least one web search query returned results
+Approving a price proposal does two separate things:
 
-Otherwise the proposal stays in `pending_review`.
+1. updates the matched `store_price` rows for the same site / listing / volume
+2. stores a reusable alias for the listing name
 
-## Moderator approval behavior
+Schema-first alias rule:
 
-Approving a proposal does two things:
+- price listing aliases should stay bottle-level unless the listing name is exactly a canonical release alias
+- canonical release aliases should be created from the release record itself
 
-1. Assigns a bottle alias for the exact `store_price.name`.
-2. Marks other queue proposals with the same case-insensitive `store_price.name` as approved too.
+This prevents a retailer-specific title from globally turning into an exact release alias.
 
-Important current behavior:
+## Known Gaps
 
-- This approval fanout is name-based, not site-based.
-- It is also not volume-aware.
-- As of this document, active `processing` proposals are excluded from that fanout.
-
-Ignoring a proposal only affects the selected proposal.
-
-## Retry and processing leases
-
-Retries do not reuse the original BullMQ job identity. A retry claims a DB lease and enqueues a tokenized job.
-
-Lease behavior today:
-
-- Lease is stored on the proposal row.
-- Default lease length is `30 minutes`.
-- The worker refreshes the lease once when the retry job starts.
-- On normal completion, the worker clears the lease if the token still matches.
-- If enqueue fails, the lease is cleared immediately.
-- If the worker never runs or crashes without cleanup, the proposal becomes actionable again once the lease expires.
-
-Processing proposals are not reviewable through the moderator resolution routes.
-
-## Operator expectations
-
-- The admin queue is an operator inbox, not a full audit log.
-- One `store_price` has at most one current proposal row.
-- Retrying recomputes and overwrites the proposal instead of appending a new attempt.
-- `errored` means the evaluation failed, not necessarily that no bottle exists.
-- `no_match` means the classifier could not safely select or create a bottle.
-- `verified` is not shown in the moderator queue.
-- `approved` and `ignored` are terminal for queue purposes.
-
-## Known limitations
-
-- Retry leases are refreshed only once at worker start. A genuinely long-running job can outlive its lease and become actionable again before it finishes.
-- Proposal history is lossy because retries overwrite the existing proposal row.
-- Approval fanout is currently driven only by exact case-insensitive store price name, which may be broader than intended across sites or package sizes.
-- Trusted SMWS matching is deterministic today, but the system still derives identity from parsed metadata in the title because bottles do not yet have a dedicated SMWS code field.
-- Candidate generation is still a blend of exact alias lookups, heuristic search, and LLM reasoning rather than a fully explicit deterministic rules engine.
+- queue manual override still needs an explicit existing-release selector
+- alias embeddings and canonical release alias maintenance should continue to be audited when release naming rules evolve

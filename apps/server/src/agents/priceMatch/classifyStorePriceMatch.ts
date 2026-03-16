@@ -2,7 +2,10 @@ import { Agent, OpenAIProvider, Runner } from "@openai/agents";
 import { buildStorePriceMatchInstructions } from "@peated/server/agents/whisky/guidance";
 import config from "@peated/server/config";
 import { type StorePrice } from "@peated/server/db/schema";
-import { getBottleMatchCandidateById } from "@peated/server/lib/priceMatchingCandidates";
+import {
+  getBottleMatchCandidateById,
+  mergePriceMatchCandidate,
+} from "@peated/server/lib/priceMatchingCandidates";
 import type {
   ExtractedBottleDetailsSchema,
   PriceMatchCandidateSchema,
@@ -36,56 +39,11 @@ export type StorePriceMatchClassification = {
   resolvedEntities: EntitySearchResult[];
 };
 
-const CANDIDATE_METADATA_FIELDS = [
-  "category",
-  "statedAge",
-  "edition",
-  "caskStrength",
-  "singleCask",
-  "abv",
-  "vintageYear",
-  "releaseYear",
-  "caskType",
-] as const satisfies ReadonlyArray<keyof PriceMatchCandidate>;
-
 function mergeCandidate(
-  candidates: Map<number, PriceMatchCandidate>,
+  candidates: Map<string, PriceMatchCandidate>,
   candidate: PriceMatchCandidate,
 ) {
-  const existing = candidates.get(candidate.bottleId);
-  if (!existing) {
-    candidates.set(candidate.bottleId, candidate);
-    return;
-  }
-
-  existing.source = Array.from(
-    new Set([...existing.source, ...candidate.source]),
-  );
-
-  if (
-    candidate.score !== null &&
-    (existing.score === null || candidate.score > existing.score)
-  ) {
-    existing.score = candidate.score;
-  }
-
-  if (!existing.alias && candidate.alias) {
-    existing.alias = candidate.alias;
-  }
-
-  const existingMetadata = existing as Record<
-    (typeof CANDIDATE_METADATA_FIELDS)[number],
-    PriceMatchCandidate[(typeof CANDIDATE_METADATA_FIELDS)[number]]
-  >;
-
-  for (const field of CANDIDATE_METADATA_FIELDS) {
-    const existingValue = existingMetadata[field];
-    const candidateValue = candidate[field];
-
-    if (existingValue === null && candidateValue !== null) {
-      existingMetadata[field] = candidateValue;
-    }
-  }
+  mergePriceMatchCandidate(candidates, candidate);
 }
 
 function mergeResolvedEntity(
@@ -151,7 +109,7 @@ export async function classifyStorePriceMatch({
   });
 
   const searchEvidence: SearchEvidence[] = [];
-  const candidateBottles = new Map<number, PriceMatchCandidate>();
+  const candidateBottles = new Map<string, PriceMatchCandidate>();
   const resolvedEntities = new Map<number, EntitySearchResult>();
   const hasExactAliasMatch = initialCandidates.some((candidate) =>
     candidate.source.includes("exact"),
@@ -162,7 +120,7 @@ export async function classifyStorePriceMatch({
   }
 
   const currentBottle = price.bottleId
-    ? await getBottleMatchCandidateById(price.bottleId)
+    ? await getBottleMatchCandidateById(price.bottleId, price.releaseId ?? null)
     : null;
   if (currentBottle) {
     mergeCandidate(candidateBottles, currentBottle);
@@ -228,6 +186,7 @@ export async function classifyStorePriceMatch({
         url: price.url,
         volume: price.volume,
         currentBottleId: price.bottleId,
+        currentReleaseId: price.releaseId,
       },
       currentBottle,
       extractedLabel,

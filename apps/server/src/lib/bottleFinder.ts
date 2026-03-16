@@ -2,16 +2,31 @@ import { eq, sql } from "drizzle-orm";
 import { db } from "../db";
 import { bottleAliases, entities, type Entity } from "../db/schema";
 
-export async function findBottleId(name: string): Promise<number | null> {
-  let result: { id: number | null } | null | undefined;
-
-  // exact match
-  [result] = await db
-    .select({ id: bottleAliases.bottleId })
+export async function findBottleTarget(
+  name: string,
+): Promise<{ bottleId: number; releaseId: number | null } | null> {
+  const [result] = await db
+    .select({
+      bottleId: bottleAliases.bottleId,
+      releaseId: bottleAliases.releaseId,
+    })
     .from(bottleAliases)
     .where(eq(sql`LOWER(${bottleAliases.name})`, sql`LOWER(${name})`))
     .limit(1);
-  if (result?.id) return result?.id;
+
+  if (!result?.bottleId) {
+    return null;
+  }
+
+  return {
+    bottleId: result.bottleId,
+    releaseId: result.releaseId ?? null,
+  };
+}
+
+export async function findBottleId(name: string): Promise<number | null> {
+  const target = await findBottleTarget(name);
+  if (target?.bottleId) return target.bottleId;
 
   // TODO: improve this, but until then we're relying on humans
   // // match the store's listing as a prefix
@@ -34,8 +49,7 @@ export async function findBottleId(name: string): Promise<number | null> {
   //   .where(ilike(bottleAliases.name, `${name} %`))
   //   .orderBy(sql`LENGTH(${bottleAliases.name})`)
   //   .limit(1);
-
-  return result?.id || null;
+  return null;
 }
 
 export async function findEntity(fullName: string): Promise<Entity | null> {

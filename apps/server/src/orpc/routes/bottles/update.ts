@@ -291,6 +291,11 @@ export default procedure
             statedAge: bottle.statedAge ? null : release.statedAge,
             releaseYear: release.releaseYear,
             vintageYear: release.vintageYear,
+            singleCask: release.singleCask,
+            caskStrength: release.caskStrength,
+            caskFill: release.caskFill,
+            caskType: release.caskType,
+            caskSize: release.caskSize,
           });
 
           const newFullName = formatReleaseName({
@@ -300,6 +305,11 @@ export default procedure
             statedAge: bottle.statedAge ? null : release.statedAge,
             releaseYear: release.releaseYear,
             vintageYear: release.vintageYear,
+            singleCask: release.singleCask,
+            caskStrength: release.caskStrength,
+            caskFill: release.caskFill,
+            caskType: release.caskType,
+            caskSize: release.caskSize,
           });
 
           await tx
@@ -309,6 +319,22 @@ export default procedure
               fullName: newFullName,
             })
             .where(eq(bottleReleases.id, release.id));
+
+          const releaseAlias = await upsertBottleAlias(
+            tx,
+            newFullName,
+            bottle.id,
+            release.id,
+          );
+          if (
+            releaseAlias.bottleId !== bottle.id ||
+            (releaseAlias.releaseId ?? null) !== release.id
+          ) {
+            throw errors.CONFLICT({
+              message: "Release alias already belongs to a different bottle.",
+            });
+          }
+          newAliases.push(newFullName);
         }
       }
 

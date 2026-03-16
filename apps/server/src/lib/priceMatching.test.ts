@@ -289,6 +289,9 @@ describe("priceMatching", () => {
           alias: "Fractional Confidence Candidate",
           fullName: bottle.fullName,
           brand: null,
+          bottler: null,
+          series: null,
+          distillery: [],
           category: null,
           statedAge: null,
           edition: null,
@@ -298,6 +301,8 @@ describe("priceMatching", () => {
           vintageYear: null,
           releaseYear: null,
           caskType: null,
+          caskSize: null,
+          caskFill: null,
           score: 0.95,
           source: ["exact"],
         },
@@ -312,7 +317,104 @@ describe("priceMatching", () => {
     expect(proposal.confidence).toBe(88);
   });
 
-  test("caps local-only create_new confidence below the auto-create threshold", async ({
+  test("rejects create_new release proposals that point at an unknown parent bottle", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+    const candidateBottle = await fixtures.Bottle();
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Unknown Parent Release Candidate",
+      imageUrl: null,
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Parent Brand",
+      bottler: null,
+      expression: "Reserve",
+      series: null,
+      distillery: ["Parent Distillery"],
+      category: "single_malt",
+      stated_age: null,
+      abv: 58.4,
+      release_year: 2024,
+      vintage_year: null,
+      cask_type: "tawny_port",
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: true,
+      single_cask: true,
+      edition: "Batch 1",
+    });
+    vi.mocked(classifyStorePriceMatch).mockResolvedValue({
+      decision: {
+        action: "create_new",
+        confidence: 97,
+        rationale: "This looks like a new release under an existing bottle.",
+        suggestedBottleId: null,
+        suggestedReleaseId: null,
+        parentBottleId: 999999,
+        creationTarget: "release",
+        candidateBottleIds: [candidateBottle.id],
+        proposedBottle: null,
+        proposedRelease: {
+          edition: "Batch 1",
+          statedAge: null,
+          abv: 58.4,
+          releaseYear: 2024,
+          vintageYear: null,
+          caskType: "tawny_port",
+          caskSize: null,
+          caskFill: null,
+          caskStrength: true,
+          singleCask: true,
+          description: null,
+          imageUrl: null,
+          tastingNotes: null,
+        },
+      },
+      searchEvidence: [],
+      candidateBottles: [
+        {
+          bottleId: candidateBottle.id,
+          alias: null,
+          fullName: candidateBottle.fullName,
+          brand: null,
+          bottler: null,
+          series: null,
+          distillery: [],
+          category: null,
+          statedAge: null,
+          edition: null,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          score: 0.84,
+          source: ["brand"],
+        },
+      ],
+      resolvedEntities: [],
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(proposal.status).toBe("errored");
+    expect(proposal.error).toContain("unknown parent bottle id");
+  });
+
+  test("keeps local-only create_new proposals in review without mutating model confidence", async ({
     fixtures,
   }) => {
     config.OPENAI_API_KEY = undefined;
@@ -387,7 +489,7 @@ describe("priceMatching", () => {
 
     expect(proposal.status).toBe("pending_review");
     expect(proposal.proposalType).toBe("create_new");
-    expect(proposal.confidence).toBe(89);
+    expect(proposal.confidence).toBe(95);
   });
 
   test("normalizes proposed bottle drafts before persisting create_new proposals", async ({
@@ -542,10 +644,12 @@ describe("priceMatching", () => {
       searchEvidence: [
         {
           query: 'site:woodencork.com "Spirit Category Candidate"',
+          summary: "Retailer listing for Spirit Category Candidate.",
           results: [
             {
               title: "Spirit Category Candidate",
               url: "https://woodencork.example/spirit-category-candidate",
+              domain: "woodencork.example",
               description: "Retailer listing",
               extraSnippets: [],
             },
@@ -562,7 +666,7 @@ describe("priceMatching", () => {
     });
 
     expect(proposal.status).toBe("pending_review");
-    expect(proposal.confidence).toBe(89);
+    expect(proposal.confidence).toBe(96);
     expect(proposal.extractedLabel).toMatchObject({
       category: null,
       edition: "Batch 1",
@@ -645,6 +749,7 @@ describe("priceMatching", () => {
       searchEvidence: [
         {
           query: 'site:example.com "Empty Evidence Candidate"',
+          summary: null,
           results: [],
         },
       ],
@@ -659,7 +764,7 @@ describe("priceMatching", () => {
 
     expect(proposal.status).toBe("pending_review");
     expect(proposal.proposalType).toBe("create_new");
-    expect(proposal.confidence).toBe(89);
+    expect(proposal.confidence).toBe(95);
     expect(updatedPrice?.bottleId).toBeNull();
   });
 
@@ -1058,12 +1163,16 @@ describe("priceMatching", () => {
       },
       searchEvidence: [
         {
-          query: 'site:woodencork.com "Auto Create Candidate"',
+          query: '"Auto Brand" "Web Reserve" official',
+          summary:
+            "The official Auto Brand release page confirms Web Reserve as a 12 year single malt.",
           results: [
             {
               title: "Auto Create Candidate",
-              url: "https://woodencork.example/auto-create",
-              description: "Retailer listing",
+              url: "https://www.autobrand.com/web-reserve",
+              domain: "autobrand.com",
+              description:
+                "The official Auto Brand release page confirms Web Reserve as a 12 year single malt.",
               extraSnippets: [],
             },
           ],
@@ -1184,12 +1293,16 @@ describe("priceMatching", () => {
       },
       searchEvidence: [
         {
-          query: '"Retry Auto Brand" "Lease Reserve" whisky',
+          query: '"Retry Auto Brand" "Lease Reserve" official',
+          summary:
+            "The official Retry Auto Brand release page confirms Lease Reserve as a 12 year single malt.",
           results: [
             {
               title: "Retry Auto Brand Lease Reserve",
-              url: "https://example.com/retry-auto-create",
-              description: "Retailer listing",
+              url: "https://www.retryautobrand.com/lease-reserve",
+              domain: "retryautobrand.com",
+              description:
+                "The official Retry Auto Brand release page confirms Lease Reserve as a 12 year single malt.",
               extraSnippets: [],
             },
           ],
@@ -1308,12 +1421,16 @@ describe("priceMatching", () => {
       },
       searchEvidence: [
         {
-          query: 'site:woodencork.com "Replacement Create Candidate"',
+          query: '"Replacement Brand" "Fresh Release" official',
+          summary:
+            "The official Replacement Brand page confirms Fresh Release as a 12 year single malt release.",
           results: [
             {
               title: "Replacement Create Candidate",
-              url: "https://woodencork.example/replacement-create",
-              description: "Retailer listing",
+              url: "https://www.replacementbrand.com/fresh-release",
+              domain: "replacementbrand.com",
+              description:
+                "The official Replacement Brand page confirms Fresh Release as a 12 year single malt release.",
               extraSnippets: [],
             },
           ],
@@ -1325,6 +1442,9 @@ describe("priceMatching", () => {
           alias: null,
           fullName: currentBottle.fullName,
           brand: null,
+          bottler: null,
+          series: null,
+          distillery: [],
           category: null,
           statedAge: null,
           edition: null,
@@ -1334,6 +1454,8 @@ describe("priceMatching", () => {
           vintageYear: null,
           releaseYear: null,
           caskType: null,
+          caskSize: null,
+          caskFill: null,
           score: 1,
           source: ["current"],
         },
@@ -1390,6 +1512,9 @@ describe("priceMatching", () => {
         alias: "Classifier Failure Candidate",
         fullName: bottle.fullName,
         brand: null,
+        bottler: null,
+        series: null,
+        distillery: [],
         category: null,
         statedAge: null,
         edition: null,
@@ -1399,6 +1524,8 @@ describe("priceMatching", () => {
         vintageYear: null,
         releaseYear: null,
         caskType: null,
+        caskSize: null,
+        caskFill: null,
         score: 1,
         source: ["exact"],
       },
@@ -1459,6 +1586,7 @@ describe("priceMatching", () => {
     await findBottleMatchCandidates({
       query: "Springbank Local Barley",
       brand: "Springbank",
+      bottler: "Campbeltown Merchant",
       expression: "Local Barley",
       series: null,
       distillery: ["Springbank"],
@@ -1466,6 +1594,8 @@ describe("priceMatching", () => {
       stated_age: null,
       abv: 59.2,
       cask_type: null,
+      cask_size: "port_pipe",
+      cask_fill: "1st_fill",
       cask_strength: true,
       single_cask: true,
       edition: "Batch 1",
@@ -1483,6 +1613,15 @@ describe("priceMatching", () => {
     );
     expect(getOpenAIEmbedding).toHaveBeenCalledWith(
       expect.stringContaining("59.2% ABV"),
+    );
+    expect(getOpenAIEmbedding).toHaveBeenCalledWith(
+      expect.stringContaining("Campbeltown Merchant"),
+    );
+    expect(getOpenAIEmbedding).toHaveBeenCalledWith(
+      expect.stringContaining("port_pipe"),
+    );
+    expect(getOpenAIEmbedding).toHaveBeenCalledWith(
+      expect.stringContaining("1st_fill"),
     );
     expect(getOpenAIEmbedding).toHaveBeenCalledWith(
       expect.stringContaining("cask strength"),
@@ -1558,6 +1697,108 @@ describe("priceMatching", () => {
       singleCask: true,
       abv: 59.2,
     });
+  });
+
+  test("enriches candidates with bottler, series, distillery, and release metadata", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const brand = await fixtures.Entity({
+      name: "Independent Label",
+      type: ["brand"],
+    });
+    const bottler = await fixtures.Entity({
+      name: "Campbeltown Merchant",
+      type: ["bottler"],
+    });
+    const distiller = await fixtures.Entity({
+      name: "Ben Nevis",
+      type: ["distiller"],
+    });
+    const series = await fixtures.BottleSeries({
+      brandId: brand.id,
+      name: "Small Batch",
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: bottler.id,
+      seriesId: series.id,
+      distillerIds: [distiller.id],
+      name: "Reserve",
+      category: "single_malt",
+      statedAge: null,
+      edition: null,
+      caskStrength: null,
+      singleCask: null,
+      abv: null,
+      vintageYear: null,
+      releaseYear: null,
+      caskType: null,
+      caskSize: null,
+      caskFill: null,
+    });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Independent Label Small Batch Reserve Batch 7",
+    });
+    await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      statedAge: 12,
+      edition: "Batch 7",
+      caskStrength: true,
+      singleCask: true,
+      abv: 57.8,
+      vintageYear: 2011,
+      releaseYear: 2024,
+      caskType: "ruby_port",
+      caskSize: "port_pipe",
+      caskFill: "1st_fill",
+    });
+
+    const [candidate] = await findBottleMatchCandidates({
+      query: "Independent Label Small Batch Reserve Batch 7",
+      brand: brand.name,
+      bottler: bottler.name,
+      expression: "Reserve",
+      series: series.name,
+      distillery: [distiller.name],
+      category: "single_malt",
+      stated_age: 12,
+      abv: 57.8,
+      cask_type: "ruby_port",
+      cask_size: "port_pipe",
+      cask_fill: "1st_fill",
+      cask_strength: true,
+      single_cask: true,
+      edition: "Batch 7",
+      vintage_year: 2011,
+      release_year: 2024,
+      currentBottleId: null,
+      limit: 15,
+    });
+
+    expect(candidate).toMatchObject({
+      bottleId: bottle.id,
+      brand: brand.name,
+      bottler: bottler.name,
+      series: series.name,
+      distillery: [distiller.name],
+      category: "single_malt",
+      statedAge: 12,
+      edition: "Batch 7",
+      caskStrength: true,
+      singleCask: true,
+      abv: 57.8,
+      vintageYear: 2011,
+      releaseYear: 2024,
+      caskType: "ruby_port",
+      caskSize: "port_pipe",
+      caskFill: "1st_fill",
+    });
+    expect(candidate?.source).toEqual(
+      expect.arrayContaining(["exact", "release"]),
+    );
   });
 
   test("does not treat edition substring collisions as matching evidence", async () => {
@@ -1841,6 +2082,9 @@ describe("priceMatching", () => {
           alias: "Retry Candidate",
           fullName: bottle.fullName,
           brand: null,
+          bottler: null,
+          series: null,
+          distillery: [],
           category: null,
           statedAge: null,
           edition: null,
@@ -1850,6 +2094,8 @@ describe("priceMatching", () => {
           vintageYear: null,
           releaseYear: null,
           caskType: null,
+          caskSize: null,
+          caskFill: null,
           score: 1,
           source: ["exact"],
         },
@@ -2183,6 +2429,9 @@ describe("priceMatching", () => {
           alias: "Unknown Suggested Candidate",
           fullName: bottle.fullName,
           brand: null,
+          bottler: null,
+          series: null,
+          distillery: [],
           category: null,
           statedAge: null,
           edition: null,
@@ -2192,6 +2441,8 @@ describe("priceMatching", () => {
           vintageYear: null,
           releaseYear: null,
           caskType: null,
+          caskSize: null,
+          caskFill: null,
           score: 0.95,
           source: ["exact"],
         },

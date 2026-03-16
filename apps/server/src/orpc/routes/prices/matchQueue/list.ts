@@ -4,7 +4,7 @@ import {
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
-import { getProposalBottles } from "@peated/server/lib/priceMatching";
+import { getProposalTargets } from "@peated/server/lib/priceMatching";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { StorePriceMatchQueueListResponse } from "@peated/server/schemas";
@@ -87,12 +87,12 @@ export default procedure
       },
     }));
 
-    const bottleList = await getProposalBottles(
+    const targets = await getProposalTargets(
       queueRows.map((row) => row.proposal),
     );
 
     return {
-      results: await serializeQueueItems(queueRows, bottleList, context),
+      results: await serializeQueueItems(queueRows, targets, context),
       rel: {
         nextCursor: hasNextPage ? input.cursor + 1 : null,
         prevCursor: input.cursor > 1 ? input.cursor - 1 : null,

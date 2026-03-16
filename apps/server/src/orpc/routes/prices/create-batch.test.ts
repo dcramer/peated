@@ -139,6 +139,54 @@ describe("POST /external-sites/:site/prices", () => {
     expect(prices[0].url).toBe("http://example.com");
   });
 
+  test("preserves an exact release target during ingestion", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const bottle = await fixtures.Bottle({
+      name: "Reserve",
+      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Batch 1",
+      abv: 46,
+    });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      name: release.fullName,
+    });
+    const user = await fixtures.User({ admin: true });
+
+    await routerClient.prices.createBatch(
+      {
+        site: site.type,
+        prices: [
+          {
+            name: release.fullName,
+            price: 4999,
+            currency: "usd",
+            volume: 750,
+            url: "http://example.com/release",
+          },
+        ],
+      },
+      { context: { user } },
+    );
+
+    const [price] = await db
+      .select()
+      .from(storePrices)
+      .where(eq(storePrices.externalSiteId, site.id));
+
+    expect(price).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      name: release.fullName,
+    });
+  });
+
   test("processes new price without bottle", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const user = await fixtures.User({ admin: true });

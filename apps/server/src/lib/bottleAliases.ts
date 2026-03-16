@@ -28,10 +28,18 @@ export async function assignBottleAliasInTransaction(
   tx: AnyDatabase,
   {
     bottleId,
+    releaseId = null,
+    aliasReleaseId = releaseId,
+    externalSiteId,
     name,
+    volume,
   }: {
     bottleId: number;
+    releaseId?: number | null;
+    aliasReleaseId?: number | null;
+    externalSiteId?: number;
     name: string;
+    volume?: number;
   },
 ): Promise<{ alias: BottleAlias; isNew: boolean }> {
   const existingAlias = await tx.query.bottleAliases.findFirst({
@@ -40,12 +48,28 @@ export async function assignBottleAliasInTransaction(
 
   let alias: BottleAlias | undefined;
   let isNew = false;
+  const nextAliasReleaseId =
+    aliasReleaseId === null
+      ? (existingAlias?.releaseId ?? null)
+      : aliasReleaseId;
 
-  if (existingAlias?.bottleId === bottleId) {
-    if (existingAlias.name !== name) {
+  const hasMatchingBottle = existingAlias?.bottleId === bottleId;
+  const hasMatchingRelease =
+    existingAlias?.releaseId === aliasReleaseId ||
+    existingAlias?.releaseId === null ||
+    aliasReleaseId === null;
+
+  if (hasMatchingBottle && hasMatchingRelease) {
+    if (
+      existingAlias.name !== name ||
+      (existingAlias.releaseId ?? null) !== nextAliasReleaseId
+    ) {
       [alias] = await tx
         .update(bottleAliases)
-        .set({ name })
+        .set({
+          name,
+          releaseId: nextAliasReleaseId,
+        })
         .where(eq(bottleAliases.name, existingAlias.name))
         .returning();
     } else {
@@ -57,6 +81,7 @@ export async function assignBottleAliasInTransaction(
       .values({
         name,
         bottleId,
+        releaseId: aliasReleaseId,
       })
       .returning();
     isNew = true;
@@ -65,6 +90,7 @@ export async function assignBottleAliasInTransaction(
       .update(bottleAliases)
       .set({
         bottleId,
+        releaseId: aliasReleaseId,
       })
       .where(eq(bottleAliases.name, existingAlias.name))
       .returning();
@@ -80,8 +106,13 @@ export async function assignBottleAliasInTransaction(
     .update(storePrices)
     .set({
       bottleId,
+      releaseId,
     })
-    .where(eq(sql`LOWER(${storePrices.name})`, name.toLowerCase()))
+    .where(
+      sql`LOWER(${storePrices.name}) = ${name.toLowerCase()}
+        ${externalSiteId ? sql`AND ${storePrices.externalSiteId} = ${externalSiteId}` : sql``}
+        ${volume ? sql`AND ${storePrices.volume} = ${volume}` : sql``}`,
+    )
     .returning({
       imageUrl: storePrices.imageUrl,
     });
@@ -150,17 +181,29 @@ export async function finalizeBottleAliasAssignment(
 export async function assignBottleAlias(
   {
     bottleId,
+    releaseId = null,
+    aliasReleaseId = releaseId,
+    externalSiteId,
     name,
+    volume,
   }: {
     bottleId: number;
+    releaseId?: number | null;
+    aliasReleaseId?: number | null;
+    externalSiteId?: number;
     name: string;
+    volume?: number;
   },
   contexts?: Record<string, Record<string, any>>,
 ) {
   const result = await db.transaction(async (tx) =>
     assignBottleAliasInTransaction(tx, {
       bottleId,
+      releaseId,
+      aliasReleaseId,
+      externalSiteId,
       name,
+      volume,
     }),
   );
 

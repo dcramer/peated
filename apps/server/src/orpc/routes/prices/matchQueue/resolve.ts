@@ -18,6 +18,7 @@ const InputSchema = z
     proposal: z.coerce.number(),
     action: z.enum(["match", "ignore"]),
     bottle: z.coerce.number().optional(),
+    release: z.coerce.number().nullable().optional(),
   })
   .superRefine((input, ctx) => {
     if (input.action === "match" && !input.bottle) {
@@ -47,6 +48,7 @@ export default procedure
         await applyApprovedStorePriceMatch({
           proposalId: input.proposal,
           bottleId: input.bottle!,
+          releaseId: input.release ?? null,
           reviewedById: context.user.id,
         });
         return {};

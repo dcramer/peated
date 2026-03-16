@@ -4,7 +4,7 @@ import {
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
-import { getProposalBottles } from "@peated/server/lib/priceMatching";
+import { getProposalTargets } from "@peated/server/lib/priceMatching";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
@@ -58,7 +58,7 @@ export default procedure
       });
     }
 
-    const bottleList = await getProposalBottles([row.proposal]);
+    const targets = await getProposalTargets([row.proposal]);
     const [result] = await serializeQueueItems(
       [
         {
@@ -70,7 +70,7 @@ export default procedure
           },
         },
       ],
-      bottleList,
+      targets,
       context,
     );
 

@@ -1,17 +1,26 @@
 import {
+  type Bottle,
+  type BottleRelease,
   type ExternalSite,
   type StorePrice,
   type StorePriceMatchProposal,
 } from "@peated/server/db/schema";
 import { hasActiveStorePriceMatchProposalProcessingLease } from "@peated/server/lib/priceMatching";
+import { getStorePriceMatchAutomationAssessment } from "@peated/server/lib/priceMatchingAutomation";
 import { normalizeProposedBottleDraft } from "@peated/server/lib/priceMatchingDraftNormalization";
 import { type Context } from "@peated/server/orpc/context";
 import {
+  ExtractedBottleDetailsSchema,
+  PriceMatchCandidateSchema,
+  PriceMatchSearchEvidenceSchema,
+  ProposedBottleSchema,
+  ProposedReleaseSchema,
   StorePriceMatchProposalSchema,
   StorePriceMatchQueueItemSchema,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
+import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
 import { StorePriceWithSiteSerializer } from "@peated/server/serializers/storePrice";
 
 type QueueRow = {
@@ -22,7 +31,13 @@ type QueueRow = {
 
 export async function serializeQueueItems(
   rows: QueueRow[],
-  bottleList: any[],
+  {
+    bottleList,
+    releaseList,
+  }: {
+    bottleList: Bottle[];
+    releaseList: BottleRelease[];
+  },
   context: Context,
 ) {
   const bottlesById = Object.fromEntries(
@@ -32,6 +47,11 @@ export async function serializeQueueItems(
         "tastingNotes",
       ])
     ).map((item, index) => [bottleList[index].id, item]),
+  );
+  const releasesById = Object.fromEntries(
+    (await serialize(BottleReleaseSerializer, releaseList, context.user)).map(
+      (item, index) => [releaseList[index].id, item],
+    ),
   );
 
   const prices = await serialize(
@@ -44,13 +64,23 @@ export async function serializeQueueItems(
     StorePriceMatchQueueItemSchema.parse({
       ...serializeProposal(row.proposal, {
         isProcessing: row.isProcessing,
+        price: row.price,
       }),
       price: prices[index],
       currentBottle: row.proposal.currentBottleId
         ? (bottlesById[row.proposal.currentBottleId] ?? null)
         : null,
+      currentRelease: row.proposal.currentReleaseId
+        ? (releasesById[row.proposal.currentReleaseId] ?? null)
+        : null,
       suggestedBottle: row.proposal.suggestedBottleId
         ? (bottlesById[row.proposal.suggestedBottleId] ?? null)
+        : null,
+      suggestedRelease: row.proposal.suggestedReleaseId
+        ? (releasesById[row.proposal.suggestedReleaseId] ?? null)
+        : null,
+      parentBottle: row.proposal.parentBottleId
+        ? (bottlesById[row.proposal.parentBottleId] ?? null)
         : null,
     }),
   );
@@ -58,19 +88,81 @@ export async function serializeQueueItems(
 
 export function serializeProposal(
   proposal: StorePriceMatchProposal,
-  { isProcessing }: { isProcessing?: boolean } = {},
+  {
+    isProcessing,
+    price,
+  }: {
+    isProcessing?: boolean;
+    price?: StorePrice & { externalSite: ExternalSite };
+  } = {},
 ) {
+  const candidateBottles = PriceMatchCandidateSchema.array().parse(
+    proposal.candidateBottles,
+  );
+  const extractedLabel = proposal.extractedLabel
+    ? ExtractedBottleDetailsSchema.parse(proposal.extractedLabel)
+    : null;
+  const normalizedProposedBottle = proposal.proposedBottle
+    ? normalizeProposedBottleDraft(
+        ProposedBottleSchema.parse(proposal.proposedBottle),
+      )
+    : null;
+  const proposedRelease = proposal.proposedRelease
+    ? ProposedReleaseSchema.parse(proposal.proposedRelease)
+    : null;
+  const searchEvidence = PriceMatchSearchEvidenceSchema.array().parse(
+    proposal.searchEvidence,
+  );
+  const automationAssessment = price
+    ? getStorePriceMatchAutomationAssessment({
+        action: proposal.proposalType,
+        modelConfidence: proposal.confidence,
+        price,
+        suggestedBottleId: proposal.suggestedBottleId,
+        suggestedReleaseId: proposal.suggestedReleaseId,
+        candidateBottles,
+        extractedLabel,
+        proposedBottle: normalizedProposedBottle,
+        proposedRelease,
+        creationTarget: proposal.creationTarget,
+        searchEvidence,
+      })
+    : {
+        modelConfidence: proposal.confidence,
+        automationScore: null,
+        automationEligible: false,
+        automationBlockers: [],
+        decisiveMatchAttributes: [],
+        differentiatingAttributes: [],
+        webEvidenceChecks: [],
+      };
+  const automationBlockers =
+    proposal.status === "errored" && proposal.error
+      ? [...automationAssessment.automationBlockers, proposal.error]
+      : automationAssessment.automationBlockers;
   const serializedProposal = StorePriceMatchProposalSchema.parse({
     id: proposal.id,
     status: proposal.status,
     proposalType: proposal.proposalType,
     confidence: proposal.confidence,
+    modelConfidence: automationAssessment.modelConfidence,
+    automationScore: automationAssessment.automationScore,
+    automationEligible: automationAssessment.automationEligible,
+    automationBlockers: Array.from(new Set(automationBlockers)),
+    decisiveMatchAttributes: automationAssessment.decisiveMatchAttributes,
+    differentiatingAttributes: automationAssessment.differentiatingAttributes,
+    webEvidenceChecks: automationAssessment.webEvidenceChecks,
     currentBottleId: proposal.currentBottleId,
+    currentReleaseId: proposal.currentReleaseId,
     suggestedBottleId: proposal.suggestedBottleId,
-    candidateBottles: proposal.candidateBottles,
-    extractedLabel: proposal.extractedLabel ?? null,
-    proposedBottle: proposal.proposedBottle ?? null,
-    searchEvidence: proposal.searchEvidence,
+    suggestedReleaseId: proposal.suggestedReleaseId,
+    parentBottleId: proposal.parentBottleId,
+    creationTarget: proposal.creationTarget,
+    candidateBottles,
+    extractedLabel,
+    proposedBottle: normalizedProposedBottle,
+    proposedRelease,
+    searchEvidence,
     rationale: proposal.rationale,
     model: proposal.model,
     error: proposal.error,
@@ -92,8 +184,6 @@ export function serializeProposal(
 
   return {
     ...serializedProposal,
-    proposedBottle: serializedProposal.proposedBottle
-      ? normalizeProposedBottleDraft(serializedProposal.proposedBottle)
-      : null,
+    proposedBottle: serializedProposal.proposedBottle,
   };
 }

@@ -58,7 +58,11 @@ function formatConfidence(item: QueueItem): string {
     return "n/a";
   }
 
-  return item.confidence === null ? "?" : `${item.confidence}`;
+  return item.modelConfidence === null ? "?" : `${item.modelConfidence}`;
+}
+
+function formatAutomationScore(item: QueueItem): string {
+  return item.automationScore === null ? "?" : `${item.automationScore}`;
 }
 
 function getEvidenceBadges(item: QueueItem): string[] {
@@ -76,6 +80,10 @@ function getEvidenceBadges(item: QueueItem): string[] {
     badges.push(
       `${item.candidateBottles.length} local candidate${item.candidateBottles.length === 1 ? "" : "s"}`,
     );
+  }
+
+  if (item.automationEligible) {
+    badges.push("automation ready");
   }
 
   if (item.currentBottle && item.proposalType === "correction") {
@@ -96,6 +104,9 @@ function getExtractedLabelSummary(item: QueueItem): string[] {
   if (extractedLabel.brand) {
     summary.push(`brand: ${extractedLabel.brand}`);
   }
+  if (extractedLabel.bottler) {
+    summary.push(`bottler: ${extractedLabel.bottler}`);
+  }
   if (extractedLabel.expression) {
     summary.push(`expression: ${extractedLabel.expression}`);
   }
@@ -111,6 +122,12 @@ function getExtractedLabelSummary(item: QueueItem): string[] {
   if (extractedLabel.cask_type) {
     summary.push(`cask: ${extractedLabel.cask_type}`);
   }
+  if (extractedLabel.cask_size) {
+    summary.push(`cask size: ${extractedLabel.cask_size}`);
+  }
+  if (extractedLabel.cask_fill) {
+    summary.push(`cask fill: ${extractedLabel.cask_fill}`);
+  }
   if (extractedLabel.distillery?.length) {
     summary.push(`distillery: ${extractedLabel.distillery.join(", ")}`);
   }
@@ -121,6 +138,10 @@ function getExtractedLabelSummary(item: QueueItem): string[] {
 function getRecommendationTitle(item: QueueItem): string {
   if (item.status === "errored") {
     return "No recommendation available";
+  }
+
+  if (item.suggestedRelease) {
+    return item.suggestedRelease.fullName;
   }
 
   if (item.suggestedBottle) {
@@ -165,6 +186,44 @@ function formatTimestamp(value: string | null): string | null {
   });
 }
 
+function formatAttributeName(
+  attribute: QueueItem["webEvidenceChecks"][number]["attribute"],
+) {
+  switch (attribute) {
+    case "bottler":
+      return "Bottler";
+    case "statedAge":
+      return "Age";
+    case "caskType":
+      return "Cask";
+    case "caskSize":
+      return "Cask Size";
+    case "caskFill":
+      return "Cask Fill";
+    case "caskStrength":
+      return "Cask Strength";
+    case "singleCask":
+      return "Single Cask";
+    case "vintageYear":
+      return "Vintage Year";
+    case "releaseYear":
+      return "Release Year";
+    default:
+      return attribute.charAt(0).toUpperCase() + attribute.slice(1);
+  }
+}
+
+function formatSourceTier(
+  tier: QueueItem["webEvidenceChecks"][number]["matchedSourceTiers"][number],
+) {
+  switch (tier) {
+    case "origin_retailer":
+      return "origin retailer";
+    default:
+      return tier;
+  }
+}
+
 export default function QueueItemCard({
   isBusy,
   item,
@@ -181,7 +240,19 @@ export default function QueueItemCard({
   const canApproveMatch =
     item.status === "pending_review" && !!item.suggestedBottle && !isProcessing;
   const canCreateBottle =
-    item.status === "pending_review" && !!item.proposedBottle && !isProcessing;
+    item.status === "pending_review" &&
+    (!!item.proposedBottle || !!item.proposedRelease) &&
+    !isProcessing;
+  const createHref =
+    item.creationTarget === "release" && item.parentBottle
+      ? `/bottles/${item.parentBottle.id}/addRelease?proposal=${item.id}&returnTo=${encodeURIComponent(returnTo)}`
+      : `/addBottle?proposal=${item.id}&returnTo=${encodeURIComponent(returnTo)}`;
+  const createLabel =
+    item.creationTarget === "release"
+      ? "Create Release"
+      : item.creationTarget === "bottle_and_release"
+        ? "Create Bottle + Release"
+        : "Create Bottle";
   const processingQueuedAt = formatTimestamp(item.processingQueuedAt);
   const processingExpiresAt = formatTimestamp(item.processingExpiresAt);
 
@@ -220,7 +291,10 @@ export default function QueueItemCard({
                 {getDecisionLabel(item)}
               </span>
               <span className="rounded-full border border-slate-700 bg-slate-900 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-slate-200">
-                Confidence {formatConfidence(item)}
+                Model {formatConfidence(item)}
+              </span>
+              <span className="rounded-full border border-slate-700 bg-slate-900 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-slate-200">
+                Automation {formatAutomationScore(item)}
               </span>
             </div>
           </div>
@@ -252,6 +326,11 @@ export default function QueueItemCard({
               >
                 {item.currentBottle.fullName}
               </Link>
+              {item.currentRelease ? (
+                <div className="mt-1 text-slate-300">
+                  Release: {item.currentRelease.fullName}
+                </div>
+              ) : null}
             </div>
           ) : null}
 
@@ -410,6 +489,19 @@ export default function QueueItemCard({
             ))}
           </div>
 
+          {item.automationBlockers.length > 0 ? (
+            <div className="rounded-lg border border-amber-900/70 bg-amber-950/30 p-3 text-sm text-amber-100">
+              <div className="text-xs font-semibold uppercase tracking-wide text-amber-200">
+                Automation Blockers
+              </div>
+              <div className="mt-2 space-y-1">
+                {item.automationBlockers.map((blocker) => (
+                  <div key={`${item.id}-${blocker}`}>{blocker}</div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           <details className="rounded-lg border border-slate-800 bg-slate-900/40 p-4 text-sm">
             <summary className="cursor-pointer list-none font-semibold text-white">
               Review evidence
@@ -433,6 +525,90 @@ export default function QueueItemCard({
                 </div>
               ) : null}
 
+              {item.decisiveMatchAttributes.length > 0 ||
+              item.differentiatingAttributes.length > 0 ? (
+                <div className="space-y-2">
+                  {item.decisiveMatchAttributes.length > 0 ? (
+                    <div>
+                      <div className="text-muted text-xs font-semibold uppercase tracking-wide">
+                        Decisive Match Traits
+                      </div>
+                      <div className="mt-1 flex flex-wrap gap-2">
+                        {item.decisiveMatchAttributes.map((attribute) => (
+                          <span
+                            key={`${item.id}-decisive-${attribute}`}
+                            className="rounded-full border border-emerald-800 bg-emerald-950/60 px-2.5 py-1 text-xs text-emerald-100"
+                          >
+                            {formatAttributeName(attribute)}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {item.differentiatingAttributes.length > 0 ? (
+                    <div>
+                      <div className="text-muted text-xs font-semibold uppercase tracking-wide">
+                        Traits Requiring Validation
+                      </div>
+                      <div className="mt-1 flex flex-wrap gap-2">
+                        {item.differentiatingAttributes.map((attribute) => (
+                          <span
+                            key={`${item.id}-diff-${attribute}`}
+                            className="rounded-full border border-slate-700 bg-slate-900 px-2.5 py-1 text-xs text-slate-200"
+                          >
+                            {formatAttributeName(attribute)}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+
+              {item.webEvidenceChecks.length > 0 ? (
+                <div className="space-y-2">
+                  <div className="text-muted text-xs font-semibold uppercase tracking-wide">
+                    Evidence Checks
+                  </div>
+                  {item.webEvidenceChecks.map((check) => (
+                    <div
+                      key={`${item.id}-${check.attribute}-${check.expectedValue}`}
+                      className="rounded-lg border border-slate-800 bg-slate-950/60 p-3"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="font-medium text-slate-100">
+                          {formatAttributeName(check.attribute)}:{" "}
+                          {check.expectedValue}
+                        </div>
+                        <div className="text-xs text-slate-300">
+                          {check.validated
+                            ? "authoritatively validated"
+                            : check.weaklySupported
+                              ? "retailer or weak support only"
+                              : "not validated"}
+                        </div>
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-300">
+                        {check.required ? (
+                          <span className="rounded-full border border-slate-700 px-2 py-0.5">
+                            required
+                          </span>
+                        ) : null}
+                        {check.matchedSourceTiers.map((tier) => (
+                          <span
+                            key={`${item.id}-${check.attribute}-${check.expectedValue}-${tier}`}
+                            className="rounded-full border border-slate-700 px-2 py-0.5"
+                          >
+                            {formatSourceTier(tier)}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
               {item.searchEvidence.length > 0 ? (
                 <div className="space-y-2">
                   <div className="text-muted text-xs font-semibold uppercase tracking-wide">
@@ -446,6 +622,11 @@ export default function QueueItemCard({
                       <div className="font-medium text-slate-100">
                         {evidence.query}
                       </div>
+                      {evidence.summary ? (
+                        <div className="mt-2 text-sm text-slate-300">
+                          {evidence.summary}
+                        </div>
+                      ) : null}
                       <div className="mt-2 space-y-1">
                         {evidence.results.slice(0, 3).map((result) => (
                           <div key={result.url} className="text-sm">
@@ -456,6 +637,11 @@ export default function QueueItemCard({
                             >
                               {result.title}
                             </Link>
+                            {result.domain ? (
+                              <div className="text-xs text-slate-400">
+                                {result.domain}
+                              </div>
+                            ) : null}
                           </div>
                         ))}
                       </div>
@@ -493,12 +679,8 @@ export default function QueueItemCard({
               ) : null}
 
               {canCreateBottle ? (
-                <Button
-                  href={`/addBottle?proposal=${item.id}&returnTo=${encodeURIComponent(returnTo)}`}
-                  color="highlight"
-                  fullWidth
-                >
-                  Create Bottle
+                <Button href={createHref} color="highlight" fullWidth>
+                  {createLabel}
                 </Button>
               ) : null}
 

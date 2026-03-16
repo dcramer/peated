@@ -12,6 +12,7 @@ import {
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
+import { upsertBottleAlias } from "@peated/server/lib/db";
 import { formatReleaseName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { pushUniqueJob } from "@peated/server/worker/client";
@@ -42,6 +43,7 @@ export default async function mergeBottle({
   }
 
   // TODO: this doesnt handle duplicate bottles
+  const updatedAliasNames = new Set<string>();
   await db.transaction(async (tx) => {
     await Promise.all([
       tx
@@ -93,36 +95,59 @@ export default async function mergeBottle({
       where: inArray(bottleReleases.bottleId, fromBottleIds),
     });
 
-    await Promise.all(
-      releases.map(async (release) => {
-        const newName = formatReleaseName({
-          name: targetBottle.name,
-          edition: release.edition,
-          abv: release.abv,
-          statedAge: release.statedAge,
-          releaseYear: release.releaseYear,
-          vintageYear: release.vintageYear,
-        });
+    for (const release of releases) {
+      const newName = formatReleaseName({
+        name: targetBottle.name,
+        edition: release.edition,
+        abv: release.abv,
+        statedAge: targetBottle.statedAge ? null : release.statedAge,
+        releaseYear: release.releaseYear,
+        vintageYear: release.vintageYear,
+        singleCask: release.singleCask,
+        caskStrength: release.caskStrength,
+        caskFill: release.caskFill,
+        caskType: release.caskType,
+        caskSize: release.caskSize,
+      });
 
-        const newFullName = formatReleaseName({
-          name: targetBottle.fullName,
-          edition: release.edition,
-          abv: release.abv,
-          statedAge: release.statedAge,
-          releaseYear: release.releaseYear,
-          vintageYear: release.vintageYear,
-        });
+      const newFullName = formatReleaseName({
+        name: targetBottle.fullName,
+        edition: release.edition,
+        abv: release.abv,
+        statedAge: targetBottle.statedAge ? null : release.statedAge,
+        releaseYear: release.releaseYear,
+        vintageYear: release.vintageYear,
+        singleCask: release.singleCask,
+        caskStrength: release.caskStrength,
+        caskFill: release.caskFill,
+        caskType: release.caskType,
+        caskSize: release.caskSize,
+      });
 
-        return tx
-          .update(bottleReleases)
-          .set({
-            bottleId: toBottleId,
-            name: newName,
-            fullName: newFullName,
-          })
-          .where(eq(bottleReleases.id, release.id));
-      }),
-    );
+      await tx
+        .update(bottleReleases)
+        .set({
+          bottleId: toBottleId,
+          name: newName,
+          fullName: newFullName,
+        })
+        .where(eq(bottleReleases.id, release.id));
+
+      const releaseAlias = await upsertBottleAlias(
+        tx,
+        newFullName,
+        toBottleId,
+        release.id,
+      );
+      if (
+        releaseAlias.bottleId !== toBottleId ||
+        (releaseAlias.releaseId ?? null) !== release.id
+      ) {
+        throw new Error("Release alias already belongs to a different bottle.");
+      }
+
+      updatedAliasNames.add(newFullName);
+    }
 
     await Promise.all(
       fromBottleIds.map((id) =>
@@ -165,6 +190,22 @@ export default async function mergeBottle({
 
     await tx.delete(bottles).where(inArray(bottles.id, fromBottleIds));
   });
+
+  for (const aliasName of updatedAliasNames) {
+    try {
+      await pushUniqueJob(
+        "OnBottleAliasChange",
+        { name: aliasName },
+        { delay: 5000 },
+      );
+    } catch (err) {
+      logError(err, {
+        alias: {
+          name: aliasName,
+        },
+      });
+    }
+  }
 
   try {
     await pushUniqueJob(

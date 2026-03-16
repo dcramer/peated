@@ -1,0 +1,15 @@
+CREATE TYPE "public"."store_price_match_creation_target" AS ENUM('bottle', 'release', 'bottle_and_release');
+ALTER TABLE "store_price_match_proposal" ADD COLUMN "current_release_id" bigint;
+ALTER TABLE "store_price_match_proposal" ADD COLUMN "suggested_release_id" bigint;
+ALTER TABLE "store_price_match_proposal" ADD COLUMN "parent_bottle_id" bigint;
+ALTER TABLE "store_price_match_proposal" ADD COLUMN "creation_target" "store_price_match_creation_target";
+ALTER TABLE "store_price_match_proposal" ADD COLUMN "proposed_release" jsonb;
+ALTER TABLE "store_price" ADD COLUMN "release_id" bigint;
+ALTER TABLE "store_price_match_proposal" ADD CONSTRAINT "store_price_match_proposal_current_release_id_bottle_release_id_fk" FOREIGN KEY ("current_release_id") REFERENCES "public"."bottle_release"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "store_price_match_proposal" ADD CONSTRAINT "store_price_match_proposal_suggested_release_id_bottle_release_id_fk" FOREIGN KEY ("suggested_release_id") REFERENCES "public"."bottle_release"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "store_price_match_proposal" ADD CONSTRAINT "store_price_match_proposal_parent_bottle_id_bottle_id_fk" FOREIGN KEY ("parent_bottle_id") REFERENCES "public"."bottle"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "store_price" ADD CONSTRAINT "store_price_release_id_bottle_release_id_fk" FOREIGN KEY ("release_id") REFERENCES "public"."bottle_release"("id") ON DELETE no action ON UPDATE no action;
+CREATE INDEX "store_price_match_proposal_current_release_idx" ON "store_price_match_proposal" USING btree ("current_release_id");
+CREATE INDEX "store_price_match_proposal_suggested_release_idx" ON "store_price_match_proposal" USING btree ("suggested_release_id");
+CREATE INDEX "store_price_match_proposal_parent_bottle_idx" ON "store_price_match_proposal" USING btree ("parent_bottle_id");
+CREATE INDEX "store_price_release_idx" ON "store_price" USING btree ("release_id");

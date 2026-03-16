@@ -1,5 +1,10 @@
 import { db } from "@peated/server/db";
-import { bottleReleases, bottles, changes } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottleReleases,
+  bottles,
+  changes,
+} from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq } from "drizzle-orm";
@@ -42,8 +47,8 @@ describe("POST /bottle-releases", () => {
       vintageYear: 2013,
       edition: "Batch 1",
       fullName:
-        "Ardbeg Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV",
-      name: "Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV",
+        "Ardbeg Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV - Refill - Bourbon - Hogshead",
+      name: "Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV - Refill - Bourbon - Hogshead",
       hasTasted: false,
       isFavorite: false,
       totalTastings: 0,
@@ -65,11 +70,20 @@ describe("POST /bottle-releases", () => {
     expect(release.releaseYear).toBe(2023);
     expect(release.vintageYear).toBe(2013);
     expect(release.fullName).toBe(
-      "Ardbeg Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV",
+      "Ardbeg Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV - Refill - Bourbon - Hogshead",
     );
     expect(release.name).toBe(
-      "Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV",
+      "Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV - Refill - Bourbon - Hogshead",
     );
+
+    const releaseAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, release.fullName),
+    });
+    expect(releaseAlias).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      name: release.fullName,
+    });
 
     // Verify numReleases was incremented
     const [updatedBottle] = await db
@@ -129,8 +143,9 @@ describe("POST /bottle-releases", () => {
       releaseYear: 2023,
       vintageYear: 2013,
       edition: "Batch 1",
-      fullName: "Ardbeg 10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV",
-      name: "10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV",
+      fullName:
+        "Ardbeg 10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV - Refill - Bourbon - Hogshead",
+      name: "10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV - Refill - Bourbon - Hogshead",
       hasTasted: false,
       isFavorite: false,
       totalTastings: 0,
@@ -152,10 +167,10 @@ describe("POST /bottle-releases", () => {
     expect(release.releaseYear).toBe(2023);
     expect(release.vintageYear).toBe(2013);
     expect(release.fullName).toBe(
-      "Ardbeg 10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV", // No age in name since it's in bottle
+      "Ardbeg 10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV - Refill - Bourbon - Hogshead", // No age in name since it's in bottle
     );
     expect(release.name).toBe(
-      "10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV", // No age in name since it's in bottle
+      "10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV - Refill - Bourbon - Hogshead", // No age in name since it's in bottle
     );
 
     // Verify numReleases was incremented
@@ -229,6 +244,87 @@ describe("POST /bottle-releases", () => {
       }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
+  });
+
+  it("creates cask-only releases with distinct canonical names", async function ({
+    fixtures,
+    defaults,
+  }) {
+    const bottle = await fixtures.Bottle({
+      name: "Distillery Reserve",
+      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+      statedAge: null,
+    });
+
+    const result = await routerClient.bottleReleases.create(
+      {
+        bottle: bottle.id,
+        edition: null,
+        statedAge: null,
+        abv: null,
+        releaseYear: null,
+        vintageYear: null,
+        singleCask: true,
+        caskStrength: true,
+        caskType: "tawny_port",
+        caskSize: "hogshead",
+        caskFill: "1st_fill",
+      },
+      {
+        context: { user: defaults.user },
+      },
+    );
+
+    expect(result.fullName).toBe(
+      "Ardbeg Distillery Reserve - Single Cask - Cask Strength - 1st Fill - Tawny Port - Hogshead",
+    );
+  });
+
+  it("allows releases that differ only by cask identity", async function ({
+    fixtures,
+    defaults,
+  }) {
+    const bottle = await fixtures.Bottle({
+      name: "Distillery Reserve",
+      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+      statedAge: null,
+    });
+
+    await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: null,
+      statedAge: null,
+      abv: 46,
+      caskType: "bourbon",
+      caskSize: "hogshead",
+      caskFill: "refill",
+      singleCask: false,
+      caskStrength: false,
+    });
+
+    const result = await routerClient.bottleReleases.create(
+      {
+        bottle: bottle.id,
+        edition: null,
+        statedAge: null,
+        abv: 46,
+        releaseYear: null,
+        vintageYear: null,
+        singleCask: false,
+        caskStrength: false,
+        caskType: "oloroso",
+        caskSize: "hogshead",
+        caskFill: "refill",
+      },
+      {
+        context: { user: defaults.user },
+      },
+    );
+
+    expect(result.caskType).toBe("oloroso");
+    expect(result.fullName).toBe(
+      "Ardbeg Distillery Reserve - 46.0% ABV - Refill - Oloroso - Hogshead",
+    );
   });
 
   it("throws error if release with same attributes exists", async function ({

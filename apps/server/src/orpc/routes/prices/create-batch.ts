@@ -5,7 +5,7 @@ import {
   storePriceHistories,
   storePrices,
 } from "@peated/server/db/schema";
-import { findBottleId } from "@peated/server/lib/bottleFinder";
+import { findBottleTarget } from "@peated/server/lib/bottleFinder";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { normalizeBottle } from "@peated/server/lib/normalize";
 import { chunked } from "@peated/server/lib/scraper";
@@ -54,17 +54,20 @@ export default procedure
         prices.map(async (sp) => {
           const [price] = await db.transaction(async (tx) => {
             const { name } = normalizeBottle({ name: sp.name });
-            const bottleId = await findBottleId(name);
+            const target = await findBottleTarget(name);
+            const bottleId = target?.bottleId ?? null;
+            const releaseId = target?.releaseId ?? null;
 
             // XXX: maybe we should constrain on URL?
             const {
               rows: [{ id: rawPriceId, imageUrl }],
             } = await tx.execute<Pick<StorePrice, "id" | "imageUrl">>(sql`
-              INSERT INTO ${storePrices} (bottle_id, external_site_id, name, volume, price, currency, url)
-              VALUES (${bottleId}, ${site.id}, ${name}, ${sp.volume}, ${sp.price}, ${sp.currency}, ${sp.url})
+              INSERT INTO ${storePrices} (bottle_id, release_id, external_site_id, name, volume, price, currency, url)
+              VALUES (${bottleId}, ${releaseId}, ${site.id}, ${name}, ${sp.volume}, ${sp.price}, ${sp.currency}, ${sp.url})
               ON CONFLICT (external_site_id, LOWER(name), volume)
               DO UPDATE
               SET bottle_id = COALESCE(excluded.bottle_id, ${storePrices.bottleId}),
+                  release_id = COALESCE(excluded.release_id, ${storePrices.releaseId}),
                   price = excluded.price,
                   currency = excluded.currency,
                   url = excluded.url,
@@ -85,7 +88,7 @@ export default procedure
               .onConflictDoNothing();
 
             if (bottleId) {
-              await upsertBottleAlias(tx, name, bottleId);
+              await upsertBottleAlias(tx, name, bottleId, releaseId);
             }
 
             return [{ id: priceId, imageUrl }];

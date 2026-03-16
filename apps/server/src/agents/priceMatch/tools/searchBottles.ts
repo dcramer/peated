@@ -20,13 +20,16 @@ export function createSearchBottlesTool({
   return tool({
     name: "search_bottles",
     description:
-      "Search the local bottle database using exact alias matching, embeddings, full-text search, and producer-aware heuristics. Use this before web search when local candidates are thin, conflicting, or missing obvious near matches. Provide the most specific bottle identity you know, including brand, expression, series, edition, age, ABV, cask details, and years. Do not include packaging, volume, pricing, or retailer SEO noise in the query.",
+      "Search the local bottle database using exact alias matching, embeddings, full-text search, and producer-aware heuristics. Results may be either bottle targets or specific release targets. Use this before web search when local candidates are thin, conflicting, or missing obvious near matches. Provide the most specific bottle identity you know, including brand, bottler, distillery, expression, series, edition, age, ABV, cask details, and years. Do not include packaging, volume, pricing, or retailer SEO noise in the query.",
     parameters: BottleCandidateSearchInputSchema.extend({
       query: BottleCandidateSearchInputSchema.shape.query.describe(
         "Raw retailer listing title or fallback search text. Exclude volume, pack-size, gift-set, and price noise when possible.",
       ),
       brand: BottleCandidateSearchInputSchema.shape.brand.describe(
-        "Most prominent producer or bottler on the label. For independent bottlings, this is usually the bottler, not the distillery.",
+        "Most prominent consumer-facing brand on the label. For independent bottlings, this is usually the bottler label, not the distillery.",
+      ),
+      bottler: BottleCandidateSearchInputSchema.shape.bottler.describe(
+        "Separately stated bottler when different from the label brand. Leave null when the brand itself is the bottler.",
       ),
       expression: BottleCandidateSearchInputSchema.shape.expression.describe(
         "Core release name after removing brand, age, ABV, and generic style words.",
@@ -49,6 +52,12 @@ export function createSearchBottlesTool({
       cask_type: BottleCandidateSearchInputSchema.shape.cask_type.describe(
         "Primary cask or finish wording such as First Fill Bourbon or PX Cask Finish.",
       ),
+      cask_size: BottleCandidateSearchInputSchema.shape.cask_size.describe(
+        "Normalized cask size when explicitly stated, such as port_pipe or hogshead.",
+      ),
+      cask_fill: BottleCandidateSearchInputSchema.shape.cask_fill.describe(
+        "Normalized cask fill when explicitly stated, such as 1st_fill or refill.",
+      ),
       cask_strength:
         BottleCandidateSearchInputSchema.shape.cask_strength.describe(
           "True only when the listing explicitly says cask strength, barrel strength, barrel proof, full proof, or natural strength.",
@@ -70,6 +79,10 @@ export function createSearchBottlesTool({
       currentBottleId:
         BottleCandidateSearchInputSchema.shape.currentBottleId.describe(
           "Current assigned bottle id, if the listing is already attached to a bottle.",
+        ),
+      currentReleaseId:
+        BottleCandidateSearchInputSchema.shape.currentReleaseId.describe(
+          "Current assigned release id, if the listing is already attached to a specific release.",
         ),
       limit: BottleCandidateSearchInputSchema.shape.limit.describe(
         "Maximum number of candidates to return.",

@@ -407,7 +407,7 @@ describe("price match queue", () => {
     });
   });
 
-  test("approves a matched bottle and backfills related records", async ({
+  test("approves a matched bottle without cross-site fanout", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -507,7 +507,7 @@ describe("price match queue", () => {
 
     expect(alias?.bottleId).toBe(bottle.id);
     expect(updatedPrice?.bottleId).toBe(bottle.id);
-    expect(updatedSiblingPrice?.bottleId).toBe(bottle.id);
+    expect(updatedSiblingPrice?.bottleId).toBeNull();
     expect(updatedReview?.bottleId).toBe(bottle.id);
     expect(updatedBottle?.imageUrl).toBe("https://example.com/price.jpg");
     expect(updatedProposal).toMatchObject({
@@ -517,11 +517,10 @@ describe("price match queue", () => {
       reviewedById: user.id,
     });
     expect(updatedSiblingProposal).toMatchObject({
-      status: "approved",
-      proposalType: "match_existing",
-      currentBottleId: bottle.id,
-      suggestedBottleId: bottle.id,
-      reviewedById: user.id,
+      status: "errored",
+      proposalType: "no_match",
+      currentBottleId: null,
+      suggestedBottleId: null,
     });
     expect(untouchedIgnoredProposal).toMatchObject({
       status: "ignored",
@@ -582,15 +581,15 @@ describe("price match queue", () => {
       where: eq(bottleAliases.name, "Queue Create Candidate"),
     });
 
-    expect(result.fullName).toBe("Queue Brand Single Cask");
-    expect(updatedPrice?.bottleId).toBe(result.id);
+    expect(result.bottle.fullName).toBe("Queue Brand Single Cask");
+    expect(updatedPrice?.bottleId).toBe(result.bottle.id);
     expect(updatedProposal).toMatchObject({
       status: "approved",
-      currentBottleId: result.id,
-      suggestedBottleId: result.id,
+      currentBottleId: result.bottle.id,
+      suggestedBottleId: result.bottle.id,
       reviewedById: user.id,
     });
-    expect(listingAlias?.bottleId).toBe(result.id);
+    expect(listingAlias?.bottleId).toBe(result.bottle.id);
   });
 
   test("rolls back proposal-backed bottle creation when approval fails", async ({
