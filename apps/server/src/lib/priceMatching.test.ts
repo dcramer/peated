@@ -1423,14 +1423,14 @@ describe("priceMatching", () => {
         {
           query: '"Replacement Brand" "Fresh Release" official',
           summary:
-            "The official Replacement Brand page confirms Fresh Release as a 12 year single malt release.",
+            "The official Replacement Brand page confirms Fresh Release from Replacement Distillery as a 12 year single malt release.",
           results: [
             {
               title: "Replacement Create Candidate",
               url: "https://www.replacementbrand.com/fresh-release",
               domain: "replacementbrand.com",
               description:
-                "The official Replacement Brand page confirms Fresh Release as a 12 year single malt release.",
+                "The official Replacement Brand page confirms Fresh Release from Replacement Distillery as a 12 year single malt release.",
               extraSnippets: [],
             },
           ],

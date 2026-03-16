@@ -116,7 +116,17 @@ describe("StorePriceMatchDecisionSchema", () => {
           };
         }
       | undefined;
-    const proposedBottle = createNewSchema?.properties?.proposedBottle;
+    const proposedBottle = (
+      createNewSchema?.properties?.proposedBottle as
+        | {
+            anyOf?: Array<{
+              type?: string;
+              properties?: Record<string, unknown>;
+              required?: string[];
+            }>;
+          }
+        | undefined
+    )?.anyOf?.find((schema) => schema.type === "object");
     const series = proposedBottle?.properties?.series as
       | {
           anyOf?: Array<{

@@ -1363,6 +1363,7 @@ export async function findBottleMatchCandidates(
   }
 
   const extractedLabel = buildSearchLabel(input);
+  const exactSearchName = getNormalizedPriceName(input.query ?? searchName);
   const normalizedName = getNormalizedPriceName(searchName);
   const queryText = buildQueryText(normalizedName, extractedLabel);
   const candidates = new Map<string, PriceMatchCandidate>();
@@ -1415,7 +1416,7 @@ export async function findBottleMatchCandidates(
       "exact",
       searchName,
       null as PriceMatchCandidate | null,
-      async () => await getExactBottleCandidate(normalizedName),
+      async () => await getExactBottleCandidate(exactSearchName),
     ),
   ]);
 

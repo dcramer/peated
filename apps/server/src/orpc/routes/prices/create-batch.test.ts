@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleAliases, storePrices } from "@peated/server/db/schema";
+import { normalizeBottle } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
@@ -180,10 +181,14 @@ describe("POST /external-sites/:site/prices", () => {
       .from(storePrices)
       .where(eq(storePrices.externalSiteId, site.id));
 
+    const normalizedReleaseName = normalizeBottle({
+      name: release.fullName,
+    }).name;
+
     expect(price).toMatchObject({
       bottleId: bottle.id,
       releaseId: release.id,
-      name: release.fullName,
+      name: normalizedReleaseName,
     });
   });
 

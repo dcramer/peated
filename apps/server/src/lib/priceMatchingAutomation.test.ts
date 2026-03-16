@@ -34,7 +34,9 @@ function buildCandidate(
   overrides: Partial<AssessmentInput["candidateBottles"][number]> = {},
 ): AssessmentInput["candidateBottles"][number] {
   return {
+    kind: "bottle",
     bottleId: 1,
+    releaseId: null,
     alias: null,
     fullName: "Example Distillery Port Cask 10 Year",
     brand: "Example Distillery",
