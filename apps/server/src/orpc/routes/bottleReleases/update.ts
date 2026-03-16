@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleReleases, bottles, changes } from "@peated/server/db/schema";
+import { findExistingBottleReleaseByIdentity } from "@peated/server/lib/bottleReleaseIdentity";
 import {
   formatCanonicalReleaseName,
   getResolvedReleaseIdentity,
@@ -16,7 +17,7 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
 import { pushJob } from "@peated/server/worker/client";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 // PATCH routes need to distinguish between omitted fields and an explicit null
@@ -57,6 +58,16 @@ function hasInputField<
   TKey extends keyof TInput,
 >(input: TInput, key: TKey) {
   return input[key] !== undefined;
+}
+
+function getPatchedNullableValue<
+  TInput extends Record<string, unknown>,
+  TKey extends keyof TInput,
+  TValue,
+>(input: TInput, key: TKey, currentValue: TValue): TValue {
+  return hasInputField(input, key)
+    ? ((input[key] ?? null) as TValue)
+    : currentValue;
 }
 
 export default procedure
@@ -117,60 +128,55 @@ export default procedure
 
       // Preserve existing values for omitted fields while still allowing mods
       // to clear nullable release attributes with an explicit null.
-      const nextEdition = hasInputField(input, "edition")
-        ? (input.edition ?? null)
-        : release.edition;
-      const nextStatedAge = hasInputField(input, "statedAge")
-        ? (input.statedAge ?? null)
-        : release.statedAge;
-      const nextAbv = hasInputField(input, "abv")
-        ? (input.abv ?? null)
-        : release.abv;
-      const nextReleaseYear = hasInputField(input, "releaseYear")
-        ? (input.releaseYear ?? null)
-        : release.releaseYear;
-      const nextVintageYear = hasInputField(input, "vintageYear")
-        ? (input.vintageYear ?? null)
-        : release.vintageYear;
-      const nextSingleCask = hasInputField(input, "singleCask")
-        ? (input.singleCask ?? null)
-        : release.singleCask;
-      const nextCaskStrength = hasInputField(input, "caskStrength")
-        ? (input.caskStrength ?? null)
-        : release.caskStrength;
-      const nextCaskFill = hasInputField(input, "caskFill")
-        ? (input.caskFill ?? null)
-        : release.caskFill;
-      const nextCaskType = hasInputField(input, "caskType")
-        ? (input.caskType ?? null)
-        : release.caskType;
-      const nextCaskSize = hasInputField(input, "caskSize")
-        ? (input.caskSize ?? null)
-        : release.caskSize;
-      const nextDescription = hasInputField(input, "description")
-        ? (input.description ?? null)
-        : release.description;
-      const nextImageUrl = hasInputField(input, "imageUrl")
-        ? (input.imageUrl ?? null)
-        : release.imageUrl;
-      const nextTastingNotes = hasInputField(input, "tastingNotes")
-        ? (input.tastingNotes ?? null)
-        : release.tastingNotes;
+      const nextReleaseIdentity = {
+        edition: getPatchedNullableValue(input, "edition", release.edition),
+        statedAge: getPatchedNullableValue(
+          input,
+          "statedAge",
+          release.statedAge,
+        ),
+        abv: getPatchedNullableValue(input, "abv", release.abv),
+        releaseYear: getPatchedNullableValue(
+          input,
+          "releaseYear",
+          release.releaseYear,
+        ),
+        vintageYear: getPatchedNullableValue(
+          input,
+          "vintageYear",
+          release.vintageYear,
+        ),
+        singleCask: getPatchedNullableValue(
+          input,
+          "singleCask",
+          release.singleCask,
+        ),
+        caskStrength: getPatchedNullableValue(
+          input,
+          "caskStrength",
+          release.caskStrength,
+        ),
+        caskFill: getPatchedNullableValue(input, "caskFill", release.caskFill),
+        caskType: getPatchedNullableValue(input, "caskType", release.caskType),
+        caskSize: getPatchedNullableValue(input, "caskSize", release.caskSize),
+      };
+      const nextReleaseMetadata = {
+        description: getPatchedNullableValue(
+          input,
+          "description",
+          release.description,
+        ),
+        imageUrl: getPatchedNullableValue(input, "imageUrl", release.imageUrl),
+        tastingNotes: getPatchedNullableValue(
+          input,
+          "tastingNotes",
+          release.tastingNotes,
+        ),
+      };
 
       const resolvedReleaseIdentity = getResolvedReleaseIdentity({
         bottle,
-        release: {
-          edition: nextEdition,
-          statedAge: nextStatedAge,
-          abv: nextAbv,
-          releaseYear: nextReleaseYear,
-          vintageYear: nextVintageYear,
-          singleCask: nextSingleCask,
-          caskStrength: nextCaskStrength,
-          caskFill: nextCaskFill,
-          caskType: nextCaskType,
-          caskSize: nextCaskSize,
-        },
+        release: nextReleaseIdentity,
       });
 
       // Always derive the name from the resolved bottle/release identity so a
@@ -182,58 +188,10 @@ export default procedure
         release: resolvedReleaseIdentity,
       });
 
-      const existingRelease = await tx.query.bottleReleases.findFirst({
-        where: and(
-          eq(bottleReleases.bottleId, bottle.id),
-          // Check edition
-          resolvedReleaseIdentity.edition !== null
-            ? eq(
-                sql`LOWER(${bottleReleases.edition})`,
-                resolvedReleaseIdentity.edition.toLowerCase(),
-              )
-            : isNull(bottleReleases.edition),
-          // Check vintage year
-          resolvedReleaseIdentity.vintageYear !== null
-            ? eq(
-                bottleReleases.vintageYear,
-                resolvedReleaseIdentity.vintageYear,
-              )
-            : isNull(bottleReleases.vintageYear),
-          // Check release year
-          resolvedReleaseIdentity.releaseYear !== null
-            ? eq(
-                bottleReleases.releaseYear,
-                resolvedReleaseIdentity.releaseYear,
-              )
-            : isNull(bottleReleases.releaseYear),
-          // Check stated age
-          resolvedReleaseIdentity.statedAge !== null
-            ? eq(bottleReleases.statedAge, resolvedReleaseIdentity.statedAge)
-            : isNull(bottleReleases.statedAge),
-          resolvedReleaseIdentity.abv !== null
-            ? eq(bottleReleases.abv, resolvedReleaseIdentity.abv)
-            : isNull(bottleReleases.abv),
-          resolvedReleaseIdentity.singleCask !== null
-            ? eq(bottleReleases.singleCask, resolvedReleaseIdentity.singleCask)
-            : isNull(bottleReleases.singleCask),
-          resolvedReleaseIdentity.caskStrength !== null
-            ? eq(
-                bottleReleases.caskStrength,
-                resolvedReleaseIdentity.caskStrength,
-              )
-            : isNull(bottleReleases.caskStrength),
-          resolvedReleaseIdentity.caskSize !== null
-            ? eq(bottleReleases.caskSize, resolvedReleaseIdentity.caskSize)
-            : isNull(bottleReleases.caskSize),
-          resolvedReleaseIdentity.caskType !== null
-            ? eq(bottleReleases.caskType, resolvedReleaseIdentity.caskType)
-            : isNull(bottleReleases.caskType),
-          resolvedReleaseIdentity.caskFill !== null
-            ? eq(bottleReleases.caskFill, resolvedReleaseIdentity.caskFill)
-            : isNull(bottleReleases.caskFill),
-          // Exclude the current release from the check
-          sql`${bottleReleases.id} != ${release.id}`,
-        ),
+      const existingRelease = await findExistingBottleReleaseByIdentity(tx, {
+        bottleId: bottle.id,
+        release: resolvedReleaseIdentity,
+        excludeReleaseId: release.id,
       });
 
       if (existingRelease) {
@@ -269,9 +227,9 @@ export default procedure
           caskSize: resolvedReleaseIdentity.caskSize,
           caskType: resolvedReleaseIdentity.caskType,
           caskFill: resolvedReleaseIdentity.caskFill,
-          description: nextDescription,
-          imageUrl: nextImageUrl,
-          tastingNotes: nextTastingNotes,
+          description: nextReleaseMetadata.description,
+          imageUrl: nextReleaseMetadata.imageUrl,
+          tastingNotes: nextReleaseMetadata.tastingNotes,
           updatedAt: sql`NOW()`,
         })
         .where(eq(bottleReleases.id, release.id))

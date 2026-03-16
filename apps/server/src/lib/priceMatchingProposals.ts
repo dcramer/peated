@@ -46,8 +46,8 @@ import {
   getBottleMatchCandidateById,
 } from "@peated/server/lib/priceMatchingCandidates";
 import {
-  normalizeProposedBottleDraft,
-  splitProposedBottleReleaseDraft,
+  inferPriceMatchCreationTarget,
+  normalizeCreateNewDrafts,
 } from "@peated/server/lib/priceMatchingDraftNormalization";
 import {
   hasActiveStorePriceMatchProposalProcessingLease,
@@ -84,6 +84,10 @@ type PriceMatchCandidate = z.infer<typeof PriceMatchCandidateSchema>;
 type SearchEvidence = z.infer<typeof PriceMatchSearchEvidenceSchema>;
 type ProposedRelease = z.infer<typeof ProposedReleaseSchema>;
 type StorePriceMatchDecision = z.infer<typeof StorePriceMatchDecisionSchema>;
+type ProposedBottleDraft = NonNullable<
+  StorePriceMatchDecision["proposedBottle"]
+>;
+type BottleCreateInput = z.infer<typeof BottleInputSchema>;
 type ResolvedEntity = NonNullable<
   StorePriceMatchClassification["resolvedEntities"]
 >[number];
@@ -141,6 +145,65 @@ function sanitizeResolvedEntityChoice(
     id: resolvedEntity.entityId,
     name: resolvedEntity.name,
   };
+}
+
+function sanitizeProposedBottleDraft(
+  proposedBottle: NonNullable<StorePriceMatchDecision["proposedBottle"]>,
+  resolvedEntitiesById: Map<number, ResolvedEntity>,
+) {
+  return {
+    ...proposedBottle,
+    category:
+      proposedBottle.category === "spirit" ? null : proposedBottle.category,
+    series: proposedBottle.series
+      ? {
+          ...proposedBottle.series,
+          id: null,
+        }
+      : null,
+    brand: sanitizeResolvedEntityChoice(
+      proposedBottle.brand,
+      "brand",
+      resolvedEntitiesById,
+    ),
+    distillers: proposedBottle.distillers.map((distiller) =>
+      sanitizeResolvedEntityChoice(
+        distiller,
+        "distiller",
+        resolvedEntitiesById,
+      ),
+    ),
+    bottler: proposedBottle.bottler
+      ? sanitizeResolvedEntityChoice(
+          proposedBottle.bottler,
+          "bottler",
+          resolvedEntitiesById,
+        )
+      : null,
+  };
+}
+
+function buildBottleEntityInput(
+  choice: {
+    id: number | null;
+    name: string;
+  },
+  entityType: "brand" | "distiller" | "bottler",
+): BottleCreateInput["brand"] {
+  return (
+    choice.id ?? {
+      name: choice.name,
+      type: [entityType],
+      description: null,
+      shortName: null,
+      location: null,
+      address: null,
+      yearEstablished: null,
+      website: null,
+      country: null,
+      region: null,
+    }
+  );
 }
 
 function sanitizeStorePriceMatchDecision(
@@ -212,55 +275,24 @@ function sanitizeStorePriceMatchDecision(
 
   if (decision.action === "create_new") {
     const sanitizedBottleDraft = decision.proposedBottle
-      ? {
-          ...decision.proposedBottle,
-          category:
-            decision.proposedBottle.category === "spirit"
-              ? null
-              : decision.proposedBottle.category,
-          series: decision.proposedBottle.series
-            ? {
-                ...decision.proposedBottle.series,
-                id: null,
-              }
-            : null,
-          brand: sanitizeResolvedEntityChoice(
-            decision.proposedBottle.brand,
-            "brand",
-            resolvedEntitiesById,
-          ),
-          distillers: decision.proposedBottle.distillers.map((distiller) =>
-            sanitizeResolvedEntityChoice(
-              distiller,
-              "distiller",
-              resolvedEntitiesById,
-            ),
-          ),
-          bottler: decision.proposedBottle.bottler
-            ? sanitizeResolvedEntityChoice(
-                decision.proposedBottle.bottler,
-                "bottler",
-                resolvedEntitiesById,
-              )
-            : null,
-        }
+      ? sanitizeProposedBottleDraft(
+          decision.proposedBottle,
+          resolvedEntitiesById,
+        )
       : null;
 
-    const normalizedDrafts = sanitizedBottleDraft
-      ? splitProposedBottleReleaseDraft({
-          proposedBottle: sanitizedBottleDraft,
-          proposedRelease: decision.proposedRelease ?? null,
-        })
-      : {
-          proposedBottle: null,
-          proposedRelease: decision.proposedRelease ?? null,
-        };
+    const normalizedDrafts = normalizeCreateNewDrafts({
+      creationTarget: decision.creationTarget ?? null,
+      proposedBottle: sanitizedBottleDraft,
+      proposedRelease: decision.proposedRelease ?? null,
+    });
 
     return {
       ...decision,
       confidence: normalizedConfidence,
       suggestedBottleId: null,
       suggestedReleaseId: null,
+      creationTarget: normalizedDrafts.creationTarget,
       candidateBottleIds: filteredCandidateBottleIds,
       proposedBottle: normalizedDrafts.proposedBottle,
       proposedRelease: normalizedDrafts.proposedRelease,
@@ -663,58 +695,22 @@ async function maybeResolveTrustedSmwsStorePriceMatch(
 }
 
 function buildBottleInputFromProposedBottle(
-  proposedBottle: NonNullable<StorePriceMatchDecision["proposedBottle"]>,
-): z.infer<typeof BottleInputSchema> {
-  const normalizedProposedBottle = normalizeProposedBottleDraft(proposedBottle);
-
+  proposedBottle: ProposedBottleDraft,
+): BottleCreateInput {
   return {
-    ...normalizedProposedBottle,
-    series: normalizedProposedBottle.series
-      ? (normalizedProposedBottle.series.id ?? {
-          name: normalizedProposedBottle.series.name,
+    ...proposedBottle,
+    series: proposedBottle.series
+      ? (proposedBottle.series.id ?? {
+          name: proposedBottle.series.name,
           description: null,
         })
       : null,
-    brand: normalizedProposedBottle.brand.id ?? {
-      name: normalizedProposedBottle.brand.name,
-      type: ["brand"],
-      description: null,
-      shortName: null,
-      location: null,
-      address: null,
-      yearEstablished: null,
-      website: null,
-      country: null,
-      region: null,
-    },
-    distillers: normalizedProposedBottle.distillers.map(
-      (distiller) =>
-        distiller.id ?? {
-          name: distiller.name,
-          type: ["distiller"],
-          description: null,
-          shortName: null,
-          location: null,
-          address: null,
-          yearEstablished: null,
-          website: null,
-          country: null,
-          region: null,
-        },
+    brand: buildBottleEntityInput(proposedBottle.brand, "brand"),
+    distillers: proposedBottle.distillers.map((distiller) =>
+      buildBottleEntityInput(distiller, "distiller"),
     ),
-    bottler: normalizedProposedBottle.bottler
-      ? (normalizedProposedBottle.bottler.id ?? {
-          name: normalizedProposedBottle.bottler.name,
-          type: ["bottler"],
-          description: null,
-          shortName: null,
-          location: null,
-          address: null,
-          yearEstablished: null,
-          website: null,
-          country: null,
-          region: null,
-        })
+    bottler: proposedBottle.bottler
+      ? buildBottleEntityInput(proposedBottle.bottler, "bottler")
       : null,
     description: null,
     descriptionSrc: null,
@@ -742,24 +738,14 @@ function buildStorePriceMatchCreateInputs(decision: StorePriceMatchDecision) {
     };
   }
 
-  const normalizedDrafts = decision.proposedBottle
-    ? splitProposedBottleReleaseDraft({
-        proposedBottle: decision.proposedBottle,
-        proposedRelease: decision.proposedRelease ?? null,
-      })
-    : {
-        proposedBottle: null,
-        proposedRelease: decision.proposedRelease ?? null,
-      };
-
+  // Callers sanitize create_new decisions first, so these drafts are already
+  // normalized and aligned with the explicit bottle-vs-release target.
   return {
-    input: normalizedDrafts.proposedBottle
-      ? buildBottleInputFromProposedBottle(normalizedDrafts.proposedBottle)
+    input: decision.proposedBottle
+      ? buildBottleInputFromProposedBottle(decision.proposedBottle)
       : undefined,
-    releaseInput: normalizedDrafts.proposedRelease
-      ? buildBottleReleaseInputFromProposedRelease(
-          normalizedDrafts.proposedRelease,
-        )
+    releaseInput: decision.proposedRelease
+      ? buildBottleReleaseInputFromProposedRelease(decision.proposedRelease)
       : undefined,
   };
 }
@@ -770,12 +756,12 @@ function buildStorePriceObservationFacts(
     "proposalType" | "creationTarget" | "proposedBottle" | "proposedRelease"
   >,
 ) {
-  const releaseFacts =
-    proposal.proposedRelease && typeof proposal.proposedRelease === "object"
-      ? getReleaseObservationFacts(
-          proposal.proposedRelease as Partial<ProposedRelease>,
-        )
-      : {};
+  const releaseObservationSource =
+    proposal.proposedRelease ??
+    (proposal.proposedBottle as Partial<ProposedRelease> | null);
+  const releaseFacts = releaseObservationSource
+    ? getReleaseObservationFacts(releaseObservationSource)
+    : {};
 
   return {
     proposalType: proposal.proposalType,
@@ -844,72 +830,48 @@ export async function upsertStorePriceMatchProposal({
     (decision
       ? getProposalStatus(price, decision, automationAssessment ?? null)
       : "errored");
+  const creationTarget =
+    decision?.action === "create_new"
+      ? (decision.creationTarget ?? null)
+      : null;
+  const proposalValues = {
+    status,
+    proposalType,
+    confidence: decision?.confidence ?? null,
+    currentBottleId: price.bottleId,
+    currentReleaseId: price.releaseId ?? null,
+    suggestedBottleId: decision?.suggestedBottleId ?? null,
+    suggestedReleaseId: decision?.suggestedReleaseId ?? null,
+    parentBottleId:
+      decision?.action === "create_new"
+        ? (decision.parentBottleId ?? null)
+        : null,
+    creationTarget,
+    candidateBottles: candidates,
+    extractedLabel,
+    proposedBottle: decision?.proposedBottle ?? null,
+    proposedRelease: decision?.proposedRelease ?? null,
+    searchEvidence: searchEvidence || [],
+    rationale: decision?.rationale ?? null,
+    model: config.OPENAI_MODEL,
+    error: error || null,
+    lastEvaluatedAt: sql`NOW()`,
+    reviewedById: null,
+    reviewedAt: null,
+    updatedAt: sql`NOW()`,
+  };
   const [proposal] = await db
     .insert(storePriceMatchProposals)
     .values({
       priceId: price.id,
-      status,
-      proposalType,
-      confidence: decision?.confidence ?? null,
-      currentBottleId: price.bottleId,
-      currentReleaseId: price.releaseId ?? null,
-      suggestedBottleId: decision?.suggestedBottleId ?? null,
-      suggestedReleaseId: decision?.suggestedReleaseId ?? null,
-      parentBottleId:
-        decision?.action === "create_new"
-          ? (decision.parentBottleId ?? null)
-          : null,
-      creationTarget:
-        decision?.action === "create_new"
-          ? (decision.creationTarget ?? DEFAULT_PRICE_MATCH_CREATION_TARGET)
-          : null,
-      candidateBottles: candidates,
-      extractedLabel,
-      proposedBottle: decision?.proposedBottle ?? null,
-      proposedRelease: decision?.proposedRelease ?? null,
-      searchEvidence: searchEvidence || [],
-      rationale: decision?.rationale ?? null,
-      model: config.OPENAI_MODEL,
-      error: error || null,
-      lastEvaluatedAt: sql`NOW()`,
-      reviewedById: null,
-      reviewedAt: null,
-      updatedAt: sql`NOW()`,
+      ...proposalValues,
     })
     .onConflictDoUpdate({
       target: storePriceMatchProposals.priceId,
       setWhere: expectedProcessingToken
         ? sql`${storePriceMatchProposals.processingToken} = ${expectedProcessingToken} AND ${storePriceMatchProposals.processingExpiresAt} IS NOT NULL AND ${storePriceMatchProposals.processingExpiresAt} > NOW()`
         : undefined,
-      set: {
-        status,
-        proposalType,
-        confidence: decision?.confidence ?? null,
-        currentBottleId: price.bottleId,
-        currentReleaseId: price.releaseId ?? null,
-        suggestedBottleId: decision?.suggestedBottleId ?? null,
-        suggestedReleaseId: decision?.suggestedReleaseId ?? null,
-        parentBottleId:
-          decision?.action === "create_new"
-            ? (decision.parentBottleId ?? null)
-            : null,
-        creationTarget:
-          decision?.action === "create_new"
-            ? (decision.creationTarget ?? DEFAULT_PRICE_MATCH_CREATION_TARGET)
-            : null,
-        candidateBottles: candidates,
-        extractedLabel,
-        proposedBottle: decision?.proposedBottle ?? null,
-        proposedRelease: decision?.proposedRelease ?? null,
-        searchEvidence: searchEvidence || [],
-        rationale: decision?.rationale ?? null,
-        model: config.OPENAI_MODEL,
-        error: error || null,
-        lastEvaluatedAt: sql`NOW()`,
-        reviewedById: null,
-        reviewedAt: null,
-        updatedAt: sql`NOW()`,
-      },
+      set: proposalValues,
     })
     .returning();
 
@@ -943,13 +905,16 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     expectedProcessingToken,
   });
 
-  const creationTarget =
-    proposal.creationTarget ??
-    (releaseInput
-      ? input
-        ? "bottle_and_release"
-        : "release"
-      : DEFAULT_PRICE_MATCH_CREATION_TARGET);
+  const creationTarget = inferPriceMatchCreationTarget({
+    bottle: input,
+    release: releaseInput,
+  });
+
+  if (!creationTarget) {
+    throw new Error(
+      `Missing proposed bottle or release input for price match proposal (${proposal.id}).`,
+    );
+  }
 
   let createResult: Awaited<
     ReturnType<typeof createBottleInTransaction>
@@ -1192,7 +1157,7 @@ export async function resolveStorePriceMatchProposal(
       proposedRelease: decision.proposedRelease ?? null,
       creationTarget:
         decision.action === "create_new"
-          ? (decision.creationTarget ?? DEFAULT_PRICE_MATCH_CREATION_TARGET)
+          ? (decision.creationTarget ?? null)
           : null,
       searchEvidence,
     });

@@ -1,14 +1,17 @@
+import { DEFAULT_PRICE_MATCH_CREATION_TARGET } from "@peated/server/lib/bottleSchemaRules";
 import {
   normalizeBottle,
   normalizeString,
   stripDuplicateBrandPrefixFromBottleName,
 } from "@peated/server/lib/normalize";
 import type {
+  PriceMatchCreationTargetEnum,
   ProposedBottleSchema,
   ProposedReleaseSchema,
 } from "@peated/server/schemas";
 import type { z } from "zod";
 
+type MatchCreationTarget = z.infer<typeof PriceMatchCreationTargetEnum>;
 type ProposedBottle = z.infer<typeof ProposedBottleSchema>;
 type ProposedRelease = z.infer<typeof ProposedReleaseSchema>;
 
@@ -103,6 +106,28 @@ function hasReleaseSpecificDraft(proposedRelease: ProposedRelease | null) {
   ].some((value) => value !== null && value !== undefined);
 }
 
+export function inferPriceMatchCreationTarget({
+  bottle,
+  release,
+}: {
+  bottle?: unknown | null;
+  release?: unknown | null;
+}): MatchCreationTarget | null {
+  if (bottle && release) {
+    return "bottle_and_release";
+  }
+
+  if (bottle) {
+    return "bottle";
+  }
+
+  if (release) {
+    return "release";
+  }
+
+  return null;
+}
+
 export function splitProposedBottleReleaseDraft({
   proposedBottle,
   proposedRelease,
@@ -150,5 +175,62 @@ export function splitProposedBottleReleaseDraft({
     proposedRelease: hasReleaseSpecificDraft(mergedRelease)
       ? mergedRelease
       : null,
+  };
+}
+
+export function normalizeCreateNewDrafts({
+  creationTarget,
+  proposedBottle,
+  proposedRelease,
+}: {
+  creationTarget?: MatchCreationTarget | null;
+  proposedBottle?: ProposedBottle | null;
+  proposedRelease?: ProposedRelease | null;
+}): {
+  creationTarget: MatchCreationTarget;
+  proposedBottle: ProposedBottle | null;
+  proposedRelease: ProposedRelease | null;
+} {
+  const requestedCreationTarget =
+    creationTarget ?? DEFAULT_PRICE_MATCH_CREATION_TARGET;
+
+  if (requestedCreationTarget === "bottle") {
+    return {
+      creationTarget: "bottle",
+      proposedBottle: proposedBottle
+        ? normalizeProposedBottleDraft(proposedBottle)
+        : null,
+      proposedRelease: null,
+    };
+  }
+
+  const normalizedDrafts = proposedBottle
+    ? splitProposedBottleReleaseDraft({
+        proposedBottle,
+        proposedRelease: proposedRelease ?? null,
+      })
+    : {
+        proposedBottle: null,
+        proposedRelease: proposedRelease ?? null,
+      };
+
+  if (requestedCreationTarget === "release") {
+    return {
+      creationTarget:
+        inferPriceMatchCreationTarget({
+          release: normalizedDrafts.proposedRelease,
+        }) ?? "release",
+      proposedBottle: null,
+      proposedRelease: normalizedDrafts.proposedRelease,
+    };
+  }
+
+  return {
+    ...normalizedDrafts,
+    creationTarget:
+      inferPriceMatchCreationTarget({
+        bottle: normalizedDrafts.proposedBottle,
+        release: normalizedDrafts.proposedRelease,
+      }) ?? requestedCreationTarget,
   };
 }

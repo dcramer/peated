@@ -531,20 +531,21 @@ describe("priceMatching", () => {
         rationale: "The listing looks like a distinct release.",
         suggestedBottleId: null,
         candidateBottleIds: [],
+        creationTarget: "bottle",
         proposedBottle: {
-          name: "Normalized Brand 8 year",
+          name: "Normalized Brand 8 year Batch 7",
           series: null,
           category: "single_malt",
-          edition: null,
+          edition: "Batch 7",
           statedAge: null,
-          caskStrength: null,
+          caskStrength: true,
           singleCask: null,
-          abv: null,
+          abv: 46,
           vintageYear: null,
-          releaseYear: null,
-          caskType: null,
-          caskSize: null,
-          caskFill: null,
+          releaseYear: 2024,
+          caskType: "bourbon",
+          caskSize: "barrel",
+          caskFill: "1st_fill",
           brand: {
             id: null,
             name: "Normalized Brand",
@@ -566,12 +567,116 @@ describe("priceMatching", () => {
     const proposal = await resolveStorePriceMatchProposal(price.id);
 
     expect(proposal.status).toBe("pending_review");
+    expect(proposal.creationTarget).toBe("bottle");
     expect(proposal.proposedBottle).toMatchObject({
-      name: "8-year-old",
+      name: "8-year-old (Batch 7)",
       statedAge: 8,
+      edition: "Batch 7",
+      caskStrength: true,
+      abv: 46,
+      releaseYear: 2024,
       brand: {
         name: "Normalized Brand",
       },
+    });
+    expect(proposal.proposedRelease).toBeNull();
+  });
+
+  test("splits normalized drafts when create_new explicitly targets bottle_and_release", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Normalized Release Draft Candidate",
+      imageUrl: null,
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Normalized Brand",
+      expression: "8 Year",
+      series: null,
+      distillery: ["Normalized Distillery"],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyStorePriceMatch).mockResolvedValue({
+      decision: {
+        action: "create_new",
+        confidence: 85,
+        rationale: "The listing looks like a distinct release.",
+        suggestedBottleId: null,
+        candidateBottleIds: [],
+        creationTarget: "bottle_and_release",
+        proposedBottle: {
+          name: "Normalized Brand 8 year Batch 7",
+          series: null,
+          category: "single_malt",
+          edition: "Batch 7",
+          statedAge: null,
+          caskStrength: true,
+          singleCask: null,
+          abv: 46,
+          vintageYear: null,
+          releaseYear: 2024,
+          caskType: "bourbon",
+          caskSize: "barrel",
+          caskFill: "1st_fill",
+          brand: {
+            id: null,
+            name: "Normalized Brand",
+          },
+          distillers: [
+            {
+              id: null,
+              name: "Normalized Distillery",
+            },
+          ],
+          bottler: null,
+        },
+      },
+      searchEvidence: [],
+      candidateBottles: [],
+      resolvedEntities: [],
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(proposal.status).toBe("pending_review");
+    expect(proposal.creationTarget).toBe("bottle_and_release");
+    expect(proposal.proposedBottle).toMatchObject({
+      name: "8-year-old (Batch 7)",
+      statedAge: 8,
+      edition: null,
+      caskStrength: null,
+      abv: null,
+      releaseYear: null,
+      brand: {
+        name: "Normalized Brand",
+      },
+    });
+    expect(proposal.proposedRelease).toMatchObject({
+      edition: "Batch 7",
+      caskStrength: true,
+      abv: 46,
+      releaseYear: 2024,
+      caskType: "bourbon",
+      caskSize: "barrel",
+      caskFill: "1st_fill",
     });
   });
 
@@ -675,15 +780,11 @@ describe("priceMatching", () => {
     });
     expect(proposal.proposedBottle).toMatchObject({
       category: null,
-      edition: null,
-      releaseYear: null,
-      vintageYear: null,
-    });
-    expect(proposal.proposedRelease).toMatchObject({
       edition: "Batch 1",
       releaseYear: 2024,
       vintageYear: 2010,
     });
+    expect(proposal.proposedRelease).toBeNull();
     expect(updatedPrice?.bottleId).toBeNull();
   });
 
@@ -933,7 +1034,7 @@ describe("priceMatching", () => {
       brandId: brand.id,
       bottlerId: brand.id,
       category: "rye",
-      singleCask: null,
+      singleCask: true,
     });
     expect(listingAlias?.bottleId).toBe(proposal.suggestedBottleId);
     expect(observation).toMatchObject({
@@ -2242,16 +2343,6 @@ describe("priceMatching", () => {
         name: "Draft Bottler",
       },
       statedAge: 12,
-      edition: null,
-      caskStrength: null,
-      singleCask: null,
-      abv: null,
-      releaseYear: null,
-      caskType: null,
-      caskSize: null,
-      caskFill: null,
-    });
-    expect(proposal.proposedRelease).toMatchObject({
       edition: "Batch 7",
       caskStrength: true,
       singleCask: true,
@@ -2261,6 +2352,7 @@ describe("priceMatching", () => {
       caskSize: "barrel",
       caskFill: "1st_fill",
     });
+    expect(proposal.proposedRelease).toBeNull();
   });
 
   test("preserves validated entity ids and canonical names on create_new proposals", async ({
