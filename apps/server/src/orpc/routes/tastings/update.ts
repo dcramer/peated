@@ -6,7 +6,7 @@ import {
   follows,
   tastings,
 } from "@peated/server/db/schema";
-import { arraysEqual } from "@peated/server/lib/equals";
+import { arraysEqual, objectsShallowEqual } from "@peated/server/lib/equals";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -24,6 +24,9 @@ const InputSchema = z.object({
   tasting: z.coerce.number(),
   notes: TastingInputSchema.shape.notes.removeDefault().optional(),
   rating: TastingInputSchema.shape.rating.removeDefault().optional(),
+  bottleDetails: TastingInputSchema.shape.bottleDetails
+    .removeDefault()
+    .optional(),
   servingStyle: TastingInputSchema.shape.servingStyle
     .removeDefault()
     .optional(),
@@ -71,6 +74,19 @@ export default procedure
     }
     if (input.rating !== undefined && input.rating !== tasting.rating) {
       tastingData.rating = input.rating;
+    }
+    if (input.bottleDetails !== undefined) {
+      // bottleDetails are optional enthusiast precision, not canonical identity.
+      // Updating or clearing them should not imply any bottle/release mutation.
+      const nextBottleDetails = input.bottleDetails ?? null;
+      if (
+        (nextBottleDetails === null && tasting.bottleDetails !== null) ||
+        (nextBottleDetails !== null &&
+          (tasting.bottleDetails === null ||
+            !objectsShallowEqual(nextBottleDetails, tasting.bottleDetails)))
+      ) {
+        tastingData.bottleDetails = nextBottleDetails;
+      }
     }
     if (
       input.servingStyle !== undefined &&

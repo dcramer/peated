@@ -26,6 +26,7 @@ import { tsvector } from "../columns";
 import { vector } from "../columns/vector";
 import { entities } from "./entities";
 import { categoryEnum, contentSourceEnum, flavorProfileEnum } from "./enums";
+import { externalSites } from "./externalSites";
 import { users } from "./users";
 
 type TastingNotes = {
@@ -33,6 +34,13 @@ type TastingNotes = {
   palate: string;
   finish: string;
 };
+
+const OBSERVATION_SOURCE_TYPES = [
+  "store_price",
+  "manual",
+  "import",
+  "other",
+] as const;
 
 /**
  * Represents a series of bottles from a brand.
@@ -126,23 +134,16 @@ export const bottles = pgTable(
     ),
     flavorProfile: flavorProfileEnum("flavor_profile"),
 
-    // @deprecated - being migrated to bottle_edition table
+    // Legacy release-level traits remain on bottle for compatibility with
+    // existing data. New canonical release writes should prefer bottle_release.
     edition: varchar("edition", { length: 255 }),
-    // @deprecated - being migrated to bottle_edition table
     abv: doublePrecision("abv"),
-    // @deprecated - being migrated to bottle_edition table
     singleCask: boolean("single_cask"),
-    // @deprecated - being migrated to bottle_edition table
     caskStrength: boolean("cask_strength"),
-    // @deprecated - being migrated to bottle_edition table
     vintageYear: smallint("vintage_year"),
-    // @deprecated - being migrated to bottle_edition table
     releaseYear: smallint("release_year"),
-    // @deprecated - being migrated to bottle_edition table
     caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
-    // @deprecated - being migrated to bottle_edition table
     caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
-    // @deprecated - being migrated to bottle_edition table
     caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
 
     // Materialized fields from editions
@@ -226,6 +227,7 @@ export const bottlesRelations = relations(bottles, ({ one, many }) => ({
   }),
   bottlesToDistillers: many(bottlesToDistillers),
   releases: many(bottleReleases),
+  observations: many(bottleObservations),
   createdBy: one(users, {
     fields: [bottles.createdById],
     references: [users.id],
@@ -340,19 +342,89 @@ export const bottleReleases = pgTable(
   ],
 );
 
-export const bottleReleasesRelations = relations(bottleReleases, ({ one }) => ({
-  bottle: one(bottles, {
-    fields: [bottleReleases.bottleId],
-    references: [bottles.id],
+export const bottleReleasesRelations = relations(
+  bottleReleases,
+  ({ one, many }) => ({
+    bottle: one(bottles, {
+      fields: [bottleReleases.bottleId],
+      references: [bottles.id],
+    }),
+    observations: many(bottleObservations),
+    createdBy: one(users, {
+      fields: [bottleReleases.createdById],
+      references: [users.id],
+    }),
   }),
-  createdBy: one(users, {
-    fields: [bottleReleases.createdById],
-    references: [users.id],
-  }),
-}));
+);
 
 export type BottleRelease = typeof bottleReleases.$inferSelect;
 export type NewBottleRelease = typeof bottleReleases.$inferInsert;
+
+export const bottleObservations = pgTable(
+  "bottle_observation",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id, { onDelete: "cascade" })
+      .notNull(),
+    releaseId: bigint("release_id", { mode: "number" }).references(
+      () => bottleReleases.id,
+      { onDelete: "cascade" },
+    ),
+    sourceType: varchar("source_type", {
+      length: 32,
+      enum: OBSERVATION_SOURCE_TYPES,
+    }).notNull(),
+    sourceKey: varchar("source_key", { length: 255 }).notNull(),
+    sourceName: varchar("source_name", { length: 255 }).notNull(),
+    sourceUrl: text("source_url"),
+    externalSiteId: bigint("external_site_id", { mode: "number" }).references(
+      () => externalSites.id,
+    ),
+    rawText: text("raw_text"),
+    parsedIdentity: jsonb("parsed_identity").$type<Record<string, unknown>>(),
+    facts: jsonb("facts").$type<Record<string, unknown>>(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    createdById: bigint("created_by_id", { mode: "number" }).references(
+      () => users.id,
+    ),
+  },
+  (table) => [
+    uniqueIndex("bottle_observation_source_idx").on(
+      table.sourceType,
+      table.sourceKey,
+    ),
+    index("bottle_observation_bottle_idx").on(table.bottleId),
+    index("bottle_observation_release_idx").on(table.releaseId),
+    index("bottle_observation_external_site_idx").on(table.externalSiteId),
+  ],
+);
+
+export const bottleObservationsRelations = relations(
+  bottleObservations,
+  ({ one }) => ({
+    bottle: one(bottles, {
+      fields: [bottleObservations.bottleId],
+      references: [bottles.id],
+    }),
+    release: one(bottleReleases, {
+      fields: [bottleObservations.releaseId],
+      references: [bottleReleases.id],
+    }),
+    externalSite: one(externalSites, {
+      fields: [bottleObservations.externalSiteId],
+      references: [externalSites.id],
+    }),
+    createdBy: one(users, {
+      fields: [bottleObservations.createdById],
+      references: [users.id],
+    }),
+  }),
+);
+
+export type BottleObservation = typeof bottleObservations.$inferSelect;
+export type NewBottleObservation = typeof bottleObservations.$inferInsert;
 
 export const bottlesToDistillers = pgTable(
   "bottle_distiller",

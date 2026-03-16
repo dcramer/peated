@@ -48,6 +48,8 @@ export function formatReleaseName({
   caskType?: ReleaseIdentityInput["caskType"] | undefined;
   caskSize?: ReleaseIdentityInput["caskSize"] | undefined;
 }) {
+  // This legacy formatter is intentionally display-oriented. Canonical release
+  // writes must use formatCanonicalReleaseName with the parent bottle context.
   return formatCanonicalReleaseName({
     bottleName: name ?? "",
     bottleFullName: name ?? "",

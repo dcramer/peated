@@ -675,6 +675,11 @@ describe("priceMatching", () => {
     });
     expect(proposal.proposedBottle).toMatchObject({
       category: null,
+      edition: null,
+      releaseYear: null,
+      vintageYear: null,
+    });
+    expect(proposal.proposedRelease).toMatchObject({
       edition: "Batch 1",
       releaseYear: 2024,
       vintageYear: 2010,
@@ -903,6 +908,10 @@ describe("priceMatching", () => {
     const listingAlias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, price.name),
     });
+    const observation = await db.query.bottleObservations.findFirst({
+      where: (bottleObservations, { eq }) =>
+        eq(bottleObservations.sourceKey, `store_price:${price.id}`),
+    });
     const distillerLinks = await db
       .select()
       .from(bottlesToDistillers)
@@ -924,9 +933,17 @@ describe("priceMatching", () => {
       brandId: brand.id,
       bottlerId: brand.id,
       category: "rye",
-      singleCask: true,
+      singleCask: null,
     });
     expect(listingAlias?.bottleId).toBe(proposal.suggestedBottleId);
+    expect(observation).toMatchObject({
+      bottleId: proposal.suggestedBottleId,
+      releaseId: null,
+      sourceType: "store_price",
+      parsedIdentity: expect.objectContaining({
+        single_cask: true,
+      }),
+    });
     expect(distillerLinks).toEqual([
       expect.objectContaining({
         bottleId: proposal.suggestedBottleId,
@@ -2169,16 +2186,16 @@ describe("priceMatching", () => {
             name: "Special Releases",
           },
           category: "single_malt",
-          edition: null,
+          edition: "Batch 7",
           statedAge: 12,
-          caskStrength: null,
-          singleCask: null,
+          caskStrength: true,
+          singleCask: true,
           abv: 46,
           vintageYear: null,
-          releaseYear: null,
-          caskType: null,
-          caskSize: null,
-          caskFill: null,
+          releaseYear: 2024,
+          caskType: "bourbon",
+          caskSize: "barrel",
+          caskFill: "1st_fill",
           brand: {
             id: 100,
             name: "Draft Brand",
@@ -2224,6 +2241,25 @@ describe("priceMatching", () => {
         id: null,
         name: "Draft Bottler",
       },
+      statedAge: 12,
+      edition: null,
+      caskStrength: null,
+      singleCask: null,
+      abv: null,
+      releaseYear: null,
+      caskType: null,
+      caskSize: null,
+      caskFill: null,
+    });
+    expect(proposal.proposedRelease).toMatchObject({
+      edition: "Batch 7",
+      caskStrength: true,
+      singleCask: true,
+      abv: 46,
+      releaseYear: 2024,
+      caskType: "bourbon",
+      caskSize: "barrel",
+      caskFill: "1st_fill",
     });
   });
 
@@ -2598,6 +2634,137 @@ describe("priceMatching", () => {
       status: "pending_review",
       suggestedBottleId: null,
       processingToken: "lease-token",
+    });
+  });
+
+  test("stores a bottle observation when approving a store price match", async ({
+    fixtures,
+  }) => {
+    const reviewer = await fixtures.User();
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Batch 7",
+      releaseYear: 2024,
+    });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "Observation Candidate",
+      url: "https://example.com/observation-candidate",
+      volume: 750,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "create_new",
+        creationTarget: "bottle_and_release",
+        extractedLabel: {
+          brand: "Observation Brand",
+          bottler: null,
+          expression: "Reserve",
+          series: null,
+          distillery: ["Observation Distillery"],
+          category: "single_malt",
+          stated_age: 12,
+          abv: 55.1,
+          release_year: 2024,
+          vintage_year: null,
+          cask_type: "bourbon",
+          cask_size: "barrel",
+          cask_fill: "1st_fill",
+          cask_strength: true,
+          single_cask: true,
+          edition: "Batch 7",
+        },
+        proposedBottle: {
+          name: "Reserve",
+          series: null,
+          category: "single_malt",
+          edition: null,
+          statedAge: 12,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          brand: {
+            id: null,
+            name: "Observation Brand",
+          },
+          distillers: [
+            {
+              id: null,
+              name: "Observation Distillery",
+            },
+          ],
+          bottler: null,
+        },
+        proposedRelease: {
+          edition: "Batch 7",
+          statedAge: null,
+          abv: 55.1,
+          caskStrength: true,
+          singleCask: true,
+          vintageYear: null,
+          releaseYear: 2024,
+          caskType: "bourbon",
+          caskSize: "barrel",
+          caskFill: "1st_fill",
+          description: null,
+          tastingNotes: null,
+          imageUrl: null,
+        },
+      })
+      .returning();
+
+    await applyApprovedStorePriceMatch({
+      proposalId: proposal.id,
+      bottleId: bottle.id,
+      releaseId: release.id,
+      reviewedById: reviewer.id,
+    });
+
+    const observation = await db.query.bottleObservations.findFirst({
+      where: (bottleObservations, { eq }) =>
+        eq(bottleObservations.sourceKey, `store_price:${price.id}`),
+    });
+
+    expect(observation).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      sourceType: "store_price",
+      sourceKey: `store_price:${price.id}`,
+      sourceName: price.name,
+      sourceUrl: price.url,
+      externalSiteId: price.externalSiteId,
+      rawText: price.name,
+      createdById: reviewer.id,
+      parsedIdentity: expect.objectContaining({
+        brand: "Observation Brand",
+        edition: "Batch 7",
+        cask_strength: true,
+      }),
+      facts: expect.objectContaining({
+        proposalType: "create_new",
+        creationTarget: "bottle_and_release",
+        releaseFacts: expect.objectContaining({
+          edition: "Batch 7",
+          abv: 55.1,
+          caskStrength: true,
+          singleCask: true,
+          releaseYear: 2024,
+          caskType: "bourbon",
+          caskSize: "barrel",
+          caskFill: "1st_fill",
+        }),
+      }),
     });
   });
 });

@@ -102,6 +102,62 @@ describe("PUT /tastings/:tasting", () => {
     expect(newTasting.notes).toEqual("hello world");
   });
 
+  test("updates exact bottle details", async ({ defaults, fixtures }) => {
+    const tasting = await fixtures.Tasting({
+      createdById: defaults.user.id,
+    });
+    const bottleDetails = {
+      edition: "Batch 24",
+      caskNumber: "117",
+      outturn: "246 bottles",
+    };
+
+    const data = await routerClient.tastings.update(
+      {
+        tasting: tasting.id,
+        bottleDetails,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    const [newTasting] = await db
+      .select()
+      .from(tastings)
+      .where(eq(tastings.id, data.id));
+
+    expect(omit(tasting, "bottleDetails")).toEqual(
+      omit(newTasting, "bottleDetails"),
+    );
+    expect(data.bottleDetails).toEqual(bottleDetails);
+    expect(newTasting.bottleDetails).toEqual(bottleDetails);
+  });
+
+  test("clears exact bottle details", async ({ defaults, fixtures }) => {
+    const tasting = await fixtures.Tasting({
+      createdById: defaults.user.id,
+      bottleDetails: {
+        edition: "Batch 24",
+        caskNumber: "117",
+      },
+    });
+
+    const data = await routerClient.tastings.update(
+      {
+        tasting: tasting.id,
+        bottleDetails: null,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    const [newTasting] = await db
+      .select()
+      .from(tastings)
+      .where(eq(tastings.id, data.id));
+
+    expect(data.bottleDetails).toBeNull();
+    expect(newTasting.bottleDetails).toBeNull();
+  });
+
   test("updates tags", async ({ defaults, fixtures }) => {
     const tag = await fixtures.Tag();
     const tasting = await fixtures.Tasting({

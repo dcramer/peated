@@ -3,10 +3,30 @@ import {
   normalizeString,
   stripDuplicateBrandPrefixFromBottleName,
 } from "@peated/server/lib/normalize";
-import type { ProposedBottleSchema } from "@peated/server/schemas";
+import type {
+  ProposedBottleSchema,
+  ProposedReleaseSchema,
+} from "@peated/server/schemas";
 import type { z } from "zod";
 
 type ProposedBottle = z.infer<typeof ProposedBottleSchema>;
+type ProposedRelease = z.infer<typeof ProposedReleaseSchema>;
+
+const EMPTY_PROPOSED_RELEASE: ProposedRelease = {
+  edition: null,
+  statedAge: null,
+  abv: null,
+  caskStrength: null,
+  singleCask: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  description: null,
+  tastingNotes: null,
+  imageUrl: null,
+};
 
 export function normalizeProposedBottleDraft(
   proposedBottle: ProposedBottle,
@@ -61,5 +81,74 @@ export function normalizeProposedBottleDraft(
       normalizedBottlerName && normalizedBottlerName === normalizedBrandName
         ? null
         : proposedBottle.bottler,
+  };
+}
+
+function hasReleaseSpecificDraft(proposedRelease: ProposedRelease | null) {
+  if (!proposedRelease) {
+    return false;
+  }
+
+  return [
+    proposedRelease.edition,
+    proposedRelease.statedAge,
+    proposedRelease.abv,
+    proposedRelease.caskStrength,
+    proposedRelease.singleCask,
+    proposedRelease.vintageYear,
+    proposedRelease.releaseYear,
+    proposedRelease.caskType,
+    proposedRelease.caskSize,
+    proposedRelease.caskFill,
+  ].some((value) => value !== null && value !== undefined);
+}
+
+export function splitProposedBottleReleaseDraft({
+  proposedBottle,
+  proposedRelease,
+}: {
+  proposedBottle: ProposedBottle;
+  proposedRelease?: ProposedRelease | null;
+}): {
+  proposedBottle: ProposedBottle;
+  proposedRelease: ProposedRelease | null;
+} {
+  const normalizedBottle = normalizeProposedBottleDraft(proposedBottle);
+  const releaseFromBottle: ProposedRelease = {
+    ...EMPTY_PROPOSED_RELEASE,
+    edition: normalizedBottle.edition,
+    abv: normalizedBottle.abv,
+    caskStrength: normalizedBottle.caskStrength,
+    singleCask: normalizedBottle.singleCask,
+    vintageYear: normalizedBottle.vintageYear,
+    releaseYear: normalizedBottle.releaseYear,
+    caskType: normalizedBottle.caskType,
+    caskSize: normalizedBottle.caskSize,
+    caskFill: normalizedBottle.caskFill,
+  };
+
+  const mergedRelease: ProposedRelease = {
+    ...releaseFromBottle,
+    ...(proposedRelease ?? {}),
+  };
+
+  const bottleWithoutReleaseLeak: ProposedBottle = {
+    ...normalizedBottle,
+    edition: null,
+    abv: null,
+    caskStrength: null,
+    singleCask: null,
+    vintageYear: null,
+    releaseYear: null,
+    caskType: null,
+    caskSize: null,
+    caskFill: null,
+  };
+
+  return {
+    proposedBottle: bottleWithoutReleaseLeak,
+    proposedRelease: hasReleaseSpecificDraft(mergedRelease)
+      ? mergedRelease
+      : null,
   };
 }

@@ -1,7 +1,10 @@
 import { db } from "@peated/server/db";
 import { bottleReleases, bottles, changes } from "@peated/server/db/schema";
+import {
+  formatCanonicalReleaseName,
+  getResolvedReleaseIdentity,
+} from "@peated/server/lib/bottleSchemaRules";
 import { upsertBottleAlias } from "@peated/server/lib/db";
-import { formatReleaseName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { ConflictError } from "@peated/server/orpc/errors";
@@ -16,9 +19,45 @@ import { pushJob } from "@peated/server/worker/client";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
-const InputSchema = BottleReleaseInputSchema.partial().extend({
+// PATCH routes need to distinguish between omitted fields and an explicit null
+// clear, so we remove zod defaults before making fields optional.
+const InputSchema = z.object({
   release: z.coerce.number(),
+  edition: BottleReleaseInputSchema.shape.edition.removeDefault().optional(),
+  statedAge: BottleReleaseInputSchema.shape.statedAge
+    .removeDefault()
+    .optional(),
+  abv: BottleReleaseInputSchema.shape.abv.removeDefault().optional(),
+  caskStrength: BottleReleaseInputSchema.shape.caskStrength
+    .removeDefault()
+    .optional(),
+  singleCask: BottleReleaseInputSchema.shape.singleCask
+    .removeDefault()
+    .optional(),
+  vintageYear: BottleReleaseInputSchema.shape.vintageYear
+    .removeDefault()
+    .optional(),
+  releaseYear: BottleReleaseInputSchema.shape.releaseYear
+    .removeDefault()
+    .optional(),
+  caskType: BottleReleaseInputSchema.shape.caskType.removeDefault().optional(),
+  caskSize: BottleReleaseInputSchema.shape.caskSize.removeDefault().optional(),
+  caskFill: BottleReleaseInputSchema.shape.caskFill.removeDefault().optional(),
+  description: BottleReleaseInputSchema.shape.description
+    .removeDefault()
+    .optional(),
+  tastingNotes: BottleReleaseInputSchema.shape.tastingNotes
+    .removeDefault()
+    .optional(),
+  imageUrl: BottleReleaseInputSchema.shape.imageUrl.removeDefault().optional(),
 });
+
+function hasInputField<
+  TInput extends Record<string, unknown>,
+  TKey extends keyof TInput,
+>(input: TInput, key: TKey) {
+  return input[key] !== undefined;
+}
 
 export default procedure
   .use(requireMod)
@@ -66,117 +105,131 @@ export default procedure
 
       // Validate statedAge against bottle's statedAge
       if (
-        bottle.statedAge &&
-        input.statedAge &&
-        bottle.statedAge !== input.statedAge
+        bottle.statedAge !== null &&
+        hasInputField(input, "statedAge") &&
+        input.statedAge !== null &&
+        input.statedAge !== bottle.statedAge
       ) {
         throw errors.BAD_REQUEST({
           message: "Release statedAge must match bottle's statedAge.",
         });
       }
 
-      // Format the new name based on updated fields
-      const name = formatReleaseName({
-        name: bottle.name,
-        edition: input.edition ?? release.edition,
-        abv: input.abv ?? release.abv,
-        statedAge: bottle.statedAge
-          ? null
-          : (input.statedAge ?? release.statedAge),
-        releaseYear: input.releaseYear ?? release.releaseYear,
-        vintageYear: input.vintageYear ?? release.vintageYear,
-        singleCask: input.singleCask ?? release.singleCask,
-        caskStrength: input.caskStrength ?? release.caskStrength,
-        caskFill: input.caskFill ?? release.caskFill,
-        caskType: input.caskType ?? release.caskType,
-        caskSize: input.caskSize ?? release.caskSize,
+      // Preserve existing values for omitted fields while still allowing mods
+      // to clear nullable release attributes with an explicit null.
+      const nextEdition = hasInputField(input, "edition")
+        ? (input.edition ?? null)
+        : release.edition;
+      const nextStatedAge = hasInputField(input, "statedAge")
+        ? (input.statedAge ?? null)
+        : release.statedAge;
+      const nextAbv = hasInputField(input, "abv")
+        ? (input.abv ?? null)
+        : release.abv;
+      const nextReleaseYear = hasInputField(input, "releaseYear")
+        ? (input.releaseYear ?? null)
+        : release.releaseYear;
+      const nextVintageYear = hasInputField(input, "vintageYear")
+        ? (input.vintageYear ?? null)
+        : release.vintageYear;
+      const nextSingleCask = hasInputField(input, "singleCask")
+        ? (input.singleCask ?? null)
+        : release.singleCask;
+      const nextCaskStrength = hasInputField(input, "caskStrength")
+        ? (input.caskStrength ?? null)
+        : release.caskStrength;
+      const nextCaskFill = hasInputField(input, "caskFill")
+        ? (input.caskFill ?? null)
+        : release.caskFill;
+      const nextCaskType = hasInputField(input, "caskType")
+        ? (input.caskType ?? null)
+        : release.caskType;
+      const nextCaskSize = hasInputField(input, "caskSize")
+        ? (input.caskSize ?? null)
+        : release.caskSize;
+      const nextDescription = hasInputField(input, "description")
+        ? (input.description ?? null)
+        : release.description;
+      const nextImageUrl = hasInputField(input, "imageUrl")
+        ? (input.imageUrl ?? null)
+        : release.imageUrl;
+      const nextTastingNotes = hasInputField(input, "tastingNotes")
+        ? (input.tastingNotes ?? null)
+        : release.tastingNotes;
+
+      const resolvedReleaseIdentity = getResolvedReleaseIdentity({
+        bottle,
+        release: {
+          edition: nextEdition,
+          statedAge: nextStatedAge,
+          abv: nextAbv,
+          releaseYear: nextReleaseYear,
+          vintageYear: nextVintageYear,
+          singleCask: nextSingleCask,
+          caskStrength: nextCaskStrength,
+          caskFill: nextCaskFill,
+          caskType: nextCaskType,
+          caskSize: nextCaskSize,
+        },
       });
 
-      const fullName = formatReleaseName({
-        name: bottle.fullName,
-        edition: input.edition ?? release.edition,
-        abv: input.abv ?? release.abv,
-        statedAge: bottle.statedAge
-          ? null
-          : (input.statedAge ?? release.statedAge),
-        releaseYear: input.releaseYear ?? release.releaseYear,
-        vintageYear: input.vintageYear ?? release.vintageYear,
-        singleCask: input.singleCask ?? release.singleCask,
-        caskStrength: input.caskStrength ?? release.caskStrength,
-        caskFill: input.caskFill ?? release.caskFill,
-        caskType: input.caskType ?? release.caskType,
-        caskSize: input.caskSize ?? release.caskSize,
+      // Always derive the name from the resolved bottle/release identity so a
+      // parent bottle age does not get duplicated into the release suffix.
+      const { name, fullName } = formatCanonicalReleaseName({
+        bottleName: bottle.name,
+        bottleFullName: bottle.fullName,
+        bottleStatedAge: bottle.statedAge,
+        release: resolvedReleaseIdentity,
       });
-
-      // Check for existing release with same attributes
-      const newData = {
-        edition: input.edition !== undefined ? input.edition : release.edition,
-        vintageYear:
-          input.vintageYear !== undefined
-            ? input.vintageYear
-            : release.vintageYear,
-        releaseYear:
-          input.releaseYear !== undefined
-            ? input.releaseYear
-            : release.releaseYear,
-        statedAge:
-          input.statedAge !== undefined ? input.statedAge : release.statedAge,
-        abv: input.abv !== undefined ? input.abv : release.abv,
-        singleCask:
-          input.singleCask !== undefined
-            ? input.singleCask
-            : release.singleCask,
-        caskStrength:
-          input.caskStrength !== undefined
-            ? input.caskStrength
-            : release.caskStrength,
-        caskSize:
-          input.caskSize !== undefined ? input.caskSize : release.caskSize,
-        caskType:
-          input.caskType !== undefined ? input.caskType : release.caskType,
-        caskFill:
-          input.caskFill !== undefined ? input.caskFill : release.caskFill,
-      };
 
       const existingRelease = await tx.query.bottleReleases.findFirst({
         where: and(
           eq(bottleReleases.bottleId, bottle.id),
           // Check edition
-          newData.edition !== null
+          resolvedReleaseIdentity.edition !== null
             ? eq(
                 sql`LOWER(${bottleReleases.edition})`,
-                newData.edition.toLowerCase(),
+                resolvedReleaseIdentity.edition.toLowerCase(),
               )
             : isNull(bottleReleases.edition),
           // Check vintage year
-          newData.vintageYear !== null
-            ? eq(bottleReleases.vintageYear, newData.vintageYear)
+          resolvedReleaseIdentity.vintageYear !== null
+            ? eq(
+                bottleReleases.vintageYear,
+                resolvedReleaseIdentity.vintageYear,
+              )
             : isNull(bottleReleases.vintageYear),
           // Check release year
-          newData.releaseYear !== null
-            ? eq(bottleReleases.releaseYear, newData.releaseYear)
+          resolvedReleaseIdentity.releaseYear !== null
+            ? eq(
+                bottleReleases.releaseYear,
+                resolvedReleaseIdentity.releaseYear,
+              )
             : isNull(bottleReleases.releaseYear),
           // Check stated age
-          newData.statedAge !== null
-            ? eq(bottleReleases.statedAge, newData.statedAge)
+          resolvedReleaseIdentity.statedAge !== null
+            ? eq(bottleReleases.statedAge, resolvedReleaseIdentity.statedAge)
             : isNull(bottleReleases.statedAge),
-          newData.abv !== null
-            ? eq(bottleReleases.abv, newData.abv)
+          resolvedReleaseIdentity.abv !== null
+            ? eq(bottleReleases.abv, resolvedReleaseIdentity.abv)
             : isNull(bottleReleases.abv),
-          newData.singleCask !== null
-            ? eq(bottleReleases.singleCask, newData.singleCask)
+          resolvedReleaseIdentity.singleCask !== null
+            ? eq(bottleReleases.singleCask, resolvedReleaseIdentity.singleCask)
             : isNull(bottleReleases.singleCask),
-          newData.caskStrength !== null
-            ? eq(bottleReleases.caskStrength, newData.caskStrength)
+          resolvedReleaseIdentity.caskStrength !== null
+            ? eq(
+                bottleReleases.caskStrength,
+                resolvedReleaseIdentity.caskStrength,
+              )
             : isNull(bottleReleases.caskStrength),
-          newData.caskSize !== null
-            ? eq(bottleReleases.caskSize, newData.caskSize)
+          resolvedReleaseIdentity.caskSize !== null
+            ? eq(bottleReleases.caskSize, resolvedReleaseIdentity.caskSize)
             : isNull(bottleReleases.caskSize),
-          newData.caskType !== null
-            ? eq(bottleReleases.caskType, newData.caskType)
+          resolvedReleaseIdentity.caskType !== null
+            ? eq(bottleReleases.caskType, resolvedReleaseIdentity.caskType)
             : isNull(bottleReleases.caskType),
-          newData.caskFill !== null
-            ? eq(bottleReleases.caskFill, newData.caskFill)
+          resolvedReleaseIdentity.caskFill !== null
+            ? eq(bottleReleases.caskFill, resolvedReleaseIdentity.caskFill)
             : isNull(bottleReleases.caskFill),
           // Exclude the current release from the check
           sql`${bottleReleases.id} != ${release.id}`,
@@ -206,19 +259,19 @@ export default procedure
         .set({
           fullName,
           name,
-          edition: input.edition ?? release.edition,
-          vintageYear: input.vintageYear ?? release.vintageYear,
-          releaseYear: input.releaseYear ?? release.releaseYear,
-          abv: input.abv ?? release.abv,
-          singleCask: input.singleCask ?? release.singleCask,
-          caskStrength: input.caskStrength ?? release.caskStrength,
-          statedAge: (bottle.statedAge || input.statedAge) ?? release.statedAge,
-          caskSize: input.caskSize ?? release.caskSize,
-          caskType: input.caskType ?? release.caskType,
-          caskFill: input.caskFill ?? release.caskFill,
-          description: input.description ?? release.description,
-          imageUrl: input.imageUrl ?? release.imageUrl,
-          tastingNotes: input.tastingNotes ?? release.tastingNotes,
+          edition: resolvedReleaseIdentity.edition,
+          vintageYear: resolvedReleaseIdentity.vintageYear,
+          releaseYear: resolvedReleaseIdentity.releaseYear,
+          abv: resolvedReleaseIdentity.abv,
+          singleCask: resolvedReleaseIdentity.singleCask,
+          caskStrength: resolvedReleaseIdentity.caskStrength,
+          statedAge: resolvedReleaseIdentity.statedAge,
+          caskSize: resolvedReleaseIdentity.caskSize,
+          caskType: resolvedReleaseIdentity.caskType,
+          caskFill: resolvedReleaseIdentity.caskFill,
+          description: nextDescription,
+          imageUrl: nextImageUrl,
+          tastingNotes: nextTastingNotes,
           updatedAt: sql`NOW()`,
         })
         .where(eq(bottleReleases.id, release.id))

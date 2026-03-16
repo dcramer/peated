@@ -32,6 +32,8 @@ export const BOTTLE_SCHEMA_RULES = {
     "Bottle identity is the stable parent product. Brand, bottler, distillery, expression/name, series, and category belong here.",
   releaseIdentity:
     "Release identity is optional and only exists under a bottle. Edition, ABV, years, single-cask, cask-strength, and cask details belong here.",
+  observationPolicy:
+    "Exact source facts like cask numbers, bottle numbers, outturns, exclusives, and raw maturation wording should be preserved as observations first. Promote them to canonical release identity only when they are clearly part of the marketed release.",
   aliasPolicy:
     "Retailer listing aliases are bottle-level evidence unless they exactly match a canonical release alias.",
 } as const;
@@ -68,6 +70,25 @@ function formatReleaseEnum(value: string): string {
   return value
     .replace(/_/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+export function getReleaseObservationFacts(
+  release: Partial<ReleaseIdentityInput>,
+) {
+  return Object.fromEntries(
+    Object.entries({
+      edition: release.edition ?? null,
+      statedAge: release.statedAge ?? null,
+      releaseYear: release.releaseYear ?? null,
+      vintageYear: release.vintageYear ?? null,
+      abv: release.abv ?? null,
+      singleCask: release.singleCask ?? null,
+      caskStrength: release.caskStrength ?? null,
+      caskFill: release.caskFill ?? null,
+      caskType: release.caskType ?? null,
+      caskSize: release.caskSize ?? null,
+    }).filter(([, value]) => value !== null && value !== undefined),
+  );
 }
 
 function formatReleaseTraitLabel(
@@ -107,6 +128,8 @@ export function getResolvedReleaseIdentity({
   bottle: Pick<Bottle, "statedAge">;
   release: ReleaseIdentityInput;
 }): ReleaseIdentityInput {
+  // When a marketed age lives on the parent bottle, it is part of the stable
+  // expression identity and should not be duplicated as a release-only suffix.
   return {
     edition: release.edition ?? null,
     statedAge: bottle.statedAge ?? release.statedAge ?? null,
@@ -135,6 +158,8 @@ export function formatCanonicalReleaseName({
   fullName: string;
   name: string;
 } {
+  // Canonical release names are built from typed identity fields instead of raw
+  // label text so duplicate checks and aliases stay consistent across sources.
   const resolvedRelease = getResolvedReleaseIdentity({
     bottle: {
       statedAge: bottleStatedAge,
@@ -146,6 +171,8 @@ export function formatCanonicalReleaseName({
   const fullNameBits = [bottleFullName];
 
   for (const field of RELEASE_IDENTITY_FIELDS) {
+    // The bottle already owns its marketed age, so only release-specific ages
+    // should appear in the generated suffix.
     if (field === "statedAge" && bottleStatedAge !== null) {
       continue;
     }

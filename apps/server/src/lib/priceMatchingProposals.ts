@@ -20,7 +20,11 @@ import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
-import { DEFAULT_PRICE_MATCH_CREATION_TARGET } from "@peated/server/lib/bottleSchemaRules";
+import { upsertBottleObservationInTransaction } from "@peated/server/lib/bottleObservations";
+import {
+  DEFAULT_PRICE_MATCH_CREATION_TARGET,
+  getReleaseObservationFacts,
+} from "@peated/server/lib/bottleSchemaRules";
 import {
   createBottleInTransaction,
   finalizeCreatedBottle,
@@ -41,7 +45,10 @@ import {
   findStorePriceMatchCandidates,
   getBottleMatchCandidateById,
 } from "@peated/server/lib/priceMatchingCandidates";
-import { normalizeProposedBottleDraft } from "@peated/server/lib/priceMatchingDraftNormalization";
+import {
+  normalizeProposedBottleDraft,
+  splitProposedBottleReleaseDraft,
+} from "@peated/server/lib/priceMatchingDraftNormalization";
 import {
   hasActiveStorePriceMatchProposalProcessingLease,
   refreshStorePriceMatchProposalProcessingLease,
@@ -204,8 +211,8 @@ function sanitizeStorePriceMatchDecision(
   );
 
   if (decision.action === "create_new") {
-    const normalizedProposedBottle = decision.proposedBottle
-      ? normalizeProposedBottleDraft({
+    const sanitizedBottleDraft = decision.proposedBottle
+      ? {
           ...decision.proposedBottle,
           category:
             decision.proposedBottle.category === "spirit"
@@ -236,8 +243,18 @@ function sanitizeStorePriceMatchDecision(
                 resolvedEntitiesById,
               )
             : null,
-        })
+        }
       : null;
+
+    const normalizedDrafts = sanitizedBottleDraft
+      ? splitProposedBottleReleaseDraft({
+          proposedBottle: sanitizedBottleDraft,
+          proposedRelease: decision.proposedRelease ?? null,
+        })
+      : {
+          proposedBottle: null,
+          proposedRelease: decision.proposedRelease ?? null,
+        };
 
     return {
       ...decision,
@@ -245,8 +262,8 @@ function sanitizeStorePriceMatchDecision(
       suggestedBottleId: null,
       suggestedReleaseId: null,
       candidateBottleIds: filteredCandidateBottleIds,
-      proposedBottle: normalizedProposedBottle,
-      proposedRelease: decision.proposedRelease ?? null,
+      proposedBottle: normalizedDrafts.proposedBottle,
+      proposedRelease: normalizedDrafts.proposedRelease,
     };
   }
 
@@ -565,11 +582,17 @@ async function maybeResolveTrustedSmwsStorePriceMatch(
         proposedRelease: null,
       };
 
+  const normalizedDecision = sanitizeStorePriceMatchDecision(decision, {
+    candidateBottles: candidates,
+    searchEvidence: [],
+    resolvedEntities: [],
+  });
+
   const proposal = await upsertStorePriceMatchProposal({
     price,
     extractedLabel,
     candidates,
-    decision,
+    decision: normalizedDecision,
     searchEvidence: [],
     expectedProcessingToken: processingToken,
   });
@@ -599,7 +622,7 @@ async function maybeResolveTrustedSmwsStorePriceMatch(
         expectedProcessingToken: processingToken,
       });
     } else {
-      const createInputs = buildStorePriceMatchCreateInputs(decision);
+      const createInputs = buildStorePriceMatchCreateInputs(normalizedDecision);
       if (!createInputs.input && !createInputs.releaseInput) {
         throw new Error(
           `Unable to auto-create trusted SMWS proposal without creation inputs (${proposal.id}).`,
@@ -630,7 +653,7 @@ async function maybeResolveTrustedSmwsStorePriceMatch(
       price,
       extractedLabel,
       candidates,
-      decision,
+      decision: normalizedDecision,
       searchEvidence: [],
       error: err instanceof Error ? err.message : "Unknown trusted SMWS error",
       statusOverride: "errored",
@@ -719,14 +742,79 @@ function buildStorePriceMatchCreateInputs(decision: StorePriceMatchDecision) {
     };
   }
 
+  const normalizedDrafts = decision.proposedBottle
+    ? splitProposedBottleReleaseDraft({
+        proposedBottle: decision.proposedBottle,
+        proposedRelease: decision.proposedRelease ?? null,
+      })
+    : {
+        proposedBottle: null,
+        proposedRelease: decision.proposedRelease ?? null,
+      };
+
   return {
-    input: decision.proposedBottle
-      ? buildBottleInputFromProposedBottle(decision.proposedBottle)
+    input: normalizedDrafts.proposedBottle
+      ? buildBottleInputFromProposedBottle(normalizedDrafts.proposedBottle)
       : undefined,
-    releaseInput: decision.proposedRelease
-      ? buildBottleReleaseInputFromProposedRelease(decision.proposedRelease)
+    releaseInput: normalizedDrafts.proposedRelease
+      ? buildBottleReleaseInputFromProposedRelease(
+          normalizedDrafts.proposedRelease,
+        )
       : undefined,
   };
+}
+
+function buildStorePriceObservationFacts(
+  proposal: Pick<
+    StorePriceMatchProposalForReview,
+    "proposalType" | "creationTarget" | "proposedBottle" | "proposedRelease"
+  >,
+) {
+  const releaseFacts =
+    proposal.proposedRelease && typeof proposal.proposedRelease === "object"
+      ? getReleaseObservationFacts(
+          proposal.proposedRelease as Partial<ProposedRelease>,
+        )
+      : {};
+
+  return {
+    proposalType: proposal.proposalType,
+    creationTarget: proposal.creationTarget,
+    proposedBottle: proposal.proposedBottle ?? null,
+    proposedRelease: proposal.proposedRelease ?? null,
+    releaseFacts,
+  };
+}
+
+async function upsertStorePriceObservationInTransaction(
+  tx: AnyDatabase,
+  {
+    proposal,
+    bottleId,
+    releaseId = null,
+    createdById,
+  }: {
+    proposal: StorePriceMatchProposalForReview;
+    bottleId: number;
+    releaseId?: number | null;
+    createdById: number;
+  },
+) {
+  // Preserve the exact store listing as evidence even when the canonical alias
+  // stays bottle-level. Approval should capture facts without forcing a split.
+  return await upsertBottleObservationInTransaction(tx, {
+    bottleId,
+    releaseId,
+    sourceType: "store_price",
+    sourceKey: `store_price:${proposal.price.id}`,
+    sourceName: proposal.price.name,
+    sourceUrl: proposal.price.url,
+    externalSiteId: proposal.price.externalSiteId,
+    rawText: proposal.price.name,
+    parsedIdentity: proposal.extractedLabel ?? null,
+    facts: buildStorePriceObservationFacts(proposal),
+    createdById,
+  });
 }
 
 export async function upsertStorePriceMatchProposal({
@@ -1395,6 +1483,15 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     releaseId,
     reviewedById,
     volume: proposal.price.volume,
+  });
+
+  // One approved store price should always leave behind one source record keyed
+  // by the store_price id so moderators can recover the original evidence later.
+  await upsertStorePriceObservationInTransaction(tx, {
+    proposal,
+    bottleId,
+    releaseId,
+    createdById: reviewedById,
   });
 
   return aliasResult;
