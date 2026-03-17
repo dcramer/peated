@@ -14,7 +14,7 @@ These rules are the anchor for matching, automation, aliases, and moderator flow
    `bottleId` required when matched, `releaseId` optional.
 4. Bottle identity and release identity are not interchangeable.
 5. Exact source facts should be preserved as observations before they are promoted into canonical release identity.
-6. Tasting-side exact details are user metadata and do not change the matcher's bottle-or-release contract.
+6. Observation persistence is currently store-price-only.
 
 Bottle identity lives on the parent bottle:
 

@@ -6,7 +6,7 @@ This is the source of truth for how Peated models whisky identity.
 
 - `bottle`: the stable parent product most users rate, search, and collect.
 - `bottle_release`: optional precision under a bottle when a user cares about a specific batch, vintage, annual release, or other marketed variant.
-- `bottle_observation`: internal source evidence tied to a bottle or release. This is where exact listing facts live before they are promoted into canonical identity.
+- `bottle_observation`: internal store-price evidence tied to a bottle or release. This is where exact listing facts live before they are promoted into canonical identity.
 
 ## Field Ownership
 
@@ -61,7 +61,7 @@ Observation-only facts by default:
 ## Precision Layers
 
 - `release` is shared canon. It is the reusable identity that multiple tastings, prices, and pages should point to.
-- `bottle_observation` is internal evidence. It preserves exact source facts from retailer pages, moderator work, and other non-canonical inputs.
+- `bottle_observation` is internal evidence. Today it preserves exact facts from approved store-price listings.
 
 If a detail should aggregate across users, searches, and stats, it belongs in `bottle_release`. If it is exact but not yet canonical, preserve it as evidence first rather than forcing a new shared object.
 

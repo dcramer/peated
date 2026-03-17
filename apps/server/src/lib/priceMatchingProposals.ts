@@ -6,6 +6,7 @@ import {
 import config from "@peated/server/config";
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import {
+  bottleObservations,
   bottleReleases,
   bottles,
   entities,
@@ -20,7 +21,6 @@ import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
-import { upsertBottleObservationInTransaction } from "@peated/server/lib/bottleObservations";
 import {
   DEFAULT_PRICE_MATCH_CREATION_TARGET,
   getReleaseObservationFacts,
@@ -788,19 +788,39 @@ async function upsertStorePriceObservationInTransaction(
 ) {
   // Preserve the exact store listing as evidence even when the canonical alias
   // stays bottle-level. Approval should capture facts without forcing a split.
-  return await upsertBottleObservationInTransaction(tx, {
-    bottleId,
-    releaseId,
-    sourceType: "store_price",
-    sourceKey: `store_price:${proposal.price.id}`,
-    sourceName: proposal.price.name,
-    sourceUrl: proposal.price.url,
-    externalSiteId: proposal.price.externalSiteId,
-    rawText: proposal.price.name,
-    parsedIdentity: proposal.extractedLabel ?? null,
-    facts: buildStorePriceObservationFacts(proposal),
-    createdById,
-  });
+  const [observation] = await tx
+    .insert(bottleObservations)
+    .values({
+      bottleId,
+      releaseId,
+      sourceType: "store_price",
+      sourceKey: `store_price:${proposal.price.id}`,
+      sourceName: proposal.price.name,
+      sourceUrl: proposal.price.url,
+      externalSiteId: proposal.price.externalSiteId,
+      rawText: proposal.price.name,
+      parsedIdentity: proposal.extractedLabel ?? null,
+      facts: buildStorePriceObservationFacts(proposal),
+      createdById,
+    })
+    .onConflictDoUpdate({
+      target: [bottleObservations.sourceType, bottleObservations.sourceKey],
+      set: {
+        bottleId,
+        releaseId,
+        sourceName: proposal.price.name,
+        sourceUrl: proposal.price.url,
+        externalSiteId: proposal.price.externalSiteId,
+        rawText: proposal.price.name,
+        parsedIdentity: proposal.extractedLabel ?? null,
+        facts: buildStorePriceObservationFacts(proposal),
+        createdById,
+        updatedAt: sql`NOW()`,
+      },
+    })
+    .returning();
+
+  return observation;
 }
 
 export async function upsertStorePriceMatchProposal({

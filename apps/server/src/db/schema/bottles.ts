@@ -35,12 +35,7 @@ type TastingNotes = {
   finish: string;
 };
 
-const OBSERVATION_SOURCE_TYPES = [
-  "store_price",
-  "manual",
-  "import",
-  "other",
-] as const;
+const OBSERVATION_SOURCE_TYPES = ["store_price"] as const;
 
 /**
  * Represents a series of bottles from a brand.
@@ -363,13 +358,10 @@ export type BottleRelease = typeof bottleReleases.$inferSelect;
 export type NewBottleRelease = typeof bottleReleases.$inferInsert;
 
 /**
- * Source evidence attached to a bottle or bottle_release.
+ * Store-listing evidence attached to a bottle or bottle_release.
  *
- * Observations preserve exact external facts, moderator notes, or imported
- * identity details without forcing them into canonical bottle/release rows.
- *
- * Observations are shared evidence records that can later justify alias
- * changes, release creation, or moderator decisions.
+ * Today this table is populated from approved store-price matches. It keeps
+ * exact listing facts without forcing them into canonical bottle/release rows.
  */
 export const bottleObservations = pgTable(
   "bottle_observation",
