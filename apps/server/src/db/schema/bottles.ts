@@ -252,12 +252,14 @@ export const bottleSeriesRelations = relations(
 );
 
 /**
- * Represents a specific edition/release/vintage of a bottle.
- * This contains all the specific details about a particular release,
- * such as ABV, cask details, vintage year, etc.
+ * Represents a shared canonical release under a parent bottle.
  *
- * Each edition belongs to a parent bottle and inherits its core attributes,
- * while adding edition-specific details.
+ * Use this table when the distinction should aggregate across users, searches,
+ * prices, and stats. Release rows carry the typed identity traits that are not
+ * stable on the parent bottle, such as edition, years, ABV, and cask traits.
+ *
+ * If a detail is exact but not yet strong enough to justify a canonical split,
+ * preserve it in bottle_observation first.
  *
  * Examples:
  * 1. Ardbeg Supernova 2019 Release
@@ -360,6 +362,15 @@ export const bottleReleasesRelations = relations(
 export type BottleRelease = typeof bottleReleases.$inferSelect;
 export type NewBottleRelease = typeof bottleReleases.$inferInsert;
 
+/**
+ * Source evidence attached to a bottle or bottle_release.
+ *
+ * Observations preserve exact external facts, moderator notes, or imported
+ * identity details without forcing them into canonical bottle/release rows.
+ *
+ * Observations are shared evidence records that can later justify alias
+ * changes, release creation, or moderator decisions.
+ */
 export const bottleObservations = pgTable(
   "bottle_observation",
   {

@@ -6,27 +6,6 @@ import { BottleSchema } from "./bottles";
 import { ServingStyleEnum, zDatetime } from "./common";
 import { UserSchema } from "./users";
 
-const MAX_YEAR = new Date().getFullYear() + 1;
-
-export const TastingBottleDetailsSchema = z
-  .object({
-    edition: z.string().trim().min(1).max(64).optional(),
-    vintageYear: z.number().int().gte(1800).lte(MAX_YEAR).optional(),
-    releaseYear: z.number().int().gte(1800).lte(MAX_YEAR).optional(),
-    abv: z.number().min(0).max(100).optional(),
-    singleCask: z.boolean().optional(),
-    caskStrength: z.boolean().optional(),
-    caskNumber: z.string().trim().min(1).max(64).optional(),
-    bottleNumber: z.string().trim().min(1).max(64).optional(),
-    outturn: z.string().trim().min(1).max(64).optional(),
-    exclusiveText: z.string().trim().min(1).max(255).optional(),
-    labelNotes: z.string().trim().min(1).max(255).optional(),
-  })
-  .strict()
-  .refine((value) => Object.keys(value).length > 0, {
-    message: "Provide at least one bottle detail",
-  });
-
 export const TastingSchema = z.object({
   id: z.number().describe("Unique identifier for the tasting"),
   imageUrl: z
@@ -45,11 +24,6 @@ export const TastingSchema = z.object({
     .default(null)
     .describe(
       "The release of the bottle, if applicable. e.g. 'Ardbeg Supernova 2023'",
-    ),
-  bottleDetails: TastingBottleDetailsSchema.nullable()
-    .default(null)
-    .describe(
-      "Optional exact bottle details for this tasting when the shared release is missing or not specific enough",
     ),
   rating: z
     .union([

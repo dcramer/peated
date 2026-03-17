@@ -121,35 +121,6 @@ describe("POST /tastings", () => {
     expect(tasting.notes).toEqual("hello world");
   });
 
-  test("creates a new tasting with exact bottle details", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    const bottleDetails = {
-      edition: "Batch 24",
-      caskNumber: "117",
-      bottleNumber: "142/246",
-      exclusiveText: "K&L Exclusive",
-    };
-
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        bottleDetails,
-      },
-      { context: { user: defaults.user } },
-    );
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(data.tasting.bottleDetails).toEqual(bottleDetails);
-    expect(tasting.bottleDetails).toEqual(bottleDetails);
-  });
-
   test("creates a new tasting with empty rating", async ({
     defaults,
     fixtures,

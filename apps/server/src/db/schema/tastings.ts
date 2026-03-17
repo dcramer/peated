@@ -5,7 +5,6 @@ import {
   doublePrecision,
   index,
   integer,
-  jsonb,
   pgEnum,
   pgTable,
   smallint,
@@ -24,22 +23,12 @@ import { users } from "./users";
 
 export const servingStyleEnum = pgEnum("servingStyle", SERVING_STYLE_LIST);
 
-export type TastingBottleDetails = {
-  // Exact enthusiast detail for one tasting. These fields can be more specific
-  // than canon and should not create or mutate shared release identity by themselves.
-  edition?: string;
-  vintageYear?: number;
-  releaseYear?: number;
-  abv?: number;
-  singleCask?: boolean;
-  caskStrength?: boolean;
-  caskNumber?: string;
-  bottleNumber?: string;
-  outturn?: string;
-  exclusiveText?: string;
-  labelNotes?: string;
-};
-
+/**
+ * User-authored tasting records.
+ *
+ * A tasting always points at a bottle and may optionally point at a canonical
+ * release when the user knows the exact shared variant they had.
+ */
 export const tastings = pgTable(
   "tasting",
   {
@@ -51,9 +40,6 @@ export const tastings = pgTable(
     releaseId: bigint("release_id", { mode: "number" }).references(
       () => bottleReleases.id,
     ),
-    // Optional tasting-level precision when the user knows more than the
-    // canonical bottle/release graph currently captures.
-    bottleDetails: jsonb("bottle_details").$type<TastingBottleDetails>(),
     tags: varchar("tags", { length: 64 })
       .array()
       .default(sql`array[]::varchar[]`)

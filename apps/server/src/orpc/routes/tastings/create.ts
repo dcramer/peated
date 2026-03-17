@@ -108,9 +108,6 @@ export default procedure
     const data: NewTasting = {
       bottleId: bottle.id,
       releaseId: input.release || null,
-      // Exact tasting details stay user-scoped until moderators decide they
-      // belong in shared canon, so we persist them separately from releaseId.
-      bottleDetails: input.bottleDetails ?? null,
       notes: input.notes || null,
       rating: input.rating || null,
       flightId: flight ? flight.id : null,

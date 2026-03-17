@@ -58,7 +58,6 @@ Observation-only by default:
 - **expression**: The core release name after removing producer, age, ABV, and generic style words.
 - **series**: A stable range or family, or `null`.
 - **edition**: A simple human-facing release descriptor such as `Batch 3`, `2024 Release`, or `S2B13`.
-- **tasting exact details**: Optional structured metadata on a tasting when a user knows more than the canonical bottle or release currently captures.
 - **category**: One of `blend`, `bourbon`, `rye`, `single_grain`, `single_malt`, or `single_pot_still`.
 - **stated_age**: The age in years as an integer, or `null` if there is no age statement.
 - **abv**: Alcohol by volume as a percentage, for example `43.0`.
@@ -108,8 +107,6 @@ These should usually be preserved as observations instead of forcing a canonical
 - bottle counts or outturn
 - `store pick`, `exclusive`, `private barrel`, or similar merchandising text when it is not part of the marketed canonical release name
 - retailer-specific title suffixes
-
-These same facts may also appear in `tasting.bottleDetails` when a user is recording exactly what they drank. That does not make them canonical release identity by itself.
 
 ## Release Year Rules
 
@@ -174,7 +171,6 @@ These same facts may also appear in `tasting.bottleDetails` when a user is recor
 - For independent bottlings, evaluate `brand` and `distillery` separately.
 - Bias toward `no_match` or manual review when the decisive identity components are weak or conflicting. A false match is worse than an unresolved listing.
 - Preserve exact details as observations even when they are not strong enough to define a canonical release.
-- Treat tasting exact details as evidence, not an automatic release-creation signal.
 
 ## Retailer Title Examples
 

@@ -187,7 +187,6 @@ export const TastingSerializer = serializer({
 
       bottle: attrs.bottle,
       release: attrs.release,
-      bottleDetails: item.bottleDetails ?? null,
       createdBy: attrs.createdBy,
       hasToasted: attrs.hasToasted,
     };

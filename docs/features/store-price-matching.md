@@ -129,12 +129,6 @@ That observation stores:
 
 This keeps exact source detail without forcing new public fields into the normal bottle or release entry flow.
 
-Tasting exact details are adjacent but separate:
-
-- a tasting may keep enthusiast-only exact details such as cask number or bottle number
-- that does not require a canonical release
-- repeated evidence can still justify promotion later
-
 ## Candidate Generation
 
 Candidate search is release-aware. Results are keyed by `(bottleId, releaseId)` rather than collapsing everything to `bottleId`.
