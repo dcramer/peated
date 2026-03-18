@@ -58,7 +58,15 @@ export async function getUserFromHeader(
   const token = authorizationHeader?.replace(/^Bearer /i, "");
   if (!token) return null;
 
-  const { id } = (await verifyPayload(token)) as any;
+  let payload: Awaited<ReturnType<typeof verifyPayload>>;
+  try {
+    payload = await verifyPayload(token);
+  } catch {
+    logger.warn(`Invalid Bearer token`);
+    return null;
+  }
+
+  const { id } = (payload ?? {}) as any;
   if (!id) {
     logger.warn(`Invalid Bearer token`);
     return null;
