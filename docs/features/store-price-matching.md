@@ -2,6 +2,8 @@
 
 This document reflects the store-price matcher as implemented on March 15, 2026.
 
+The authoritative identity model lives in [docs/architecture/whisky-identity-model.md](/home/dcramer/src/peated/docs/architecture/whisky-identity-model.md).
+
 ## Core Schema Rules
 
 These rules are the anchor for matching, automation, aliases, and moderator flows.
@@ -11,6 +13,8 @@ These rules are the anchor for matching, automation, aliases, and moderator flow
 3. `store_price` should follow the same shape as tastings and collections:
    `bottleId` required when matched, `releaseId` optional.
 4. Bottle identity and release identity are not interchangeable.
+5. Exact source facts should be preserved as observations before they are promoted into canonical release identity.
+6. Observation persistence is currently store-price-only.
 
 Bottle identity lives on the parent bottle:
 
@@ -34,10 +38,19 @@ Release identity lives on the child release:
 - cask type
 - cask size
 
+Observation-first facts:
+
+- exact cask or barrel numbers
+- outturn
+- bottle numbers
+- exclusive wording
+- unmodeled raw maturation text
+
 Operational rule:
 
 - If bottle identity is clear but release identity is not, match the bottle and leave `releaseId = null`.
 - Do not force a release from weak evidence.
+- Preserve the exact source facts as a `bottle_observation` row instead.
 
 Alias rule:
 
@@ -102,6 +115,19 @@ Evaluation order:
 7. compute automation eligibility from deterministic checks
 8. upsert the proposal row
 9. auto-create only when the deterministic gate says it is safe
+
+## Observation Persistence
+
+Every approved store-price match writes one `bottle_observation` keyed by `store_price:<priceId>`.
+
+That observation stores:
+
+- the raw store title and source URL
+- the parsed extracted identity
+- the proposal type and creation target
+- normalized release facts when they exist
+
+This keeps exact source detail without forcing new public fields into the normal bottle or release entry flow.
 
 ## Candidate Generation
 
@@ -243,6 +269,8 @@ Moderators can:
 - create a bottle
 - create a release
 - create a bottle and release together
+
+Default moderation should stay bottle-first. Release creation is optional precision, not a requirement for approval.
 
 Current UI limitation:
 

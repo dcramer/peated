@@ -112,6 +112,97 @@ describe("PATCH /bottle-releases/:release", () => {
     expect(change.displayName).toBe(updatedRelease.fullName);
   });
 
+  it("does not duplicate bottle age in the release name when the bottle already carries the age", async function ({
+    fixtures,
+  }) {
+    const modUser = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({
+      name: "10",
+      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+      statedAge: 10,
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Batch 1",
+      statedAge: 10,
+      abv: 46.0,
+      releaseYear: 2023,
+    });
+
+    const result = await routerClient.bottleReleases.update(
+      {
+        release: release.id,
+        edition: "Batch 2",
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(result.fullName).toBe(
+      "Ardbeg 10 - Batch 2 - 2023 Release - 46.0% ABV",
+    );
+    expect(result.name).toBe("10 - Batch 2 - 2023 Release - 46.0% ABV");
+    expect(result.fullName).not.toContain("10-year-old - 10-year-old");
+  });
+
+  it("clears nullable release fields when null is provided", async function ({
+    fixtures,
+  }) {
+    const modUser = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({
+      name: "Test Bottle",
+      statedAge: null,
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Batch 1",
+      statedAge: 12,
+      abv: 48.0,
+      releaseYear: 2021,
+      description: "Original description",
+      imageUrl: "https://example.com/release.png",
+      tastingNotes: {
+        nose: "Oak",
+        palate: "Vanilla",
+        finish: "Spice",
+      },
+    });
+
+    const result = await routerClient.bottleReleases.update(
+      {
+        release: release.id,
+        edition: null,
+        abv: null,
+        releaseYear: null,
+        description: null,
+        imageUrl: null,
+        tastingNotes: null,
+      },
+      { context: { user: modUser } },
+    );
+
+    const [updatedRelease] = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, release.id));
+
+    expect(result).toMatchObject({
+      edition: null,
+      abv: null,
+      releaseYear: null,
+      description: null,
+      imageUrl: null,
+      tastingNotes: null,
+    });
+    expect(updatedRelease).toMatchObject({
+      edition: null,
+      abv: null,
+      releaseYear: null,
+      description: null,
+      imageUrl: null,
+      tastingNotes: null,
+    });
+  });
+
   it("throws error if release not found", async function ({ fixtures }) {
     const modUser = await fixtures.User({ mod: true });
 

@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleReleases,
   bottles,
   reviews,
   storePriceMatchProposals,
@@ -590,6 +591,76 @@ describe("price match queue", () => {
       reviewedById: user.id,
     });
     expect(listingAlias?.bottleId).toBe(result.bottle.id);
+  });
+
+  test("creates both bottle and release even when the stored creation target is stale", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Stale Target Brand" });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "astorwines" });
+    const price = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Stale Target Candidate",
+      bottleId: null,
+    });
+
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "create_new",
+        creationTarget: "bottle",
+      })
+      .returning();
+
+    const result = await routerClient.prices.matchQueue.createBottle(
+      {
+        proposal: proposal.id,
+        bottle: {
+          name: "Private Selection",
+          brand: brand.id,
+        },
+        release: {
+          edition: "Batch 7",
+          releaseYear: 2024,
+        },
+      },
+      { context: { user } },
+    );
+
+    const createdRelease = await db.query.bottleReleases.findFirst({
+      where: eq(bottleReleases.id, result.release!.id),
+    });
+    const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
+      where: eq(storePriceMatchProposals.id, proposal.id),
+    });
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+
+    expect(result.bottle.fullName).toBe("Stale Target Brand Private Selection");
+    expect(result.release).toMatchObject({
+      edition: "Batch 7",
+      releaseYear: 2024,
+    });
+    expect(createdRelease).toMatchObject({
+      bottleId: result.bottle.id,
+      edition: "Batch 7",
+      releaseYear: 2024,
+    });
+    expect(updatedProposal).toMatchObject({
+      status: "approved",
+      currentBottleId: result.bottle.id,
+      suggestedBottleId: result.bottle.id,
+      suggestedReleaseId: result.release?.id,
+      reviewedById: user.id,
+    });
+    expect(updatedPrice).toMatchObject({
+      bottleId: result.bottle.id,
+      releaseId: result.release?.id,
+    });
   });
 
   test("rolls back proposal-backed bottle creation when approval fails", async ({

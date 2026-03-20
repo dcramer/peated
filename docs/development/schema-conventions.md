@@ -1,28 +1,77 @@
 # Schema Conventions
 
-This document captures the whisky schema terminology and normalization rules used across extraction, matching, and bottle modeling work.
+The authoritative model lives in [docs/architecture/whisky-identity-model.md](/home/dcramer/src/peated/docs/architecture/whisky-identity-model.md). This document focuses on extraction and normalization terms.
+
+## Identity Layers
+
+Bottle identity:
+
+- `brand`
+- `bottler`
+- `distillery`
+- `expression`
+- `series`
+- `category`
+- `stated_age` only when stable across releases
+
+Release identity:
+
+- `edition`
+- `release_year`
+- `vintage_year`
+- `stated_age` when release-specific
+- `abv`
+- `single_cask`
+- `cask_strength`
+- `cask_fill`
+- `cask_type`
+- `cask_size`
+
+Tasting exact details:
+
+- `edition`
+- `release_year`
+- `vintage_year`
+- `abv`
+- `single_cask`
+- `cask_strength`
+- `cask_number`
+- `bottle_number`
+- `outturn`
+- `exclusive_text`
+- `label_notes`
+
+Observation-only by default:
+
+- cask number
+- barrel number
+- bottle number
+- outturn
+- exclusive wording
+- uncommon raw maturation text
 
 ## Field Definitions
 
-- **brand**: The brand or bottler of the whiskey.
-- **distillery**: An array of distilleries where the whiskey was produced. For example, `[ "Macallan", "Highland Park" ]` for a blend, or `[ "Lagavulin" ]` for a single distillery release. If the distilleries are unknown, use `[]`.
-- **expression**: The specific name or expression of the whiskey.
-- **series**: The series or collection name, or `null`.
+- **brand**: The consumer-facing label brand.
+- **bottler**: A separately stated bottling house when different from `brand`.
+- **distillery**: An array of actual producing distilleries. Use `[]` when unknown.
+- **expression**: The core release name after removing producer, age, ABV, and generic style words.
+- **series**: A stable range or family, or `null`.
+- **edition**: A simple human-facing release descriptor such as `Batch 3`, `2024 Release`, or `S2B13`.
 - **category**: One of `blend`, `bourbon`, `rye`, `single_grain`, `single_malt`, or `single_pot_still`.
 - **stated_age**: The age in years as an integer, or `null` if there is no age statement.
 - **abv**: Alcohol by volume as a percentage, for example `43.0`.
-- **release_year**: The bottled or release year.
+- **release_year**: The bottling or release year.
 - **vintage_year**: The distillation or vintage year, or `null`.
 - **cask_type**: The primary cask type or finish, or `null`.
 - **cask_strength**: `true` only when the label explicitly says cask strength, barrel proof, full proof, natural strength, or an equivalent phrase. Otherwise `null`.
-- **single_cask**: `true` only when the label explicitly says single cask, single barrel, or a specific cask or barrel selection. Otherwise `null`.
-- **edition**: A batch, edition, or release identifier, or `null`.
+- **single_cask**: `true` only when the label explicitly says single cask, single barrel, or an equivalent phrase. Otherwise `null`.
 
 ## Label Components
 
 Treat a label or retailer title as a bundle of bottle-identity components:
 
-- **producer / bottler**: The top-level producer name that maps to `brand`.
+- **producer / bottler**: The top-level producer name that usually maps to `brand`.
 - **distillery**: The actual producing distillery or distilleries, which may differ from `brand` for independent bottlings.
 - **expression**: The core release name after removing producer, age, ABV, and generic style words.
 - **series**: The stable collection or range, such as `Private Selection` or `Distillers Edition`.
@@ -51,6 +100,13 @@ These are usually noise and should not drive matching on their own:
 - retailer SEO words such as `Scotch Whisky`, `Kentucky Bourbon Whisky`, or `American Whiskey` when they only restate the category
 - ratings blurbs, tasting notes, medals, and shelf-talker copy
 - pricing, shipping, and legal text
+
+These should usually be preserved as observations instead of forcing a canonical split:
+
+- exact cask or barrel numbers
+- bottle counts or outturn
+- `store pick`, `exclusive`, `private barrel`, or similar merchandising text when it is not part of the marketed canonical release name
+- retailer-specific title suffixes
 
 ## Release Year Rules
 
@@ -81,8 +137,9 @@ These are usually noise and should not drive matching on their own:
 
 ### Series and Edition
 
-- Extract a named series into `series`.
+- Extract a named stable family into `series`.
 - Extract a release label like `"Batch 3"` or `"2021 Release"` into `edition`.
+- Do not use `series` for one-off batch codes, annual years, or exact cask numbers.
 
 ### Cask Type
 
@@ -108,10 +165,12 @@ These are usually noise and should not drive matching on their own:
 ## Matching Heuristics
 
 - Compare candidate bottles in this order: producer, distillery, expression, series, age, edition, category, cask details, single-cask and cask-strength flags, then ABV and year fields.
+- Prefer bottle-level matches when bottle identity is clear but release identity is weak.
 - Missing generic style words like `single malt` are weak evidence.
 - Conflicting age statements, edition codes, store-pick codes, barrel descriptors, or single-cask indicators are strong evidence that two listings are different bottles.
 - For independent bottlings, evaluate `brand` and `distillery` separately.
 - Bias toward `no_match` or manual review when the decisive identity components are weak or conflicting. A false match is worse than an unresolved listing.
+- Preserve exact details as observations even when they are not strong enough to define a canonical release.
 
 ## Retailer Title Examples
 

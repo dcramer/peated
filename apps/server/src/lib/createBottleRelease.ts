@@ -1,6 +1,7 @@
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, BottleRelease, User } from "@peated/server/db/schema";
 import { bottleReleases, bottles, changes } from "@peated/server/db/schema";
+import { findExistingBottleReleaseByIdentity } from "@peated/server/lib/bottleReleaseIdentity";
 import {
   formatCanonicalReleaseName,
   getCanonicalReleaseAliasNames,
@@ -10,7 +11,7 @@ import { upsertBottleAlias } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
 import type { BottleReleaseInputSchema } from "@peated/server/schemas";
 import { pushJob } from "@peated/server/worker/client";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 
 export class BottleReleaseCreateBadRequestError extends Error {
@@ -89,43 +90,9 @@ export async function createBottleReleaseInTransaction(
     release: resolvedReleaseIdentity,
   });
 
-  const existingRelease = await tx.query.bottleReleases.findFirst({
-    where: and(
-      eq(bottleReleases.bottleId, bottleId),
-      resolvedReleaseIdentity.edition
-        ? eq(
-            sql`LOWER(${bottleReleases.edition})`,
-            resolvedReleaseIdentity.edition.toLowerCase(),
-          )
-        : isNull(bottleReleases.edition),
-      resolvedReleaseIdentity.vintageYear
-        ? eq(bottleReleases.vintageYear, resolvedReleaseIdentity.vintageYear)
-        : isNull(bottleReleases.vintageYear),
-      resolvedReleaseIdentity.releaseYear
-        ? eq(bottleReleases.releaseYear, resolvedReleaseIdentity.releaseYear)
-        : isNull(bottleReleases.releaseYear),
-      resolvedReleaseIdentity.statedAge
-        ? eq(bottleReleases.statedAge, resolvedReleaseIdentity.statedAge)
-        : isNull(bottleReleases.statedAge),
-      resolvedReleaseIdentity.abv
-        ? eq(bottleReleases.abv, resolvedReleaseIdentity.abv)
-        : isNull(bottleReleases.abv),
-      resolvedReleaseIdentity.singleCask !== null
-        ? eq(bottleReleases.singleCask, resolvedReleaseIdentity.singleCask)
-        : isNull(bottleReleases.singleCask),
-      resolvedReleaseIdentity.caskStrength !== null
-        ? eq(bottleReleases.caskStrength, resolvedReleaseIdentity.caskStrength)
-        : isNull(bottleReleases.caskStrength),
-      resolvedReleaseIdentity.caskSize
-        ? eq(bottleReleases.caskSize, resolvedReleaseIdentity.caskSize)
-        : isNull(bottleReleases.caskSize),
-      resolvedReleaseIdentity.caskType
-        ? eq(bottleReleases.caskType, resolvedReleaseIdentity.caskType)
-        : isNull(bottleReleases.caskType),
-      resolvedReleaseIdentity.caskFill
-        ? eq(bottleReleases.caskFill, resolvedReleaseIdentity.caskFill)
-        : isNull(bottleReleases.caskFill),
-    ),
+  const existingRelease = await findExistingBottleReleaseByIdentity(tx, {
+    bottleId,
+    release: resolvedReleaseIdentity,
   });
 
   if (existingRelease) {

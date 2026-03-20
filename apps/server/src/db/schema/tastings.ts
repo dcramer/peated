@@ -23,6 +23,12 @@ import { users } from "./users";
 
 export const servingStyleEnum = pgEnum("servingStyle", SERVING_STYLE_LIST);
 
+/**
+ * User-authored tasting records.
+ *
+ * A tasting always points at a bottle and may optionally point at a canonical
+ * release when the user knows the exact shared variant they had.
+ */
 export const tastings = pgTable(
   "tasting",
   {

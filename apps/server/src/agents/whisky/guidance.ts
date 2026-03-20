@@ -367,6 +367,7 @@ function renderSchemaRules() {
   return renderBulletLines([
     BOTTLE_SCHEMA_RULES.bottleIdentity,
     BOTTLE_SCHEMA_RULES.releaseIdentity,
+    BOTTLE_SCHEMA_RULES.observationPolicy,
     BOTTLE_SCHEMA_RULES.aliasPolicy,
   ]);
 }
@@ -458,6 +459,7 @@ export function buildStorePriceMatchInstructions({
     renderBulletLines([
       BOTTLE_SCHEMA_RULES.bottleIdentity,
       BOTTLE_SCHEMA_RULES.releaseIdentity,
+      BOTTLE_SCHEMA_RULES.observationPolicy,
       BOTTLE_SCHEMA_RULES.aliasPolicy,
       "`brand` is the consumer-facing brand shown most prominently on the label.",
       "`bottler` is only for a separately stated bottler when different from `brand`.",
