@@ -105,6 +105,278 @@ function normalizeEntityChoiceName(name: string) {
   return normalizeString(name).toLowerCase();
 }
 
+const GENERIC_NAME_TOKENS = new Set([
+  "american",
+  "and",
+  "bottle",
+  "bourbon",
+  "canadian",
+  "cl",
+  "irish",
+  "japanese",
+  "kentucky",
+  "l",
+  "malt",
+  "ml",
+  "of",
+  "old",
+  "oz",
+  "rye",
+  "scotch",
+  "single",
+  "spirit",
+  "spirits",
+  "straight",
+  "the",
+  "whiskey",
+  "whisky",
+  "world",
+  "year",
+  "years",
+  "yr",
+  "yrs",
+]);
+
+function normalizeComparableText(value: string | null | undefined) {
+  return normalizeString(value ?? "")
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .trim();
+}
+
+function getComparableDomain(url: string | null | undefined) {
+  if (!url) {
+    return null;
+  }
+
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+    return hostname.startsWith("www.") ? hostname.slice(4) : hostname;
+  } catch {
+    return null;
+  }
+}
+
+function domainMatches(hostname: string, domain: string) {
+  return hostname === domain || hostname.endsWith(`.${domain}`);
+}
+
+function getComparableNameTokens(value: string | null | undefined) {
+  return normalizeComparableText(value)
+    .replace(/\b\d+(?:\.\d+)?\s?(?:ml|cl|l|oz)\b/g, " ")
+    .split(/[^a-z0-9]+/g)
+    .filter((token) => token.length > 0 && !GENERIC_NAME_TOKENS.has(token));
+}
+
+function tokenSetsMatchExactly(left: string[], right: string[]) {
+  if (!left.length || !right.length) {
+    return false;
+  }
+
+  const leftSet = new Set(left);
+  const rightSet = new Set(right);
+
+  if (leftSet.size !== rightSet.size) {
+    return false;
+  }
+
+  for (const token of leftSet) {
+    if (!rightSet.has(token)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function isBasicallyExactNameMatch(
+  listingName: string,
+  candidateName: string | null | undefined,
+) {
+  return tokenSetsMatchExactly(
+    getComparableNameTokens(listingName),
+    getComparableNameTokens(candidateName),
+  );
+}
+
+function getSearchEvidenceText(
+  evidence: SearchEvidence,
+  result: SearchEvidence["results"][number],
+) {
+  return [
+    evidence.summary,
+    result.title,
+    result.description,
+    ...result.extraSnippets,
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function getSuggestedTarget(
+  decision: StorePriceMatchDecision,
+  candidateBottles: PriceMatchCandidate[],
+) {
+  if (
+    (decision.action !== "match_existing" &&
+      decision.action !== "correction") ||
+    decision.suggestedBottleId === null
+  ) {
+    return null;
+  }
+
+  return (
+    candidateBottles.find(
+      (candidate) =>
+        candidate.bottleId === decision.suggestedBottleId &&
+        (decision.suggestedReleaseId != null
+          ? candidate.releaseId === decision.suggestedReleaseId
+          : candidate.releaseId === null || candidate.kind === "bottle"),
+    ) ?? null
+  );
+}
+
+function getTargetNameCandidates(
+  target: PriceMatchCandidate,
+  decision: StorePriceMatchDecision,
+) {
+  const candidates =
+    decision.suggestedReleaseId != null || target.kind === "release"
+      ? [target.alias, target.fullName]
+      : [
+          target.alias,
+          target.bottleFullName ?? target.fullName,
+          target.fullName,
+        ];
+
+  return Array.from(new Set(candidates.filter(Boolean))) as string[];
+}
+
+function hasSupportiveWebEvidenceForTarget({
+  target,
+  decision,
+  searchEvidence,
+  priceUrl,
+}: {
+  target: PriceMatchCandidate;
+  decision: StorePriceMatchDecision;
+  searchEvidence: SearchEvidence[];
+  priceUrl: string | null;
+}) {
+  const priceDomain = getComparableDomain(priceUrl);
+  const targetTokenSets = getTargetNameCandidates(target, decision)
+    .map((name) => getComparableNameTokens(name))
+    .filter((tokens) => tokens.length > 0);
+
+  if (!targetTokenSets.length) {
+    return false;
+  }
+
+  for (const evidence of searchEvidence) {
+    for (const result of evidence.results) {
+      const resultDomain = getComparableDomain(result.url);
+      if (
+        !resultDomain ||
+        (priceDomain !== null && domainMatches(resultDomain, priceDomain))
+      ) {
+        continue;
+      }
+
+      const resultTokens = new Set(
+        getComparableNameTokens(getSearchEvidenceText(evidence, result)),
+      );
+      if (!resultTokens.size) {
+        continue;
+      }
+
+      if (
+        targetTokenSets.some((tokens) =>
+          tokens.every((token) => resultTokens.has(token)),
+        )
+      ) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+function hasHardMatchConflict(
+  automationAssessment: StorePriceMatchAutomationAssessment,
+) {
+  return automationAssessment.automationBlockers.some(
+    (blocker) =>
+      blocker === "candidate bottler conflicts with extracted label" ||
+      (blocker.startsWith("candidate ") &&
+        blocker.endsWith(" conflicts with extracted label")),
+  );
+}
+
+function downgradeUnsafeExistingMatchDecision({
+  price,
+  decision,
+  candidateBottles,
+  searchEvidence,
+  automationAssessment,
+}: {
+  price: StorePrice;
+  decision: StorePriceMatchDecision;
+  candidateBottles: PriceMatchCandidate[];
+  searchEvidence: SearchEvidence[];
+  automationAssessment: StorePriceMatchAutomationAssessment;
+}): StorePriceMatchDecision {
+  const target = getSuggestedTarget(decision, candidateBottles);
+  if (!target || target.source.includes("exact")) {
+    return decision;
+  }
+
+  const hasExactishLocalName = getTargetNameCandidates(target, decision).some(
+    (name) => isBasicallyExactNameMatch(price.name, name),
+  );
+  const hasSupportiveWebEvidence = hasSupportiveWebEvidenceForTarget({
+    target,
+    decision,
+    searchEvidence,
+    priceUrl: price.url ?? null,
+  });
+  const hasIdentityConflict = hasHardMatchConflict(automationAssessment);
+
+  if (
+    !hasIdentityConflict &&
+    (hasExactishLocalName || hasSupportiveWebEvidence)
+  ) {
+    return decision;
+  }
+
+  const reasons: string[] = [];
+  if (hasIdentityConflict) {
+    reasons.push("the candidate conflicts with extracted listing details");
+  }
+  if (!hasExactishLocalName && !hasSupportiveWebEvidence) {
+    reasons.push(
+      "there is no exact alias, no basically exact canonical name match, and no supportive off-retailer web evidence for the suggested target",
+    );
+  }
+
+  const rationalePrefix = decision.rationale ? `${decision.rationale} ` : "";
+
+  return {
+    action: "no_match",
+    confidence: decision.confidence,
+    rationale: `${rationalePrefix}Server downgraded the existing-match recommendation because ${reasons.join(
+      " and ",
+    )}.`,
+    candidateBottleIds: decision.candidateBottleIds,
+    suggestedBottleId: null,
+    suggestedReleaseId: null,
+    parentBottleId: null,
+    creationTarget: null,
+    proposedBottle: null,
+    proposedRelease: null,
+  };
+}
+
 function sanitizeResolvedEntityChoice(
   choice: {
     id: number | null;
@@ -1160,12 +1432,35 @@ export async function resolveStorePriceMatchProposal(
     });
     candidates = classification.candidateBottles;
     searchEvidence = classification.searchEvidence;
-    const decision = sanitizeStorePriceMatchDecision(classification.decision, {
+    let decision = sanitizeStorePriceMatchDecision(classification.decision, {
       candidateBottles: candidates,
       searchEvidence,
       resolvedEntities: classification.resolvedEntities,
     });
-    const automationAssessment = getStorePriceMatchAutomationAssessment({
+    let automationAssessment = getStorePriceMatchAutomationAssessment({
+      action: decision.action,
+      modelConfidence: decision.confidence,
+      price,
+      suggestedBottleId: decision.suggestedBottleId,
+      suggestedReleaseId: decision.suggestedReleaseId ?? null,
+      candidateBottles: candidates,
+      extractedLabel,
+      proposedBottle: decision.proposedBottle,
+      proposedRelease: decision.proposedRelease ?? null,
+      creationTarget:
+        decision.action === "create_new"
+          ? (decision.creationTarget ?? null)
+          : null,
+      searchEvidence,
+    });
+    decision = downgradeUnsafeExistingMatchDecision({
+      price,
+      decision,
+      candidateBottles: candidates,
+      searchEvidence,
+      automationAssessment,
+    });
+    automationAssessment = getStorePriceMatchAutomationAssessment({
       action: decision.action,
       modelConfidence: decision.confidence,
       price,

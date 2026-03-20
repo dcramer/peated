@@ -317,6 +317,187 @@ describe("priceMatching", () => {
     expect(proposal.confidence).toBe(88);
   });
 
+  test("downgrades non-exact existing matches without web support to no_match", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+    const brand = await fixtures.Entity({
+      name: "Wild Turkey",
+      type: ["brand", "distiller"],
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [brand.id],
+      name: "Rare Breed Barrel-Proof Kentucky Straight Rye",
+      category: "rye",
+      caskStrength: true,
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Wild Turkey Rare Breed Rye",
+      imageUrl: null,
+      url: "https://shop.example/wild-turkey-rare-breed-rye",
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Wild Turkey",
+      bottler: null,
+      expression: "Rare Breed",
+      series: null,
+      distillery: ["Wild Turkey"],
+      category: "rye",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyStorePriceMatch).mockResolvedValue({
+      decision: {
+        action: "match_existing",
+        confidence: 82,
+        rationale: "The local rye candidate looks like the closest match.",
+        suggestedBottleId: bottle.id,
+        candidateBottleIds: [bottle.id],
+        proposedBottle: null,
+      },
+      searchEvidence: [],
+      candidateBottles: [
+        {
+          kind: "bottle",
+          bottleId: bottle.id,
+          releaseId: null,
+          alias: null,
+          fullName: bottle.fullName,
+          bottleFullName: bottle.fullName,
+          brand: "Wild Turkey",
+          bottler: null,
+          series: null,
+          distillery: ["Wild Turkey"],
+          category: "rye",
+          statedAge: null,
+          edition: null,
+          caskStrength: true,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          score: 0.86,
+          source: ["brand"],
+        },
+      ],
+      resolvedEntities: [],
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(proposal.status).toBe("pending_review");
+    expect(proposal.proposalType).toBe("no_match");
+    expect(proposal.suggestedBottleId).toBeNull();
+    expect(proposal.rationale).toContain(
+      "Server downgraded the existing-match recommendation",
+    );
+  });
+
+  test("keeps exact-ish bottle matches when only generic retailer words differ", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { extractFromText } = await import(
+      "@peated/server/agents/whisky/labelExtractor"
+    );
+    const { classifyStorePriceMatch } = await import(
+      "@peated/server/agents/priceMatch"
+    );
+    const bottle = await fixtures.Bottle();
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Ardbeg Uigeadail Single Malt Scotch Whisky",
+      imageUrl: null,
+      url: "https://shop.example/ardbeg-uigeadail",
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Ardbeg",
+      bottler: null,
+      expression: "Uigeadail",
+      series: null,
+      distillery: ["Ardbeg"],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyStorePriceMatch).mockResolvedValue({
+      decision: {
+        action: "match_existing",
+        confidence: 84,
+        rationale: "The bottle identity matches cleanly.",
+        suggestedBottleId: bottle.id,
+        candidateBottleIds: [bottle.id],
+        proposedBottle: null,
+      },
+      searchEvidence: [],
+      candidateBottles: [
+        {
+          kind: "bottle",
+          bottleId: bottle.id,
+          releaseId: null,
+          alias: null,
+          fullName: "Ardbeg Uigeadail",
+          bottleFullName: "Ardbeg Uigeadail",
+          brand: "Ardbeg",
+          bottler: null,
+          series: null,
+          distillery: ["Ardbeg"],
+          category: "single_malt",
+          statedAge: null,
+          edition: null,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          score: 0.84,
+          source: ["brand"],
+        },
+      ],
+      resolvedEntities: [],
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(proposal.status).toBe("pending_review");
+    expect(proposal.proposalType).toBe("match_existing");
+    expect(proposal.suggestedBottleId).toBe(bottle.id);
+  });
+
   test("rejects create_new release proposals that point at an unknown parent bottle", async ({
     fixtures,
   }) => {
