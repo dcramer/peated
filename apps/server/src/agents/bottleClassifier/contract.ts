@@ -11,13 +11,38 @@ import {
 // small, schema-backed, and decoupled from price-matching persistence so evals
 // and future callers can rely on one clean interface.
 
+const BottleReferenceUrlSchema = z.preprocess((value) => {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (value === null) {
+    return null;
+  }
+
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmedValue = value.trim();
+  if (!trimmedValue) {
+    return null;
+  }
+
+  try {
+    return new URL(trimmedValue).toString();
+  } catch {
+    return null;
+  }
+}, z.string().url().nullable().optional());
+
 export const BottleReferenceSchema = z
   .object({
     id: z.union([z.number(), z.string()]).nullable().optional(),
     externalSiteId: z.number().int().nullable().optional(),
     name: z.string().trim().min(1),
-    url: z.string().url().nullable().optional(),
-    imageUrl: z.string().url().nullable().optional(),
+    url: BottleReferenceUrlSchema,
+    imageUrl: BottleReferenceUrlSchema,
     currentBottleId: z.number().int().nullable().optional(),
     currentReleaseId: z.number().int().nullable().optional(),
   })

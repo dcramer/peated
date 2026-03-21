@@ -29,6 +29,83 @@ type QueueRow = {
   price: StorePrice & { externalSite: ExternalSite };
 };
 
+type StructuredAutomationIssue = {
+  code?: unknown;
+  format?: unknown;
+  message?: unknown;
+  path?: unknown;
+};
+
+function humanizeAutomationIssuePath(path: unknown): string | null {
+  const rawParts = Array.isArray(path)
+    ? path.filter((segment): segment is string => typeof segment === "string")
+    : typeof path === "string"
+      ? path.split(".").filter(Boolean)
+      : [];
+
+  if (rawParts.length === 0) {
+    return null;
+  }
+
+  return rawParts
+    .map((part) =>
+      part
+        .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+        .split(" ")
+        .map((word) =>
+          word.toLowerCase() === "url" ? "URL" : word.toLowerCase(),
+        )
+        .join(" "),
+    )
+    .join(" ");
+}
+
+function formatStructuredAutomationIssue(
+  issue: StructuredAutomationIssue,
+): string | null {
+  const path = humanizeAutomationIssuePath(issue.path);
+  const message =
+    typeof issue.message === "string" && issue.message.length > 0
+      ? issue.message
+      : null;
+
+  if (issue.code === "invalid_format" && issue.format === "url") {
+    return path ? `${path} is invalid` : "URL is invalid";
+  }
+
+  if (!message) {
+    return null;
+  }
+
+  return path ? `${path}: ${message}` : message;
+}
+
+function getAutomationBlockersFromError(error: string): string[] {
+  const trimmedError = error.trim();
+  if (!trimmedError.startsWith("[") || !trimmedError.endsWith("]")) {
+    return [error];
+  }
+
+  try {
+    const parsedIssues = JSON.parse(trimmedError);
+    if (!Array.isArray(parsedIssues)) {
+      return [error];
+    }
+
+    const formattedIssues = parsedIssues
+      .map((issue) =>
+        issue && typeof issue === "object"
+          ? formatStructuredAutomationIssue(issue)
+          : null,
+      )
+      .filter((issue): issue is string => !!issue);
+
+    return formattedIssues.length > 0 ? formattedIssues : [error];
+  } catch {
+    return [error];
+  }
+}
+
 export async function serializeQueueItems(
   rows: QueueRow[],
   {
@@ -138,7 +215,10 @@ export function serializeProposal(
       };
   const automationBlockers =
     proposal.status === "errored" && proposal.error
-      ? [...automationAssessment.automationBlockers, proposal.error]
+      ? [
+          ...automationAssessment.automationBlockers,
+          ...getAutomationBlockersFromError(proposal.error),
+        ]
       : automationAssessment.automationBlockers;
   const serializedProposal = StorePriceMatchProposalSchema.parse({
     id: proposal.id,

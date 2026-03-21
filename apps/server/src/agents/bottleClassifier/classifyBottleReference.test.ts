@@ -174,4 +174,50 @@ describe("classifyBottleReference", () => {
       suggestedBottleId: null,
     });
   });
+
+  test("treats invalid reference URLs as absent metadata", async () => {
+    const { runBottleClassifierAgent } = await import(
+      "./runBottleClassifierAgent"
+    );
+
+    vi.mocked(runBottleClassifierAgent).mockResolvedValue({
+      decision: {
+        action: "no_match",
+        confidence: 0.82,
+        rationale: "No safe local match.",
+        suggestedBottleId: null,
+        suggestedReleaseId: null,
+        parentBottleId: null,
+        creationTarget: null,
+        candidateBottleIds: [],
+        proposedBottle: null,
+        proposedRelease: null,
+      },
+      artifacts: {
+        extractedIdentity: null,
+        searchEvidence: [],
+        candidates: [],
+        resolvedEntities: [],
+      },
+    });
+
+    await classifyBottleReference({
+      reference: {
+        name: "Wild Turkey Rare Breed Bourbon",
+        url: "not-a-url",
+        imageUrl: "/images/wild-turkey-rare-breed.jpg",
+      },
+      extractedIdentity: null,
+      initialCandidates: [],
+    });
+
+    expect(runBottleClassifierAgent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        reference: expect.objectContaining({
+          url: null,
+          imageUrl: null,
+        }),
+      }),
+    );
+  });
 });

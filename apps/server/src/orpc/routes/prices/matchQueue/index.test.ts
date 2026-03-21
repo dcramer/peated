@@ -304,6 +304,41 @@ describe("price match queue", () => {
     ]);
   });
 
+  test("formats structured classifier errors into readable automation blockers", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const price = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Broken Image Candidate",
+    });
+
+    await db.insert(storePriceMatchProposals).values({
+      priceId: price.id,
+      status: "errored",
+      proposalType: "no_match",
+      error: JSON.stringify([
+        {
+          code: "invalid_format",
+          format: "url",
+          path: ["reference", "imageUrl"],
+          message: "Invalid URL",
+        },
+      ]),
+      updatedAt: new Date("2026-03-08T10:00:00.000Z"),
+    });
+
+    const results = await routerClient.prices.matchQueue.list(
+      { kind: "errored" },
+      { context: { user } },
+    );
+
+    expect(results.results[0]?.automationBlockers).toContain(
+      "reference image URL is invalid",
+    );
+  });
+
   test("separates actionable and processing queue items and returns counts", async ({
     fixtures,
   }) => {
