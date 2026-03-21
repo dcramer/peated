@@ -1,6 +1,7 @@
 import { Agent, OpenAIProvider, Runner } from "@openai/agents";
 import { buildBottleClassifierInstructions } from "@peated/server/agents/whisky/guidance";
 import config from "@peated/server/config";
+import { normalizePotentialProofLikeDecision } from "@peated/server/lib/abv";
 import {
   getBottleCandidateById,
   mergeBottleCandidate,
@@ -79,7 +80,9 @@ function mergeResolvedEntity(
 function parseAgentDecision(
   decision: BottleClassifierAgentDecision,
 ): BottleMatchDecision {
-  return BottleMatchDecisionSchema.parse(decision);
+  return BottleMatchDecisionSchema.parse(
+    normalizePotentialProofLikeDecision(decision),
+  );
 }
 
 function createOpenAIClient(): OpenAI {
@@ -195,6 +198,7 @@ export async function runBottleClassifierAgent({
     createOpenAIWebSearchTool({
       client,
       budget: webSearchBudget,
+      braveApiKey: config.BRAVE_API_KEY,
       onEvidence: (evidence) => {
         searchEvidence.push(evidence);
       },

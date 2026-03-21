@@ -128,6 +128,7 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
       "`abv`, `vintage_year`, `release_year`, `cask_size`, `cask_fill`",
     guidance: [
       "ABV is the numeric alcohol percentage.",
+      "If the source gives proof instead of ABV, convert proof to ABV by dividing by 2. Never copy a proof number directly into `abv`.",
       "Use `vintage_year` for the distillation year and `release_year` for the bottling or release year.",
       "Use `cask_size` and `cask_fill` only when they are explicitly stated.",
     ],
@@ -444,6 +445,7 @@ export function buildWhiskyLabelExtractorInstructions({
       "If `edition`, `release_year`, or `vintage_year` is populated, do not also copy that same batch code or year into `expression`.",
       "Use `release_year` only for explicit release or bottling years, not founding dates or warning text.",
       "If both distillation and bottling years are present, use `vintage_year` for the distillation year and `release_year` for the bottling year.",
+      "If the source gives proof instead of ABV, convert proof to ABV by dividing by 2 and store only the ABV percentage.",
       "Use `cask_size` and `cask_fill` only when the source text states them explicitly.",
       "Set `cask_strength` and `single_cask` only when the label states them explicitly. `Barrel Strength`, `Barrel Proof`, `Full Proof`, and `Natural Strength` all count as `cask_strength: true`.",
       "Correct obvious whisky-name typos only when the intended bottle is clear from the input.",
@@ -575,6 +577,7 @@ export function buildBottleClassifierInstructions({
       "When bottle identity is certain but release identity is not, prefer `match_existing` or `create_new` at the bottle layer instead of inventing a release.",
       "If you return `create_new` with a bottle target, `proposedBottle` must include every schema field, using `null` or `[]` when unknown.",
       "For `proposedBottle.name`, follow the bottle's evidenced canonical name, not a mechanically copied source title. Do not append extra style/category words just because they appeared in the source text.",
+      "`abv` must always be alcohol by volume percentage, never proof. For example, `115.6 proof` means `57.8` ABV.",
       "If `proposedBottle.edition`, `proposedBottle.releaseYear`, or `proposedBottle.vintageYear` is set, do not repeat that same batch code or year in `proposedBottle.name` unless it is part of the evidenced canonical series name.",
       "For `proposedRelease`, use only release-specific fields such as edition, ABV, age when release-specific, years, single-cask, cask-strength, and cask details.",
       "For `brand`, `distillers`, `bottler`, and `series`, return objects with `{ id, name }`. Use `id: null` when you do not know a local id.",

@@ -70,42 +70,57 @@ export function createBraveWebSearchTool({
         return budget.getExhaustedError();
       }
 
-      try {
-        const url = new URL("https://api.search.brave.com/res/v1/web/search");
-        url.searchParams.set("q", args.query);
-        url.searchParams.set("count", "10");
-        url.searchParams.set("extra_snippets", "true");
+      const evidence = await runBraveWebSearch({
+        apiKey,
+        query: args.query,
+      });
 
-        const response = await fetch(url, {
-          signal: AbortSignal.timeout(BRAVE_WEB_SEARCH_TIMEOUT_MS),
-          headers: {
-            Accept: "application/json",
-            "X-Subscription-Token": apiKey,
-          },
-        });
-
-        if (!response.ok) {
-          return {
-            error: `Brave web search failed (${response.status})`,
-          };
-        }
-
-        const evidence = extractBraveSearchEvidence(
-          args.query,
-          await response.json(),
-        );
-        if (evidence.results.length > 0) {
-          onEvidence?.(evidence);
-        }
+      if ("error" in evidence) {
         return evidence;
-      } catch (error) {
-        return {
-          error:
-            error instanceof Error
-              ? `Brave web search failed: ${error.message}`
-              : "Brave web search failed",
-        };
       }
+
+      if (evidence.results.length > 0) {
+        onEvidence?.(evidence);
+      }
+      return evidence;
     },
   });
+}
+
+export async function runBraveWebSearch({
+  apiKey,
+  query,
+}: {
+  apiKey: string;
+  query: string;
+}): Promise<BottleSearchEvidence | { error: string }> {
+  try {
+    const url = new URL("https://api.search.brave.com/res/v1/web/search");
+    url.searchParams.set("q", query);
+    url.searchParams.set("count", "10");
+    url.searchParams.set("extra_snippets", "true");
+
+    const response = await fetch(url, {
+      signal: AbortSignal.timeout(BRAVE_WEB_SEARCH_TIMEOUT_MS),
+      headers: {
+        Accept: "application/json",
+        "X-Subscription-Token": apiKey,
+      },
+    });
+
+    if (!response.ok) {
+      return {
+        error: `Brave web search failed (${response.status})`,
+      };
+    }
+
+    return extractBraveSearchEvidence(query, await response.json());
+  } catch (error) {
+    return {
+      error:
+        error instanceof Error
+          ? `Brave web search failed: ${error.message}`
+          : "Brave web search failed",
+    };
+  }
 }

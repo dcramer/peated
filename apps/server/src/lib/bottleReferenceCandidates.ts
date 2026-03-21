@@ -14,6 +14,10 @@ import {
   entities,
   type StorePrice,
 } from "@peated/server/db/schema";
+import {
+  normalizePotentialProofLikeAbvFields,
+  normalizePotentialProofToAbv,
+} from "@peated/server/lib/abv";
 import { logError } from "@peated/server/lib/log";
 import { normalizeBottle, normalizeString } from "@peated/server/lib/normalize";
 import { absoluteUrl } from "@peated/server/lib/urls";
@@ -80,7 +84,7 @@ export const BottleCandidateSearchInputSchema = z.object({
   distillery: z.array(z.string().trim()).default([]),
   category: z.enum(CATEGORY_LIST).nullable().default(null),
   stated_age: z.number().nullable().default(null),
-  abv: z.number().min(0).max(100).nullable().default(null),
+  abv: z.number().nullable().default(null),
   cask_type: z.string().trim().nullable().default(null),
   cask_size: CaskSizeEnum.nullable().default(null),
   cask_fill: CaskFillEnum.nullable().default(null),
@@ -323,7 +327,7 @@ function buildBottleCandidate(
     edition: row.edition ?? null,
     caskStrength: row.caskStrength ?? null,
     singleCask: row.singleCask ?? null,
-    abv: parseNullableNumber(row.abv),
+    abv: normalizePotentialProofToAbv(parseNullableNumber(row.abv)),
     vintageYear: parseNullableNumber(row.vintageYear),
     releaseYear: parseNullableNumber(row.releaseYear),
     caskType: row.caskType ?? null,
@@ -347,7 +351,9 @@ export async function extractBottleReferenceIdentity(
       return null;
     }
 
-    const parsedDetails = BottleReferenceIdentitySchema.parse(extractedDetails);
+    const parsedDetails = normalizePotentialProofLikeAbvFields(
+      BottleReferenceIdentitySchema.parse(extractedDetails),
+    );
 
     return {
       ...parsedDetails,
@@ -1384,7 +1390,9 @@ export const findStorePriceMatchCandidates = findBottleReferenceCandidates;
 export async function searchBottleCandidates(
   rawInput: BottleCandidateSearchInputRequest,
 ) {
-  const input = BottleCandidateSearchInputSchema.parse(rawInput);
+  const input = normalizePotentialProofLikeAbvFields(
+    BottleCandidateSearchInputSchema.parse(rawInput),
+  );
   const searchName = buildRawSearchName(input);
   if (!searchName) {
     return [];

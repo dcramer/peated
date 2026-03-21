@@ -1,7 +1,11 @@
 import { describe, expect, test } from "vitest";
 import { extractBraveSearchEvidence } from "./braveWebSearch";
 import { extractOpenAISearchEvidence } from "./openaiWebSearch";
-import { createBottleWebSearchBudget } from "./sharedWebSearch";
+import {
+  createBottleWebSearchBudget,
+  isThinBottleSearchEvidence,
+  mergeBottleSearchEvidence,
+} from "./sharedWebSearch";
 
 describe("bottleClassifier web search tools", () => {
   test("shares one web search budget across providers", () => {
@@ -77,5 +81,88 @@ describe("bottleClassifier web search tools", () => {
       ],
     });
     expect(evidence.summary).toContain("Official Glenmorangie page");
+  });
+
+  test("treats a single cited domain as thin evidence", () => {
+    const evidence = extractOpenAISearchEvidence("four roses obso 115.6", {
+      output_text: "Four Roses lists barrel strength details.",
+      output: [
+        {
+          type: "message",
+          content: [
+            {
+              type: "output_text",
+              annotations: [
+                {
+                  type: "url_citation",
+                  url: "https://www.fourrosesbourbon.com/bourbon/single-barrel-barrel-strength/",
+                  title: "Four Roses Single Barrel Barrel Strength",
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(isThinBottleSearchEvidence(evidence)).toBe(true);
+  });
+
+  test("merges evidence across passes with deduped urls", () => {
+    const openaiEvidence = extractOpenAISearchEvidence(
+      "four roses obso 115.6",
+      {
+        output_text: "Four Roses confirms OBSO barrel strength releases.",
+        output: [
+          {
+            type: "message",
+            content: [
+              {
+                type: "output_text",
+                annotations: [
+                  {
+                    type: "url_citation",
+                    url: "https://www.fourrosesbourbon.com/bourbon/single-barrel-barrel-strength/",
+                    title: "Four Roses Single Barrel Barrel Strength",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    );
+    const braveEvidence = extractBraveSearchEvidence("four roses obso 115.6", {
+      web: {
+        results: [
+          {
+            title: "Four Roses Private Selection Guide",
+            url: "https://www.breakingbourbon.com/review/four-roses-single-barrel-barrel-strength-private-selection",
+            description:
+              "Breaking Bourbon reviews Four Roses barrel strength picks.",
+            extra_snippets: [
+              "Includes recipe codes such as OBSO and proof details.",
+            ],
+          },
+          {
+            title: "Four Roses Single Barrel Barrel Strength",
+            url: "https://www.fourrosesbourbon.com/bourbon/single-barrel-barrel-strength/",
+            description: "Official Four Roses page.",
+            extra_snippets: [],
+          },
+        ],
+      },
+    });
+
+    const mergedEvidence = mergeBottleSearchEvidence({
+      provider: "openai",
+      query: "four roses obso 115.6",
+      evidences: [openaiEvidence, braveEvidence],
+    });
+
+    expect(mergedEvidence.results).toHaveLength(2);
+    expect(mergedEvidence.summary).toContain("Four Roses confirms OBSO");
+    expect(mergedEvidence.summary).toContain("Breaking Bourbon reviews");
+    expect(isThinBottleSearchEvidence(mergedEvidence)).toBe(false);
   });
 });

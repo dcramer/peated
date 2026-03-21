@@ -47,7 +47,7 @@ export function createSearchBottlesTool({
         "Age statement in years.",
       ),
       abv: BottleCandidateSearchInputSchema.shape.abv.describe(
-        "Alcohol by volume percentage as a number, for example 59.2.",
+        "Alcohol by volume percentage as a number, for example 59.2. If the source gives proof, convert it to ABV first.",
       ),
       cask_type: BottleCandidateSearchInputSchema.shape.cask_type.describe(
         "Primary cask or finish wording such as First Fill Bourbon or PX Cask Finish.",

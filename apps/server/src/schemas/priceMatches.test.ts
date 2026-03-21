@@ -359,6 +359,36 @@ describe("StorePriceMatchDecisionSchema", () => {
     expect(result.data.proposedRelease).toBeUndefined();
   });
 
+  test("allows proof-like ABV values in agent create_new drafts", () => {
+    const result = StorePriceMatchAgentResponseSchema.safeParse({
+      decision: {
+        action: "create_new",
+        confidence: 91,
+        rationale: null,
+        suggestedBottleId: null,
+        suggestedReleaseId: null,
+        parentBottleId: null,
+        creationTarget: "release",
+        candidateBottleIds: [],
+        proposedBottle: null,
+        proposedRelease: {
+          ...baseProposedRelease,
+          abv: 115.6,
+        },
+      },
+    });
+
+    expect(result.success).toBe(true);
+
+    if (!result.success) {
+      throw new Error(
+        "Expected agent response schema to accept proof-like ABV",
+      );
+    }
+
+    expect(result.data.decision.proposedRelease?.abv).toBe(115.6);
+  });
+
   test("rejects release creation without a parent bottle", () => {
     const result = StorePriceMatchDecisionSchema.safeParse({
       action: "create_new",

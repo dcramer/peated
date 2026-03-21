@@ -202,6 +202,14 @@ export const ProposedReleaseSchema = BottleReleaseInputSchema.omit({
   image: true,
 });
 
+const AgentProposedBottleSchema = ProposedBottleSchema.extend({
+  abv: z.number().nullable().default(null),
+});
+
+const AgentProposedReleaseSchema = ProposedReleaseSchema.extend({
+  abv: z.number().nullable().default(null),
+});
+
 function validateCreateNewDecisionShape(
   value: {
     creationTarget?: z.infer<typeof PriceMatchCreationTargetEnum> | null;
@@ -345,8 +353,8 @@ export const StorePriceMatchAgentDecisionSchema =
     suggestedReleaseId: z.number().int().nullable().default(null),
     parentBottleId: z.number().int().nullable().default(null),
     creationTarget: PriceMatchCreationTargetEnum.nullable().default(null),
-    proposedBottle: ProposedBottleSchema.nullable().default(null),
-    proposedRelease: ProposedReleaseSchema.nullable().default(null),
+    proposedBottle: AgentProposedBottleSchema.nullable().default(null),
+    proposedRelease: AgentProposedReleaseSchema.nullable().default(null),
   });
 export const BottleClassifierAgentDecisionSchema =
   StorePriceMatchAgentDecisionSchema;

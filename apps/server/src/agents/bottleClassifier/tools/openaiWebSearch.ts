@@ -2,10 +2,16 @@ import { tool } from "@openai/agents";
 import config from "@peated/server/config";
 import type OpenAI from "openai";
 import type { BottleSearchEvidence } from "../schemas";
+import { runBraveWebSearch } from "./braveWebSearch";
 import {
   BottleWebSearchArgsSchema,
   buildBottleSearchEvidence,
+  getDistinctResultDomains,
   getResultDomain,
+  isThinBottleSearchEvidence,
+  mergeBottleSearchEvidence,
+  mergeBottleSearchResults,
+  summarizeSearchResults,
   type BottleWebSearchBudget,
 } from "./sharedWebSearch";
 
@@ -50,16 +56,18 @@ export function extractOpenAISearchEvidence(
 export function createOpenAIWebSearchTool({
   client,
   budget,
+  braveApiKey,
   onEvidence,
 }: {
   client: OpenAI;
   budget: BottleWebSearchBudget;
+  braveApiKey?: string | null;
   onEvidence?: (evidence: BottleSearchEvidence) => void;
 }) {
   return tool({
     name: "openai_web_search",
     description:
-      "Search the live web using OpenAI's native web search capability. This is the default web search tool when local bottle and entity search are still ambiguous or conflicting. Use it to validate the bottle or release traits that make a match safe, especially when the source text may have omitted a canonical trait that could bridge a generic reference to a more specific local candidate. Prefer official producer, distillery, bottler, or importer domains first, then critics or publications, and treat retailer pages as weak corroboration.",
+      "Search the live web using OpenAI's native web search capability. This is the default web search tool when local bottle and entity search are still ambiguous or conflicting. Use it to validate the bottle or release traits that make a match safe, especially when the source text may have omitted a canonical trait that could bridge a generic reference to a more specific local candidate. Prefer official producer, distillery, bottler, or importer domains first, then critics or publications, and treat retailer pages as weak corroboration. When the first search is thin, this tool will automatically try to gather additional non-retailer evidence.",
     parameters: BottleWebSearchArgsSchema,
     execute: async (args) => {
       if (!budget.tryConsume()) {
@@ -67,30 +75,91 @@ export function createOpenAIWebSearchTool({
       }
 
       try {
-        const response = await client.responses.create({
-          model: config.OPENAI_MODEL,
+        const primaryEvidence = await runOpenAIWebSearch({
+          client,
+          query: args.query,
           instructions:
-            "Search the web for authoritative evidence about a spirits bottle reference. Prefer official producer, distillery, bottler, or importer domains first, then critics or publications. Do not treat the originating retailer or source page as decisive proof. In the cited summary, explicitly mention which bottle or release traits the sources confirm, such as distillery, bottler, cask finish, cask size, cask fill, ABV, age, edition, or release year, and call out any traits the sources do not confirm. When the goal is to determine whether a generic source title still points at a more specific canonical bottle, explicitly say whether the sources confirm the omitted trait that would bridge that gap, such as barrel proof or a numbered edition.",
-          input: [
-            {
-              role: "user",
-              content: [
-                {
-                  type: "input_text",
-                  text: args.query,
-                },
-              ],
-            },
-          ],
-          tools: [{ type: "web_search_preview" }],
-          temperature: 0,
+            "Search the web for authoritative evidence about a spirits bottle reference. Prefer official producer, distillery, bottler, or importer domains first, then critics, reviewers, or publications. Do not treat the originating retailer or source page as decisive proof. Cite 2 to 4 distinct URLs when available, including at least one official source and one independent non-retailer source when the web supports that. In the cited summary, explicitly mention which bottle or release traits the sources confirm, such as distillery, bottler, cask finish, cask size, cask fill, ABV, age, edition, release year, or whether a number is proof rather than ABV.",
         });
+        const openAIEvidences = [primaryEvidence];
 
-        const evidence = extractOpenAISearchEvidence(args.query, response);
-        if (evidence.results.length > 0) {
-          onEvidence?.(evidence);
+        if (
+          isThinBottleSearchEvidence(primaryEvidence) &&
+          budget.tryConsume()
+        ) {
+          const citedDomains = getDistinctResultDomains(
+            primaryEvidence.results,
+          );
+          let supplementalEvidence: BottleSearchEvidence | null = null;
+          try {
+            supplementalEvidence = await runOpenAIWebSearch({
+              client,
+              query: args.query,
+              instructions:
+                "Search the web for additional corroborating sources about the same spirits bottle reference. Prefer domains different from the first pass, especially official producer, distillery, bottler, or importer pages if missing, otherwise independent reviewers, critics, or publications. Avoid retailer-only evidence when possible. Explicitly call out whether the sources confirm proof-style labeling, barrel strength, or a concrete ABV.",
+              extraContext:
+                citedDomains.length > 0
+                  ? `Previously cited domains: ${citedDomains.join(", ")}. Find different domains if possible.`
+                  : null,
+            });
+          } catch {
+            supplementalEvidence = null;
+          }
+
+          if (supplementalEvidence?.results.length) {
+            openAIEvidences.push(supplementalEvidence);
+          }
         }
-        return evidence;
+
+        const openAIEvidence =
+          openAIEvidences.length > 1
+            ? mergeBottleSearchEvidence({
+                provider: "openai",
+                query: args.query,
+                evidences: openAIEvidences,
+              })
+            : primaryEvidence;
+
+        if (openAIEvidence.results.length > 0) {
+          onEvidence?.(openAIEvidence);
+        }
+
+        if (
+          braveApiKey &&
+          isThinBottleSearchEvidence(openAIEvidence) &&
+          budget.tryConsume()
+        ) {
+          const braveEvidence = await runBraveWebSearch({
+            apiKey: braveApiKey,
+            query: args.query,
+          });
+
+          if ("error" in braveEvidence) {
+            return {
+              ...openAIEvidence,
+              supplementalError: braveEvidence.error,
+            };
+          }
+
+          if (braveEvidence.results.length > 0) {
+            onEvidence?.(braveEvidence);
+          }
+
+          const mergedResults = mergeBottleSearchResults(
+            openAIEvidence.results,
+            braveEvidence.results,
+          );
+
+          return buildBottleSearchEvidence({
+            provider: "openai",
+            query: args.query,
+            summary:
+              summarizeSearchResults(mergedResults) ?? openAIEvidence.summary,
+            results: mergedResults,
+          });
+        }
+
+        return openAIEvidence;
       } catch (error) {
         return {
           error:
@@ -101,4 +170,36 @@ export function createOpenAIWebSearchTool({
       }
     },
   });
+}
+
+async function runOpenAIWebSearch({
+  client,
+  query,
+  instructions,
+  extraContext = null,
+}: {
+  client: OpenAI;
+  query: string;
+  instructions: string;
+  extraContext?: string | null;
+}): Promise<BottleSearchEvidence> {
+  const response = await client.responses.create({
+    model: config.OPENAI_MODEL,
+    instructions,
+    input: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "input_text",
+            text: [query, extraContext].filter(Boolean).join("\n\n"),
+          },
+        ],
+      },
+    ],
+    tools: [{ type: "web_search_preview" }],
+    temperature: 0,
+  });
+
+  return extractOpenAISearchEvidence(query, response);
 }
