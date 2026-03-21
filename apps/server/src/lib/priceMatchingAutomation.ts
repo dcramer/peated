@@ -1,27 +1,28 @@
 import type { StorePrice } from "@peated/server/db/schema";
+import { hasSupportiveWebEvidenceForExistingMatch as hasSupportiveBottleEvidence } from "@peated/server/lib/bottleClassificationEvidence";
 import { hasExtractedReleaseIdentity } from "@peated/server/lib/bottleSchemaRules";
 import { normalizeString } from "@peated/server/lib/normalize";
 import {
-  type ExtractedBottleDetailsSchema,
-  type PriceMatchCandidateSchema,
-  type PriceMatchCreationTargetEnum,
-  type PriceMatchEvidenceCheckSchema,
-  type PriceMatchSearchEvidenceSchema,
+  type BottleCandidateSchema,
+  type BottleCreationTargetEnum,
+  type BottleEvidenceCheckSchema,
+  type BottleReferenceIdentitySchema,
+  type BottleSearchEvidenceSchema,
   type ProposedBottleSchema,
   type ProposedReleaseSchema,
 } from "@peated/server/schemas";
 import type { z } from "zod";
 
-type ExtractedBottleDetails = z.infer<typeof ExtractedBottleDetailsSchema>;
-type PriceMatchCandidate = z.infer<typeof PriceMatchCandidateSchema>;
+type ExtractedBottleDetails = z.infer<typeof BottleReferenceIdentitySchema>;
+type PriceMatchCandidate = z.infer<typeof BottleCandidateSchema>;
 type ProposedBottle = z.infer<typeof ProposedBottleSchema>;
 type ProposedRelease = z.infer<typeof ProposedReleaseSchema>;
-type SearchEvidence = z.infer<typeof PriceMatchSearchEvidenceSchema>;
-type EvidenceCheck = z.infer<typeof PriceMatchEvidenceCheckSchema>;
+type SearchEvidence = z.infer<typeof BottleSearchEvidenceSchema>;
+type EvidenceCheck = z.infer<typeof BottleEvidenceCheckSchema>;
 type MatchAction = "match_existing" | "correction" | "create_new" | "no_match";
 type MatchAttribute = EvidenceCheck["attribute"];
 type SourceTier = EvidenceCheck["matchedSourceTiers"][number];
-type MatchCreationTarget = z.infer<typeof PriceMatchCreationTargetEnum>;
+type MatchCreationTarget = z.infer<typeof BottleCreationTargetEnum>;
 
 type MatchAutomationInput = {
   action: MatchAction;
@@ -38,6 +39,25 @@ type MatchAutomationInput = {
   creationTarget?: MatchCreationTarget | null;
   searchEvidence: SearchEvidence[];
 };
+
+export function hasSupportiveWebEvidenceForExistingMatch({
+  priceUrl,
+  target,
+  extractedLabel,
+  searchEvidence,
+}: {
+  priceUrl: string;
+  target: PriceMatchCandidate;
+  extractedLabel: ExtractedBottleDetails | null;
+  searchEvidence: SearchEvidence[];
+}) {
+  return hasSupportiveBottleEvidence({
+    sourceUrl: priceUrl,
+    target,
+    extractedLabel,
+    searchEvidence,
+  });
+}
 
 export type StorePriceMatchAutomationAssessment = {
   modelConfidence: number | null;
@@ -56,6 +76,7 @@ const CRITIC_DOMAINS = [
   "breakingbourbon.com",
   "distiller.com",
   "paste.com",
+  "rarebird101.com",
   "thewhiskeywash.com",
   "whiskyadvocate.com",
   "whiskyfun.com",
@@ -90,26 +111,6 @@ const WEB_VALIDATED_DIFFERENTIATORS = new Set<MatchAttribute>([
   "vintageYear",
   "releaseYear",
 ]);
-const IGNORED_IDENTITY_TOKENS = new Set([
-  "bottle",
-  "bourbon",
-  "cask",
-  "distillery",
-  "distilleries",
-  "edition",
-  "finish",
-  "finished",
-  "malt",
-  "reserve",
-  "rye",
-  "scotch",
-  "single",
-  "spirits",
-  "strength",
-  "whiskey",
-  "whisky",
-]);
-
 function clampScore(score: number) {
   return Math.min(100, Math.max(0, Math.round(score)));
 }
@@ -173,36 +174,35 @@ function domainMatches(hostname: string, domain: string) {
   return hostname === domain || hostname.endsWith(`.${domain}`);
 }
 
-function splitIdentityTokens(value: string | null | undefined) {
+function normalizeComparablePhrase(value: string | null | undefined) {
   return normalizeComparableText(value)
-    .split(/[^a-z0-9]+/g)
-    .filter(
-      (token) => token.length >= 4 && !IGNORED_IDENTITY_TOKENS.has(token),
-    );
+    .replace(/[^a-z0-9]+/g, "")
+    .trim();
 }
 
-function buildIdentityTokens({
+function buildProducerIdentityPhrases({
   proposedBottle,
   extractedLabel,
+  targetCandidate,
 }: {
   proposedBottle: ProposedBottle | null;
   extractedLabel: ExtractedBottleDetails | null;
+  targetCandidate?: PriceMatchCandidate | null;
 }) {
   return new Set(
     [
       proposedBottle?.brand.name,
       proposedBottle?.bottler?.name,
-      proposedBottle?.name,
-      proposedBottle?.series?.name,
       ...(proposedBottle?.distillers.map((distiller) => distiller.name) ?? []),
       extractedLabel?.brand,
       extractedLabel?.bottler,
-      extractedLabel?.expression,
-      extractedLabel?.series,
       ...(extractedLabel?.distillery ?? []),
+      targetCandidate?.brand,
+      targetCandidate?.bottler,
+      ...(targetCandidate?.distillery ?? []),
     ]
-      .flatMap((value) => splitIdentityTokens(value))
-      .filter(Boolean),
+      .map((value) => normalizeComparablePhrase(value))
+      .filter((value) => value.length >= 4),
   );
 }
 
@@ -238,11 +238,11 @@ function getSearchResultText(
 function classifySourceTier({
   result,
   priceUrl,
-  identityTokens,
+  producerPhrases,
 }: {
   result: SearchEvidence["results"][number];
   priceUrl: string;
-  identityTokens: Set<string>;
+  producerPhrases: Set<string>;
 }): SourceTier {
   const resultDomain = result.domain ?? getComparableDomain(result.url);
   const originDomain = getComparableDomain(priceUrl);
@@ -264,7 +264,9 @@ function classifySourceTier({
 
   if (
     resultDomain &&
-    Array.from(identityTokens).some((token) => resultDomain.includes(token))
+    Array.from(producerPhrases).some((phrase) =>
+      resultDomain.replace(/[^a-z0-9]+/g, "").includes(phrase),
+    )
   ) {
     return "official";
   }
@@ -624,20 +626,23 @@ function evaluateSearchEvidenceChecks({
   priceUrl,
   proposedBottle,
   extractedLabel,
+  targetCandidate,
 }: {
   checks: EvidenceCheck[];
   searchEvidence: SearchEvidence[];
   priceUrl: string;
   proposedBottle: ProposedBottle | null;
   extractedLabel: ExtractedBottleDetails | null;
+  targetCandidate?: PriceMatchCandidate | null;
 }) {
   if (!checks.length || !searchEvidence.length) {
     return checks;
   }
 
-  const identityTokens = buildIdentityTokens({
+  const producerPhrases = buildProducerIdentityPhrases({
     proposedBottle,
     extractedLabel,
+    targetCandidate,
   });
 
   return checks.map((check) => {
@@ -654,7 +659,7 @@ function evaluateSearchEvidenceChecks({
         const sourceTier = classifySourceTier({
           result,
           priceUrl,
-          identityTokens,
+          producerPhrases,
         });
         matchedSourceTiers.add(sourceTier);
         matchedSourceUrls.add(result.url);

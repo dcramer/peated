@@ -4,6 +4,7 @@ import { db } from "@peated/server/db";
 import { entities, entityAliases } from "@peated/server/db/schema";
 import { and, eq, ilike, or, sql } from "drizzle-orm";
 import { z } from "zod";
+import { EntityResolutionSchema } from "../schemas";
 
 const SearchEntitiesArgsSchema = z.object({
   query: z
@@ -29,15 +30,7 @@ const SearchEntitiesArgsSchema = z.object({
     .describe("Maximum number of entity candidates to return."),
 });
 
-export const EntitySearchResultSchema = z.object({
-  entityId: z.number(),
-  name: z.string(),
-  shortName: z.string().nullable().default(null),
-  type: z.array(z.enum(ENTITY_TYPE_LIST)).default([]),
-  alias: z.string().nullable().default(null),
-  score: z.number().nullable().default(null),
-  source: z.array(z.string()).default([]),
-});
+export const EntitySearchResultSchema = EntityResolutionSchema;
 
 const SearchEntitiesResultSchema = z.object({
   results: z.array(EntitySearchResultSchema),

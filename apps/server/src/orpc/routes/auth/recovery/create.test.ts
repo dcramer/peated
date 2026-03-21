@@ -1,6 +1,7 @@
 import { sendPasswordResetEmail } from "@peated/server/lib/email";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import * as workerClient from "@peated/server/worker/client";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // Mock the sendPasswordResetEmail function
@@ -57,6 +58,26 @@ describe("POST /auth/password-reset", () => {
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+    expect(sendPasswordResetEmail).not.toHaveBeenCalled();
+  });
+
+  test("enforces auth rate limits when Redis reports the request is over quota", async () => {
+    vi.mocked(workerClient.getConnection).mockResolvedValue({
+      eval: vi.fn(async () => 16),
+    } as any);
+
+    const err = await waitError(
+      routerClient.auth.recovery.create(
+        {
+          email: "nonexistent@example.com",
+        },
+        { context: { ip: "127.0.0.1" } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Too many requests. Please try again later.]`,
+    );
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
   });
 });

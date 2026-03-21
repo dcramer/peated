@@ -70,7 +70,7 @@ export default procedure
     const myFollow = await db.transaction(async (tx) => {
       const currentStatus =
         (
-          await db
+          await tx
             .select({
               status: follows.status,
             })

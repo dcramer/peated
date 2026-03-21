@@ -1,8 +1,11 @@
 # Store Price Matching
 
-This document reflects the store-price matcher as implemented on March 15, 2026.
+This document reflects the store-price matching flow as implemented on March 15, 2026.
 
 The authoritative identity model lives in [docs/architecture/whisky-identity-model.md](/home/dcramer/src/peated/docs/architecture/whisky-identity-model.md).
+
+The classifier contract lives in [docs/architecture/bottle-classifier.md](/home/dcramer/src/peated/docs/architecture/bottle-classifier.md).
+Price matching is one consumer of that bottle-classifier boundary.
 
 ## Core Schema Rules
 
@@ -14,7 +17,7 @@ These rules are the anchor for matching, automation, aliases, and moderator flow
    `bottleId` required when matched, `releaseId` optional.
 4. Bottle identity and release identity are not interchangeable.
 5. Exact source facts should be preserved as observations before they are promoted into canonical release identity.
-6. Observation persistence is currently store-price-only.
+6. Observation persistence is currently bottle-reference-only.
 
 Bottle identity lives on the parent bottle:
 
@@ -118,7 +121,7 @@ Evaluation order:
 
 ## Observation Persistence
 
-Every approved store-price match writes one `bottle_observation` keyed by `store_price:<priceId>`.
+Every approved bottle-reference match writes one `bottle_observation` keyed by `store_price:<priceId>`.
 
 That observation stores:
 
@@ -173,9 +176,13 @@ The extractor should prefer missing values over invented certainty.
 
 ## Classifier Contract
 
+Store-price matching is a consumer of the generic bottle classifier, not the
+owner of bottle-identity policy. The older `priceMatching*` helper names remain
+only as compatibility shims around the canonical bottle-classifier modules.
+
 The classifier receives:
 
-- store price metadata
+- generic bottle reference metadata
 - the current matched bottle / release, if present
 - extracted identity
 - initial local candidates
@@ -186,7 +193,14 @@ It may use:
 - local entity search
 - web search
 
-It must return one decision:
+It returns a reviewed classification result with:
+
+- `status = ignored | classified`
+- `reason` when ignored
+- `decision` when classified
+- `artifacts` containing extracted identity, candidates, search evidence, and resolved entities
+
+When `status = classified`, the decision must be one of:
 
 - `match_existing`
 - `correction`

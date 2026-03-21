@@ -1,11 +1,12 @@
 import { eq, sql } from "drizzle-orm";
-import { db } from "../db";
+import { db, type AnyDatabase } from "../db";
 import { bottleAliases, entities, type Entity } from "../db/schema";
 
 export async function findBottleTarget(
   name: string,
+  database: AnyDatabase = db,
 ): Promise<{ bottleId: number; releaseId: number | null } | null> {
-  const [result] = await db
+  const [result] = await database
     .select({
       bottleId: bottleAliases.bottleId,
       releaseId: bottleAliases.releaseId,
@@ -24,8 +25,11 @@ export async function findBottleTarget(
   };
 }
 
-export async function findBottleId(name: string): Promise<number | null> {
-  const target = await findBottleTarget(name);
+export async function findBottleId(
+  name: string,
+  database: AnyDatabase = db,
+): Promise<number | null> {
+  const target = await findBottleTarget(name, database);
   if (target?.bottleId) return target.bottleId;
 
   // TODO: improve this, but until then we're relying on humans

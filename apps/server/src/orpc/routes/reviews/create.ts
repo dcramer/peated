@@ -64,7 +64,7 @@ export default procedure
     }
 
     const review = await db.transaction(async (tx) => {
-      const { rows } = await db.execute(
+      const { rows } = await tx.execute(
         sql`INSERT INTO ${reviews} (bottle_id, external_site_id, name, issue, rating, url)
             VALUES (${bottleId}, ${site.id}, ${name}, ${input.issue}, ${input.rating}, ${input.url})
             ON CONFLICT (external_site_id, LOWER(name), issue)

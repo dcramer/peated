@@ -1,6 +1,9 @@
 import { describe, expect, test } from "vitest";
 
-import { getStorePriceMatchAutomationAssessment } from "./priceMatchingAutomation";
+import {
+  getStorePriceMatchAutomationAssessment,
+  hasSupportiveWebEvidenceForExistingMatch,
+} from "./priceMatchingAutomation";
 
 type AssessmentInput = Parameters<
   typeof getStorePriceMatchAutomationAssessment
@@ -121,6 +124,7 @@ describe("priceMatchingAutomation", () => {
       },
       searchEvidence: [
         {
+          provider: "openai",
           query: '"Example Distillery" "Tawny Port Finish" "58.4% ABV"',
           summary:
             "Total Wine lists Example Distillery Tawny Port Finish at 58.4% ABV.",
@@ -205,6 +209,7 @@ describe("priceMatchingAutomation", () => {
       },
       searchEvidence: [
         {
+          provider: "openai",
           query: '"Example Distillery" "Tawny Port Finish" "58.4% ABV"',
           summary:
             "The official Example Distillery release page confirms a tawny port finished bottling at 58.4% ABV.",
@@ -241,5 +246,103 @@ describe("priceMatchingAutomation", () => {
       validated: true,
       matchedSourceTiers: expect.arrayContaining(["official"]),
     });
+  });
+
+  test("treats critic or official web evidence as support when it validates an omitted canonical trait", () => {
+    const supported = hasSupportiveWebEvidenceForExistingMatch({
+      priceUrl: "https://shop.example/wild-turkey-rare-breed-rye",
+      target: buildCandidate({
+        fullName: "Wild Turkey Rare Breed Barrel-Proof Kentucky Straight Rye",
+        brand: "Wild Turkey",
+        distillery: ["Wild Turkey"],
+        category: "rye",
+        statedAge: null,
+        caskType: null,
+        caskStrength: true,
+      }),
+      extractedLabel: buildExtractedLabel({
+        brand: "Wild Turkey",
+        expression: "Rare Breed",
+        distillery: ["Wild Turkey"],
+        category: "rye",
+        stated_age: null,
+        abv: null,
+        cask_type: null,
+      }),
+      searchEvidence: [
+        {
+          provider: "openai",
+          query: '"Wild Turkey Rare Breed Rye" barrel proof',
+          summary:
+            "Wild Turkey says Rare Breed Rye is bottled at barrel proof. Rare Bird 101 also describes Rare Breed Rye as Wild Turkey's barrel-proof rye.",
+          results: [
+            {
+              title:
+                "What is Rye Whiskey & What Makes it So Special? | Wild Turkey",
+              url: "https://www.wildturkeybourbon.com/en-us/latest-news/what-is-rye-whiskey/",
+              domain: "wildturkeybourbon.com",
+              description:
+                "Wild Turkey Rare Breed Rye is bottled at barrel proof.",
+              extraSnippets: [],
+            },
+            {
+              title: "Rare Breed Rye (2024) – Rare Bird 101",
+              url: "https://rarebird101.com/2024/04/24/rare-breed-rye-2024/",
+              domain: "rarebird101.com",
+              description:
+                "Rare Bird 101 describes Rare Breed Rye as the brand's barrel-proof rye.",
+              extraSnippets: [],
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(supported).toBe(true);
+  });
+
+  test("does not treat web evidence as supportive when it confirms only the generic parent and not the missing edition", () => {
+    const supported = hasSupportiveWebEvidenceForExistingMatch({
+      priceUrl: "https://shop.example/glenmorangie-quinta-ruban-14",
+      target: buildCandidate({
+        fullName: "Glenmorangie 14-year-old Quinta Ruban - 4th Edition",
+        brand: "Glenmorangie",
+        distillery: ["Glenmorangie"],
+        statedAge: 14,
+        edition: "4th Edition",
+        caskType: null,
+        abv: 46,
+      }),
+      extractedLabel: buildExtractedLabel({
+        brand: "Glenmorangie",
+        expression: "Quinta Ruban",
+        distillery: ["Glenmorangie"],
+        category: "single_malt",
+        stated_age: 14,
+        abv: null,
+        cask_type: null,
+        edition: null,
+      }),
+      searchEvidence: [
+        {
+          provider: "openai",
+          query: '"Glenmorangie Quinta Ruban 14 Years Old"',
+          summary:
+            "Glenmorangie's official page confirms The Quinta Ruban 14 Years Old at 46% ABV.",
+          results: [
+            {
+              title: "Glenmorangie The Quinta Ruban 14 Years Old",
+              url: "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+              domain: "glenmorangie.com",
+              description:
+                "The official Glenmorangie page confirms Quinta Ruban 14 Years Old at 46% ABV.",
+              extraSnippets: [],
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(supported).toBe(false);
   });
 });

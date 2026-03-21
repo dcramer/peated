@@ -7,10 +7,8 @@ import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import { and, eq, sql } from "drizzle-orm";
 import { pgTable, text } from "drizzle-orm/pg-core";
-import { Client } from "pg";
-import { beforeAll, beforeEach, vi } from "vitest";
-import { db, pool } from "../db";
-import { migrate } from "../db/migrate";
+import { beforeEach, vi } from "vitest";
+import { db, type AnyDatabase } from "../db";
 import "../lib/test/expects";
 import * as fixtures from "../lib/test/fixtures";
 
@@ -22,15 +20,13 @@ const axiosMock = new MockAdapter(axios);
 
 // TODO: no fucking clue how to just use my mock module anymore and docs
 // are almost non-existant
-vi.mock("../worker/client", async (importOriginal) => {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  const oJobs = await importOriginal<typeof import("../worker/client.js")>();
+vi.mock("../worker/client", () => {
   return {
-    pushJob: vi.fn(() => Promise<void>),
-    pushUniqueJob: vi.fn(() => Promise<void>),
-    runJob: oJobs.runJob,
-    gracefulShutdown: vi.fn(() => Promise<void>),
-    getConnection: oJobs.getConnection,
+    pushJob: vi.fn(async () => undefined),
+    pushUniqueJob: vi.fn(async () => undefined),
+    runJob: vi.fn(async () => undefined),
+    gracefulShutdown: vi.fn(async () => undefined),
+    getConnection: vi.fn(async () => null),
   };
 });
 
@@ -55,50 +51,67 @@ const pgNamespace = pgTable("pg_namespace", {
 });
 
 const schemaname = "public";
-
 const SAFE_TABLES = ["__drizzle_migrations"];
+const TEST_DATABASE_RESET_LOCK_ID = 287441;
+let cachedResettableTables: string | null = null;
+let cachedResettableSequences: string[] | null = null;
 
-const getTableNames = async (exclude = SAFE_TABLES) => {
-  const tnQuery = await db
+const getResettableTables = async (
+  exclude = SAFE_TABLES,
+  conn: AnyDatabase = db,
+) => {
+  if (exclude === SAFE_TABLES && cachedResettableTables) {
+    return cachedResettableTables;
+  }
+
+  const tnQuery = await conn
     .select({ tablename: pgTables.tablename })
     .from(pgTables)
     .where(eq(pgTables.schemaname, schemaname));
 
-  return tnQuery
+  const tableNames = tnQuery
     .filter(({ tablename }) => !exclude.includes(tablename))
     .map(({ tablename }) => `"${schemaname}"."${tablename}"`)
     .join(", ");
-};
 
-const dropTables = async () => {
-  const tableNames = await getTableNames([]);
-  if (!tableNames.length) return;
-
-  try {
-    await db.execute(sql.raw(`DROP TABLE ${tableNames} CASCADE;`));
-  } catch (error) {
-    console.error({ error });
+  if (exclude === SAFE_TABLES) {
+    cachedResettableTables = tableNames;
   }
+
+  return tableNames;
 };
 
-const clearTables = async () => {
-  const tableNames = await getTableNames();
-  if (!tableNames.length) return;
+const getResettableSequences = async (conn: AnyDatabase = db) => {
+  if (cachedResettableSequences) {
+    return cachedResettableSequences;
+  }
 
-  await db.execute(sql.raw(`TRUNCATE TABLE ${tableNames} CASCADE;`));
-
-  // reset sequences
-  const snQuery = await db
+  const sequenceRows = await conn
     .select({ relname: pgClass.relname })
     .from(pgClass)
     .innerJoin(pgNamespace, eq(pgNamespace.oid, pgClass.relnamespace))
     .where(and(eq(pgClass.relkind, "S"), eq(pgNamespace.nspname, schemaname)));
-  for (const { relname } of snQuery) {
-    if (!relname.startsWith("__drizzle_migrations")) {
-      await db.execute(
-        sql.raw(`ALTER SEQUENCE "${schemaname}"."${relname}" RESTART WITH 1;`),
-      );
-    }
+
+  cachedResettableSequences = sequenceRows
+    .map(({ relname }) => relname)
+    .filter((relname) => !relname.startsWith("__drizzle_migrations"));
+
+  return cachedResettableSequences;
+};
+
+const clearTables = async (conn: AnyDatabase = db) => {
+  const tableNames = await getResettableTables(SAFE_TABLES, conn);
+  if (!tableNames.length) return;
+
+  await conn.execute(sql.raw(`TRUNCATE TABLE ${tableNames} CASCADE;`));
+
+  const sequenceNames = await getResettableSequences(conn);
+  for (const sequenceName of sequenceNames) {
+    await conn.execute(
+      sql.raw(
+        `ALTER SEQUENCE "${schemaname}"."${sequenceName}" RESTART WITH 1;`,
+      ),
+    );
   }
 };
 
@@ -109,54 +122,19 @@ const clearTables = async () => {
  *
  * @returns The created user.
  */
-const createDefaultUser = async () => {
-  return await fixtures.User({
-    email: "fizz.buzz@example.com",
-    displayName: "Fizzy Buzz",
-    username: "fizz.buzz",
-    admin: false,
-    mod: false,
-    active: true,
-  });
-};
-
-async function setupDatabase() {
-  const [host, username, password] = ["localhost", "postgres", "postgres"];
-  const client = new Client({ host, user: username, password });
-  await client.connect();
-
-  const applicationDatabaseName = "test_peated";
-
-  const dbQuery = await client.query(
-    `SELECT FROM pg_database WHERE datname = $1`,
-    [applicationDatabaseName],
+const createDefaultUser = async (conn: AnyDatabase = db) => {
+  return await fixtures.User(
+    {
+      email: "fizz.buzz@example.com",
+      displayName: "Fizzy Buzz",
+      username: "fizz.buzz",
+      admin: false,
+      mod: false,
+      active: true,
+    },
+    conn,
   );
-  if (dbQuery.rows.length === 0) {
-    // database does not exist, make it:
-    await client.query(`CREATE DATABASE ${applicationDatabaseName}`);
-  } else {
-    // TODO:
-    // await dropTables();
-  }
-
-  client.end();
-}
-
-beforeAll(async () => {
-  await setupDatabase();
-
-  // this will automatically run needed migrations on the database
-  try {
-    await migrate({ db });
-  } catch (err) {
-    await pool.end();
-    throw new Error("Unable to run db migrations", { cause: err });
-  }
-
-  return async () => {
-    await pool.end();
-  };
-});
+};
 
 beforeEach(async (ctx) => {
   ctx.axiosMock = axiosMock;
@@ -167,8 +145,6 @@ beforeEach(async (ctx) => {
 });
 
 beforeEach(async (ctx) => {
-  await clearTables();
-
   // Clear rate limit keys from Redis
   try {
     const oJobs = await import("../worker/client");
@@ -183,10 +159,18 @@ beforeEach(async (ctx) => {
       }
     }
   } catch {
-    // Redis not available in test environment - continue without clearing rate limits
+    // Redis not available in test environment - continue without clearing
+    // rate limits.
   }
 
-  const user = await createDefaultUser();
+  const user = await db.transaction(async (tx) => {
+    await tx.execute(
+      sql.raw(`SELECT pg_advisory_xact_lock(${TEST_DATABASE_RESET_LOCK_ID});`),
+    );
+
+    await clearTables(tx);
+    return await createDefaultUser(tx);
+  });
 
   ctx.defaults = {
     user,

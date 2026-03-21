@@ -73,7 +73,7 @@ export async function createBottleInTransaction(
 ): Promise<CreateBottleResult> {
   const user = context.user;
   const bottleData: BottlePreviewResult & Record<string, any> =
-    await bottleNormalize({ input, context });
+    await bottleNormalize({ input, context, entityDb: tx });
 
   if (input.description !== undefined) {
     bottleData.description = input.description;

@@ -55,8 +55,8 @@ export default procedure
           const [price] = await db.transaction(async (tx) => {
             const { name } = normalizeBottle({ name: sp.name });
             const target =
-              (await findBottleTarget(sp.name)) ??
-              (sp.name === name ? null : await findBottleTarget(name));
+              (await findBottleTarget(sp.name, tx)) ??
+              (sp.name === name ? null : await findBottleTarget(name, tx));
             const bottleId = target?.bottleId ?? null;
             const releaseId = target?.releaseId ?? null;
 

@@ -1,8 +1,8 @@
 import {
-  classifyStorePriceMatch,
-  StorePriceMatchClassificationError,
-  type StorePriceMatchClassification,
-} from "@peated/server/agents/priceMatch";
+  BottleClassificationError,
+  classifyBottleReference,
+  isIgnoredBottleClassification,
+} from "@peated/server/agents/bottleClassifier";
 import config from "@peated/server/config";
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import {
@@ -40,15 +40,8 @@ import {
   shouldVerifyStorePriceMatch,
   type StorePriceMatchAutomationAssessment,
 } from "@peated/server/lib/priceMatchingAutomation";
-import {
-  extractStorePriceBottleDetails,
-  findStorePriceMatchCandidates,
-  getBottleMatchCandidateById,
-} from "@peated/server/lib/priceMatchingCandidates";
-import {
-  inferPriceMatchCreationTarget,
-  normalizeCreateNewDrafts,
-} from "@peated/server/lib/priceMatchingDraftNormalization";
+import { getBottleMatchCandidateById } from "@peated/server/lib/priceMatchingCandidates";
+import { inferPriceMatchCreationTarget } from "@peated/server/lib/priceMatchingDraftNormalization";
 import {
   hasActiveStorePriceMatchProposalProcessingLease,
   refreshStorePriceMatchProposalProcessingLease,
@@ -74,9 +67,9 @@ import type { z } from "zod";
 
 const SMWS_EXTERNAL_SITE_TYPE = "smws";
 const SMWS_BRAND_NAME = "The Scotch Malt Whisky Society";
-const NON_WHISKY_KEYWORDS =
+const NON_WHISKY_LISTING_KEYWORDS =
   /\b(vodka|gin|rum|tequila|mezcal|sotol|soju|baijiu|sake|shochu|brandy|cognac|armagnac|liqueur)\b/i;
-const WHISKY_KEYWORDS =
+const WHISKY_LISTING_KEYWORDS =
   /\b(whisk(?:e)?y|single malt|single grain|single pot still|bourbon|rye|scotch|malt whisky|malt whiskey)\b/i;
 
 type ExtractedBottleDetails = z.infer<typeof ExtractedBottleDetailsSchema>;
@@ -88,372 +81,9 @@ type ProposedBottleDraft = NonNullable<
   StorePriceMatchDecision["proposedBottle"]
 >;
 type BottleCreateInput = z.infer<typeof BottleInputSchema>;
-type ResolvedEntity = NonNullable<
-  StorePriceMatchClassification["resolvedEntities"]
->[number];
 type StorePriceMatchProposalForReview = StorePriceMatchProposal & {
   price: StorePrice;
 };
-
-function normalizeStorePriceMatchConfidence(confidence: number): number {
-  const percentageConfidence = confidence <= 1 ? confidence * 100 : confidence;
-
-  return Math.min(100, Math.max(0, Math.round(percentageConfidence)));
-}
-
-function normalizeEntityChoiceName(name: string) {
-  return normalizeString(name).toLowerCase();
-}
-
-const GENERIC_NAME_TOKENS = new Set([
-  "american",
-  "and",
-  "bottle",
-  "bourbon",
-  "canadian",
-  "cl",
-  "irish",
-  "japanese",
-  "kentucky",
-  "l",
-  "malt",
-  "ml",
-  "of",
-  "old",
-  "oz",
-  "rye",
-  "scotch",
-  "single",
-  "spirit",
-  "spirits",
-  "straight",
-  "the",
-  "whiskey",
-  "whisky",
-  "world",
-  "year",
-  "years",
-  "yr",
-  "yrs",
-]);
-
-function normalizeComparableText(value: string | null | undefined) {
-  return normalizeString(value ?? "")
-    .toLowerCase()
-    .replace(/_/g, " ")
-    .trim();
-}
-
-function getComparableDomain(url: string | null | undefined) {
-  if (!url) {
-    return null;
-  }
-
-  try {
-    const hostname = new URL(url).hostname.toLowerCase();
-    return hostname.startsWith("www.") ? hostname.slice(4) : hostname;
-  } catch {
-    return null;
-  }
-}
-
-function domainMatches(hostname: string, domain: string) {
-  return hostname === domain || hostname.endsWith(`.${domain}`);
-}
-
-function getComparableNameTokens(value: string | null | undefined) {
-  return normalizeComparableText(value)
-    .replace(/\b\d+(?:\.\d+)?\s?(?:ml|cl|l|oz)\b/g, " ")
-    .split(/[^a-z0-9]+/g)
-    .filter((token) => token.length > 0 && !GENERIC_NAME_TOKENS.has(token));
-}
-
-function tokenSetsMatchExactly(left: string[], right: string[]) {
-  if (!left.length || !right.length) {
-    return false;
-  }
-
-  const leftSet = new Set(left);
-  const rightSet = new Set(right);
-
-  if (leftSet.size !== rightSet.size) {
-    return false;
-  }
-
-  for (const token of leftSet) {
-    if (!rightSet.has(token)) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-function isBasicallyExactNameMatch(
-  listingName: string,
-  candidateName: string | null | undefined,
-) {
-  return tokenSetsMatchExactly(
-    getComparableNameTokens(listingName),
-    getComparableNameTokens(candidateName),
-  );
-}
-
-function getSearchEvidenceText(
-  evidence: SearchEvidence,
-  result: SearchEvidence["results"][number],
-) {
-  return [
-    evidence.summary,
-    result.title,
-    result.description,
-    ...result.extraSnippets,
-  ]
-    .filter(Boolean)
-    .join(" ");
-}
-
-function getSuggestedTarget(
-  decision: StorePriceMatchDecision,
-  candidateBottles: PriceMatchCandidate[],
-) {
-  if (
-    (decision.action !== "match_existing" &&
-      decision.action !== "correction") ||
-    decision.suggestedBottleId === null
-  ) {
-    return null;
-  }
-
-  return (
-    candidateBottles.find(
-      (candidate) =>
-        candidate.bottleId === decision.suggestedBottleId &&
-        (decision.suggestedReleaseId != null
-          ? candidate.releaseId === decision.suggestedReleaseId
-          : candidate.releaseId === null || candidate.kind === "bottle"),
-    ) ?? null
-  );
-}
-
-function getTargetNameCandidates(
-  target: PriceMatchCandidate,
-  decision: StorePriceMatchDecision,
-) {
-  const candidates =
-    decision.suggestedReleaseId != null || target.kind === "release"
-      ? [target.alias, target.fullName]
-      : [
-          target.alias,
-          target.bottleFullName ?? target.fullName,
-          target.fullName,
-        ];
-
-  return Array.from(new Set(candidates.filter(Boolean))) as string[];
-}
-
-function hasSupportiveWebEvidenceForTarget({
-  target,
-  decision,
-  searchEvidence,
-  priceUrl,
-}: {
-  target: PriceMatchCandidate;
-  decision: StorePriceMatchDecision;
-  searchEvidence: SearchEvidence[];
-  priceUrl: string | null;
-}) {
-  const priceDomain = getComparableDomain(priceUrl);
-  const targetTokenSets = getTargetNameCandidates(target, decision)
-    .map((name) => getComparableNameTokens(name))
-    .filter((tokens) => tokens.length > 0);
-
-  if (!targetTokenSets.length) {
-    return false;
-  }
-
-  for (const evidence of searchEvidence) {
-    for (const result of evidence.results) {
-      const resultDomain = getComparableDomain(result.url);
-      if (
-        !resultDomain ||
-        (priceDomain !== null && domainMatches(resultDomain, priceDomain))
-      ) {
-        continue;
-      }
-
-      const resultTokens = new Set(
-        getComparableNameTokens(getSearchEvidenceText(evidence, result)),
-      );
-      if (!resultTokens.size) {
-        continue;
-      }
-
-      if (
-        targetTokenSets.some((tokens) =>
-          tokens.every((token) => resultTokens.has(token)),
-        )
-      ) {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-function hasHardMatchConflict(
-  automationAssessment: StorePriceMatchAutomationAssessment,
-) {
-  return automationAssessment.automationBlockers.some(
-    (blocker) =>
-      blocker === "candidate bottler conflicts with extracted label" ||
-      (blocker.startsWith("candidate ") &&
-        blocker.endsWith(" conflicts with extracted label")),
-  );
-}
-
-function downgradeUnsafeExistingMatchDecision({
-  price,
-  decision,
-  candidateBottles,
-  searchEvidence,
-  automationAssessment,
-}: {
-  price: StorePrice;
-  decision: StorePriceMatchDecision;
-  candidateBottles: PriceMatchCandidate[];
-  searchEvidence: SearchEvidence[];
-  automationAssessment: StorePriceMatchAutomationAssessment;
-}): StorePriceMatchDecision {
-  const target = getSuggestedTarget(decision, candidateBottles);
-  if (!target || target.source.includes("exact")) {
-    return decision;
-  }
-
-  const hasExactishLocalName = getTargetNameCandidates(target, decision).some(
-    (name) => isBasicallyExactNameMatch(price.name, name),
-  );
-  const hasSupportiveWebEvidence = hasSupportiveWebEvidenceForTarget({
-    target,
-    decision,
-    searchEvidence,
-    priceUrl: price.url ?? null,
-  });
-  const hasIdentityConflict = hasHardMatchConflict(automationAssessment);
-
-  if (
-    !hasIdentityConflict &&
-    (hasExactishLocalName || hasSupportiveWebEvidence)
-  ) {
-    return decision;
-  }
-
-  const reasons: string[] = [];
-  if (hasIdentityConflict) {
-    reasons.push("the candidate conflicts with extracted listing details");
-  }
-  if (!hasExactishLocalName && !hasSupportiveWebEvidence) {
-    reasons.push(
-      "there is no exact alias, no basically exact canonical name match, and no supportive off-retailer web evidence for the suggested target",
-    );
-  }
-
-  const rationalePrefix = decision.rationale ? `${decision.rationale} ` : "";
-
-  return {
-    action: "no_match",
-    confidence: decision.confidence,
-    rationale: `${rationalePrefix}Server downgraded the existing-match recommendation because ${reasons.join(
-      " and ",
-    )}.`,
-    candidateBottleIds: decision.candidateBottleIds,
-    suggestedBottleId: null,
-    suggestedReleaseId: null,
-    parentBottleId: null,
-    creationTarget: null,
-    proposedBottle: null,
-    proposedRelease: null,
-  };
-}
-
-function sanitizeResolvedEntityChoice(
-  choice: {
-    id: number | null;
-    name: string;
-  },
-  expectedType: "brand" | "distiller" | "bottler",
-  resolvedEntities: Map<number, ResolvedEntity>,
-) {
-  if (choice.id === null) {
-    return choice;
-  }
-
-  const resolvedEntity = resolvedEntities.get(choice.id);
-  if (!resolvedEntity || !resolvedEntity.type.includes(expectedType)) {
-    return {
-      ...choice,
-      id: null,
-    };
-  }
-
-  const normalizedChoiceName = normalizeEntityChoiceName(choice.name);
-  const matchedNames = [
-    resolvedEntity.name,
-    resolvedEntity.shortName,
-    resolvedEntity.alias,
-  ]
-    .filter((name): name is string => !!name)
-    .map(normalizeEntityChoiceName);
-
-  if (!matchedNames.includes(normalizedChoiceName)) {
-    return {
-      ...choice,
-      id: null,
-    };
-  }
-
-  return {
-    id: resolvedEntity.entityId,
-    name: resolvedEntity.name,
-  };
-}
-
-function sanitizeProposedBottleDraft(
-  proposedBottle: NonNullable<StorePriceMatchDecision["proposedBottle"]>,
-  resolvedEntitiesById: Map<number, ResolvedEntity>,
-) {
-  return {
-    ...proposedBottle,
-    category:
-      proposedBottle.category === "spirit" ? null : proposedBottle.category,
-    series: proposedBottle.series
-      ? {
-          ...proposedBottle.series,
-          id: null,
-        }
-      : null,
-    brand: sanitizeResolvedEntityChoice(
-      proposedBottle.brand,
-      "brand",
-      resolvedEntitiesById,
-    ),
-    distillers: proposedBottle.distillers.map((distiller) =>
-      sanitizeResolvedEntityChoice(
-        distiller,
-        "distiller",
-        resolvedEntitiesById,
-      ),
-    ),
-    bottler: proposedBottle.bottler
-      ? sanitizeResolvedEntityChoice(
-          proposedBottle.bottler,
-          "bottler",
-          resolvedEntitiesById,
-        )
-      : null,
-  };
-}
 
 function buildBottleEntityInput(
   choice: {
@@ -478,142 +108,6 @@ function buildBottleEntityInput(
   );
 }
 
-function sanitizeStorePriceMatchDecision(
-  decision: StorePriceMatchDecision,
-  {
-    candidateBottles,
-    searchEvidence,
-    resolvedEntities = [],
-  }: {
-    candidateBottles: PriceMatchCandidate[];
-    searchEvidence: SearchEvidence[];
-    resolvedEntities?: ResolvedEntity[];
-  },
-): StorePriceMatchDecision {
-  const candidateBottleIds = new Set(
-    candidateBottles.map((candidate) => candidate.bottleId),
-  );
-  const candidateReleaseIds = new Set(
-    candidateBottles
-      .map((candidate) => candidate.releaseId)
-      .filter((releaseId): releaseId is number => releaseId !== null),
-  );
-  const resolvedEntitiesById = new Map(
-    resolvedEntities.map((entity) => [entity.entityId, entity]),
-  );
-
-  if (
-    decision.suggestedBottleId !== null &&
-    !candidateBottleIds.has(decision.suggestedBottleId)
-  ) {
-    throw new StorePriceMatchClassificationError(
-      `Classifier returned unknown suggested bottle id (${decision.suggestedBottleId}).`,
-      searchEvidence,
-      candidateBottles,
-    );
-  }
-
-  if (
-    decision.suggestedReleaseId != null &&
-    !candidateReleaseIds.has(decision.suggestedReleaseId)
-  ) {
-    throw new StorePriceMatchClassificationError(
-      `Classifier returned unknown suggested release id (${decision.suggestedReleaseId}).`,
-      searchEvidence,
-      candidateBottles,
-    );
-  }
-
-  if (
-    decision.action === "create_new" &&
-    decision.parentBottleId !== null &&
-    decision.parentBottleId !== undefined &&
-    !candidateBottleIds.has(decision.parentBottleId)
-  ) {
-    throw new StorePriceMatchClassificationError(
-      `Classifier returned unknown parent bottle id (${decision.parentBottleId}).`,
-      searchEvidence,
-      candidateBottles,
-    );
-  }
-
-  const normalizedConfidence = normalizeStorePriceMatchConfidence(
-    decision.confidence,
-  );
-
-  const filteredCandidateBottleIds = decision.candidateBottleIds.filter((id) =>
-    candidateBottleIds.has(id),
-  );
-
-  if (decision.action === "create_new") {
-    const sanitizedBottleDraft = decision.proposedBottle
-      ? sanitizeProposedBottleDraft(
-          decision.proposedBottle,
-          resolvedEntitiesById,
-        )
-      : null;
-
-    const normalizedDrafts = normalizeCreateNewDrafts({
-      creationTarget: decision.creationTarget ?? null,
-      proposedBottle: sanitizedBottleDraft,
-      proposedRelease: decision.proposedRelease ?? null,
-    });
-
-    return {
-      ...decision,
-      confidence: normalizedConfidence,
-      suggestedBottleId: null,
-      suggestedReleaseId: null,
-      creationTarget: normalizedDrafts.creationTarget,
-      candidateBottleIds: filteredCandidateBottleIds,
-      proposedBottle: normalizedDrafts.proposedBottle,
-      proposedRelease: normalizedDrafts.proposedRelease,
-    };
-  }
-
-  if (
-    decision.action === "match_existing" ||
-    decision.action === "correction"
-  ) {
-    return {
-      ...decision,
-      confidence: normalizedConfidence,
-      candidateBottleIds: filteredCandidateBottleIds,
-      proposedBottle: null,
-      proposedRelease: null,
-      parentBottleId: null,
-      creationTarget: null,
-    };
-  }
-
-  return {
-    ...decision,
-    confidence: normalizedConfidence,
-    suggestedBottleId: null,
-    suggestedReleaseId: null,
-    parentBottleId: null,
-    creationTarget: null,
-    candidateBottleIds: filteredCandidateBottleIds,
-    proposedBottle: null,
-    proposedRelease: null,
-  };
-}
-
-function shouldAutoIgnoreStorePriceListing(
-  priceName: string,
-  extractedLabel: ExtractedBottleDetails | null,
-) {
-  if (extractedLabel) {
-    return false;
-  }
-
-  const normalizedName = normalizeString(priceName).toLowerCase();
-  return (
-    NON_WHISKY_KEYWORDS.test(normalizedName) &&
-    !WHISKY_KEYWORDS.test(normalizedName)
-  );
-}
-
 export class UnknownStorePriceMatchProposalError extends Error {
   constructor(proposalId: number) {
     super(`Price match proposal not found (${proposalId}).`);
@@ -629,6 +123,69 @@ export class StorePriceMatchProposalNotReviewableError extends Error {
     super(`Price match proposal is not reviewable (${proposalId}, ${status}).`);
     this.name = "StorePriceMatchProposalNotReviewableError";
   }
+}
+
+function normalizeClassifierConfidence(confidence: number): number {
+  const percentageConfidence = confidence <= 1 ? confidence * 100 : confidence;
+  return Math.min(100, Math.max(0, Math.round(percentageConfidence)));
+}
+
+function shouldAutoIgnoreTrivialNonWhiskyListing(name: string): boolean {
+  // Keep this fast path limited to obvious non-whisky categories. Flavored
+  // whisky detection intentionally stays model-driven because retailer titles
+  // are too inconsistent for regex heuristics to be reliable there.
+  const normalizedName = normalizeString(name).toLowerCase();
+  return (
+    NON_WHISKY_LISTING_KEYWORDS.test(normalizedName) &&
+    !WHISKY_LISTING_KEYWORDS.test(normalizedName)
+  );
+}
+
+function normalizePriceMatchDecision(
+  decision: StorePriceMatchDecision,
+  candidates: PriceMatchCandidate[],
+): StorePriceMatchDecision {
+  if (
+    decision.suggestedBottleId != null &&
+    !candidates.some(
+      (candidate) => candidate.bottleId === decision.suggestedBottleId,
+    )
+  ) {
+    throw new Error(
+      `Classifier returned unknown suggested bottle id (${decision.suggestedBottleId}).`,
+    );
+  }
+
+  if (
+    decision.suggestedReleaseId != null &&
+    !candidates.some(
+      (candidate) => candidate.releaseId === decision.suggestedReleaseId,
+    )
+  ) {
+    throw new Error(
+      `Classifier returned unknown suggested release id (${decision.suggestedReleaseId}).`,
+    );
+  }
+
+  // Price matching consumes the classifier's reviewed result. Keep the adapter
+  // layer limited to persistence compatibility checks instead of re-running
+  // classifier policy here.
+  if (
+    decision.action === "create_new" &&
+    decision.parentBottleId != null &&
+    !candidates.some(
+      (candidate) => candidate.bottleId === decision.parentBottleId,
+    )
+  ) {
+    throw new Error(
+      `Classifier returned unknown parent bottle id (${decision.parentBottleId}).`,
+    );
+  }
+
+  return {
+    ...decision,
+    confidence: normalizeClassifierConfidence(decision.confidence),
+  };
 }
 
 export class StorePriceMatchProposalAlreadyProcessingError extends Error {
@@ -886,17 +443,11 @@ async function maybeResolveTrustedSmwsStorePriceMatch(
         proposedRelease: null,
       };
 
-  const normalizedDecision = sanitizeStorePriceMatchDecision(decision, {
-    candidateBottles: candidates,
-    searchEvidence: [],
-    resolvedEntities: [],
-  });
-
   const proposal = await upsertStorePriceMatchProposal({
     price,
     extractedLabel,
     candidates,
-    decision: normalizedDecision,
+    decision,
     searchEvidence: [],
     expectedProcessingToken: processingToken,
   });
@@ -926,7 +477,7 @@ async function maybeResolveTrustedSmwsStorePriceMatch(
         expectedProcessingToken: processingToken,
       });
     } else {
-      const createInputs = buildStorePriceMatchCreateInputs(normalizedDecision);
+      const createInputs = buildStorePriceMatchCreateInputs(decision);
       if (!createInputs.input && !createInputs.releaseInput) {
         throw new Error(
           `Unable to auto-create trusted SMWS proposal without creation inputs (${proposal.id}).`,
@@ -957,7 +508,7 @@ async function maybeResolveTrustedSmwsStorePriceMatch(
       price,
       extractedLabel,
       candidates,
-      decision: normalizedDecision,
+      decision,
       searchEvidence: [],
       error: err instanceof Error ? err.message : "Unknown trusted SMWS error",
       statusOverride: "errored",
@@ -1412,55 +963,51 @@ export async function resolveStorePriceMatchProposal(
       return trustedSmwsProposal;
     }
 
-    extractedLabel = await extractStorePriceBottleDetails(price);
-    if (shouldAutoIgnoreStorePriceListing(price.name, extractedLabel)) {
+    if (shouldAutoIgnoreTrivialNonWhiskyListing(price.name)) {
       return await upsertStorePriceMatchProposal({
         price,
         extractedLabel,
-        candidates: [],
-        searchEvidence: [],
+        candidates,
+        searchEvidence,
         statusOverride: "ignored",
         expectedProcessingToken: processingToken,
       });
     }
 
-    candidates = await findStorePriceMatchCandidates(price, extractedLabel);
-    const classification = await classifyStorePriceMatch({
-      price,
-      extractedLabel,
-      initialCandidates: candidates,
+    // Price matching consumes the generic bottle classifier and only layers
+    // price-specific persistence and automation policy on top of its result.
+    const classification = await classifyBottleReference({
+      reference: {
+        id: price.id,
+        externalSiteId: price.externalSiteId,
+        name: price.name,
+        url: price.url ?? null,
+        imageUrl: price.imageUrl ?? null,
+        currentBottleId: price.bottleId ?? null,
+        currentReleaseId: price.releaseId ?? null,
+      },
     });
-    candidates = classification.candidateBottles;
-    searchEvidence = classification.searchEvidence;
-    let decision = sanitizeStorePriceMatchDecision(classification.decision, {
-      candidateBottles: candidates,
-      searchEvidence,
-      resolvedEntities: classification.resolvedEntities,
-    });
-    let automationAssessment = getStorePriceMatchAutomationAssessment({
-      action: decision.action,
-      modelConfidence: decision.confidence,
-      price,
-      suggestedBottleId: decision.suggestedBottleId,
-      suggestedReleaseId: decision.suggestedReleaseId ?? null,
-      candidateBottles: candidates,
-      extractedLabel,
-      proposedBottle: decision.proposedBottle,
-      proposedRelease: decision.proposedRelease ?? null,
-      creationTarget:
-        decision.action === "create_new"
-          ? (decision.creationTarget ?? null)
-          : null,
-      searchEvidence,
-    });
-    decision = downgradeUnsafeExistingMatchDecision({
-      price,
-      decision,
-      candidateBottles: candidates,
-      searchEvidence,
-      automationAssessment,
-    });
-    automationAssessment = getStorePriceMatchAutomationAssessment({
+
+    extractedLabel = classification.artifacts.extractedIdentity;
+    candidates = classification.artifacts.candidates;
+    searchEvidence = classification.artifacts.searchEvidence;
+
+    if (isIgnoredBottleClassification(classification)) {
+      return await upsertStorePriceMatchProposal({
+        price,
+        extractedLabel,
+        candidates,
+        searchEvidence,
+        statusOverride: "ignored",
+        expectedProcessingToken: processingToken,
+      });
+    }
+
+    const decision = normalizePriceMatchDecision(
+      classification.decision,
+      candidates,
+    );
+    const automationAssessment = getStorePriceMatchAutomationAssessment({
       action: decision.action,
       modelConfidence: decision.confidence,
       price,
@@ -1555,14 +1102,17 @@ export async function resolveStorePriceMatchProposal(
 
     return await upsertStorePriceMatchProposal({
       price,
-      extractedLabel,
+      extractedLabel:
+        err instanceof BottleClassificationError
+          ? err.artifacts.extractedIdentity
+          : extractedLabel,
       candidates:
-        err instanceof StorePriceMatchClassificationError
-          ? err.candidateBottles
+        err instanceof BottleClassificationError
+          ? err.artifacts.candidates
           : candidates,
       searchEvidence:
-        err instanceof StorePriceMatchClassificationError
-          ? err.searchEvidence
+        err instanceof BottleClassificationError
+          ? err.artifacts.searchEvidence
           : searchEvidence,
       error: err instanceof Error ? err.message : "Unknown classifier error",
       expectedProcessingToken: processingToken,

@@ -38,7 +38,9 @@ export const BOTTLE_SCHEMA_RULES = {
     "Retailer listing aliases are bottle-level evidence unless they exactly match a canonical release alias.",
 } as const;
 
-export const DEFAULT_PRICE_MATCH_CREATION_TARGET = "bottle" as const;
+export const DEFAULT_BOTTLE_CREATION_TARGET = "bottle" as const;
+export const DEFAULT_PRICE_MATCH_CREATION_TARGET =
+  DEFAULT_BOTTLE_CREATION_TARGET;
 
 export const RELEASE_IDENTITY_FIELDS = [
   "edition",

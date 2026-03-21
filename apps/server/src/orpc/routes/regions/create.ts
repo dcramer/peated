@@ -47,39 +47,38 @@ export default procedure
         (input.description && input.description !== null ? "user" : null);
     }
 
-    const [newRegion] = await db.transaction(async (tx) => {
-      try {
-        return await tx.insert(regions).values(data).returning();
-      } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "region_slug_unq") {
-          const [existingRegion] = await db
-            .select()
-            .from(regions)
-            .where(
-              and(
-                eq(sql`LOWER(${regions.slug})`, data.slug.toLowerCase()),
-                eq(regions.countryId, data.countryId),
-              ),
-            );
-          throw new ConflictError(existingRegion, err);
-        } else if (
-          err?.code === "23505" &&
-          err?.constraint === "region_name_unq"
-        ) {
-          const [existingRegion] = await db
-            .select()
-            .from(regions)
-            .where(
-              and(
-                eq(sql`LOWER(${regions.name})`, data.name.toLowerCase()),
-                eq(regions.countryId, data.countryId),
-              ),
-            );
-          throw new ConflictError(existingRegion, err);
-        }
-        throw err;
+    let newRegion: typeof regions.$inferSelect | undefined;
+    try {
+      [newRegion] = await db.insert(regions).values(data).returning();
+    } catch (err: any) {
+      if (err?.code === "23505" && err?.constraint === "region_slug_unq") {
+        const [existingRegion] = await db
+          .select()
+          .from(regions)
+          .where(
+            and(
+              eq(sql`LOWER(${regions.slug})`, data.slug.toLowerCase()),
+              eq(regions.countryId, data.countryId),
+            ),
+          );
+        throw new ConflictError(existingRegion, err);
+      } else if (
+        err?.code === "23505" &&
+        err?.constraint === "region_name_unq"
+      ) {
+        const [existingRegion] = await db
+          .select()
+          .from(regions)
+          .where(
+            and(
+              eq(sql`LOWER(${regions.name})`, data.name.toLowerCase()),
+              eq(regions.countryId, data.countryId),
+            ),
+          );
+        throw new ConflictError(existingRegion, err);
       }
-    });
+      throw err;
+    }
 
     if (!newRegion) {
       throw errors.INTERNAL_SERVER_ERROR({

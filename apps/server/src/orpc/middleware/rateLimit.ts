@@ -1,4 +1,6 @@
+import { ORPCError } from "@orpc/server";
 import { base } from "..";
+import { logError } from "../../lib/log";
 import { getConnection } from "../../worker/client";
 import type { Context } from "../context";
 
@@ -26,22 +28,41 @@ export function createRateLimit(options: RateLimitOptions) {
 
       const key = `${keyPrefix}:${identifier}`;
 
-      const redis = await getConnection();
+      try {
+        const redis = await getConnection();
+        if (!redis) {
+          // Rate limiting is defense in depth. If Redis is unavailable or
+          // intentionally stubbed in tests, do not turn the route into a 500.
+          return next({ context });
+        }
 
-      // Atomically increment and set expiration if this is the first request
-      // This Lua script prevents race conditions
-      const lua = `
-        local count = redis.call('INCR', KEYS[1])
-        if count == 1 then
-          redis.call('PEXPIRE', KEYS[1], ARGV[1])
-        end
-        return count
-      `;
-      const count = (await redis.eval(lua, 1, key, windowMs)) as number;
+        // Atomically increment and set expiration if this is the first request.
+        // This Lua script prevents race conditions.
+        const lua = `
+          local count = redis.call('INCR', KEYS[1])
+          if count == 1 then
+            redis.call('PEXPIRE', KEYS[1], ARGV[1])
+          end
+          return count
+        `;
+        const count = (await redis.eval(lua, 1, key, windowMs)) as number;
 
-      if (count > maxRequests) {
-        throw errors.FORBIDDEN({
-          message: "Too many requests. Please try again later.",
+        if (count > maxRequests) {
+          throw errors.FORBIDDEN({
+            message: "Too many requests. Please try again later.",
+          });
+        }
+      } catch (error) {
+        if (error instanceof ORPCError) {
+          throw error;
+        }
+
+        logError(error, {
+          extra: {
+            keyPrefix,
+            maxRequests,
+            windowMs,
+          },
         });
       }
 

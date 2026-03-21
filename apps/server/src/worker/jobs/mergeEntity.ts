@@ -11,8 +11,9 @@ import { upsertBottleAlias } from "@peated/server/lib/db";
 import { formatBottleName, formatReleaseName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { ConflictError } from "@peated/server/orpc/errors";
-import { pushUniqueJob, runJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/worker/client";
 import { eq, inArray } from "drizzle-orm";
+import mergeBottle from "./mergeBottle";
 
 // TODO: this should happen async
 export default async function mergeEntity({
@@ -66,7 +67,9 @@ export default async function mergeEntity({
             "An error occurred while trying to merge duplicate bottles.",
           );
         }
-        await runJob("MergeBottle", {
+        // Keep duplicate bottle merges inside the current transaction so the
+        // source entity cannot be deleted if the bottle merge fails.
+        await mergeBottle({
           toBottleId: alias.bottleId,
           fromBottleIds: [bottle.id],
           db: tx,

@@ -8,19 +8,24 @@ import * as schema from "./schema";
 // I love to ESM.
 import { default as pg } from "pg";
 const { Pool } = pg;
+type NodePgPool = InstanceType<typeof Pool>;
+const TEST_DB_APPLICATION_NAME = "peated-vitest";
 
 declare global {
   interface BigInt {
     toJSON(): string;
   }
+
+  // eslint-disable-next-line no-var
+  var __peatedPgPool: NodePgPool | undefined;
 }
 
 BigInt.prototype.toJSON = function (): string {
   return this.toString();
 };
 
-export const pool = new Pool(
-  process.env.INSTANCE_UNIX_SOCKET
+function createPool(): NodePgPool {
+  const connectionConfig = process.env.INSTANCE_UNIX_SOCKET
     ? {
         host: process.env.INSTANCE_UNIX_SOCKET,
         user: process.env.DATABASE_USER,
@@ -29,8 +34,27 @@ export const pool = new Pool(
       }
     : {
         connectionString: process.env.DATABASE_URL,
-      },
-);
+      };
+
+  return new Pool({
+    ...connectionConfig,
+    // Vitest can re-evaluate modules across suites. Reusing one low-concurrency
+    // pool in test mode avoids exhausting local Postgres clients.
+    ...(config.ENV === "test"
+      ? {
+          application_name: TEST_DB_APPLICATION_NAME,
+          max: 1,
+          idleTimeoutMillis: 0,
+        }
+      : {}),
+  });
+}
+
+export const pool = globalThis.__peatedPgPool ?? createPool();
+
+if (config.ENV !== "production") {
+  globalThis.__peatedPgPool = pool;
+}
 
 export const db = drizzle(pool, {
   schema,

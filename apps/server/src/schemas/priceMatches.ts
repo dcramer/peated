@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { CATEGORY_LIST } from "../constants";
-import { DEFAULT_PRICE_MATCH_CREATION_TARGET } from "../lib/bottleSchemaRules";
+import { DEFAULT_BOTTLE_CREATION_TARGET } from "../lib/bottleSchemaRules";
 import {
   BottleReleaseInputSchema,
   BottleReleaseSchema,
@@ -34,6 +34,7 @@ export const ExtractedBottleDetailsSchema = z.object({
   single_cask: z.boolean().nullable().default(null),
   edition: z.string().nullable().default(null),
 });
+export const BottleReferenceIdentitySchema = ExtractedBottleDetailsSchema;
 
 export const PriceMatchCandidateSchema = z.object({
   kind: z.enum(["bottle", "release"]).optional(),
@@ -72,6 +73,7 @@ export const PriceMatchCandidateSchema = z.object({
   score: z.number().nullable().default(null),
   source: z.array(z.string()).default([]),
 });
+export const BottleCandidateSchema = PriceMatchCandidateSchema;
 
 export const PriceMatchSearchResultSchema = z.object({
   title: z.string(),
@@ -80,12 +82,15 @@ export const PriceMatchSearchResultSchema = z.object({
   description: z.string().nullable().default(null),
   extraSnippets: z.array(z.string()).default([]),
 });
+export const BottleSearchResultSchema = PriceMatchSearchResultSchema;
 
 export const PriceMatchSearchEvidenceSchema = z.object({
+  provider: z.enum(["openai", "brave"]).default("openai"),
   query: z.string(),
   summary: z.string().nullable().default(null),
   results: z.array(PriceMatchSearchResultSchema).default([]),
 });
+export const BottleSearchEvidenceSchema = PriceMatchSearchEvidenceSchema;
 
 export const PriceMatchAttributeEnum = z.enum([
   "brand",
@@ -113,6 +118,7 @@ export const PriceMatchEvidenceSourceTierEnum = z.enum([
   "origin_retailer",
   "unknown",
 ]);
+export const BottleEvidenceSourceTierEnum = PriceMatchEvidenceSourceTierEnum;
 
 export const PriceMatchEvidenceCheckSchema = z.object({
   attribute: PriceMatchAttributeEnum,
@@ -123,6 +129,7 @@ export const PriceMatchEvidenceCheckSchema = z.object({
   matchedSourceTiers: z.array(PriceMatchEvidenceSourceTierEnum).default([]),
   matchedSourceUrls: z.array(z.string().url()).default([]),
 });
+export const BottleEvidenceCheckSchema = PriceMatchEvidenceCheckSchema;
 
 export const StorePriceMatchProposalStatusEnum = z.enum([
   "verified",
@@ -143,6 +150,7 @@ export const PriceMatchCreationTargetEnum = z.enum([
   "release",
   "bottle_and_release",
 ]);
+export const BottleCreationTargetEnum = PriceMatchCreationTargetEnum;
 
 export const StorePriceMatchQueueStateEnum = z.enum([
   "actionable",
@@ -203,8 +211,7 @@ function validateCreateNewDecisionShape(
   },
   ctx: z.RefinementCtx,
 ) {
-  const creationTarget =
-    value.creationTarget ?? DEFAULT_PRICE_MATCH_CREATION_TARGET;
+  const creationTarget = value.creationTarget ?? DEFAULT_BOTTLE_CREATION_TARGET;
   const parentBottleId = value.parentBottleId ?? null;
   const proposedRelease = value.proposedRelease ?? null;
 
@@ -329,6 +336,7 @@ export const StorePriceMatchDecisionSchema = z.discriminatedUnion("action", [
     proposedRelease: z.null().optional(),
   }),
 ]);
+export const BottleClassificationDecisionSchema = StorePriceMatchDecisionSchema;
 
 export const StorePriceMatchAgentDecisionSchema =
   StorePriceMatchDecisionBaseSchema.extend({
@@ -340,10 +348,14 @@ export const StorePriceMatchAgentDecisionSchema =
     proposedBottle: ProposedBottleSchema.nullable().default(null),
     proposedRelease: ProposedReleaseSchema.nullable().default(null),
   });
+export const BottleClassifierAgentDecisionSchema =
+  StorePriceMatchAgentDecisionSchema;
 
 export const StorePriceMatchAgentResponseSchema = z.object({
   decision: StorePriceMatchAgentDecisionSchema,
 });
+export const BottleClassifierAgentResponseSchema =
+  StorePriceMatchAgentResponseSchema;
 
 export const StorePriceMatchProposalSchema = z.object({
   id: z.number(),

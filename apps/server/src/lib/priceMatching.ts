@@ -1,4 +1,4 @@
-export { classifyStorePriceMatch } from "@peated/server/agents/priceMatch";
+export { classifyBottleReference } from "@peated/server/agents/bottleClassifier";
 export { findStorePriceMatchCandidates } from "@peated/server/lib/priceMatchingCandidates";
 export {
   STORE_PRICE_MATCH_PROCESSING_LEASE_MS,
