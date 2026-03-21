@@ -232,6 +232,78 @@ describe("price match queue", () => {
     ]);
   });
 
+  test("sorts queue items by queue age when requested", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const oldestPrice = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Oldest Queue Candidate",
+    });
+    const middlePrice = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Middle Queue Candidate",
+    });
+    const newestPrice = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Newest Queue Candidate",
+    });
+
+    const [oldestProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: oldestPrice.id,
+        status: "pending_review",
+        proposalType: "create_new",
+        createdAt: new Date("2026-03-08T08:00:00.000Z"),
+        updatedAt: new Date("2026-03-08T11:00:00.000Z"),
+      })
+      .returning();
+
+    const [middleProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: middlePrice.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+        createdAt: new Date("2026-03-08T09:00:00.000Z"),
+        updatedAt: new Date("2026-03-08T10:00:00.000Z"),
+      })
+      .returning();
+
+    const [newestProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: newestPrice.id,
+        status: "pending_review",
+        proposalType: "correction",
+        createdAt: new Date("2026-03-08T10:00:00.000Z"),
+        updatedAt: new Date("2026-03-08T09:00:00.000Z"),
+      })
+      .returning();
+
+    const oldestFirstResults = await routerClient.prices.matchQueue.list(
+      { sort: "created" },
+      { context: { user } },
+    );
+    const newestFirstResults = await routerClient.prices.matchQueue.list(
+      { sort: "-created" },
+      { context: { user } },
+    );
+
+    expect(oldestFirstResults.results.map((item) => item.id)).toEqual([
+      oldestProposal.id,
+      middleProposal.id,
+      newestProposal.id,
+    ]);
+    expect(newestFirstResults.results.map((item) => item.id)).toEqual([
+      newestProposal.id,
+      middleProposal.id,
+      oldestProposal.id,
+    ]);
+  });
+
   test("separates actionable and processing queue items and returns counts", async ({
     fixtures,
   }) => {

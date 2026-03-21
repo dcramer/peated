@@ -14,11 +14,16 @@ export const QueueStateSchema = z
   .enum(["actionable", "processing"])
   .default("actionable");
 
+export const QueueSortSchema = z
+  .enum(["priority", "created", "-created"])
+  .default("priority");
+
 export const QueueListInputSchema = z
   .object({
     query: z.string().default(""),
     kind: QueueKindSchema,
     state: QueueStateSchema,
+    sort: QueueSortSchema,
     cursor: z.coerce.number().gte(1).default(1),
     limit: z.coerce.number().gte(1).lte(100).default(50),
   })
@@ -26,6 +31,7 @@ export const QueueListInputSchema = z
     query: "",
     kind: null,
     state: "actionable",
+    sort: "priority",
     cursor: 1,
     limit: 50,
   });

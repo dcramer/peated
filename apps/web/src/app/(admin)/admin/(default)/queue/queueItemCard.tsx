@@ -253,6 +253,7 @@ export default function QueueItemCard({
       : item.creationTarget === "bottle_and_release"
         ? "Create Bottle + Release"
         : "Create Bottle";
+  const queuedAt = formatTimestamp(item.createdAt);
   const processingQueuedAt = formatTimestamp(item.processingQueuedAt);
   const processingExpiresAt = formatTimestamp(item.processingExpiresAt);
 
@@ -274,6 +275,7 @@ export default function QueueItemCard({
                   {item.price.site.name}
                 </Link>
                 {item.price.volume ? <span>{item.price.volume}mL</span> : null}
+                {queuedAt ? <span>Queued {queuedAt}</span> : null}
               </div>
             </div>
             <div className="flex flex-wrap gap-2">

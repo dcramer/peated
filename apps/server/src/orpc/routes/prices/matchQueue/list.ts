@@ -8,7 +8,7 @@ import { getProposalTargets } from "@peated/server/lib/priceMatching";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { StorePriceMatchQueueListResponse } from "@peated/server/schemas";
-import { desc, eq, sql } from "drizzle-orm";
+import { asc, desc, eq, sql } from "drizzle-orm";
 import {
   getQueueBaseWhere,
   getQueueIsProcessingSql,
@@ -46,15 +46,25 @@ export default procedure
       )
       .where(baseWhere);
     const orderBy =
-      input.state === "processing"
+      input.sort === "created"
         ? [
-            desc(storePriceMatchProposals.processingQueuedAt),
-            desc(storePriceMatchProposals.id),
+            asc(storePriceMatchProposals.createdAt),
+            asc(storePriceMatchProposals.id),
           ]
-        : [
-            desc(storePriceMatchProposals.updatedAt),
-            desc(storePriceMatchProposals.id),
-          ];
+        : input.sort === "-created"
+          ? [
+              desc(storePriceMatchProposals.createdAt),
+              desc(storePriceMatchProposals.id),
+            ]
+          : input.state === "processing"
+            ? [
+                desc(storePriceMatchProposals.processingQueuedAt),
+                desc(storePriceMatchProposals.id),
+              ]
+            : [
+                desc(storePriceMatchProposals.updatedAt),
+                desc(storePriceMatchProposals.id),
+              ];
 
     const rows = await db
       .select({

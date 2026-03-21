@@ -22,6 +22,9 @@ import QueueItemCard, { type QueueItem } from "./queueItemCard";
 
 type QueueKind = "create_new" | "match_existing" | "correction" | "errored";
 type QueueState = "actionable" | "processing";
+type QueueSort = "priority" | "created" | "-created";
+
+const DEFAULT_QUEUE_SORT: QueueSort = "priority";
 
 const QUEUE_KIND_OPTIONS: Array<{ id: null | QueueKind; label: string }> = [
   { id: null, label: "All" },
@@ -34,6 +37,12 @@ const QUEUE_KIND_OPTIONS: Array<{ id: null | QueueKind; label: string }> = [
 const QUEUE_STATE_OPTIONS: Array<{ id: QueueState; label: string }> = [
   { id: "actionable", label: "Actionable" },
   { id: "processing", label: "Processing" },
+];
+
+const QUEUE_SORT_OPTIONS: Array<{ id: QueueSort; label: string }> = [
+  { id: "priority", label: "Recent Activity" },
+  { id: "-created", label: "Newest First" },
+  { id: "created", label: "Oldest First" },
 ];
 
 function getReturnTo(pathname: string, searchParams: URLSearchParams): string {
@@ -56,6 +65,8 @@ export default function Page() {
   const currentKind = (searchParams.get("kind") as QueueKind | null) ?? null;
   const currentState =
     (searchParams.get("state") as QueueState | null) ?? "actionable";
+  const currentSort =
+    (searchParams.get("sort") as QueueSort | null) ?? DEFAULT_QUEUE_SORT;
   const currentQuery = searchParams.get("query") ?? "";
   const returnTo = getReturnTo(pathname, searchParams);
   const queryParams = useApiQueryParams({
@@ -214,6 +225,7 @@ export default function Page() {
           className="mb-0 rounded-xl border border-slate-800 bg-slate-950 px-4 py-4"
         >
           <input type="hidden" name="state" value={currentState} />
+          <input type="hidden" name="sort" value={currentSort} />
           {currentKind ? (
             <input type="hidden" name="kind" value={currentKind} />
           ) : null}
@@ -277,6 +289,22 @@ export default function Page() {
               })}
               size="small"
               active={currentKind === option.id}
+            >
+              {option.label}
+            </Button>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {QUEUE_SORT_OPTIONS.map((option) => (
+            <Button
+              key={option.id}
+              href={buildQueueHref(pathname, searchParams, {
+                sort: option.id === DEFAULT_QUEUE_SORT ? null : option.id,
+                cursor: null,
+              })}
+              size="small"
+              active={currentSort === option.id}
             >
               {option.label}
             </Button>
