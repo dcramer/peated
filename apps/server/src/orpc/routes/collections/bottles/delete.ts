@@ -8,7 +8,7 @@ import {
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
 import { CollectionBottleInputSchema } from "@peated/server/schemas";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -26,6 +26,7 @@ export default procedure
     CollectionBottleInputSchema.extend({
       collection: z.union([z.coerce.number(), z.literal("default")]),
       user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
+      baseOnly: z.coerce.boolean().optional(),
     }),
   )
   .output(z.object({}))
@@ -64,23 +65,25 @@ export default procedure
     }
 
     await db.transaction(async (tx) => {
-      const [cb] = await tx
+      const deleted = await tx
         .delete(collectionBottles)
         .where(
           and(
             eq(collectionBottles.bottleId, input.bottle),
             eq(collectionBottles.collectionId, collection.id),
-            input.release
-              ? eq(collectionBottles.releaseId, input.release)
-              : undefined,
+            input.baseOnly
+              ? isNull(collectionBottles.releaseId)
+              : input.release
+                ? eq(collectionBottles.releaseId, input.release)
+                : undefined,
           ),
         )
         .returning();
-      if (cb) {
+      if (deleted.length) {
         await tx
           .update(collections)
           .set({
-            totalBottles: sql`${collections.totalBottles} - 1`,
+            totalBottles: sql`${collections.totalBottles} - ${deleted.length}`,
           })
           .where(eq(collections.id, collection.id));
       }

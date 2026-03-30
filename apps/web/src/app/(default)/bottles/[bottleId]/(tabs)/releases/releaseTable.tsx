@@ -3,9 +3,16 @@
 import { type Outputs } from "@peated/server/orpc/router";
 import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import Button from "@peated/web/components/button";
+import CollectionAction from "@peated/web/components/collectionAction";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Link from "@peated/web/components/link";
+import PaginationButtons from "@peated/web/components/paginationButtons";
 import Table from "@peated/web/components/table";
+import {
+  formatBottlingName,
+  getBottleBottlingPath,
+  getNewBottleBottlingPath,
+} from "@peated/web/lib/bottlings";
 import ModActions from "./modActions";
 
 export default function ReleaseTable({
@@ -19,24 +26,55 @@ export default function ReleaseTable({
     return (
       <EmptyActivity>
         <div className="font-semibold">
-          We're not aware of any named releases of this bottling.
+          We&apos;re not aware of any bottlings for this bottle yet.
         </div>
         <div className="mt-4">
-          <Button href={`/bottles/${bottleId}/addRelease`} color="primary">
-            Add Release
+          <Button href={getNewBottleBottlingPath(bottleId)} color="primary">
+            Add Bottling
           </Button>
         </div>
       </EmptyActivity>
     );
   }
+
+  return (
+    <div className="space-y-6">
+      <p className="text-muted text-sm">
+        Add an exact bottling when you care about a specific batch, vintage,
+        pick, or single cask.
+      </p>
+      <ReleaseTableSection bottleId={bottleId} items={releaseList.results} />
+      <PaginationButtons rel={releaseList.rel} />
+    </div>
+  );
+}
+
+function ReleaseTableSection({
+  bottleId,
+  items,
+}: {
+  bottleId: number;
+  items: Outputs["bottleReleases"]["list"]["results"];
+}) {
   return (
     <Table
-      items={releaseList.results}
-      rel={releaseList.rel}
+      items={items}
       defaultSort="releaseYear"
-      // url={(item) => `/bottles/${bottleId}/releases/${item.id}`}
       columns={[
-        { name: "edition", sort: "edition", sortDefaultOrder: "asc" },
+        {
+          name: "edition",
+          title: "Bottling",
+          sort: "edition",
+          sortDefaultOrder: "asc",
+          value: (item) => (
+            <Link
+              className="hover:underline"
+              href={getBottleBottlingPath(bottleId, item.id)}
+            >
+              {formatBottlingName(item)}
+            </Link>
+          ),
+        },
         {
           name: "age",
           sort: "statedAge",
@@ -60,7 +98,7 @@ export default function ReleaseTable({
         {
           name: "releaseYear",
           sort: "releaseYear",
-          title: "Release",
+          title: "Bottled",
           className: "sm:w-1/8",
           sortDefaultOrder: "desc",
         },
@@ -78,12 +116,18 @@ export default function ReleaseTable({
             return (
               <div className="flex flex-row justify-end gap-2">
                 <Button
-                  href={`/bottles/${bottleId}/addTasting?release=${item.id}`}
+                  href={`/bottles/${bottleId}/addTasting?bottling=${item.id}`}
                   size="small"
                   title="Record a Tasting"
                 >
                   <PeatedGlyph className="h-3 w-3" />
                 </Button>
+                <CollectionAction
+                  bottleId={bottleId}
+                  releaseId={item.id}
+                  size="small"
+                  title="Save Specific Bottling"
+                />
                 <ModActions release={item} />
               </div>
             );

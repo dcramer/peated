@@ -246,6 +246,39 @@ describe("POST /bottle-releases", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
   });
 
+  it("creates exact releases without a classification field", async function ({
+    fixtures,
+    defaults,
+  }) {
+    const bottle = await fixtures.Bottle({
+      name: "Private Selection",
+      brandId: (await fixtures.Entity({ name: "Maker's Mark" })).id,
+    });
+
+    const result = await routerClient.bottleReleases.create(
+      {
+        bottle: bottle.id,
+        edition: "S2B13",
+        singleCask: true,
+        abv: 55.1,
+      },
+      {
+        context: { user: defaults.user },
+      },
+    );
+
+    expect(result.edition).toBe("S2B13");
+    expect(result.singleCask).toBe(true);
+
+    const [release] = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, result.id));
+
+    expect(release.edition).toBe("S2B13");
+    expect(release.singleCask).toBe(true);
+  });
+
   it("creates cask-only releases with distinct canonical names", async function ({
     fixtures,
     defaults,
@@ -413,5 +446,48 @@ describe("POST /bottle-releases", () => {
       .from(bottles)
       .where(eq(bottles.id, bottle.id));
     expect(updatedBottle.numReleases).toBe(1);
+  });
+
+  it("rejects creating a child release when the parent bottle still stores release details", async function ({
+    fixtures,
+    defaults,
+  }) {
+    const bottle = await fixtures.Bottle({
+      name: "Mystery Distillery",
+      edition: "1990 Release",
+      releaseYear: 1990,
+      abv: 43,
+      vintageYear: 1978,
+    });
+
+    const err = await waitError(() =>
+      routerClient.bottleReleases.create(
+        {
+          bottle: bottle.id,
+          edition: "1991 Release",
+          releaseYear: 1991,
+          abv: 46,
+        },
+        {
+          context: { user: defaults.user },
+        },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Bottle already stores specific release details on the parent record. A moderator must split or clear those bottle fields before adding child releases.]`,
+    );
+
+    const [updatedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+    expect(updatedBottle.numReleases).toBe(0);
+
+    const releaseList = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.bottleId, bottle.id));
+    expect(releaseList).toHaveLength(0);
   });
 });

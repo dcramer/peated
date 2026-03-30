@@ -2,6 +2,7 @@ import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type { Flight } from "@peated/server/db/schema";
 import {
+  bottleAliases,
   bottles,
   bottlesToDistillers,
   entities,
@@ -18,7 +19,7 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, eq, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNotNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const DEFAULT_SORT = "-tastings";
@@ -76,12 +77,33 @@ export default procedure
   .handler(async function ({ input, context, errors }) {
     const { query, cursor, limit, ...rest } = input;
     const offset = (cursor - 1) * limit;
+    const exactAliasBottleIds = query
+      ? (
+          await db
+            .selectDistinct({ bottleId: bottleAliases.bottleId })
+            .from(bottleAliases)
+            .where(
+              and(
+                eq(sql`LOWER(${bottleAliases.name})`, query.toLowerCase()),
+                isNotNull(bottleAliases.bottleId),
+              ),
+            )
+        )
+          .map((row) => row.bottleId)
+          // Narrow type: isNotNull in query guarantees non-null at runtime
+          .filter((bottleId): bottleId is number => bottleId !== null)
+      : [];
 
     const where: (SQL<unknown> | undefined)[] = [];
 
     if (query) {
       where.push(
-        sql`${bottles.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
+        or(
+          sql`${bottles.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
+          exactAliasBottleIds.length
+            ? inArray(bottles.id, exactAliasBottleIds)
+            : undefined,
+        ),
       );
     }
     if (rest.brand) {
@@ -211,7 +233,17 @@ export default procedure
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(orderBy);
+      .orderBy(
+        ...(exactAliasBottleIds.length
+          ? [
+              sql`CASE WHEN ${bottles.id} IN (${sql.join(
+                exactAliasBottleIds.map((bottleId) => sql`${bottleId}`),
+                sql`, `,
+              )}) THEN 0 ELSE 1 END`,
+              orderBy,
+            ]
+          : [orderBy]),
+      );
 
     return {
       results: await serialize(

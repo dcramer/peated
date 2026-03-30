@@ -3,7 +3,8 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
 import Link from "@peated/web/components/link";
-import { Fragment, type ReactNode } from "react";
+import { formatBottlingCountLabel } from "@peated/web/lib/bottlings";
+import { type ReactNode } from "react";
 import Join from "../join";
 export type BottleResult = {
   type: "bottle";
@@ -18,7 +19,6 @@ export default function BottleResultRow({
   directToTasting: boolean;
 }) {
   const metadata: ReactNode[] = [];
-  if (bottle.edition) metadata.push(<span>({bottle.edition})</span>);
   if (bottle.distillers.length)
     metadata.push(
       <span>
@@ -29,10 +29,6 @@ export default function BottleResultRow({
         </Join>
       </span>,
     );
-  if (bottle.vintageYear)
-    metadata.push(<span>{bottle.vintageYear} Vintage</span>);
-  if (bottle.releaseYear)
-    metadata.push(<span>{bottle.releaseYear} Release</span>);
 
   return (
     <>
@@ -52,8 +48,7 @@ export default function BottleResultRow({
               <span>{bottle.fullName}</span>
               {bottle.numReleases > 0 && (
                 <span className="text-muted text-sm">
-                  {bottle.numReleases} release
-                  {bottle.numReleases === 1 ? "" : "s"}
+                  {formatBottlingCountLabel(bottle.numReleases)}
                 </span>
               )}
             </div>

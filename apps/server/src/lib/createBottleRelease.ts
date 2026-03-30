@@ -6,6 +6,7 @@ import {
   formatCanonicalReleaseName,
   getCanonicalReleaseAliasNames,
   getResolvedReleaseIdentity,
+  hasBottleLevelReleaseTraits,
 } from "@peated/server/lib/bottleSchemaRules";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
@@ -55,6 +56,12 @@ export async function createBottleReleaseInTransaction(
 
   if (!bottle) {
     throw new BottleReleaseCreateBadRequestError("Bottle not found.");
+  }
+
+  if (hasBottleLevelReleaseTraits(bottle)) {
+    throw new BottleReleaseCreateBadRequestError(
+      "Bottle already stores specific release details on the parent record. A moderator must split or clear those bottle fields before adding child releases.",
+    );
   }
 
   if (

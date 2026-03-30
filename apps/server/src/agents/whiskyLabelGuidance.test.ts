@@ -86,8 +86,9 @@ describe("whiskyLabelGuidance", () => {
     expect(instructions).toContain(
       "If `localSearch.hasExactAliasMatch` is false, no exact alias match was found for the reference.",
     );
-    expect(instructions).toContain("creationTarget");
-    expect(instructions).toContain("suggestedReleaseId");
+    expect(instructions).toContain("matchedReleaseId");
+    expect(instructions).toContain("parentBottleId");
+    expect(instructions).toContain("create_bottle_and_release");
     expect(instructions).toContain(
       "combined hard limit of 5 web search calls across all web search tools",
     );

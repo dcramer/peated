@@ -56,6 +56,7 @@ export default function Page({
         router.push(`/bottles/${bottleId}`);
       }}
       initialData={bottle}
+      showBottleReleaseDetails
       title="Edit Bottle"
     />
   );

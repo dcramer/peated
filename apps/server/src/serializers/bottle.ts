@@ -5,6 +5,7 @@ import config from "../config";
 import { db } from "../db";
 import type { Bottle, Flight, User } from "../db/schema";
 import {
+  bottleReleases,
   bottleSeries,
   bottlesToDistillers,
   collectionBottles,
@@ -21,6 +22,7 @@ import { EntitySerializer } from "./entity";
 type Attrs = {
   isFavorite: boolean;
   hasTasted: boolean;
+  numReleases: number;
   brand: ReturnType<(typeof EntitySerializer)["item"]>;
   distillers: ReturnType<(typeof EntitySerializer)["item"]>[];
   bottler: ReturnType<(typeof EntitySerializer)["item"]> | null;
@@ -41,6 +43,19 @@ export const BottleSerializer = serializer({
     context?: Context,
   ): Promise<Record<number, Attrs>> => {
     const itemIds = itemList.map((t) => t.id);
+    const releaseCounts = itemIds.length
+      ? await db
+          .select({
+            bottleId: bottleReleases.bottleId,
+            count: sql<number>`COUNT(*)`,
+          })
+          .from(bottleReleases)
+          .where(inArray(bottleReleases.bottleId, itemIds))
+          .groupBy(bottleReleases.bottleId)
+      : [];
+    const releaseCountByBottleId = Object.fromEntries(
+      releaseCounts.map((row) => [row.bottleId, Number(row.count)]),
+    );
 
     const distillerList = await db
       .select()
@@ -149,6 +164,7 @@ export const BottleSerializer = serializer({
           {
             isFavorite: favoriteSet.has(item.id),
             hasTasted: tastedSet.has(item.id),
+            numReleases: releaseCountByBottleId[item.id] ?? 0,
             brand: entitiesById[item.brandId],
             distillers: distillersByBottleId[item.id] || [],
             bottler: item.bottlerId ? entitiesById[item.bottlerId] : null,
@@ -203,7 +219,7 @@ export const BottleSerializer = serializer({
       avgRating: item.avgRating,
       ratingStats: item.ratingStats,
       totalTastings: item.totalTastings,
-      numReleases: item.numReleases,
+      numReleases: attrs.numReleases,
 
       suggestedTags: item.suggestedTags,
       isFavorite: attrs.isFavorite,

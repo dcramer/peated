@@ -77,28 +77,31 @@ export type BottleSeries = typeof bottleSeries.$inferSelect;
 export type NewBottleSeries = typeof bottleSeries.$inferInsert;
 
 /**
- * Represents a unique expression from a brand.
- * This is the parent table that contains the core information about a bottle.
- * Each bottle can have multiple editions (vintages, releases, etc.) which are stored in bottle_edition.
+ * Represents the stable parent product from a brand.
+ * This is the default identity object that most users taste, search, and collect.
+ * Child releases are optional and only used when a reusable marketed distinction
+ * should aggregate separately across users, prices, and stats.
  *
- * Some fields (description, imageUrl, etc.) are materialized from the editions,
- * meaning they represent an aggregate or selected value from the editions.
+ * A bottle may temporarily carry release-like traits when only one marketed
+ * form is known, or when older data predates an explicit release split.
+ *
+ * Some fields (description, imageUrl, etc.) are materialized from child
+ * releases when they exist.
  *
  * Examples:
  * 1. Ardbeg Supernova
  *    - Brand: Ardbeg
  *    - Series: Supernova
- *    - Multiple editions released in 2009, 2010, 2014, 2015, 2019
+ *    - Can have child releases such as 2019 Release or later annual releases
  *
- * 2. Octomore
- *    - Brand: Octomore
- *    - Series: 13
- *    - Multiple editions like 13.1, 13.2, 13.3, etc.
- *
- * 3. Macallan 18
+ * 2. Macallan 18
  *    - Brand: Macallan
  *    - Series: 18-year-old
- *    - Multiple editions by vintage year (1993, 1994, etc.)
+ *    - Can have child releases by vintage year (1993, 1994, etc.)
+ *
+ * 3. Octomore 13.1
+ *    - One bottle
+ *    - `13.1` is part of the bottle identity, not a child release
  */
 export const bottles = pgTable(
   "bottle",
@@ -129,8 +132,9 @@ export const bottles = pgTable(
     ),
     flavorProfile: flavorProfileEnum("flavor_profile"),
 
-    // Legacy release-level traits remain on bottle for compatibility with
-    // existing data. New canonical release writes should prefer bottle_release.
+    // Legacy or single-known-release traits can remain on bottle. Once a
+    // reusable child release boundary is clear, new canonical release data
+    // should prefer bottle_release.
     edition: varchar("edition", { length: 255 }),
     abv: doublePrecision("abv"),
     singleCask: boolean("single_cask"),
@@ -141,7 +145,7 @@ export const bottles = pgTable(
     caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
     caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
 
-    // Materialized fields from editions
+    // Materialized fields from child releases
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
     imageUrl: text("image_url"),
@@ -261,21 +265,18 @@ export const bottleSeriesRelations = relations(
  *    - Bottle: Ardbeg Supernova
  *    - Release Year: 2019
  *    - ABV: 53.8%
- *    - Edition-specific details: ppm, cask types, etc.
+ *    - Release-specific details: ppm, cask types, etc.
  *
- * 2. Octomore 13.1
- *    - Bottle: Octomore
- *    - Expression: 13.1
- *    - Release Year: 2022
- *    - ABV: 59.2%
- *    - Edition-specific details: 137.3 ppm, 5 years old, ex-American oak
+ * 2. Springbank 12 Cask Strength Batch 24
+ *    - Bottle: Springbank 12 Cask Strength
+ *    - Edition: Batch 24
+ *    - ABV: 57.2%
+ *    - Release-specific details: batch label, exact ABV
  *
- * 3. Macallan 18 Year Old 1993
- *    - Bottle: Macallan 18
- *    - Vintage Year: 1993
- *    - Release Year: 2011
- *    - ABV: 43%
- *    - Edition-specific details: Sherry oak casks
+ * 3. Maker's Mark Private Selection S2B13
+ *    - Bottle: Maker's Mark Private Selection
+ *    - Edition: S2B13
+ *    - Release-specific details: pick code and other marketed variation
  */
 export const bottleReleases = pgTable(
   "bottle_release",

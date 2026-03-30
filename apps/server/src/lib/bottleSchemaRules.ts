@@ -14,6 +14,19 @@ export type ReleaseIdentityInput = Pick<
   | "vintageYear"
 >;
 
+export type BottleLevelReleaseTraitsInput = Pick<
+  Bottle,
+  | "abv"
+  | "caskFill"
+  | "caskSize"
+  | "caskStrength"
+  | "caskType"
+  | "edition"
+  | "releaseYear"
+  | "singleCask"
+  | "vintageYear"
+>;
+
 type ExtractedReleaseIdentityInput = {
   stated_age: number | null;
   edition: string | null;
@@ -29,9 +42,9 @@ type ExtractedReleaseIdentityInput = {
 
 export const BOTTLE_SCHEMA_RULES = {
   bottleIdentity:
-    "Bottle identity is the stable parent product. Brand, bottler, distillery, expression/name, series, and category belong here.",
+    "Bottle identity is the stable parent product and the default object for tasting, search, and collection. Brand, bottler, distillery, expression/name, series, and category belong here. When only one marketed form is known, the bottle may temporarily carry release-like traits until a reusable child release is warranted.",
   releaseIdentity:
-    "Release identity is optional and only exists under a bottle. Edition, ABV, years, single-cask, cask-strength, and cask details belong here.",
+    "Release identity is optional and only exists under a bottle when the differentiator should aggregate across users, searches, prices, and stats. Edition, ABV, years, single-cask, cask-strength, and cask details belong here.",
   observationPolicy:
     "Exact source facts like cask numbers, bottle numbers, outturns, exclusives, and raw maturation wording should be preserved as observations first. Promote them to canonical release identity only when they are clearly part of the marketed release.",
   aliasPolicy:
@@ -54,6 +67,18 @@ export const RELEASE_IDENTITY_FIELDS = [
   "caskType",
   "caskSize",
 ] as const satisfies ReadonlyArray<keyof ReleaseIdentityInput>;
+
+export const BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS = [
+  "edition",
+  "releaseYear",
+  "vintageYear",
+  "abv",
+  "singleCask",
+  "caskStrength",
+  "caskFill",
+  "caskType",
+  "caskSize",
+] as const satisfies ReadonlyArray<keyof BottleLevelReleaseTraitsInput>;
 
 export const EXTRACTED_RELEASE_IDENTITY_FIELDS = [
   "edition",
@@ -91,6 +116,46 @@ export function getReleaseObservationFacts(
       caskSize: release.caskSize ?? null,
     }).filter(([, value]) => value !== null && value !== undefined),
   );
+}
+
+export function getBottleLevelReleaseTraits(
+  bottle: Partial<BottleLevelReleaseTraitsInput>,
+) {
+  return Object.fromEntries(
+    Object.entries({
+      edition: bottle.edition ?? null,
+      releaseYear: bottle.releaseYear ?? null,
+      vintageYear: bottle.vintageYear ?? null,
+      abv: bottle.abv ?? null,
+      singleCask: bottle.singleCask ?? null,
+      caskStrength: bottle.caskStrength ?? null,
+      caskFill: bottle.caskFill ?? null,
+      caskType: bottle.caskType ?? null,
+      caskSize: bottle.caskSize ?? null,
+    }).filter(([, value]) => value !== null && value !== undefined),
+  );
+}
+
+export function hasBottleLevelReleaseTraits(
+  bottle: Partial<BottleLevelReleaseTraitsInput>,
+) {
+  return Object.keys(getBottleLevelReleaseTraits(bottle)).length > 0;
+}
+
+export function isAddingBottleLevelReleaseTraits({
+  current,
+  next,
+}: {
+  current: Partial<BottleLevelReleaseTraitsInput>;
+  next: Partial<BottleLevelReleaseTraitsInput>;
+}) {
+  return BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS.some((field) => {
+    const nextValue = next[field];
+    if (nextValue === null || nextValue === undefined) {
+      return false;
+    }
+    return nextValue !== current[field];
+  });
 }
 
 function formatReleaseTraitLabel(

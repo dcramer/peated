@@ -3,26 +3,29 @@ import { CASK_FILLS, CASK_SIZE_IDS, CASK_TYPE_IDS } from "../constants";
 import { CaskFillEnum, CaskSizeEnum, CaskTypeEnum } from "./common";
 
 export const BottleReleaseSchema = z.object({
-  id: z.number().describe("Unique identifier for the bottle edition"),
+  id: z.number().describe("Unique identifier for the release"),
   bottleId: z.number().describe("Reference to the parent bottle"),
 
   fullName: z
     .string()
     .readonly()
-    .describe("Canonical name including the brand"),
-  name: z.string().readonly().describe("Canonical name excluding the brand."),
+    .describe("Canonical release name including the brand"),
+  name: z
+    .string()
+    .readonly()
+    .describe("Canonical release name excluding the brand."),
 
   edition: z
     .string()
     .nullable()
     .default(null)
-    .describe("Specific edition identifier (e.g. Batch #1)"),
+    .describe("Specific release label (e.g. Batch 24)"),
 
   statedAge: z
     .number()
     .nullable()
     .default(null)
-    .describe("Official age statement in years"),
+    .describe("Official age statement for this release in years"),
   abv: z
     .number()
     .nullable()
@@ -70,7 +73,7 @@ export const BottleReleaseSchema = z.object({
     .string()
     .nullable()
     .default(null)
-    .describe("Detailed description of the bottle edition"),
+    .describe("Detailed description of this release"),
   tastingNotes: z
     .object({
       nose: z.string().describe("Aroma characteristics of the whisky"),
@@ -83,22 +86,22 @@ export const BottleReleaseSchema = z.object({
     .string()
     .nullable()
     .default(null)
-    .describe("URL to the bottle edition's image"),
+    .describe("URL to this release's image"),
 
   avgRating: z
     .number()
     .readonly()
     .nullable()
-    .describe("Average user rating for this edition"),
+    .describe("Average user rating for this release"),
   totalTastings: z
     .number()
     .readonly()
-    .describe("Total number of recorded tastings for this edition"),
+    .describe("Total number of recorded tastings for this release"),
 
   suggestedTags: z
     .array(z.string())
     .readonly()
-    .describe("System-generated tags based on the edition's characteristics"),
+    .describe("System-generated tags based on this release's characteristics"),
   isFavorite: z
     .boolean()
     .readonly()
@@ -106,16 +109,16 @@ export const BottleReleaseSchema = z.object({
 
   hasTasted: z
     .boolean()
-    .describe("Whether the current user has tasted this edition"),
+    .describe("Whether the current user has tasted this release"),
 
   createdAt: z
     .string()
     .datetime()
-    .describe("Timestamp when the edition was created"),
+    .describe("Timestamp when this release was created"),
   updatedAt: z
     .string()
     .datetime()
-    .describe("Timestamp when the edition was last updated"),
+    .describe("Timestamp when this release was last updated"),
 });
 
 export const BottleReleaseInputSchema = BottleReleaseSchema.omit({
@@ -131,7 +134,7 @@ export const BottleReleaseInputSchema = BottleReleaseSchema.omit({
   isFavorite: true,
   hasTasted: true,
 }).extend({
-  image: z.null().optional().describe("Optional image upload for the bottle"),
+  image: z.null().optional().describe("Optional image upload for this release"),
   abv: z
     .number()
     .min(0)

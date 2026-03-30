@@ -120,30 +120,52 @@ export default function BottleOverview({
                   <em>unknown</em>
                 )}
               </DefinitionList.Details>
-              <DefinitionList.Term>ABV</DefinitionList.Term>
-              <DefinitionList.Details>
-                {bottle.abv ? `${bottle.abv.toFixed(1)}%` : <em>unknown</em>}
-              </DefinitionList.Details>
-              <DefinitionList.Term>Cask Strength?</DefinitionList.Term>
-              <DefinitionList.Details>
-                <YesNo value={bottle.caskStrength} />
-              </DefinitionList.Details>
-              <DefinitionList.Term>Single Cask?</DefinitionList.Term>
-              <DefinitionList.Details>
-                <YesNo value={bottle.singleCask} />
-              </DefinitionList.Details>
-              <DefinitionList.Term>Cask Details</DefinitionList.Term>
-              <DefinitionList.Details>
-                {bottle.caskFill || bottle.caskSize || bottle.caskType ? (
-                  <CaskDetails
-                    caskFill={bottle.caskFill}
-                    caskSize={bottle.caskSize}
-                    caskType={bottle.caskType}
-                  />
-                ) : (
-                  <em>unknown</em>
+              {bottle.edition && (
+                <>
+                  <DefinitionList.Term>Bottle Label</DefinitionList.Term>
+                  <DefinitionList.Details>
+                    {bottle.edition}
+                  </DefinitionList.Details>
+                </>
+              )}
+              {bottle.abv !== null && bottle.abv !== undefined && (
+                <>
+                  <DefinitionList.Term>ABV</DefinitionList.Term>
+                  <DefinitionList.Details>
+                    {bottle.abv.toFixed(1)}%
+                  </DefinitionList.Details>
+                </>
+              )}
+              {bottle.caskStrength !== null &&
+                bottle.caskStrength !== undefined && (
+                  <>
+                    <DefinitionList.Term>Cask Strength?</DefinitionList.Term>
+                    <DefinitionList.Details>
+                      <YesNo value={bottle.caskStrength} />
+                    </DefinitionList.Details>
+                  </>
                 )}
-              </DefinitionList.Details>
+              {bottle.singleCask !== null &&
+                bottle.singleCask !== undefined && (
+                  <>
+                    <DefinitionList.Term>Single Cask?</DefinitionList.Term>
+                    <DefinitionList.Details>
+                      <YesNo value={bottle.singleCask} />
+                    </DefinitionList.Details>
+                  </>
+                )}
+              {(bottle.caskFill || bottle.caskSize || bottle.caskType) && (
+                <>
+                  <DefinitionList.Term>Cask Details</DefinitionList.Term>
+                  <DefinitionList.Details>
+                    <CaskDetails
+                      caskFill={bottle.caskFill}
+                      caskSize={bottle.caskSize}
+                      caskType={bottle.caskType}
+                    />
+                  </DefinitionList.Details>
+                </>
+              )}
               {!!bottle.vintageYear && (
                 <>
                   <DefinitionList.Term>Vintage Year</DefinitionList.Term>
@@ -160,6 +182,10 @@ export default function BottleOverview({
                   </DefinitionList.Details>
                 </>
               )}
+              <DefinitionList.Term>Bottlings</DefinitionList.Term>
+              <DefinitionList.Details>
+                {formatBottlingSummary(bottle.numReleases)}
+              </DefinitionList.Details>
               <>
                 <DefinitionList.Term>Added By</DefinitionList.Term>
                 <DefinitionList.Details>
@@ -205,6 +231,14 @@ export default function BottleOverview({
       </div>
     </>
   );
+}
+
+function formatBottlingSummary(numReleases: number) {
+  if (!numReleases) {
+    return <em>none tracked yet</em>;
+  }
+
+  return `${numReleases} bottling${numReleases === 1 ? "" : "s"} tracked`;
 }
 
 function YesNo({ value }: { value: boolean | null | undefined }) {

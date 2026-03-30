@@ -135,11 +135,15 @@ export type BottlePreviewResult = {
   brand: FreeformEntity;
   bottler?: FreeformEntity | null;
   distillers?: FreeformEntity[] | null;
+  edition?: string | null;
   statedAge?: number | null;
+  abv?: number | null;
   flavorProfile?: FlavorProfile | null;
   caskSize?: CaskSize | null;
   caskType?: CaskType | null;
   caskFill?: CaskFill | null;
+  caskStrength?: boolean | null;
+  singleCask?: boolean | null;
   vintageYear?: number | null;
   releaseYear?: number | null;
 };

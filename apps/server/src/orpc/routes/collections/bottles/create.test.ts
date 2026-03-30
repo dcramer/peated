@@ -110,6 +110,44 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
     expect(bottleList[0].releaseId).toBe(release.id);
   });
 
+  test("allows saving the base bottle and a specific release separately", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+
+    await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "default",
+        bottle: bottle.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "default",
+        bottle: bottle.id,
+        release: release.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    const bottleList = await db
+      .select()
+      .from(collectionBottles)
+      .where(eq(collectionBottles.bottleId, bottle.id));
+
+    expect(bottleList).toHaveLength(2);
+    expect(bottleList.some((item) => item.releaseId === null)).toBeTruthy();
+    expect(
+      bottleList.some((item) => item.releaseId === release.id),
+    ).toBeTruthy();
+  });
+
   test("fails with invalid release", async ({ fixtures, defaults }) => {
     const bottle = await fixtures.Bottle();
     const otherBottle = await fixtures.Bottle();

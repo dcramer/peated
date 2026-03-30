@@ -75,9 +75,9 @@ export default procedure
   .route({
     method: "PATCH",
     path: "/bottle-releases/{release}",
-    summary: "Update bottle release",
+    summary: "Update bottle bottling",
     description:
-      "Update bottle release information including edition, vintage, and cask details. Requires moderator privileges",
+      "Update bottling information including edition, vintage, and cask details. Requires moderator privileges",
     spec: (spec) => ({
       ...spec,
       operationId: "updateBottleRelease",

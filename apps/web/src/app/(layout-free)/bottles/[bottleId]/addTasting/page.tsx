@@ -27,7 +27,9 @@ export default function AddTasting({
   const orpc = useORPC();
 
   const params = useSearchParams();
+  const bottlingId = params.get("bottling");
   const releaseId = params.get("release");
+  const selectedBottlingId = bottlingId || releaseId;
 
   const { data: bottle } = useSuspenseQuery(
     orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
@@ -41,13 +43,13 @@ export default function AddTasting({
 
   // TODO: we want this to be suspense, but skipToken wont work
   const releaseQuery = useQuery(
-    releaseId
+    selectedBottlingId
       ? orpc.bottleReleases.details.queryOptions({
-          input: { release: Number(releaseId) },
+          input: { release: Number(selectedBottlingId) },
         })
       : { queryFn: skipToken, queryKey: ["release", ""] },
   );
-  const release = releaseId ? releaseQuery.data : null;
+  const release = selectedBottlingId ? releaseQuery.data : null;
 
   const flightId = params.get("flight") || null;
   // TODO: we want this to be suspense, but skipToken wont work
@@ -81,7 +83,8 @@ export default function AddTasting({
       onSubmit={async ({ image, ...data }) => {
         const { tasting, awards } = await tastingCreateMutation.mutateAsync({
           ...data,
-          release: release?.id || null,
+          release:
+            data.release === undefined ? (release?.id ?? null) : data.release,
           flight: flight?.id || null,
           createdAt,
         });

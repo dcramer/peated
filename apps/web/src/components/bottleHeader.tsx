@@ -32,9 +32,6 @@ export default function BottleHeader({
               {bottle.name}
             </div>
           )}
-          {!!bottle.edition && (
-            <span className="text-muted">{bottle.edition}</span>
-          )}
         </div>
       }
       titleExtra={

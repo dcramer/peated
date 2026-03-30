@@ -120,4 +120,27 @@ describe("BottleSerializer", () => {
       series: null,
     });
   });
+
+  it("serializes the number of tracked bottlings", async function ({
+    fixtures,
+  }) {
+    const bottle = await fixtures.Bottle();
+
+    await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Batch 24",
+    });
+    await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "S2B13",
+    });
+    await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Store Pick",
+    });
+
+    const [result] = await serialize(BottleSerializer, [bottle]);
+
+    expect(result.numReleases).toBe(3);
+  });
 });

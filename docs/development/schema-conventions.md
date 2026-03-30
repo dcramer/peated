@@ -27,6 +27,11 @@ Release identity:
 - `cask_type`
 - `cask_size`
 
+Single-known-release rule:
+
+- When only one marketed form is known, release-like traits may temporarily live on the parent bottle.
+- Once canonical child releases exist, those release-like traits should not also remain on the parent bottle unless they are truly part of bottle identity.
+
 Tasting exact details:
 
 - `edition`

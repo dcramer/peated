@@ -11,7 +11,7 @@ import { CollectionBottleSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CollectionBottleSerializer } from "@peated/server/serializers/collectionBottle";
 import type { SQL } from "drizzle-orm";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -27,6 +27,9 @@ export default procedure
     z.object({
       collection: z.union([z.literal("default"), z.coerce.number()]),
       user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
+      bottle: z.coerce.number().optional(),
+      release: z.coerce.number().optional(),
+      baseOnly: z.coerce.boolean().optional(),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
     }),
@@ -71,6 +74,14 @@ export default procedure
     const where: (SQL<unknown> | undefined)[] = [
       eq(collectionBottles.collectionId, collection.id),
     ];
+    if (input.bottle) {
+      where.push(eq(collectionBottles.bottleId, input.bottle));
+    }
+    if (input.baseOnly) {
+      where.push(isNull(collectionBottles.releaseId));
+    } else if (input.release) {
+      where.push(eq(collectionBottles.releaseId, input.release));
+    }
 
     const results = await db
       .select({ collectionBottles, bottle: bottles, release: bottleReleases })

@@ -7,6 +7,7 @@ import type { TastingSchema } from "@peated/server/schemas";
 import { TastingInputSchema } from "@peated/server/schemas";
 import type {
   Bottle,
+  BottleRelease,
   Paginated,
   ServingStyle,
   SuggestedTag,
@@ -22,12 +23,14 @@ import type { Option } from "@peated/web/components/selectField";
 import SelectField from "@peated/web/components/selectField";
 import SimpleRatingInput from "@peated/web/components/simpleRatingInput";
 import TextAreaField from "@peated/web/components/textAreaField";
-import { getFormErrorMessage, toOption } from "@peated/web/lib/formHelpers";
+import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
+import { formatBottlingName } from "../lib/bottlings";
+import Button from "./button";
 import ColorField from "./colorField";
 import Form from "./form";
 import NoResultsFoundEntry from "./selectField/noResultsFoundEntry";
@@ -50,6 +53,22 @@ const userToOption = (user: User): Option => {
     name: user.username,
   };
 };
+
+type ReleaseOption = BottleRelease & Option;
+
+function toReleaseOption(
+  release: Partial<z.infer<typeof TastingSchema>>["release"],
+): ReleaseOption | undefined {
+  if (!release) {
+    return undefined;
+  }
+
+  return {
+    ...release,
+    id: release.id,
+    name: formatBottlingName(release) || release.fullName,
+  };
+}
 
 export default function TastingForm({
   onSubmit,
@@ -94,8 +113,11 @@ export default function TastingForm({
   const [friendsValue, setFriendsValue] = useState<Option[]>(
     initialData.friends ? initialData.friends.map(userToOption) : [],
   );
-  const [releaseValue, setReleaseValue] = useState<Option | undefined>(
-    toOption(initialData.release),
+  const [showReleasePicker, setShowReleasePicker] = useState(
+    Boolean(initialData.release),
+  );
+  const [releaseValue, setReleaseValue] = useState<ReleaseOption | undefined>(
+    toReleaseOption(initialData.release),
   );
 
   const orpc = useORPC();
@@ -142,6 +164,72 @@ export default function TastingForm({
         isSubmitting={isSubmitting}
       >
         <Fieldset>
+          <Controller
+            name="release"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) =>
+              showReleasePicker ? (
+                <div className="space-y-3">
+                  <SelectField<ReleaseOption>
+                    {...field}
+                    error={errors.release}
+                    label="Specific Bottling"
+                    helpText="Optional. Use this only when you're tasting an exact batch, pick, single cask, or other known bottling."
+                    placeholder="e.g. Batch 24, store pick, single cask"
+                    onQuery={async (query) => {
+                      const { results } = await orpc.bottleReleases.list.call({
+                        bottle: initialData.bottle.id,
+                        query,
+                        limit: 25,
+                        sort: "name",
+                      });
+
+                      return results
+                        .map((release) => ({
+                          ...release,
+                          id: release.id,
+                          name: formatBottlingName(release) || release.fullName,
+                        }))
+                        .sort((a, b) => a.name.localeCompare(b.name));
+                    }}
+                    onChange={(value) => {
+                      onChange(value?.id ?? null);
+                      setReleaseValue(value);
+                    }}
+                    value={releaseValue}
+                  />
+                  <button
+                    className="text-muted text-sm underline"
+                    type="button"
+                    onClick={() => {
+                      onChange(null);
+                      setReleaseValue(undefined);
+                      setShowReleasePicker(false);
+                    }}
+                  >
+                    Use Bottle Instead
+                  </button>
+                </div>
+              ) : (
+                <div className="rounded border border-slate-800 bg-slate-950/40 p-4">
+                  <div className="text-sm font-medium">Specific Bottling</div>
+                  <div className="text-muted mt-1 text-sm">
+                    Default to the main bottle unless you care about an exact
+                    batch, pick, or single cask.
+                  </div>
+                  <div className="mt-3">
+                    <Button
+                      size="small"
+                      onClick={() => setShowReleasePicker(true)}
+                    >
+                      Choose Specific Bottling
+                    </Button>
+                  </div>
+                </div>
+              )
+            }
+          />
+
           <Controller
             name="rating"
             control={control}

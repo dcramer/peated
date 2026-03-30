@@ -75,7 +75,6 @@ export default function NewBottles() {
                         {formatCategoryName(bottle.category)}
                       </Link>
                     )}
-                    {!!bottle.edition && <span>({bottle.edition})</span>}
                   </div>
                 </td>
               </tr>

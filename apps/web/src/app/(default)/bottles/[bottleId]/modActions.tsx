@@ -53,7 +53,7 @@ export default function ModActions({ bottle }: { bottle: Bottle }) {
               : "",
           }).toString()}`}
         >
-          Add Similar Release
+          Add Similar Bottling
         </MenuItem>
         <MenuItem as={Link} href={`/bottles/${bottle.id}/edit`}>
           Edit Bottle

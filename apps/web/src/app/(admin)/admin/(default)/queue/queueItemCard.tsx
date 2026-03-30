@@ -3,6 +3,7 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
+import { getNewBottleBottlingPath } from "@peated/web/lib/bottlings";
 import classNames from "@peated/web/lib/classNames";
 
 export type QueueItem =
@@ -245,13 +246,13 @@ export default function QueueItemCard({
     !isProcessing;
   const createHref =
     item.creationTarget === "release" && item.parentBottle
-      ? `/bottles/${item.parentBottle.id}/addRelease?proposal=${item.id}&returnTo=${encodeURIComponent(returnTo)}`
+      ? `${getNewBottleBottlingPath(item.parentBottle.id)}?proposal=${item.id}&returnTo=${encodeURIComponent(returnTo)}`
       : `/addBottle?proposal=${item.id}&returnTo=${encodeURIComponent(returnTo)}`;
   const createLabel =
     item.creationTarget === "release"
-      ? "Create Release"
+      ? "Create Bottling"
       : item.creationTarget === "bottle_and_release"
-        ? "Create Bottle + Release"
+        ? "Create Bottle + Bottling"
         : "Create Bottle";
   const queuedAt = formatTimestamp(item.createdAt);
   const processingQueuedAt = formatTimestamp(item.processingQueuedAt);
@@ -330,7 +331,7 @@ export default function QueueItemCard({
               </Link>
               {item.currentRelease ? (
                 <div className="mt-1 text-slate-300">
-                  Release: {item.currentRelease.fullName}
+                  Bottling: {item.currentRelease.fullName}
                 </div>
               ) : null}
             </div>

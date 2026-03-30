@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { flightBottles } from "@peated/server/db/schema";
+import { bottleAliases, flightBottles } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
@@ -23,6 +23,31 @@ describe("GET /bottles", () => {
 
     expect(results.length).toBe(1);
     expect(results[0].id).toBe(bottle1.id);
+  });
+
+  test("lists parent bottles for exact release aliases", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "Private Selection" });
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "S2B13",
+      name: "Private Selection - S2B13",
+      fullName: `${bottle.fullName} - S2B13`,
+    });
+
+    await db.insert(bottleAliases).values({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      name: release.fullName,
+    });
+
+    const { results } = await routerClient.bottles.list({
+      query: release.fullName,
+    });
+
+    expect(results.length).toBe(1);
+    expect(results[0].id).toBe(bottle.id);
   });
 
   test("lists bottles with 'The' prefix", async ({ fixtures }) => {
