@@ -1,7 +1,8 @@
 PG_CONTAINER=docker exec -t peated-postgres-1
 
 setup:
-	pnpm run setup
+	pnpm install
+	pnpx @sentry/dotagents install
 
 reset-db:
 	$(MAKE) drop-db
