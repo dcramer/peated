@@ -6,6 +6,7 @@ import {
   changes,
   collectionBottles,
   flightBottles,
+  reviews,
   tastings,
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -75,6 +76,12 @@ export default procedure
           .update(tastings)
           .set({ releaseId: null })
           .where(eq(tastings.releaseId, release.id)),
+
+        // Update reviews to remove release reference
+        tx
+          .update(reviews)
+          .set({ releaseId: null })
+          .where(eq(reviews.releaseId, release.id)),
       ]);
       // Delete the release
       const affected = await tx
