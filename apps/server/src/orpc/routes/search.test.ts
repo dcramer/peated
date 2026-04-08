@@ -83,6 +83,19 @@ describe("GET /search", () => {
     expect(results.length).toBe(2);
   });
 
+  test("defaults the limit when omitted", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle({ name: "Unique Whiskey" });
+
+    const { results } = await routerClient.search({
+      query: "unique",
+    });
+
+    expect(results.length).toBeGreaterThanOrEqual(1);
+    expect(
+      results.some((r) => r.type === "bottle" && r.ref.id === bottle.id),
+    ).toBeTruthy();
+  });
+
   test("sorts exact matches first", async ({ fixtures }) => {
     await fixtures.Bottle({ name: "Lagavulin 16" });
     const exactMatch = await fixtures.Bottle({ name: "Lagavulin" });
