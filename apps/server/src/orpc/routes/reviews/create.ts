@@ -43,21 +43,29 @@ export default procedure
       });
     }
 
-    const { name } = normalizeBottle({ name: input.name });
+    const rawName = input.name;
+    const { name: normalizedName } = normalizeBottle({ name: rawName });
 
+    const rawMatchedTarget = await findBottleTarget(rawName);
     const matchedTarget =
-      (await findBottleTarget(input.name)) ??
-      (input.name === name ? null : await findBottleTarget(name));
+      rawMatchedTarget ??
+      (rawName === normalizedName
+        ? null
+        : await findBottleTarget(normalizedName));
     let bottleId = matchedTarget?.bottleId ?? null;
     let releaseId = matchedTarget?.releaseId ?? null;
+    const reviewName =
+      rawMatchedTarget?.releaseId != null && rawName !== normalizedName
+        ? rawName
+        : normalizedName;
 
     if (!bottleId) {
-      const entity = await findEntity(name);
+      const entity = await findEntity(normalizedName);
       if (entity) {
         const result = await call(
           bottleCreate,
           BottleInputSchema.parse({
-            name,
+            name: normalizedName,
             edition: null,
             brand: entity.id,
             category: input.category,
@@ -71,7 +79,7 @@ export default procedure
     const review = await db.transaction(async (tx) => {
       const { rows } = await tx.execute(
         sql`INSERT INTO ${reviews} (bottle_id, release_id, external_site_id, name, issue, rating, url)
-            VALUES (${bottleId}, ${releaseId}, ${site.id}, ${name}, ${input.issue}, ${input.rating}, ${input.url})
+            VALUES (${bottleId}, ${releaseId}, ${site.id}, ${reviewName}, ${input.issue}, ${input.rating}, ${input.url})
             ON CONFLICT (external_site_id, LOWER(name), issue)
             DO UPDATE
             SET bottle_id = COALESCE(excluded.bottle_id, ${reviews.bottleId}),
@@ -85,12 +93,12 @@ export default procedure
       const [review] = mapRows(rows, reviews);
 
       if (bottleId) {
-        await upsertBottleAlias(tx, name, bottleId, releaseId);
+        await upsertBottleAlias(tx, reviewName, bottleId, releaseId);
       } else {
         await tx
           .insert(bottleAliases)
           .values({
-            name,
+            name: reviewName,
           })
           .onConflictDoNothing();
       }

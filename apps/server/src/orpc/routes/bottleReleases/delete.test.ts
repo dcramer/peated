@@ -6,6 +6,7 @@ import {
   changes,
   collectionBottles,
   flightBottles,
+  reviews,
   tastings,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
@@ -51,6 +52,12 @@ describe("DELETE /bottle-releases/:release", () => {
       releaseId: release.id,
     });
 
+    await fixtures.Review({
+      bottleId: release.bottleId,
+      releaseId: release.id,
+      name: release.fullName,
+    });
+
     // Delete the release
     await routerClient.bottleReleases.delete(
       { release: release.id },
@@ -90,6 +97,12 @@ describe("DELETE /bottle-releases/:release", () => {
       .from(tastings)
       .where(eq(tastings.bottleId, release.bottleId));
     expect(tasting.releaseId).toBeNull();
+
+    const [review] = await db
+      .select()
+      .from(reviews)
+      .where(eq(reviews.bottleId, release.bottleId));
+    expect(review.releaseId).toBeNull();
 
     // Verify change record is created
     const [change] = await db

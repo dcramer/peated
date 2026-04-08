@@ -1,6 +1,8 @@
 import { db } from "@peated/server/db";
+import { bottleAliases } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { and, eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("POST /reviews", () => {
@@ -160,6 +162,56 @@ describe("POST /reviews", () => {
     expect(review?.releaseId).toEqual(release.id);
     expect(data.bottle?.id).toEqual(bottle.id);
     expect(data.release?.id).toEqual(release.id);
+  });
+
+  test("preserves raw release alias text when normalization would strip release identity", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle({
+      name: "Calvados Cask Finished",
+      vintageYear: null,
+      releaseYear: null,
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      fullName: `${bottle.fullName} (2024 Release)`,
+      name: `${bottle.name} (2024 Release)`,
+      releaseYear: 2024,
+    });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      name: release.fullName,
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: release.fullName,
+        issue: "Default",
+        rating: 91,
+        url: "https://example.com/2024-release",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: (table, { eq }) => eq(table.id, data.id),
+    });
+    expect(review).toBeDefined();
+    expect(review?.releaseId).toEqual(release.id);
+    expect(review?.name).toEqual(release.fullName);
+
+    const normalizedReleaseAlias = await db.query.bottleAliases.findFirst({
+      where: and(
+        eq(bottleAliases.name, bottle.fullName),
+        eq(bottleAliases.releaseId, release.id),
+      ),
+    });
+    expect(normalizedReleaseAlias).toBeUndefined();
   });
 
   test("returns error for non-existent site", async ({ fixtures }) => {
