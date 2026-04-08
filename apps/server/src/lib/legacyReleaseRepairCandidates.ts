@@ -10,15 +10,20 @@ import {
 const LEGACY_RELEASE_MARKER_PATTERN = "batch|[0-9]{4}\\s+release";
 const MAX_SCAN_LIMIT = 2000;
 
-type LegacyReleaseRepairBottle = Pick<
-  Bottle,
-  | "id"
-  | "fullName"
-  | "edition"
-  | "releaseYear"
-  | "numReleases"
-  | "totalTastings"
->;
+type LegacyReleaseRepairBottle = Omit<
+  Pick<
+    Bottle,
+    | "id"
+    | "fullName"
+    | "edition"
+    | "releaseYear"
+    | "numReleases"
+    | "totalTastings"
+  >,
+  "totalTastings"
+> & {
+  totalTastings: null | number;
+};
 
 type DerivedLegacyReleaseRepairCandidate = {
   bottle: LegacyReleaseRepairBottle;
@@ -49,6 +54,10 @@ export type LegacyReleaseRepairCandidate = {
 
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function getTastingCount(value: null | number | undefined): number {
+  return value ?? 0;
 }
 
 function extractBatchEdition(fullName: string): string | null {
@@ -141,10 +150,6 @@ export async function getLegacyReleaseRepairCandidates({
   cursor?: number;
   limit?: number;
 }) {
-  const scanLimit = Math.min(
-    MAX_SCAN_LIMIT,
-    Math.max(limit * cursor * 10, 250),
-  );
   const suspiciousBottles = await db
     .select({
       id: bottles.id,
@@ -167,7 +172,7 @@ export async function getLegacyReleaseRepairCandidates({
       ),
     )
     .orderBy(desc(bottles.totalTastings), desc(bottles.id))
-    .limit(scanLimit);
+    .limit(MAX_SCAN_LIMIT);
 
   const derivedCandidates = suspiciousBottles
     .map((bottle) => deriveLegacyReleaseRepairCandidate(bottle))
@@ -217,12 +222,16 @@ export async function getLegacyReleaseRepairCandidates({
 
   const parentByName = new Map<
     string,
-    { id: number; fullName: string; totalTastings: number }
+    { id: number; fullName: string; totalTastings: null | number }
   >();
   for (const row of parentRows) {
     const key = row.fullName.toLowerCase();
     const existing = parentByName.get(key);
-    if (!existing || row.totalTastings > existing.totalTastings) {
+    if (
+      !existing ||
+      getTastingCount(row.totalTastings) >
+        getTastingCount(existing.totalTastings)
+    ) {
       parentByName.set(key, row);
     }
   }
@@ -272,8 +281,11 @@ export async function getLegacyReleaseRepairCandidates({
         return b.siblingLegacyBottles.length - a.siblingLegacyBottles.length;
       }
 
-      if (a.legacyBottle.totalTastings !== b.legacyBottle.totalTastings) {
-        return b.legacyBottle.totalTastings - a.legacyBottle.totalTastings;
+      const aTastingCount = getTastingCount(a.legacyBottle.totalTastings);
+      const bTastingCount = getTastingCount(b.legacyBottle.totalTastings);
+
+      if (aTastingCount !== bTastingCount) {
+        return bTastingCount - aTastingCount;
       }
 
       return b.legacyBottle.id - a.legacyBottle.id;

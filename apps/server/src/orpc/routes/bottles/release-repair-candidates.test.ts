@@ -109,4 +109,74 @@ describe("GET /bottles/release-repair-candidates", () => {
       siblingLegacyBottles: [{ id: batch2.id, fullName: batch2.fullName }],
     });
   });
+
+  test("keeps pagination stable when valid candidates extend past the initial scan window", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Pagination Probe Distillery",
+    });
+    const user = await fixtures.User({ mod: true });
+
+    for (let index = 0; index < 240; index += 1) {
+      await fixtures.Bottle({
+        brandId: brand.id,
+        name: `Pagination Probe Single Barrel ${index} (Batch 1)`,
+        totalTastings: 1000 - index,
+      });
+    }
+
+    await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Pagination Probe Archive Series",
+      totalTastings: 50,
+    });
+
+    const validCandidateIds: number[] = [];
+    for (let index = 0; index < 20; index += 1) {
+      const bottle = await fixtures.Bottle({
+        brandId: brand.id,
+        name: `Pagination Probe Archive Series (Batch ${index + 1})`,
+        totalTastings: 40 - index,
+      });
+      validCandidateIds.push(bottle.id);
+    }
+
+    const firstPage = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "Pagination Probe",
+        cursor: 1,
+        limit: 15,
+      },
+      { context: { user } },
+    );
+
+    expect(firstPage.results).toHaveLength(15);
+    expect(firstPage.rel).toMatchObject({
+      nextCursor: 2,
+      prevCursor: null,
+    });
+
+    const secondPage = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "Pagination Probe",
+        cursor: 2,
+        limit: 15,
+      },
+      { context: { user } },
+    );
+
+    expect(secondPage.results).toHaveLength(5);
+    expect(secondPage.rel).toMatchObject({
+      nextCursor: null,
+      prevCursor: 1,
+    });
+
+    const returnedIds = new Set([
+      ...firstPage.results.map((candidate) => candidate.legacyBottle.id),
+      ...secondPage.results.map((candidate) => candidate.legacyBottle.id),
+    ]);
+
+    expect(returnedIds).toEqual(new Set(validCandidateIds));
+  });
 });

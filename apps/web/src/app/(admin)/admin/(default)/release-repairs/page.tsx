@@ -21,6 +21,10 @@ const MARKER_LABELS: Record<string, string> = {
   name_release_year: "Name release year",
 };
 
+function formatTastingCount(value: null | number): string {
+  return (value ?? 0).toLocaleString();
+}
+
 function buildReleaseRepairHref(
   pathname: string,
   searchParams: URLSearchParams,
@@ -136,7 +140,7 @@ export default function Page() {
                     {candidate.legacyBottle.fullName}
                   </Link>
                   <div className="mt-1 text-sm text-slate-400">
-                    {candidate.legacyBottle.totalTastings.toLocaleString()}{" "}
+                    {formatTastingCount(candidate.legacyBottle.totalTastings)}{" "}
                     tastings on legacy bottle
                   </div>
                 </div>
@@ -172,7 +176,7 @@ export default function Page() {
                   )}
                   <div className="mt-2 text-sm text-slate-400">
                     {candidate.hasExactParent
-                      ? `${candidate.proposedParent.totalTastings?.toLocaleString() ?? 0} tastings on the existing parent bottle.`
+                      ? `${formatTastingCount(candidate.proposedParent.totalTastings)} tastings on the existing parent bottle.`
                       : "No exact parent bottle exists yet."}
                   </div>
                 </div>

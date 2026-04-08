@@ -10,7 +10,7 @@ const LegacyReleaseRepairCandidateSchema = z.object({
     edition: z.string().nullable(),
     releaseYear: z.number().nullable(),
     numReleases: z.number(),
-    totalTastings: z.number(),
+    totalTastings: z.number().nullable(),
   }),
   proposedParent: z.object({
     id: z.number().nullable(),
