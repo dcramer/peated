@@ -53,6 +53,12 @@ export default function AdminSidebar() {
                     Locations
                   </SidebarLink>
                   <SidebarLink
+                    href="/admin/release-repairs"
+                    active={pathname.startsWith("/admin/release-repairs")}
+                  >
+                    Release Repairs
+                  </SidebarLink>
+                  <SidebarLink
                     href="/admin/sites"
                     active={pathname.startsWith("/admin/sites")}
                   >
