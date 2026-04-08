@@ -130,6 +130,84 @@ const elijahCraigBarrelProofCandidate: BottleCandidate = {
   source: ["exact"],
 };
 
+const cadbollEstateParentCandidate: BottleCandidate = {
+  bottleId: 13442,
+  releaseId: null,
+  kind: "bottle",
+  alias: null,
+  fullName: "Glenmorangie 15-year-old The Cadboll Estate",
+  bottleFullName: "Glenmorangie 15-year-old The Cadboll Estate",
+  brand: "Glenmorangie",
+  bottler: null,
+  series: null,
+  distillery: ["Glenmorangie"],
+  category: "single_malt",
+  statedAge: 15,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.92,
+  source: ["text"],
+};
+
+const cadbollEstateLegacyBatch4Candidate: BottleCandidate = {
+  bottleId: 43034,
+  releaseId: null,
+  kind: "bottle",
+  alias: "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
+  fullName: "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
+  bottleFullName: "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
+  brand: "Glenmorangie",
+  bottler: null,
+  series: null,
+  distillery: ["Glenmorangie"],
+  category: "single_malt",
+  statedAge: 15,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 1,
+  source: ["exact"],
+};
+
+const cadbollEstateLegacyBatch2Candidate: BottleCandidate = {
+  bottleId: 12900,
+  releaseId: null,
+  kind: "bottle",
+  alias: null,
+  fullName: "Glenmorangie The Cadboll Estate 15-year-old (Batch 2)",
+  bottleFullName: "Glenmorangie The Cadboll Estate 15-year-old (Batch 2)",
+  brand: "Glenmorangie",
+  bottler: null,
+  series: null,
+  distillery: ["Glenmorangie"],
+  category: "single_malt",
+  statedAge: 15,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.87,
+  source: ["text"],
+};
+
 describe("createBottleClassifier", () => {
   test("auto ignores obvious non-whisky references when extraction fails", async () => {
     const runBottleClassifierAgent = vi.fn();
@@ -454,6 +532,156 @@ describe("createBottleClassifier", () => {
       proposedRelease: {
         edition: "Batch C923",
       },
+    });
+  });
+
+  test("redirects an exact legacy batch bottle match to a reusable parent bottle", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Glenmorangie",
+      bottler: null,
+      expression: "The Cadboll Estate",
+      series: null,
+      distillery: ["Glenmorangie"],
+      category: "single_malt",
+      stated_age: 15,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: "Batch 4",
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 96,
+          rationale:
+            "The title exactly matches the existing local candidate alias.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 43034,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [43034, 13442, 12900],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [
+            cadbollEstateLegacyBatch4Candidate,
+            cadbollEstateParentCandidate,
+            cadbollEstateLegacyBatch2Candidate,
+          ],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
+      },
+      extractedIdentity,
+      initialCandidates: [
+        cadbollEstateLegacyBatch4Candidate,
+        cadbollEstateParentCandidate,
+        cadbollEstateLegacyBatch2Candidate,
+      ],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "create_release",
+      parentBottleId: 13442,
+      identityScope: "product",
+      proposedRelease: {
+        edition: "Batch 4",
+      },
+    });
+    expect(result.decision.rationale).toContain(
+      "legacy release-like bottle candidate",
+    );
+  });
+
+  test("does not create a child release under a legacy batch bottle when no reusable parent exists", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Glenmorangie",
+      bottler: null,
+      expression: "The Cadboll Estate",
+      series: null,
+      distillery: ["Glenmorangie"],
+      category: "single_malt",
+      stated_age: 15,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: "Batch 4",
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 96,
+          rationale:
+            "The title exactly matches the existing local candidate alias.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 43034,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [43034],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [cadbollEstateLegacyBatch4Candidate],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
+      },
+      extractedIdentity,
+      initialCandidates: [cadbollEstateLegacyBatch4Candidate],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "match",
+      matchedBottleId: 43034,
+      matchedReleaseId: null,
     });
   });
 

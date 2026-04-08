@@ -79,6 +79,12 @@ const EXACT_CASK_NUMBER_PATTERNS = [
 ] as const;
 const EXACT_CASK_ALPHA_NUMERIC_CODE_PATTERN = /\b[a-z]{1,4}\d+\.\d+\b/i;
 const EXACT_CASK_NUMERIC_CODE_PATTERN = /\b\d+\.\d+\b/g;
+const LEGACY_RELEASE_LIKE_NAME_PATTERNS = [
+  /\bbatch(?:\s*(?:no\.?|number|#))?\s*[a-z0-9.-]+\b/i,
+  /\b\d{4}\s+release\b/i,
+  /\b\d{4}\s+vintage\b/i,
+  /\b\d+(?:st|nd|rd|th)\s+edition\b/i,
+] as const;
 
 function normalizeClassifierConfidence(confidence: number): number {
   const percentageConfidence = confidence <= 1 ? confidence * 100 : confidence;
@@ -188,6 +194,146 @@ function isBasicallyExactNameMatch(
   return tokenSetsMatchExactly(
     getComparableNameTokens(referenceName),
     getComparableNameTokens(candidateName),
+  );
+}
+
+function stripComparablePhrase(
+  haystack: string,
+  needle: string | null | undefined,
+): string {
+  const comparableNeedle = normalizeComparableText(needle);
+  if (!haystack || !comparableNeedle) {
+    return haystack;
+  }
+
+  return haystack.replace(
+    new RegExp(
+      `(^|[^a-z0-9])${escapeRegExp(comparableNeedle)}($|[^a-z0-9])`,
+      "g",
+    ),
+    "$1 $2",
+  );
+}
+
+function stripExtractedReleaseIdentityFromReferenceName(
+  referenceName: string,
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"],
+): string {
+  let comparableName = normalizeComparableText(referenceName);
+
+  comparableName = stripComparablePhrase(
+    comparableName,
+    extractedIdentity?.edition ?? null,
+  );
+
+  if (extractedIdentity?.release_year) {
+    comparableName = stripComparablePhrase(
+      comparableName,
+      `${extractedIdentity.release_year} release`,
+    );
+  }
+
+  if (extractedIdentity?.vintage_year) {
+    comparableName = stripComparablePhrase(
+      comparableName,
+      `${extractedIdentity.vintage_year} vintage`,
+    );
+  }
+
+  return comparableName.replace(/\s+/g, " ").trim();
+}
+
+function buildReferenceNameTokenVariants({
+  referenceName,
+  extractedIdentity,
+}: {
+  referenceName: string;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+}): string[][] {
+  const variants: string[][] = [];
+  const referenceTokens = getComparableNameTokens(referenceName);
+  if (referenceTokens.length) {
+    variants.push(referenceTokens);
+  }
+
+  const strippedReferenceName = stripExtractedReleaseIdentityFromReferenceName(
+    referenceName,
+    extractedIdentity,
+  );
+  const strippedReferenceTokens = getComparableNameTokens(
+    strippedReferenceName,
+  );
+  if (
+    strippedReferenceTokens.length &&
+    !variants.some((tokens) =>
+      tokenSetsMatchExactly(tokens, strippedReferenceTokens),
+    )
+  ) {
+    variants.push(strippedReferenceTokens);
+  }
+
+  return variants;
+}
+
+function candidateNameMatchesReferenceVariants({
+  referenceName,
+  extractedIdentity,
+  candidateNames,
+}: {
+  referenceName: string;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+  candidateNames: string[];
+}): boolean {
+  const referenceTokenVariants = buildReferenceNameTokenVariants({
+    referenceName,
+    extractedIdentity,
+  });
+  if (!referenceTokenVariants.length) {
+    return false;
+  }
+
+  return candidateNames.some((candidateName) => {
+    const candidateTokens = getComparableNameTokens(candidateName);
+    if (!candidateTokens.length) {
+      return false;
+    }
+
+    return referenceTokenVariants.some((referenceTokens) =>
+      tokenSetsMatchExactly(referenceTokens, candidateTokens),
+    );
+  });
+}
+
+function textHasLegacyReleaseLikeNameSignals(
+  value: string | null | undefined,
+): boolean {
+  if (!value) {
+    return false;
+  }
+
+  return LEGACY_RELEASE_LIKE_NAME_PATTERNS.some((pattern) =>
+    pattern.test(value),
+  );
+}
+
+function candidateLooksLikeLegacyReleaseBottle(
+  candidate: BottleCandidate | null | undefined,
+): boolean {
+  if (
+    !candidate ||
+    candidate.kind === "release" ||
+    candidate.releaseId !== null
+  ) {
+    return false;
+  }
+
+  return Boolean(
+    candidate.edition ||
+    candidate.releaseYear ||
+    candidate.vintageYear ||
+    textHasLegacyReleaseLikeNameSignals(candidate.alias) ||
+    textHasLegacyReleaseLikeNameSignals(candidate.fullName) ||
+    textHasLegacyReleaseLikeNameSignals(candidate.bottleFullName),
   );
 }
 
@@ -435,6 +581,62 @@ function getTargetNameCandidates(
   return Array.from(new Set(names.filter(Boolean))) as string[];
 }
 
+function getBottleTargetNameCandidates(target: BottleCandidate): string[] {
+  return Array.from(
+    new Set(
+      [target.alias, target.bottleFullName ?? target.fullName, target.fullName]
+        .filter(Boolean)
+        .map((value) => value!.trim())
+        .filter((value) => value.length > 0),
+    ),
+  );
+}
+
+function resolvePromotableParentBottleTarget({
+  reference,
+  target,
+  artifacts,
+}: {
+  reference: BottleReference;
+  target: BottleCandidate | null;
+  artifacts: BottleClassificationArtifacts;
+}): BottleCandidate | null {
+  if (!target || target.kind === "release" || target.releaseId !== null) {
+    return null;
+  }
+
+  if (!candidateLooksLikeLegacyReleaseBottle(target)) {
+    return target;
+  }
+
+  const reusableParentCandidates = artifacts.candidates
+    .filter(
+      (candidate) =>
+        candidate.bottleId !== target.bottleId &&
+        candidate.releaseId === null &&
+        candidate.kind !== "release" &&
+        !candidateLooksLikeLegacyReleaseBottle(candidate),
+    )
+    .filter(
+      (candidate) =>
+        getExistingMatchIdentityConflicts({
+          referenceName: reference.name,
+          targetCandidate: candidate,
+          extractedLabel: artifacts.extractedIdentity,
+        }).length === 0,
+    )
+    .filter((candidate) =>
+      candidateNameMatchesReferenceVariants({
+        referenceName: reference.name,
+        extractedIdentity: artifacts.extractedIdentity,
+        candidateNames: getBottleTargetNameCandidates(candidate),
+      }),
+    )
+    .sort((left, right) => (right.score ?? 0) - (left.score ?? 0));
+
+  return reusableParentCandidates[0] ?? null;
+}
+
 function hasSupportiveWebEvidenceForTarget({
   target,
   decision,
@@ -615,14 +817,19 @@ function maybePromoteBottleMatchToCreateRelease({
   candidateBottleIds: number[];
   observation: BottleObservation | null;
 }): BottleMatchDecision | null {
+  const parentTarget = resolvePromotableParentBottleTarget({
+    reference,
+    target,
+    artifacts,
+  });
+
   if (
-    !target ||
-    target.kind === "release" ||
-    target.releaseId !== null ||
+    !parentTarget ||
     decision.identityScope === "exact_cask" ||
     artifacts.candidates.some(
       (candidate) =>
-        candidate.bottleId === target.bottleId && candidate.releaseId !== null,
+        candidate.bottleId === parentTarget.bottleId &&
+        candidate.releaseId !== null,
     )
   ) {
     return null;
@@ -630,7 +837,7 @@ function maybePromoteBottleMatchToCreateRelease({
 
   const proposedRelease = buildReleaseDraftFromExtractedIdentity({
     extractedIdentity: artifacts.extractedIdentity,
-    target,
+    target: parentTarget,
   });
 
   if (!proposedRelease) {
@@ -639,24 +846,28 @@ function maybePromoteBottleMatchToCreateRelease({
 
   const identityConflicts = getExistingMatchIdentityConflicts({
     referenceName: reference.name,
-    targetCandidate: target,
+    targetCandidate: parentTarget,
     extractedLabel: artifacts.extractedIdentity,
   });
-  const hasExactishLocalName = getTargetNameCandidates(target, {
-    action: "match",
-    confidence: decision.confidence,
-    rationale: decision.rationale,
-    candidateBottleIds,
-    identityScope: decision.identityScope ?? "product",
-    observation,
-    matchedBottleId: target.bottleId,
-    matchedReleaseId: null,
-    parentBottleId: null,
-    proposedBottle: null,
-    proposedRelease: null,
-  }).some((name) => isBasicallyExactNameMatch(reference.name, name));
+  const hasExactishLocalName = candidateNameMatchesReferenceVariants({
+    referenceName: reference.name,
+    extractedIdentity: artifacts.extractedIdentity,
+    candidateNames: getTargetNameCandidates(parentTarget, {
+      action: "match",
+      confidence: decision.confidence,
+      rationale: decision.rationale,
+      candidateBottleIds,
+      identityScope: decision.identityScope ?? "product",
+      observation,
+      matchedBottleId: parentTarget.bottleId,
+      matchedReleaseId: null,
+      parentBottleId: null,
+      proposedBottle: null,
+      proposedRelease: null,
+    }),
+  });
   const hasSupportiveWebEvidence = hasSupportiveWebEvidenceForTarget({
-    target,
+    target: parentTarget,
     decision: {
       action: "match",
       confidence: decision.confidence,
@@ -664,7 +875,7 @@ function maybePromoteBottleMatchToCreateRelease({
       candidateBottleIds,
       identityScope: decision.identityScope ?? "product",
       observation,
-      matchedBottleId: target.bottleId,
+      matchedBottleId: parentTarget.bottleId,
       matchedReleaseId: null,
       parentBottleId: null,
       proposedBottle: null,
@@ -675,26 +886,34 @@ function maybePromoteBottleMatchToCreateRelease({
   });
 
   if (
-    !target.source.includes("exact") &&
+    !parentTarget.source.includes("exact") &&
     (identityConflicts.length > 0 ||
       (!hasExactishLocalName && !hasSupportiveWebEvidence))
   ) {
     return null;
   }
 
+  const promotionRationale = appendRationale(
+    decision.rationale,
+    "Server promoted the bottle match to release creation because the extracted identity carries release-level detail beyond the matched parent bottle.",
+  );
+
   return {
     action: "create_release",
     confidence: decision.confidence,
-    rationale: appendRationale(
-      decision.rationale,
-      "Server promoted the bottle match to release creation because the extracted identity carries release-level detail beyond the matched parent bottle.",
-    ),
+    rationale:
+      target && parentTarget.bottleId !== target.bottleId
+        ? appendRationale(
+            promotionRationale,
+            "Server redirected release creation away from a legacy release-like bottle candidate to a reusable parent bottle.",
+          )
+        : promotionRationale,
     candidateBottleIds,
     identityScope: "product",
     observation,
     matchedBottleId: null,
     matchedReleaseId: null,
-    parentBottleId: target.bottleId,
+    parentBottleId: parentTarget.bottleId,
     proposedBottle: null,
     proposedRelease,
   };
