@@ -765,17 +765,30 @@ export const Review = async (
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Review> => {
   const [result] = await db.transaction(async (tx) => {
+    const release = data.releaseId
+      ? await tx.query.bottleReleases.findFirst({
+          where: eq(dbSchema.bottleReleases.id, data.releaseId),
+        })
+      : null;
+
     if (!data.name) {
-      const bottle = data.bottleId
-        ? await tx.query.bottles.findFirst({
-            where: eq(bottles.id, data.bottleId),
-            with: { brand: true },
-          })
-        : await Bottle({}, tx);
-      if (!bottle) throw new Error("Unexpected");
-      // this lets us pass in something that should match, but hasnt
-      if (data.bottleId === undefined) data.bottleId = bottle.id;
-      data.name = bottle.fullName;
+      if (release) {
+        if (data.bottleId === undefined) data.bottleId = release.bottleId;
+        data.name = release.fullName;
+      } else {
+        const bottle = data.bottleId
+          ? await tx.query.bottles.findFirst({
+              where: eq(bottles.id, data.bottleId),
+              with: { brand: true },
+            })
+          : await Bottle({}, tx);
+        if (!bottle) throw new Error("Unexpected");
+        // this lets us pass in something that should match, but hasnt
+        if (data.bottleId === undefined) data.bottleId = bottle.id;
+        data.name = bottle.fullName;
+      }
+    } else if (release && data.bottleId === undefined) {
+      data.bottleId = release.bottleId;
     }
 
     return await tx

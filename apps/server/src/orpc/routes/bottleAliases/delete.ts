@@ -47,19 +47,21 @@ export default procedure
           .update(storePrices)
           .set({
             bottleId: null,
+            releaseId: null,
           })
           .where(eq(sql`LOWER(${storePrices.name})`, alias.name.toLowerCase())),
         tx
           .update(reviews)
           .set({
             bottleId: null,
+            releaseId: null,
           })
           .where(eq(sql`LOWER(${reviews.name})`, alias.name.toLowerCase())),
 
         // we dont actually delete aliases, just unassociate them
         tx
           .update(bottleAliases)
-          .set({ bottleId: null })
+          .set({ bottleId: null, releaseId: null })
           .where(
             eq(sql`LOWER(${bottleAliases.name})`, alias.name.toLowerCase()),
           ),

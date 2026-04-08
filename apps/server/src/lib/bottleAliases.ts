@@ -140,6 +140,7 @@ export async function assignBottleAliasInTransaction(
     .update(reviews)
     .set({
       bottleId,
+      releaseId,
     })
     .where(eq(sql`LOWER(${reviews.name})`, name.toLowerCase()));
 
