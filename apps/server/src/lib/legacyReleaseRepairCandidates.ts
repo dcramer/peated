@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottles, type Bottle } from "@peated/server/db/schema";
-import { and, desc, eq, ilike, isNotNull, or, sql } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull, or, sql } from "drizzle-orm";
 import {
   normalizeBottle,
   normalizeBottleAge,
@@ -55,6 +55,13 @@ export type LegacyReleaseRepairCandidate = {
 
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function escapeLikePattern(value: string) {
+  return value
+    .replaceAll("\\", "\\\\")
+    .replaceAll("%", "\\%")
+    .replaceAll("_", "\\_");
 }
 
 function getTastingCount(value: null | number | undefined): number {
@@ -166,19 +173,21 @@ export async function getLegacyReleaseRepairCandidates({
       fullName: bottles.fullName,
       edition: bottles.edition,
       releaseYear: bottles.releaseYear,
-      numReleases: bottles.numReleases,
+      numReleases: sql<number>`COALESCE(${bottles.numReleases}, 0)::integer`,
       totalTastings: bottles.totalTastings,
     })
     .from(bottles)
     .where(
       and(
-        eq(bottles.numReleases, 0),
+        or(eq(bottles.numReleases, 0), isNull(bottles.numReleases)),
         or(
           isNotNull(bottles.edition),
           isNotNull(bottles.releaseYear),
           sql`LOWER(${bottles.fullName}) ~ ${LEGACY_RELEASE_MARKER_PATTERN}`,
         ),
-        query ? ilike(bottles.fullName, `%${query}%`) : undefined,
+        query
+          ? sql`${bottles.fullName} ILIKE ${`%${escapeLikePattern(query)}%`} ESCAPE '\\'`
+          : undefined,
       ),
     )
     .orderBy(desc(bottles.totalTastings), desc(bottles.id))

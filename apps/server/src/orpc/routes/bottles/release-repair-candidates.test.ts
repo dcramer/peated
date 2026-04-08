@@ -143,6 +143,42 @@ describe("GET /bottles/release-repair-candidates", () => {
     ).toBeUndefined();
   });
 
+  test("treats query wildcards as literal characters", async ({ fixtures }) => {
+    const brand = await fixtures.Entity({ name: "Percent Distillery" });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      name: "100% Cask Strength",
+      totalTastings: 50,
+    });
+    const percentBatch = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "100% Cask Strength (Batch 1)",
+      totalTastings: 10,
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      name: "100 Proof Cask Strength",
+      totalTastings: 40,
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      name: "100 Proof Cask Strength (Batch 1)",
+      totalTastings: 9,
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "100% Cask Strength",
+      },
+      { context: { user } },
+    );
+
+    expect(
+      result.results.map((candidate) => candidate.legacyBottle.id),
+    ).toEqual([percentBatch.id]);
+  });
+
   test("keeps pagination stable when valid candidates extend past the initial scan window", async ({
     fixtures,
   }) => {
