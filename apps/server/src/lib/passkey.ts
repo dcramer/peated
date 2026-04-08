@@ -9,6 +9,7 @@ import {
   type AuthenticatorTransportFuture,
   type PublicKeyCredentialCreationOptionsJSON,
   type RegistrationResponseJSON,
+  type Uint8Array_,
 } from "@simplewebauthn/server";
 import { z } from "zod";
 
@@ -43,17 +44,17 @@ export interface ExcludeCredential {
 export async function generatePasskeyChallenge(options: {
   username: string;
   userDisplayName?: string;
-  userID?: Uint8Array | string | number;
+  userID?: Uint8Array_ | string | number;
   excludeCredentials?: ExcludeCredential[];
 }): Promise<{
   options: PublicKeyCredentialCreationOptionsJSON;
   signedChallenge: string;
 }> {
   // Convert userID to Uint8Array if it's a string or number
-  let userID: Uint8Array | undefined;
+  let userID: Uint8Array_ | undefined;
   if (options.userID !== undefined) {
     if (options.userID instanceof Uint8Array) {
-      userID = options.userID;
+      userID = options.userID.slice();
     } else {
       userID = new TextEncoder().encode(options.userID.toString());
     }
