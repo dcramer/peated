@@ -144,6 +144,39 @@ const elijahCraigBarrelProof = buildBottleCandidate({
   source: ["exact"],
 });
 
+const cadbollEstateParent = buildBottleCandidate({
+  bottleId: 660,
+  fullName: "Glenmorangie 15-year-old The Cadboll Estate",
+  brand: "Glenmorangie",
+  distillery: ["Glenmorangie"],
+  category: "single_malt",
+  statedAge: 15,
+  score: 0.91,
+  source: ["text"],
+});
+
+const cadbollEstateLegacyBatch4 = buildBottleCandidate({
+  bottleId: 661,
+  fullName: "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
+  brand: "Glenmorangie",
+  distillery: ["Glenmorangie"],
+  category: "single_malt",
+  statedAge: 15,
+  score: 1,
+  source: ["exact"],
+});
+
+const cadbollEstateLegacyBatch2 = buildBottleCandidate({
+  bottleId: 662,
+  fullName: "Glenmorangie The Cadboll Estate 15-year-old (Batch 2)",
+  brand: "Glenmorangie",
+  distillery: ["Glenmorangie"],
+  category: "single_malt",
+  statedAge: 15,
+  score: 0.86,
+  source: ["text"],
+});
+
 const ardbegUigeadail = buildBottleCandidate({
   bottleId: 630,
   fullName: "Ardbeg Uigeadail",
@@ -417,6 +450,36 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       parentBottleId: 620,
       summary:
         "Extract batch-level identity directly from the title and create a child release beneath the existing Elijah Craig Barrel Proof bottle.",
+    },
+  },
+  {
+    name: "store listing: redirects an exact legacy batch bottle to a reusable parent release",
+    input: {
+      reference: {
+        name: "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
+        url: "https://shop.example/products/cadboll-estate-batch-4",
+      },
+      extractedIdentity: buildExtractedIdentity({
+        brand: "Glenmorangie",
+        expression: "The Cadboll Estate",
+        distillery: ["Glenmorangie"],
+        category: "single_malt",
+        stated_age: 15,
+        edition: "Batch 4",
+      }),
+      initialCandidates: [
+        cadbollEstateLegacyBatch4,
+        cadbollEstateParent,
+        cadbollEstateLegacyBatch2,
+      ],
+    },
+    expected: {
+      status: "classified",
+      action: "create_release",
+      identityScope: "product",
+      parentBottleId: 660,
+      summary:
+        "Treat the exact batch bottle hit as a legacy release-like row and create Batch 4 beneath the reusable Cadboll Estate parent bottle instead.",
     },
   },
   {
