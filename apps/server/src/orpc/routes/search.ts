@@ -72,7 +72,7 @@ export default procedure
     z.object({
       query: z.coerce.string(),
       include: z.array(z.enum(INCLUDE_LIST)).default([...INCLUDE_LIST]),
-      limit: z.coerce.number().lte(100),
+      limit: z.coerce.number().gte(1).lte(100).default(25),
     }),
   )
   .output(
