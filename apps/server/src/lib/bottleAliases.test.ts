@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { bottleAliases } from "@peated/server/db/schema";
+import { bottleAliases, reviews } from "@peated/server/db/schema";
 import { assignBottleAliasInTransaction } from "@peated/server/lib/bottleAliases";
 import { eq } from "drizzle-orm";
 
@@ -35,6 +35,38 @@ describe("assignBottleAliasInTransaction", () => {
       bottleId: bottle.id,
       releaseId: release.id,
       name: release.fullName,
+    });
+  });
+
+  test("updates matching reviews with the assigned release", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Batch 1",
+    });
+    const review = await fixtures.Review({
+      bottleId: null,
+      releaseId: null,
+      name: release.fullName,
+    });
+
+    await db.transaction(async (tx) => {
+      await assignBottleAliasInTransaction(tx, {
+        bottleId: bottle.id,
+        releaseId: release.id,
+        name: release.fullName,
+      });
+    });
+
+    const updatedReview = await db.query.reviews.findFirst({
+      where: eq(reviews.id, review.id),
+    });
+
+    expect(updatedReview).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: release.id,
     });
   });
 });

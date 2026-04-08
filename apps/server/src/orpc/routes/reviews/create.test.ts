@@ -120,6 +120,48 @@ describe("POST /reviews", () => {
     expect(review?.url).toEqual("https://example.com");
   });
 
+  test("new review with existing release", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle({
+      name: "Cadboll Estate",
+      vintageYear: null,
+      releaseYear: null,
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      fullName: `${bottle.fullName} - Batch 4`,
+      name: `${bottle.name} - Batch 4`,
+      edition: "Batch 4",
+    });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      name: release.fullName,
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: release.fullName,
+        issue: "Default",
+        rating: 89,
+        url: "https://example.com/batch-4",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: (table, { eq }) => eq(table.id, data.id),
+    });
+    expect(review).toBeDefined();
+    expect(review?.bottleId).toEqual(bottle.id);
+    expect(review?.releaseId).toEqual(release.id);
+    expect(data.bottle?.id).toEqual(bottle.id);
+    expect(data.release?.id).toEqual(release.id);
+  });
+
   test("returns error for non-existent site", async ({ fixtures }) => {
     const adminUser = await fixtures.User({ admin: true });
 

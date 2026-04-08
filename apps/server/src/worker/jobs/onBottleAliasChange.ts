@@ -29,15 +29,22 @@ export default async ({ name }: { name: string }) => {
           })
           .where(eq(sql`LOWER(${storePrices.name})`, alias.name.toLowerCase()));
 
-    await Promise.all([
-      storePriceUpdate,
-      db
-        .update(reviews)
-        .set({
-          bottleId: alias.bottleId,
-        })
-        .where(eq(sql`LOWER(${reviews.name})`, alias.name.toLowerCase())),
-    ]);
+    const reviewUpdate = alias.releaseId
+      ? db
+          .update(reviews)
+          .set({
+            bottleId: alias.bottleId,
+            releaseId: alias.releaseId,
+          })
+          .where(eq(sql`LOWER(${reviews.name})`, alias.name.toLowerCase()))
+      : db
+          .update(reviews)
+          .set({
+            bottleId: alias.bottleId,
+          })
+          .where(eq(sql`LOWER(${reviews.name})`, alias.name.toLowerCase()));
+
+    await Promise.all([storePriceUpdate, reviewUpdate]);
   }
 
   await runJob("IndexBottleAlias", { name });

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { BottleReleaseSchema } from "./bottleReleases";
 import { BottleSchema } from "./bottles";
 import { CategoryEnum } from "./common";
 import { ExternalSiteSchema, ExternalSiteTypeEnum } from "./externalSites";
@@ -14,6 +15,9 @@ export const ReviewSchema = z.object({
   bottle: BottleSchema.nullish()
     .default(null)
     .describe("Bottle this review is associated with"),
+  release: BottleReleaseSchema.nullish()
+    .default(null)
+    .describe("Release this review is associated with"),
   createdAt: z
     .string()
     .datetime()

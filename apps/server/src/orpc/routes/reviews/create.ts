@@ -5,7 +5,7 @@ import {
   externalSites,
   reviews,
 } from "@peated/server/db/schema";
-import { findBottleId, findEntity } from "@peated/server/lib/bottleFinder";
+import { findBottleTarget, findEntity } from "@peated/server/lib/bottleFinder";
 import { mapRows, upsertBottleAlias } from "@peated/server/lib/db";
 import { normalizeBottle } from "@peated/server/lib/normalize";
 import { procedure } from "@peated/server/orpc";
@@ -45,7 +45,12 @@ export default procedure
 
     const { name } = normalizeBottle({ name: input.name });
 
-    let bottleId = await findBottleId(name);
+    const matchedTarget =
+      (await findBottleTarget(input.name)) ??
+      (input.name === name ? null : await findBottleTarget(name));
+    let bottleId = matchedTarget?.bottleId ?? null;
+    let releaseId = matchedTarget?.releaseId ?? null;
+
     if (!bottleId) {
       const entity = await findEntity(name);
       if (entity) {
@@ -65,11 +70,12 @@ export default procedure
 
     const review = await db.transaction(async (tx) => {
       const { rows } = await tx.execute(
-        sql`INSERT INTO ${reviews} (bottle_id, external_site_id, name, issue, rating, url)
-            VALUES (${bottleId}, ${site.id}, ${name}, ${input.issue}, ${input.rating}, ${input.url})
+        sql`INSERT INTO ${reviews} (bottle_id, release_id, external_site_id, name, issue, rating, url)
+            VALUES (${bottleId}, ${releaseId}, ${site.id}, ${name}, ${input.issue}, ${input.rating}, ${input.url})
             ON CONFLICT (external_site_id, LOWER(name), issue)
             DO UPDATE
             SET bottle_id = COALESCE(excluded.bottle_id, ${reviews.bottleId}),
+                release_id = COALESCE(excluded.release_id, ${reviews.releaseId}),
                 rating = excluded.rating,
                 url = excluded.url,
                 updated_at = NOW()
@@ -79,7 +85,7 @@ export default procedure
       const [review] = mapRows(rows, reviews);
 
       if (bottleId) {
-        await upsertBottleAlias(tx, name, bottleId);
+        await upsertBottleAlias(tx, name, bottleId, releaseId);
       } else {
         await tx
           .insert(bottleAliases)

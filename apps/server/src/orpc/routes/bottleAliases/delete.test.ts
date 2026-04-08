@@ -65,4 +65,59 @@ describe("DELETE /bottle-aliases/:name", () => {
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
+
+  test("clears release matches for release aliases", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Batch 4",
+    });
+    const alias = await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      name: release.fullName,
+    });
+
+    const review = await fixtures.Review({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      name: alias.name,
+    });
+    const storePrice = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      name: alias.name,
+    });
+
+    const data = await routerClient.bottleAliases.delete(
+      { alias: alias.name },
+      {
+        context: { user },
+      },
+    );
+    expect(data).toEqual({});
+
+    const [newAlias] = await db
+      .select()
+      .from(bottleAliases)
+      .where(eq(bottleAliases.name, alias.name));
+    expect(newAlias).toBeDefined();
+    expect(newAlias.bottleId).toBeNull();
+    expect(newAlias.releaseId).toBeNull();
+
+    const [newReview] = await db
+      .select()
+      .from(reviews)
+      .where(eq(reviews.id, review.id));
+    expect(newReview.bottleId).toBeNull();
+    expect(newReview.releaseId).toBeNull();
+
+    const [newStorePrice] = await db
+      .select()
+      .from(storePrices)
+      .where(eq(storePrices.id, storePrice.id));
+    expect(newStorePrice.bottleId).toBeNull();
+    expect(newStorePrice.releaseId).toBeNull();
+  });
 });

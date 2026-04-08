@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import { reviews } from "@peated/server/db/schema";
-import { findBottleId, findEntity } from "@peated/server/lib/bottleFinder";
+import { findBottleTarget, findEntity } from "@peated/server/lib/bottleFinder";
+import { normalizeBottle } from "@peated/server/lib/normalize";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq, isNull } from "drizzle-orm";
@@ -22,7 +23,14 @@ export default async function createMissingBottles() {
     }
 
     for (const review of missingInReviews) {
-      let bottleId = await findBottleId(review.name);
+      const { name } = normalizeBottle({ name: review.name });
+      const target =
+        (await findBottleTarget(review.name)) ??
+        (review.name === name ? null : await findBottleTarget(name));
+
+      let bottleId = target?.bottleId ?? null;
+      let releaseId = target?.releaseId ?? null;
+
       if (!bottleId) {
         console.log(`Creating bottle for review [${review.id}]`);
 
@@ -36,6 +44,7 @@ export default async function createMissingBottles() {
             { context: { user: systemUser } },
           );
           bottleId = result.id;
+          releaseId = null;
         }
       } else {
         console.log(`Identified bottle for review [${review.id}]`);
@@ -45,6 +54,7 @@ export default async function createMissingBottles() {
         .update(reviews)
         .set({
           bottleId,
+          releaseId,
         })
         .where(and(eq(reviews.id, review.id), isNull(reviews.bottleId)));
     }

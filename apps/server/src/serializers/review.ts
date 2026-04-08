@@ -3,26 +3,29 @@ import type { z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
 import {
+  bottleReleases,
   bottles,
   externalSites,
-  type Bottle,
+  type BottleRelease,
   type Review,
   type User,
 } from "../db/schema";
 import { notEmpty } from "../lib/filter";
 import { type ReviewSchema } from "../schemas";
 import { BottleSerializer } from "./bottle";
+import { BottleReleaseSerializer } from "./bottleRelease";
 import { ExternalSiteSerializer } from "./externalSite";
 
 type ReviewAttrs = {
   bottle: ReturnType<(typeof BottleSerializer)["item"]> | null;
+  release: ReturnType<(typeof BottleReleaseSerializer)["item"]> | null;
   site: ReturnType<(typeof ExternalSiteSerializer)["item"]>;
 };
 
 export const ReviewSerializer = serializer({
   name: "review",
   attrs: async (
-    itemList: (Review & { bottle: Bottle })[],
+    itemList: Review[],
     currentUser?: User,
   ): Promise<Record<string, ReviewAttrs>> => {
     const bottleIds = Array.from(
@@ -34,6 +37,21 @@ export const ReviewSerializer = serializer({
     const bottlesByRef = Object.fromEntries(
       (await serialize(BottleSerializer, bottleList, currentUser)).map(
         (data, index) => [bottleList[index].id, data],
+      ),
+    );
+
+    const releaseIds = Array.from(
+      new Set(itemList.map((i) => i.releaseId).filter(notEmpty)),
+    );
+    const releaseList = releaseIds.length
+      ? await db
+          .select()
+          .from(bottleReleases)
+          .where(inArray(bottleReleases.id, releaseIds))
+      : [];
+    const releasesByRef = Object.fromEntries(
+      (await serialize(BottleReleaseSerializer, releaseList, currentUser)).map(
+        (data, index) => [releaseList[index].id, data],
       ),
     );
 
@@ -56,6 +74,7 @@ export const ReviewSerializer = serializer({
           item.id,
           {
             bottle: item.bottleId ? bottlesByRef[item.bottleId] : null,
+            release: item.releaseId ? releasesByRef[item.releaseId] : null,
             site: sitesByRef[item.externalSiteId],
           },
         ];
@@ -74,6 +93,7 @@ export const ReviewSerializer = serializer({
       rating: item.rating,
       url: item.url,
       bottle: attrs.bottle,
+      release: attrs.release,
       site: attrs.site,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
