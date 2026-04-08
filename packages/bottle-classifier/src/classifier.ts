@@ -22,7 +22,6 @@ import { buildBottleClassifierInstructions } from "./instructions";
 import {
   BottleCandidateSearchInputSchema,
   BottleClassifierAgentDecisionSchema,
-  BottleClassifierAgentResponseSchema,
   type BottleCandidate,
   type BottleCandidateSearchInput,
   type BottleClassifierAgentDecision,
@@ -469,7 +468,7 @@ export function createBottleClassifier(
         parallelToolCalls: false,
         temperature: 0,
       },
-      outputType: BottleClassifierAgentResponseSchema,
+      outputType: BottleClassifierAgentDecisionSchema,
       tools,
     });
     const runner = new Runner({
@@ -513,11 +512,10 @@ export function createBottleClassifier(
         throw new Error("Agent returned empty output");
       }
 
-      const { decision: agentDecision } =
-        BottleClassifierAgentResponseSchema.parse(result.finalOutput);
-
       return {
-        decision: parseAgentDecision(agentDecision),
+        decision: parseAgentDecision(
+          result.finalOutput as BottleClassifierAgentDecision,
+        ),
         artifacts: buildBottleClassificationArtifacts({
           extractedIdentity: extractedIdentity ?? null,
           searchEvidence,
