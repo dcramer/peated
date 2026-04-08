@@ -190,7 +190,7 @@ export async function getLegacyReleaseRepairCandidates({
           : undefined,
       ),
     )
-    .orderBy(desc(bottles.totalTastings), desc(bottles.id))
+    .orderBy(sql`${bottles.totalTastings} DESC NULLS LAST`, desc(bottles.id))
     .limit(MAX_SCAN_LIMIT);
 
   const derivedCandidates = suspiciousBottles
