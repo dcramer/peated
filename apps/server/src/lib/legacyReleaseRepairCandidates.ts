@@ -27,6 +27,21 @@ type LegacyReleaseRepairBottle = Omit<
   totalTastings: null | number;
 };
 
+export type LegacyReleaseRepairParentCandidate = Pick<
+  Bottle,
+  | "abv"
+  | "caskFill"
+  | "caskSize"
+  | "caskStrength"
+  | "edition"
+  | "fullName"
+  | "id"
+  | "releaseYear"
+  | "singleCask"
+  | "totalTastings"
+  | "vintageYear"
+>;
+
 export type LegacyReleaseRepairIdentity = {
   proposedParentFullName: string;
   edition: string | null;
@@ -71,6 +86,28 @@ function escapeLikePattern(value: string) {
 
 function getTastingCount(value: null | number | undefined): number {
   return value ?? 0;
+}
+
+export function pickBestLegacyReleaseRepairParent<
+  TRow extends LegacyReleaseRepairParentCandidate,
+>(rows: TRow[]): null | TRow {
+  let bestRow: null | TRow = null;
+
+  for (const row of rows) {
+    if (hasBottleLevelReleaseTraits(row)) {
+      continue;
+    }
+
+    if (
+      !bestRow ||
+      getTastingCount(row.totalTastings) >
+        getTastingCount(bestRow.totalTastings)
+    ) {
+      bestRow = row;
+    }
+  }
+
+  return bestRow;
 }
 
 export function normalizeComparableBottleName(fullName: string): string {
@@ -344,19 +381,17 @@ export async function getLegacyReleaseRepairCandidates({
     string,
     { id: number; fullName: string; totalTastings: null | number }
   >();
+  const parentRowsByName = new Map<string, typeof parentRows>();
   for (const row of parentRows) {
-    if (hasBottleLevelReleaseTraits(row)) {
-      continue;
-    }
-
     const key = row.fullName.toLowerCase();
-    const existing = parentByName.get(key);
-    if (
-      !existing ||
-      getTastingCount(row.totalTastings) >
-        getTastingCount(existing.totalTastings)
-    ) {
-      parentByName.set(key, row);
+    const group = parentRowsByName.get(key) ?? [];
+    group.push(row);
+    parentRowsByName.set(key, group);
+  }
+  for (const [key, rows] of parentRowsByName) {
+    const parent = pickBestLegacyReleaseRepairParent(rows);
+    if (parent) {
+      parentByName.set(key, parent);
     }
   }
 

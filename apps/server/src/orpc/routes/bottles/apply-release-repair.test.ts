@@ -352,6 +352,156 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     );
   });
 
+  test("prefers a clean exact-name parent when a dirtier duplicate also exists", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Aberlour" });
+    const dirtyParent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "A'bunadh",
+      totalTastings: 100,
+    });
+    await db
+      .update(bottles)
+      .set({ edition: "Batch 31" })
+      .where(eq(bottles.id, dirtyParent.id));
+    const cleanParent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "A'bunadh Parent Placeholder",
+      totalTastings: 50,
+    });
+    await db
+      .update(bottles)
+      .set({
+        name: "A'bunadh",
+        fullName: dirtyParent.fullName,
+      })
+      .where(eq(bottles.id, cleanParent.id));
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "A'bunadh (Batch 32)",
+    });
+    const mod = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.applyReleaseRepair(
+      {
+        bottle: legacyBottle.id,
+      },
+      { context: { user: mod } },
+    );
+
+    expect(result.parentBottleId).toBe(cleanParent.id);
+
+    const [release] = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, result.releaseId));
+    expect(release.bottleId).toBe(cleanParent.id);
+  });
+
+  test("reuses an existing release without duplicating collection or flight rows", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Aberlour" });
+    const mod = await fixtures.User({ mod: true });
+    const parent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "A'bunadh",
+      totalTastings: 80,
+    });
+    const existingRelease = await fixtures.BottleRelease({
+      bottleId: parent.id,
+      edition: "Batch 32",
+      description: null,
+      imageUrl: "https://example.com/existing-release.png",
+      tastingNotes: null,
+      createdById: mod.id,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "A'bunadh (Batch 32)",
+      description: "Recovered legacy description",
+      imageUrl: "/images/legacy-abunadh.png",
+      tastingNotes: {
+        nose: "Raisin",
+        palate: "Chocolate",
+        finish: "Spice",
+      },
+      createdById: mod.id,
+    });
+
+    const collection = await fixtures.Collection();
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: collection.id,
+        bottleId: parent.id,
+        releaseId: existingRelease.id,
+      },
+      {
+        collectionId: collection.id,
+        bottleId: legacyBottle.id,
+      },
+    ]);
+
+    const flight = await fixtures.Flight();
+    await db.insert(flightBottles).values([
+      {
+        flightId: flight.id,
+        bottleId: parent.id,
+        releaseId: existingRelease.id,
+      },
+      {
+        flightId: flight.id,
+        bottleId: legacyBottle.id,
+      },
+    ]);
+
+    const result = await routerClient.bottles.applyReleaseRepair(
+      {
+        bottle: legacyBottle.id,
+      },
+      { context: { user: mod } },
+    );
+
+    expect(result.releaseId).toBe(existingRelease.id);
+
+    const [updatedRelease] = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, existingRelease.id));
+    expect(updatedRelease).toMatchObject({
+      description: "Recovered legacy description",
+      imageUrl: "https://example.com/existing-release.png",
+      tastingNotes: {
+        nose: "Raisin",
+        palate: "Chocolate",
+        finish: "Spice",
+      },
+    });
+
+    const collectionRows = await db
+      .select()
+      .from(collectionBottles)
+      .where(eq(collectionBottles.collectionId, collection.id));
+    expect(collectionRows).toHaveLength(1);
+    expect(collectionRows[0]).toMatchObject({
+      collectionId: collection.id,
+      bottleId: parent.id,
+      releaseId: existingRelease.id,
+    });
+
+    const flightRows = await db
+      .select()
+      .from(flightBottles)
+      .where(eq(flightBottles.flightId, flight.id));
+    expect(flightRows).toHaveLength(1);
+    expect(flightRows[0]).toMatchObject({
+      flightId: flight.id,
+      bottleId: parent.id,
+      releaseId: existingRelease.id,
+    });
+  });
+
   test("rejects repair when the exact-name parent is still release-specific", async ({
     fixtures,
   }) => {

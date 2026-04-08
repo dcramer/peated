@@ -1,5 +1,5 @@
 import { db, type AnyTransaction } from "@peated/server/db";
-import type { Bottle, User } from "@peated/server/db/schema";
+import type { Bottle, BottleRelease, User } from "@peated/server/db/schema";
 import {
   bottleAliases,
   bottleFlavorProfiles,
@@ -30,6 +30,7 @@ import {
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import {
   deriveLegacyReleaseRepairIdentity,
+  pickBestLegacyReleaseRepairParent,
   resolveLegacyReleaseRepairNameScope,
 } from "@peated/server/lib/legacyReleaseRepairCandidates";
 import { logError } from "@peated/server/lib/log";
@@ -164,7 +165,7 @@ async function getExactParentBottle(
     proposedParentFullName: string;
   },
 ) {
-  const [parentBottle] = await tx
+  const parentRows = await tx
     .select()
     .from(bottles)
     .where(
@@ -177,22 +178,65 @@ async function getExactParentBottle(
       ),
     )
     .orderBy(sql`${bottles.totalTastings} DESC NULLS LAST`, desc(bottles.id))
-    .limit(1)
     .for("update");
 
+  const parentBottle = pickBestLegacyReleaseRepairParent(parentRows);
+
   if (!parentBottle) {
+    if (parentRows.some((row) => hasBottleLevelReleaseTraits(row))) {
+      throw new LegacyReleaseRepairBadRequestError(
+        "Exact parent bottle still contains bottle-level release traits.",
+      );
+    }
+
     throw new LegacyReleaseRepairBadRequestError(
       "No exact reusable parent bottle exists for this repair.",
     );
   }
 
-  if (hasBottleLevelReleaseTraits(parentBottle)) {
-    throw new LegacyReleaseRepairBadRequestError(
-      "Exact parent bottle still contains bottle-level release traits.",
-    );
+  return parentBottle;
+}
+
+async function backfillExistingReleaseMetadata(
+  tx: AnyTransaction,
+  {
+    legacyBottle,
+    release,
+  }: {
+    legacyBottle: RepairBottle;
+    release: BottleRelease;
+  },
+) {
+  const nextDescription =
+    release.description ?? legacyBottle.description ?? null;
+  const nextImageUrl = release.imageUrl ?? legacyBottle.imageUrl ?? null;
+  const nextTastingNotes =
+    release.tastingNotes ?? legacyBottle.tastingNotes ?? null;
+
+  if (
+    nextDescription === release.description &&
+    nextImageUrl === release.imageUrl &&
+    nextTastingNotes === release.tastingNotes
+  ) {
+    return release;
   }
 
-  return parentBottle;
+  const [updatedRelease] = await tx
+    .update(bottleReleases)
+    .set({
+      description: nextDescription,
+      imageUrl: nextImageUrl,
+      tastingNotes: nextTastingNotes,
+      updatedAt: sql`NOW()`,
+    })
+    .where(eq(bottleReleases.id, release.id))
+    .returning();
+
+  if (!updatedRelease) {
+    throw new LegacyReleaseRepairBadRequestError("Bottle release not found.");
+  }
+
+  return updatedRelease;
 }
 
 export async function applyLegacyReleaseRepairInTransaction(
@@ -236,6 +280,19 @@ export async function applyLegacyReleaseRepairInTransaction(
       .from(bottlesToDistillers)
       .where(eq(bottlesToDistillers.bottleId, legacyBottle.id))
   ).map((row) => row.distillerId);
+  const legacyCollectionRows = await tx
+    .select({
+      collectionId: collectionBottles.collectionId,
+      createdAt: collectionBottles.createdAt,
+    })
+    .from(collectionBottles)
+    .where(eq(collectionBottles.bottleId, legacyBottle.id));
+  const legacyFlightRows = await tx
+    .select({
+      flightId: flightBottles.flightId,
+    })
+    .from(flightBottles)
+    .where(eq(flightBottles.bottleId, legacyBottle.id));
 
   if (legacyAliases.length > 0) {
     await tx
@@ -248,6 +305,7 @@ export async function applyLegacyReleaseRepairInTransaction(
   }
 
   let releaseId: number;
+  let reusedExistingRelease = false;
   try {
     const result = await createBottleReleaseInTransaction(tx, {
       bottleId: parentBottle.id,
@@ -258,6 +316,7 @@ export async function applyLegacyReleaseRepairInTransaction(
   } catch (err) {
     if (err instanceof BottleReleaseAlreadyExistsError) {
       releaseId = err.releaseId;
+      reusedExistingRelease = true;
     } else if (err instanceof BottleReleaseCreateBadRequestError) {
       throw new LegacyReleaseRepairBadRequestError(err.message);
     } else {
@@ -267,13 +326,21 @@ export async function applyLegacyReleaseRepairInTransaction(
 
   const repairedAliasNames = new Set<string>();
 
-  const [release] = await tx
+  let [release] = await tx
     .select()
     .from(bottleReleases)
     .where(eq(bottleReleases.id, releaseId))
-    .limit(1);
+    .limit(1)
+    .for("update");
   if (!release) {
     throw new LegacyReleaseRepairBadRequestError("Bottle release not found.");
+  }
+
+  if (reusedExistingRelease) {
+    release = await backfillExistingReleaseMetadata(tx, {
+      legacyBottle,
+      release,
+    });
   }
 
   for (const aliasName of getCanonicalReleaseAliasNames({
@@ -363,23 +430,6 @@ export async function applyLegacyReleaseRepairInTransaction(
         releaseId: release.id,
       })
       .where(eq(tastings.bottleId, legacyBottle.id)),
-
-    tx
-      .update(collectionBottles)
-      .set({
-        bottleId: parentBottle.id,
-        releaseId: release.id,
-      })
-      .where(eq(collectionBottles.bottleId, legacyBottle.id)),
-
-    tx
-      .update(flightBottles)
-      .set({
-        bottleId: parentBottle.id,
-        releaseId: release.id,
-      })
-      .where(eq(flightBottles.bottleId, legacyBottle.id)),
-
     tx
       .update(bottleObservations)
       .set({
@@ -388,6 +438,41 @@ export async function applyLegacyReleaseRepairInTransaction(
       })
       .where(eq(bottleObservations.bottleId, legacyBottle.id)),
   ]);
+
+  if (legacyCollectionRows.length > 0) {
+    await tx
+      .insert(collectionBottles)
+      .values(
+        legacyCollectionRows.map((row) => ({
+          collectionId: row.collectionId,
+          bottleId: parentBottle.id,
+          releaseId: release.id,
+          createdAt: row.createdAt,
+        })),
+      )
+      .onConflictDoNothing();
+
+    await tx
+      .delete(collectionBottles)
+      .where(eq(collectionBottles.bottleId, legacyBottle.id));
+  }
+
+  if (legacyFlightRows.length > 0) {
+    await tx
+      .insert(flightBottles)
+      .values(
+        legacyFlightRows.map((row) => ({
+          flightId: row.flightId,
+          bottleId: parentBottle.id,
+          releaseId: release.id,
+        })),
+      )
+      .onConflictDoNothing();
+
+    await tx
+      .delete(flightBottles)
+      .where(eq(flightBottles.bottleId, legacyBottle.id));
+  }
 
   for (const row of legacyTags) {
     await tx
