@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { bottleAliases } from "@peated/server/db/schema";
+import { bottleAliases, reviews } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq } from "drizzle-orm";
@@ -212,6 +212,66 @@ describe("POST /reviews", () => {
       ),
     });
     expect(normalizedReleaseAlias).toBeUndefined();
+  });
+
+  test("updates an existing normalized review when a release alias later matches", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle({
+      name: "Calvados Cask Finished",
+      vintageYear: null,
+      releaseYear: null,
+    });
+    const existingReview = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: bottle.id,
+      releaseId: null,
+      name: bottle.fullName,
+      issue: "Default",
+      rating: 88,
+      url: "https://example.com/original",
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      fullName: `${bottle.fullName} (2024 Release)`,
+      name: `${bottle.name} (2024 Release)`,
+      releaseYear: 2024,
+    });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      name: release.fullName,
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: release.fullName,
+        issue: "Default",
+        rating: 91,
+        url: "https://example.com/2024-release",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: (table, { eq }) => eq(table.id, existingReview.id),
+    });
+    expect(review).toBeDefined();
+    expect(review?.id).toEqual(existingReview.id);
+    expect(review?.releaseId).toEqual(release.id);
+    expect(review?.name).toEqual(release.fullName);
+    expect(review?.url).toEqual("https://example.com/2024-release");
+    expect(data.id).toEqual(existingReview.id);
+
+    const siteReviews = await db
+      .select({ id: reviews.id })
+      .from(reviews)
+      .where(eq(reviews.externalSiteId, site.id));
+    expect(siteReviews).toHaveLength(1);
   });
 
   test("returns error for non-existent site", async ({ fixtures }) => {

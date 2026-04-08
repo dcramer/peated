@@ -17,7 +17,7 @@ import {
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 import bottleCreate from "../bottles/create";
 
 export default procedure
@@ -58,6 +58,9 @@ export default procedure
       rawMatchedTarget?.releaseId != null && rawName !== normalizedName
         ? rawName
         : normalizedName;
+    const reviewNameCandidates = Array.from(
+      new Set([reviewName.toLowerCase(), normalizedName.toLowerCase()]),
+    );
 
     if (!bottleId) {
       const entity = await findEntity(normalizedName);
@@ -77,20 +80,55 @@ export default procedure
     }
 
     const review = await db.transaction(async (tx) => {
-      const { rows } = await tx.execute(
-        sql`INSERT INTO ${reviews} (bottle_id, release_id, external_site_id, name, issue, rating, url)
-            VALUES (${bottleId}, ${releaseId}, ${site.id}, ${reviewName}, ${input.issue}, ${input.rating}, ${input.url})
-            ON CONFLICT (external_site_id, LOWER(name), issue)
-            DO UPDATE
-            SET bottle_id = COALESCE(excluded.bottle_id, ${reviews.bottleId}),
-                release_id = COALESCE(excluded.release_id, ${reviews.releaseId}),
-                rating = excluded.rating,
-                url = excluded.url,
-                updated_at = NOW()
-            RETURNING *`,
-      );
+      const existingReview =
+        (await tx.query.reviews.findFirst({
+          where: and(
+            eq(reviews.externalSiteId, site.id),
+            eq(reviews.url, input.url),
+          ),
+        })) ??
+        (await tx.query.reviews.findFirst({
+          where: and(
+            eq(reviews.externalSiteId, site.id),
+            eq(reviews.issue, input.issue),
+            or(
+              ...reviewNameCandidates.map((name) =>
+                eq(sql`LOWER(${reviews.name})`, name),
+              ),
+            ),
+          ),
+        }));
 
-      const [review] = mapRows(rows, reviews);
+      let review;
+      if (existingReview) {
+        [review] = await tx
+          .update(reviews)
+          .set({
+            bottleId: bottleId ?? existingReview.bottleId,
+            releaseId: releaseId ?? existingReview.releaseId,
+            name: reviewName,
+            rating: input.rating,
+            url: input.url,
+            updatedAt: sql`NOW()`,
+          })
+          .where(eq(reviews.id, existingReview.id))
+          .returning();
+      } else {
+        const { rows } = await tx.execute(
+          sql`INSERT INTO ${reviews} (bottle_id, release_id, external_site_id, name, issue, rating, url)
+              VALUES (${bottleId}, ${releaseId}, ${site.id}, ${reviewName}, ${input.issue}, ${input.rating}, ${input.url})
+              ON CONFLICT (external_site_id, LOWER(name), issue)
+              DO UPDATE
+              SET bottle_id = COALESCE(excluded.bottle_id, ${reviews.bottleId}),
+                  release_id = COALESCE(excluded.release_id, ${reviews.releaseId}),
+                  rating = excluded.rating,
+                  url = excluded.url,
+                  updated_at = NOW()
+              RETURNING *`,
+        );
+
+        [review] = mapRows(rows, reviews);
+      }
 
       if (bottleId) {
         await upsertBottleAlias(tx, reviewName, bottleId, releaseId);
