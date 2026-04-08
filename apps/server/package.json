@@ -68,7 +68,7 @@
     "jsx-email": "catalog:",
     "mime-types": "^3.0.2",
     "nanoid": "^3.3.8",
-    "nodemailer": "^8.0.2",
+    "nodemailer": "^8.0.5",
     "openai": "^6.27.0",
     "pg": "catalog:",
     "react": "catalog:",
