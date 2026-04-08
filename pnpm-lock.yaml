@@ -218,7 +218,7 @@ importers:
         version: 3.4.2
       '@hono/node-server':
         specifier: ^1.14.1
-        version: 1.14.1(hono@4.7.9)
+        version: 1.14.1(hono@4.12.12)
       '@openai/agents':
         specifier: ^0.6.0
         version: 0.6.0(ws@8.18.3)(zod@4.3.6)
@@ -346,8 +346,8 @@ importers:
         specifier: ^10.6.1
         version: 10.6.1
       hono:
-        specifier: ^4.7.9
-        version: 4.7.9
+        specifier: ^4.12.12
+        version: 4.12.12
       ioredis:
         specifier: ^5.5.0
         version: 5.5.0
@@ -6347,12 +6347,8 @@ packages:
   hmac-drbg@1.0.1:
     resolution: {integrity: sha512-Tti3gMqLdZfhOQY1Mzf/AanLiqh1WTiJgEj26ZuYQ9fbkLomzGchCws4FyrSd4VkpBfiNhaE1On+lOz894jvXg==}
 
-  hono@4.12.7:
-    resolution: {integrity: sha512-jq9l1DM0zVIvsm3lv9Nw9nlJnMNPOcAtsbsgiUhWcFzPE99Gvo6yRTlszSLLYacMeQ6quHD6hMfId8crVHvexw==}
-    engines: {node: '>=16.9.0'}
-
-  hono@4.7.9:
-    resolution: {integrity: sha512-/EsCoR5h7N4yu01TDu9GMCCJa6ZLk5ZJIWFFGNawAXmd1Tp53+Wir4xm0D2X19bbykWUlzQG0+BvPAji6p9E8Q==}
+  hono@4.12.12:
+    resolution: {integrity: sha512-p1JfQMKaceuCbpJKAPKVqyqviZdS0eUxH9v82oWo1kb9xjQ5wA6iP3FNVAPDFlz5/p7d45lO+BpSk1tuSZMF4Q==}
     engines: {node: '>=16.9.0'}
 
   html-encoding-sniffer@4.0.0:
@@ -11107,13 +11103,13 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hono/node-server@1.14.1(hono@4.7.9)':
+  '@hono/node-server@1.14.1(hono@4.12.12)':
     dependencies:
-      hono: 4.7.9
+      hono: 4.12.12
 
-  '@hono/node-server@1.19.11(hono@4.12.7)':
+  '@hono/node-server@1.19.11(hono@4.12.12)':
     dependencies:
-      hono: 4.12.7
+      hono: 4.12.12
     optional: true
 
   '@hookform/resolvers@3.6.0(react-hook-form@7.52.0(react@18.3.1))':
@@ -11385,7 +11381,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.27.1(zod@4.3.6)':
     dependencies:
-      '@hono/node-server': 1.19.11(hono@4.12.7)
+      '@hono/node-server': 1.19.11(hono@4.12.12)
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
       content-type: 1.0.5
@@ -11395,7 +11391,7 @@ snapshots:
       eventsource-parser: 3.0.0
       express: 5.2.1
       express-rate-limit: 8.3.1(express@5.2.1)
-      hono: 4.12.7
+      hono: 4.12.12
       jose: 6.2.1
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -16010,10 +16006,7 @@ snapshots:
       minimalistic-assert: 1.0.1
       minimalistic-crypto-utils: 1.0.1
 
-  hono@4.12.7:
-    optional: true
-
-  hono@4.7.9: {}
+  hono@4.12.12: {}
 
   html-encoding-sniffer@4.0.0:
     dependencies:
