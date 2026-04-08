@@ -6,6 +6,7 @@ import imageUpdate from "./image-update";
 import list from "./list";
 import merge from "./merge";
 import prices from "./prices";
+import releaseRepairCandidates from "./release-repair-candidates";
 import similar from "./similar";
 import suggestedTags from "./suggested-tags";
 import tags from "./tags";
@@ -21,6 +22,7 @@ export default base.tag("bottles").router({
   delete: delete_,
   merge,
   validation,
+  releaseRepairCandidates,
   similar,
   tags,
   suggestedTags,
