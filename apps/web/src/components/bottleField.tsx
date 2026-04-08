@@ -12,7 +12,7 @@ export default function BottleField({
       onQuery={async (query) => {
         const { results } = await orpc.bottles.list.call({ query });
         return results.map((r) => ({
-          name: r.edition ? `${r.fullName} (${r.edition})` : r.fullName,
+          name: r.fullName,
           id: r.id,
         }));
       }}

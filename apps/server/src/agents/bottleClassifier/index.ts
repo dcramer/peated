@@ -1,36 +1,39 @@
-export { classifyBottleReference } from "./classifyBottleReference";
 export {
+  BottleCandidateSchema,
   BottleClassificationArtifactsSchema,
+  BottleClassificationDecisionSchema,
+  BottleClassificationError,
   BottleClassificationResultSchema,
+  BottleClassifierAgentDecisionSchema,
+  BottleClassifierAgentResponseSchema,
+  BottleExtractedDetailsSchema,
+  BottleIdentityScopeEnum,
+  BottleMatchDecisionSchema,
+  BottleObservationSchema,
   BottleReferenceSchema,
+  BottleSearchEvidenceSchema,
   ClassifyBottleReferenceInputSchema,
   DecidedBottleClassificationResultSchema,
+  EntityResolutionSchema,
   IgnoredBottleClassificationResultSchema,
   buildBottleClassificationArtifacts,
   createDecidedBottleClassification,
   createIgnoredBottleClassification,
   isIgnoredBottleClassification,
-} from "./contract";
-export type {
-  BottleClassificationArtifacts,
-  BottleClassificationResult,
-  BottleReference,
-  ClassifyBottleReferenceInput,
-  DecidedBottleClassificationResult,
-  IgnoredBottleClassificationResult,
-} from "./contract";
-export { BottleClassificationError } from "./runBottleClassifierAgent";
-export {
-  BottleCandidateSchema,
-  BottleExtractedDetailsSchema,
-  BottleMatchDecisionSchema,
-  BottleSearchEvidenceSchema,
-  EntityResolutionSchema,
-} from "./schemas";
+} from "@peated/bottle-classifier";
 export type {
   BottleCandidate,
+  BottleClassificationArtifacts,
+  BottleClassificationResult,
+  BottleClassifierAgentDecision,
   BottleExtractedDetails,
   BottleMatchDecision,
+  BottleObservation,
+  BottleReference,
   BottleSearchEvidence,
+  ClassifyBottleReferenceInput,
+  DecidedBottleClassificationResult,
   EntityResolution,
-} from "./schemas";
+  IgnoredBottleClassificationResult,
+} from "@peated/bottle-classifier";
+export { classifyBottleReference } from "./classifyBottleReference";

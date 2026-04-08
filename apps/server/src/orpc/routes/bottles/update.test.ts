@@ -1301,4 +1301,89 @@ describe("PUT /bottles/:bottle", () => {
     expect(distillers.length).toBe(1);
     expect(distillers[0].distillerId).toEqual(distiller.id);
   });
+
+  test("rejects setting bottle-level release fields when child releases exist", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({
+      name: "Parent Bottle",
+      releaseYear: null,
+      edition: null,
+      abv: null,
+    });
+    await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "1990 Release",
+      releaseYear: 1990,
+      abv: 43,
+    });
+    await db
+      .update(bottles)
+      .set({ numReleases: 1 })
+      .where(eq(bottles.id, bottle.id));
+
+    const modUser = await fixtures.User({ mod: true });
+
+    const err = await waitError(() =>
+      routerClient.bottles.update(
+        {
+          bottle: bottle.id,
+          releaseYear: 2024,
+        },
+        { context: { user: modUser } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Bottle-level release fields cannot be set while child releases exist. Move those details to bottle releases instead.]`,
+    );
+  });
+
+  test("allows clearing bottle-level release fields when child releases exist", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({
+      name: "Legacy Parent",
+      edition: "1990 Release",
+      abv: 43,
+      caskType: "bourbon",
+      vintageYear: 1978,
+      releaseYear: 1990,
+    });
+    await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "1991 Release",
+      releaseYear: 1991,
+      abv: 46,
+    });
+    await db
+      .update(bottles)
+      .set({ numReleases: 1 })
+      .where(eq(bottles.id, bottle.id));
+
+    const modUser = await fixtures.User({ mod: true });
+
+    await routerClient.bottles.update(
+      {
+        bottle: bottle.id,
+        edition: null,
+        abv: null,
+        caskType: null,
+        vintageYear: null,
+        releaseYear: null,
+      },
+      { context: { user: modUser } },
+    );
+
+    const [updatedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+
+    expect(updatedBottle.edition).toBeNull();
+    expect(updatedBottle.abv).toBeNull();
+    expect(updatedBottle.caskType).toBeNull();
+    expect(updatedBottle.vintageYear).toBeNull();
+    expect(updatedBottle.releaseYear).toBeNull();
+  });
 });

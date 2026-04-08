@@ -26,9 +26,9 @@ export default procedure
   .route({
     method: "POST",
     path: "/bottle-releases",
-    summary: "Create bottle release",
+    summary: "Create bottle bottling",
     description:
-      "Create a new bottle release with specific edition, vintage, and cask details. Requires authentication",
+      "Create a new bottling with specific edition, vintage, and cask details. Requires authentication",
     spec: (spec) => ({
       ...spec,
       operationId: "createBottleRelease",

@@ -71,10 +71,19 @@ function buildMockBottleReferenceClassification(
     overrides.status === "ignored" || overrides.ignored === true
       ? "ignored"
       : "classified";
-  const decision =
+  const rawDecision =
     overrides.decision && typeof overrides.decision === "object"
-      ? (overrides.decision as { confidence?: number | null })
+      ? (overrides.decision as {
+          action?: string;
+          confidence?: number | null;
+        })
       : null;
+  const decision =
+    rawDecision && typeof rawDecision.action === "string"
+      ? normalizeMockBottleClassifierDecision(
+          rawDecision as Record<string, any>,
+        )
+      : rawDecision;
   const {
     decision: _decision,
     extractedLabel,
@@ -106,6 +115,70 @@ function buildMockBottleReferenceClassification(
     },
     ...restOverrides,
   } as any;
+}
+
+function normalizeMockBottleClassifierDecision(decision: Record<string, any>) {
+  if (
+    decision.action === "match" ||
+    decision.action === "create_bottle" ||
+    decision.action === "create_release" ||
+    decision.action === "create_bottle_and_release" ||
+    decision.action === "no_match"
+  ) {
+    return {
+      identityScope: "product",
+      observation: null,
+      ...decision,
+    };
+  }
+
+  if (
+    decision.action === "match_existing" ||
+    decision.action === "correction"
+  ) {
+    return {
+      action: "match",
+      confidence: decision.confidence ?? 0,
+      rationale: decision.rationale ?? null,
+      candidateBottleIds: decision.candidateBottleIds ?? [],
+      identityScope: decision.identityScope ?? "product",
+      observation: decision.observation ?? null,
+      matchedBottleId: decision.suggestedBottleId,
+      matchedReleaseId: decision.suggestedReleaseId ?? null,
+      parentBottleId: null,
+      proposedBottle: null,
+      proposedRelease: null,
+    };
+  }
+
+  if (decision.action === "create_new") {
+    const creationTarget = decision.creationTarget ?? "bottle";
+    const action =
+      creationTarget === "release"
+        ? "create_release"
+        : creationTarget === "bottle_and_release"
+          ? "create_bottle_and_release"
+          : "create_bottle";
+
+    return {
+      action,
+      confidence: decision.confidence ?? 0,
+      rationale: decision.rationale ?? null,
+      candidateBottleIds: decision.candidateBottleIds ?? [],
+      identityScope: decision.identityScope ?? "product",
+      observation: decision.observation ?? null,
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId:
+        creationTarget === "release" ? decision.parentBottleId : null,
+      proposedBottle:
+        creationTarget === "release" ? null : (decision.proposedBottle ?? null),
+      proposedRelease:
+        creationTarget === "bottle" ? null : (decision.proposedRelease ?? null),
+    };
+  }
+
+  return decision;
 }
 
 describe("priceMatching", () => {
@@ -315,6 +388,7 @@ describe("priceMatching", () => {
 
     vi.mocked(extractFromText).mockResolvedValue({
       brand: "Confidence Brand",
+      bottler: null,
       expression: "Reserve",
       series: null,
       distillery: ["Confidence Distillery"],
@@ -324,6 +398,8 @@ describe("priceMatching", () => {
       release_year: null,
       vintage_year: null,
       cask_type: null,
+      cask_size: null,
+      cask_fill: null,
       cask_strength: null,
       single_cask: null,
       edition: null,
@@ -821,6 +897,7 @@ describe("priceMatching", () => {
 
     vi.mocked(extractFromText).mockResolvedValue({
       brand: "Local Only Brand",
+      bottler: null,
       expression: "Reserve",
       series: null,
       distillery: ["Local Only Distillery"],
@@ -830,6 +907,8 @@ describe("priceMatching", () => {
       release_year: null,
       vintage_year: null,
       cask_type: null,
+      cask_size: null,
+      cask_fill: null,
       cask_strength: null,
       single_cask: null,
       edition: null,
@@ -901,6 +980,7 @@ describe("priceMatching", () => {
 
     vi.mocked(extractFromText).mockResolvedValue({
       brand: "Normalized Brand",
+      bottler: null,
       expression: "8 Year",
       series: null,
       distillery: ["Normalized Distillery"],
@@ -910,6 +990,8 @@ describe("priceMatching", () => {
       release_year: null,
       vintage_year: null,
       cask_type: null,
+      cask_size: null,
+      cask_fill: null,
       cask_strength: null,
       single_cask: null,
       edition: null,
@@ -993,6 +1075,7 @@ describe("priceMatching", () => {
 
     vi.mocked(extractFromText).mockResolvedValue({
       brand: "Normalized Brand",
+      bottler: null,
       expression: "8 Year",
       series: null,
       distillery: ["Normalized Distillery"],
@@ -1002,6 +1085,8 @@ describe("priceMatching", () => {
       release_year: null,
       vintage_year: null,
       cask_type: null,
+      cask_size: null,
+      cask_fill: null,
       cask_strength: null,
       single_cask: null,
       edition: null,
@@ -1108,6 +1193,7 @@ describe("priceMatching", () => {
 
     vi.mocked(extractFromText).mockResolvedValue({
       brand: "Spirit Brand",
+      bottler: null,
       expression: "Reserve",
       series: null,
       distillery: ["Spirit Distillery"],
@@ -1117,6 +1203,8 @@ describe("priceMatching", () => {
       release_year: 2024,
       vintage_year: 2010,
       cask_type: null,
+      cask_size: null,
+      cask_fill: null,
       cask_strength: null,
       single_cask: null,
       edition: "Batch 1",
@@ -1234,6 +1322,7 @@ describe("priceMatching", () => {
 
     vi.mocked(extractFromText).mockResolvedValue({
       brand: "Evidence Brand",
+      bottler: null,
       expression: "Reserve",
       series: null,
       distillery: ["Evidence Distillery"],
@@ -1243,6 +1332,8 @@ describe("priceMatching", () => {
       release_year: null,
       vintage_year: null,
       cask_type: null,
+      cask_size: null,
+      cask_fill: null,
       cask_strength: null,
       single_cask: null,
       edition: null,
@@ -1709,6 +1800,7 @@ describe("priceMatching", () => {
 
     vi.mocked(extractFromText).mockResolvedValue({
       brand: "Auto Brand",
+      bottler: null,
       expression: "Web Reserve",
       series: null,
       distillery: ["Auto Distillery"],
@@ -1718,6 +1810,8 @@ describe("priceMatching", () => {
       release_year: null,
       vintage_year: null,
       cask_type: null,
+      cask_size: null,
+      cask_fill: null,
       cask_strength: null,
       single_cask: null,
       edition: null,
@@ -1841,6 +1935,7 @@ describe("priceMatching", () => {
 
     vi.mocked(extractFromText).mockResolvedValue({
       brand: "Retry Auto Brand",
+      bottler: null,
       expression: "Lease Reserve",
       series: null,
       distillery: ["Retry Auto Distillery"],
@@ -1850,6 +1945,8 @@ describe("priceMatching", () => {
       release_year: null,
       vintage_year: null,
       cask_type: null,
+      cask_size: null,
+      cask_fill: null,
       cask_strength: null,
       single_cask: null,
       edition: null,
@@ -1971,6 +2068,7 @@ describe("priceMatching", () => {
 
     vi.mocked(extractFromText).mockResolvedValue({
       brand: "Replacement Brand",
+      bottler: null,
       expression: "Fresh Release",
       series: null,
       distillery: ["Replacement Distillery"],
@@ -1980,6 +2078,8 @@ describe("priceMatching", () => {
       release_year: null,
       vintage_year: null,
       cask_type: null,
+      cask_size: null,
+      cask_fill: null,
       cask_strength: null,
       single_cask: null,
       edition: null,
@@ -2159,6 +2259,7 @@ describe("priceMatching", () => {
 
     vi.mocked(extractFromText).mockResolvedValue({
       brand: "Failure Brand",
+      bottler: null,
       expression: "Reserve",
       series: null,
       distillery: ["Failure Distillery"],
@@ -2168,6 +2269,10 @@ describe("priceMatching", () => {
       release_year: null,
       vintage_year: null,
       cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
       edition: null,
     });
 
@@ -2636,6 +2741,7 @@ describe("priceMatching", () => {
 
     vi.mocked(extractFromText).mockResolvedValue({
       brand: "Retry Brand",
+      bottler: null,
       expression: "Reserve",
       series: null,
       distillery: ["Retry Distillery"],
@@ -2645,6 +2751,8 @@ describe("priceMatching", () => {
       release_year: null,
       vintage_year: null,
       cask_type: null,
+      cask_size: null,
+      cask_fill: null,
       cask_strength: null,
       single_cask: null,
       edition: null,
@@ -2727,6 +2835,7 @@ describe("priceMatching", () => {
 
     vi.mocked(extractFromText).mockResolvedValue({
       brand: "Draft Brand",
+      bottler: null,
       expression: "Reserve",
       series: null,
       distillery: ["Draft Distillery"],
@@ -2736,6 +2845,8 @@ describe("priceMatching", () => {
       release_year: null,
       vintage_year: null,
       cask_type: null,
+      cask_size: null,
+      cask_fill: null,
       cask_strength: null,
       single_cask: null,
       edition: null,
@@ -2865,6 +2976,7 @@ describe("priceMatching", () => {
 
     vi.mocked(extractFromText).mockResolvedValue({
       brand: "Canonical Brand",
+      bottler: null,
       expression: "Reserve",
       series: null,
       distillery: ["Canonical Distillery"],
@@ -2874,6 +2986,8 @@ describe("priceMatching", () => {
       release_year: null,
       vintage_year: null,
       cask_type: null,
+      cask_size: null,
+      cask_fill: null,
       cask_strength: null,
       single_cask: null,
       edition: null,
@@ -2999,6 +3113,7 @@ describe("priceMatching", () => {
 
     vi.mocked(extractFromText).mockResolvedValue({
       brand: "Unknown Brand",
+      bottler: null,
       expression: "Reserve",
       series: null,
       distillery: ["Unknown Distillery"],
@@ -3008,6 +3123,8 @@ describe("priceMatching", () => {
       release_year: null,
       vintage_year: null,
       cask_type: null,
+      cask_size: null,
+      cask_fill: null,
       cask_strength: null,
       single_cask: null,
       edition: null,
@@ -3094,6 +3211,7 @@ describe("priceMatching", () => {
 
     vi.mocked(extractFromText).mockResolvedValue({
       brand: "Retry Brand",
+      bottler: null,
       expression: "Retry Lease Candidate",
       series: null,
       distillery: null,
@@ -3103,6 +3221,8 @@ describe("priceMatching", () => {
       release_year: null,
       vintage_year: null,
       cask_type: null,
+      cask_size: null,
+      cask_fill: null,
       cask_strength: null,
       single_cask: null,
       edition: null,

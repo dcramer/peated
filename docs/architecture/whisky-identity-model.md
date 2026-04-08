@@ -58,6 +58,12 @@ Observation-only facts by default:
 - Preserve exact source facts as observations first. Do not force a canonical release split just because a retailer page mentions a cask number or similar exact detail.
 - Promote an observation fact into canonical release identity only when it is clearly part of the marketed release or moderators decide it is needed for recurring disambiguation.
 
+## Single Known Release Rule
+
+- If the only currently known marketed form is a single dated, batched, or otherwise specific version and there is no clear reusable parent expression yet, it may live on `bottle` initially.
+- If a second sibling later appears and the shared parent expression becomes clear, split the record into a parent `bottle` plus child `bottle_release` rows and move release-specific traits there.
+- If the year or code is itself the stable marketed product identity rather than optional precision, keep it at the bottle layer instead of forcing a child release.
+
 ## Precision Layers
 
 - `release` is shared canon. It is the reusable identity that multiple tastings, prices, and pages should point to.
@@ -85,6 +91,7 @@ Normal user input should focus on:
 - `Macallan 18` with annual vintages: one bottle, separate releases by vintage year.
 - `Springbank 12 Cask Strength Batch 24`: one bottle, release carries `edition = Batch 24`.
 - `Maker's Mark Private Selection S2B13`: one bottle, release carries `edition = S2B13`; any more exact barrel data stays in observations unless it becomes canonical.
+- `Mystery Distillery 1990 Release`: if `1990` is the only known marketed form and no reusable parent expression is established yet, one bottle is acceptable. If a `1991 Release` later appears under the same parent expression, split into one bottle plus `1990` and `1991` releases.
 - `Octomore 13.1` vs `Octomore 13.3`: separate bottles under a shared range because drinkers generally treat them as different expressions.
 - `SMWS 6.53`: the SMWS code is part of the bottle identity; additional retailer-only detail stays in observations.
 

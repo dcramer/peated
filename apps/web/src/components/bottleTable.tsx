@@ -2,12 +2,24 @@
 
 import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/lib/format";
-import type { Bottle, CollectionBottle, PagingRel } from "@peated/server/types";
+import type {
+  Bottle,
+  BottleRelease,
+  CollectionBottle,
+  PagingRel,
+} from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import type { ComponentProps } from "react";
+import { formatBottlingName } from "../lib/bottlings";
 import BottleLink from "./bottleLink";
 import SimpleRatingIndicator from "./simpleRatingIndicator";
 import Table from "./table";
+
+type BottleRow = {
+  bottle: Bottle;
+  release: BottleRelease | null;
+  key: string;
+};
 
 export default function BottleTable({
   bottleList,
@@ -17,11 +29,20 @@ export default function BottleTable({
   bottleList: (Bottle | CollectionBottle)[];
   rel?: PagingRel;
 }) {
+  const rows: BottleRow[] = bottleList.map((item) =>
+    "bottle" in item
+      ? {
+          bottle: item.bottle,
+          release: item.release ?? null,
+          key: `collection-${item.id}`,
+        }
+      : { bottle: item, release: null, key: `bottle-${item.id}` },
+  );
+
   return (
-    <Table<Bottle>
-      items={bottleList.map((b) => {
-        return "bottle" in b ? b.bottle : b;
-      })}
+    <Table<BottleRow>
+      items={rows}
+      primaryKey={(item) => item.key}
       rel={rel}
       columns={[
         {
@@ -35,28 +56,33 @@ export default function BottleTable({
               <div className="flex flex-col justify-center">
                 <div className="flex items-center gap-x-1">
                   <BottleLink
-                    bottle={item}
+                    bottle={item.bottle}
                     className="font-medium hover:underline"
                   >
-                    {item.brand.shortName || item.brand.name} {item.name}
+                    {item.bottle.brand.shortName || item.bottle.brand.name}{" "}
+                    {item.bottle.name}
                   </BottleLink>
-                  {item.isFavorite && (
+                  {item.bottle.isFavorite && (
                     <StarIcon className="h-4 w-4" aria-hidden="true" />
                   )}
-                  {item.hasTasted && (
+                  {item.bottle.hasTasted && (
                     <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
                   )}
                 </div>
-                <div className="text-muted flex gap-x-1 text-sm">
-                  {item.category && (
+                <div className="text-muted flex flex-col gap-y-1 text-sm">
+                  {item.release && (
+                    <div>
+                      Specific Bottling: {formatBottlingName(item.release)}
+                    </div>
+                  )}
+                  {item.bottle.category && (
                     <Link
-                      href={`/bottles/?category=${item.category}`}
+                      href={`/bottles/?category=${item.bottle.category}`}
                       className="hover:underline"
                     >
-                      {formatCategoryName(item.category)}
+                      {formatCategoryName(item.bottle.category)}
                     </Link>
                   )}
-                  {!!item.edition && <span>({item.edition})</span>}
                 </div>
               </div>
             );
@@ -64,13 +90,15 @@ export default function BottleTable({
         },
         {
           name: "tastings",
-          value: (item) => item.totalTastings.toLocaleString(),
+          value: (item) => item.bottle.totalTastings.toLocaleString(),
           className: "sm:w-1/6",
           sortDefaultOrder: "desc",
         },
         {
           name: "rating",
-          value: (item) => <SimpleRatingIndicator avgRating={item.avgRating} />,
+          value: (item) => (
+            <SimpleRatingIndicator avgRating={item.bottle.avgRating} />
+          ),
           className: "sm:w-1/6",
           sortDefaultOrder: "desc",
           align: "center",
@@ -78,11 +106,11 @@ export default function BottleTable({
         {
           name: "age",
           value: (item) =>
-            item.statedAge ? (
+            item.bottle.statedAge ? (
               <Link
                 className="hover:underline"
-                href={`/bottles/?age=${item.statedAge}`}
-              >{`${item.statedAge} years`}</Link>
+                href={`/bottles/?age=${item.bottle.statedAge}`}
+              >{`${item.bottle.statedAge} years`}</Link>
             ) : null,
           className: "sm:w-1/6",
           sortDefaultOrder: "desc",

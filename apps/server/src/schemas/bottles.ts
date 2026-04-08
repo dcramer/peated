@@ -26,21 +26,23 @@ export const BottleSchema = z.object({
 
   series: BottleSeriesSchema.nullable()
     .default(null)
-    .describe(
-      "Series name for this bottling (e.g. Supernova for Ardbeg Supernova)",
-    ),
+    .describe("Series or family name for this bottle"),
 
   category: CategoryEnum.nullable()
     .default(null)
     .describe("Category of the whisky (e.g., Scotch, Bourbon, etc.)"),
 
-  // <deprecated>: moving to editions
+  // These release-like traits can still live on the bottle when no reusable
+  // child release exists yet, and they also support older rows that predate
+  // explicit bottle_release splits.
   edition: z
     .string()
     .trim()
     .nullable()
     .default(null)
-    .describe("Edition name or number for this bottling"),
+    .describe(
+      "Optional release-like label stored on the bottle when no child release exists yet",
+    ),
   statedAge: z
     .number()
     .min(0)
@@ -72,14 +74,18 @@ export const BottleSchema = z.object({
     .lte(new Date().getFullYear())
     .nullable()
     .default(null)
-    .describe("Year the whisky was distilled"),
+    .describe(
+      "Distillation year when it belongs to the bottle identity or no child release exists yet",
+    ),
   releaseYear: z
     .number()
     .gte(1800)
     .lte(new Date().getFullYear())
     .nullable()
     .default(null)
-    .describe("Year the whisky was released"),
+    .describe(
+      "Release year when it belongs to the bottle identity or no child release exists yet",
+    ),
 
   caskType: CaskTypeEnum.nullable()
     .default(null)
@@ -90,7 +96,6 @@ export const BottleSchema = z.object({
   caskFill: CaskFillEnum.nullable()
     .default(null)
     .describe("Fill number of the cask (1st fill, refill, etc.)"),
-  // </deprecated>: moving to editions
 
   brand: EntitySchema.describe("The brand that produces this bottle"),
   distillers: z
@@ -167,7 +172,7 @@ export const BottleSchema = z.object({
     .number()
     .gte(0)
     .readonly()
-    .describe("Number of different editions of this bottle"),
+    .describe("Number of specific releases recorded under this bottle"),
 
   createdAt: z
     .string()

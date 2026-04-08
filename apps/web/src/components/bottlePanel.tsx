@@ -39,7 +39,7 @@ export default function BottlePanel({
         <div className="h-auto flex-1 lg:w-10/12 lg:flex-auto">
           <div className="flex justify-center gap-4 px-4 lg:justify-start lg:px-0">
             <Suspense fallback={<SkeletonButton className="w-10" />}>
-              <CollectionAction bottle={bottle} />
+              <CollectionAction bottleId={bottle.id} />
             </Suspense>
 
             <Button

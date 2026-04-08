@@ -54,6 +54,7 @@ Operational rule:
 - If bottle identity is clear but release identity is not, match the bottle and leave `releaseId = null`.
 - Do not force a release from weak evidence.
 - Preserve the exact source facts as a `bottle_observation` row instead.
+- If a bottle is still carrying a single known release-like identity on itself, do not also create a child `bottle_release`. Split the parent bottle first.
 
 Alias rule:
 
@@ -202,17 +203,18 @@ It returns a reviewed classification result with:
 
 When `status = classified`, the decision must be one of:
 
-- `match_existing`
-- `correction`
-- `create_new`
+- `match`
+- `create_bottle`
+- `create_release`
+- `create_bottle_and_release`
 - `no_match`
 
 Additional rules:
 
-- `suggestedBottleId` must be a known candidate bottle id
-- `suggestedReleaseId`, when present, must be a known candidate release id
+- `matchedBottleId` must be a known candidate bottle id when `action = match`
+- `matchedReleaseId`, when present, must be a known candidate release id
 - `parentBottleId`, when present for release creation, must be a known candidate bottle id
-- `creationTarget` must be explicit for `create_new`
+- `identityScope` is reviewed as `product | exact_cask`
 
 ## Proposal Types
 

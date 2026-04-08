@@ -9,6 +9,7 @@ import Spinner from "@peated/web/components/spinner";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useVerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
+import { getNewBottleBottlingPath } from "@peated/web/lib/bottlings";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
@@ -137,7 +138,7 @@ export default function AddBottle() {
     proposalQuery.data.parentBottle
   ) {
     redirect(
-      `/bottles/${proposalQuery.data.parentBottle.id}/addRelease?proposal=${proposalId}&returnTo=${encodeURIComponent(returnTo || "/admin/queue")}`,
+      `${getNewBottleBottlingPath(proposalQuery.data.parentBottle.id)}?proposal=${proposalId}&returnTo=${encodeURIComponent(returnTo || "/admin/queue")}`,
     );
   }
 

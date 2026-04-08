@@ -26,6 +26,7 @@
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
     "test": "turbo test",
+    "evals:classifier": "pnpm --filter @peated/bottle-classifier evals",
     "test:ci": "CI=true pnpm -r run test:ci",
     "preinstall": "npx only-allow pnpm",
     "postinstall": "simple-git-hooks",

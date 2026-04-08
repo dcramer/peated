@@ -37,7 +37,12 @@ export const ExtractedBottleDetailsSchema = z.object({
 export const BottleReferenceIdentitySchema = ExtractedBottleDetailsSchema;
 
 export const PriceMatchCandidateSchema = z.object({
-  kind: z.enum(["bottle", "release"]).optional(),
+  kind: z
+    .enum(["bottle", "release"])
+    .optional()
+    .describe(
+      "Internal candidate discriminator: `bottle` means a parent bottle candidate and `release` means a child bottle_release candidate.",
+    ),
   bottleId: z.number().int(),
   releaseId: z.number().int().nullable().optional(),
   alias: z.string().nullable().default(null),

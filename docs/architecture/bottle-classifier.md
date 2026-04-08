@@ -7,21 +7,30 @@ for bottle identity reasoning for any generic bottle reference input.
 
 The implementation lives in:
 
-- `apps/server/src/agents/bottleClassifier/classifyBottleReference.ts`
-- `apps/server/src/agents/bottleClassifier/contract.ts`
+- `packages/bottle-classifier/src/classifier.ts`
+- `packages/bottle-classifier/src/contract.ts`
+- `packages/bottle-classifier/README.md`
+- `packages/bottle-classifier/AGENTS.md`
 
-The low-level LLM/tool runner lives in:
+Server composition lives in:
 
-- `apps/server/src/agents/bottleClassifier/runBottleClassifierAgent.ts`
+- `apps/server/src/agents/bottleClassifier/service.ts`
 
-Shared bottle-classifier infrastructure lives in:
+Classifier-owned infrastructure lives in:
+
+- `packages/bottle-classifier/src/instructions.ts`
+- `packages/bottle-classifier/src/extractor.ts`
+- `packages/bottle-classifier/src/classificationPolicy.ts`
+- `packages/bottle-classifier/src/bottleCreationDrafts.ts`
+- `packages/bottle-classifier/src/bottleClassificationEvidence.ts`
+
+Injected server adapters live in:
 
 - `apps/server/src/lib/bottleReferenceCandidates.ts`
-- `apps/server/src/lib/bottleCreationDrafts.ts`
 
 ## Goal
 
-The classifier should be the only module that turns a raw bottle reference into a reviewed matching decision.
+The classifier should be the only module that turns a raw bottle reference into a reviewed identity decision.
 
 It owns:
 
@@ -30,6 +39,7 @@ It owns:
 3. LLM-led reasoning
 4. server-side validation of model output
 5. deterministic downgrade rules
+6. exact-cask versus parent-bottle scope
 
 Everything downstream should treat the classifier output as authoritative for bottle identity reasoning. Use-case-specific policy such as price-match automation should consume that output rather than reshaping the classifier itself.
 
@@ -61,18 +71,24 @@ The classifier runs in this order:
 3. Retrieve initial local bottle/release candidates.
 4. Run the LLM reasoner with local search, entity search, and web search tools.
 5. Sanitize the returned decision against known candidates and resolved entities.
-6. Downgrade unsafe existing-match recommendations when the candidate is only a loose near-match and there is no exact-name or off-retailer support.
+6. Normalize create actions into reviewed `create_bottle`, `create_release`, or `create_bottle_and_release` outcomes.
+7. Infer `identityScope = product | exact_cask` deterministically.
+8. Downgrade unsafe existing-match recommendations when the candidate is only a loose near-match and there is no exact-name or off-retailer support.
 
 ## Invariants
 
 These rules should remain centralized in the classifier:
 
 - The model may suggest only known candidate bottle/release ids.
-- `create_new` drafts must be normalized before persistence.
+- Create drafts must be normalized before persistence.
 - Flavored whisky / novelty drink exclusion is model-driven, not regex-driven.
 - Over-specific local candidates should not be matched unless the missing differentiator is actually supported.
 - Web evidence is support, not identity by itself.
-- Proposal resolution should not “fix up” raw model decisions after the classifier returns.
+- Generic `single cask` / `single barrel` language is not enough to infer `exact_cask`; exact-cask scope needs a stronger marketed-identity signal such as a known program code or numbered cask identity.
+- Downstream consumers should adapt the reviewed classifier result instead of “fixing up” raw model decisions.
+- Consumer-specific semantics such as price-match `correction` should be derived outside the generic classifier.
+- `create_release` only makes sense when the target bottle is acting as a reusable parent expression, not when the bottle is still storing a single known release-like identity on itself.
+- Downstream persistence must not create a child release while keeping the same release-like traits on the parent bottle. Split the bottle explicitly first.
 
 ## Result Shape
 
@@ -83,6 +99,15 @@ The classifier returns:
 - `decision` when classified
 - `artifacts`
 
+The reviewed `decision` is generic and bottle-centric:
+
+- `action = match | create_bottle | create_release | create_bottle_and_release | no_match`
+- `identityScope = product | exact_cask`
+- `matchedBottleId` and optional `matchedReleaseId` for safe existing matches
+- `parentBottleId` only for `create_release`
+- `proposedBottle` / `proposedRelease` only for create outcomes
+- `observation` for non-canonical exact details such as selector names, cask numbers, bottle numbers, outturn, and exclusive wording
+
 `artifacts` contains:
 
 - `extractedIdentity`
@@ -91,6 +116,8 @@ The classifier returns:
 - `resolvedEntities`
 
 That result is already reviewed for bottle identity. Downstream consumers may apply their own persistence or automation policy on top of it.
+
+Price matching is the main example: it derives `match_existing`, `correction`, and `create_new` proposal semantics from the reviewed classifier result instead of asking the classifier to reason in price-match terms directly.
 
 ## Eval Surface
 
@@ -102,20 +129,46 @@ The classifier contract is intentionally shaped for evals:
 
 That gives eval harnesses a stable place to score both the final decision and the intermediate evidence without reaching into price-matching persistence code.
 
+The current package-local eval harness lives in:
+
+- `packages/bottle-classifier/src/classifier.eval.test.ts`
+- `packages/bottle-classifier/src/classifier.eval.fixtures.ts`
+
+Run it from the repo root with:
+
+- `pnpm evals:classifier`
+
+Local setup for live evals:
+
+- put `OPENAI_API_KEY` in the repo-root `.env.local`
+- `OPENAI_MODEL` is optional for evals and defaults to `gpt-5.4`
+- set `OPENAI_EVAL_MODEL` only if you want a different judge model; otherwise the judge reuses `OPENAI_MODEL`
+- `OPENAI_HOST`, `OPENAI_ORGANIZATION`, and `OPENAI_PROJECT` are optional for proxy or non-default account routing
+- `BRAVE_API_KEY` is optional; without it the classifier still runs with OpenAI web search only
+- `BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES` is optional and defaults to `3`
+
+Notes:
+
+- both `pnpm evals:classifier` and `pnpm --filter @peated/bottle-classifier evals` load the repo-root `.env` and then `.env.local`
+- the eval suite is intentionally a live LLM integration test; each case runs the classifier and then an LLM judge scores the result
+- the fixture set is meant to mirror production-style inputs such as SMWS listings, retailer titles, and user-entered shorthand names
+
 ## Internal Structure
 
 The classifier is intentionally split into a few narrow modules:
 
 - `contract.ts` defines the public API and normalized result artifacts.
-- `classifyBottleReference.ts` is the reviewed orchestration boundary.
-- `runBottleClassifierAgent.ts` is only the model/tool loop.
-- `classificationPolicy.ts` owns deterministic validation and downgrade rules.
-- `bottleReferenceCandidates.ts` owns extraction and local candidate retrieval.
-- `bottleCreationDrafts.ts` owns bottle/release draft normalization for `create_new`.
+- `classifier.ts` owns the reviewed orchestration boundary and the raw model/tool loop.
+- `classificationPolicy.ts` owns deterministic validation, create normalization, exact-cask scope inference, and downgrade rules.
+- `extractor.ts` owns bottle-label extraction.
+- `instructions.ts` owns classifier and extractor prompts.
+- `bottleCreationDrafts.ts` owns bottle/release draft normalization for create decisions.
+- `apps/server/src/agents/bottleClassifier/service.ts` injects server search adapters and config.
 
-Price matching still has compatibility wrappers for some older module names, but
-the canonical implementation now lives under the generic bottle-classifier
-names above. New code and eval tooling should depend on the generic modules.
+Price matching and other server consumers still have compatibility wrappers for
+older module names, but the canonical implementation now lives in the package.
+New code and eval tooling should depend on the package and only use the server
+layer for composition.
 
 ## Use Cases
 

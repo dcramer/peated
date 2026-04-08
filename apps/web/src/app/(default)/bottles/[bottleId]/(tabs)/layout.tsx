@@ -1,5 +1,6 @@
 import Link from "@peated/web/components/link";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
+import { getBottleBottlingsPath } from "@peated/web/lib/bottlings";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
@@ -51,6 +52,7 @@ export default async function Layout({
   );
 
   const baseUrl = `/bottles/${bottle.id}`;
+  const bottlingsUrl = getBottleBottlingsPath(bottle.id);
 
   return (
     <>
@@ -61,8 +63,8 @@ export default async function Layout({
         <TabItem as={Link} href={`${baseUrl}/tastings`} controlled>
           Tastings ({bottle.totalTastings.toLocaleString()})
         </TabItem>
-        <TabItem as={Link} href={`${baseUrl}/releases`} controlled>
-          Releases ({bottle.numReleases.toLocaleString()})
+        <TabItem as={Link} href={bottlingsUrl} controlled>
+          Bottlings ({bottle.numReleases.toLocaleString()})
         </TabItem>
         <TabItem as={Link} href={`${baseUrl}/prices`} controlled desktopOnly>
           Prices

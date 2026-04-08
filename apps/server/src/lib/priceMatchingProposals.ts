@@ -2,6 +2,7 @@ import {
   BottleClassificationError,
   classifyBottleReference,
   isIgnoredBottleClassification,
+  type BottleMatchDecision,
 } from "@peated/server/agents/bottleClassifier";
 import config from "@peated/server/config";
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
@@ -141,29 +142,30 @@ function shouldAutoIgnoreTrivialNonWhiskyListing(name: string): boolean {
   );
 }
 
-function normalizePriceMatchDecision(
-  decision: StorePriceMatchDecision,
+function normalizeClassifierDecisionForPriceMatching(
+  decision: BottleMatchDecision,
   candidates: PriceMatchCandidate[],
-): StorePriceMatchDecision {
+): BottleMatchDecision {
   if (
-    decision.suggestedBottleId != null &&
+    decision.action === "match" &&
     !candidates.some(
-      (candidate) => candidate.bottleId === decision.suggestedBottleId,
+      (candidate) => candidate.bottleId === decision.matchedBottleId,
     )
   ) {
     throw new Error(
-      `Classifier returned unknown suggested bottle id (${decision.suggestedBottleId}).`,
+      `Classifier returned unknown suggested bottle id (${decision.matchedBottleId}).`,
     );
   }
 
   if (
-    decision.suggestedReleaseId != null &&
+    decision.action === "match" &&
+    decision.matchedReleaseId != null &&
     !candidates.some(
-      (candidate) => candidate.releaseId === decision.suggestedReleaseId,
+      (candidate) => candidate.releaseId === decision.matchedReleaseId,
     )
   ) {
     throw new Error(
-      `Classifier returned unknown suggested release id (${decision.suggestedReleaseId}).`,
+      `Classifier returned unknown suggested release id (${decision.matchedReleaseId}).`,
     );
   }
 
@@ -171,8 +173,7 @@ function normalizePriceMatchDecision(
   // layer limited to persistence compatibility checks instead of re-running
   // classifier policy here.
   if (
-    decision.action === "create_new" &&
-    decision.parentBottleId != null &&
+    decision.action === "create_release" &&
     !candidates.some(
       (candidate) => candidate.bottleId === decision.parentBottleId,
     )
@@ -185,6 +186,94 @@ function normalizePriceMatchDecision(
   return {
     ...decision,
     confidence: normalizeClassifierConfidence(decision.confidence),
+  };
+}
+
+function toStorePriceMatchDecision({
+  price,
+  decision,
+}: {
+  price: Pick<StorePrice, "bottleId" | "releaseId">;
+  decision: BottleMatchDecision;
+}): StorePriceMatchDecision {
+  if (decision.action === "match") {
+    const action =
+      price.bottleId !== null &&
+      (price.bottleId !== decision.matchedBottleId ||
+        price.releaseId !== decision.matchedReleaseId)
+        ? "correction"
+        : "match_existing";
+
+    return {
+      action,
+      confidence: decision.confidence,
+      rationale: decision.rationale,
+      candidateBottleIds: decision.candidateBottleIds,
+      suggestedBottleId: decision.matchedBottleId,
+      suggestedReleaseId: decision.matchedReleaseId,
+      parentBottleId: null,
+      creationTarget: null,
+      proposedBottle: null,
+      proposedRelease: null,
+    };
+  }
+
+  if (decision.action === "create_bottle") {
+    return {
+      action: "create_new",
+      confidence: decision.confidence,
+      rationale: decision.rationale,
+      candidateBottleIds: decision.candidateBottleIds,
+      suggestedBottleId: null,
+      suggestedReleaseId: null,
+      parentBottleId: null,
+      creationTarget: "bottle",
+      proposedBottle: decision.proposedBottle,
+      proposedRelease: null,
+    };
+  }
+
+  if (decision.action === "create_release") {
+    return {
+      action: "create_new",
+      confidence: decision.confidence,
+      rationale: decision.rationale,
+      candidateBottleIds: decision.candidateBottleIds,
+      suggestedBottleId: null,
+      suggestedReleaseId: null,
+      parentBottleId: decision.parentBottleId,
+      creationTarget: "release",
+      proposedBottle: null,
+      proposedRelease: decision.proposedRelease,
+    };
+  }
+
+  if (decision.action === "create_bottle_and_release") {
+    return {
+      action: "create_new",
+      confidence: decision.confidence,
+      rationale: decision.rationale,
+      candidateBottleIds: decision.candidateBottleIds,
+      suggestedBottleId: null,
+      suggestedReleaseId: null,
+      parentBottleId: null,
+      creationTarget: "bottle_and_release",
+      proposedBottle: decision.proposedBottle,
+      proposedRelease: decision.proposedRelease,
+    };
+  }
+
+  return {
+    action: "no_match",
+    confidence: decision.confidence,
+    rationale: decision.rationale,
+    candidateBottleIds: decision.candidateBottleIds,
+    suggestedBottleId: null,
+    suggestedReleaseId: null,
+    parentBottleId: null,
+    creationTarget: null,
+    proposedBottle: null,
+    proposedRelease: null,
   };
 }
 
@@ -1003,10 +1092,14 @@ export async function resolveStorePriceMatchProposal(
       });
     }
 
-    const decision = normalizePriceMatchDecision(
+    const classifierDecision = normalizeClassifierDecisionForPriceMatching(
       classification.decision,
       candidates,
     );
+    const decision = toStorePriceMatchDecision({
+      price,
+      decision: classifierDecision,
+    });
     const automationAssessment = getStorePriceMatchAutomationAssessment({
       action: decision.action,
       modelConfidence: decision.confidence,

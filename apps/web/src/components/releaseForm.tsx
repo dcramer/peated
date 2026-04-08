@@ -91,7 +91,7 @@ export default function ReleaseForm({
             {...register("edition")}
             error={errors.edition}
             autoFocus
-            label="Edition"
+            label="Edition / Bottling Label"
             type="text"
             placeholder="e.g. Batch #1, Distillers Release"
             helpText={BottleReleaseInputSchema.shape.edition.description}

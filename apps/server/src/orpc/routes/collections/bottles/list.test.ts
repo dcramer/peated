@@ -106,4 +106,94 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     expect(bottle1Result?.bottle.name).toBe(bottle1.name);
     expect(bottle2Result?.bottle.name).toBe(bottle2.name);
   });
+
+  test("can filter collection bottles by exact bottle", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release1 = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "A",
+    });
+    const release2 = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "B",
+    });
+
+    const defaultCollection = await getDefaultCollection(db, defaults.user.id);
+    if (!defaultCollection) {
+      throw new Error("Default collection not found");
+    }
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: defaultCollection.id,
+        bottleId: bottle.id,
+        releaseId: release1.id,
+      },
+      {
+        collectionId: defaultCollection.id,
+        bottleId: bottle.id,
+        releaseId: release2.id,
+      },
+    ]);
+
+    const { results } = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "default",
+        bottle: bottle.id,
+        release: release2.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(results).toHaveLength(1);
+    expect(results[0].bottle.id).toBe(bottle.id);
+    expect(results[0].release?.id).toBe(release2.id);
+  });
+
+  test("can filter only the base bottle entry", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Store Pick",
+    });
+
+    const defaultCollection = await getDefaultCollection(db, defaults.user.id);
+    if (!defaultCollection) {
+      throw new Error("Default collection not found");
+    }
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: defaultCollection.id,
+        bottleId: bottle.id,
+        releaseId: null,
+      },
+      {
+        collectionId: defaultCollection.id,
+        bottleId: bottle.id,
+        releaseId: release.id,
+      },
+    ]);
+
+    const { results } = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "default",
+        bottle: bottle.id,
+        baseOnly: true,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(results).toHaveLength(1);
+    expect(results[0].bottle.id).toBe(bottle.id);
+    expect(results[0].release).toBeNull();
+  });
 });

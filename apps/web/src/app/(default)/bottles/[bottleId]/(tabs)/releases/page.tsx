@@ -1,33 +1,23 @@
-"use client";
-
-import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { useORPC } from "@peated/web/lib/orpc/context";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import ReleaseTable from "./releaseTable";
+import { getBottleBottlingsPath } from "@peated/web/lib/bottlings";
+import { permanentRedirect } from "next/navigation";
 
 export default function Page({
   params: { bottleId },
+  searchParams,
 }: {
   params: { bottleId: string };
+  searchParams?: Record<string, string | string[] | undefined>;
 }) {
-  const orpc = useORPC();
-  const queryParams = useApiQueryParams({
-    numericFields: ["cursor", "limit"],
-    overrides: {
-      bottle: Number(bottleId),
-      limit: 100,
-    },
+  const nextParams = new URLSearchParams();
+  Object.entries(searchParams ?? {}).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      value.forEach((item) => nextParams.append(key, item));
+    } else if (value !== undefined) {
+      nextParams.set(key, value);
+    }
   });
 
-  const { data: releaseList } = useSuspenseQuery(
-    orpc.bottleReleases.list.queryOptions({
-      input: queryParams,
-    }),
-  );
-
-  return (
-    <div className="mt-6 px-3 lg:px-0">
-      <ReleaseTable bottleId={Number(bottleId)} releaseList={releaseList} />
-    </div>
+  permanentRedirect(
+    `${getBottleBottlingsPath(bottleId)}${nextParams.size ? `?${nextParams.toString()}` : ""}`,
   );
 }

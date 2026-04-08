@@ -28,6 +28,7 @@ import SelectField from "@peated/web/components/selectField";
 import SeriesField from "@peated/web/components/seriesField";
 import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
+import useAuth from "@peated/web/hooks/useAuth";
 import {
   getFormErrorMessage,
   toChoiceValue,
@@ -41,13 +42,10 @@ import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
-import useAuth from "../hooks/useAuth";
 import BooleanField from "./booleanField";
 import Button from "./button";
-import Collapsable from "./collapsable";
 import { classesForProfile } from "./flavorProfile";
 import Form from "./form";
-import Legend from "./legend";
 import TextAreaField from "./textAreaField";
 
 const categoryList = CATEGORY_LIST.map((c) => ({
@@ -88,6 +86,7 @@ export type BottleFormInitialData = Partial<
   bottler?: number | Entity | ChoiceLike | null;
   series?: number | ChoiceLike | null;
   imageUrl?: string | null;
+  numReleases?: number | null;
 };
 
 const toEntityChoiceValue = (
@@ -114,6 +113,7 @@ export default function BottleForm({
   initialData,
   title,
   returnTo,
+  showBottleReleaseDetails = false,
 }: {
   onSubmit: SubmitHandler<
     Omit<FormSchemaType, "image"> & {
@@ -123,6 +123,7 @@ export default function BottleForm({
   initialData: BottleFormInitialData;
   title: string;
   returnTo?: string | null;
+  showBottleReleaseDetails?: boolean;
 }) {
   const {
     control,
@@ -143,14 +144,14 @@ export default function BottleForm({
     },
   });
 
-  const { user } = useAuth();
-
   const [error, setError] = useState<string | undefined>();
   const [image, setImage] = useState<HTMLCanvasElement | null | undefined>(
     undefined,
   );
   const router = useRouter();
   const orpc = useORPC();
+  const { user } = useAuth();
+  const canUseBottleLookup = !!(user?.mod || user?.admin);
 
   const generateDataMutation = useMutation(
     orpc.ai.bottleLookup.mutationOptions(),
@@ -181,9 +182,6 @@ export default function BottleForm({
     toOption(initialData.series),
   );
 
-  const [showCaskDetails, setShowCaskDetails] = useState(true);
-  const [showAddDetails, setShowAddDetails] = useState(true);
-
   return (
     <FormScreen
       title={title}
@@ -201,6 +199,11 @@ export default function BottleForm({
             the full bottle label.
           </p>
           <p>
+            Keep this form focused on the core bottle. If you care about a
+            specific batch, single cask, or other exact bottling, you can track
+            that later from the bottle page or when recording a tasting.
+          </p>
+          <p>
             Have any suggestions for making it easier to enter correct data?{" "}
             <a href={config.GITHUB_REPO}>Open an Issue on GitHub</a> or{" "}
             <a href={config.DISCORD_LINK}>drop a note on Discord</a> if you have
@@ -213,13 +216,10 @@ export default function BottleForm({
         <PreviewBottleCard
           data={{
             name: watch("name"),
-            edition: watch("edition"),
             category: watch("category"),
             statedAge: watch("statedAge"),
             distillers: distillersValue,
             brand: brandValue,
-            vintageYear: watch("vintageYear"),
-            releaseYear: watch("releaseYear"),
           }}
         />
       </div>
@@ -321,45 +321,8 @@ export default function BottleForm({
               />
             )}
           />
-
-          <TextField
-            {...register("edition")}
-            error={errors.edition}
-            type="text"
-            label="Edition"
-            helpText={
-              <div className="flex flex-col gap-y-2">
-                <p>
-                  If applicable, the edition of the bottling series. This field
-                  should particularly be utilized when a specific bottle may
-                  have multiple editions.
-                </p>
-                <ul className="ml-6 flex list-disc flex-col gap-y-1">
-                  <li>
-                    This may be the release year, the batch number, or a special
-                    limited edition of a bottling.
-                  </li>
-                  <li>
-                    This <strong>should not be</strong> extremely specific
-                    bottling information, such as an individual cask number.
-                  </li>
-                  <li>
-                    This will often be something like <em>6th Edition</em>,{" "}
-                    <em>2010 Release</em>, or <em>Batch 3</em>.
-                  </li>
-                </ul>
-              </div>
-            }
-            placeholder="e.g. 225th Anniversary"
-          />
         </Fieldset>
         <Fieldset>
-          <Legend
-            title="Core Data"
-            isCollapsed={showCaskDetails}
-            onCollapse={() => setShowCaskDetails(!showCaskDetails)}
-          />
-
           <TextField
             {...register("statedAge", {
               setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
@@ -370,21 +333,6 @@ export default function BottleForm({
             placeholder="e.g. 12"
             helpText="The number of years the spirit was aged, as stated on the bottle."
             suffixLabel="years"
-          />
-
-          <TextField
-            {...register("abv", {
-              setValueAs: (v) => (v === "" || !v ? null : parseFloat(v)),
-            })}
-            error={errors.abv}
-            type="number"
-            label="ABV"
-            placeholder="e.g. 40.5"
-            helpText="The Alcohol By Volume percentage of the spirit."
-            suffixLabel="%"
-            step="0.1"
-            min="0"
-            max="100"
           />
 
           <Controller
@@ -440,28 +388,6 @@ export default function BottleForm({
             )}
           />
 
-          <TextField
-            {...register("releaseYear", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
-            })}
-            error={errors.releaseYear}
-            type="number"
-            label="Release Year"
-            placeholder="e.g. 2024"
-            helpText="The year this bottling was released."
-          />
-
-          <TextField
-            {...register("vintageYear", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
-            })}
-            error={errors.vintageYear}
-            type="number"
-            label="Vintage Year"
-            placeholder="e.g. 2024"
-            helpText="The year this spirit was distilled and transferred to a cask."
-          />
-
           <Controller
             name="bottler"
             control={control}
@@ -489,24 +415,80 @@ export default function BottleForm({
           />
         </Fieldset>
 
-        <Fieldset>
-          <Legend
-            title="Cask Specifics"
-            isCollapsed={showCaskDetails}
-            onCollapse={() => setShowCaskDetails(!showCaskDetails)}
-          />
-          <Collapsable open={showCaskDetails}>
+        {showBottleReleaseDetails && (
+          <Fieldset>
+            <div className="text-muted text-sm leading-6">
+              {initialData.numReleases ? (
+                <p>
+                  This bottle already has tracked bottlings. These parent-level
+                  fields should usually be cleared before splitting legacy data
+                  into child bottlings.
+                </p>
+              ) : (
+                <p>
+                  Use these only when the bottle itself is the exact marketed
+                  release and there is no reusable child bottling yet.
+                </p>
+              )}
+            </div>
+
+            <TextField
+              {...register("edition")}
+              error={errors.edition}
+              type="text"
+              label="Edition / Label"
+              helpText="Optional bottle-level release label when this bottle is itself the specific marketed release."
+              placeholder="e.g. Batch 24, 1990 Release"
+            />
+
+            <TextField
+              {...register("abv", {
+                setValueAs: (v) => (v === "" || !v ? null : parseFloat(v)),
+              })}
+              error={errors.abv}
+              type="number"
+              label="ABV"
+              placeholder="e.g. 40.5"
+              helpText="Bottle-level ABV only when it belongs to the bottle identity or no child bottlings exist yet."
+              suffixLabel="%"
+              step="0.1"
+              min="0"
+              max="100"
+            />
+
+            <TextField
+              {...register("releaseYear", {
+                setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              })}
+              error={errors.releaseYear}
+              type="number"
+              label="Release Year"
+              placeholder="e.g. 1990"
+              helpText="Bottle-level release year only when there is not a reusable child bottling yet."
+            />
+
+            <TextField
+              {...register("vintageYear", {
+                setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              })}
+              error={errors.vintageYear}
+              type="number"
+              label="Vintage Year"
+              placeholder="e.g. 1986"
+              helpText="Bottle-level vintage year only when it belongs to the bottle identity or no child bottlings exist yet."
+            />
+
             <BooleanField
               control={control}
               label="Single Cask"
-              helpText="Is this spirit bottled from a single cask?"
+              helpText="Whether the bottle itself is explicitly a single-cask release."
               name="singleCask"
             />
 
             <BooleanField
               control={control}
               label="Cask Strength"
-              helpText="Is this spirit bottled at Cask Strength, usually ranging from 60-65% abv?"
+              helpText="Whether the bottle itself is explicitly bottled at cask strength."
               name="caskStrength"
             />
 
@@ -524,10 +506,7 @@ export default function BottleForm({
                   onChange={(value) => onChange(value?.id)}
                   value={
                     value
-                      ? {
-                          id: value,
-                          name: toTitleCase(value),
-                        }
+                      ? caskFillList.find((item) => item.id === value)
                       : undefined
                   }
                 />
@@ -548,10 +527,7 @@ export default function BottleForm({
                   onChange={(value) => onChange(value?.id)}
                   value={
                     value
-                      ? {
-                          id: value,
-                          name: toTitleCase(value),
-                        }
+                      ? caskTypeList.find((item) => item.id === value)
                       : undefined
                   }
                 />
@@ -572,25 +548,19 @@ export default function BottleForm({
                   onChange={(value) => onChange(value?.id)}
                   value={
                     value
-                      ? {
-                          id: value,
-                          name: toTitleCase(value),
-                        }
+                      ? caskSizeList.find((item) => item.id === value)
                       : undefined
                   }
                 />
               )}
             />
-          </Collapsable>
-        </Fieldset>
+          </Fieldset>
+        )}
 
-        {user && (user.mod || user.admin) && (
-          <Fieldset>
-            <Legend
-              title="Additional Details"
-              isCollapsed={showAddDetails}
-              onCollapse={() => setShowAddDetails(!showAddDetails)}
-            >
+        <Fieldset>
+          <div className="flex items-center justify-between gap-4">
+            <div className="font-medium">Additional Details</div>
+            {canUseBottleLookup && (
               <Button
                 color="primary"
                 onClick={async () => {
@@ -615,75 +585,68 @@ export default function BottleForm({
               >
                 Help me fill this in [Beta]
               </Button>
-            </Legend>
-            <Collapsable open={showAddDetails}>
-              <Controller
-                name="flavorProfile"
-                control={control}
-                render={({ field: { onChange, value, ref, ...field } }) => (
-                  <SelectField
-                    {...field}
-                    error={errors.flavorProfile}
-                    placeholder="The flavor profile of the spirit."
-                    suggestedOptions={[]}
-                    label="Flavor Profile"
-                    onRenderOption={(option) => {
-                      const classes = classesForProfile(
-                        option.id as FlavorProfile,
-                      );
-                      return (
-                        <div className="flex flex-col items-start justify-start gap-y-2 text-left">
-                          <h4
-                            className={`${classes.bg} ${classes.bgHover} rounded px-2 py-1`}
-                          >
-                            {option.name}
-                          </h4>
-                          <div className="text-muted text-sm font-normal">
-                            {notesForProfile(option.id as FlavorProfile)}
-                          </div>
-                        </div>
-                      );
-                    }}
-                    options={flavorProfileList}
-                    onChange={(value) => onChange(value?.id)}
-                    value={
-                      value
-                        ? {
-                            id: value,
-                            name: formatFlavorProfile(value),
-                          }
-                        : undefined
-                    }
-                  />
-                )}
+            )}
+          </div>
+
+          <Controller
+            name="flavorProfile"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                error={errors.flavorProfile}
+                placeholder="The flavor profile of the spirit."
+                suggestedOptions={[]}
+                label="Flavor Profile"
+                onRenderOption={(option) => {
+                  const classes = classesForProfile(option.id as FlavorProfile);
+                  return (
+                    <div className="flex flex-col items-start justify-start gap-y-2 text-left">
+                      <h4
+                        className={`${classes.bg} ${classes.bgHover} rounded px-2 py-1`}
+                      >
+                        {option.name}
+                      </h4>
+                      <div className="text-muted text-sm font-normal">
+                        {notesForProfile(option.id as FlavorProfile)}
+                      </div>
+                    </div>
+                  );
+                }}
+                options={flavorProfileList}
+                onChange={(value) => onChange(value?.id)}
+                value={
+                  value
+                    ? {
+                        id: value,
+                        name: formatFlavorProfile(value),
+                      }
+                    : undefined
+                }
               />
+            )}
+          />
 
-              {user && (user.mod || user.admin) && (
-                <>
-                  <ImageField
-                    name="image"
-                    label="Image"
-                    value={initialData.imageUrl}
-                    onChange={(value) => setImage(value)}
-                    noEditor
-                  />
+          <ImageField
+            name="image"
+            label="Image"
+            value={initialData.imageUrl}
+            onChange={(value) => setImage(value)}
+            noEditor
+          />
 
-                  <TextAreaField
-                    {...register("description", {
-                      setValueAs: (v) => (v === "" || !v ? null : v),
-                      onChange: () => {
-                        setValue("descriptionSrc", "user");
-                      },
-                    })}
-                    error={errors.description}
-                    label="Description"
-                    rows={8}
-                  />
-                </>
-              )}
-            </Collapsable>
-          </Fieldset>
-        )}
+          <TextAreaField
+            {...register("description", {
+              setValueAs: (v) => (v === "" || !v ? null : v),
+              onChange: () => {
+                setValue("descriptionSrc", "user");
+              },
+            })}
+            error={errors.description}
+            label="Description"
+            rows={8}
+          />
+        </Fieldset>
       </Form>
     </FormScreen>
   );

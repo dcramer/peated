@@ -1,0 +1,11 @@
+{
+  "extends": "@peated/tsconfig/internal.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "dist",
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "lib": ["ESNext", "DOM"]
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

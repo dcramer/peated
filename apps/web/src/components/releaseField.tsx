@@ -58,7 +58,7 @@ export default function ReleaseField({
             result.vintageYear ??
             result.releaseYear ??
             result.abv ??
-            "Unnamed Release",
+            "Unnamed Bottling",
           ...result,
         }));
       }}
@@ -78,7 +78,7 @@ export default function ReleaseField({
 }
 
 function CreateForm({
-  createDialogHelpText = "Most values of the release are optional, and we'll come up with a canonical name based on what's present.",
+  createDialogHelpText = "Most values of the bottling are optional, and we'll come up with a canonical name based on what's present.",
   data,
   onSubmit,
   onClose,
@@ -101,7 +101,7 @@ function CreateForm({
     <LayoutModal
       header={
         <FormHeader
-          title="Add Release of Bottle"
+          title="Add Bottling"
           onSave={handleSubmit(onSubmit)}
           saveDisabled={isSubmitting}
           onClose={onClose}

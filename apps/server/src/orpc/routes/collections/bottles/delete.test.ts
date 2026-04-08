@@ -108,7 +108,7 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
     const collection = await fixtures.Collection({
       name: "default",
       createdById: defaults.user.id,
-      totalBottles: 1,
+      totalBottles: 2,
     });
 
     // Add both releases to collection
@@ -147,7 +147,115 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
       .select()
       .from(collections)
       .where(eq(collections.id, collection.id));
+    expect(updatedCollection.totalBottles).toBe(1);
+  });
+
+  test("deletes all exact bottles for a bottle when no release is specified", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release1 = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "A",
+    });
+    const release2 = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "B",
+    });
+    const collection = await fixtures.Collection({
+      name: "default",
+      createdById: defaults.user.id,
+      totalBottles: 2,
+    });
+
+    await db.insert(collectionBottles).values([
+      {
+        bottleId: bottle.id,
+        collectionId: collection.id,
+        releaseId: release1.id,
+      },
+      {
+        bottleId: bottle.id,
+        collectionId: collection.id,
+        releaseId: release2.id,
+      },
+    ]);
+
+    await routerClient.collections.bottles.delete(
+      {
+        user: "me",
+        collection: "default",
+        bottle: bottle.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    const bottleList = await db
+      .select()
+      .from(collectionBottles)
+      .where(eq(collectionBottles.bottleId, bottle.id));
+
+    expect(bottleList).toHaveLength(0);
+
+    const [updatedCollection] = await db
+      .select()
+      .from(collections)
+      .where(eq(collections.id, collection.id));
     expect(updatedCollection.totalBottles).toBe(0);
+  });
+
+  test("deletes only the base bottle entry when baseOnly is specified", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Store Pick",
+    });
+    const collection = await fixtures.Collection({
+      name: "default",
+      createdById: defaults.user.id,
+      totalBottles: 2,
+    });
+
+    await db.insert(collectionBottles).values([
+      {
+        bottleId: bottle.id,
+        collectionId: collection.id,
+        releaseId: null,
+      },
+      {
+        bottleId: bottle.id,
+        collectionId: collection.id,
+        releaseId: release.id,
+      },
+    ]);
+
+    await routerClient.collections.bottles.delete(
+      {
+        user: "me",
+        collection: "default",
+        bottle: bottle.id,
+        baseOnly: true,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    const bottleList = await db
+      .select()
+      .from(collectionBottles)
+      .where(eq(collectionBottles.bottleId, bottle.id));
+
+    expect(bottleList).toHaveLength(1);
+    expect(bottleList[0].releaseId).toBe(release.id);
+
+    const [updatedCollection] = await db
+      .select()
+      .from(collections)
+      .where(eq(collections.id, collection.id));
+    expect(updatedCollection.totalBottles).toBe(1);
   });
 
   test("deleting non-existent bottle from collection", async ({

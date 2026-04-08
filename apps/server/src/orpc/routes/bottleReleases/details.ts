@@ -11,9 +11,9 @@ export default procedure
   .route({
     method: "GET",
     path: "/bottle-releases/{release}",
-    summary: "Get bottle release details",
+    summary: "Get bottle bottling details",
     description:
-      "Retrieve detailed information about a specific bottle release including bottle and creator information",
+      "Retrieve detailed information about a specific bottling including bottle and creator information",
     spec: (spec) => ({
       ...spec,
       operationId: "getBottleRelease",

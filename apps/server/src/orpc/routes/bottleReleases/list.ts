@@ -30,9 +30,9 @@ export default procedure
   .route({
     method: "GET",
     path: "/bottles/{bottle}/releases",
-    summary: "List bottle releases",
+    summary: "List bottle bottlings",
     description:
-      "Retrieve releases for a specific bottle with search, sorting, and pagination support",
+      "Retrieve bottlings for a specific bottle with search, sorting, and pagination support",
     spec: (spec) => ({
       ...spec,
       operationId: "listBottleReleases",
@@ -126,7 +126,7 @@ export default procedure
       .select()
       .from(bottleReleases)
       .where(where ? and(...where) : undefined)
-      .orderBy(orderBy)
+      .orderBy(orderBy, asc(bottleReleases.id))
       .limit(limit + 1)
       .offset(offset);
 

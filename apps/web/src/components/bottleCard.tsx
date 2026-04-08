@@ -6,6 +6,7 @@ import {
 import type { Bottle, BottleRelease } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import type { ComponentPropsWithoutRef } from "react";
+import { formatBottlingName } from "../lib/bottlings";
 import classNames from "../lib/classNames";
 import BottleLink from "./bottleLink";
 import Join from "./join";
@@ -17,9 +18,6 @@ type EntityOption = Option & {
 
 type BottleFormData = {
   name: string;
-  edition?: string | null;
-  vintageYear?: number | null;
-  releaseYear?: number | null;
   brand?: EntityOption | null | undefined;
   distillers?: EntityOption[] | null | undefined;
   statedAge?: number | null | undefined;
@@ -118,14 +116,6 @@ export const PreviewBottleCard = ({
   );
 };
 
-function formatRelease(release: BottleRelease | null | undefined) {
-  if (!release) return null;
-  if (release.edition) {
-    return `${release.edition}${release.releaseYear ? ` (${release.releaseYear})` : ""}${release.vintageYear ? ` (${release.vintageYear} Vintage)` : ""}`;
-  }
-  return `${release.releaseYear ?? release.vintageYear}`;
-}
-
 export default function BottleCard({
   bottle,
   release,
@@ -160,7 +150,7 @@ export default function BottleCard({
           </div>
         </div>
       }
-      release={release ? <div>{formatRelease(release)}</div> : null}
+      release={release ? <div>{formatBottlingName(release)}</div> : null}
       category={
         <div>
           {bottle.category && (

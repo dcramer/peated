@@ -10,6 +10,7 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
+import { isAddingBottleLevelReleaseTraits } from "@peated/server/lib/bottleSchemaRules";
 import {
   coerceToUpsert,
   upsertBottleAlias,
@@ -69,34 +70,65 @@ export default procedure
       });
     }
 
+    const normalizedInput = BottleInputSchema.parse({
+      name: bottle.name,
+      brand: {
+        id: bottle.brand.id,
+        name: bottle.brand.name,
+      },
+      bottler: bottle.bottler
+        ? {
+            id: bottle.bottler.id,
+            name: bottle.bottler.name,
+          }
+        : null,
+      edition: bottle.edition,
+      statedAge: bottle.statedAge,
+      abv: bottle.abv,
+      caskStrength: bottle.caskStrength,
+      singleCask: bottle.singleCask,
+      category: bottle.category,
+      flavorProfile: bottle.flavorProfile,
+      distillers: bottle.bottlesToDistillers.map((d) => ({
+        id: d.distiller.id,
+        name: d.distiller.name,
+      })),
+      vintageYear: bottle.vintageYear,
+      releaseYear: bottle.releaseYear,
+      caskType: bottle.caskType,
+      caskSize: bottle.caskSize,
+      caskFill: bottle.caskFill,
+      ...input,
+    });
+
     const bottleData: BottlePreviewResult & Record<string, any> =
       await bottleNormalize({
-        input: BottleInputSchema.parse({
-          name: bottle.name,
-          brand: {
-            id: bottle.brand.id,
-            name: bottle.brand.name,
-          },
-          bottler: bottle.bottler
-            ? {
-                id: bottle.bottler.id,
-                name: bottle.bottler.name,
-              }
-            : null,
-          statedAge: bottle.statedAge,
-          caskStrength: bottle.caskStrength,
-          singleCask: bottle.singleCask,
-          category: bottle.category,
-          distillers: bottle.bottlesToDistillers.map((d) => ({
-            id: d.distiller.id,
-            name: d.distiller.name,
-          })),
-          vintageYear: bottle.vintageYear,
-          releaseYear: bottle.releaseYear,
-          ...input,
-        }),
+        input: normalizedInput,
         context,
       });
+
+    // bottleNormalize only owns a subset of structural fields. Preserve the
+    // parsed values for the rest so unrelated updates do not implicitly clear
+    // bottle-level release details or flavor metadata.
+    bottleData.edition = normalizedInput.edition;
+    bottleData.abv = normalizedInput.abv;
+    bottleData.flavorProfile = normalizedInput.flavorProfile;
+    bottleData.caskType = normalizedInput.caskType;
+    bottleData.caskSize = normalizedInput.caskSize;
+    bottleData.caskFill = normalizedInput.caskFill;
+
+    if (
+      bottle.numReleases > 0 &&
+      isAddingBottleLevelReleaseTraits({
+        current: bottle,
+        next: bottleData,
+      })
+    ) {
+      throw errors.BAD_REQUEST({
+        message:
+          "Bottle-level release fields cannot be set while child releases exist. Move those details to bottle releases instead.",
+      });
+    }
 
     if (
       input.description !== undefined &&
