@@ -1,5 +1,8 @@
+import { db } from "@peated/server/db";
+import { bottles } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("GET /bottles/release-repair-candidates", () => {
@@ -177,6 +180,40 @@ describe("GET /bottles/release-repair-candidates", () => {
     expect(
       result.results.map((candidate) => candidate.legacyBottle.id),
     ).toEqual([percentBatch.id]);
+  });
+
+  test("does not mark a dirty exact-name parent as actionable", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Aberlour" });
+    const dirtyParent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "A'bunadh",
+      totalTastings: 40,
+    });
+    await db
+      .update(bottles)
+      .set({ edition: "Batch 31" })
+      .where(eq(bottles.id, dirtyParent.id));
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "A'bunadh (Batch 32)",
+      totalTastings: 10,
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "A'bunadh",
+      },
+      { context: { user } },
+    );
+
+    expect(
+      result.results.find(
+        (candidate) => candidate.legacyBottle.id === legacyBottle.id,
+      ),
+    ).toBeUndefined();
   });
 
   test("keeps pagination stable when valid candidates extend past the initial scan window", async ({

@@ -3,6 +3,7 @@
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
+import { useFlashMessages } from "@peated/web/components/flash";
 import Form from "@peated/web/components/form";
 import Link from "@peated/web/components/link";
 import PaginationButtons from "@peated/web/components/paginationButtons";
@@ -11,8 +12,13 @@ import TextInput from "@peated/web/components/textInput";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { buildQueryString } from "@peated/web/lib/urls";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { usePathname, useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 const MARKER_LABELS: Record<string, string> = {
   structured_edition: "Structured edition",
@@ -46,11 +52,47 @@ export default function Page() {
   });
 
   const orpc = useORPC();
-  const { data: candidateList } = useSuspenseQuery(
+  const queryClient = useQueryClient();
+  const { flash } = useFlashMessages();
+  const [repairingBottleId, setRepairingBottleId] = useState<number | null>(
+    null,
+  );
+  const candidateListQueryOptions =
     orpc.bottles.releaseRepairCandidates.queryOptions({
       input: queryParams,
-    }),
+    });
+  const { data: candidateList } = useSuspenseQuery(candidateListQueryOptions);
+  const applyRepairMutation = useMutation(
+    orpc.bottles.applyReleaseRepair.mutationOptions(),
   );
+
+  const applyRepair = async ({
+    bottleId,
+    legacyBottleName,
+    parentBottleName,
+  }: {
+    bottleId: number;
+    legacyBottleName: string;
+    parentBottleName: string;
+  }) => {
+    setRepairingBottleId(bottleId);
+    try {
+      await applyRepairMutation.mutateAsync({
+        bottle: bottleId,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: candidateListQueryOptions.queryKey,
+      });
+      flash(`Moved ${legacyBottleName} under ${parentBottleName}.`);
+    } catch (err) {
+      flash(
+        err instanceof Error ? err.message : "Unable to apply release repair.",
+        "error",
+      );
+    } finally {
+      setRepairingBottleId(null);
+    }
+  };
 
   return (
     <>
@@ -73,8 +115,8 @@ export default function Page() {
       <div className="mb-6 space-y-4">
         <div className="rounded-xl border border-slate-800 bg-slate-950 px-4 py-4 text-sm text-slate-300">
           High-confidence legacy bottles that likely need to be split into a
-          reusable parent bottle plus child releases. This view is audit-only
-          for now.
+          reusable parent bottle plus child releases. Exact-parent candidates
+          can be applied directly here. The rest still need manual follow-up.
         </div>
 
         <Form
@@ -152,6 +194,22 @@ export default function Page() {
                   {candidate.proposedParent.id ? (
                     <Button href={`/bottles/${candidate.proposedParent.id}`}>
                       Open Parent Bottle
+                    </Button>
+                  ) : null}
+                  {candidate.hasExactParent ? (
+                    <Button
+                      color="highlight"
+                      disabled={repairingBottleId === candidate.legacyBottle.id}
+                      loading={repairingBottleId === candidate.legacyBottle.id}
+                      onClick={() =>
+                        applyRepair({
+                          bottleId: candidate.legacyBottle.id,
+                          legacyBottleName: candidate.legacyBottle.fullName,
+                          parentBottleName: candidate.proposedParent.fullName,
+                        })
+                      }
+                    >
+                      Apply Repair
                     </Button>
                   ) : null}
                 </div>
