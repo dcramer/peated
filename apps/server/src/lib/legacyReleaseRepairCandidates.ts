@@ -3,6 +3,7 @@ import { bottles, type Bottle } from "@peated/server/db/schema";
 import { and, desc, eq, ilike, isNotNull, or, sql } from "drizzle-orm";
 import {
   normalizeBottle,
+  normalizeBottleAge,
   normalizeBottleBatchNumber,
   normalizeString,
 } from "./normalize";
@@ -60,6 +61,13 @@ function getTastingCount(value: null | number | undefined): number {
   return value ?? 0;
 }
 
+function normalizeComparableBottleName(fullName: string): string {
+  const normalizedName = normalizeBottleBatchNumber(normalizeString(fullName));
+  return normalizeBottleAge({ name: normalizedName })
+    .name.replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 function extractBatchEdition(fullName: string): string | null {
   const normalizedName = normalizeBottleBatchNumber(normalizeString(fullName));
   const parenthesized = normalizedName.match(/\((Batch [^)]+)\)/i);
@@ -77,6 +85,7 @@ function deriveLegacyReleaseRepairCandidate(
   const normalizedFullName = normalizeBottleBatchNumber(
     normalizeString(bottle.fullName),
   );
+  const comparableFullName = normalizeComparableBottleName(normalizedFullName);
   const parsedIdentity = normalizeBottle({ name: normalizedFullName });
   const edition = bottle.edition ?? extractBatchEdition(normalizedFullName);
   const releaseYear = bottle.releaseYear ?? parsedIdentity.releaseYear;
@@ -127,7 +136,8 @@ function deriveLegacyReleaseRepairCandidate(
 
   if (
     !proposedParentFullName ||
-    proposedParentFullName.toLowerCase() === normalizedFullName.toLowerCase()
+    normalizeComparableBottleName(proposedParentFullName).toLowerCase() ===
+      comparableFullName.toLowerCase()
   ) {
     return null;
   }

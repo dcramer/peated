@@ -110,6 +110,39 @@ describe("GET /bottles/release-repair-candidates", () => {
     });
   });
 
+  test("ignores formatting-only parent matches when release identity is only structured", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Formatting Distillery" });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Archive 15-year-old",
+      statedAge: 15,
+      totalTastings: 50,
+    });
+    const legacyRelease = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Archive 15 Year Old",
+      statedAge: 15,
+      releaseYear: 2024,
+      totalTastings: 10,
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "Archive",
+      },
+      { context: { user } },
+    );
+
+    expect(
+      result.results.find(
+        (candidate) => candidate.legacyBottle.id === legacyRelease.id,
+      ),
+    ).toBeUndefined();
+  });
+
   test("keeps pagination stable when valid candidates extend past the initial scan window", async ({
     fixtures,
   }) => {
