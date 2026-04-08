@@ -5,7 +5,7 @@ packages:
 
 catalog:
   drizzle-kit: ^0.30.6
-  drizzle-orm: ^0.39.3
+  drizzle-orm: ^0.45.2
   eslint: ^8.57.1
   "@fontsource/raleway": ^5.0.19
   jsx-email: ^1.10.11
