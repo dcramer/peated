@@ -1,4 +1,6 @@
 import { base } from "@peated/server/orpc";
+import ageRepairCandidates from "./age-repair-candidates";
+import applyAgeRepair from "./apply-age-repair";
 import applyReleaseRepair from "./apply-release-repair";
 import create from "./create";
 import delete_ from "./delete";
@@ -20,6 +22,8 @@ export default base.tag("bottles").router({
   list,
   create,
   update,
+  ageRepairCandidates,
+  applyAgeRepair,
   applyReleaseRepair,
   delete: delete_,
   merge,
