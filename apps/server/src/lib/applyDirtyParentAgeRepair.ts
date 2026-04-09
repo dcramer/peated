@@ -9,6 +9,7 @@ import {
   collectionBottles,
   flightBottles,
   reviews,
+  storePriceMatchProposals,
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
@@ -474,16 +475,33 @@ export async function applyDirtyParentAgeRepairInTransaction(
   }
 
   for (const storePrice of bottleScopedStorePrices) {
+    const releaseId = resolveBottleLinkedNameReleaseId({
+      defaultReleaseId: release.id,
+      name: storePrice.name,
+      releases: releasesForScope,
+    });
+
     await tx
       .update(storePrices)
       .set({
-        releaseId: resolveBottleLinkedNameReleaseId({
-          defaultReleaseId: release.id,
-          name: storePrice.name,
-          releases: releasesForScope,
-        }),
+        releaseId,
       })
       .where(eq(storePrices.id, storePrice.id));
+
+    await tx
+      .update(storePriceMatchProposals)
+      .set({
+        currentBottleId: bottle.id,
+        currentReleaseId: releaseId,
+        suggestedReleaseId: sql`CASE
+          WHEN ${storePriceMatchProposals.suggestedBottleId} = ${bottle.id}
+            AND ${storePriceMatchProposals.suggestedReleaseId} IS NULL
+          THEN ${releaseId}
+          ELSE ${storePriceMatchProposals.suggestedReleaseId}
+        END`,
+        updatedAt: sql`NOW()`,
+      })
+      .where(eq(storePriceMatchProposals.priceId, storePrice.id));
   }
 
   await Promise.all([

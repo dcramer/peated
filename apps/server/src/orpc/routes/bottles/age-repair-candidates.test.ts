@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { bottles } from "@peated/server/db/schema";
+import { bottleReleases, bottles } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -142,5 +142,75 @@ describe("GET /bottles/age-repair-candidates", () => {
     expect(
       result.results.find((candidate) => candidate.bottle.id === bottle.id),
     ).toBeUndefined();
+  });
+
+  test("continues scanning after filtered rows before applying the candidate cap", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Springbank" });
+    const user = await fixtures.User({ mod: true });
+    const falsePositiveBottles = await db
+      .insert(bottles)
+      .values(
+        Array.from({ length: 2000 }, (_, index) => ({
+          brandId: brand.id,
+          createdById: user.id,
+          fullName: `Springbank 10yo Noise ${index + 1}`,
+          name: `10yo Noise ${index + 1}`,
+          statedAge: 10,
+          numReleases: 1,
+          totalTastings: 5000 - index,
+        })),
+      )
+      .returning({
+        id: bottles.id,
+        fullName: bottles.fullName,
+        name: bottles.name,
+      });
+
+    await db.insert(bottleReleases).values(
+      falsePositiveBottles.map((bottle) => ({
+        bottleId: bottle.id,
+        createdById: user.id,
+        fullName: `${bottle.fullName} - Batch 1`,
+        name: `${bottle.name} - Batch 1`,
+        edition: "Batch 1",
+        statedAge: 12,
+      })),
+    );
+
+    const validBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "1978 Rare Cask Release",
+      statedAge: 40,
+      totalTastings: 1,
+    });
+    await fixtures.BottleRelease({
+      bottleId: validBottle.id,
+      edition: "Batch 1",
+      statedAge: 35,
+      totalTastings: 1,
+    });
+
+    await db
+      .update(bottles)
+      .set({ numReleases: 1 })
+      .where(eq(bottles.id, validBottle.id));
+
+    const result = await routerClient.bottles.ageRepairCandidates(
+      {},
+      { context: { user } },
+    );
+
+    expect(
+      result.results.find(
+        (candidate) => candidate.bottle.id === validBottle.id,
+      ),
+    ).toMatchObject({
+      bottle: {
+        id: validBottle.id,
+      },
+      repairMode: "create_release",
+    });
   });
 });

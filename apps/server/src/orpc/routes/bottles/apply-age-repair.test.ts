@@ -7,6 +7,7 @@ import {
   collectionBottles,
   flightBottles,
   reviews,
+  storePriceMatchProposals,
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
@@ -112,6 +113,21 @@ describe("POST /bottles/:bottle/apply-age-repair", () => {
       bottleId: bottle.id,
     });
 
+    const [genericPriceProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: genericPrice.id,
+        status: "approved",
+        proposalType: "match_existing",
+        currentBottleId: bottle.id,
+        currentReleaseId: null,
+        suggestedBottleId: bottle.id,
+        suggestedReleaseId: null,
+        reviewedById: mod.id,
+        reviewedAt: new Date(),
+      })
+      .returning();
+
     const result = await routerClient.bottles.applyAgeRepair(
       {
         bottle: bottle.id,
@@ -216,6 +232,19 @@ describe("POST /bottles/:bottle/apply-age-repair", () => {
       id: childPrice.id,
       bottleId: bottle.id,
       releaseId: batch1.id,
+    });
+
+    const updatedGenericPriceProposal =
+      await db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, genericPriceProposal.id),
+      });
+    expect(updatedGenericPriceProposal).toMatchObject({
+      id: genericPriceProposal.id,
+      currentBottleId: bottle.id,
+      currentReleaseId: createdRelease.id,
+      suggestedBottleId: bottle.id,
+      suggestedReleaseId: createdRelease.id,
+      status: "approved",
     });
 
     const genericAlias = await db.query.bottleAliases.findFirst({

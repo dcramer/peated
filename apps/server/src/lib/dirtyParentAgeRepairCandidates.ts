@@ -13,7 +13,8 @@ import {
 } from "@peated/server/lib/bottleSchemaRules";
 import { desc, gt, isNotNull, sql } from "drizzle-orm";
 
-const MAX_SCAN_LIMIT = 2000;
+const MAX_CANDIDATE_LIMIT = 2000;
+const SCAN_BATCH_LIMIT = 2000;
 
 type DirtyParentAgeRepairBottle = Pick<
   Bottle,
@@ -231,41 +232,106 @@ export async function getDirtyParentAgeRepairCandidates({
   limit?: number;
   query?: string;
 }) {
-  const suspiciousBottles = await db
-    .select({
-      id: bottles.id,
-      fullName: bottles.fullName,
-      name: bottles.name,
-      statedAge: bottles.statedAge,
-      numReleases: bottles.numReleases,
-      totalTastings: bottles.totalTastings,
-      edition: bottles.edition,
-      releaseYear: bottles.releaseYear,
-      vintageYear: bottles.vintageYear,
-      abv: bottles.abv,
-      singleCask: bottles.singleCask,
-      caskStrength: bottles.caskStrength,
-      caskFill: bottles.caskFill,
-      caskType: bottles.caskType,
-      caskSize: bottles.caskSize,
-    })
-    .from(bottles)
-    .where(
-      sql.join(
-        [
-          isNotNull(bottles.statedAge),
-          gt(bottles.numReleases, 0),
-          query
-            ? sql`${bottles.fullName} ILIKE ${`%${escapeLikePattern(query)}%`} ESCAPE '\\'`
-            : undefined,
-        ].filter((value): value is NonNullable<typeof value> => Boolean(value)),
-        sql` AND `,
-      ),
-    )
-    .orderBy(sql`${bottles.totalTastings} DESC NULLS LAST`, desc(bottles.id))
-    .limit(MAX_SCAN_LIMIT);
+  const candidates: DirtyParentAgeRepairCandidate[] = [];
+  let scanOffset = 0;
 
-  if (suspiciousBottles.length === 0) {
+  while (candidates.length < MAX_CANDIDATE_LIMIT) {
+    const suspiciousBottles = await db
+      .select({
+        id: bottles.id,
+        fullName: bottles.fullName,
+        name: bottles.name,
+        statedAge: bottles.statedAge,
+        numReleases: bottles.numReleases,
+        totalTastings: bottles.totalTastings,
+        edition: bottles.edition,
+        releaseYear: bottles.releaseYear,
+        vintageYear: bottles.vintageYear,
+        abv: bottles.abv,
+        singleCask: bottles.singleCask,
+        caskStrength: bottles.caskStrength,
+        caskFill: bottles.caskFill,
+        caskType: bottles.caskType,
+        caskSize: bottles.caskSize,
+      })
+      .from(bottles)
+      .where(
+        sql.join(
+          [
+            isNotNull(bottles.statedAge),
+            gt(bottles.numReleases, 0),
+            query
+              ? sql`${bottles.fullName} ILIKE ${`%${escapeLikePattern(query)}%`} ESCAPE '\\'`
+              : undefined,
+          ].filter((value): value is NonNullable<typeof value> =>
+            Boolean(value),
+          ),
+          sql` AND `,
+        ),
+      )
+      .orderBy(sql`${bottles.totalTastings} DESC NULLS LAST`, desc(bottles.id))
+      .offset(scanOffset)
+      .limit(SCAN_BATCH_LIMIT);
+
+    if (suspiciousBottles.length === 0) {
+      break;
+    }
+
+    const bottleIds = suspiciousBottles.map((bottle) => bottle.id);
+    const releaseRows = await db
+      .select({
+        id: bottleReleases.id,
+        bottleId: bottleReleases.bottleId,
+        fullName: bottleReleases.fullName,
+        name: bottleReleases.name,
+        statedAge: bottleReleases.statedAge,
+        edition: bottleReleases.edition,
+        releaseYear: bottleReleases.releaseYear,
+        vintageYear: bottleReleases.vintageYear,
+        abv: bottleReleases.abv,
+        singleCask: bottleReleases.singleCask,
+        caskStrength: bottleReleases.caskStrength,
+        caskFill: bottleReleases.caskFill,
+        caskType: bottleReleases.caskType,
+        caskSize: bottleReleases.caskSize,
+        totalTastings: bottleReleases.totalTastings,
+      })
+      .from(bottleReleases)
+      .where(
+        sql`${bottleReleases.bottleId} IN (${sql.join(
+          bottleIds.map((id) => sql`${id}`),
+          sql`, `,
+        )})`,
+      );
+
+    const releasesByBottleId = new Map<number, DirtyParentAgeRepairRelease[]>();
+    for (const release of releaseRows) {
+      const group = releasesByBottleId.get(release.bottleId) ?? [];
+      group.push(release);
+      releasesByBottleId.set(release.bottleId, group);
+    }
+
+    candidates.push(
+      ...suspiciousBottles
+        .map((bottle) =>
+          deriveDirtyParentAgeRepairCandidate({
+            bottle,
+            releases: releasesByBottleId.get(bottle.id) ?? [],
+          }),
+        )
+        .filter((candidate): candidate is DirtyParentAgeRepairCandidate =>
+          Boolean(candidate),
+        ),
+    );
+
+    if (suspiciousBottles.length < SCAN_BATCH_LIMIT) {
+      break;
+    }
+
+    scanOffset += suspiciousBottles.length;
+  }
+
+  if (candidates.length === 0) {
     return {
       results: [],
       rel: {
@@ -274,51 +340,7 @@ export async function getDirtyParentAgeRepairCandidates({
       },
     };
   }
-
-  const bottleIds = suspiciousBottles.map((bottle) => bottle.id);
-  const releaseRows = await db
-    .select({
-      id: bottleReleases.id,
-      bottleId: bottleReleases.bottleId,
-      fullName: bottleReleases.fullName,
-      name: bottleReleases.name,
-      statedAge: bottleReleases.statedAge,
-      edition: bottleReleases.edition,
-      releaseYear: bottleReleases.releaseYear,
-      vintageYear: bottleReleases.vintageYear,
-      abv: bottleReleases.abv,
-      singleCask: bottleReleases.singleCask,
-      caskStrength: bottleReleases.caskStrength,
-      caskFill: bottleReleases.caskFill,
-      caskType: bottleReleases.caskType,
-      caskSize: bottleReleases.caskSize,
-      totalTastings: bottleReleases.totalTastings,
-    })
-    .from(bottleReleases)
-    .where(
-      sql`${bottleReleases.bottleId} IN (${sql.join(
-        bottleIds.map((id) => sql`${id}`),
-        sql`, `,
-      )})`,
-    );
-
-  const releasesByBottleId = new Map<number, DirtyParentAgeRepairRelease[]>();
-  for (const release of releaseRows) {
-    const group = releasesByBottleId.get(release.bottleId) ?? [];
-    group.push(release);
-    releasesByBottleId.set(release.bottleId, group);
-  }
-
-  const candidates = suspiciousBottles
-    .map((bottle) =>
-      deriveDirtyParentAgeRepairCandidate({
-        bottle,
-        releases: releasesByBottleId.get(bottle.id) ?? [],
-      }),
-    )
-    .filter((candidate): candidate is DirtyParentAgeRepairCandidate =>
-      Boolean(candidate),
-    )
+  const cappedCandidates = candidates
     .sort((left, right) => {
       if (left.repairMode !== right.repairMode) {
         return left.repairMode === "existing_release" ? -1 : 1;
@@ -340,10 +362,11 @@ export async function getDirtyParentAgeRepairCandidates({
       }
 
       return right.bottle.id - left.bottle.id;
-    });
+    })
+    .slice(0, MAX_CANDIDATE_LIMIT);
 
   const offset = (cursor - 1) * limit;
-  const results = candidates.slice(offset, offset + limit + 1);
+  const results = cappedCandidates.slice(offset, offset + limit + 1);
 
   return {
     results: results.slice(0, limit),
