@@ -107,6 +107,11 @@ export type LegacyReleaseRepairCandidate = {
     releaseFullName: string | null;
     releaseId: number | null;
   };
+  blockingParent: null | {
+    id: number;
+    fullName: string;
+    totalTastings: number | null;
+  };
   legacyBottle: LegacyReleaseRepairBottle;
   proposedParent: {
     id: number | null;
@@ -228,6 +233,28 @@ export function pickBestLegacyReleaseRepairParent<
   return bestRow;
 }
 
+function pickBestDirtyLegacyReleaseRepairParent<
+  TRow extends LegacyReleaseRepairParentCandidate,
+>(rows: TRow[]): null | TRow {
+  let bestRow: null | TRow = null;
+
+  for (const row of rows) {
+    if (!hasBottleLevelReleaseTraits(row)) {
+      continue;
+    }
+
+    if (
+      !bestRow ||
+      getTastingCount(row.totalTastings) >
+        getTastingCount(bestRow.totalTastings)
+    ) {
+      bestRow = row;
+    }
+  }
+
+  return bestRow;
+}
+
 export function resolveLegacyReleaseRepairParentMatch<
   TRow extends LegacyReleaseRepairParentCandidate,
 >(
@@ -332,6 +359,29 @@ export function getLegacyReleaseRepairParentMode<
   }
 
   return "create_parent";
+}
+
+export function getLegacyReleaseRepairBlockingParent<
+  TRow extends LegacyReleaseRepairParentCandidate,
+>(
+  rows: TRow[],
+  {
+    currentLegacyBottleId,
+    proposedParentFullName,
+  }: {
+    currentLegacyBottleId?: number;
+    proposedParentFullName: string;
+  },
+): null | TRow {
+  const parentMatch = resolveLegacyReleaseRepairParentMatch(rows, {
+    currentLegacyBottleId,
+    proposedParentFullName,
+  });
+
+  return (
+    pickBestDirtyLegacyReleaseRepairParent(parentMatch.exactRows) ??
+    pickBestDirtyLegacyReleaseRepairParent(parentMatch.variantRows)
+  );
 }
 
 export function normalizeComparableBottleName(fullName: string): string {
@@ -766,6 +816,13 @@ export async function getLegacyReleaseRepairCandidates({
         },
       );
       const parent = parentMatch.parent;
+      const blockingParent = getLegacyReleaseRepairBlockingParent(
+        parentRowsForCandidate,
+        {
+          currentLegacyBottleId: candidate.bottle.id,
+          proposedParentFullName: candidate.proposedParentFullName,
+        },
+      );
       const repairMode = getLegacyReleaseRepairParentMode(
         parentRowsForCandidate,
         {
@@ -786,6 +843,14 @@ export async function getLegacyReleaseRepairCandidates({
                 releaseId: parentAlias.releaseId,
               }
             : null,
+        blockingParent:
+          repairMode === "blocked_dirty_parent" && blockingParent
+            ? {
+                id: blockingParent.id,
+                fullName: blockingParent.fullName,
+                totalTastings: blockingParent.totalTastings,
+              }
+            : null,
         legacyBottle: candidate.bottle,
         proposedParent: {
           id: parent?.id ?? null,
@@ -802,9 +867,6 @@ export async function getLegacyReleaseRepairCandidates({
         repairMode,
       } satisfies LegacyReleaseRepairCandidate;
     })
-    .filter((candidate): candidate is LegacyReleaseRepairCandidate =>
-      Boolean(candidate),
-    )
     .sort((a, b) => {
       const repairModePriority =
         getLegacyReleaseRepairModePriority(a.repairMode) -

@@ -48,7 +48,7 @@ function getRepairModeDescription(repairMode: keyof typeof REPAIR_MODE_LABELS) {
     case "blocked_alias_conflict":
       return "The proposed parent name is already owned by a different bottle or release alias and needs manual cleanup first.";
     case "blocked_dirty_parent":
-      return "An exact-name bottle exists, but it still carries release traits and needs manual cleanup first.";
+      return "A matching parent bottle exists, but it still carries release traits. Repair that parent first, then retry the legacy child.";
   }
 }
 
@@ -91,6 +91,8 @@ export default function Page() {
   const [repairingBottleId, setRepairingBottleId] = useState<number | null>(
     null,
   );
+  const [repairingDirtyParentBottleId, setRepairingDirtyParentBottleId] =
+    useState<number | null>(null);
   const [clearingAliasName, setClearingAliasName] = useState<null | string>(
     null,
   );
@@ -101,6 +103,9 @@ export default function Page() {
   const { data: candidateList } = useSuspenseQuery(candidateListQueryOptions);
   const applyRepairMutation = useMutation(
     orpc.bottles.applyReleaseRepair.mutationOptions(),
+  );
+  const applyDirtyParentRepairMutation = useMutation(
+    orpc.bottles.applyDirtyParentReleaseRepair.mutationOptions(),
   );
   const deleteBottleAliasMutation = useMutation(
     orpc.bottleAliases.delete.mutationOptions(),
@@ -170,6 +175,38 @@ export default function Page() {
     }
   };
 
+  const repairDirtyParent = async ({
+    blockingParentId,
+    blockingParentName,
+    legacyBottleName,
+  }: {
+    blockingParentId: number;
+    blockingParentName: string;
+    legacyBottleName: string;
+  }) => {
+    setRepairingDirtyParentBottleId(blockingParentId);
+    try {
+      await applyDirtyParentRepairMutation.mutateAsync({
+        bottle: blockingParentId,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: candidateListQueryOptions.queryKey,
+      });
+      flash(
+        `Repaired ${blockingParentName}. ${legacyBottleName} can now be applied under the cleaned parent.`,
+      );
+    } catch (err) {
+      flash(
+        err instanceof Error
+          ? err.message
+          : "Unable to repair the dirty parent bottle.",
+        "error",
+      );
+    } finally {
+      setRepairingDirtyParentBottleId(null);
+    }
+  };
+
   return (
     <>
       <Breadcrumbs
@@ -193,7 +230,7 @@ export default function Page() {
           High-confidence legacy bottles that likely need to be split into a
           reusable parent bottle plus child releases. Existing-parent and
           create-parent candidates can be applied directly here. Blocked
-          parent-name conflicts still need manual follow-up.
+          parent-name alias conflicts still need manual follow-up.
         </div>
 
         <Form
@@ -301,6 +338,35 @@ export default function Page() {
                       Clear Blocking Alias
                     </ConfirmationButton>
                   ) : null}
+                  {candidate.repairMode === "blocked_dirty_parent" &&
+                  candidate.blockingParent ? (
+                    <>
+                      <Button href={`/bottles/${candidate.blockingParent.id}`}>
+                        Open Blocking Parent
+                      </Button>
+                      <Button
+                        color="highlight"
+                        disabled={
+                          repairingDirtyParentBottleId ===
+                          candidate.blockingParent.id
+                        }
+                        loading={
+                          repairingDirtyParentBottleId ===
+                          candidate.blockingParent.id
+                        }
+                        onClick={() =>
+                          repairDirtyParent({
+                            blockingParentId: candidate.blockingParent!.id,
+                            blockingParentName:
+                              candidate.blockingParent!.fullName,
+                            legacyBottleName: candidate.legacyBottle.fullName,
+                          })
+                        }
+                      >
+                        Repair Dirty Parent
+                      </Button>
+                    </>
+                  ) : null}
                   {canApplyRepair(candidate.repairMode) ? (
                     <Button
                       color="highlight"
@@ -349,6 +415,18 @@ export default function Page() {
                       {candidate.blockingAlias.releaseFullName ??
                         candidate.blockingAlias.bottleFullName ??
                         "another record"}
+                      .
+                    </div>
+                  ) : null}
+                  {candidate.blockingParent ? (
+                    <div className="mt-3 text-sm text-amber-300">
+                      Blocking parent currently lives on{" "}
+                      <Link
+                        href={`/bottles/${candidate.blockingParent.id}`}
+                        className="text-amber-200 hover:text-white"
+                      >
+                        {candidate.blockingParent.fullName}
+                      </Link>
                       .
                     </div>
                   ) : null}
