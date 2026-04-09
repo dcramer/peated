@@ -2,6 +2,7 @@
 
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
+import ConfirmationButton from "@peated/web/components/confirmationButton";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import { useFlashMessages } from "@peated/web/components/flash";
 import Form from "@peated/web/components/form";
@@ -90,6 +91,9 @@ export default function Page() {
   const [repairingBottleId, setRepairingBottleId] = useState<number | null>(
     null,
   );
+  const [clearingAliasName, setClearingAliasName] = useState<null | string>(
+    null,
+  );
   const candidateListQueryOptions =
     orpc.bottles.releaseRepairCandidates.queryOptions({
       input: queryParams,
@@ -97,6 +101,9 @@ export default function Page() {
   const { data: candidateList } = useSuspenseQuery(candidateListQueryOptions);
   const applyRepairMutation = useMutation(
     orpc.bottles.applyReleaseRepair.mutationOptions(),
+  );
+  const deleteBottleAliasMutation = useMutation(
+    orpc.bottleAliases.delete.mutationOptions(),
   );
 
   const applyRepair = async ({
@@ -130,6 +137,36 @@ export default function Page() {
       );
     } finally {
       setRepairingBottleId(null);
+    }
+  };
+
+  const clearBlockingAlias = async ({
+    aliasName,
+    legacyBottleName,
+    parentBottleName,
+  }: {
+    aliasName: string;
+    legacyBottleName: string;
+    parentBottleName: string;
+  }) => {
+    setClearingAliasName(aliasName);
+    try {
+      await deleteBottleAliasMutation.mutateAsync({
+        alias: aliasName,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: candidateListQueryOptions.queryKey,
+      });
+      flash(
+        `Cleared the blocking alias for ${parentBottleName}. ${legacyBottleName} can now be repaired.`,
+      );
+    } catch (err) {
+      flash(
+        err instanceof Error ? err.message : "Unable to clear blocking alias.",
+        "error",
+      );
+    } finally {
+      setClearingAliasName(null);
     }
   };
 
@@ -234,6 +271,36 @@ export default function Page() {
                       Open Parent Bottle
                     </Button>
                   ) : null}
+                  {candidate.repairMode === "blocked_alias_conflict" &&
+                  candidate.blockingAlias?.bottleId ? (
+                    <Button
+                      href={`/bottles/${candidate.blockingAlias.bottleId}`}
+                    >
+                      Open Blocking Bottle
+                    </Button>
+                  ) : null}
+                  {candidate.repairMode === "blocked_alias_conflict" &&
+                  candidate.blockingAlias ? (
+                    <ConfirmationButton
+                      className={`inline-flex justify-center rounded border px-3 py-2 text-sm font-semibold shadow-sm ${
+                        clearingAliasName === candidate.blockingAlias.name
+                          ? "text-muted cursor-auto border-red-900 bg-red-900"
+                          : "cursor-pointer border-red-700 bg-red-700 text-white hover:bg-red-600"
+                      }`}
+                      onContinue={() =>
+                        clearBlockingAlias({
+                          aliasName: candidate.blockingAlias!.name,
+                          legacyBottleName: candidate.legacyBottle.fullName,
+                          parentBottleName: candidate.proposedParent.fullName,
+                        })
+                      }
+                      disabled={
+                        clearingAliasName === candidate.blockingAlias.name
+                      }
+                    >
+                      Clear Blocking Alias
+                    </ConfirmationButton>
+                  ) : null}
                   {canApplyRepair(candidate.repairMode) ? (
                     <Button
                       color="highlight"
@@ -276,6 +343,15 @@ export default function Page() {
                       ? `${formatTastingCount(candidate.proposedParent.totalTastings)} tastings on the existing parent bottle.`
                       : getRepairModeDescription(candidate.repairMode)}
                   </div>
+                  {candidate.blockingAlias ? (
+                    <div className="mt-3 text-sm text-amber-300">
+                      Blocking alias currently points to{" "}
+                      {candidate.blockingAlias.releaseFullName ??
+                        candidate.blockingAlias.bottleFullName ??
+                        "another record"}
+                      .
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">

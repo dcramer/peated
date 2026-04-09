@@ -4,6 +4,15 @@ import { requireMod } from "@peated/server/orpc/middleware";
 import { z } from "zod";
 
 const LegacyReleaseRepairCandidateSchema = z.object({
+  blockingAlias: z
+    .object({
+      name: z.string(),
+      bottleId: z.number().nullable(),
+      bottleFullName: z.string().nullable(),
+      releaseId: z.number().nullable(),
+      releaseFullName: z.string().nullable(),
+    })
+    .nullable(),
   legacyBottle: z.object({
     id: z.number(),
     fullName: z.string(),
