@@ -227,6 +227,11 @@ describe("GET /bottles/release-repair-candidates", () => {
         (candidate) => candidate.legacyBottle.id === batch32.id,
       ),
     ).toMatchObject({
+      blockingParent: {
+        id: dirtyParent.id,
+        fullName: dirtyParent.fullName,
+        totalTastings: dirtyParent.totalTastings,
+      },
       hasExactParent: false,
       repairMode: "blocked_dirty_parent",
       proposedParent: {
@@ -338,6 +343,11 @@ describe("GET /bottles/release-repair-candidates", () => {
         (candidate) => candidate.legacyBottle.id === legacyBottle.id,
       ),
     ).toMatchObject({
+      blockingParent: {
+        id: dirtyParent.id,
+        fullName: dirtyParent.fullName,
+        totalTastings: dirtyParent.totalTastings,
+      },
       hasExactParent: false,
       repairMode: "blocked_dirty_parent",
       proposedParent: {

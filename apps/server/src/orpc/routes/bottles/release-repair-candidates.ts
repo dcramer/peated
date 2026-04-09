@@ -13,6 +13,13 @@ const LegacyReleaseRepairCandidateSchema = z.object({
       releaseFullName: z.string().nullable(),
     })
     .nullable(),
+  blockingParent: z
+    .object({
+      id: z.number(),
+      fullName: z.string(),
+      totalTastings: z.number().nullable(),
+    })
+    .nullable(),
   legacyBottle: z.object({
     id: z.number(),
     fullName: z.string(),
