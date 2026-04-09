@@ -7,6 +7,7 @@ import {
   bottles,
   changes,
   collectionBottles,
+  entities,
   flightBottles,
   reviews,
   storePriceMatchProposals,
@@ -19,9 +20,16 @@ import {
   BottleReleaseCreateBadRequestError,
   createBottleReleaseInTransaction,
 } from "@peated/server/lib/createBottleRelease";
-import { resolveLegacyReleaseRepairNameScope } from "@peated/server/lib/legacyReleaseRepairCandidates";
+import { upsertBottleAlias } from "@peated/server/lib/db";
+import {
+  deriveLegacyReleaseRepairIdentity,
+  resolveLegacyReleaseRepairNameScope,
+} from "@peated/server/lib/legacyReleaseRepairCandidates";
 import { logError } from "@peated/server/lib/log";
-import { normalizeString } from "@peated/server/lib/normalize";
+import {
+  normalizeString,
+  stripDuplicateBrandPrefixFromBottleName,
+} from "@peated/server/lib/normalize";
 import { pushJob } from "@peated/server/worker/client";
 import { and, desc, eq, isNull, sql } from "drizzle-orm";
 
@@ -36,6 +44,7 @@ type RepairBottle = Pick<
   | "descriptionSrc"
   | "edition"
   | "fullName"
+  | "brandId"
   | "id"
   | "imageUrl"
   | "name"
@@ -87,6 +96,7 @@ async function getBottleForRepair(tx: AnyTransaction, bottleId: number) {
       id: bottles.id,
       fullName: bottles.fullName,
       name: bottles.name,
+      brandId: bottles.brandId,
       statedAge: bottles.statedAge,
       description: bottles.description,
       descriptionSrc: bottles.descriptionSrc,
@@ -196,6 +206,62 @@ async function backfillExistingReleaseMetadata(
   return updatedRelease satisfies RepairRelease;
 }
 
+async function getRepairedParentBottleNames(
+  tx: AnyTransaction,
+  bottle: RepairBottle,
+): Promise<{
+  fullName: string;
+  name: string;
+}> {
+  const derivedIdentity = deriveLegacyReleaseRepairIdentity({
+    fullName: bottle.fullName,
+    edition: bottle.edition,
+    releaseYear: bottle.releaseYear,
+  });
+
+  if (!derivedIdentity) {
+    return {
+      fullName: bottle.fullName,
+      name: bottle.name,
+    };
+  }
+
+  const [brand] = await tx
+    .select({
+      name: entities.name,
+      shortName: entities.shortName,
+    })
+    .from(entities)
+    .where(eq(entities.id, bottle.brandId))
+    .limit(1);
+
+  let nextName = derivedIdentity.proposedParentFullName;
+  const brandNames = [
+    ...new Set(
+      [brand?.shortName, brand?.name].filter((value): value is string =>
+        Boolean(value),
+      ),
+    ),
+  ].sort((left, right) => right.length - left.length);
+
+  for (const brandName of brandNames) {
+    const strippedName = stripDuplicateBrandPrefixFromBottleName(
+      nextName,
+      brandName,
+    );
+
+    if (strippedName !== nextName) {
+      nextName = strippedName;
+      break;
+    }
+  }
+
+  return {
+    fullName: derivedIdentity.proposedParentFullName,
+    name: nextName,
+  };
+}
+
 function findExactReleaseNameMatch({
   name,
   releases,
@@ -247,14 +313,21 @@ function resolveAliasReleaseId({
 }
 
 function resolveLinkedRowReleaseId({
-  defaultReleaseId,
+  bottleFullName,
   name,
   releases,
+  targetReleaseId,
+  targetReleaseIdentity,
 }: {
-  defaultReleaseId: number;
+  bottleFullName: string;
   name: string;
   releases: Array<Pick<RepairRelease, "fullName" | "id" | "name">>;
-}): number {
+  targetReleaseId: number;
+  targetReleaseIdentity: {
+    edition: string | null;
+    releaseYear: number | null;
+  };
+}): null | number {
   const exactReleaseId = findExactReleaseNameMatch({
     name,
     releases,
@@ -263,7 +336,13 @@ function resolveLinkedRowReleaseId({
     return exactReleaseId;
   }
 
-  return defaultReleaseId;
+  return resolveLegacyReleaseRepairNameScope({
+    name,
+    proposedParentFullName: bottleFullName,
+    releaseIdentity: targetReleaseIdentity,
+  }) === "release"
+    ? targetReleaseId
+    : null;
 }
 
 export async function applyDirtyParentReleaseRepairInTransaction(
@@ -317,10 +396,16 @@ export async function applyDirtyParentReleaseRepairInTransaction(
         isNull(flightBottles.releaseId),
       ),
     );
+  const repairedParentBottleNames = await getRepairedParentBottleNames(
+    tx,
+    bottle,
+  );
 
   const clearedBottleRows = await tx
     .update(bottles)
     .set({
+      fullName: repairedParentBottleNames.fullName,
+      name: repairedParentBottleNames.name,
       edition: null,
       releaseYear: null,
       vintageYear: null,
@@ -342,6 +427,7 @@ export async function applyDirtyParentReleaseRepairInTransaction(
   if (!clearedBottleRows[0]) {
     throw new DirtyParentReleaseRepairBadRequestError("Bottle not found.");
   }
+  const repairedBottle = clearedBottleRows[0];
 
   const aliasNames = new Set<string>();
   let release: RepairRelease | BottleRelease;
@@ -396,6 +482,21 @@ export async function applyDirtyParentReleaseRepairInTransaction(
     }
   }
 
+  const repairedParentAlias = await upsertBottleAlias(
+    tx,
+    repairedBottle.fullName,
+    repairedBottle.id,
+  );
+  if (
+    repairedParentAlias.bottleId &&
+    repairedParentAlias.bottleId !== repairedBottle.id
+  ) {
+    throw new DirtyParentReleaseRepairBadRequestError(
+      "Bottle alias already belongs to a different bottle.",
+    );
+  }
+  aliasNames.add(repairedBottle.fullName);
+
   const releasesForScope = [
     ...lockedReleases.filter((row) => row.id !== release.id),
     release,
@@ -407,7 +508,7 @@ export async function applyDirtyParentReleaseRepairInTransaction(
 
   for (const alias of bottleScopedAliases) {
     const releaseId = resolveAliasReleaseId({
-      bottleFullName: bottle.fullName,
+      bottleFullName: repairedBottle.fullName,
       name: alias.name,
       releases: releasesForScope,
       targetReleaseId: release.id,
@@ -439,9 +540,11 @@ export async function applyDirtyParentReleaseRepairInTransaction(
       .update(reviews)
       .set({
         releaseId: resolveLinkedRowReleaseId({
-          defaultReleaseId: release.id,
+          bottleFullName: repairedBottle.fullName,
           name: review.name,
           releases: releasesForScope,
+          targetReleaseId: release.id,
+          targetReleaseIdentity,
         }),
       })
       .where(eq(reviews.id, review.id));
@@ -449,9 +552,11 @@ export async function applyDirtyParentReleaseRepairInTransaction(
 
   for (const storePrice of bottleScopedStorePrices) {
     const releaseId = resolveLinkedRowReleaseId({
-      defaultReleaseId: release.id,
+      bottleFullName: repairedBottle.fullName,
       name: storePrice.name,
       releases: releasesForScope,
+      targetReleaseId: release.id,
+      targetReleaseIdentity,
     });
 
     await tx
@@ -574,6 +679,16 @@ export async function applyDirtyParentReleaseRepairInTransaction(
         ...updatedBottle,
       },
       changes: {
+        ...(updatedBottle.name !== bottle.name
+          ? {
+              name: updatedBottle.name,
+            }
+          : {}),
+        ...(updatedBottle.fullName !== bottle.fullName
+          ? {
+              fullName: updatedBottle.fullName,
+            }
+          : {}),
         edition: null,
         releaseYear: null,
         vintageYear: null,

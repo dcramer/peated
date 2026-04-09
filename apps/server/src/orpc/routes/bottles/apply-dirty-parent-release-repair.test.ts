@@ -108,6 +108,8 @@ describe("POST /bottles/:bottle/apply-dirty-parent-release-repair", () => {
       .from(bottles)
       .where(eq(bottles.id, bottle.id));
     expect(updatedBottle).toMatchObject({
+      name: "A'bunadh",
+      fullName: "Aberlour A'bunadh",
       id: bottle.id,
       edition: null,
       releaseYear: null,
@@ -131,20 +133,31 @@ describe("POST /bottles/:bottle/apply-dirty-parent-release-repair", () => {
       .where(eq(bottleReleases.id, result.releaseId));
     expect(release).toMatchObject({
       bottleId: bottle.id,
+      name: "A'bunadh - Batch 31",
+      fullName: "Aberlour A'bunadh - Batch 31",
       edition: "Batch 31",
       statedAge: 12,
       description: "Dirty parent description",
       imageUrl: "/images/abunadh-batch31.png",
     });
 
-    const genericAlias = await db.query.bottleAliases.findFirst({
+    const parentAlias = await db.query.bottleAliases.findFirst({
       where: and(
         eq(bottleAliases.bottleId, bottle.id),
-        eq(bottleAliases.name, bottle.fullName),
+        eq(bottleAliases.name, updatedBottle.fullName),
         isNull(bottleAliases.releaseId),
       ),
     });
-    expect(genericAlias).toBeDefined();
+    expect(parentAlias).toBeDefined();
+
+    const releaseAlias = await db.query.bottleAliases.findFirst({
+      where: and(
+        eq(bottleAliases.bottleId, bottle.id),
+        eq(bottleAliases.name, bottle.fullName),
+        eq(bottleAliases.releaseId, release.id),
+      ),
+    });
+    expect(releaseAlias).toBeDefined();
 
     const [updatedReview] = await db
       .select()
@@ -215,16 +228,15 @@ describe("POST /bottles/:bottle/apply-dirty-parent-release-repair", () => {
   test("reuses an existing release when the dirty parent already matches one", async ({
     fixtures,
   }) => {
-    const brand = await fixtures.Entity({ name: "Lagavulin" });
     const mod = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle({
-      brandId: brand.id,
       name: "Distillers Edition",
       edition: "2011 Release",
       releaseYear: 2011,
       description: "Recovered metadata",
       createdById: mod.id,
     });
+    const genericParentName = bottle.fullName.replace(/ - 2011 Release$/, "");
     const existingRelease = await fixtures.BottleRelease({
       bottleId: bottle.id,
       edition: "2011 Release",
@@ -232,9 +244,17 @@ describe("POST /bottles/:bottle/apply-dirty-parent-release-repair", () => {
       description: null,
       createdById: mod.id,
     });
-    const review = await fixtures.Review({
+    const releaseReview = await fixtures.Review({
       bottleId: bottle.id,
       name: bottle.fullName,
+    });
+    const genericReview = await fixtures.Review({
+      bottleId: bottle.id,
+      name: genericParentName,
+    });
+    const genericStorePrice = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      name: genericParentName,
     });
 
     const result = await routerClient.bottles.applyDirtyParentReleaseRepair(
@@ -251,6 +271,7 @@ describe("POST /bottles/:bottle/apply-dirty-parent-release-repair", () => {
       .from(bottles)
       .where(eq(bottles.id, bottle.id));
     expect(updatedBottle).toMatchObject({
+      fullName: genericParentName,
       edition: null,
       releaseYear: null,
     });
@@ -266,10 +287,28 @@ describe("POST /bottles/:bottle/apply-dirty-parent-release-repair", () => {
     const [updatedReview] = await db
       .select()
       .from(reviews)
-      .where(eq(reviews.id, review.id));
+      .where(eq(reviews.id, releaseReview.id));
     expect(updatedReview).toMatchObject({
       bottleId: bottle.id,
       releaseId: existingRelease.id,
+    });
+
+    const [updatedGenericReview] = await db
+      .select()
+      .from(reviews)
+      .where(eq(reviews.id, genericReview.id));
+    expect(updatedGenericReview).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+
+    const [updatedGenericStorePrice] = await db
+      .select()
+      .from(storePrices)
+      .where(eq(storePrices.id, genericStorePrice.id));
+    expect(updatedGenericStorePrice).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
     });
   });
 
