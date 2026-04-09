@@ -57,7 +57,20 @@ const GENERIC_NAME_TOKENS = new Set([
   "yr",
   "yrs",
 ]);
-const OPTIONAL_NAME_MATCH_TOKENS = new Set(["a"]);
+const STANDALONE_ARTICLE_TOKENS = new Set(["a"]);
+const STANDALONE_ARTICLE_BLOCKERS = new Set([
+  "batch",
+  "edition",
+  "release",
+  "vintage",
+  "series",
+  "cask",
+  "barrel",
+  "lot",
+  "chapter",
+  "part",
+  "volume",
+]);
 const GIFT_SET_PACKAGING_TOKENS = new Set([
   "box",
   "gift",
@@ -189,7 +202,26 @@ function tokenSetsMatchExactly(left: string[], right: string[]): boolean {
   return true;
 }
 
-function tokenSetsMatchAllowingOptionalTokens(
+function canSkipStandaloneArticleToken(
+  tokens: string[],
+  index: number,
+): boolean {
+  if (!STANDALONE_ARTICLE_TOKENS.has(tokens[index] ?? "")) {
+    return false;
+  }
+
+  if (index >= tokens.length - 1) {
+    return false;
+  }
+
+  if (index > 0 && STANDALONE_ARTICLE_BLOCKERS.has(tokens[index - 1] ?? "")) {
+    return false;
+  }
+
+  return true;
+}
+
+function tokenSequencesMatchAllowingStandaloneArticle(
   left: string[],
   right: string[],
 ): boolean {
@@ -197,28 +229,48 @@ function tokenSetsMatchAllowingOptionalTokens(
     return true;
   }
 
-  const normalizedLeft = left.filter(
-    (token) => !OPTIONAL_NAME_MATCH_TOKENS.has(token),
-  );
-  const normalizedRight = right.filter(
-    (token) => !OPTIONAL_NAME_MATCH_TOKENS.has(token),
-  );
+  let leftIndex = 0;
+  let rightIndex = 0;
+  let skippedStandaloneArticle = false;
 
-  if (
-    normalizedLeft.length === left.length &&
-    normalizedRight.length === right.length
-  ) {
+  while (leftIndex < left.length && rightIndex < right.length) {
+    if (left[leftIndex] === right[rightIndex]) {
+      leftIndex += 1;
+      rightIndex += 1;
+      continue;
+    }
+
+    if (
+      !skippedStandaloneArticle &&
+      canSkipStandaloneArticleToken(left, leftIndex) &&
+      left[leftIndex + 1] === right[rightIndex]
+    ) {
+      skippedStandaloneArticle = true;
+      leftIndex += 1;
+      continue;
+    }
+
+    if (
+      !skippedStandaloneArticle &&
+      canSkipStandaloneArticleToken(right, rightIndex) &&
+      right[rightIndex + 1] === left[leftIndex]
+    ) {
+      skippedStandaloneArticle = true;
+      rightIndex += 1;
+      continue;
+    }
+
     return false;
   }
 
-  return tokenSetsMatchExactly(normalizedLeft, normalizedRight);
+  return leftIndex === left.length && rightIndex === right.length;
 }
 
 function isBasicallyExactNameMatch(
   referenceName: string,
   candidateName: string | null | undefined,
 ): boolean {
-  return tokenSetsMatchAllowingOptionalTokens(
+  return tokenSequencesMatchAllowingStandaloneArticle(
     getComparableNameTokens(referenceName),
     getComparableNameTokens(candidateName),
   );
@@ -326,7 +378,7 @@ function candidateNameMatchesReferenceVariants({
     }
 
     return referenceTokenVariants.some((referenceTokens) =>
-      tokenSetsMatchAllowingOptionalTokens(referenceTokens, candidateTokens),
+      tokenSetsMatchExactly(referenceTokens, candidateTokens),
     );
   });
 }
@@ -974,11 +1026,9 @@ function downgradeUnsafeExistingMatchDecision({
     return decision;
   }
 
-  const hasExactishLocalName = candidateNameMatchesReferenceVariants({
-    referenceName: reference.name,
-    extractedIdentity: artifacts.extractedIdentity,
-    candidateNames: getTargetNameCandidates(target, decision),
-  });
+  const hasExactishLocalName = getTargetNameCandidates(target, decision).some(
+    (name) => isBasicallyExactNameMatch(reference.name, name),
+  );
   const hasSupportiveWebEvidence = hasSupportiveWebEvidenceForTarget({
     target,
     decision,

@@ -182,6 +182,32 @@ const taleOfIceCreamCandidate: BottleCandidate = {
   source: ["text"],
 };
 
+const redbreastBatchACandidate: BottleCandidate = {
+  bottleId: 9101,
+  releaseId: null,
+  kind: "bottle",
+  alias: null,
+  fullName: "Redbreast Small Batch Cask Strength Batch A",
+  bottleFullName: "Redbreast Small Batch Cask Strength Batch A",
+  brand: "Redbreast",
+  bottler: null,
+  series: null,
+  distillery: ["Midleton"],
+  category: "single_pot_still",
+  statedAge: null,
+  edition: null,
+  caskStrength: true,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.83,
+  source: ["text"],
+};
+
 const springbank10YearOldCandidate: BottleCandidate = {
   bottleId: 11,
   releaseId: null,
@@ -283,6 +309,32 @@ const cadbollEstateLegacyBatch2Candidate: BottleCandidate = {
   caskSize: null,
   caskFill: null,
   score: 0.87,
+  source: ["text"],
+};
+
+const cadbollEstateBatch4ReleaseCandidate: BottleCandidate = {
+  bottleId: 13442,
+  releaseId: 9102,
+  kind: "release",
+  alias: null,
+  fullName: "Glenmorangie 15-year-old The Cadboll Estate - Batch 4",
+  bottleFullName: "Glenmorangie 15-year-old The Cadboll Estate",
+  brand: "Glenmorangie",
+  bottler: null,
+  series: null,
+  distillery: ["Glenmorangie"],
+  category: "single_malt",
+  statedAge: 15,
+  edition: "Batch 4",
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.9,
   source: ["text"],
 };
 
@@ -821,6 +873,154 @@ describe("createBottleClassifier", () => {
       identityScope: "product",
     });
     expect(result.decision.rationale).not.toContain(
+      "Server downgraded the existing-match recommendation",
+    );
+  });
+
+  test("still downgrades a more specific batch-A bottle when the listing omits the lettered release suffix", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Redbreast",
+      bottler: null,
+      expression: "Small Batch Cask Strength",
+      series: null,
+      distillery: ["Midleton"],
+      category: "single_pot_still",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: true,
+      single_cask: null,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 84,
+          rationale: "The local candidate looks close to the listing.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 9101,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [9101],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [redbreastBatchACandidate],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Redbreast Small Batch Cask Strength",
+      },
+      extractedIdentity,
+      initialCandidates: [redbreastBatchACandidate],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "no_match",
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId: null,
+    });
+    expect(result.decision.rationale).toContain(
+      "Server downgraded the existing-match recommendation",
+    );
+  });
+
+  test("downgrades a plain parent-bottle match when the listing still carries release identity and an existing release candidate blocks promotion", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Glenmorangie",
+      bottler: null,
+      expression: "The Cadboll Estate",
+      series: null,
+      distillery: ["Glenmorangie"],
+      category: "single_malt",
+      stated_age: 15,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: "Batch 4",
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 88,
+          rationale: "The parent bottle is the closest local match.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 13442,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [13442],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [
+            cadbollEstateParentCandidate,
+            cadbollEstateBatch4ReleaseCandidate,
+          ],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
+      },
+      extractedIdentity,
+      initialCandidates: [
+        cadbollEstateParentCandidate,
+        cadbollEstateBatch4ReleaseCandidate,
+      ],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "no_match",
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId: null,
+    });
+    expect(result.decision.rationale).toContain(
       "Server downgraded the existing-match recommendation",
     );
   });
