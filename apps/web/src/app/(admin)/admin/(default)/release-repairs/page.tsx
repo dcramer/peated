@@ -30,6 +30,7 @@ const MARKER_LABELS: Record<string, string> = {
 const REPAIR_MODE_LABELS = {
   existing_parent: "Exact parent exists",
   create_parent: "Needs parent creation",
+  blocked_alias_conflict: "Parent alias is blocked",
   blocked_dirty_parent: "Dirty parent blocks repair",
 } as const;
 
@@ -43,13 +44,18 @@ function getRepairModeDescription(repairMode: keyof typeof REPAIR_MODE_LABELS) {
       return "An existing reusable parent bottle can absorb this legacy release directly.";
     case "create_parent":
       return "A new reusable parent bottle will be created during repair.";
+    case "blocked_alias_conflict":
+      return "The proposed parent name is already owned by a different bottle or release alias and needs manual cleanup first.";
     case "blocked_dirty_parent":
       return "An exact-name bottle exists, but it still carries release traits and needs manual cleanup first.";
   }
 }
 
 function canApplyRepair(repairMode: keyof typeof REPAIR_MODE_LABELS) {
-  return repairMode !== "blocked_dirty_parent";
+  return (
+    repairMode !== "blocked_dirty_parent" &&
+    repairMode !== "blocked_alias_conflict"
+  );
 }
 
 function getApplyRepairLabel(repairMode: keyof typeof REPAIR_MODE_LABELS) {
@@ -149,8 +155,8 @@ export default function Page() {
         <div className="rounded-xl border border-slate-800 bg-slate-950 px-4 py-4 text-sm text-slate-300">
           High-confidence legacy bottles that likely need to be split into a
           reusable parent bottle plus child releases. Existing-parent and
-          create-parent candidates can be applied directly here. Dirty-parent
-          blockers still need manual follow-up.
+          create-parent candidates can be applied directly here. Blocked
+          parent-name conflicts still need manual follow-up.
         </div>
 
         <Form

@@ -32,6 +32,7 @@ const LegacyReleaseRepairCandidateSchema = z.object({
   repairMode: z.enum([
     "existing_parent",
     "create_parent",
+    "blocked_alias_conflict",
     "blocked_dirty_parent",
   ]),
 });
