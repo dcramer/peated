@@ -57,6 +57,20 @@ const GENERIC_NAME_TOKENS = new Set([
   "yr",
   "yrs",
 ]);
+const STANDALONE_ARTICLE_TOKENS = new Set(["a"]);
+const STANDALONE_ARTICLE_BLOCKERS = new Set([
+  "batch",
+  "edition",
+  "release",
+  "vintage",
+  "series",
+  "cask",
+  "barrel",
+  "lot",
+  "chapter",
+  "part",
+  "volume",
+]);
 const GIFT_SET_PACKAGING_TOKENS = new Set([
   "box",
   "gift",
@@ -188,11 +202,75 @@ function tokenSetsMatchExactly(left: string[], right: string[]): boolean {
   return true;
 }
 
+function canSkipStandaloneArticleToken(
+  tokens: string[],
+  index: number,
+): boolean {
+  if (!STANDALONE_ARTICLE_TOKENS.has(tokens[index] ?? "")) {
+    return false;
+  }
+
+  if (index >= tokens.length - 1) {
+    return false;
+  }
+
+  if (index > 0 && STANDALONE_ARTICLE_BLOCKERS.has(tokens[index - 1] ?? "")) {
+    return false;
+  }
+
+  return true;
+}
+
+function tokenSequencesMatchAllowingStandaloneArticle(
+  left: string[],
+  right: string[],
+): boolean {
+  if (tokenSetsMatchExactly(left, right)) {
+    return true;
+  }
+
+  let leftIndex = 0;
+  let rightIndex = 0;
+  let skippedStandaloneArticle = false;
+
+  while (leftIndex < left.length && rightIndex < right.length) {
+    if (left[leftIndex] === right[rightIndex]) {
+      leftIndex += 1;
+      rightIndex += 1;
+      continue;
+    }
+
+    if (
+      !skippedStandaloneArticle &&
+      canSkipStandaloneArticleToken(left, leftIndex) &&
+      left[leftIndex + 1] === right[rightIndex]
+    ) {
+      skippedStandaloneArticle = true;
+      leftIndex += 1;
+      continue;
+    }
+
+    if (
+      !skippedStandaloneArticle &&
+      canSkipStandaloneArticleToken(right, rightIndex) &&
+      right[rightIndex + 1] === left[leftIndex]
+    ) {
+      skippedStandaloneArticle = true;
+      rightIndex += 1;
+      continue;
+    }
+
+    return false;
+  }
+
+  return leftIndex === left.length && rightIndex === right.length;
+}
+
 function isBasicallyExactNameMatch(
   referenceName: string,
   candidateName: string | null | undefined,
 ): boolean {
-  return tokenSetsMatchExactly(
+  return tokenSequencesMatchAllowingStandaloneArticle(
     getComparableNameTokens(referenceName),
     getComparableNameTokens(candidateName),
   );

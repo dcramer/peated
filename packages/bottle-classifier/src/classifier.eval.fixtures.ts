@@ -155,6 +155,16 @@ const glenglassaughRareCaskParent = buildBottleCandidate({
   source: ["exact"],
 });
 
+const taleOfIceCream = buildBottleCandidate({
+  bottleId: 43236,
+  fullName: "Glenmorangie A Tale of Ice Cream",
+  brand: "Glenmorangie",
+  distillery: ["Glenmorangie"],
+  category: "single_malt",
+  score: 0.9,
+  source: ["text"],
+});
+
 const cadbollEstateParent = buildBottleCandidate({
   bottleId: 660,
   fullName: "Glenmorangie 15-year-old The Cadboll Estate",
@@ -547,6 +557,30 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       matchedBottleId: 630,
       summary:
         "Ignore generic retailer suffixes like Single Malt Scotch Whisky and 750ml, then match the canonical Ardbeg Uigeadail bottle.",
+    },
+  },
+  {
+    name: "store listing: keeps a strong local match when only a standalone article differs",
+    input: {
+      reference: {
+        name: "Glenmorangie Tale of Ice Cream Single Malt Scotch Whisky",
+        url: "https://shop.example/products/glenmorangie-tale-of-ice-cream",
+      },
+      extractedIdentity: buildExtractedIdentity({
+        brand: "Glenmorangie",
+        expression: "Tale of Ice Cream",
+        distillery: ["Glenmorangie"],
+        category: "single_malt",
+      }),
+      initialCandidates: [taleOfIceCream],
+    },
+    expected: {
+      status: "classified",
+      action: "match",
+      identityScope: "product",
+      matchedBottleId: 43236,
+      summary:
+        "Treat a standalone article difference plus generic retailer style words as a strong local name variant and keep the Glenmorangie A Tale of Ice Cream bottle match without requiring web evidence.",
     },
   },
   {
