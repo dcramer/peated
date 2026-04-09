@@ -1,5 +1,10 @@
 import { db } from "@peated/server/db";
-import { bottleAliases, bottles, type Bottle } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottleReleases,
+  bottles,
+  type Bottle,
+} from "@peated/server/db/schema";
 import { hasBottleLevelReleaseTraits } from "@peated/server/lib/bottleSchemaRules";
 import { and, desc, eq, isNotNull, isNull, or, sql } from "drizzle-orm";
 import {
@@ -61,6 +66,13 @@ export type DerivedLegacyReleaseRepairCandidate =
   };
 
 export type LegacyReleaseRepairCandidate = {
+  blockingAlias: null | {
+    bottleFullName: string | null;
+    bottleId: number | null;
+    name: string;
+    releaseFullName: string | null;
+    releaseId: number | null;
+  };
   legacyBottle: LegacyReleaseRepairBottle;
   proposedParent: {
     id: number | null;
@@ -456,8 +468,65 @@ export async function getLegacyReleaseRepairCandidates({
   const parentRowsByName = new Map<string, typeof parentRows>();
   const parentAliasByName = new Map<
     string,
-    { bottleId: number | null; releaseId: number | null }
+    {
+      bottleFullName: string | null;
+      bottleId: number | null;
+      releaseFullName: string | null;
+      releaseId: number | null;
+    }
   >();
+
+  const aliasBottleIds = Array.from(
+    new Set(
+      parentAliasRows
+        .map((row) => row.bottleId)
+        .filter((value): value is number => value !== null),
+    ),
+  );
+  const aliasReleaseIds = Array.from(
+    new Set(
+      parentAliasRows
+        .map((row) => row.releaseId)
+        .filter((value): value is number => value !== null),
+    ),
+  );
+  const aliasBottleRows =
+    aliasBottleIds.length > 0
+      ? await db
+          .select({
+            fullName: bottles.fullName,
+            id: bottles.id,
+          })
+          .from(bottles)
+          .where(
+            sql`${bottles.id} IN (${sql.join(
+              aliasBottleIds.map((id) => sql`${id}`),
+              sql`, `,
+            )})`,
+          )
+      : [];
+  const aliasReleaseRows =
+    aliasReleaseIds.length > 0
+      ? await db
+          .select({
+            fullName: bottleReleases.fullName,
+            id: bottleReleases.id,
+          })
+          .from(bottleReleases)
+          .where(
+            sql`${bottleReleases.id} IN (${sql.join(
+              aliasReleaseIds.map((id) => sql`${id}`),
+              sql`, `,
+            )})`,
+          )
+      : [];
+  const aliasBottleFullNameById = new Map(
+    aliasBottleRows.map((row) => [row.id, row.fullName]),
+  );
+  const aliasReleaseFullNameById = new Map(
+    aliasReleaseRows.map((row) => [row.id, row.fullName]),
+  );
+
   for (const row of parentRows) {
     const key = row.fullName.toLowerCase();
     const group = parentRowsByName.get(key) ?? [];
@@ -472,7 +541,15 @@ export async function getLegacyReleaseRepairCandidates({
   }
   for (const row of parentAliasRows) {
     parentAliasByName.set(row.name.toLowerCase(), {
+      bottleFullName:
+        row.bottleId !== null
+          ? (aliasBottleFullNameById.get(row.bottleId) ?? null)
+          : null,
       bottleId: row.bottleId,
+      releaseFullName:
+        row.releaseId !== null
+          ? (aliasReleaseFullNameById.get(row.releaseId) ?? null)
+          : null,
       releaseId: row.releaseId,
     });
   }
@@ -497,6 +574,16 @@ export async function getLegacyReleaseRepairCandidates({
       });
 
       return {
+        blockingAlias:
+          repairMode === "blocked_alias_conflict" && parentAlias
+            ? {
+                bottleFullName: parentAlias.bottleFullName,
+                bottleId: parentAlias.bottleId,
+                name: candidate.proposedParentFullName,
+                releaseFullName: parentAlias.releaseFullName,
+                releaseId: parentAlias.releaseId,
+              }
+            : null,
         legacyBottle: candidate.bottle,
         proposedParent: {
           id: parent?.id ?? null,

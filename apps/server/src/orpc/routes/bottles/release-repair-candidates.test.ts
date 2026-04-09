@@ -338,6 +338,13 @@ describe("GET /bottles/release-repair-candidates", () => {
         (candidate) => candidate.legacyBottle.id === legacyBottle.id,
       ),
     ).toMatchObject({
+      blockingAlias: {
+        bottleFullName: conflictingBottle.fullName,
+        bottleId: conflictingBottle.id,
+        name: "Alias Conflict Distillery Warehouse Session",
+        releaseFullName: null,
+        releaseId: null,
+      },
       hasExactParent: false,
       repairMode: "blocked_alias_conflict",
       proposedParent: {
@@ -345,6 +352,54 @@ describe("GET /bottles/release-repair-candidates", () => {
         fullName: "Alias Conflict Distillery Warehouse Session",
       },
       siblingLegacyBottles: [],
+    });
+  });
+
+  test("includes the blocking release when a release alias owns the parent name", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Release Alias Distillery" });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Session (Batch 1)",
+      totalTastings: 6,
+    });
+    const parentBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Different Product",
+      totalTastings: 20,
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: parentBottle.id,
+      edition: "Special Alias",
+    });
+    await db.insert(bottleAliases).values({
+      bottleId: parentBottle.id,
+      releaseId: release.id,
+      name: "Release Alias Distillery Warehouse Session",
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "Warehouse Session",
+      },
+      { context: { user } },
+    );
+
+    expect(
+      result.results.find(
+        (candidate) => candidate.legacyBottle.id === legacyBottle.id,
+      ),
+    ).toMatchObject({
+      blockingAlias: {
+        bottleFullName: parentBottle.fullName,
+        bottleId: parentBottle.id,
+        name: "Release Alias Distillery Warehouse Session",
+        releaseFullName: release.fullName,
+        releaseId: release.id,
+      },
+      repairMode: "blocked_alias_conflict",
     });
   });
 
