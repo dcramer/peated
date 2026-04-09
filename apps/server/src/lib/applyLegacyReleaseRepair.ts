@@ -18,10 +18,7 @@ import {
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
-import {
-  getCanonicalReleaseAliasNames,
-  hasBottleLevelReleaseTraits,
-} from "@peated/server/lib/bottleSchemaRules";
+import { getCanonicalReleaseAliasNames } from "@peated/server/lib/bottleSchemaRules";
 import {
   BottleReleaseAlreadyExistsError,
   BottleReleaseCreateBadRequestError,
@@ -31,8 +28,8 @@ import { upsertBottleAlias } from "@peated/server/lib/db";
 import {
   deriveLegacyReleaseRepairIdentity,
   getLegacyReleaseRepairParentMode,
-  pickBestLegacyReleaseRepairParent,
   resolveLegacyReleaseRepairNameScope,
+  resolveLegacyReleaseRepairParentMatch,
 } from "@peated/server/lib/legacyReleaseRepairCandidates";
 import { logError } from "@peated/server/lib/log";
 import { stripDuplicateBrandPrefixFromBottleName } from "@peated/server/lib/normalize";
@@ -299,18 +296,25 @@ async function resolveParentBottleForRepair(
     .select()
     .from(bottles)
     .where(
-      and(
-        eq(
-          sql`LOWER(${bottles.fullName})`,
-          proposedParentFullName.toLowerCase(),
-        ),
-        sql`${bottles.id} != ${legacyBottleId}`,
-      ),
+      legacyBottle.brandId
+        ? and(
+            eq(bottles.brandId, legacyBottle.brandId),
+            sql`${bottles.id} != ${legacyBottleId}`,
+          )
+        : and(
+            eq(
+              sql`LOWER(${bottles.fullName})`,
+              proposedParentFullName.toLowerCase(),
+            ),
+            sql`${bottles.id} != ${legacyBottleId}`,
+          ),
     )
     .orderBy(sql`${bottles.totalTastings} DESC NULLS LAST`, desc(bottles.id))
     .for("update");
 
-  const parentMode = getLegacyReleaseRepairParentMode(parentRows);
+  const parentMode = getLegacyReleaseRepairParentMode(parentRows, {
+    proposedParentFullName,
+  });
 
   if (parentMode === "blocked_dirty_parent") {
     throw new LegacyReleaseRepairBadRequestError(
@@ -327,17 +331,13 @@ async function resolveParentBottleForRepair(
     });
   }
 
-  const parentBottle = pickBestLegacyReleaseRepairParent(parentRows);
+  const parentBottle = resolveLegacyReleaseRepairParentMatch(parentRows, {
+    proposedParentFullName,
+  }).parent;
 
   if (!parentBottle) {
-    if (parentRows.some((row) => hasBottleLevelReleaseTraits(row))) {
-      throw new LegacyReleaseRepairBadRequestError(
-        "Exact parent bottle still contains bottle-level release traits.",
-      );
-    }
-
     throw new LegacyReleaseRepairBadRequestError(
-      "No exact reusable parent bottle exists for this repair.",
+      "No reusable parent bottle exists for this repair.",
     );
   }
 

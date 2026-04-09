@@ -29,7 +29,7 @@ const MARKER_LABELS: Record<string, string> = {
 };
 
 const REPAIR_MODE_LABELS = {
-  existing_parent: "Exact parent exists",
+  existing_parent: "Reusable parent exists",
   create_parent: "Needs parent creation",
   blocked_alias_conflict: "Parent alias is blocked",
   blocked_dirty_parent: "Dirty parent blocks repair",
