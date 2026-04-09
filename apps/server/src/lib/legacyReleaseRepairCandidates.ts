@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottles, type Bottle } from "@peated/server/db/schema";
+import { hasBottleLevelReleaseTraits } from "@peated/server/lib/bottleSchemaRules";
 import { and, desc, eq, isNotNull, isNull, or, sql } from "drizzle-orm";
 import {
   normalizeBottle,
@@ -26,13 +27,32 @@ type LegacyReleaseRepairBottle = Omit<
   totalTastings: null | number;
 };
 
-type DerivedLegacyReleaseRepairCandidate = {
-  bottle: LegacyReleaseRepairBottle;
+export type LegacyReleaseRepairParentCandidate = Pick<
+  Bottle,
+  | "abv"
+  | "caskFill"
+  | "caskSize"
+  | "caskStrength"
+  | "edition"
+  | "fullName"
+  | "id"
+  | "releaseYear"
+  | "singleCask"
+  | "totalTastings"
+  | "vintageYear"
+>;
+
+export type LegacyReleaseRepairIdentity = {
   proposedParentFullName: string;
   edition: string | null;
   releaseYear: number | null;
   markerSources: string[];
 };
+
+export type DerivedLegacyReleaseRepairCandidate =
+  LegacyReleaseRepairIdentity & {
+    bottle: LegacyReleaseRepairBottle;
+  };
 
 export type LegacyReleaseRepairCandidate = {
   legacyBottle: LegacyReleaseRepairBottle;
@@ -68,7 +88,29 @@ function getTastingCount(value: null | number | undefined): number {
   return value ?? 0;
 }
 
-function normalizeComparableBottleName(fullName: string): string {
+export function pickBestLegacyReleaseRepairParent<
+  TRow extends LegacyReleaseRepairParentCandidate,
+>(rows: TRow[]): null | TRow {
+  let bestRow: null | TRow = null;
+
+  for (const row of rows) {
+    if (hasBottleLevelReleaseTraits(row)) {
+      continue;
+    }
+
+    if (
+      !bestRow ||
+      getTastingCount(row.totalTastings) >
+        getTastingCount(bestRow.totalTastings)
+    ) {
+      bestRow = row;
+    }
+  }
+
+  return bestRow;
+}
+
+export function normalizeComparableBottleName(fullName: string): string {
   const normalizedName = normalizeBottleBatchNumber(normalizeString(fullName));
   return normalizeBottleAge({ name: normalizedName })
     .name.replace(/\s{2,}/g, " ")
@@ -86,25 +128,31 @@ function extractBatchEdition(fullName: string): string | null {
   return inline?.[1] ?? null;
 }
 
-function deriveLegacyReleaseRepairCandidate(
-  bottle: LegacyReleaseRepairBottle,
-): DerivedLegacyReleaseRepairCandidate | null {
+export function deriveLegacyReleaseRepairIdentity({
+  fullName,
+  edition: structuredEdition = null,
+  releaseYear: structuredReleaseYear = null,
+}: {
+  fullName: string;
+  edition?: string | null;
+  releaseYear?: number | null;
+}): LegacyReleaseRepairIdentity | null {
   const normalizedFullName = normalizeBottleBatchNumber(
-    normalizeString(bottle.fullName),
+    normalizeString(fullName),
   );
   const comparableFullName = normalizeComparableBottleName(normalizedFullName);
   const parsedIdentity = normalizeBottle({ name: normalizedFullName });
-  const edition = bottle.edition ?? extractBatchEdition(normalizedFullName);
-  const releaseYear = bottle.releaseYear ?? parsedIdentity.releaseYear;
+  const edition = structuredEdition ?? extractBatchEdition(normalizedFullName);
+  const releaseYear = structuredReleaseYear ?? parsedIdentity.releaseYear;
   const markerSources: string[] = [];
 
-  if (bottle.edition) {
+  if (structuredEdition) {
     markerSources.push("structured_edition");
   } else if (edition) {
     markerSources.push("name_batch");
   }
 
-  if (bottle.releaseYear) {
+  if (structuredReleaseYear) {
     markerSources.push("structured_release_year");
   } else if (parsedIdentity.releaseYear) {
     markerSources.push("name_release_year");
@@ -150,12 +198,93 @@ function deriveLegacyReleaseRepairCandidate(
   }
 
   return {
-    bottle,
     proposedParentFullName,
     edition,
     releaseYear,
     markerSources,
   };
+}
+
+export function deriveLegacyReleaseRepairCandidate(
+  bottle: LegacyReleaseRepairBottle,
+): DerivedLegacyReleaseRepairCandidate | null {
+  const repairIdentity = deriveLegacyReleaseRepairIdentity({
+    fullName: bottle.fullName,
+    edition: bottle.edition,
+    releaseYear: bottle.releaseYear,
+  });
+
+  if (!repairIdentity) {
+    return null;
+  }
+
+  return {
+    bottle,
+    ...repairIdentity,
+  };
+}
+
+export function resolveLegacyReleaseRepairNameScope({
+  name,
+  proposedParentFullName,
+  releaseIdentity,
+}: {
+  name: string;
+  proposedParentFullName: string;
+  releaseIdentity: {
+    edition: string | null;
+    releaseYear: number | null;
+  };
+}): "parent" | "release" {
+  const comparableName = normalizeComparableBottleName(name).toLowerCase();
+  const comparableParentName = normalizeComparableBottleName(
+    proposedParentFullName,
+  ).toLowerCase();
+
+  if (comparableName === comparableParentName) {
+    return "parent";
+  }
+
+  const derivedIdentity = deriveLegacyReleaseRepairIdentity({
+    fullName: name,
+  });
+
+  if (!derivedIdentity) {
+    return "parent";
+  }
+
+  const derivedParentName = normalizeComparableBottleName(
+    derivedIdentity.proposedParentFullName,
+  ).toLowerCase();
+
+  if (derivedParentName !== comparableParentName) {
+    return "parent";
+  }
+
+  const hasMatchingEdition =
+    derivedIdentity.edition !== null &&
+    derivedIdentity.edition === releaseIdentity.edition;
+  const hasMatchingReleaseYear =
+    derivedIdentity.releaseYear !== null &&
+    derivedIdentity.releaseYear === releaseIdentity.releaseYear;
+  const hasConflictingEdition =
+    derivedIdentity.edition !== null &&
+    releaseIdentity.edition !== null &&
+    derivedIdentity.edition !== releaseIdentity.edition;
+  const hasConflictingReleaseYear =
+    derivedIdentity.releaseYear !== null &&
+    releaseIdentity.releaseYear !== null &&
+    derivedIdentity.releaseYear !== releaseIdentity.releaseYear;
+
+  if (hasConflictingEdition || hasConflictingReleaseYear) {
+    return "parent";
+  }
+
+  if (hasMatchingEdition || hasMatchingReleaseYear) {
+    return "release";
+  }
+
+  return "parent";
 }
 
 export async function getLegacyReleaseRepairCandidates({
@@ -229,6 +358,15 @@ export async function getLegacyReleaseRepairCandidates({
             id: bottles.id,
             fullName: bottles.fullName,
             totalTastings: bottles.totalTastings,
+            edition: bottles.edition,
+            releaseYear: bottles.releaseYear,
+            vintageYear: bottles.vintageYear,
+            abv: bottles.abv,
+            singleCask: bottles.singleCask,
+            caskStrength: bottles.caskStrength,
+            caskFill: bottles.caskFill,
+            caskType: bottles.caskType,
+            caskSize: bottles.caskSize,
           })
           .from(bottles)
           .where(
@@ -243,15 +381,17 @@ export async function getLegacyReleaseRepairCandidates({
     string,
     { id: number; fullName: string; totalTastings: null | number }
   >();
+  const parentRowsByName = new Map<string, typeof parentRows>();
   for (const row of parentRows) {
     const key = row.fullName.toLowerCase();
-    const existing = parentByName.get(key);
-    if (
-      !existing ||
-      getTastingCount(row.totalTastings) >
-        getTastingCount(existing.totalTastings)
-    ) {
-      parentByName.set(key, row);
+    const group = parentRowsByName.get(key) ?? [];
+    group.push(row);
+    parentRowsByName.set(key, group);
+  }
+  for (const [key, rows] of parentRowsByName) {
+    const parent = pickBestLegacyReleaseRepairParent(rows);
+    if (parent) {
+      parentByName.set(key, parent);
     }
   }
 
