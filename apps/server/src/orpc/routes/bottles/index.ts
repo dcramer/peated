@@ -3,6 +3,7 @@ import ageRepairCandidates from "./age-repair-candidates";
 import applyAgeRepair from "./apply-age-repair";
 import applyDirtyParentReleaseRepair from "./apply-dirty-parent-release-repair";
 import applyReleaseRepair from "./apply-release-repair";
+import canonRepairCandidates from "./canon-repair-candidates";
 import create from "./create";
 import delete_ from "./delete";
 import details from "./details";
@@ -23,6 +24,7 @@ export default base.tag("bottles").router({
   list,
   create,
   update,
+  canonRepairCandidates,
   ageRepairCandidates,
   applyAgeRepair,
   applyDirtyParentReleaseRepair,
