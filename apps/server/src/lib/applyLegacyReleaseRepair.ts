@@ -190,7 +190,15 @@ async function getProposedParentBottleName(
 
   let proposedParentName = proposedParentFullName;
 
-  for (const brandName of [brand?.shortName, brand?.name]) {
+  const brandNames = [
+    ...new Set(
+      [brand?.shortName, brand?.name].filter((value): value is string =>
+        Boolean(value),
+      ),
+    ),
+  ].sort((left, right) => right.length - left.length);
+
+  for (const brandName of brandNames) {
     const strippedName = stripDuplicateBrandPrefixFromBottleName(
       proposedParentName,
       brandName,
