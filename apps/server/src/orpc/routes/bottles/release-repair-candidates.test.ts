@@ -115,6 +115,48 @@ describe("GET /bottles/release-repair-candidates", () => {
     });
   });
 
+  test("reuses an existing parent bottle for exactish generic-name variants", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Elijah Craig" });
+    const parent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Barrel Proof",
+      totalTastings: 80,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Barrel Proof Kentucky Straight Bourbon (Batch C923)",
+      totalTastings: 8,
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "Elijah Craig Barrel Proof",
+      },
+      { context: { user } },
+    );
+
+    expect(
+      result.results.find(
+        (candidate) => candidate.legacyBottle.id === legacyBottle.id,
+      ),
+    ).toMatchObject({
+      hasExactParent: false,
+      repairMode: "existing_parent",
+      proposedParent: {
+        id: parent.id,
+        fullName: parent.fullName,
+      },
+      releaseIdentity: {
+        edition: "Batch C923",
+        releaseYear: null,
+        markerSources: ["name_batch"],
+      },
+    });
+  });
+
   test("keeps singleton create-parent repairs in the candidate list", async ({
     fixtures,
   }) => {

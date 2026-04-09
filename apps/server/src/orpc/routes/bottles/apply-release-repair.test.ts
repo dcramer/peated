@@ -463,6 +463,56 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     });
   });
 
+  test("reuses an existing exactish generic parent instead of creating a duplicate parent bottle", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Elijah Craig",
+      totalBottles: 2,
+    });
+    const parentBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Barrel Proof",
+      category: "bourbon",
+      totalTastings: 120,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Barrel Proof Kentucky Straight Bourbon (Batch C923)",
+      statedAge: 12,
+      category: "bourbon",
+      totalTastings: 9,
+    });
+    const mod = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.applyReleaseRepair(
+      {
+        bottle: legacyBottle.id,
+      },
+      { context: { user: mod } },
+    );
+
+    expect(result.parentBottleId).toBe(parentBottle.id);
+
+    const [release] = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, result.releaseId));
+    expect(release).toMatchObject({
+      bottleId: parentBottle.id,
+      edition: "Batch C923",
+      statedAge: 12,
+    });
+
+    const existingParents = await db
+      .select({
+        id: bottles.id,
+      })
+      .from(bottles)
+      .where(eq(bottles.brandId, brand.id));
+    expect(existingParents.map((row) => row.id)).toEqual([parentBottle.id]);
+  });
+
   test("prefers the longest brand prefix when deriving a created parent name", async ({
     fixtures,
   }) => {

@@ -16,11 +16,43 @@ import {
 
 const LEGACY_RELEASE_MARKER_PATTERN = "batch|[0-9]{4}\\s+release";
 const MAX_SCAN_LIMIT = 2000;
+const GENERIC_PARENT_NAME_TOKENS = new Set([
+  "american",
+  "and",
+  "bottle",
+  "bourbon",
+  "canadian",
+  "cl",
+  "irish",
+  "japanese",
+  "kentucky",
+  "l",
+  "malt",
+  "ml",
+  "of",
+  "old",
+  "oz",
+  "rye",
+  "scotch",
+  "single",
+  "spirit",
+  "spirits",
+  "straight",
+  "the",
+  "whiskey",
+  "whisky",
+  "world",
+  "year",
+  "years",
+  "yr",
+  "yrs",
+]);
 
 type LegacyReleaseRepairBottle = Omit<
   Pick<
     Bottle,
     | "id"
+    | "brandId"
     | "fullName"
     | "edition"
     | "releaseYear"
@@ -59,6 +91,8 @@ export type LegacyReleaseRepairParentMode =
   | "create_parent"
   | "blocked_alias_conflict"
   | "blocked_dirty_parent";
+
+type LegacyReleaseRepairParentMatchType = "exact" | "variant";
 
 export type DerivedLegacyReleaseRepairCandidate =
   LegacyReleaseRepairIdentity & {
@@ -122,6 +156,56 @@ function getLegacyReleaseRepairModePriority(
   }
 }
 
+function getComparableParentNameTokens(fullName: string): string[] {
+  return normalizeComparableBottleName(fullName)
+    .toLowerCase()
+    .split(/[^a-z0-9]+/g)
+    .filter(
+      (token) => token.length > 0 && !GENERIC_PARENT_NAME_TOKENS.has(token),
+    );
+}
+
+function tokenSetsMatchExactly(left: string[], right: string[]): boolean {
+  if (!left.length || !right.length) {
+    return false;
+  }
+
+  const leftSet = new Set(left);
+  const rightSet = new Set(right);
+  if (leftSet.size !== rightSet.size) {
+    return false;
+  }
+
+  for (const token of leftSet) {
+    if (!rightSet.has(token)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function hasExactLegacyReleaseRepairParentName(
+  fullName: string,
+  proposedParentFullName: string,
+): boolean {
+  return fullName.toLowerCase() === proposedParentFullName.toLowerCase();
+}
+
+export function hasVariantLegacyReleaseRepairParentName(
+  fullName: string,
+  proposedParentFullName: string,
+): boolean {
+  if (hasExactLegacyReleaseRepairParentName(fullName, proposedParentFullName)) {
+    return false;
+  }
+
+  return tokenSetsMatchExactly(
+    getComparableParentNameTokens(fullName),
+    getComparableParentNameTokens(proposedParentFullName),
+  );
+}
+
 export function pickBestLegacyReleaseRepairParent<
   TRow extends LegacyReleaseRepairParentCandidate,
 >(rows: TRow[]): null | TRow {
@@ -144,6 +228,63 @@ export function pickBestLegacyReleaseRepairParent<
   return bestRow;
 }
 
+export function resolveLegacyReleaseRepairParentMatch<
+  TRow extends LegacyReleaseRepairParentCandidate,
+>(
+  rows: TRow[],
+  {
+    currentLegacyBottleId,
+    proposedParentFullName,
+  }: {
+    currentLegacyBottleId?: number;
+    proposedParentFullName: string;
+  },
+): {
+  exactParent: null | TRow;
+  exactRows: TRow[];
+  matchType: LegacyReleaseRepairParentMatchType | null;
+  parent: null | TRow;
+  variantParent: null | TRow;
+  variantRows: TRow[];
+} {
+  const candidateRows = rows.filter(
+    (row) =>
+      currentLegacyBottleId === undefined || row.id !== currentLegacyBottleId,
+  );
+  const exactRows = candidateRows.filter((row) =>
+    hasExactLegacyReleaseRepairParentName(row.fullName, proposedParentFullName),
+  );
+  const exactParent = pickBestLegacyReleaseRepairParent(exactRows);
+
+  if (exactParent) {
+    return {
+      exactParent,
+      exactRows,
+      matchType: "exact",
+      parent: exactParent,
+      variantParent: null,
+      variantRows: [],
+    };
+  }
+
+  const variantRows = candidateRows.filter((row) =>
+    hasVariantLegacyReleaseRepairParentName(
+      row.fullName,
+      proposedParentFullName,
+    ),
+  );
+  const variantParent = pickBestLegacyReleaseRepairParent(variantRows);
+
+  return {
+    exactParent: null,
+    exactRows,
+    matchType: variantParent ? "variant" : null,
+    parent: variantParent,
+    variantParent,
+    variantRows,
+  };
+}
+
 export function getLegacyReleaseRepairParentMode<
   TRow extends LegacyReleaseRepairParentCandidate,
 >(
@@ -151,19 +292,34 @@ export function getLegacyReleaseRepairParentMode<
   {
     currentLegacyBottleId,
     parentAlias,
+    proposedParentFullName,
   }: {
     currentLegacyBottleId?: number;
     parentAlias?: {
       bottleId: number | null;
       releaseId: number | null;
     } | null;
-  } = {},
+    proposedParentFullName: string;
+  },
 ): LegacyReleaseRepairParentMode {
-  if (pickBestLegacyReleaseRepairParent(rows)) {
+  const parentMatch = resolveLegacyReleaseRepairParentMatch(rows, {
+    currentLegacyBottleId,
+    proposedParentFullName,
+  });
+
+  if (parentMatch.exactParent) {
     return "existing_parent";
   }
 
-  if (rows.some((row) => hasBottleLevelReleaseTraits(row))) {
+  if (parentMatch.exactRows.some((row) => hasBottleLevelReleaseTraits(row))) {
+    return "blocked_dirty_parent";
+  }
+
+  if (parentMatch.variantParent) {
+    return "existing_parent";
+  }
+
+  if (parentMatch.variantRows.some((row) => hasBottleLevelReleaseTraits(row))) {
     return "blocked_dirty_parent";
   }
 
@@ -367,6 +523,7 @@ export async function getLegacyReleaseRepairCandidates({
   const suspiciousBottles = await db
     .select({
       id: bottles.id,
+      brandId: bottles.brandId,
       fullName: bottles.fullName,
       edition: bottles.edition,
       releaseYear: bottles.releaseYear,
@@ -410,9 +567,11 @@ export async function getLegacyReleaseRepairCandidates({
     string,
     DerivedLegacyReleaseRepairCandidate[]
   >();
+  const brandIds = new Set<number>();
   const parentNames = new Set<string>();
   for (const candidate of derivedCandidates) {
     const parentKey = candidate.proposedParentFullName.toLowerCase();
+    brandIds.add(candidate.bottle.brandId);
     parentNames.add(parentKey);
     const group = groupedCandidates.get(parentKey) ?? [];
     group.push(candidate);
@@ -444,6 +603,32 @@ export async function getLegacyReleaseRepairCandidates({
             )})`,
           )
       : [];
+  const brandParentRows =
+    brandIds.size > 0
+      ? await db
+          .select({
+            brandId: bottles.brandId,
+            id: bottles.id,
+            fullName: bottles.fullName,
+            totalTastings: bottles.totalTastings,
+            edition: bottles.edition,
+            releaseYear: bottles.releaseYear,
+            vintageYear: bottles.vintageYear,
+            abv: bottles.abv,
+            singleCask: bottles.singleCask,
+            caskStrength: bottles.caskStrength,
+            caskFill: bottles.caskFill,
+            caskType: bottles.caskType,
+            caskSize: bottles.caskSize,
+          })
+          .from(bottles)
+          .where(
+            sql`${bottles.brandId} IN (${sql.join(
+              Array.from(brandIds).map((brandId) => sql`${brandId}`),
+              sql`, `,
+            )})`,
+          )
+      : [];
   const parentAliasRows =
     parentNames.size > 0
       ? await db
@@ -461,11 +646,8 @@ export async function getLegacyReleaseRepairCandidates({
           )
       : [];
 
-  const parentByName = new Map<
-    string,
-    { id: number; fullName: string; totalTastings: null | number }
-  >();
   const parentRowsByName = new Map<string, typeof parentRows>();
+  const brandParentRowsByBrandId = new Map<number, typeof brandParentRows>();
   const parentAliasByName = new Map<
     string,
     {
@@ -533,11 +715,10 @@ export async function getLegacyReleaseRepairCandidates({
     group.push(row);
     parentRowsByName.set(key, group);
   }
-  for (const [key, rows] of parentRowsByName) {
-    const parent = pickBestLegacyReleaseRepairParent(rows);
-    if (parent) {
-      parentByName.set(key, parent);
-    }
+  for (const row of brandParentRows) {
+    const group = brandParentRowsByBrandId.get(row.brandId) ?? [];
+    group.push(row);
+    brandParentRowsByBrandId.set(row.brandId, group);
   }
   for (const row of parentAliasRows) {
     parentAliasByName.set(row.name.toLowerCase(), {
@@ -566,12 +747,33 @@ export async function getLegacyReleaseRepairCandidates({
             fullName: sibling.bottle.fullName,
           })) ?? [];
       const parentRowsForName = parentRowsByName.get(parentKey) ?? [];
+      const brandRowsForBottle =
+        brandParentRowsByBrandId.get(candidate.bottle.brandId) ?? [];
+      const parentRowsForCandidate = Array.from(
+        new Map(
+          [...parentRowsForName, ...brandRowsForBottle].map((row) => [
+            row.id,
+            row,
+          ]),
+        ).values(),
+      );
       const parentAlias = parentAliasByName.get(parentKey) ?? null;
-      const parent = parentByName.get(parentKey) ?? null;
-      const repairMode = getLegacyReleaseRepairParentMode(parentRowsForName, {
-        currentLegacyBottleId: candidate.bottle.id,
-        parentAlias,
-      });
+      const parentMatch = resolveLegacyReleaseRepairParentMatch(
+        parentRowsForCandidate,
+        {
+          currentLegacyBottleId: candidate.bottle.id,
+          proposedParentFullName: candidate.proposedParentFullName,
+        },
+      );
+      const parent = parentMatch.parent;
+      const repairMode = getLegacyReleaseRepairParentMode(
+        parentRowsForCandidate,
+        {
+          currentLegacyBottleId: candidate.bottle.id,
+          parentAlias,
+          proposedParentFullName: candidate.proposedParentFullName,
+        },
+      );
 
       return {
         blockingAlias:
@@ -596,7 +798,7 @@ export async function getLegacyReleaseRepairCandidates({
           markerSources: candidate.markerSources,
         },
         siblingLegacyBottles: siblings,
-        hasExactParent: Boolean(parent),
+        hasExactParent: parentMatch.matchType === "exact",
         repairMode,
       } satisfies LegacyReleaseRepairCandidate;
     })
