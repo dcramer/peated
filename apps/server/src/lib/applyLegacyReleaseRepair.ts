@@ -35,6 +35,7 @@ import {
   resolveLegacyReleaseRepairNameScope,
 } from "@peated/server/lib/legacyReleaseRepairCandidates";
 import { logError } from "@peated/server/lib/log";
+import { stripDuplicateBrandPrefixFromBottleName } from "@peated/server/lib/normalize";
 import { pushJob } from "@peated/server/worker/client";
 import { and, desc, eq, gt, inArray, or, sql } from "drizzle-orm";
 
@@ -168,20 +169,48 @@ async function getLegacyBottleForRepair(
   return legacyBottle satisfies RepairBottle;
 }
 
-function getProposedParentBottleName(legacyBottle: RepairBottle): string {
-  const repairIdentity = deriveLegacyReleaseRepairIdentity({
-    fullName: legacyBottle.name,
-    edition: legacyBottle.edition,
-    releaseYear: legacyBottle.releaseYear,
-  });
+async function getProposedParentBottleName(
+  tx: AnyTransaction,
+  {
+    legacyBottle,
+    proposedParentFullName,
+  }: {
+    legacyBottle: RepairBottle;
+    proposedParentFullName: string;
+  },
+): Promise<string> {
+  const [brand] = await tx
+    .select({
+      name: entities.name,
+      shortName: entities.shortName,
+    })
+    .from(entities)
+    .where(eq(entities.id, legacyBottle.brandId))
+    .limit(1);
 
-  if (!repairIdentity) {
-    throw new LegacyReleaseRepairBadRequestError(
-      "Bottle does not contain reusable parent identity.",
+  let proposedParentName = proposedParentFullName;
+
+  const brandNames = [
+    ...new Set(
+      [brand?.shortName, brand?.name].filter((value): value is string =>
+        Boolean(value),
+      ),
+    ),
+  ].sort((left, right) => right.length - left.length);
+
+  for (const brandName of brandNames) {
+    const strippedName = stripDuplicateBrandPrefixFromBottleName(
+      proposedParentName,
+      brandName,
     );
+
+    if (strippedName !== proposedParentName) {
+      proposedParentName = strippedName;
+      break;
+    }
   }
 
-  return repairIdentity.proposedParentFullName;
+  return proposedParentName;
 }
 
 async function createParentBottleForRepair(
@@ -198,11 +227,16 @@ async function createParentBottleForRepair(
     user: User;
   },
 ): Promise<ResolvedLegacyReleaseRepairParent> {
+  const proposedParentName = await getProposedParentBottleName(tx, {
+    legacyBottle,
+    proposedParentFullName,
+  });
+
   const [parentBottle] = await tx
     .insert(bottles)
     .values({
       fullName: proposedParentFullName,
-      name: getProposedParentBottleName(legacyBottle),
+      name: proposedParentName,
       statedAge: legacyBottle.statedAge,
       seriesId: legacyBottle.seriesId,
       category: legacyBottle.category,

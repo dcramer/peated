@@ -415,6 +415,105 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     expect(refreshedBrand?.totalBottles).toBe(1);
   });
 
+  test("creates a reusable parent bottle for branded generic-name releases", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Lagavulin",
+      totalBottles: 1,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Distillers Edition",
+      edition: "2011 Release",
+      releaseYear: 2011,
+      category: "single_malt",
+    });
+    const mod = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.applyReleaseRepair(
+      {
+        bottle: legacyBottle.id,
+      },
+      { context: { user: mod } },
+    );
+
+    const [parentBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, result.parentBottleId));
+    expect(parentBottle).toMatchObject({
+      id: result.parentBottleId,
+      brandId: brand.id,
+      name: "Distillers Edition",
+      fullName: "Lagavulin Distillers Edition",
+      releaseYear: null,
+      edition: null,
+      numReleases: 1,
+    });
+
+    const [release] = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, result.releaseId));
+    expect(release).toMatchObject({
+      bottleId: parentBottle.id,
+      edition: "2011 Release",
+      releaseYear: 2011,
+    });
+  });
+
+  test("prefers the longest brand prefix when deriving a created parent name", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "MAKER'S MARK",
+      shortName: "MAKER'S",
+      totalBottles: 1,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "46",
+      edition: "Batch 1",
+      category: "bourbon",
+    });
+    await db
+      .update(bottles)
+      .set({
+        fullName: "Maker's Mark 46 - Batch 1",
+      })
+      .where(eq(bottles.id, legacyBottle.id));
+    const mod = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.applyReleaseRepair(
+      {
+        bottle: legacyBottle.id,
+      },
+      { context: { user: mod } },
+    );
+
+    const [parentBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, result.parentBottleId));
+    expect(parentBottle).toMatchObject({
+      id: result.parentBottleId,
+      brandId: brand.id,
+      name: "46",
+      fullName: "Maker's Mark 46",
+    });
+
+    const [release] = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, result.releaseId));
+    expect(release).toMatchObject({
+      bottleId: parentBottle.id,
+      name: "46 - Batch 1",
+      fullName: "Maker's Mark 46 - Batch 1",
+    });
+  });
+
   test("prefers a clean exact-name parent when a dirtier duplicate also exists", async ({
     fixtures,
   }) => {
