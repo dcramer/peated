@@ -248,6 +248,50 @@ describe("PATCH /bottle-releases/:release", () => {
     );
   });
 
+  it("updates a release when the parent bottle only has a dirty structured statedAge", async function ({
+    fixtures,
+  }) {
+    const modUser = await fixtures.User({ mod: true });
+
+    const bottle = await fixtures.Bottle({
+      name: "1978 Rare Cask Release",
+      statedAge: 40,
+      brandId: (await fixtures.Entity({ name: "Glenglassaugh" })).id,
+    });
+
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Batch 1",
+      statedAge: 40,
+    });
+
+    const result = await routerClient.bottleReleases.update(
+      {
+        release: release.id,
+        statedAge: 35,
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(result).toMatchObject({
+      id: release.id,
+      statedAge: 35,
+      fullName: "Glenglassaugh 1978 Rare Cask Release - Batch 1 - 35-year-old",
+      name: "1978 Rare Cask Release - Batch 1 - 35-year-old",
+    });
+
+    const [updatedRelease] = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, release.id));
+    expect(updatedRelease).toMatchObject({
+      id: release.id,
+      statedAge: 35,
+      fullName: "Glenglassaugh 1978 Rare Cask Release - Batch 1 - 35-year-old",
+      name: "1978 Rare Cask Release - Batch 1 - 35-year-old",
+    });
+  });
+
   it("throws error if release with same attributes exists", async function ({
     fixtures,
   }) {

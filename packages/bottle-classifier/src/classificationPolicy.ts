@@ -771,7 +771,11 @@ function buildReleaseDraftFromExtractedIdentity({
         !textsOverlap(extractedIdentity.edition, target.edition)
           ? extractedIdentity.edition
           : null,
-      statedAge: null,
+      statedAge:
+        extractedIdentity.stated_age !== null &&
+        extractedIdentity.stated_age !== target.statedAge
+          ? extractedIdentity.stated_age
+          : null,
       abv: null,
       caskStrength: null,
       singleCask: null,

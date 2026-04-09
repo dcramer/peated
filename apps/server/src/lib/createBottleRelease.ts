@@ -7,6 +7,7 @@ import {
   getCanonicalReleaseAliasNames,
   getResolvedReleaseIdentity,
   hasBottleLevelReleaseTraits,
+  hasDirtyBottleLevelStatedAgeConflict,
 } from "@peated/server/lib/bottleSchemaRules";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
@@ -67,7 +68,11 @@ export async function createBottleReleaseInTransaction(
   if (
     bottle.statedAge &&
     input.statedAge &&
-    bottle.statedAge !== input.statedAge
+    bottle.statedAge !== input.statedAge &&
+    !hasDirtyBottleLevelStatedAgeConflict({
+      bottle,
+      releaseStatedAge: input.statedAge,
+    })
   ) {
     throw new BottleReleaseCreateBadRequestError(
       "Release statedAge must match bottle's statedAge.",

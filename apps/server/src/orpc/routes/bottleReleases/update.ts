@@ -4,6 +4,7 @@ import { findExistingBottleReleaseByIdentity } from "@peated/server/lib/bottleRe
 import {
   formatCanonicalReleaseName,
   getResolvedReleaseIdentity,
+  hasDirtyBottleLevelStatedAgeConflict,
 } from "@peated/server/lib/bottleSchemaRules";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
@@ -119,7 +120,11 @@ export default procedure
         bottle.statedAge !== null &&
         hasInputField(input, "statedAge") &&
         input.statedAge !== null &&
-        input.statedAge !== bottle.statedAge
+        input.statedAge !== bottle.statedAge &&
+        !hasDirtyBottleLevelStatedAgeConflict({
+          bottle,
+          releaseStatedAge: input.statedAge,
+        })
       ) {
         throw errors.BAD_REQUEST({
           message: "Release statedAge must match bottle's statedAge.",

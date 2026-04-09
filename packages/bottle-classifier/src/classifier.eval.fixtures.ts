@@ -144,6 +144,17 @@ const elijahCraigBarrelProof = buildBottleCandidate({
   source: ["exact"],
 });
 
+const glenglassaughRareCaskParent = buildBottleCandidate({
+  bottleId: 2457,
+  fullName: "Glenglassaugh 1978 Rare Cask Release",
+  brand: "Glenglassaugh",
+  distillery: ["Glenglassaugh"],
+  category: "single_malt",
+  statedAge: 40,
+  score: 0.95,
+  source: ["exact"],
+});
+
 const cadbollEstateParent = buildBottleCandidate({
   bottleId: 660,
   fullName: "Glenmorangie 15-year-old The Cadboll Estate",
@@ -480,6 +491,32 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       parentBottleId: 660,
       summary:
         "Treat the exact batch bottle hit as a legacy release-like row and create Batch 4 beneath the reusable Cadboll Estate parent bottle instead.",
+    },
+  },
+  {
+    name: "store listing: dirty parent age mismatch still creates a child release",
+    input: {
+      reference: {
+        name: "Glenglassaugh 1978 Rare Cask Release (Batch 1) 35-year-old",
+        url: "https://shop.example/products/glenglassaugh-rare-cask-batch-1",
+      },
+      extractedIdentity: buildExtractedIdentity({
+        brand: "Glenglassaugh",
+        expression: "1978 Rare Cask Release",
+        distillery: ["Glenglassaugh"],
+        category: "single_malt",
+        stated_age: 35,
+        edition: "Batch 1",
+      }),
+      initialCandidates: [glenglassaughRareCaskParent],
+    },
+    expected: {
+      status: "classified",
+      action: "create_release",
+      identityScope: "product",
+      parentBottleId: 2457,
+      summary:
+        "Treat the differing 35-year age as release-specific because the matched parent bottle only carries a dirty structured age, not a marketed 40-year statement in its name.",
     },
   },
   {

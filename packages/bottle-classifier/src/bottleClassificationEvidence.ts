@@ -4,7 +4,7 @@ import type {
   BottleSearchEvidence,
   ProposedBottle,
 } from "./index";
-import { normalizeString } from "./normalize";
+import { normalizeBottle, normalizeString } from "./normalize";
 
 type MatchAttribute =
   | "brand"
@@ -183,6 +183,52 @@ function getTargetNameVariants(targetCandidate: BottleCandidate): string[] {
         .map((value) => value.trim())
         .filter((value) => value.length > 0),
     ),
+  );
+}
+
+function nameMarketsStatedAge({
+  name,
+  statedAge,
+}: {
+  name: string | null | undefined;
+  statedAge: number | null | undefined;
+}): boolean {
+  if (!name || statedAge === null || statedAge === undefined) {
+    return false;
+  }
+
+  return normalizeBottle({
+    name,
+    statedAge,
+  })
+    .name.toLowerCase()
+    .includes(`${statedAge}-year-old`);
+}
+
+function targetHasDirtyParentStatedAgeConflict({
+  targetCandidate,
+  extractedLabel,
+}: {
+  targetCandidate: BottleCandidate;
+  extractedLabel: BottleExtractedDetails | null | undefined;
+}): boolean {
+  if (
+    !extractedLabel ||
+    extractedLabel.stated_age === null ||
+    extractedLabel.stated_age === undefined ||
+    targetCandidate.kind === "release" ||
+    targetCandidate.releaseId !== null ||
+    targetCandidate.statedAge === null ||
+    targetCandidate.statedAge === extractedLabel.stated_age
+  ) {
+    return false;
+  }
+
+  return !getTargetNameVariants(targetCandidate).some((name) =>
+    nameMarketsStatedAge({
+      name,
+      statedAge: targetCandidate.statedAge,
+    }),
   );
 }
 
@@ -657,7 +703,11 @@ export function getExistingMatchIdentityConflicts({
     extractedLabel?.stated_age !== null &&
     extractedLabel?.stated_age !== undefined &&
     targetCandidate.statedAge !== null &&
-    extractedLabel.stated_age !== targetCandidate.statedAge
+    extractedLabel.stated_age !== targetCandidate.statedAge &&
+    !targetHasDirtyParentStatedAgeConflict({
+      targetCandidate,
+      extractedLabel,
+    })
   ) {
     conflicts.push("stated_age");
   }
