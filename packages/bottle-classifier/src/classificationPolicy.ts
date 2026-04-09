@@ -57,6 +57,7 @@ const GENERIC_NAME_TOKENS = new Set([
   "yr",
   "yrs",
 ]);
+const OPTIONAL_NAME_MATCH_TOKENS = new Set(["a"]);
 const GIFT_SET_PACKAGING_TOKENS = new Set([
   "box",
   "gift",
@@ -188,11 +189,36 @@ function tokenSetsMatchExactly(left: string[], right: string[]): boolean {
   return true;
 }
 
+function tokenSetsMatchAllowingOptionalTokens(
+  left: string[],
+  right: string[],
+): boolean {
+  if (tokenSetsMatchExactly(left, right)) {
+    return true;
+  }
+
+  const normalizedLeft = left.filter(
+    (token) => !OPTIONAL_NAME_MATCH_TOKENS.has(token),
+  );
+  const normalizedRight = right.filter(
+    (token) => !OPTIONAL_NAME_MATCH_TOKENS.has(token),
+  );
+
+  if (
+    normalizedLeft.length === left.length &&
+    normalizedRight.length === right.length
+  ) {
+    return false;
+  }
+
+  return tokenSetsMatchExactly(normalizedLeft, normalizedRight);
+}
+
 function isBasicallyExactNameMatch(
   referenceName: string,
   candidateName: string | null | undefined,
 ): boolean {
-  return tokenSetsMatchExactly(
+  return tokenSetsMatchAllowingOptionalTokens(
     getComparableNameTokens(referenceName),
     getComparableNameTokens(candidateName),
   );
@@ -300,7 +326,7 @@ function candidateNameMatchesReferenceVariants({
     }
 
     return referenceTokenVariants.some((referenceTokens) =>
-      tokenSetsMatchExactly(referenceTokens, candidateTokens),
+      tokenSetsMatchAllowingOptionalTokens(referenceTokens, candidateTokens),
     );
   });
 }
@@ -948,9 +974,11 @@ function downgradeUnsafeExistingMatchDecision({
     return decision;
   }
 
-  const hasExactishLocalName = getTargetNameCandidates(target, decision).some(
-    (name) => isBasicallyExactNameMatch(reference.name, name),
-  );
+  const hasExactishLocalName = candidateNameMatchesReferenceVariants({
+    referenceName: reference.name,
+    extractedIdentity: artifacts.extractedIdentity,
+    candidateNames: getTargetNameCandidates(target, decision),
+  });
   const hasSupportiveWebEvidence = hasSupportiveWebEvidenceForTarget({
     target,
     decision,

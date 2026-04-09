@@ -156,6 +156,32 @@ const glenglassaughRareCaskParentCandidate: BottleCandidate = {
   source: ["exact"],
 };
 
+const taleOfIceCreamCandidate: BottleCandidate = {
+  bottleId: 43236,
+  releaseId: null,
+  kind: "bottle",
+  alias: null,
+  fullName: "Glenmorangie A Tale of Ice Cream",
+  bottleFullName: "Glenmorangie A Tale of Ice Cream",
+  brand: "Glenmorangie",
+  bottler: null,
+  series: null,
+  distillery: ["Glenmorangie"],
+  category: "single_malt",
+  statedAge: null,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.9,
+  source: ["text"],
+};
+
 const springbank10YearOldCandidate: BottleCandidate = {
   bottleId: 11,
   releaseId: null,
@@ -725,6 +751,78 @@ describe("createBottleClassifier", () => {
       parentBottleId: null,
     });
     expect(result.decision.proposedRelease).toBeNull();
+  });
+
+  test("keeps a strong local bottle match when the retailer title only differs by a standalone article and generic style words", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Glenmorangie",
+      bottler: null,
+      expression: "Tale of Ice Cream",
+      series: null,
+      distillery: ["Glenmorangie"],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 89,
+          rationale: "The local bottle identity matches the listing cleanly.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 43236,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [43236],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [taleOfIceCreamCandidate],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Glenmorangie Tale of Ice Cream Single Malt Scotch Whisky",
+      },
+      extractedIdentity,
+      initialCandidates: [taleOfIceCreamCandidate],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "match",
+      matchedBottleId: 43236,
+      matchedReleaseId: null,
+      parentBottleId: null,
+      identityScope: "product",
+    });
+    expect(result.decision.rationale).not.toContain(
+      "Server downgraded the existing-match recommendation",
+    );
   });
 
   test("redirects an exact legacy batch bottle match to a reusable parent bottle", async () => {
