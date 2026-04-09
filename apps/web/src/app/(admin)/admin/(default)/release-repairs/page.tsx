@@ -27,8 +27,35 @@ const MARKER_LABELS: Record<string, string> = {
   name_release_year: "Name release year",
 };
 
+const REPAIR_MODE_LABELS = {
+  existing_parent: "Exact parent exists",
+  create_parent: "Needs parent creation",
+  blocked_dirty_parent: "Dirty parent blocks repair",
+} as const;
+
 function formatTastingCount(value: null | number): string {
   return (value ?? 0).toLocaleString();
+}
+
+function getRepairModeDescription(repairMode: keyof typeof REPAIR_MODE_LABELS) {
+  switch (repairMode) {
+    case "existing_parent":
+      return "An existing reusable parent bottle can absorb this legacy release directly.";
+    case "create_parent":
+      return "A new reusable parent bottle will be created during repair.";
+    case "blocked_dirty_parent":
+      return "An exact-name bottle exists, but it still carries release traits and needs manual cleanup first.";
+  }
+}
+
+function canApplyRepair(repairMode: keyof typeof REPAIR_MODE_LABELS) {
+  return repairMode !== "blocked_dirty_parent";
+}
+
+function getApplyRepairLabel(repairMode: keyof typeof REPAIR_MODE_LABELS) {
+  return repairMode === "create_parent"
+    ? "Create Parent + Apply"
+    : "Apply Repair";
 }
 
 function buildReleaseRepairHref(
@@ -70,10 +97,12 @@ export default function Page() {
     bottleId,
     legacyBottleName,
     parentBottleName,
+    repairMode,
   }: {
     bottleId: number;
     legacyBottleName: string;
     parentBottleName: string;
+    repairMode: keyof typeof REPAIR_MODE_LABELS;
   }) => {
     setRepairingBottleId(bottleId);
     try {
@@ -83,7 +112,11 @@ export default function Page() {
       await queryClient.invalidateQueries({
         queryKey: candidateListQueryOptions.queryKey,
       });
-      flash(`Moved ${legacyBottleName} under ${parentBottleName}.`);
+      flash(
+        repairMode === "create_parent"
+          ? `Created ${parentBottleName} and moved ${legacyBottleName}.`
+          : `Moved ${legacyBottleName} under ${parentBottleName}.`,
+      );
     } catch (err) {
       flash(
         err instanceof Error ? err.message : "Unable to apply release repair.",
@@ -115,8 +148,9 @@ export default function Page() {
       <div className="mb-6 space-y-4">
         <div className="rounded-xl border border-slate-800 bg-slate-950 px-4 py-4 text-sm text-slate-300">
           High-confidence legacy bottles that likely need to be split into a
-          reusable parent bottle plus child releases. Exact-parent candidates
-          can be applied directly here. The rest still need manual follow-up.
+          reusable parent bottle plus child releases. Existing-parent and
+          create-parent candidates can be applied directly here. Dirty-parent
+          blockers still need manual follow-up.
         </div>
 
         <Form
@@ -162,9 +196,7 @@ export default function Page() {
                 <div className="min-w-0">
                   <div className="mb-3 flex flex-wrap gap-2">
                     <span className="rounded-full border border-slate-700 bg-slate-900 px-2 py-1 text-xs font-medium text-slate-300">
-                      {candidate.hasExactParent
-                        ? "Exact parent exists"
-                        : "Needs parent creation"}
+                      {REPAIR_MODE_LABELS[candidate.repairMode]}
                     </span>
                     {candidate.releaseIdentity.markerSources.map((source) => (
                       <span
@@ -196,7 +228,7 @@ export default function Page() {
                       Open Parent Bottle
                     </Button>
                   ) : null}
-                  {candidate.hasExactParent ? (
+                  {canApplyRepair(candidate.repairMode) ? (
                     <Button
                       color="highlight"
                       disabled={repairingBottleId === candidate.legacyBottle.id}
@@ -206,10 +238,11 @@ export default function Page() {
                           bottleId: candidate.legacyBottle.id,
                           legacyBottleName: candidate.legacyBottle.fullName,
                           parentBottleName: candidate.proposedParent.fullName,
+                          repairMode: candidate.repairMode,
                         })
                       }
                     >
-                      Apply Repair
+                      {getApplyRepairLabel(candidate.repairMode)}
                     </Button>
                   ) : null}
                 </div>
@@ -233,9 +266,9 @@ export default function Page() {
                     </div>
                   )}
                   <div className="mt-2 text-sm text-slate-400">
-                    {candidate.hasExactParent
+                    {candidate.repairMode === "existing_parent"
                       ? `${formatTastingCount(candidate.proposedParent.totalTastings)} tastings on the existing parent bottle.`
-                      : "No exact parent bottle exists yet."}
+                      : getRepairModeDescription(candidate.repairMode)}
                   </div>
                 </div>
 

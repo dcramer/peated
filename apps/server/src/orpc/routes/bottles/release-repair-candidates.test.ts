@@ -52,6 +52,7 @@ describe("GET /bottles/release-repair-candidates", () => {
     );
     expect(batch4Candidate).toMatchObject({
       hasExactParent: true,
+      repairMode: "existing_parent",
       legacyBottle: {
         id: batch4.id,
         fullName: batch4.fullName,
@@ -99,6 +100,7 @@ describe("GET /bottles/release-repair-candidates", () => {
     );
     expect(batch1Candidate).toMatchObject({
       hasExactParent: false,
+      repairMode: "create_parent",
       proposedParent: {
         id: null,
         fullName: "Festival Distillery Warehouse Session",
@@ -110,6 +112,53 @@ describe("GET /bottles/release-repair-candidates", () => {
         markerSources: ["name_batch"],
       },
       siblingLegacyBottles: [{ id: batch2.id, fullName: batch2.fullName }],
+    });
+  });
+
+  test("flags sibling clusters behind a dirty exact-name parent as blocked", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Aberlour" });
+    const dirtyParent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "A'bunadh",
+      totalTastings: 40,
+    });
+    await db
+      .update(bottles)
+      .set({ edition: "Batch 31" })
+      .where(eq(bottles.id, dirtyParent.id));
+    const batch32 = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "A'bunadh (Batch 32)",
+      totalTastings: 10,
+    });
+    const batch33 = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "A'bunadh (Batch 33)",
+      totalTastings: 8,
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "A'bunadh",
+      },
+      { context: { user } },
+    );
+
+    expect(
+      result.results.find(
+        (candidate) => candidate.legacyBottle.id === batch32.id,
+      ),
+    ).toMatchObject({
+      hasExactParent: false,
+      repairMode: "blocked_dirty_parent",
+      proposedParent: {
+        id: null,
+        fullName: dirtyParent.fullName,
+      },
+      siblingLegacyBottles: [{ id: batch33.id, fullName: batch33.fullName }],
     });
   });
 

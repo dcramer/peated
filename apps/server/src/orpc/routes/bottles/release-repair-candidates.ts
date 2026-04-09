@@ -29,6 +29,11 @@ const LegacyReleaseRepairCandidateSchema = z.object({
     }),
   ),
   hasExactParent: z.boolean(),
+  repairMode: z.enum([
+    "existing_parent",
+    "create_parent",
+    "blocked_dirty_parent",
+  ]),
 });
 
 export default procedure
