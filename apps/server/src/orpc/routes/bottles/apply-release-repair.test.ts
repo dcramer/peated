@@ -467,8 +467,8 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     fixtures,
   }) => {
     const brand = await fixtures.Entity({
-      name: "Maker's Mark",
-      shortName: "Maker's",
+      name: "MAKER'S MARK",
+      shortName: "MAKER'S",
       totalBottles: 1,
     });
     const legacyBottle = await fixtures.Bottle({

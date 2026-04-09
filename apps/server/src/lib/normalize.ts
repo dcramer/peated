@@ -56,7 +56,12 @@ export function stripDuplicateBrandPrefixFromBottleName(
     return name;
   }
 
-  return stripPrefix(name, `${brandName} `);
+  const prefix = `${brandName} `;
+  if (name.toLowerCase().startsWith(prefix.toLowerCase())) {
+    return name.substring(prefix.length);
+  }
+
+  return name;
 }
 
 // TODO: this is no longer normalizing a bottle name, lets rethink this code

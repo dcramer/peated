@@ -1,4 +1,8 @@
-import { normalizeBottle, normalizeVolume } from "./normalize";
+import {
+  normalizeBottle,
+  normalizeVolume,
+  stripDuplicateBrandPrefixFromBottleName,
+} from "./normalize";
 
 describe("normalizeBottle", () => {
   test("just the age", async () => {
@@ -556,6 +560,17 @@ describe("normalizeBottle", () => {
         "vintageYear": null,
       }
     `);
+  });
+});
+
+describe("stripDuplicateBrandPrefixFromBottleName", () => {
+  test("strips a duplicate brand prefix case-insensitively", () => {
+    expect(
+      stripDuplicateBrandPrefixFromBottleName(
+        "Maker's Mark 46",
+        "MAKER'S MARK",
+      ),
+    ).toBe("46");
   });
 });
 
