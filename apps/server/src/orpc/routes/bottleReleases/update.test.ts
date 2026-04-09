@@ -248,6 +248,38 @@ describe("PATCH /bottle-releases/:release", () => {
     );
   });
 
+  it("throws error if a compact marketed bottle age conflicts with the release statedAge", async function ({
+    fixtures,
+  }) {
+    const modUser = await fixtures.User({ mod: true });
+
+    const bottle = await fixtures.Bottle({
+      name: "10yo",
+      statedAge: 10,
+      brandId: (await fixtures.Entity({ name: "Springbank" })).id,
+    });
+
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Batch 1",
+      statedAge: 10,
+    });
+
+    const err = await waitError(
+      routerClient.bottleReleases.update(
+        {
+          release: release.id,
+          statedAge: 12,
+        },
+        { context: { user: modUser } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Release statedAge must match bottle's statedAge.]`,
+    );
+  });
+
   it("updates a release when the parent bottle only has a dirty structured statedAge", async function ({
     fixtures,
   }) {

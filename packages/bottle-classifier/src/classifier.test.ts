@@ -156,6 +156,32 @@ const glenglassaughRareCaskParentCandidate: BottleCandidate = {
   source: ["exact"],
 };
 
+const springbank10YearOldCandidate: BottleCandidate = {
+  bottleId: 11,
+  releaseId: null,
+  kind: "bottle",
+  alias: "Springbank 10-year-old",
+  fullName: "Springbank 10-year-old",
+  bottleFullName: "Springbank 10-year-old",
+  brand: "Springbank",
+  bottler: null,
+  series: null,
+  distillery: ["Springbank"],
+  category: "single_malt",
+  statedAge: 10,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: 46,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.99,
+  source: ["exact"],
+};
+
 const cadbollEstateParentCandidate: BottleCandidate = {
   bottleId: 13442,
   releaseId: null,
@@ -630,6 +656,75 @@ describe("createBottleClassifier", () => {
         statedAge: 35,
       },
     });
+  });
+
+  test("does not fabricate a release from an exact marketed-age bottle match with a noisy extracted age", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Springbank",
+      bottler: null,
+      expression: "10 Year Old",
+      series: null,
+      distillery: ["Springbank"],
+      category: "single_malt",
+      stated_age: 12,
+      abv: 46,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 94,
+          rationale: "The local alias is an exact wording match.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 11,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [11],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [springbank10YearOldCandidate],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Springbank 10-year-old",
+      },
+      extractedIdentity,
+      initialCandidates: [springbank10YearOldCandidate],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "match",
+      matchedBottleId: 11,
+      matchedReleaseId: null,
+      parentBottleId: null,
+    });
+    expect(result.decision.proposedRelease).toBeNull();
   });
 
   test("redirects an exact legacy batch bottle match to a reusable parent bottle", async () => {

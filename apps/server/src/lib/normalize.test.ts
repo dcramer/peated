@@ -104,6 +104,14 @@ describe("normalizeBottle", () => {
     expect(statedAge).toBe(12);
   });
 
+  test("Name 12YO", async () => {
+    const { name, statedAge } = normalizeBottle({
+      name: "Delicious 12YO",
+    });
+    expect(name).toMatchInlineSnapshot(`"Delicious 12-year-old"`);
+    expect(statedAge).toBe(12);
+  });
+
   test("Name 12yrs", async () => {
     const { name, statedAge } = normalizeBottle({
       name: "Delicious 12yrs",

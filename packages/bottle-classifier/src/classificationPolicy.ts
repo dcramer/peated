@@ -1,5 +1,6 @@
 import {
   getExistingMatchIdentityConflicts,
+  hasDirtyParentStatedAgeConflict,
   hasSupportiveWebEvidenceForExistingMatch,
 } from "./bottleClassificationEvidence";
 import { normalizeBottleCreationDrafts } from "./bottleCreationDrafts";
@@ -773,7 +774,13 @@ function buildReleaseDraftFromExtractedIdentity({
           : null,
       statedAge:
         extractedIdentity.stated_age !== null &&
-        extractedIdentity.stated_age !== target.statedAge
+        extractedIdentity.stated_age !== target.statedAge &&
+        (target.statedAge === null ||
+          target.statedAge === undefined ||
+          hasDirtyParentStatedAgeConflict({
+            targetCandidate: target,
+            extractedLabel: extractedIdentity,
+          }))
           ? extractedIdentity.stated_age
           : null,
       abv: null,

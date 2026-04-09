@@ -159,7 +159,9 @@ function nameMarketsStatedAge({
     statedAge,
   })
     .name.toLowerCase()
-    .includes(`${statedAge}-year-old`);
+    .match(new RegExp(`\\b${statedAge}-year-old\\b`, "i"))
+    ? true
+    : false;
 }
 
 export function bottleMarketsStatedAge(

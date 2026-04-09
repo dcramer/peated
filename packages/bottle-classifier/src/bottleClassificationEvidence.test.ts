@@ -151,4 +151,42 @@ describe("bottleClassificationEvidence", () => {
       }),
     ).not.toContain("stated_age");
   });
+
+  test("treats compact marketed ages like 10yo as a real stated-age conflict", () => {
+    const targetCandidate = buildBottleCandidate({
+      bottleId: 10,
+      fullName: "Springbank 10yo",
+      bottleFullName: "Springbank 10yo",
+      brand: "Springbank",
+      distillery: ["Springbank"],
+      category: "single_malt",
+      statedAge: 10,
+      source: ["exact"],
+    });
+
+    expect(
+      getExistingMatchIdentityConflicts({
+        referenceName: "Springbank 12-year-old",
+        extractedLabel: {
+          brand: "Springbank",
+          bottler: null,
+          expression: "10yo",
+          series: null,
+          distillery: ["Springbank"],
+          category: "single_malt",
+          stated_age: 12,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        targetCandidate,
+      }),
+    ).toContain("stated_age");
+  });
 });

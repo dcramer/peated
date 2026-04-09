@@ -202,10 +202,12 @@ function nameMarketsStatedAge({
     statedAge,
   })
     .name.toLowerCase()
-    .includes(`${statedAge}-year-old`);
+    .match(new RegExp(`\\b${statedAge}-year-old\\b`, "i"))
+    ? true
+    : false;
 }
 
-function targetHasDirtyParentStatedAgeConflict({
+export function hasDirtyParentStatedAgeConflict({
   targetCandidate,
   extractedLabel,
 }: {
@@ -704,7 +706,7 @@ export function getExistingMatchIdentityConflicts({
     extractedLabel?.stated_age !== undefined &&
     targetCandidate.statedAge !== null &&
     extractedLabel.stated_age !== targetCandidate.statedAge &&
-    !targetHasDirtyParentStatedAgeConflict({
+    !hasDirtyParentStatedAgeConflict({
       targetCandidate,
       extractedLabel,
     })
