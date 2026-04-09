@@ -328,28 +328,91 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     expect(deleteChange.type).toBe("delete");
   });
 
-  test("rejects repair when no exact parent bottle exists", async ({
+  test("creates a reusable parent bottle when no exact parent bottle exists", async ({
     fixtures,
   }) => {
-    const brand = await fixtures.Entity({ name: "Festival Distillery" });
+    const brand = await fixtures.Entity({
+      name: "Festival Distillery",
+      totalBottles: 1,
+    });
+    const distiller = await fixtures.Entity({ name: "Warehouse Distillery" });
     const legacyBottle = await fixtures.Bottle({
       brandId: brand.id,
       name: "Warehouse Session (Batch 2)",
+      statedAge: 12,
+      category: "single_malt",
+      flavorProfile: "spicy_sweet",
+    });
+    await db.insert(bottlesToDistillers).values({
+      bottleId: legacyBottle.id,
+      distillerId: distiller.id,
+    });
+    await db.insert(bottleAliases).values({
+      bottleId: legacyBottle.id,
+      name: "Festival Distillery Warehouse Session",
     });
     const mod = await fixtures.User({ mod: true });
 
-    const err = await waitError(
-      routerClient.bottles.applyReleaseRepair(
-        {
-          bottle: legacyBottle.id,
-        },
-        { context: { user: mod } },
-      ),
+    const result = await routerClient.bottles.applyReleaseRepair(
+      {
+        bottle: legacyBottle.id,
+      },
+      { context: { user: mod } },
     );
 
-    expect(err).toMatchInlineSnapshot(
-      `[Error: No exact reusable parent bottle exists for this repair.]`,
+    const [parentBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, result.parentBottleId));
+    expect(parentBottle).toMatchObject({
+      id: result.parentBottleId,
+      brandId: brand.id,
+      name: "Warehouse Session",
+      fullName: "Festival Distillery Warehouse Session",
+      statedAge: 12,
+      category: "single_malt",
+      flavorProfile: "spicy_sweet",
+      edition: null,
+      releaseYear: null,
+      numReleases: 1,
+    });
+
+    const [release] = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, result.releaseId));
+    expect(release).toMatchObject({
+      bottleId: parentBottle.id,
+      edition: "Batch 2",
+      statedAge: 12,
+    });
+
+    const genericAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, parentBottle.fullName),
+    });
+    expect(genericAlias).toMatchObject({
+      bottleId: parentBottle.id,
+      releaseId: null,
+    });
+
+    const [deletedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, legacyBottle.id));
+    expect(deletedBottle).toBeUndefined();
+
+    const parentDistillers = await db
+      .select()
+      .from(bottlesToDistillers)
+      .where(eq(bottlesToDistillers.bottleId, parentBottle.id));
+    expect(parentDistillers.map((row) => row.distillerId)).toContain(
+      distiller.id,
     );
+
+    const refreshedBrand = await db.query.entities.findFirst({
+      where: (entities, { eq }) => eq(entities.id, brand.id),
+    });
+    expect(refreshedBrand?.totalBottles).toBe(1);
   });
 
   test("prefers a clean exact-name parent when a dirtier duplicate also exists", async ({

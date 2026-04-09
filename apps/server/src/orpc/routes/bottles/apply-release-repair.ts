@@ -13,7 +13,7 @@ export default procedure
     path: "/bottles/{bottle}/apply-release-repair",
     summary: "Apply legacy release repair",
     description:
-      "Split a legacy release-like bottle into an existing reusable parent bottle plus a child bottle release. Requires moderator privileges",
+      "Split a legacy release-like bottle into a reusable parent bottle plus a child bottle release, creating the parent when needed. Requires moderator privileges",
     spec: (spec) => ({
       ...spec,
       operationId: "applyBottleReleaseRepair",

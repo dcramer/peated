@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { bottles } from "@peated/server/db/schema";
+import { bottleAliases, bottles } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -52,6 +52,7 @@ describe("GET /bottles/release-repair-candidates", () => {
     );
     expect(batch4Candidate).toMatchObject({
       hasExactParent: true,
+      repairMode: "existing_parent",
       legacyBottle: {
         id: batch4.id,
         fullName: batch4.fullName,
@@ -99,6 +100,7 @@ describe("GET /bottles/release-repair-candidates", () => {
     );
     expect(batch1Candidate).toMatchObject({
       hasExactParent: false,
+      repairMode: "create_parent",
       proposedParent: {
         id: null,
         fullName: "Festival Distillery Warehouse Session",
@@ -110,6 +112,86 @@ describe("GET /bottles/release-repair-candidates", () => {
         markerSources: ["name_batch"],
       },
       siblingLegacyBottles: [{ id: batch2.id, fullName: batch2.fullName }],
+    });
+  });
+
+  test("keeps singleton create-parent repairs in the candidate list", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Lone Release Distillery" });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Session (Batch 1)",
+      totalTastings: 6,
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "Warehouse Session",
+      },
+      { context: { user } },
+    );
+
+    expect(
+      result.results.find(
+        (candidate) => candidate.legacyBottle.id === legacyBottle.id,
+      ),
+    ).toMatchObject({
+      hasExactParent: false,
+      repairMode: "create_parent",
+      proposedParent: {
+        id: null,
+        fullName: "Lone Release Distillery Warehouse Session",
+      },
+      siblingLegacyBottles: [],
+    });
+  });
+
+  test("flags sibling clusters behind a dirty exact-name parent as blocked", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Aberlour" });
+    const dirtyParent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "A'bunadh",
+      totalTastings: 40,
+    });
+    await db
+      .update(bottles)
+      .set({ edition: "Batch 31" })
+      .where(eq(bottles.id, dirtyParent.id));
+    const batch32 = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "A'bunadh (Batch 32)",
+      totalTastings: 10,
+    });
+    const batch33 = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "A'bunadh (Batch 33)",
+      totalTastings: 8,
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "A'bunadh",
+      },
+      { context: { user } },
+    );
+
+    expect(
+      result.results.find(
+        (candidate) => candidate.legacyBottle.id === batch32.id,
+      ),
+    ).toMatchObject({
+      hasExactParent: false,
+      repairMode: "blocked_dirty_parent",
+      proposedParent: {
+        id: null,
+        fullName: dirtyParent.fullName,
+      },
+      siblingLegacyBottles: [{ id: batch33.id, fullName: batch33.fullName }],
     });
   });
 
@@ -182,7 +264,7 @@ describe("GET /bottles/release-repair-candidates", () => {
     ).toEqual([percentBatch.id]);
   });
 
-  test("does not mark a dirty exact-name parent as actionable", async ({
+  test("keeps singleton dirty-parent blockers in the candidate list", async ({
     fixtures,
   }) => {
     const brand = await fixtures.Entity({ name: "Aberlour" });
@@ -213,7 +295,57 @@ describe("GET /bottles/release-repair-candidates", () => {
       result.results.find(
         (candidate) => candidate.legacyBottle.id === legacyBottle.id,
       ),
-    ).toBeUndefined();
+    ).toMatchObject({
+      hasExactParent: false,
+      repairMode: "blocked_dirty_parent",
+      proposedParent: {
+        id: null,
+        fullName: dirtyParent.fullName,
+      },
+      siblingLegacyBottles: [],
+    });
+  });
+
+  test("marks create-parent candidates as blocked when another alias owns the parent name", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Alias Conflict Distillery" });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Session (Batch 1)",
+      totalTastings: 6,
+    });
+    const conflictingBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Different Product",
+      totalTastings: 20,
+    });
+    await db.insert(bottleAliases).values({
+      bottleId: conflictingBottle.id,
+      name: "Alias Conflict Distillery Warehouse Session",
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "Warehouse Session",
+      },
+      { context: { user } },
+    );
+
+    expect(
+      result.results.find(
+        (candidate) => candidate.legacyBottle.id === legacyBottle.id,
+      ),
+    ).toMatchObject({
+      hasExactParent: false,
+      repairMode: "blocked_alias_conflict",
+      proposedParent: {
+        id: null,
+        fullName: "Alias Conflict Distillery Warehouse Session",
+      },
+      siblingLegacyBottles: [],
+    });
   });
 
   test("keeps pagination stable when valid candidates extend past the initial scan window", async ({
@@ -272,17 +404,19 @@ describe("GET /bottles/release-repair-candidates", () => {
       { context: { user } },
     );
 
-    expect(secondPage.results).toHaveLength(5);
+    expect(secondPage.results).toHaveLength(15);
     expect(secondPage.rel).toMatchObject({
-      nextCursor: null,
+      nextCursor: 3,
       prevCursor: 1,
     });
 
-    const returnedIds = new Set([
+    const returnedIds = [
       ...firstPage.results.map((candidate) => candidate.legacyBottle.id),
       ...secondPage.results.map((candidate) => candidate.legacyBottle.id),
-    ]);
+    ];
 
-    expect(returnedIds).toEqual(new Set(validCandidateIds));
+    expect(new Set(returnedIds.slice(0, 20))).toEqual(
+      new Set(validCandidateIds),
+    );
   });
 });

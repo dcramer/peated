@@ -30,6 +30,7 @@ import {
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import {
   deriveLegacyReleaseRepairIdentity,
+  getLegacyReleaseRepairParentMode,
   pickBestLegacyReleaseRepairParent,
   resolveLegacyReleaseRepairNameScope,
 } from "@peated/server/lib/legacyReleaseRepairCandidates";
@@ -46,15 +47,18 @@ type RepairBottle = Pick<
   | "caskSize"
   | "caskStrength"
   | "caskType"
+  | "category"
   | "createdById"
   | "description"
   | "edition"
+  | "flavorProfile"
   | "fullName"
   | "id"
   | "imageUrl"
   | "name"
   | "numReleases"
   | "releaseYear"
+  | "seriesId"
   | "singleCask"
   | "statedAge"
   | "tastingNotes"
@@ -74,6 +78,12 @@ type ApplyLegacyReleaseRepairResult = {
   legacyBottleId: number;
   parentBottleId: number;
   releaseId: number;
+};
+
+type ResolvedLegacyReleaseRepairParent = {
+  aliasName: string | null;
+  bottle: Bottle;
+  createdParent: boolean;
 };
 
 function getReleaseInput(legacyBottle: RepairBottle) {
@@ -119,6 +129,8 @@ async function getLegacyBottleForRepair(
       name: bottles.name,
       fullName: bottles.fullName,
       statedAge: bottles.statedAge,
+      seriesId: bottles.seriesId,
+      category: bottles.category,
       edition: bottles.edition,
       abv: bottles.abv,
       singleCask: bottles.singleCask,
@@ -131,6 +143,7 @@ async function getLegacyBottleForRepair(
       description: bottles.description,
       imageUrl: bottles.imageUrl,
       tastingNotes: bottles.tastingNotes,
+      flavorProfile: bottles.flavorProfile,
       brandId: bottles.brandId,
       bottlerId: bottles.bottlerId,
       createdById: bottles.createdById,
@@ -155,16 +168,99 @@ async function getLegacyBottleForRepair(
   return legacyBottle satisfies RepairBottle;
 }
 
-async function getExactParentBottle(
+function getProposedParentBottleName(legacyBottle: RepairBottle): string {
+  const repairIdentity = deriveLegacyReleaseRepairIdentity({
+    fullName: legacyBottle.name,
+    edition: legacyBottle.edition,
+    releaseYear: legacyBottle.releaseYear,
+  });
+
+  if (!repairIdentity) {
+    throw new LegacyReleaseRepairBadRequestError(
+      "Bottle does not contain reusable parent identity.",
+    );
+  }
+
+  return repairIdentity.proposedParentFullName;
+}
+
+async function createParentBottleForRepair(
   tx: AnyTransaction,
   {
+    distillerIds,
+    legacyBottle,
+    proposedParentFullName,
+    user,
+  }: {
+    distillerIds: number[];
+    legacyBottle: RepairBottle;
+    proposedParentFullName: string;
+    user: User;
+  },
+): Promise<ResolvedLegacyReleaseRepairParent> {
+  const [parentBottle] = await tx
+    .insert(bottles)
+    .values({
+      fullName: proposedParentFullName,
+      name: getProposedParentBottleName(legacyBottle),
+      statedAge: legacyBottle.statedAge,
+      seriesId: legacyBottle.seriesId,
+      category: legacyBottle.category,
+      brandId: legacyBottle.brandId,
+      bottlerId: legacyBottle.bottlerId,
+      flavorProfile: legacyBottle.flavorProfile,
+      createdById: user.id,
+    })
+    .returning();
+
+  const alias = await upsertBottleAlias(
+    tx,
+    parentBottle.fullName,
+    parentBottle.id,
+    null,
+  );
+  if (alias.bottleId !== parentBottle.id || alias.releaseId !== null) {
+    throw new LegacyReleaseRepairBadRequestError(
+      "Parent bottle alias already belongs to a different bottle.",
+    );
+  }
+
+  await tx.insert(changes).values({
+    objectType: "bottle",
+    objectId: parentBottle.id,
+    createdAt: parentBottle.createdAt,
+    createdById: user.id,
+    displayName: parentBottle.fullName,
+    type: "add",
+    data: {
+      ...parentBottle,
+      distillerIds,
+    },
+  });
+
+  return {
+    aliasName: alias.name,
+    bottle: parentBottle,
+    createdParent: true,
+  };
+}
+
+async function resolveParentBottleForRepair(
+  tx: AnyTransaction,
+  {
+    distillerIds,
+    legacyBottle,
     legacyBottleId,
     proposedParentFullName,
+    user,
   }: {
+    distillerIds: number[];
+    legacyBottle: RepairBottle;
     legacyBottleId: number;
     proposedParentFullName: string;
+    user: User;
   },
-) {
+): Promise<ResolvedLegacyReleaseRepairParent> {
   const parentRows = await tx
     .select()
     .from(bottles)
@@ -180,6 +276,23 @@ async function getExactParentBottle(
     .orderBy(sql`${bottles.totalTastings} DESC NULLS LAST`, desc(bottles.id))
     .for("update");
 
+  const parentMode = getLegacyReleaseRepairParentMode(parentRows);
+
+  if (parentMode === "blocked_dirty_parent") {
+    throw new LegacyReleaseRepairBadRequestError(
+      "Exact parent bottle still contains bottle-level release traits.",
+    );
+  }
+
+  if (parentMode === "create_parent") {
+    return createParentBottleForRepair(tx, {
+      distillerIds,
+      legacyBottle,
+      proposedParentFullName,
+      user,
+    });
+  }
+
   const parentBottle = pickBestLegacyReleaseRepairParent(parentRows);
 
   if (!parentBottle) {
@@ -194,7 +307,11 @@ async function getExactParentBottle(
     );
   }
 
-  return parentBottle;
+  return {
+    aliasName: null,
+    bottle: parentBottle,
+    createdParent: false,
+  };
 }
 
 async function backfillExistingReleaseMetadata(
@@ -252,10 +369,6 @@ export async function applyLegacyReleaseRepairInTransaction(
   const legacyBottle = await getLegacyBottleForRepair(tx, legacyBottleId);
   const { input: releaseInput, releaseIdentity } =
     getReleaseInput(legacyBottle);
-  const parentBottle = await getExactParentBottle(tx, {
-    legacyBottleId,
-    proposedParentFullName: releaseIdentity.proposedParentFullName,
-  });
 
   const legacyAliases = await tx.query.bottleAliases.findMany({
     where: eq(bottleAliases.bottleId, legacyBottle.id),
@@ -304,6 +417,22 @@ export async function applyLegacyReleaseRepairInTransaction(
       .where(eq(bottleAliases.bottleId, legacyBottle.id));
   }
 
+  const repairedAliasNames = new Set<string>();
+  const {
+    aliasName: parentAliasName,
+    bottle: parentBottle,
+    createdParent,
+  } = await resolveParentBottleForRepair(tx, {
+    distillerIds,
+    legacyBottle,
+    legacyBottleId,
+    proposedParentFullName: releaseIdentity.proposedParentFullName,
+    user,
+  });
+  if (parentAliasName) {
+    repairedAliasNames.add(parentAliasName);
+  }
+
   let releaseId: number;
   let reusedExistingRelease = false;
   try {
@@ -323,8 +452,6 @@ export async function applyLegacyReleaseRepairInTransaction(
       throw err;
     }
   }
-
-  const repairedAliasNames = new Set<string>();
 
   let [release] = await tx
     .select()
@@ -591,7 +718,7 @@ export async function applyLegacyReleaseRepairInTransaction(
       .where(eq(bottlesToDistillers.bottleId, legacyBottle.id)),
   ]);
 
-  if (entityIds.length > 0) {
+  if (!createdParent && entityIds.length > 0) {
     await tx
       .update(entities)
       .set({ totalBottles: sql`${entities.totalBottles} - 1` })
