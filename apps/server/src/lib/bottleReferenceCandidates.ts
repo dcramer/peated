@@ -202,21 +202,21 @@ function buildRawSearchName(input: BottleCandidateSearchInput) {
   const structuredName = structuredParts.filter(Boolean).join(" ").trim();
   const hasStrongStructuredIdentity = Boolean(
     input.expression ||
-      input.series ||
-      input.edition ||
-      input.stated_age ||
-      input.cask_type ||
-      input.cask_size ||
-      input.cask_fill ||
-      input.vintage_year ||
-      input.release_year ||
-      input.distillery.length,
+    input.series ||
+    input.edition ||
+    input.stated_age ||
+    input.cask_type ||
+    input.cask_size ||
+    input.cask_fill ||
+    input.vintage_year ||
+    input.release_year ||
+    input.distillery.length,
   );
   const hasStructuredIdentity = Boolean(
     hasStrongStructuredIdentity ||
-      input.abv !== null ||
-      input.cask_strength !== null ||
-      input.single_cask !== null,
+    input.abv !== null ||
+    input.cask_strength !== null ||
+    input.single_cask !== null,
   );
 
   if (structuredName && hasStrongStructuredIdentity) {
@@ -458,6 +458,66 @@ function listMatchesExpectedValue(values: string[], expectedValues: string[]) {
   );
 }
 
+function getCandidateNameVariants(
+  candidate: Pick<BottleCandidate, "alias" | "bottleFullName" | "fullName">,
+) {
+  return Array.from(
+    new Set(
+      [candidate.alias, candidate.bottleFullName, candidate.fullName]
+        .filter((value): value is string => Boolean(value))
+        .map((value) => value.trim())
+        .filter((value) => value.length > 0),
+    ),
+  );
+}
+
+function nameMarketsStatedAge({
+  name,
+  statedAge,
+}: {
+  name: string | null | undefined;
+  statedAge: number | null | undefined;
+}) {
+  if (!name || statedAge === null || statedAge === undefined) {
+    return false;
+  }
+
+  return normalizeBottle({
+    name,
+    statedAge,
+  })
+    .name.toLowerCase()
+    .match(new RegExp(`\\b${statedAge}-year-old\\b`, "i"))
+    ? true
+    : false;
+}
+
+function candidateHasDirtyParentStatedAgeConflict({
+  candidate,
+  extractedLabel,
+}: {
+  candidate: BottleCandidate;
+  extractedLabel: BottleReferenceIdentity | null;
+}) {
+  if (
+    !extractedLabel ||
+    extractedLabel.stated_age === null ||
+    candidate.kind === "release" ||
+    candidate.releaseId !== null ||
+    candidate.statedAge === null ||
+    candidate.statedAge === extractedLabel.stated_age
+  ) {
+    return false;
+  }
+
+  return !getCandidateNameVariants(candidate).some((name) =>
+    nameMarketsStatedAge({
+      name,
+      statedAge: candidate.statedAge,
+    }),
+  );
+}
+
 function getStructuredCandidateAdjustment(
   candidate: BottleCandidate,
   extractedLabel: BottleReferenceIdentity | null,
@@ -504,7 +564,14 @@ function getStructuredCandidateAdjustment(
 
   if (extractedLabel.stated_age !== null && candidate.statedAge !== null) {
     adjustment +=
-      candidate.statedAge === extractedLabel.stated_age ? 0.1 : -0.18;
+      candidate.statedAge === extractedLabel.stated_age
+        ? 0.1
+        : candidateHasDirtyParentStatedAgeConflict({
+              candidate,
+              extractedLabel,
+            })
+          ? 0
+          : -0.18;
   }
 
   if (extractedLabel.edition && candidate.edition) {
@@ -666,16 +733,16 @@ function hasReleaseSpecificIdentity(
 ) {
   return Boolean(
     extractedLabel &&
-      (extractedLabel.stated_age !== null ||
-        extractedLabel.edition ||
-        extractedLabel.abv !== null ||
-        extractedLabel.vintage_year !== null ||
-        extractedLabel.release_year !== null ||
-        extractedLabel.cask_type ||
-        extractedLabel.cask_size !== null ||
-        extractedLabel.cask_fill !== null ||
-        extractedLabel.cask_strength !== null ||
-        extractedLabel.single_cask !== null),
+    (extractedLabel.stated_age !== null ||
+      extractedLabel.edition ||
+      extractedLabel.abv !== null ||
+      extractedLabel.vintage_year !== null ||
+      extractedLabel.release_year !== null ||
+      extractedLabel.cask_type ||
+      extractedLabel.cask_size !== null ||
+      extractedLabel.cask_fill !== null ||
+      extractedLabel.cask_strength !== null ||
+      extractedLabel.single_cask !== null),
   );
 }
 

@@ -215,7 +215,7 @@ function convertWordToNumber(word: string) {
 }
 
 const AGE_NORM_REGEXP = new RegExp(
-  `\\b(\\d{1,2}|${Object.keys(NUMBERS).join("|")})(?:[\\s-]?(?:years?|yrs?.?))(?:[\\s-]old)?($|[\\s,])`,
+  `\\b(\\d{1,2}|${Object.keys(NUMBERS).join("|")})(?:[\\s-]?(?:years?|yrs?\\.?|y\\.?o\\.?))(?:[\\s-]old)?($|[\\s,])`,
   "i",
 );
 

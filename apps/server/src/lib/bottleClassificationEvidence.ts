@@ -1,4 +1,4 @@
-import { normalizeString } from "@peated/server/lib/normalize";
+import { normalizeBottle, normalizeString } from "@peated/server/lib/normalize";
 import type {
   BottleCandidateSchema,
   BottleEvidenceCheckSchema,
@@ -87,6 +87,68 @@ function textsOverlap(
     normalizedLeft === normalizedRight ||
     containsComparablePhrase(normalizedLeft, normalizedRight) ||
     containsComparablePhrase(normalizedRight, normalizedLeft)
+  );
+}
+
+function getTargetNameVariants(targetCandidate: BottleCandidate): string[] {
+  return Array.from(
+    new Set(
+      [
+        targetCandidate.alias,
+        targetCandidate.bottleFullName,
+        targetCandidate.fullName,
+      ]
+        .filter((value): value is string => Boolean(value))
+        .map((value) => value.trim())
+        .filter((value) => value.length > 0),
+    ),
+  );
+}
+
+function nameMarketsStatedAge({
+  name,
+  statedAge,
+}: {
+  name: string | null | undefined;
+  statedAge: number | null | undefined;
+}) {
+  if (!name || statedAge === null || statedAge === undefined) {
+    return false;
+  }
+
+  return normalizeBottle({
+    name,
+    statedAge,
+  })
+    .name.toLowerCase()
+    .match(new RegExp(`\\b${statedAge}-year-old\\b`, "i"))
+    ? true
+    : false;
+}
+
+function targetHasDirtyParentStatedAgeConflict({
+  target,
+  extractedLabel,
+}: {
+  target: BottleCandidate;
+  extractedLabel: BottleExtractedDetails | null;
+}) {
+  if (
+    !extractedLabel ||
+    extractedLabel.stated_age === null ||
+    target.kind === "release" ||
+    target.releaseId !== null ||
+    target.statedAge === null ||
+    target.statedAge === extractedLabel.stated_age
+  ) {
+    return false;
+  }
+
+  return !getTargetNameVariants(target).some((name) =>
+    nameMarketsStatedAge({
+      name,
+      statedAge: target.statedAge,
+    }),
   );
 }
 
@@ -762,7 +824,11 @@ export function getExistingMatchIdentityConflicts({
   if (
     extractedLabel.stated_age !== null &&
     target.statedAge !== null &&
-    target.statedAge !== extractedLabel.stated_age
+    target.statedAge !== extractedLabel.stated_age &&
+    !targetHasDirtyParentStatedAgeConflict({
+      target,
+      extractedLabel,
+    })
   ) {
     conflicts.push("candidate age conflicts with extracted label");
   }

@@ -1,4 +1,5 @@
 import type { Bottle, BottleRelease } from "@peated/server/db/schema";
+import { normalizeBottle } from "./normalize";
 
 export type ReleaseIdentityInput = Pick<
   BottleRelease,
@@ -142,6 +143,59 @@ export function hasBottleLevelReleaseTraits(
   return Object.keys(getBottleLevelReleaseTraits(bottle)).length > 0;
 }
 
+function nameMarketsStatedAge({
+  name,
+  statedAge,
+}: {
+  name: string | null | undefined;
+  statedAge: number | null | undefined;
+}) {
+  if (!name || statedAge === null || statedAge === undefined) {
+    return false;
+  }
+
+  return normalizeBottle({
+    name,
+    statedAge,
+  })
+    .name.toLowerCase()
+    .match(new RegExp(`\\b${statedAge}-year-old\\b`, "i"))
+    ? true
+    : false;
+}
+
+export function bottleMarketsStatedAge(
+  bottle: Pick<Bottle, "fullName" | "name" | "statedAge">,
+) {
+  if (bottle.statedAge === null || bottle.statedAge === undefined) {
+    return false;
+  }
+
+  return [bottle.name, bottle.fullName].some((name) =>
+    nameMarketsStatedAge({
+      name,
+      statedAge: bottle.statedAge,
+    }),
+  );
+}
+
+export function hasDirtyBottleLevelStatedAgeConflict({
+  bottle,
+  releaseStatedAge,
+}: {
+  bottle: Pick<Bottle, "fullName" | "name" | "statedAge">;
+  releaseStatedAge: number | null | undefined;
+}) {
+  return (
+    bottle.statedAge !== null &&
+    bottle.statedAge !== undefined &&
+    releaseStatedAge !== null &&
+    releaseStatedAge !== undefined &&
+    bottle.statedAge !== releaseStatedAge &&
+    !bottleMarketsStatedAge(bottle)
+  );
+}
+
 export function isAddingBottleLevelReleaseTraits({
   current,
   next,
@@ -192,14 +246,21 @@ export function getResolvedReleaseIdentity({
   bottle,
   release,
 }: {
-  bottle: Pick<Bottle, "statedAge">;
+  bottle: Pick<Bottle, "fullName" | "name" | "statedAge">;
   release: ReleaseIdentityInput;
 }): ReleaseIdentityInput {
   // When a marketed age lives on the parent bottle, it is part of the stable
   // expression identity and should not be duplicated as a release-only suffix.
+  const hasDirtyParentStatedAgeConflict = hasDirtyBottleLevelStatedAgeConflict({
+    bottle,
+    releaseStatedAge: release.statedAge,
+  });
+
   return {
     edition: release.edition ?? null,
-    statedAge: bottle.statedAge ?? release.statedAge ?? null,
+    statedAge: hasDirtyParentStatedAgeConflict
+      ? (release.statedAge ?? null)
+      : (bottle.statedAge ?? release.statedAge ?? null),
     releaseYear: release.releaseYear ?? null,
     vintageYear: release.vintageYear ?? null,
     abv: release.abv ?? null,
@@ -229,6 +290,8 @@ export function formatCanonicalReleaseName({
   // label text so duplicate checks and aliases stay consistent across sources.
   const resolvedRelease = getResolvedReleaseIdentity({
     bottle: {
+      name: bottleName,
+      fullName: bottleFullName,
       statedAge: bottleStatedAge,
     },
     release,
@@ -240,7 +303,11 @@ export function formatCanonicalReleaseName({
   for (const field of RELEASE_IDENTITY_FIELDS) {
     // The bottle already owns its marketed age, so only release-specific ages
     // should appear in the generated suffix.
-    if (field === "statedAge" && bottleStatedAge !== null) {
+    if (
+      field === "statedAge" &&
+      bottleStatedAge !== null &&
+      resolvedRelease.statedAge === bottleStatedAge
+    ) {
       continue;
     }
 

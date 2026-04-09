@@ -1,5 +1,8 @@
 import { describe, expect, test } from "vitest";
-import { hasSupportiveWebEvidenceForExistingMatch } from "./bottleClassificationEvidence";
+import {
+  getExistingMatchIdentityConflicts,
+  hasSupportiveWebEvidenceForExistingMatch,
+} from "./bottleClassificationEvidence";
 import type { BottleCandidate, BottleSearchEvidence } from "./index";
 
 function buildBottleCandidate(
@@ -110,5 +113,80 @@ describe("bottleClassificationEvidence", () => {
         targetCandidate,
       }),
     ).toBe(true);
+  });
+
+  test("does not treat a differing age as a hard conflict for dirty parent bottle candidates", () => {
+    const targetCandidate = buildBottleCandidate({
+      bottleId: 2457,
+      fullName: "Glenglassaugh 1978 Rare Cask Release",
+      brand: "Glenglassaugh",
+      distillery: ["Glenglassaugh"],
+      category: "single_malt",
+      statedAge: 40,
+    });
+
+    expect(
+      getExistingMatchIdentityConflicts({
+        referenceName:
+          "Glenglassaugh 1978 Rare Cask Release (Batch 1) 35-year-old",
+        extractedLabel: {
+          brand: "Glenglassaugh",
+          bottler: null,
+          expression: "1978 Rare Cask Release",
+          series: null,
+          distillery: ["Glenglassaugh"],
+          category: "single_malt",
+          stated_age: 35,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: "Batch 1",
+        },
+        targetCandidate,
+      }),
+    ).not.toContain("stated_age");
+  });
+
+  test("treats compact marketed ages like 10yo as a real stated-age conflict", () => {
+    const targetCandidate = buildBottleCandidate({
+      bottleId: 10,
+      fullName: "Springbank 10yo",
+      bottleFullName: "Springbank 10yo",
+      brand: "Springbank",
+      distillery: ["Springbank"],
+      category: "single_malt",
+      statedAge: 10,
+      source: ["exact"],
+    });
+
+    expect(
+      getExistingMatchIdentityConflicts({
+        referenceName: "Springbank 12-year-old",
+        extractedLabel: {
+          brand: "Springbank",
+          bottler: null,
+          expression: "10yo",
+          series: null,
+          distillery: ["Springbank"],
+          category: "single_malt",
+          stated_age: 12,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        targetCandidate,
+      }),
+    ).toContain("stated_age");
   });
 });

@@ -230,6 +230,85 @@ describe("POST /bottle-releases", () => {
     expect(updatedBottle.numReleases).toBe(0);
   });
 
+  it("throws error if a compact marketed bottle age conflicts with the release statedAge", async function ({
+    fixtures,
+    defaults,
+  }) {
+    const bottle = await fixtures.Bottle({
+      name: "10yo",
+      statedAge: 10,
+      brandId: (await fixtures.Entity({ name: "Springbank" })).id,
+    });
+
+    const err = await waitError(() =>
+      routerClient.bottleReleases.create(
+        {
+          bottle: bottle.id,
+          edition: "Batch 1",
+          statedAge: 12,
+        },
+        {
+          context: { user: defaults.user },
+        },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Release statedAge must match bottle's statedAge.]`,
+    );
+  });
+
+  it("creates a release when a generic parent bottle has a conflicting dirty statedAge", async function ({
+    fixtures,
+    defaults,
+  }) {
+    const bottle = await fixtures.Bottle({
+      name: "1978 Rare Cask Release",
+      statedAge: 40,
+      brandId: (await fixtures.Entity({ name: "Glenglassaugh" })).id,
+    });
+
+    const result = await routerClient.bottleReleases.create(
+      {
+        bottle: bottle.id,
+        edition: "Batch 1",
+        statedAge: 35,
+      },
+      {
+        context: { user: defaults.user },
+      },
+    );
+
+    expect(result).toMatchObject({
+      statedAge: 35,
+      edition: "Batch 1",
+      fullName: "Glenglassaugh 1978 Rare Cask Release - Batch 1 - 35-year-old",
+      name: "1978 Rare Cask Release - Batch 1 - 35-year-old",
+    });
+
+    const [release] = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, result.id));
+
+    expect(release).toMatchObject({
+      bottleId: bottle.id,
+      statedAge: 35,
+      edition: "Batch 1",
+      fullName: "Glenglassaugh 1978 Rare Cask Release - Batch 1 - 35-year-old",
+      name: "1978 Rare Cask Release - Batch 1 - 35-year-old",
+    });
+
+    const [updatedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+    expect(updatedBottle).toMatchObject({
+      statedAge: 40,
+      numReleases: 1,
+    });
+  });
+
   it("throws error if bottle not found", async function ({ defaults }) {
     const data = {
       bottle: 999999,
