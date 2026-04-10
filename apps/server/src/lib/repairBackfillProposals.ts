@@ -144,6 +144,25 @@ function getRepairBackfillProposalActionability(
     : "blocked";
 }
 
+function isActionableReleaseRepairCandidate(
+  candidate: LegacyReleaseRepairCandidate,
+): candidate is LegacyReleaseRepairCandidate & {
+  repairMode: "create_parent" | "existing_parent";
+} {
+  return (
+    candidate.repairMode === "create_parent" ||
+    candidate.repairMode === "existing_parent"
+  );
+}
+
+function isAutomationEligibleReleaseRepairCandidate(
+  candidate: LegacyReleaseRepairCandidate,
+): candidate is LegacyReleaseRepairCandidate & {
+  repairMode: "existing_parent";
+} {
+  return candidate.repairMode === "existing_parent" && candidate.hasExactParent;
+}
+
 function getReleaseRepairProposalAutomationAssessment(
   candidate: LegacyReleaseRepairCandidate,
 ): RepairBackfillProposalAutomationAssessment {
@@ -193,6 +212,23 @@ function getAgeRepairProposalAutomationAssessment(
   };
 }
 
+function isAutomationEligibleAgeRepairCandidate(
+  candidate: DirtyParentAgeRepairCandidate,
+): candidate is DirtyParentAgeRepairCandidate & {
+  repairMode: "existing_release";
+  targetRelease: {
+    fullName: string;
+    id: number;
+    statedAge: number;
+    totalTastings: null | number;
+  };
+} {
+  return (
+    candidate.repairMode === "existing_release" &&
+    candidate.targetRelease.id !== null
+  );
+}
+
 function getCanonRepairProposalAutomationAssessment(): RepairBackfillProposalAutomationAssessment {
   return {
     automationEligible: false,
@@ -202,6 +238,7 @@ function getCanonRepairProposalAutomationAssessment(): RepairBackfillProposalAut
 
 async function collectRepairCandidates<TCandidate>({
   fetcher,
+  isEligible,
   perTypeLimit,
   query,
 }: {
@@ -210,6 +247,7 @@ async function collectRepairCandidates<TCandidate>({
     limit: number;
     query: string;
   }) => Promise<RepairBackfillCandidatePage<TCandidate>>;
+  isEligible?: (candidate: TCandidate) => boolean;
   perTypeLimit: number;
   query: string;
 }) {
@@ -224,7 +262,17 @@ async function collectRepairCandidates<TCandidate>({
       query,
     });
 
-    results.push(...page.results);
+    for (const candidate of page.results) {
+      if (isEligible && !isEligible(candidate)) {
+        continue;
+      }
+
+      results.push(candidate);
+
+      if (results.length >= perTypeLimit) {
+        break;
+      }
+    }
 
     if (!page.rel.nextCursor || page.results.length === 0) {
       break;
@@ -357,6 +405,11 @@ export async function getRepairBackfillProposals({
   if (normalizedTypes.includes("release")) {
     const results = await collectRepairCandidates({
       fetcher: getLegacyReleaseRepairCandidates,
+      isEligible: onlyAutomationEligible
+        ? isAutomationEligibleReleaseRepairCandidate
+        : onlyActionable
+          ? isActionableReleaseRepairCandidate
+          : undefined,
       perTypeLimit,
       query,
     });
@@ -366,13 +419,20 @@ export async function getRepairBackfillProposals({
   if (normalizedTypes.includes("age")) {
     const results = await collectRepairCandidates({
       fetcher: getDirtyParentAgeRepairCandidates,
+      isEligible: onlyAutomationEligible
+        ? isAutomationEligibleAgeRepairCandidate
+        : undefined,
       perTypeLimit,
       query,
     });
     proposals.push(...results.map(toAgeRepairBackfillProposal));
   }
 
-  if (normalizedTypes.includes("canon")) {
+  if (
+    normalizedTypes.includes("canon") &&
+    !onlyActionable &&
+    !onlyAutomationEligible
+  ) {
     const results = await collectRepairCandidates({
       fetcher: getCanonRepairCandidates,
       perTypeLimit,

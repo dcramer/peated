@@ -627,6 +627,110 @@ describe("getRepairBackfillProposals", () => {
     ]);
   });
 
+  test("keeps paging until it finds the requested automation-eligible release proposals", async () => {
+    getLegacyReleaseRepairCandidatesMock
+      .mockResolvedValueOnce({
+        results: [
+          {
+            blockingAlias: null,
+            blockingParent: null,
+            legacyBottle: createLegacyBottleMock({
+              id: 11,
+              fullName:
+                "Elijah Craig Barrel Proof Kentucky Straight Bourbon (Batch C923)",
+              edition: "Batch C923",
+              totalTastings: 50,
+            }),
+            proposedParent: {
+              id: 14,
+              fullName: "Elijah Craig Barrel Proof",
+              totalTastings: 180,
+            },
+            releaseIdentity: {
+              edition: "Batch C923",
+              releaseYear: null,
+              markerSources: ["name_batch"],
+            },
+            siblingLegacyBottles: [],
+            hasExactParent: false,
+            repairMode: "existing_parent",
+          },
+        ],
+        rel: {
+          nextCursor: 2,
+          prevCursor: null,
+        },
+      })
+      .mockResolvedValueOnce({
+        results: [
+          {
+            blockingAlias: null,
+            blockingParent: null,
+            legacyBottle: createLegacyBottleMock({
+              id: 12,
+              fullName: "Aberlour A'bunadh Batch 32",
+              edition: "Batch 32",
+              totalTastings: 12,
+            }),
+            proposedParent: {
+              id: 13,
+              fullName: "Aberlour A'bunadh",
+              totalTastings: 200,
+            },
+            releaseIdentity: {
+              edition: "Batch 32",
+              releaseYear: null,
+              markerSources: ["name_batch"],
+            },
+            siblingLegacyBottles: [],
+            hasExactParent: true,
+            repairMode: "existing_parent",
+          },
+        ],
+        rel: {
+          nextCursor: null,
+          prevCursor: 1,
+        },
+      });
+
+    const result = await getRepairBackfillProposals({
+      onlyAutomationEligible: true,
+      perTypeLimit: 1,
+      types: ["release"],
+    });
+
+    expect(getLegacyReleaseRepairCandidatesMock).toHaveBeenNthCalledWith(1, {
+      cursor: 1,
+      limit: 1,
+      query: "",
+    });
+    expect(getLegacyReleaseRepairCandidatesMock).toHaveBeenNthCalledWith(2, {
+      cursor: 2,
+      limit: 1,
+      query: "",
+    });
+    expect(result.summary).toEqual({
+      total: 1,
+      byType: {
+        release: 1,
+        age: 0,
+        canon: 0,
+      },
+      byActionability: {
+        apply: 1,
+        blocked: 0,
+        manual: 0,
+      },
+    });
+    expect(result.proposals).toEqual([
+      expect.objectContaining({
+        type: "release",
+        bottle: expect.objectContaining({ id: 12 }),
+        automationEligible: true,
+      }),
+    ]);
+  });
+
   test("keeps a stable page size across cursor hops above the max page size", async () => {
     getLegacyReleaseRepairCandidatesMock
       .mockResolvedValueOnce({
