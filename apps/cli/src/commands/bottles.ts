@@ -7,6 +7,10 @@ import {
   entities,
   reviews,
 } from "@peated/server/db/schema";
+import {
+  applyRepairBackfillProposals,
+  type BatchApplicableRepairBackfillProposalType,
+} from "@peated/server/lib/applyRepairBackfillProposals";
 import { findEntity } from "@peated/server/lib/bottleFinder";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import {
@@ -19,6 +23,7 @@ import {
   type RepairBackfillProposal,
   type RepairBackfillProposalType,
 } from "@peated/server/lib/repairBackfillProposals";
+import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import { routerClient } from "@peated/server/orpc/router";
 import { runJob } from "@peated/server/worker/client";
 import { and, asc, eq, inArray, isNull, ne } from "drizzle-orm";
@@ -26,6 +31,7 @@ import { and, asc, eq, inArray, isNull, ne } from "drizzle-orm";
 const subcommand = program.command("bottles");
 const REPAIR_BACKFILL_PROPOSAL_TYPES = ["release", "age", "canon"] as const;
 const REPAIR_BACKFILL_PROPOSAL_FORMATS = ["summary", "json"] as const;
+const APPLICABLE_REPAIR_BACKFILL_PROPOSAL_TYPES = ["release", "age"] as const;
 
 function parseRepairBackfillProposalTypes(
   value: string,
@@ -58,6 +64,39 @@ function parseRepairBackfillProposalTypes(
   }
 
   return types as RepairBackfillProposalType[];
+}
+
+function parseBatchApplicableRepairBackfillProposalTypes(
+  value: string,
+): BatchApplicableRepairBackfillProposalType[] {
+  if (value === "all") {
+    return [...APPLICABLE_REPAIR_BACKFILL_PROPOSAL_TYPES];
+  }
+
+  const types = Array.from(
+    new Set(
+      value
+        .split(",")
+        .map((entry) => entry.trim())
+        .filter(Boolean),
+    ),
+  );
+
+  if (types.length === 0) {
+    throw new Error(
+      "Repair apply types must include one of: release, age, all.",
+    );
+  }
+
+  for (const type of types) {
+    if (!APPLICABLE_REPAIR_BACKFILL_PROPOSAL_TYPES.includes(type as never)) {
+      throw new Error(
+        `Unknown batch-applicable repair proposal type: ${type}. Expected one of: release, age, all.`,
+      );
+    }
+  }
+
+  return types as BatchApplicableRepairBackfillProposalType[];
 }
 
 function parseRepairBackfillProposalFormat(value: string): "json" | "summary" {
@@ -417,6 +456,62 @@ subcommand
       console.log("");
       console.log(
         `... ${result.proposals.length - 25} more proposal(s) omitted. Use --format json for the full output.`,
+      );
+    }
+  });
+
+subcommand
+  .command("apply-repair-proposals")
+  .description(
+    "Preview or apply directly actionable release and age repair proposals in bulk",
+  )
+  .option(
+    "--type <type>",
+    "Comma-separated proposal types: release, age, or all",
+    "all",
+  )
+  .option(
+    "--limit <number>",
+    "Maximum number of proposals to collect per type",
+    "100",
+  )
+  .option("--query <query>", "Filter proposals by bottle name", "")
+  .option(
+    "--execute",
+    "Actually apply the repair proposals. Without this flag the command only previews.",
+  )
+  .action(async (options) => {
+    const perTypeLimit = Number.parseInt(options.limit, 10);
+    if (!Number.isFinite(perTypeLimit) || perTypeLimit <= 0) {
+      throw new Error(`Invalid limit: ${options.limit}`);
+    }
+
+    const types = parseBatchApplicableRepairBackfillProposalTypes(options.type);
+    const result = await applyRepairBackfillProposals({
+      dryRun: !options.execute,
+      perTypeLimit,
+      query: options.query,
+      types,
+      user: options.execute ? await getAutomationModeratorUser() : undefined,
+    });
+
+    console.log(
+      `${options.execute ? "Applied" : "Previewed"} repair proposals: ${result.summary.total}`,
+    );
+    console.log(
+      `planned=${result.summary.planned} applied=${result.summary.applied} failed=${result.summary.failed}`,
+    );
+
+    for (const item of result.items) {
+      console.log(
+        `[${item.type}/${item.status}] ${item.bottleName} (${item.bottleId})`,
+      );
+      console.log(`  ${item.message}`);
+    }
+
+    if (options.execute && result.summary.failed > 0) {
+      throw new Error(
+        `${result.summary.failed} repair proposal(s) failed during execution.`,
       );
     }
   });
