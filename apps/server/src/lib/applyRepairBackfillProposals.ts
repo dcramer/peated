@@ -8,12 +8,15 @@ import {
   LegacyReleaseRepairBadRequestError,
 } from "@peated/server/lib/applyLegacyReleaseRepair";
 import {
-  getRepairBackfillProposals,
-  type AgeRepairBackfillProposal,
-  type ReleaseRepairBackfillProposal,
-  type RepairBackfillProposal,
-  type RepairBackfillProposalType,
-} from "@peated/server/lib/repairBackfillProposals";
+  getDirtyParentAgeRepairCandidates,
+  type DirtyParentAgeRepairCandidate,
+} from "@peated/server/lib/dirtyParentAgeRepairCandidates";
+import {
+  getLegacyReleaseRepairCandidates,
+  type LegacyReleaseRepairCandidate,
+} from "@peated/server/lib/legacyReleaseRepairCandidates";
+
+const MAX_PAGE_SIZE = 100;
 
 export type BatchApplicableRepairBackfillProposalType = "age" | "release";
 
@@ -41,18 +44,42 @@ export type ApplyRepairBackfillProposalsResult = {
   };
 };
 
-type BatchApplicableRepairProposal =
-  | AgeRepairBackfillProposal
-  | ReleaseRepairBackfillProposal;
+type BatchApplicableReleaseRepairProposal = {
+  bottle: {
+    fullName: string;
+    id: number;
+  };
+  proposedParent: {
+    fullName: string;
+  };
+  repairMode: "create_parent" | "existing_parent";
+  type: "release";
+};
 
-function isBatchApplicableRepairProposal(
-  proposal: RepairBackfillProposal,
-): proposal is BatchApplicableRepairProposal {
-  return (
-    proposal.actionability === "apply" &&
-    (proposal.type === "release" || proposal.type === "age")
-  );
-}
+type BatchApplicableAgeRepairProposal = {
+  bottle: {
+    fullName: string;
+    id: number;
+  };
+  repairMode: "create_release" | "existing_release";
+  targetRelease: {
+    fullName: string;
+    id: number | null;
+  };
+  type: "age";
+};
+
+type BatchApplicableRepairProposal =
+  | BatchApplicableAgeRepairProposal
+  | BatchApplicableReleaseRepairProposal;
+
+type CandidatePage<TCandidate> = {
+  rel: {
+    nextCursor: null | number;
+    prevCursor: null | number;
+  };
+  results: TCandidate[];
+};
 
 function createResultSummary(items: ApplyRepairBackfillProposalItem[]) {
   return items.reduce(
@@ -162,6 +189,101 @@ async function applyRepairBackfillProposal(
   }
 }
 
+function isActionableReleaseRepairCandidate(
+  candidate: LegacyReleaseRepairCandidate,
+): candidate is LegacyReleaseRepairCandidate & {
+  repairMode: "create_parent" | "existing_parent";
+} {
+  return (
+    candidate.repairMode === "create_parent" ||
+    candidate.repairMode === "existing_parent"
+  );
+}
+
+function toApplicableReleaseRepairProposal(
+  candidate: LegacyReleaseRepairCandidate & {
+    repairMode: "create_parent" | "existing_parent";
+  },
+): BatchApplicableReleaseRepairProposal {
+  return {
+    type: "release",
+    bottle: {
+      id: candidate.legacyBottle.id,
+      fullName: candidate.legacyBottle.fullName,
+    },
+    proposedParent: {
+      fullName: candidate.proposedParent.fullName,
+    },
+    repairMode: candidate.repairMode,
+  };
+}
+
+function toApplicableAgeRepairProposal(
+  candidate: DirtyParentAgeRepairCandidate,
+): BatchApplicableAgeRepairProposal {
+  return {
+    type: "age",
+    bottle: {
+      id: candidate.bottle.id,
+      fullName: candidate.bottle.fullName,
+    },
+    repairMode: candidate.repairMode,
+    targetRelease: {
+      id: candidate.targetRelease.id,
+      fullName: candidate.targetRelease.fullName,
+    },
+  };
+}
+
+async function collectApplicableRepairCandidates<TCandidate, TProposal>({
+  fetcher,
+  isApplicable,
+  map,
+  perTypeLimit,
+  query,
+}: {
+  fetcher: (args: {
+    cursor: number;
+    limit: number;
+    query: string;
+  }) => Promise<CandidatePage<TCandidate>>;
+  isApplicable: (candidate: TCandidate) => boolean;
+  map: (candidate: TCandidate) => TProposal;
+  perTypeLimit: number;
+  query: string;
+}) {
+  const proposals: TProposal[] = [];
+  const pageSize = Math.min(MAX_PAGE_SIZE, perTypeLimit);
+  let cursor = 1;
+
+  while (proposals.length < perTypeLimit) {
+    const page = await fetcher({
+      cursor,
+      limit: pageSize,
+      query,
+    });
+
+    for (const candidate of page.results) {
+      if (!isApplicable(candidate)) {
+        continue;
+      }
+
+      proposals.push(map(candidate));
+      if (proposals.length >= perTypeLimit) {
+        break;
+      }
+    }
+
+    if (!page.rel.nextCursor || page.results.length === 0) {
+      break;
+    }
+
+    cursor = page.rel.nextCursor;
+  }
+
+  return proposals;
+}
+
 export async function applyRepairBackfillProposals({
   dryRun = true,
   perTypeLimit = 100,
@@ -173,19 +295,48 @@ export async function applyRepairBackfillProposals({
   perTypeLimit?: number;
   query?: string;
   types?: BatchApplicableRepairBackfillProposalType[];
-  user: User;
+  user?: User;
 }): Promise<ApplyRepairBackfillProposalsResult> {
-  const proposalTypes = Array.from(
-    new Set(types),
-  ) as RepairBackfillProposalType[];
-  const { proposals } = await getRepairBackfillProposals({
-    onlyActionable: true,
-    perTypeLimit,
-    query,
-    types: proposalTypes,
-  });
+  const normalizedTypes = Array.from(new Set(types));
+  const applicableProposals: BatchApplicableRepairProposal[] = [];
 
-  const applicableProposals = proposals.filter(isBatchApplicableRepairProposal);
+  if (normalizedTypes.includes("release")) {
+    applicableProposals.push(
+      ...(await collectApplicableRepairCandidates({
+        fetcher: getLegacyReleaseRepairCandidates,
+        isApplicable: isActionableReleaseRepairCandidate,
+        map: (candidate) =>
+          toApplicableReleaseRepairProposal(
+            candidate as LegacyReleaseRepairCandidate & {
+              repairMode: "create_parent" | "existing_parent";
+            },
+          ),
+        perTypeLimit,
+        query,
+      })),
+    );
+  }
+
+  if (normalizedTypes.includes("age")) {
+    applicableProposals.push(
+      ...(await collectApplicableRepairCandidates({
+        fetcher: getDirtyParentAgeRepairCandidates,
+        isApplicable: () => true,
+        map: toApplicableAgeRepairProposal,
+        perTypeLimit,
+        query,
+      })),
+    );
+  }
+
+  if (!dryRun && !user) {
+    throw new Error(
+      "Automation moderator user is required to execute repair proposals.",
+    );
+  }
+
+  const executionUser = user;
+
   const items: ApplyRepairBackfillProposalItem[] = [];
 
   for (const proposal of applicableProposals) {
@@ -194,7 +345,7 @@ export async function applyRepairBackfillProposals({
       continue;
     }
 
-    items.push(await applyRepairBackfillProposal(proposal, user));
+    items.push(await applyRepairBackfillProposal(proposal, executionUser!));
   }
 
   return {

@@ -487,13 +487,12 @@ subcommand
     }
 
     const types = parseBatchApplicableRepairBackfillProposalTypes(options.type);
-    const user = await getAutomationModeratorUser();
     const result = await applyRepairBackfillProposals({
       dryRun: !options.execute,
       perTypeLimit,
       query: options.query,
       types,
-      user,
+      user: options.execute ? await getAutomationModeratorUser() : undefined,
     });
 
     console.log(

@@ -3,10 +3,15 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { applyDirtyParentAgeRepair } from "@peated/server/lib/applyDirtyParentAgeRepair";
 import { applyLegacyReleaseRepair } from "@peated/server/lib/applyLegacyReleaseRepair";
 import { applyRepairBackfillProposals } from "@peated/server/lib/applyRepairBackfillProposals";
-import { getRepairBackfillProposals } from "@peated/server/lib/repairBackfillProposals";
+import { getDirtyParentAgeRepairCandidates } from "@peated/server/lib/dirtyParentAgeRepairCandidates";
+import { getLegacyReleaseRepairCandidates } from "@peated/server/lib/legacyReleaseRepairCandidates";
 
-vi.mock("@peated/server/lib/repairBackfillProposals", () => ({
-  getRepairBackfillProposals: vi.fn(),
+vi.mock("@peated/server/lib/legacyReleaseRepairCandidates", () => ({
+  getLegacyReleaseRepairCandidates: vi.fn(),
+}));
+
+vi.mock("@peated/server/lib/dirtyParentAgeRepairCandidates", () => ({
+  getDirtyParentAgeRepairCandidates: vi.fn(),
 }));
 
 vi.mock("@peated/server/lib/applyLegacyReleaseRepair", () => ({
@@ -19,7 +24,12 @@ vi.mock("@peated/server/lib/applyDirtyParentAgeRepair", () => ({
   applyDirtyParentAgeRepair: vi.fn(),
 }));
 
-const getRepairBackfillProposalsMock = vi.mocked(getRepairBackfillProposals);
+const getLegacyReleaseRepairCandidatesMock = vi.mocked(
+  getLegacyReleaseRepairCandidates,
+);
+const getDirtyParentAgeRepairCandidatesMock = vi.mocked(
+  getDirtyParentAgeRepairCandidates,
+);
 const applyLegacyReleaseRepairMock = vi.mocked(applyLegacyReleaseRepair);
 const applyDirtyParentAgeRepairMock = vi.mocked(applyDirtyParentAgeRepair);
 
@@ -34,182 +44,153 @@ describe("applyRepairBackfillProposals", () => {
     vi.resetAllMocks();
   });
 
-  test("previews directly actionable release and age proposals without mutating", async () => {
-    getRepairBackfillProposalsMock.mockResolvedValue({
-      proposals: [
-        {
-          type: "release",
-          actionability: "apply",
-          adminHref: "/admin/release-repairs?query=Aberlour",
-          bottle: {
-            id: 11,
-            fullName: "Aberlour A'bunadh Batch 32",
-            totalTastings: 10,
-          },
-          blockingAlias: null,
-          blockingParent: null,
-          proposedParent: {
-            id: 12,
-            fullName: "Aberlour A'bunadh",
-            totalTastings: 100,
-          },
-          releaseIdentity: {
-            edition: "Batch 32",
-            markerSources: ["name_batch"],
-            releaseYear: null,
-          },
-          repairMode: "existing_parent",
-          siblingCount: 2,
-          totalTastings: 10,
+  test("previews actionable release repairs across multiple pages without requiring a user", async () => {
+    getLegacyReleaseRepairCandidatesMock
+      .mockResolvedValueOnce({
+        rel: {
+          nextCursor: 2,
+          prevCursor: null,
         },
-        {
-          type: "age",
-          actionability: "apply",
-          adminHref: "/admin/age-repairs?query=Glenglassaugh",
-          bottle: {
-            id: 21,
-            fullName: "Glenglassaugh 1978 Rare Cask Release",
-            statedAge: 40,
-            totalTastings: 9,
+        results: [
+          {
+            legacyBottle: {
+              id: 11,
+              fullName: "Aberlour A'bunadh (Batch 32)",
+            },
+            proposedParent: {
+              id: 12,
+              fullName: "Aberlour A'bunadh",
+              totalTastings: 100,
+            },
+            repairMode: "blocked_alias_conflict",
           },
-          conflictingReleaseCount: 1,
-          repairMode: "create_release",
-          targetRelease: {
-            id: null,
-            fullName: "Glenglassaugh 1978 Rare Cask Release 40-year-old",
-            statedAge: 40,
-            totalTastings: null,
+        ],
+      } as any)
+      .mockResolvedValueOnce({
+        rel: {
+          nextCursor: 3,
+          prevCursor: 1,
+        },
+        results: [
+          {
+            legacyBottle: {
+              id: 13,
+              fullName: "Aberlour A'bunadh (Batch 33)",
+            },
+            proposedParent: {
+              id: 12,
+              fullName: "Aberlour A'bunadh",
+              totalTastings: 100,
+            },
+            repairMode: "blocked_dirty_parent",
           },
-          totalTastings: 9,
+        ],
+      } as any)
+      .mockResolvedValueOnce({
+        rel: {
+          nextCursor: null,
+          prevCursor: 2,
         },
-        {
-          type: "canon",
-          actionability: "manual",
-          adminHref: "/admin/canon-repairs?query=Elijah",
-          bottle: {
-            id: 31,
-            fullName: "Elijah Craig Barrel Proof Kentucky Straight Bourbon",
-            totalTastings: 3,
+        results: [
+          {
+            legacyBottle: {
+              id: 14,
+              fullName: "Aberlour A'bunadh (Batch 34)",
+            },
+            proposedParent: {
+              id: 12,
+              fullName: "Aberlour A'bunadh",
+              totalTastings: 100,
+            },
+            repairMode: "existing_parent",
           },
-          targetBottle: {
-            id: 32,
-            fullName: "Elijah Craig Barrel Proof",
-            totalTastings: 24,
-          },
-          totalTastings: 3,
-          variantCount: 0,
-        },
-      ],
-      summary: {
-        total: 3,
-        byType: {
-          release: 1,
-          age: 1,
-          canon: 1,
-        },
-        byActionability: {
-          apply: 2,
-          blocked: 0,
-          manual: 1,
-        },
+        ],
+      } as any);
+    getDirtyParentAgeRepairCandidatesMock.mockResolvedValue({
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
       },
-    });
+      results: [],
+    } as any);
 
     const result = await applyRepairBackfillProposals({
-      user,
+      perTypeLimit: 1,
+      types: ["release"],
     });
 
-    expect(getRepairBackfillProposalsMock).toHaveBeenCalledWith({
-      onlyActionable: true,
-      perTypeLimit: 100,
+    expect(getLegacyReleaseRepairCandidatesMock).toHaveBeenNthCalledWith(1, {
+      cursor: 1,
+      limit: 1,
       query: "",
-      types: ["release", "age"],
+    });
+    expect(getLegacyReleaseRepairCandidatesMock).toHaveBeenNthCalledWith(2, {
+      cursor: 2,
+      limit: 1,
+      query: "",
+    });
+    expect(getLegacyReleaseRepairCandidatesMock).toHaveBeenNthCalledWith(3, {
+      cursor: 3,
+      limit: 1,
+      query: "",
     });
     expect(applyLegacyReleaseRepairMock).not.toHaveBeenCalled();
-    expect(applyDirtyParentAgeRepairMock).not.toHaveBeenCalled();
     expect(result.summary).toEqual({
-      total: 2,
-      planned: 2,
+      total: 1,
+      planned: 1,
       applied: 0,
       failed: 0,
     });
     expect(result.items).toEqual([
       expect.objectContaining({
+        type: "release",
         status: "planned",
         action: "preview_release_repair",
-        bottleId: 11,
-      }),
-      expect.objectContaining({
-        status: "planned",
-        action: "preview_age_repair",
-        bottleId: 21,
+        bottleId: 14,
       }),
     ]);
   });
 
   test("applies proposals and reports mixed success and failure", async () => {
-    getRepairBackfillProposalsMock.mockResolvedValue({
-      proposals: [
+    getLegacyReleaseRepairCandidatesMock.mockResolvedValue({
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
+      },
+      results: [
         {
-          type: "release",
-          actionability: "apply",
-          adminHref: "/admin/release-repairs?query=Aberlour",
-          bottle: {
+          legacyBottle: {
             id: 11,
-            fullName: "Aberlour A'bunadh Batch 32",
-            totalTastings: 10,
+            fullName: "Aberlour A'bunadh (Batch 32)",
           },
-          blockingAlias: null,
-          blockingParent: null,
           proposedParent: {
             id: 12,
             fullName: "Aberlour A'bunadh",
             totalTastings: 100,
           },
-          releaseIdentity: {
-            edition: "Batch 32",
-            markerSources: ["name_batch"],
-            releaseYear: null,
-          },
           repairMode: "existing_parent",
-          siblingCount: 2,
-          totalTastings: 10,
         },
+      ],
+    } as any);
+    getDirtyParentAgeRepairCandidatesMock.mockResolvedValue({
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
+      },
+      results: [
         {
-          type: "age",
-          actionability: "apply",
-          adminHref: "/admin/age-repairs?query=Glenglassaugh",
           bottle: {
             id: 21,
             fullName: "Glenglassaugh 1978 Rare Cask Release",
-            statedAge: 40,
-            totalTastings: 9,
           },
-          conflictingReleaseCount: 1,
           repairMode: "existing_release",
           targetRelease: {
             id: 22,
             fullName: "Glenglassaugh 1978 Rare Cask Release 40-year-old",
-            statedAge: 40,
-            totalTastings: 2,
           },
-          totalTastings: 9,
         },
       ],
-      summary: {
-        total: 2,
-        byType: {
-          release: 1,
-          age: 1,
-          canon: 0,
-        },
-        byActionability: {
-          apply: 2,
-          blocked: 0,
-          manual: 0,
-        },
-      },
-    });
+    } as any);
     applyLegacyReleaseRepairMock.mockResolvedValue({
       legacyBottleId: 11,
       parentBottleId: 12,
@@ -230,11 +211,15 @@ describe("applyRepairBackfillProposals", () => {
       user,
     });
 
-    expect(getRepairBackfillProposalsMock).toHaveBeenCalledWith({
-      onlyActionable: true,
-      perTypeLimit: 50,
+    expect(getLegacyReleaseRepairCandidatesMock).toHaveBeenCalledWith({
+      cursor: 1,
+      limit: 50,
       query: "Rare",
-      types: ["age", "release"],
+    });
+    expect(getDirtyParentAgeRepairCandidatesMock).toHaveBeenCalledWith({
+      cursor: 1,
+      limit: 50,
+      query: "Rare",
     });
     expect(applyLegacyReleaseRepairMock).toHaveBeenCalledWith({
       legacyBottleId: 11,
@@ -252,11 +237,13 @@ describe("applyRepairBackfillProposals", () => {
     });
     expect(result.items).toEqual([
       expect.objectContaining({
+        type: "release",
         status: "applied",
         action: "apply_release_repair",
         releaseId: 13,
       }),
       expect.objectContaining({
+        type: "age",
         status: "failed",
         action: "apply_age_repair",
         message:
