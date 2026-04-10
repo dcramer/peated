@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { reviews } from "@peated/server/db/schema";
+import { externalSites, reviews } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -49,6 +49,18 @@ describe("PATCH /reviews/:review", () => {
       .from(reviews)
       .where(eq(reviews.id, review.id));
     expect(updatedReview.hidden).toBe(false);
+  });
+
+  test("reuses the same implicit external site across review fixtures", async ({
+    fixtures,
+  }) => {
+    const firstReview = await fixtures.Review();
+    const secondReview = await fixtures.Review();
+
+    expect(secondReview.externalSiteId).toBe(firstReview.externalSiteId);
+
+    const allSites = await db.select().from(externalSites);
+    expect(allSites).toHaveLength(1);
   });
 
   test("assigns a release and infers the parent bottle", async ({
