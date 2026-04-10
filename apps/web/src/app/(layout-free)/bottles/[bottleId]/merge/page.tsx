@@ -47,12 +47,17 @@ export default function MergeBottle({
   const prefilledOtherBottleId = Number(searchParams.get("other") ?? 0) || null;
   const prefilledDirection =
     searchParams.get("direction") === "mergeFrom" ? "mergeFrom" : "mergeInto";
+  const prefillKey = prefilledOtherBottleId
+    ? `${prefilledOtherBottleId}:${prefilledDirection}`
+    : null;
 
   const [otherBottleName, setOtherBottleName] = useState<string>("Other");
   const [selectedOtherBottle, setSelectedOtherBottle] = useState<Option | null>(
     null,
   );
-  const [hasAppliedPrefill, setHasAppliedPrefill] = useState(false);
+  const [appliedPrefillKey, setAppliedPrefillKey] = useState<null | string>(
+    null,
+  );
 
   const { data: prefilledOtherBottle } = useQuery({
     ...orpc.bottles.details.queryOptions({
@@ -87,7 +92,8 @@ export default function MergeBottle({
   useEffect(() => {
     if (
       !prefilledOtherBottle ||
-      hasAppliedPrefill ||
+      !prefillKey ||
+      appliedPrefillKey === prefillKey ||
       dirtyFields.bottleId ||
       dirtyFields.direction
     ) {
@@ -103,11 +109,12 @@ export default function MergeBottle({
     setOtherBottleName(prefilledOtherBottle.fullName);
     setValue("bottleId", prefilledOtherBottle.id, { shouldDirty: false });
     setValue("direction", prefilledDirection, { shouldDirty: false });
-    setHasAppliedPrefill(true);
+    setAppliedPrefillKey(prefillKey);
   }, [
+    appliedPrefillKey,
     dirtyFields.bottleId,
     dirtyFields.direction,
-    hasAppliedPrefill,
+    prefillKey,
     prefilledDirection,
     prefilledOtherBottle,
     setValue,

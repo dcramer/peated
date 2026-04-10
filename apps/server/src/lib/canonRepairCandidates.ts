@@ -3,7 +3,7 @@ import { bottles, type Bottle } from "@peated/server/db/schema";
 import { hasBottleLevelReleaseTraits } from "@peated/server/lib/bottleSchemaRules";
 import { hasVariantLegacyReleaseRepairParentName } from "@peated/server/lib/legacyReleaseRepairCandidates";
 import { normalizeString } from "@peated/server/lib/normalize";
-import { desc } from "drizzle-orm";
+import { desc, inArray, sql } from "drizzle-orm";
 
 const MAX_SCAN_LIMIT = 2000;
 
@@ -51,6 +51,13 @@ export type CanonRepairCandidate = {
   }>;
 };
 
+function escapeLikePattern(value: string) {
+  return value
+    .replaceAll("\\", "\\\\")
+    .replaceAll("%", "\\%")
+    .replaceAll("_", "\\_");
+}
+
 function getTastingCount(value: null | number | undefined): number {
   return value ?? 0;
 }
@@ -93,6 +100,37 @@ function hasConflictingValue<TValue>(
   return left !== null && right !== null && left !== right;
 }
 
+const DISTINCT_CATEGORY_NAME_MARKERS = [
+  "bourbon",
+  "rye",
+  "scotch",
+  "irish",
+  "japanese",
+  "canadian",
+] as const;
+
+function getDistinctCategoryNameMarkers(fullName: string) {
+  const normalizedFullName = normalizeString(fullName).toLowerCase();
+
+  return DISTINCT_CATEGORY_NAME_MARKERS.filter((marker) =>
+    normalizedFullName.match(new RegExp(`\\b${marker}\\b`, "i")),
+  );
+}
+
+function hasConflictingCategoryNameMarkers(
+  source: Pick<CanonRepairBottle, "fullName">,
+  target: Pick<CanonRepairBottle, "fullName">,
+) {
+  const sourceMarkers = getDistinctCategoryNameMarkers(source.fullName);
+  const targetMarkers = getDistinctCategoryNameMarkers(target.fullName);
+
+  return (
+    sourceMarkers.length > 0 &&
+    targetMarkers.length > 0 &&
+    !sourceMarkers.some((marker) => targetMarkers.includes(marker))
+  );
+}
+
 function canCanonRepairPair(
   source: CanonRepairBottle,
   target: CanonRepairBottle,
@@ -113,7 +151,8 @@ function canCanonRepairPair(
     hasConflictingValue(source.category, target.category) ||
     hasConflictingValue(source.bottlerId, target.bottlerId) ||
     hasConflictingValue(source.seriesId, target.seriesId) ||
-    hasConflictingValue(source.statedAge, target.statedAge)
+    hasConflictingValue(source.statedAge, target.statedAge) ||
+    hasConflictingCategoryNameMarkers(source, target)
   ) {
     return false;
   }
@@ -167,9 +206,40 @@ export async function getCanonRepairCandidates({
     })
     .from(bottles);
 
-  const rows = await baseQuery
-    .orderBy(desc(bottles.totalTastings), desc(bottles.id))
-    .limit(MAX_SCAN_LIMIT);
+  const normalizedQuery = normalizeString(query).toLowerCase().trim();
+  let rows: CanonRepairBottle[];
+
+  if (normalizedQuery) {
+    const queryRows = await baseQuery
+      .where(
+        sql`${bottles.fullName} ILIKE ${`%${escapeLikePattern(query)}%`} ESCAPE '\\'`,
+      )
+      .orderBy(desc(bottles.totalTastings), desc(bottles.id))
+      .limit(MAX_SCAN_LIMIT);
+
+    if (queryRows.length === 0) {
+      return {
+        results: [],
+        rel: {
+          nextCursor: null,
+          prevCursor: cursor > 1 ? cursor - 1 : null,
+        },
+      };
+    }
+
+    rows = await baseQuery
+      .where(
+        inArray(
+          bottles.brandId,
+          Array.from(new Set(queryRows.map((row) => row.brandId))),
+        ),
+      )
+      .orderBy(desc(bottles.totalTastings), desc(bottles.id));
+  } else {
+    rows = await baseQuery
+      .orderBy(desc(bottles.totalTastings), desc(bottles.id))
+      .limit(MAX_SCAN_LIMIT);
+  }
 
   const brandGroups = new Map<number, CanonRepairBottle[]>();
   for (const row of rows) {
@@ -238,7 +308,6 @@ export async function getCanonRepairCandidates({
     return right.bottle.id - left.bottle.id;
   });
 
-  const normalizedQuery = normalizeString(query).toLowerCase().trim();
   const filteredCandidates = normalizedQuery
     ? candidates.filter((candidate) =>
         canonRepairCandidateMatchesQuery(candidate, normalizedQuery),

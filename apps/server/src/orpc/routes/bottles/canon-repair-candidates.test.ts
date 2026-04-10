@@ -1,3 +1,5 @@
+import { db } from "@peated/server/db";
+import { bottles } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
@@ -93,6 +95,48 @@ describe("GET /bottles/canon-repair-candidates", () => {
     expect(emptyResults.results).toEqual([]);
   });
 
+  test("search still finds candidates when they fall below the default unfiltered scan cap", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Elijah Craig" });
+    const noiseBrand = await fixtures.Entity({ name: "Noise Brand" });
+    const user = await fixtures.User({ mod: true });
+
+    await db.insert(bottles).values(
+      Array.from({ length: 2000 }, (_, index) => ({
+        brandId: noiseBrand.id,
+        createdById: user.id,
+        fullName: `Noise Brand Noise ${index + 1}`,
+        name: `Noise ${index + 1}`,
+        totalTastings: 5000 - index,
+      })),
+    );
+
+    await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Barrel Proof",
+      category: "bourbon",
+      totalTastings: 1,
+    });
+    const sourceBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Barrel Proof Kentucky Straight Bourbon",
+      category: "bourbon",
+      totalTastings: 1,
+    });
+
+    const matchingResults = await routerClient.bottles.canonRepairCandidates(
+      {
+        query: "Kentucky",
+      },
+      { context: { user } },
+    );
+
+    expect(matchingResults.results.map((result) => result.bottle.id)).toContain(
+      sourceBottle.id,
+    );
+  });
+
   test("does not surface release-like bottles as canon repair candidates", async ({
     fixtures,
   }) => {
@@ -110,6 +154,32 @@ describe("GET /bottles/canon-repair-candidates", () => {
       edition: "Batch 31",
       category: "single_malt",
       totalTastings: 3,
+    });
+
+    const { results } = await routerClient.bottles.canonRepairCandidates(
+      {},
+      { context: { user } },
+    );
+
+    expect(results).toEqual([]);
+  });
+
+  test("does not surface category-only wording conflicts when one side lacks structured category", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Brand" });
+    const user = await fixtures.User({ mod: true });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Special Bourbon",
+      category: null,
+      totalTastings: 20,
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Special Rye",
+      category: "rye",
+      totalTastings: 10,
     });
 
     const { results } = await routerClient.bottles.canonRepairCandidates(
