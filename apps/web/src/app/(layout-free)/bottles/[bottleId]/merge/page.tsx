@@ -11,15 +11,17 @@ import FormError from "@peated/web/components/formError";
 import FormHeader from "@peated/web/components/formHeader";
 import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
+import type { Option } from "@peated/web/components/selectField";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   useMutation,
+  useQuery,
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
@@ -35,14 +37,34 @@ export default function MergeBottle({
 
   const orpc = useORPC();
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
   const { data: bottle } = useSuspenseQuery(
     orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
   );
   const { flash } = useFlashMessages();
 
   const router = useRouter();
+  const prefilledOtherBottleId = Number(searchParams.get("other") ?? 0) || null;
+  const prefilledDirection =
+    searchParams.get("direction") === "mergeFrom" ? "mergeFrom" : "mergeInto";
+  const prefillKey = prefilledOtherBottleId
+    ? `${prefilledOtherBottleId}:${prefilledDirection}`
+    : null;
 
   const [otherBottleName, setOtherBottleName] = useState<string>("Other");
+  const [selectedOtherBottle, setSelectedOtherBottle] = useState<Option | null>(
+    null,
+  );
+  const [appliedPrefillKey, setAppliedPrefillKey] = useState<null | string>(
+    null,
+  );
+
+  const { data: prefilledOtherBottle } = useQuery({
+    ...orpc.bottles.details.queryOptions({
+      input: { bottle: prefilledOtherBottleId ?? 0 },
+    }),
+    enabled: prefilledOtherBottleId !== null,
+  });
 
   const bottleMergeMutation = useMutation({
     ...orpc.bottles.merge.mutationOptions(),
@@ -58,13 +80,45 @@ export default function MergeBottle({
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    setValue,
+    formState: { dirtyFields, errors, isSubmitting },
   } = useForm<FormSchemaType>({
     resolver: zodResolver(BottleMergeSchema),
     defaultValues: {
-      direction: "mergeInto",
+      direction: prefilledDirection,
     },
   });
+
+  useEffect(() => {
+    if (
+      !prefilledOtherBottle ||
+      !prefillKey ||
+      appliedPrefillKey === prefillKey ||
+      dirtyFields.bottleId ||
+      dirtyFields.direction
+    ) {
+      return;
+    }
+
+    const nextBottle = {
+      id: prefilledOtherBottle.id,
+      name: prefilledOtherBottle.fullName,
+    };
+
+    setSelectedOtherBottle(nextBottle);
+    setOtherBottleName(prefilledOtherBottle.fullName);
+    setValue("bottleId", prefilledOtherBottle.id, { shouldDirty: false });
+    setValue("direction", prefilledDirection, { shouldDirty: false });
+    setAppliedPrefillKey(prefillKey);
+  }, [
+    appliedPrefillKey,
+    dirtyFields.bottleId,
+    dirtyFields.direction,
+    prefillKey,
+    prefilledDirection,
+    prefilledOtherBottle,
+    setValue,
+  ]);
 
   const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
     await bottleMergeMutation.mutateAsync(
@@ -114,8 +168,10 @@ export default function MergeBottle({
                 error={errors.bottleId}
                 label="Other Bottle"
                 required
+                value={selectedOtherBottle}
                 onChange={(value) => {
                   onChange(value?.id);
+                  setSelectedOtherBottle(value ?? null);
                   setOtherBottleName(value?.name || "Other");
                 }}
                 onResults={(results) => {
