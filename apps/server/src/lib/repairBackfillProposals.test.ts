@@ -32,6 +32,7 @@ function createLegacyBottleMock(overrides: Record<string, unknown>) {
   return {
     id: 1,
     brandId: 1,
+    category: null,
     fullName: "Legacy Bottle",
     edition: null,
     releaseYear: null,

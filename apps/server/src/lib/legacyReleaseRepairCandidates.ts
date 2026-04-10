@@ -47,12 +47,21 @@ const GENERIC_PARENT_NAME_TOKENS = new Set([
   "yr",
   "yrs",
 ]);
+const DISTINCT_CATEGORY_NAME_MARKERS = [
+  "bourbon",
+  "rye",
+  "scotch",
+  "irish",
+  "japanese",
+  "canadian",
+] as const;
 
 type LegacyReleaseRepairBottle = Omit<
   Pick<
     Bottle,
     | "id"
     | "brandId"
+    | "category"
     | "fullName"
     | "edition"
     | "releaseYear"
@@ -70,6 +79,7 @@ export type LegacyReleaseRepairParentCandidate = Pick<
   | "caskFill"
   | "caskSize"
   | "caskStrength"
+  | "category"
   | "edition"
   | "fullName"
   | "id"
@@ -170,6 +180,28 @@ function getComparableParentNameTokens(fullName: string): string[] {
     );
 }
 
+function getDistinctCategoryNameMarkers(fullName: string) {
+  const normalizedFullName = normalizeString(fullName).toLowerCase();
+
+  return DISTINCT_CATEGORY_NAME_MARKERS.filter((marker) =>
+    normalizedFullName.match(new RegExp(`\\b${marker}\\b`, "i")),
+  );
+}
+
+function hasConflictingCategoryNameMarkers(
+  sourceFullName: string,
+  targetFullName: string,
+) {
+  const sourceMarkers = getDistinctCategoryNameMarkers(sourceFullName);
+  const targetMarkers = getDistinctCategoryNameMarkers(targetFullName);
+
+  return (
+    sourceMarkers.length > 0 &&
+    targetMarkers.length > 0 &&
+    !sourceMarkers.some((marker) => targetMarkers.includes(marker))
+  );
+}
+
 function tokenSetsMatchExactly(left: string[], right: string[]): boolean {
   if (!left.length || !right.length) {
     return false;
@@ -195,6 +227,21 @@ function hasExactLegacyReleaseRepairParentName(
   proposedParentFullName: string,
 ): boolean {
   return fullName.toLowerCase() === proposedParentFullName.toLowerCase();
+}
+
+function canReuseLegacyReleaseRepairParent(
+  row: LegacyReleaseRepairParentCandidate,
+  {
+    proposedParentFullName,
+  }: {
+    proposedParentFullName: string;
+  },
+) {
+  if (hasConflictingCategoryNameMarkers(row.fullName, proposedParentFullName)) {
+    return false;
+  }
+
+  return true;
 }
 
 export function hasVariantLegacyReleaseRepairParentName(
@@ -276,7 +323,11 @@ export function resolveLegacyReleaseRepairParentMatch<
 } {
   const candidateRows = rows.filter(
     (row) =>
-      currentLegacyBottleId === undefined || row.id !== currentLegacyBottleId,
+      (currentLegacyBottleId === undefined ||
+        row.id !== currentLegacyBottleId) &&
+      canReuseLegacyReleaseRepairParent(row, {
+        proposedParentFullName,
+      }),
   );
   const exactRows = candidateRows.filter((row) =>
     hasExactLegacyReleaseRepairParentName(row.fullName, proposedParentFullName),
@@ -574,6 +625,7 @@ export async function getLegacyReleaseRepairCandidates({
     .select({
       id: bottles.id,
       brandId: bottles.brandId,
+      category: bottles.category,
       fullName: bottles.fullName,
       edition: bottles.edition,
       releaseYear: bottles.releaseYear,
@@ -634,6 +686,7 @@ export async function getLegacyReleaseRepairCandidates({
           .select({
             id: bottles.id,
             fullName: bottles.fullName,
+            category: bottles.category,
             totalTastings: bottles.totalTastings,
             edition: bottles.edition,
             releaseYear: bottles.releaseYear,
@@ -660,6 +713,7 @@ export async function getLegacyReleaseRepairCandidates({
             brandId: bottles.brandId,
             id: bottles.id,
             fullName: bottles.fullName,
+            category: bottles.category,
             totalTastings: bottles.totalTastings,
             edition: bottles.edition,
             releaseYear: bottles.releaseYear,
