@@ -3,7 +3,7 @@ import { bottles, type Bottle } from "@peated/server/db/schema";
 import { hasBottleLevelReleaseTraits } from "@peated/server/lib/bottleSchemaRules";
 import { hasVariantLegacyReleaseRepairParentName } from "@peated/server/lib/legacyReleaseRepairCandidates";
 import { normalizeString } from "@peated/server/lib/normalize";
-import { desc, inArray, sql } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 
 const MAX_SCAN_LIMIT = 2000;
 
@@ -214,8 +214,7 @@ export async function getCanonRepairCandidates({
       .where(
         sql`${bottles.fullName} ILIKE ${`%${escapeLikePattern(query)}%`} ESCAPE '\\'`,
       )
-      .orderBy(desc(bottles.totalTastings), desc(bottles.id))
-      .limit(MAX_SCAN_LIMIT);
+      .orderBy(desc(bottles.totalTastings), desc(bottles.id));
 
     if (queryRows.length === 0) {
       return {
@@ -227,14 +226,32 @@ export async function getCanonRepairCandidates({
       };
     }
 
-    rows = await baseQuery
-      .where(
-        inArray(
-          bottles.brandId,
-          Array.from(new Set(queryRows.map((row) => row.brandId))),
-        ),
-      )
-      .orderBy(desc(bottles.totalTastings), desc(bottles.id));
+    const rowsById = new Map<number, CanonRepairBottle>();
+    for (const row of queryRows) {
+      rowsById.set(row.id, row);
+    }
+
+    for (const brandId of new Set(queryRows.map((row) => row.brandId))) {
+      const brandRows = await baseQuery
+        .where(eq(bottles.brandId, brandId))
+        .orderBy(desc(bottles.totalTastings), desc(bottles.id))
+        .limit(MAX_SCAN_LIMIT);
+
+      for (const row of brandRows) {
+        rowsById.set(row.id, row);
+      }
+    }
+
+    rows = Array.from(rowsById.values()).sort((left, right) => {
+      const tastingDiff =
+        getTastingCount(right.totalTastings) -
+        getTastingCount(left.totalTastings);
+      if (tastingDiff !== 0) {
+        return tastingDiff;
+      }
+
+      return right.id - left.id;
+    });
   } else {
     rows = await baseQuery
       .orderBy(desc(bottles.totalTastings), desc(bottles.id))
