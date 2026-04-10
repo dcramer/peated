@@ -156,13 +156,6 @@ function getTastingCount(value: null | number | undefined): number {
   return value ?? 0;
 }
 
-function hasConflictingValue<TValue>(
-  left: null | TValue,
-  right: null | TValue,
-): boolean {
-  return left !== null && right !== null && left !== right;
-}
-
 function getLegacyReleaseRepairModePriority(
   value: LegacyReleaseRepairParentMode,
 ): number {
@@ -240,16 +233,10 @@ function canReuseLegacyReleaseRepairParent(
   row: LegacyReleaseRepairParentCandidate,
   {
     proposedParentFullName,
-    sourceCategory,
   }: {
     proposedParentFullName: string;
-    sourceCategory: Bottle["category"];
   },
 ) {
-  if (hasConflictingValue(row.category, sourceCategory)) {
-    return false;
-  }
-
   if (hasConflictingCategoryNameMarkers(row.fullName, proposedParentFullName)) {
     return false;
   }
@@ -322,11 +309,9 @@ export function resolveLegacyReleaseRepairParentMatch<
   {
     currentLegacyBottleId,
     proposedParentFullName,
-    sourceCategory,
   }: {
     currentLegacyBottleId?: number;
     proposedParentFullName: string;
-    sourceCategory: Bottle["category"];
   },
 ): {
   exactParent: null | TRow;
@@ -342,7 +327,6 @@ export function resolveLegacyReleaseRepairParentMatch<
         row.id !== currentLegacyBottleId) &&
       canReuseLegacyReleaseRepairParent(row, {
         proposedParentFullName,
-        sourceCategory,
       }),
   );
   const exactRows = candidateRows.filter((row) =>
@@ -387,7 +371,6 @@ export function getLegacyReleaseRepairParentMode<
     currentLegacyBottleId,
     parentAlias,
     proposedParentFullName,
-    sourceCategory,
   }: {
     currentLegacyBottleId?: number;
     parentAlias?: {
@@ -395,13 +378,11 @@ export function getLegacyReleaseRepairParentMode<
       releaseId: number | null;
     } | null;
     proposedParentFullName: string;
-    sourceCategory: Bottle["category"];
   },
 ): LegacyReleaseRepairParentMode {
   const parentMatch = resolveLegacyReleaseRepairParentMatch(rows, {
     currentLegacyBottleId,
     proposedParentFullName,
-    sourceCategory,
   });
 
   if (parentMatch.exactParent) {
@@ -438,17 +419,14 @@ export function getLegacyReleaseRepairBlockingParent<
   {
     currentLegacyBottleId,
     proposedParentFullName,
-    sourceCategory,
   }: {
     currentLegacyBottleId?: number;
     proposedParentFullName: string;
-    sourceCategory: Bottle["category"];
   },
 ): null | TRow {
   const parentMatch = resolveLegacyReleaseRepairParentMatch(rows, {
     currentLegacyBottleId,
     proposedParentFullName,
-    sourceCategory,
   });
 
   return (
@@ -889,7 +867,6 @@ export async function getLegacyReleaseRepairCandidates({
         {
           currentLegacyBottleId: candidate.bottle.id,
           proposedParentFullName: candidate.proposedParentFullName,
-          sourceCategory: candidate.bottle.category,
         },
       );
       const parent = parentMatch.parent;
@@ -898,7 +875,6 @@ export async function getLegacyReleaseRepairCandidates({
         {
           currentLegacyBottleId: candidate.bottle.id,
           proposedParentFullName: candidate.proposedParentFullName,
-          sourceCategory: candidate.bottle.category,
         },
       );
       const repairMode = getLegacyReleaseRepairParentMode(
@@ -907,7 +883,6 @@ export async function getLegacyReleaseRepairCandidates({
           currentLegacyBottleId: candidate.bottle.id,
           parentAlias,
           proposedParentFullName: candidate.proposedParentFullName,
-          sourceCategory: candidate.bottle.category,
         },
       );
 
