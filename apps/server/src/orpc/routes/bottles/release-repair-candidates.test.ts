@@ -157,6 +157,50 @@ describe("GET /bottles/release-repair-candidates", () => {
     });
   });
 
+  test("does not reuse a cross-category generic variant as the parent repair target", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Rock Town" });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Arkansas Bourbon",
+      category: null,
+      totalTastings: 80,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Arkansas Rye (Batch 1)",
+      category: "rye",
+      totalTastings: 8,
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "Rock Town Arkansas",
+      },
+      { context: { user } },
+    );
+
+    expect(
+      result.results.find(
+        (candidate) => candidate.legacyBottle.id === legacyBottle.id,
+      ),
+    ).toMatchObject({
+      hasExactParent: false,
+      repairMode: "create_parent",
+      proposedParent: {
+        id: null,
+        fullName: "Rock Town Arkansas Rye",
+      },
+      releaseIdentity: {
+        edition: "Batch 1",
+        releaseYear: null,
+        markerSources: ["name_batch"],
+      },
+    });
+  });
+
   test("keeps singleton create-parent repairs in the candidate list", async ({
     fixtures,
   }) => {

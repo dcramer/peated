@@ -513,6 +513,58 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     expect(existingParents.map((row) => row.id)).toEqual([parentBottle.id]);
   });
 
+  test("creates a new parent when the only generic variant conflicts on category markers", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Rock Town",
+      totalBottles: 2,
+    });
+    const bourbonParent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Arkansas Bourbon",
+      category: null,
+      totalTastings: 120,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Arkansas Rye (Batch 1)",
+      category: "rye",
+      totalTastings: 9,
+    });
+    const mod = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.applyReleaseRepair(
+      {
+        bottle: legacyBottle.id,
+      },
+      { context: { user: mod } },
+    );
+
+    expect(result.parentBottleId).not.toBe(bourbonParent.id);
+
+    const [parentBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, result.parentBottleId));
+    expect(parentBottle).toMatchObject({
+      id: result.parentBottleId,
+      brandId: brand.id,
+      name: "Arkansas Rye",
+      fullName: "Rock Town Arkansas Rye",
+      category: "rye",
+    });
+
+    const [release] = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, result.releaseId));
+    expect(release).toMatchObject({
+      bottleId: parentBottle.id,
+      edition: "Batch 1",
+    });
+  });
+
   test("prefers the longest brand prefix when deriving a created parent name", async ({
     fixtures,
   }) => {

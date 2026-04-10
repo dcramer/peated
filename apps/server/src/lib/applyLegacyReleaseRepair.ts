@@ -314,6 +314,7 @@ async function resolveParentBottleForRepair(
 
   const parentMode = getLegacyReleaseRepairParentMode(parentRows, {
     proposedParentFullName,
+    sourceCategory: legacyBottle.category,
   });
 
   if (parentMode === "blocked_dirty_parent") {
@@ -333,6 +334,7 @@ async function resolveParentBottleForRepair(
 
   const parentBottle = resolveLegacyReleaseRepairParentMatch(parentRows, {
     proposedParentFullName,
+    sourceCategory: legacyBottle.category,
   }).parent;
 
   if (!parentBottle) {

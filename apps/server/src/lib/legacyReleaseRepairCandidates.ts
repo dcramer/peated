@@ -47,12 +47,21 @@ const GENERIC_PARENT_NAME_TOKENS = new Set([
   "yr",
   "yrs",
 ]);
+const DISTINCT_CATEGORY_NAME_MARKERS = [
+  "bourbon",
+  "rye",
+  "scotch",
+  "irish",
+  "japanese",
+  "canadian",
+] as const;
 
 type LegacyReleaseRepairBottle = Omit<
   Pick<
     Bottle,
     | "id"
     | "brandId"
+    | "category"
     | "fullName"
     | "edition"
     | "releaseYear"
@@ -70,6 +79,7 @@ export type LegacyReleaseRepairParentCandidate = Pick<
   | "caskFill"
   | "caskSize"
   | "caskStrength"
+  | "category"
   | "edition"
   | "fullName"
   | "id"
@@ -146,6 +156,13 @@ function getTastingCount(value: null | number | undefined): number {
   return value ?? 0;
 }
 
+function hasConflictingValue<TValue>(
+  left: null | TValue,
+  right: null | TValue,
+): boolean {
+  return left !== null && right !== null && left !== right;
+}
+
 function getLegacyReleaseRepairModePriority(
   value: LegacyReleaseRepairParentMode,
 ): number {
@@ -168,6 +185,28 @@ function getComparableParentNameTokens(fullName: string): string[] {
     .filter(
       (token) => token.length > 0 && !GENERIC_PARENT_NAME_TOKENS.has(token),
     );
+}
+
+function getDistinctCategoryNameMarkers(fullName: string) {
+  const normalizedFullName = normalizeString(fullName).toLowerCase();
+
+  return DISTINCT_CATEGORY_NAME_MARKERS.filter((marker) =>
+    normalizedFullName.match(new RegExp(`\\b${marker}\\b`, "i")),
+  );
+}
+
+function hasConflictingCategoryNameMarkers(
+  sourceFullName: string,
+  targetFullName: string,
+) {
+  const sourceMarkers = getDistinctCategoryNameMarkers(sourceFullName);
+  const targetMarkers = getDistinctCategoryNameMarkers(targetFullName);
+
+  return (
+    sourceMarkers.length > 0 &&
+    targetMarkers.length > 0 &&
+    !sourceMarkers.some((marker) => targetMarkers.includes(marker))
+  );
 }
 
 function tokenSetsMatchExactly(left: string[], right: string[]): boolean {
@@ -195,6 +234,27 @@ function hasExactLegacyReleaseRepairParentName(
   proposedParentFullName: string,
 ): boolean {
   return fullName.toLowerCase() === proposedParentFullName.toLowerCase();
+}
+
+function canReuseLegacyReleaseRepairParent(
+  row: LegacyReleaseRepairParentCandidate,
+  {
+    proposedParentFullName,
+    sourceCategory,
+  }: {
+    proposedParentFullName: string;
+    sourceCategory: Bottle["category"];
+  },
+) {
+  if (hasConflictingValue(row.category, sourceCategory)) {
+    return false;
+  }
+
+  if (hasConflictingCategoryNameMarkers(row.fullName, proposedParentFullName)) {
+    return false;
+  }
+
+  return true;
 }
 
 export function hasVariantLegacyReleaseRepairParentName(
@@ -262,9 +322,11 @@ export function resolveLegacyReleaseRepairParentMatch<
   {
     currentLegacyBottleId,
     proposedParentFullName,
+    sourceCategory,
   }: {
     currentLegacyBottleId?: number;
     proposedParentFullName: string;
+    sourceCategory: Bottle["category"];
   },
 ): {
   exactParent: null | TRow;
@@ -276,7 +338,12 @@ export function resolveLegacyReleaseRepairParentMatch<
 } {
   const candidateRows = rows.filter(
     (row) =>
-      currentLegacyBottleId === undefined || row.id !== currentLegacyBottleId,
+      (currentLegacyBottleId === undefined ||
+        row.id !== currentLegacyBottleId) &&
+      canReuseLegacyReleaseRepairParent(row, {
+        proposedParentFullName,
+        sourceCategory,
+      }),
   );
   const exactRows = candidateRows.filter((row) =>
     hasExactLegacyReleaseRepairParentName(row.fullName, proposedParentFullName),
@@ -320,6 +387,7 @@ export function getLegacyReleaseRepairParentMode<
     currentLegacyBottleId,
     parentAlias,
     proposedParentFullName,
+    sourceCategory,
   }: {
     currentLegacyBottleId?: number;
     parentAlias?: {
@@ -327,11 +395,13 @@ export function getLegacyReleaseRepairParentMode<
       releaseId: number | null;
     } | null;
     proposedParentFullName: string;
+    sourceCategory: Bottle["category"];
   },
 ): LegacyReleaseRepairParentMode {
   const parentMatch = resolveLegacyReleaseRepairParentMatch(rows, {
     currentLegacyBottleId,
     proposedParentFullName,
+    sourceCategory,
   });
 
   if (parentMatch.exactParent) {
@@ -368,14 +438,17 @@ export function getLegacyReleaseRepairBlockingParent<
   {
     currentLegacyBottleId,
     proposedParentFullName,
+    sourceCategory,
   }: {
     currentLegacyBottleId?: number;
     proposedParentFullName: string;
+    sourceCategory: Bottle["category"];
   },
 ): null | TRow {
   const parentMatch = resolveLegacyReleaseRepairParentMatch(rows, {
     currentLegacyBottleId,
     proposedParentFullName,
+    sourceCategory,
   });
 
   return (
@@ -574,6 +647,7 @@ export async function getLegacyReleaseRepairCandidates({
     .select({
       id: bottles.id,
       brandId: bottles.brandId,
+      category: bottles.category,
       fullName: bottles.fullName,
       edition: bottles.edition,
       releaseYear: bottles.releaseYear,
@@ -634,6 +708,7 @@ export async function getLegacyReleaseRepairCandidates({
           .select({
             id: bottles.id,
             fullName: bottles.fullName,
+            category: bottles.category,
             totalTastings: bottles.totalTastings,
             edition: bottles.edition,
             releaseYear: bottles.releaseYear,
@@ -660,6 +735,7 @@ export async function getLegacyReleaseRepairCandidates({
             brandId: bottles.brandId,
             id: bottles.id,
             fullName: bottles.fullName,
+            category: bottles.category,
             totalTastings: bottles.totalTastings,
             edition: bottles.edition,
             releaseYear: bottles.releaseYear,
@@ -813,6 +889,7 @@ export async function getLegacyReleaseRepairCandidates({
         {
           currentLegacyBottleId: candidate.bottle.id,
           proposedParentFullName: candidate.proposedParentFullName,
+          sourceCategory: candidate.bottle.category,
         },
       );
       const parent = parentMatch.parent;
@@ -821,6 +898,7 @@ export async function getLegacyReleaseRepairCandidates({
         {
           currentLegacyBottleId: candidate.bottle.id,
           proposedParentFullName: candidate.proposedParentFullName,
+          sourceCategory: candidate.bottle.category,
         },
       );
       const repairMode = getLegacyReleaseRepairParentMode(
@@ -829,6 +907,7 @@ export async function getLegacyReleaseRepairCandidates({
           currentLegacyBottleId: candidate.bottle.id,
           parentAlias,
           proposedParentFullName: candidate.proposedParentFullName,
+          sourceCategory: candidate.bottle.category,
         },
       );
 
