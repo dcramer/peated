@@ -214,7 +214,8 @@ export async function getCanonRepairCandidates({
       .where(
         sql`${bottles.fullName} ILIKE ${`%${escapeLikePattern(query)}%`} ESCAPE '\\'`,
       )
-      .orderBy(desc(bottles.totalTastings), desc(bottles.id));
+      .orderBy(desc(bottles.totalTastings), desc(bottles.id))
+      .limit(MAX_SCAN_LIMIT);
 
     if (queryRows.length === 0) {
       return {
