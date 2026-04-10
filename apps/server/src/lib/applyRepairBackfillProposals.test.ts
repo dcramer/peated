@@ -351,4 +351,146 @@ describe("applyRepairBackfillProposals", () => {
       }),
     ]);
   });
+
+  test("can restrict preview and execution to the unattended-safe subset", async () => {
+    getLegacyReleaseRepairCandidatesMock.mockResolvedValue({
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
+      },
+      results: [
+        {
+          legacyBottle: {
+            id: 11,
+            fullName: "Aberlour A'bunadh (Batch 32)",
+          },
+          proposedParent: {
+            id: 12,
+            fullName: "Aberlour A'bunadh",
+            totalTastings: 100,
+          },
+          hasExactParent: true,
+          repairMode: "existing_parent",
+        },
+        {
+          legacyBottle: {
+            id: 13,
+            fullName:
+              "Elijah Craig Barrel Proof Kentucky Straight Bourbon (Batch C923)",
+          },
+          proposedParent: {
+            id: 14,
+            fullName: "Elijah Craig Barrel Proof",
+            totalTastings: 100,
+          },
+          hasExactParent: false,
+          repairMode: "existing_parent",
+        },
+      ],
+    } as any);
+    getDirtyParentAgeRepairCandidatesMock.mockResolvedValue({
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
+      },
+      results: [
+        {
+          bottle: {
+            id: 21,
+            fullName: "Glenglassaugh 1978 Rare Cask Release",
+          },
+          repairMode: "existing_release",
+          targetRelease: {
+            id: 22,
+            fullName: "Glenglassaugh 1978 Rare Cask Release 40-year-old",
+          },
+        },
+        {
+          bottle: {
+            id: 23,
+            fullName: "Another Dirty Parent",
+          },
+          repairMode: "create_release",
+          targetRelease: {
+            id: null,
+            fullName: "Another Dirty Parent 18-year-old",
+          },
+        },
+      ],
+    } as any);
+    applyLegacyReleaseRepairMock.mockResolvedValue({
+      legacyBottleId: 11,
+      parentBottleId: 12,
+      releaseId: 31,
+      aliasNames: [],
+    });
+    applyDirtyParentAgeRepairMock.mockResolvedValue({
+      bottleId: 21,
+      releaseId: 22,
+    } as any);
+
+    const preview = await applyRepairBackfillProposals({
+      automationOnly: true,
+      perTypeLimit: 10,
+      types: ["release", "age"],
+    });
+
+    expect(preview.summary).toEqual({
+      total: 2,
+      planned: 2,
+      applied: 0,
+      failed: 0,
+    });
+    expect(preview.items).toEqual([
+      expect.objectContaining({
+        type: "release",
+        bottleId: 11,
+        status: "planned",
+      }),
+      expect.objectContaining({
+        type: "age",
+        bottleId: 21,
+        status: "planned",
+      }),
+    ]);
+
+    const execution = await applyRepairBackfillProposals({
+      automationOnly: true,
+      dryRun: false,
+      perTypeLimit: 10,
+      types: ["release", "age"],
+      user,
+    });
+
+    expect(applyLegacyReleaseRepairMock).toHaveBeenCalledTimes(1);
+    expect(applyLegacyReleaseRepairMock).toHaveBeenCalledWith({
+      legacyBottleId: 11,
+      user,
+    });
+    expect(applyDirtyParentAgeRepairMock).toHaveBeenCalledTimes(1);
+    expect(applyDirtyParentAgeRepairMock).toHaveBeenCalledWith({
+      bottleId: 21,
+      user,
+    });
+    expect(execution.summary).toEqual({
+      total: 2,
+      planned: 0,
+      applied: 2,
+      failed: 0,
+    });
+    expect(execution.items).toEqual([
+      expect.objectContaining({
+        type: "release",
+        bottleId: 11,
+        status: "applied",
+        releaseId: 31,
+      }),
+      expect.objectContaining({
+        type: "age",
+        bottleId: 21,
+        status: "applied",
+        releaseId: 22,
+      }),
+    ]);
+  });
 });

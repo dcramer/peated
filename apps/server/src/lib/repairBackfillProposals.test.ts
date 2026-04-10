@@ -350,6 +350,387 @@ describe("getRepairBackfillProposals", () => {
     ]);
   });
 
+  test("marks only the narrow unattended-safe subset as automation eligible", async () => {
+    getLegacyReleaseRepairCandidatesMock.mockResolvedValue({
+      results: [
+        {
+          blockingAlias: null,
+          blockingParent: null,
+          legacyBottle: createLegacyBottleMock({
+            id: 11,
+            fullName: "Aberlour A'bunadh Batch 32",
+            edition: "Batch 32",
+            totalTastings: 12,
+          }),
+          proposedParent: {
+            id: 12,
+            fullName: "Aberlour A'bunadh",
+            totalTastings: 200,
+          },
+          releaseIdentity: {
+            edition: "Batch 32",
+            releaseYear: null,
+            markerSources: ["name_batch"],
+          },
+          siblingLegacyBottles: [],
+          hasExactParent: true,
+          repairMode: "existing_parent",
+        },
+        {
+          blockingAlias: null,
+          blockingParent: null,
+          legacyBottle: createLegacyBottleMock({
+            id: 13,
+            fullName:
+              "Elijah Craig Barrel Proof Kentucky Straight Bourbon (Batch C923)",
+            edition: "Batch C923",
+            totalTastings: 9,
+          }),
+          proposedParent: {
+            id: 14,
+            fullName: "Elijah Craig Barrel Proof",
+            totalTastings: 180,
+          },
+          releaseIdentity: {
+            edition: "Batch C923",
+            releaseYear: null,
+            markerSources: ["name_batch"],
+          },
+          siblingLegacyBottles: [],
+          hasExactParent: false,
+          repairMode: "existing_parent",
+        },
+      ],
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
+      },
+    });
+
+    getDirtyParentAgeRepairCandidatesMock.mockResolvedValue({
+      results: [
+        {
+          bottle: createAgeBottleMock({
+            id: 21,
+            fullName: "Glenglassaugh 1978 Rare Cask Release",
+            name: "Rare Cask Release",
+            statedAge: 40,
+            numReleases: 2,
+            totalTastings: 9,
+          }),
+          conflictingReleases: [],
+          repairMode: "existing_release",
+          targetRelease: {
+            id: 22,
+            fullName: "Glenglassaugh 1978 Rare Cask Release 40-year-old",
+            statedAge: 40,
+            totalTastings: 7,
+          },
+        },
+        {
+          bottle: createAgeBottleMock({
+            id: 23,
+            fullName: "Another Dirty Parent",
+            name: "Another Dirty Parent",
+            statedAge: 18,
+            numReleases: 1,
+            totalTastings: 3,
+          }),
+          conflictingReleases: [],
+          repairMode: "create_release",
+          targetRelease: {
+            id: null,
+            fullName: "Another Dirty Parent 18-year-old",
+            statedAge: 18,
+            totalTastings: null,
+          },
+        },
+      ],
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
+      },
+    });
+
+    const result = await getRepairBackfillProposals({
+      perTypeLimit: 10,
+    });
+
+    expect(result.proposals).toEqual(
+      expect.arrayContaining<RepairBackfillProposal>([
+        expect.objectContaining({
+          type: "release",
+          bottle: expect.objectContaining({ id: 11 }),
+          automationEligible: true,
+          automationBlockers: [],
+        }),
+        expect.objectContaining({
+          type: "release",
+          bottle: expect.objectContaining({ id: 13 }),
+          automationEligible: false,
+          automationBlockers: [
+            "release repair only has an exactish reusable parent match",
+          ],
+        }),
+        expect.objectContaining({
+          type: "age",
+          bottle: expect.objectContaining({ id: 21 }),
+          automationEligible: true,
+          automationBlockers: [],
+        }),
+        expect.objectContaining({
+          type: "age",
+          bottle: expect.objectContaining({ id: 23 }),
+          automationEligible: false,
+          automationBlockers: ["age repair would create a new release"],
+        }),
+        expect.objectContaining({
+          type: "canon",
+          automationEligible: false,
+          automationBlockers: ["canon repair requires moderator review"],
+        }),
+      ]),
+    );
+  });
+
+  test("can filter down to unattended-safe repair proposals", async () => {
+    getLegacyReleaseRepairCandidatesMock.mockResolvedValue({
+      results: [
+        {
+          blockingAlias: null,
+          blockingParent: null,
+          legacyBottle: createLegacyBottleMock({
+            id: 11,
+            fullName: "Aberlour A'bunadh Batch 32",
+            edition: "Batch 32",
+            totalTastings: 12,
+          }),
+          proposedParent: {
+            id: 12,
+            fullName: "Aberlour A'bunadh",
+            totalTastings: 200,
+          },
+          releaseIdentity: {
+            edition: "Batch 32",
+            releaseYear: null,
+            markerSources: ["name_batch"],
+          },
+          siblingLegacyBottles: [],
+          hasExactParent: true,
+          repairMode: "existing_parent",
+        },
+        {
+          blockingAlias: null,
+          blockingParent: null,
+          legacyBottle: createLegacyBottleMock({
+            id: 13,
+            fullName:
+              "Elijah Craig Barrel Proof Kentucky Straight Bourbon (Batch C923)",
+            edition: "Batch C923",
+            totalTastings: 9,
+          }),
+          proposedParent: {
+            id: 14,
+            fullName: "Elijah Craig Barrel Proof",
+            totalTastings: 180,
+          },
+          releaseIdentity: {
+            edition: "Batch C923",
+            releaseYear: null,
+            markerSources: ["name_batch"],
+          },
+          siblingLegacyBottles: [],
+          hasExactParent: false,
+          repairMode: "existing_parent",
+        },
+      ],
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
+      },
+    });
+
+    getDirtyParentAgeRepairCandidatesMock.mockResolvedValue({
+      results: [
+        {
+          bottle: createAgeBottleMock({
+            id: 21,
+            fullName: "Glenglassaugh 1978 Rare Cask Release",
+            name: "Rare Cask Release",
+            statedAge: 40,
+            numReleases: 2,
+            totalTastings: 9,
+          }),
+          conflictingReleases: [],
+          repairMode: "existing_release",
+          targetRelease: {
+            id: 22,
+            fullName: "Glenglassaugh 1978 Rare Cask Release 40-year-old",
+            statedAge: 40,
+            totalTastings: 7,
+          },
+        },
+        {
+          bottle: createAgeBottleMock({
+            id: 23,
+            fullName: "Another Dirty Parent",
+            name: "Another Dirty Parent",
+            statedAge: 18,
+            numReleases: 1,
+            totalTastings: 3,
+          }),
+          conflictingReleases: [],
+          repairMode: "create_release",
+          targetRelease: {
+            id: null,
+            fullName: "Another Dirty Parent 18-year-old",
+            statedAge: 18,
+            totalTastings: null,
+          },
+        },
+      ],
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
+      },
+    });
+
+    const result = await getRepairBackfillProposals({
+      onlyAutomationEligible: true,
+      perTypeLimit: 10,
+    });
+
+    expect(result.summary).toEqual({
+      total: 2,
+      byType: {
+        release: 1,
+        age: 1,
+        canon: 0,
+      },
+      byActionability: {
+        apply: 2,
+        blocked: 0,
+        manual: 0,
+      },
+    });
+    expect(result.proposals).toEqual([
+      expect.objectContaining({
+        type: "release",
+        bottle: expect.objectContaining({ id: 11 }),
+        automationEligible: true,
+      }),
+      expect.objectContaining({
+        type: "age",
+        bottle: expect.objectContaining({ id: 21 }),
+        automationEligible: true,
+      }),
+    ]);
+  });
+
+  test("keeps paging until it finds the requested automation-eligible release proposals", async () => {
+    getLegacyReleaseRepairCandidatesMock
+      .mockResolvedValueOnce({
+        results: [
+          {
+            blockingAlias: null,
+            blockingParent: null,
+            legacyBottle: createLegacyBottleMock({
+              id: 11,
+              fullName:
+                "Elijah Craig Barrel Proof Kentucky Straight Bourbon (Batch C923)",
+              edition: "Batch C923",
+              totalTastings: 50,
+            }),
+            proposedParent: {
+              id: 14,
+              fullName: "Elijah Craig Barrel Proof",
+              totalTastings: 180,
+            },
+            releaseIdentity: {
+              edition: "Batch C923",
+              releaseYear: null,
+              markerSources: ["name_batch"],
+            },
+            siblingLegacyBottles: [],
+            hasExactParent: false,
+            repairMode: "existing_parent",
+          },
+        ],
+        rel: {
+          nextCursor: 2,
+          prevCursor: null,
+        },
+      })
+      .mockResolvedValueOnce({
+        results: [
+          {
+            blockingAlias: null,
+            blockingParent: null,
+            legacyBottle: createLegacyBottleMock({
+              id: 12,
+              fullName: "Aberlour A'bunadh Batch 32",
+              edition: "Batch 32",
+              totalTastings: 12,
+            }),
+            proposedParent: {
+              id: 13,
+              fullName: "Aberlour A'bunadh",
+              totalTastings: 200,
+            },
+            releaseIdentity: {
+              edition: "Batch 32",
+              releaseYear: null,
+              markerSources: ["name_batch"],
+            },
+            siblingLegacyBottles: [],
+            hasExactParent: true,
+            repairMode: "existing_parent",
+          },
+        ],
+        rel: {
+          nextCursor: null,
+          prevCursor: 1,
+        },
+      });
+
+    const result = await getRepairBackfillProposals({
+      onlyAutomationEligible: true,
+      perTypeLimit: 1,
+      types: ["release"],
+    });
+
+    expect(getLegacyReleaseRepairCandidatesMock).toHaveBeenNthCalledWith(1, {
+      cursor: 1,
+      limit: 1,
+      query: "",
+    });
+    expect(getLegacyReleaseRepairCandidatesMock).toHaveBeenNthCalledWith(2, {
+      cursor: 2,
+      limit: 1,
+      query: "",
+    });
+    expect(result.summary).toEqual({
+      total: 1,
+      byType: {
+        release: 1,
+        age: 0,
+        canon: 0,
+      },
+      byActionability: {
+        apply: 1,
+        blocked: 0,
+        manual: 0,
+      },
+    });
+    expect(result.proposals).toEqual([
+      expect.objectContaining({
+        type: "release",
+        bottle: expect.objectContaining({ id: 12 }),
+        automationEligible: true,
+      }),
+    ]);
+  });
+
   test("keeps a stable page size across cursor hops above the max page size", async () => {
     getLegacyReleaseRepairCandidatesMock
       .mockResolvedValueOnce({

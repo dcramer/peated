@@ -200,6 +200,14 @@ function isActionableReleaseRepairCandidate(
   );
 }
 
+function isAutomationEligibleReleaseRepairCandidate(
+  candidate: LegacyReleaseRepairCandidate,
+): candidate is LegacyReleaseRepairCandidate & {
+  repairMode: "existing_parent";
+} {
+  return candidate.repairMode === "existing_parent" && candidate.hasExactParent;
+}
+
 function toApplicableReleaseRepairProposal(
   candidate: LegacyReleaseRepairCandidate & {
     repairMode: "create_parent" | "existing_parent";
@@ -233,6 +241,21 @@ function toApplicableAgeRepairProposal(
       fullName: candidate.targetRelease.fullName,
     },
   };
+}
+
+function isAutomationEligibleAgeRepairCandidate(
+  candidate: DirtyParentAgeRepairCandidate,
+): candidate is DirtyParentAgeRepairCandidate & {
+  repairMode: "existing_release";
+  targetRelease: {
+    fullName: string;
+    id: number;
+  };
+} {
+  return (
+    candidate.repairMode === "existing_release" &&
+    candidate.targetRelease.id !== null
+  );
 }
 
 async function collectApplicableRepairCandidates<TCandidate, TProposal>({
@@ -285,15 +308,19 @@ async function collectApplicableRepairCandidates<TCandidate, TProposal>({
 }
 
 async function collectApplicableReleaseRepairProposals({
+  automationOnly = false,
   perTypeLimit,
   query,
 }: {
+  automationOnly?: boolean;
   perTypeLimit: number;
   query: string;
 }) {
   return collectApplicableRepairCandidates({
     fetcher: getLegacyReleaseRepairCandidates,
-    isApplicable: isActionableReleaseRepairCandidate,
+    isApplicable: automationOnly
+      ? isAutomationEligibleReleaseRepairCandidate
+      : isActionableReleaseRepairCandidate,
     map: (candidate) =>
       toApplicableReleaseRepairProposal(
         candidate as LegacyReleaseRepairCandidate & {
@@ -306,15 +333,19 @@ async function collectApplicableReleaseRepairProposals({
 }
 
 async function collectApplicableAgeRepairProposals({
+  automationOnly = false,
   perTypeLimit,
   query,
 }: {
+  automationOnly?: boolean;
   perTypeLimit: number;
   query: string;
 }) {
   return collectApplicableRepairCandidates({
     fetcher: getDirtyParentAgeRepairCandidates,
-    isApplicable: () => true,
+    isApplicable: automationOnly
+      ? isAutomationEligibleAgeRepairCandidate
+      : () => true,
     map: toApplicableAgeRepairProposal,
     perTypeLimit,
     query,
@@ -322,12 +353,14 @@ async function collectApplicableAgeRepairProposals({
 }
 
 export async function applyRepairBackfillProposals({
+  automationOnly = false,
   dryRun = true,
   perTypeLimit = 100,
   query = "",
   types = ["release", "age"],
   user,
 }: {
+  automationOnly?: boolean;
   dryRun?: boolean;
   perTypeLimit?: number;
   query?: string;
@@ -347,6 +380,7 @@ export async function applyRepairBackfillProposals({
 
   if (normalizedTypes.includes("release")) {
     const releaseProposals = await collectApplicableReleaseRepairProposals({
+      automationOnly,
       perTypeLimit,
       query,
     });
@@ -363,6 +397,7 @@ export async function applyRepairBackfillProposals({
 
   if (normalizedTypes.includes("age")) {
     const ageProposals = await collectApplicableAgeRepairProposals({
+      automationOnly,
       perTypeLimit,
       query,
     });

@@ -112,13 +112,15 @@ function parseRepairBackfillProposalFormat(value: string): "json" | "summary" {
 function formatRepairBackfillProposalSummaryLine(
   proposal: RepairBackfillProposal,
 ) {
+  const automationState = proposal.automationEligible ? "auto" : "review";
+
   switch (proposal.type) {
     case "release":
-      return `[release/${proposal.repairMode}/${proposal.actionability}] ${proposal.bottle.fullName} -> ${proposal.proposedParent.fullName}`;
+      return `[release/${proposal.repairMode}/${proposal.actionability}/${automationState}] ${proposal.bottle.fullName} -> ${proposal.proposedParent.fullName}`;
     case "age":
-      return `[age/${proposal.repairMode}/${proposal.actionability}] ${proposal.bottle.fullName} -> ${proposal.targetRelease.fullName}`;
+      return `[age/${proposal.repairMode}/${proposal.actionability}/${automationState}] ${proposal.bottle.fullName} -> ${proposal.targetRelease.fullName}`;
     case "canon":
-      return `[canon/${proposal.actionability}] ${proposal.bottle.fullName} -> ${proposal.targetBottle.fullName}`;
+      return `[canon/${proposal.actionability}/${automationState}] ${proposal.bottle.fullName} -> ${proposal.targetBottle.fullName}`;
   }
 }
 
@@ -410,6 +412,10 @@ subcommand
     "--only-actionable",
     "Only include proposals that can be applied directly today",
   )
+  .option(
+    "--automation-only",
+    "Only include the unattended-safe proposal subset",
+  )
   .action(async (options) => {
     const perTypeLimit = Number.parseInt(options.limit, 10);
     if (!Number.isFinite(perTypeLimit) || perTypeLimit <= 0) {
@@ -419,6 +425,7 @@ subcommand
     const types = parseRepairBackfillProposalTypes(options.type);
     const format = parseRepairBackfillProposalFormat(options.format);
     const result = await getRepairBackfillProposals({
+      onlyAutomationEligible: Boolean(options.automationOnly),
       onlyActionable: Boolean(options.onlyActionable),
       perTypeLimit,
       query: options.query,
@@ -433,6 +440,9 @@ subcommand
     console.log(`Repair backfill proposals: ${result.summary.total}`);
     console.log(
       `Types: ${types.join(", ")} | Per-type limit: ${perTypeLimit} | Query: ${options.query || "(none)"}`,
+    );
+    console.log(
+      `Automation eligible: ${result.proposals.filter((proposal) => proposal.automationEligible).length}`,
     );
     console.log(
       `Actionability: apply=${result.summary.byActionability.apply}, blocked=${result.summary.byActionability.blocked}, manual=${result.summary.byActionability.manual}`,
@@ -480,6 +490,10 @@ subcommand
     "--execute",
     "Actually apply the repair proposals. Without this flag the command only previews.",
   )
+  .option(
+    "--automation-only",
+    "Only preview or apply the unattended-safe proposal subset",
+  )
   .action(async (options) => {
     const perTypeLimit = Number.parseInt(options.limit, 10);
     if (!Number.isFinite(perTypeLimit) || perTypeLimit <= 0) {
@@ -488,6 +502,7 @@ subcommand
 
     const types = parseBatchApplicableRepairBackfillProposalTypes(options.type);
     const result = await applyRepairBackfillProposals({
+      automationOnly: Boolean(options.automationOnly),
       dryRun: !options.execute,
       perTypeLimit,
       query: options.query,

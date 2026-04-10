@@ -641,7 +641,13 @@ export const ExternalSiteOrExisting = async (
   { ...data }: Partial<Omit<dbSchema.NewExternalSite, "id">> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.ExternalSite> => {
-  if (!data.type) data.type = choose(EXTERNAL_SITE_TYPE_LIST);
+  if (!data.type) {
+    const existing = await db.query.externalSites.findFirst();
+    if (existing) return existing;
+
+    data.type = choose(EXTERNAL_SITE_TYPE_LIST);
+  }
+
   const existing = await db.query.externalSites.findFirst({
     where: (externalSites, { eq }) =>
       eq(externalSites.type, data.type as ExternalSiteType),
@@ -795,7 +801,8 @@ export const Review = async (
       .insert(reviews)
       .values({
         name: "",
-        externalSiteId: data.externalSiteId || (await ExternalSite({}, tx)).id,
+        externalSiteId:
+          data.externalSiteId || (await ExternalSiteOrExisting({}, tx)).id,
         rating: faker.number.int({ min: 59, max: 100 }),
         url: faker.internet.url(),
         issue: "Default",
