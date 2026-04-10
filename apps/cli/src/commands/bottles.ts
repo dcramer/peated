@@ -14,11 +14,74 @@ import {
   formatCategoryName,
 } from "@peated/server/lib/format";
 import { normalizeBottle } from "@peated/server/lib/normalize";
+import {
+  getRepairBackfillProposals,
+  type RepairBackfillProposal,
+  type RepairBackfillProposalType,
+} from "@peated/server/lib/repairBackfillProposals";
 import { routerClient } from "@peated/server/orpc/router";
 import { runJob } from "@peated/server/worker/client";
 import { and, asc, eq, inArray, isNull, ne } from "drizzle-orm";
 
 const subcommand = program.command("bottles");
+const REPAIR_BACKFILL_PROPOSAL_TYPES = ["release", "age", "canon"] as const;
+const REPAIR_BACKFILL_PROPOSAL_FORMATS = ["summary", "json"] as const;
+
+function parseRepairBackfillProposalTypes(
+  value: string,
+): RepairBackfillProposalType[] {
+  if (value === "all") {
+    return [...REPAIR_BACKFILL_PROPOSAL_TYPES];
+  }
+
+  const types = Array.from(
+    new Set(
+      value
+        .split(",")
+        .map((entry) => entry.trim())
+        .filter(Boolean),
+    ),
+  );
+
+  if (types.length === 0) {
+    throw new Error(
+      "Repair proposal types must include one of: release, age, canon, all.",
+    );
+  }
+
+  for (const type of types) {
+    if (!REPAIR_BACKFILL_PROPOSAL_TYPES.includes(type as never)) {
+      throw new Error(
+        `Unknown repair proposal type: ${type}. Expected one of: release, age, canon, all.`,
+      );
+    }
+  }
+
+  return types as RepairBackfillProposalType[];
+}
+
+function parseRepairBackfillProposalFormat(value: string): "json" | "summary" {
+  if (!REPAIR_BACKFILL_PROPOSAL_FORMATS.includes(value as never)) {
+    throw new Error(
+      `Unknown repair proposal format: ${value}. Expected one of: summary, json.`,
+    );
+  }
+
+  return value as "json" | "summary";
+}
+
+function formatRepairBackfillProposalSummaryLine(
+  proposal: RepairBackfillProposal,
+) {
+  switch (proposal.type) {
+    case "release":
+      return `[release/${proposal.repairMode}/${proposal.actionability}] ${proposal.bottle.fullName} -> ${proposal.proposedParent.fullName}`;
+    case "age":
+      return `[age/${proposal.repairMode}/${proposal.actionability}] ${proposal.bottle.fullName} -> ${proposal.targetRelease.fullName}`;
+    case "canon":
+      return `[canon/${proposal.actionability}] ${proposal.bottle.fullName} -> ${proposal.targetBottle.fullName}`;
+  }
+}
 
 subcommand
   .command("normalize")
@@ -284,6 +347,77 @@ subcommand
         hasResults = true;
       }
       offset += step;
+    }
+  });
+
+subcommand
+  .command("dump-repair-proposals")
+  .description(
+    "Dump high-confidence repair/backfill proposals across release, age, and canon queues",
+  )
+  .option(
+    "--type <type>",
+    "Comma-separated proposal types: release, age, canon, or all",
+    "all",
+  )
+  .option("--format <format>", "Output format: summary or json", "summary")
+  .option(
+    "--limit <number>",
+    "Maximum number of proposals to collect per type",
+    "100",
+  )
+  .option("--query <query>", "Filter proposals by bottle name", "")
+  .option(
+    "--only-actionable",
+    "Only include proposals that can be applied directly today",
+  )
+  .action(async (options) => {
+    const perTypeLimit = Number.parseInt(options.limit, 10);
+    if (!Number.isFinite(perTypeLimit) || perTypeLimit <= 0) {
+      throw new Error(`Invalid limit: ${options.limit}`);
+    }
+
+    const types = parseRepairBackfillProposalTypes(options.type);
+    const format = parseRepairBackfillProposalFormat(options.format);
+    const result = await getRepairBackfillProposals({
+      onlyActionable: Boolean(options.onlyActionable),
+      perTypeLimit,
+      query: options.query,
+      types,
+    });
+
+    if (format === "json") {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+
+    console.log(`Repair backfill proposals: ${result.summary.total}`);
+    console.log(
+      `Types: ${types.join(", ")} | Per-type limit: ${perTypeLimit} | Query: ${options.query || "(none)"}`,
+    );
+    console.log(
+      `Actionability: apply=${result.summary.byActionability.apply}, blocked=${result.summary.byActionability.blocked}, manual=${result.summary.byActionability.manual}`,
+    );
+    console.log(
+      `By type: release=${result.summary.byType.release}, age=${result.summary.byType.age}, canon=${result.summary.byType.canon}`,
+    );
+
+    if (result.proposals.length === 0) {
+      return;
+    }
+
+    console.log("");
+    console.log("Top proposals:");
+    for (const proposal of result.proposals.slice(0, 25)) {
+      console.log(formatRepairBackfillProposalSummaryLine(proposal));
+      console.log(`  ${proposal.adminHref}`);
+    }
+
+    if (result.proposals.length > 25) {
+      console.log("");
+      console.log(
+        `... ${result.proposals.length - 25} more proposal(s) omitted. Use --format json for the full output.`,
+      );
     }
   });
 
