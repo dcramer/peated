@@ -21,6 +21,11 @@ export type RepairBackfillProposalActionability =
   | "blocked"
   | "manual";
 
+type RepairBackfillProposalAutomationAssessment = {
+  automationBlockers: string[];
+  automationEligible: boolean;
+};
+
 type RepairBackfillProposalSummary = {
   byActionability: Record<RepairBackfillProposalActionability, number>;
   byType: Record<RepairBackfillProposalType, number>;
@@ -38,6 +43,8 @@ type RepairBackfillCandidatePage<TCandidate> = {
 type RepairBackfillProposalBase = {
   actionability: RepairBackfillProposalActionability;
   adminHref: string;
+  automationBlockers: string[];
+  automationEligible: boolean;
   totalTastings: null | number;
   type: RepairBackfillProposalType;
 };
@@ -137,6 +144,62 @@ function getRepairBackfillProposalActionability(
     : "blocked";
 }
 
+function getReleaseRepairProposalAutomationAssessment(
+  candidate: LegacyReleaseRepairCandidate,
+): RepairBackfillProposalAutomationAssessment {
+  const automationBlockers: string[] = [];
+
+  switch (candidate.repairMode) {
+    case "existing_parent":
+      if (!candidate.hasExactParent) {
+        automationBlockers.push(
+          "release repair only has an exactish reusable parent match",
+        );
+      }
+      break;
+    case "create_parent":
+      automationBlockers.push(
+        "release repair would create a new parent bottle",
+      );
+      break;
+    case "blocked_alias_conflict":
+      automationBlockers.push("release repair is blocked by an alias conflict");
+      break;
+    case "blocked_dirty_parent":
+      automationBlockers.push(
+        "release repair is blocked by a dirty parent bottle",
+      );
+      break;
+  }
+
+  return {
+    automationEligible: automationBlockers.length === 0,
+    automationBlockers,
+  };
+}
+
+function getAgeRepairProposalAutomationAssessment(
+  candidate: DirtyParentAgeRepairCandidate,
+): RepairBackfillProposalAutomationAssessment {
+  const automationBlockers: string[] = [];
+
+  if (candidate.repairMode !== "existing_release") {
+    automationBlockers.push("age repair would create a new release");
+  }
+
+  return {
+    automationEligible: automationBlockers.length === 0,
+    automationBlockers,
+  };
+}
+
+function getCanonRepairProposalAutomationAssessment(): RepairBackfillProposalAutomationAssessment {
+  return {
+    automationEligible: false,
+    automationBlockers: ["canon repair requires moderator review"],
+  };
+}
+
 async function collectRepairCandidates<TCandidate>({
   fetcher,
   perTypeLimit,
@@ -176,6 +239,9 @@ async function collectRepairCandidates<TCandidate>({
 function toReleaseRepairBackfillProposal(
   candidate: LegacyReleaseRepairCandidate,
 ): ReleaseRepairBackfillProposal {
+  const automationAssessment =
+    getReleaseRepairProposalAutomationAssessment(candidate);
+
   return {
     type: "release",
     actionability: getRepairBackfillProposalActionability(candidate.repairMode),
@@ -183,6 +249,8 @@ function toReleaseRepairBackfillProposal(
       "/admin/release-repairs",
       candidate.legacyBottle.fullName,
     ),
+    automationBlockers: automationAssessment.automationBlockers,
+    automationEligible: automationAssessment.automationEligible,
     bottle: {
       id: candidate.legacyBottle.id,
       fullName: candidate.legacyBottle.fullName,
@@ -201,10 +269,15 @@ function toReleaseRepairBackfillProposal(
 function toAgeRepairBackfillProposal(
   candidate: DirtyParentAgeRepairCandidate,
 ): AgeRepairBackfillProposal {
+  const automationAssessment =
+    getAgeRepairProposalAutomationAssessment(candidate);
+
   return {
     type: "age",
     actionability: "apply",
     adminHref: buildAdminHref("/admin/age-repairs", candidate.bottle.fullName),
+    automationBlockers: automationAssessment.automationBlockers,
+    automationEligible: automationAssessment.automationEligible,
     bottle: {
       id: candidate.bottle.id,
       fullName: candidate.bottle.fullName,
@@ -221,6 +294,8 @@ function toAgeRepairBackfillProposal(
 function toCanonRepairBackfillProposal(
   candidate: CanonRepairCandidate,
 ): CanonRepairBackfillProposal {
+  const automationAssessment = getCanonRepairProposalAutomationAssessment();
+
   return {
     type: "canon",
     actionability: "manual",
@@ -228,6 +303,8 @@ function toCanonRepairBackfillProposal(
       "/admin/canon-repairs",
       candidate.bottle.fullName,
     ),
+    automationBlockers: automationAssessment.automationBlockers,
+    automationEligible: automationAssessment.automationEligible,
     bottle: candidate.bottle,
     targetBottle: candidate.targetBottle,
     totalTastings: candidate.bottle.totalTastings,
@@ -263,11 +340,13 @@ function createRepairBackfillProposalSummary(
 
 export async function getRepairBackfillProposals({
   onlyActionable = false,
+  onlyAutomationEligible = false,
   perTypeLimit = DEFAULT_PER_TYPE_LIMIT,
   query = "",
   types = ["release", "age", "canon"],
 }: {
   onlyActionable?: boolean;
+  onlyAutomationEligible?: boolean;
   perTypeLimit?: number;
   query?: string;
   types?: RepairBackfillProposalType[];
@@ -302,9 +381,17 @@ export async function getRepairBackfillProposals({
     proposals.push(...results.map(toCanonRepairBackfillProposal));
   }
 
-  const filteredProposals = onlyActionable
-    ? proposals.filter((proposal) => proposal.actionability === "apply")
-    : proposals;
+  const filteredProposals = proposals.filter((proposal) => {
+    if (onlyActionable && proposal.actionability !== "apply") {
+      return false;
+    }
+
+    if (onlyAutomationEligible && !proposal.automationEligible) {
+      return false;
+    }
+
+    return true;
+  });
 
   filteredProposals.sort((left, right) => {
     const tastingDiff =
