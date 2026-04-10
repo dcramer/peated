@@ -284,6 +284,43 @@ async function collectApplicableRepairCandidates<TCandidate, TProposal>({
   return proposals;
 }
 
+async function collectApplicableReleaseRepairProposals({
+  perTypeLimit,
+  query,
+}: {
+  perTypeLimit: number;
+  query: string;
+}) {
+  return collectApplicableRepairCandidates({
+    fetcher: getLegacyReleaseRepairCandidates,
+    isApplicable: isActionableReleaseRepairCandidate,
+    map: (candidate) =>
+      toApplicableReleaseRepairProposal(
+        candidate as LegacyReleaseRepairCandidate & {
+          repairMode: "create_parent" | "existing_parent";
+        },
+      ),
+    perTypeLimit,
+    query,
+  });
+}
+
+async function collectApplicableAgeRepairProposals({
+  perTypeLimit,
+  query,
+}: {
+  perTypeLimit: number;
+  query: string;
+}) {
+  return collectApplicableRepairCandidates({
+    fetcher: getDirtyParentAgeRepairCandidates,
+    isApplicable: () => true,
+    map: toApplicableAgeRepairProposal,
+    perTypeLimit,
+    query,
+  });
+}
+
 export async function applyRepairBackfillProposals({
   dryRun = true,
   perTypeLimit = 100,
@@ -298,36 +335,6 @@ export async function applyRepairBackfillProposals({
   user?: User;
 }): Promise<ApplyRepairBackfillProposalsResult> {
   const normalizedTypes = Array.from(new Set(types));
-  const applicableProposals: BatchApplicableRepairProposal[] = [];
-
-  if (normalizedTypes.includes("release")) {
-    applicableProposals.push(
-      ...(await collectApplicableRepairCandidates({
-        fetcher: getLegacyReleaseRepairCandidates,
-        isApplicable: isActionableReleaseRepairCandidate,
-        map: (candidate) =>
-          toApplicableReleaseRepairProposal(
-            candidate as LegacyReleaseRepairCandidate & {
-              repairMode: "create_parent" | "existing_parent";
-            },
-          ),
-        perTypeLimit,
-        query,
-      })),
-    );
-  }
-
-  if (normalizedTypes.includes("age")) {
-    applicableProposals.push(
-      ...(await collectApplicableRepairCandidates({
-        fetcher: getDirtyParentAgeRepairCandidates,
-        isApplicable: () => true,
-        map: toApplicableAgeRepairProposal,
-        perTypeLimit,
-        query,
-      })),
-    );
-  }
 
   if (!dryRun && !user) {
     throw new Error(
@@ -336,16 +343,38 @@ export async function applyRepairBackfillProposals({
   }
 
   const executionUser = user;
-
   const items: ApplyRepairBackfillProposalItem[] = [];
 
-  for (const proposal of applicableProposals) {
-    if (dryRun) {
-      items.push(createDryRunItem(proposal));
-      continue;
-    }
+  if (normalizedTypes.includes("release")) {
+    const releaseProposals = await collectApplicableReleaseRepairProposals({
+      perTypeLimit,
+      query,
+    });
 
-    items.push(await applyRepairBackfillProposal(proposal, executionUser!));
+    for (const proposal of releaseProposals) {
+      if (dryRun) {
+        items.push(createDryRunItem(proposal));
+        continue;
+      }
+
+      items.push(await applyRepairBackfillProposal(proposal, executionUser!));
+    }
+  }
+
+  if (normalizedTypes.includes("age")) {
+    const ageProposals = await collectApplicableAgeRepairProposals({
+      perTypeLimit,
+      query,
+    });
+
+    for (const proposal of ageProposals) {
+      if (dryRun) {
+        items.push(createDryRunItem(proposal));
+        continue;
+      }
+
+      items.push(await applyRepairBackfillProposal(proposal, executionUser!));
+    }
   }
 
   return {

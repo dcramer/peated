@@ -251,4 +251,104 @@ describe("applyRepairBackfillProposals", () => {
       }),
     ]);
   });
+
+  test("rescans age repairs after applying release repairs during execution", async () => {
+    getLegacyReleaseRepairCandidatesMock.mockResolvedValue({
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
+      },
+      results: [
+        {
+          legacyBottle: {
+            id: 11,
+            fullName: "Dirty Legacy Release 10-year-old",
+          },
+          proposedParent: {
+            id: 12,
+            fullName: "Dirty Legacy Parent",
+            totalTastings: 100,
+          },
+          repairMode: "existing_parent",
+        },
+      ],
+    } as any);
+    getDirtyParentAgeRepairCandidatesMock.mockImplementation(async () => {
+      expect(applyLegacyReleaseRepairMock).toHaveBeenCalledWith({
+        legacyBottleId: 11,
+        user,
+      });
+
+      return {
+        rel: {
+          nextCursor: null,
+          prevCursor: null,
+        },
+        results: [
+          {
+            bottle: {
+              id: 12,
+              fullName: "Dirty Legacy Parent",
+            },
+            repairMode: "create_release",
+            targetRelease: {
+              id: null,
+              fullName: "Dirty Legacy Parent 12-year-old",
+            },
+          },
+        ],
+      } as any;
+    });
+    applyLegacyReleaseRepairMock.mockResolvedValue({
+      legacyBottleId: 11,
+      parentBottleId: 12,
+      releaseId: 13,
+      aliasNames: [],
+    });
+    applyDirtyParentAgeRepairMock.mockResolvedValue({
+      bottleId: 12,
+      releaseId: 14,
+    } as any);
+
+    const result = await applyRepairBackfillProposals({
+      dryRun: false,
+      perTypeLimit: 10,
+      types: ["release", "age"],
+      user,
+    });
+
+    expect(getLegacyReleaseRepairCandidatesMock).toHaveBeenCalledTimes(1);
+    expect(getDirtyParentAgeRepairCandidatesMock).toHaveBeenCalledTimes(1);
+    expect(
+      applyLegacyReleaseRepairMock.mock.invocationCallOrder[0],
+    ).toBeLessThan(
+      getDirtyParentAgeRepairCandidatesMock.mock.invocationCallOrder[0]!,
+    );
+    expect(applyDirtyParentAgeRepairMock).toHaveBeenCalledWith({
+      bottleId: 12,
+      user,
+    });
+    expect(result.summary).toEqual({
+      total: 2,
+      planned: 0,
+      applied: 2,
+      failed: 0,
+    });
+    expect(result.items).toEqual([
+      expect.objectContaining({
+        type: "release",
+        status: "applied",
+        action: "apply_release_repair",
+        bottleId: 11,
+        releaseId: 13,
+      }),
+      expect.objectContaining({
+        type: "age",
+        status: "applied",
+        action: "apply_age_repair",
+        bottleId: 12,
+        releaseId: 14,
+      }),
+    ]);
+  });
 });
