@@ -213,7 +213,7 @@ describe("getRepairBackfillProposals", () => {
     });
     expect(getLegacyReleaseRepairCandidatesMock).toHaveBeenNthCalledWith(2, {
       cursor: 2,
-      limit: 1,
+      limit: 2,
       query: "",
     });
     expect(result.summary).toEqual({
@@ -347,5 +347,93 @@ describe("getRepairBackfillProposals", () => {
         repairMode: "existing_parent",
       }),
     ]);
+  });
+
+  test("keeps a stable page size across cursor hops above the max page size", async () => {
+    getLegacyReleaseRepairCandidatesMock
+      .mockResolvedValueOnce({
+        results: Array.from({ length: 100 }, (_, index) => ({
+          blockingAlias: null,
+          blockingParent: null,
+          legacyBottle: createLegacyBottleMock({
+            id: index + 1,
+            fullName: `Release Repair ${index + 1}`,
+            edition: `Batch ${index + 1}`,
+            totalTastings: 500 - index,
+          }),
+          proposedParent: {
+            id: 1000,
+            fullName: "Release Repair",
+            totalTastings: 1000,
+          },
+          releaseIdentity: {
+            edition: `Batch ${index + 1}`,
+            releaseYear: null,
+            markerSources: ["name_batch"],
+          },
+          siblingLegacyBottles: [],
+          hasExactParent: true,
+          repairMode: "existing_parent" as const,
+        })),
+        rel: {
+          nextCursor: 2,
+          prevCursor: null,
+        },
+      })
+      .mockResolvedValueOnce({
+        results: Array.from({ length: 100 }, (_, index) => ({
+          blockingAlias: null,
+          blockingParent: null,
+          legacyBottle: createLegacyBottleMock({
+            id: index + 101,
+            fullName: `Release Repair ${index + 101}`,
+            edition: `Batch ${index + 101}`,
+            totalTastings: 400 - index,
+          }),
+          proposedParent: {
+            id: 1000,
+            fullName: "Release Repair",
+            totalTastings: 1000,
+          },
+          releaseIdentity: {
+            edition: `Batch ${index + 101}`,
+            releaseYear: null,
+            markerSources: ["name_batch"],
+          },
+          siblingLegacyBottles: [],
+          hasExactParent: true,
+          repairMode: "existing_parent" as const,
+        })),
+        rel: {
+          nextCursor: null,
+          prevCursor: 1,
+        },
+      });
+
+    const result = await getRepairBackfillProposals({
+      perTypeLimit: 150,
+      types: ["release"],
+    });
+
+    expect(getLegacyReleaseRepairCandidatesMock).toHaveBeenNthCalledWith(1, {
+      cursor: 1,
+      limit: 100,
+      query: "",
+    });
+    expect(getLegacyReleaseRepairCandidatesMock).toHaveBeenNthCalledWith(2, {
+      cursor: 2,
+      limit: 100,
+      query: "",
+    });
+    expect(result.summary.total).toBe(150);
+    expect(result.proposals).toHaveLength(150);
+    expect(result.proposals.at(-1)).toEqual(
+      expect.objectContaining({
+        type: "release",
+        bottle: expect.objectContaining({
+          id: 150,
+        }),
+      }),
+    );
   });
 });

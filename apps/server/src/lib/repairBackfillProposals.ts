@@ -151,13 +151,13 @@ async function collectRepairCandidates<TCandidate>({
   query: string;
 }) {
   const results: TCandidate[] = [];
+  const pageSize = Math.min(MAX_PAGE_SIZE, perTypeLimit);
   let cursor = 1;
 
   while (results.length < perTypeLimit) {
-    const pageLimit = Math.min(MAX_PAGE_SIZE, perTypeLimit - results.length);
     const page = await fetcher({
       cursor,
-      limit: pageLimit,
+      limit: pageSize,
       query,
     });
 
@@ -170,7 +170,7 @@ async function collectRepairCandidates<TCandidate>({
     cursor = page.rel.nextCursor;
   }
 
-  return results;
+  return results.slice(0, perTypeLimit);
 }
 
 function toReleaseRepairBackfillProposal(
