@@ -437,4 +437,166 @@ describe("getRepairBackfillProposals", () => {
       }),
     );
   });
+
+  test("normalizes blocked release, existing-release age, and manual canon proposals together", async () => {
+    getLegacyReleaseRepairCandidatesMock.mockResolvedValue({
+      results: [
+        {
+          blockingAlias: null,
+          blockingParent: {
+            id: 17,
+            fullName: "Aberlour A'bunadh",
+            totalTastings: 120,
+          },
+          legacyBottle: createLegacyBottleMock({
+            id: 16,
+            fullName: "Aberlour A'bunadh (Batch 4)",
+            edition: "Batch 4",
+            totalTastings: 6,
+          }),
+          proposedParent: {
+            id: 17,
+            fullName: "Aberlour A'bunadh",
+            totalTastings: 120,
+          },
+          releaseIdentity: {
+            edition: "Batch 4",
+            releaseYear: null,
+            markerSources: ["name_batch"],
+          },
+          siblingLegacyBottles: [
+            {
+              id: 15,
+              fullName: "Aberlour A'bunadh (Batch 3)",
+            },
+          ],
+          hasExactParent: true,
+          repairMode: "blocked_dirty_parent",
+        },
+      ],
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
+      },
+    });
+
+    getDirtyParentAgeRepairCandidatesMock.mockResolvedValue({
+      results: [
+        {
+          bottle: createAgeBottleMock({
+            id: 21,
+            fullName: "Glenglassaugh 1978 Rare Cask Release",
+            name: "Rare Cask Release",
+            statedAge: 40,
+            numReleases: 2,
+            totalTastings: 9,
+          }),
+          conflictingReleases: [
+            {
+              id: 22,
+              fullName: "Glenglassaugh 1978 Rare Cask Release - Batch 1",
+              statedAge: 35,
+              totalTastings: 4,
+            },
+          ],
+          repairMode: "existing_release",
+          targetRelease: {
+            id: 23,
+            fullName: "Glenglassaugh 1978 Rare Cask Release 40-year-old",
+            statedAge: 40,
+            totalTastings: 7,
+          },
+        },
+      ],
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
+      },
+    });
+
+    getCanonRepairCandidatesMock.mockResolvedValue({
+      results: [
+        {
+          bottle: {
+            id: 31,
+            fullName: "Elijah Craig Barrel Proof Kentucky Straight Bourbon",
+            numReleases: 0,
+            totalTastings: 3,
+          },
+          targetBottle: {
+            id: 32,
+            fullName: "Elijah Craig Barrel Proof",
+            numReleases: 5,
+            totalTastings: 24,
+          },
+          variantBottles: [
+            {
+              id: 33,
+              fullName: "Elijah Craig Barrel Proof Bourbon",
+              numReleases: 0,
+              totalTastings: 2,
+            },
+          ],
+        },
+      ],
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
+      },
+    });
+
+    const result = await getRepairBackfillProposals({
+      perTypeLimit: 5,
+    });
+
+    expect(result.summary).toEqual({
+      total: 3,
+      byType: {
+        release: 1,
+        age: 1,
+        canon: 1,
+      },
+      byActionability: {
+        apply: 1,
+        blocked: 1,
+        manual: 1,
+      },
+    });
+
+    expect(result.proposals).toEqual(
+      expect.arrayContaining<RepairBackfillProposal>([
+        expect.objectContaining({
+          type: "release",
+          actionability: "blocked",
+          repairMode: "blocked_dirty_parent",
+          blockingParent: expect.objectContaining({
+            id: 17,
+            fullName: "Aberlour A'bunadh",
+          }),
+          siblingCount: 1,
+          adminHref:
+            "/admin/release-repairs?query=Aberlour%20A'bunadh%20(Batch%204)",
+        }),
+        expect.objectContaining({
+          type: "age",
+          actionability: "apply",
+          repairMode: "existing_release",
+          targetRelease: expect.objectContaining({
+            id: 23,
+            fullName: "Glenglassaugh 1978 Rare Cask Release 40-year-old",
+          }),
+          conflictingReleaseCount: 1,
+        }),
+        expect.objectContaining({
+          type: "canon",
+          actionability: "manual",
+          variantCount: 1,
+          targetBottle: expect.objectContaining({
+            id: 32,
+            fullName: "Elijah Craig Barrel Proof",
+          }),
+        }),
+      ]),
+    );
+  });
 });

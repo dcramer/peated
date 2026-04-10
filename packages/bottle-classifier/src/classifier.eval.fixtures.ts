@@ -221,6 +221,21 @@ const springbank10 = buildBottleCandidate({
   source: ["exact"],
 });
 
+const cadbollEstateBatch4Release = buildBottleCandidate({
+  bottleId: 660,
+  releaseId: 9102,
+  kind: "release",
+  fullName: "Glenmorangie 15-year-old The Cadboll Estate - Batch 4",
+  bottleFullName: "Glenmorangie 15-year-old The Cadboll Estate",
+  brand: "Glenmorangie",
+  distillery: ["Glenmorangie"],
+  category: "single_malt",
+  statedAge: 15,
+  edition: "Batch 4",
+  score: 0.93,
+  source: ["text"],
+});
+
 const smwsa41176Match = buildBottleCandidate({
   bottleId: 650,
   fullName: "SMWS 41.176 Baristaliscious",
@@ -530,6 +545,39 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
     },
   },
   {
+    name: "store listing: noisy extracted age does not fabricate a child release under a marketed-age parent",
+    input: {
+      reference: {
+        name: "Springbank 10-year-old",
+        url: "https://shop.example/products/springbank-10-year-old",
+      },
+      extractedIdentity: buildExtractedIdentity({
+        brand: "Springbank",
+        expression: "10 Year Old",
+        distillery: ["Springbank"],
+        category: "single_malt",
+        stated_age: 12,
+        abv: 46,
+      }),
+      initialCandidates: [springbank10],
+    },
+    searchResponses: [
+      {
+        when: ["springbank", "10"],
+        results: [springbank10],
+      },
+    ],
+    expected: {
+      status: "classified",
+      action: "match",
+      identityScope: "product",
+      matchedBottleId: 640,
+      matchedReleaseId: null,
+      summary:
+        "Treat a noisy differing age extraction conservatively when the matched bottle explicitly markets 10 years in its name, and keep the Springbank 10 Year Old bottle match instead of fabricating a child release.",
+    },
+  },
+  {
     name: "store listing: strips retailer suffix noise and matches the canonical bottle",
     input: {
       reference: {
@@ -581,6 +629,37 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       matchedBottleId: 43236,
       summary:
         "Treat a standalone article difference plus generic retailer style words as a strong local name variant and keep the Glenmorangie A Tale of Ice Cream bottle match without requiring web evidence.",
+    },
+  },
+  {
+    name: "store listing: matches an existing child release instead of keeping a plain parent-bottle match",
+    input: {
+      reference: {
+        name: "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
+        url: "https://shop.example/products/cadboll-estate-batch-4",
+      },
+      extractedIdentity: buildExtractedIdentity({
+        brand: "Glenmorangie",
+        expression: "The Cadboll Estate",
+        distillery: ["Glenmorangie"],
+        category: "single_malt",
+        stated_age: 15,
+        edition: "Batch 4",
+      }),
+      initialCandidates: [
+        cadbollEstateParent,
+        cadbollEstateBatch4Release,
+        cadbollEstateLegacyBatch2,
+      ],
+    },
+    expected: {
+      status: "classified",
+      action: "match",
+      identityScope: "product",
+      matchedBottleId: 660,
+      matchedReleaseId: 9102,
+      summary:
+        "When a clean Batch 4 child release already exists, match that release directly instead of keeping or downgrading a plain parent-bottle match for the Cadboll Estate listing.",
     },
   },
   {
