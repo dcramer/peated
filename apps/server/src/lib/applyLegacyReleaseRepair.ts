@@ -1,3 +1,4 @@
+import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, BottleRelease, User } from "@peated/server/db/schema";
 import {
@@ -18,7 +19,10 @@ import {
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
-import { getCanonicalReleaseAliasNames } from "@peated/server/lib/bottleSchemaRules";
+import {
+  getCanonicalReleaseAliasNames,
+  hasBottleLevelReleaseTraits,
+} from "@peated/server/lib/bottleSchemaRules";
 import {
   BottleReleaseAlreadyExistsError,
   BottleReleaseCreateBadRequestError,
@@ -83,6 +87,21 @@ type ResolvedLegacyReleaseRepairParent = {
   bottle: Bottle;
   createdParent: boolean;
 };
+
+type ClassifierReviewedCreateParentResolution =
+  | {
+      parentBottle: Bottle;
+      resolution: "reuse_existing_parent";
+    }
+  | {
+      resolution: "allow_create_parent";
+    }
+  | {
+      message: string;
+      resolution: "blocked";
+    };
+
+type LegacyBottleRepairSnapshot = RepairBottle;
 
 function getReleaseInput(legacyBottle: RepairBottle) {
   const repairIdentity = deriveLegacyReleaseRepairIdentity({
@@ -164,6 +183,74 @@ async function getLegacyBottleForRepair(
   }
 
   return legacyBottle satisfies RepairBottle;
+}
+
+async function getLegacyBottleSnapshotForRepair(legacyBottleId: number) {
+  const [legacyBottle] = await db
+    .select({
+      id: bottles.id,
+      name: bottles.name,
+      fullName: bottles.fullName,
+      statedAge: bottles.statedAge,
+      seriesId: bottles.seriesId,
+      category: bottles.category,
+      edition: bottles.edition,
+      abv: bottles.abv,
+      singleCask: bottles.singleCask,
+      caskStrength: bottles.caskStrength,
+      vintageYear: bottles.vintageYear,
+      releaseYear: bottles.releaseYear,
+      caskType: bottles.caskType,
+      caskSize: bottles.caskSize,
+      caskFill: bottles.caskFill,
+      description: bottles.description,
+      imageUrl: bottles.imageUrl,
+      tastingNotes: bottles.tastingNotes,
+      flavorProfile: bottles.flavorProfile,
+      brandId: bottles.brandId,
+      bottlerId: bottles.bottlerId,
+      createdById: bottles.createdById,
+      numReleases: bottles.numReleases,
+      totalTastings: bottles.totalTastings,
+    })
+    .from(bottles)
+    .where(eq(bottles.id, legacyBottleId))
+    .limit(1);
+
+  if (!legacyBottle || legacyBottle.numReleases > 0) {
+    return null;
+  }
+
+  return legacyBottle satisfies LegacyBottleRepairSnapshot;
+}
+
+async function getParentRowsForRepair({
+  legacyBottleId,
+  legacyBottle,
+  proposedParentFullName,
+}: {
+  legacyBottle: Pick<RepairBottle, "brandId">;
+  legacyBottleId: number;
+  proposedParentFullName: string;
+}) {
+  return await db
+    .select()
+    .from(bottles)
+    .where(
+      legacyBottle.brandId
+        ? and(
+            eq(bottles.brandId, legacyBottle.brandId),
+            sql`${bottles.id} != ${legacyBottleId}`,
+          )
+        : and(
+            eq(
+              sql`LOWER(${bottles.fullName})`,
+              proposedParentFullName.toLowerCase(),
+            ),
+            sql`${bottles.id} != ${legacyBottleId}`,
+          ),
+    )
+    .orderBy(sql`${bottles.totalTastings} DESC NULLS LAST`, desc(bottles.id));
 }
 
 async function getProposedParentBottleName(
@@ -276,15 +363,151 @@ async function createParentBottleForRepair(
   };
 }
 
+async function reviewCreateParentResolutionWithClassifier({
+  legacyBottle,
+  legacyBottleId,
+  parentRows,
+}: {
+  legacyBottle: LegacyBottleRepairSnapshot;
+  legacyBottleId: number;
+  parentRows: Bottle[];
+}): Promise<ClassifierReviewedCreateParentResolution> {
+  const [brand] = await db
+    .select({
+      name: entities.name,
+      shortName: entities.shortName,
+    })
+    .from(entities)
+    .where(eq(entities.id, legacyBottle.brandId))
+    .limit(1);
+
+  const initialCandidates = parentRows
+    .filter((row) => row.id !== legacyBottleId)
+    .map((row) => ({
+      kind: "bottle" as const,
+      bottleId: row.id,
+      releaseId: null,
+      alias: null,
+      fullName: row.fullName,
+      bottleFullName: row.fullName,
+      brand: brand?.name ?? brand?.shortName ?? null,
+      bottler: null,
+      series: null,
+      distillery: [],
+      category: row.category,
+      statedAge: row.statedAge,
+      edition: row.edition,
+      caskStrength: row.caskStrength,
+      singleCask: row.singleCask,
+      abv: row.abv,
+      vintageYear: row.vintageYear,
+      releaseYear: row.releaseYear,
+      caskType: row.caskType,
+      caskSize: row.caskSize,
+      caskFill: row.caskFill,
+      score: null,
+      source: ["repair_parent"],
+    }));
+
+  const classification = await classifyBottleReference({
+    reference: {
+      name: legacyBottle.fullName,
+    },
+    extractedIdentity: {
+      brand: brand?.name ?? brand?.shortName ?? null,
+      bottler: null,
+      expression: null,
+      series: null,
+      distillery: [],
+      category: legacyBottle.category,
+      stated_age: legacyBottle.statedAge,
+      abv: legacyBottle.abv,
+      release_year: legacyBottle.releaseYear,
+      vintage_year: legacyBottle.vintageYear,
+      cask_type: legacyBottle.caskType,
+      cask_size: legacyBottle.caskSize,
+      cask_fill: legacyBottle.caskFill,
+      cask_strength: legacyBottle.caskStrength,
+      single_cask: legacyBottle.singleCask,
+      edition: legacyBottle.edition,
+    },
+    initialCandidates,
+  });
+
+  if (classification.status === "ignored") {
+    return {
+      resolution: "blocked",
+      message: `Classifier could not review parent resolution: ${classification.reason}`,
+    };
+  }
+
+  const { decision } = classification;
+  if (decision.identityScope === "exact_cask") {
+    return {
+      resolution: "blocked",
+      message:
+        "Classifier treated this bottle as exact-cask identity, so release repair cannot safely create a reusable parent bottle.",
+    };
+  }
+
+  if (decision.action === "match" || decision.action === "create_release") {
+    const parentBottleId =
+      decision.action === "match"
+        ? decision.matchedBottleId
+        : decision.parentBottleId;
+
+    const parentBottle =
+      parentRows.find((row) => row.id === parentBottleId) ?? null;
+
+    if (!parentBottle) {
+      return {
+        resolution: "blocked",
+        message:
+          "Classifier pointed at a bottle outside the reviewed repair parent set.",
+      };
+    }
+
+    if (hasBottleLevelReleaseTraits(parentBottle)) {
+      return {
+        resolution: "blocked",
+        message:
+          "Classifier found a reusable parent candidate, but that bottle still has bottle-level release traits.",
+      };
+    }
+
+    return {
+      resolution: "reuse_existing_parent",
+      parentBottle,
+    };
+  }
+
+  if (
+    decision.action === "create_bottle" ||
+    decision.action === "create_bottle_and_release"
+  ) {
+    return {
+      resolution: "allow_create_parent",
+    };
+  }
+
+  return {
+    resolution: "blocked",
+    message:
+      "Classifier could not verify whether this repair should reuse an existing parent bottle or create a new one.",
+  };
+}
+
 async function resolveParentBottleForRepair(
   tx: AnyTransaction,
   {
+    classifierResolution,
     distillerIds,
     legacyBottle,
     legacyBottleId,
     proposedParentFullName,
     user,
   }: {
+    classifierResolution: ClassifierReviewedCreateParentResolution | null;
     distillerIds: number[];
     legacyBottle: RepairBottle;
     legacyBottleId: number;
@@ -323,6 +546,42 @@ async function resolveParentBottleForRepair(
   }
 
   if (parentMode === "create_parent") {
+    if (!classifierResolution) {
+      throw new LegacyReleaseRepairBadRequestError(
+        "Classifier review was unavailable for create-parent repair validation.",
+      );
+    }
+
+    if (classifierResolution.resolution === "blocked") {
+      throw new LegacyReleaseRepairBadRequestError(
+        classifierResolution.message,
+      );
+    }
+
+    if (classifierResolution.resolution === "reuse_existing_parent") {
+      const lockedParentBottle =
+        parentRows.find(
+          (row) => row.id === classifierResolution.parentBottle.id,
+        ) ?? null;
+      if (!lockedParentBottle) {
+        throw new LegacyReleaseRepairBadRequestError(
+          "Classifier-reviewed parent bottle is outside the locked repair parent set.",
+        );
+      }
+
+      if (hasBottleLevelReleaseTraits(lockedParentBottle)) {
+        throw new LegacyReleaseRepairBadRequestError(
+          "Classifier-reviewed parent bottle still contains bottle-level release traits.",
+        );
+      }
+
+      return {
+        aliasName: null,
+        bottle: lockedParentBottle,
+        createdParent: false,
+      };
+    }
+
     return createParentBottleForRepair(tx, {
       distillerIds,
       legacyBottle,
@@ -393,9 +652,11 @@ async function backfillExistingReleaseMetadata(
 export async function applyLegacyReleaseRepairInTransaction(
   tx: AnyTransaction,
   {
+    classifierResolution = null,
     legacyBottleId,
     user,
   }: {
+    classifierResolution?: ClassifierReviewedCreateParentResolution | null;
     legacyBottleId: number;
     user: User;
   },
@@ -457,6 +718,7 @@ export async function applyLegacyReleaseRepairInTransaction(
     bottle: parentBottle,
     createdParent,
   } = await resolveParentBottleForRepair(tx, {
+    classifierResolution,
     distillerIds,
     legacyBottle,
     legacyBottleId,
@@ -786,8 +1048,42 @@ export async function applyLegacyReleaseRepair({
   legacyBottleId: number;
   user: User;
 }) {
+  let classifierResolution: ClassifierReviewedCreateParentResolution | null =
+    null;
+  const legacyBottle = await getLegacyBottleSnapshotForRepair(legacyBottleId);
+
+  if (legacyBottle) {
+    const repairIdentity = deriveLegacyReleaseRepairIdentity({
+      fullName: legacyBottle.fullName,
+      edition: legacyBottle.edition,
+      releaseYear: legacyBottle.releaseYear,
+    });
+
+    if (repairIdentity) {
+      const parentRows = await getParentRowsForRepair({
+        legacyBottle,
+        legacyBottleId,
+        proposedParentFullName: repairIdentity.proposedParentFullName,
+      });
+      const parentMode = getLegacyReleaseRepairParentMode(parentRows, {
+        proposedParentFullName: repairIdentity.proposedParentFullName,
+      });
+
+      if (parentMode === "create_parent") {
+        classifierResolution = await reviewCreateParentResolutionWithClassifier(
+          {
+            legacyBottle,
+            legacyBottleId,
+            parentRows,
+          },
+        );
+      }
+    }
+  }
+
   const result = await db.transaction(async (tx) =>
     applyLegacyReleaseRepairInTransaction(tx, {
+      classifierResolution,
       legacyBottleId,
       user,
     }),

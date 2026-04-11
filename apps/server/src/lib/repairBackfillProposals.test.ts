@@ -219,6 +219,8 @@ describe("getRepairBackfillProposals", () => {
     });
     expect(result.summary).toEqual({
       total: 4,
+      automationEligible: 1,
+      automationBlocked: 3,
       byType: {
         release: 2,
         age: 1,
@@ -228,6 +230,21 @@ describe("getRepairBackfillProposals", () => {
         apply: 2,
         blocked: 1,
         manual: 1,
+      },
+      byRepairMode: {
+        release: {
+          existing_parent: 1,
+          create_parent: 0,
+          blocked_alias_conflict: 1,
+          blocked_dirty_parent: 0,
+        },
+        age: {
+          existing_release: 0,
+          create_release: 1,
+        },
+        canon: {
+          review_required: 1,
+        },
       },
     });
     expect(result.proposals).toEqual(
@@ -330,6 +347,8 @@ describe("getRepairBackfillProposals", () => {
 
     expect(result.summary).toEqual({
       total: 1,
+      automationEligible: 1,
+      automationBlocked: 0,
       byType: {
         release: 1,
         age: 0,
@@ -339,6 +358,21 @@ describe("getRepairBackfillProposals", () => {
         apply: 1,
         blocked: 0,
         manual: 0,
+      },
+      byRepairMode: {
+        release: {
+          existing_parent: 1,
+          create_parent: 0,
+          blocked_alias_conflict: 0,
+          blocked_dirty_parent: 0,
+        },
+        age: {
+          existing_release: 0,
+          create_release: 0,
+        },
+        canon: {
+          review_required: 0,
+        },
       },
     });
     expect(result.proposals).toEqual([
@@ -602,6 +636,8 @@ describe("getRepairBackfillProposals", () => {
 
     expect(result.summary).toEqual({
       total: 2,
+      automationEligible: 2,
+      automationBlocked: 0,
       byType: {
         release: 1,
         age: 1,
@@ -611,6 +647,21 @@ describe("getRepairBackfillProposals", () => {
         apply: 2,
         blocked: 0,
         manual: 0,
+      },
+      byRepairMode: {
+        release: {
+          existing_parent: 1,
+          create_parent: 0,
+          blocked_alias_conflict: 0,
+          blocked_dirty_parent: 0,
+        },
+        age: {
+          existing_release: 1,
+          create_release: 0,
+        },
+        canon: {
+          review_required: 0,
+        },
       },
     });
     expect(result.proposals).toEqual([
@@ -711,6 +762,8 @@ describe("getRepairBackfillProposals", () => {
     });
     expect(result.summary).toEqual({
       total: 1,
+      automationEligible: 1,
+      automationBlocked: 0,
       byType: {
         release: 1,
         age: 0,
@@ -720,6 +773,21 @@ describe("getRepairBackfillProposals", () => {
         apply: 1,
         blocked: 0,
         manual: 0,
+      },
+      byRepairMode: {
+        release: {
+          existing_parent: 1,
+          create_parent: 0,
+          blocked_alias_conflict: 0,
+          blocked_dirty_parent: 0,
+        },
+        age: {
+          existing_release: 0,
+          create_release: 0,
+        },
+        canon: {
+          review_required: 0,
+        },
       },
     });
     expect(result.proposals).toEqual([
@@ -932,6 +1000,8 @@ describe("getRepairBackfillProposals", () => {
 
     expect(result.summary).toEqual({
       total: 3,
+      automationEligible: 1,
+      automationBlocked: 2,
       byType: {
         release: 1,
         age: 1,
@@ -941,6 +1011,21 @@ describe("getRepairBackfillProposals", () => {
         apply: 1,
         blocked: 1,
         manual: 1,
+      },
+      byRepairMode: {
+        release: {
+          existing_parent: 0,
+          create_parent: 0,
+          blocked_alias_conflict: 0,
+          blocked_dirty_parent: 1,
+        },
+        age: {
+          existing_release: 1,
+          create_release: 0,
+        },
+        canon: {
+          review_required: 1,
+        },
       },
     });
 

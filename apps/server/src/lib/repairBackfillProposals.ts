@@ -27,7 +27,16 @@ type RepairBackfillProposalAutomationAssessment = {
 };
 
 type RepairBackfillProposalSummary = {
+  automationBlocked: number;
+  automationEligible: number;
   byActionability: Record<RepairBackfillProposalActionability, number>;
+  byRepairMode: {
+    age: Record<AgeRepairBackfillProposal["repairMode"], number>;
+    canon: {
+      review_required: number;
+    };
+    release: Record<ReleaseRepairBackfillProposal["repairMode"], number>;
+  };
   byType: Record<RepairBackfillProposalType, number>;
   total: number;
 };
@@ -368,10 +377,30 @@ function createRepairBackfillProposalSummary(
       summary.total += 1;
       summary.byType[proposal.type] += 1;
       summary.byActionability[proposal.actionability] += 1;
+      if (proposal.automationEligible) {
+        summary.automationEligible += 1;
+      } else {
+        summary.automationBlocked += 1;
+      }
+
+      switch (proposal.type) {
+        case "release":
+          summary.byRepairMode.release[proposal.repairMode] += 1;
+          break;
+        case "age":
+          summary.byRepairMode.age[proposal.repairMode] += 1;
+          break;
+        case "canon":
+          summary.byRepairMode.canon.review_required += 1;
+          break;
+      }
+
       return summary;
     },
     {
       total: 0,
+      automationEligible: 0,
+      automationBlocked: 0,
       byType: {
         release: 0,
         age: 0,
@@ -381,6 +410,21 @@ function createRepairBackfillProposalSummary(
         apply: 0,
         blocked: 0,
         manual: 0,
+      },
+      byRepairMode: {
+        release: {
+          existing_parent: 0,
+          create_parent: 0,
+          blocked_alias_conflict: 0,
+          blocked_dirty_parent: 0,
+        },
+        age: {
+          existing_release: 0,
+          create_release: 0,
+        },
+        canon: {
+          review_required: 0,
+        },
       },
     },
   );

@@ -442,13 +442,22 @@ subcommand
       `Types: ${types.join(", ")} | Per-type limit: ${perTypeLimit} | Query: ${options.query || "(none)"}`,
     );
     console.log(
-      `Automation eligible: ${result.proposals.filter((proposal) => proposal.automationEligible).length}`,
+      `Automation: eligible=${result.summary.automationEligible}, blocked=${result.summary.automationBlocked}`,
     );
     console.log(
       `Actionability: apply=${result.summary.byActionability.apply}, blocked=${result.summary.byActionability.blocked}, manual=${result.summary.byActionability.manual}`,
     );
     console.log(
       `By type: release=${result.summary.byType.release}, age=${result.summary.byType.age}, canon=${result.summary.byType.canon}`,
+    );
+    console.log(
+      `Release modes: existing_parent=${result.summary.byRepairMode.release.existing_parent}, create_parent=${result.summary.byRepairMode.release.create_parent}, blocked_alias_conflict=${result.summary.byRepairMode.release.blocked_alias_conflict}, blocked_dirty_parent=${result.summary.byRepairMode.release.blocked_dirty_parent}`,
+    );
+    console.log(
+      `Age modes: existing_release=${result.summary.byRepairMode.age.existing_release}, create_release=${result.summary.byRepairMode.age.create_release}`,
+    );
+    console.log(
+      `Canon modes: review_required=${result.summary.byRepairMode.canon.review_required}`,
     );
 
     if (result.proposals.length === 0) {

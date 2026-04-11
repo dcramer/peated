@@ -19,8 +19,70 @@ import {
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq, inArray } from "drizzle-orm";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+
+const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
+
+vi.mock(
+  "@peated/server/agents/bottleClassifier/classifyBottleReference",
+  () => ({
+    classifyBottleReference: classifyBottleReferenceMock,
+  }),
+);
+
+function createClassifierCreateBottleResult() {
+  return {
+    status: "classified" as const,
+    decision: {
+      action: "create_bottle" as const,
+      confidence: 92,
+      rationale: "Local candidates do not show a reusable parent bottle.",
+      candidateBottleIds: [],
+      identityScope: "product" as const,
+      observation: null,
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId: null,
+      proposedBottle: {
+        name: "Classifier Parent",
+        series: null,
+        category: null,
+        edition: null,
+        statedAge: null,
+        caskStrength: null,
+        singleCask: null,
+        abv: null,
+        vintageYear: null,
+        releaseYear: null,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+        brand: {
+          id: null,
+          name: "Classifier Brand",
+        },
+        distillers: [],
+        bottler: null,
+      },
+      proposedRelease: null,
+    },
+    artifacts: {
+      extractedIdentity: null,
+      candidates: [],
+      searchEvidence: [],
+      resolvedEntities: [],
+    },
+  };
+}
 
 describe("POST /bottles/:bottle/apply-release-repair", () => {
+  beforeEach(() => {
+    classifyBottleReferenceMock.mockReset();
+    classifyBottleReferenceMock.mockResolvedValue(
+      createClassifierCreateBottleResult(),
+    );
+  });
+
   test("requires moderator access", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: false });
 
@@ -413,6 +475,190 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       where: (entities, { eq }) => eq(entities.id, brand.id),
     });
     expect(refreshedBrand?.totalBottles).toBe(1);
+  });
+
+  test("reuses a classifier-reviewed existing parent instead of creating a heuristic duplicate", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Festival Distillery",
+      totalBottles: 2,
+    });
+    const parentBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Sessions",
+      totalTastings: 80,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Session (Batch 2)",
+      statedAge: 12,
+      category: "single_malt",
+    });
+    const mod = await fixtures.User({ mod: true });
+
+    classifyBottleReferenceMock.mockResolvedValueOnce({
+      status: "classified",
+      decision: {
+        action: "match",
+        confidence: 95,
+        rationale: "The existing parent bottle is the same product family.",
+        candidateBottleIds: [parentBottle.id],
+        identityScope: "product",
+        observation: null,
+        matchedBottleId: parentBottle.id,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: null,
+        proposedRelease: null,
+      },
+      artifacts: {
+        extractedIdentity: null,
+        candidates: [],
+        searchEvidence: [],
+        resolvedEntities: [],
+      },
+    });
+
+    const result = await routerClient.bottles.applyReleaseRepair(
+      {
+        bottle: legacyBottle.id,
+      },
+      { context: { user: mod } },
+    );
+
+    expect(result.parentBottleId).toBe(parentBottle.id);
+
+    const brandBottles = await db
+      .select({
+        id: bottles.id,
+      })
+      .from(bottles)
+      .where(eq(bottles.brandId, brand.id));
+    expect(brandBottles.map((row) => row.id).sort((a, b) => a - b)).toEqual([
+      parentBottle.id,
+    ]);
+  });
+
+  test("blocks heuristic create-parent repairs when classifier cannot verify the parent decision", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Festival Distillery",
+      totalBottles: 1,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Session (Batch 2)",
+      statedAge: 12,
+      category: "single_malt",
+    });
+    const mod = await fixtures.User({ mod: true });
+
+    classifyBottleReferenceMock.mockResolvedValueOnce({
+      status: "classified",
+      decision: {
+        action: "no_match",
+        confidence: 41,
+        rationale: "Identity is not strong enough to create or reuse a parent.",
+        candidateBottleIds: [],
+        identityScope: "product",
+        observation: null,
+        matchedBottleId: null,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: null,
+        proposedRelease: null,
+      },
+      artifacts: {
+        extractedIdentity: null,
+        candidates: [],
+        searchEvidence: [],
+        resolvedEntities: [],
+      },
+    });
+
+    const err = await waitError(
+      routerClient.bottles.applyReleaseRepair(
+        {
+          bottle: legacyBottle.id,
+        },
+        { context: { user: mod } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Classifier could not verify whether this repair should reuse an existing parent bottle or create a new one.]`,
+    );
+
+    const brandBottles = await db
+      .select({
+        id: bottles.id,
+      })
+      .from(bottles)
+      .where(eq(bottles.brandId, brand.id));
+    expect(brandBottles.map((row) => row.id)).toEqual([legacyBottle.id]);
+  });
+
+  test("blocks classifier redirects to parent bottles outside the reviewed repair parent set", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Festival Distillery",
+      totalBottles: 1,
+    });
+    const unrelatedBrand = await fixtures.Entity({
+      name: "Other Distillery",
+      totalBottles: 1,
+    });
+    const unrelatedBottle = await fixtures.Bottle({
+      brandId: unrelatedBrand.id,
+      name: "Warehouse Session",
+      totalTastings: 80,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Session (Batch 2)",
+      statedAge: 12,
+      category: "single_malt",
+    });
+    const mod = await fixtures.User({ mod: true });
+
+    classifyBottleReferenceMock.mockResolvedValueOnce({
+      status: "classified",
+      decision: {
+        action: "match",
+        confidence: 88,
+        rationale: "Classifier picked an unrelated bottle.",
+        candidateBottleIds: [unrelatedBottle.id],
+        identityScope: "product",
+        observation: null,
+        matchedBottleId: unrelatedBottle.id,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: null,
+        proposedRelease: null,
+      },
+      artifacts: {
+        extractedIdentity: null,
+        candidates: [],
+        searchEvidence: [],
+        resolvedEntities: [],
+      },
+    });
+
+    const err = await waitError(
+      routerClient.bottles.applyReleaseRepair(
+        {
+          bottle: legacyBottle.id,
+        },
+        { context: { user: mod } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Classifier pointed at a bottle outside the reviewed repair parent set.]`,
+    );
   });
 
   test("creates a reusable parent bottle for branded generic-name releases", async ({
