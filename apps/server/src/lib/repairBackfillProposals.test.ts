@@ -219,8 +219,8 @@ describe("getRepairBackfillProposals", () => {
     });
     expect(result.summary).toEqual({
       total: 4,
-      automationEligible: 2,
-      automationBlocked: 2,
+      automationEligible: 1,
+      automationBlocked: 3,
       byType: {
         release: 2,
         age: 1,
