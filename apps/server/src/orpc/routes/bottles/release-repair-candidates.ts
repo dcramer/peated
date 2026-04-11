@@ -20,6 +20,7 @@ const LegacyReleaseRepairCandidateSchema = z.object({
       totalTastings: z.number().nullable(),
     })
     .nullable(),
+  classifierBlocker: z.string().nullable(),
   legacyBottle: z.object({
     id: z.number(),
     fullName: z.string(),
@@ -48,6 +49,7 @@ const LegacyReleaseRepairCandidateSchema = z.object({
   repairMode: z.enum([
     "existing_parent",
     "create_parent",
+    "blocked_classifier",
     "blocked_alias_conflict",
     "blocked_dirty_parent",
   ]),

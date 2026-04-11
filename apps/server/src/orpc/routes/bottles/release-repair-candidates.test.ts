@@ -3,9 +3,70 @@ import { bottleAliases, bottles } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+
+const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
+
+vi.mock(
+  "@peated/server/agents/bottleClassifier/classifyBottleReference",
+  () => ({
+    classifyBottleReference: classifyBottleReferenceMock,
+  }),
+);
+
+function createClassifierCreateBottleResult() {
+  return {
+    status: "classified" as const,
+    decision: {
+      action: "create_bottle" as const,
+      confidence: 92,
+      rationale: "Local candidates do not show a reusable parent bottle.",
+      candidateBottleIds: [],
+      identityScope: "product" as const,
+      observation: null,
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId: null,
+      proposedBottle: {
+        name: "Classifier Parent",
+        series: null,
+        category: null,
+        edition: null,
+        statedAge: null,
+        caskStrength: null,
+        singleCask: null,
+        abv: null,
+        vintageYear: null,
+        releaseYear: null,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+        brand: {
+          id: null,
+          name: "Classifier Brand",
+        },
+        distillers: [],
+        bottler: null,
+      },
+      proposedRelease: null,
+    },
+    artifacts: {
+      extractedIdentity: null,
+      candidates: [],
+      searchEvidence: [],
+      resolvedEntities: [],
+    },
+  };
+}
 
 describe("GET /bottles/release-repair-candidates", () => {
+  beforeEach(() => {
+    classifyBottleReferenceMock.mockReset();
+    classifyBottleReferenceMock.mockResolvedValue(
+      createClassifierCreateBottleResult(),
+    );
+  });
+
   test("requires moderator access", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: false });
 
@@ -278,6 +339,92 @@ describe("GET /bottles/release-repair-candidates", () => {
     });
   });
 
+  test("rewrites create-parent candidates to existing-parent when classifier finds a reviewed parent", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Review Distillery" });
+    const reusableParent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Session Archive",
+      totalTastings: 30,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Session (Batch 1)",
+      totalTastings: 6,
+    });
+    const user = await fixtures.User({ mod: true });
+
+    classifyBottleReferenceMock.mockResolvedValue({
+      ...createClassifierCreateBottleResult(),
+      decision: {
+        ...createClassifierCreateBottleResult().decision,
+        action: "match",
+        matchedBottleId: reusableParent.id,
+      },
+    });
+
+    const result = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "Warehouse Session",
+      },
+      { context: { user } },
+    );
+
+    expect(
+      result.results.find(
+        (candidate) => candidate.legacyBottle.id === legacyBottle.id,
+      ),
+    ).toMatchObject({
+      classifierBlocker: null,
+      hasExactParent: false,
+      repairMode: "existing_parent",
+      proposedParent: {
+        id: reusableParent.id,
+        fullName: reusableParent.fullName,
+      },
+    });
+  });
+
+  test("blocks create-parent candidates when classifier cannot verify the parent decision", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Blocked Distillery" });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Session (Batch 1)",
+      totalTastings: 6,
+    });
+    const user = await fixtures.User({ mod: true });
+
+    classifyBottleReferenceMock.mockResolvedValue({
+      status: "ignored" as const,
+      reason: "reference is too ambiguous",
+    });
+
+    const result = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "Warehouse Session",
+      },
+      { context: { user } },
+    );
+
+    expect(
+      result.results.find(
+        (candidate) => candidate.legacyBottle.id === legacyBottle.id,
+      ),
+    ).toMatchObject({
+      classifierBlocker:
+        "Classifier could not review parent resolution: reference is too ambiguous",
+      hasExactParent: false,
+      repairMode: "blocked_classifier",
+      proposedParent: {
+        id: null,
+        fullName: "Blocked Distillery Warehouse Session",
+      },
+    });
+  });
+
   test("flags sibling clusters behind a dirty exact-name parent as blocked", async ({
     fixtures,
   }) => {
@@ -546,6 +693,9 @@ describe("GET /bottles/release-repair-candidates", () => {
   test("keeps pagination stable when valid candidates extend past the initial scan window", async ({
     fixtures,
   }) => {
+    classifyBottleReferenceMock.mockResolvedValue(
+      createClassifierCreateBottleResult(),
+    );
     const brand = await fixtures.Entity({
       name: "Pagination Probe Distillery",
     });
@@ -613,5 +763,5 @@ describe("GET /bottles/release-repair-candidates", () => {
     expect(new Set(returnedIds.slice(0, 20))).toEqual(
       new Set(validCandidateIds),
     );
-  });
+  }, 15000);
 });

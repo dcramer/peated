@@ -31,6 +31,7 @@ const MARKER_LABELS: Record<string, string> = {
 const REPAIR_MODE_LABELS = {
   existing_parent: "Reusable parent exists",
   create_parent: "Needs parent creation",
+  blocked_classifier: "Classifier review blocked",
   blocked_alias_conflict: "Parent alias is blocked",
   blocked_dirty_parent: "Dirty parent blocks repair",
 } as const;
@@ -45,6 +46,8 @@ function getRepairModeDescription(repairMode: keyof typeof REPAIR_MODE_LABELS) {
       return "An existing reusable parent bottle can absorb this legacy release directly.";
     case "create_parent":
       return "A new reusable parent bottle will be created during repair.";
+    case "blocked_classifier":
+      return "Classifier review could not verify whether this legacy bottle should reuse an existing parent or create a new one.";
     case "blocked_alias_conflict":
       return "The proposed parent name is already owned by a different bottle or release alias and needs manual cleanup first.";
     case "blocked_dirty_parent":
@@ -54,6 +57,7 @@ function getRepairModeDescription(repairMode: keyof typeof REPAIR_MODE_LABELS) {
 
 function canApplyRepair(repairMode: keyof typeof REPAIR_MODE_LABELS) {
   return (
+    repairMode !== "blocked_classifier" &&
     repairMode !== "blocked_dirty_parent" &&
     repairMode !== "blocked_alias_conflict"
   );
@@ -428,6 +432,11 @@ export default function Page() {
                         {candidate.blockingParent.fullName}
                       </Link>
                       .
+                    </div>
+                  ) : null}
+                  {candidate.classifierBlocker ? (
+                    <div className="mt-3 text-sm text-amber-300">
+                      {candidate.classifierBlocker}
                     </div>
                   ) : null}
                 </div>
