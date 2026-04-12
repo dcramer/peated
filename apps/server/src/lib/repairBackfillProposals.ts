@@ -186,7 +186,8 @@ function isAutomationEligibleReleaseRepairCandidate(
 } {
   return (
     candidate.repairMode === "existing_parent" &&
-    candidate.parentResolutionSource === "heuristic_exact"
+    (candidate.parentResolutionSource === "heuristic_exact" ||
+      candidate.parentResolutionSource === "classifier_review_persisted")
   );
 }
 
@@ -200,12 +201,6 @@ function getReleaseRepairProposalAutomationAssessment(
       if (candidate.parentResolutionSource === "heuristic_variant") {
         automationBlockers.push(
           "release repair only has an exactish reusable parent match",
-        );
-      } else if (
-        candidate.parentResolutionSource === "classifier_review_persisted"
-      ) {
-        automationBlockers.push(
-          "release repair has a persisted classifier-reviewed reusable parent, but unattended apply still revalidates live at execution time",
         );
       } else if (
         candidate.parentResolutionSource === "classifier_review_live"

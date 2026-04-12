@@ -207,7 +207,8 @@ function isAutomationEligibleReleaseRepairCandidate(
 } {
   return (
     candidate.repairMode === "existing_parent" &&
-    candidate.parentResolutionSource === "heuristic_exact"
+    (candidate.parentResolutionSource === "heuristic_exact" ||
+      candidate.parentResolutionSource === "classifier_review_persisted")
   );
 }
 
