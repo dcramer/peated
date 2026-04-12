@@ -14,6 +14,7 @@ export * from "./identities";
 export * from "./notifications";
 export * from "./passkeys";
 export * from "./regions";
+export * from "./repairs";
 export * from "./reviews";
 export * from "./stores";
 export * from "./tags";

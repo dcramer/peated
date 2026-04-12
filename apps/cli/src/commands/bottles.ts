@@ -17,6 +17,11 @@ import {
   formatBottleName,
   formatCategoryName,
 } from "@peated/server/lib/format";
+import {
+  getHeuristicLegacyReleaseRepairCandidates,
+  type LegacyReleaseRepairCandidate,
+} from "@peated/server/lib/legacyReleaseRepairCandidates";
+import { refreshLegacyReleaseRepairReview } from "@peated/server/lib/legacyReleaseRepairReviews";
 import { normalizeBottle } from "@peated/server/lib/normalize";
 import {
   getRepairBackfillProposals,
@@ -122,6 +127,12 @@ function formatRepairBackfillProposalSummaryLine(
     case "canon":
       return `[canon/${proposal.actionability}/${automationState}] ${proposal.bottle.fullName} -> ${proposal.targetBottle.fullName}`;
   }
+}
+
+function formatReleaseRepairReviewSummaryLine(
+  candidate: LegacyReleaseRepairCandidate,
+) {
+  return `[release/${candidate.repairMode}] ${candidate.legacyBottle.fullName} -> ${candidate.proposedParent.fullName}`;
 }
 
 subcommand
@@ -477,6 +488,84 @@ subcommand
         `... ${result.proposals.length - 25} more proposal(s) omitted. Use --format json for the full output.`,
       );
     }
+  });
+
+subcommand
+  .command("review-release-repairs")
+  .description(
+    "Refresh persisted classifier reviews for heuristic create-parent release repairs",
+  )
+  .option(
+    "--limit <number>",
+    "Maximum number of create-parent release repairs to review",
+    "100",
+  )
+  .option("--query <query>", "Filter repairs by bottle name", "")
+  .action(async (options) => {
+    const limit = Number.parseInt(options.limit, 10);
+    if (!Number.isFinite(limit) || limit <= 0) {
+      throw new Error(`Invalid limit: ${options.limit}`);
+    }
+
+    const pageSize = Math.min(limit, 100);
+    let cursor = 1;
+    let reviewed = 0;
+    let scannedCreateParent = 0;
+    const summary = {
+      allow_create_parent: 0,
+      blocked: 0,
+      reuse_existing_parent: 0,
+    };
+
+    while (reviewed < limit) {
+      const page = await getHeuristicLegacyReleaseRepairCandidates({
+        cursor,
+        limit: pageSize,
+        query: options.query,
+      });
+
+      if (page.results.length === 0) {
+        break;
+      }
+
+      for (const candidate of page.results) {
+        if (candidate.repairMode !== "create_parent") {
+          continue;
+        }
+
+        scannedCreateParent += 1;
+        const review = await refreshLegacyReleaseRepairReview({
+          legacyBottleId: candidate.legacyBottle.id,
+        });
+        if (!review) {
+          continue;
+        }
+
+        reviewed += 1;
+        summary[review.resolution] += 1;
+        console.log(formatReleaseRepairReviewSummaryLine(candidate));
+        console.log(
+          `  reviewed=${review.resolution} parent=${review.reviewedParentBottleId ?? "(create)"} blocked=${review.blockedReason ?? "(none)"}`,
+        );
+
+        if (reviewed >= limit) {
+          break;
+        }
+      }
+
+      if (!page.rel.nextCursor) {
+        break;
+      }
+
+      cursor = page.rel.nextCursor;
+    }
+
+    console.log(
+      `Reviewed release repairs: ${reviewed} (scanned create_parent candidates: ${scannedCreateParent})`,
+    );
+    console.log(
+      `reuse_existing_parent=${summary.reuse_existing_parent} allow_create_parent=${summary.allow_create_parent} blocked=${summary.blocked}`,
+    );
   });
 
 subcommand

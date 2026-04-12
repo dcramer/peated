@@ -27,3 +27,8 @@ export const contentSourceEnum = pgEnum("content_source", [
   "generated",
   "user",
 ]);
+
+export const legacyReleaseRepairReviewResolutionEnum = pgEnum(
+  "legacy_release_repair_review_resolution",
+  ["allow_create_parent", "blocked", "reuse_existing_parent"],
+);
