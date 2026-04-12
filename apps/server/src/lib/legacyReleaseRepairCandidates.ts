@@ -108,6 +108,12 @@ export type LegacyReleaseRepairParentMode =
   | "blocked_alias_conflict"
   | "blocked_dirty_parent";
 
+export type LegacyReleaseRepairParentResolutionSource =
+  | "classifier_review_live"
+  | "classifier_review_persisted"
+  | "heuristic_exact"
+  | "heuristic_variant";
+
 type LegacyReleaseRepairParentMatchType = "exact" | "variant";
 
 export type DerivedLegacyReleaseRepairCandidate =
@@ -145,6 +151,7 @@ export type LegacyReleaseRepairCandidate = {
     fullName: string;
   }>;
   hasExactParent: boolean;
+  parentResolutionSource: LegacyReleaseRepairParentResolutionSource | null;
   repairMode: LegacyReleaseRepairParentMode;
 };
 
@@ -716,6 +723,7 @@ function applyStoredLegacyReleaseRepairReview({
       ...candidate,
       classifierBlocker: null,
       hasExactParent: false,
+      parentResolutionSource: "classifier_review_persisted",
       proposedParent: {
         id: reviewedParent.id,
         fullName: reviewedParent.fullName,
@@ -817,6 +825,7 @@ async function applyLiveLegacyReleaseRepairClassifierReview(
       ...candidate,
       classifierBlocker: null,
       hasExactParent: false,
+      parentResolutionSource: "classifier_review_live",
       proposedParent: {
         id: classifierResolution.parentBottle.id,
         fullName: classifierResolution.parentBottle.fullName,
@@ -1132,6 +1141,12 @@ async function listHeuristicLegacyReleaseRepairCandidates(query = "") {
         },
         siblingLegacyBottles: siblings,
         hasExactParent: parentMatch.matchType === "exact",
+        parentResolutionSource:
+          repairMode === "existing_parent"
+            ? parentMatch.matchType === "exact"
+              ? "heuristic_exact"
+              : "heuristic_variant"
+            : null,
         repairMode,
       } satisfies LegacyReleaseRepairCandidate;
     }),

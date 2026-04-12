@@ -370,6 +370,7 @@ describe("applyRepairBackfillProposals", () => {
             totalTastings: 100,
           },
           hasExactParent: true,
+          parentResolutionSource: "heuristic_exact",
           repairMode: "existing_parent",
         },
         {
@@ -384,6 +385,7 @@ describe("applyRepairBackfillProposals", () => {
             totalTastings: 100,
           },
           hasExactParent: false,
+          parentResolutionSource: "classifier_review_persisted",
           repairMode: "existing_parent",
         },
       ],
