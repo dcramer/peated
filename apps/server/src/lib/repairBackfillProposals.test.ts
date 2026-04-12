@@ -527,7 +527,7 @@ describe("getRepairBackfillProposals", () => {
           automationBlockers: [
             "release repair has a persisted classifier-reviewed reusable parent, but unattended apply still revalidates live at execution time",
           ],
-          parentResolutionSource: "heuristic_variant",
+          parentResolutionSource: "classifier_review_persisted",
         }),
         expect.objectContaining({
           type: "age",
