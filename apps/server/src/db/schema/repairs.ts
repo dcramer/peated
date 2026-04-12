@@ -24,6 +24,12 @@ export const legacyReleaseRepairReviews = pgTable(
     proposedParentFullName: varchar("proposed_parent_full_name", {
       length: 255,
     }).notNull(),
+    legacyBottleFingerprint: varchar("legacy_bottle_fingerprint", {
+      length: 40,
+    }),
+    parentCandidatesFingerprint: varchar("parent_candidates_fingerprint", {
+      length: 40,
+    }),
     releaseEdition: varchar("release_edition", { length: 255 }),
     releaseYear: integer("release_year"),
     resolution: legacyReleaseRepairReviewResolutionEnum("resolution").notNull(),

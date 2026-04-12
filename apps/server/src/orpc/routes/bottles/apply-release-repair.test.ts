@@ -4,18 +4,24 @@ import {
   bottleFlavorProfiles,
   bottleObservations,
   bottleReleases,
-  bottleTags,
-  bottleTombstones,
   bottles,
   bottlesToDistillers,
+  bottleTags,
+  bottleTombstones,
   changes,
   collectionBottles,
   flightBottles,
+  legacyReleaseRepairReviews,
   reviews,
   storePriceMatchProposals,
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
+import {
+  getLegacyReleaseRepairBottleFingerprint,
+  getLegacyReleaseRepairParentCandidatesFingerprint,
+  LEGACY_RELEASE_REPAIR_REVIEW_VERSION,
+} from "@peated/server/lib/legacyReleaseRepairReviewState";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq, inArray } from "drizzle-orm";
@@ -72,6 +78,70 @@ function createClassifierCreateBottleResult() {
       searchEvidence: [],
       resolvedEntities: [],
     },
+  };
+}
+
+function getLegacyBottleReviewFingerprintInput(legacyBottle: {
+  abv?: null | number;
+  category?: null | string;
+  caskFill?: null | string;
+  caskSize?: null | string;
+  caskStrength?: null | boolean;
+  caskType?: null | string;
+  edition?: null | string;
+  fullName: string;
+  releaseYear?: null | number;
+  singleCask?: null | boolean;
+  statedAge?: null | number;
+  vintageYear?: null | number;
+}) {
+  return {
+    abv: legacyBottle.abv ?? null,
+    category: legacyBottle.category ?? null,
+    caskFill: legacyBottle.caskFill ?? null,
+    caskSize: legacyBottle.caskSize ?? null,
+    caskStrength: legacyBottle.caskStrength ?? null,
+    caskType: legacyBottle.caskType ?? null,
+    edition: legacyBottle.edition ?? null,
+    fullName: legacyBottle.fullName,
+    releaseYear: legacyBottle.releaseYear ?? null,
+    singleCask: legacyBottle.singleCask ?? null,
+    statedAge: legacyBottle.statedAge ?? null,
+    vintageYear: legacyBottle.vintageYear ?? null,
+  };
+}
+
+function getParentBottleReviewFingerprintInput(parentBottle: {
+  id: number;
+  abv?: null | number;
+  category?: null | string;
+  caskFill?: null | string;
+  caskSize?: null | string;
+  caskStrength?: null | boolean;
+  caskType?: null | string;
+  edition?: null | string;
+  fullName: string;
+  releaseYear?: null | number;
+  singleCask?: null | boolean;
+  statedAge?: null | number;
+  totalTastings?: null | number;
+  vintageYear?: null | number;
+}) {
+  return {
+    id: parentBottle.id,
+    abv: parentBottle.abv ?? null,
+    category: parentBottle.category ?? null,
+    caskFill: parentBottle.caskFill ?? null,
+    caskSize: parentBottle.caskSize ?? null,
+    caskStrength: parentBottle.caskStrength ?? null,
+    caskType: parentBottle.caskType ?? null,
+    edition: parentBottle.edition ?? null,
+    fullName: parentBottle.fullName,
+    releaseYear: parentBottle.releaseYear ?? null,
+    singleCask: parentBottle.singleCask ?? null,
+    statedAge: parentBottle.statedAge ?? null,
+    totalTastings: parentBottle.totalTastings ?? null,
+    vintageYear: parentBottle.vintageYear ?? null,
   };
 }
 
@@ -538,6 +608,327 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     expect(brandBottles.map((row) => row.id).sort((a, b) => a - b)).toEqual([
       parentBottle.id,
     ]);
+  });
+
+  test("reuses a matching persisted reviewed parent without re-running live classifier review", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Festival Distillery",
+      totalBottles: 2,
+    });
+    const parentBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Sessions",
+      totalTastings: 80,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Session (Batch 2)",
+      statedAge: 12,
+      category: "single_malt",
+    });
+    const mod = await fixtures.User({ mod: true });
+
+    await db.insert(legacyReleaseRepairReviews).values({
+      legacyBottleId: legacyBottle.id,
+      legacyBottleFingerprint: getLegacyReleaseRepairBottleFingerprint(
+        getLegacyBottleReviewFingerprintInput(legacyBottle),
+      ),
+      parentCandidatesFingerprint:
+        getLegacyReleaseRepairParentCandidatesFingerprint([
+          getParentBottleReviewFingerprintInput(parentBottle),
+        ]),
+      proposedParentFullName: "Festival Distillery Warehouse Session",
+      releaseEdition: "Batch 2",
+      releaseYear: null,
+      resolution: "reuse_existing_parent",
+      reviewedParentBottleId: parentBottle.id,
+      reviewVersion: LEGACY_RELEASE_REPAIR_REVIEW_VERSION,
+      reviewedAt: new Date(),
+    });
+
+    const result = await routerClient.bottles.applyReleaseRepair(
+      {
+        bottle: legacyBottle.id,
+      },
+      { context: { user: mod } },
+    );
+
+    expect(result.parentBottleId).toBe(parentBottle.id);
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("blocks apply-time repair from a matching persisted blocked review without re-running live classifier review", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Festival Distillery",
+      totalBottles: 1,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Session (Batch 2)",
+      statedAge: 12,
+      category: "single_malt",
+    });
+    const mod = await fixtures.User({ mod: true });
+
+    await db.insert(legacyReleaseRepairReviews).values({
+      legacyBottleId: legacyBottle.id,
+      legacyBottleFingerprint: getLegacyReleaseRepairBottleFingerprint(
+        getLegacyBottleReviewFingerprintInput(legacyBottle),
+      ),
+      parentCandidatesFingerprint:
+        getLegacyReleaseRepairParentCandidatesFingerprint([]),
+      proposedParentFullName: "Festival Distillery Warehouse Session",
+      releaseEdition: "Batch 2",
+      releaseYear: null,
+      resolution: "blocked",
+      reviewedParentBottleId: null,
+      blockedReason: "Stored classifier review blocked this repair.",
+      reviewVersion: LEGACY_RELEASE_REPAIR_REVIEW_VERSION,
+      reviewedAt: new Date(),
+    });
+
+    const err = await waitError(
+      routerClient.bottles.applyReleaseRepair(
+        {
+          bottle: legacyBottle.id,
+        },
+        { context: { user: mod } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Stored classifier review blocked this repair.]`,
+    );
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("ignores stale persisted reviews when the derived release identity changes and falls back to live classifier validation", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Festival Distillery",
+      totalBottles: 2,
+    });
+    const parentBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Sessions",
+      totalTastings: 80,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Session (Batch 2)",
+      statedAge: 12,
+      category: "single_malt",
+    });
+    const mod = await fixtures.User({ mod: true });
+
+    await db.insert(legacyReleaseRepairReviews).values({
+      legacyBottleId: legacyBottle.id,
+      legacyBottleFingerprint: getLegacyReleaseRepairBottleFingerprint(
+        getLegacyBottleReviewFingerprintInput(legacyBottle),
+      ),
+      parentCandidatesFingerprint:
+        getLegacyReleaseRepairParentCandidatesFingerprint([
+          getParentBottleReviewFingerprintInput(parentBottle),
+        ]),
+      proposedParentFullName: "Festival Distillery Warehouse Session",
+      releaseEdition: "Batch 3",
+      releaseYear: null,
+      resolution: "blocked",
+      reviewedParentBottleId: null,
+      blockedReason: "stale review",
+      reviewVersion: LEGACY_RELEASE_REPAIR_REVIEW_VERSION,
+      reviewedAt: new Date(),
+    });
+
+    classifyBottleReferenceMock.mockResolvedValueOnce({
+      status: "classified",
+      decision: {
+        action: "match",
+        confidence: 95,
+        rationale: "The existing parent bottle is the same product family.",
+        candidateBottleIds: [parentBottle.id],
+        identityScope: "product",
+        observation: null,
+        matchedBottleId: parentBottle.id,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: null,
+        proposedRelease: null,
+      },
+      artifacts: {
+        extractedIdentity: null,
+        candidates: [],
+        searchEvidence: [],
+        resolvedEntities: [],
+      },
+    });
+
+    const result = await routerClient.bottles.applyReleaseRepair(
+      {
+        bottle: legacyBottle.id,
+      },
+      { context: { user: mod } },
+    );
+
+    expect(result.parentBottleId).toBe(parentBottle.id);
+    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+  });
+
+  test("ignores persisted reviews when classifier-relevant legacy bottle traits change and falls back to live classifier validation", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Festival Distillery",
+      totalBottles: 2,
+    });
+    const parentBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Sessions",
+      category: "single_malt",
+      totalTastings: 80,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Session (Batch 2)",
+      statedAge: 12,
+      category: "single_malt",
+    });
+    const mod = await fixtures.User({ mod: true });
+
+    await db.insert(legacyReleaseRepairReviews).values({
+      legacyBottleId: legacyBottle.id,
+      legacyBottleFingerprint: getLegacyReleaseRepairBottleFingerprint(
+        getLegacyBottleReviewFingerprintInput(legacyBottle),
+      ),
+      parentCandidatesFingerprint:
+        getLegacyReleaseRepairParentCandidatesFingerprint([
+          getParentBottleReviewFingerprintInput(parentBottle),
+        ]),
+      proposedParentFullName: "Festival Distillery Warehouse Session",
+      releaseEdition: "Batch 2",
+      releaseYear: null,
+      resolution: "blocked",
+      reviewedParentBottleId: null,
+      blockedReason: "stale review",
+      reviewVersion: LEGACY_RELEASE_REPAIR_REVIEW_VERSION,
+      reviewedAt: new Date(),
+    });
+
+    await db
+      .update(bottles)
+      .set({ category: "bourbon" })
+      .where(eq(bottles.id, legacyBottle.id));
+
+    classifyBottleReferenceMock.mockResolvedValueOnce({
+      status: "classified",
+      decision: {
+        action: "match",
+        confidence: 95,
+        rationale: "The existing parent bottle is the same product family.",
+        candidateBottleIds: [parentBottle.id],
+        identityScope: "product",
+        observation: null,
+        matchedBottleId: parentBottle.id,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: null,
+        proposedRelease: null,
+      },
+      artifacts: {
+        extractedIdentity: null,
+        candidates: [],
+        searchEvidence: [],
+        resolvedEntities: [],
+      },
+    });
+
+    const result = await routerClient.bottles.applyReleaseRepair(
+      {
+        bottle: legacyBottle.id,
+      },
+      { context: { user: mod } },
+    );
+
+    expect(result.parentBottleId).toBe(parentBottle.id);
+    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+  });
+
+  test("ignores persisted reviews when the reviewed parent candidate set changes and falls back to live classifier validation", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Festival Distillery",
+      totalBottles: 2,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Session (Batch 2)",
+      statedAge: 12,
+      category: "single_malt",
+    });
+    const mod = await fixtures.User({ mod: true });
+
+    await db.insert(legacyReleaseRepairReviews).values({
+      legacyBottleId: legacyBottle.id,
+      legacyBottleFingerprint: getLegacyReleaseRepairBottleFingerprint(
+        getLegacyBottleReviewFingerprintInput(legacyBottle),
+      ),
+      parentCandidatesFingerprint:
+        getLegacyReleaseRepairParentCandidatesFingerprint([]),
+      proposedParentFullName: "Festival Distillery Warehouse Session",
+      releaseEdition: "Batch 2",
+      releaseYear: null,
+      resolution: "blocked",
+      reviewedParentBottleId: null,
+      blockedReason: "stale review",
+      reviewVersion: LEGACY_RELEASE_REPAIR_REVIEW_VERSION,
+      reviewedAt: new Date(),
+    });
+
+    const parentBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Warehouse Sessions",
+      category: "single_malt",
+      totalTastings: 80,
+    });
+
+    classifyBottleReferenceMock.mockResolvedValueOnce({
+      status: "classified",
+      decision: {
+        action: "match",
+        confidence: 95,
+        rationale: "The existing parent bottle is the same product family.",
+        candidateBottleIds: [parentBottle.id],
+        identityScope: "product",
+        observation: null,
+        matchedBottleId: parentBottle.id,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: null,
+        proposedRelease: null,
+      },
+      artifacts: {
+        extractedIdentity: null,
+        candidates: [],
+        searchEvidence: [],
+        resolvedEntities: [],
+      },
+    });
+
+    const result = await routerClient.bottles.applyReleaseRepair(
+      {
+        bottle: legacyBottle.id,
+      },
+      { context: { user: mod } },
+    );
+
+    expect(result.parentBottleId).toBe(parentBottle.id);
+    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
   });
 
   test("blocks heuristic create-parent repairs when classifier cannot verify the parent decision", async ({

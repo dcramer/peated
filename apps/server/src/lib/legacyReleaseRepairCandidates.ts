@@ -8,7 +8,10 @@ import {
 } from "@peated/server/db/schema";
 import { hasBottleLevelReleaseTraits } from "@peated/server/lib/bottleSchemaRules";
 import { reviewLegacyCreateParentResolutionWithClassifier } from "@peated/server/lib/legacyReleaseRepairClassifier";
-import { LEGACY_RELEASE_REPAIR_REVIEW_VERSION } from "@peated/server/lib/legacyReleaseRepairReviewState";
+import {
+  isMatchingLegacyReleaseRepairReviewIdentity,
+  LEGACY_RELEASE_REPAIR_REVIEW_VERSION,
+} from "@peated/server/lib/legacyReleaseRepairReviewState";
 import { and, desc, eq, isNotNull, isNull, or, sql } from "drizzle-orm";
 import {
   normalizeBottle,
@@ -221,11 +224,12 @@ function reviewMatchesLegacyReleaseRepairCandidate(
     releaseYear: number | null;
   },
 ) {
-  return (
-    review.proposedParentFullName.toLowerCase() ===
-      candidate.proposedParent.fullName.toLowerCase() &&
-    (review.releaseEdition ?? null) === candidate.releaseIdentity.edition &&
-    (review.releaseYear ?? null) === candidate.releaseIdentity.releaseYear
+  return isMatchingLegacyReleaseRepairReviewIdentity(
+    {
+      proposedParentFullName: candidate.proposedParent.fullName,
+      releaseIdentity: candidate.releaseIdentity,
+    },
+    review,
   );
 }
 
