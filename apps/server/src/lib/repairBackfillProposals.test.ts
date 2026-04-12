@@ -243,6 +243,15 @@ describe("getRepairBackfillProposals", () => {
         blocked: 1,
         manual: 1,
       },
+      byParentResolutionSource: {
+        release: {
+          classifier_review_live: 0,
+          classifier_review_persisted: 0,
+          heuristic_exact: 1,
+          heuristic_variant: 0,
+          none: 1,
+        },
+      },
       byRepairMode: {
         release: {
           existing_parent: 1,
@@ -375,6 +384,15 @@ describe("getRepairBackfillProposals", () => {
         apply: 1,
         blocked: 0,
         manual: 0,
+      },
+      byParentResolutionSource: {
+        release: {
+          classifier_review_live: 0,
+          classifier_review_persisted: 0,
+          heuristic_exact: 1,
+          heuristic_variant: 0,
+          none: 0,
+        },
       },
       byRepairMode: {
         release: {
@@ -675,6 +693,15 @@ describe("getRepairBackfillProposals", () => {
         blocked: 0,
         manual: 0,
       },
+      byParentResolutionSource: {
+        release: {
+          classifier_review_live: 0,
+          classifier_review_persisted: 0,
+          heuristic_exact: 1,
+          heuristic_variant: 0,
+          none: 0,
+        },
+      },
       byRepairMode: {
         release: {
           existing_parent: 1,
@@ -806,6 +833,15 @@ describe("getRepairBackfillProposals", () => {
         apply: 1,
         blocked: 0,
         manual: 0,
+      },
+      byParentResolutionSource: {
+        release: {
+          classifier_review_live: 0,
+          classifier_review_persisted: 0,
+          heuristic_exact: 1,
+          heuristic_variant: 0,
+          none: 0,
+        },
       },
       byRepairMode: {
         release: {
@@ -1051,6 +1087,15 @@ describe("getRepairBackfillProposals", () => {
         apply: 1,
         blocked: 1,
         manual: 1,
+      },
+      byParentResolutionSource: {
+        release: {
+          classifier_review_live: 0,
+          classifier_review_persisted: 0,
+          heuristic_exact: 0,
+          heuristic_variant: 0,
+          none: 1,
+        },
       },
       byRepairMode: {
         release: {

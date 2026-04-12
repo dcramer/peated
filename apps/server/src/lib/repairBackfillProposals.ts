@@ -30,6 +30,15 @@ type RepairBackfillProposalSummary = {
   automationBlocked: number;
   automationEligible: number;
   byActionability: Record<RepairBackfillProposalActionability, number>;
+  byParentResolutionSource: {
+    release: {
+      classifier_review_live: number;
+      classifier_review_persisted: number;
+      heuristic_exact: number;
+      heuristic_variant: number;
+      none: number;
+    };
+  };
   byRepairMode: {
     age: Record<AgeRepairBackfillProposal["repairMode"], number>;
     canon: {
@@ -413,6 +422,9 @@ function createRepairBackfillProposalSummary(
       switch (proposal.type) {
         case "release":
           summary.byRepairMode.release[proposal.repairMode] += 1;
+          summary.byParentResolutionSource.release[
+            proposal.parentResolutionSource ?? "none"
+          ] += 1;
           break;
         case "age":
           summary.byRepairMode.age[proposal.repairMode] += 1;
@@ -437,6 +449,15 @@ function createRepairBackfillProposalSummary(
         apply: 0,
         blocked: 0,
         manual: 0,
+      },
+      byParentResolutionSource: {
+        release: {
+          classifier_review_live: 0,
+          classifier_review_persisted: 0,
+          heuristic_exact: 0,
+          heuristic_variant: 0,
+          none: 0,
+        },
       },
       byRepairMode: {
         release: {

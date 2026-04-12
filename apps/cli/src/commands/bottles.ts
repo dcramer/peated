@@ -465,6 +465,9 @@ subcommand
       `Release modes: existing_parent=${result.summary.byRepairMode.release.existing_parent}, create_parent=${result.summary.byRepairMode.release.create_parent}, blocked_classifier=${result.summary.byRepairMode.release.blocked_classifier}, blocked_alias_conflict=${result.summary.byRepairMode.release.blocked_alias_conflict}, blocked_dirty_parent=${result.summary.byRepairMode.release.blocked_dirty_parent}`,
     );
     console.log(
+      `Release parent sources: heuristic_exact=${result.summary.byParentResolutionSource.release.heuristic_exact}, heuristic_variant=${result.summary.byParentResolutionSource.release.heuristic_variant}, classifier_review_persisted=${result.summary.byParentResolutionSource.release.classifier_review_persisted}, classifier_review_live=${result.summary.byParentResolutionSource.release.classifier_review_live}, none=${result.summary.byParentResolutionSource.release.none}`,
+    );
+    console.log(
       `Age modes: existing_release=${result.summary.byRepairMode.age.existing_release}, create_release=${result.summary.byRepairMode.age.create_release}`,
     );
     console.log(
