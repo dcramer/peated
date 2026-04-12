@@ -378,6 +378,7 @@ describe("GET /bottles/release-repair-candidates", () => {
       ),
     ).toMatchObject({
       hasExactParent: false,
+      parentResolutionSource: "classifier_review_live",
       repairMode: "existing_parent",
       proposedParent: {
         id: reusableParent.id,
@@ -428,6 +429,7 @@ describe("GET /bottles/release-repair-candidates", () => {
       ),
     ).toMatchObject({
       hasExactParent: false,
+      parentResolutionSource: "classifier_review_persisted",
       repairMode: "existing_parent",
       proposedParent: {
         id: reusableParent.id,
