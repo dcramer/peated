@@ -190,11 +190,6 @@ function getReleaseRepairProposalAutomationAssessment(
         "release repair would create a new parent bottle",
       );
       break;
-    case "blocked_classifier":
-      automationBlockers.push(
-        "release repair is blocked until classifier review can verify the parent decision",
-      );
-      break;
     case "blocked_alias_conflict":
       automationBlockers.push("release repair is blocked by an alias conflict");
       break;
@@ -420,7 +415,6 @@ function createRepairBackfillProposalSummary(
         release: {
           existing_parent: 0,
           create_parent: 0,
-          blocked_classifier: 0,
           blocked_alias_conflict: 0,
           blocked_dirty_parent: 0,
         },

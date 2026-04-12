@@ -141,7 +141,6 @@ describe("getRepairBackfillProposals", () => {
           {
             blockingAlias: null,
             blockingParent: null,
-            classifierBlocker: null,
             legacyBottle: createLegacyBottleMock({
               id: 11,
               fullName: "Aberlour A'bunadh Batch 32",
@@ -184,7 +183,6 @@ describe("getRepairBackfillProposals", () => {
               releaseFullName: null,
             },
             blockingParent: null,
-            classifierBlocker: null,
             legacyBottle: createLegacyBottleMock({
               id: 41,
               fullName: "Lagavulin Distillers Edition 2011 Release",
@@ -245,7 +243,6 @@ describe("getRepairBackfillProposals", () => {
         release: {
           existing_parent: 1,
           create_parent: 0,
-          blocked_classifier: 0,
           blocked_alias_conflict: 1,
           blocked_dirty_parent: 0,
         },
@@ -297,7 +294,6 @@ describe("getRepairBackfillProposals", () => {
         {
           blockingAlias: null,
           blockingParent: null,
-          classifierBlocker: null,
           legacyBottle: createLegacyBottleMock({
             id: 11,
             fullName: "Aberlour A'bunadh Batch 32",
@@ -325,7 +321,6 @@ describe("getRepairBackfillProposals", () => {
             fullName: "Dirty Parent",
             totalTastings: 10,
           },
-          classifierBlocker: null,
           legacyBottle: createLegacyBottleMock({
             id: 16,
             fullName: "Dirty Parent Batch 4",
@@ -376,7 +371,6 @@ describe("getRepairBackfillProposals", () => {
         release: {
           existing_parent: 1,
           create_parent: 0,
-          blocked_classifier: 0,
           blocked_alias_conflict: 0,
           blocked_dirty_parent: 0,
         },
@@ -404,7 +398,6 @@ describe("getRepairBackfillProposals", () => {
         {
           blockingAlias: null,
           blockingParent: null,
-          classifierBlocker: null,
           legacyBottle: createLegacyBottleMock({
             id: 11,
             fullName: "Aberlour A'bunadh Batch 32",
@@ -428,7 +421,6 @@ describe("getRepairBackfillProposals", () => {
         {
           blockingAlias: null,
           blockingParent: null,
-          classifierBlocker: null,
           legacyBottle: createLegacyBottleMock({
             id: 13,
             fullName:
@@ -549,7 +541,6 @@ describe("getRepairBackfillProposals", () => {
         {
           blockingAlias: null,
           blockingParent: null,
-          classifierBlocker: null,
           legacyBottle: createLegacyBottleMock({
             id: 11,
             fullName: "Aberlour A'bunadh Batch 32",
@@ -573,7 +564,6 @@ describe("getRepairBackfillProposals", () => {
         {
           blockingAlias: null,
           blockingParent: null,
-          classifierBlocker: null,
           legacyBottle: createLegacyBottleMock({
             id: 13,
             fullName:
@@ -670,7 +660,6 @@ describe("getRepairBackfillProposals", () => {
         release: {
           existing_parent: 1,
           create_parent: 0,
-          blocked_classifier: 0,
           blocked_alias_conflict: 0,
           blocked_dirty_parent: 0,
         },
@@ -704,7 +693,6 @@ describe("getRepairBackfillProposals", () => {
           {
             blockingAlias: null,
             blockingParent: null,
-            classifierBlocker: null,
             legacyBottle: createLegacyBottleMock({
               id: 11,
               fullName:
@@ -737,7 +725,6 @@ describe("getRepairBackfillProposals", () => {
           {
             blockingAlias: null,
             blockingParent: null,
-            classifierBlocker: null,
             legacyBottle: createLegacyBottleMock({
               id: 12,
               fullName: "Aberlour A'bunadh Batch 32",
@@ -799,7 +786,6 @@ describe("getRepairBackfillProposals", () => {
         release: {
           existing_parent: 1,
           create_parent: 0,
-          blocked_classifier: 0,
           blocked_alias_conflict: 0,
           blocked_dirty_parent: 0,
         },
@@ -827,7 +813,6 @@ describe("getRepairBackfillProposals", () => {
         results: Array.from({ length: 100 }, (_, index) => ({
           blockingAlias: null,
           blockingParent: null,
-          classifierBlocker: null,
           legacyBottle: createLegacyBottleMock({
             id: index + 1,
             fullName: `Release Repair ${index + 1}`,
@@ -857,7 +842,6 @@ describe("getRepairBackfillProposals", () => {
         results: Array.from({ length: 100 }, (_, index) => ({
           blockingAlias: null,
           blockingParent: null,
-          classifierBlocker: null,
           legacyBottle: createLegacyBottleMock({
             id: index + 101,
             fullName: `Release Repair ${index + 101}`,
@@ -921,7 +905,6 @@ describe("getRepairBackfillProposals", () => {
             fullName: "Aberlour A'bunadh",
             totalTastings: 120,
           },
-          classifierBlocker: null,
           legacyBottle: createLegacyBottleMock({
             id: 16,
             fullName: "Aberlour A'bunadh (Batch 4)",
@@ -1041,7 +1024,6 @@ describe("getRepairBackfillProposals", () => {
         release: {
           existing_parent: 0,
           create_parent: 0,
-          blocked_classifier: 0,
           blocked_alias_conflict: 0,
           blocked_dirty_parent: 1,
         },

@@ -451,7 +451,7 @@ subcommand
       `By type: release=${result.summary.byType.release}, age=${result.summary.byType.age}, canon=${result.summary.byType.canon}`,
     );
     console.log(
-      `Release modes: existing_parent=${result.summary.byRepairMode.release.existing_parent}, create_parent=${result.summary.byRepairMode.release.create_parent}, blocked_classifier=${result.summary.byRepairMode.release.blocked_classifier}, blocked_alias_conflict=${result.summary.byRepairMode.release.blocked_alias_conflict}, blocked_dirty_parent=${result.summary.byRepairMode.release.blocked_dirty_parent}`,
+      `Release modes: existing_parent=${result.summary.byRepairMode.release.existing_parent}, create_parent=${result.summary.byRepairMode.release.create_parent}, blocked_alias_conflict=${result.summary.byRepairMode.release.blocked_alias_conflict}, blocked_dirty_parent=${result.summary.byRepairMode.release.blocked_dirty_parent}`,
     );
     console.log(
       `Age modes: existing_release=${result.summary.byRepairMode.age.existing_release}, create_release=${result.summary.byRepairMode.age.create_release}`,
