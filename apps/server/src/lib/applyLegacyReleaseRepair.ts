@@ -5,14 +5,15 @@ import {
   bottleFlavorProfiles,
   bottleObservations,
   bottleReleases,
-  bottleTags,
-  bottleTombstones,
   bottles,
   bottlesToDistillers,
+  bottleTags,
+  bottleTombstones,
   changes,
   collectionBottles,
   entities,
   flightBottles,
+  legacyReleaseRepairReviews,
   reviews,
   storePriceMatchProposals,
   storePrices,
@@ -39,6 +40,12 @@ import {
   type ClassifierReviewedCreateParentResolution,
   type LegacyReleaseRepairClassifierParentCandidate,
 } from "@peated/server/lib/legacyReleaseRepairClassifier";
+import {
+  getLegacyReleaseRepairBottleFingerprint,
+  getLegacyReleaseRepairParentCandidatesFingerprint,
+  isMatchingLegacyReleaseRepairReview,
+  LEGACY_RELEASE_REPAIR_REVIEW_VERSION,
+} from "@peated/server/lib/legacyReleaseRepairReviewState";
 import { logError } from "@peated/server/lib/log";
 import { stripDuplicateBrandPrefixFromBottleName } from "@peated/server/lib/normalize";
 import { pushJob } from "@peated/server/worker/client";
@@ -242,6 +249,108 @@ async function getParentRowsForRepair({
           ),
     )
     .orderBy(sql`${bottles.totalTastings} DESC NULLS LAST`, desc(bottles.id));
+}
+
+async function getStoredClassifierResolutionForLegacyReleaseRepair({
+  legacyBottle,
+  legacyBottleId,
+  parentRows,
+  proposedParentFullName,
+  releaseIdentity,
+}: {
+  legacyBottle: Pick<
+    RepairBottle,
+    | "abv"
+    | "category"
+    | "caskFill"
+    | "caskSize"
+    | "caskStrength"
+    | "caskType"
+    | "edition"
+    | "fullName"
+    | "releaseYear"
+    | "singleCask"
+    | "statedAge"
+    | "vintageYear"
+  >;
+  legacyBottleId: number;
+  parentRows: LegacyReleaseRepairClassifierParentCandidate[];
+  proposedParentFullName: string;
+  releaseIdentity: {
+    edition: string | null;
+    releaseYear: number | null;
+  };
+}): Promise<ClassifierReviewedCreateParentResolution | null> {
+  const [review] = await db
+    .select({
+      blockedReason: legacyReleaseRepairReviews.blockedReason,
+      legacyBottleFingerprint:
+        legacyReleaseRepairReviews.legacyBottleFingerprint,
+      parentCandidatesFingerprint:
+        legacyReleaseRepairReviews.parentCandidatesFingerprint,
+      proposedParentFullName: legacyReleaseRepairReviews.proposedParentFullName,
+      releaseEdition: legacyReleaseRepairReviews.releaseEdition,
+      releaseYear: legacyReleaseRepairReviews.releaseYear,
+      resolution: legacyReleaseRepairReviews.resolution,
+      reviewedParentBottleId: legacyReleaseRepairReviews.reviewedParentBottleId,
+    })
+    .from(legacyReleaseRepairReviews)
+    .where(
+      and(
+        eq(legacyReleaseRepairReviews.legacyBottleId, legacyBottleId),
+        eq(
+          legacyReleaseRepairReviews.reviewVersion,
+          LEGACY_RELEASE_REPAIR_REVIEW_VERSION,
+        ),
+      ),
+    )
+    .limit(1);
+
+  if (
+    !review ||
+    !isMatchingLegacyReleaseRepairReview(
+      {
+        legacyBottleFingerprint:
+          getLegacyReleaseRepairBottleFingerprint(legacyBottle),
+        parentCandidatesFingerprint:
+          getLegacyReleaseRepairParentCandidatesFingerprint(parentRows),
+        proposedParentFullName,
+        releaseIdentity,
+      },
+      review,
+    )
+  ) {
+    return null;
+  }
+
+  if (review.resolution === "reuse_existing_parent") {
+    const parentBottle =
+      review.reviewedParentBottleId !== null
+        ? (parentRows.find((row) => row.id === review.reviewedParentBottleId) ??
+          null)
+        : null;
+    if (!parentBottle) {
+      return null;
+    }
+
+    return {
+      resolution: "reuse_existing_parent",
+      parentBottle,
+    };
+  }
+
+  if (review.resolution === "blocked") {
+    return {
+      resolution: "blocked",
+      message:
+        review.blockedReason ??
+        "Stored classifier review blocked this repair. Refresh the review for more detail.",
+    };
+  }
+
+  return {
+    resolution: "allow_create_parent",
+  };
 }
 
 async function getProposedParentBottleName(
@@ -928,11 +1037,26 @@ export async function applyLegacyReleaseRepair({
 
       if (parentMode === "create_parent") {
         classifierResolution =
-          await reviewLegacyCreateParentResolutionWithClassifier({
+          await getStoredClassifierResolutionForLegacyReleaseRepair({
             legacyBottle,
+            legacyBottleId,
             parentRows:
               parentRows as LegacyReleaseRepairClassifierParentCandidate[],
+            proposedParentFullName: repairIdentity.proposedParentFullName,
+            releaseIdentity: {
+              edition: repairIdentity.edition,
+              releaseYear: repairIdentity.releaseYear,
+            },
           });
+
+        if (!classifierResolution) {
+          classifierResolution =
+            await reviewLegacyCreateParentResolutionWithClassifier({
+              legacyBottle,
+              parentRows:
+                parentRows as LegacyReleaseRepairClassifierParentCandidate[],
+            });
+        }
       }
     }
   }

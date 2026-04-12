@@ -12,7 +12,11 @@ import {
   type LegacyReleaseRepairParentCandidate,
 } from "@peated/server/lib/legacyReleaseRepairCandidates";
 import { reviewLegacyCreateParentResolutionWithClassifier } from "@peated/server/lib/legacyReleaseRepairClassifier";
-import { LEGACY_RELEASE_REPAIR_REVIEW_VERSION } from "@peated/server/lib/legacyReleaseRepairReviewState";
+import {
+  getLegacyReleaseRepairBottleFingerprint,
+  getLegacyReleaseRepairParentCandidatesFingerprint,
+  LEGACY_RELEASE_REPAIR_REVIEW_VERSION,
+} from "@peated/server/lib/legacyReleaseRepairReviewState";
 import { and, desc, eq, sql } from "drizzle-orm";
 
 type LegacyReleaseRepairReviewBottle = Pick<
@@ -136,6 +140,8 @@ function normalizeReviewRow(
   return {
     ...row,
     blockedReason: row.blockedReason ?? null,
+    legacyBottleFingerprint: row.legacyBottleFingerprint ?? null,
+    parentCandidatesFingerprint: row.parentCandidatesFingerprint ?? null,
     releaseEdition: row.releaseEdition ?? null,
     releaseYear: row.releaseYear ?? null,
     reviewedParentBottleId: row.reviewedParentBottleId ?? null,
@@ -241,11 +247,17 @@ export async function refreshLegacyReleaseRepairReview({
       legacyBottle,
       parentRows: parentRows as LegacyReleaseRepairParentCandidate[],
     });
+  const legacyBottleFingerprint =
+    getLegacyReleaseRepairBottleFingerprint(legacyBottle);
+  const parentCandidatesFingerprint =
+    getLegacyReleaseRepairParentCandidatesFingerprint(parentRows);
 
   const [review] = await db
     .insert(legacyReleaseRepairReviews)
     .values({
       legacyBottleId,
+      legacyBottleFingerprint,
+      parentCandidatesFingerprint,
       proposedParentFullName: repairIdentity.proposedParentFullName,
       releaseEdition: repairIdentity.edition,
       releaseYear: repairIdentity.releaseYear,
@@ -265,6 +277,8 @@ export async function refreshLegacyReleaseRepairReview({
     .onConflictDoUpdate({
       target: legacyReleaseRepairReviews.legacyBottleId,
       set: {
+        legacyBottleFingerprint,
+        parentCandidatesFingerprint,
         proposedParentFullName: repairIdentity.proposedParentFullName,
         releaseEdition: repairIdentity.edition,
         releaseYear: repairIdentity.releaseYear,
