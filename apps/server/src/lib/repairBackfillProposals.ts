@@ -87,6 +87,12 @@ export type ReleaseRepairBackfillProposal = RepairBackfillProposalBase & {
     markerSources: string[];
     releaseYear: null | number;
   };
+  parentResolutionSource:
+    | "classifier_review_live"
+    | "classifier_review_persisted"
+    | "heuristic_exact"
+    | "heuristic_variant"
+    | null;
   repairMode: LegacyReleaseRepairParentMode;
   siblingCount: number;
   type: "release";
@@ -169,7 +175,10 @@ function isAutomationEligibleReleaseRepairCandidate(
 ): candidate is LegacyReleaseRepairCandidate & {
   repairMode: "existing_parent";
 } {
-  return candidate.repairMode === "existing_parent" && candidate.hasExactParent;
+  return (
+    candidate.repairMode === "existing_parent" &&
+    candidate.parentResolutionSource === "heuristic_exact"
+  );
 }
 
 function getReleaseRepairProposalAutomationAssessment(
@@ -179,9 +188,21 @@ function getReleaseRepairProposalAutomationAssessment(
 
   switch (candidate.repairMode) {
     case "existing_parent":
-      if (!candidate.hasExactParent) {
+      if (candidate.parentResolutionSource === "heuristic_variant") {
         automationBlockers.push(
           "release repair only has an exactish reusable parent match",
+        );
+      } else if (
+        candidate.parentResolutionSource === "classifier_review_persisted"
+      ) {
+        automationBlockers.push(
+          "release repair has a persisted classifier-reviewed reusable parent, but unattended apply still revalidates live at execution time",
+        );
+      } else if (
+        candidate.parentResolutionSource === "classifier_review_live"
+      ) {
+        automationBlockers.push(
+          "release repair only has a live classifier-reviewed reusable parent; refresh persisted review before unattended apply",
         );
       }
       break;
@@ -322,6 +343,7 @@ function toReleaseRepairBackfillProposal(
     blockingParent: candidate.blockingParent,
     proposedParent: candidate.proposedParent,
     releaseIdentity: candidate.releaseIdentity,
+    parentResolutionSource: candidate.parentResolutionSource,
     repairMode: candidate.repairMode,
     siblingCount: candidate.siblingLegacyBottles.length,
     totalTastings: candidate.legacyBottle.totalTastings,
