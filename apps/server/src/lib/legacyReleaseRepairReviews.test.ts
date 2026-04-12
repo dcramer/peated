@@ -1,6 +1,9 @@
 import { db } from "@peated/server/db";
 import { bottles, legacyReleaseRepairReviews } from "@peated/server/db/schema";
-import { refreshLegacyReleaseRepairReview } from "@peated/server/lib/legacyReleaseRepairReviews";
+import {
+  getLegacyReleaseRepairReviewBlockedReasonCategory,
+  refreshLegacyReleaseRepairReview,
+} from "@peated/server/lib/legacyReleaseRepairReviews";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -167,5 +170,41 @@ describe("refreshLegacyReleaseRepairReview", () => {
       .from(bottles)
       .where(eq(bottles.id, exactParent.id));
     expect(parentBottle?.fullName).toBe(exactParent.fullName);
+  });
+});
+
+describe("getLegacyReleaseRepairReviewBlockedReasonCategory", () => {
+  test("buckets the known classifier review blocker messages", () => {
+    expect(
+      getLegacyReleaseRepairReviewBlockedReasonCategory(
+        "Classifier could not review parent resolution: reference is too ambiguous",
+      ),
+    ).toBe("classifier_review_failed");
+    expect(
+      getLegacyReleaseRepairReviewBlockedReasonCategory(
+        "Classifier treated this bottle as exact-cask identity, so release repair cannot safely create a reusable parent bottle.",
+      ),
+    ).toBe("classifier_exact_cask");
+    expect(
+      getLegacyReleaseRepairReviewBlockedReasonCategory(
+        "Classifier pointed at a bottle outside the reviewed repair parent set.",
+      ),
+    ).toBe("classifier_outside_parent_set");
+    expect(
+      getLegacyReleaseRepairReviewBlockedReasonCategory(
+        "Classifier found a reusable parent candidate, but that bottle still has bottle-level release traits.",
+      ),
+    ).toBe("classifier_dirty_parent_candidate");
+    expect(
+      getLegacyReleaseRepairReviewBlockedReasonCategory(
+        "Classifier could not verify whether this repair should reuse an existing parent bottle or create a new one.",
+      ),
+    ).toBe("classifier_unresolved_parent_decision");
+    expect(
+      getLegacyReleaseRepairReviewBlockedReasonCategory("something else"),
+    ).toBe("other");
+    expect(getLegacyReleaseRepairReviewBlockedReasonCategory(null)).toBe(
+      "other",
+    );
   });
 });
