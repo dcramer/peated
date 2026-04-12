@@ -46,6 +46,14 @@ const LegacyReleaseRepairCandidateSchema = z.object({
     }),
   ),
   hasExactParent: z.boolean(),
+  parentResolutionSource: z
+    .enum([
+      "classifier_review_live",
+      "classifier_review_persisted",
+      "heuristic_exact",
+      "heuristic_variant",
+    ])
+    .nullable(),
   repairMode: z.enum([
     "existing_parent",
     "create_parent",

@@ -29,7 +29,7 @@ export const legacyReleaseRepairReviews = pgTable(
     resolution: legacyReleaseRepairReviewResolutionEnum("resolution").notNull(),
     reviewedParentBottleId: bigint("reviewed_parent_bottle_id", {
       mode: "number",
-    }).references(() => bottles.id),
+    }).references(() => bottles.id, { onDelete: "set null" }),
     blockedReason: text("blocked_reason"),
     reviewVersion: integer("review_version").default(1).notNull(),
     reviewedAt: timestamp("reviewed_at").defaultNow().notNull(),

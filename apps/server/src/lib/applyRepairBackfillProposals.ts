@@ -205,7 +205,10 @@ function isAutomationEligibleReleaseRepairCandidate(
 ): candidate is LegacyReleaseRepairCandidate & {
   repairMode: "existing_parent";
 } {
-  return candidate.repairMode === "existing_parent" && candidate.hasExactParent;
+  return (
+    candidate.repairMode === "existing_parent" &&
+    candidate.parentResolutionSource === "heuristic_exact"
+  );
 }
 
 function toApplicableReleaseRepairProposal(
