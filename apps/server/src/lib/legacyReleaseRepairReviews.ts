@@ -142,6 +142,58 @@ function normalizeReviewRow(
   };
 }
 
+export type LegacyReleaseRepairReviewBlockedReasonCategory =
+  | "classifier_review_failed"
+  | "classifier_exact_cask"
+  | "classifier_outside_parent_set"
+  | "classifier_dirty_parent_candidate"
+  | "classifier_unresolved_parent_decision"
+  | "other";
+
+export function getLegacyReleaseRepairReviewBlockedReasonCategory(
+  blockedReason: null | string,
+): LegacyReleaseRepairReviewBlockedReasonCategory {
+  if (!blockedReason) {
+    return "other";
+  }
+
+  if (
+    blockedReason.startsWith("Classifier could not review parent resolution:")
+  ) {
+    return "classifier_review_failed";
+  }
+
+  if (
+    blockedReason ===
+    "Classifier treated this bottle as exact-cask identity, so release repair cannot safely create a reusable parent bottle."
+  ) {
+    return "classifier_exact_cask";
+  }
+
+  if (
+    blockedReason ===
+    "Classifier pointed at a bottle outside the reviewed repair parent set."
+  ) {
+    return "classifier_outside_parent_set";
+  }
+
+  if (
+    blockedReason ===
+    "Classifier found a reusable parent candidate, but that bottle still has bottle-level release traits."
+  ) {
+    return "classifier_dirty_parent_candidate";
+  }
+
+  if (
+    blockedReason ===
+    "Classifier could not verify whether this repair should reuse an existing parent bottle or create a new one."
+  ) {
+    return "classifier_unresolved_parent_decision";
+  }
+
+  return "other";
+}
+
 export async function refreshLegacyReleaseRepairReview({
   legacyBottleId,
 }: {

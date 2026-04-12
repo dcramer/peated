@@ -21,7 +21,10 @@ import {
   getHeuristicLegacyReleaseRepairCandidates,
   type LegacyReleaseRepairCandidate,
 } from "@peated/server/lib/legacyReleaseRepairCandidates";
-import { refreshLegacyReleaseRepairReview } from "@peated/server/lib/legacyReleaseRepairReviews";
+import {
+  getLegacyReleaseRepairReviewBlockedReasonCategory,
+  refreshLegacyReleaseRepairReview,
+} from "@peated/server/lib/legacyReleaseRepairReviews";
 import { normalizeBottle } from "@peated/server/lib/normalize";
 import {
   getRepairBackfillProposals,
@@ -519,6 +522,14 @@ subcommand
       blocked: 0,
       reuse_existing_parent: 0,
     };
+    const blockedSummary = {
+      classifier_review_failed: 0,
+      classifier_exact_cask: 0,
+      classifier_outside_parent_set: 0,
+      classifier_dirty_parent_candidate: 0,
+      classifier_unresolved_parent_decision: 0,
+      other: 0,
+    };
 
     while (reviewed < limit) {
       const page = await getHeuristicLegacyReleaseRepairCandidates({
@@ -546,6 +557,13 @@ subcommand
 
         reviewed += 1;
         summary[review.resolution] += 1;
+        if (review.resolution === "blocked") {
+          blockedSummary[
+            getLegacyReleaseRepairReviewBlockedReasonCategory(
+              review.blockedReason,
+            )
+          ] += 1;
+        }
         console.log(formatReleaseRepairReviewSummaryLine(candidate));
         console.log(
           `  reviewed=${review.resolution} parent=${review.reviewedParentBottleId ?? "(create)"} blocked=${review.blockedReason ?? "(none)"}`,
@@ -569,6 +587,11 @@ subcommand
     console.log(
       `reuse_existing_parent=${summary.reuse_existing_parent} allow_create_parent=${summary.allow_create_parent} blocked=${summary.blocked}`,
     );
+    if (summary.blocked > 0) {
+      console.log(
+        `blocked reasons: classifier_review_failed=${blockedSummary.classifier_review_failed} classifier_exact_cask=${blockedSummary.classifier_exact_cask} classifier_outside_parent_set=${blockedSummary.classifier_outside_parent_set} classifier_dirty_parent_candidate=${blockedSummary.classifier_dirty_parent_candidate} classifier_unresolved_parent_decision=${blockedSummary.classifier_unresolved_parent_decision} other=${blockedSummary.other}`,
+      );
+    }
   });
 
 subcommand
