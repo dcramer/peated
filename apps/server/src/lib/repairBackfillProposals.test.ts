@@ -347,7 +347,7 @@ describe("getRepairBackfillProposals", () => {
           },
           siblingLegacyBottles: [],
           hasExactParent: true,
-          parentResolutionSource: "heuristic_exact",
+          parentResolutionSource: null,
           repairMode: "blocked_dirty_parent",
         },
       ],
@@ -527,6 +527,7 @@ describe("getRepairBackfillProposals", () => {
           automationBlockers: [
             "release repair has a persisted classifier-reviewed reusable parent, but unattended apply still revalidates live at execution time",
           ],
+          parentResolutionSource: "heuristic_variant",
         }),
         expect.objectContaining({
           type: "age",
@@ -696,6 +697,7 @@ describe("getRepairBackfillProposals", () => {
         type: "release",
         bottle: expect.objectContaining({ id: 11 }),
         automationEligible: true,
+        parentResolutionSource: "heuristic_exact",
       }),
       expect.objectContaining({
         type: "age",
@@ -957,7 +959,7 @@ describe("getRepairBackfillProposals", () => {
             },
           ],
           hasExactParent: true,
-          parentResolutionSource: "heuristic_exact",
+          parentResolutionSource: null,
           repairMode: "blocked_dirty_parent",
         },
       ],

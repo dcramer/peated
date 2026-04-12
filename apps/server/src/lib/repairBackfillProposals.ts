@@ -87,6 +87,12 @@ export type ReleaseRepairBackfillProposal = RepairBackfillProposalBase & {
     markerSources: string[];
     releaseYear: null | number;
   };
+  parentResolutionSource:
+    | "classifier_review_live"
+    | "classifier_review_persisted"
+    | "heuristic_exact"
+    | "heuristic_variant"
+    | null;
   repairMode: LegacyReleaseRepairParentMode;
   siblingCount: number;
   type: "release";
@@ -337,6 +343,7 @@ function toReleaseRepairBackfillProposal(
     blockingParent: candidate.blockingParent,
     proposedParent: candidate.proposedParent,
     releaseIdentity: candidate.releaseIdentity,
+    parentResolutionSource: candidate.parentResolutionSource,
     repairMode: candidate.repairMode,
     siblingCount: candidate.siblingLegacyBottles.length,
     totalTastings: candidate.legacyBottle.totalTastings,
