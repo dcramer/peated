@@ -340,11 +340,11 @@ describe("GET /bottles/release-repair-candidates", () => {
     });
   });
 
-  test("falls back to live classifier review when no stored review exists", async ({
+  test("keeps create-parent candidates unresolved when no stored review exists", async ({
     fixtures,
   }) => {
     const brand = await fixtures.Entity({ name: "Fallback Distillery" });
-    const reusableParent = await fixtures.Bottle({
+    await fixtures.Bottle({
       brandId: brand.id,
       name: "Session Archive",
       totalTastings: 30,
@@ -355,15 +355,6 @@ describe("GET /bottles/release-repair-candidates", () => {
       totalTastings: 6,
     });
     const user = await fixtures.User({ mod: true });
-
-    classifyBottleReferenceMock.mockResolvedValue({
-      ...createClassifierCreateBottleResult(),
-      decision: {
-        ...createClassifierCreateBottleResult().decision,
-        action: "match",
-        matchedBottleId: reusableParent.id,
-      },
-    });
 
     const result = await routerClient.bottles.releaseRepairCandidates(
       {
@@ -378,13 +369,14 @@ describe("GET /bottles/release-repair-candidates", () => {
       ),
     ).toMatchObject({
       hasExactParent: false,
-      parentResolutionSource: "classifier_review_live",
-      repairMode: "existing_parent",
+      parentResolutionSource: null,
+      repairMode: "create_parent",
       proposedParent: {
-        id: reusableParent.id,
-        fullName: reusableParent.fullName,
+        id: null,
+        fullName: "Fallback Distillery Warehouse Session",
       },
     });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
   test("rewrites create-parent candidates to existing-parent when classifier finds a reviewed parent", async ({
@@ -415,6 +407,7 @@ describe("GET /bottles/release-repair-candidates", () => {
     await refreshLegacyReleaseRepairReview({
       legacyBottleId: legacyBottle.id,
     });
+    classifyBottleReferenceMock.mockReset();
 
     const result = await routerClient.bottles.releaseRepairCandidates(
       {
@@ -436,6 +429,7 @@ describe("GET /bottles/release-repair-candidates", () => {
         fullName: reusableParent.fullName,
       },
     });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
   test("ignores stale stored reviews when the release identity changes", async ({
@@ -474,11 +468,6 @@ describe("GET /bottles/release-repair-candidates", () => {
       })
       .where(eq(bottles.id, legacyBottle.id));
 
-    classifyBottleReferenceMock.mockReset();
-    classifyBottleReferenceMock.mockResolvedValue(
-      createClassifierCreateBottleResult(),
-    );
-
     const result = await routerClient.bottles.releaseRepairCandidates(
       {
         query: "Warehouse Session",
@@ -503,6 +492,7 @@ describe("GET /bottles/release-repair-candidates", () => {
         markerSources: ["name_batch"],
       },
     });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
   test("blocks create-parent candidates when classifier cannot verify the parent decision", async ({
@@ -581,11 +571,7 @@ describe("GET /bottles/release-repair-candidates", () => {
     await refreshLegacyReleaseRepairReview({
       legacyBottleId: reviewedLegacy.id,
     });
-
     classifyBottleReferenceMock.mockReset();
-    classifyBottleReferenceMock.mockResolvedValue(
-      createClassifierCreateBottleResult(),
-    );
 
     const result = await routerClient.bottles.releaseRepairCandidates(
       {
@@ -609,6 +595,7 @@ describe("GET /bottles/release-repair-candidates", () => {
     expect(result.results[0].legacyBottle.id).not.toBe(
       highPriorityHeuristic.id,
     );
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
   test("flags sibling clusters behind a dirty exact-name parent as blocked", async ({
