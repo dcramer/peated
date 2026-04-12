@@ -83,6 +83,7 @@ function createClassifierCreateBottleResult() {
 
 function getLegacyBottleReviewFingerprintInput(legacyBottle: {
   abv?: null | number;
+  brandId?: null | number;
   category?: null | string;
   caskFill?: null | string;
   caskSize?: null | string;
@@ -97,6 +98,7 @@ function getLegacyBottleReviewFingerprintInput(legacyBottle: {
 }) {
   return {
     abv: legacyBottle.abv ?? null,
+    brandId: legacyBottle.brandId ?? null,
     category: legacyBottle.category ?? null,
     caskFill: legacyBottle.caskFill ?? null,
     caskSize: legacyBottle.caskSize ?? null,

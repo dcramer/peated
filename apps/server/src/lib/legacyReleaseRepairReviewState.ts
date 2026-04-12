@@ -12,6 +12,7 @@ type LegacyReleaseRepairReviewIdentity = {
 
 type LegacyReleaseRepairClassifierInputBottle = {
   abv: null | number;
+  brandId: null | number;
   category: null | string;
   caskFill: null | string;
   caskSize: null | string;
@@ -38,7 +39,6 @@ type LegacyReleaseRepairClassifierInputParent = {
   releaseYear: null | number;
   singleCask: null | boolean;
   statedAge: null | number;
-  totalTastings: null | number;
   vintageYear: null | number;
 };
 
@@ -46,6 +46,7 @@ export function getLegacyReleaseRepairBottleFingerprint(
   bottle: LegacyReleaseRepairClassifierInputBottle,
 ) {
   return sha1(
+    bottle.brandId,
     bottle.fullName,
     bottle.category,
     bottle.edition,
@@ -72,7 +73,6 @@ export function getLegacyReleaseRepairParentCandidatesFingerprint(
         row.id,
         row.fullName,
         row.category,
-        row.totalTastings,
         row.edition,
         row.statedAge,
         row.releaseYear,

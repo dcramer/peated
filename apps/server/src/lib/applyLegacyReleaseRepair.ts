@@ -261,6 +261,7 @@ async function getStoredClassifierResolutionForLegacyReleaseRepair({
   legacyBottle: Pick<
     RepairBottle,
     | "abv"
+    | "brandId"
     | "category"
     | "caskFill"
     | "caskSize"
