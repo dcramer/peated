@@ -541,10 +541,8 @@ describe("getRepairBackfillProposals", () => {
         expect.objectContaining({
           type: "release",
           bottle: expect.objectContaining({ id: 13 }),
-          automationEligible: false,
-          automationBlockers: [
-            "release repair has a persisted classifier-reviewed reusable parent, but unattended apply still revalidates live at execution time",
-          ],
+          automationEligible: true,
+          automationBlockers: [],
           parentResolutionSource: "classifier_review_persisted",
         }),
         expect.objectContaining({
@@ -680,23 +678,23 @@ describe("getRepairBackfillProposals", () => {
     });
 
     expect(result.summary).toEqual({
-      total: 2,
-      automationEligible: 2,
+      total: 3,
+      automationEligible: 3,
       automationBlocked: 0,
       byType: {
-        release: 1,
+        release: 2,
         age: 1,
         canon: 0,
       },
       byActionability: {
-        apply: 2,
+        apply: 3,
         blocked: 0,
         manual: 0,
       },
       byParentResolutionSource: {
         release: {
           classifier_review_live: 0,
-          classifier_review_persisted: 0,
+          classifier_review_persisted: 1,
           heuristic_exact: 1,
           heuristic_variant: 0,
           none: 0,
@@ -704,7 +702,7 @@ describe("getRepairBackfillProposals", () => {
       },
       byRepairMode: {
         release: {
-          existing_parent: 1,
+          existing_parent: 2,
           create_parent: 0,
           blocked_classifier: 0,
           blocked_alias_conflict: 0,
@@ -719,19 +717,27 @@ describe("getRepairBackfillProposals", () => {
         },
       },
     });
-    expect(result.proposals).toEqual([
-      expect.objectContaining({
-        type: "release",
-        bottle: expect.objectContaining({ id: 11 }),
-        automationEligible: true,
-        parentResolutionSource: "heuristic_exact",
-      }),
-      expect.objectContaining({
-        type: "age",
-        bottle: expect.objectContaining({ id: 21 }),
-        automationEligible: true,
-      }),
-    ]);
+    expect(result.proposals).toEqual(
+      expect.arrayContaining<RepairBackfillProposal>([
+        expect.objectContaining({
+          type: "release",
+          bottle: expect.objectContaining({ id: 11 }),
+          automationEligible: true,
+          parentResolutionSource: "heuristic_exact",
+        }),
+        expect.objectContaining({
+          type: "release",
+          bottle: expect.objectContaining({ id: 13 }),
+          automationEligible: true,
+          parentResolutionSource: "classifier_review_persisted",
+        }),
+        expect.objectContaining({
+          type: "age",
+          bottle: expect.objectContaining({ id: 21 }),
+          automationEligible: true,
+        }),
+      ]),
+    );
   });
 
   test("keeps paging until it finds the requested automation-eligible release proposals", async () => {

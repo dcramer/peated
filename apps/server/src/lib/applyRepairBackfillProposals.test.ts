@@ -438,8 +438,8 @@ describe("applyRepairBackfillProposals", () => {
     });
 
     expect(preview.summary).toEqual({
-      total: 2,
-      planned: 2,
+      total: 3,
+      planned: 3,
       applied: 0,
       failed: 0,
     });
@@ -447,6 +447,11 @@ describe("applyRepairBackfillProposals", () => {
       expect.objectContaining({
         type: "release",
         bottleId: 11,
+        status: "planned",
+      }),
+      expect.objectContaining({
+        type: "release",
+        bottleId: 13,
         status: "planned",
       }),
       expect.objectContaining({
@@ -464,9 +469,13 @@ describe("applyRepairBackfillProposals", () => {
       user,
     });
 
-    expect(applyLegacyReleaseRepairMock).toHaveBeenCalledTimes(1);
-    expect(applyLegacyReleaseRepairMock).toHaveBeenCalledWith({
+    expect(applyLegacyReleaseRepairMock).toHaveBeenCalledTimes(2);
+    expect(applyLegacyReleaseRepairMock).toHaveBeenNthCalledWith(1, {
       legacyBottleId: 11,
+      user,
+    });
+    expect(applyLegacyReleaseRepairMock).toHaveBeenNthCalledWith(2, {
+      legacyBottleId: 13,
       user,
     });
     expect(applyDirtyParentAgeRepairMock).toHaveBeenCalledTimes(1);
@@ -475,9 +484,9 @@ describe("applyRepairBackfillProposals", () => {
       user,
     });
     expect(execution.summary).toEqual({
-      total: 2,
+      total: 3,
       planned: 0,
-      applied: 2,
+      applied: 3,
       failed: 0,
     });
     expect(execution.items).toEqual([
@@ -486,6 +495,11 @@ describe("applyRepairBackfillProposals", () => {
         bottleId: 11,
         status: "applied",
         releaseId: 31,
+      }),
+      expect.objectContaining({
+        type: "release",
+        bottleId: 13,
+        status: "applied",
       }),
       expect.objectContaining({
         type: "age",
