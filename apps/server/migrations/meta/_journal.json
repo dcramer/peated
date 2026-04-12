@@ -1212,6 +1212,13 @@
       "when": 1775668277678,
       "tag": "0172_noisy_komodo",
       "breakpoints": false
+    },
+    {
+      "idx": 173,
+      "version": "7",
+      "when": 1775958070726,
+      "tag": "0173_flat_ben_urich",
+      "breakpoints": false
     }
   ]
 }

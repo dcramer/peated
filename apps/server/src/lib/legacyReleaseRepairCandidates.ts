@@ -3,10 +3,12 @@ import {
   bottleAliases,
   bottleReleases,
   bottles,
+  legacyReleaseRepairReviews,
   type Bottle,
 } from "@peated/server/db/schema";
 import { hasBottleLevelReleaseTraits } from "@peated/server/lib/bottleSchemaRules";
 import { reviewLegacyCreateParentResolutionWithClassifier } from "@peated/server/lib/legacyReleaseRepairClassifier";
+import { LEGACY_RELEASE_REPAIR_REVIEW_VERSION } from "@peated/server/lib/legacyReleaseRepairReviewState";
 import { and, desc, eq, isNotNull, isNull, or, sql } from "drizzle-orm";
 import {
   normalizeBottle,
@@ -74,19 +76,6 @@ type LegacyReleaseRepairBottle = Omit<
   totalTastings: null | number;
 };
 
-type LegacyReleaseRepairClassifierInputBottle = LegacyReleaseRepairBottle &
-  Pick<
-    Bottle,
-    | "statedAge"
-    | "abv"
-    | "singleCask"
-    | "caskStrength"
-    | "vintageYear"
-    | "caskType"
-    | "caskSize"
-    | "caskFill"
-  >;
-
 export type LegacyReleaseRepairParentCandidate = Pick<
   Bottle,
   | "abv"
@@ -123,7 +112,7 @@ type LegacyReleaseRepairParentMatchType = "exact" | "variant";
 
 export type DerivedLegacyReleaseRepairCandidate =
   LegacyReleaseRepairIdentity & {
-    bottle: LegacyReleaseRepairClassifierInputBottle;
+    bottle: LegacyReleaseRepairBottle;
   };
 
 export type LegacyReleaseRepairCandidate = {
@@ -189,6 +178,48 @@ function getLegacyReleaseRepairModePriority(
     case "blocked_dirty_parent":
       return 4;
   }
+}
+
+function sortLegacyReleaseRepairCandidates(
+  candidates: LegacyReleaseRepairCandidate[],
+) {
+  return [...candidates].sort((a, b) => {
+    const repairModePriority =
+      getLegacyReleaseRepairModePriority(a.repairMode) -
+      getLegacyReleaseRepairModePriority(b.repairMode);
+    if (repairModePriority !== 0) {
+      return repairModePriority;
+    }
+
+    if (a.siblingLegacyBottles.length !== b.siblingLegacyBottles.length) {
+      return b.siblingLegacyBottles.length - a.siblingLegacyBottles.length;
+    }
+
+    const aTastingCount = getTastingCount(a.legacyBottle.totalTastings);
+    const bTastingCount = getTastingCount(b.legacyBottle.totalTastings);
+
+    if (aTastingCount !== bTastingCount) {
+      return bTastingCount - aTastingCount;
+    }
+
+    return b.legacyBottle.id - a.legacyBottle.id;
+  });
+}
+
+function reviewMatchesLegacyReleaseRepairCandidate(
+  candidate: LegacyReleaseRepairCandidate,
+  review: {
+    proposedParentFullName: string;
+    releaseEdition: string | null;
+    releaseYear: number | null;
+  },
+) {
+  return (
+    review.proposedParentFullName.toLowerCase() ===
+      candidate.proposedParent.fullName.toLowerCase() &&
+    (review.releaseEdition ?? null) === candidate.releaseIdentity.edition &&
+    (review.releaseYear ?? null) === candidate.releaseIdentity.releaseYear
+  );
 }
 
 function getComparableParentNameTokens(fullName: string): string[] {
@@ -551,7 +582,7 @@ export function deriveLegacyReleaseRepairIdentity({
 }
 
 export function deriveLegacyReleaseRepairCandidate(
-  bottle: LegacyReleaseRepairClassifierInputBottle,
+  bottle: LegacyReleaseRepairBottle,
 ): DerivedLegacyReleaseRepairCandidate | null {
   const repairIdentity = deriveLegacyReleaseRepairIdentity({
     fullName: bottle.fullName,
@@ -632,12 +663,146 @@ export function resolveLegacyReleaseRepairNameScope({
   return "parent";
 }
 
-async function applyClassifierReviewToLegacyReleaseRepairCandidate(
+function applyStoredLegacyReleaseRepairReview({
+  candidate,
+  review,
+  reviewedParentById,
+}: {
+  candidate: LegacyReleaseRepairCandidate;
+  review:
+    | {
+        blockedReason: string | null;
+        proposedParentFullName: string;
+        releaseEdition: string | null;
+        releaseYear: number | null;
+        resolution: "allow_create_parent" | "blocked" | "reuse_existing_parent";
+        reviewedParentBottleId: number | null;
+      }
+    | undefined;
+  reviewedParentById: Map<number, LegacyReleaseRepairParentCandidate>;
+}): LegacyReleaseRepairCandidate {
+  if (
+    candidate.repairMode !== "create_parent" ||
+    !review ||
+    !reviewMatchesLegacyReleaseRepairCandidate(candidate, review)
+  ) {
+    return candidate;
+  }
+
+  if (review.resolution === "reuse_existing_parent") {
+    const reviewedParent =
+      review.reviewedParentBottleId !== null
+        ? (reviewedParentById.get(review.reviewedParentBottleId) ?? null)
+        : null;
+    if (!reviewedParent) {
+      return {
+        ...candidate,
+        classifierBlocker:
+          "Stored classifier review points at a missing parent bottle. Refresh the review before applying this repair.",
+        repairMode: "blocked_classifier",
+      } satisfies LegacyReleaseRepairCandidate;
+    }
+
+    if (hasBottleLevelReleaseTraits(reviewedParent)) {
+      return {
+        ...candidate,
+        classifierBlocker:
+          "Stored classifier-reviewed parent bottle still carries bottle-level release traits. Refresh the review after cleaning that parent.",
+        repairMode: "blocked_classifier",
+      } satisfies LegacyReleaseRepairCandidate;
+    }
+
+    return {
+      ...candidate,
+      classifierBlocker: null,
+      hasExactParent: false,
+      proposedParent: {
+        id: reviewedParent.id,
+        fullName: reviewedParent.fullName,
+        totalTastings: reviewedParent.totalTastings,
+      },
+      repairMode: "existing_parent",
+    } satisfies LegacyReleaseRepairCandidate;
+  }
+
+  if (review.resolution === "blocked") {
+    return {
+      ...candidate,
+      classifierBlocker:
+        review.blockedReason ??
+        "Stored classifier review blocked this repair. Refresh the review for more detail.",
+      repairMode: "blocked_classifier",
+    } satisfies LegacyReleaseRepairCandidate;
+  }
+
+  return candidate;
+}
+
+async function applyLiveLegacyReleaseRepairClassifierReview(
   candidate: LegacyReleaseRepairCandidate,
-  legacyBottle: LegacyReleaseRepairClassifierInputBottle,
-  parentRows: LegacyReleaseRepairParentCandidate[],
 ): Promise<LegacyReleaseRepairCandidate> {
   if (candidate.repairMode !== "create_parent") {
+    return candidate;
+  }
+
+  const [legacyBottle, parentRows] = await Promise.all([
+    db
+      .select({
+        id: bottles.id,
+        brandId: bottles.brandId,
+        category: bottles.category,
+        fullName: bottles.fullName,
+        edition: bottles.edition,
+        statedAge: bottles.statedAge,
+        abv: bottles.abv,
+        singleCask: bottles.singleCask,
+        caskStrength: bottles.caskStrength,
+        vintageYear: bottles.vintageYear,
+        releaseYear: bottles.releaseYear,
+        caskType: bottles.caskType,
+        caskSize: bottles.caskSize,
+        caskFill: bottles.caskFill,
+      })
+      .from(bottles)
+      .where(eq(bottles.id, candidate.legacyBottle.id))
+      .limit(1)
+      .then((rows) => rows[0] ?? null),
+    db
+      .select({
+        id: bottles.id,
+        fullName: bottles.fullName,
+        category: bottles.category,
+        totalTastings: bottles.totalTastings,
+        edition: bottles.edition,
+        statedAge: bottles.statedAge,
+        releaseYear: bottles.releaseYear,
+        vintageYear: bottles.vintageYear,
+        abv: bottles.abv,
+        singleCask: bottles.singleCask,
+        caskStrength: bottles.caskStrength,
+        caskFill: bottles.caskFill,
+        caskType: bottles.caskType,
+        caskSize: bottles.caskSize,
+      })
+      .from(bottles)
+      .where(
+        candidate.legacyBottle.brandId
+          ? and(
+              eq(bottles.brandId, candidate.legacyBottle.brandId),
+              sql`${bottles.id} != ${candidate.legacyBottle.id}`,
+            )
+          : and(
+              eq(
+                sql`LOWER(${bottles.fullName})`,
+                candidate.proposedParent.fullName.toLowerCase(),
+              ),
+              sql`${bottles.id} != ${candidate.legacyBottle.id}`,
+            ),
+      )
+      .orderBy(sql`${bottles.totalTastings} DESC NULLS LAST`, desc(bottles.id)),
+  ]);
+
+  if (!legacyBottle) {
     return candidate;
   }
 
@@ -655,10 +820,10 @@ async function applyClassifierReviewToLegacyReleaseRepairCandidate(
       proposedParent: {
         id: classifierResolution.parentBottle.id,
         fullName: classifierResolution.parentBottle.fullName,
-        totalTastings: classifierResolution.parentBottle.totalTastings ?? null,
+        totalTastings: classifierResolution.parentBottle.totalTastings,
       },
       repairMode: "existing_parent",
-    };
+    } satisfies LegacyReleaseRepairCandidate;
   }
 
   if (classifierResolution.resolution === "blocked") {
@@ -666,21 +831,13 @@ async function applyClassifierReviewToLegacyReleaseRepairCandidate(
       ...candidate,
       classifierBlocker: classifierResolution.message,
       repairMode: "blocked_classifier",
-    };
+    } satisfies LegacyReleaseRepairCandidate;
   }
 
   return candidate;
 }
 
-export async function getLegacyReleaseRepairCandidates({
-  query = "",
-  cursor = 1,
-  limit = 25,
-}: {
-  query?: string;
-  cursor?: number;
-  limit?: number;
-}) {
+async function listHeuristicLegacyReleaseRepairCandidates(query = "") {
   const suspiciousBottles = await db
     .select({
       id: bottles.id,
@@ -689,14 +846,6 @@ export async function getLegacyReleaseRepairCandidates({
       fullName: bottles.fullName,
       edition: bottles.edition,
       releaseYear: bottles.releaseYear,
-      statedAge: bottles.statedAge,
-      abv: bottles.abv,
-      singleCask: bottles.singleCask,
-      caskStrength: bottles.caskStrength,
-      vintageYear: bottles.vintageYear,
-      caskType: bottles.caskType,
-      caskSize: bottles.caskSize,
-      caskFill: bottles.caskFill,
       numReleases: sql<number>`COALESCE(${bottles.numReleases}, 0)::integer`,
       totalTastings: bottles.totalTastings,
     })
@@ -724,28 +873,17 @@ export async function getLegacyReleaseRepairCandidates({
     );
 
   if (derivedCandidates.length === 0) {
-    return {
-      results: [],
-      rel: {
-        nextCursor: null,
-        prevCursor: cursor > 1 ? cursor - 1 : null,
-      },
-    };
+    return [];
   }
 
   const groupedCandidates = new Map<
     string,
     DerivedLegacyReleaseRepairCandidate[]
   >();
-  const derivedCandidateByBottleId = new Map<
-    number,
-    DerivedLegacyReleaseRepairCandidate
-  >();
   const brandIds = new Set<number>();
   const parentNames = new Set<string>();
   for (const candidate of derivedCandidates) {
     const parentKey = candidate.proposedParentFullName.toLowerCase();
-    derivedCandidateByBottleId.set(candidate.bottle.id, candidate);
     brandIds.add(candidate.bottle.brandId);
     parentNames.add(parentKey);
     const group = groupedCandidates.get(parentKey) ?? [];
@@ -914,8 +1052,8 @@ export async function getLegacyReleaseRepairCandidates({
     });
   }
 
-  const filteredCandidates = derivedCandidates
-    .map((candidate) => {
+  return sortLegacyReleaseRepairCandidates(
+    derivedCandidates.map((candidate) => {
       const parentKey = candidate.proposedParentFullName.toLowerCase();
       const siblings =
         groupedCandidates
@@ -996,95 +1134,154 @@ export async function getLegacyReleaseRepairCandidates({
         hasExactParent: parentMatch.matchType === "exact",
         repairMode,
       } satisfies LegacyReleaseRepairCandidate;
-    })
-    .sort((a, b) => {
-      const repairModePriority =
-        getLegacyReleaseRepairModePriority(a.repairMode) -
-        getLegacyReleaseRepairModePriority(b.repairMode);
-      if (repairModePriority !== 0) {
-        return repairModePriority;
-      }
+    }),
+  );
+}
 
-      if (a.siblingLegacyBottles.length !== b.siblingLegacyBottles.length) {
-        return b.siblingLegacyBottles.length - a.siblingLegacyBottles.length;
-      }
-
-      const aTastingCount = getTastingCount(a.legacyBottle.totalTastings);
-      const bTastingCount = getTastingCount(b.legacyBottle.totalTastings);
-
-      if (aTastingCount !== bTastingCount) {
-        return bTastingCount - aTastingCount;
-      }
-
-      return b.legacyBottle.id - a.legacyBottle.id;
-    });
+export async function getHeuristicLegacyReleaseRepairCandidates({
+  query = "",
+  cursor = 1,
+  limit = 25,
+}: {
+  query?: string;
+  cursor?: number;
+  limit?: number;
+}) {
+  const filteredCandidates =
+    await listHeuristicLegacyReleaseRepairCandidates(query);
 
   const offset = (cursor - 1) * limit;
   const results = filteredCandidates.slice(offset, offset + limit + 1);
-  const classifierReviewByParentKey = new Map<
-    string,
-    Promise<LegacyReleaseRepairCandidate>
-  >();
-  const reviewedResults = await Promise.all(
-    results
-      .slice(0, limit)
-      .map(async (candidate): Promise<LegacyReleaseRepairCandidate> => {
+
+  return {
+    results: results.slice(0, limit),
+    rel: {
+      nextCursor: results.length > limit ? cursor + 1 : null,
+      prevCursor: cursor > 1 ? cursor - 1 : null,
+    },
+  };
+}
+
+export async function getLegacyReleaseRepairCandidates(args: {
+  query?: string;
+  cursor?: number;
+  limit?: number;
+}) {
+  const { query = "", cursor = 1, limit = 25 } = args;
+  const heuristicCandidates =
+    await listHeuristicLegacyReleaseRepairCandidates(query);
+  const createParentCandidates = heuristicCandidates.filter(
+    (candidate) => candidate.repairMode === "create_parent",
+  );
+
+  if (createParentCandidates.length === 0) {
+    const offset = (cursor - 1) * limit;
+    const results = heuristicCandidates.slice(offset, offset + limit + 1);
+
+    return {
+      results: results.slice(0, limit),
+      rel: {
+        nextCursor: results.length > limit ? cursor + 1 : null,
+        prevCursor: cursor > 1 ? cursor - 1 : null,
+      },
+    };
+  }
+
+  const reviewRows = await db
+    .select()
+    .from(legacyReleaseRepairReviews)
+    .where(
+      and(
+        sql`${legacyReleaseRepairReviews.legacyBottleId} IN (${sql.join(
+          createParentCandidates.map(
+            (candidate) => sql`${candidate.legacyBottle.id}`,
+          ),
+          sql`, `,
+        )})`,
+        eq(
+          legacyReleaseRepairReviews.reviewVersion,
+          LEGACY_RELEASE_REPAIR_REVIEW_VERSION,
+        ),
+      ),
+    );
+
+  const reviewByBottleId = new Map(
+    reviewRows.map((review) => [review.legacyBottleId, review]),
+  );
+  const reviewedParentIds = Array.from(
+    new Set(
+      reviewRows
+        .map((review) => review.reviewedParentBottleId)
+        .filter((value): value is number => value !== null),
+    ),
+  );
+  const reviewedParents =
+    reviewedParentIds.length > 0
+      ? await db
+          .select({
+            id: bottles.id,
+            fullName: bottles.fullName,
+            category: bottles.category,
+            totalTastings: bottles.totalTastings,
+            edition: bottles.edition,
+            statedAge: bottles.statedAge,
+            releaseYear: bottles.releaseYear,
+            vintageYear: bottles.vintageYear,
+            abv: bottles.abv,
+            singleCask: bottles.singleCask,
+            caskStrength: bottles.caskStrength,
+            caskFill: bottles.caskFill,
+            caskType: bottles.caskType,
+            caskSize: bottles.caskSize,
+          })
+          .from(bottles)
+          .where(
+            sql`${bottles.id} IN (${sql.join(
+              reviewedParentIds.map((id) => sql`${id}`),
+              sql`, `,
+            )})`,
+          )
+      : [];
+  const reviewedParentById = new Map(
+    reviewedParents.map((parent) => [parent.id, parent]),
+  );
+
+  const reviewedCandidates = sortLegacyReleaseRepairCandidates(
+    heuristicCandidates.map((candidate) =>
+      applyStoredLegacyReleaseRepairReview({
+        candidate,
+        review: reviewByBottleId.get(candidate.legacyBottle.id),
+        reviewedParentById,
+      }),
+    ),
+  );
+
+  const offset = (cursor - 1) * limit;
+  const pageResults = reviewedCandidates.slice(offset, offset + limit + 1);
+  const finalPageResults = sortLegacyReleaseRepairCandidates(
+    await Promise.all(
+      pageResults.slice(0, limit).map(async (candidate) => {
         if (candidate.repairMode !== "create_parent") {
           return candidate;
         }
 
-        const parentKey = `${candidate.legacyBottle.brandId}:${candidate.proposedParent.fullName.toLowerCase()}`;
-        const cachedReview = classifierReviewByParentKey.get(parentKey);
-        if (cachedReview) {
-          return cachedReview;
-        }
-
-        const parentRowsForCandidate =
-          brandParentRowsByBrandId.get(candidate.legacyBottle.brandId) ?? [];
-        const derivedCandidate = derivedCandidateByBottleId.get(
-          candidate.legacyBottle.id,
-        );
-        if (!derivedCandidate) {
+        const review = reviewByBottleId.get(candidate.legacyBottle.id);
+        if (
+          review &&
+          reviewMatchesLegacyReleaseRepairCandidate(candidate, review)
+        ) {
           return candidate;
         }
-        const reviewPromise =
-          applyClassifierReviewToLegacyReleaseRepairCandidate(
-            candidate,
-            derivedCandidate.bottle,
-            parentRowsForCandidate.filter(
-              (row) => row.id !== candidate.legacyBottle.id,
-            ),
-          );
-        classifierReviewByParentKey.set(parentKey, reviewPromise);
-        return reviewPromise;
+
+        return await applyLiveLegacyReleaseRepairClassifierReview(candidate);
       }),
+    ),
   );
-  reviewedResults.sort((a, b) => {
-    const repairModePriority =
-      getLegacyReleaseRepairModePriority(a.repairMode) -
-      getLegacyReleaseRepairModePriority(b.repairMode);
-    if (repairModePriority !== 0) {
-      return repairModePriority;
-    }
-
-    if (a.siblingLegacyBottles.length !== b.siblingLegacyBottles.length) {
-      return b.siblingLegacyBottles.length - a.siblingLegacyBottles.length;
-    }
-
-    const aTastingCount = getTastingCount(a.legacyBottle.totalTastings);
-    const bTastingCount = getTastingCount(b.legacyBottle.totalTastings);
-
-    if (aTastingCount !== bTastingCount) {
-      return bTastingCount - aTastingCount;
-    }
-
-    return b.legacyBottle.id - a.legacyBottle.id;
-  });
 
   return {
-    results: reviewedResults,
+    results: finalPageResults,
     rel: {
-      nextCursor: results.length > limit ? cursor + 1 : null,
+      nextCursor: pageResults.length > limit ? cursor + 1 : null,
       prevCursor: cursor > 1 ? cursor - 1 : null,
     },
   };
