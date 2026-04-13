@@ -5,6 +5,7 @@ import { applyLegacyReleaseRepair } from "@peated/server/lib/applyLegacyReleaseR
 import { applyRepairBackfillProposals } from "@peated/server/lib/applyRepairBackfillProposals";
 import { getDirtyParentAgeRepairCandidates } from "@peated/server/lib/dirtyParentAgeRepairCandidates";
 import { getLegacyReleaseRepairCandidates } from "@peated/server/lib/legacyReleaseRepairCandidates";
+import { refreshLegacyReleaseRepairReview } from "@peated/server/lib/legacyReleaseRepairReviews";
 
 vi.mock("@peated/server/lib/legacyReleaseRepairCandidates", () => ({
   getLegacyReleaseRepairCandidates: vi.fn(),
@@ -12,6 +13,10 @@ vi.mock("@peated/server/lib/legacyReleaseRepairCandidates", () => ({
 
 vi.mock("@peated/server/lib/dirtyParentAgeRepairCandidates", () => ({
   getDirtyParentAgeRepairCandidates: vi.fn(),
+}));
+
+vi.mock("@peated/server/lib/legacyReleaseRepairReviews", () => ({
+  refreshLegacyReleaseRepairReview: vi.fn(),
 }));
 
 vi.mock("@peated/server/lib/applyLegacyReleaseRepair", () => ({
@@ -30,6 +35,9 @@ const getLegacyReleaseRepairCandidatesMock = vi.mocked(
 const getDirtyParentAgeRepairCandidatesMock = vi.mocked(
   getDirtyParentAgeRepairCandidates,
 );
+const refreshLegacyReleaseRepairReviewMock = vi.mocked(
+  refreshLegacyReleaseRepairReview,
+);
 const applyLegacyReleaseRepairMock = vi.mocked(applyLegacyReleaseRepair);
 const applyDirtyParentAgeRepairMock = vi.mocked(applyDirtyParentAgeRepair);
 
@@ -42,6 +50,7 @@ const user = {
 describe("applyRepairBackfillProposals", () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    refreshLegacyReleaseRepairReviewMock.mockResolvedValue(null);
   });
 
   test("previews actionable release repairs across multiple pages without requiring a user", async () => {
@@ -506,6 +515,97 @@ describe("applyRepairBackfillProposals", () => {
         bottleId: 21,
         status: "applied",
         releaseId: 22,
+      }),
+    ]);
+  });
+
+  test("can refresh release reviews before collecting automation-safe release proposals", async () => {
+    getLegacyReleaseRepairCandidatesMock
+      .mockResolvedValueOnce({
+        rel: {
+          nextCursor: null,
+          prevCursor: null,
+        },
+        results: [
+          {
+            legacyBottle: {
+              id: 13,
+              fullName:
+                "Elijah Craig Barrel Proof Kentucky Straight Bourbon (Batch C923)",
+            },
+            proposedParent: {
+              id: null,
+              fullName: "Elijah Craig Barrel Proof",
+              totalTastings: null,
+            },
+            parentResolutionSource: null,
+            repairMode: "create_parent",
+          },
+        ],
+      } as any)
+      .mockResolvedValueOnce({
+        rel: {
+          nextCursor: null,
+          prevCursor: null,
+        },
+        results: [
+          {
+            legacyBottle: {
+              id: 13,
+              fullName:
+                "Elijah Craig Barrel Proof Kentucky Straight Bourbon (Batch C923)",
+            },
+            proposedParent: {
+              id: 14,
+              fullName: "Elijah Craig Barrel Proof",
+              totalTastings: 100,
+            },
+            hasExactParent: false,
+            parentResolutionSource: "classifier_review_persisted",
+            repairMode: "existing_parent",
+          },
+        ],
+      } as any);
+    getDirtyParentAgeRepairCandidatesMock.mockResolvedValue({
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
+      },
+      results: [],
+    } as any);
+
+    const result = await applyRepairBackfillProposals({
+      automationOnly: true,
+      perTypeLimit: 10,
+      refreshReleaseReviews: true,
+      types: ["release"],
+    });
+
+    expect(refreshLegacyReleaseRepairReviewMock).toHaveBeenCalledTimes(1);
+    expect(refreshLegacyReleaseRepairReviewMock).toHaveBeenCalledWith({
+      legacyBottleId: 13,
+    });
+    expect(getLegacyReleaseRepairCandidatesMock).toHaveBeenNthCalledWith(1, {
+      cursor: 1,
+      limit: 10,
+      query: "",
+    });
+    expect(getLegacyReleaseRepairCandidatesMock).toHaveBeenNthCalledWith(2, {
+      cursor: 1,
+      limit: 10,
+      query: "",
+    });
+    expect(result.summary).toEqual({
+      total: 1,
+      planned: 1,
+      applied: 0,
+      failed: 0,
+    });
+    expect(result.items).toEqual([
+      expect.objectContaining({
+        type: "release",
+        bottleId: 13,
+        status: "planned",
       }),
     ]);
   });

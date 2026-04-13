@@ -15,6 +15,7 @@ import {
   getLegacyReleaseRepairCandidates,
   type LegacyReleaseRepairCandidate,
 } from "@peated/server/lib/legacyReleaseRepairCandidates";
+import { refreshLegacyReleaseRepairReview } from "@peated/server/lib/legacyReleaseRepairReviews";
 
 const MAX_PAGE_SIZE = 100;
 
@@ -336,6 +337,47 @@ async function collectApplicableReleaseRepairProposals({
   });
 }
 
+async function refreshReleaseRepairReviews({
+  perTypeLimit,
+  query,
+}: {
+  perTypeLimit: number;
+  query: string;
+}) {
+  const pageSize = Math.min(MAX_PAGE_SIZE, perTypeLimit);
+  let cursor = 1;
+  let refreshed = 0;
+
+  while (refreshed < perTypeLimit) {
+    const page = await getLegacyReleaseRepairCandidates({
+      cursor,
+      limit: pageSize,
+      query,
+    });
+
+    for (const candidate of page.results) {
+      if (candidate.repairMode !== "create_parent") {
+        continue;
+      }
+
+      await refreshLegacyReleaseRepairReview({
+        legacyBottleId: candidate.legacyBottle.id,
+      });
+
+      refreshed += 1;
+      if (refreshed >= perTypeLimit) {
+        break;
+      }
+    }
+
+    if (!page.rel.nextCursor || page.results.length === 0) {
+      break;
+    }
+
+    cursor = page.rel.nextCursor;
+  }
+}
+
 async function collectApplicableAgeRepairProposals({
   automationOnly = false,
   perTypeLimit,
@@ -361,6 +403,7 @@ export async function applyRepairBackfillProposals({
   dryRun = true,
   perTypeLimit = 100,
   query = "",
+  refreshReleaseReviews: shouldRefreshReleaseReviews = false,
   types = ["release", "age"],
   user,
 }: {
@@ -368,6 +411,7 @@ export async function applyRepairBackfillProposals({
   dryRun?: boolean;
   perTypeLimit?: number;
   query?: string;
+  refreshReleaseReviews?: boolean;
   types?: BatchApplicableRepairBackfillProposalType[];
   user?: User;
 }): Promise<ApplyRepairBackfillProposalsResult> {
@@ -383,6 +427,13 @@ export async function applyRepairBackfillProposals({
   const items: ApplyRepairBackfillProposalItem[] = [];
 
   if (normalizedTypes.includes("release")) {
+    if (shouldRefreshReleaseReviews) {
+      await refreshReleaseRepairReviews({
+        perTypeLimit,
+        query,
+      });
+    }
+
     const releaseProposals = await collectApplicableReleaseRepairProposals({
       automationOnly,
       perTypeLimit,
