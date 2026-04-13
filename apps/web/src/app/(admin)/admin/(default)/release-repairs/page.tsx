@@ -43,6 +43,14 @@ const RESOLUTION_SOURCE_LABELS = {
   classifier_review_live: "Live classifier review",
 } as const;
 
+const REVIEW_STATE_LABELS = {
+  fresh_allow_create_parent: "Reviewed create-parent",
+  fresh_blocked: "Reviewed blocked",
+  fresh_reuse_existing_parent: "Reviewed reusable parent",
+  stale_review: "Stale review",
+  unreviewed: "Unreviewed",
+} as const;
+
 function formatTastingCount(value: null | number): string {
   return (value ?? 0).toLocaleString();
 }
@@ -74,6 +82,25 @@ function getResolutionSourceDescription(
       return "This repair reuses a persisted classifier-reviewed parent decision.";
     case "classifier_review_live":
       return "This repair reuses a live classifier-reviewed parent decision.";
+    case null:
+      return null;
+  }
+}
+
+function getReviewStateDescription(
+  reviewState: keyof typeof REVIEW_STATE_LABELS | null,
+) {
+  switch (reviewState) {
+    case "fresh_allow_create_parent":
+      return "Classifier review still supports creating a new reusable parent bottle.";
+    case "fresh_blocked":
+      return "Stored classifier review currently blocks this repair.";
+    case "fresh_reuse_existing_parent":
+      return "Stored classifier review currently supports reusing an existing parent bottle.";
+    case "stale_review":
+      return "A stored review exists, but the legacy bottle or parent set changed and it needs refresh.";
+    case "unreviewed":
+      return "This create-parent repair has not been classifier-reviewed yet.";
     case null:
       return null;
   }
@@ -315,6 +342,11 @@ export default function Page() {
                         }
                       </span>
                     ) : null}
+                    {candidate.reviewState ? (
+                      <span className="rounded-full border border-sky-800 bg-sky-950 px-2 py-1 text-xs font-medium text-sky-300">
+                        {REVIEW_STATE_LABELS[candidate.reviewState]}
+                      </span>
+                    ) : null}
                     {candidate.releaseIdentity.markerSources.map((source) => (
                       <span
                         key={source}
@@ -451,6 +483,11 @@ export default function Page() {
                       {getResolutionSourceDescription(
                         candidate.parentResolutionSource,
                       )}
+                    </div>
+                  ) : null}
+                  {candidate.reviewState ? (
+                    <div className="mt-3 text-sm text-sky-300">
+                      {getReviewStateDescription(candidate.reviewState)}
                     </div>
                   ) : null}
                   {candidate.blockingAlias ? (

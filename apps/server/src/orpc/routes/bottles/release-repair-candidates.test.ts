@@ -177,6 +177,49 @@ describe("GET /bottles/release-repair-candidates", () => {
     });
   });
 
+  test("does not treat generic batch naming labels as release markers", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Batch Name Distillery" });
+    const strengthBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Batch Strength",
+      totalTastings: 8,
+    });
+    const proofBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Batch Proof",
+      totalTastings: 6,
+    });
+    const sherryBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Batch Sherry",
+      totalTastings: 4,
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "Batch",
+      },
+      { context: { user } },
+    );
+
+    expect(result.results).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          legacyBottle: expect.objectContaining({ id: strengthBottle.id }),
+        }),
+        expect.objectContaining({
+          legacyBottle: expect.objectContaining({ id: proofBottle.id }),
+        }),
+        expect.objectContaining({
+          legacyBottle: expect.objectContaining({ id: sherryBottle.id }),
+        }),
+      ]),
+    );
+  });
+
   test("reuses an existing parent bottle for exactish generic-name variants", async ({
     fixtures,
   }) => {

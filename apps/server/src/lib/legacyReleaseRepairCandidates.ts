@@ -22,7 +22,9 @@ import {
   normalizeString,
 } from "./normalize";
 
-const LEGACY_RELEASE_MARKER_PATTERN = "batch|[0-9]{4}\\s+release";
+const LEGACY_RELEASE_BATCH_MARKER_PATTERN =
+  "batch(?:\\s*(?:no\\.?|number|#))?\\s*(?:[a-z]*\\d[a-z0-9.-]*)";
+const LEGACY_RELEASE_MARKER_PATTERN = `${LEGACY_RELEASE_BATCH_MARKER_PATTERN}|[0-9]{4}\\s+release`;
 const MAX_SCAN_LIMIT = 2000;
 const GENERIC_PARENT_NAME_TOKENS = new Set([
   "american",
@@ -127,6 +129,13 @@ export type LegacyReleaseRepairParentResolutionSource =
   | "heuristic_exact"
   | "heuristic_variant";
 
+export type LegacyReleaseRepairReviewState =
+  | "fresh_allow_create_parent"
+  | "fresh_blocked"
+  | "fresh_reuse_existing_parent"
+  | "stale_review"
+  | "unreviewed";
+
 type LegacyReleaseRepairParentMatchType = "exact" | "variant";
 
 export type DerivedLegacyReleaseRepairCandidate =
@@ -168,6 +177,7 @@ export type LegacyReleaseRepairCandidate = {
   hasExactParent: boolean;
   parentResolutionSource: LegacyReleaseRepairParentResolutionSource | null;
   repairMode: LegacyReleaseRepairParentMode;
+  reviewState?: LegacyReleaseRepairReviewState | null;
 };
 
 function escapeRegExp(value: string) {
@@ -518,13 +528,25 @@ export function normalizeComparableBottleName(fullName: string): string {
 
 function extractBatchEdition(fullName: string): string | null {
   const normalizedName = normalizeBottleBatchNumber(normalizeString(fullName));
+  const isReleaseLikeBatchEdition = (value: string) => {
+    const suffix = value
+      .replace(/^batch/i, "")
+      .replace(/^(?:\s*(?:no\.?|number|#))?/i, "")
+      .trim();
+
+    return /^(?:[a-z]*\d[a-z0-9.-]*)$/i.test(suffix);
+  };
   const parenthesized = normalizedName.match(/\((Batch [^)]+)\)/i);
-  if (parenthesized) {
+  if (parenthesized && isReleaseLikeBatchEdition(parenthesized[1])) {
     return parenthesized[1];
   }
 
   const inline = normalizedName.match(/\b(Batch [A-Za-z0-9.-]+)\b/i);
-  return inline?.[1] ?? null;
+  if (inline && isReleaseLikeBatchEdition(inline[1])) {
+    return inline[1];
+  }
+
+  return null;
 }
 
 export function deriveLegacyReleaseRepairIdentity({
@@ -706,9 +728,18 @@ function applyStoredLegacyReleaseRepairReview({
     | undefined;
   reviewedParentById: Map<number, LegacyReleaseRepairParentCandidate>;
 }): LegacyReleaseRepairCandidate {
+  if (candidate.repairMode !== "create_parent") {
+    return candidate;
+  }
+
+  if (!review) {
+    return {
+      ...candidate,
+      reviewState: "unreviewed",
+    } satisfies LegacyReleaseRepairCandidate;
+  }
+
   if (
-    candidate.repairMode !== "create_parent" ||
-    !review ||
     candidate.legacyBottleFingerprint == null ||
     candidate.parentCandidatesFingerprint == null ||
     !isMatchingLegacyReleaseRepairReview(
@@ -721,7 +752,10 @@ function applyStoredLegacyReleaseRepairReview({
       review,
     )
   ) {
-    return candidate;
+    return {
+      ...candidate,
+      reviewState: "stale_review",
+    } satisfies LegacyReleaseRepairCandidate;
   }
 
   if (review.resolution === "reuse_existing_parent") {
@@ -735,6 +769,7 @@ function applyStoredLegacyReleaseRepairReview({
         classifierBlocker:
           "Stored classifier review points at a missing parent bottle. Refresh the review before applying this repair.",
         repairMode: "blocked_classifier",
+        reviewState: "fresh_blocked",
       } satisfies LegacyReleaseRepairCandidate;
     }
 
@@ -744,6 +779,7 @@ function applyStoredLegacyReleaseRepairReview({
         classifierBlocker:
           "Stored classifier-reviewed parent bottle still carries bottle-level release traits. Refresh the review after cleaning that parent.",
         repairMode: "blocked_classifier",
+        reviewState: "fresh_blocked",
       } satisfies LegacyReleaseRepairCandidate;
     }
 
@@ -758,6 +794,7 @@ function applyStoredLegacyReleaseRepairReview({
         totalTastings: reviewedParent.totalTastings,
       },
       repairMode: "existing_parent",
+      reviewState: "fresh_reuse_existing_parent",
     } satisfies LegacyReleaseRepairCandidate;
   }
 
@@ -768,10 +805,14 @@ function applyStoredLegacyReleaseRepairReview({
         review.blockedReason ??
         "Stored classifier review blocked this repair. Refresh the review for more detail.",
       repairMode: "blocked_classifier",
+      reviewState: "fresh_blocked",
     } satisfies LegacyReleaseRepairCandidate;
   }
 
-  return candidate;
+  return {
+    ...candidate,
+    reviewState: "fresh_allow_create_parent",
+  } satisfies LegacyReleaseRepairCandidate;
 }
 
 async function listHeuristicLegacyReleaseRepairCandidates(query = "") {
@@ -1093,6 +1134,7 @@ async function listHeuristicLegacyReleaseRepairCandidates(query = "") {
               : "heuristic_variant"
             : null,
         repairMode,
+        reviewState: null,
       } satisfies LegacyReleaseRepairCandidate;
     }),
   );
@@ -1114,7 +1156,10 @@ export async function getHeuristicLegacyReleaseRepairCandidates({
   const results = filteredCandidates.slice(offset, offset + limit + 1);
 
   return {
-    results: results.slice(0, limit),
+    results: results.slice(0, limit).map((candidate) => ({
+      ...candidate,
+      reviewState: candidate.reviewState ?? null,
+    })),
     rel: {
       nextCursor: results.length > limit ? cursor + 1 : null,
       prevCursor: cursor > 1 ? cursor - 1 : null,
@@ -1220,7 +1265,10 @@ export async function getLegacyReleaseRepairCandidates(args: {
   const pageResults = reviewedCandidates.slice(offset, offset + limit + 1);
 
   return {
-    results: pageResults.slice(0, limit),
+    results: pageResults.slice(0, limit).map((candidate) => ({
+      ...candidate,
+      reviewState: candidate.reviewState ?? null,
+    })),
     rel: {
       nextCursor: pageResults.length > limit ? cursor + 1 : null,
       prevCursor: cursor > 1 ? cursor - 1 : null,
