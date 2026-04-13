@@ -618,6 +618,10 @@ subcommand
     "--automation-only",
     "Only preview or apply the unattended-safe proposal subset",
   )
+  .option(
+    "--refresh-release-reviews",
+    "Refresh persisted release reviews before collecting release proposals",
+  )
   .action(async (options) => {
     const perTypeLimit = Number.parseInt(options.limit, 10);
     if (!Number.isFinite(perTypeLimit) || perTypeLimit <= 0) {
@@ -630,6 +634,7 @@ subcommand
       dryRun: !options.execute,
       perTypeLimit,
       query: options.query,
+      refreshReleaseReviews: Boolean(options.refreshReleaseReviews),
       types,
       user: options.execute ? await getAutomationModeratorUser() : undefined,
     });
