@@ -36,6 +36,13 @@ const REPAIR_MODE_LABELS = {
   blocked_dirty_parent: "Dirty parent blocks repair",
 } as const;
 
+const RESOLUTION_SOURCE_LABELS = {
+  heuristic_exact: "Exact parent match",
+  heuristic_variant: "Variant parent match",
+  classifier_review_persisted: "Persisted classifier review",
+  classifier_review_live: "Live classifier review",
+} as const;
+
 function formatTastingCount(value: null | number): string {
   return (value ?? 0).toLocaleString();
 }
@@ -52,6 +59,23 @@ function getRepairModeDescription(repairMode: keyof typeof REPAIR_MODE_LABELS) {
       return "The proposed parent name is already owned by a different bottle or release alias and needs manual cleanup first.";
     case "blocked_dirty_parent":
       return "A matching parent bottle exists, but it still carries release traits. Repair that parent first, then retry the legacy child.";
+  }
+}
+
+function getResolutionSourceDescription(
+  parentResolutionSource: keyof typeof RESOLUTION_SOURCE_LABELS | null,
+) {
+  switch (parentResolutionSource) {
+    case "heuristic_exact":
+      return "This repair reuses an exact parent match from the current bottle data.";
+    case "heuristic_variant":
+      return "This repair reuses a variant/generic parent match from the current bottle data.";
+    case "classifier_review_persisted":
+      return "This repair reuses a persisted classifier-reviewed parent decision.";
+    case "classifier_review_live":
+      return "This repair reuses a live classifier-reviewed parent decision.";
+    case null:
+      return null;
   }
 }
 
@@ -282,6 +306,15 @@ export default function Page() {
                     <span className="rounded-full border border-slate-700 bg-slate-900 px-2 py-1 text-xs font-medium text-slate-300">
                       {REPAIR_MODE_LABELS[candidate.repairMode]}
                     </span>
+                    {candidate.parentResolutionSource ? (
+                      <span className="rounded-full border border-emerald-800 bg-emerald-950 px-2 py-1 text-xs font-medium text-emerald-300">
+                        {
+                          RESOLUTION_SOURCE_LABELS[
+                            candidate.parentResolutionSource
+                          ]
+                        }
+                      </span>
+                    ) : null}
                     {candidate.releaseIdentity.markerSources.map((source) => (
                       <span
                         key={source}
@@ -413,6 +446,13 @@ export default function Page() {
                       ? `${formatTastingCount(candidate.proposedParent.totalTastings)} tastings on the existing parent bottle.`
                       : getRepairModeDescription(candidate.repairMode)}
                   </div>
+                  {candidate.parentResolutionSource ? (
+                    <div className="mt-3 text-sm text-emerald-300">
+                      {getResolutionSourceDescription(
+                        candidate.parentResolutionSource,
+                      )}
+                    </div>
+                  ) : null}
                   {candidate.blockingAlias ? (
                     <div className="mt-3 text-sm text-amber-300">
                       Blocking alias currently points to{" "}
