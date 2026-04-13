@@ -8,6 +8,9 @@ import {
 } from "@peated/server/db/schema";
 import { hasBottleLevelReleaseTraits } from "@peated/server/lib/bottleSchemaRules";
 import {
+  getLegacyReleaseRepairBottleFingerprint,
+  getLegacyReleaseRepairParentCandidatesFingerprint,
+  isMatchingLegacyReleaseRepairReview,
   isMatchingLegacyReleaseRepairReviewIdentity,
   LEGACY_RELEASE_REPAIR_REVIEW_VERSION,
 } from "@peated/server/lib/legacyReleaseRepairReviewState";
@@ -65,10 +68,18 @@ type LegacyReleaseRepairBottle = Omit<
   Pick<
     Bottle,
     | "id"
+    | "abv"
     | "brandId"
+    | "caskFill"
+    | "caskSize"
+    | "caskStrength"
+    | "caskType"
     | "category"
     | "fullName"
     | "edition"
+    | "singleCask"
+    | "statedAge"
+    | "vintageYear"
     | "releaseYear"
     | "numReleases"
     | "totalTastings"
@@ -137,7 +148,9 @@ export type LegacyReleaseRepairCandidate = {
     totalTastings: number | null;
   };
   classifierBlocker: string | null;
+  legacyBottleFingerprint?: null | string;
   legacyBottle: LegacyReleaseRepairBottle;
+  parentCandidatesFingerprint?: null | string;
   proposedParent: {
     id: number | null;
     fullName: string;
@@ -682,6 +695,8 @@ function applyStoredLegacyReleaseRepairReview({
   review:
     | {
         blockedReason: string | null;
+        legacyBottleFingerprint: null | string;
+        parentCandidatesFingerprint: null | string;
         proposedParentFullName: string;
         releaseEdition: string | null;
         releaseYear: number | null;
@@ -694,7 +709,17 @@ function applyStoredLegacyReleaseRepairReview({
   if (
     candidate.repairMode !== "create_parent" ||
     !review ||
-    !reviewMatchesLegacyReleaseRepairCandidate(candidate, review)
+    candidate.legacyBottleFingerprint == null ||
+    candidate.parentCandidatesFingerprint == null ||
+    !isMatchingLegacyReleaseRepairReview(
+      {
+        legacyBottleFingerprint: candidate.legacyBottleFingerprint,
+        parentCandidatesFingerprint: candidate.parentCandidatesFingerprint,
+        proposedParentFullName: candidate.proposedParent.fullName,
+        releaseIdentity: candidate.releaseIdentity,
+      },
+      review,
+    )
   ) {
     return candidate;
   }
@@ -753,10 +778,18 @@ async function listHeuristicLegacyReleaseRepairCandidates(query = "") {
   const suspiciousBottles = await db
     .select({
       id: bottles.id,
+      abv: bottles.abv,
       brandId: bottles.brandId,
+      caskFill: bottles.caskFill,
+      caskSize: bottles.caskSize,
+      caskStrength: bottles.caskStrength,
+      caskType: bottles.caskType,
       category: bottles.category,
       fullName: bottles.fullName,
       edition: bottles.edition,
+      singleCask: bottles.singleCask,
+      statedAge: bottles.statedAge,
+      vintageYear: bottles.vintageYear,
       releaseYear: bottles.releaseYear,
       numReleases: sql<number>`COALESCE(${bottles.numReleases}, 0)::integer`,
       totalTastings: bottles.totalTastings,
@@ -1031,7 +1064,16 @@ async function listHeuristicLegacyReleaseRepairCandidates(query = "") {
               }
             : null,
         classifierBlocker: null,
+        legacyBottleFingerprint: getLegacyReleaseRepairBottleFingerprint(
+          candidate.bottle,
+        ),
         legacyBottle: candidate.bottle,
+        parentCandidatesFingerprint:
+          getLegacyReleaseRepairParentCandidatesFingerprint(
+            parentRowsForCandidate.filter(
+              (row) => row.id !== candidate.bottle.id,
+            ),
+          ),
         proposedParent: {
           id: parent?.id ?? null,
           fullName: parent?.fullName ?? candidate.proposedParentFullName,
