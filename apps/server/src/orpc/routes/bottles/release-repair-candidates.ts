@@ -54,6 +54,15 @@ const LegacyReleaseRepairCandidateSchema = z.object({
       "heuristic_variant",
     ])
     .nullable(),
+  reviewState: z
+    .enum([
+      "fresh_allow_create_parent",
+      "fresh_blocked",
+      "fresh_reuse_existing_parent",
+      "stale_review",
+      "unreviewed",
+    ])
+    .nullable(),
   repairMode: z.enum([
     "existing_parent",
     "create_parent",
@@ -93,5 +102,13 @@ export default procedure
     }),
   )
   .handler(async function ({ input }) {
-    return await getLegacyReleaseRepairCandidates(input);
+    const result = await getLegacyReleaseRepairCandidates(input);
+
+    return {
+      ...result,
+      results: result.results.map((candidate) => ({
+        ...candidate,
+        reviewState: candidate.reviewState ?? null,
+      })),
+    };
   });
