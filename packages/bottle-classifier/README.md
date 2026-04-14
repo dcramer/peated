@@ -109,6 +109,9 @@ These are the rules to preserve when iterating on the classifier:
 - If the parent bottle identity is clear and the new detail is release-level, prefer `create_release` over creating a whole new bottle.
 - Downstream consumers should adapt the reviewed classifier result instead of re-sanitizing raw model output.
 - Price-matching language such as `match_existing`, `correction`, and `create_new` does not belong in this package.
+- Deterministic fast paths must stay limited to structurally safe behavior that is effectively zero-ambiguity.
+- If the behavior depends on brand context, marketed family meaning, or program semantics, keep it classifier-owned.
+- If the input is too sparse to safely infer a canonical bottle, block or return `no_match` instead of guessing.
 
 ## File Map
 
@@ -152,6 +155,15 @@ When changing classifier behavior:
 3. Update or add realistic positive and negative eval fixtures when the behavior is model-sensitive.
 4. Keep prompts, schemas, deterministic review logic, and pure normalization helpers aligned. Do not patch around package behavior in the server wrapper.
 5. Re-run package tests and evals before touching downstream consumers.
+
+When adding a new bottle family or edge case:
+
+- add both a positive and a negative example when the family is ambiguous enough to regress
+- group those paired examples under a shared `contrastGroup` and use differing `contrastOutcome` values so corpus tests enforce the contrast
+- mark whether the case is `deterministic_safe`, `classifier_required`, or `block_if_uncertain`
+- record `peatedBottleIds` when the example came from a real Peated bottle page so future cleanup can trace back to the observed family
+- opt into `liveEvalCoverage: "required"` only for ambiguous cases that are worth paid classifier validation, plus rare exact-cask observation-detail cases where we need to prove the classifier preserves the program code as canonical identity
+- do not promote a variable semantic case into deterministic logic just to make a test pass
 
 Useful commands:
 

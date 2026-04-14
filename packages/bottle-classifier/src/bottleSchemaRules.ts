@@ -1,3 +1,11 @@
+/**
+ * Pure bottle-versus-release identity rules for already extracted structured
+ * fields.
+ *
+ * Keep this module structurally safe and brand-agnostic. If a decision depends
+ * on marketed family meaning or producer-specific semantics, it belongs in the
+ * reviewed classifier, not in these helpers.
+ */
 import type {
   BottleExtractedDetails,
   ProposedRelease,
@@ -231,6 +239,10 @@ function formatReleaseTraitLabel(
   }
 }
 
+/**
+ * Produces the canonical release identity after accounting for bottle-level
+ * stated-age carryover and dirty-parent conflicts.
+ */
 export function getResolvedReleaseIdentity({
   bottle,
   release,

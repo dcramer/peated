@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@peated/bottle-classifier": "workspace:*",
     "@peated/server": "workspace:*",
     "@peated/tsconfig": "workspace:*",
     "@sentry/node": "catalog:",

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { splitProposedBottleReleaseDraft } from "@peated/server/lib/bottleCreationDrafts";
+import { splitProposedBottleReleaseDraft } from "@peated/bottle-classifier/bottleCreationDrafts";
 
 describe("splitProposedBottleReleaseDraft", () => {
   test("moves release-only fields off the bottle draft", () => {

@@ -1,7 +1,7 @@
+import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import { reviews } from "@peated/server/db/schema";
 import { findBottleTarget, findEntity } from "@peated/server/lib/bottleFinder";
-import { normalizeBottle } from "@peated/server/lib/normalize";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq, isNull } from "drizzle-orm";

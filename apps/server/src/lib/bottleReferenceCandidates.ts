@@ -1,4 +1,8 @@
 import {
+  normalizeBottle,
+  normalizeString,
+} from "@peated/bottle-classifier/normalize";
+import {
   extractFromImage,
   extractFromText,
 } from "@peated/server/agents/whisky/labelExtractor";
@@ -19,7 +23,6 @@ import {
   normalizePotentialProofToAbv,
 } from "@peated/server/lib/abv";
 import { logError } from "@peated/server/lib/log";
-import { normalizeBottle, normalizeString } from "@peated/server/lib/normalize";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import {
   BottleCandidateSchema,

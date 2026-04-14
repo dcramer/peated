@@ -41,7 +41,8 @@ describe("deriveLegacyReleaseRepairIdentity", () => {
       });
 
       if (
-        example.expectation.heuristicExpectation !== "strong_release_marker"
+        example.expectation.deterministicReleaseExpectation !==
+        "strong_release_marker"
       ) {
         expect(result).toBeNull();
         return;

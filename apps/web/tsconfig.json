@@ -13,6 +13,10 @@
       }
     ],
     "paths": {
+      "@peated/bottle-classifier": [
+        "../../packages/bottle-classifier/src/index.ts"
+      ],
+      "@peated/bottle-classifier/*": ["../../packages/bottle-classifier/src/*"],
       "@peated/web/*": ["./src/*"],
       "@peated/server/*": ["../../apps/server/src/*"]
     }

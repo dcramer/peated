@@ -1,6 +1,6 @@
+import type { ReleaseIdentityInput } from "@peated/bottle-classifier/bottleSchemaRules";
 import { type AnyDatabase } from "@peated/server/db";
 import { bottleReleases } from "@peated/server/db/schema";
-import type { ReleaseIdentityInput } from "@peated/server/lib/bottleSchemaRules";
 import { and, eq, isNull, sql } from "drizzle-orm";
 
 function getBottleReleaseIdentityWhere({

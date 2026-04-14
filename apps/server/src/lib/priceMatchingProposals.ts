@@ -1,3 +1,12 @@
+import { inferBottleCreationTarget } from "@peated/bottle-classifier/bottleCreationDrafts";
+import {
+  DEFAULT_PRICE_MATCH_CREATION_TARGET,
+  getReleaseObservationFacts,
+} from "@peated/bottle-classifier/bottleSchemaRules";
+import {
+  normalizeBottle,
+  normalizeString,
+} from "@peated/bottle-classifier/normalize";
 import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
 import {
   BottleClassificationError,
@@ -24,10 +33,6 @@ import {
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
 import {
-  DEFAULT_PRICE_MATCH_CREATION_TARGET,
-  getReleaseObservationFacts,
-} from "@peated/server/lib/bottleSchemaRules";
-import {
   createBottleInTransaction,
   finalizeCreatedBottle,
 } from "@peated/server/lib/createBottle";
@@ -36,14 +41,12 @@ import {
   finalizeCreatedBottleRelease,
 } from "@peated/server/lib/createBottleRelease";
 import { logError } from "@peated/server/lib/log";
-import { normalizeBottle, normalizeString } from "@peated/server/lib/normalize";
 import {
   getStorePriceMatchAutomationAssessment,
   shouldVerifyStorePriceMatch,
   type StorePriceMatchAutomationAssessment,
 } from "@peated/server/lib/priceMatchingAutomation";
 import { getBottleMatchCandidateById } from "@peated/server/lib/priceMatchingCandidates";
-import { inferPriceMatchCreationTarget } from "@peated/server/lib/priceMatchingDraftNormalization";
 import {
   hasActiveStorePriceMatchProposalProcessingLease,
   refreshStorePriceMatchProposalProcessingLease,
@@ -837,7 +840,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     expectedProcessingToken,
   });
 
-  const creationTarget = inferPriceMatchCreationTarget({
+  const creationTarget = inferBottleCreationTarget({
     bottle: input,
     release: releaseInput,
   });

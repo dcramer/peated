@@ -1,8 +1,8 @@
-import { logError } from "@peated/server/lib/log";
 import {
   normalizeBottle,
   normalizeCategory,
-} from "@peated/server/lib/normalize";
+} from "@peated/bottle-classifier/normalize";
+import { logError } from "@peated/server/lib/log";
 import { orpcClient } from "@peated/server/lib/orpc-client/server";
 import { getUrl, type BottleReview } from "@peated/server/lib/scraper";
 import { absoluteUrl } from "@peated/server/lib/urls";

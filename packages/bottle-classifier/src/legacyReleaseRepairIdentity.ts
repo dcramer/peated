@@ -1,3 +1,14 @@
+/**
+ * Deterministic helpers for legacy release-repair discovery.
+ *
+ * This module is intentionally narrow. It may only derive parent/release
+ * boundaries from strong structural markers that are safe to interpret without
+ * brand-specific semantics, such as coded `Batch 24` markers or explicit
+ * `2011 Release` suffixes.
+ *
+ * If a split depends on marketed family meaning or brand/program context, this
+ * layer must leave the name untouched and let the reviewed classifier decide.
+ */
 import type {
   BottleExtractedDetails,
   ProposedRelease,
@@ -380,6 +391,12 @@ export function hasDirtyLegacyReleaseRepairParent(
   );
 }
 
+/**
+ * Normalizes bottle names for conservative parent matching.
+ *
+ * This removes only low-risk formatting differences such as batch formatting or
+ * age normalization. It must not introduce brand-specific canonicalization.
+ */
 export function normalizeComparableBottleName(fullName: string): string {
   const normalizedName = normalizeBottleBatchNumber(normalizeString(fullName));
   return normalizeBottleAge({ name: normalizedName })
@@ -410,6 +427,19 @@ function extractBatchEdition(fullName: string): string | null {
   return null;
 }
 
+/**
+ * Derives a release repair identity only from strong structural release
+ * markers already present in the source name or structured fields.
+ *
+ * Examples:
+ * - `Springbank 12 Cask Strength Batch 24` -> parent + `Batch 24`
+ * - `Lagavulin Distillers Edition 2011 Release` -> parent + `2011 Release`
+ *
+ * Counterexamples that must remain unsplit here:
+ * - `Macallan Double Cask`
+ * - `Four Roses Single Barrel`
+ * - `Maker's Mark Private Selection S2B13`
+ */
 export function deriveLegacyReleaseRepairIdentity({
   fullName,
   edition: structuredEdition = null,
@@ -487,6 +517,10 @@ export function deriveLegacyReleaseRepairIdentity({
   };
 }
 
+/**
+ * Determines whether a raw name still belongs to the parent bottle scope or to
+ * the derived release scope after a deterministic split.
+ */
 export function resolveLegacyReleaseRepairNameScope({
   name,
   proposedParentFullName,

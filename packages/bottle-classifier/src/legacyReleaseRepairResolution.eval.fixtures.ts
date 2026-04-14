@@ -104,22 +104,6 @@ function buildRepairEvalCase({
   };
 }
 
-const springbankParent = buildReviewedParent({
-  id: 640,
-  fullName: "Springbank 12 Cask Strength",
-  brand: "Springbank",
-  category: "single_malt",
-  statedAge: 12,
-  caskStrength: true,
-});
-
-const lagavulinDistillersEditionParent = buildReviewedParent({
-  id: 720,
-  fullName: "Lagavulin Distillers Edition",
-  brand: "Lagavulin",
-  category: "single_malt",
-});
-
 const makersPrivateSelectionParent = buildReviewedParent({
   id: 730,
   fullName: "Maker's Mark Private Selection",
@@ -145,42 +129,30 @@ const smwsExistingBottle = buildReviewedParent({
   singleCask: true,
 });
 
+const taliskerDistillersEditionParent = buildReviewedParent({
+  id: 740,
+  fullName: "Talisker The Distillers Edition",
+  brand: "Talisker",
+  category: "single_malt",
+});
+
 export const LEGACY_RELEASE_REPAIR_RESOLUTION_EVAL_CASES: LegacyReleaseRepairResolutionEvalCase[] =
   [
     buildRepairEvalCase({
-      corpusExampleId: "springbank-batch-release",
-      name: "repair resolution: reuses the existing Springbank parent for a numeric batch release",
+      corpusExampleId: "talisker-distillers-edition-2001",
+      name: "repair resolution: reuses a stable Distillers Edition parent for year-first releases",
       extractedIdentity: buildExtractedIdentity({
-        brand: "Springbank",
+        brand: "Talisker",
         category: "single_malt",
-        stated_age: 12,
-        cask_strength: true,
-        edition: "Batch 24",
+        release_year: 2001,
       }),
-      initialCandidates: [springbankParent.candidate],
-      reviewedParentRows: [springbankParent.parentRow],
+      initialCandidates: [taliskerDistillersEditionParent.candidate],
+      reviewedParentRows: [taliskerDistillersEditionParent.parentRow],
       expected: {
         resolution: "reuse_existing_parent",
-        parentBottleId: 640,
+        parentBottleId: 740,
         summary:
-          "Treat Batch 24 as release identity under the reusable Springbank 12 Cask Strength parent.",
-      },
-    }),
-    buildRepairEvalCase({
-      corpusExampleId: "lagavulin-distillers-edition-year-release",
-      name: "repair resolution: reuses Distillers Edition parent for annual release labels",
-      extractedIdentity: buildExtractedIdentity({
-        brand: "Lagavulin",
-        category: "single_malt",
-        release_year: 2011,
-      }),
-      initialCandidates: [lagavulinDistillersEditionParent.candidate],
-      reviewedParentRows: [lagavulinDistillersEditionParent.parentRow],
-      expected: {
-        resolution: "reuse_existing_parent",
-        parentBottleId: 720,
-        summary:
-          "Keep Distillers Edition as the reusable parent and attach the year-specific release beneath it.",
+          "A year-first Distillers Edition sibling should resolve to the reusable Talisker The Distillers Edition parent bottle rather than forcing create-parent.",
       },
     }),
     buildRepairEvalCase({

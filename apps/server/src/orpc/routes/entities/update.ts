@@ -1,3 +1,4 @@
+import { normalizeEntityName } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import {
@@ -11,7 +12,6 @@ import {
 } from "@peated/server/db/schema";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { logError } from "@peated/server/lib/log";
-import { normalizeEntityName } from "@peated/server/lib/normalize";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { EntityInputSchema, EntitySchema } from "@peated/server/schemas";

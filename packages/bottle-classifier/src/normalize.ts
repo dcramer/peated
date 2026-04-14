@@ -1,3 +1,12 @@
+/**
+ * Pure structural normalization helpers shared by the classifier and repair
+ * flows.
+ *
+ * This layer is limited to low-risk rewrites such as quote cleanup, age/year
+ * formatting, batch marker normalization, and other transformations that do not
+ * require brand or program semantics. Do not add bottle-family interpretation
+ * here; ambiguous meaning belongs to the reviewed classifier.
+ */
 import { CATEGORY_LIST } from "./classifierSchemas";
 
 const ageSuffix = "-year-old";
@@ -149,6 +158,10 @@ export function normalizeBottleBatchNumber(name: string) {
   );
 }
 
+/**
+ * Normalizes a bottle name and attached structured traits without making any
+ * brand-specific identity inferences.
+ */
 export function normalizeBottle({
   name,
   statedAge = null,

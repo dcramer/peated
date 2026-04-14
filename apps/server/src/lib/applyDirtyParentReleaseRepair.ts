@@ -1,7 +1,12 @@
+import { hasBottleLevelReleaseTraits } from "@peated/bottle-classifier/bottleSchemaRules";
 import {
   deriveLegacyReleaseRepairIdentity,
   resolveLegacyReleaseRepairNameScope,
 } from "@peated/bottle-classifier/legacyReleaseRepairIdentity";
+import {
+  normalizeString,
+  stripDuplicateBrandPrefixFromBottleName,
+} from "@peated/bottle-classifier/normalize";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, BottleRelease, User } from "@peated/server/db/schema";
 import {
@@ -18,7 +23,6 @@ import {
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
-import { hasBottleLevelReleaseTraits } from "@peated/server/lib/bottleSchemaRules";
 import {
   BottleReleaseAlreadyExistsError,
   BottleReleaseCreateBadRequestError,
@@ -26,10 +30,6 @@ import {
 } from "@peated/server/lib/createBottleRelease";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
-import {
-  normalizeString,
-  stripDuplicateBrandPrefixFromBottleName,
-} from "@peated/server/lib/normalize";
 import { pushJob } from "@peated/server/worker/client";
 import { and, desc, eq, isNull, sql } from "drizzle-orm";
 

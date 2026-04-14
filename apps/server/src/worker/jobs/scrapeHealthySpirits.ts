@@ -1,5 +1,8 @@
+import {
+  normalizeBottle,
+  normalizeVolume,
+} from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
-import { normalizeBottle, normalizeVolume } from "@peated/server/lib/normalize";
 import type { ScrapePricesCallback } from "@peated/server/lib/scraper";
 import scrapePrices, { getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { toTitleCase } from "@peated/server/lib/strings";

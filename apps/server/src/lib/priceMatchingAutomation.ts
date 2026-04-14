@@ -1,7 +1,7 @@
+import { hasExtractedReleaseIdentity } from "@peated/bottle-classifier/bottleSchemaRules";
+import { normalizeString } from "@peated/bottle-classifier/normalize";
 import { hasSupportiveWebEvidenceForExistingMatch as hasSupportiveBottleEvidence } from "@peated/bottle-classifier/priceMatchingEvidence";
 import type { StorePrice } from "@peated/server/db/schema";
-import { hasExtractedReleaseIdentity } from "@peated/server/lib/bottleSchemaRules";
-import { normalizeString } from "@peated/server/lib/normalize";
 import {
   type BottleCandidateSchema,
   type BottleCreationTargetEnum,

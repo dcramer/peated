@@ -1,3 +1,4 @@
+import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import type { StorePrice } from "@peated/server/db/schema";
 import {
@@ -7,7 +8,6 @@ import {
 } from "@peated/server/db/schema";
 import { findBottleTarget } from "@peated/server/lib/bottleFinder";
 import { upsertBottleAlias } from "@peated/server/lib/db";
-import { normalizeBottle } from "@peated/server/lib/normalize";
 import { chunked } from "@peated/server/lib/scraper";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";

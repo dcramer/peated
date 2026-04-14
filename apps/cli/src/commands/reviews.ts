@@ -1,9 +1,9 @@
+import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import { bottleAliases, reviews } from "@peated/server/db/schema";
 import { findBottleId } from "@peated/server/lib/bottleFinder";
 import { upsertBottleAlias } from "@peated/server/lib/db";
-import { normalizeBottle } from "@peated/server/lib/normalize";
 import { asc, eq } from "drizzle-orm";
 
 const subcommand = program.command("reviews");

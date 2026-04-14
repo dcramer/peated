@@ -1,7 +1,7 @@
 import {
   formatCanonicalReleaseName,
   type ReleaseIdentityInput,
-} from "@peated/server/lib/bottleSchemaRules";
+} from "@peated/bottle-classifier/bottleSchemaRules";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type {
   Category,

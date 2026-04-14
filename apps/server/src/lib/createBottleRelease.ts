@@ -1,14 +1,14 @@
-import { db, type AnyTransaction } from "@peated/server/db";
-import type { Bottle, BottleRelease, User } from "@peated/server/db/schema";
-import { bottleReleases, bottles, changes } from "@peated/server/db/schema";
-import { findExistingBottleReleaseByIdentity } from "@peated/server/lib/bottleReleaseIdentity";
 import {
   formatCanonicalReleaseName,
   getCanonicalReleaseAliasNames,
   getResolvedReleaseIdentity,
   hasBottleLevelReleaseTraits,
   hasDirtyBottleLevelStatedAgeConflict,
-} from "@peated/server/lib/bottleSchemaRules";
+} from "@peated/bottle-classifier/bottleSchemaRules";
+import { db, type AnyTransaction } from "@peated/server/db";
+import type { Bottle, BottleRelease, User } from "@peated/server/db/schema";
+import { bottleReleases, bottles, changes } from "@peated/server/db/schema";
+import { findExistingBottleReleaseByIdentity } from "@peated/server/lib/bottleReleaseIdentity";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
 import type { BottleReleaseInputSchema } from "@peated/server/schemas";

@@ -1,8 +1,87 @@
 import { describe, expect, test } from "vitest";
+import type { ProposedBottle } from "./classifierSchemas";
 
-import { splitProposedBottleReleaseDraft } from "./bottleCreationDrafts";
+import {
+  inferBottleCreationTarget,
+  normalizeBottleCreationDrafts,
+  normalizeProposedBottleDraft,
+  splitProposedBottleReleaseDraft,
+} from "./bottleCreationDrafts";
+
+function buildProposedBottle(): ProposedBottle {
+  return {
+    name: "Maker's Mark Private Selection 10 yr",
+    series: {
+      id: null,
+      name: "Private Selection",
+    },
+    category: "bourbon",
+    edition: "S2B13",
+    statedAge: 10,
+    caskStrength: true,
+    singleCask: true,
+    abv: 55.1,
+    vintageYear: 2014,
+    releaseYear: 2024,
+    caskType: "bourbon",
+    caskSize: "barrel",
+    caskFill: "1st_fill",
+    brand: {
+      id: null,
+      name: "Maker's Mark",
+    },
+    distillers: [
+      {
+        id: null,
+        name: "Maker’s Mark",
+      },
+      {
+        id: 12,
+        name: "Maker's Mark",
+      },
+    ],
+    bottler: {
+      id: 44,
+      name: "Maker’s Mark",
+    },
+  };
+}
 
 describe("splitProposedBottleReleaseDraft", () => {
+  test("normalizes proposed bottle drafts before splitting release fields", () => {
+    expect(normalizeProposedBottleDraft(buildProposedBottle())).toMatchObject({
+      name: "Private Selection 10-year-old",
+      statedAge: 10,
+      distillers: [
+        {
+          id: 12,
+          name: "Maker's Mark",
+        },
+      ],
+      bottler: null,
+    });
+  });
+
+  test("infers creation targets from the populated draft sides", () => {
+    expect(
+      inferBottleCreationTarget({
+        bottle: { name: "Bottle" },
+        release: { edition: "Batch 1" },
+      }),
+    ).toBe("bottle_and_release");
+    expect(
+      inferBottleCreationTarget({
+        bottle: { name: "Bottle" },
+      }),
+    ).toBe("bottle");
+    expect(
+      inferBottleCreationTarget({
+        release: { edition: "Batch 1" },
+      }),
+    ).toBe("release");
+    expect(inferBottleCreationTarget({})).toBeNull();
+  });
+
   test("moves release-only fields off the bottle draft", () => {
     const { proposedBottle, proposedRelease } = splitProposedBottleReleaseDraft(
       {
@@ -115,6 +194,46 @@ describe("splitProposedBottleReleaseDraft", () => {
     expect(proposedBottle.statedAge).toBe(18);
     expect(proposedRelease).toMatchObject({
       statedAge: 12,
+    });
+  });
+
+  test("normalizes creation drafts according to the requested target", () => {
+    const bottleOnly = normalizeBottleCreationDrafts({
+      creationTarget: "bottle",
+      proposedBottle: buildProposedBottle(),
+    });
+    expect(bottleOnly).toMatchObject({
+      creationTarget: "bottle",
+      proposedBottle: {
+        name: "Private Selection 10-year-old",
+      },
+      proposedRelease: null,
+    });
+
+    const releaseOnly = normalizeBottleCreationDrafts({
+      creationTarget: "release",
+      proposedBottle: buildProposedBottle(),
+    });
+    expect(releaseOnly).toMatchObject({
+      creationTarget: "release",
+      proposedBottle: null,
+      proposedRelease: {
+        edition: "S2B13",
+      },
+    });
+
+    const inferred = normalizeBottleCreationDrafts({
+      creationTarget: "bottle_and_release",
+      proposedBottle: buildProposedBottle(),
+    });
+    expect(inferred).toMatchObject({
+      creationTarget: "bottle_and_release",
+      proposedBottle: {
+        name: "Private Selection 10-year-old",
+      },
+      proposedRelease: {
+        edition: "S2B13",
+      },
     });
   });
 });

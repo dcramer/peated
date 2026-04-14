@@ -26,7 +26,7 @@ Classifier-owned infrastructure lives in:
 - `packages/bottle-classifier/src/normalize.ts`
 - `packages/bottle-classifier/src/legacyReleaseRepairIdentity.ts`
 - `packages/bottle-classifier/src/bottleCreationDrafts.ts`
-- `packages/bottle-classifier/src/bottleClassificationEvidence.ts`
+- `packages/bottle-classifier/src/priceMatchingEvidence.ts`
 
 Injected server adapters live in:
 
@@ -85,6 +85,15 @@ classifier policy and server consumers:
 
 Those helpers should stay package-owned and corpus-tested so server code can
 remain focused on retrieval, persistence, and automation policy.
+
+The rule for package-owned deterministic behavior is strict:
+
+- deterministic helpers may only own structurally safe, effectively zero-ambiguity behavior
+- if the behavior depends on brand context, marketed family meaning, or program semantics, it stays classifier-owned
+- if the input is too sparse to safely infer a canonical bottle, block instead of guessing
+- the normalization corpus should record real `peatedBottleIds` when an example came from an observed Peated bottle family
+- ambiguous families should use shared `contrastGroup` keys with differing `contrastOutcome` values so the corpus always carries a real positive/negative contrast
+- live eval coverage should stay narrow and explicit; only classifier-owned ambiguity should opt in
 
 For lightweight consumers and internal adapters, prefer the narrow package subpaths:
 
@@ -197,6 +206,7 @@ Notes:
 - the eval suite is intentionally a live LLM integration test; each case runs the classifier and then an LLM judge scores the result
 - the fixture set is meant to mirror production-style inputs such as SMWS listings, retailer titles, and user-entered shorthand names
 - the repair eval set specifically scores the repair-facing interpretation layer, not just raw classifier actions, so reusable-parent safety can be tracked separately from generic classification quality
+- new bottle families should add paired positive and negative examples whenever the wording is ambiguous enough to regress
 
 ## Internal Structure
 

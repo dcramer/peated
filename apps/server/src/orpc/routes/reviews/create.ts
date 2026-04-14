@@ -1,4 +1,5 @@
 import { call } from "@orpc/server";
+import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
@@ -7,7 +8,6 @@ import {
 } from "@peated/server/db/schema";
 import { findBottleTarget, findEntity } from "@peated/server/lib/bottleFinder";
 import { mapRows, upsertBottleAlias } from "@peated/server/lib/db";
-import { normalizeBottle } from "@peated/server/lib/normalize";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import {

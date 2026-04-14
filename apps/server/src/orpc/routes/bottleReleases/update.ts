@@ -1,11 +1,11 @@
-import { db } from "@peated/server/db";
-import { bottleReleases, bottles, changes } from "@peated/server/db/schema";
-import { findExistingBottleReleaseByIdentity } from "@peated/server/lib/bottleReleaseIdentity";
 import {
   formatCanonicalReleaseName,
   getResolvedReleaseIdentity,
   hasDirtyBottleLevelStatedAgeConflict,
-} from "@peated/server/lib/bottleSchemaRules";
+} from "@peated/bottle-classifier/bottleSchemaRules";
+import { db } from "@peated/server/db";
+import { bottleReleases, bottles, changes } from "@peated/server/db/schema";
+import { findExistingBottleReleaseByIdentity } from "@peated/server/lib/bottleReleaseIdentity";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";

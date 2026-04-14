@@ -2,6 +2,8 @@ import { describe, expect, test } from "vitest";
 
 import {
   normalizeBottle,
+  normalizeBottleAge,
+  normalizeBottleBatchNumber,
   normalizeCategory,
   normalizeEntityName,
   normalizeString,
@@ -10,6 +12,24 @@ import {
 } from "./normalize";
 
 describe("normalize", () => {
+  test("normalizes standalone age and batch helper expressions", () => {
+    expect(
+      normalizeBottleAge({
+        name: "Springbank 12 yo",
+      }),
+    ).toEqual({
+      name: "Springbank 12-year-old",
+      statedAge: 12,
+    });
+
+    expect(
+      normalizeBottleBatchNumber("Elijah Craig Barrel Proof Batch C923"),
+    ).toBe("Elijah Craig Barrel Proof (Batch C923)");
+    expect(normalizeBottleBatchNumber("Elijah Craig Small Batch")).toBe(
+      "Elijah Craig Small Batch",
+    );
+  });
+
   test("normalizes age expressions into bottle identity", () => {
     expect(
       normalizeBottle({
