@@ -1,8 +1,18 @@
+import { inferBottleCreationTarget } from "@peated/bottle-classifier/bottleCreationDrafts";
+import {
+  normalizeBottle,
+  normalizeString,
+} from "@peated/bottle-classifier/normalize";
+import {
+  DEFAULT_PRICE_MATCH_CREATION_TARGET,
+  getReleaseObservationFacts,
+} from "@peated/bottle-classifier/releaseIdentity";
+import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
 import {
   BottleClassificationError,
   classifyBottleReference,
   isIgnoredBottleClassification,
-  type BottleMatchDecision,
+  type BottleClassificationDecision,
 } from "@peated/server/agents/bottleClassifier";
 import config from "@peated/server/config";
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
@@ -23,10 +33,6 @@ import {
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
 import {
-  DEFAULT_PRICE_MATCH_CREATION_TARGET,
-  getReleaseObservationFacts,
-} from "@peated/server/lib/bottleSchemaRules";
-import {
   createBottleInTransaction,
   finalizeCreatedBottle,
 } from "@peated/server/lib/createBottle";
@@ -35,14 +41,12 @@ import {
   finalizeCreatedBottleRelease,
 } from "@peated/server/lib/createBottleRelease";
 import { logError } from "@peated/server/lib/log";
-import { normalizeBottle, normalizeString } from "@peated/server/lib/normalize";
 import {
   getStorePriceMatchAutomationAssessment,
   shouldVerifyStorePriceMatch,
   type StorePriceMatchAutomationAssessment,
 } from "@peated/server/lib/priceMatchingAutomation";
 import { getBottleMatchCandidateById } from "@peated/server/lib/priceMatchingCandidates";
-import { inferPriceMatchCreationTarget } from "@peated/server/lib/priceMatchingDraftNormalization";
 import {
   hasActiveStorePriceMatchProposalProcessingLease,
   refreshStorePriceMatchProposalProcessingLease,
@@ -52,7 +56,6 @@ import {
   CLOSED_STORE_PRICE_MATCH_PROPOSAL_STATUSES,
   REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES,
 } from "@peated/server/lib/priceMatchingStatus";
-import { parseDetailsFromName } from "@peated/server/lib/smws";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import type {
   BottleInputSchema,
@@ -143,9 +146,9 @@ function shouldAutoIgnoreTrivialNonWhiskyListing(name: string): boolean {
 }
 
 function normalizeClassifierDecisionForPriceMatching(
-  decision: BottleMatchDecision,
+  decision: BottleClassificationDecision,
   candidates: PriceMatchCandidate[],
-): BottleMatchDecision {
+): BottleClassificationDecision {
   if (
     decision.action === "match" &&
     !candidates.some(
@@ -194,7 +197,7 @@ function toStorePriceMatchDecision({
   decision,
 }: {
   price: Pick<StorePrice, "bottleId" | "releaseId">;
-  decision: BottleMatchDecision;
+  decision: BottleClassificationDecision;
 }): StorePriceMatchDecision {
   if (decision.action === "match") {
     const action =
@@ -837,7 +840,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     expectedProcessingToken,
   });
 
-  const creationTarget = inferPriceMatchCreationTarget({
+  const creationTarget = inferBottleCreationTarget({
     bottle: input,
     release: releaseInput,
   });

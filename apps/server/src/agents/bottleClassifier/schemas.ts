@@ -5,17 +5,16 @@ export {
   BottleClassifierAgentResponseSchema,
   BottleExtractedDetailsSchema,
   BottleIdentityScopeEnum,
-  BottleMatchDecisionSchema,
   BottleObservationSchema,
   BottleSearchEvidenceSchema,
   EntityResolutionSchema,
-} from "@peated/bottle-classifier";
+} from "@peated/bottle-classifier/internal/types";
 export type {
   BottleCandidate,
+  BottleClassificationDecision,
   BottleClassifierAgentDecision,
   BottleExtractedDetails,
-  BottleMatchDecision,
   BottleObservation,
   BottleSearchEvidence,
   EntityResolution,
-} from "@peated/bottle-classifier";
+} from "@peated/bottle-classifier/internal/types";

@@ -1,10 +1,10 @@
-import { normalizeBottle } from "@peated/server/lib/normalize";
-import { getUrl, handleBottle } from "@peated/server/lib/scraper";
+import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import {
   parseCaskType,
   parseDetailsFromName,
   parseFlavorProfile,
-} from "@peated/server/lib/smws";
+} from "@peated/bottle-classifier/smws";
+import { getUrl, handleBottle } from "@peated/server/lib/scraper";
 import {
   type BottleInputSchema,
   type StorePriceInputSchema,

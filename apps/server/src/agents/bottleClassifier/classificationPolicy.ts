@@ -1,4 +1,4 @@
 export {
   finalizeBottleReferenceClassification,
   shouldAutoIgnoreBottleReference,
-} from "@peated/bottle-classifier";
+} from "@peated/bottle-classifier/internal/policy";

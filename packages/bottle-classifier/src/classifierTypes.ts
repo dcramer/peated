@@ -461,11 +461,17 @@ export const SearchEntitiesResultSchema = z.object({
   results: z.array(EntityResolutionSchema),
 });
 
-export const BottleMatchDecisionSchema = BottleClassificationDecisionSchema;
-
 export type BottleExtractedDetails = z.infer<
   typeof BottleExtractedDetailsSchema
 >;
+export type BottleEvidenceSourceTier = z.infer<
+  typeof BottleEvidenceSourceTierEnum
+>;
+export type BottleEvidenceCheck = z.infer<typeof BottleEvidenceCheckSchema>;
+export type CaskFill = z.infer<typeof CaskFillEnum>;
+export type CaskSize = z.infer<typeof CaskSizeEnum>;
+export type CaskType = z.infer<typeof CaskTypeEnum>;
+export type Category = z.infer<typeof CategoryEnum>;
 export type BottleCandidate = z.infer<typeof BottleCandidateSchema>;
 export type BottleSearchEvidence = z.infer<typeof BottleSearchEvidenceSchema>;
 export type BottleCandidateSearchInput = z.infer<
@@ -475,7 +481,9 @@ export type SearchEntitiesArgs = z.infer<typeof SearchEntitiesArgsSchema>;
 export type BottleClassifierAgentDecision = z.infer<
   typeof BottleClassifierAgentDecisionSchema
 >;
-export type BottleMatchDecision = z.infer<typeof BottleMatchDecisionSchema>;
+export type BottleClassificationDecision = z.infer<
+  typeof BottleClassificationDecisionSchema
+>;
 export type BottleObservation = z.infer<typeof BottleObservationSchema>;
 export type EntityResolution = z.infer<typeof EntityResolutionSchema>;
 export type ProposedBottle = z.infer<typeof ProposedBottleSchema>;

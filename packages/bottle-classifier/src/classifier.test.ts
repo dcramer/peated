@@ -3,13 +3,13 @@ import { describe, expect, test, vi } from "vitest";
 import {
   createBottleClassifier,
   type RunBottleClassifierAgentInput,
-} from "./classifier";
-import type { BottleClassificationArtifacts } from "./contract";
+} from "./classifierRuntime";
 import type {
   BottleCandidate,
   BottleClassifierAgentDecision,
   BottleExtractedDetails,
-} from "./schemas";
+} from "./classifierTypes";
+import type { BottleClassificationArtifacts } from "./contract";
 
 type ReasoningResult = {
   decision: BottleClassifierAgentDecision;
@@ -595,6 +595,177 @@ describe("createBottleClassifier", () => {
     });
   });
 
+  test("does not invent a branded bottle from sparse generic batch wording", async () => {
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "create_bottle_and_release",
+          confidence: 80,
+          rationale:
+            "Web evidence suggests Johnnie Walker Blenders' Batch Sherry Cask Finish EXP#7.",
+          identityScope: "product",
+          observation: {
+            selector: "Batch Sherry",
+            caskNumber: null,
+            barrelNumber: null,
+            bottleNumber: null,
+            outturn: null,
+            market: "travel-retail",
+            exclusive: "travel-retail",
+          },
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [],
+          proposedBottle: {
+            name: "Blenders' Sherry Cask Finish",
+            series: {
+              id: null,
+              name: "Blenders' Batch",
+            },
+            category: "blend",
+            edition: null,
+            statedAge: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: null,
+              name: "Johnnie Walker",
+            },
+            distillers: [],
+            bottler: null,
+          },
+          proposedRelease: {
+            edition: "EXP#7",
+            statedAge: 12,
+            abv: 40,
+            caskStrength: false,
+            singleCask: false,
+            vintageYear: null,
+            releaseYear: 2018,
+            caskType: "other",
+            caskSize: null,
+            caskFill: null,
+            description: "Sherry cask finish travel-retail release.",
+            tastingNotes: null,
+            imageUrl: null,
+          },
+        },
+        artifacts: {
+          extractedIdentity: null,
+          searchEvidence: [],
+          candidates: [],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity: null,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Batch Sherry",
+      },
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "no_match",
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId: null,
+    });
+    expect(result.decision.rationale).toContain(
+      "expanded too far beyond a sparse unanchored reference",
+    );
+  });
+
+  test("keeps a matched bottle when the only name difference is a canonical proof suffix", async () => {
+    const rareBreedRyeMatch: BottleCandidate = {
+      bottleId: 501,
+      releaseId: null,
+      kind: "bottle",
+      alias: null,
+      fullName: "Wild Turkey Rare Breed Rye Barrel Proof",
+      bottleFullName: "Wild Turkey Rare Breed Rye Barrel Proof",
+      brand: "Wild Turkey",
+      bottler: null,
+      series: "Rare Breed",
+      distillery: [],
+      category: "rye",
+      statedAge: null,
+      edition: null,
+      caskStrength: true,
+      singleCask: null,
+      abv: 56.1,
+      vintageYear: null,
+      releaseYear: null,
+      caskType: null,
+      caskSize: null,
+      caskFill: null,
+      score: 0.93,
+      source: ["text"],
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async ({ initialCandidates }): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 90,
+          rationale: "Recovered the exact Rare Breed Rye bottle.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 501,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [501],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity: wildTurkeyRareBreedRyeIdentity,
+          searchEvidence: [],
+          candidates: initialCandidates,
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity: wildTurkeyRareBreedRyeIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Wild Turkey Rare Breed Rye",
+        url: "https://example.com/products/rare-breed-rye",
+      },
+      extractedIdentity: wildTurkeyRareBreedRyeIdentity,
+      initialCandidates: [rareBreedRyeMatch],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "match",
+      matchedBottleId: 501,
+    });
+  });
+
   test("promotes a bottle match into create_release when extracted identity includes batch-level detail", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Elijah Craig",
@@ -698,6 +869,128 @@ describe("createBottleClassifier", () => {
           candidateBottleIds: [2457],
           proposedBottle: null,
           proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [glenglassaughRareCaskParentCandidate],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Glenglassaugh 1978 Rare Cask Release (Batch 1) 35-year-old",
+      },
+      extractedIdentity,
+      initialCandidates: [glenglassaughRareCaskParentCandidate],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "create_release",
+      parentBottleId: 2457,
+      identityScope: "product",
+      proposedRelease: {
+        edition: "Batch 1",
+        statedAge: 35,
+      },
+    });
+  });
+
+  test("promotes dirty-parent bottle-and-release creation into create_release instead of exact-cask bottle creation", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Glenglassaugh",
+      bottler: null,
+      expression: "1978 Rare Cask Release",
+      series: null,
+      distillery: ["Glenglassaugh"],
+      category: "single_malt",
+      stated_age: 35,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: "Batch 1",
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "create_bottle_and_release",
+          confidence: 80,
+          rationale:
+            "Batch 1 and the differing 35-year age need a child release beneath the Rare Cask Release family.",
+          identityScope: "product",
+          observation: {
+            selector: "shop.example Glenglassaugh Rare Cask Batch 1 listing",
+            caskNumber: "casks 1803, 1810 (reported by producer/press)",
+            barrelNumber: null,
+            bottleNumber: null,
+            outturn: null,
+            market: null,
+            exclusive: null,
+          },
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [2457],
+          proposedBottle: {
+            name: "Rare Cask Release",
+            series: {
+              id: null,
+              name: "Rare Cask Release",
+            },
+            category: "single_malt",
+            edition: "Batch 1",
+            statedAge: 35,
+            caskStrength: null,
+            singleCask: true,
+            abv: null,
+            vintageYear: 1978,
+            releaseYear: 2014,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: null,
+              name: "Glenglassaugh",
+            },
+            distillers: [
+              {
+                id: null,
+                name: "Glenglassaugh",
+              },
+            ],
+            bottler: null,
+          },
+          proposedRelease: {
+            edition: "Batch 1",
+            statedAge: 35,
+            abv: null,
+            caskStrength: null,
+            singleCask: true,
+            vintageYear: 1978,
+            releaseYear: 2014,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            description: null,
+            tastingNotes: null,
+            imageUrl: null,
+          },
         },
         artifacts: {
           extractedIdentity,
@@ -1572,5 +1865,119 @@ describe("createBottleClassifier", () => {
     expect(result.decision.rationale).toContain(
       "exact-cask identity cannot create a child release beneath the bottle",
     );
+  });
+
+  test("keeps bare SMWS code references anchored to the code when creating an exact-cask bottle", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "SMWS",
+      bottler: "Scotch Malt Whisky Society",
+      expression: null,
+      series: null,
+      distillery: [],
+      category: null,
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: true,
+      edition: "6.53",
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "create_bottle",
+          confidence: 94,
+          rationale:
+            "SMWS 6.53 is a distinct exact-cask bottle and web evidence also reveals the official subtitle.",
+          candidateBottleIds: [],
+          identityScope: "exact_cask",
+          observation: {
+            selector: "Fresh from the replicator",
+            caskNumber: "6.53",
+            barrelNumber: null,
+            bottleNumber: null,
+            outturn: null,
+            market: null,
+            exclusive: null,
+          },
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          proposedBottle: {
+            name: "Fresh from the replicator",
+            series: null,
+            category: "single_malt",
+            edition: "6.53",
+            statedAge: 13,
+            caskStrength: null,
+            singleCask: true,
+            abv: 57.9,
+            vintageYear: 2008,
+            releaseYear: 2021,
+            caskType: "other",
+            caskSize: "barrel",
+            caskFill: "2nd_fill",
+            brand: {
+              id: null,
+              name: "SMWS",
+            },
+            distillers: [
+              {
+                id: null,
+                name: "Macduff",
+              },
+            ],
+            bottler: {
+              id: null,
+              name: "Scotch Malt Whisky Society",
+            },
+          },
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "SMWS 6.53",
+      },
+      extractedIdentity,
+      initialCandidates: [],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "create_bottle",
+      identityScope: "exact_cask",
+      proposedBottle: {
+        name: "6.53",
+        edition: null,
+        statedAge: 13,
+        singleCask: true,
+        abv: 57.9,
+      },
+      observation: {
+        selector: "Fresh from the replicator",
+        caskNumber: "6.53",
+      },
+    });
   });
 });

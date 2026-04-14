@@ -1,3 +1,4 @@
+import { normalizeProposedBottleDraft } from "@peated/bottle-classifier/bottleCreationDrafts";
 import {
   type Bottle,
   type BottleRelease,
@@ -7,7 +8,6 @@ import {
 } from "@peated/server/db/schema";
 import { hasActiveStorePriceMatchProposalProcessingLease } from "@peated/server/lib/priceMatching";
 import { getStorePriceMatchAutomationAssessment } from "@peated/server/lib/priceMatchingAutomation";
-import { normalizeProposedBottleDraft } from "@peated/server/lib/priceMatchingDraftNormalization";
 import { type Context } from "@peated/server/orpc/context";
 import {
   ExtractedBottleDetailsSchema,

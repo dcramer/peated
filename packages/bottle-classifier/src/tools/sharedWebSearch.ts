@@ -2,7 +2,7 @@ import { z } from "zod";
 import {
   BottleSearchEvidenceSchema,
   type BottleSearchEvidence,
-} from "../schemas";
+} from "../classifierTypes";
 
 export const BottleWebSearchProviderSchema = z.enum(["openai", "brave"]);
 export type BottleWebSearchProvider = z.infer<

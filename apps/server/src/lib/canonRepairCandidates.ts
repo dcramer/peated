@@ -1,8 +1,8 @@
+import { hasVariantLegacyReleaseRepairParentName } from "@peated/bottle-classifier/legacyReleaseRepairIdentity";
+import { normalizeString } from "@peated/bottle-classifier/normalize";
+import { hasBottleLevelReleaseTraits } from "@peated/bottle-classifier/releaseIdentity";
 import { db } from "@peated/server/db";
 import { bottles, type Bottle } from "@peated/server/db/schema";
-import { hasBottleLevelReleaseTraits } from "@peated/server/lib/bottleSchemaRules";
-import { hasVariantLegacyReleaseRepairParentName } from "@peated/server/lib/legacyReleaseRepairCandidates";
-import { normalizeString } from "@peated/server/lib/normalize";
 import { desc, eq, sql } from "drizzle-orm";
 
 const MAX_SCAN_LIMIT = 2000;

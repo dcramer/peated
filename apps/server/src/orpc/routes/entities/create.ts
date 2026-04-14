@@ -1,3 +1,4 @@
+import { normalizeEntityName } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import type { NewEntity } from "@peated/server/db/schema";
 import {
@@ -8,7 +9,6 @@ import {
   regions,
 } from "@peated/server/db/schema";
 import { logError } from "@peated/server/lib/log";
-import { normalizeEntityName } from "@peated/server/lib/normalize";
 import { buildEntitySearchVector } from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
 import {

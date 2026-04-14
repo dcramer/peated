@@ -3,7 +3,7 @@
 import {
   SMWS_CATEGORY_LIST,
   SMWS_DISTILLERY_CODES,
-} from "@peated/server/lib/smws";
+} from "@peated/bottle-classifier/smws";
 import Heading from "@peated/web/components/heading";
 import Link from "@peated/web/components/link";
 import { logError } from "@peated/web/lib/log";

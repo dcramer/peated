@@ -1,7 +1,10 @@
+import {
+  getLegacyReleaseRepairClassifierBlockedReasonMessage,
+  resolveLegacyCreateParentClassification,
+} from "@peated/bottle-classifier/legacyReleaseRepairResolution";
 import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
 import { db } from "@peated/server/db";
 import { bottles, entities, type Bottle } from "@peated/server/db/schema";
-import { hasBottleLevelReleaseTraits } from "@peated/server/lib/bottleSchemaRules";
 import { eq } from "drizzle-orm";
 
 export type LegacyReleaseRepairClassifierBottle = Pick<
@@ -22,23 +25,28 @@ export type LegacyReleaseRepairClassifierBottle = Pick<
   | "caskType"
 >;
 
-export type LegacyReleaseRepairClassifierParentCandidate = Pick<
-  Bottle,
-  | "abv"
-  | "caskFill"
-  | "caskSize"
-  | "caskStrength"
-  | "category"
-  | "edition"
-  | "fullName"
-  | "id"
-  | "releaseYear"
-  | "singleCask"
-  | "statedAge"
-  | "totalTastings"
-  | "vintageYear"
-  | "caskType"
->;
+export type LegacyReleaseRepairClassifierParentCandidate = Omit<
+  Pick<
+    Bottle,
+    | "abv"
+    | "caskFill"
+    | "caskSize"
+    | "caskStrength"
+    | "category"
+    | "edition"
+    | "fullName"
+    | "id"
+    | "releaseYear"
+    | "singleCask"
+    | "statedAge"
+    | "totalTastings"
+    | "vintageYear"
+    | "caskType"
+  >,
+  "totalTastings"
+> & {
+  totalTastings: null | number;
+};
 
 export type ClassifierReviewedCreateParentResolution =
   | {
@@ -122,65 +130,24 @@ export async function reviewLegacyCreateParentResolutionWithClassifier({
     initialCandidates,
   });
 
-  if (classification.status === "ignored") {
-    return {
-      resolution: "blocked",
-      message: `Classifier could not review parent resolution: ${classification.reason}`,
-    };
+  const resolution = resolveLegacyCreateParentClassification({
+    classification,
+    parentRows,
+  });
+
+  if (resolution.resolution === "reuse_existing_parent") {
+    return resolution;
   }
 
-  const { decision } = classification;
-  if (decision.identityScope === "exact_cask") {
-    return {
-      resolution: "blocked",
-      message:
-        "Classifier treated this bottle as exact-cask identity, so release repair cannot safely create a reusable parent bottle.",
-    };
-  }
-
-  if (decision.action === "match" || decision.action === "create_release") {
-    const parentBottleId =
-      decision.action === "match"
-        ? decision.matchedBottleId
-        : decision.parentBottleId;
-
-    const parentBottle =
-      parentRows.find((row) => row.id === parentBottleId) ?? null;
-
-    if (!parentBottle) {
-      return {
-        resolution: "blocked",
-        message:
-          "Classifier pointed at a bottle outside the reviewed repair parent set.",
-      };
-    }
-
-    if (hasBottleLevelReleaseTraits(parentBottle)) {
-      return {
-        resolution: "blocked",
-        message:
-          "Classifier found a reusable parent candidate, but that bottle still has bottle-level release traits.",
-      };
-    }
-
-    return {
-      resolution: "reuse_existing_parent",
-      parentBottle,
-    };
-  }
-
-  if (
-    decision.action === "create_bottle" ||
-    decision.action === "create_bottle_and_release"
-  ) {
-    return {
-      resolution: "allow_create_parent",
-    };
+  if (resolution.resolution === "allow_create_parent") {
+    return resolution;
   }
 
   return {
     resolution: "blocked",
-    message:
-      "Classifier could not verify whether this repair should reuse an existing parent bottle or create a new one.",
+    message: getLegacyReleaseRepairClassifierBlockedReasonMessage({
+      reason: resolution.reason,
+      ignoredReason: resolution.ignoredReason,
+    }),
   };
 }

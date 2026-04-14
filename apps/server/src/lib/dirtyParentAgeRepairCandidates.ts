@@ -1,3 +1,9 @@
+import {
+  bottleMarketsStatedAge,
+  formatCanonicalReleaseName,
+  hasBottleLevelReleaseTraits,
+  hasDirtyBottleLevelStatedAgeConflict,
+} from "@peated/bottle-classifier/releaseIdentity";
 import { db } from "@peated/server/db";
 import {
   bottleReleases,
@@ -5,12 +11,6 @@ import {
   type Bottle,
   type BottleRelease,
 } from "@peated/server/db/schema";
-import {
-  bottleMarketsStatedAge,
-  formatCanonicalReleaseName,
-  hasBottleLevelReleaseTraits,
-  hasDirtyBottleLevelStatedAgeConflict,
-} from "@peated/server/lib/bottleSchemaRules";
 import { desc, gt, isNotNull, sql } from "drizzle-orm";
 
 const MAX_CANDIDATE_LIMIT = 2000;

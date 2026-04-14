@@ -1,12 +1,14 @@
+import type {
+  BottleReference,
+  ClassifyBottleReferenceInput,
+} from "@peated/bottle-classifier/contract";
+import type { RunBottleClassifierAgentInput } from "@peated/bottle-classifier/internal/runtime";
+import { createBottleClassifier } from "@peated/bottle-classifier/internal/runtime";
 import {
-  createBottleClassifier,
   EntityResolutionSchema,
   SearchEntitiesArgsSchema,
-  type BottleReference,
-  type ClassifyBottleReferenceInput,
-  type RunBottleClassifierAgentInput,
   type SearchEntitiesArgs,
-} from "@peated/bottle-classifier";
+} from "@peated/bottle-classifier/internal/types";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { entities, entityAliases } from "@peated/server/db/schema";

@@ -4,6 +4,10 @@
     "baseUrl": "./",
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "paths": {
+      "@peated/bottle-classifier": [
+        "../../packages/bottle-classifier/src/index.ts"
+      ],
+      "@peated/bottle-classifier/*": ["../../packages/bottle-classifier/src/*"],
       "@peated/cli/*": ["src/*"],
       "@peated/server/*": ["../../apps/server/src/*"]
     }

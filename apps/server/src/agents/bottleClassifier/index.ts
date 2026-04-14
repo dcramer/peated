@@ -1,39 +1,42 @@
 export {
-  BottleCandidateSchema,
   BottleClassificationArtifactsSchema,
-  BottleClassificationDecisionSchema,
-  BottleClassificationError,
   BottleClassificationResultSchema,
-  BottleClassifierAgentDecisionSchema,
-  BottleClassifierAgentResponseSchema,
-  BottleExtractedDetailsSchema,
-  BottleIdentityScopeEnum,
-  BottleMatchDecisionSchema,
-  BottleObservationSchema,
   BottleReferenceSchema,
-  BottleSearchEvidenceSchema,
   ClassifyBottleReferenceInputSchema,
   DecidedBottleClassificationResultSchema,
-  EntityResolutionSchema,
   IgnoredBottleClassificationResultSchema,
   buildBottleClassificationArtifacts,
   createDecidedBottleClassification,
   createIgnoredBottleClassification,
   isIgnoredBottleClassification,
-} from "@peated/bottle-classifier";
+} from "@peated/bottle-classifier/contract";
 export type {
-  BottleCandidate,
   BottleClassificationArtifacts,
   BottleClassificationResult,
-  BottleClassifierAgentDecision,
-  BottleExtractedDetails,
-  BottleMatchDecision,
-  BottleObservation,
   BottleReference,
-  BottleSearchEvidence,
   ClassifyBottleReferenceInput,
   DecidedBottleClassificationResult,
-  EntityResolution,
   IgnoredBottleClassificationResult,
-} from "@peated/bottle-classifier";
+} from "@peated/bottle-classifier/contract";
+export { BottleClassificationError } from "@peated/bottle-classifier/error";
+export {
+  BottleCandidateSchema,
+  BottleClassificationDecisionSchema,
+  BottleClassifierAgentDecisionSchema,
+  BottleClassifierAgentResponseSchema,
+  BottleExtractedDetailsSchema,
+  BottleIdentityScopeEnum,
+  BottleObservationSchema,
+  BottleSearchEvidenceSchema,
+  EntityResolutionSchema,
+} from "@peated/bottle-classifier/internal/types";
+export type {
+  BottleCandidate,
+  BottleClassificationDecision,
+  BottleClassifierAgentDecision,
+  BottleExtractedDetails,
+  BottleObservation,
+  BottleSearchEvidence,
+  EntityResolution,
+} from "@peated/bottle-classifier/internal/types";
 export { classifyBottleReference } from "./classifyBottleReference";

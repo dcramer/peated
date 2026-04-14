@@ -15,6 +15,12 @@ import {
   type BottleWebSearchBudget,
 } from "./sharedWebSearch";
 
+function getDeterministicOpenAISettings(model: string): {
+  temperature?: number;
+} {
+  return model.toLowerCase().startsWith("gpt-5") ? {} : { temperature: 0 };
+}
+
 export function extractOpenAISearchEvidence(
   query: string,
   response: any,
@@ -197,8 +203,8 @@ async function runOpenAIWebSearch({
         ],
       },
     ],
-    tools: [{ type: "web_search_preview" }],
-    temperature: 0,
+    tools: [{ type: "web_search" }],
+    ...getDeterministicOpenAISettings(config.OPENAI_MODEL),
   });
 
   return extractOpenAISearchEvidence(query, response);

@@ -4,4 +4,4 @@ export {
   WHISKY_LABEL_COMPONENTS,
   buildBottleClassifierInstructions,
   buildWhiskyLabelExtractorInstructions,
-} from "@peated/bottle-classifier";
+} from "@peated/bottle-classifier/internal/prompts";

@@ -1,3 +1,4 @@
+import { isAddingBottleLevelReleaseTraits } from "@peated/bottle-classifier/releaseIdentity";
 import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import {
@@ -10,7 +11,6 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
-import { isAddingBottleLevelReleaseTraits } from "@peated/server/lib/bottleSchemaRules";
 import {
   coerceToUpsert,
   upsertBottleAlias,

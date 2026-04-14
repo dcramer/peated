@@ -1,3 +1,8 @@
+import {
+  deriveLegacyReleaseRepairIdentity,
+  getLegacyReleaseRepairParentMode,
+  type LegacyReleaseRepairParentCandidate,
+} from "@peated/bottle-classifier/legacyReleaseRepairIdentity";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
@@ -6,11 +11,6 @@ import {
   type Bottle,
   type LegacyReleaseRepairReview,
 } from "@peated/server/db/schema";
-import {
-  deriveLegacyReleaseRepairIdentity,
-  getLegacyReleaseRepairParentMode,
-  type LegacyReleaseRepairParentCandidate,
-} from "@peated/server/lib/legacyReleaseRepairCandidates";
 import { reviewLegacyCreateParentResolutionWithClassifier } from "@peated/server/lib/legacyReleaseRepairClassifier";
 import {
   getLegacyReleaseRepairBottleFingerprint,

@@ -5,7 +5,7 @@ import {
   BottleCandidateSearchInputSchema,
   type BottleCandidate,
   type BottleCandidateSearchInput,
-} from "../schemas";
+} from "../classifierTypes";
 
 const SearchBottlesResultSchema = z.object({
   results: z.array(BottleCandidateSchema),
@@ -25,7 +25,7 @@ export function createSearchBottlesTool({
   return tool({
     name: "search_bottles",
     description:
-      "Search the local bottle database using exact alias matching, embeddings, full-text search, and producer-aware heuristics. Results may be either bottle targets or specific release targets. Use this before web search when local candidates are thin, conflicting, or missing obvious near matches. Provide the most specific bottle identity you know, including brand, bottler, distillery, expression, series, edition, age, ABV, cask details, and years. Do not include packaging, volume, pricing, or retailer SEO noise in the query.",
+      "Search the local bottle database using exact alias matching, embeddings, full-text search, and producer-aware heuristics. Results may be either bottle targets or specific release targets. Use this before web search when local candidates are thin, conflicting, or missing obvious near matches. Re-run it after web search when the web confirms a missing canonical trait such as Barrel Proof, Single Cask, a batch code, or a producer/distillery detail that could recover a better local match. Provide the most specific bottle identity you know, including brand, bottler, distillery, expression, series, edition, age, ABV, cask details, and years. Do not include packaging, volume, pricing, or retailer SEO noise in the query.",
     parameters: BottleCandidateSearchInputSchema.extend({
       query: BottleCandidateSearchInputSchema.shape.query.describe(
         "Raw bottle reference text or fallback search text. Exclude volume, pack-size, gift-set, and price noise when possible.",

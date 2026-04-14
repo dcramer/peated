@@ -1,6 +1,7 @@
 import { tool } from "@openai/agents";
 import type OpenAI from "openai";
-import type { BottleSearchEvidence } from "../schemas";
+import type { BottleSearchEvidence } from "../classifierTypes";
+import { getDeterministicOpenAISettings } from "../openaiModelSettings";
 import { runBraveWebSearch } from "./braveWebSearch";
 import {
   BottleWebSearchArgsSchema,
@@ -202,8 +203,8 @@ async function runOpenAIWebSearch({
         ],
       },
     ],
-    tools: [{ type: "web_search_preview" }],
-    temperature: 0,
+    tools: [{ type: "web_search" }],
+    ...getDeterministicOpenAISettings(model),
   });
 
   return extractOpenAISearchEvidence(query, response);

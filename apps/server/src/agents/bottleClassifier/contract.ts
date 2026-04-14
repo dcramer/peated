@@ -9,7 +9,7 @@ export {
   createDecidedBottleClassification,
   createIgnoredBottleClassification,
   isIgnoredBottleClassification,
-} from "@peated/bottle-classifier";
+} from "@peated/bottle-classifier/contract";
 export type {
   BottleClassificationArtifacts,
   BottleClassificationResult,
@@ -17,4 +17,4 @@ export type {
   ClassifyBottleReferenceInput,
   DecidedBottleClassificationResult,
   IgnoredBottleClassificationResult,
-} from "@peated/bottle-classifier";
+} from "@peated/bottle-classifier/contract";

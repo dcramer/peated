@@ -1,3 +1,12 @@
+import {
+  normalizeBottle,
+  normalizeString,
+} from "@peated/bottle-classifier/normalize";
+import {
+  bottleMarketsStatedAge,
+  hasBottleLevelReleaseTraits,
+  hasDirtyBottleLevelStatedAgeConflict,
+} from "@peated/bottle-classifier/releaseIdentity";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, BottleRelease, User } from "@peated/server/db/schema";
 import {
@@ -14,11 +23,6 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import {
-  bottleMarketsStatedAge,
-  hasBottleLevelReleaseTraits,
-  hasDirtyBottleLevelStatedAgeConflict,
-} from "@peated/server/lib/bottleSchemaRules";
-import {
   BottleReleaseAlreadyExistsError,
   BottleReleaseCreateBadRequestError,
   createBottleReleaseInTransaction,
@@ -28,7 +32,6 @@ import {
   type DirtyParentAgeRepairRelease,
 } from "@peated/server/lib/dirtyParentAgeRepairCandidates";
 import { logError } from "@peated/server/lib/log";
-import { normalizeBottle, normalizeString } from "@peated/server/lib/normalize";
 import { pushJob } from "@peated/server/worker/client";
 import { and, desc, eq, isNull, sql } from "drizzle-orm";
 

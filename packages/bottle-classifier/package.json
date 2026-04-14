@@ -6,6 +6,82 @@
     ".": {
       "types": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./classifier": {
+      "types": "./src/classifier.ts",
+      "default": "./src/classifier.ts"
+    },
+    "./contract": {
+      "types": "./src/contract.ts",
+      "default": "./src/contract.ts"
+    },
+    "./normalize": {
+      "types": "./src/normalize.ts",
+      "default": "./src/normalize.ts"
+    },
+    "./bottleCreationDrafts": {
+      "types": "./src/bottleCreationDrafts.ts",
+      "default": "./src/bottleCreationDrafts.ts"
+    },
+    "./priceMatchingEvidence": {
+      "types": "./src/priceMatchingEvidence.ts",
+      "default": "./src/priceMatchingEvidence.ts"
+    },
+    "./error": {
+      "types": "./src/error.ts",
+      "default": "./src/error.ts"
+    },
+    "./normalizationCorpus": {
+      "types": "./src/normalizationCorpus.ts",
+      "default": "./src/normalizationCorpus.ts"
+    },
+    "./legacyReleaseRepairIdentity": {
+      "types": "./src/legacyReleaseRepairIdentity.ts",
+      "default": "./src/legacyReleaseRepairIdentity.ts"
+    },
+    "./legacyReleaseRepairResolution": {
+      "types": "./src/legacyReleaseRepairResolution.ts",
+      "default": "./src/legacyReleaseRepairResolution.ts"
+    },
+    "./releaseIdentity": {
+      "types": "./src/releaseIdentity.ts",
+      "default": "./src/releaseIdentity.ts"
+    },
+    "./bottleSchemaRules": {
+      "types": "./src/bottleSchemaRules.ts",
+      "default": "./src/bottleSchemaRules.ts"
+    },
+    "./bottleSchemaGuidance": {
+      "types": "./src/bottleSchemaGuidance.ts",
+      "default": "./src/bottleSchemaGuidance.ts"
+    },
+    "./smws": {
+      "types": "./src/smws.ts",
+      "default": "./src/smws.ts"
+    },
+    "./internal/runtime": {
+      "types": "./src/internal/runtime.ts",
+      "default": "./src/internal/runtime.ts"
+    },
+    "./internal/types": {
+      "types": "./src/internal/types.ts",
+      "default": "./src/internal/types.ts"
+    },
+    "./internal/schemas": {
+      "types": "./src/internal/schemas.ts",
+      "default": "./src/internal/schemas.ts"
+    },
+    "./internal/policy": {
+      "types": "./src/internal/policy.ts",
+      "default": "./src/internal/policy.ts"
+    },
+    "./internal/prompts": {
+      "types": "./src/internal/prompts.ts",
+      "default": "./src/internal/prompts.ts"
+    },
+    "./internal/extractor": {
+      "types": "./src/internal/extractor.ts",
+      "default": "./src/internal/extractor.ts"
     }
   },
   "scripts": {

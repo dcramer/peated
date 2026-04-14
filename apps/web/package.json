@@ -16,6 +16,7 @@
     "@orpc/client": "^1.13.6",
     "@orpc/server": "^1.13.6",
     "@orpc/tanstack-query": "^1.13.6",
+    "@peated/bottle-classifier": "workspace:*",
     "@peated/design": "workspace:*",
     "@peated/orpc": "workspace:*",
     "@peated/server": "workspace:*",

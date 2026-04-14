@@ -1,3 +1,14 @@
+/**
+ * Pure structural normalization helpers shared by the classifier and repair
+ * flows.
+ *
+ * This layer is limited to low-risk rewrites such as quote cleanup, age/year
+ * formatting, batch marker normalization, and other transformations that do not
+ * require brand or program semantics. Do not add bottle-family interpretation
+ * here; ambiguous meaning belongs to the reviewed classifier.
+ */
+import { CATEGORY_LIST } from "./classifierTypes";
+
 const ageSuffix = "-year-old";
 
 const NUMBERS: Record<string, string> = {
@@ -23,13 +34,6 @@ const NUMBERS: Record<string, string> = {
   twenty: "20",
 };
 
-function stripPrefix(value: string, prefix: string) {
-  if (value.startsWith(prefix)) {
-    return value.substring(prefix.length);
-  }
-  return value;
-}
-
 function convertWordToNumber(word: string) {
   return NUMBERS[word.toLowerCase()] || word;
 }
@@ -51,6 +55,42 @@ export function normalizeString(value: string): string {
     .replace(/[\u00ae\u2122]/g, "");
 }
 
+function formatCategoryNameForMatch(
+  category: (typeof CATEGORY_LIST)[number],
+): string {
+  return category.replace(/_/g, " ");
+}
+
+export function normalizeCategory(
+  name: string,
+): (typeof CATEGORY_LIST)[number] | null {
+  const normalizedName = name.toLowerCase();
+  if (
+    CATEGORY_LIST.includes(normalizedName as (typeof CATEGORY_LIST)[number])
+  ) {
+    return normalizedName as (typeof CATEGORY_LIST)[number];
+  }
+
+  if (
+    normalizedName.startsWith("single malt") ||
+    normalizedName.endsWith("single malt")
+  ) {
+    return "single_malt";
+  }
+
+  for (const category of CATEGORY_LIST) {
+    if (normalizedName.startsWith(formatCategoryNameForMatch(category))) {
+      return category;
+    }
+  }
+
+  return null;
+}
+
+export function normalizeEntityName(name: string): string {
+  return name;
+}
+
 export function stripDuplicateBrandPrefixFromBottleName(
   name: string,
   brandName: string | null | undefined,
@@ -59,7 +99,12 @@ export function stripDuplicateBrandPrefixFromBottleName(
     return name;
   }
 
-  return stripPrefix(name, `${brandName} `);
+  const prefix = `${brandName} `;
+  if (name.toLowerCase().startsWith(prefix.toLowerCase())) {
+    return name.substring(prefix.length);
+  }
+
+  return name;
 }
 
 export type NormalizedBottle = {
@@ -113,6 +158,10 @@ export function normalizeBottleBatchNumber(name: string) {
   );
 }
 
+/**
+ * Normalizes a bottle name and attached structured traits without making any
+ * brand-specific identity inferences.
+ */
 export function normalizeBottle({
   name,
   statedAge = null,
@@ -226,4 +275,22 @@ export function normalizeBottle({
     caskStrength,
     singleCask,
   };
+}
+
+export function normalizeVolume(volume: string): number | null {
+  const match = volume.match(/^\s*([0-9.]+)\s?(ml|l)\s*,?(\sbottle)?$/i);
+  if (!match) {
+    return null;
+  }
+
+  const [amount, measure] = match.slice(1, 3);
+
+  switch (measure.toLowerCase()) {
+    case "l":
+      return parseFloat(amount) * 1000;
+    case "ml":
+      return parseInt(amount, 10);
+    default:
+      return null;
+  }
 }

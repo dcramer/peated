@@ -8,11 +8,16 @@ import {
   type ClassifierEvalCase,
   type ClassifierEvalExpectation,
 } from "./classifier.eval.fixtures";
-import type { BottleCandidate, BottleClassificationResult } from "./index";
+import type { BottleCandidate } from "./classifierTypes";
+import type { BottleClassificationResult } from "./contract";
+import {
+  DEFAULT_OPENAI_EVAL_MODEL,
+  DEFAULT_OPENAI_MODEL,
+  getDeterministicOpenAISettings,
+} from "./openaiModelSettings";
 
-const DEFAULT_OPENAI_MODEL = "gpt-5.4";
 const classifierModel = process.env.OPENAI_MODEL ?? DEFAULT_OPENAI_MODEL;
-const judgeModel = process.env.OPENAI_EVAL_MODEL ?? classifierModel;
+const judgeModel = process.env.OPENAI_EVAL_MODEL ?? DEFAULT_OPENAI_EVAL_MODEL;
 
 function serializeEvalCase(testCase: ClassifierEvalCase): string {
   return JSON.stringify(testCase);
@@ -175,6 +180,8 @@ function createJudgeScorer() {
         "Score from 0.0 to 1.0.",
         "Prioritize whether the classifier identified the correct bottle identity and chose a safe action.",
         "A false positive existing match is worse than a conservative create/no-match result.",
+        "For exact-cask code programs such as SMWS, a correct matched bottle id and identity scope should score highly even when the source subtitle remains in observation-level text.",
+        "Do not over-penalize selector or subtitle noise when the exact-cask code anchor, matched bottle id, and final action are correct.",
         "Use 1.0 for a clearly correct result, 0.5 for partially correct but materially flawed output, and 0.0 for the wrong bottle or unsafe matching behavior.",
         "Return only the structured judgement.",
       ].join("\n"),
@@ -197,7 +204,7 @@ function createJudgeScorer() {
       text: {
         format: zodTextFormat(JudgeSchema, "ClassifierEvalJudgement"),
       },
-      temperature: 0,
+      ...getDeterministicOpenAISettings(judgeModel!),
     });
 
     const judgement = JudgeSchema.parse(JSON.parse(response.output_text));
@@ -212,6 +219,7 @@ function createJudgeScorer() {
 
 describeEval("bottle classifier", {
   skipIf: () => !process.env.OPENAI_API_KEY,
+  timeout: 300000,
   data: async () =>
     EVAL_CASES.map((testCase) => ({
       name: testCase.name,
