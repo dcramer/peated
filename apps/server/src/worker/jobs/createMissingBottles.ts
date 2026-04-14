@@ -1,62 +1,65 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import { reviews } from "@peated/server/db/schema";
-import { findBottleTarget, findEntity } from "@peated/server/lib/bottleFinder";
+import { assignBottleAlias } from "@peated/server/lib/bottleAliases";
+import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
-import { routerClient } from "@peated/server/orpc/router";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, asc, gt, isNull } from "drizzle-orm";
 
 export default async function createMissingBottles() {
   const systemUser = await getAutomationModeratorUser();
 
-  let hasResults = true;
-  while (hasResults) {
+  // Advance by id so unresolved reviews are visited once per run instead of
+  // hot-looping forever on the same null bottle assignments.
+  let cursor = 0;
+  let hasMore = true;
+  while (hasMore) {
     const missingInReviews = await db
       .select()
       .from(reviews)
-      .where(isNull(reviews.bottleId))
+      .where(and(isNull(reviews.bottleId), gt(reviews.id, cursor)))
+      .orderBy(asc(reviews.id))
       .limit(100);
 
-    if (missingInReviews.length === 0) {
-      hasResults = false;
-      break;
-    }
+    hasMore = missingInReviews.length > 0;
+    if (!hasMore) break;
 
     for (const review of missingInReviews) {
-      const { name } = normalizeBottle({ name: review.name });
-      const target =
-        (await findBottleTarget(review.name)) ??
-        (review.name === name ? null : await findBottleTarget(name));
+      cursor = review.id;
 
-      let bottleId = target?.bottleId ?? null;
-      let releaseId = target?.releaseId ?? null;
+      const resolution = await resolveBottleReferenceTarget({
+        reference: {
+          id: review.id,
+          externalSiteId: review.externalSiteId,
+          name: review.name,
+          url: review.url,
+          imageUrl: null,
+          currentBottleId: review.bottleId,
+          currentReleaseId: review.releaseId,
+        },
+        // Backfill uses the same conservative rule as live review ingestion:
+        // only raw exact aliases are trusted before classifier review because a
+        // normalized fallback can collapse real release detail to the parent.
+        aliasLookupNames: [review.name],
+        user: systemUser,
+      });
 
-      if (!bottleId) {
-        console.log(`Creating bottle for review [${review.id}]`);
-
-        const entity = await findEntity(review.name);
-        if (entity) {
-          const result = await routerClient.bottles.create(
-            {
-              name: review.name,
-              brand: entity.id,
-            },
-            { context: { user: systemUser } },
-          );
-          bottleId = result.id;
-          releaseId = null;
-        }
+      if (resolution.bottleId) {
+        console.log(
+          `Resolved bottle for review [${review.id}] via ${resolution.source}`,
+        );
       } else {
-        console.log(`Identified bottle for review [${review.id}]`);
+        console.log(`Unable to resolve bottle for review [${review.id}]`);
+        if (resolution.error) {
+          console.error(resolution.error);
+        }
+        continue;
       }
 
-      await db
-        .update(reviews)
-        .set({
-          bottleId,
-          releaseId,
-        })
-        .where(and(eq(reviews.id, review.id), isNull(reviews.bottleId)));
+      await assignBottleAlias({
+        bottleId: resolution.bottleId,
+        releaseId: resolution.releaseId,
+        name: review.name,
+      });
     }
   }
 }

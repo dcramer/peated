@@ -1,10 +1,17 @@
+import { normalizeEntityName } from "@peated/bottle-classifier/normalize";
 import type { InferSelectModel, Table } from "drizzle-orm";
-import { and, eq, getTableColumns, sql } from "drizzle-orm";
+import { and, eq, getTableColumns, inArray, sql } from "drizzle-orm";
 import type { PgTableWithColumns, TableConfig } from "drizzle-orm/pg-core";
 import { type z } from "zod";
 import type { AnyDatabase } from "../db";
 import type { BottleAlias, Entity, EntityType } from "../db/schema";
-import { bottleAliases, changes, collections, entities } from "../db/schema";
+import {
+  bottleAliases,
+  changes,
+  collections,
+  entities,
+  entityAliases,
+} from "../db/schema";
 import { type EntityInputSchema, type EntitySchema } from "../schemas";
 import { type EntityInput } from "../types";
 
@@ -37,6 +44,198 @@ export function coerceToUpsert({
   return rv;
 }
 
+function getEntityAliasNames({
+  name,
+  shortName,
+}: {
+  name: string;
+  shortName?: string | null;
+}) {
+  return Array.from(
+    new Set(
+      [
+        name,
+        shortName,
+        name.startsWith("The ") ? name.substring(4) : null,
+      ].filter((value): value is string => Boolean(value)),
+    ),
+  );
+}
+
+/**
+ * Bottle creation accepts entity ids or lightweight draft objects. When a draft
+ * name is already known as an exact canonical name, short name, or alias, we
+ * should reuse that entity instead of minting a duplicate brand/bottler.
+ */
+export async function findEntityByExactNameOrAlias(
+  db: AnyDatabase,
+  name: string,
+): Promise<Entity | null> {
+  const normalizedName = normalizeEntityName(name).trim();
+  if (!normalizedName) {
+    return null;
+  }
+
+  const lowerName = normalizedName.toLowerCase();
+
+  const [entityByName] = await db
+    .select()
+    .from(entities)
+    .where(eq(sql`LOWER(${entities.name})`, lowerName))
+    .limit(1);
+  if (entityByName) {
+    return entityByName;
+  }
+
+  const [entityByShortName] = await db
+    .select()
+    .from(entities)
+    .where(eq(sql`LOWER(COALESCE(${entities.shortName}, ''))`, lowerName))
+    .limit(1);
+  if (entityByShortName) {
+    return entityByShortName;
+  }
+
+  const [entityByTrimmedArticle] = await db
+    .select()
+    .from(entities)
+    .where(
+      eq(
+        sql`LOWER(
+          CASE
+            WHEN ${entities.name} ILIKE 'The %'
+              THEN SUBSTRING(${entities.name} FROM 5)
+              ELSE ''
+          END
+        )`,
+        lowerName,
+      ),
+    )
+    .limit(1);
+  if (entityByTrimmedArticle) {
+    return entityByTrimmedArticle;
+  }
+
+  const [entityByAlias] = await db
+    .select({ entity: entities })
+    .from(entityAliases)
+    .innerJoin(entities, eq(entityAliases.entityId, entities.id))
+    .where(eq(sql`LOWER(${entityAliases.name})`, lowerName))
+    .limit(1);
+
+  return entityByAlias?.entity ?? null;
+}
+
+async function mergeEntityTypeIfNeeded({
+  db,
+  entity,
+  type,
+}: {
+  db: AnyDatabase;
+  entity: Entity;
+  type?: EntityType;
+}): Promise<Entity> {
+  if (!type || entity.type.includes(type)) {
+    return entity;
+  }
+
+  const [updatedEntity] = await db
+    .update(entities)
+    .set({ type: [...entity.type, type] })
+    .where(eq(entities.id, entity.id))
+    .returning();
+
+  return updatedEntity ?? { ...entity, type: [...entity.type, type] };
+}
+
+/**
+ * Keep entity aliases in sync anywhere we can create or rename entities.
+ * Exact short-name and alias matching is one of the cheap deterministic paths
+ * that lets ingestion bypass the classifier safely when the identity is known.
+ */
+export async function upsertEntityAliases({
+  db,
+  entity,
+  previousEntity = null,
+}: {
+  db: AnyDatabase;
+  entity: Pick<Entity, "id" | "name" | "shortName" | "createdAt">;
+  previousEntity?: Pick<Entity, "name" | "shortName"> | null;
+}) {
+  const nextAliasNames = getEntityAliasNames(entity);
+  const nextAliasNamesLower = new Set(
+    nextAliasNames.map((aliasName) => aliasName.toLowerCase()),
+  );
+
+  for (const aliasName of nextAliasNames) {
+    const existingAlias = await db.query.entityAliases.findFirst({
+      where: eq(sql`LOWER(${entityAliases.name})`, aliasName.toLowerCase()),
+    });
+
+    if (existingAlias?.entityId === entity.id) {
+      if (existingAlias.name !== aliasName) {
+        await db
+          .update(entityAliases)
+          .set({ name: aliasName })
+          .where(
+            eq(
+              sql`LOWER(${entityAliases.name})`,
+              existingAlias.name.toLowerCase(),
+            ),
+          );
+      }
+      continue;
+    }
+
+    if (!existingAlias) {
+      await db.insert(entityAliases).values({
+        name: aliasName,
+        entityId: entity.id,
+        createdAt: entity.createdAt,
+      });
+      continue;
+    }
+
+    if (!existingAlias.entityId) {
+      await db
+        .update(entityAliases)
+        .set({ entityId: entity.id })
+        .where(
+          eq(
+            sql`LOWER(${entityAliases.name})`,
+            existingAlias.name.toLowerCase(),
+          ),
+        );
+      continue;
+    }
+
+    throw new Error(
+      `Duplicate entity alias found (${existingAlias.entityId}) for "${aliasName}".`,
+    );
+  }
+
+  if (!previousEntity) {
+    return;
+  }
+
+  const retiredAliasNames = getEntityAliasNames(previousEntity).filter(
+    (aliasName) => !nextAliasNamesLower.has(aliasName.toLowerCase()),
+  );
+  if (!retiredAliasNames.length) {
+    return;
+  }
+
+  await db.delete(entityAliases).where(
+    and(
+      eq(entityAliases.entityId, entity.id),
+      inArray(
+        sql`LOWER(${entityAliases.name})`,
+        retiredAliasNames.map((aliasName) => aliasName.toLowerCase()),
+      ),
+    ),
+  );
+}
+
 export const upsertEntity = async ({
   db,
   data,
@@ -56,15 +255,33 @@ export const upsertEntity = async ({
       where: (entities, { eq }) => eq(entities.id, entityId),
     });
 
-    if (result && type && !result.type.includes(type)) {
-      await db
-        .update(entities)
-        .set({ type: [...result.type, type] })
-        .where(eq(entities.id, result.id));
+    if (!result) {
+      return undefined;
     }
-    return result ? { id: result.id, result, created: false } : undefined;
+
+    const mergedResult = await mergeEntityTypeIfNeeded({
+      db,
+      entity: result,
+      type,
+    });
+    return { id: mergedResult.id, result: mergedResult, created: false };
   } else if (data.id === null) {
     data.id = undefined;
+  }
+
+  data = {
+    ...data,
+    name: normalizeEntityName(data.name),
+  };
+
+  const existingEntity = await findEntityByExactNameOrAlias(db, data.name);
+  if (existingEntity) {
+    const mergedEntity = await mergeEntityTypeIfNeeded({
+      db,
+      entity: existingEntity,
+      type,
+    });
+    return { id: mergedEntity.id, result: mergedEntity, created: false };
   }
 
   const [result] = await db
@@ -90,15 +307,24 @@ export const upsertEntity = async ({
       createdAt: result.createdAt,
     });
 
+    await upsertEntityAliases({
+      db,
+      entity: result,
+    });
+
     return { id: result.id, result, created: true };
   }
 
-  const resultConflict = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.name, data.name),
-  });
+  const resultConflict = await findEntityByExactNameOrAlias(db, data.name);
 
-  if (resultConflict)
-    return { id: resultConflict.id, result: resultConflict, created: false };
+  if (resultConflict) {
+    const mergedEntity = await mergeEntityTypeIfNeeded({
+      db,
+      entity: resultConflict,
+      type,
+    });
+    return { id: mergedEntity.id, result: mergedEntity, created: false };
+  }
   throw new Error("We should never hit this case in upsert");
 };
 

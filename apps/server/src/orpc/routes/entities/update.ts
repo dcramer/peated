@@ -7,9 +7,9 @@ import {
   changes,
   countries,
   entities,
-  entityAliases,
   regions,
 } from "@peated/server/db/schema";
+import { upsertEntityAliases } from "@peated/server/lib/db";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
@@ -181,76 +181,29 @@ export default procedure
       }
       if (!newEntity) return;
 
-      if (data.name) {
-        const newAliases = [data.name];
-        if (data.name.startsWith("The ")) {
-          newAliases.push(data.name.substring(4));
-        }
-
-        for (const aliasName of newAliases) {
-          const existingAlias = await tx.query.entityAliases.findFirst({
-            where: eq(
-              sql`LOWER(${entityAliases.name})`,
-              aliasName.toLowerCase(),
-            ),
-          });
-
-          if (existingAlias?.entityId === newEntity.id) {
-            if (existingAlias.name !== aliasName) {
-              // case change
-              await tx
-                .update(entityAliases)
-                .set({ name: aliasName })
-                .where(
-                  eq(
-                    sql`LOWER(${entityAliases.name})`,
-                    existingAlias.name.toLowerCase(),
-                  ),
-                );
-            }
-            // we're good - likely renaming to an alias that already existed
-          } else if (!existingAlias) {
-            await tx.insert(entityAliases).values({
-              name: aliasName,
-              entityId: newEntity.id,
-              createdAt: newEntity.createdAt,
-            });
-          } else if (!existingAlias.entityId) {
-            await tx
-              .update(entityAliases)
-              .set({
-                entityId: newEntity.id,
-              })
-              .where(
-                eq(
-                  sql`LOWER(${entityAliases.name})`,
-                  existingAlias.name.toLowerCase(),
-                ),
-              );
-          } else {
-            throw new Error(
-              `Duplicate alias found (${existingAlias.entityId}). Not implemented.`,
-            );
-          }
-        }
+      if (data.name || data.shortName !== undefined) {
+        await upsertEntityAliases({
+          db: tx,
+          entity: newEntity,
+          previousEntity: entity,
+        });
       }
 
-      if (data.name || data.shortName) {
+      if (data.name || data.shortName !== undefined) {
+        const previousBottlePrefix = entity.shortName || entity.name;
+        const nextBottlePrefix = newEntity.shortName || newEntity.name;
+
         await tx
           .update(bottles)
           .set({
-            fullName: sql`${newEntity.shortName || newEntity.name} || ' ' || ${
-              bottles.name
-            }`,
+            fullName: sql`${nextBottlePrefix} || ' ' || ${bottles.name}`,
           })
           .where(
             and(
               eq(bottles.brandId, newEntity.id),
               ne(
                 bottles.fullName,
-                sql`${newEntity.shortName || newEntity.name} || ' ' || ${
-                  bottles.name
-                }`,
+                sql`${nextBottlePrefix} || ' ' || ${bottles.name}`,
               ),
             ),
           );
@@ -264,14 +217,18 @@ export default procedure
             DO UPDATE SET bottle_id = excluded.bottle_id WHERE ${bottleAliases.bottleId} IS NULL
         `);
 
-        await tx.execute(sql`
-            DELETE FROM ${bottleAliases}
-            WHERE ${bottleAliases.bottleId} IN (
-              SELECT ${bottles.id} FROM ${bottles}
-               WHERE ${bottles.brandId} = ${newEntity.id}
-                 AND LOWER(${bottleAliases.name}) = LOWER(${entity.name} || ' ' || ${bottles.name})
-            )
-        `);
+        if (
+          previousBottlePrefix.toLowerCase() !== nextBottlePrefix.toLowerCase()
+        ) {
+          await tx.execute(sql`
+              DELETE FROM ${bottleAliases}
+              WHERE ${bottleAliases.bottleId} IN (
+                SELECT ${bottles.id} FROM ${bottles}
+                 WHERE ${bottles.brandId} = ${newEntity.id}
+                   AND LOWER(${bottleAliases.name}) = LOWER(${previousBottlePrefix} || ' ' || ${bottles.name})
+              )
+          `);
+        }
       }
 
       await tx.insert(changes).values({

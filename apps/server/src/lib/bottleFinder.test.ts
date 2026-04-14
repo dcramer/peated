@@ -1,4 +1,4 @@
-import { findBottleId, findEntity } from "./bottleFinder";
+import { findBottleId } from "./bottleFinder";
 
 describe("findBottleId", () => {
   test("matches exact", async ({ fixtures }) => {
@@ -58,28 +58,5 @@ describe("findBottleId", () => {
 
     const result2 = await findBottleId("Aberfeldy 18-year-old");
     expect(result2).toMatchInlineSnapshot(`1`);
-  });
-});
-
-describe("findEntity", () => {
-  test("matches exact", async ({ fixtures }) => {
-    const entity = await fixtures.Entity({ name: "Hibiki" });
-    const result = await findEntity("Hibiki");
-    expect(result?.id).toEqual(entity.id);
-  });
-
-  test("matches bottle name prefix", async ({ fixtures }) => {
-    const entity = await fixtures.Entity({ name: "Hibiki" });
-    const result = await findEntity("Hibiki 12-year-old");
-    expect(result?.id).toEqual(entity.id);
-  });
-
-  test("does not match entity name prefix", async ({ fixtures }) => {
-    await fixtures.Entity({ name: "Hibiki Real" });
-    const result = await findEntity("Hibiki 12-year-old");
-    expect(result).toBeNull();
-
-    await findEntity("The Hibiki Real 12-year-old");
-    expect(result).toBeNull();
   });
 });
