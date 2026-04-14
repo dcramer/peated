@@ -1,10 +1,10 @@
-import { DEFAULT_BOTTLE_CREATION_TARGET } from "./bottleSchemaRules";
-import type { ProposedBottle, ProposedRelease } from "./classifierSchemas";
+import type { ProposedBottle, ProposedRelease } from "./classifierTypes";
 import {
   normalizeBottle,
   normalizeString,
   stripDuplicateBrandPrefixFromBottleName,
 } from "./normalize";
+import { DEFAULT_BOTTLE_CREATION_TARGET } from "./releaseIdentity";
 
 export type BottleCreationTarget = "bottle" | "release" | "bottle_and_release";
 

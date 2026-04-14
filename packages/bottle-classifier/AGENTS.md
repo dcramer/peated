@@ -27,7 +27,8 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - Do not import `apps/server` into this package.
 - Keep price-match proposal semantics out of this package.
 - Preserve the reviewed boundary in `src/contract.ts` and `src/classifier.ts`.
-- Deterministic validation, downgrades, and `identityScope` rules live in `src/classificationPolicy.ts`.
+- Internal adapter-facing modules should stay behind the `internal/*` package namespace.
+- Deterministic validation, downgrades, and `identityScope` rules live in `src/reviewPolicy.ts`.
 - Prompt-only fixes are incomplete when the invariant is deterministic; fix policy and tests together.
 - False positive existing matches are worse than conservative create or no-match results.
 - `exact_cask` needs strong marketed identity signals such as SMWS codes, cask numbers, or barrel numbers.

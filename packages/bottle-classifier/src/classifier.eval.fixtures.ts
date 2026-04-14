@@ -1,4 +1,4 @@
-import type { BottleCandidate } from "./classifierSchemas";
+import type { BottleCandidate } from "./classifierTypes";
 import type { ClassifyBottleReferenceInput } from "./contract";
 import {
   buildBottleCandidate,

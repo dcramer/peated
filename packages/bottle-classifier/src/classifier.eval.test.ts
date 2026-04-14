@@ -8,12 +8,14 @@ import {
   type ClassifierEvalCase,
   type ClassifierEvalExpectation,
 } from "./classifier.eval.fixtures";
-import type { BottleCandidate } from "./classifierSchemas";
+import type { BottleCandidate } from "./classifierTypes";
 import type { BottleClassificationResult } from "./contract";
-import { getDeterministicOpenAISettings } from "./openaiModelSettings";
+import {
+  DEFAULT_OPENAI_EVAL_MODEL,
+  DEFAULT_OPENAI_MODEL,
+  getDeterministicOpenAISettings,
+} from "./openaiModelSettings";
 
-const DEFAULT_OPENAI_MODEL = "gpt-5-mini";
-const DEFAULT_OPENAI_EVAL_MODEL = "gpt-5-mini";
 const classifierModel = process.env.OPENAI_MODEL ?? DEFAULT_OPENAI_MODEL;
 const judgeModel = process.env.OPENAI_EVAL_MODEL ?? DEFAULT_OPENAI_EVAL_MODEL;
 

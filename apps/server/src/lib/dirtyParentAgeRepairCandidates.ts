@@ -3,7 +3,7 @@ import {
   formatCanonicalReleaseName,
   hasBottleLevelReleaseTraits,
   hasDirtyBottleLevelStatedAgeConflict,
-} from "@peated/bottle-classifier/bottleSchemaRules";
+} from "@peated/bottle-classifier/releaseIdentity";
 import { db } from "@peated/server/db";
 import {
   bottleReleases,

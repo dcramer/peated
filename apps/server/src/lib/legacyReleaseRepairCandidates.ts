@@ -1,4 +1,3 @@
-import { hasBottleLevelReleaseTraits } from "@peated/bottle-classifier/bottleSchemaRules";
 import {
   deriveLegacyReleaseRepairIdentity,
   getLegacyReleaseRepairBlockingParent,
@@ -11,6 +10,7 @@ import {
   type LegacyReleaseRepairIdentity,
   type LegacyReleaseRepairParentCandidate,
 } from "@peated/bottle-classifier/legacyReleaseRepairIdentity";
+import { hasBottleLevelReleaseTraits } from "@peated/bottle-classifier/releaseIdentity";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,

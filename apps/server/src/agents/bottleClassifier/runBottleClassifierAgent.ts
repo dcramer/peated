@@ -1,6 +1,6 @@
-export type { RunBottleClassifierAgentInput } from "@peated/bottle-classifier/classifierRuntime";
 export { BottleClassificationError } from "@peated/bottle-classifier/error";
-import type { RunBottleClassifierAgentInput } from "@peated/bottle-classifier/classifierRuntime";
+export type { RunBottleClassifierAgentInput } from "@peated/bottle-classifier/internal/runtime";
+import type { RunBottleClassifierAgentInput } from "@peated/bottle-classifier/internal/runtime";
 import { runBottleClassifierAgent as runBottleClassifierAgentWithServerAdapters } from "./service";
 
 export async function runBottleClassifierAgent(

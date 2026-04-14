@@ -5,7 +5,7 @@ import {
   BottleCandidateSearchInputSchema,
   type BottleCandidate,
   type BottleCandidateSearchInput,
-} from "../classifierSchemas";
+} from "../classifierTypes";
 
 const SearchBottlesResultSchema = z.object({
   results: z.array(BottleCandidateSchema),

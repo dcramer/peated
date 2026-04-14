@@ -4,10 +4,7 @@ import {
   hasDirtyParentStatedAgeConflict,
   hasSupportiveWebEvidenceForExistingMatch,
 } from "./bottleClassificationEvidence";
-import type {
-  BottleCandidate,
-  BottleSearchEvidence,
-} from "./classifierSchemas";
+import type { BottleCandidate, BottleSearchEvidence } from "./classifierTypes";
 
 function buildBottleCandidate(
   candidate: Pick<BottleCandidate, "bottleId" | "fullName"> &

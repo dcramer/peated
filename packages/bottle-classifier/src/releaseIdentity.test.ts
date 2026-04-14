@@ -12,9 +12,9 @@ import {
   hasDirtyBottleLevelStatedAgeConflict,
   hasExtractedReleaseIdentity,
   isAddingBottleLevelReleaseTraits,
-} from "./bottleSchemaRules";
+} from "./releaseIdentity";
 
-describe("bottleSchemaRules", () => {
+describe("releaseIdentity", () => {
   test("detects bottle-level release traits", () => {
     expect(
       hasBottleLevelReleaseTraits({

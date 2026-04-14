@@ -85,14 +85,17 @@ Additional pure helpers that are package-owned but not part of the root API:
 - `@peated/bottle-classifier/priceMatchingEvidence`
 - `@peated/bottle-classifier/smws`
 
-Internal server adapters should also import package internals through explicit subpaths such as:
+Internal server adapters should import internals only through the explicit
+`internal/*` namespace:
 
-- `@peated/bottle-classifier/classifierRuntime`
-- `@peated/bottle-classifier/contract`
-- `@peated/bottle-classifier/classifierSchemas`
-- `@peated/bottle-classifier/extractor`
-- `@peated/bottle-classifier/instructions`
-- `@peated/bottle-classifier/classificationPolicy`
+- `@peated/bottle-classifier/internal/runtime`
+- `@peated/bottle-classifier/internal/types`
+- `@peated/bottle-classifier/internal/extractor`
+- `@peated/bottle-classifier/internal/prompts`
+- `@peated/bottle-classifier/internal/policy`
+
+The `contract` subpath remains public because it defines the reviewed request
+and response boundary itself.
 
 ## Behavioral Expectations
 
@@ -117,21 +120,24 @@ These are the rules to preserve when iterating on the classifier:
 
 - [`src/classifier.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifier.ts): narrow public classifier factory and types
 - [`src/contract.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/contract.ts): public schemas and result helpers
-- [`src/classifierRuntime.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifierRuntime.ts): internal orchestration boundary and tool loop
-- [`src/classifierSchemas.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifierSchemas.ts): internal classifier working schemas
-- [`src/classificationPolicy.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classificationPolicy.ts): deterministic review, normalization, scope inference, downgrades
+- [`src/classifierRuntime.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifierRuntime.ts): internal orchestration boundary and tool loop, exposed to server adapters as `internal/runtime`
+- [`src/classifierTypes.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifierTypes.ts): internal classifier working types and schemas, exposed to server adapters as `internal/types`
+- [`src/classifierSchemas.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifierSchemas.ts): compatibility alias for `classifierTypes`
+- [`src/reviewPolicy.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/reviewPolicy.ts): deterministic review, normalization, scope inference, downgrades, exposed to server adapters as `internal/policy`
+- [`src/classificationPolicy.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classificationPolicy.ts): compatibility alias for `reviewPolicy`
 - [`src/normalize.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/normalize.ts): pure bottle/name/category/volume normalization helpers
-- [`src/bottleSchemaRules.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/bottleSchemaRules.ts): pure bottle-versus-release identity policy and canonical release naming helpers
+- [`src/releaseIdentity.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/releaseIdentity.ts): pure bottle-versus-release identity policy and canonical release naming helpers
+- [`src/bottleSchemaRules.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/bottleSchemaRules.ts): compatibility alias for `releaseIdentity`
 - [`src/bottleSchemaGuidance.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/bottleSchemaGuidance.ts): prompt-facing guidance text for bottle versus release identity
 - [`src/bottleCreationDrafts.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/bottleCreationDrafts.ts): pure bottle versus release draft normalization helpers
 - [`src/priceMatchingEvidence.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/priceMatchingEvidence.ts): pure price-matching evidence and conflict checks
 - [`src/legacyReleaseRepairIdentity.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/legacyReleaseRepairIdentity.ts): pure legacy release-repair identity derivation and parent-match heuristics
 - [`src/legacyReleaseRepairResolution.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/legacyReleaseRepairResolution.ts): pure repair-facing interpretation of reviewed classifier output
 - [`src/smws.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/smws.ts): pure SMWS code, flavor-profile, and cask parsing helpers
-- [`src/extractor.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/extractor.ts): bottle-label extraction
-- [`src/instructions.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/instructions.ts): classifier and extractor prompts
+- [`src/extractor.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/extractor.ts): bottle-label extraction, exposed to server adapters as `internal/extractor`
+- [`src/instructions.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/instructions.ts): classifier and extractor prompts, exposed to server adapters as `internal/prompts`
 - [`src/classifier.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifier.test.ts): policy-level unit coverage
-- [`src/bottleSchemaRules.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/bottleSchemaRules.test.ts): package-local bottle versus release rule coverage
+- [`src/releaseIdentity.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/releaseIdentity.test.ts): package-local bottle versus release rule coverage
 - [`src/normalize.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/normalize.test.ts): package-local normalization unit coverage
 - [`src/bottleCreationDrafts.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/bottleCreationDrafts.test.ts): package-local draft normalization coverage
 - [`src/priceMatchingEvidence.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/priceMatchingEvidence.test.ts): package-local price-matching evidence coverage
@@ -173,7 +179,7 @@ pnpm --filter @peated/bottle-classifier test
 pnpm --filter @peated/bottle-classifier evals
 ```
 
-The eval command loads the repo-root `.env` and then `.env.local`. `OPENAI_API_KEY` is required. `OPENAI_MODEL` defaults to `gpt-5-mini` for the classifier pass. `OPENAI_EVAL_MODEL` also defaults to `gpt-5-mini` for judging; override it if you want a slower or stricter judge. `BRAVE_API_KEY` is optional.
+The eval command loads the repo-root `.env` and then `.env.local`. `OPENAI_API_KEY` is required. `OPENAI_MODEL` defaults to `gpt-5.4` for the classifier pass. `OPENAI_EVAL_MODEL` defaults to `gpt-5-mini` for judging so routine evals stay cheaper by default; override either if you want a different cost or quality tradeoff. `BRAVE_API_KEY` is optional.
 
 ## Related Docs
 

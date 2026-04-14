@@ -5,7 +5,7 @@ import {
   SearchEntitiesResultSchema,
   type EntityResolution,
   type SearchEntitiesArgs,
-} from "../classifierSchemas";
+} from "../classifierTypes";
 
 export const EntitySearchResultSchema = EntityResolutionSchema;
 export type EntitySearchResult = EntityResolution;

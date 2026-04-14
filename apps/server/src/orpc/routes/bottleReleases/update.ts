@@ -2,7 +2,7 @@ import {
   formatCanonicalReleaseName,
   getResolvedReleaseIdentity,
   hasDirtyBottleLevelStatedAgeConflict,
-} from "@peated/bottle-classifier/bottleSchemaRules";
+} from "@peated/bottle-classifier/releaseIdentity";
 import { db } from "@peated/server/db";
 import { bottleReleases, bottles, changes } from "@peated/server/db/schema";
 import { findExistingBottleReleaseByIdentity } from "@peated/server/lib/bottleReleaseIdentity";

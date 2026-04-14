@@ -22,7 +22,7 @@ Classifier-owned infrastructure lives in:
 
 - `packages/bottle-classifier/src/instructions.ts`
 - `packages/bottle-classifier/src/extractor.ts`
-- `packages/bottle-classifier/src/classificationPolicy.ts`
+- `packages/bottle-classifier/src/reviewPolicy.ts`
 - `packages/bottle-classifier/src/normalize.ts`
 - `packages/bottle-classifier/src/legacyReleaseRepairIdentity.ts`
 - `packages/bottle-classifier/src/bottleCreationDrafts.ts`
@@ -95,7 +95,7 @@ The rule for package-owned deterministic behavior is strict:
 - ambiguous families should use shared `contrastGroup` keys with differing `contrastOutcome` values so the corpus always carries a real positive/negative contrast
 - live eval coverage should stay narrow and explicit; only classifier-owned ambiguity should opt in
 
-For lightweight consumers and internal adapters, prefer the narrow package subpaths:
+For lightweight consumers, prefer the narrow package subpaths:
 
 - `@peated/bottle-classifier/normalize`
 - `@peated/bottle-classifier/bottleCreationDrafts`
@@ -104,12 +104,15 @@ For lightweight consumers and internal adapters, prefer the narrow package subpa
 - `@peated/bottle-classifier/normalizationCorpus`
 - `@peated/bottle-classifier/priceMatchingEvidence`
 - `@peated/bottle-classifier/smws`
-- `@peated/bottle-classifier/classifierRuntime`
 - `@peated/bottle-classifier/contract`
-- `@peated/bottle-classifier/classifierSchemas`
-- `@peated/bottle-classifier/extractor`
-- `@peated/bottle-classifier/instructions`
-- `@peated/bottle-classifier/classificationPolicy`
+
+Internal server adapters should use the explicit internal namespace:
+
+- `@peated/bottle-classifier/internal/runtime`
+- `@peated/bottle-classifier/internal/types`
+- `@peated/bottle-classifier/internal/extractor`
+- `@peated/bottle-classifier/internal/prompts`
+- `@peated/bottle-classifier/internal/policy`
 
 ## Pipeline
 
@@ -194,8 +197,8 @@ Run it from the repo root with:
 Local setup for live evals:
 
 - put `OPENAI_API_KEY` in the repo-root `.env.local`
-- `OPENAI_MODEL` is optional for evals and defaults to `gpt-5-mini` for the classifier pass
-- `OPENAI_EVAL_MODEL` is optional and defaults to `gpt-5-mini` for judging; override it if you want a different cost/quality tradeoff
+- `OPENAI_MODEL` is optional for evals and defaults to `gpt-5.4` for the classifier pass
+- `OPENAI_EVAL_MODEL` is optional and defaults to `gpt-5-mini` for judging so routine evals stay cheaper; override it if you want a different cost/quality tradeoff
 - `OPENAI_HOST`, `OPENAI_ORGANIZATION`, and `OPENAI_PROJECT` are optional for proxy or non-default account routing
 - `BRAVE_API_KEY` is optional; without it the classifier still runs with OpenAI web search only
 - `BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES` is optional and defaults to `3`
@@ -215,8 +218,8 @@ The classifier is intentionally split into a few narrow modules:
 - `classifier.ts` defines the narrow public classifier factory and public types.
 - `contract.ts` defines the public request/response contract and normalized result artifacts.
 - `classifierRuntime.ts` owns the reviewed orchestration boundary and the raw model/tool loop.
-- `classifierSchemas.ts` owns internal classifier working schemas that should not leak through the package root.
-- `classificationPolicy.ts` owns deterministic validation, create normalization, exact-cask scope inference, and downgrade rules.
+- `classifierTypes.ts` owns internal classifier working types and schemas that should not leak through the package root.
+- `reviewPolicy.ts` owns deterministic validation, create normalization, exact-cask scope inference, and downgrade rules.
 - `normalize.ts` owns shared bottle/name/category/volume normalization.
 - `priceMatchingEvidence.ts` owns pure evidence/conflict checks shared with price matching.
 - `bottleSchemaGuidance.ts` owns prompt-facing bottle versus release guidance text.

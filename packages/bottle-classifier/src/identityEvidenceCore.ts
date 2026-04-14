@@ -4,7 +4,7 @@ import type {
   BottleExtractedDetails,
   BottleSearchEvidence,
   ProposedBottle,
-} from "./classifierSchemas";
+} from "./classifierTypes";
 import { normalizeString } from "./normalize";
 
 /**

@@ -1,10 +1,5 @@
-import type {
-  CaskFill,
-  CaskSize,
-  CaskType,
-  Category,
-} from "./classifierSchemas";
-import { CATEGORY_LIST } from "./classifierSchemas";
+import type { CaskFill, CaskSize, CaskType, Category } from "./classifierTypes";
+import { CATEGORY_LIST } from "./classifierTypes";
 
 const FLAVOR_PROFILES = [
   "young_spritely",

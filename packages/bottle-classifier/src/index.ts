@@ -6,12 +6,6 @@ export {
 } from "./bottleCreationDrafts";
 export type { BottleCreationTarget } from "./bottleCreationDrafts";
 export {
-  formatCanonicalReleaseName,
-  getResolvedReleaseIdentity,
-  hasExtractedReleaseIdentity,
-} from "./bottleSchemaRules";
-export type { ReleaseIdentityInput } from "./bottleSchemaRules";
-export {
   createBottleClassifier,
   type BottleClassifier,
   type BottleClassifierAdapters,
@@ -37,3 +31,9 @@ export type {
 export { BottleClassificationError } from "./error";
 export { createWhiskyLabelExtractor } from "./extractor";
 export { normalizeBottle, type NormalizedBottle } from "./normalize";
+export {
+  formatCanonicalReleaseName,
+  getResolvedReleaseIdentity,
+  hasExtractedReleaseIdentity,
+} from "./releaseIdentity";
+export type { ReleaseIdentityInput } from "./releaseIdentity";

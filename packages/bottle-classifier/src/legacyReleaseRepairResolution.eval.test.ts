@@ -9,10 +9,12 @@ import {
   LEGACY_RELEASE_REPAIR_RESOLUTION_EVAL_CASES,
   type LegacyReleaseRepairResolutionEvalCase,
 } from "./legacyReleaseRepairResolution.eval.fixtures";
-import { getDeterministicOpenAISettings } from "./openaiModelSettings";
+import {
+  DEFAULT_OPENAI_EVAL_MODEL,
+  DEFAULT_OPENAI_MODEL,
+  getDeterministicOpenAISettings,
+} from "./openaiModelSettings";
 
-const DEFAULT_OPENAI_MODEL = "gpt-5-mini";
-const DEFAULT_OPENAI_EVAL_MODEL = "gpt-5-mini";
 const classifierModel = process.env.OPENAI_MODEL ?? DEFAULT_OPENAI_MODEL;
 const judgeModel = process.env.OPENAI_EVAL_MODEL ?? DEFAULT_OPENAI_EVAL_MODEL;
 

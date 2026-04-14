@@ -8,7 +8,7 @@ import type {
   BottleCandidate,
   BottleClassifierAgentDecision,
   BottleExtractedDetails,
-} from "./classifierSchemas";
+} from "./classifierTypes";
 import type { BottleClassificationArtifacts } from "./contract";
 
 type ReasoningResult = {

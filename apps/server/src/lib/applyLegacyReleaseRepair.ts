@@ -1,14 +1,14 @@
 import {
-  getCanonicalReleaseAliasNames,
-  hasBottleLevelReleaseTraits,
-} from "@peated/bottle-classifier/bottleSchemaRules";
-import {
   deriveLegacyReleaseRepairIdentity,
   getLegacyReleaseRepairParentMode,
   resolveLegacyReleaseRepairNameScope,
   resolveLegacyReleaseRepairParentMatch,
 } from "@peated/bottle-classifier/legacyReleaseRepairIdentity";
 import { stripDuplicateBrandPrefixFromBottleName } from "@peated/bottle-classifier/normalize";
+import {
+  getCanonicalReleaseAliasNames,
+  hasBottleLevelReleaseTraits,
+} from "@peated/bottle-classifier/releaseIdentity";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, BottleRelease, User } from "@peated/server/db/schema";
 import {

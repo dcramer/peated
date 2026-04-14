@@ -7,7 +7,7 @@
  * require brand or program semantics. Do not add bottle-family interpretation
  * here; ambiguous meaning belongs to the reviewed classifier.
  */
-import { CATEGORY_LIST } from "./classifierSchemas";
+import { CATEGORY_LIST } from "./classifierTypes";
 
 const ageSuffix = "-year-old";
 

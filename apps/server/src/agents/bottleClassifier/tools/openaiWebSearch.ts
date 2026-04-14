@@ -203,7 +203,7 @@ async function runOpenAIWebSearch({
         ],
       },
     ],
-    tools: [{ type: "web_search_preview" }],
+    tools: [{ type: "web_search" }],
     ...getDeterministicOpenAISettings(config.OPENAI_MODEL),
   });
 

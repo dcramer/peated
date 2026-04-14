@@ -8,7 +8,7 @@ export {
   BottleObservationSchema,
   BottleSearchEvidenceSchema,
   EntityResolutionSchema,
-} from "@peated/bottle-classifier/classifierSchemas";
+} from "@peated/bottle-classifier/internal/types";
 export type {
   BottleCandidate,
   BottleClassificationDecision,
@@ -17,4 +17,4 @@ export type {
   BottleObservation,
   BottleSearchEvidence,
   EntityResolution,
-} from "@peated/bottle-classifier/classifierSchemas";
+} from "@peated/bottle-classifier/internal/types";

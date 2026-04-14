@@ -1,7 +1,7 @@
 import type {
   BottleCandidate,
   BottleExtractedDetails,
-} from "./classifierSchemas";
+} from "./classifierTypes";
 import type { LegacyReleaseRepairParentCandidate } from "./legacyReleaseRepairIdentity";
 
 export function buildBottleCandidate(

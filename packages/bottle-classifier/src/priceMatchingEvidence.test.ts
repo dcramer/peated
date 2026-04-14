@@ -3,7 +3,7 @@ import type {
   BottleCandidate,
   BottleExtractedDetails,
   BottleSearchEvidence,
-} from "./classifierSchemas";
+} from "./classifierTypes";
 import {
   getExistingMatchIdentityConflicts,
   hasSupportiveWebEvidenceForExistingMatch,

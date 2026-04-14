@@ -18,4 +18,4 @@ export {
   isAddingBottleLevelReleaseTraits,
   type BottleLevelReleaseTraitsInput,
   type ReleaseIdentityInput,
-} from "@peated/bottle-classifier/bottleSchemaRules";
+} from "@peated/bottle-classifier/releaseIdentity";

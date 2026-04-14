@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import type { ProposedBottle } from "./classifierSchemas";
+import type { ProposedBottle } from "./classifierTypes";
 
 import {
   inferBottleCreationTarget,

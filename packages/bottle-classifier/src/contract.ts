@@ -5,7 +5,7 @@ import {
   BottleExtractedDetailsSchema,
   BottleSearchEvidenceSchema,
   EntityResolutionSchema,
-} from "./classifierSchemas";
+} from "./classifierTypes";
 
 const BottleReferenceUrlSchema = z.preprocess((value) => {
   if (value === undefined) {

@@ -1,12 +1,12 @@
 import {
-  bottleMarketsStatedAge,
-  hasBottleLevelReleaseTraits,
-  hasDirtyBottleLevelStatedAgeConflict,
-} from "@peated/bottle-classifier/bottleSchemaRules";
-import {
   normalizeBottle,
   normalizeString,
 } from "@peated/bottle-classifier/normalize";
+import {
+  bottleMarketsStatedAge,
+  hasBottleLevelReleaseTraits,
+  hasDirtyBottleLevelStatedAgeConflict,
+} from "@peated/bottle-classifier/releaseIdentity";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, BottleRelease, User } from "@peated/server/db/schema";
 import {

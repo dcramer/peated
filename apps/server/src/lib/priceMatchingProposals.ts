@@ -1,12 +1,12 @@
 import { inferBottleCreationTarget } from "@peated/bottle-classifier/bottleCreationDrafts";
 import {
-  DEFAULT_PRICE_MATCH_CREATION_TARGET,
-  getReleaseObservationFacts,
-} from "@peated/bottle-classifier/bottleSchemaRules";
-import {
   normalizeBottle,
   normalizeString,
 } from "@peated/bottle-classifier/normalize";
+import {
+  DEFAULT_PRICE_MATCH_CREATION_TARGET,
+  getReleaseObservationFacts,
+} from "@peated/bottle-classifier/releaseIdentity";
 import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
 import {
   BottleClassificationError,

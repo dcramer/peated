@@ -12,7 +12,7 @@
 import type {
   BottleExtractedDetails,
   ProposedRelease,
-} from "./classifierSchemas";
+} from "./classifierTypes";
 import {
   normalizeBottle,
   normalizeBottleAge,

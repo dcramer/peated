@@ -1,6 +1,6 @@
 import type OpenAI from "openai";
 import { z } from "zod";
-import { BottleExtractedDetailsSchema } from "./classifierSchemas";
+import { BottleExtractedDetailsSchema } from "./classifierTypes";
 import { buildWhiskyLabelExtractorInstructions } from "./instructions";
 import { getDeterministicOpenAISettings } from "./openaiModelSettings";
 

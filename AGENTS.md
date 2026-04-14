@@ -38,6 +38,12 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - Database migrations must be created with `pnpm db:generate` (Drizzle Kit); never hand-write migration SQL or edit `apps/server/migrations/meta/*` manually
 - Web app uses Next.js App Router in `apps/web/src/app/`
 
+## Policies
+
+- Policy docs live under `docs/policies/`
+- Read relevant policy docs before changing code in that area
+- `docs/policies/code-comments.md` applies by default for code changes and inline documentation
+
 ## Docs Index
 
 - Any new doc added under `docs/` must also be added to this index in `AGENTS.md`
@@ -52,3 +58,6 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - `docs/development/schema-conventions.md`
 - `docs/features/store-price-matching.md`
 - `docs/features/simple-rating-system.md`
+- `docs/policies/README.md`
+- `docs/policies/policy-template.md`
+- `docs/policies/code-comments.md`

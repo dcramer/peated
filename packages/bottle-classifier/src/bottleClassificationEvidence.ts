@@ -3,7 +3,7 @@ import type {
   BottleExtractedDetails,
   BottleSearchEvidence,
   ProposedBottle,
-} from "./classifierSchemas";
+} from "./classifierTypes";
 import {
   AUTHORITATIVE_SOURCE_TIERS,
   buildProducerIdentityPhrases,

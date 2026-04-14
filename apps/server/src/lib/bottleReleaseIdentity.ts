@@ -1,4 +1,4 @@
-import type { ReleaseIdentityInput } from "@peated/bottle-classifier/bottleSchemaRules";
+import type { ReleaseIdentityInput } from "@peated/bottle-classifier/releaseIdentity";
 import { type AnyDatabase } from "@peated/server/db";
 import { bottleReleases } from "@peated/server/db/schema";
 import { and, eq, isNull, sql } from "drizzle-orm";

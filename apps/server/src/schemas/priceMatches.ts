@@ -1,6 +1,6 @@
+import { DEFAULT_BOTTLE_CREATION_TARGET } from "@peated/bottle-classifier/releaseIdentity";
 import { z } from "zod";
 import { CATEGORY_LIST } from "../constants";
-import { DEFAULT_BOTTLE_CREATION_TARGET } from "../lib/bottleSchemaRules";
 import {
   BottleReleaseInputSchema,
   BottleReleaseSchema,

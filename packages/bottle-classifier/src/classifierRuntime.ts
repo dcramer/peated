@@ -2,11 +2,6 @@ import { Agent, OpenAIProvider, Runner } from "@openai/agents";
 import type OpenAI from "openai";
 import { normalizePotentialProofLikeDecision } from "./abv";
 import {
-  finalizeBottleReferenceClassification,
-  getAutoIgnoreBottleReferenceReason,
-} from "./classificationPolicy";
-import {
-  BottleCandidateSearchInputSchema,
   BottleClassifierAgentDecisionSchema,
   type BottleCandidate,
   type BottleCandidateSearchInput,
@@ -14,7 +9,7 @@ import {
   type BottleExtractedDetails,
   type EntityResolution,
   type SearchEntitiesArgs,
-} from "./classifierSchemas";
+} from "./classifierTypes";
 import {
   BottleClassificationResultSchema,
   ClassifyBottleReferenceInputSchema,
@@ -31,6 +26,18 @@ import { createWhiskyLabelExtractor } from "./extractor";
 import { buildBottleClassifierInstructions } from "./instructions";
 import { getDeterministicOpenAISettings } from "./openaiModelSettings";
 import {
+  finalizeBottleReferenceClassification,
+  getAutoIgnoreBottleReferenceReason,
+} from "./reviewPolicy";
+import {
+  buildAgentInput,
+  buildDefaultBottleSearchInput,
+} from "./runtime/agentInput";
+import {
+  mergeBottleCandidate,
+  mergeResolvedEntity,
+} from "./runtime/candidates";
+import {
   createBottleWebSearchBudget,
   createBraveWebSearchTool,
   createOpenAIWebSearchTool,
@@ -39,7 +46,6 @@ import {
 } from "./tools";
 
 const CLASSIFIER_MAX_TURNS = 8;
-const DEFAULT_MATCH_CANDIDATE_LIMIT = 15;
 
 type BottleClassifierReasoningResult = {
   decision: BottleClassifierAgentDecision;
@@ -100,187 +106,12 @@ export type BottleClassifier = {
   extractFromText: (label: string) => Promise<BottleExtractedDetails | null>;
 };
 
-const CANDIDATE_METADATA_FIELDS = [
-  "bottler",
-  "series",
-  "category",
-  "statedAge",
-  "edition",
-  "caskStrength",
-  "singleCask",
-  "abv",
-  "vintageYear",
-  "releaseYear",
-  "caskType",
-  "caskSize",
-  "caskFill",
-] as const satisfies ReadonlyArray<keyof BottleCandidate>;
-
-function getBottleCandidateKey(
-  candidate: Pick<BottleCandidate, "bottleId" | "releaseId" | "kind">,
-) {
-  return candidate.releaseId !== null || candidate.kind === "release"
-    ? `release:${candidate.releaseId ?? "missing"}`
-    : `bottle:${candidate.bottleId}`;
-}
-
-function mergeBottleCandidate(
-  candidates: Map<string, BottleCandidate>,
-  candidate: BottleCandidate,
-) {
-  const key = getBottleCandidateKey(candidate);
-  const existing = candidates.get(key);
-  if (!existing) {
-    candidates.set(key, candidate);
-    return;
-  }
-
-  existing.source = Array.from(
-    new Set([...existing.source, ...candidate.source]),
-  );
-
-  if (
-    candidate.score !== null &&
-    (existing.score === null || candidate.score > existing.score)
-  ) {
-    existing.score = candidate.score;
-  }
-
-  if (!existing.alias && candidate.alias) {
-    existing.alias = candidate.alias;
-  }
-
-  if (!existing.series && candidate.series) {
-    existing.series = candidate.series;
-  }
-
-  if (!existing.bottler && candidate.bottler) {
-    existing.bottler = candidate.bottler;
-  }
-
-  if (!existing.distillery.length && candidate.distillery.length) {
-    existing.distillery = candidate.distillery;
-  } else if (candidate.distillery.length) {
-    existing.distillery = Array.from(
-      new Set([...existing.distillery, ...candidate.distillery]),
-    );
-  }
-
-  const existingMetadata = existing as Record<
-    (typeof CANDIDATE_METADATA_FIELDS)[number],
-    BottleCandidate[(typeof CANDIDATE_METADATA_FIELDS)[number]]
-  >;
-
-  for (const field of CANDIDATE_METADATA_FIELDS) {
-    const existingValue = existingMetadata[field];
-    const candidateValue = candidate[field];
-
-    if (existingValue === null && candidateValue !== null) {
-      existingMetadata[field] = candidateValue;
-    }
-  }
-}
-
-function mergeResolvedEntity(
-  entities: Map<number, EntityResolution>,
-  entity: EntityResolution,
-): void {
-  const existing = entities.get(entity.entityId);
-  if (!existing) {
-    entities.set(entity.entityId, entity);
-    return;
-  }
-
-  existing.source = Array.from(new Set([...existing.source, ...entity.source]));
-
-  if (
-    entity.score !== null &&
-    (existing.score === null || entity.score > existing.score)
-  ) {
-    existing.score = entity.score;
-  }
-
-  if (!existing.alias && entity.alias) {
-    existing.alias = entity.alias;
-  }
-
-  if (!existing.shortName && entity.shortName) {
-    existing.shortName = entity.shortName;
-  }
-}
-
 function parseAgentDecision(
   decision: BottleClassifierAgentDecision,
 ): BottleClassifierAgentDecision {
   return BottleClassifierAgentDecisionSchema.parse(
     normalizePotentialProofLikeDecision(decision),
   );
-}
-
-function buildAgentInput({
-  reference,
-  extractedIdentity,
-  initialCandidates,
-  currentBottle,
-  hasExactAliasMatch,
-}: {
-  reference: BottleReference;
-  extractedIdentity: BottleExtractedDetails | null;
-  initialCandidates: BottleCandidate[];
-  currentBottle: BottleCandidate | null;
-  hasExactAliasMatch: boolean;
-}): string {
-  return JSON.stringify(
-    {
-      reference: {
-        id: reference.id ?? null,
-        name: reference.name,
-        url: reference.url ?? null,
-        imageUrl: reference.imageUrl ?? null,
-        currentBottleId: reference.currentBottleId ?? null,
-        currentReleaseId: reference.currentReleaseId ?? null,
-      },
-      currentBottle,
-      extractedIdentity,
-      localSearch: {
-        hasExactAliasMatch,
-        candidates: initialCandidates,
-      },
-    },
-    null,
-    2,
-  );
-}
-
-function buildDefaultBottleSearchInput({
-  reference,
-  extractedIdentity,
-}: {
-  reference: BottleReference;
-  extractedIdentity: BottleExtractedDetails | null;
-}): BottleCandidateSearchInput {
-  return BottleCandidateSearchInputSchema.parse({
-    query: reference.name,
-    brand: extractedIdentity?.brand ?? null,
-    bottler: extractedIdentity?.bottler ?? null,
-    expression: extractedIdentity?.expression ?? null,
-    series: extractedIdentity?.series ?? null,
-    distillery: extractedIdentity?.distillery ?? [],
-    category: extractedIdentity?.category ?? null,
-    stated_age: extractedIdentity?.stated_age ?? null,
-    abv: extractedIdentity?.abv ?? null,
-    cask_type: extractedIdentity?.cask_type ?? null,
-    cask_size: extractedIdentity?.cask_size ?? null,
-    cask_fill: extractedIdentity?.cask_fill ?? null,
-    cask_strength: extractedIdentity?.cask_strength ?? null,
-    single_cask: extractedIdentity?.single_cask ?? null,
-    edition: extractedIdentity?.edition ?? null,
-    vintage_year: extractedIdentity?.vintage_year ?? null,
-    release_year: extractedIdentity?.release_year ?? null,
-    currentBottleId: reference.currentBottleId ?? null,
-    currentReleaseId: reference.currentReleaseId ?? null,
-    limit: DEFAULT_MATCH_CANDIDATE_LIMIT,
-  });
 }
 
 function createIgnoredReferenceClassification(
