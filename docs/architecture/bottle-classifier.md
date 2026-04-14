@@ -8,7 +8,9 @@ for bottle identity reasoning for any generic bottle reference input.
 The implementation lives in:
 
 - `packages/bottle-classifier/src/classifier.ts`
+- `packages/bottle-classifier/src/classifierRuntime.ts`
 - `packages/bottle-classifier/src/contract.ts`
+- `packages/bottle-classifier/src/normalizationCorpus.ts`
 - `packages/bottle-classifier/README.md`
 - `packages/bottle-classifier/AGENTS.md`
 
@@ -21,6 +23,8 @@ Classifier-owned infrastructure lives in:
 - `packages/bottle-classifier/src/instructions.ts`
 - `packages/bottle-classifier/src/extractor.ts`
 - `packages/bottle-classifier/src/classificationPolicy.ts`
+- `packages/bottle-classifier/src/normalize.ts`
+- `packages/bottle-classifier/src/legacyReleaseRepairIdentity.ts`
 - `packages/bottle-classifier/src/bottleCreationDrafts.ts`
 - `packages/bottle-classifier/src/bottleClassificationEvidence.ts`
 
@@ -58,9 +62,45 @@ The public entrypoint is:
 - `currentReleaseId?`
 - optional tracing metadata such as `id` and `externalSiteId`
 
-Optional overrides exist for callers that already have extracted identity or candidate sets, but normal callers should pass only `reference`.
+Optional `extractedIdentity` and `initialCandidates` inputs exist for callers that already have extracted identity or candidate sets, but normal callers should pass only `reference`.
 
 The boundary is schema-backed in `contract.ts` so evals and downstream consumers can validate the exact request and response shape.
+
+The package root should stay small and export only the core classify/normalize entrypoints used by most consumers:
+
+- `createBottleClassifier(...)`
+- `createWhiskyLabelExtractor(...)`
+- `normalizeBottle(...)`
+- `normalizeBottleCreationDrafts(...)`
+- `getResolvedReleaseIdentity(...)`
+- `formatCanonicalReleaseName(...)`
+
+The package also owns the deterministic normalization entrypoints used by
+classifier policy and server consumers:
+
+- `normalizeBottle(...)`
+- `normalizeBottleCreationDrafts(...)`
+- `deriveLegacyReleaseRepairIdentity(...)`
+- `resolveLegacyCreateParentClassification(...)`
+
+Those helpers should stay package-owned and corpus-tested so server code can
+remain focused on retrieval, persistence, and automation policy.
+
+For lightweight consumers and internal adapters, prefer the narrow package subpaths:
+
+- `@peated/bottle-classifier/normalize`
+- `@peated/bottle-classifier/bottleCreationDrafts`
+- `@peated/bottle-classifier/legacyReleaseRepairIdentity`
+- `@peated/bottle-classifier/legacyReleaseRepairResolution`
+- `@peated/bottle-classifier/normalizationCorpus`
+- `@peated/bottle-classifier/priceMatchingEvidence`
+- `@peated/bottle-classifier/smws`
+- `@peated/bottle-classifier/classifierRuntime`
+- `@peated/bottle-classifier/contract`
+- `@peated/bottle-classifier/classifierSchemas`
+- `@peated/bottle-classifier/extractor`
+- `@peated/bottle-classifier/instructions`
+- `@peated/bottle-classifier/classificationPolicy`
 
 ## Pipeline
 
@@ -133,6 +173,10 @@ The current package-local eval harness lives in:
 
 - `packages/bottle-classifier/src/classifier.eval.test.ts`
 - `packages/bottle-classifier/src/classifier.eval.fixtures.ts`
+- `packages/bottle-classifier/src/normalizationCorpus.eval.test.ts`
+- `packages/bottle-classifier/src/normalizationCorpus.eval.fixtures.ts`
+- `packages/bottle-classifier/src/legacyReleaseRepairResolution.eval.test.ts`
+- `packages/bottle-classifier/src/legacyReleaseRepairResolution.eval.fixtures.ts`
 
 Run it from the repo root with:
 
@@ -141,8 +185,8 @@ Run it from the repo root with:
 Local setup for live evals:
 
 - put `OPENAI_API_KEY` in the repo-root `.env.local`
-- `OPENAI_MODEL` is optional for evals and defaults to `gpt-5.4`
-- set `OPENAI_EVAL_MODEL` only if you want a different judge model; otherwise the judge reuses `OPENAI_MODEL`
+- `OPENAI_MODEL` is optional for evals and defaults to `gpt-5-mini` for the classifier pass
+- `OPENAI_EVAL_MODEL` is optional and defaults to `gpt-5-mini` for judging; override it if you want a different cost/quality tradeoff
 - `OPENAI_HOST`, `OPENAI_ORGANIZATION`, and `OPENAI_PROJECT` are optional for proxy or non-default account routing
 - `BRAVE_API_KEY` is optional; without it the classifier still runs with OpenAI web search only
 - `BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES` is optional and defaults to `3`
@@ -152,14 +196,23 @@ Notes:
 - both `pnpm evals:classifier` and `pnpm --filter @peated/bottle-classifier evals` load the repo-root `.env` and then `.env.local`
 - the eval suite is intentionally a live LLM integration test; each case runs the classifier and then an LLM judge scores the result
 - the fixture set is meant to mirror production-style inputs such as SMWS listings, retailer titles, and user-entered shorthand names
+- the repair eval set specifically scores the repair-facing interpretation layer, not just raw classifier actions, so reusable-parent safety can be tracked separately from generic classification quality
 
 ## Internal Structure
 
 The classifier is intentionally split into a few narrow modules:
 
-- `contract.ts` defines the public API and normalized result artifacts.
-- `classifier.ts` owns the reviewed orchestration boundary and the raw model/tool loop.
+- `classifier.ts` defines the narrow public classifier factory and public types.
+- `contract.ts` defines the public request/response contract and normalized result artifacts.
+- `classifierRuntime.ts` owns the reviewed orchestration boundary and the raw model/tool loop.
+- `classifierSchemas.ts` owns internal classifier working schemas that should not leak through the package root.
 - `classificationPolicy.ts` owns deterministic validation, create normalization, exact-cask scope inference, and downgrade rules.
+- `normalize.ts` owns shared bottle/name/category/volume normalization.
+- `priceMatchingEvidence.ts` owns pure evidence/conflict checks shared with price matching.
+- `bottleSchemaGuidance.ts` owns prompt-facing bottle versus release guidance text.
+- `legacyReleaseRepairIdentity.ts` owns the pure release-repair parent/release split and reusable-parent matching heuristics.
+- `legacyReleaseRepairResolution.ts` owns the pure repair-facing mapping from reviewed classifier output to reusable-parent, allow-create, or blocked release-repair outcomes.
+- `smws.ts` owns pure SMWS code, flavor-profile, and cask parsing.
 - `extractor.ts` owns bottle-label extraction.
 - `instructions.ts` owns classifier and extractor prompts.
 - `bottleCreationDrafts.ts` owns bottle/release draft normalization for create decisions.

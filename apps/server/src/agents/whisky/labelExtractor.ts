@@ -2,7 +2,7 @@ import {
   createWhiskyLabelExtractor,
   extractFromImage as extractFromImageWithClient,
   extractFromText as extractFromTextWithClient,
-} from "@peated/bottle-classifier";
+} from "@peated/bottle-classifier/extractor";
 import config from "@peated/server/config";
 import OpenAI from "openai";
 

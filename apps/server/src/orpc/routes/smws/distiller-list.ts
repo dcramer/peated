@@ -1,6 +1,6 @@
+import { SMWS_DISTILLERY_CODES } from "@peated/bottle-classifier/smws";
 import { db } from "@peated/server/db";
 import { entities, entityAliases } from "@peated/server/db/schema";
-import { SMWS_DISTILLERY_CODES } from "@peated/server/lib/smws";
 import { procedure } from "@peated/server/orpc";
 import { EntitySchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";

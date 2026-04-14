@@ -3,7 +3,10 @@ import {
   getExistingMatchIdentityConflicts,
   hasSupportiveWebEvidenceForExistingMatch,
 } from "./bottleClassificationEvidence";
-import type { BottleCandidate, BottleSearchEvidence } from "./index";
+import type {
+  BottleCandidate,
+  BottleSearchEvidence,
+} from "./classifierSchemas";
 
 function buildBottleCandidate(
   candidate: Pick<BottleCandidate, "bottleId" | "fullName"> &

@@ -1,4 +1,5 @@
 import { ORPCError } from "@orpc/server";
+import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
 import { db, type AnyDatabase } from "@peated/server/db";
 import type { User } from "@peated/server/db/schema";
 import { entities, entityTombstones } from "@peated/server/db/schema";
@@ -7,7 +8,6 @@ import {
   stripDuplicateBrandPrefixFromBottleName,
   type NormalizedBottle,
 } from "@peated/server/lib/normalize";
-import { parseDetailsFromName } from "@peated/server/lib/smws";
 import { procedure } from "@peated/server/orpc";
 import type { Context } from "@peated/server/orpc/context";
 import { requireAuth } from "@peated/server/orpc/middleware";

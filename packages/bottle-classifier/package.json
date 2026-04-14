@@ -6,6 +6,74 @@
     ".": {
       "types": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./classifier": {
+      "types": "./src/classifier.ts",
+      "default": "./src/classifier.ts"
+    },
+    "./classifierRuntime": {
+      "types": "./src/classifierRuntime.ts",
+      "default": "./src/classifierRuntime.ts"
+    },
+    "./classificationPolicy": {
+      "types": "./src/classificationPolicy.ts",
+      "default": "./src/classificationPolicy.ts"
+    },
+    "./classifierSchemas": {
+      "types": "./src/classifierSchemas.ts",
+      "default": "./src/classifierSchemas.ts"
+    },
+    "./contract": {
+      "types": "./src/contract.ts",
+      "default": "./src/contract.ts"
+    },
+    "./normalize": {
+      "types": "./src/normalize.ts",
+      "default": "./src/normalize.ts"
+    },
+    "./bottleCreationDrafts": {
+      "types": "./src/bottleCreationDrafts.ts",
+      "default": "./src/bottleCreationDrafts.ts"
+    },
+    "./priceMatchingEvidence": {
+      "types": "./src/priceMatchingEvidence.ts",
+      "default": "./src/priceMatchingEvidence.ts"
+    },
+    "./error": {
+      "types": "./src/error.ts",
+      "default": "./src/error.ts"
+    },
+    "./extractor": {
+      "types": "./src/extractor.ts",
+      "default": "./src/extractor.ts"
+    },
+    "./instructions": {
+      "types": "./src/instructions.ts",
+      "default": "./src/instructions.ts"
+    },
+    "./normalizationCorpus": {
+      "types": "./src/normalizationCorpus.ts",
+      "default": "./src/normalizationCorpus.ts"
+    },
+    "./legacyReleaseRepairIdentity": {
+      "types": "./src/legacyReleaseRepairIdentity.ts",
+      "default": "./src/legacyReleaseRepairIdentity.ts"
+    },
+    "./legacyReleaseRepairResolution": {
+      "types": "./src/legacyReleaseRepairResolution.ts",
+      "default": "./src/legacyReleaseRepairResolution.ts"
+    },
+    "./bottleSchemaRules": {
+      "types": "./src/bottleSchemaRules.ts",
+      "default": "./src/bottleSchemaRules.ts"
+    },
+    "./bottleSchemaGuidance": {
+      "types": "./src/bottleSchemaGuidance.ts",
+      "default": "./src/bottleSchemaGuidance.ts"
+    },
+    "./smws": {
+      "types": "./src/smws.ts",
+      "default": "./src/smws.ts"
     }
   },
   "scripts": {

@@ -1,8 +1,9 @@
+import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
 import {
   BottleClassificationError,
   classifyBottleReference,
   isIgnoredBottleClassification,
-  type BottleMatchDecision,
+  type BottleClassificationDecision,
 } from "@peated/server/agents/bottleClassifier";
 import config from "@peated/server/config";
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
@@ -52,7 +53,6 @@ import {
   CLOSED_STORE_PRICE_MATCH_PROPOSAL_STATUSES,
   REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES,
 } from "@peated/server/lib/priceMatchingStatus";
-import { parseDetailsFromName } from "@peated/server/lib/smws";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import type {
   BottleInputSchema,
@@ -143,9 +143,9 @@ function shouldAutoIgnoreTrivialNonWhiskyListing(name: string): boolean {
 }
 
 function normalizeClassifierDecisionForPriceMatching(
-  decision: BottleMatchDecision,
+  decision: BottleClassificationDecision,
   candidates: PriceMatchCandidate[],
-): BottleMatchDecision {
+): BottleClassificationDecision {
   if (
     decision.action === "match" &&
     !candidates.some(
@@ -194,7 +194,7 @@ function toStorePriceMatchDecision({
   decision,
 }: {
   price: Pick<StorePrice, "bottleId" | "releaseId">;
-  decision: BottleMatchDecision;
+  decision: BottleClassificationDecision;
 }): StorePriceMatchDecision {
   if (decision.action === "match") {
     const action =

@@ -1,5 +1,5 @@
+import { hasSupportiveWebEvidenceForExistingMatch as hasSupportiveBottleEvidence } from "@peated/bottle-classifier/priceMatchingEvidence";
 import type { StorePrice } from "@peated/server/db/schema";
-import { hasSupportiveWebEvidenceForExistingMatch as hasSupportiveBottleEvidence } from "@peated/server/lib/bottleClassificationEvidence";
 import { hasExtractedReleaseIdentity } from "@peated/server/lib/bottleSchemaRules";
 import { normalizeString } from "@peated/server/lib/normalize";
 import {

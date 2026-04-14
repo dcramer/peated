@@ -1,6 +1,6 @@
 import { tool } from "@openai/agents";
 import { z } from "zod";
-import type { BottleSearchEvidence } from "../schemas";
+import type { BottleSearchEvidence } from "../classifierSchemas";
 import {
   BottleWebSearchArgsSchema,
   buildBottleSearchEvidence,

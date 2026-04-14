@@ -1,11 +1,11 @@
 import { z } from "zod";
 import {
   BottleCandidateSchema,
+  BottleClassificationDecisionSchema,
   BottleExtractedDetailsSchema,
-  BottleMatchDecisionSchema,
   BottleSearchEvidenceSchema,
   EntityResolutionSchema,
-} from "./schemas";
+} from "./classifierSchemas";
 
 const BottleReferenceUrlSchema = z.preprocess((value) => {
   if (value === undefined) {
@@ -72,7 +72,7 @@ export const IgnoredBottleClassificationResultSchema = z
 export const DecidedBottleClassificationResultSchema = z
   .object({
     status: z.literal("classified"),
-    decision: BottleMatchDecisionSchema,
+    decision: BottleClassificationDecisionSchema,
     artifacts: BottleClassificationArtifactsSchema,
   })
   .strict();
@@ -129,7 +129,7 @@ export function createDecidedBottleClassification({
   decision,
   artifacts,
 }: {
-  decision: z.infer<typeof BottleMatchDecisionSchema>;
+  decision: z.infer<typeof BottleClassificationDecisionSchema>;
   artifacts: Partial<BottleClassificationArtifacts>;
 }): DecidedBottleClassificationResult {
   return DecidedBottleClassificationResultSchema.parse({

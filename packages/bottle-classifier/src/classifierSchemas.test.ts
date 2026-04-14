@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { z } from "zod";
-import { BottleClassifierAgentDecisionSchema } from "./schemas";
+import { BottleClassifierAgentDecisionSchema } from "./classifierSchemas";
 
 describe("BottleClassifierAgentDecisionSchema", () => {
   test("uses a flat structured-output schema at the root", () => {

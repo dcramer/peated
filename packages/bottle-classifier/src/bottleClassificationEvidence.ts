@@ -3,7 +3,7 @@ import type {
   BottleExtractedDetails,
   BottleSearchEvidence,
   ProposedBottle,
-} from "./index";
+} from "./classifierSchemas";
 import { normalizeBottle, normalizeString } from "./normalize";
 
 type MatchAttribute =

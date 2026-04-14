@@ -4,21 +4,21 @@ import {
   hasSupportiveWebEvidenceForExistingMatch,
 } from "./bottleClassificationEvidence";
 import { normalizeBottleCreationDrafts } from "./bottleCreationDrafts";
+import {
+  BottleClassificationDecisionSchema,
+  type BottleCandidate,
+  type BottleClassificationDecision,
+  type BottleClassifierAgentDecision,
+  type BottleObservation,
+  type EntityResolution,
+  type ProposedRelease,
+} from "./classifierSchemas";
 import type {
   BottleClassificationArtifacts,
   BottleReference,
 } from "./contract";
 import { BottleClassificationError } from "./error";
 import { normalizeString } from "./normalize";
-import {
-  BottleMatchDecisionSchema,
-  type BottleCandidate,
-  type BottleClassifierAgentDecision,
-  type BottleMatchDecision,
-  type BottleObservation,
-  type EntityResolution,
-  type ProposedRelease,
-} from "./schemas";
 
 const NON_WHISKY_KEYWORDS =
   /\b(vodka|gin|rum|tequila|mezcal|sotol|soju|baijiu|sake|shochu|brandy|cognac|armagnac|liqueur)\b/i;
@@ -158,6 +158,66 @@ function textsOverlap(
   );
 }
 
+const BARE_SMWS_CODE_REFERENCE_PATTERN = /^SMWS\s+([A-Z]*\d+\.\d+)$/i;
+
+function isSmwsIdentityAnchor(value: string | null | undefined): boolean {
+  const normalizedValue = normalizeComparableText(value);
+  return (
+    normalizedValue === "smws" ||
+    normalizedValue === "the scotch malt whisky society" ||
+    normalizedValue === "scotch malt whisky society"
+  );
+}
+
+function getBareSmwsCodeReference(
+  referenceName: string | null | undefined,
+): string | null {
+  const match = normalizeString(referenceName ?? "")
+    .trim()
+    .match(BARE_SMWS_CODE_REFERENCE_PATTERN);
+
+  return match?.[1] ?? null;
+}
+
+function normalizeExactCaskProposedBottleDraft({
+  extractedIdentity,
+  proposedBottle,
+  reference,
+}: {
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
+  reference: BottleReference;
+}): NonNullable<BottleClassificationDecision["proposedBottle"]> {
+  const brandLooksSmws =
+    isSmwsIdentityAnchor(proposedBottle.brand.name) ||
+    isSmwsIdentityAnchor(extractedIdentity?.brand) ||
+    isSmwsIdentityAnchor(extractedIdentity?.bottler);
+
+  if (!brandLooksSmws) {
+    return proposedBottle;
+  }
+
+  const bareReferenceCode = getBareSmwsCodeReference(reference.name);
+  if (bareReferenceCode) {
+    return {
+      ...proposedBottle,
+      name: bareReferenceCode,
+      edition: null,
+    };
+  }
+
+  const draftCode = proposedBottle.edition ?? extractedIdentity?.edition;
+  if (!draftCode || textsOverlap(proposedBottle.name, draftCode)) {
+    return proposedBottle;
+  }
+
+  return {
+    ...proposedBottle,
+    name: `${draftCode} ${proposedBottle.name}`.trim(),
+    edition: null,
+  };
+}
+
 function getComparableDomain(url: string | null | undefined): string | null {
   if (!url) {
     return null;
@@ -180,6 +240,37 @@ function getComparableNameTokens(value: string | null | undefined): string[] {
     .replace(/\b\d+(?:\.\d+)?\s?(?:ml|cl|l|oz)\b/g, " ")
     .split(/[^a-z0-9]+/g)
     .filter((token) => token.length > 0 && !GENERIC_NAME_TOKENS.has(token));
+}
+
+function getStrictComparableNameTokens(
+  value: string | null | undefined,
+): string[] {
+  return normalizeComparableText(value)
+    .replace(/\b\d+(?:\.\d+)?\s?(?:ml|cl|l|oz)\b/g, " ")
+    .split(/[^a-z0-9]+/g)
+    .filter((token) => token.length > 0);
+}
+
+function getReferenceAnchoredCreateTokens({
+  proposedBottle,
+  proposedRelease,
+}: {
+  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
+  proposedRelease: null | ProposedRelease;
+}): string[] {
+  return Array.from(
+    new Set([
+      ...getStrictComparableNameTokens(proposedBottle.brand.name),
+      ...getStrictComparableNameTokens(proposedBottle.series?.name),
+      ...getStrictComparableNameTokens(proposedBottle.name),
+      ...getStrictComparableNameTokens(proposedRelease?.edition),
+      ...getStrictComparableNameTokens(
+        proposedRelease?.releaseYear != null
+          ? String(proposedRelease.releaseYear)
+          : null,
+      ),
+    ]),
+  );
 }
 
 function tokenSetsMatchExactly(left: string[], right: string[]): boolean {
@@ -276,6 +367,90 @@ function isBasicallyExactNameMatch(
   );
 }
 
+function isStrictlyExactNameMatch(
+  referenceName: string,
+  candidateName: string | null | undefined,
+): boolean {
+  return tokenSequencesMatchAllowingStandaloneArticle(
+    getStrictComparableNameTokens(referenceName),
+    getStrictComparableNameTokens(candidateName),
+  );
+}
+
+function isConservativelySupportedExistingMatchName(
+  referenceName: string,
+  candidateName: string | null | undefined,
+): boolean {
+  if (isBasicallyExactNameMatch(referenceName, candidateName)) {
+    return true;
+  }
+
+  if (!candidateName) {
+    return false;
+  }
+
+  const strippedCandidateName = stripSafeStrengthPhrases(candidateName);
+  if (strippedCandidateName === normalizeComparableText(candidateName).trim()) {
+    return false;
+  }
+
+  return isStrictlyExactNameMatch(referenceName, strippedCandidateName);
+}
+
+function hasReferenceAnchoredSparseCreateProposal({
+  reference,
+  extractedIdentity,
+  candidates,
+  proposedBottle,
+  proposedRelease,
+}: {
+  reference: BottleReference;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+  candidates: BottleCandidate[];
+  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
+  proposedRelease: null | ProposedRelease;
+}): boolean {
+  if (extractedIdentity || candidates.length > 0) {
+    return true;
+  }
+
+  const referenceTokens = new Set(
+    getStrictComparableNameTokens(reference.name),
+  );
+  if (!referenceTokens.size) {
+    return false;
+  }
+
+  const brandTokens = getStrictComparableNameTokens(proposedBottle.brand.name);
+  const seriesTokens = getStrictComparableNameTokens(
+    proposedBottle.series?.name,
+  );
+  const nameTokens = getStrictComparableNameTokens(proposedBottle.name);
+  const proposedTokens = getReferenceAnchoredCreateTokens({
+    proposedBottle,
+    proposedRelease,
+  });
+  const introducedTokens = proposedTokens.filter(
+    (token) => !referenceTokens.has(token),
+  );
+  const hasAnchoredBrand =
+    brandTokens.length === 0 ||
+    brandTokens.every((token) => referenceTokens.has(token));
+  const hasAnchoredSeries =
+    seriesTokens.length === 0 ||
+    seriesTokens.some((token) => referenceTokens.has(token));
+  const hasAnchoredName = nameTokens.some((token) =>
+    referenceTokens.has(token),
+  );
+
+  return (
+    hasAnchoredBrand &&
+    hasAnchoredSeries &&
+    hasAnchoredName &&
+    introducedTokens.length <= 2
+  );
+}
+
 function stripComparablePhrase(
   haystack: string,
   needle: string | null | undefined,
@@ -291,6 +466,21 @@ function stripComparablePhrase(
       "g",
     ),
     "$1 $2",
+  );
+}
+
+const SAFE_STRENGTH_NAME_PHRASES = [
+  "barrel proof",
+  "barrel strength",
+  "cask strength",
+  "full proof",
+  "natural strength",
+] as const;
+
+function stripSafeStrengthPhrases(value: string): string {
+  return SAFE_STRENGTH_NAME_PHRASES.reduce(
+    (current, phrase) => stripComparablePhrase(current, phrase),
+    normalizeComparableText(value),
   );
 }
 
@@ -372,13 +562,25 @@ function candidateNameMatchesReferenceVariants({
   }
 
   return candidateNames.some((candidateName) => {
-    const candidateTokens = getComparableNameTokens(candidateName);
-    if (!candidateTokens.length) {
-      return false;
-    }
+    const candidateTokenVariants = [
+      getComparableNameTokens(candidateName),
+      getComparableNameTokens(
+        stripSafeStrengthPhrases(normalizeComparableText(candidateName)),
+      ),
+    ].filter((tokens, index, variants) => {
+      if (!tokens.length) {
+        return false;
+      }
 
-    return referenceTokenVariants.some((referenceTokens) =>
-      tokenSetsMatchExactly(referenceTokens, candidateTokens),
+      return !variants
+        .slice(0, index)
+        .some((existing) => tokenSetsMatchExactly(existing, tokens));
+    });
+
+    return candidateTokenVariants.some((candidateTokens) =>
+      referenceTokenVariants.some((referenceTokens) =>
+        tokenSetsMatchExactly(referenceTokens, candidateTokens),
+      ),
     );
   });
 }
@@ -452,6 +654,26 @@ function normalizeObservation(
     : null;
 }
 
+function hasSingularCaskObservationValue(
+  value: string | null | undefined,
+): boolean {
+  const normalizedValue = normalizeComparableText(value);
+  if (!normalizedValue) {
+    return false;
+  }
+
+  if (
+    /\bcasks\b|\bbarrels\b/.test(normalizedValue) ||
+    /,|\/|&/.test(normalizedValue) ||
+    /\band\b/.test(normalizedValue)
+  ) {
+    return false;
+  }
+
+  const numericMatches = normalizedValue.match(/\d+/g) ?? [];
+  return numericMatches.length <= 1;
+}
+
 function isKnownExactCaskProgramBrand(value: string | null | undefined) {
   return EXACT_CASK_PROGRAM_BRANDS.has(normalizeComparableText(value));
 }
@@ -520,7 +742,7 @@ function hasExactCaskSignals({
 }: {
   reference: BottleReference;
   target?: BottleCandidate | null;
-  proposedBottle?: BottleMatchDecision["proposedBottle"];
+  proposedBottle?: BottleClassificationDecision["proposedBottle"];
   extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
   observation: BottleObservation | null;
 }): boolean {
@@ -535,7 +757,8 @@ function hasExactCaskSignals({
     target?.abv,
   ].filter((value): value is number => value !== null && value !== undefined);
   const hasSpecificCaskReference = Boolean(
-    observation?.caskNumber || observation?.barrelNumber,
+    hasSingularCaskObservationValue(observation?.caskNumber) ||
+    hasSingularCaskObservationValue(observation?.barrelNumber),
   );
   const hasSingleCaskTrait =
     proposedBottle?.singleCask === true ||
@@ -574,11 +797,11 @@ function inferIdentityScope({
   requestedIdentityScope: BottleClassifierAgentDecision["identityScope"] | null;
   reference: BottleReference;
   target?: BottleCandidate | null;
-  proposedBottle?: BottleMatchDecision["proposedBottle"];
+  proposedBottle?: BottleClassificationDecision["proposedBottle"];
   extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
   hasReleaseIdentity: boolean;
   observation: BottleObservation | null;
-}): BottleMatchDecision["identityScope"] {
+}): BottleClassificationDecision["identityScope"] {
   if (hasReleaseIdentity) {
     return "product";
   }
@@ -606,9 +829,9 @@ function mergeReleaseIdentityIntoBottleDraft({
   proposedBottle,
   proposedRelease,
 }: {
-  proposedBottle: NonNullable<BottleMatchDecision["proposedBottle"]>;
-  proposedRelease: NonNullable<BottleMatchDecision["proposedRelease"]>;
-}): NonNullable<BottleMatchDecision["proposedBottle"]> {
+  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
+  proposedRelease: NonNullable<BottleClassificationDecision["proposedRelease"]>;
+}): NonNullable<BottleClassificationDecision["proposedBottle"]> {
   return {
     ...proposedBottle,
     edition: proposedBottle.edition ?? proposedRelease.edition,
@@ -625,7 +848,7 @@ function mergeReleaseIdentityIntoBottleDraft({
 }
 
 function getMatchedTarget(
-  decision: BottleMatchDecision,
+  decision: BottleClassificationDecision,
   candidates: BottleCandidate[],
 ): BottleCandidate | null {
   if (decision.action !== "match") {
@@ -645,7 +868,7 @@ function getMatchedTarget(
 
 function getTargetNameCandidates(
   target: BottleCandidate,
-  decision: BottleMatchDecision,
+  decision: BottleClassificationDecision,
 ): string[] {
   const names =
     decision.action === "match" &&
@@ -723,7 +946,7 @@ function hasSupportiveWebEvidenceForTarget({
   artifacts,
 }: {
   target: BottleCandidate;
-  decision: BottleMatchDecision;
+  decision: BottleClassificationDecision;
   reference: BottleReference;
   artifacts: BottleClassificationArtifacts;
 }): boolean {
@@ -793,8 +1016,8 @@ function createNoMatchDecision({
   candidateBottleIds: number[];
   rationale: string | null;
   observation: BottleObservation | null;
-  identityScope?: BottleMatchDecision["identityScope"];
-}): BottleMatchDecision {
+  identityScope?: BottleClassificationDecision["identityScope"];
+}): BottleClassificationDecision {
   return {
     action: "no_match",
     confidence: decision.confidence,
@@ -898,14 +1121,14 @@ function maybePromoteBottleMatchToCreateRelease({
 }: {
   reference: BottleReference;
   decision: Pick<
-    BottleMatchDecision,
+    BottleClassificationDecision,
     "confidence" | "rationale" | "identityScope"
   >;
   target: BottleCandidate | null;
   artifacts: BottleClassificationArtifacts;
   candidateBottleIds: number[];
   observation: BottleObservation | null;
-}): BottleMatchDecision | null {
+}): BottleClassificationDecision | null {
   const parentTarget = resolvePromotableParentBottleTarget({
     reference,
     target,
@@ -1008,15 +1231,66 @@ function maybePromoteBottleMatchToCreateRelease({
   };
 }
 
+function findReusableParentBottleTargetForCreateRelease({
+  reference,
+  artifacts,
+  proposedBottle,
+}: {
+  reference: BottleReference;
+  artifacts: BottleClassificationArtifacts;
+  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
+}): BottleCandidate | null {
+  return (
+    artifacts.candidates
+      .filter(
+        (candidate) =>
+          candidate.releaseId === null &&
+          candidate.kind !== "release" &&
+          !candidateLooksLikeLegacyReleaseBottle(candidate),
+      )
+      .filter(
+        (candidate) =>
+          candidateNameMatchesReferenceVariants({
+            referenceName: reference.name,
+            extractedIdentity: artifacts.extractedIdentity,
+            candidateNames: getBottleTargetNameCandidates(candidate),
+          }) ||
+          getBottleTargetNameCandidates(candidate).some(
+            (candidateName) =>
+              textsOverlap(
+                candidateName,
+                `${proposedBottle.brand.name} ${proposedBottle.name}`,
+              ) ||
+              textsOverlap(candidateName, proposedBottle.name) ||
+              textsOverlap(candidateName, proposedBottle.series?.name),
+          ),
+      )
+      .filter((candidate) => {
+        if (candidate.source.includes("exact")) {
+          return true;
+        }
+
+        return (
+          getExistingMatchIdentityConflicts({
+            referenceName: reference.name,
+            targetCandidate: candidate,
+            extractedLabel: artifacts.extractedIdentity,
+          }).length === 0
+        );
+      })
+      .sort((left, right) => (right.score ?? 0) - (left.score ?? 0))[0] ?? null
+  );
+}
+
 function downgradeUnsafeExistingMatchDecision({
   reference,
   decision,
   artifacts,
 }: {
   reference: BottleReference;
-  decision: BottleMatchDecision;
+  decision: BottleClassificationDecision;
   artifacts: BottleClassificationArtifacts;
-}): BottleMatchDecision {
+}): BottleClassificationDecision {
   if (decision.action !== "match") {
     return decision;
   }
@@ -1027,7 +1301,7 @@ function downgradeUnsafeExistingMatchDecision({
   }
 
   const hasExactishLocalName = getTargetNameCandidates(target, decision).some(
-    (name) => isBasicallyExactNameMatch(reference.name, name),
+    (name) => isConservativelySupportedExistingMatchName(reference.name, name),
   );
   const hasSupportiveWebEvidence = hasSupportiveWebEvidenceForTarget({
     target,
@@ -1058,7 +1332,7 @@ function downgradeUnsafeExistingMatchDecision({
   }
   if (!hasExactishLocalName && !hasSupportiveWebEvidence) {
     reasons.push(
-      "there is no exact alias, no basically exact canonical name match, and no supportive off-retailer web evidence for the matched target",
+      "there is no exact alias, no exactish canonical name match, and no supportive off-retailer web evidence for the matched target",
     );
   }
 
@@ -1122,9 +1396,9 @@ function sanitizeResolvedEntityChoice(
 }
 
 function sanitizeProposedBottleDraft(
-  proposedBottle: NonNullable<BottleMatchDecision["proposedBottle"]>,
+  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>,
   resolvedEntitiesById: Map<number, EntityResolution>,
-): NonNullable<BottleMatchDecision["proposedBottle"]> {
+): NonNullable<BottleClassificationDecision["proposedBottle"]> {
   return {
     ...proposedBottle,
     category:
@@ -1165,7 +1439,7 @@ function sanitizeClassifierDecision({
   reference: BottleReference;
   decision: BottleClassifierAgentDecision;
   artifacts: BottleClassificationArtifacts;
-}): BottleMatchDecision {
+}): BottleClassificationDecision {
   const candidateBottleIds = new Set(
     artifacts.candidates.map((candidate) => candidate.bottleId),
   );
@@ -1288,10 +1562,14 @@ function sanitizeClassifierDecision({
       });
     }
 
-    const sanitizedBottleDraft = sanitizeProposedBottleDraft(
-      decision.proposedBottle,
-      resolvedEntitiesById,
-    );
+    const sanitizedBottleDraft = normalizeExactCaskProposedBottleDraft({
+      extractedIdentity: artifacts.extractedIdentity,
+      proposedBottle: sanitizeProposedBottleDraft(
+        decision.proposedBottle,
+        resolvedEntitiesById,
+      ),
+      reference,
+    });
     const normalizedDrafts = normalizeBottleCreationDrafts({
       creationTarget: "bottle",
       proposedBottle: sanitizedBottleDraft,
@@ -1310,6 +1588,30 @@ function sanitizeClassifierDecision({
         rationale: appendRationale(
           decision.rationale,
           "Server downgraded create_bottle because the proposed bottle draft could not be normalized.",
+        ),
+      });
+    }
+
+    if (
+      !hasReferenceAnchoredSparseCreateProposal({
+        reference,
+        extractedIdentity: artifacts.extractedIdentity,
+        candidates: artifacts.candidates,
+        proposedBottle: normalizedDrafts.proposedBottle,
+        proposedRelease: null,
+      })
+    ) {
+      return createNoMatchDecision({
+        decision: {
+          ...decision,
+          confidence: normalizedConfidence,
+        },
+        candidateBottleIds: filteredCandidateBottleIds,
+        observation,
+        identityScope: "product",
+        rationale: appendRationale(
+          decision.rationale,
+          "Server downgraded create_bottle because the proposed bottle identity expanded too far beyond a sparse unanchored reference.",
         ),
       });
     }
@@ -1420,10 +1722,14 @@ function sanitizeClassifierDecision({
       });
     }
 
-    const sanitizedBottleDraft = sanitizeProposedBottleDraft(
-      decision.proposedBottle,
-      resolvedEntitiesById,
-    );
+    const sanitizedBottleDraft = normalizeExactCaskProposedBottleDraft({
+      extractedIdentity: artifacts.extractedIdentity,
+      proposedBottle: sanitizeProposedBottleDraft(
+        decision.proposedBottle,
+        resolvedEntitiesById,
+      ),
+      reference,
+    });
     const normalizedDrafts = normalizeBottleCreationDrafts({
       creationTarget: "bottle_and_release",
       proposedBottle: sanitizedBottleDraft,
@@ -1470,6 +1776,63 @@ function sanitizeClassifierDecision({
         parentBottleId: null,
         proposedBottle: normalizedDrafts.proposedBottle,
         proposedRelease: null,
+      };
+    }
+
+    if (
+      !hasReferenceAnchoredSparseCreateProposal({
+        reference,
+        extractedIdentity: artifacts.extractedIdentity,
+        candidates: artifacts.candidates,
+        proposedBottle: normalizedDrafts.proposedBottle,
+        proposedRelease: normalizedDrafts.proposedRelease,
+      })
+    ) {
+      return createNoMatchDecision({
+        decision: {
+          ...decision,
+          confidence: normalizedConfidence,
+        },
+        candidateBottleIds: filteredCandidateBottleIds,
+        observation,
+        identityScope: "product",
+        rationale: appendRationale(
+          decision.rationale,
+          "Server downgraded bottle-and-release creation because the proposed bottle or release identity expanded too far beyond a sparse unanchored reference.",
+        ),
+      });
+    }
+
+    const promotedParentTarget = findReusableParentBottleTargetForCreateRelease(
+      {
+        reference,
+        artifacts,
+        proposedBottle: normalizedDrafts.proposedBottle,
+      },
+    );
+    const promotedReleaseDraft =
+      promotedParentTarget &&
+      buildReleaseDraftFromExtractedIdentity({
+        extractedIdentity: artifacts.extractedIdentity,
+        target: promotedParentTarget,
+      });
+
+    if (promotedParentTarget && promotedReleaseDraft) {
+      return {
+        action: "create_release",
+        confidence: normalizedConfidence,
+        rationale: appendRationale(
+          decision.rationale,
+          "Server promoted bottle-and-release creation to release creation because a reusable parent bottle already exists locally.",
+        ),
+        candidateBottleIds: filteredCandidateBottleIds,
+        identityScope: "product",
+        observation,
+        matchedBottleId: null,
+        matchedReleaseId: null,
+        parentBottleId: promotedParentTarget.bottleId,
+        proposedBottle: null,
+        proposedRelease: promotedReleaseDraft,
       };
     }
 
@@ -1595,13 +1958,13 @@ export function finalizeBottleReferenceClassification({
   reference: BottleReference;
   decision: BottleClassifierAgentDecision;
   artifacts: BottleClassificationArtifacts;
-}): BottleMatchDecision {
+}): BottleClassificationDecision {
   const sanitizedDecision = sanitizeClassifierDecision({
     reference,
     decision,
     artifacts,
   });
-  return BottleMatchDecisionSchema.parse(
+  return BottleClassificationDecisionSchema.parse(
     downgradeUnsafeExistingMatchDecision({
       reference,
       decision: sanitizedDecision,

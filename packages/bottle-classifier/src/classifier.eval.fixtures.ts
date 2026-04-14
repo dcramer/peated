@@ -1,5 +1,9 @@
+import type { BottleCandidate } from "./classifierSchemas";
 import type { ClassifyBottleReferenceInput } from "./contract";
-import type { BottleCandidate, BottleExtractedDetails } from "./schemas";
+import {
+  buildBottleCandidate,
+  buildExtractedIdentity,
+} from "./evalFixtureBuilders";
 
 export type SearchResponseFixture = {
   when: string[];
@@ -27,60 +31,6 @@ export type ClassifierEvalCase = {
   searchResponses?: SearchResponseFixture[];
   expected: ClassifierEvalExpectation;
 };
-
-function buildBottleCandidate(
-  candidate: Pick<BottleCandidate, "bottleId" | "fullName"> &
-    Partial<BottleCandidate>,
-): BottleCandidate {
-  return {
-    kind: "bottle",
-    releaseId: null,
-    alias: null,
-    bottleFullName: candidate.fullName,
-    brand: null,
-    bottler: null,
-    series: null,
-    distillery: [],
-    category: null,
-    statedAge: null,
-    edition: null,
-    caskStrength: null,
-    singleCask: null,
-    abv: null,
-    vintageYear: null,
-    releaseYear: null,
-    caskType: null,
-    caskSize: null,
-    caskFill: null,
-    score: null,
-    source: [],
-    ...candidate,
-  };
-}
-
-function buildExtractedIdentity(
-  identity: Partial<BottleExtractedDetails>,
-): BottleExtractedDetails {
-  return {
-    brand: null,
-    bottler: null,
-    expression: null,
-    series: null,
-    distillery: [],
-    category: null,
-    stated_age: null,
-    abv: null,
-    release_year: null,
-    vintage_year: null,
-    cask_type: null,
-    cask_size: null,
-    cask_fill: null,
-    cask_strength: null,
-    single_cask: null,
-    edition: null,
-    ...identity,
-  };
-}
 
 const quintaRubanEditionCandidate = buildBottleCandidate({
   bottleId: 401,
@@ -122,7 +72,7 @@ const rareBreedRyeMatch = buildBottleCandidate({
 
 const smwsRw65Match = buildBottleCandidate({
   bottleId: 610,
-  fullName: "SMWS RW6.5 Sauna Smoke",
+  fullName: "SMWS RW6.5 Appley ever after",
   brand: "The Scotch Malt Whisky Society",
   bottler: "The Scotch Malt Whisky Society",
   distillery: ["Kyro"],
@@ -289,6 +239,10 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
     },
     searchResponses: [
       {
+        when: ["wild turkey", "rare breed", "rye"],
+        results: [rareBreedRyeMatch],
+      },
+      {
         when: ["rare breed", "rye", "barrel proof"],
         results: [rareBreedRyeMatch],
       },
@@ -316,6 +270,10 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       initialCandidates: [rareBreedNearMatch],
     },
     searchResponses: [
+      {
+        when: ["wild turkey", "rare breed", "rye"],
+        results: [rareBreedRyeMatch],
+      },
       {
         when: ["rare breed", "rye", "barrel proof"],
         results: [rareBreedRyeMatch],
@@ -363,7 +321,7 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       identityScope: "exact_cask",
       matchedBottleId: 610,
       summary:
-        "Recognize the SMWS code as exact-cask identity and match the existing SMWS RW6.5 Sauna Smoke bottle.",
+        "Recognize the SMWS code as exact-cask identity and match the existing SMWS RW6.5 bottle even when the subtitle wording in the raw reference is stale or inconsistent.",
     },
   },
   {
@@ -387,7 +345,7 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       identityScope: "exact_cask",
       matchedBottleId: 610,
       summary:
-        "Extract the SMWS identity directly from the title text and match the existing exact-cask bottle by code.",
+        "Extract the SMWS identity directly from the title text and let the exact cask code win over stale subtitle wording when matching the existing bottle.",
     },
   },
   {

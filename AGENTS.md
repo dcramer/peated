@@ -44,6 +44,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - `docs/architecture/account-policies.md`
 - `docs/architecture/rating-systems.md`
 - `docs/architecture/bottle-classifier.md`
+- `docs/architecture/bottle-normalization-examples.md`
 - `docs/architecture/whisky-identity-model.md`
 - `docs/development/backend-testing.md`
 - `docs/development/orpc-client.md`

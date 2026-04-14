@@ -1,3 +1,7 @@
+import {
+  deriveLegacyReleaseRepairIdentity,
+  resolveLegacyReleaseRepairNameScope,
+} from "@peated/bottle-classifier/legacyReleaseRepairIdentity";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, BottleRelease, User } from "@peated/server/db/schema";
 import {
@@ -21,10 +25,6 @@ import {
   createBottleReleaseInTransaction,
 } from "@peated/server/lib/createBottleRelease";
 import { upsertBottleAlias } from "@peated/server/lib/db";
-import {
-  deriveLegacyReleaseRepairIdentity,
-  resolveLegacyReleaseRepairNameScope,
-} from "@peated/server/lib/legacyReleaseRepairCandidates";
 import { logError } from "@peated/server/lib/log";
 import {
   normalizeString,

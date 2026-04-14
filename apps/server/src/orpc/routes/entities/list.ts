@@ -1,3 +1,4 @@
+import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
 import { ENTITY_TYPE_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
@@ -8,7 +9,6 @@ import {
   entityAliases,
   regions,
 } from "@peated/server/db/schema";
-import { parseDetailsFromName } from "@peated/server/lib/smws";
 import { procedure } from "@peated/server/orpc";
 import { EntitySchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
