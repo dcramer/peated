@@ -1,5 +1,6 @@
 "use client";
 
+import AdminWorkstreamTabs from "@peated/web/components/admin/workstreamTabs";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
@@ -53,22 +54,24 @@ export default function Page() {
             href: "/admin",
           },
           {
-            name: "Canon Repairs",
+            name: "Bottle Name Repairs",
             href: "/admin/canon-repairs",
             current: true,
           },
         ]}
       />
 
-      <SimpleHeader>Canon Repairs</SimpleHeader>
+      <SimpleHeader>Bottle Name Repairs</SimpleHeader>
 
       <div className="mb-6 space-y-4">
         <div className="rounded-xl border border-slate-800 bg-slate-950 px-4 py-4 text-sm text-slate-300">
-          High-confidence same-brand bottle variants where the current canonical
-          bottle name likely needs to be merged into an existing cleaner target.
-          This queue links directly into the existing moderator merge flow with
-          the suggested target preselected.
+          Use this queue when two bottle records are really the same bottle and
+          the cleaner existing name should win. This is a merge and naming
+          cleanup workflow, not a bottle versus release split. The suggested
+          target opens directly into the existing moderator merge flow.
         </div>
+
+        <AdminWorkstreamTabs />
 
         <Form
           action={pathname}
@@ -106,8 +109,8 @@ export default function Page() {
         {candidateList.results.length === 0 ? (
           <EmptyActivity>
             {currentQuery
-              ? "No canon repair candidates matched that search."
-              : "No canon repair candidates right now."}
+              ? "No bottle name repairs matched that search."
+              : "No bottle name repairs right now."}
           </EmptyActivity>
         ) : (
           candidateList.results.map((candidate) => (
