@@ -1,5 +1,7 @@
 "use client";
 
+import AdminWorkstreamTabs from "@peated/web/components/admin/workstreamTabs";
+import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import { useFlashMessages } from "@peated/web/components/flash";
 import Form from "@peated/web/components/form";
@@ -217,9 +219,33 @@ export default function Page() {
 
   return (
     <>
-      <SimpleHeader>Price Match Queue</SimpleHeader>
+      <Breadcrumbs
+        pages={[
+          {
+            name: "Admin",
+            href: "/admin",
+          },
+          {
+            name: "Incoming Listings",
+            href: "/admin/queue",
+            current: true,
+          },
+        ]}
+      />
+
+      <SimpleHeader>Incoming Listings</SimpleHeader>
 
       <div className="mb-6 space-y-4">
+        <div className="rounded-xl border border-slate-800 bg-slate-950 px-4 py-4 text-sm text-slate-300">
+          Review new or changed retailer listings here. Use this queue when the
+          listing is unmatched, misclassified, or needs a bottle or bottling
+          decision. If the underlying catalog bottle itself is wrong, switch to
+          one of the repair queues below instead of forcing the listing to carry
+          that cleanup.
+        </div>
+
+        <AdminWorkstreamTabs />
+
         <Form
           action={pathname}
           className="mb-0 rounded-xl border border-slate-800 bg-slate-950 px-4 py-4"
@@ -235,7 +261,7 @@ export default function Page() {
                 type="text"
                 name="query"
                 defaultValue={currentQuery}
-                placeholder="Search queue by listing name"
+                placeholder="Search incoming listings"
               />
             </div>
             <div className="flex gap-2">

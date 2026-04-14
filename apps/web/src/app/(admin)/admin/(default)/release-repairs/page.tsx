@@ -1,5 +1,6 @@
 "use client";
 
+import AdminWorkstreamTabs from "@peated/web/components/admin/workstreamTabs";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
@@ -271,22 +272,25 @@ export default function Page() {
             href: "/admin",
           },
           {
-            name: "Release Repairs",
+            name: "Bottle / Release Repairs",
             href: "/admin/release-repairs",
             current: true,
           },
         ]}
       />
 
-      <SimpleHeader>Release Repairs</SimpleHeader>
+      <SimpleHeader>Bottle / Release Repairs</SimpleHeader>
 
       <div className="mb-6 space-y-4">
         <div className="rounded-xl border border-slate-800 bg-slate-950 px-4 py-4 text-sm text-slate-300">
-          High-confidence legacy bottles that likely need to be split into a
-          reusable parent bottle plus child releases. Existing-parent and
-          create-parent candidates can be applied directly here. Blocked
-          parent-name alias conflicts still need manual follow-up.
+          Use this queue when one bottle record is actually carrying reusable
+          parent identity plus release-level detail. Existing-parent and
+          create-parent candidates can be applied directly here. If the problem
+          is only duplicate bottle wording, use Bottle Name Repairs instead.
+          Blocked parent-name alias conflicts still need manual follow-up.
         </div>
+
+        <AdminWorkstreamTabs />
 
         <Form
           action={pathname}
@@ -298,7 +302,7 @@ export default function Page() {
                 type="text"
                 name="query"
                 defaultValue={currentQuery}
-                placeholder="Search legacy bottle names"
+                placeholder="Search bottle or parent names"
               />
             </div>
             <div className="flex gap-2">
@@ -563,8 +567,8 @@ export default function Page() {
       ) : (
         <EmptyActivity>
           {currentQuery
-            ? "No legacy release repair candidates match the current search."
-            : "No legacy release repair candidates found."}
+            ? "No bottle or release repairs match the current search."
+            : "No bottle or release repairs found."}
         </EmptyActivity>
       )}
 

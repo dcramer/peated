@@ -1,5 +1,6 @@
 "use client";
 
+import AdminWorkstreamTabs from "@peated/web/components/admin/workstreamTabs";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import { useFlashMessages } from "@peated/web/components/flash";
@@ -121,22 +122,24 @@ export default function Page() {
             href: "/admin",
           },
           {
-            name: "Age Repairs",
+            name: "Parent Age Repairs",
             href: "/admin/age-repairs",
             current: true,
           },
         ]}
       />
 
-      <SimpleHeader>Age Repairs</SimpleHeader>
+      <SimpleHeader>Parent Age Repairs</SimpleHeader>
 
       <div className="mb-6 space-y-4">
         <div className="rounded-xl border border-slate-800 bg-slate-950 px-4 py-4 text-sm text-slate-300">
-          High-confidence parent bottles whose structured bottle-level age is
-          dirty because child releases already carry different ages. Applying a
-          repair creates or reuses the former parent-age release, moves direct
-          bottle-scoped rows onto it, and clears the parent age.
+          Use this queue when the parent bottle still carries a release-specific
+          age that belongs on a child release. Applying a repair creates or
+          reuses the former parent-age release, moves direct bottle-scoped rows
+          onto it, and clears the parent age.
         </div>
+
+        <AdminWorkstreamTabs />
 
         <Form
           action={pathname}
@@ -148,7 +151,7 @@ export default function Page() {
                 type="text"
                 name="query"
                 defaultValue={currentQuery}
-                placeholder="Search dirty parent bottle names"
+                placeholder="Search parent bottle names"
               />
             </div>
             <div className="flex gap-2">
@@ -275,7 +278,7 @@ export default function Page() {
       ) : (
         <div className="rounded-xl border border-slate-800 bg-slate-950 p-10">
           <div className="text-sm text-slate-400">
-            No dirty parent age repairs found.
+            No parent age repairs found.
           </div>
         </div>
       )}
