@@ -1,4 +1,3 @@
-import { call } from "@orpc/server";
 import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import {
@@ -6,19 +5,19 @@ import {
   externalSites,
   reviews,
 } from "@peated/server/db/schema";
-import { findBottleTarget, findEntity } from "@peated/server/lib/bottleFinder";
-import { mapRows, upsertBottleAlias } from "@peated/server/lib/db";
+import {
+  assignBottleAliasInTransaction,
+  finalizeBottleAliasAssignment,
+} from "@peated/server/lib/bottleAliases";
+import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
+import { mapRows } from "@peated/server/lib/db";
+import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import {
-  BottleInputSchema,
-  ReviewInputSchema,
-  ReviewSchema,
-} from "@peated/server/schemas";
+import { ReviewInputSchema, ReviewSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
 import { and, eq, or, sql } from "drizzle-orm";
-import bottleCreate from "../bottles/create";
 
 export default procedure
   .use(requireAdmin)
@@ -45,41 +44,44 @@ export default procedure
 
     const rawName = input.name;
     const { name: normalizedName } = normalizeBottle({ name: rawName });
-
-    const rawMatchedTarget = await findBottleTarget(rawName);
-    const matchedTarget =
-      rawMatchedTarget ??
-      (rawName === normalizedName
-        ? null
-        : await findBottleTarget(normalizedName));
-    let bottleId = matchedTarget?.bottleId ?? null;
-    let releaseId = matchedTarget?.releaseId ?? null;
+    const resolution = await resolveBottleReferenceTarget({
+      reference: {
+        externalSiteId: site.id,
+        name: rawName,
+        url: input.url,
+        imageUrl: null,
+        currentBottleId: null,
+        currentReleaseId: null,
+      },
+      // Normalized review titles can strip release markers like year or batch
+      // detail, so only the raw exact alias is safe to trust before the
+      // classifier has a chance to review the full reference.
+      aliasLookupNames: [rawName],
+      extractedIdentity: {
+        category: input.category,
+      },
+      user: context.user!,
+    });
+    if (resolution.error) {
+      logError(resolution.error, {
+        review: {
+          site: input.site,
+          name: rawName,
+          url: input.url,
+        },
+      });
+    }
+    const bottleId = resolution.bottleId;
+    const releaseId = resolution.releaseId;
     const reviewName =
-      rawMatchedTarget?.releaseId != null && rawName !== normalizedName
+      resolution.releaseId != null && rawName !== normalizedName
         ? rawName
         : normalizedName;
     const reviewNameCandidates = Array.from(
       new Set([reviewName.toLowerCase(), normalizedName.toLowerCase()]),
     );
 
-    if (!bottleId) {
-      const entity = await findEntity(normalizedName);
-      if (entity) {
-        const result = await call(
-          bottleCreate,
-          BottleInputSchema.parse({
-            name: normalizedName,
-            edition: null,
-            brand: entity.id,
-            category: input.category,
-          }),
-          { context },
-        );
-        bottleId = result.id;
-      }
-    }
-
-    const review = await db.transaction(async (tx) => {
+    const { review, aliasAssignment } = await db.transaction(async (tx) => {
       const existingReview =
         (await tx.query.reviews.findFirst({
           where: and(
@@ -130,18 +132,34 @@ export default procedure
         [review] = mapRows(rows, reviews);
       }
 
-      if (bottleId) {
-        await upsertBottleAlias(tx, reviewName, bottleId, releaseId);
-      } else {
+      if (!bottleId) {
         await tx
           .insert(bottleAliases)
           .values({
             name: reviewName,
           })
           .onConflictDoNothing();
+        return { review, aliasAssignment: null };
       }
-      return review;
+
+      const aliasAssignment = await assignBottleAliasInTransaction(tx, {
+        bottleId,
+        releaseId,
+        name: reviewName,
+      });
+
+      return { review, aliasAssignment };
     });
+
+    if (aliasAssignment) {
+      await finalizeBottleAliasAssignment(aliasAssignment, {
+        review: {
+          site: input.site,
+          name: reviewName,
+          url: input.url,
+        },
+      });
+    }
 
     await db
       .update(externalSites)

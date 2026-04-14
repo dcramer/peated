@@ -5,9 +5,9 @@ import {
   changes,
   countries,
   entities,
-  entityAliases,
   regions,
 } from "@peated/server/db/schema";
+import { upsertEntityAliases } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
 import { buildEntitySearchVector } from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
@@ -109,12 +109,10 @@ export default procedure
         return null;
       }
 
-      // TODO: handle existing duplicate
-      const promises: Promise<any>[] = [
-        tx.insert(entityAliases).values({
-          entityId: entity.id,
-          name: entity.name,
-          createdAt: entity.createdAt,
+      await Promise.all([
+        upsertEntityAliases({
+          db: tx,
+          entity,
         }),
         tx.insert(changes).values({
           objectType: "entity",
@@ -125,29 +123,7 @@ export default procedure
           createdById: user.id,
           data: data,
         }),
-      ];
-
-      if (entity.shortName) {
-        promises.push(
-          tx.insert(entityAliases).values({
-            entityId: entity.id,
-            name: entity.shortName,
-            createdAt: entity.createdAt,
-          }),
-        );
-      }
-
-      if (entity.name.startsWith("The ")) {
-        promises.push(
-          tx.insert(entityAliases).values({
-            entityId: entity.id,
-            name: entity.name.substring(4),
-            createdAt: entity.createdAt,
-          }),
-        );
-      }
-
-      await Promise.all(promises);
+      ]);
 
       return entity;
     });

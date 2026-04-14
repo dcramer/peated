@@ -8,6 +8,7 @@ import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
 import { db, type AnyDatabase } from "@peated/server/db";
 import type { User } from "@peated/server/db/schema";
 import { entities, entityTombstones } from "@peated/server/db/schema";
+import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
 import { procedure } from "@peated/server/orpc";
 import type { Context } from "@peated/server/orpc/context";
 import { requireAuth } from "@peated/server/orpc/middleware";
@@ -74,7 +75,34 @@ async function getEntity(
 
     return entity;
   }
-  return EntityInputSchema.parse(input);
+  const parsedInput = EntityInputSchema.parse(input);
+  const existingEntity = await findEntityByExactNameOrAlias(
+    entityDb,
+    parsedInput.name,
+  );
+
+  if (!existingEntity) {
+    return parsedInput;
+  }
+
+  return EntitySchema.parse({
+    id: existingEntity.id,
+    name: existingEntity.name,
+    shortName: existingEntity.shortName,
+    type: existingEntity.type,
+    description: existingEntity.description,
+    descriptionSrc: existingEntity.descriptionSrc,
+    yearEstablished: existingEntity.yearEstablished,
+    website: existingEntity.website,
+    country: null,
+    region: null,
+    address: existingEntity.address,
+    location: existingEntity.location,
+    totalTastings: existingEntity.totalTastings,
+    totalBottles: existingEntity.totalBottles,
+    createdAt: existingEntity.createdAt.toISOString(),
+    updatedAt: existingEntity.updatedAt.toISOString(),
+  });
 }
 
 export async function bottleNormalize({

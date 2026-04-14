@@ -32,6 +32,7 @@ import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
+import { buildClassifierCreateInputs } from "@peated/server/lib/classifierDecisionCreateInputs";
 import {
   createBottleInTransaction,
   finalizeCreatedBottle,
@@ -81,36 +82,9 @@ type PriceMatchCandidate = z.infer<typeof PriceMatchCandidateSchema>;
 type SearchEvidence = z.infer<typeof PriceMatchSearchEvidenceSchema>;
 type ProposedRelease = z.infer<typeof ProposedReleaseSchema>;
 type StorePriceMatchDecision = z.infer<typeof StorePriceMatchDecisionSchema>;
-type ProposedBottleDraft = NonNullable<
-  StorePriceMatchDecision["proposedBottle"]
->;
-type BottleCreateInput = z.infer<typeof BottleInputSchema>;
 type StorePriceMatchProposalForReview = StorePriceMatchProposal & {
   price: StorePrice;
 };
-
-function buildBottleEntityInput(
-  choice: {
-    id: number | null;
-    name: string;
-  },
-  entityType: "brand" | "distiller" | "bottler",
-): BottleCreateInput["brand"] {
-  return (
-    choice.id ?? {
-      name: choice.name,
-      type: [entityType],
-      description: null,
-      shortName: null,
-      location: null,
-      address: null,
-      yearEstablished: null,
-      website: null,
-      country: null,
-      region: null,
-    }
-  );
-}
 
 export class UnknownStorePriceMatchProposalError extends Error {
   constructor(proposalId: number) {
@@ -609,42 +583,6 @@ async function maybeResolveTrustedSmwsStorePriceMatch(
   }
 }
 
-function buildBottleInputFromProposedBottle(
-  proposedBottle: ProposedBottleDraft,
-): BottleCreateInput {
-  return {
-    ...proposedBottle,
-    series: proposedBottle.series
-      ? (proposedBottle.series.id ?? {
-          name: proposedBottle.series.name,
-          description: null,
-        })
-      : null,
-    brand: buildBottleEntityInput(proposedBottle.brand, "brand"),
-    distillers: proposedBottle.distillers.map((distiller) =>
-      buildBottleEntityInput(distiller, "distiller"),
-    ),
-    bottler: proposedBottle.bottler
-      ? buildBottleEntityInput(proposedBottle.bottler, "bottler")
-      : null,
-    description: null,
-    descriptionSrc: null,
-    imageUrl: null,
-    flavorProfile: null,
-  };
-}
-
-function buildBottleReleaseInputFromProposedRelease(
-  proposedRelease: ProposedRelease,
-): z.infer<typeof BottleReleaseInputSchema> {
-  return {
-    ...proposedRelease,
-    description: proposedRelease.description ?? null,
-    imageUrl: proposedRelease.imageUrl ?? null,
-    tastingNotes: proposedRelease.tastingNotes ?? null,
-  };
-}
-
 function buildStorePriceMatchCreateInputs(decision: StorePriceMatchDecision) {
   if (decision.action !== "create_new") {
     return {
@@ -655,14 +593,23 @@ function buildStorePriceMatchCreateInputs(decision: StorePriceMatchDecision) {
 
   // Callers sanitize create_new decisions first, so these drafts are already
   // normalized and aligned with the explicit bottle-vs-release target.
-  return {
-    input: decision.proposedBottle
-      ? buildBottleInputFromProposedBottle(decision.proposedBottle)
-      : undefined,
-    releaseInput: decision.proposedRelease
-      ? buildBottleReleaseInputFromProposedRelease(decision.proposedRelease)
-      : undefined,
-  };
+  return buildClassifierCreateInputs(
+    decision.creationTarget === "bottle"
+      ? {
+          action: "create_bottle",
+          proposedBottle: decision.proposedBottle!,
+        }
+      : decision.creationTarget === "release"
+        ? {
+            action: "create_release",
+            proposedRelease: decision.proposedRelease!,
+          }
+        : {
+            action: "create_bottle_and_release",
+            proposedBottle: decision.proposedBottle!,
+            proposedRelease: decision.proposedRelease!,
+          },
+  );
 }
 
 function buildStorePriceObservationFacts(

@@ -1,6 +1,6 @@
 import { eq, sql } from "drizzle-orm";
 import { db, type AnyDatabase } from "../db";
-import { bottleAliases, entities, type Entity } from "../db/schema";
+import { bottleAliases } from "../db/schema";
 
 export async function findBottleTarget(
   name: string,
@@ -54,16 +54,4 @@ export async function findBottleId(
   //   .orderBy(sql`LENGTH(${bottleAliases.name})`)
   //   .limit(1);
   return null;
-}
-
-export async function findEntity(fullName: string): Promise<Entity | null> {
-  const [result] = await db
-    .select()
-    .from(entities)
-    .where(sql`${fullName} ILIKE ${entities.name} || '%'`)
-    // .where(sql`${entities.name} ~* ANY (string_to_array(${fullName}, ' '))`)
-    .orderBy(sql`LENGTH(${entities.name})`)
-    .limit(1);
-
-  return result ?? null;
 }

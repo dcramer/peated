@@ -4,6 +4,7 @@ import {
   bottles,
   changes,
   entities,
+  entityAliases,
 } from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import waitError from "@peated/server/lib/test/waitError";
@@ -338,6 +339,161 @@ describe("PATCH /entities/:entity", () => {
       .where(eq(bottles.id, otherBottle.id));
 
     expect(newOtherBottle.fullName).toEqual(otherBottle.fullName);
+
+    const shortNameAlias = await db.query.entityAliases.findFirst({
+      where: eq(entityAliases.name, "F"),
+    });
+    expect(shortNameAlias?.entityId).toEqual(entity.id);
+  });
+
+  test("name change preserves brand bottle aliases when short name stays the same", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Foo Distillery",
+      shortName: "FD",
+      type: ["brand", "distiller"],
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: entity.id,
+      name: "Bar",
+    });
+    expect(bottle.fullName).toEqual("FD Bar");
+
+    const modUser = await fixtures.User({ mod: true });
+    await routerClient.entities.update(
+      {
+        entity: entity.id,
+        name: "Foo Co",
+      },
+      { context: { user: modUser } },
+    );
+
+    const [updatedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+    expect(updatedBottle.fullName).toEqual("FD Bar");
+
+    const preservedAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, "FD Bar"),
+    });
+    expect(preservedAlias?.bottleId).toEqual(bottle.id);
+
+    const oldEntityAlias = await db.query.entityAliases.findFirst({
+      where: eq(entityAliases.name, "Foo Distillery"),
+    });
+    expect(oldEntityAlias).toBeUndefined();
+
+    const currentEntityAlias = await db.query.entityAliases.findFirst({
+      where: eq(entityAliases.name, "Foo Co"),
+    });
+    expect(currentEntityAlias?.entityId).toEqual(entity.id);
+
+    const preservedShortNameAlias = await db.query.entityAliases.findFirst({
+      where: eq(entityAliases.name, "FD"),
+    });
+    expect(preservedShortNameAlias?.entityId).toEqual(entity.id);
+  });
+
+  test("changing short name retires the old entity alias", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Foo",
+      shortName: "F",
+      type: ["brand", "distiller"],
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: entity.id,
+      name: "Bar",
+    });
+    expect(bottle.fullName).toEqual("F Bar");
+
+    const modUser = await fixtures.User({ mod: true });
+    await routerClient.entities.update(
+      {
+        entity: entity.id,
+        shortName: "FC",
+      },
+      { context: { user: modUser } },
+    );
+
+    const [updatedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+    expect(updatedBottle.fullName).toEqual("FC Bar");
+
+    const oldBottleAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, "F Bar"),
+    });
+    expect(oldBottleAlias).toBeUndefined();
+
+    const newBottleAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, "FC Bar"),
+    });
+    expect(newBottleAlias?.bottleId).toEqual(bottle.id);
+
+    const oldEntityAlias = await db.query.entityAliases.findFirst({
+      where: eq(entityAliases.name, "F"),
+    });
+    expect(oldEntityAlias).toBeUndefined();
+
+    const newEntityAlias = await db.query.entityAliases.findFirst({
+      where: eq(entityAliases.name, "FC"),
+    });
+    expect(newEntityAlias?.entityId).toEqual(entity.id);
+  });
+
+  test("clearing short name reverts brand bottle names and removes the old display alias", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Foo",
+      shortName: "F",
+      type: ["brand", "distiller"],
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: entity.id,
+      name: "Bar",
+    });
+    expect(bottle.fullName).toEqual("F Bar");
+
+    const modUser = await fixtures.User({ mod: true });
+    await routerClient.entities.update(
+      {
+        entity: entity.id,
+        shortName: null,
+      },
+      { context: { user: modUser } },
+    );
+
+    const [updatedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+    expect(updatedBottle.fullName).toEqual("Foo Bar");
+
+    const oldShortNameAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, "F Bar"),
+    });
+    expect(oldShortNameAlias).toBeUndefined();
+
+    const oldEntityAlias = await db.query.entityAliases.findFirst({
+      where: eq(entityAliases.name, "F"),
+    });
+    expect(oldEntityAlias).toBeUndefined();
+
+    const revertedAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, "Foo Bar"),
+    });
+    expect(revertedAlias?.bottleId).toEqual(bottle.id);
+
+    const canonicalEntityAlias = await db.query.entityAliases.findFirst({
+      where: eq(entityAliases.name, "Foo"),
+    });
+    expect(canonicalEntityAlias?.entityId).toEqual(entity.id);
   });
 
   test("sets descriptionSrc with description", async ({ fixtures }) => {

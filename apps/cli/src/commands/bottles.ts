@@ -6,18 +6,14 @@ import {
   bottleReleases,
   bottles,
   entities,
-  reviews,
 } from "@peated/server/db/schema";
 import {
   applyRepairBackfillProposals,
   type BatchApplicableRepairBackfillProposalType,
 } from "@peated/server/lib/applyRepairBackfillProposals";
-import { findEntity } from "@peated/server/lib/bottleFinder";
 import { upsertBottleAlias } from "@peated/server/lib/db";
-import {
-  formatBottleName,
-  formatCategoryName,
-} from "@peated/server/lib/format";
+import { fixBadReviewEntities } from "@peated/server/lib/fixBadReviewEntities";
+import { formatBottleName } from "@peated/server/lib/format";
 import {
   getHeuristicLegacyReleaseRepairCandidates,
   type LegacyReleaseRepairCandidate,
@@ -34,7 +30,7 @@ import {
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import { routerClient } from "@peated/server/orpc/router";
 import { runJob } from "@peated/server/worker/client";
-import { and, asc, eq, inArray, isNull, ne } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 
 const subcommand = program.command("bottles");
 const REPAIR_BACKFILL_PROPOSAL_TYPES = ["release", "age", "canon"] as const;
@@ -246,63 +242,13 @@ subcommand
 
 subcommand
   .command("fix-bad-entities")
-  .description("Fix bottles with bad entities")
+  .description("Re-resolve mismatched review bottle assignments")
   .action(async (options) => {
-    const results = await db
-      .select({ bottle: bottles, review: reviews })
-      .from(bottles)
-      .innerJoin(
-        reviews,
-        and(
-          eq(reviews.bottleId, bottles.id),
-          ne(reviews.name, bottles.fullName),
-        ),
-      );
-
-    const systemUser = await db.query.users.findFirst({
-      where: (table, { eq }) => eq(table.username, "dcramer"),
-    });
-    if (!systemUser) throw new Error("Unable to identify system user");
-
-    for (const { bottle, review } of results) {
-      if (bottle.fullName.indexOf(review.name) !== 0) {
-        const entity = await findEntity(review.name);
-        if (!entity) {
-          console.warn(
-            `Removing bottle due to unknown entity: ${bottle.fullName}`,
-          );
-          await routerClient.bottles.delete(
-            { bottle: bottle.id },
-            {
-              context: { user: systemUser },
-            },
-          );
-        } else {
-          // probably mismatched bottle
-          if (bottle.brandId === entity.id) continue;
-
-          if (!review.name.startsWith(entity.name)) {
-            throw new Error();
-          }
-
-          let newName = review.name.slice(entity.name.length + 1);
-          if (!newName) newName = formatCategoryName(bottle.category);
-
-          console.log(
-            `Updating ${bottle.fullName} to ${entity.name} ${newName} (from ${entity.name})`,
-          );
-
-          await routerClient.bottles.update(
-            {
-              bottle: bottle.id,
-              name: newName,
-              brand: entity.id,
-            },
-            { context: { user: systemUser } },
-          );
-        }
-      }
-    }
+    const systemUser = await getAutomationModeratorUser();
+    const summary = await fixBadReviewEntities({ user: systemUser });
+    console.log(
+      `Processed ${summary.scanned} mismatched reviews: ${summary.reassigned} reassigned, ${summary.unresolved} unresolved, ${summary.errored} errored, ${summary.unchanged} unchanged.`,
+    );
   });
 
 subcommand
