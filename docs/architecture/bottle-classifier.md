@@ -241,8 +241,10 @@ layer for composition.
 Current consumers include:
 
 - store-price proposal resolution
+- review ingestion and unresolved review backfill through `apps/server/src/lib/bottleReferenceResolution.ts`
+- legacy release-repair parent review through `apps/server/src/lib/legacyReleaseRepairClassifier.ts`
 
-Future consumers should depend on the same classifier contract instead of
+New consumers should depend on the same classifier contract instead of
 re-implementing bottle extraction, candidate search, or LLM policy in parallel.
 
 ## Naming
