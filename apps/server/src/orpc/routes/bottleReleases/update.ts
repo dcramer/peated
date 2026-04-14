@@ -1,6 +1,7 @@
 import {
   formatCanonicalReleaseName,
   getResolvedReleaseIdentity,
+  hasBlockingBottleLevelReleaseTraits,
   hasDirtyBottleLevelStatedAgeConflict,
 } from "@peated/bottle-classifier/releaseIdentity";
 import { db } from "@peated/server/db";
@@ -184,11 +185,24 @@ export default procedure
         release: nextReleaseIdentity,
       });
 
+      if (
+        hasBlockingBottleLevelReleaseTraits({
+          bottle,
+          release: resolvedReleaseIdentity,
+        })
+      ) {
+        throw errors.BAD_REQUEST({
+          message:
+            "Bottle already stores specific release details on the parent record. A moderator must split or clear those bottle fields before adding child releases.",
+        });
+      }
+
       // Always derive the name from the resolved bottle/release identity so a
       // parent bottle age does not get duplicated into the release suffix.
       const { name, fullName } = formatCanonicalReleaseName({
         bottleName: bottle.name,
         bottleFullName: bottle.fullName,
+        bottleReleaseTraits: bottle,
         bottleStatedAge: bottle.statedAge,
         release: resolvedReleaseIdentity,
       });

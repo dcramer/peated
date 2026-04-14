@@ -7,7 +7,7 @@ import {
 import { stripDuplicateBrandPrefixFromBottleName } from "@peated/bottle-classifier/normalize";
 import {
   getCanonicalReleaseAliasNames,
-  hasBottleLevelReleaseTraits,
+  hasBlockingBottleLevelReleaseTraits,
 } from "@peated/bottle-classifier/releaseIdentity";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, BottleRelease, User } from "@peated/server/db/schema";
@@ -472,6 +472,7 @@ async function resolveParentBottleForRepair(
     legacyBottle,
     legacyBottleId,
     proposedParentFullName,
+    releaseInput,
     user,
   }: {
     classifierResolution: ClassifierReviewedCreateParentResolution | null;
@@ -479,6 +480,7 @@ async function resolveParentBottleForRepair(
     legacyBottle: RepairBottle;
     legacyBottleId: number;
     proposedParentFullName: string;
+    releaseInput: ReturnType<typeof getReleaseInput>["input"];
     user: User;
   },
 ): Promise<ResolvedLegacyReleaseRepairParent> {
@@ -536,7 +538,12 @@ async function resolveParentBottleForRepair(
         );
       }
 
-      if (hasBottleLevelReleaseTraits(lockedParentBottle)) {
+      if (
+        hasBlockingBottleLevelReleaseTraits({
+          bottle: lockedParentBottle,
+          release: releaseInput,
+        })
+      ) {
         throw new LegacyReleaseRepairBadRequestError(
           "Classifier-reviewed parent bottle still contains bottle-level release traits.",
         );
@@ -690,6 +697,7 @@ export async function applyLegacyReleaseRepairInTransaction(
     legacyBottle,
     legacyBottleId,
     proposedParentFullName: releaseIdentity.proposedParentFullName,
+    releaseInput,
     user,
   });
   if (parentAliasName) {

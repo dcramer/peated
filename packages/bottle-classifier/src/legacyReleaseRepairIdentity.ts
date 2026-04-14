@@ -137,19 +137,29 @@ function tokenSetsMatchExactly(left: string[], right: string[]): boolean {
     return false;
   }
 
-  const leftSet = new Set(left);
-  const rightSet = new Set(right);
-  if (leftSet.size !== rightSet.size) {
+  if (left.length !== right.length) {
     return false;
   }
 
-  for (const token of leftSet) {
-    if (!rightSet.has(token)) {
+  const rightCounts = new Map<string, number>();
+  for (const token of right) {
+    rightCounts.set(token, (rightCounts.get(token) ?? 0) + 1);
+  }
+
+  for (const token of left) {
+    const count = rightCounts.get(token) ?? 0;
+    if (count === 0) {
       return false;
+    }
+
+    if (count === 1) {
+      rightCounts.delete(token);
+    } else {
+      rightCounts.set(token, count - 1);
     }
   }
 
-  return true;
+  return rightCounts.size === 0;
 }
 
 function getTastingCount(value: null | number | undefined): number {

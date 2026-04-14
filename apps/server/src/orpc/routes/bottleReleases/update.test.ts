@@ -203,6 +203,49 @@ describe("PATCH /bottle-releases/:release", () => {
     });
   });
 
+  it("rejects clearing inherited marketed parent traits from a child release", async function ({
+    fixtures,
+  }) {
+    const modUser = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({
+      name: "1972 Single-Cask",
+      brandId: (await fixtures.Entity({ name: "Glendronach" })).id,
+      statedAge: 48,
+      singleCask: true,
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Batch 1",
+      statedAge: 48,
+      singleCask: true,
+    });
+
+    const err = await waitError(
+      routerClient.bottleReleases.update(
+        {
+          release: release.id,
+          singleCask: null,
+        },
+        { context: { user: modUser } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Bottle already stores specific release details on the parent record. A moderator must split or clear those bottle fields before adding child releases.]`,
+    );
+
+    const [unchangedRelease] = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, release.id));
+    expect(unchangedRelease).toMatchObject({
+      id: release.id,
+      singleCask: true,
+      fullName: release.fullName,
+      name: release.name,
+    });
+  });
+
   it("throws error if release not found", async function ({ fixtures }) {
     const modUser = await fixtures.User({ mod: true });
 
