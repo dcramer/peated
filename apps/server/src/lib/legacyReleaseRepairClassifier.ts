@@ -133,6 +133,18 @@ export async function reviewLegacyCreateParentResolutionWithClassifier({
   const resolution = resolveLegacyCreateParentClassification({
     classification,
     parentRows,
+    release: {
+      edition: legacyBottle.edition,
+      statedAge: legacyBottle.statedAge,
+      abv: legacyBottle.abv,
+      releaseYear: legacyBottle.releaseYear,
+      vintageYear: legacyBottle.vintageYear,
+      singleCask: legacyBottle.singleCask,
+      caskStrength: legacyBottle.caskStrength,
+      caskFill: legacyBottle.caskFill,
+      caskType: legacyBottle.caskType,
+      caskSize: legacyBottle.caskSize,
+    },
   });
 
   if (resolution.resolution === "reuse_existing_parent") {

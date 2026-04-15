@@ -929,6 +929,51 @@ describe("GET /bottles/release-repair-candidates", () => {
     });
   });
 
+  test("flags exact-name parents that still carry non-marker release traits as blocked", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Kilkerran" });
+    const dirtyParent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Heavily Peated",
+      abv: 58.4,
+      totalTastings: 40,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Heavily Peated (Batch 10)",
+      abv: 58.4,
+      totalTastings: 10,
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "Heavily Peated",
+      },
+      { context: { user } },
+    );
+
+    expect(
+      result.results.find(
+        (candidate) => candidate.legacyBottle.id === legacyBottle.id,
+      ),
+    ).toMatchObject({
+      blockingParent: {
+        id: dirtyParent.id,
+        fullName: dirtyParent.fullName,
+        totalTastings: dirtyParent.totalTastings,
+      },
+      hasExactParent: false,
+      repairMode: "blocked_dirty_parent",
+      proposedParent: {
+        id: null,
+        fullName: dirtyParent.fullName,
+      },
+      siblingLegacyBottles: [],
+    });
+  });
+
   test("ignores formatting-only parent matches when release identity is only structured", async ({
     fixtures,
   }) => {

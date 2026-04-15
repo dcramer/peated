@@ -123,6 +123,35 @@ describe("release-repair parent matching", () => {
     ).toBe("blocked_alias_conflict");
   });
 
+  test("blocks parents with non-marker release traits when the child repair would still conflict", () => {
+    const dirtyParent = buildParentCandidate({
+      id: 24,
+      fullName: "Kilkerran Heavily Peated",
+      abv: 58.4,
+      totalTastings: 18,
+    });
+
+    expect(
+      getLegacyReleaseRepairParentMode([dirtyParent], {
+        proposedParentFullName: "Kilkerran Heavily Peated",
+        release: {
+          edition: "Batch 10",
+          abv: 58.4,
+        },
+      }),
+    ).toBe("blocked_dirty_parent");
+
+    expect(
+      getLegacyReleaseRepairBlockingParent([dirtyParent], {
+        proposedParentFullName: "Kilkerran Heavily Peated",
+        release: {
+          edition: "Batch 10",
+          abv: 58.4,
+        },
+      }),
+    ).toEqual(dirtyParent);
+  });
+
   test("falls back to create-parent when no reusable or blocked parent exists", () => {
     expect(
       getLegacyReleaseRepairParentMode([], {
@@ -142,6 +171,10 @@ describe("release-repair parent matching", () => {
     expect(
       getLegacyReleaseRepairParentMode([stableParent], {
         proposedParentFullName: "Springbank 12 Cask Strength",
+        release: {
+          edition: "Batch 24",
+          caskStrength: true,
+        },
       }),
     ).toBe("existing_parent");
   });

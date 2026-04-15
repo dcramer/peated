@@ -235,6 +235,18 @@ export async function refreshLegacyReleaseRepairReview({
     currentLegacyBottleId: legacyBottle.id,
     parentAlias,
     proposedParentFullName: repairIdentity.proposedParentFullName,
+    release: {
+      edition: repairIdentity.edition,
+      statedAge: legacyBottle.statedAge,
+      abv: legacyBottle.abv,
+      releaseYear: repairIdentity.releaseYear,
+      vintageYear: legacyBottle.vintageYear,
+      singleCask: legacyBottle.singleCask,
+      caskStrength: legacyBottle.caskStrength,
+      caskFill: legacyBottle.caskFill,
+      caskType: legacyBottle.caskType,
+      caskSize: legacyBottle.caskSize,
+    },
   });
 
   if (heuristicRepairMode !== "create_parent") {

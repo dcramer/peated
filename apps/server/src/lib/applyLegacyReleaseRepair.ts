@@ -506,6 +506,7 @@ async function resolveParentBottleForRepair(
 
   const parentMode = getLegacyReleaseRepairParentMode(parentRows, {
     proposedParentFullName,
+    release: releaseInput,
   });
 
   if (parentMode === "blocked_dirty_parent") {
@@ -566,6 +567,7 @@ async function resolveParentBottleForRepair(
 
   const parentBottle = resolveLegacyReleaseRepairParentMatch(parentRows, {
     proposedParentFullName,
+    release: releaseInput,
   }).parent;
 
   if (!parentBottle) {
@@ -1042,6 +1044,18 @@ export async function applyLegacyReleaseRepair({
       });
       const parentMode = getLegacyReleaseRepairParentMode(parentRows, {
         proposedParentFullName: repairIdentity.proposedParentFullName,
+        release: {
+          edition: repairIdentity.edition,
+          statedAge: legacyBottle.statedAge,
+          abv: legacyBottle.abv,
+          releaseYear: repairIdentity.releaseYear,
+          vintageYear: legacyBottle.vintageYear,
+          singleCask: legacyBottle.singleCask,
+          caskStrength: legacyBottle.caskStrength,
+          caskFill: legacyBottle.caskFill,
+          caskType: legacyBottle.caskType,
+          caskSize: legacyBottle.caskSize,
+        },
       });
 
       if (parentMode === "create_parent") {

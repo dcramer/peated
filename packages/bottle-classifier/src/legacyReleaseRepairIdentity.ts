@@ -19,6 +19,10 @@ import {
   normalizeBottleBatchNumber,
   normalizeString,
 } from "./normalize";
+import {
+  hasBlockingBottleLevelReleaseTraits,
+  type ReleaseIdentityInput,
+} from "./releaseIdentity";
 
 export const LEGACY_RELEASE_BATCH_MARKER_PATTERN =
   "batch(?:\\s*(?:no\\.?|number|#))?\\s*(?:[a-z]*\\d[a-z0-9.-]*)";
@@ -95,6 +99,8 @@ export type LegacyReleaseRepairParentMode =
   | "blocked_dirty_parent";
 
 export type LegacyReleaseRepairParentMatchType = "exact" | "variant";
+
+type LegacyReleaseRepairCandidateRelease = Partial<ReleaseIdentityInput>;
 
 const LEGACY_RELEASE_DIRTY_PARENT_NAME_PATTERN = new RegExp(
   `\\b(?:${LEGACY_RELEASE_MARKER_PATTERN}|[0-9]{4}\\s+vintage)\\b`,
@@ -204,11 +210,11 @@ export function hasVariantLegacyReleaseRepairParentName(
 
 export function pickBestLegacyReleaseRepairParent<
   TRow extends LegacyReleaseRepairParentCandidate,
->(rows: TRow[]): null | TRow {
+>(rows: TRow[], release?: LegacyReleaseRepairCandidateRelease): null | TRow {
   let bestRow: null | TRow = null;
 
   for (const row of rows) {
-    if (hasDirtyLegacyReleaseRepairParent(row)) {
+    if (hasDirtyLegacyReleaseRepairParent(row, release)) {
       continue;
     }
 
@@ -226,11 +232,11 @@ export function pickBestLegacyReleaseRepairParent<
 
 function pickBestDirtyLegacyReleaseRepairParent<
   TRow extends LegacyReleaseRepairParentCandidate,
->(rows: TRow[]): null | TRow {
+>(rows: TRow[], release?: LegacyReleaseRepairCandidateRelease): null | TRow {
   let bestRow: null | TRow = null;
 
   for (const row of rows) {
-    if (!hasDirtyLegacyReleaseRepairParent(row)) {
+    if (!hasDirtyLegacyReleaseRepairParent(row, release)) {
       continue;
     }
 
@@ -253,9 +259,11 @@ export function resolveLegacyReleaseRepairParentMatch<
   {
     currentLegacyBottleId,
     proposedParentFullName,
+    release,
   }: {
     currentLegacyBottleId?: number;
     proposedParentFullName: string;
+    release?: LegacyReleaseRepairCandidateRelease;
   },
 ): {
   exactParent: null | TRow;
@@ -276,7 +284,7 @@ export function resolveLegacyReleaseRepairParentMatch<
   const exactRows = candidateRows.filter((row) =>
     hasExactLegacyReleaseRepairParentName(row.fullName, proposedParentFullName),
   );
-  const exactParent = pickBestLegacyReleaseRepairParent(exactRows);
+  const exactParent = pickBestLegacyReleaseRepairParent(exactRows, release);
 
   if (exactParent) {
     return {
@@ -295,7 +303,7 @@ export function resolveLegacyReleaseRepairParentMatch<
       proposedParentFullName,
     ),
   );
-  const variantParent = pickBestLegacyReleaseRepairParent(variantRows);
+  const variantParent = pickBestLegacyReleaseRepairParent(variantRows, release);
 
   return {
     exactParent: null,
@@ -315,6 +323,7 @@ export function getLegacyReleaseRepairParentMode<
     currentLegacyBottleId,
     parentAlias,
     proposedParentFullName,
+    release,
   }: {
     currentLegacyBottleId?: number;
     parentAlias?: {
@@ -322,11 +331,13 @@ export function getLegacyReleaseRepairParentMode<
       releaseId: number | null;
     } | null;
     proposedParentFullName: string;
+    release?: LegacyReleaseRepairCandidateRelease;
   },
 ): LegacyReleaseRepairParentMode {
   const parentMatch = resolveLegacyReleaseRepairParentMatch(rows, {
     currentLegacyBottleId,
     proposedParentFullName,
+    release,
   });
 
   if (parentMatch.exactParent) {
@@ -334,7 +345,9 @@ export function getLegacyReleaseRepairParentMode<
   }
 
   if (
-    parentMatch.exactRows.some((row) => hasDirtyLegacyReleaseRepairParent(row))
+    parentMatch.exactRows.some((row) =>
+      hasDirtyLegacyReleaseRepairParent(row, release),
+    )
   ) {
     return "blocked_dirty_parent";
   }
@@ -345,7 +358,7 @@ export function getLegacyReleaseRepairParentMode<
 
   if (
     parentMatch.variantRows.some((row) =>
-      hasDirtyLegacyReleaseRepairParent(row),
+      hasDirtyLegacyReleaseRepairParent(row, release),
     )
   ) {
     return "blocked_dirty_parent";
@@ -369,36 +382,71 @@ export function getLegacyReleaseRepairBlockingParent<
   {
     currentLegacyBottleId,
     proposedParentFullName,
+    release,
   }: {
     currentLegacyBottleId?: number;
     proposedParentFullName: string;
+    release?: LegacyReleaseRepairCandidateRelease;
   },
 ): null | TRow {
   const parentMatch = resolveLegacyReleaseRepairParentMatch(rows, {
     currentLegacyBottleId,
     proposedParentFullName,
+    release,
   });
 
   return (
-    pickBestDirtyLegacyReleaseRepairParent(parentMatch.exactRows) ??
-    pickBestDirtyLegacyReleaseRepairParent(parentMatch.variantRows)
+    pickBestDirtyLegacyReleaseRepairParent(parentMatch.exactRows, release) ??
+    pickBestDirtyLegacyReleaseRepairParent(parentMatch.variantRows, release)
   );
 }
 
 export function hasDirtyLegacyReleaseRepairParent(
   row: Pick<
     LegacyReleaseRepairParentCandidate,
-    "edition" | "fullName" | "releaseYear" | "vintageYear"
+    | "abv"
+    | "caskFill"
+    | "caskSize"
+    | "caskStrength"
+    | "caskType"
+    | "edition"
+    | "fullName"
+    | "releaseYear"
+    | "singleCask"
+    | "vintageYear"
   >,
+  release?: LegacyReleaseRepairCandidateRelease,
 ) {
-  return Boolean(
+  if (
     row.edition ||
     row.releaseYear ||
     row.vintageYear ||
-    LEGACY_RELEASE_DIRTY_PARENT_NAME_PATTERN.test(
-      normalizeString(row.fullName),
-    ),
-  );
+    LEGACY_RELEASE_DIRTY_PARENT_NAME_PATTERN.test(normalizeString(row.fullName))
+  ) {
+    return true;
+  }
+
+  if (!release) {
+    return false;
+  }
+
+  return hasBlockingBottleLevelReleaseTraits({
+    bottle: {
+      abv: row.abv,
+      caskFill: row.caskFill,
+      caskSize: row.caskSize,
+      caskStrength: row.caskStrength,
+      caskType: row.caskType,
+      edition: row.edition,
+      fullName: row.fullName,
+      name: row.fullName,
+      releaseYear: row.releaseYear,
+      singleCask: row.singleCask,
+      statedAge: null,
+      vintageYear: row.vintageYear,
+    },
+    release,
+  });
 }
 
 /**
