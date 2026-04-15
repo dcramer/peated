@@ -3,6 +3,7 @@ import {
   hasDirtyLegacyReleaseRepairParent,
   type LegacyReleaseRepairParentCandidate,
 } from "./legacyReleaseRepairIdentity";
+import type { ReleaseIdentityInput } from "./releaseIdentity";
 
 export type LegacyReleaseRepairClassifierBlockedReason =
   | "classifier_ignored"
@@ -33,9 +34,11 @@ export function resolveLegacyCreateParentClassification<
 >({
   classification,
   parentRows,
+  release,
 }: {
   classification: BottleClassificationResult;
   parentRows: TRow[];
+  release?: Partial<ReleaseIdentityInput>;
 }): LegacyReleaseRepairClassifierResolution<TRow> {
   if (classification.status === "ignored") {
     return {
@@ -68,7 +71,7 @@ export function resolveLegacyCreateParentClassification<
       };
     }
 
-    if (hasDirtyLegacyReleaseRepairParent(parentBottle)) {
+    if (hasDirtyLegacyReleaseRepairParent(parentBottle, release)) {
       return {
         resolution: "blocked",
         reason: "classifier_dirty_parent_candidate",

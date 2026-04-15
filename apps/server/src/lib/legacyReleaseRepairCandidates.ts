@@ -145,19 +145,45 @@ function getLegacyReleaseRepairModePriority(
   }
 }
 
-function getCandidateReleaseIdentity(candidate: LegacyReleaseRepairCandidate) {
+function getLegacyReleaseRepairCandidateReleaseIdentity({
+  legacyBottle,
+  releaseIdentity,
+}: {
+  legacyBottle: Pick<
+    LegacyReleaseRepairBottle,
+    | "abv"
+    | "caskFill"
+    | "caskSize"
+    | "caskStrength"
+    | "caskType"
+    | "singleCask"
+    | "statedAge"
+    | "vintageYear"
+  >;
+  releaseIdentity: Pick<
+    LegacyReleaseRepairCandidate["releaseIdentity"],
+    "edition" | "releaseYear"
+  >;
+}) {
   return {
-    edition: candidate.releaseIdentity.edition,
-    statedAge: candidate.legacyBottle.statedAge,
-    abv: candidate.legacyBottle.abv,
-    releaseYear: candidate.releaseIdentity.releaseYear,
-    vintageYear: candidate.legacyBottle.vintageYear,
-    singleCask: candidate.legacyBottle.singleCask,
-    caskStrength: candidate.legacyBottle.caskStrength,
-    caskFill: candidate.legacyBottle.caskFill,
-    caskType: candidate.legacyBottle.caskType,
-    caskSize: candidate.legacyBottle.caskSize,
+    edition: releaseIdentity.edition,
+    statedAge: legacyBottle.statedAge,
+    abv: legacyBottle.abv,
+    releaseYear: releaseIdentity.releaseYear,
+    vintageYear: legacyBottle.vintageYear,
+    singleCask: legacyBottle.singleCask,
+    caskStrength: legacyBottle.caskStrength,
+    caskFill: legacyBottle.caskFill,
+    caskType: legacyBottle.caskType,
+    caskSize: legacyBottle.caskSize,
   };
+}
+
+function getCandidateReleaseIdentity(candidate: LegacyReleaseRepairCandidate) {
+  return getLegacyReleaseRepairCandidateReleaseIdentity({
+    legacyBottle: candidate.legacyBottle,
+    releaseIdentity: candidate.releaseIdentity,
+  });
 }
 
 function sortLegacyReleaseRepairCandidates(
@@ -582,11 +608,19 @@ async function listHeuristicLegacyReleaseRepairCandidates(query = "") {
         ).values(),
       );
       const parentAlias = parentAliasByName.get(parentKey) ?? null;
+      const candidateRelease = getLegacyReleaseRepairCandidateReleaseIdentity({
+        legacyBottle: candidate.bottle,
+        releaseIdentity: {
+          edition: candidate.edition,
+          releaseYear: candidate.releaseYear,
+        },
+      });
       const parentMatch = resolveLegacyReleaseRepairParentMatch(
         parentRowsForCandidate,
         {
           currentLegacyBottleId: candidate.bottle.id,
           proposedParentFullName: candidate.proposedParentFullName,
+          release: candidateRelease,
         },
       );
       const parent = parentMatch.parent;
@@ -595,6 +629,7 @@ async function listHeuristicLegacyReleaseRepairCandidates(query = "") {
         {
           currentLegacyBottleId: candidate.bottle.id,
           proposedParentFullName: candidate.proposedParentFullName,
+          release: candidateRelease,
         },
       );
       const repairMode = getLegacyReleaseRepairParentMode(
@@ -603,6 +638,7 @@ async function listHeuristicLegacyReleaseRepairCandidates(query = "") {
           currentLegacyBottleId: candidate.bottle.id,
           parentAlias,
           proposedParentFullName: candidate.proposedParentFullName,
+          release: candidateRelease,
         },
       );
 

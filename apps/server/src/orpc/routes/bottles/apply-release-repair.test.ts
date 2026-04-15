@@ -1534,4 +1534,34 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       `[Error: Exact parent bottle still contains bottle-level release traits.]`,
     );
   });
+
+  test("rejects repair when the exact-name parent still carries non-marker release traits", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Kilkerran" });
+    const dirtyParent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Heavily Peated",
+      abv: 58.4,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Heavily Peated (Batch 10)",
+      abv: 58.4,
+    });
+    const mod = await fixtures.User({ mod: true });
+
+    const err = await waitError(
+      routerClient.bottles.applyReleaseRepair(
+        {
+          bottle: legacyBottle.id,
+        },
+        { context: { user: mod } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Exact parent bottle still contains bottle-level release traits.]`,
+    );
+  });
 });
