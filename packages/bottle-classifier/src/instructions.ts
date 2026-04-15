@@ -567,21 +567,33 @@ export function buildWhiskyLabelExtractorInstructions({
 
 export function buildBottleClassifierInstructions({
   maxSearchQueries,
+  hasBottleSearch = true,
+  hasOpenAIWebSearch = true,
   hasBraveWebSearch = false,
   hasEntitySearch = true,
 }: {
   maxSearchQueries: number;
+  hasBottleSearch?: boolean;
+  hasOpenAIWebSearch?: boolean;
   hasBraveWebSearch?: boolean;
   hasEntitySearch?: boolean;
 }) {
   const availableTools = [
-    "Use `search_bottles` to query the local bottle database with hybrid retrieval. Prefer this before web search when you need more candidates.",
+    ...(hasBottleSearch
+      ? [
+          "Use `search_bottles` to query the local bottle database with hybrid retrieval. Prefer this before web search when you need more candidates.",
+        ]
+      : []),
     ...(hasEntitySearch
       ? [
           "Use `search_entities` to query local producers, distilleries, and bottlers when you need to resolve `brand` or `distillery` identity.",
         ]
       : []),
-    "Use `openai_web_search` as the default web search tool only after local search is still ambiguous or conflicting.",
+    ...(hasOpenAIWebSearch
+      ? [
+          "Use `openai_web_search` as the default web search tool only after local search is still ambiguous or conflicting.",
+        ]
+      : []),
     ...(hasBraveWebSearch
       ? [
           "Use `brave_web_search` after `openai_web_search` when the first search returns sparse results, weak domains, or mostly retailer pages. Treat it as a second opinion from a different index, not a duplicate first step.",
@@ -590,18 +602,30 @@ export function buildBottleClassifierInstructions({
   ];
 
   const decisionProcess = [
-    "Prefer local evidence first: current assignment, exact aliases, vector candidates, text candidates, brand candidates, extracted identity details, and local search tools.",
+    hasBottleSearch
+      ? "Prefer local evidence first: current assignment, exact aliases, vector candidates, text candidates, brand candidates, extracted identity details, and local search tools."
+      : "Prefer local evidence first: current assignment, exact aliases, vector candidates, text candidates, brand candidates, and extracted identity details.",
     "The input includes `localSearch`, which is the server's initial local bottle search result set. If `localSearch.hasExactAliasMatch` is false, no exact alias match was found for the reference.",
     "Local candidates may be either parent bottle targets or child release targets. Use `releaseId` and the candidate `kind` discriminator to tell the difference.",
     "An exact alias can still point at a legacy bottle row that stores batch or annual release detail in the bottle name. If a cleaner parent bottle candidate exists, prefer the parent plus `create_release` instead of matching the legacy specific bottle.",
     "Local candidates may include structured bottle and release fields such as brand, bottler, distillery, series, category, age, edition, cask type, cask size, cask fill, cask-strength, single-cask, ABV, and release years. Use those fields directly when present instead of inferring everything from the candidate name.",
-    "When the provided local candidates are thin, conflicting, or missing obvious near matches, call `search_bottles` with the most specific query you can form from the reference and extracted identity.",
-    "If web search reveals a decisive omitted trait such as `Barrel Proof`, a specific ABV, or an edition label, call `search_bottles` again with those enriched structured fields before returning a final decision.",
-    "If the closest local candidate shares the same brand or series but differs on a meaningful component such as bourbon versus rye, rerun `search_bottles` with the extracted brand, expression, and category before creating a new bottle.",
+    ...(hasBottleSearch
+      ? [
+          "When the provided local candidates are thin, conflicting, or missing obvious near matches, call `search_bottles` with the most specific query you can form from the reference and extracted identity.",
+          "If web search reveals a decisive omitted trait such as `Barrel Proof`, a specific ABV, or an edition label, call `search_bottles` again with those enriched structured fields before returning a final decision.",
+          "If the closest local candidate shares the same brand or series but differs on a meaningful component such as bourbon versus rye, rerun `search_bottles` with the extracted brand, expression, and category before creating a new bottle.",
+        ]
+      : [
+          "This run is closed-set. Treat the provided local candidates as the full allowed existing-match set, and do not imply or invent outside bottle ids.",
+        ]),
     "Compare the reference against candidate bottles component by component in this order: " +
       MATCH_COMPONENT_PRIORITY.join(", ") +
       ".",
-    "Use `search_bottles` iteratively when the first candidate set is thin or missing obvious near matches.",
+    ...(hasBottleSearch
+      ? [
+          "Use `search_bottles` iteratively when the first candidate set is thin or missing obvious near matches.",
+        ]
+      : []),
     ...(hasEntitySearch
       ? [
           "Use `search_entities` when brand, distillery, or bottler identity is unclear and that ambiguity blocks a decision.",
@@ -626,7 +650,13 @@ export function buildBottleClassifierInstructions({
     "Decide whether the reference matches an existing bottle or release, requires a new bottle, requires a new release under an existing bottle, requires a new bottle plus release, or has no safe match.",
     "",
     "Available tools:",
-    renderBulletLines(availableTools),
+    renderBulletLines(
+      availableTools.length
+        ? availableTools
+        : [
+            "No search tools are available for this run. Decide only from the provided local candidates and extracted identity.",
+          ],
+    ),
     "",
     "House schema conventions:",
     renderBulletLines([
@@ -651,26 +681,42 @@ export function buildBottleClassifierInstructions({
     "",
     "Common retailer failure modes:",
     renderRetailerExamples(),
-    "",
-    "Search policy:",
-    renderBulletLines([
-      "Use `openai_web_search` first when local evidence is ambiguous, conflicting, or suggests the current assignment is wrong.",
-      "Before returning any create action, use `openai_web_search` to validate the bottle traits that make the reference distinct unless local evidence is already decisive.",
-      ...(hasBraveWebSearch
-        ? [
-            "If `openai_web_search` returns no useful results, only retailer results, or no authoritative producer, importer, or critic domains, use `brave_web_search` before giving up.",
-            "Use `brave_web_search` when you want a second web opinion from an independent index, especially for generic bottle names or when recall seems weak.",
-          ]
-        : []),
-      "When you are leaning toward any create action or `no_match` because local candidates are weak, do at least one web search while search budget remains.",
-      "If `localSearch.hasExactAliasMatch` is false and you do not have authoritative web evidence, you can still return a create action, but do not assume the server will auto-create it.",
-      "When searching, prioritize official producer, distillery, bottler, or importer domains first, then critics or publications, then broader web if still unresolved.",
-      "Do not treat the originating source page as decisive evidence for differentiating traits such as distillery, bottler, cask finish, cask size, cask fill, ABV, edition, or release year.",
-      "When a candidate may still be right but the source title omitted a canonical trait, search for the exact base bottle name plus the missing trait and prefer authoritative domains that can confirm it.",
-      "If the distinctness of the bottle depends on a trait such as `Port Cask Finished`, `Single Cask`, `Barrel Proof`, a specific ABV, `1st Fill`, or `Port Pipe`, the web evidence should explicitly confirm that trait.",
-      "If the raw reference is still just a sparse generic phrase like `Batch Sherry` after extraction and local search, do not invent a branded bottle or release from web similarity alone. Prefer `no_match` unless the source itself provides a strong identity anchor.",
-      `You have a combined hard limit of ${maxSearchQueries} web search calls across all web search tools.`,
-    ]),
+    ...(hasBottleSearch || hasOpenAIWebSearch || hasBraveWebSearch
+      ? [
+          "",
+          "Search policy:",
+          renderBulletLines([
+            ...(hasOpenAIWebSearch
+              ? [
+                  "Use `openai_web_search` first when local evidence is ambiguous, conflicting, or suggests the current assignment is wrong.",
+                  "Before returning any create action, use `openai_web_search` to validate the bottle traits that make the reference distinct unless local evidence is already decisive.",
+                ]
+              : []),
+            ...(hasBraveWebSearch
+              ? [
+                  "If `openai_web_search` returns no useful results, only retailer results, or no authoritative producer, importer, or critic domains, use `brave_web_search` before giving up.",
+                  "Use `brave_web_search` when you want a second web opinion from an independent index, especially for generic bottle names or when recall seems weak.",
+                ]
+              : []),
+            ...(hasOpenAIWebSearch || hasBraveWebSearch
+              ? [
+                  "When you are leaning toward any create action or `no_match` because local candidates are weak, do at least one web search while search budget remains.",
+                ]
+              : []),
+            "If `localSearch.hasExactAliasMatch` is false and you do not have authoritative web evidence, you can still return a create action, but do not assume the server will auto-create it.",
+            ...(hasOpenAIWebSearch || hasBraveWebSearch
+              ? [
+                  "When searching, prioritize official producer, distillery, bottler, or importer domains first, then critics or publications, then broader web if still unresolved.",
+                  "Do not treat the originating source page as decisive evidence for differentiating traits such as distillery, bottler, cask finish, cask size, cask fill, ABV, edition, or release year.",
+                  "When a candidate may still be right but the source title omitted a canonical trait, search for the exact base bottle name plus the missing trait and prefer authoritative domains that can confirm it.",
+                  "If the distinctness of the bottle depends on a trait such as `Port Cask Finished`, `Single Cask`, `Barrel Proof`, a specific ABV, `1st Fill`, or `Port Pipe`, the web evidence should explicitly confirm that trait.",
+                  "If the raw reference is still just a sparse generic phrase like `Batch Sherry` after extraction and local search, do not invent a branded bottle or release from web similarity alone. Prefer `no_match` unless the source itself provides a strong identity anchor.",
+                  `You have a combined hard limit of ${maxSearchQueries} web search calls across all web search tools.`,
+                ]
+              : []),
+          ]),
+        ]
+      : []),
     "",
     "Output rules:",
     renderBulletLines([
@@ -680,7 +726,11 @@ export function buildBottleClassifierInstructions({
       "Use `create_release` only when the parent bottle already exists in the candidate set and the reference is confidently specific to a reusable child release.",
       "Use `create_bottle_and_release` only when both a new bottle and a reusable child release are clearly needed.",
       "If the correct outcome is a reusable parent bottle plus release detail but no safe parent bottle exists in the candidate set, use `create_bottle_and_release` instead of `create_release` or `no_match`.",
-      "Do not return a create action from sparse local evidence alone when a web search could still confirm or refute the bottle identity.",
+      ...(hasOpenAIWebSearch || hasBraveWebSearch
+        ? [
+            "Do not return a create action from sparse local evidence alone when a web search could still confirm or refute the bottle identity.",
+          ]
+        : []),
       "If identity evidence is weak, conflicting, or missing on the decisive components, do not force a match.",
       "Do not return `no_match` when bottle identity is clear but the only local candidate is too specific. In that case prefer `create_bottle` for the parent bottle unless authoritative evidence validates the more specific candidate.",
       "For known exact-cask program codes such as SMWS, a conflicting retailer subtitle or selector is usually observation-level evidence, not a reason to return `no_match`, when the cask code and authoritative producer evidence are otherwise decisive.",

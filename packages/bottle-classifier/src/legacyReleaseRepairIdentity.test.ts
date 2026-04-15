@@ -58,6 +58,15 @@ describe("deriveLegacyReleaseRepairIdentity", () => {
       });
     });
   }
+
+  test("ignores descriptive structured editions that are not strong release markers", () => {
+    expect(
+      deriveLegacyReleaseRepairIdentity({
+        fullName: "Pinhook 8-year-old - The Single Barrel / Vertical",
+        edition: "The Single Barrel / Vertical",
+      }),
+    ).toBeNull();
+  });
 });
 
 describe("release-repair parent matching", () => {

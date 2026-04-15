@@ -779,6 +779,11 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
 
     expect(result.parentBottleId).toBe(parentBottle.id);
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+    expect(classifyBottleReferenceMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        candidateExpansion: "initial_only",
+      }),
+    );
   });
 
   test("ignores persisted reviews when classifier-relevant legacy bottle traits change and falls back to live classifier validation", async ({

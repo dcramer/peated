@@ -53,11 +53,14 @@ export const BottleClassificationArtifactsSchema = z
   })
   .strict();
 
+export const CandidateExpansionModeSchema = z.enum(["open", "initial_only"]);
+
 export const ClassifyBottleReferenceInputSchema = z
   .object({
     reference: BottleReferenceSchema,
     extractedIdentity: BottleExtractedDetailsSchema.nullable().optional(),
     initialCandidates: z.array(BottleCandidateSchema).optional(),
+    candidateExpansion: CandidateExpansionModeSchema.default("open"),
   })
   .strict();
 
@@ -86,9 +89,15 @@ export type BottleReference = z.infer<typeof BottleReferenceSchema>;
 export type BottleClassificationArtifacts = z.infer<
   typeof BottleClassificationArtifactsSchema
 >;
-export type ClassifyBottleReferenceInput = z.infer<
-  typeof ClassifyBottleReferenceInputSchema
+export type CandidateExpansionMode = z.infer<
+  typeof CandidateExpansionModeSchema
 >;
+export type ClassifyBottleReferenceInput = {
+  reference: BottleReference;
+  extractedIdentity?: null | z.infer<typeof BottleExtractedDetailsSchema>;
+  initialCandidates?: z.infer<typeof BottleCandidateSchema>[];
+  candidateExpansion?: CandidateExpansionMode;
+};
 export type IgnoredBottleClassificationResult = z.infer<
   typeof IgnoredBottleClassificationResultSchema
 >;

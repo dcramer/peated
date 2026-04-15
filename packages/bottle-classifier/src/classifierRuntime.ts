@@ -19,6 +19,7 @@ import {
   type BottleClassificationArtifacts,
   type BottleClassificationResult,
   type BottleReference,
+  type CandidateExpansionMode,
   type ClassifyBottleReferenceInput,
 } from "./contract";
 import { BottleClassificationError } from "./error";
@@ -56,6 +57,7 @@ export type RunBottleClassifierAgentInput = {
   reference: BottleReference;
   extractedIdentity?: BottleExtractedDetails | null;
   initialCandidates?: BottleCandidate[];
+  candidateExpansion?: CandidateExpansionMode;
 };
 
 export type BottleClassifierAdapters = {
@@ -198,12 +200,14 @@ export function createBottleClassifier(
     reference,
     extractedIdentity,
     initialCandidates = [],
+    candidateExpansion = "open",
   }: RunBottleClassifierAgentInput): Promise<BottleClassifierReasoningResult> => {
     if (options.overrides?.runBottleClassifierAgent) {
       return await options.overrides.runBottleClassifierAgent({
         reference,
         extractedIdentity,
         initialCandidates,
+        candidateExpansion,
       });
     }
 
@@ -236,61 +240,63 @@ export function createBottleClassifier(
       mergeBottleCandidate(candidateBottles, currentBottle);
     }
 
+    const allowCandidateExpansion = candidateExpansion === "open";
     const webSearchBudget = createBottleWebSearchBudget(
       options.maxSearchQueries,
     );
     const instructions = buildBottleClassifierInstructions({
       maxSearchQueries: options.maxSearchQueries,
-      hasBraveWebSearch: !!options.braveApiKey,
-      hasEntitySearch: !!options.adapters.searchEntities,
+      hasBottleSearch: allowCandidateExpansion,
+      hasOpenAIWebSearch: allowCandidateExpansion,
+      hasBraveWebSearch: allowCandidateExpansion && !!options.braveApiKey,
+      hasEntitySearch:
+        allowCandidateExpansion && !!options.adapters.searchEntities,
     });
 
-    const tools = [
-      createSearchBottlesTool({
-        searchBottles: options.adapters.searchBottles,
-        onResults: (results) => {
-          for (const candidate of results) {
-            mergeBottleCandidate(candidateBottles, candidate);
-          }
-        },
-      }),
-      createOpenAIWebSearchTool({
-        client: options.client,
-        model: options.model,
-        budget: webSearchBudget,
-        braveApiKey: options.braveApiKey,
-        onEvidence: (evidence) => {
-          searchEvidence.push(evidence);
-        },
-      }),
-    ];
-
-    if (options.adapters.searchEntities) {
-      tools.splice(
-        1,
-        0,
-        createSearchEntitiesTool({
-          searchEntities: options.adapters.searchEntities,
-          onResults: (results) => {
-            for (const result of results) {
-              mergeResolvedEntity(resolvedEntities, result);
-            }
-          },
-        }),
-      );
-    }
-
-    if (options.braveApiKey) {
-      tools.push(
-        createBraveWebSearchTool({
-          apiKey: options.braveApiKey,
-          budget: webSearchBudget,
-          onEvidence: (evidence) => {
-            searchEvidence.push(evidence);
-          },
-        }),
-      );
-    }
+    const tools = allowCandidateExpansion
+      ? [
+          createSearchBottlesTool({
+            searchBottles: options.adapters.searchBottles,
+            onResults: (results) => {
+              for (const candidate of results) {
+                mergeBottleCandidate(candidateBottles, candidate);
+              }
+            },
+          }),
+          ...(options.adapters.searchEntities
+            ? [
+                createSearchEntitiesTool({
+                  searchEntities: options.adapters.searchEntities,
+                  onResults: (results) => {
+                    for (const result of results) {
+                      mergeResolvedEntity(resolvedEntities, result);
+                    }
+                  },
+                }),
+              ]
+            : []),
+          createOpenAIWebSearchTool({
+            client: options.client,
+            model: options.model,
+            budget: webSearchBudget,
+            braveApiKey: options.braveApiKey,
+            onEvidence: (evidence) => {
+              searchEvidence.push(evidence);
+            },
+          }),
+          ...(options.braveApiKey
+            ? [
+                createBraveWebSearchTool({
+                  apiKey: options.braveApiKey,
+                  budget: webSearchBudget,
+                  onEvidence: (evidence) => {
+                    searchEvidence.push(evidence);
+                  },
+                }),
+              ]
+            : []),
+        ]
+      : [];
 
     const agent = new Agent({
       name: "bottle_classifier_reasoner",
@@ -334,6 +340,7 @@ export function createBottleClassifier(
       initialCandidates,
       currentBottle,
       hasExactAliasMatch,
+      candidateExpansion,
     });
 
     try {
@@ -420,6 +427,7 @@ export function createBottleClassifier(
         reference: parsedInput.reference,
         extractedIdentity: artifacts.extractedIdentity,
         initialCandidates: artifacts.candidates,
+        candidateExpansion: parsedInput.candidateExpansion,
       });
       const decision = finalizeBottleReferenceClassification({
         reference: parsedInput.reference,

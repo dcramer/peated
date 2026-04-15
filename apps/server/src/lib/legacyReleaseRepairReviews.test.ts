@@ -104,6 +104,11 @@ describe("refreshLegacyReleaseRepairReview", () => {
       reviewedParentBottleId: reusableParent.id,
       blockedReason: null,
     });
+    expect(classifyBottleReferenceMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        candidateExpansion: "initial_only",
+      }),
+    );
   });
 
   test("persists a blocked review when classifier cannot verify the parent decision", async ({

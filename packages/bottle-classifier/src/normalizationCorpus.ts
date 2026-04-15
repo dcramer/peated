@@ -493,6 +493,23 @@ export const BOTTLE_NORMALIZATION_CORPUS: BottleNormalizationCorpusExample[] = [
       "Real Peated bottle family showing that Single Barrel wording alone is still bottle identity.",
   },
   {
+    id: "pinhook-vertical-single-barrel-wording",
+    inputName: "Pinhook 8-year-old - The Single Barrel / Vertical",
+    expectedBottleName: "Pinhook 8-year-old",
+    peatedBottleIds: [43683],
+    contrastGroup: "single_barrel_strength_wording",
+    contrastOutcome: "block",
+    liveEvalCoverage: "skip",
+    expectation: {
+      handlingStrategy: "classifier_required",
+      classifierExpectation: "review_required",
+      deterministicReleaseExpectation: "none",
+      releaseIdentity: null,
+    },
+    notes:
+      "Real Peated family where freeform single-barrel program wording should not let deterministic repair peel the bottle into a reusable parent plus child release.",
+  },
+  {
     id: "talisker-distillers-edition-2001",
     inputName: "Talisker 2001 The Distillers Edition",
     expectedBottleName: "Talisker The Distillers Edition",

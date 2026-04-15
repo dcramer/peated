@@ -495,6 +495,71 @@ describe("createBottleClassifier", () => {
     expect(runBottleClassifierAgent).not.toHaveBeenCalled();
   });
 
+  test("forwards closed-set candidate expansion to the reasoning pass", async () => {
+    const runBottleClassifierAgent = vi.fn(
+      async ({
+        candidateExpansion,
+      }: RunBottleClassifierAgentInput): Promise<ReasoningResult> => ({
+        decision: {
+          action: "create_bottle",
+          confidence: 82,
+          rationale: "Closed-set review could not reuse a parent bottle.",
+          candidateBottleIds: [],
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          proposedBottle: {
+            name: "Warehouse Session",
+            series: null,
+            category: "single_malt",
+            edition: null,
+            statedAge: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: null,
+              name: "Festival Distillery",
+            },
+            distillers: [],
+            bottler: null,
+          },
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity: null,
+          candidates: [],
+          searchEvidence: [],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity: null,
+      runBottleClassifierAgent,
+    });
+
+    await classifier.classifyBottleReference({
+      reference: {
+        name: "Warehouse Session (Batch 2)",
+      },
+      candidateExpansion: "initial_only",
+    });
+
+    expect(runBottleClassifierAgent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        candidateExpansion: "initial_only",
+      }),
+    );
+  });
+
   test("falls back to text extraction when image extraction returns null", async () => {
     const runBottleClassifierAgent = vi.fn(
       async ({ extractedIdentity }): Promise<ReasoningResult> => ({
