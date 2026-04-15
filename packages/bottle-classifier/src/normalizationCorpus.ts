@@ -304,6 +304,38 @@ export const BOTTLE_NORMALIZATION_CORPUS: BottleNormalizationCorpusExample[] = [
     notes: "Stable product wording, not a release split.",
   },
   {
+    id: "woodford-double-oaked",
+    inputName: "Woodford Reserve Double Oaked",
+    expectedBottleName: "Woodford Reserve Double Oaked",
+    liveEvalCoverage: "required",
+    liveEvalSummary:
+      "Treat Woodford Reserve Double Oaked as a distinct bottle identity and avoid mutating it into the separate Double Double Oaked sibling.",
+    expectation: {
+      handlingStrategy: "classifier_required",
+      classifierExpectation: "bottle",
+      deterministicReleaseExpectation: "none",
+      releaseIdentity: null,
+    },
+    notes:
+      "Real sibling bottle family where the repeated Double token is meaningful bottle identity, not release structure.",
+  },
+  {
+    id: "woodford-double-double-oaked",
+    inputName: "Woodford Reserve Double Double Oaked",
+    expectedBottleName: "Woodford Reserve Double Double Oaked",
+    liveEvalCoverage: "required",
+    liveEvalSummary:
+      "Treat Woodford Reserve Double Double Oaked as its own bottle identity and do not collapse the repeated Double wording into Double Oaked.",
+    expectation: {
+      handlingStrategy: "classifier_required",
+      classifierExpectation: "bottle",
+      deterministicReleaseExpectation: "none",
+      releaseIdentity: null,
+    },
+    notes:
+      "Real sibling bottle family where repeated marketed wording must be preserved rather than deduped.",
+  },
+  {
     id: "glenallachie-sherry-cask",
     inputName: "Glenallachie Sherry Cask",
     expectedBottleName: "Glenallachie Sherry Cask",
