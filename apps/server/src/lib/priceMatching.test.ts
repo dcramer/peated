@@ -197,9 +197,8 @@ describe("priceMatching", () => {
     fixtures,
   }) => {
     config.OPENAI_API_KEY = "test-openai-key";
-    const { getOpenAIEmbedding } = await import(
-      "@peated/server/lib/openaiEmbeddings"
-    );
+    const { getOpenAIEmbedding } =
+      await import("@peated/server/lib/openaiEmbeddings");
     vi.mocked(getOpenAIEmbedding).mockRejectedValue(
       new Error("Embeddings unavailable"),
     );
@@ -323,9 +322,8 @@ describe("priceMatching", () => {
   test("normalizes string bottle ids returned from raw candidate queries", async () => {
     config.OPENAI_API_KEY = "test-openai-key";
 
-    const { getOpenAIEmbedding } = await import(
-      "@peated/server/lib/openaiEmbeddings"
-    );
+    const { getOpenAIEmbedding } =
+      await import("@peated/server/lib/openaiEmbeddings");
     vi.mocked(getOpenAIEmbedding).mockResolvedValue([0.1, 0.2, 0.3]);
 
     const executeSpy = vi.spyOn(db, "execute") as any;
@@ -373,12 +371,10 @@ describe("priceMatching", () => {
   }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       bottleId: null,
@@ -455,12 +451,10 @@ describe("priceMatching", () => {
   }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const brand = await fixtures.Entity({
       name: "Wild Turkey",
       type: ["brand", "distiller"],
@@ -573,12 +567,10 @@ describe("priceMatching", () => {
   }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const brand = await fixtures.Entity({
       name: "Wild Turkey",
       type: ["brand", "distiller"],
@@ -698,12 +690,10 @@ describe("priceMatching", () => {
   }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       bottleId: null,
@@ -784,12 +774,10 @@ describe("priceMatching", () => {
   }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const candidateBottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       bottleId: null,
@@ -883,12 +871,10 @@ describe("priceMatching", () => {
   }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Local Only Create Candidate",
@@ -966,12 +952,10 @@ describe("priceMatching", () => {
   }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Normalized Draft Candidate",
@@ -1061,12 +1045,10 @@ describe("priceMatching", () => {
   }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Normalized Release Draft Candidate",
@@ -1179,12 +1161,10 @@ describe("priceMatching", () => {
   }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Spirit Category Candidate",
@@ -1308,12 +1288,10 @@ describe("priceMatching", () => {
   test("does not auto-create from empty web evidence", async ({ fixtures }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Empty Evidence Candidate",
@@ -1399,12 +1377,10 @@ describe("priceMatching", () => {
   test("auto ignores clearly non-whisky listings", async ({ fixtures }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Tito's Handmade Vodka",
@@ -1425,12 +1401,10 @@ describe("priceMatching", () => {
   }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Skrewball Peanut Butter Whiskey",
@@ -1503,12 +1477,10 @@ describe("priceMatching", () => {
       url: "https://smws.example/rw6-5-existing",
     });
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
 
     const proposal = await resolveStorePriceMatchProposal(price.id);
     const updatedPrice = await db.query.storePrices.findFirst({
@@ -1560,12 +1532,10 @@ describe("priceMatching", () => {
       url: "https://smws.example/rw6-5-new",
     });
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
 
     const proposal = await resolveStorePriceMatchProposal(price.id);
     const updatedPrice = await db.query.storePrices.findFirst({
@@ -1669,12 +1639,10 @@ describe("priceMatching", () => {
       })
       .returning();
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
 
     const proposal = await resolveStorePriceMatchProposal(price.id, {
       force: true,
@@ -1744,12 +1712,10 @@ describe("priceMatching", () => {
       url: "https://smws.example/rw6-5-name-invariant",
     });
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
 
     const proposal = await resolveStorePriceMatchProposal(price.id);
     const createdBottle = await db.query.bottles.findFirst({
@@ -1786,12 +1752,10 @@ describe("priceMatching", () => {
       mod: true,
     });
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Auto Create Candidate",
@@ -1910,12 +1874,10 @@ describe("priceMatching", () => {
       mod: true,
     });
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Retry Auto Create Candidate",
@@ -2054,12 +2016,10 @@ describe("priceMatching", () => {
     });
 
     const currentBottle = await fixtures.Bottle();
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: currentBottle.id,
       name: "Replacement Create Candidate",
@@ -2192,12 +2152,10 @@ describe("priceMatching", () => {
   }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference, BottleClassificationError } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference, BottleClassificationError } =
+      await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
     await fixtures.BottleAlias({
       bottleId: bottle.id,
@@ -2298,9 +2256,8 @@ describe("priceMatching", () => {
   test("includes structured bottle fields in candidate search text", async () => {
     config.OPENAI_API_KEY = "test-openai-key";
 
-    const { getOpenAIEmbedding } = await import(
-      "@peated/server/lib/openaiEmbeddings"
-    );
+    const { getOpenAIEmbedding } =
+      await import("@peated/server/lib/openaiEmbeddings");
     vi.mocked(getOpenAIEmbedding).mockResolvedValue([0.1, 0.2, 0.3]);
 
     const executeSpy = vi.spyOn(db, "execute") as any;
@@ -2524,6 +2481,133 @@ describe("priceMatching", () => {
     );
   });
 
+  test("adds a reusable parent candidate for age-statement listings", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const brand = await fixtures.Entity({
+      name: "The Macallan",
+      type: ["brand"],
+    });
+    const cleanParent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Sherry Oak",
+      category: "single_malt",
+      statedAge: null,
+    });
+    const dirtyAgeBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Sherry Oak 30-year-old",
+      category: "single_malt",
+      statedAge: 30,
+    });
+    await fixtures.BottleAlias({
+      bottleId: dirtyAgeBottle.id,
+      name: "The Macallan Sherry Oak Single Malt Scotch 30-year-old",
+    });
+
+    const candidates = await findBottleMatchCandidates({
+      query: "The Macallan Sherry Oak Single Malt Scotch 30-year-old",
+      brand: brand.name,
+      bottler: null,
+      expression: "Sherry Oak",
+      series: null,
+      distillery: [],
+      category: "single_malt",
+      stated_age: 30,
+      abv: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+      vintage_year: null,
+      release_year: null,
+      currentBottleId: null,
+      limit: 15,
+    });
+
+    expect(candidates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          bottleId: dirtyAgeBottle.id,
+          source: expect.arrayContaining(["exact"]),
+        }),
+        expect.objectContaining({
+          bottleId: cleanParent.id,
+          releaseId: null,
+        }),
+      ]),
+    );
+  });
+
+  test("finds buggy batch aliases and still surfaces the reusable parent bottle", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const brand = await fixtures.Entity({
+      name: "Penelope",
+      type: ["brand"],
+    });
+    const cleanParent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Bourbon Barrel Strength Straight Bourbon Whiskey",
+      category: "bourbon",
+      statedAge: null,
+      edition: null,
+    });
+    const legacyBatchBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Bourbon Barrel Strength Straight Bourbon Whiskey (Batch 11)",
+      category: "bourbon",
+      statedAge: null,
+      edition: "Batch 11",
+    });
+    await fixtures.BottleAlias({
+      bottleId: legacyBatchBottle.id,
+      name: "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey Batch 11",
+    });
+
+    const candidates = await findBottleMatchCandidates({
+      query:
+        "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey (Batch 11)",
+      brand: brand.name,
+      bottler: null,
+      expression: "Bourbon Barrel Strength Straight Bourbon Whiskey",
+      series: null,
+      distillery: [],
+      category: "bourbon",
+      stated_age: null,
+      abv: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: "Batch 11",
+      vintage_year: null,
+      release_year: null,
+      currentBottleId: null,
+      limit: 15,
+    });
+
+    expect(candidates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          bottleId: legacyBatchBottle.id,
+          source: expect.arrayContaining(["exact"]),
+        }),
+        expect.objectContaining({
+          bottleId: cleanParent.id,
+          releaseId: null,
+        }),
+      ]),
+    );
+  });
+
   test("does not treat edition substring collisions as matching evidence", async () => {
     config.OPENAI_API_KEY = undefined;
 
@@ -2652,9 +2736,8 @@ describe("priceMatching", () => {
   }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Presearch Candidate",
@@ -2700,9 +2783,8 @@ describe("priceMatching", () => {
       })
       .returning();
 
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
 
     const result = await resolveStorePriceMatchProposal(price.id);
 
@@ -2732,12 +2814,10 @@ describe("priceMatching", () => {
       reviewedAt: new Date("2026-03-10T13:00:00.000Z"),
     });
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
 
     vi.mocked(extractFromText).mockResolvedValue({
       brand: "Retry Brand",
@@ -2821,12 +2901,10 @@ describe("priceMatching", () => {
   }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Draft Candidate",
@@ -2940,12 +3018,10 @@ describe("priceMatching", () => {
   }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const brand = await fixtures.Entity({
       name: "Canonical Brand",
       shortName: "Brand Short",
@@ -3099,12 +3175,10 @@ describe("priceMatching", () => {
   }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       name: "Unknown Suggested Candidate",
@@ -3187,12 +3261,10 @@ describe("priceMatching", () => {
   }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } = await import(
-      "@peated/server/agents/whisky/labelExtractor"
-    );
-    const { classifyBottleReference } = await import(
-      "@peated/server/agents/bottleClassifier"
-    );
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       name: "Retry Lease Candidate",
       imageUrl: null,

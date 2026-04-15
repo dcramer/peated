@@ -1,5 +1,7 @@
+import { deriveLegacyReleaseRepairIdentity } from "@peated/bottle-classifier/legacyReleaseRepairIdentity";
 import {
   normalizeBottle,
+  normalizeBottleBatchNumber,
   normalizeString,
 } from "@peated/bottle-classifier/normalize";
 import {
@@ -405,6 +407,35 @@ function buildQueryText(
   return Array.from(new Set(parts.filter(Boolean))).join(" ");
 }
 
+function buildExactSearchNameVariants(normalizedName: string) {
+  const variants = [normalizedName];
+  const batchSuffixMatch = normalizedName.match(/\s+\((batch [^)]+)\)\s*$/i);
+
+  if (batchSuffixMatch?.[1]) {
+    variants.push(
+      normalizedName.replace(
+        /\s+\((batch [^)]+)\)\s*$/i,
+        ` ${batchSuffixMatch[1]}`,
+      ),
+    );
+  }
+
+  return variants;
+}
+
+function buildExactSearchNames(
+  normalizedNames: Array<null | string | undefined>,
+) {
+  return Array.from(
+    new Set(
+      normalizedNames
+        .filter((value): value is string => Boolean(value))
+        .flatMap((value) => buildExactSearchNameVariants(value))
+        .map((value) => value.toLowerCase()),
+    ),
+  );
+}
+
 function normalizeIdentityText(value: string | null | undefined) {
   if (!value) {
     return "";
@@ -419,6 +450,154 @@ function normalizeComparableText(value: string | null | undefined) {
 
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+type ParentSearchSignals = {
+  edition: string | null;
+  releaseYear: number | null;
+  statedAge: number | null;
+  vintageYear: number | null;
+};
+
+function getParentSearchSignals({
+  searchName,
+  extractedLabel,
+}: {
+  searchName: string;
+  extractedLabel: BottleReferenceIdentity | null;
+}): ParentSearchSignals {
+  const normalizedSearchName = normalizeBottle({ name: searchName });
+  const derivedLegacyReleaseIdentity = deriveLegacyReleaseRepairIdentity({
+    fullName: searchName,
+    edition: extractedLabel?.edition ?? null,
+    releaseYear: extractedLabel?.release_year ?? null,
+  });
+
+  return {
+    edition:
+      extractedLabel?.edition ?? derivedLegacyReleaseIdentity?.edition ?? null,
+    releaseYear:
+      extractedLabel?.release_year ??
+      derivedLegacyReleaseIdentity?.releaseYear ??
+      normalizedSearchName.releaseYear ??
+      null,
+    statedAge:
+      extractedLabel?.stated_age ?? normalizedSearchName.statedAge ?? null,
+    vintageYear:
+      extractedLabel?.vintage_year ?? normalizedSearchName.vintageYear ?? null,
+  };
+}
+
+function stripReleaseIdentityFromSearchName(
+  name: string,
+  signals: ParentSearchSignals,
+) {
+  let strippedName = normalizeString(name);
+
+  if (signals.edition) {
+    const normalizedEdition = normalizeBottleBatchNumber(
+      normalizeString(signals.edition),
+    );
+    const escapedEdition = escapeRegExp(normalizedEdition);
+
+    strippedName = strippedName
+      .replace(new RegExp(`\\s*\\(${escapedEdition}\\)\\s*$`, "i"), " ")
+      .replace(new RegExp(`\\b${escapedEdition}\\b`, "i"), " ");
+  }
+
+  if (signals.statedAge !== null) {
+    strippedName = strippedName.replace(
+      new RegExp(`\\b${signals.statedAge}-year-old\\b`, "i"),
+      " ",
+    );
+  }
+
+  if (signals.releaseYear !== null) {
+    strippedName = strippedName.replace(
+      new RegExp(`\\b${signals.releaseYear}\\s+release\\b`, "i"),
+      " ",
+    );
+  }
+
+  if (signals.vintageYear !== null) {
+    strippedName = strippedName.replace(
+      new RegExp(`\\b${signals.vintageYear}\\s+vintage\\b`, "i"),
+      " ",
+    );
+  }
+
+  return strippedName
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s*[-,(]+\s*$/g, "")
+    .trim();
+}
+
+function buildParentCandidateSearchContext({
+  input,
+  extractedLabel,
+  normalizedName,
+}: {
+  input: BottleCandidateSearchInput;
+  extractedLabel: BottleReferenceIdentity | null;
+  normalizedName: string;
+}) {
+  const signals = getParentSearchSignals({
+    searchName: normalizedName,
+    extractedLabel,
+  });
+  const hasParentSearchSignal =
+    signals.edition !== null ||
+    signals.statedAge !== null ||
+    signals.releaseYear !== null ||
+    signals.vintageYear !== null;
+
+  if (!hasParentSearchSignal) {
+    return null;
+  }
+
+  const strippedQuery = stripReleaseIdentityFromSearchName(
+    normalizedName,
+    signals,
+  );
+  const strippedExpression = extractedLabel?.expression
+    ? stripReleaseIdentityFromSearchName(extractedLabel.expression, signals)
+    : null;
+  const parentInput: BottleCandidateSearchInput = {
+    ...input,
+    query: strippedQuery || input.query,
+    expression: strippedExpression || null,
+    stated_age: null,
+    abv: null,
+    cask_type: null,
+    cask_size: null,
+    cask_fill: null,
+    cask_strength: null,
+    single_cask: null,
+    edition: null,
+    vintage_year: null,
+    release_year: null,
+  };
+  const parentLabel = buildSearchLabel(parentInput);
+  const parentSearchName = buildRawSearchName(parentInput);
+
+  if (!parentSearchName) {
+    return null;
+  }
+
+  const parentNormalizedName = getNormalizedPriceName(parentSearchName);
+  if (parentNormalizedName.toLowerCase() === normalizedName.toLowerCase()) {
+    return null;
+  }
+
+  return {
+    exactSearchNames: buildExactSearchNames([
+      parentNormalizedName,
+      parentInput.query ? getNormalizedPriceName(parentInput.query) : null,
+    ]),
+    extractedLabel: parentLabel,
+    normalizedName: parentNormalizedName,
+    queryText: buildQueryText(parentNormalizedName, parentLabel),
+  };
 }
 
 function containsComparablePhrase(haystack: string, needle: string) {
@@ -1470,14 +1649,16 @@ export async function searchBottleCandidates(
 
   const extractedLabel = buildSearchLabel(input);
   const normalizedName = getNormalizedPriceName(searchName);
-  const exactSearchNames = Array.from(
-    new Set(
-      [normalizedName, input.query ? getNormalizedPriceName(input.query) : null]
-        .filter((value): value is string => Boolean(value))
-        .map((value) => value.toLowerCase()),
-    ),
-  );
+  const exactSearchNames = buildExactSearchNames([
+    normalizedName,
+    input.query ? getNormalizedPriceName(input.query) : null,
+  ]);
   const queryText = buildQueryText(normalizedName, extractedLabel);
+  const parentSearchContext = buildParentCandidateSearchContext({
+    input,
+    extractedLabel,
+    normalizedName,
+  });
   const candidates = new Map<string, BottleCandidate>();
 
   const [
@@ -1487,6 +1668,11 @@ export async function searchBottleCandidates(
     releaseTextCandidates,
     brandCandidates,
     exactCandidate,
+    parentVectorCandidates,
+    parentTextCandidates,
+    parentReleaseTextCandidates,
+    parentBrandCandidates,
+    parentExactCandidate,
   ] = await Promise.all([
     input.currentBottleId
       ? runCandidateLookupSafely(
@@ -1530,6 +1716,54 @@ export async function searchBottleCandidates(
       null as BottleCandidate | null,
       async () => await getExactBottleCandidateByNames(exactSearchNames),
     ),
+    parentSearchContext
+      ? runCandidateLookupSafely(
+          "parent_vector",
+          searchName,
+          [] as BottleCandidate[],
+          async () => await getVectorCandidates(parentSearchContext.queryText),
+        )
+      : Promise.resolve([] as BottleCandidate[]),
+    parentSearchContext
+      ? runCandidateLookupSafely(
+          "parent_text",
+          searchName,
+          [] as BottleCandidate[],
+          async () => await getTextCandidates(parentSearchContext.queryText),
+        )
+      : Promise.resolve([] as BottleCandidate[]),
+    parentSearchContext
+      ? runCandidateLookupSafely(
+          "parent_release_text",
+          searchName,
+          [] as BottleCandidate[],
+          async () =>
+            await getReleaseTextCandidates(parentSearchContext.queryText),
+        )
+      : Promise.resolve([] as BottleCandidate[]),
+    parentSearchContext
+      ? runCandidateLookupSafely(
+          "parent_brand",
+          searchName,
+          [] as BottleCandidate[],
+          async () =>
+            await getBrandCandidates(
+              parentSearchContext.normalizedName,
+              parentSearchContext.extractedLabel,
+            ),
+        )
+      : Promise.resolve([] as BottleCandidate[]),
+    parentSearchContext
+      ? runCandidateLookupSafely(
+          "parent_exact",
+          searchName,
+          null as BottleCandidate | null,
+          async () =>
+            await getExactBottleCandidateByNames(
+              parentSearchContext.exactSearchNames,
+            ),
+        )
+      : Promise.resolve(null as BottleCandidate | null),
   ]);
 
   if (currentCandidate) {
@@ -1549,6 +1783,21 @@ export async function searchBottleCandidates(
   }
   if (exactCandidate) {
     mergeBottleCandidate(candidates, exactCandidate);
+  }
+  for (const candidate of parentVectorCandidates) {
+    mergeBottleCandidate(candidates, candidate);
+  }
+  for (const candidate of parentTextCandidates) {
+    mergeBottleCandidate(candidates, candidate);
+  }
+  for (const candidate of parentReleaseTextCandidates) {
+    mergeBottleCandidate(candidates, candidate);
+  }
+  for (const candidate of parentBrandCandidates) {
+    mergeBottleCandidate(candidates, candidate);
+  }
+  if (parentExactCandidate) {
+    mergeBottleCandidate(candidates, parentExactCandidate);
   }
 
   const enrichedCandidates = await enrichBottleCandidates(

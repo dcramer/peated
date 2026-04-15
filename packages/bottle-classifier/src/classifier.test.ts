@@ -156,6 +156,112 @@ const glenglassaughRareCaskParentCandidate: BottleCandidate = {
   source: ["exact"],
 };
 
+const macallanSherryOakParentCandidate: BottleCandidate = {
+  bottleId: 54082,
+  releaseId: null,
+  kind: "bottle",
+  alias: null,
+  fullName: "The Macallan Sherry Oak",
+  bottleFullName: "The Macallan Sherry Oak",
+  brand: "The Macallan",
+  bottler: null,
+  series: null,
+  distillery: [],
+  category: "single_malt",
+  statedAge: null,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.9,
+  source: ["text"],
+};
+
+const macallanSherryOakLegacy30Candidate: BottleCandidate = {
+  bottleId: 54083,
+  releaseId: null,
+  kind: "bottle",
+  alias: "The Macallan Sherry Oak Single Malt Scotch 30-year-old",
+  fullName: "The Macallan Sherry Oak 30-year-old",
+  bottleFullName: "The Macallan Sherry Oak 30-year-old",
+  brand: "The Macallan",
+  bottler: null,
+  series: null,
+  distillery: [],
+  category: "single_malt",
+  statedAge: 30,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 1,
+  source: ["exact"],
+};
+
+const penelopeBarrelStrengthParentCandidate: BottleCandidate = {
+  bottleId: 54068,
+  releaseId: null,
+  kind: "bottle",
+  alias: null,
+  fullName: "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey",
+  bottleFullName: "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey",
+  brand: "Penelope",
+  bottler: null,
+  series: null,
+  distillery: [],
+  category: "bourbon",
+  statedAge: null,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.89,
+  source: ["text"],
+};
+
+const penelopeLegacyBatch11Candidate: BottleCandidate = {
+  bottleId: 54069,
+  releaseId: null,
+  kind: "bottle",
+  alias: "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey Batch 11",
+  fullName:
+    "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey (Batch 11)",
+  bottleFullName:
+    "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey (Batch 11)",
+  brand: "Penelope",
+  bottler: null,
+  series: null,
+  distillery: [],
+  category: "bourbon",
+  statedAge: null,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 1,
+  source: ["exact"],
+};
+
 const taleOfIceCreamCandidate: BottleCandidate = {
   bottleId: 43236,
   releaseId: null,
@@ -907,6 +1013,86 @@ describe("createBottleClassifier", () => {
     });
   });
 
+  test("redirects a dirty Macallan age-statement bottle match to the reusable parent bottle", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "The Macallan",
+      bottler: null,
+      expression: "Sherry Oak",
+      series: null,
+      distillery: [],
+      category: "single_malt",
+      stated_age: 30,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 95,
+          rationale: "The title maps to the existing 30-year-old local bottle.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 54083,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [54083, 54082],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [
+            macallanSherryOakLegacy30Candidate,
+            macallanSherryOakParentCandidate,
+          ],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "The Macallan Sherry Oak Single Malt Scotch 30-year-old",
+      },
+      extractedIdentity,
+      initialCandidates: [
+        macallanSherryOakLegacy30Candidate,
+        macallanSherryOakParentCandidate,
+      ],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "create_release",
+      parentBottleId: 54082,
+      identityScope: "product",
+      proposedRelease: {
+        edition: null,
+        statedAge: 30,
+      },
+    });
+    expect(result.decision.rationale).toContain(
+      "legacy release-like bottle candidate",
+    );
+  });
+
   test("promotes dirty-parent bottle-and-release creation into create_release instead of exact-cask bottle creation", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Glenglassaugh",
@@ -1393,6 +1579,86 @@ describe("createBottleClassifier", () => {
       identityScope: "product",
       proposedRelease: {
         edition: "Batch 4",
+      },
+    });
+    expect(result.decision.rationale).toContain(
+      "legacy release-like bottle candidate",
+    );
+  });
+
+  test("redirects a Penelope batch bottle match to the reusable parent bottle", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Penelope",
+      bottler: null,
+      expression: "Bourbon Barrel Strength Straight Bourbon Whiskey",
+      series: null,
+      distillery: [],
+      category: "bourbon",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: "Batch 11",
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 96,
+          rationale:
+            "The title matches the existing local Batch 11 bottle candidate.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 54069,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [54069, 54068],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [
+            penelopeLegacyBatch11Candidate,
+            penelopeBarrelStrengthParentCandidate,
+          ],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey (Batch 11)",
+      },
+      extractedIdentity,
+      initialCandidates: [
+        penelopeLegacyBatch11Candidate,
+        penelopeBarrelStrengthParentCandidate,
+      ],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "create_release",
+      parentBottleId: 54068,
+      identityScope: "product",
+      proposedRelease: {
+        edition: "Batch 11",
       },
     });
     expect(result.decision.rationale).toContain(

@@ -585,6 +585,42 @@ function candidateNameMatchesReferenceVariants({
   });
 }
 
+function candidateNameMatchesReferenceVariantsIgnoringStatedAge({
+  referenceName,
+  extractedIdentity,
+  candidateNames,
+}: {
+  referenceName: string;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+  candidateNames: string[];
+}): boolean {
+  if (
+    extractedIdentity?.stated_age === null ||
+    extractedIdentity?.stated_age === undefined
+  ) {
+    return false;
+  }
+
+  const strippedReferenceName = stripComparablePhrase(
+    normalizeComparableText(referenceName),
+    `${extractedIdentity.stated_age}-year-old`,
+  )
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!strippedReferenceName) {
+    return false;
+  }
+
+  return candidateNameMatchesReferenceVariants({
+    referenceName: strippedReferenceName,
+    extractedIdentity: {
+      ...extractedIdentity,
+      stated_age: null,
+    },
+    candidateNames,
+  });
+}
+
 function textHasLegacyReleaseLikeNameSignals(
   value: string | null | undefined,
 ): boolean {
@@ -615,6 +651,33 @@ function candidateLooksLikeLegacyReleaseBottle(
     textHasLegacyReleaseLikeNameSignals(candidate.alias) ||
     textHasLegacyReleaseLikeNameSignals(candidate.fullName) ||
     textHasLegacyReleaseLikeNameSignals(candidate.bottleFullName),
+  );
+}
+
+function candidateLooksLikeDirtyAgeReleaseBottle({
+  candidate,
+  extractedIdentity,
+}: {
+  candidate: BottleCandidate | null | undefined;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+}): boolean {
+  if (
+    !candidate ||
+    candidate.kind === "release" ||
+    candidate.releaseId !== null ||
+    extractedIdentity?.stated_age === null ||
+    extractedIdentity?.stated_age === undefined ||
+    candidate.statedAge === null ||
+    candidate.statedAge === undefined ||
+    candidate.statedAge !== extractedIdentity.stated_age
+  ) {
+    return false;
+  }
+
+  return getBottleTargetNameCandidates(candidate).some((name) =>
+    new RegExp(`\\b${candidate.statedAge}-year-old\\b`, "i").test(
+      normalizeComparableText(name),
+    ),
   );
 }
 
@@ -907,7 +970,16 @@ function resolvePromotableParentBottleTarget({
     return null;
   }
 
-  if (!candidateLooksLikeLegacyReleaseBottle(target)) {
+  const looksLikeDirtyAgeReleaseBottle =
+    candidateLooksLikeDirtyAgeReleaseBottle({
+      candidate: target,
+      extractedIdentity: artifacts.extractedIdentity,
+    });
+
+  if (
+    !candidateLooksLikeLegacyReleaseBottle(target) &&
+    !looksLikeDirtyAgeReleaseBottle
+  ) {
     return target;
   }
 
@@ -927,12 +999,19 @@ function resolvePromotableParentBottleTarget({
           extractedLabel: artifacts.extractedIdentity,
         }).length === 0,
     )
-    .filter((candidate) =>
-      candidateNameMatchesReferenceVariants({
-        referenceName: reference.name,
-        extractedIdentity: artifacts.extractedIdentity,
-        candidateNames: getBottleTargetNameCandidates(candidate),
-      }),
+    .filter(
+      (candidate) =>
+        candidateNameMatchesReferenceVariants({
+          referenceName: reference.name,
+          extractedIdentity: artifacts.extractedIdentity,
+          candidateNames: getBottleTargetNameCandidates(candidate),
+        }) ||
+        (looksLikeDirtyAgeReleaseBottle &&
+          candidateNameMatchesReferenceVariantsIgnoringStatedAge({
+            referenceName: reference.name,
+            extractedIdentity: artifacts.extractedIdentity,
+            candidateNames: getBottleTargetNameCandidates(candidate),
+          })),
     )
     .sort((left, right) => (right.score ?? 0) - (left.score ?? 0));
 
@@ -1161,23 +1240,35 @@ function maybePromoteBottleMatchToCreateRelease({
     targetCandidate: parentTarget,
     extractedLabel: artifacts.extractedIdentity,
   });
-  const hasExactishLocalName = candidateNameMatchesReferenceVariants({
-    referenceName: reference.name,
-    extractedIdentity: artifacts.extractedIdentity,
-    candidateNames: getTargetNameCandidates(parentTarget, {
-      action: "match",
-      confidence: decision.confidence,
-      rationale: decision.rationale,
-      candidateBottleIds,
-      identityScope: decision.identityScope ?? "product",
-      observation,
-      matchedBottleId: parentTarget.bottleId,
-      matchedReleaseId: null,
-      parentBottleId: null,
-      proposedBottle: null,
-      proposedRelease: null,
-    }),
+  const parentTargetNameCandidates = getTargetNameCandidates(parentTarget, {
+    action: "match",
+    confidence: decision.confidence,
+    rationale: decision.rationale,
+    candidateBottleIds,
+    identityScope: decision.identityScope ?? "product",
+    observation,
+    matchedBottleId: parentTarget.bottleId,
+    matchedReleaseId: null,
+    parentBottleId: null,
+    proposedBottle: null,
+    proposedRelease: null,
   });
+  const hasExactishLocalName =
+    candidateNameMatchesReferenceVariants({
+      referenceName: reference.name,
+      extractedIdentity: artifacts.extractedIdentity,
+      candidateNames: parentTargetNameCandidates,
+    }) ||
+    (target &&
+      candidateLooksLikeDirtyAgeReleaseBottle({
+        candidate: target,
+        extractedIdentity: artifacts.extractedIdentity,
+      }) &&
+      candidateNameMatchesReferenceVariantsIgnoringStatedAge({
+        referenceName: reference.name,
+        extractedIdentity: artifacts.extractedIdentity,
+        candidateNames: parentTargetNameCandidates,
+      }));
   const hasSupportiveWebEvidence = hasSupportiveWebEvidenceForTarget({
     target: parentTarget,
     decision: {

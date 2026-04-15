@@ -105,6 +105,26 @@ const glenglassaughRareCaskParent = buildBottleCandidate({
   source: ["exact"],
 });
 
+const macallanSherryOakParent = buildBottleCandidate({
+  bottleId: 54082,
+  fullName: "The Macallan Sherry Oak",
+  brand: "The Macallan",
+  category: "single_malt",
+  score: 0.9,
+  source: ["text"],
+});
+
+const macallanSherryOakLegacy30 = buildBottleCandidate({
+  bottleId: 54083,
+  alias: "The Macallan Sherry Oak Single Malt Scotch 30-year-old",
+  fullName: "The Macallan Sherry Oak 30-year-old",
+  brand: "The Macallan",
+  category: "single_malt",
+  statedAge: 30,
+  score: 1,
+  source: ["exact"],
+});
+
 const taleOfIceCream = buildBottleCandidate({
   bottleId: 43236,
   fullName: "Glenmorangie A Tale of Ice Cream",
@@ -124,6 +144,26 @@ const cadbollEstateParent = buildBottleCandidate({
   statedAge: 15,
   score: 0.91,
   source: ["text"],
+});
+
+const penelopeBarrelStrengthParent = buildBottleCandidate({
+  bottleId: 54068,
+  fullName: "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey",
+  brand: "Penelope",
+  category: "bourbon",
+  score: 0.89,
+  source: ["text"],
+});
+
+const penelopeLegacyBatch11 = buildBottleCandidate({
+  bottleId: 54069,
+  alias: "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey Batch 11",
+  fullName:
+    "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey (Batch 11)",
+  brand: "Penelope",
+  category: "bourbon",
+  score: 1,
+  source: ["exact"],
 });
 
 const cadbollEstateLegacyBatch4 = buildBottleCandidate({
@@ -500,6 +540,54 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       parentBottleId: 2457,
       summary:
         "Treat the differing 35-year age as release-specific because the matched parent bottle only carries a dirty structured age, not a marketed 40-year statement in its name.",
+    },
+  },
+  {
+    name: "store listing: redirects a dirty Macallan age statement to the reusable parent bottle",
+    input: {
+      reference: {
+        name: "The Macallan Sherry Oak Single Malt Scotch 30-year-old",
+        url: "https://shop.example/products/macallan-sherry-oak-30",
+      },
+      extractedIdentity: buildExtractedIdentity({
+        brand: "The Macallan",
+        expression: "Sherry Oak",
+        category: "single_malt",
+        stated_age: 30,
+      }),
+      initialCandidates: [macallanSherryOakLegacy30, macallanSherryOakParent],
+    },
+    expected: {
+      status: "classified",
+      action: "create_release",
+      identityScope: "product",
+      parentBottleId: 54082,
+      summary:
+        "Treat the local 30-year-old bottle row as a dirty release-like candidate and create a 30-year-old child release beneath the reusable Macallan Sherry Oak parent bottle instead.",
+    },
+  },
+  {
+    name: "store listing: redirects a Penelope batch bottle to the reusable parent bottle",
+    input: {
+      reference: {
+        name: "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey (Batch 11)",
+        url: "https://shop.example/products/penelope-batch-11",
+      },
+      extractedIdentity: buildExtractedIdentity({
+        brand: "Penelope",
+        expression: "Bourbon Barrel Strength Straight Bourbon Whiskey",
+        category: "bourbon",
+        edition: "Batch 11",
+      }),
+      initialCandidates: [penelopeLegacyBatch11, penelopeBarrelStrengthParent],
+    },
+    expected: {
+      status: "classified",
+      action: "create_release",
+      identityScope: "product",
+      parentBottleId: 54068,
+      summary:
+        "Treat the legacy Penelope Batch 11 bottle hit as release-like and create Batch 11 beneath the reusable Penelope Barrel Strength parent bottle instead.",
     },
   },
   {
