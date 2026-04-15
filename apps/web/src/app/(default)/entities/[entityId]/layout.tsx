@@ -4,6 +4,7 @@ import ShareButton from "@peated/web/components/shareButton";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
+import { getCanonicalRouteRedirectPath } from "@peated/web/lib/tombstoneRedirect";
 import { redirect } from "next/navigation";
 import { type ReactNode } from "react";
 import type { Organization, WithContext } from "schema-dts";
@@ -55,12 +56,13 @@ export default async function Layout({
 
   // tombstone path - redirect to the absolute url to ensure search engines dont get mad
   if (entity.id !== entityId) {
-    // const newPath = pathname.replace(
-    //   `/entities/${entityId}`,
-    //   `/entities/${entity.id}`,
-    // );
-    // TODO: this should redirect to subpath
-    return redirect(`/entities/${entity.id}/`);
+    return redirect(
+      getCanonicalRouteRedirectPath({
+        currentId: entityId,
+        canonicalId: entity.id,
+        collectionPath: "/entities",
+      }),
+    );
   }
 
   const jsonLd: WithContext<Organization> = {

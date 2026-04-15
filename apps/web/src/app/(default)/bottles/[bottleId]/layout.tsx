@@ -8,6 +8,7 @@ import SkeletonButton from "@peated/web/components/skeletonButton";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
+import { getCanonicalRouteRedirectPath } from "@peated/web/lib/tombstoneRedirect";
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import type { Product, WithContext } from "schema-dts";
@@ -31,12 +32,13 @@ export default async function Layout({
 
   // tombstone path - redirect to the absolute url to ensure search engines dont get mad
   if (bottle.id !== bottleId) {
-    // const newPath = pathname.replace(
-    //   `/bottles/${bottleId}`,
-    //   `/bottles/${bottle.id}`,
-    // );
-    // TODO: this should redirect to subpath
-    return redirect(`/bottles/${bottle.id}/`);
+    return redirect(
+      getCanonicalRouteRedirectPath({
+        currentId: bottleId,
+        canonicalId: bottle.id,
+        collectionPath: "/bottles",
+      }),
+    );
   }
 
   const jsonLd: WithContext<Product> = {
