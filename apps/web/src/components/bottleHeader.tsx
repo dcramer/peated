@@ -4,6 +4,7 @@ import BottleIcon from "@peated/web/assets/bottle.svg";
 import Link from "@peated/web/components/link";
 import BottleMetadata from "./bottleMetadata";
 import PageHeader from "./pageHeader";
+import SingleCaskChip from "./singleCaskChip";
 
 export default function BottleHeader({
   bottle,
@@ -16,13 +17,13 @@ export default function BottleHeader({
     <PageHeader
       icon={BottleIcon}
       title={
-        <div className="flex gap-x-2">
+        <div className="flex flex-wrap items-center gap-2">
           {href ? (
             <Link href={href} className="hover:underline">
               {bottle.fullName}
             </Link>
           ) : (
-            <div className="flex gap-x-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Link
                 href={`/entities/${bottle.brand.id}`}
                 className="hover:underline"
@@ -32,6 +33,7 @@ export default function BottleHeader({
               {bottle.name}
             </div>
           )}
+          {bottle.singleCask && <SingleCaskChip />}
         </div>
       }
       titleExtra={

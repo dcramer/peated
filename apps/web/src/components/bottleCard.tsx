@@ -11,6 +11,7 @@ import classNames from "../lib/classNames";
 import BottleLink from "./bottleLink";
 import Join from "./join";
 import type { Option } from "./selectField";
+import SingleCaskChip from "./singleCaskChip";
 
 type EntityOption = Option & {
   shortName?: string;
@@ -147,10 +148,18 @@ export default function BottleCard({
             {bottle.hasTasted && (
               <CheckBadgeIcon className="inline w-4" aria-hidden="true" />
             )}
+            {!release && bottle.singleCask && <SingleCaskChip />}
           </div>
         </div>
       }
-      release={release ? <div>{formatBottlingName(release)}</div> : null}
+      release={
+        release ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <span>{formatBottlingName(release)}</span>
+            {release.singleCask && <SingleCaskChip />}
+          </div>
+        ) : null
+      }
       category={
         <div>
           {bottle.category && (
