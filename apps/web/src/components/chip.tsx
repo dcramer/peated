@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 import type { ElementType, MouseEventHandler } from "react";
 import classNames from "../lib/classNames";
 
-type ChipSize = "small" | "base";
+type ChipSize = "compact" | "small" | "base";
 
-type ChipColor = "default" | "highlight";
+type ChipColor = "default" | "highlight" | "accent";
 
 type Props = {
   active?: boolean;
@@ -24,6 +24,7 @@ export default function Chip<E extends ElementType = typeof defaultElement>({
   size = "base",
   color = "default",
   as,
+  className,
   ...props
 }: PolymorphicProps<E, Props>) {
   const Component = as ?? defaultElement;
@@ -34,6 +35,10 @@ export default function Chip<E extends ElementType = typeof defaultElement>({
 
   let colorClass = "";
   switch (color) {
+    case "accent":
+      colorClass =
+        "border-amber-800/60 bg-amber-950/40 text-amber-200 hover:bg-amber-950/60";
+      break;
     case "highlight":
       colorClass = "border-highlight text-black bg-highlight";
       break;
@@ -52,9 +57,12 @@ export default function Chip<E extends ElementType = typeof defaultElement>({
         active
           ? "border-slate-700 bg-slate-700 text-white hover:bg-slate-700"
           : colorClass,
-        size === "small"
-          ? "min-h-[24px] px-[6px] text-sm"
-          : "min-h-[32px] px-[12px]",
+        size === "compact"
+          ? "min-h-[18px] px-1.5 py-0.5 text-[11px] leading-none"
+          : size === "small"
+            ? "min-h-[24px] px-[6px] text-sm"
+            : "min-h-[32px] px-[12px]",
+        className,
       )}
       onClick={onClick || defaultOnClick}
       {...props}
