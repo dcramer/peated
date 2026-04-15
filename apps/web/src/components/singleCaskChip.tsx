@@ -1,23 +1,19 @@
 import classNames from "@peated/web/lib/classNames";
 import type { ComponentPropsWithoutRef } from "react";
-import Chip from "./chip";
 
 export default function SingleCaskChip({
   className,
 }: Pick<ComponentPropsWithoutRef<"span">, "className">) {
   return (
-    <Chip
-      as="span"
-      size="compact"
-      color="accent"
+    <span
       className={classNames(
-        "shrink-0 !justify-start gap-1 rounded-full font-medium",
+        "inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-amber-800/60 bg-amber-950/40 text-[10px] font-semibold uppercase leading-none text-amber-200",
         className,
       )}
       title="Single cask"
     >
-      <span className="h-1.5 w-1.5 rounded-full bg-amber-300/90" />
-      <span>Single Cask</span>
-    </Chip>
+      <span aria-hidden="true">S</span>
+      <span className="sr-only">Single cask</span>
+    </span>
   );
 }
