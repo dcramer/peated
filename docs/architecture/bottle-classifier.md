@@ -51,7 +51,7 @@ Everything downstream should treat the classifier output as authoritative for bo
 
 The public entrypoint is:
 
-- `classifyBottleReference({ reference, extractedIdentity?, initialCandidates? })`
+- `classifyBottleReference({ reference, extractedIdentity?, initialCandidates?, candidateExpansion? })`
 
 `reference` is intentionally generic. It is not tied to the `store_prices` row type; it is the minimum identity/context needed for matching:
 
@@ -63,6 +63,7 @@ The public entrypoint is:
 - optional tracing metadata such as `id` and `externalSiteId`
 
 Optional `extractedIdentity` and `initialCandidates` inputs exist for callers that already have extracted identity or candidate sets, but normal callers should pass only `reference`.
+`candidateExpansion` defaults to `open`; set `candidateExpansion: "initial_only"` for closed-set review flows that must stay within the supplied candidate set.
 
 The boundary is schema-backed in `contract.ts` so evals and downstream consumers can validate the exact request and response shape.
 

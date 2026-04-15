@@ -128,6 +128,9 @@ export async function reviewLegacyCreateParentResolutionWithClassifier({
       edition: legacyBottle.edition,
     },
     initialCandidates,
+    // Create-parent review is a closed-set decision between the reviewed
+    // parent candidates versus creating a new parent bottle.
+    candidateExpansion: "initial_only",
   });
 
   const resolution = resolveLegacyCreateParentClassification({

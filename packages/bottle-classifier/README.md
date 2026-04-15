@@ -49,10 +49,12 @@ await classifier.classifyBottleReference({
   reference,
   extractedIdentity?,
   initialCandidates?,
+  candidateExpansion?,
 });
 ```
 
 The normal path is to pass only `reference`. The optional `extractedIdentity` and `initialCandidates` inputs exist for cases where extraction or retrieval has already been done upstream.
+Set `candidateExpansion: "initial_only"` for closed-set review flows that must stay within the provided candidate set instead of searching for more bottles.
 
 Deterministic normalization entrypoints:
 

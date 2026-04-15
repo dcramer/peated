@@ -122,4 +122,21 @@ describe("bottle-classifier instructions", () => {
     expect(instructions).not.toContain("brave_web_search");
     expect(instructions).toContain("openai_web_search");
   });
+
+  test("builds closed-set guidance when candidate expansion is disabled", () => {
+    const instructions = buildBottleClassifierInstructions({
+      maxSearchQueries: 5,
+      hasBottleSearch: false,
+      hasOpenAIWebSearch: false,
+      hasEntitySearch: false,
+    });
+
+    expect(instructions).toContain(
+      "No search tools are available for this run",
+    );
+    expect(instructions).toContain("This run is closed-set.");
+    expect(instructions).not.toContain("search_bottles");
+    expect(instructions).not.toContain("search_entities");
+    expect(instructions).not.toContain("openai_web_search");
+  });
 });

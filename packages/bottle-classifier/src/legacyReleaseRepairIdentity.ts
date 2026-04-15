@@ -462,16 +462,50 @@ export function normalizeComparableBottleName(fullName: string): string {
     .trim();
 }
 
+function isReleaseLikeBatchEdition(value: string) {
+  const suffix = value
+    .replace(/^batch/i, "")
+    .replace(/^(?:\s*(?:no\.?|number|#))?/i, "")
+    .trim();
+
+  return /^(?:[a-z]*\d[a-z0-9.-]*)$/i.test(suffix);
+}
+
+function isStrongStructuredEditionMarker(value: string): boolean {
+  const normalizedValue = normalizeBottleBatchNumber(
+    normalizeString(value),
+  ).trim();
+
+  if (!normalizedValue) {
+    return false;
+  }
+
+  if (isReleaseLikeBatchEdition(normalizedValue)) {
+    return true;
+  }
+
+  if (/^\d{4}\s+(?:release|vintage)$/i.test(normalizedValue)) {
+    return true;
+  }
+
+  if (
+    /^(?:\d+(?:st|nd|rd|th)\s+edition|edition\s+\d+(?:st|nd|rd|th)?|edition\s+[a-z]*\d[a-z0-9#.-]*)$/i.test(
+      normalizedValue,
+    )
+  ) {
+    return true;
+  }
+
+  return (
+    !/\s/.test(normalizedValue) &&
+    /^[a-z0-9#.-]+$/i.test(normalizedValue) &&
+    /[a-z]/i.test(normalizedValue) &&
+    /\d/.test(normalizedValue)
+  );
+}
+
 function extractBatchEdition(fullName: string): string | null {
   const normalizedName = normalizeBottleBatchNumber(normalizeString(fullName));
-  const isReleaseLikeBatchEdition = (value: string) => {
-    const suffix = value
-      .replace(/^batch/i, "")
-      .replace(/^(?:\s*(?:no\.?|number|#))?/i, "")
-      .trim();
-
-    return /^(?:[a-z]*\d[a-z0-9.-]*)$/i.test(suffix);
-  };
   const parenthesized = normalizedName.match(/\((Batch [^)]+)\)/i);
   if (parenthesized && isReleaseLikeBatchEdition(parenthesized[1])) {
     return parenthesized[1];
@@ -512,11 +546,16 @@ export function deriveLegacyReleaseRepairIdentity({
   );
   const comparableFullName = normalizeComparableBottleName(normalizedFullName);
   const parsedIdentity = normalizeBottle({ name: normalizedFullName });
-  const edition = structuredEdition ?? extractBatchEdition(normalizedFullName);
+  const normalizedStructuredEdition =
+    structuredEdition && isStrongStructuredEditionMarker(structuredEdition)
+      ? normalizeBottleBatchNumber(normalizeString(structuredEdition))
+      : null;
+  const edition =
+    normalizedStructuredEdition ?? extractBatchEdition(normalizedFullName);
   const releaseYear = structuredReleaseYear ?? parsedIdentity.releaseYear;
   const markerSources: string[] = [];
 
-  if (structuredEdition) {
+  if (normalizedStructuredEdition) {
     markerSources.push("structured_edition");
   } else if (edition) {
     markerSources.push("name_batch");

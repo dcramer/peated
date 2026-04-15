@@ -220,6 +220,42 @@ describe("GET /bottles/release-repair-candidates", () => {
     );
   });
 
+  test("does not treat descriptive structured editions as reusable release identity", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Pinhook" });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      name: "8-year-old",
+      statedAge: 8,
+      totalTastings: 40,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "8-year-old",
+      statedAge: 8,
+      edition: "The Single Barrel / Vertical",
+      singleCask: true,
+      caskStrength: true,
+      abv: 57.2,
+      totalTastings: 5,
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.releaseRepairCandidates(
+      {
+        query: "Pinhook 8-year-old",
+      },
+      { context: { user } },
+    );
+
+    expect(
+      result.results.find(
+        (candidate) => candidate.legacyBottle.id === legacyBottle.id,
+      ),
+    ).toBeUndefined();
+  });
+
   test("reuses an existing parent bottle for exactish generic-name variants", async ({
     fixtures,
   }) => {

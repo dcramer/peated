@@ -14,12 +14,14 @@ export function buildAgentInput({
   initialCandidates,
   currentBottle,
   hasExactAliasMatch,
+  candidateExpansion,
 }: {
   reference: BottleReference;
   extractedIdentity: BottleExtractedDetails | null;
   initialCandidates: BottleCandidate[];
   currentBottle: BottleCandidate | null;
   hasExactAliasMatch: boolean;
+  candidateExpansion: "initial_only" | "open";
 }): string {
   /**
    * The model should see the raw reference, the best current extraction, and
@@ -36,6 +38,7 @@ export function buildAgentInput({
         currentBottleId: reference.currentBottleId ?? null,
         currentReleaseId: reference.currentReleaseId ?? null,
       },
+      candidateExpansion,
       currentBottle,
       extractedIdentity,
       localSearch: {
