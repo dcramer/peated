@@ -13,6 +13,7 @@ import type { ComponentProps } from "react";
 import { formatBottlingName } from "../lib/bottlings";
 import BottleLink from "./bottleLink";
 import SimpleRatingIndicator from "./simpleRatingIndicator";
+import SingleCaskChip from "./singleCaskChip";
 import Table from "./table";
 
 type BottleRow = {
@@ -68,11 +69,17 @@ export default function BottleTable({
                   {item.bottle.hasTasted && (
                     <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
                   )}
+                  {!item.release && item.bottle.singleCask && (
+                    <SingleCaskChip />
+                  )}
                 </div>
                 <div className="text-muted flex flex-col gap-y-1 text-sm">
                   {item.release && (
-                    <div>
-                      Specific Bottling: {formatBottlingName(item.release)}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span>
+                        Specific Bottling: {formatBottlingName(item.release)}
+                      </span>
+                      {item.release.singleCask && <SingleCaskChip />}
                     </div>
                   )}
                   {item.bottle.category && (

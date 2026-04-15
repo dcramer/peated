@@ -6,6 +6,7 @@ import Heading from "@peated/web/components/heading";
 import Link from "@peated/web/components/link";
 import Markdown from "@peated/web/components/markdown";
 import PageHeader from "@peated/web/components/pageHeader";
+import SingleCaskChip from "@peated/web/components/singleCaskChip";
 import {
   formatBottlingName,
   getBottleBottlingsPath,
@@ -70,9 +71,14 @@ export default async function Page({
     <div className="w-full p-3 lg:py-0">
       <PageHeader
         icon={BottleIcon}
-        title={formatBottlingName(bottling) || bottling.fullName}
+        title={
+          <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+            <span>{formatBottlingName(bottling) || bottling.fullName}</span>
+            {bottling.singleCask && <SingleCaskChip />}
+          </div>
+        }
         titleExtra={
-          <div className="text-muted flex items-center gap-x-2 truncate">
+          <div className="text-muted flex flex-wrap items-center gap-x-2 gap-y-1">
             <span>Bottling of</span>
             <Link href={`/bottles/${bottle.id}`} className="hover:underline">
               {bottle.fullName}

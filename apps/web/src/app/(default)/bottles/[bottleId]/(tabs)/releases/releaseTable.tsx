@@ -7,6 +7,7 @@ import CollectionAction from "@peated/web/components/collectionAction";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Link from "@peated/web/components/link";
 import PaginationButtons from "@peated/web/components/paginationButtons";
+import SingleCaskChip from "@peated/web/components/singleCaskChip";
 import Table from "@peated/web/components/table";
 import {
   formatBottlingName,
@@ -67,12 +68,15 @@ function ReleaseTableSection({
           sort: "edition",
           sortDefaultOrder: "asc",
           value: (item) => (
-            <Link
-              className="hover:underline"
-              href={getBottleBottlingPath(bottleId, item.id)}
-            >
-              {formatBottlingName(item)}
-            </Link>
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                className="hover:underline"
+                href={getBottleBottlingPath(bottleId, item.id)}
+              >
+                {formatBottlingName(item)}
+              </Link>
+              {item.singleCask && <SingleCaskChip />}
+            </div>
           ),
         },
         {
