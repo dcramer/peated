@@ -189,4 +189,30 @@ describe("GET /bottles/canon-repair-candidates", () => {
 
     expect(results).toEqual([]);
   });
+
+  test("does not surface repeated-token marketed variants as canon repairs", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Woodford Reserve" });
+    const user = await fixtures.User({ mod: true });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Double Oaked",
+      category: "bourbon",
+      totalTastings: 30,
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Double Double Oaked",
+      category: "bourbon",
+      totalTastings: 10,
+    });
+
+    const { results } = await routerClient.bottles.canonRepairCandidates(
+      {},
+      { context: { user } },
+    );
+
+    expect(results).toEqual([]);
+  });
 });

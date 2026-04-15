@@ -527,6 +527,72 @@ describe("POST /bottle-releases", () => {
     expect(updatedBottle.numReleases).toBe(1);
   });
 
+  it("allows inherited marketed parent traits without duplicating them in the release name", async function ({
+    fixtures,
+    defaults,
+  }) {
+    const bottle = await fixtures.Bottle({
+      name: "1972 Single Cask",
+      brandId: (await fixtures.Entity({ name: "Glendronach" })).id,
+      statedAge: 48,
+      singleCask: true,
+    });
+
+    const result = await routerClient.bottleReleases.create(
+      {
+        bottle: bottle.id,
+        edition: "Batch 1",
+        statedAge: 48,
+        singleCask: true,
+      },
+      {
+        context: { user: defaults.user },
+      },
+    );
+
+    expect(result).toMatchObject({
+      bottleId: bottle.id,
+      edition: "Batch 1",
+      statedAge: 48,
+      singleCask: true,
+      fullName: "Glendronach 1972 Single Cask - Batch 1",
+      name: "1972 Single Cask - Batch 1",
+    });
+  });
+
+  it("allows inherited marketed parent traits when the parent uses hyphenated wording", async function ({
+    fixtures,
+    defaults,
+  }) {
+    const bottle = await fixtures.Bottle({
+      name: "1972 Single-Cask",
+      brandId: (await fixtures.Entity({ name: "Glendronach" })).id,
+      statedAge: 48,
+      singleCask: true,
+    });
+
+    const result = await routerClient.bottleReleases.create(
+      {
+        bottle: bottle.id,
+        edition: "Batch 1",
+        statedAge: 48,
+        singleCask: true,
+      },
+      {
+        context: { user: defaults.user },
+      },
+    );
+
+    expect(result).toMatchObject({
+      bottleId: bottle.id,
+      edition: "Batch 1",
+      statedAge: 48,
+      singleCask: true,
+      fullName: "Glendronach 1972 Single-Cask - Batch 1",
+      name: "1972 Single-Cask - Batch 1",
+    });
+  });
+
   it("rejects creating a child release when the parent bottle still stores release details", async function ({
     fixtures,
     defaults,

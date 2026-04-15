@@ -10,7 +10,7 @@ import {
   type LegacyReleaseRepairIdentity,
   type LegacyReleaseRepairParentCandidate,
 } from "@peated/bottle-classifier/legacyReleaseRepairIdentity";
-import { hasBottleLevelReleaseTraits } from "@peated/bottle-classifier/releaseIdentity";
+import { hasBlockingBottleLevelReleaseTraits } from "@peated/bottle-classifier/releaseIdentity";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
@@ -145,6 +145,21 @@ function getLegacyReleaseRepairModePriority(
   }
 }
 
+function getCandidateReleaseIdentity(candidate: LegacyReleaseRepairCandidate) {
+  return {
+    edition: candidate.releaseIdentity.edition,
+    statedAge: candidate.legacyBottle.statedAge,
+    abv: candidate.legacyBottle.abv,
+    releaseYear: candidate.releaseIdentity.releaseYear,
+    vintageYear: candidate.legacyBottle.vintageYear,
+    singleCask: candidate.legacyBottle.singleCask,
+    caskStrength: candidate.legacyBottle.caskStrength,
+    caskFill: candidate.legacyBottle.caskFill,
+    caskType: candidate.legacyBottle.caskType,
+    caskSize: candidate.legacyBottle.caskSize,
+  };
+}
+
 function sortLegacyReleaseRepairCandidates(
   candidates: LegacyReleaseRepairCandidate[],
 ) {
@@ -271,7 +286,15 @@ function applyStoredLegacyReleaseRepairReview({
       } satisfies LegacyReleaseRepairCandidate;
     }
 
-    if (hasBottleLevelReleaseTraits(reviewedParent)) {
+    if (
+      hasBlockingBottleLevelReleaseTraits({
+        bottle: {
+          ...reviewedParent,
+          name: reviewedParent.fullName,
+        },
+        release: getCandidateReleaseIdentity(candidate),
+      })
+    ) {
       return {
         ...candidate,
         classifierBlocker:

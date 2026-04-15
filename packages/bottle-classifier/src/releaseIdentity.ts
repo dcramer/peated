@@ -31,6 +31,9 @@ export type BottleLevelReleaseTraitsInput = Omit<
   "statedAge"
 >;
 
+type BottleReleaseIdentityBottleInput = BottleNameInput &
+  Partial<BottleLevelReleaseTraitsInput>;
+
 type ExtractedReleaseIdentityInput = Pick<
   BottleExtractedDetails,
   | "stated_age"
@@ -79,6 +82,16 @@ export const BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS = [
   "caskType",
   "caskSize",
 ] as const satisfies ReadonlyArray<keyof BottleLevelReleaseTraitsInput>;
+
+const STABLE_BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS = [
+  "singleCask",
+  "caskStrength",
+] as const satisfies ReadonlyArray<
+  Extract<
+    (typeof BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS)[number],
+    keyof ReleaseIdentityInput
+  >
+>;
 
 export const EXTRACTED_RELEASE_IDENTITY_FIELDS = [
   "edition",
@@ -140,6 +153,81 @@ export function hasBottleLevelReleaseTraits(
   bottle: Partial<BottleLevelReleaseTraitsInput>,
 ) {
   return Object.keys(getBottleLevelReleaseTraits(bottle)).length > 0;
+}
+
+function bottleNameMarketsPattern(
+  bottle: BottleNameInput,
+  pattern: RegExp,
+): boolean {
+  return [bottle.name, bottle.fullName].some((name) => {
+    if (typeof name !== "string") {
+      return false;
+    }
+
+    return pattern.test(name);
+  });
+}
+
+function bottleMarketsInheritedReleaseTrait(
+  bottle: BottleNameInput,
+  field: (typeof STABLE_BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS)[number],
+): boolean {
+  switch (field) {
+    case "singleCask":
+      return bottleNameMarketsPattern(
+        bottle,
+        /\b(single[-\s]+cask|single[-\s]+barrel)\b/i,
+      );
+    case "caskStrength":
+      return bottleNameMarketsPattern(
+        bottle,
+        /\b(cask[-\s]+strength|barrel[-\s]+strength|barrel[-\s]+proof|full[-\s]+proof|natural[-\s]+strength|original[-\s]+strength|undiluted|cask[-\s]+bottling)\b/i,
+      );
+  }
+}
+
+function isInheritedBottleLevelReleaseTrait({
+  bottle,
+  field,
+  release,
+}: {
+  bottle: BottleReleaseIdentityBottleInput;
+  field: (typeof STABLE_BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS)[number];
+  release: Partial<ReleaseIdentityInput>;
+}) {
+  return (
+    bottle[field] === true &&
+    release[field] === true &&
+    bottleMarketsInheritedReleaseTrait(bottle, field)
+  );
+}
+
+export function hasBlockingBottleLevelReleaseTraits({
+  bottle,
+  release,
+}: {
+  bottle: BottleReleaseIdentityBottleInput;
+  release: Partial<ReleaseIdentityInput>;
+}) {
+  return BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS.some((field) => {
+    const value = bottle[field];
+    if (value === null || value === undefined) {
+      return false;
+    }
+
+    if (
+      (field === "singleCask" || field === "caskStrength") &&
+      isInheritedBottleLevelReleaseTrait({
+        bottle,
+        field,
+        release,
+      })
+    ) {
+      return false;
+    }
+
+    return true;
+  });
 }
 
 function nameMarketsStatedAge({
@@ -274,11 +362,13 @@ export function getResolvedReleaseIdentity({
 export function formatCanonicalReleaseName({
   bottleName,
   bottleFullName,
+  bottleReleaseTraits,
   bottleStatedAge,
   release,
 }: {
   bottleName: string;
   bottleFullName: string;
+  bottleReleaseTraits?: Partial<BottleLevelReleaseTraitsInput>;
   bottleStatedAge: number | null;
   release: ReleaseIdentityInput;
 }): {
@@ -302,6 +392,22 @@ export function formatCanonicalReleaseName({
       field === "statedAge" &&
       bottleStatedAge !== null &&
       resolvedRelease.statedAge === bottleStatedAge
+    ) {
+      continue;
+    }
+
+    if (
+      (field === "singleCask" || field === "caskStrength") &&
+      isInheritedBottleLevelReleaseTrait({
+        bottle: {
+          name: bottleName,
+          fullName: bottleFullName,
+          statedAge: bottleStatedAge,
+          ...bottleReleaseTraits,
+        },
+        field,
+        release: resolvedRelease,
+      })
     ) {
       continue;
     }

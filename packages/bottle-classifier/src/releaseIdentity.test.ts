@@ -8,6 +8,7 @@ import {
   getCanonicalReleaseAliasNames,
   getReleaseObservationFacts,
   getResolvedReleaseIdentity,
+  hasBlockingBottleLevelReleaseTraits,
   hasBottleLevelReleaseTraits,
   hasDirtyBottleLevelStatedAgeConflict,
   hasExtractedReleaseIdentity,
@@ -46,6 +47,100 @@ describe("releaseIdentity", () => {
       edition: "Batch 24",
       abv: 58.4,
     });
+  });
+
+  test("allows stable marketed parent traits, including hyphenated spellings, to be inherited by child releases", () => {
+    expect(
+      hasBlockingBottleLevelReleaseTraits({
+        bottle: {
+          name: "Glendronach 1972 Single Cask",
+          fullName: "Glendronach 1972 Single Cask",
+          statedAge: 48,
+          singleCask: true,
+        },
+        release: {
+          edition: "Batch 1",
+          statedAge: 48,
+          releaseYear: null,
+          vintageYear: null,
+          abv: null,
+          singleCask: true,
+          caskStrength: null,
+          caskFill: null,
+          caskType: null,
+          caskSize: null,
+        },
+      }),
+    ).toBe(false);
+
+    expect(
+      hasBlockingBottleLevelReleaseTraits({
+        bottle: {
+          name: "Warehouse Single-Cask Archive",
+          fullName: "Warehouse Single-Cask Archive",
+          statedAge: 12,
+          singleCask: true,
+        },
+        release: {
+          edition: "Batch 1",
+          statedAge: 12,
+          releaseYear: null,
+          vintageYear: null,
+          abv: null,
+          singleCask: true,
+          caskStrength: null,
+          caskFill: null,
+          caskType: null,
+          caskSize: null,
+        },
+      }),
+    ).toBe(false);
+
+    expect(
+      hasBlockingBottleLevelReleaseTraits({
+        bottle: {
+          name: "Warehouse Cask-Strength Archive",
+          fullName: "Warehouse Cask-Strength Archive",
+          statedAge: 12,
+          caskStrength: true,
+        },
+        release: {
+          edition: "Batch 1",
+          statedAge: 12,
+          releaseYear: null,
+          vintageYear: null,
+          abv: null,
+          singleCask: null,
+          caskStrength: true,
+          caskFill: null,
+          caskType: null,
+          caskSize: null,
+        },
+      }),
+    ).toBe(false);
+
+    expect(
+      hasBlockingBottleLevelReleaseTraits({
+        bottle: {
+          name: "Warehouse Archive",
+          fullName: "Warehouse Archive",
+          statedAge: 48,
+          singleCask: true,
+        },
+        release: {
+          edition: "Batch 1",
+          statedAge: 48,
+          releaseYear: null,
+          vintageYear: null,
+          abv: null,
+          singleCask: true,
+          caskStrength: null,
+          caskFill: null,
+          caskType: null,
+          caskSize: null,
+        },
+      }),
+    ).toBe(true);
   });
 
   test("returns only populated release observation facts", () => {
@@ -139,6 +234,34 @@ describe("releaseIdentity", () => {
     ).toEqual({
       name: "Lagavulin Distillers Edition - 2011 Release - 43.0% ABV",
       fullName: "Lagavulin Distillers Edition - 2011 Release - 43.0% ABV",
+    });
+  });
+
+  test("does not duplicate inherited stable parent traits in release naming", () => {
+    expect(
+      formatCanonicalReleaseName({
+        bottleName: "Glendronach 1972 Single Cask",
+        bottleFullName: "Glendronach 1972 Single Cask",
+        bottleReleaseTraits: {
+          singleCask: true,
+        },
+        bottleStatedAge: 48,
+        release: {
+          edition: "Batch 1",
+          statedAge: 48,
+          releaseYear: null,
+          vintageYear: null,
+          abv: null,
+          singleCask: true,
+          caskStrength: null,
+          caskFill: null,
+          caskType: null,
+          caskSize: null,
+        },
+      }),
+    ).toEqual({
+      name: "Glendronach 1972 Single Cask - Batch 1",
+      fullName: "Glendronach 1972 Single Cask - Batch 1",
     });
   });
 

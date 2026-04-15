@@ -2,7 +2,7 @@ import {
   formatCanonicalReleaseName,
   getCanonicalReleaseAliasNames,
   getResolvedReleaseIdentity,
-  hasBottleLevelReleaseTraits,
+  hasBlockingBottleLevelReleaseTraits,
   hasDirtyBottleLevelStatedAgeConflict,
 } from "@peated/bottle-classifier/releaseIdentity";
 import { db, type AnyTransaction } from "@peated/server/db";
@@ -59,12 +59,6 @@ export async function createBottleReleaseInTransaction(
     throw new BottleReleaseCreateBadRequestError("Bottle not found.");
   }
 
-  if (hasBottleLevelReleaseTraits(bottle)) {
-    throw new BottleReleaseCreateBadRequestError(
-      "Bottle already stores specific release details on the parent record. A moderator must split or clear those bottle fields before adding child releases.",
-    );
-  }
-
   if (
     bottle.statedAge &&
     input.statedAge &&
@@ -95,9 +89,21 @@ export async function createBottleReleaseInTransaction(
     },
   });
 
+  if (
+    hasBlockingBottleLevelReleaseTraits({
+      bottle,
+      release: resolvedReleaseIdentity,
+    })
+  ) {
+    throw new BottleReleaseCreateBadRequestError(
+      "Bottle already stores specific release details on the parent record. A moderator must split or clear those bottle fields before adding child releases.",
+    );
+  }
+
   const { name, fullName } = formatCanonicalReleaseName({
     bottleName: bottle.name,
     bottleFullName: bottle.fullName,
+    bottleReleaseTraits: bottle,
     bottleStatedAge: bottle.statedAge,
     release: resolvedReleaseIdentity,
   });

@@ -1456,6 +1456,53 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     });
   });
 
+  test("reuses a marketed single-cask parent without duplicating the trait in the child release name", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Glendronach" });
+    const mod = await fixtures.User({ mod: true });
+    const parent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "1972 Single Cask",
+      statedAge: 48,
+      singleCask: true,
+      totalTastings: 40,
+    });
+    const legacyBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "1972 Single Cask (Batch 1)",
+      statedAge: 48,
+      singleCask: true,
+      totalTastings: 5,
+      createdById: mod.id,
+    });
+
+    const result = await routerClient.bottles.applyReleaseRepair(
+      {
+        bottle: legacyBottle.id,
+      },
+      { context: { user: mod } },
+    );
+
+    expect(result).toMatchObject({
+      legacyBottleId: legacyBottle.id,
+      parentBottleId: parent.id,
+    });
+
+    const [release] = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, result.releaseId));
+    expect(release).toMatchObject({
+      bottleId: parent.id,
+      edition: "Batch 1",
+      statedAge: 48,
+      singleCask: true,
+      fullName: "Glendronach 1972 Single Cask - Batch 1",
+      name: "1972 Single Cask - Batch 1",
+    });
+  });
+
   test("rejects repair when the exact-name parent is still release-specific", async ({
     fixtures,
   }) => {

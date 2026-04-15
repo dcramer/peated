@@ -167,6 +167,15 @@ describe("release-repair parent matching", () => {
       }),
     ).toBe("create_parent");
   });
+
+  test("does not variant-match when one side repeats a meaningful token", () => {
+    expect(
+      hasVariantLegacyReleaseRepairParentName(
+        "Woodford Reserve Double Double Oaked",
+        "Woodford Reserve Double Oaked",
+      ),
+    ).toBe(false);
+  });
 });
 
 describe("resolveLegacyReleaseRepairNameScope", () => {
