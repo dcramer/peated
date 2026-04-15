@@ -8,10 +8,16 @@ export default function SingleCaskChip({
   return (
     <Chip
       as="span"
-      size="small"
-      className={classNames("shrink-0 align-middle", className)}
+      size="compact"
+      color="accent"
+      className={classNames(
+        "shrink-0 !justify-start gap-1 rounded-full font-medium",
+        className,
+      )}
+      title="Single cask"
     >
-      Single Cask
+      <span className="h-1.5 w-1.5 rounded-full bg-amber-300/90" />
+      <span>Single Cask</span>
     </Chip>
   );
 }
