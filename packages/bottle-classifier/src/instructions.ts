@@ -725,6 +725,8 @@ export function buildBottleClassifierInstructions({
     "Local candidates may be either parent bottle targets or child release targets. Use `releaseId` and the candidate `kind` discriminator to tell the difference.",
     "An exact alias can still point at a legacy bottle row that stores batch or annual release detail in the bottle name. If a cleaner parent bottle candidate exists, prefer the parent plus `create_release` instead of matching the legacy specific bottle.",
     "Local candidates may include structured bottle and release fields such as brand, bottler, distillery, series, category, age, edition, cask type, cask size, cask fill, cask-strength, single-cask, ABV, and release years. Use those fields directly when present instead of inferring everything from the candidate name.",
+    "When local candidates already include both a reusable parent bottle and a clean child release under that same bottle, and the extracted release detail uniquely matches the child candidate, prefer matching that existing release over returning a plain parent-bottle match or creating a duplicate release.",
+    "For annual-release families such as Distillers Edition, a bare year can be decisive release identity. If one local child release candidate aligns on the correct parent bottle and matching release year, treat that release as the leading existing-match target rather than treating the year as retailer noise.",
     ...(hasBottleSearch
       ? [
           "When the provided local candidates are thin, conflicting, or missing obvious near matches, call `search_bottles` with the most specific query you can form from the reference and extracted identity.",
@@ -817,6 +819,7 @@ export function buildBottleClassifierInstructions({
             ...(hasOpenAIWebSearch || hasBraveWebSearch
               ? [
                   "When you are leaning toward any create action or `no_match` because local candidates are weak, do at least one web search while search budget remains.",
+                  "When a plausible existing release candidate lacks an exact alias but differs from its parent bottle by a decisive trait such as release year, edition, or batch code, use web search to validate that exact release before falling back to `no_match`.",
                 ]
               : []),
             "If `localSearch.hasExactAliasMatch` is false and you do not have authoritative web evidence, you can still return a create action, but do not assume the server will auto-create it.",
@@ -825,6 +828,7 @@ export function buildBottleClassifierInstructions({
                   "When searching, prioritize official producer, distillery, bottler, or importer domains first, then critics or publications, then broader web if still unresolved.",
                   "Do not treat the originating source page as decisive evidence for differentiating traits such as distillery, bottler, cask finish, cask size, cask fill, ABV, edition, or release year.",
                   "When a candidate may still be right but the source title omitted a canonical trait, search for the exact base bottle name plus the missing trait and prefer authoritative domains that can confirm it.",
+                  "For bare annual releases, search the exact family or expression name plus the year so you can confirm whether the candidate is an existing yearly release rather than a generic parent bottle.",
                   "If the distinctness of the bottle depends on a trait such as `Port Cask Finished`, `Single Cask`, `Barrel Proof`, a specific ABV, `1st Fill`, or `Port Pipe`, the web evidence should explicitly confirm that trait.",
                   "If the raw reference is still just a sparse generic phrase like `Batch Sherry` after extraction and local search, do not invent a branded bottle or release from web similarity alone. Prefer `no_match` unless the source itself provides a strong identity anchor.",
                   `You have a combined hard limit of ${maxSearchQueries} web search calls across all web search tools.`,

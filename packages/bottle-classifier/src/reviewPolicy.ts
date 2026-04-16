@@ -236,7 +236,7 @@ function domainMatches(hostname: string, domain: string): boolean {
 }
 
 function getComparableNameTokens(value: string | null | undefined): string[] {
-  return normalizeComparableText(value)
+  return normalizeNameTokenizationText(value)
     .replace(/\b\d+(?:\.\d+)?\s?(?:ml|cl|l|oz)\b/g, " ")
     .split(/[^a-z0-9]+/g)
     .filter((token) => token.length > 0 && !GENERIC_NAME_TOKENS.has(token));
@@ -245,10 +245,47 @@ function getComparableNameTokens(value: string | null | undefined): string[] {
 function getStrictComparableNameTokens(
   value: string | null | undefined,
 ): string[] {
-  return normalizeComparableText(value)
+  return normalizeNameTokenizationText(value)
     .replace(/\b\d+(?:\.\d+)?\s?(?:ml|cl|l|oz)\b/g, " ")
     .split(/[^a-z0-9]+/g)
     .filter((token) => token.length > 0);
+}
+
+function normalizeNameTokenizationText(
+  value: string | null | undefined,
+): string {
+  return normalizeComparableText(value)
+    .replace(/\b([a-z0-9]+)'s\b/g, "$1s")
+    .replace(/\b([a-z0-9]+)s'\b/g, "$1s");
+}
+
+function getComparableEvidenceTokens(
+  value: string | null | undefined,
+): string[] {
+  return normalizeComparableText(value)
+    .replace(/\b\d+(?:\.\d+)?\s?(?:ml|cl|l|oz)\b/g, " ")
+    .split(/[^a-z0-9']+/g)
+    .flatMap(expandComparableEvidenceToken)
+    .filter(
+      (token) =>
+        token.length > 0 && token !== "s" && !GENERIC_NAME_TOKENS.has(token),
+    );
+}
+
+function expandComparableEvidenceToken(token: string): string[] {
+  const singularPossessiveMatch = token.match(/^([a-z0-9]+)'s$/);
+  if (singularPossessiveMatch) {
+    const base = singularPossessiveMatch[1];
+    return [base, `${base}s`];
+  }
+
+  const pluralPossessiveMatch = token.match(/^([a-z0-9]+)s'$/);
+  if (pluralPossessiveMatch) {
+    const base = pluralPossessiveMatch[1];
+    return [base, `${base}s`];
+  }
+
+  return [token];
 }
 
 function getReferenceAnchoredCreateTokens({
@@ -1062,7 +1099,7 @@ function hasSupportiveWebEvidenceForTarget({
       }
 
       const resultTokens = new Set(
-        getComparableNameTokens(getSearchEvidenceText(evidence, result)),
+        getComparableEvidenceTokens(getSearchEvidenceText(evidence, result)),
       );
       if (!resultTokens.size) {
         continue;
