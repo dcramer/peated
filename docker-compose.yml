@@ -10,7 +10,7 @@ services:
       - POSTGRES_DB=postgres
       # - ALLOW_IP_RANGE=0.0.0.0/0
     ports:
-      - "5432:5432"
+      - "15432:5432"
     volumes:
       - postgis-data:/var/lib/postgresql
     healthcheck:
@@ -19,7 +19,7 @@ services:
     image: redis
     restart: on-failure
     ports:
-      - "6379:6379"
+      - "16379:6379"
 
 volumes:
   postgis-data:

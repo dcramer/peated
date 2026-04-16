@@ -7,7 +7,6 @@ if (config.ENV !== "test") {
     release: config.VERSION,
     tracesSampleRate: 1.0,
     tracePropagationTargets: ["localhost", "api.peated.com", "peated.com"],
-    spotlight: config.ENV === "development",
     includeLocalVariables: true,
     sendDefaultPii: true,
     integrations: [
