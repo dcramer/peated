@@ -449,7 +449,11 @@ function normalizeIdentityText(value: string | null | undefined) {
 }
 
 function normalizeComparableText(value: string | null | undefined) {
-  return normalizeIdentityText(value).replace(/_/g, " ");
+  return normalizeIdentityText(value)
+    .replace(/'/g, "")
+    .replace(/_/g, " ")
+    .replace(/\s{2,}/g, " ")
+    .trim();
 }
 
 function escapeRegExp(value: string) {
@@ -945,12 +949,28 @@ function getPreferredReleaseMetadata(
   releases: CandidateReleaseMetadataRow[],
   extractedLabel: BottleReferenceIdentity | null,
 ) {
+  const preferredReleaseMatch = getPreferredReleaseMatch(
+    releases,
+    extractedLabel,
+  );
+  return preferredReleaseMatch?.release ?? null;
+}
+
+function getPreferredReleaseMatch(
+  releases: CandidateReleaseMetadataRow[],
+  extractedLabel: BottleReferenceIdentity | null,
+) {
   if (!releases.length) {
     return null;
   }
 
   if (!hasReleaseSpecificIdentity(extractedLabel)) {
-    return releases.length === 1 ? releases[0] : null;
+    return releases.length === 1
+      ? {
+          release: releases[0]!,
+          score: 0,
+        }
+      : null;
   }
 
   const sortedReleases = [...releases]
@@ -964,8 +984,18 @@ function getPreferredReleaseMetadata(
     return null;
   }
 
-  if (sortedReleases[0]!.score > 0 || releases.length === 1) {
-    return sortedReleases[0]!.release;
+  const bestMatch = sortedReleases[0]!;
+  const nextBestMatch = sortedReleases[1];
+
+  if (releases.length === 1) {
+    return bestMatch;
+  }
+
+  if (
+    bestMatch.score > 0 &&
+    (!nextBestMatch || nextBestMatch.score < bestMatch.score)
+  ) {
+    return bestMatch;
   }
 
   return null;
@@ -1061,19 +1091,28 @@ async function enrichBottleCandidates(
     releaseMetadataById.set(row.releaseId, row);
   }
 
+  const enrichedCandidates = new Map<string, BottleCandidate>();
+
   for (const candidate of candidates) {
     const bottleMetadata = bottleMetadataById.get(candidate.bottleId);
     if (!bottleMetadata) {
+      mergeBottleCandidate(enrichedCandidates, candidate);
       continue;
     }
 
-    const preferredRelease =
+    const preferredReleaseMatch =
       candidate.releaseId != null
-        ? (releaseMetadataById.get(candidate.releaseId) ?? null)
-        : getPreferredReleaseMetadata(
+        ? releaseMetadataById.get(candidate.releaseId)
+          ? {
+              release: releaseMetadataById.get(candidate.releaseId)!,
+              score: Number.POSITIVE_INFINITY,
+            }
+          : null
+        : getPreferredReleaseMatch(
             releasesByBottleId.get(candidate.bottleId) ?? [],
             extractedLabel,
           );
+    const preferredRelease = preferredReleaseMatch?.release ?? null;
 
     if (!candidate.brand && bottleMetadata.brand) {
       candidate.brand = bottleMetadata.brand;
@@ -1128,9 +1167,49 @@ async function enrichBottleCandidates(
     ) {
       candidate.source = Array.from(new Set([...candidate.source, "release"]));
     }
+
+    mergeBottleCandidate(enrichedCandidates, candidate);
+
+    if (
+      candidate.releaseId === null &&
+      candidate.kind !== "release" &&
+      preferredReleaseMatch &&
+      preferredReleaseMatch.score > 0
+    ) {
+      const matchedRelease = preferredReleaseMatch.release;
+
+      mergeBottleCandidate(
+        enrichedCandidates,
+        BottleCandidateSchema.parse({
+          kind: "release",
+          bottleId: candidate.bottleId,
+          releaseId: matchedRelease.releaseId,
+          alias: candidate.alias,
+          fullName: matchedRelease.fullName,
+          bottleFullName: candidate.bottleFullName ?? candidate.fullName,
+          brand: candidate.brand,
+          bottler: candidate.bottler,
+          series: candidate.series,
+          distillery: candidate.distillery,
+          category: candidate.category,
+          statedAge: matchedRelease.statedAge ?? candidate.statedAge,
+          edition: matchedRelease.edition,
+          caskStrength: matchedRelease.caskStrength,
+          singleCask: matchedRelease.singleCask,
+          abv: matchedRelease.abv,
+          vintageYear: matchedRelease.vintageYear,
+          releaseYear: matchedRelease.releaseYear,
+          caskType: matchedRelease.caskType,
+          caskSize: matchedRelease.caskSize,
+          caskFill: matchedRelease.caskFill,
+          score: candidate.score,
+          source: Array.from(new Set([...candidate.source, "release"])),
+        }),
+      );
+    }
   }
 
-  return candidates;
+  return Array.from(enrichedCandidates.values());
 }
 
 async function runCandidateLookupSafely<T>(
@@ -1335,6 +1414,10 @@ async function getBrandCandidates(
     return [];
   }
   const expression = extractedLabel.expression || normalizedName;
+  const comparableExpression = normalizeComparableText(expression);
+  const comparableExpressionClause = comparableExpression
+    ? sql`OR LOWER(REPLACE(${bottles.fullName}, ${"'"}, '')) LIKE ${`%${comparableExpression}%`}`
+    : sql``;
 
   const result = await db.execute<{
     bottleId: number;
@@ -1371,7 +1454,10 @@ async function getBrandCandidates(
       LOWER(${entities.name}) = LOWER(${brandName})
       OR LOWER(COALESCE(${entities.shortName}, '')) = LOWER(${brandName})
     )
-      AND ${bottles.fullName} ILIKE ${`%${expression}%`}
+      AND (
+        LOWER(${bottles.fullName}) LIKE LOWER(${`%${expression}%`})
+        ${comparableExpressionClause}
+      )
     ORDER BY ${bottles.fullName} ASC
     LIMIT ${BRAND_CANDIDATE_LIMIT}
   `);
@@ -1466,7 +1552,9 @@ export const getBottleMatchCandidateById = getBottleCandidateById;
 async function getExactBottleCandidate(
   normalizedName: string,
 ): Promise<BottleCandidate | null> {
-  const [exactMatch] = await db
+  const normalizedLowerName = normalizedName.toLowerCase();
+  const comparableName = normalizeComparableText(normalizedName);
+  const exactMatches = await db
     .select({
       bottleId: bottleAliases.bottleId,
       releaseId: bottleAliases.releaseId,
@@ -1510,36 +1598,120 @@ async function getExactBottleCandidate(
     .innerJoin(entities, eq(entities.id, bottles.brandId))
     .where(
       and(
-        eq(sql`LOWER(${bottleAliases.name})`, normalizedName.toLowerCase()),
+        sql`LOWER(${bottleAliases.name}) = ${normalizedLowerName}`,
         eq(bottleAliases.ignored, false),
         isNotNull(bottleAliases.bottleId),
       ),
     )
     .limit(1);
 
-  if (!exactMatch?.bottleId) {
+  const exactMatch = exactMatches[0];
+  if (exactMatch?.bottleId) {
+    return buildBottleCandidate(
+      {
+        bottleId: exactMatch.bottleId,
+        releaseId: exactMatch.releaseId,
+        alias: exactMatch.alias,
+        fullName: exactMatch.fullName,
+        bottleFullName: exactMatch.bottleFullName,
+        brand: exactMatch.brand || null,
+        category: exactMatch.category,
+        statedAge: exactMatch.statedAge,
+        edition: exactMatch.edition,
+        caskStrength: exactMatch.caskStrength,
+        singleCask: exactMatch.singleCask,
+        abv: exactMatch.abv,
+        vintageYear: exactMatch.vintageYear,
+        releaseYear: exactMatch.releaseYear,
+        caskType: exactMatch.caskType,
+        caskSize: exactMatch.caskSize,
+        caskFill: exactMatch.caskFill,
+        score: 1,
+      },
+      "exact",
+    );
+  }
+
+  if (!comparableName || comparableName === normalizedLowerName) {
     return null;
   }
 
+  const comparableMatches = await db
+    .select({
+      bottleId: bottleAliases.bottleId,
+      releaseId: bottleAliases.releaseId,
+      alias: bottleAliases.name,
+      fullName: sql<string>`COALESCE(${bottleReleases.fullName}, ${bottles.fullName})`,
+      bottleFullName: bottles.fullName,
+      brand: entities.name,
+      category: bottles.category,
+      statedAge: sql<
+        number | null
+      >`COALESCE(${bottleReleases.statedAge}, ${bottles.statedAge})`,
+      edition: sql<
+        string | null
+      >`COALESCE(${bottleReleases.edition}, ${bottles.edition})`,
+      caskStrength: sql<
+        boolean | null
+      >`COALESCE(${bottleReleases.caskStrength}, ${bottles.caskStrength})`,
+      singleCask: sql<
+        boolean | null
+      >`COALESCE(${bottleReleases.singleCask}, ${bottles.singleCask})`,
+      abv: sql<number | null>`COALESCE(${bottleReleases.abv}, ${bottles.abv})`,
+      vintageYear: sql<
+        number | null
+      >`COALESCE(${bottleReleases.vintageYear}, ${bottles.vintageYear})`,
+      releaseYear: sql<
+        number | null
+      >`COALESCE(${bottleReleases.releaseYear}, ${bottles.releaseYear})`,
+      caskType: sql<
+        string | null
+      >`COALESCE(${bottleReleases.caskType}, ${bottles.caskType})`,
+      caskSize: sql<
+        string | null
+      >`COALESCE(${bottleReleases.caskSize}, ${bottles.caskSize})`,
+      caskFill: sql<
+        string | null
+      >`COALESCE(${bottleReleases.caskFill}, ${bottles.caskFill})`,
+    })
+    .from(bottleAliases)
+    .innerJoin(bottles, eq(bottles.id, bottleAliases.bottleId))
+    .leftJoin(bottleReleases, eq(bottleReleases.id, bottleAliases.releaseId))
+    .innerJoin(entities, eq(entities.id, bottles.brandId))
+    .where(
+      and(
+        sql`LOWER(REPLACE(${bottleAliases.name}, ${"'"}, '')) = ${comparableName}`,
+        eq(bottleAliases.ignored, false),
+        isNotNull(bottleAliases.bottleId),
+      ),
+    )
+    .limit(2);
+
+  if (comparableMatches.length !== 1) {
+    return null;
+  }
+
+  const comparableMatch = comparableMatches[0]!;
+
   return buildBottleCandidate(
     {
-      bottleId: exactMatch.bottleId,
-      releaseId: exactMatch.releaseId,
-      alias: exactMatch.alias,
-      fullName: exactMatch.fullName,
-      bottleFullName: exactMatch.bottleFullName,
-      brand: exactMatch.brand || null,
-      category: exactMatch.category,
-      statedAge: exactMatch.statedAge,
-      edition: exactMatch.edition,
-      caskStrength: exactMatch.caskStrength,
-      singleCask: exactMatch.singleCask,
-      abv: exactMatch.abv,
-      vintageYear: exactMatch.vintageYear,
-      releaseYear: exactMatch.releaseYear,
-      caskType: exactMatch.caskType,
-      caskSize: exactMatch.caskSize,
-      caskFill: exactMatch.caskFill,
+      bottleId: comparableMatch.bottleId!,
+      releaseId: comparableMatch.releaseId,
+      alias: comparableMatch.alias,
+      fullName: comparableMatch.fullName,
+      bottleFullName: comparableMatch.bottleFullName,
+      brand: comparableMatch.brand || null,
+      category: comparableMatch.category,
+      statedAge: comparableMatch.statedAge,
+      edition: comparableMatch.edition,
+      caskStrength: comparableMatch.caskStrength,
+      singleCask: comparableMatch.singleCask,
+      abv: comparableMatch.abv,
+      vintageYear: comparableMatch.vintageYear,
+      releaseYear: comparableMatch.releaseYear,
+      caskType: comparableMatch.caskType,
+      caskSize: comparableMatch.caskSize,
+      caskFill: comparableMatch.caskFill,
       score: 1,
     },
     "exact",
