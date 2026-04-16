@@ -67,6 +67,39 @@ describe("deriveLegacyReleaseRepairIdentity", () => {
       }),
     ).toBeNull();
   });
+
+  test("does not treat Small Batch family wording as a batch marker", () => {
+    expect(
+      deriveLegacyReleaseRepairIdentity({
+        fullName: "Four Roses Limited Edition Small Batch 2017",
+      }),
+    ).toBeNull();
+  });
+
+  test("supports structured numbered editions without forcing batch semantics", () => {
+    expect(
+      deriveLegacyReleaseRepairIdentity({
+        fullName: "Highland Park Cask Strength No. 5",
+        edition: "No. 5",
+      }),
+    ).toMatchObject({
+      proposedParentFullName: "Highland Park Cask Strength",
+      edition: "No. 5",
+      releaseYear: null,
+    });
+  });
+
+  test("derives explicit release-number markers from the raw name", () => {
+    expect(
+      deriveLegacyReleaseRepairIdentity({
+        fullName: "Highland Park Cask Strength Release No. 5",
+      }),
+    ).toMatchObject({
+      proposedParentFullName: "Highland Park Cask Strength",
+      edition: "Release No. 5",
+      releaseYear: null,
+    });
+  });
 });
 
 describe("release-repair parent matching", () => {

@@ -95,6 +95,14 @@ describe("bottle-classifier instructions", () => {
     expect(instructions).toContain("Glenmorangie Quinta Ruban 14-year-old");
     expect(instructions).toContain("Wild Turkey Rare Breed Rye");
     expect(instructions).toContain("SMWS RW6.5 Sauna Smoke");
+    expect(instructions).toContain("Heaven's Door Bootleg Vol 3 Whiskey");
+    expect(instructions).toContain(
+      "Four Roses Limited Edition Small Batch 2017",
+    );
+    expect(instructions).toContain("Highland Park Cask Strength No. 5");
+    expect(instructions).toContain(
+      "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
+    );
     expect(instructions).toContain("over-specific");
     expect(instructions).toContain(
       "call `search_bottles` again with those enriched structured fields",

@@ -35,6 +35,10 @@ import {
 import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
+import {
+  stripReleaseIdentityFromSearchName,
+  type BottleReferenceSearchSignals,
+} from "./bottleReferenceSearchName";
 import { getOpenAIEmbedding } from "./openaiEmbeddings";
 
 const VECTOR_CANDIDATE_LIMIT = 20;
@@ -452,20 +456,13 @@ function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-type ParentSearchSignals = {
-  edition: string | null;
-  releaseYear: number | null;
-  statedAge: number | null;
-  vintageYear: number | null;
-};
-
 function getParentSearchSignals({
   searchName,
   extractedLabel,
 }: {
   searchName: string;
   extractedLabel: BottleReferenceIdentity | null;
-}): ParentSearchSignals {
+}): BottleReferenceSearchSignals {
   const normalizedSearchName = normalizeBottle({ name: searchName });
   const derivedLegacyReleaseIdentity = deriveLegacyReleaseRepairIdentity({
     fullName: searchName,
@@ -486,50 +483,6 @@ function getParentSearchSignals({
     vintageYear:
       extractedLabel?.vintage_year ?? normalizedSearchName.vintageYear ?? null,
   };
-}
-
-function stripReleaseIdentityFromSearchName(
-  name: string,
-  signals: ParentSearchSignals,
-) {
-  let strippedName = normalizeString(name);
-
-  if (signals.edition) {
-    const normalizedEdition = normalizeBottleBatchNumber(
-      normalizeString(signals.edition),
-    );
-    const escapedEdition = escapeRegExp(normalizedEdition);
-
-    strippedName = strippedName
-      .replace(new RegExp(`\\s*\\(${escapedEdition}\\)\\s*$`, "i"), " ")
-      .replace(new RegExp(`\\b${escapedEdition}\\b`, "i"), " ");
-  }
-
-  if (signals.statedAge !== null) {
-    strippedName = strippedName.replace(
-      new RegExp(`\\b${signals.statedAge}-year-old\\b`, "i"),
-      " ",
-    );
-  }
-
-  if (signals.releaseYear !== null) {
-    strippedName = strippedName.replace(
-      new RegExp(`\\b${signals.releaseYear}\\s+release\\b`, "i"),
-      " ",
-    );
-  }
-
-  if (signals.vintageYear !== null) {
-    strippedName = strippedName.replace(
-      new RegExp(`\\b${signals.vintageYear}\\s+vintage\\b`, "i"),
-      " ",
-    );
-  }
-
-  return strippedName
-    .replace(/\s{2,}/g, " ")
-    .replace(/\s*[-,(]+\s*$/g, "")
-    .trim();
 }
 
 function buildParentCandidateSearchContext({

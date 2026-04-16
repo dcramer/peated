@@ -164,6 +164,29 @@ export const BOTTLE_NORMALIZATION_CORPUS: BottleNormalizationCorpusExample[] = [
     notes: "Annual release under a stable Distillers Edition parent.",
   },
   {
+    id: "lagavulin-distillers-edition-2023",
+    inputName:
+      "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
+    expectedBottleName: "Lagavulin Distillers Edition",
+    peatedBottleIds: [44006],
+    contrastGroup: "distillers_edition",
+    contrastOutcome: "split_release",
+    liveEvalCoverage: "required",
+    liveEvalSummary:
+      "Treat Lagavulin Distiller's Edition 2023 as a year-specific Distillers Edition release instead of keeping the year on the bottle or ignoring it as retailer noise.",
+    expectation: {
+      handlingStrategy: "classifier_required",
+      classifierExpectation: "bottle_plus_release",
+      deterministicReleaseExpectation: "none",
+      releaseIdentity: {
+        edition: null,
+        releaseYear: 2023,
+      },
+    },
+    notes:
+      "Real Distillers Edition family variant where the bare annual year and apostrophe spelling should still resolve to the reusable parent plus release year.",
+  },
+  {
     id: "makers-private-selection-family",
     inputName: "Maker's Mark Private Selection",
     expectedBottleName: "Maker's Mark Private Selection",
@@ -201,6 +224,43 @@ export const BOTTLE_NORMALIZATION_CORPUS: BottleNormalizationCorpusExample[] = [
     },
     notes:
       "Program code is release identity, but current repair heuristics should leave this to classifier review.",
+  },
+  {
+    id: "heavens-door-bootleg-series-family",
+    inputName: "Heaven's Door Bootleg Series",
+    expectedBottleName: "Heaven's Door Bootleg Series",
+    contrastGroup: "bootleg_series",
+    contrastOutcome: "keep_bottle",
+    liveEvalCoverage: "skip",
+    expectation: {
+      handlingStrategy: "classifier_required",
+      classifierExpectation: "bottle",
+      deterministicReleaseExpectation: "none",
+      releaseIdentity: null,
+    },
+    notes:
+      "Bootleg Series is the reusable bottle family; the annual volume numbering belongs on child releases.",
+  },
+  {
+    id: "heavens-door-bootleg-vol-3",
+    inputName: "Heaven's Door Bootleg Vol 3 Whiskey",
+    expectedBottleName: "Heaven's Door Bootleg Series",
+    contrastGroup: "bootleg_series",
+    contrastOutcome: "split_release",
+    liveEvalCoverage: "required",
+    liveEvalSummary:
+      "Treat Heaven's Door Bootleg Vol 3 as the Bootleg Series parent plus a numbered child release instead of keeping Vol 3 in the bottle identity.",
+    expectation: {
+      handlingStrategy: "classifier_required",
+      classifierExpectation: "bottle_plus_release",
+      deterministicReleaseExpectation: "none",
+      releaseIdentity: {
+        edition: "Vol. 3",
+        releaseYear: null,
+      },
+    },
+    notes:
+      "Bootleg shorthand should normalize to the Bootleg Series family, with the volume marker kept as release identity.",
   },
   {
     id: "traigh-bhan-family",
@@ -396,6 +456,43 @@ export const BOTTLE_NORMALIZATION_CORPUS: BottleNormalizationCorpusExample[] = [
       "Canonical batch code is release identity under the reusable Elijah Craig Barrel Proof bottle family.",
   },
   {
+    id: "four-roses-limited-edition-small-batch-family",
+    inputName: "Four Roses Limited Edition Small Batch",
+    expectedBottleName: "Four Roses Limited Edition Small Batch",
+    contrastGroup: "four_roses_limited_edition_small_batch",
+    contrastOutcome: "keep_bottle",
+    liveEvalCoverage: "skip",
+    expectation: {
+      handlingStrategy: "classifier_required",
+      classifierExpectation: "bottle",
+      deterministicReleaseExpectation: "none",
+      releaseIdentity: null,
+    },
+    notes:
+      "Limited Edition Small Batch is the stable Four Roses family; it should not be rewritten into a fake Small parent plus Batch child.",
+  },
+  {
+    id: "four-roses-limited-edition-small-batch-2017",
+    inputName: "Four Roses Limited Edition Small Batch 2017",
+    expectedBottleName: "Four Roses Limited Edition Small Batch",
+    contrastGroup: "four_roses_limited_edition_small_batch",
+    contrastOutcome: "split_release",
+    liveEvalCoverage: "required",
+    liveEvalSummary:
+      "Treat Four Roses Limited Edition Small Batch 2017 as the annual 2017 release under the stable family instead of inventing Batch 2017 or truncating the parent bottle name.",
+    expectation: {
+      handlingStrategy: "classifier_required",
+      classifierExpectation: "bottle_plus_release",
+      deterministicReleaseExpectation: "none",
+      releaseIdentity: {
+        edition: null,
+        releaseYear: 2017,
+      },
+    },
+    notes:
+      "The trailing year is annual release identity for this family, while Small Batch remains bottle-level wording.",
+  },
+  {
     id: "four-roses-single-barrel",
     inputName: "Four Roses Single Barrel",
     expectedBottleName: "Four Roses Single Barrel",
@@ -457,6 +554,44 @@ export const BOTTLE_NORMALIZATION_CORPUS: BottleNormalizationCorpusExample[] = [
     },
     notes:
       "Dot expressions are distinct bottles, not child releases of Octomore 13.",
+  },
+  {
+    id: "highland-park-cask-strength-family",
+    inputName: "Highland Park Cask Strength",
+    expectedBottleName: "Highland Park Cask Strength",
+    peatedBottleIds: [44080],
+    contrastGroup: "highland_park_cask_strength",
+    contrastOutcome: "keep_bottle",
+    liveEvalCoverage: "skip",
+    expectation: {
+      handlingStrategy: "classifier_required",
+      classifierExpectation: "bottle",
+      deterministicReleaseExpectation: "none",
+      releaseIdentity: null,
+    },
+    notes:
+      "Highland Park Cask Strength is the reusable bottle family; the numbered releases belong under it.",
+  },
+  {
+    id: "highland-park-cask-strength-no-5",
+    inputName: "Highland Park Cask Strength No. 5",
+    expectedBottleName: "Highland Park Cask Strength",
+    contrastGroup: "highland_park_cask_strength",
+    contrastOutcome: "split_release",
+    liveEvalCoverage: "required",
+    liveEvalSummary:
+      "Treat Highland Park Cask Strength No. 5 as the Cask Strength parent plus a numbered child release instead of baking No. 5 into the bottle identity.",
+    expectation: {
+      handlingStrategy: "classifier_required",
+      classifierExpectation: "bottle_plus_release",
+      deterministicReleaseExpectation: "none",
+      releaseIdentity: {
+        edition: "No. 5",
+        releaseYear: null,
+      },
+    },
+    notes:
+      "The numbered release marker should stay on the child release even when the retailer omits the explicit Release word.",
   },
   {
     id: "glen-scotia-double-cask-classic",

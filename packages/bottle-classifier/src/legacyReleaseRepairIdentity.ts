@@ -462,6 +462,10 @@ export function normalizeComparableBottleName(fullName: string): string {
     .trim();
 }
 
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function isReleaseLikeBatchEdition(value: string) {
   const suffix = value
     .replace(/^batch/i, "")
@@ -471,10 +475,51 @@ function isReleaseLikeBatchEdition(value: string) {
   return /^(?:[a-z]*\d[a-z0-9.-]*)$/i.test(suffix);
 }
 
-function isStrongStructuredEditionMarker(value: string): boolean {
+function normalizeEditionToken(value: string) {
+  return /^[ivxlcdm]+$/i.test(value) ? value.toUpperCase() : value;
+}
+
+function normalizeExplicitEditionMarker(value: string) {
+  const normalizedValue = normalizeString(value).trim().replace(/\s+/g, " ");
+  const volumeMatch = normalizedValue.match(
+    /^Vol(?:ume)?\.?\s+([A-Za-z0-9IVXLCM.-]+)$/i,
+  );
+
+  if (volumeMatch) {
+    return `Vol. ${normalizeEditionToken(volumeMatch[1])}`;
+  }
+
+  const releaseNoMatch = normalizedValue.match(
+    /^Release\s+No\.?\s+([A-Za-z0-9.-]+)$/i,
+  );
+
+  if (releaseNoMatch) {
+    return `Release No. ${normalizeEditionToken(releaseNoMatch[1])}`;
+  }
+
+  const bareNoMatch = normalizedValue.match(/^No\.?\s+([A-Za-z0-9.-]+)$/i);
+
+  if (bareNoMatch) {
+    return `No. ${normalizeEditionToken(bareNoMatch[1])}`;
+  }
+
+  return normalizedValue;
+}
+
+function normalizeStrongEditionMarker(value: string) {
   const normalizedValue = normalizeBottleBatchNumber(
     normalizeString(value),
   ).trim();
+
+  if (isReleaseLikeBatchEdition(normalizedValue)) {
+    return normalizedValue;
+  }
+
+  return normalizeExplicitEditionMarker(normalizedValue);
+}
+
+function isStrongStructuredEditionMarker(value: string): boolean {
+  const normalizedValue = normalizeStrongEditionMarker(value);
 
   if (!normalizedValue) {
     return false;
@@ -485,6 +530,14 @@ function isStrongStructuredEditionMarker(value: string): boolean {
   }
 
   if (/^\d{4}\s+(?:release|vintage)$/i.test(normalizedValue)) {
+    return true;
+  }
+
+  if (
+    /^(?:vol(?:ume)?\.?\s+[a-z0-9ivxlcdm.-]+|release\s+no\.?\s+[a-z0-9.-]+|no\.?\s+[a-z0-9.-]+)$/i.test(
+      normalizedValue,
+    )
+  ) {
     return true;
   }
 
@@ -504,6 +557,23 @@ function isStrongStructuredEditionMarker(value: string): boolean {
   );
 }
 
+function extractInlineBatchEdition(fullName: string): string | null {
+  for (const match of fullName.matchAll(/\b(Batch [A-Za-z0-9.-]+)\b/gi)) {
+    const matchIndex = match.index ?? 0;
+    const prefix = fullName.slice(Math.max(0, matchIndex - 6), matchIndex);
+
+    if (/small\s$/i.test(prefix)) {
+      continue;
+    }
+
+    if (isReleaseLikeBatchEdition(match[1])) {
+      return match[1];
+    }
+  }
+
+  return null;
+}
+
 function extractBatchEdition(fullName: string): string | null {
   const normalizedName = normalizeBottleBatchNumber(normalizeString(fullName));
   const parenthesized = normalizedName.match(/\((Batch [^)]+)\)/i);
@@ -511,12 +581,52 @@ function extractBatchEdition(fullName: string): string | null {
     return parenthesized[1];
   }
 
-  const inline = normalizedName.match(/\b(Batch [A-Za-z0-9.-]+)\b/i);
-  if (inline && isReleaseLikeBatchEdition(inline[1])) {
-    return inline[1];
+  const inline = extractInlineBatchEdition(normalizedName);
+  if (inline) {
+    return inline;
   }
 
   return null;
+}
+
+function extractExplicitEditionMarker(fullName: string): string | null {
+  const normalizedName = normalizeString(fullName).replace(/\s+/g, " ").trim();
+  const releaseNoMatch = normalizedName.match(
+    /\b(Release\s+No\.?\s+[A-Za-z0-9.-]+)\b/i,
+  );
+
+  if (releaseNoMatch) {
+    return normalizeExplicitEditionMarker(releaseNoMatch[1]);
+  }
+
+  return null;
+}
+
+function buildLooseEditionPattern(edition: string) {
+  const normalizedEdition = normalizeStrongEditionMarker(edition);
+  const releaseNoMatch = normalizedEdition.match(
+    /^Release\s+No\.?\s+([A-Za-z0-9.-]+)$/i,
+  );
+
+  if (releaseNoMatch) {
+    return `Release\\s+No\\.?\\s+${escapeRegExp(releaseNoMatch[1])}`;
+  }
+
+  const bareNoMatch = normalizedEdition.match(/^No\.?\s+([A-Za-z0-9.-]+)$/i);
+
+  if (bareNoMatch) {
+    return `(?:Release\\s+)?No\\.?\\s+${escapeRegExp(bareNoMatch[1])}`;
+  }
+
+  const volumeMatch = normalizedEdition.match(
+    /^Vol(?:ume)?\.?\s+([A-Za-z0-9IVXLCM.-]+)$/i,
+  );
+
+  if (volumeMatch) {
+    return `Vol(?:ume)?\\.?\\s+${escapeRegExp(volumeMatch[1])}`;
+  }
+
+  return escapeRegExp(normalizedEdition).replace(/\\ /g, "\\s+");
 }
 
 /**
@@ -548,10 +658,12 @@ export function deriveLegacyReleaseRepairIdentity({
   const parsedIdentity = normalizeBottle({ name: normalizedFullName });
   const normalizedStructuredEdition =
     structuredEdition && isStrongStructuredEditionMarker(structuredEdition)
-      ? normalizeBottleBatchNumber(normalizeString(structuredEdition))
+      ? normalizeStrongEditionMarker(structuredEdition)
       : null;
   const edition =
-    normalizedStructuredEdition ?? extractBatchEdition(normalizedFullName);
+    normalizedStructuredEdition ??
+    extractBatchEdition(normalizedFullName) ??
+    extractExplicitEditionMarker(normalizedFullName);
   const releaseYear = structuredReleaseYear ?? parsedIdentity.releaseYear;
   const markerSources: string[] = [];
 
@@ -581,11 +693,11 @@ export function deriveLegacyReleaseRepairIdentity({
   }
 
   if (edition) {
-    const escapedEdition = edition.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const editionPattern = buildLooseEditionPattern(edition);
     const editionPatterns = [
-      new RegExp(`\\s*\\(${escapedEdition}\\)\\s*$`, "i"),
-      new RegExp(`\\s*-\\s*${escapedEdition}\\s*$`, "i"),
-      new RegExp(`\\s+${escapedEdition}\\s*$`, "i"),
+      new RegExp(`\\s*\\(${editionPattern}\\)\\s*$`, "i"),
+      new RegExp(`\\s*-\\s*${editionPattern}\\s*$`, "i"),
+      new RegExp(`\\s+${editionPattern}\\s*$`, "i"),
     ];
 
     for (const pattern of editionPatterns) {
