@@ -226,6 +226,30 @@ const cadbollEstateBatch4Release = buildBottleCandidate({
   source: ["text"],
 });
 
+const lagavulinDistillersEditionParent = buildBottleCandidate({
+  bottleId: 44006,
+  fullName: "Lagavulin Distillers Edition",
+  brand: "Lagavulin",
+  distillery: ["Lagavulin"],
+  category: "single_malt",
+  score: 0.91,
+  source: ["brand"],
+});
+
+const lagavulinDistillersEdition2023Release = buildBottleCandidate({
+  bottleId: 44006,
+  releaseId: 78,
+  kind: "release",
+  fullName: "Lagavulin Distillers Edition 2023 Release",
+  bottleFullName: "Lagavulin Distillers Edition",
+  brand: "Lagavulin",
+  distillery: ["Lagavulin"],
+  category: "single_malt",
+  releaseYear: 2023,
+  score: 0.95,
+  source: ["brand", "release"],
+});
+
 const smwsa41176Match = buildBottleCandidate({
   bottleId: 650,
   fullName: "SMWS 41.176 Baristaliscious",
@@ -706,6 +730,35 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       matchedReleaseId: 9102,
       summary:
         "When a clean Batch 4 child release already exists, match that release directly instead of keeping or downgrading a plain parent-bottle match for the Cadboll Estate listing.",
+    },
+  },
+  {
+    name: "store listing: matches an existing annual release under Distillers Edition",
+    input: {
+      reference: {
+        name: "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
+        url: "https://shop.example/products/lagavulin-distillers-edition-2023",
+      },
+      extractedIdentity: buildExtractedIdentity({
+        brand: "Lagavulin",
+        expression: "Distillers Edition",
+        distillery: ["Lagavulin"],
+        category: "single_malt",
+        release_year: 2023,
+      }),
+      initialCandidates: [
+        lagavulinDistillersEditionParent,
+        lagavulinDistillersEdition2023Release,
+      ],
+    },
+    expected: {
+      status: "classified",
+      action: "match",
+      identityScope: "product",
+      matchedBottleId: 44006,
+      matchedReleaseId: 78,
+      summary:
+        "Treat Distillers Edition as the stable parent family, use the bare 2023 year as release identity, and match the existing 2023 child release instead of downgrading to no-match.",
     },
   },
   {
