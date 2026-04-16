@@ -2,6 +2,7 @@ import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleReleases,
   bottles,
   bottlesToDistillers,
   storePriceMatchProposals,
@@ -13,7 +14,7 @@ import {
   resolveStorePriceMatchProposal,
 } from "@peated/server/lib/priceMatching";
 import { findBottleMatchCandidates } from "@peated/server/lib/priceMatchingCandidates";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 vi.mock("@peated/server/agents/whisky/labelExtractor", () => ({
@@ -317,6 +318,61 @@ describe("priceMatching", () => {
         }),
       ]),
     );
+  });
+
+  test("prefers a literal exact alias over apostrophe-normalized fallback matches", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const brand = await fixtures.Entity({
+      type: ["brand"],
+      name: "Alias Preference Brand",
+    });
+    const literalBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Founder's Cut",
+    });
+    const normalizedBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Founders Cut Reserve",
+    });
+    await fixtures.BottleAlias({
+      bottleId: literalBottle.id,
+      name: "Founder's Cut",
+    });
+    await fixtures.BottleAlias({
+      bottleId: normalizedBottle.id,
+      name: "Founders Cut",
+    });
+
+    const candidates = await findBottleMatchCandidates({
+      query: "Founder's Cut",
+      brand: null,
+      bottler: null,
+      expression: null,
+      series: null,
+      distillery: [],
+      category: null,
+      stated_age: null,
+      abv: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+      vintage_year: null,
+      release_year: null,
+      currentBottleId: null,
+      limit: 15,
+    });
+
+    expect(candidates[0]).toMatchObject({
+      bottleId: literalBottle.id,
+      alias: "Founder's Cut",
+    });
+    expect(candidates[0]?.source).toEqual(expect.arrayContaining(["exact"]));
   });
 
   test("normalizes string bottle ids returned from raw candidate queries", async () => {
@@ -2476,9 +2532,164 @@ describe("priceMatching", () => {
       caskSize: "port_pipe",
       caskFill: "1st_fill",
     });
-    expect(candidate?.source).toEqual(
-      expect.arrayContaining(["exact", "release"]),
+    expect(candidate?.source).toEqual(expect.arrayContaining(["release"]));
+  });
+
+  test("surfaces an existing Distillers Edition release from apostrophe retailer wording without web search", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const lagavulin = await fixtures.Entity({
+      name: "Lagavulin",
+      shortName: "Lagavulin",
+      type: ["brand", "distiller"],
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: lagavulin.id,
+      distillerIds: [lagavulin.id],
+      name: "Distillers Edition",
+      category: "single_malt",
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      name: "Distillers Edition 2023 Release",
+      fullName: "Lagavulin Distillers Edition 2023 Release",
+      releaseYear: 2023,
+    });
+
+    // Blank the text-search vectors so this test exercises the local
+    // brand/parent candidate path rather than Postgres full-text matching.
+    await db.execute(
+      sql`UPDATE ${bottles} SET search_vector = NULL WHERE ${bottles.id} = ${bottle.id}`,
     );
+    await db.execute(
+      sql`UPDATE ${bottleReleases} SET search_vector = NULL WHERE ${bottleReleases.id} = ${release.id}`,
+    );
+
+    const candidates = await findBottleMatchCandidates({
+      query:
+        "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
+      brand: lagavulin.name,
+      bottler: null,
+      expression: "Distiller's Edition",
+      series: null,
+      distillery: [lagavulin.name],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+      vintage_year: null,
+      release_year: 2023,
+      currentBottleId: null,
+      limit: 15,
+    });
+
+    expect(candidates[0]).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      kind: "release",
+      fullName: release.fullName,
+      releaseYear: 2023,
+    });
+    expect(candidates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          bottleId: bottle.id,
+          releaseId: release.id,
+          kind: "release",
+          source: expect.arrayContaining(["brand", "release"]),
+        }),
+        expect.objectContaining({
+          bottleId: bottle.id,
+          releaseId: null,
+          kind: "bottle",
+          fullName: bottle.fullName,
+        }),
+      ]),
+    );
+  });
+
+  test("does not synthesize an arbitrary release when multiple releases tie on metadata", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const lagavulin = await fixtures.Entity({
+      name: "Lagavulin",
+      shortName: "Lagavulin",
+      type: ["brand", "distiller"],
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: lagavulin.id,
+      distillerIds: [lagavulin.id],
+      name: "Distillers Edition",
+      category: "single_malt",
+    });
+    const springRelease = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      name: "Distillers Edition 2023 Spring Release",
+      fullName: "Lagavulin Distillers Edition 2023 Spring Release",
+      releaseYear: 2023,
+    });
+    const autumnRelease = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      name: "Distillers Edition 2023 Autumn Release",
+      fullName: "Lagavulin Distillers Edition 2023 Autumn Release",
+      releaseYear: 2023,
+    });
+
+    await db.execute(
+      sql`UPDATE ${bottles} SET search_vector = NULL WHERE ${bottles.id} = ${bottle.id}`,
+    );
+    await db.execute(
+      sql`UPDATE ${bottleReleases} SET search_vector = NULL WHERE ${bottleReleases.id} IN (${springRelease.id}, ${autumnRelease.id})`,
+    );
+
+    const candidates = await findBottleMatchCandidates({
+      query:
+        "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
+      brand: lagavulin.name,
+      bottler: null,
+      expression: "Distiller's Edition",
+      series: null,
+      distillery: [lagavulin.name],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+      vintage_year: null,
+      release_year: 2023,
+      currentBottleId: null,
+      limit: 15,
+    });
+
+    expect(candidates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          bottleId: bottle.id,
+          releaseId: null,
+          kind: "bottle",
+          fullName: bottle.fullName,
+        }),
+      ]),
+    );
+    expect(
+      candidates.some(
+        (candidate) =>
+          candidate.bottleId === bottle.id && candidate.kind === "release",
+      ),
+    ).toBe(false);
   });
 
   test("adds a reusable parent candidate for age-statement listings", async ({

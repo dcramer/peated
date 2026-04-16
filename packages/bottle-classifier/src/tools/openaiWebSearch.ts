@@ -1,5 +1,9 @@
 import { tool } from "@openai/agents";
 import type OpenAI from "openai";
+import type {
+  ResponseCreateParamsNonStreaming,
+  ResponseIncludable,
+} from "openai/resources/responses/responses";
 import type { BottleSearchEvidence } from "../classifierTypes";
 import { getDeterministicOpenAISettings } from "../openaiModelSettings";
 import { runBraveWebSearch } from "./braveWebSearch";
@@ -15,33 +19,126 @@ import {
   type BottleWebSearchBudget,
 } from "./sharedWebSearch";
 
+const OPENAI_WEB_SEARCH_RESPONSE_INCLUDES: ResponseIncludable[] = [
+  "web_search_call.action.sources",
+];
+
 export function extractOpenAISearchEvidence(
   query: string,
   response: any,
 ): BottleSearchEvidence {
-  const summary = response.output_text?.trim().slice(0, 600) || null;
-  const seen = new Set<string>();
-  const results: BottleSearchEvidence["results"] = [];
+  const outputItems: any[] = Array.isArray(response?.output)
+    ? response.output
+    : [];
+  const messageTexts = outputItems
+    .filter((item: any): item is { content?: unknown[]; type: "message" } => {
+      return item?.type === "message";
+    })
+    .flatMap((item: { content?: unknown[] }) =>
+      Array.isArray(item.content)
+        ? item.content
+            .filter(
+              (
+                content: any,
+              ): content is { text?: string; type: "output_text" } =>
+                content?.type === "output_text",
+            )
+            .map((content: { text?: string }) => content.text?.trim())
+            .filter((value: string | undefined): value is string =>
+              Boolean(value),
+            )
+        : [],
+    );
+  const summary =
+    response.output_text?.trim().slice(0, 600) ||
+    messageTexts.join(" ").trim().slice(0, 600) ||
+    null;
+  const resultsByUrl = new Map<
+    string,
+    BottleSearchEvidence["results"][number]
+  >();
 
-  for (const item of response.output) {
-    if (item.type !== "message") continue;
+  const mergeResult = ({
+    title,
+    url,
+  }: {
+    title?: string | null;
+    url: string | null | undefined;
+  }) => {
+    if (!url) {
+      return;
+    }
 
-    for (const content of item.content) {
-      if (content.type !== "output_text") continue;
+    const normalizedTitle = title?.trim() || url;
+    const existing = resultsByUrl.get(url);
+    if (!existing) {
+      resultsByUrl.set(url, {
+        title: normalizedTitle,
+        url,
+        domain: getResultDomain(url),
+        description: summary,
+        extraSnippets: [],
+      });
+      return;
+    }
 
-      for (const annotation of content.annotations || []) {
-        if (annotation.type !== "url_citation") continue;
-        if (seen.has(annotation.url)) continue;
-        seen.add(annotation.url);
+    if (existing.title === existing.url && normalizedTitle !== url) {
+      existing.title = normalizedTitle;
+    }
 
-        results.push({
-          title: annotation.title || annotation.url,
-          url: annotation.url,
-          domain: getResultDomain(annotation.url),
-          description: summary,
-          extraSnippets: [],
+    existing.description ??= summary;
+  };
+
+  for (const item of outputItems) {
+    if (item?.type === "message") {
+      for (const content of Array.isArray(item.content) ? item.content : []) {
+        if (content?.type !== "output_text") {
+          continue;
+        }
+
+        for (const annotation of Array.isArray(content.annotations)
+          ? content.annotations
+          : []) {
+          if (annotation?.type !== "url_citation") {
+            continue;
+          }
+
+          mergeResult({
+            title: annotation.title,
+            url: annotation.url,
+          });
+        }
+      }
+      continue;
+    }
+
+    if (item?.type !== "web_search_call") {
+      continue;
+    }
+
+    if (item.action?.type === "search") {
+      for (const source of Array.isArray(item.action.sources)
+        ? item.action.sources
+        : []) {
+        if (source?.type !== "url") {
+          continue;
+        }
+
+        mergeResult({
+          url: source.url,
         });
       }
+      continue;
+    }
+
+    if (
+      (item.action?.type === "open_page" ||
+        item.action?.type === "find_in_page") &&
+      typeof item.action.url === "string"
+    ) {
+      mergeResult({
+        url: item.action.url,
+      });
     }
   }
 
@@ -49,7 +146,7 @@ export function extractOpenAISearchEvidence(
     provider: "openai",
     query,
     summary,
-    results,
+    results: Array.from(resultsByUrl.values()),
   });
 }
 
@@ -176,22 +273,21 @@ export function createOpenAIWebSearchTool({
   });
 }
 
-async function runOpenAIWebSearch({
-  client,
+export function buildOpenAIWebSearchRequest({
   model,
   query,
   instructions,
   extraContext = null,
 }: {
-  client: OpenAI;
   model: string;
   query: string;
   instructions: string;
   extraContext?: string | null;
-}): Promise<BottleSearchEvidence> {
-  const response = await client.responses.create({
+}): ResponseCreateParamsNonStreaming {
+  return {
     model,
     instructions,
+    include: OPENAI_WEB_SEARCH_RESPONSE_INCLUDES,
     input: [
       {
         role: "user",
@@ -205,7 +301,30 @@ async function runOpenAIWebSearch({
     ],
     tools: [{ type: "web_search" }],
     ...getDeterministicOpenAISettings(model),
-  });
+  };
+}
+
+async function runOpenAIWebSearch({
+  client,
+  model,
+  query,
+  instructions,
+  extraContext = null,
+}: {
+  client: OpenAI;
+  model: string;
+  query: string;
+  instructions: string;
+  extraContext?: string | null;
+}): Promise<BottleSearchEvidence> {
+  const response = await client.responses.create(
+    buildOpenAIWebSearchRequest({
+      model,
+      query,
+      instructions,
+      extraContext,
+    }),
+  );
 
   return extractOpenAISearchEvidence(query, response);
 }
