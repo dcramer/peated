@@ -31,6 +31,11 @@ docker compose up -d
 pnpm install
 ```
 
+Local Postgres is published on `localhost:15432` and Redis is published on
+`localhost:16379` to avoid colliding with other default local instances. The
+tracked local test database config in `apps/server/.env.test` uses the same
+host ports.
+
 Note: If you need to tweak default settings, `cp .env.example .env` and go to town.
 
 Setup the database:

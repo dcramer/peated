@@ -111,3 +111,8 @@ Do not mock internal business logic purely to make a backend test look unit-size
 pnpm --filter=./apps/server test --run
 pnpm --filter=./apps/server test --run routes/entities/list.test.ts
 ```
+
+`apps/server/.env.test` follows the repo's default local Docker ports. If your
+services are published on different host ports, add an untracked
+`apps/server/.env.test.local` to override `DATABASE_URL` and `REDIS_URL` for
+local test runs.

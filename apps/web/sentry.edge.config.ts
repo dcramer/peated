@@ -8,8 +8,6 @@ import { SharedSentryConfig } from "./src/config";
 
 Sentry.init({
   ...SharedSentryConfig,
-
-  spotlight: process.env.NODE_ENV === "development",
 });
 
 Sentry.setTag("service", "@peated/web");

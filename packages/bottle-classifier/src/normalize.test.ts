@@ -28,6 +28,9 @@ describe("normalize", () => {
     expect(normalizeBottleBatchNumber("Elijah Craig Small Batch")).toBe(
       "Elijah Craig Small Batch",
     );
+    expect(
+      normalizeBottleBatchNumber("Four Roses Limited Edition Small Batch 2017"),
+    ).toBe("Four Roses Limited Edition Small Batch 2017");
   });
 
   test("normalizes age expressions into bottle identity", () => {

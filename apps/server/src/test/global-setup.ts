@@ -5,12 +5,34 @@ import * as schema from "../db/schema";
 
 const TEST_DB_APPLICATION_NAME = "peated-vitest";
 
-async function setupDatabase(): Promise<void> {
-  const [host, username, password] = ["localhost", "postgres", "postgres"];
-  const client = new Client({ host, user: username, password });
-  await client.connect();
+function getSetupDatabaseConfig() {
+  const databaseUrl = process.env.DATABASE_URL;
 
-  const applicationDatabaseName = "test_peated";
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL is required for backend tests");
+  }
+
+  const parsedUrl = new URL(databaseUrl);
+  const applicationDatabaseName =
+    parsedUrl.pathname.replace(/^\//, "") || "test_peated";
+
+  return {
+    applicationDatabaseName,
+    maintenanceConnectionConfig: {
+      database: "postgres",
+      host: parsedUrl.hostname || "localhost",
+      password: decodeURIComponent(parsedUrl.password),
+      port: parsedUrl.port ? Number(parsedUrl.port) : 5432,
+      user: decodeURIComponent(parsedUrl.username) || "postgres",
+    },
+  };
+}
+
+async function setupDatabase(): Promise<void> {
+  const { applicationDatabaseName, maintenanceConnectionConfig } =
+    getSetupDatabaseConfig();
+  const client = new Client(maintenanceConnectionConfig);
+  await client.connect();
   const dbQuery = await client.query(
     `SELECT FROM pg_database WHERE datname = $1`,
     [applicationDatabaseName],
