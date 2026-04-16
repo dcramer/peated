@@ -3,12 +3,48 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
-import { getNewBottleBottlingPath } from "@peated/web/lib/bottlings";
+import {
+  getBottleBottlingPath,
+  getNewBottleBottlingPath,
+} from "@peated/web/lib/bottlings";
 import classNames from "@peated/web/lib/classNames";
+import type { ReactNode } from "react";
 
 export type QueueItem =
   Outputs["prices"]["matchQueue"]["list"]["results"][number];
 type Candidate = QueueItem["candidateBottles"][number];
+type RecommendationField = {
+  label: string;
+  value: ReactNode;
+  fullWidth?: boolean;
+};
+type RecommendationBottle = {
+  fullName?: string;
+  brand: { name: string };
+  name: string;
+  series: { name: string } | null;
+  category: string | null;
+  edition: string | null;
+  statedAge: number | null;
+  distillers: Array<{ name: string }>;
+  bottler: { name: string } | null;
+};
+type RecommendationRelease = {
+  id?: number;
+  bottleId?: number;
+  fullName?: string;
+  name?: string;
+  edition: string | null;
+  statedAge: number | null;
+  abv: number | null;
+  caskStrength: boolean | null;
+  singleCask: boolean | null;
+  vintageYear: number | null;
+  releaseYear: number | null;
+  caskType: string | null;
+  caskFill: string | null;
+  caskSize: string | null;
+};
 
 type QueueItemCardProps = {
   isBusy: boolean;
@@ -136,26 +172,6 @@ function getExtractedLabelSummary(item: QueueItem): string[] {
   return summary;
 }
 
-function getRecommendationTitle(item: QueueItem): string {
-  if (item.status === "errored") {
-    return "No recommendation available";
-  }
-
-  if (item.suggestedRelease) {
-    return item.suggestedRelease.fullName;
-  }
-
-  if (item.suggestedBottle) {
-    return item.suggestedBottle.fullName;
-  }
-
-  if (item.proposedBottle) {
-    return `${item.proposedBottle.brand.name} ${item.proposedBottle.name}`.trim();
-  }
-
-  return "No strong suggestion";
-}
-
 function getRecommendationHeading(item: QueueItem): string {
   if (item.status === "errored") {
     return "Review Status";
@@ -185,6 +201,286 @@ function formatTimestamp(value: string | null): string | null {
     dateStyle: "medium",
     timeStyle: "short",
   });
+}
+
+function formatAbv(value: number | null): string | null {
+  return value === null ? null : `${value}%`;
+}
+
+function formatAge(value: number | null): string | null {
+  return value === null ? null : `${value} years`;
+}
+
+function getBottleTitle(bottle: RecommendationBottle): string {
+  return bottle.fullName ?? `${bottle.brand.name} ${bottle.name}`.trim();
+}
+
+function getBottlingTitle(release: RecommendationRelease): string {
+  if (release.name) {
+    return release.name;
+  }
+
+  if (release.edition) {
+    return release.edition;
+  }
+
+  if (release.releaseYear !== null && release.vintageYear !== null) {
+    return `${release.releaseYear} Bottling (${release.vintageYear} Vintage)`;
+  }
+
+  if (release.releaseYear !== null) {
+    return `${release.releaseYear} Bottling`;
+  }
+
+  if (release.vintageYear !== null) {
+    return `${release.vintageYear} Vintage`;
+  }
+
+  if (release.statedAge !== null) {
+    return `${release.statedAge}-year-old bottling`;
+  }
+
+  if (release.singleCask) {
+    return "Single cask bottling";
+  }
+
+  if (release.caskStrength) {
+    return "Cask strength bottling";
+  }
+
+  return "Specific bottling";
+}
+
+function getBottleFields(bottle: RecommendationBottle): RecommendationField[] {
+  const fields: RecommendationField[] = [
+    {
+      label: "Brand",
+      value: bottle.brand.name,
+    },
+    {
+      label: "Bottle Name",
+      value: bottle.name,
+    },
+  ];
+
+  if (bottle.series) {
+    fields.push({
+      label: "Series",
+      value: bottle.series.name,
+    });
+  }
+
+  if (bottle.edition) {
+    fields.push({
+      label: "Edition",
+      value: bottle.edition,
+    });
+  }
+
+  if (bottle.statedAge !== null) {
+    fields.push({
+      label: "Age",
+      value: formatAge(bottle.statedAge),
+    });
+  }
+
+  if (bottle.category) {
+    fields.push({
+      label: "Category",
+      value: bottle.category,
+    });
+  }
+
+  if (bottle.distillers.length > 0) {
+    fields.push({
+      label: "Distillery",
+      value: bottle.distillers.map((distiller) => distiller.name).join(", "),
+      fullWidth: true,
+    });
+  }
+
+  if (bottle.bottler) {
+    fields.push({
+      label: "Bottler",
+      value: bottle.bottler.name,
+      fullWidth: true,
+    });
+  }
+
+  return fields;
+}
+
+function getBottlingFields(
+  release: RecommendationRelease,
+): RecommendationField[] {
+  const fields: RecommendationField[] = [];
+  const caskDetails = [
+    release.caskType,
+    release.caskFill,
+    release.caskSize,
+  ].filter(Boolean);
+
+  if (release.edition) {
+    fields.push({
+      label: "Edition",
+      value: release.edition,
+    });
+  }
+
+  if (release.statedAge !== null) {
+    fields.push({
+      label: "Age",
+      value: formatAge(release.statedAge),
+    });
+  }
+
+  if (release.abv !== null) {
+    fields.push({
+      label: "ABV",
+      value: formatAbv(release.abv),
+    });
+  }
+
+  if (release.releaseYear !== null) {
+    fields.push({
+      label: "Release Year",
+      value: release.releaseYear,
+    });
+  }
+
+  if (release.vintageYear !== null) {
+    fields.push({
+      label: "Vintage Year",
+      value: release.vintageYear,
+    });
+  }
+
+  if (release.caskStrength) {
+    fields.push({
+      label: "Strength",
+      value: "Cask strength",
+    });
+  }
+
+  if (release.singleCask) {
+    fields.push({
+      label: "Cask Source",
+      value: "Single cask",
+    });
+  }
+
+  if (caskDetails.length > 0) {
+    fields.push({
+      label: "Cask Details",
+      value: caskDetails.join(" / "),
+      fullWidth: true,
+    });
+  }
+
+  return fields;
+}
+
+function RecommendationSection({
+  label,
+  title,
+  href,
+  fields,
+  placeholder = "Not specified",
+}: {
+  label: string;
+  title: string | null;
+  href?: string;
+  fields: RecommendationField[];
+  placeholder?: string;
+}) {
+  return (
+    <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+      <div className="text-muted text-[11px] font-semibold uppercase tracking-wide">
+        {label}
+      </div>
+      {title ? (
+        href ? (
+          <Link
+            href={href}
+            className="mt-1 inline-block text-sm font-semibold text-white underline"
+          >
+            {title}
+          </Link>
+        ) : (
+          <div className="mt-1 text-sm font-semibold text-white">{title}</div>
+        )
+      ) : (
+        <div className="mt-1 text-sm text-slate-300">{placeholder}</div>
+      )}
+      {fields.length > 0 ? (
+        <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
+          {fields.map((field) => (
+            <div
+              key={`${label}-${field.label}`}
+              className={field.fullWidth ? "col-span-2" : undefined}
+            >
+              <dt className="text-muted text-xs uppercase tracking-wide">
+                {field.label}
+              </dt>
+              <dd className="mt-1 text-slate-100">{field.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+    </div>
+  );
+}
+
+function renderRecommendationOutcome(item: QueueItem): ReactNode {
+  if (item.status === "errored") {
+    return (
+      <div className="mt-2 text-sm text-slate-300">
+        No recommendation available.
+      </div>
+    );
+  }
+
+  const bottle =
+    item.suggestedBottle ?? item.proposedBottle ?? item.parentBottle;
+  const bottleFields = bottle ? getBottleFields(bottle) : [];
+  const bottleHref =
+    item.suggestedBottle || item.parentBottle
+      ? `/bottles/${(item.suggestedBottle ?? item.parentBottle)?.id}`
+      : undefined;
+  const release = item.suggestedRelease ?? item.proposedRelease;
+  const releaseFields = release ? getBottlingFields(release) : [];
+  const releaseHref = item.suggestedRelease
+    ? getBottleBottlingPath(
+        item.suggestedRelease.bottleId,
+        item.suggestedRelease.id,
+      )
+    : undefined;
+
+  if (!bottle && !release) {
+    return (
+      <div className="mt-2 text-sm text-slate-300">No strong suggestion.</div>
+    );
+  }
+
+  return (
+    <div className="mt-3 space-y-3">
+      <RecommendationSection
+        label="Main Bottle"
+        title={bottle ? getBottleTitle(bottle) : null}
+        href={bottleHref}
+        fields={bottleFields}
+        placeholder="No bottle identified"
+      />
+
+      <RecommendationSection
+        label="Bottling"
+        title={release ? getBottlingTitle(release) : null}
+        href={releaseHref}
+        fields={releaseFields}
+        placeholder="No specific bottling identified"
+      />
+    </div>
+  );
 }
 
 function formatAttributeName(
@@ -404,81 +700,7 @@ export default function QueueItemCard({
             <div className="text-muted text-xs font-semibold uppercase tracking-wide">
               {getRecommendationHeading(item)}
             </div>
-            <div className="mt-2 text-base font-semibold text-white">
-              {item.suggestedBottle ? (
-                <Link
-                  href={`/bottles/${item.suggestedBottle.id}`}
-                  className="underline"
-                >
-                  {getRecommendationTitle(item)}
-                </Link>
-              ) : (
-                getRecommendationTitle(item)
-              )}
-            </div>
-
-            {item.proposedBottle ? (
-              <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <dt className="text-muted text-xs uppercase tracking-wide">
-                    Brand
-                  </dt>
-                  <dd className="mt-1 text-slate-100">
-                    {item.proposedBottle.brand.name}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-muted text-xs uppercase tracking-wide">
-                    Bottle Name
-                  </dt>
-                  <dd className="mt-1 text-slate-100">
-                    {item.proposedBottle.name}
-                  </dd>
-                </div>
-                {item.proposedBottle.statedAge !== null ? (
-                  <div>
-                    <dt className="text-muted text-xs uppercase tracking-wide">
-                      Age
-                    </dt>
-                    <dd className="mt-1 text-slate-100">
-                      {item.proposedBottle.statedAge}
-                    </dd>
-                  </div>
-                ) : null}
-                {item.proposedBottle.series ? (
-                  <div>
-                    <dt className="text-muted text-xs uppercase tracking-wide">
-                      Series
-                    </dt>
-                    <dd className="mt-1 text-slate-100">
-                      {item.proposedBottle.series.name}
-                    </dd>
-                  </div>
-                ) : null}
-                {item.proposedBottle.distillers.length > 0 ? (
-                  <div className="col-span-2">
-                    <dt className="text-muted text-xs uppercase tracking-wide">
-                      Distillery
-                    </dt>
-                    <dd className="mt-1 text-slate-100">
-                      {item.proposedBottle.distillers
-                        .map((distiller) => distiller.name)
-                        .join(", ")}
-                    </dd>
-                  </div>
-                ) : null}
-                {item.proposedBottle.bottler ? (
-                  <div className="col-span-2">
-                    <dt className="text-muted text-xs uppercase tracking-wide">
-                      Bottler
-                    </dt>
-                    <dd className="mt-1 text-slate-100">
-                      {item.proposedBottle.bottler.name}
-                    </dd>
-                  </div>
-                ) : null}
-              </dl>
-            ) : null}
+            {renderRecommendationOutcome(item)}
           </div>
 
           <div className="flex flex-wrap gap-2">
