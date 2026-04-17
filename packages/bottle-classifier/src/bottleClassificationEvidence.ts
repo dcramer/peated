@@ -194,6 +194,129 @@ function titleSupportsCandidateName(
   return true;
 }
 
+function candidateLooksLikePlainAgeStatementBottle(
+  targetCandidate: BottleCandidate,
+): boolean {
+  if (
+    targetCandidate.statedAge === null ||
+    targetCandidate.statedAge === undefined ||
+    targetCandidate.series ||
+    targetCandidate.edition ||
+    targetCandidate.releaseYear !== null ||
+    targetCandidate.vintageYear !== null
+  ) {
+    return false;
+  }
+
+  const producerTokens = new Set(
+    [
+      targetCandidate.brand,
+      targetCandidate.bottler,
+      ...targetCandidate.distillery,
+    ].flatMap((value) => getComparableNameTokens(value)),
+  );
+  const ageToken = String(targetCandidate.statedAge);
+
+  return getTargetNameVariants(targetCandidate).some((name) => {
+    if (!nameMarketsStatedAge({ name, statedAge: targetCandidate.statedAge })) {
+      return false;
+    }
+
+    const tokens = getComparableNameTokens(name).filter(
+      (token) => !IGNORABLE_TITLE_EXTRA_TOKENS.has(token),
+    );
+    return (
+      tokens.filter((token) => token !== ageToken && !producerTokens.has(token))
+        .length === 0
+    );
+  });
+}
+
+export function extractedIdentityLooksLikePlainAgeStatementReference(
+  extractedLabel: BottleExtractedDetails | null | undefined,
+): boolean {
+  if (!extractedLabel) {
+    return false;
+  }
+
+  return (
+    extractedLabel.stated_age !== null &&
+    extractedLabel.stated_age !== undefined &&
+    !extractedLabel.expression &&
+    !extractedLabel.series &&
+    !extractedLabel.edition &&
+    extractedLabel.release_year === null &&
+    extractedLabel.vintage_year === null &&
+    extractedLabel.cask_type === null &&
+    extractedLabel.cask_size === null &&
+    extractedLabel.cask_fill === null &&
+    extractedLabel.cask_strength === null &&
+    extractedLabel.single_cask === null &&
+    extractedLabel.abv === null
+  );
+}
+
+function authoritativeTextSupportsPlainAgeStatementCandidate({
+  text,
+  targetCandidate,
+  extractedLabel,
+}: {
+  text: string | null | undefined;
+  targetCandidate: BottleCandidate;
+  extractedLabel: BottleExtractedDetails | null;
+}): boolean {
+  if (
+    !text ||
+    !extractedLabel ||
+    !extractedIdentityLooksLikePlainAgeStatementReference(extractedLabel) ||
+    !candidateLooksLikePlainAgeStatementBottle(targetCandidate)
+  ) {
+    return false;
+  }
+
+  const normalizedText = normalizeComparableText(text);
+  if (!normalizedText) {
+    return false;
+  }
+
+  const producerNames = [
+    extractedLabel?.brand,
+    targetCandidate.brand,
+    ...(extractedLabel?.distillery ?? []),
+    ...targetCandidate.distillery,
+  ]
+    .filter((value): value is string => Boolean(value))
+    .map((value) => normalizeComparableText(value))
+    .filter((value) => value.length > 0);
+
+  if (
+    !producerNames.some((value) =>
+      containsComparablePhrase(normalizedText, value),
+    )
+  ) {
+    return false;
+  }
+
+  const supportedAge = extractedLabel.stated_age;
+  if (
+    supportedAge === null ||
+    supportedAge === undefined ||
+    targetCandidate.statedAge !== supportedAge ||
+    !attributeMatchesText("statedAge", String(supportedAge), normalizedText)
+      .matched
+  ) {
+    return false;
+  }
+
+  const expectedCategory = extractedLabel.category;
+  if (!expectedCategory) {
+    return true;
+  }
+
+  return attributeMatchesText("category", expectedCategory, normalizedText)
+    .matched;
+}
+
 function getCategoryKeywords(value: string): string[] {
   switch (value) {
     case "single_malt":
@@ -228,6 +351,14 @@ function attributeMatchesText(
         matched: getCategoryKeywords(expectedValue).some((keyword) =>
           containsComparablePhrase(text, keyword),
         ),
+        weaklySupported: false,
+      };
+    case "statedAge":
+      return {
+        matched: new RegExp(
+          `\\b${escapeRegExp(expectedValue)}(?:\\s|-)?(?:year|yr)s?(?:\\s|-)?old\\b|\\b${escapeRegExp(expectedValue)}(?:\\s|-)?(?:year|yr)s?\\b|\\b${escapeRegExp(expectedValue)}(?:\\s|-)?y(?:\\.?o\\.?)?\\b`,
+          "i",
+        ).test(text),
         weaklySupported: false,
       };
     case "distillery":
@@ -431,8 +562,15 @@ export function hasSupportiveWebEvidenceForExistingMatch({
         return false;
       }
 
-      return targetNameVariants.some((variant) =>
-        titleSupportsCandidateName(result.title, variant),
+      return (
+        targetNameVariants.some((variant) =>
+          titleSupportsCandidateName(result.title, variant),
+        ) ||
+        authoritativeTextSupportsPlainAgeStatementCandidate({
+          text: getSearchResultText(evidence, result),
+          targetCandidate,
+          extractedLabel,
+        })
       );
     }),
   );

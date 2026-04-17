@@ -135,6 +135,27 @@ const taleOfIceCream = buildBottleCandidate({
   source: ["text"],
 });
 
+const jura12CoreMatch = buildBottleCandidate({
+  bottleId: 3233,
+  fullName: "Isle of Jura 12-year-old Single Malt Scotch Whisky",
+  brand: "Jura",
+  distillery: ["Isle of Jura"],
+  category: "single_malt",
+  statedAge: 12,
+  score: 0.93,
+  source: ["text"],
+});
+
+const juraElixirSibling = buildBottleCandidate({
+  bottleId: 4306,
+  fullName: "Jura Elixir",
+  brand: "Jura",
+  distillery: ["Isle of Jura"],
+  category: "single_malt",
+  score: 0.78,
+  source: ["text"],
+});
+
 const cadbollEstateParent = buildBottleCandidate({
   bottleId: 660,
   fullName: "Glenmorangie 15-year-old The Cadboll Estate",
@@ -699,6 +720,30 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       matchedBottleId: 43236,
       summary:
         "Treat a standalone article difference plus generic retailer style words as a strong local name variant and keep the Glenmorangie A Tale of Ice Cream bottle match without requiring web evidence.",
+    },
+  },
+  {
+    name: "text-only listing: keeps a brand-led age-statement match when the local bottle name is distillery-qualified",
+    input: {
+      reference: {
+        name: "Jura 12-year-old Scotch Whisky",
+        url: "https://shop.example/products/jura-12-year-old",
+      },
+      initialCandidates: [jura12CoreMatch, juraElixirSibling],
+    },
+    searchResponses: [
+      {
+        when: ["jura", "12"],
+        results: [jura12CoreMatch, juraElixirSibling],
+      },
+    ],
+    expected: {
+      status: "classified",
+      action: "match",
+      identityScope: "product",
+      matchedBottleId: 3233,
+      summary:
+        "Treat Jura 12-year-old as the standard age-statement Jura core bottling and keep the existing Isle of Jura 12-year-old bottle match instead of drifting to a different Jura sibling or no-match.",
     },
   },
   {

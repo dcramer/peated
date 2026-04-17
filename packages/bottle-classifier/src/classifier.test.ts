@@ -340,6 +340,84 @@ const ledaigStiuiredairNearDuplicateCandidate: BottleCandidate = {
   source: ["vector"],
 };
 
+const jura12YearOldCandidate: BottleCandidate = {
+  bottleId: 3233,
+  releaseId: null,
+  kind: "bottle",
+  alias: null,
+  fullName: "Isle of Jura 12-year-old Single Malt Scotch Whisky",
+  bottleFullName: "Isle of Jura 12-year-old Single Malt Scotch Whisky",
+  brand: "Jura",
+  bottler: null,
+  series: null,
+  distillery: ["Isle of Jura"],
+  category: "single_malt",
+  statedAge: 12,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.91,
+  source: ["text"],
+};
+
+const juraElixirCandidate: BottleCandidate = {
+  bottleId: 4306,
+  releaseId: null,
+  kind: "bottle",
+  alias: null,
+  fullName: "Jura Elixir",
+  bottleFullName: "Jura Elixir",
+  brand: "Jura",
+  bottler: null,
+  series: null,
+  distillery: ["Isle of Jura"],
+  category: "single_malt",
+  statedAge: null,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.72,
+  source: ["text"],
+};
+
+const juraSherryCaskCandidate: BottleCandidate = {
+  bottleId: 3234,
+  releaseId: null,
+  kind: "bottle",
+  alias: null,
+  fullName: "Jura 12-year-old Sherry Cask Single Malt Scotch Whisky",
+  bottleFullName: "Jura 12-year-old Sherry Cask Single Malt Scotch Whisky",
+  brand: "Jura",
+  bottler: null,
+  series: null,
+  distillery: ["Isle of Jura"],
+  category: "single_malt",
+  statedAge: 12,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: "oloroso",
+  caskSize: null,
+  caskFill: null,
+  score: 0.88,
+  source: ["text"],
+};
+
 const redbreastBatchACandidate: BottleCandidate = {
   bottleId: 9101,
   releaseId: null,
@@ -1652,6 +1730,151 @@ describe("createBottleClassifier", () => {
       identityScope: "product",
     });
     expect(result.decision.rationale).not.toContain(
+      "Server downgraded the existing-match recommendation",
+    );
+  });
+
+  test("keeps a uniquely supported plain age-statement bottle match when the local bottle name is distillery-qualified", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Jura",
+      bottler: null,
+      expression: null,
+      series: null,
+      distillery: ["Jura"],
+      category: "single_malt",
+      stated_age: 12,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 87,
+          rationale:
+            "The local bottle aligns on the Jura brand family, category, and the 12-year-old age-statement core bottling.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 3233,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [3233, 4306],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [jura12YearOldCandidate, juraElixirCandidate],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Jura 12-year-old Scotch Whisky",
+      },
+      extractedIdentity,
+      initialCandidates: [jura12YearOldCandidate, juraElixirCandidate],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "match",
+      matchedBottleId: 3233,
+      matchedReleaseId: null,
+      parentBottleId: null,
+      identityScope: "product",
+    });
+    expect(result.decision.rationale).not.toContain(
+      "Server downgraded the existing-match recommendation",
+    );
+  });
+
+  test("downgrades a plain age parent when the extracted identity includes extra cask detail", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Jura",
+      bottler: null,
+      expression: null,
+      series: null,
+      distillery: ["Jura"],
+      category: "single_malt",
+      stated_age: 12,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: "oloroso",
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 82,
+          rationale:
+            "The local Jura 12-year-old bottle appears close to the listing.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 3233,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [3233, 3234],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [jura12YearOldCandidate, juraSherryCaskCandidate],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Jura 12-year-old Sherry Cask Scotch Whisky",
+      },
+      extractedIdentity,
+      initialCandidates: [jura12YearOldCandidate, juraSherryCaskCandidate],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "no_match",
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId: null,
+    });
+    expect(result.decision.rationale).toContain(
       "Server downgraded the existing-match recommendation",
     );
   });
