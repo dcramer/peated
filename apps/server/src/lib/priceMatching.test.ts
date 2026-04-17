@@ -502,6 +502,193 @@ describe("priceMatching", () => {
     expect(proposal.confidence).toBe(88);
   });
 
+  test("keeps a plain age-statement match instead of drifting into a cask-strength release proposal", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const tomatin = await fixtures.Entity({
+      name: "Tomatin",
+      type: ["brand", "distiller"],
+    });
+    const generic12Bottle = await fixtures.Bottle({
+      brandId: tomatin.id,
+      distillerIds: [tomatin.id],
+      name: "12-year-old",
+      category: "single_malt",
+      statedAge: 12,
+    });
+    const bourbonAndSherryBottle = await fixtures.Bottle({
+      brandId: tomatin.id,
+      distillerIds: [tomatin.id],
+      name: "12-year-old Bourbon & Sherry Casks",
+      category: "single_malt",
+      statedAge: 12,
+    });
+    const caskStrengthBottle = await fixtures.Bottle({
+      brandId: tomatin.id,
+      distillerIds: [tomatin.id],
+      name: "Cask Strength",
+      category: "single_malt",
+      caskStrength: true,
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Tomatin Single Malt 12-year-old",
+      imageUrl: null,
+      url: "https://www.totalwine.com/example",
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Tomatin",
+      bottler: null,
+      expression: null,
+      series: null,
+      distillery: ["Tomatin"],
+      category: "single_malt",
+      stated_age: 12,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        decision: {
+          action: "match_existing",
+          confidence: 95,
+          rationale:
+            "The listing supports the generic 12-year-old bottle, not a cask-strength sibling.",
+          suggestedBottleId: generic12Bottle.id,
+          candidateBottleIds: [
+            generic12Bottle.id,
+            bourbonAndSherryBottle.id,
+            caskStrengthBottle.id,
+          ],
+          proposedBottle: null,
+        },
+        searchEvidence: [],
+        candidateBottles: [
+          {
+            kind: "bottle",
+            bottleId: generic12Bottle.id,
+            releaseId: null,
+            alias: "Tomatin Single Malt 12-year-old",
+            fullName: generic12Bottle.fullName,
+            bottleFullName: generic12Bottle.fullName,
+            brand: "Tomatin",
+            bottler: null,
+            series: null,
+            distillery: ["Tomatin"],
+            category: "single_malt",
+            statedAge: 12,
+            edition: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 1,
+            source: ["text"],
+          },
+          {
+            kind: "bottle",
+            bottleId: bourbonAndSherryBottle.id,
+            releaseId: null,
+            alias: null,
+            fullName: bourbonAndSherryBottle.fullName,
+            bottleFullName: bourbonAndSherryBottle.fullName,
+            brand: "Tomatin",
+            bottler: null,
+            series: null,
+            distillery: ["Tomatin"],
+            category: "single_malt",
+            statedAge: 12,
+            edition: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 1,
+            source: ["text"],
+          },
+          {
+            kind: "bottle",
+            bottleId: caskStrengthBottle.id,
+            releaseId: null,
+            alias: null,
+            fullName: caskStrengthBottle.fullName,
+            bottleFullName: caskStrengthBottle.fullName,
+            brand: "Tomatin",
+            bottler: null,
+            series: null,
+            distillery: ["Tomatin"],
+            category: "single_malt",
+            statedAge: null,
+            edition: null,
+            caskStrength: true,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 1,
+            source: ["text"],
+          },
+        ],
+        resolvedEntities: [],
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(proposal).toMatchObject({
+      status: "pending_review",
+      proposalType: "match_existing",
+      suggestedBottleId: generic12Bottle.id,
+      suggestedReleaseId: null,
+      parentBottleId: null,
+      creationTarget: null,
+      proposedBottle: null,
+      proposedRelease: null,
+    });
+    expect(proposal.candidateBottles).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          bottleId: generic12Bottle.id,
+          fullName: generic12Bottle.fullName,
+        }),
+        expect.objectContaining({
+          bottleId: bourbonAndSherryBottle.id,
+          fullName: bourbonAndSherryBottle.fullName,
+        }),
+        expect.objectContaining({
+          bottleId: caskStrengthBottle.id,
+          fullName: caskStrengthBottle.fullName,
+          caskStrength: true,
+        }),
+      ]),
+    );
+  });
+
   test("auto approves high-confidence matches that reaffirm the current bottle assignment", async ({
     fixtures,
   }) => {

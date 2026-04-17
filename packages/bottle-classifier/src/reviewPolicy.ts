@@ -586,10 +586,12 @@ function candidateNameMatchesReferenceVariants({
   referenceName,
   extractedIdentity,
   candidateNames,
+  allowSafeStrengthPhraseStripping = true,
 }: {
   referenceName: string;
   extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
   candidateNames: string[];
+  allowSafeStrengthPhraseStripping?: boolean;
 }): boolean {
   const referenceTokenVariants = buildReferenceNameTokenVariants({
     referenceName,
@@ -602,9 +604,13 @@ function candidateNameMatchesReferenceVariants({
   return candidateNames.some((candidateName) => {
     const candidateTokenVariants = [
       getComparableNameTokens(candidateName),
-      getComparableNameTokens(
-        stripSafeStrengthPhrases(normalizeComparableText(candidateName)),
-      ),
+      ...(allowSafeStrengthPhraseStripping
+        ? [
+            getComparableNameTokens(
+              stripSafeStrengthPhrases(normalizeComparableText(candidateName)),
+            ),
+          ]
+        : []),
     ].filter((tokens, index, variants) => {
       if (!tokens.length) {
         return false;
@@ -627,10 +633,12 @@ function candidateNameMatchesReferenceVariantsIgnoringStatedAge({
   referenceName,
   extractedIdentity,
   candidateNames,
+  allowSafeStrengthPhraseStripping = true,
 }: {
   referenceName: string;
   extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
   candidateNames: string[];
+  allowSafeStrengthPhraseStripping?: boolean;
 }): boolean {
   if (
     extractedIdentity?.stated_age === null ||
@@ -656,6 +664,7 @@ function candidateNameMatchesReferenceVariantsIgnoringStatedAge({
       stated_age: null,
     },
     candidateNames,
+    allowSafeStrengthPhraseStripping,
   });
 }
 
@@ -1444,12 +1453,14 @@ function resolvePromotableParentBottleTarget({
           referenceName: reference.name,
           extractedIdentity: artifacts.extractedIdentity,
           candidateNames: getBottleTargetNameCandidates(candidate),
+          allowSafeStrengthPhraseStripping: false,
         }) ||
         (looksLikeDirtyAgeReleaseBottle &&
           candidateNameMatchesReferenceVariantsIgnoringStatedAge({
             referenceName: reference.name,
             extractedIdentity: artifacts.extractedIdentity,
             candidateNames: getBottleTargetNameCandidates(candidate),
+            allowSafeStrengthPhraseStripping: false,
           })),
     )
     .sort((left, right) => (right.score ?? 0) - (left.score ?? 0));
@@ -1697,6 +1708,7 @@ function maybePromoteBottleMatchToCreateRelease({
       referenceName: reference.name,
       extractedIdentity: artifacts.extractedIdentity,
       candidateNames: parentTargetNameCandidates,
+      allowSafeStrengthPhraseStripping: false,
     }) ||
     (target &&
       candidateLooksLikeDirtyAgeReleaseBottle({
@@ -1707,6 +1719,7 @@ function maybePromoteBottleMatchToCreateRelease({
         referenceName: reference.name,
         extractedIdentity: artifacts.extractedIdentity,
         candidateNames: parentTargetNameCandidates,
+        allowSafeStrengthPhraseStripping: false,
       }));
   const hasSupportiveWebEvidence = hasSupportiveWebEvidenceForTarget({
     target: parentTarget,
@@ -1784,6 +1797,7 @@ function findReusableParentBottleTargetForCreateRelease({
             referenceName: reference.name,
             extractedIdentity: artifacts.extractedIdentity,
             candidateNames: getBottleTargetNameCandidates(candidate),
+            allowSafeStrengthPhraseStripping: false,
           }) ||
           getBottleTargetNameCandidates(candidate).some(
             (candidateName) =>
