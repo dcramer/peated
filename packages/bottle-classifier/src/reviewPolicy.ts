@@ -970,17 +970,157 @@ function getTargetNameCandidates(
   target: BottleCandidate,
   decision: BottleClassificationDecision,
 ): string[] {
+  const structuredReleaseNames =
+    (decision.action === "match" &&
+      (decision.matchedReleaseId != null || target.kind === "release")) ||
+    target.releaseId != null
+      ? [
+          target.bottleFullName && target.releaseYear != null
+            ? `${target.bottleFullName} ${target.releaseYear}`
+            : null,
+          target.bottleFullName && target.vintageYear != null
+            ? `${target.bottleFullName} ${target.vintageYear}`
+            : null,
+          target.bottleFullName && target.edition
+            ? `${target.bottleFullName} ${target.edition}`
+            : null,
+        ]
+      : [];
   const names =
     decision.action === "match" &&
     (decision.matchedReleaseId != null || target.kind === "release")
-      ? [target.alias, target.fullName]
+      ? [target.alias, target.fullName, ...structuredReleaseNames]
       : [
           target.alias,
           target.bottleFullName ?? target.fullName,
           target.fullName,
+          ...structuredReleaseNames,
         ];
 
   return Array.from(new Set(names.filter(Boolean))) as string[];
+}
+
+type DecisiveReleaseSupportField = "edition" | "releaseYear" | "vintageYear";
+
+function getMatchingDecisiveReleaseSupportFields({
+  candidate,
+  extractedIdentity,
+}: {
+  candidate: BottleCandidate;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+}): DecisiveReleaseSupportField[] {
+  if (!extractedIdentity) {
+    return [];
+  }
+
+  const matchedFields: DecisiveReleaseSupportField[] = [];
+
+  if (
+    extractedIdentity.edition &&
+    candidate.edition &&
+    textsOverlap(candidate.edition, extractedIdentity.edition)
+  ) {
+    matchedFields.push("edition");
+  }
+
+  if (
+    extractedIdentity.release_year !== null &&
+    candidate.releaseYear !== null &&
+    candidate.releaseYear === extractedIdentity.release_year
+  ) {
+    matchedFields.push("releaseYear");
+  }
+
+  if (
+    extractedIdentity.vintage_year !== null &&
+    candidate.vintageYear !== null &&
+    candidate.vintageYear === extractedIdentity.vintage_year
+  ) {
+    matchedFields.push("vintageYear");
+  }
+
+  return matchedFields;
+}
+
+function candidateMatchesDecisiveReleaseSupportFields({
+  candidate,
+  extractedIdentity,
+  fields,
+}: {
+  candidate: BottleCandidate;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+  fields: DecisiveReleaseSupportField[];
+}): boolean {
+  if (!fields.length || !extractedIdentity) {
+    return false;
+  }
+
+  return fields.every((field) => {
+    switch (field) {
+      case "edition":
+        return Boolean(
+          extractedIdentity.edition &&
+          candidate.edition &&
+          textsOverlap(candidate.edition, extractedIdentity.edition),
+        );
+      case "releaseYear":
+        return (
+          extractedIdentity.release_year !== null &&
+          candidate.releaseYear !== null &&
+          candidate.releaseYear === extractedIdentity.release_year
+        );
+      case "vintageYear":
+        return (
+          extractedIdentity.vintage_year !== null &&
+          candidate.vintageYear !== null &&
+          candidate.vintageYear === extractedIdentity.vintage_year
+        );
+    }
+  });
+}
+
+function hasUniquelySupportedStructuredReleaseMatch({
+  target,
+  artifacts,
+}: {
+  target: BottleCandidate;
+  artifacts: BottleClassificationArtifacts;
+}): boolean {
+  if (target.releaseId == null) {
+    return false;
+  }
+
+  const decisiveFields = getMatchingDecisiveReleaseSupportFields({
+    candidate: target,
+    extractedIdentity: artifacts.extractedIdentity,
+  });
+  if (!decisiveFields.length) {
+    return false;
+  }
+
+  const hasReusableParentCandidate = artifacts.candidates.some(
+    (candidate) =>
+      candidate.bottleId === target.bottleId &&
+      candidate.releaseId === null &&
+      candidate.kind !== "release",
+  );
+  if (!hasReusableParentCandidate) {
+    return false;
+  }
+
+  // A surfaced clean child release can stand on its own when the extracted
+  // release marker uniquely identifies it beneath the same reusable parent.
+  return !artifacts.candidates.some(
+    (candidate) =>
+      candidate.bottleId === target.bottleId &&
+      candidate.releaseId !== null &&
+      candidate.releaseId !== target.releaseId &&
+      candidateMatchesDecisiveReleaseSupportFields({
+        candidate,
+        extractedIdentity: artifacts.extractedIdentity,
+        fields: decisiveFields,
+      }),
+  );
 }
 
 function getBottleTargetNameCandidates(target: BottleCandidate): string[] {
@@ -1437,6 +1577,11 @@ function downgradeUnsafeExistingMatchDecision({
     reference,
     artifacts,
   });
+  const hasStructuredReleaseSupport =
+    hasUniquelySupportedStructuredReleaseMatch({
+      target,
+      artifacts,
+    });
   const identityConflicts = getExistingMatchIdentityConflicts({
     referenceName: reference.name,
     targetCandidate: target,
@@ -1445,7 +1590,9 @@ function downgradeUnsafeExistingMatchDecision({
 
   if (
     !identityConflicts.length &&
-    (hasExactishLocalName || hasSupportiveWebEvidence)
+    (hasExactishLocalName ||
+      hasSupportiveWebEvidence ||
+      hasStructuredReleaseSupport)
   ) {
     return decision;
   }
@@ -1458,7 +1605,11 @@ function downgradeUnsafeExistingMatchDecision({
       )})`,
     );
   }
-  if (!hasExactishLocalName && !hasSupportiveWebEvidence) {
+  if (
+    !hasExactishLocalName &&
+    !hasSupportiveWebEvidence &&
+    !hasStructuredReleaseSupport
+  ) {
     reasons.push(
       "there is no exact alias, no exactish canonical name match, and no supportive off-retailer web evidence for the matched target",
     );

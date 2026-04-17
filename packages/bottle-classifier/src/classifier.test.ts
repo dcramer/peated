@@ -496,6 +496,58 @@ const lagavulinDistillersEdition2023ReleaseCandidate: BottleCandidate = {
   source: ["text", "release"],
 };
 
+const lagavulinDistillersEdition2023SpringReleaseCandidate: BottleCandidate = {
+  bottleId: 44006,
+  releaseId: 79,
+  kind: "release",
+  alias: null,
+  fullName: "Lagavulin Distillers Edition 2023 Spring Release",
+  bottleFullName: "Lagavulin Distillers Edition",
+  brand: "Lagavulin",
+  bottler: null,
+  series: null,
+  distillery: ["Lagavulin"],
+  category: "single_malt",
+  statedAge: null,
+  edition: "Spring Release",
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: 2023,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.94,
+  source: ["text", "release"],
+};
+
+const lagavulinDistillersEdition2023AutumnReleaseCandidate: BottleCandidate = {
+  bottleId: 44006,
+  releaseId: 80,
+  kind: "release",
+  alias: null,
+  fullName: "Lagavulin Distillers Edition 2023 Autumn Release",
+  bottleFullName: "Lagavulin Distillers Edition",
+  brand: "Lagavulin",
+  bottler: null,
+  series: null,
+  distillery: ["Lagavulin"],
+  category: "single_malt",
+  statedAge: null,
+  edition: "Autumn Release",
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: 2023,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.93,
+  source: ["text", "release"],
+};
+
 describe("createBottleClassifier", () => {
   test("auto ignores obvious non-whisky references when extraction fails", async () => {
     const runBottleClassifierAgent = vi.fn();
@@ -1709,6 +1761,163 @@ describe("createBottleClassifier", () => {
       identityScope: "product",
     });
     expect(result.decision.rationale).not.toContain(
+      "Server downgraded the existing-match recommendation",
+    );
+  });
+
+  test("keeps a uniquely supported annual release match without web evidence", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Lagavulin",
+      bottler: null,
+      expression: "Distillers Edition",
+      series: null,
+      distillery: ["Lagavulin"],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      release_year: 2023,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 91,
+          rationale: "The existing 2023 release matches the listing cleanly.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 44006,
+          matchedReleaseId: 78,
+          parentBottleId: null,
+          candidateBottleIds: [44006],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [
+            lagavulinDistillersEditionParentCandidate,
+            lagavulinDistillersEdition2023ReleaseCandidate,
+          ],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
+      },
+      extractedIdentity,
+      initialCandidates: [
+        lagavulinDistillersEditionParentCandidate,
+        lagavulinDistillersEdition2023ReleaseCandidate,
+      ],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "match",
+      matchedBottleId: 44006,
+      matchedReleaseId: 78,
+      parentBottleId: null,
+      identityScope: "product",
+    });
+    expect(result.decision.rationale).not.toContain(
+      "Server downgraded the existing-match recommendation",
+    );
+  });
+
+  test("downgrades an annual release match when the surfaced sibling releases still tie on the same bare year", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Lagavulin",
+      bottler: null,
+      expression: "Distillers Edition",
+      series: null,
+      distillery: ["Lagavulin"],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      release_year: 2023,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 89,
+          rationale: "One of the 2023 releases appears to match the listing.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 44006,
+          matchedReleaseId: 79,
+          parentBottleId: null,
+          candidateBottleIds: [44006],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [
+            lagavulinDistillersEditionParentCandidate,
+            lagavulinDistillersEdition2023SpringReleaseCandidate,
+            lagavulinDistillersEdition2023AutumnReleaseCandidate,
+          ],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
+      },
+      extractedIdentity,
+      initialCandidates: [
+        lagavulinDistillersEditionParentCandidate,
+        lagavulinDistillersEdition2023SpringReleaseCandidate,
+        lagavulinDistillersEdition2023AutumnReleaseCandidate,
+      ],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "no_match",
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId: null,
+    });
+    expect(result.decision.rationale).toContain(
       "Server downgraded the existing-match recommendation",
     );
   });
