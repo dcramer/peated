@@ -239,7 +239,7 @@ describe("StorePriceMatchDecisionSchema", () => {
     ).toBe(false);
   });
 
-  test("requires a proposed bottle only for create_new", () => {
+  test("allows proposed bottle drafts only for create_new and correction", () => {
     expect(
       StorePriceMatchDecisionSchema.safeParse({
         action: "create_new",
@@ -280,6 +280,37 @@ describe("StorePriceMatchDecisionSchema", () => {
         },
       }).success,
     ).toBe(false);
+
+    expect(
+      StorePriceMatchDecisionSchema.safeParse({
+        action: "correction",
+        confidence: 91,
+        rationale: null,
+        suggestedBottleId: 1,
+        candidateBottleIds: [1],
+        proposedBottle: {
+          name: "Example Bottle",
+          series: null,
+          category: "single_malt",
+          edition: null,
+          statedAge: null,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          brand: {
+            id: null,
+            name: "Example Brand",
+          },
+          distillers: [],
+          bottler: null,
+        },
+      }).success,
+    ).toBe(true);
   });
 
   test("rejects fractional ids in classifier output", () => {

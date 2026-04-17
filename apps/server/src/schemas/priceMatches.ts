@@ -335,7 +335,7 @@ export const StorePriceMatchDecisionSchema = z.discriminatedUnion("action", [
     suggestedReleaseId: z.number().int().nullable().optional(),
     parentBottleId: z.null().optional(),
     creationTarget: z.null().optional(),
-    proposedBottle: z.null().default(null),
+    proposedBottle: ProposedBottleSchema.nullable().default(null),
     proposedRelease: z.null().optional(),
   }),
   StorePriceMatchCreateNewDecisionSchema,

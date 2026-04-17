@@ -129,6 +129,23 @@ export const BOTTLE_NORMALIZATION_CORPUS: BottleNormalizationCorpusExample[] = [
       "Official single-distillery bottlings can use a consumer brand that differs from the local bottle title's distillery qualifier. Brand-led Jura wording should still resolve to the Isle of Jura 12-year-old bottle family.",
   },
   {
+    id: "whistler-bodega-cask-single-malt",
+    inputName: "The Whistler Bodega Cask Single Malt Irish Whiskey",
+    expectedBottleName: "The Whistler Bodega Cask",
+    peatedBottleIds: [12953],
+    liveEvalCoverage: "required",
+    liveEvalSummary:
+      "Keep The Whistler Bodega Cask at bottle identity when the source clearly says single malt, even if the only local bottle is mislabeled as a blend. Do not force a wrong existing match or invent a different bottle identity.",
+    expectation: {
+      handlingStrategy: "classifier_required",
+      classifierExpectation: "bottle",
+      deterministicReleaseExpectation: "none",
+      releaseIdentity: null,
+    },
+    notes:
+      "Real local-data repair case. The bottle identity is correct, but the stored local category can be wrong, so the classifier should preserve the canonical bottle identity without collapsing into a false-positive match.",
+  },
+  {
     id: "springbank-batch-release",
     inputName: "Springbank 12 Cask Strength Batch 24",
     expectedBottleName: "Springbank 12 Cask Strength",

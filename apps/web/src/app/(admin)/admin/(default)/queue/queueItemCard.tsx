@@ -18,6 +18,11 @@ type RecommendationField = {
   value: ReactNode;
   fullWidth?: boolean;
 };
+type RepairChange = {
+  label: string;
+  current: string;
+  proposed: string;
+};
 type RecommendationBottle = {
   fullName?: string;
   brand: { name: string };
@@ -26,6 +31,14 @@ type RecommendationBottle = {
   category: string | null;
   edition: string | null;
   statedAge: number | null;
+  abv: number | null;
+  caskStrength: boolean | null;
+  singleCask: boolean | null;
+  vintageYear: number | null;
+  releaseYear: number | null;
+  caskType: string | null;
+  caskSize: string | null;
+  caskFill: string | null;
   distillers: Array<{ name: string }>;
   bottler: { name: string } | null;
 };
@@ -128,7 +141,9 @@ function getEvidenceBadges(item: QueueItem): string[] {
     badges.push("automation ready");
   }
 
-  if (item.currentBottle && item.proposalType === "correction") {
+  if (isRepairProposal(item)) {
+    badges.push("repair draft");
+  } else if (item.currentBottle && item.proposalType === "correction") {
     badges.push("current assignment differs");
   }
 
@@ -182,6 +197,10 @@ function getRecommendationHeading(item: QueueItem): string {
     return "Review Status";
   }
 
+  if (isRepairProposal(item)) {
+    return "Recommended Repair";
+  }
+
   return "Recommended Outcome";
 }
 
@@ -214,6 +233,29 @@ function formatAbv(value: number | null): string | null {
 
 function formatAge(value: number | null): string | null {
   return value === null ? null : `${value} years`;
+}
+
+function formatFlag(value: boolean | null): string | null {
+  if (value === null) {
+    return null;
+  }
+
+  return value ? "Yes" : "No";
+}
+
+function formatRepairValue(value: string | null): string {
+  return value ?? "unknown";
+}
+
+function isRepairProposal(item: QueueItem): boolean {
+  return (
+    item.proposalType === "correction" &&
+    !!item.currentBottle &&
+    !!item.suggestedBottle &&
+    item.currentBottle.id === item.suggestedBottle.id &&
+    !!item.proposedBottle &&
+    !item.proposedRelease
+  );
 }
 
 function getBottleTitle(bottle: RecommendationBottle): string {
@@ -385,6 +427,85 @@ function getBottlingFields(
   return fields;
 }
 
+function getBottleRepairChanges(
+  currentBottle: RecommendationBottle,
+  proposedBottle: RecommendationBottle,
+): RepairChange[] {
+  const changes: RepairChange[] = [];
+  const pushChange = (
+    label: string,
+    current: string | null,
+    proposed: string | null,
+  ) => {
+    if ((current ?? null) === (proposed ?? null)) {
+      return;
+    }
+
+    changes.push({
+      label,
+      current: formatRepairValue(current),
+      proposed: formatRepairValue(proposed),
+    });
+  };
+
+  pushChange("Brand", currentBottle.brand.name, proposedBottle.brand.name);
+  pushChange("Bottle Name", currentBottle.name, proposedBottle.name);
+  pushChange(
+    "Series",
+    currentBottle.series?.name ?? null,
+    proposedBottle.series?.name ?? null,
+  );
+  pushChange("Category", currentBottle.category, proposedBottle.category);
+  pushChange(
+    "Distillery",
+    currentBottle.distillers.map((distiller) => distiller.name).join(", ") ||
+      null,
+    proposedBottle.distillers.map((distiller) => distiller.name).join(", ") ||
+      null,
+  );
+  pushChange(
+    "Bottler",
+    currentBottle.bottler?.name ?? null,
+    proposedBottle.bottler?.name ?? null,
+  );
+  pushChange(
+    "Age",
+    formatAge(currentBottle.statedAge),
+    formatAge(proposedBottle.statedAge),
+  );
+  pushChange("Edition", currentBottle.edition, proposedBottle.edition);
+  pushChange(
+    "ABV",
+    formatAbv(currentBottle.abv),
+    formatAbv(proposedBottle.abv),
+  );
+  pushChange(
+    "Cask Strength",
+    formatFlag(currentBottle.caskStrength),
+    formatFlag(proposedBottle.caskStrength),
+  );
+  pushChange(
+    "Single Cask",
+    formatFlag(currentBottle.singleCask),
+    formatFlag(proposedBottle.singleCask),
+  );
+  pushChange("Cask", currentBottle.caskType, proposedBottle.caskType);
+  pushChange("Cask Size", currentBottle.caskSize, proposedBottle.caskSize);
+  pushChange("Cask Fill", currentBottle.caskFill, proposedBottle.caskFill);
+  pushChange(
+    "Vintage Year",
+    currentBottle.vintageYear?.toString() ?? null,
+    proposedBottle.vintageYear?.toString() ?? null,
+  );
+  pushChange(
+    "Release Year",
+    currentBottle.releaseYear?.toString() ?? null,
+    proposedBottle.releaseYear?.toString() ?? null,
+  );
+
+  return changes;
+}
+
 function RecommendationSection({
   label,
   title,
@@ -469,10 +590,59 @@ function renderRecommendationOutcome(item: QueueItem): ReactNode {
         item.suggestedRelease.id,
       )
     : undefined;
+  const repairChanges =
+    isRepairProposal(item) && item.currentBottle && item.proposedBottle
+      ? getBottleRepairChanges(item.currentBottle, item.proposedBottle)
+      : [];
 
   if (!bottle && !release) {
     return (
       <div className="mt-2 text-sm text-slate-300">No strong suggestion.</div>
+    );
+  }
+
+  if (isRepairProposal(item) && item.currentBottle && item.proposedBottle) {
+    return (
+      <div className="mt-3 space-y-3">
+        <RecommendationSection
+          label="Existing Bottle"
+          title={getBottleTitle(item.currentBottle)}
+          href={`/bottles/${item.currentBottle.id}`}
+          fields={getBottleFields(item.currentBottle)}
+          placeholder="No bottle identified"
+        />
+
+        <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+          <div className="text-muted text-[11px] font-semibold uppercase tracking-wide">
+            Proposed Changes
+          </div>
+          {repairChanges.length > 0 ? (
+            <dl className="mt-3 space-y-3 text-sm">
+              {repairChanges.map((change) => (
+                <div key={`repair-${change.label}`}>
+                  <dt className="text-muted text-xs uppercase tracking-wide">
+                    {change.label}
+                  </dt>
+                  <dd className="mt-1 text-slate-100">
+                    <span className="text-slate-400">{change.current}</span>
+                    {" -> "}
+                    <span>{change.proposed}</span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          ) : (
+            <div className="mt-1 text-sm text-slate-300">
+              No bottle field changes were captured.
+            </div>
+          )}
+        </div>
+
+        <div className="text-xs text-slate-400">
+          Edit the current bottle, then retry this proposal to confirm the
+          repaired metadata.
+        </div>
+      </div>
     );
   }
 
@@ -588,14 +758,23 @@ export default function QueueItemCard({
   const evidenceBadges = getEvidenceBadges(item);
   const extractedLabelSummary = getExtractedLabelSummary(item);
   const topCandidates = getTopCandidates(item);
+  const repairProposal = isRepairProposal(item);
   const isProcessing = item.isProcessing;
   const canApproveMatch =
-    item.status === "pending_review" && !!item.suggestedBottle && !isProcessing;
+    item.status === "pending_review" &&
+    !!item.suggestedBottle &&
+    !repairProposal &&
+    !isProcessing;
   const canCreateBottle =
     item.status === "pending_review" &&
+    item.proposalType === "create_new" &&
     (!!item.proposedBottle || !!item.proposedRelease) &&
     !isProcessing;
   const createProposalActions = getCreateProposalActions(item, returnTo);
+  const repairEditHref =
+    repairProposal && item.currentBottle
+      ? `/bottles/${item.currentBottle.id}/edit`
+      : null;
   const queuedAt = formatTimestamp(item.createdAt);
   const processingQueuedAt = formatTimestamp(item.processingQueuedAt);
   const processingExpiresAt = formatTimestamp(item.processingExpiresAt);
@@ -968,10 +1147,18 @@ export default function QueueItemCard({
                 </Button>
               ) : null}
 
+              {repairEditHref ? (
+                <Button href={repairEditHref} color="highlight" fullWidth>
+                  Edit Bottle
+                </Button>
+              ) : null}
+
               <Button
                 fullWidth
                 color={
-                  canApproveMatch || canCreateBottle ? "default" : "primary"
+                  canApproveMatch || canCreateBottle || repairEditHref
+                    ? "default"
+                    : "primary"
                 }
                 onClick={() => {
                   onChooseBottle(item);

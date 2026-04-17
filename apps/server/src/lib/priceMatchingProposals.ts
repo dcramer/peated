@@ -66,6 +66,7 @@ import type {
   ExtractedBottleDetailsSchema,
   PriceMatchCandidateSchema,
   PriceMatchSearchEvidenceSchema,
+  ProposedBottleSchema,
   ProposedReleaseSchema,
   StorePriceMatchDecisionSchema,
 } from "@peated/server/schemas";
@@ -82,6 +83,7 @@ const WHISKY_LISTING_KEYWORDS =
 type ExtractedBottleDetails = z.infer<typeof ExtractedBottleDetailsSchema>;
 type PriceMatchCandidate = z.infer<typeof PriceMatchCandidateSchema>;
 type SearchEvidence = z.infer<typeof PriceMatchSearchEvidenceSchema>;
+type ProposedBottle = z.infer<typeof ProposedBottleSchema>;
 type ProposedRelease = z.infer<typeof ProposedReleaseSchema>;
 type StorePriceMatchDecision = z.infer<typeof StorePriceMatchDecisionSchema>;
 type StorePriceMatchProposalForReview = StorePriceMatchProposal & {
@@ -118,6 +120,63 @@ function shouldAutoIgnoreTrivialNonWhiskyListing(name: string): boolean {
   return (
     NON_WHISKY_LISTING_KEYWORDS.test(normalizedName) &&
     !WHISKY_LISTING_KEYWORDS.test(normalizedName)
+  );
+}
+
+function normalizeComparableText(value: string | null | undefined): string {
+  if (!value) {
+    return "";
+  }
+
+  return normalizeString(value).toLowerCase().replace(/_/g, " ").trim();
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function containsComparablePhrase(haystack: string, needle: string): boolean {
+  if (!haystack || !needle) {
+    return false;
+  }
+
+  const pattern = new RegExp(
+    `(^|[^a-z0-9])${escapeRegExp(needle)}($|[^a-z0-9])`,
+  );
+
+  return pattern.test(haystack);
+}
+
+function textsOverlap(
+  left: string | null | undefined,
+  right: string | null | undefined,
+): boolean {
+  const normalizedLeft = normalizeComparableText(left);
+  const normalizedRight = normalizeComparableText(right);
+
+  if (!normalizedLeft || !normalizedRight) {
+    return false;
+  }
+
+  return (
+    normalizedLeft === normalizedRight ||
+    containsComparablePhrase(normalizedLeft, normalizedRight) ||
+    containsComparablePhrase(normalizedRight, normalizedLeft)
+  );
+}
+
+function listMatchesExpectedValue(
+  actualValues: string[],
+  expectedValues: string[],
+): boolean {
+  if (!actualValues.length || !expectedValues.length) {
+    return false;
+  }
+
+  return expectedValues.every((expectedValue) =>
+    actualValues.some((actualValue) =>
+      textsOverlap(actualValue, expectedValue),
+    ),
   );
 }
 
@@ -168,12 +227,232 @@ function normalizeClassifierDecisionForPriceMatching(
   };
 }
 
+function appendRationale(
+  rationale: string | null | undefined,
+  addition: string,
+): string {
+  const trimmedAddition = addition.trim();
+  if (!rationale) {
+    return trimmedAddition;
+  }
+
+  const trimmedRationale = rationale.trim();
+  if (!trimmedRationale) {
+    return trimmedAddition;
+  }
+
+  return `${trimmedRationale} ${trimmedAddition}`;
+}
+
+function candidateMatchesRepairDraftIdentity(
+  candidate: PriceMatchCandidate,
+  proposedBottle: ProposedBottle,
+): boolean {
+  const proposedFullName =
+    `${proposedBottle.brand.name} ${proposedBottle.name}`.trim();
+  const candidateNames = [
+    candidate.alias,
+    candidate.bottleFullName,
+    candidate.fullName,
+  ].filter((value): value is string => Boolean(value));
+
+  const brandMatches =
+    textsOverlap(candidate.brand, proposedBottle.brand.name) ||
+    candidateNames.some((value) =>
+      textsOverlap(value, proposedBottle.brand.name),
+    );
+  const nameMatches = candidateNames.some(
+    (value) =>
+      textsOverlap(value, proposedBottle.name) ||
+      textsOverlap(value, proposedFullName),
+  );
+
+  if (!brandMatches || !nameMatches) {
+    return false;
+  }
+
+  if (!proposedBottle.series) {
+    return true;
+  }
+
+  return (
+    textsOverlap(candidate.series, proposedBottle.series.name) ||
+    candidateNames.some((value) =>
+      textsOverlap(value, proposedBottle.series?.name),
+    )
+  );
+}
+
+function candidateNeedsExistingBottleRepair(
+  candidate: PriceMatchCandidate,
+  proposedBottle: ProposedBottle,
+): boolean {
+  if (
+    proposedBottle.category !== null &&
+    candidate.category !== proposedBottle.category
+  ) {
+    return true;
+  }
+
+  if (
+    proposedBottle.series &&
+    !textsOverlap(candidate.series, proposedBottle.series.name)
+  ) {
+    return true;
+  }
+
+  if (
+    proposedBottle.bottler &&
+    !textsOverlap(candidate.bottler, proposedBottle.bottler.name)
+  ) {
+    return true;
+  }
+
+  if (
+    proposedBottle.distillers.length > 0 &&
+    !listMatchesExpectedValue(
+      candidate.distillery,
+      proposedBottle.distillers.map((distiller) => distiller.name),
+    )
+  ) {
+    return true;
+  }
+
+  if (
+    proposedBottle.statedAge !== null &&
+    candidate.statedAge !== proposedBottle.statedAge
+  ) {
+    return true;
+  }
+
+  if (
+    proposedBottle.edition &&
+    !textsOverlap(candidate.edition, proposedBottle.edition)
+  ) {
+    return true;
+  }
+
+  if (
+    proposedBottle.caskType !== null &&
+    candidate.caskType !== proposedBottle.caskType
+  ) {
+    return true;
+  }
+
+  if (
+    proposedBottle.caskSize !== null &&
+    candidate.caskSize !== proposedBottle.caskSize
+  ) {
+    return true;
+  }
+
+  if (
+    proposedBottle.caskFill !== null &&
+    candidate.caskFill !== proposedBottle.caskFill
+  ) {
+    return true;
+  }
+
+  if (
+    proposedBottle.caskStrength !== null &&
+    candidate.caskStrength !== proposedBottle.caskStrength
+  ) {
+    return true;
+  }
+
+  if (
+    proposedBottle.singleCask !== null &&
+    candidate.singleCask !== proposedBottle.singleCask
+  ) {
+    return true;
+  }
+
+  if (proposedBottle.abv !== null && candidate.abv !== proposedBottle.abv) {
+    return true;
+  }
+
+  if (
+    proposedBottle.vintageYear !== null &&
+    candidate.vintageYear !== proposedBottle.vintageYear
+  ) {
+    return true;
+  }
+
+  if (
+    proposedBottle.releaseYear !== null &&
+    candidate.releaseYear !== proposedBottle.releaseYear
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function maybeBuildExistingBottleRepairDecision({
+  price,
+  decision,
+  candidates,
+}: {
+  price: Pick<StorePrice, "bottleId" | "releaseId">;
+  decision: Extract<BottleClassificationDecision, { action: "create_bottle" }>;
+  candidates: PriceMatchCandidate[];
+}): StorePriceMatchDecision | null {
+  if (
+    price.bottleId === null ||
+    price.releaseId !== null ||
+    !decision.proposedBottle
+  ) {
+    return null;
+  }
+
+  const currentBottleCandidate =
+    candidates.find(
+      (candidate) =>
+        candidate.bottleId === price.bottleId &&
+        (candidate.releaseId == null || candidate.kind === "bottle"),
+    ) ?? null;
+  if (!currentBottleCandidate) {
+    return null;
+  }
+
+  if (
+    !candidateMatchesRepairDraftIdentity(
+      currentBottleCandidate,
+      decision.proposedBottle,
+    ) ||
+    !candidateNeedsExistingBottleRepair(
+      currentBottleCandidate,
+      decision.proposedBottle,
+    )
+  ) {
+    return null;
+  }
+
+  return {
+    action: "correction",
+    confidence: decision.confidence,
+    rationale: appendRationale(
+      decision.rationale,
+      "The current bottle appears to be the right base identity, but its stored bottle metadata conflicts with the extracted traits. Review this as an existing-bottle repair instead of creating a duplicate bottle.",
+    ),
+    candidateBottleIds: decision.candidateBottleIds,
+    suggestedBottleId: price.bottleId,
+    suggestedReleaseId: null,
+    parentBottleId: null,
+    creationTarget: null,
+    proposedBottle: decision.proposedBottle,
+    proposedRelease: null,
+  };
+}
+
 function toStorePriceMatchDecision({
   price,
   decision,
+  candidates,
 }: {
   price: Pick<StorePrice, "bottleId" | "releaseId">;
   decision: BottleClassificationDecision;
+  candidates: PriceMatchCandidate[];
 }): StorePriceMatchDecision {
   if (decision.action === "match") {
     const action =
@@ -198,6 +477,15 @@ function toStorePriceMatchDecision({
   }
 
   if (decision.action === "create_bottle") {
+    const existingBottleRepair = maybeBuildExistingBottleRepairDecision({
+      price,
+      decision,
+      candidates,
+    });
+    if (existingBottleRepair) {
+      return existingBottleRepair;
+    }
+
     return {
       action: "create_new",
       confidence: decision.confidence,
@@ -1095,6 +1383,7 @@ export async function resolveStorePriceMatchProposal(
     const decision = toStorePriceMatchDecision({
       price,
       decision: classifierDecision,
+      candidates,
     });
     const automationAssessment = getStorePriceMatchAutomationAssessment({
       action: decision.action,

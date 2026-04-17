@@ -1313,6 +1313,181 @@ describe("priceMatching", () => {
     expect(proposal.confidence).toBe(95);
   });
 
+  test("routes same-bottle create drafts into correction review when the current bottle metadata is wrong", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const brand = await fixtures.Entity({
+      name: "The Whistler",
+      type: ["brand", "bottler"],
+    });
+    const currentBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Bodega Cask",
+      category: "blend",
+      distillerIds: [],
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: currentBottle.id,
+      releaseId: null,
+      name: "The Whistler Bodega Cask Single Malt Irish Whiskey",
+      imageUrl: null,
+      url: "https://shop.example/the-whistler-bodega-cask",
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "The Whistler",
+      bottler: null,
+      expression: "Bodega Cask",
+      series: null,
+      distillery: ["Boann Distillery"],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        decision: {
+          action: "create_new",
+          confidence: 92,
+          rationale:
+            "The local bottle shares the base name, but the stored category conflicts with authoritative evidence.",
+          suggestedBottleId: null,
+          candidateBottleIds: [currentBottle.id],
+          proposedBottle: {
+            name: "Bodega Cask",
+            series: null,
+            category: "single_malt",
+            edition: null,
+            statedAge: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: brand.id,
+              name: "The Whistler",
+            },
+            distillers: [
+              {
+                id: null,
+                name: "Boann Distillery",
+              },
+            ],
+            bottler: null,
+          },
+        },
+        extractedLabel: {
+          brand: "The Whistler",
+          bottler: null,
+          expression: "Bodega Cask",
+          series: null,
+          distillery: ["Boann Distillery"],
+          category: "single_malt",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        searchEvidence: [
+          {
+            provider: "openai",
+            query: '"The Whistler Bodega Cask" single malt',
+            summary:
+              "Official and critic sources describe The Whistler Bodega Cask as a single malt from Boann Distillery.",
+            results: [
+              {
+                title: "The Whistler Bodega Cask - Whiskybase",
+                url: "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask",
+                domain: "whiskybase.com",
+                description:
+                  "Category: Single Malt. Distillery: Boann Distillery.",
+                extraSnippets: [],
+              },
+              {
+                title:
+                  "Whiskey Review: The Whistler Bodega Cask Irish Single Malt",
+                url: "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+                domain: "thewhiskeywash.com",
+                description:
+                  "Reviewing The Whistler Bodega Cask Irish Single Malt.",
+                extraSnippets: [],
+              },
+            ],
+          },
+        ],
+        candidateBottles: [
+          {
+            bottleId: currentBottle.id,
+            alias: "The Whistler Bodega Cask",
+            fullName: currentBottle.fullName,
+            brand: "The Whistler",
+            bottler: null,
+            series: null,
+            distillery: [],
+            category: "blend",
+            statedAge: null,
+            edition: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 0.97,
+            source: ["exact"],
+          },
+        ],
+        resolvedEntities: [],
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(proposal.status).toBe("pending_review");
+    expect(proposal.proposalType).toBe("correction");
+    expect(proposal.currentBottleId).toBe(currentBottle.id);
+    expect(proposal.suggestedBottleId).toBe(currentBottle.id);
+    expect(proposal.proposedBottle).toMatchObject({
+      name: "Bodega Cask",
+      category: "single_malt",
+      brand: {
+        name: "The Whistler",
+      },
+      distillers: [
+        {
+          name: "Boann Distillery",
+        },
+      ],
+    });
+    expect(proposal.rationale).toContain("existing-bottle repair");
+  });
+
   test("persists normalized proposed bottle drafts from the classifier", async ({
     fixtures,
   }) => {
