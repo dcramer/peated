@@ -100,6 +100,10 @@ function formatConfidence(item: QueueItem): string {
 }
 
 function formatAutomationScore(item: QueueItem): string {
+  if (item.status === "errored" || item.proposalType === "no_match") {
+    return "n/a";
+  }
+
   return item.automationScore === null ? "?" : `${item.automationScore}`;
 }
 
@@ -437,6 +441,15 @@ function renderRecommendationOutcome(item: QueueItem): ReactNode {
     return (
       <div className="mt-2 text-sm text-slate-300">
         No recommendation available.
+      </div>
+    );
+  }
+
+  if (item.proposalType === "no_match") {
+    return (
+      <div className="mt-2 text-sm text-slate-300">
+        No safe existing match or create draft was recommended. Use Choose
+        Bottle to resolve it manually.
       </div>
     );
   }

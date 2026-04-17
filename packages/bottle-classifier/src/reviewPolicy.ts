@@ -1001,6 +1001,13 @@ function getTargetNameCandidates(
 }
 
 type DecisiveReleaseSupportField = "edition" | "releaseYear" | "vintageYear";
+type DecisiveBottleSupportField =
+  | "brand"
+  | "bottler"
+  | "series"
+  | "distillery"
+  | "category"
+  | "expression";
 
 function getMatchingDecisiveReleaseSupportFields({
   candidate,
@@ -1116,6 +1123,185 @@ function hasUniquelySupportedStructuredReleaseMatch({
       candidate.releaseId !== null &&
       candidate.releaseId !== target.releaseId &&
       candidateMatchesDecisiveReleaseSupportFields({
+        candidate,
+        extractedIdentity: artifacts.extractedIdentity,
+        fields: decisiveFields,
+      }),
+  );
+}
+
+function candidateMatchesStructuredBottleExpression({
+  candidate,
+  expression,
+}: {
+  candidate: BottleCandidate;
+  expression: string | null | undefined;
+}): boolean {
+  if (!expression) {
+    return false;
+  }
+
+  return getBottleTargetNameCandidates(candidate).some((name) =>
+    textsOverlap(name, expression),
+  );
+}
+
+function getMatchingDecisiveBottleSupportFields({
+  candidate,
+  extractedIdentity,
+}: {
+  candidate: BottleCandidate;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+}): DecisiveBottleSupportField[] {
+  if (!extractedIdentity) {
+    return [];
+  }
+
+  const matchedFields: DecisiveBottleSupportField[] = [];
+
+  if (
+    extractedIdentity.brand &&
+    textsOverlap(candidate.brand, extractedIdentity.brand)
+  ) {
+    matchedFields.push("brand");
+  }
+
+  if (
+    extractedIdentity.bottler &&
+    textsOverlap(candidate.bottler, extractedIdentity.bottler)
+  ) {
+    matchedFields.push("bottler");
+  }
+
+  if (
+    extractedIdentity.series &&
+    textsOverlap(candidate.series, extractedIdentity.series)
+  ) {
+    matchedFields.push("series");
+  }
+
+  if (
+    extractedIdentity.distillery?.length &&
+    extractedIdentity.distillery.every((distillery) =>
+      candidate.distillery.some((candidateDistillery) =>
+        textsOverlap(candidateDistillery, distillery),
+      ),
+    )
+  ) {
+    matchedFields.push("distillery");
+  }
+
+  if (
+    extractedIdentity.category &&
+    candidate.category === extractedIdentity.category
+  ) {
+    matchedFields.push("category");
+  }
+
+  if (
+    candidateMatchesStructuredBottleExpression({
+      candidate,
+      expression: extractedIdentity.expression,
+    })
+  ) {
+    matchedFields.push("expression");
+  }
+
+  return matchedFields;
+}
+
+function candidateMatchesDecisiveBottleSupportFields({
+  candidate,
+  extractedIdentity,
+  fields,
+}: {
+  candidate: BottleCandidate;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+  fields: DecisiveBottleSupportField[];
+}): boolean {
+  if (!fields.length || !extractedIdentity) {
+    return false;
+  }
+
+  return fields.every((field) => {
+    switch (field) {
+      case "brand":
+        return Boolean(
+          extractedIdentity.brand &&
+          textsOverlap(candidate.brand, extractedIdentity.brand),
+        );
+      case "bottler":
+        return Boolean(
+          extractedIdentity.bottler &&
+          textsOverlap(candidate.bottler, extractedIdentity.bottler),
+        );
+      case "series":
+        return Boolean(
+          extractedIdentity.series &&
+          textsOverlap(candidate.series, extractedIdentity.series),
+        );
+      case "distillery":
+        return Boolean(
+          extractedIdentity.distillery?.length &&
+          extractedIdentity.distillery.every((distillery) =>
+            candidate.distillery.some((candidateDistillery) =>
+              textsOverlap(candidateDistillery, distillery),
+            ),
+          ),
+        );
+      case "category":
+        return (
+          extractedIdentity.category !== null &&
+          extractedIdentity.category !== undefined &&
+          candidate.category === extractedIdentity.category
+        );
+      case "expression":
+        return candidateMatchesStructuredBottleExpression({
+          candidate,
+          expression: extractedIdentity.expression,
+        });
+    }
+  });
+}
+
+function hasUniquelySupportedStructuredBottleMatch({
+  target,
+  artifacts,
+}: {
+  target: BottleCandidate;
+  artifacts: BottleClassificationArtifacts;
+}): boolean {
+  if (
+    target.releaseId !== null ||
+    target.kind === "release" ||
+    candidateLooksLikeLegacyReleaseBottle(target) ||
+    candidateLooksLikeDirtyAgeReleaseBottle({
+      candidate: target,
+      extractedIdentity: artifacts.extractedIdentity,
+    })
+  ) {
+    return false;
+  }
+
+  const decisiveFields = getMatchingDecisiveBottleSupportFields({
+    candidate: target,
+    extractedIdentity: artifacts.extractedIdentity,
+  });
+  if (
+    !decisiveFields.includes("expression") ||
+    !decisiveFields.some((field) =>
+      ["brand", "bottler", "distillery"].includes(field),
+    )
+  ) {
+    return false;
+  }
+
+  // Allow non-exact matches to stand only when the extracted bottle identity
+  // uniquely supports this product-level candidate among the surfaced peers.
+  return !artifacts.candidates.some(
+    (candidate) =>
+      candidate.bottleId !== target.bottleId &&
+      candidateMatchesDecisiveBottleSupportFields({
         candidate,
         extractedIdentity: artifacts.extractedIdentity,
         fields: decisiveFields,
@@ -1582,6 +1768,10 @@ function downgradeUnsafeExistingMatchDecision({
       target,
       artifacts,
     });
+  const hasStructuredBottleSupport = hasUniquelySupportedStructuredBottleMatch({
+    target,
+    artifacts,
+  });
   const identityConflicts = getExistingMatchIdentityConflicts({
     referenceName: reference.name,
     targetCandidate: target,
@@ -1592,7 +1782,8 @@ function downgradeUnsafeExistingMatchDecision({
     !identityConflicts.length &&
     (hasExactishLocalName ||
       hasSupportiveWebEvidence ||
-      hasStructuredReleaseSupport)
+      hasStructuredReleaseSupport ||
+      hasStructuredBottleSupport)
   ) {
     return decision;
   }
@@ -1608,10 +1799,11 @@ function downgradeUnsafeExistingMatchDecision({
   if (
     !hasExactishLocalName &&
     !hasSupportiveWebEvidence &&
-    !hasStructuredReleaseSupport
+    !hasStructuredReleaseSupport &&
+    !hasStructuredBottleSupport
   ) {
     reasons.push(
-      "there is no exact alias, no exactish canonical name match, and no supportive off-retailer web evidence for the matched target",
+      "there is no exact alias, no exactish canonical name match, no uniquely supported structured bottle identity, and no supportive off-retailer web evidence for the matched target",
     );
   }
 
