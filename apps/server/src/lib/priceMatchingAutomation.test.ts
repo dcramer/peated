@@ -85,6 +85,96 @@ describe("priceMatchingAutomation", () => {
     expect(assessment.decisiveMatchAttributes).toContain("statedAge");
   });
 
+  test("does not flag a stable age statement as release-specific when the bottle already markets it", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "match_existing",
+      modelConfidence: 88,
+      price: {
+        bottleId: 1,
+        name: "The Whistler How The Years Whistle By 10-year-old Single Malt Irish Whiskey",
+        url: "https://example.com/whistler",
+      },
+      suggestedBottleId: 1,
+      suggestedReleaseId: null,
+      extractedLabel: buildExtractedLabel({
+        brand: "The Whistler",
+        expression: "How The Years Whistle By",
+        distillery: ["The Whistler"],
+        category: "single_malt",
+        stated_age: 10,
+        abv: null,
+        cask_type: null,
+      }),
+      proposedBottle: null,
+      searchEvidence: [],
+      candidateBottles: [
+        buildCandidate({
+          bottleId: 1,
+          fullName:
+            "The Whistler How The Years Whistle By 10-year-old Single Malt Irish Whiskey",
+          bottleFullName:
+            "The Whistler How The Years Whistle By 10-year-old Single Malt Irish Whiskey",
+          brand: "The Whistler",
+          distillery: ["The Whistler"],
+          category: "single_malt",
+          statedAge: 10,
+          abv: null,
+          caskType: null,
+        }),
+      ],
+    });
+
+    expect(assessment.automationBlockers).not.toContain(
+      "listing looks release-specific but the suggested target is only a bottle",
+    );
+    expect(assessment.decisiveMatchAttributes).toContain("statedAge");
+  });
+
+  test("keeps the release-specific blocker when the bottle target does not represent the extracted edition", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "match_existing",
+      modelConfidence: 88,
+      price: {
+        bottleId: 2,
+        name: "Springbank 12-year-old Cask Strength Batch 24",
+        url: "https://example.com/springbank",
+      },
+      suggestedBottleId: 2,
+      suggestedReleaseId: null,
+      extractedLabel: buildExtractedLabel({
+        brand: "Springbank",
+        expression: "12-year-old Cask Strength",
+        distillery: ["Springbank"],
+        category: "single_malt",
+        stated_age: 12,
+        abv: null,
+        cask_type: null,
+        cask_strength: true,
+        edition: "Batch 24",
+      }),
+      proposedBottle: null,
+      searchEvidence: [],
+      candidateBottles: [
+        buildCandidate({
+          bottleId: 2,
+          fullName: "Springbank 12-year-old Cask Strength",
+          bottleFullName: "Springbank 12-year-old Cask Strength",
+          brand: "Springbank",
+          distillery: ["Springbank"],
+          category: "single_malt",
+          statedAge: 12,
+          abv: null,
+          caskType: null,
+          caskStrength: true,
+        }),
+      ],
+    });
+
+    expect(assessment.automationBlockers).toContain(
+      "listing looks release-specific but the suggested target is only a bottle",
+    );
+  });
+
   test("does not treat originating retailer evidence as decisive for auto-create", () => {
     const assessment = getStorePriceMatchAutomationAssessment({
       action: "create_new",
