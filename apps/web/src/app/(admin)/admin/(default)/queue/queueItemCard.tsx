@@ -51,6 +51,7 @@ type QueueItemCardProps = {
   item: QueueItem;
   returnTo: string;
   onApproveMatch: (item: QueueItem) => Promise<void>;
+  onApplyCreateProposal: (item: QueueItem) => Promise<void>;
   onChooseBottle: (item: QueueItem) => void;
   onIgnore: (item: QueueItem) => Promise<void>;
   onRetry: (item: QueueItem) => Promise<void>;
@@ -521,11 +522,52 @@ function formatSourceTier(
   }
 }
 
+type CreateProposalActions = {
+  applyLabel: string;
+  editHref: string;
+  editLabel: string;
+};
+
+function getCreateProposalActions(
+  item: QueueItem,
+  returnTo: string,
+): CreateProposalActions | null {
+  if (!item.proposedBottle && !item.proposedRelease) {
+    return null;
+  }
+
+  const queryString = `proposal=${item.id}&returnTo=${encodeURIComponent(returnTo)}`;
+
+  switch (item.creationTarget) {
+    case "release":
+      return {
+        applyLabel: "Apply Bottling Draft",
+        editLabel: "Edit Bottling Draft",
+        editHref: item.parentBottle
+          ? `${getNewBottleBottlingPath(item.parentBottle.id)}?${queryString}`
+          : `/addBottle?${queryString}`,
+      };
+    case "bottle_and_release":
+      return {
+        applyLabel: "Apply Create Draft",
+        editLabel: "Edit Create Draft",
+        editHref: `/addBottle?${queryString}`,
+      };
+    default:
+      return {
+        applyLabel: "Apply Bottle Draft",
+        editLabel: "Edit Bottle Draft",
+        editHref: `/addBottle?${queryString}`,
+      };
+  }
+}
+
 export default function QueueItemCard({
   isBusy,
   item,
   returnTo,
   onApproveMatch,
+  onApplyCreateProposal,
   onChooseBottle,
   onIgnore,
   onRetry,
@@ -540,16 +582,7 @@ export default function QueueItemCard({
     item.status === "pending_review" &&
     (!!item.proposedBottle || !!item.proposedRelease) &&
     !isProcessing;
-  const createHref =
-    item.creationTarget === "release" && item.parentBottle
-      ? `${getNewBottleBottlingPath(item.parentBottle.id)}?proposal=${item.id}&returnTo=${encodeURIComponent(returnTo)}`
-      : `/addBottle?proposal=${item.id}&returnTo=${encodeURIComponent(returnTo)}`;
-  const createLabel =
-    item.creationTarget === "release"
-      ? "Create Bottling"
-      : item.creationTarget === "bottle_and_release"
-        ? "Create Bottle + Bottling"
-        : "Create Bottle";
+  const createProposalActions = getCreateProposalActions(item, returnTo);
   const queuedAt = formatTimestamp(item.createdAt);
   const processingQueuedAt = formatTimestamp(item.processingQueuedAt);
   const processingExpiresAt = formatTimestamp(item.processingExpiresAt);
@@ -904,8 +937,21 @@ export default function QueueItemCard({
               ) : null}
 
               {canCreateBottle ? (
-                <Button href={createHref} color="highlight" fullWidth>
-                  {createLabel}
+                <Button
+                  color="highlight"
+                  fullWidth
+                  disabled={isBusy}
+                  onClick={async () => {
+                    await onApplyCreateProposal(item);
+                  }}
+                >
+                  {createProposalActions?.applyLabel ?? "Apply Draft"}
+                </Button>
+              ) : null}
+
+              {canCreateBottle && createProposalActions ? (
+                <Button href={createProposalActions.editHref} fullWidth>
+                  {createProposalActions.editLabel}
                 </Button>
               ) : null}
 
