@@ -2433,6 +2433,112 @@ describe("priceMatching", () => {
     });
   });
 
+  test("reuses an existing bottle when auto-create collides with a canonical alias", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const brand = await fixtures.Entity({
+      name: "Aberfeldy",
+      type: ["brand"],
+    });
+    const distiller = await fixtures.Entity({
+      name: "Aberfeldy Distillery",
+      type: ["distiller"],
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "21-year-old",
+      category: "single_malt",
+      statedAge: 21,
+      distillerIds: [distiller.id],
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: bottle.fullName,
+      imageUrl: null,
+    });
+
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        decision: {
+          action: "create_new",
+          confidence: 95,
+          rationale: "Official evidence looks like a distinct bottle.",
+          suggestedBottleId: null,
+          candidateBottleIds: [],
+          proposedBottle: {
+            name: "21-year-old",
+            series: null,
+            category: "single_malt",
+            edition: null,
+            statedAge: 21,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: brand.id,
+              name: brand.name,
+            },
+            distillers: [
+              {
+                id: distiller.id,
+                name: distiller.name,
+              },
+            ],
+            bottler: null,
+          },
+        },
+        searchEvidence: [
+          {
+            query: '"Aberfeldy" "21-year-old" official',
+            summary:
+              "The official Aberfeldy page confirms Aberfeldy 21-year-old as a single malt whisky.",
+            results: [
+              {
+                title: "Aberfeldy 21 Year Old",
+                url: "https://www.aberfeldy.com/21-year-old",
+                domain: "aberfeldy.com",
+                description:
+                  "The official Aberfeldy page confirms Aberfeldy 21-year-old as a single malt whisky.",
+                extraSnippets: [],
+              },
+            ],
+          },
+        ],
+        candidateBottles: [],
+        resolvedEntities: [],
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+
+    expect(proposal).toMatchObject({
+      status: "approved",
+      proposalType: "create_new",
+      currentBottleId: bottle.id,
+      suggestedBottleId: bottle.id,
+      error: null,
+    });
+    expect(updatedPrice?.bottleId).toBe(bottle.id);
+  });
+
   test("auto creates new bottles even when replacing an existing assignment", async ({
     fixtures,
   }) => {

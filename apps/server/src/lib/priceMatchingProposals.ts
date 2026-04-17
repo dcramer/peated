@@ -34,10 +34,12 @@ import {
 } from "@peated/server/lib/bottleAliases";
 import { buildClassifierCreateInputs } from "@peated/server/lib/classifierDecisionCreateInputs";
 import {
+  BottleAlreadyExistsError,
   createBottleInTransaction,
   finalizeCreatedBottle,
 } from "@peated/server/lib/createBottle";
 import {
+  BottleReleaseAlreadyExistsError,
   createBottleReleaseInTransaction,
   finalizeCreatedBottleRelease,
 } from "@peated/server/lib/createBottleRelease";
@@ -760,6 +762,29 @@ export async function upsertStorePriceMatchProposal({
   return proposal;
 }
 
+async function getExistingBottleReleaseInTransaction(
+  tx: AnyDatabase,
+  {
+    releaseId,
+    bottleId,
+  }: {
+    releaseId: number;
+    bottleId: number;
+  },
+) {
+  const release = await tx.query.bottleReleases.findFirst({
+    where: eq(bottleReleases.id, releaseId),
+  });
+
+  if (!release || release.bottleId !== bottleId) {
+    throw new Error(
+      `Bottle release not found for existing price match proposal result (${releaseId}).`,
+    );
+  }
+
+  return release;
+}
+
 async function createBottleFromStorePriceMatchProposalInTransaction(
   tx: AnyTransaction,
   {
@@ -800,6 +825,11 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
   let createReleaseResult: Awaited<
     ReturnType<typeof createBottleReleaseInTransaction>
   > | null = null;
+  let existingRelease:
+    | Awaited<ReturnType<typeof createBottleReleaseInTransaction>>["release"]
+    | null = null;
+  let resolvedBottleId = proposal.parentBottleId;
+  let resolvedReleaseId: number | null = null;
 
   if (creationTarget === "bottle" || creationTarget === "bottle_and_release") {
     if (!input) {
@@ -808,12 +838,21 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
       );
     }
 
-    createResult = await createBottleInTransaction(tx, {
-      input,
-      context: {
-        user,
-      },
-    });
+    try {
+      createResult = await createBottleInTransaction(tx, {
+        input,
+        context: {
+          user,
+        },
+      });
+      resolvedBottleId = createResult.bottle.id;
+    } catch (err) {
+      if (!(err instanceof BottleAlreadyExistsError)) {
+        throw err;
+      }
+
+      resolvedBottleId = err.bottleId;
+    }
   }
 
   if (creationTarget === "release" || creationTarget === "bottle_and_release") {
@@ -824,9 +863,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     }
 
     const releaseBottleId =
-      creationTarget === "release"
-        ? proposal.parentBottleId
-        : (createResult?.bottle.id ?? null);
+      creationTarget === "release" ? proposal.parentBottleId : resolvedBottleId;
 
     if (!releaseBottleId) {
       throw new Error(
@@ -834,17 +871,31 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
       );
     }
 
-    createReleaseResult = await createBottleReleaseInTransaction(tx, {
-      bottleId: releaseBottleId,
-      input: releaseInput,
-      user,
-    });
+    try {
+      createReleaseResult = await createBottleReleaseInTransaction(tx, {
+        bottleId: releaseBottleId,
+        input: releaseInput,
+        user,
+      });
+      resolvedBottleId = createReleaseResult.release.bottleId;
+      resolvedReleaseId = createReleaseResult.release.id;
+    } catch (err) {
+      if (!(err instanceof BottleReleaseAlreadyExistsError)) {
+        throw err;
+      }
+
+      existingRelease = await getExistingBottleReleaseInTransaction(tx, {
+        releaseId: err.releaseId,
+        bottleId: releaseBottleId,
+      });
+      resolvedBottleId = existingRelease.bottleId;
+      resolvedReleaseId = existingRelease.id;
+    }
   }
 
-  const resolvedBottleId =
-    createResult?.bottle.id ??
-    createReleaseResult?.release.bottleId ??
-    proposal.parentBottleId;
+  if (createResult) {
+    resolvedBottleId = createResult.bottle.id;
+  }
 
   if (!resolvedBottleId) {
     throw new Error(
@@ -857,7 +908,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     {
       proposal,
       bottleId: resolvedBottleId,
-      releaseId: createReleaseResult?.release.id ?? null,
+      releaseId: resolvedReleaseId,
       reviewedById: user.id,
     },
   );
@@ -865,7 +916,10 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
   return {
     createResult,
     createReleaseResult,
+    existingRelease,
     aliasResult,
+    resolvedBottleId,
+    resolvedReleaseId,
   };
 }
 
@@ -918,13 +972,9 @@ export async function createBottleFromStorePriceMatchProposal({
     bottle:
       result.createResult?.bottle ??
       (await db.query.bottles.findFirst({
-        where: eq(
-          bottles.id,
-          result.createReleaseResult?.release.bottleId ??
-            result.aliasResult.alias.bottleId!,
-        ),
+        where: eq(bottles.id, result.resolvedBottleId),
       }))!,
-    release: result.createReleaseResult?.release ?? null,
+    release: result.createReleaseResult?.release ?? result.existingRelease,
   };
 }
 
