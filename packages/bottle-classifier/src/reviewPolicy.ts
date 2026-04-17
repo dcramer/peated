@@ -1,4 +1,5 @@
 import {
+  extractedIdentityLooksLikePlainAgeStatementReference,
   getExistingMatchIdentityConflicts,
   hasDirtyParentStatedAgeConflict,
   hasSupportiveWebEvidenceForExistingMatch,
@@ -1007,7 +1008,8 @@ type DecisiveBottleSupportField =
   | "series"
   | "distillery"
   | "category"
-  | "expression";
+  | "expression"
+  | "statedAge";
 
 function getMatchingDecisiveReleaseSupportFields({
   candidate,
@@ -1146,6 +1148,44 @@ function candidateMatchesStructuredBottleExpression({
   );
 }
 
+function candidateLooksLikePlainAgeStatementBottle(
+  candidate: BottleCandidate,
+): boolean {
+  if (
+    candidate.statedAge === null ||
+    candidate.statedAge === undefined ||
+    candidate.series ||
+    candidate.edition ||
+    candidate.releaseYear !== null ||
+    candidate.vintageYear !== null
+  ) {
+    return false;
+  }
+
+  const producerTokens = new Set(
+    [
+      ...getComparableNameTokens(candidate.brand),
+      ...getComparableNameTokens(candidate.bottler),
+      ...candidate.distillery.flatMap((distillery) =>
+        getComparableNameTokens(distillery),
+      ),
+    ].filter((token) => token.length > 0),
+  );
+  const ageToken = String(candidate.statedAge);
+
+  return getBottleTargetNameCandidates(candidate).some((name) => {
+    const tokens = getComparableNameTokens(name);
+    if (!tokens.includes(ageToken)) {
+      return false;
+    }
+
+    return (
+      tokens.filter((token) => token !== ageToken && !producerTokens.has(token))
+        .length === 0
+    );
+  });
+}
+
 function getMatchingDecisiveBottleSupportFields({
   candidate,
   extractedIdentity,
@@ -1196,6 +1236,17 @@ function getMatchingDecisiveBottleSupportFields({
     candidate.category === extractedIdentity.category
   ) {
     matchedFields.push("category");
+  }
+
+  if (
+    extractedIdentityLooksLikePlainAgeStatementReference(extractedIdentity) &&
+    extractedIdentity.stated_age !== null &&
+    extractedIdentity.stated_age !== undefined &&
+    candidate.statedAge !== null &&
+    candidate.statedAge === extractedIdentity.stated_age &&
+    candidateLooksLikePlainAgeStatementBottle(candidate)
+  ) {
+    matchedFields.push("statedAge");
   }
 
   if (
@@ -1255,6 +1306,17 @@ function candidateMatchesDecisiveBottleSupportFields({
           extractedIdentity.category !== undefined &&
           candidate.category === extractedIdentity.category
         );
+      case "statedAge":
+        return Boolean(
+          extractedIdentityLooksLikePlainAgeStatementReference(
+            extractedIdentity,
+          ) &&
+          extractedIdentity.stated_age !== null &&
+          extractedIdentity.stated_age !== undefined &&
+          candidate.statedAge !== null &&
+          candidate.statedAge === extractedIdentity.stated_age &&
+          candidateLooksLikePlainAgeStatementBottle(candidate),
+        );
       case "expression":
         return candidateMatchesStructuredBottleExpression({
           candidate,
@@ -1272,13 +1334,17 @@ function hasUniquelySupportedStructuredBottleMatch({
   artifacts: BottleClassificationArtifacts;
 }): boolean {
   if (
+    artifacts.extractedIdentity?.edition ||
+    artifacts.extractedIdentity?.release_year !== null ||
+    artifacts.extractedIdentity?.vintage_year !== null
+  ) {
+    return false;
+  }
+
+  if (
     target.releaseId !== null ||
     target.kind === "release" ||
-    candidateLooksLikeLegacyReleaseBottle(target) ||
-    candidateLooksLikeDirtyAgeReleaseBottle({
-      candidate: target,
-      extractedIdentity: artifacts.extractedIdentity,
-    })
+    candidateLooksLikeLegacyReleaseBottle(target)
   ) {
     return false;
   }
@@ -1288,10 +1354,20 @@ function hasUniquelySupportedStructuredBottleMatch({
     extractedIdentity: artifacts.extractedIdentity,
   });
   if (
-    !decisiveFields.includes("expression") ||
+    !decisiveFields.some((field) =>
+      ["expression", "statedAge"].includes(field),
+    ) ||
     !decisiveFields.some((field) =>
       ["brand", "bottler", "distillery"].includes(field),
     )
+  ) {
+    return false;
+  }
+
+  if (
+    !decisiveFields.includes("expression") &&
+    decisiveFields.includes("statedAge") &&
+    !decisiveFields.some((field) => ["category", "distillery"].includes(field))
   ) {
     return false;
   }

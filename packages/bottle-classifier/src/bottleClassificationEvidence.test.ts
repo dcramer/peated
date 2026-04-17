@@ -116,6 +116,266 @@ describe("bottleClassificationEvidence", () => {
     ).toBe(true);
   });
 
+  test("treats authoritative brand-led evidence as support for a distillery-qualified plain age-statement bottle", () => {
+    const targetCandidate = buildBottleCandidate({
+      bottleId: 3233,
+      fullName: "Isle of Jura 12-year-old Single Malt Scotch Whisky",
+      brand: "Jura",
+      distillery: ["Isle of Jura"],
+      category: "single_malt",
+      statedAge: 12,
+    });
+
+    expect(
+      hasSupportiveWebEvidenceForExistingMatch({
+        sourceUrl: "https://shop.example/products/jura-12-year-old",
+        searchEvidence: [
+          buildSearchEvidence({
+            summary:
+              "Jura's official site confirms the 12 Year Old single malt Scotch whisky.",
+            results: [
+              {
+                title: "Jura 12 Year Old | Single Malt Scotch Whisky",
+                url: "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/",
+                domain: "jurawhisky.com",
+                description:
+                  "Official Jura product page for the 12 Year Old single malt Scotch whisky.",
+                extraSnippets: [],
+              },
+            ],
+          }),
+        ],
+        extractedLabel: {
+          brand: "Jura",
+          bottler: null,
+          expression: null,
+          series: null,
+          distillery: ["Jura"],
+          category: "single_malt",
+          stated_age: 12,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        targetCandidate,
+      }),
+    ).toBe(true);
+  });
+
+  test("requires the extracted identity to include the same stated age before plain age evidence counts as support", () => {
+    const targetCandidate = buildBottleCandidate({
+      bottleId: 3233,
+      fullName: "Isle of Jura 12-year-old Single Malt Scotch Whisky",
+      brand: "Jura",
+      distillery: ["Isle of Jura"],
+      category: "single_malt",
+      statedAge: 12,
+    });
+
+    expect(
+      hasSupportiveWebEvidenceForExistingMatch({
+        sourceUrl: "https://shop.example/products/jura-single-malt",
+        searchEvidence: [
+          buildSearchEvidence({
+            summary:
+              "Jura's official site confirms the 12 Year Old single malt Scotch whisky.",
+            results: [
+              {
+                title: "Jura 12 Year Old | Single Malt Scotch Whisky",
+                url: "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/",
+                domain: "jurawhisky.com",
+                description:
+                  "Official Jura product page for the 12 Year Old single malt Scotch whisky.",
+                extraSnippets: [],
+              },
+            ],
+          }),
+        ],
+        extractedLabel: {
+          brand: "Jura",
+          bottler: null,
+          expression: null,
+          series: null,
+          distillery: ["Jura"],
+          category: "single_malt",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        targetCandidate,
+      }),
+    ).toBe(false);
+  });
+
+  test("does not treat plain age evidence as support for a release-qualified extracted identity", () => {
+    const targetCandidate = buildBottleCandidate({
+      bottleId: 3233,
+      fullName: "Isle of Jura 12-year-old Single Malt Scotch Whisky",
+      brand: "Jura",
+      distillery: ["Isle of Jura"],
+      category: "single_malt",
+      statedAge: 12,
+    });
+
+    expect(
+      hasSupportiveWebEvidenceForExistingMatch({
+        sourceUrl: "https://shop.example/products/jura-12-batch-4",
+        searchEvidence: [
+          buildSearchEvidence({
+            summary:
+              "Jura's official site confirms the 12 Year Old single malt Scotch whisky.",
+            results: [
+              {
+                title: "Jura 12 Year Old | Single Malt Scotch Whisky",
+                url: "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/",
+                domain: "jurawhisky.com",
+                description:
+                  "Official Jura product page for the 12 Year Old single malt Scotch whisky.",
+                extraSnippets: [],
+              },
+            ],
+          }),
+        ],
+        extractedLabel: {
+          brand: "Jura",
+          bottler: null,
+          expression: null,
+          series: null,
+          distillery: ["Jura"],
+          category: "single_malt",
+          stated_age: 12,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: "Batch 4",
+        },
+        targetCandidate,
+      }),
+    ).toBe(false);
+  });
+
+  test("does not treat plain age evidence as support when the extracted identity carries extra cask detail", () => {
+    const targetCandidate = buildBottleCandidate({
+      bottleId: 3233,
+      fullName: "Isle of Jura 12-year-old Single Malt Scotch Whisky",
+      brand: "Jura",
+      distillery: ["Isle of Jura"],
+      category: "single_malt",
+      statedAge: 12,
+    });
+
+    expect(
+      hasSupportiveWebEvidenceForExistingMatch({
+        sourceUrl: "https://shop.example/products/jura-12-sherry-cask",
+        searchEvidence: [
+          buildSearchEvidence({
+            summary:
+              "Jura's official site confirms the 12 Year Old single malt Scotch whisky.",
+            results: [
+              {
+                title: "Jura 12 Year Old | Single Malt Scotch Whisky",
+                url: "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/",
+                domain: "jurawhisky.com",
+                description:
+                  "Official Jura product page for the 12 Year Old single malt Scotch whisky.",
+                extraSnippets: [],
+              },
+            ],
+          }),
+        ],
+        extractedLabel: {
+          brand: "Jura",
+          bottler: null,
+          expression: null,
+          series: null,
+          distillery: ["Jura"],
+          category: "single_malt",
+          stated_age: 12,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: "oloroso",
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        targetCandidate,
+      }),
+    ).toBe(false);
+  });
+
+  test("does not treat plain age evidence as support for a named sibling expression", () => {
+    const targetCandidate = buildBottleCandidate({
+      bottleId: 3234,
+      fullName: "Jura 12-year-old Sherry Cask Single Malt Scotch Whisky",
+      brand: "Jura",
+      distillery: ["Isle of Jura"],
+      category: "single_malt",
+      statedAge: 12,
+    });
+
+    expect(
+      hasSupportiveWebEvidenceForExistingMatch({
+        sourceUrl: "https://shop.example/products/jura-12-year-old",
+        searchEvidence: [
+          buildSearchEvidence({
+            summary:
+              "Jura's official site confirms the 12 Year Old single malt Scotch whisky.",
+            results: [
+              {
+                title: "Jura 12 Year Old | Single Malt Scotch Whisky",
+                url: "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/",
+                domain: "jurawhisky.com",
+                description:
+                  "Official Jura product page for the 12 Year Old single malt Scotch whisky.",
+                extraSnippets: [],
+              },
+            ],
+          }),
+        ],
+        extractedLabel: {
+          brand: "Jura",
+          bottler: null,
+          expression: null,
+          series: null,
+          distillery: ["Jura"],
+          category: "single_malt",
+          stated_age: 12,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        targetCandidate,
+      }),
+    ).toBe(false);
+  });
+
   test("does not treat origin-retailer titles as independent authoritative support", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 3,

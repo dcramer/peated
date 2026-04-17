@@ -112,6 +112,23 @@ export const BOTTLE_NORMALIZATION_CORPUS: BottleNormalizationCorpusExample[] = [
     notes: "Stable bottle identity with no release split.",
   },
   {
+    id: "jura-12-brand-distillery",
+    inputName: "Jura 12-year-old Scotch Whisky",
+    expectedBottleName: "Isle of Jura 12-year-old Single Malt Scotch Whisky",
+    peatedBottleIds: [3233],
+    liveEvalCoverage: "required",
+    liveEvalSummary:
+      "Treat Jura 12-year-old as the standard Jura core bottling and keep the existing distillery-qualified local bottle match even when the reference uses the shorter Jura brand wording.",
+    expectation: {
+      handlingStrategy: "classifier_required",
+      classifierExpectation: "bottle",
+      deterministicReleaseExpectation: "none",
+      releaseIdentity: null,
+    },
+    notes:
+      "Official single-distillery bottlings can use a consumer brand that differs from the local bottle title's distillery qualifier. Brand-led Jura wording should still resolve to the Isle of Jura 12-year-old bottle family.",
+  },
+  {
     id: "springbank-batch-release",
     inputName: "Springbank 12 Cask Strength Batch 24",
     expectedBottleName: "Springbank 12 Cask Strength",
