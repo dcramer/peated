@@ -11,7 +11,10 @@ import {
   applyRepairBackfillProposals,
   type BatchApplicableRepairBackfillProposalType,
 } from "@peated/server/lib/applyRepairBackfillProposals";
-import { upsertBottleAlias } from "@peated/server/lib/db";
+import {
+  findEntityByExactNameOrAlias,
+  upsertBottleAlias,
+} from "@peated/server/lib/db";
 import { fixBadReviewEntities } from "@peated/server/lib/fixBadReviewEntities";
 import { formatBottleName } from "@peated/server/lib/format";
 import {
@@ -27,6 +30,7 @@ import {
   type RepairBackfillProposal,
   type RepairBackfillProposalType,
 } from "@peated/server/lib/repairBackfillProposals";
+import { repairBottleBrandDistilleryAssignments } from "@peated/server/lib/repairBottleBrandDistilleryAssignments";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import { routerClient } from "@peated/server/orpc/router";
 import { runJob } from "@peated/server/worker/client";
@@ -132,6 +136,35 @@ function formatReleaseRepairReviewSummaryLine(
   candidate: LegacyReleaseRepairCandidate,
 ) {
   return `[release/${candidate.repairMode}] ${candidate.legacyBottle.fullName} -> ${candidate.proposedParent.fullName}`;
+}
+
+async function resolveEntityReference(
+  value: string,
+  {
+    label,
+    requiredType,
+  }: {
+    label: string;
+    requiredType?: "brand" | "distiller" | "bottler";
+  },
+) {
+  const entity = /^\d+$/.test(value)
+    ? await db.query.entities.findFirst({
+        where: eq(entities.id, Number.parseInt(value, 10)),
+      })
+    : await findEntityByExactNameOrAlias(db, value);
+
+  if (!entity) {
+    throw new Error(`${label} not found: ${value}`);
+  }
+
+  if (requiredType && !entity.type.includes(requiredType)) {
+    throw new Error(
+      `${label} must include entity type "${requiredType}": ${entity.name}`,
+    );
+  }
+
+  return entity;
 }
 
 subcommand
@@ -650,5 +683,82 @@ subcommand
         hasResults = true;
       }
       offset += step;
+    }
+  });
+
+subcommand
+  .command("repair-brand-distillery")
+  .description(
+    "Preview or apply bulk bottle brand/distillery identity repairs without renaming bottle titles",
+  )
+  .requiredOption("--from-brand <entity>", "Source brand entity name or id")
+  .requiredOption("--to-brand <entity>", "Target brand entity name or id")
+  .option(
+    "--distillery <entity>",
+    "Distillery entity name or id to ensure on repaired bottles",
+  )
+  .option("--limit <number>", "Maximum number of bottles to scan")
+  .option("--query <query>", "Filter candidate bottles by full name", "")
+  .option(
+    "--execute",
+    "Actually apply the repair. Without this flag the command only previews.",
+  )
+  .argument("[bottleIds...]")
+  .action(async (bottleIds: string[], options) => {
+    const fromBrand = await resolveEntityReference(options.fromBrand, {
+      label: "Source brand",
+      requiredType: "brand",
+    });
+    const toBrand = await resolveEntityReference(options.toBrand, {
+      label: "Target brand",
+      requiredType: "brand",
+    });
+    const distillery = options.distillery
+      ? await resolveEntityReference(options.distillery, {
+          label: "Distillery",
+          requiredType: "distiller",
+        })
+      : null;
+
+    let limit: number | undefined;
+    if (options.limit !== undefined) {
+      const parsedLimit = Number.parseInt(options.limit, 10);
+      if (
+        !Number.isFinite(parsedLimit) ||
+        Number.isNaN(parsedLimit) ||
+        parsedLimit <= 0
+      ) {
+        throw new Error(`Invalid limit: ${options.limit}`);
+      }
+      limit = parsedLimit;
+    }
+
+    const result = await repairBottleBrandDistilleryAssignments({
+      bottleIds: bottleIds.map((value: string) => Number.parseInt(value, 10)),
+      distilleryId: distillery?.id ?? null,
+      dryRun: !options.execute,
+      fromBrand,
+      limit,
+      query: options.query,
+      toBrand,
+      user: options.execute ? await getAutomationModeratorUser() : undefined,
+    });
+
+    console.log(
+      `${options.execute ? "Applied" : "Previewed"} bottle brand/distillery repairs: ${result.summary.total}`,
+    );
+    console.log(
+      `planned=${result.summary.planned} applied=${result.summary.applied} failed=${result.summary.failed} seriesCreated=${result.summary.seriesCreated} seriesReused=${result.summary.seriesReused}`,
+    );
+
+    for (const item of result.items) {
+      console.log(`[${item.status}] ${item.bottleFullName} (${item.bottleId})`);
+      console.log(`  ${item.message}`);
+    }
+
+    if (options.execute && result.summary.failed > 0) {
+      throw new Error(
+        `${result.summary.failed} bottle repair(s) failed during execution.`,
+      );
     }
   });
