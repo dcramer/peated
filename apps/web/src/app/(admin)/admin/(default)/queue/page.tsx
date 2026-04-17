@@ -10,6 +10,7 @@ import PaginationButtons from "@peated/web/components/paginationButtons";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import TextInput from "@peated/web/components/textInput";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
+import { getBottleBottlingPath } from "@peated/web/lib/bottlings";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { buildQueryString } from "@peated/web/lib/urls";
 import {
@@ -89,6 +90,9 @@ export default function Page() {
   const resolveMutation = useMutation(
     orpc.prices.matchQueue.resolve.mutationOptions(),
   );
+  const createBottleMutation = useMutation(
+    orpc.prices.matchQueue.createBottle.mutationOptions(),
+  );
   const retryMutation = useMutation(
     orpc.prices.matchQueue.retry.mutationOptions(),
   );
@@ -98,6 +102,7 @@ export default function Page() {
 
   const { flash } = useFlashMessages();
   const isBusy =
+    createBottleMutation.isPending ||
     resolveMutation.isPending ||
     retryMutation.isPending ||
     retryAllMutation.isPending;
@@ -175,6 +180,39 @@ export default function Page() {
           Requeued <strong className="font-bold">{item.price.name}</strong>
         </div>
       ),
+    );
+  }
+
+  async function handleApplyCreateProposal(item: QueueItem): Promise<void> {
+    const created = await createBottleMutation.mutateAsync({
+      proposal: item.id,
+      bottle: item.proposedBottle || undefined,
+      release: item.proposedRelease || undefined,
+    });
+    await refreshQueueList();
+    flash(
+      <div>
+        Created{" "}
+        <Link href={`/bottles/${created.bottle.id}`} className="underline">
+          {created.bottle.fullName}
+        </Link>
+        {created.release ? (
+          <>
+            {" "}
+            and{" "}
+            <Link
+              href={getBottleBottlingPath(
+                created.bottle.id,
+                created.release.id,
+              )}
+              className="underline"
+            >
+              {created.release.fullName}
+            </Link>
+          </>
+        ) : null}{" "}
+        for <strong className="font-bold">{item.price.name}</strong>
+      </div>,
     );
   }
 
@@ -364,6 +402,7 @@ export default function Page() {
               isBusy={isBusy}
               returnTo={returnTo}
               onApproveMatch={handleApproveMatch}
+              onApplyCreateProposal={handleApplyCreateProposal}
               onChooseBottle={(nextProposal) => {
                 setSelectedProposal(nextProposal);
               }}
