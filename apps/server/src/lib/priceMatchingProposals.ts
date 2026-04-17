@@ -518,10 +518,6 @@ async function maybeResolveTrustedSmwsStorePriceMatch(
     expectedProcessingToken: processingToken,
   });
 
-  if (existingBottleId && price.bottleId === existingBottleId) {
-    return proposal;
-  }
-
   try {
     const automationUser = await getAutomationModeratorUser();
 
@@ -1076,23 +1072,17 @@ export async function resolveStorePriceMatchProposal(
       expectedProcessingToken: processingToken,
     });
 
-    if (
-      !shouldAutoCreateStorePriceMatchProposal({
-        decision,
-        automationAssessment,
-      })
-    ) {
+    const shouldAutoCreate = shouldAutoCreateStorePriceMatchProposal({
+      decision,
+      automationAssessment,
+    });
+
+    if (proposal.status !== "verified" && !shouldAutoCreate) {
       return proposal;
     }
 
     try {
       const automationUser = await getAutomationModeratorUser();
-      const createInputs = buildStorePriceMatchCreateInputs(decision);
-      if (!createInputs.input && !createInputs.releaseInput) {
-        throw new Error(
-          `Unable to auto-create price match proposal without creation inputs (${proposal.id}).`,
-        );
-      }
 
       if (
         processingToken &&
@@ -1102,6 +1092,31 @@ export async function resolveStorePriceMatchProposal(
         ))
       ) {
         return await reloadStorePriceMatchProposal(proposal.id);
+      }
+
+      if (proposal.status === "verified") {
+        if (!proposal.suggestedBottleId) {
+          throw new Error(
+            `Unable to auto-approve verified price match proposal without a suggested bottle (${proposal.id}).`,
+          );
+        }
+
+        await applyApprovedStorePriceMatch({
+          proposalId: proposal.id,
+          bottleId: proposal.suggestedBottleId,
+          releaseId: proposal.suggestedReleaseId ?? null,
+          reviewedById: automationUser.id,
+          expectedProcessingToken: processingToken,
+        });
+
+        return await reloadStorePriceMatchProposal(proposal.id);
+      }
+
+      const createInputs = buildStorePriceMatchCreateInputs(decision);
+      if (!createInputs.input && !createInputs.releaseInput) {
+        throw new Error(
+          `Unable to auto-create price match proposal without creation inputs (${proposal.id}).`,
+        );
       }
 
       await createBottleFromStorePriceMatchProposal({
@@ -1130,7 +1145,12 @@ export async function resolveStorePriceMatchProposal(
         decision,
         automationAssessment,
         searchEvidence,
-        error: err instanceof Error ? err.message : "Unknown auto-create error",
+        error:
+          err instanceof Error
+            ? err.message
+            : proposal.status === "verified"
+              ? "Unknown auto-approval error"
+              : "Unknown auto-create error",
         statusOverride: "errored",
         expectedProcessingToken: processingToken,
       });

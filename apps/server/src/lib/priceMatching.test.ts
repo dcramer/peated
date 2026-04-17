@@ -502,6 +502,129 @@ describe("priceMatching", () => {
     expect(proposal.confidence).toBe(88);
   });
 
+  test("auto approves high-confidence matches that reaffirm the current bottle assignment", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const brand = await fixtures.Entity({
+      name: "Example Distillery",
+      type: ["brand", "distiller"],
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [brand.id],
+      name: "Port Cask",
+      category: "single_malt",
+      statedAge: 10,
+      abv: 58.4,
+      caskType: "tawny_port",
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      name: "Example Distillery Port Cask 10 Year",
+      imageUrl: null,
+      url: "https://totalwine.com/example",
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Example Distillery",
+      bottler: null,
+      expression: "Port Cask",
+      series: null,
+      distillery: ["Example Distillery"],
+      category: "single_malt",
+      stated_age: 10,
+      abv: 58.4,
+      release_year: null,
+      vintage_year: null,
+      cask_type: "tawny_port",
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        decision: {
+          action: "match_existing",
+          confidence: 72,
+          rationale: "The current bottle identity already matches cleanly.",
+          suggestedBottleId: bottle.id,
+          candidateBottleIds: [bottle.id],
+          proposedBottle: null,
+        },
+        searchEvidence: [],
+        candidateBottles: [
+          {
+            kind: "bottle",
+            bottleId: bottle.id,
+            releaseId: null,
+            alias: "Example Distillery Port Cask 10 Year",
+            fullName: "Example Distillery Port Cask 10 Year",
+            bottleFullName: "Example Distillery Port Cask 10 Year",
+            brand: "Example Distillery",
+            bottler: null,
+            series: null,
+            distillery: ["Example Distillery"],
+            category: "single_malt",
+            statedAge: 10,
+            edition: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: 58.4,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: "tawny_port",
+            caskSize: null,
+            caskFill: null,
+            score: 0.91,
+            source: ["current", "exact"],
+          },
+        ],
+        resolvedEntities: [],
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+    const listingAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, price.name),
+    });
+    const observation = await db.query.bottleObservations.findFirst({
+      where: (bottleObservations, { eq }) =>
+        eq(bottleObservations.sourceKey, `store_price:${price.id}`),
+    });
+
+    expect(proposal).toMatchObject({
+      status: "approved",
+      proposalType: "match_existing",
+      currentBottleId: bottle.id,
+      suggestedBottleId: bottle.id,
+      reviewedById: expect.any(Number),
+    });
+    expect(updatedPrice?.bottleId).toBe(bottle.id);
+    expect(listingAlias?.bottleId).toBe(bottle.id);
+    expect(observation).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      sourceType: "store_price",
+    });
+  });
+
   test("persists classifier-reviewed no_match decisions for unsupported non-exact matches", async ({
     fixtures,
   }) => {
@@ -1531,6 +1654,69 @@ describe("priceMatching", () => {
       name: "SMWS RW6.5 Sauna Smoke",
       imageUrl: null,
       url: "https://smws.example/rw6-5-existing",
+    });
+
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+    const listingAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, price.name),
+    });
+
+    expect(extractFromText).not.toHaveBeenCalled();
+    expect(classifyBottleReference).not.toHaveBeenCalled();
+    expect(proposal).toMatchObject({
+      status: "approved",
+      proposalType: "match_existing",
+      currentBottleId: bottle.id,
+      suggestedBottleId: bottle.id,
+      reviewedById: expect.any(Number),
+    });
+    expect(updatedPrice?.bottleId).toBe(bottle.id);
+    expect(listingAlias?.bottleId).toBe(bottle.id);
+  });
+
+  test("auto approves trusted SMWS matches when the price is already linked to the same bottle", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+
+    const site = await fixtures.ExternalSiteOrExisting({ type: "smws" });
+    const brand = await fixtures.Entity({
+      name: "The Scotch Malt Whisky Society",
+      shortName: null,
+      type: ["brand", "bottler"],
+    });
+    const distiller = await fixtures.Entity({
+      name: "Kyrö",
+      type: ["distiller"],
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      distillerIds: [distiller.id],
+      name: "RW6.5 Sauna Smoke",
+      category: "rye",
+      singleCask: true,
+    });
+    const price = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      bottleId: bottle.id,
+      name: "SMWS RW6.5 Sauna Smoke",
+      imageUrl: null,
+      url: "https://smws.example/rw6-5-existing-current",
     });
 
     const { extractFromText } =
