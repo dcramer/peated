@@ -135,6 +135,161 @@ describe("price match queue", () => {
     });
   });
 
+  test("serializes same-bottle correction proposals with repair drafts", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const brand = await fixtures.Entity({
+      name: "The Whistler",
+      type: ["brand", "bottler"],
+    });
+    const currentBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Bodega Cask",
+      category: "blend",
+      distillerIds: [],
+    });
+    const price = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "The Whistler Bodega Cask Single Malt Irish Whiskey",
+      bottleId: currentBottle.id,
+    });
+
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "correction",
+        confidence: 92,
+        currentBottleId: currentBottle.id,
+        suggestedBottleId: currentBottle.id,
+        candidateBottles: [
+          {
+            bottleId: currentBottle.id,
+            fullName: currentBottle.fullName,
+            alias: currentBottle.fullName,
+            brand: "The Whistler",
+            bottler: null,
+            series: null,
+            distillery: [],
+            category: "blend",
+            statedAge: null,
+            edition: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 0.99,
+            source: ["exact"],
+          },
+        ],
+        extractedLabel: {
+          brand: "The Whistler",
+          bottler: null,
+          expression: "Bodega Cask",
+          series: null,
+          distillery: ["Boann Distillery"],
+          category: "single_malt",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        proposedBottle: {
+          name: "Bodega Cask",
+          series: null,
+          category: "single_malt",
+          edition: null,
+          statedAge: null,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          brand: {
+            id: brand.id,
+            name: "The Whistler",
+          },
+          distillers: [
+            {
+              id: null,
+              name: "Boann Distillery",
+            },
+          ],
+          bottler: null,
+        },
+        searchEvidence: [
+          {
+            provider: "openai",
+            query: '"The Whistler Bodega Cask" single malt',
+            summary:
+              "Official and critic sources describe The Whistler Bodega Cask as a single malt from Boann Distillery.",
+            results: [
+              {
+                title:
+                  "Whiskey Review: The Whistler Bodega Cask Irish Single Malt",
+                url: "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+                domain: "thewhiskeywash.com",
+                description:
+                  "Reviewing The Whistler Bodega Cask Irish Single Malt.",
+                extraSnippets: [],
+              },
+            ],
+          },
+        ],
+        rationale:
+          "The current bottle appears to be the right base identity, but its stored bottle metadata conflicts with the extracted traits.",
+      })
+      .returning();
+
+    const result = await routerClient.prices.matchQueue.list(
+      {},
+      { context: { user } },
+    );
+    const queueItem = result.results.find((item) => item.id === proposal.id);
+
+    expect(queueItem).toMatchObject({
+      proposalType: "correction",
+      currentBottle: {
+        id: currentBottle.id,
+      },
+      suggestedBottle: {
+        id: currentBottle.id,
+      },
+      proposedBottle: {
+        name: "Bodega Cask",
+        category: "single_malt",
+        distillers: [
+          {
+            name: "Boann Distillery",
+          },
+        ],
+      },
+      differentiatingAttributes: expect.arrayContaining(["distillery"]),
+      webEvidenceChecks: expect.arrayContaining([
+        expect.objectContaining({
+          attribute: "distillery",
+          expectedValue: "Boann Distillery",
+        }),
+      ]),
+    });
+  });
+
   test("filters queue items by kind and orders ties by newest id", async ({
     fixtures,
   }) => {

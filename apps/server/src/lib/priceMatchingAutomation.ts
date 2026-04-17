@@ -1234,18 +1234,25 @@ export function getStorePriceMatchAutomationAssessment({
   creationTarget,
   searchEvidence,
 }: MatchAutomationInput): StorePriceMatchAutomationAssessment {
-  if (action === "create_new" && (proposedBottle || proposedRelease)) {
+  if (
+    (action === "create_new" || action === "correction") &&
+    (proposedBottle || proposedRelease)
+  ) {
+    const createScore = getCreateNewScore({
+      proposedBottle,
+      proposedRelease: proposedRelease ?? null,
+      creationTarget: creationTarget ?? null,
+      candidateBottles,
+      searchEvidence,
+      extractedLabel,
+      price,
+    });
+
     return {
       modelConfidence,
-      ...getCreateNewScore({
-        proposedBottle,
-        proposedRelease: proposedRelease ?? null,
-        creationTarget: creationTarget ?? null,
-        candidateBottles,
-        searchEvidence,
-        extractedLabel,
-        price,
-      }),
+      ...createScore,
+      automationEligible:
+        action === "create_new" ? createScore.automationEligible : false,
     };
   }
 
