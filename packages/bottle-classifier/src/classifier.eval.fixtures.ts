@@ -125,6 +125,42 @@ const macallanSherryOakLegacy30 = buildBottleCandidate({
   source: ["exact"],
 });
 
+const tomatinLegacy12 = buildBottleCandidate({
+  bottleId: 65001,
+  alias: "Tomatin Single Malt 12-year-old",
+  fullName: "Tomatin 12-year-old",
+  brand: "Tomatin",
+  distillery: ["Tomatin"],
+  category: "single_malt",
+  statedAge: 12,
+  score: 1,
+  source: ["exact"],
+});
+
+const tomatinCaskStrengthParent = buildBottleCandidate({
+  bottleId: 65002,
+  fullName: "Tomatin Cask Strength",
+  brand: "Tomatin",
+  distillery: ["Tomatin"],
+  category: "single_malt",
+  caskStrength: true,
+  score: 0.82,
+  source: ["text"],
+});
+
+const tomatinBourbonAndSherryCasks = buildBottleCandidate({
+  bottleId: 65003,
+  fullName: "Tomatin 12-year-old Bourbon & Sherry Casks",
+  brand: "Tomatin",
+  distillery: ["Tomatin"],
+  category: "single_malt",
+  statedAge: 12,
+  abv: 43,
+  caskType: null,
+  score: 0.81,
+  source: ["text"],
+});
+
 const taleOfIceCream = buildBottleCandidate({
   bottleId: 43236,
   fullName: "Glenmorangie A Tale of Ice Cream",
@@ -609,6 +645,34 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       parentBottleId: 54082,
       summary:
         "Treat the local 30-year-old bottle row as a dirty release-like candidate and create a 30-year-old child release beneath the reusable Macallan Sherry Oak parent bottle instead.",
+    },
+  },
+  {
+    name: "store listing: plain Tomatin 12-year-old does not redirect into the cask-strength family",
+    input: {
+      reference: {
+        name: "Tomatin Single Malt 12-year-old",
+        url: "https://shop.example/products/tomatin-12-year-old",
+      },
+      extractedIdentity: buildExtractedIdentity({
+        brand: "Tomatin",
+        distillery: ["Tomatin"],
+        category: "single_malt",
+        stated_age: 12,
+      }),
+      initialCandidates: [
+        tomatinLegacy12,
+        tomatinBourbonAndSherryCasks,
+        tomatinCaskStrengthParent,
+      ],
+    },
+    expected: {
+      status: "classified",
+      action: "match",
+      identityScope: "product",
+      matchedBottleId: 65001,
+      summary:
+        "Keep the plain Tomatin 12-year-old bottle match instead of inventing a child release beneath the unrelated Tomatin Cask Strength family.",
     },
   },
   {

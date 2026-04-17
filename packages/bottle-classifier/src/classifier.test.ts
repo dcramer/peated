@@ -208,6 +208,84 @@ const macallanSherryOakLegacy30Candidate: BottleCandidate = {
   source: ["exact"],
 };
 
+const tomatinLegacy12Candidate: BottleCandidate = {
+  bottleId: 65001,
+  releaseId: null,
+  kind: "bottle",
+  alias: "Tomatin Single Malt 12-year-old",
+  fullName: "Tomatin 12-year-old",
+  bottleFullName: "Tomatin 12-year-old",
+  brand: "Tomatin",
+  bottler: null,
+  series: null,
+  distillery: ["Tomatin"],
+  category: "single_malt",
+  statedAge: 12,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 1,
+  source: ["exact"],
+};
+
+const tomatinCaskStrengthParentCandidate: BottleCandidate = {
+  bottleId: 65002,
+  releaseId: null,
+  kind: "bottle",
+  alias: null,
+  fullName: "Tomatin Cask Strength",
+  bottleFullName: "Tomatin Cask Strength",
+  brand: "Tomatin",
+  bottler: null,
+  series: null,
+  distillery: ["Tomatin"],
+  category: "single_malt",
+  statedAge: null,
+  edition: null,
+  caskStrength: true,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.82,
+  source: ["text"],
+};
+
+const tomatinBourbonAndSherryCasksCandidate: BottleCandidate = {
+  bottleId: 65003,
+  releaseId: null,
+  kind: "bottle",
+  alias: null,
+  fullName: "Tomatin 12-year-old Bourbon & Sherry Casks",
+  bottleFullName: "Tomatin 12-year-old Bourbon & Sherry Casks",
+  brand: "Tomatin",
+  bottler: null,
+  series: null,
+  distillery: ["Tomatin"],
+  category: "single_malt",
+  statedAge: 12,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: 43,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.81,
+  source: ["text"],
+};
+
 const penelopeBarrelStrengthParentCandidate: BottleCandidate = {
   bottleId: 54068,
   releaseId: null,
@@ -1389,6 +1467,87 @@ describe("createBottleClassifier", () => {
     });
     expect(result.decision.rationale).toContain(
       "legacy release-like bottle candidate",
+    );
+  });
+
+  test("keeps a plain age-statement match instead of redirecting to an unrelated cask-strength family", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Tomatin",
+      bottler: null,
+      expression: null,
+      series: null,
+      distillery: ["Tomatin"],
+      category: "single_malt",
+      stated_age: 12,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 95,
+          rationale:
+            "The generic 12-year-old local bottle is the safest match.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 65001,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [65001, 65002, 65003],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [
+            tomatinLegacy12Candidate,
+            tomatinBourbonAndSherryCasksCandidate,
+            tomatinCaskStrengthParentCandidate,
+          ],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Tomatin Single Malt 12-year-old",
+      },
+      extractedIdentity,
+      initialCandidates: [
+        tomatinLegacy12Candidate,
+        tomatinBourbonAndSherryCasksCandidate,
+        tomatinCaskStrengthParentCandidate,
+      ],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "match",
+      matchedBottleId: 65001,
+      matchedReleaseId: null,
+      parentBottleId: null,
+      identityScope: "product",
+    });
+    expect(result.decision.rationale).not.toContain(
+      "Server promoted the bottle match to release creation",
     );
   });
 
