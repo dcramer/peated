@@ -1,6 +1,5 @@
 import { normalizeString } from "@peated/bottle-classifier/normalize";
 import { hasSupportiveWebEvidenceForExistingMatch as hasSupportiveBottleEvidence } from "@peated/bottle-classifier/priceMatchingEvidence";
-import { hasExtractedReleaseIdentity } from "@peated/bottle-classifier/releaseIdentity";
 import type { StorePrice } from "@peated/server/db/schema";
 import {
   type BottleCandidateSchema,
@@ -462,7 +461,7 @@ function candidateMatchesDistillery(
 function compareCandidateValue(
   attribute: MatchAttribute,
   candidate: PriceMatchCandidate,
-  expectedValue: string | number,
+  expectedValue: string | number | boolean,
 ) {
   switch (attribute) {
     case "brand":
@@ -488,9 +487,15 @@ function compareCandidateValue(
     case "caskFill":
       return textsOverlap(candidate.caskFill, String(expectedValue));
     case "caskStrength":
-      return candidate.caskStrength === (expectedValue === "true");
+      return (
+        candidate.caskStrength ===
+        (expectedValue === true || expectedValue === "true")
+      );
     case "singleCask":
-      return candidate.singleCask === (expectedValue === "true");
+      return (
+        candidate.singleCask ===
+        (expectedValue === true || expectedValue === "true")
+      );
     case "abv":
       return (
         candidate.abv !== null &&
@@ -503,6 +508,103 @@ function compareCandidateValue(
     default:
       return false;
   }
+}
+
+function hasMeaningfulExtractedReleaseValue(
+  value: string | number | boolean | null | undefined,
+): value is string | number | true {
+  if (typeof value === "string") {
+    return value.length > 0;
+  }
+
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  return value !== null && value !== undefined;
+}
+
+function bottleTargetRepresentsExtractedReleaseIdentity({
+  target,
+  attribute,
+  expectedValue,
+}: {
+  target: PriceMatchCandidate;
+  attribute: MatchAttribute;
+  expectedValue: string | number | boolean;
+}) {
+  if (compareCandidateValue(attribute, target, expectedValue)) {
+    return true;
+  }
+
+  return [target.alias, target.bottleFullName, target.fullName]
+    .filter((value): value is string => Boolean(value))
+    .some((value) =>
+      attributeMatchesText(attribute, String(expectedValue), value),
+    );
+}
+
+function listingCarriesReleaseIdentityBeyondBottle({
+  target,
+  extractedLabel,
+}: {
+  target: PriceMatchCandidate;
+  extractedLabel: ExtractedBottleDetails | null;
+}) {
+  const extractedReleaseAttributes = [
+    {
+      attribute: "edition" as const,
+      value: extractedLabel?.edition,
+    },
+    {
+      attribute: "statedAge" as const,
+      value: extractedLabel?.stated_age,
+    },
+    {
+      attribute: "abv" as const,
+      value: extractedLabel?.abv,
+    },
+    {
+      attribute: "releaseYear" as const,
+      value: extractedLabel?.release_year,
+    },
+    {
+      attribute: "vintageYear" as const,
+      value: extractedLabel?.vintage_year,
+    },
+    {
+      attribute: "caskType" as const,
+      value: extractedLabel?.cask_type,
+    },
+    {
+      attribute: "caskSize" as const,
+      value: extractedLabel?.cask_size,
+    },
+    {
+      attribute: "caskFill" as const,
+      value: extractedLabel?.cask_fill,
+    },
+    {
+      attribute: "caskStrength" as const,
+      value: extractedLabel?.cask_strength,
+    },
+    {
+      attribute: "singleCask" as const,
+      value: extractedLabel?.single_cask,
+    },
+  ];
+
+  return extractedReleaseAttributes.some(({ attribute, value }) => {
+    if (!hasMeaningfulExtractedReleaseValue(value)) {
+      return false;
+    }
+
+    return !bottleTargetRepresentsExtractedReleaseIdentity({
+      target,
+      attribute,
+      expectedValue: value,
+    });
+  });
 }
 
 function getCreateNewChecks(
@@ -738,7 +840,10 @@ function getMatchScore({
     score += 6;
   } else if (
     target.releaseId === null &&
-    hasExtractedReleaseIdentity(extractedLabel)
+    listingCarriesReleaseIdentityBeyondBottle({
+      target,
+      extractedLabel,
+    })
   ) {
     score -= 10;
     automationBlockers.push(
