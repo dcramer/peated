@@ -288,6 +288,58 @@ const taleOfIceCreamCandidate: BottleCandidate = {
   source: ["text"],
 };
 
+const ledaigStiuireadairCandidate: BottleCandidate = {
+  bottleId: 41258,
+  releaseId: null,
+  kind: "bottle",
+  alias: "Ledaig Stiuireadair",
+  fullName: "Ledaig Stiuireadair",
+  bottleFullName: "Ledaig Stiuireadair",
+  brand: "Ledaig",
+  bottler: null,
+  series: null,
+  distillery: ["Tobermory"],
+  category: "single_malt",
+  statedAge: null,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.88,
+  source: ["text"],
+};
+
+const ledaigStiuiredairNearDuplicateCandidate: BottleCandidate = {
+  bottleId: 41259,
+  releaseId: null,
+  kind: "bottle",
+  alias: "Ledaig Stiuiredair",
+  fullName: "Ledaig Stiuiredair",
+  bottleFullName: "Ledaig Stiuiredair",
+  brand: "Ledaig",
+  bottler: null,
+  series: null,
+  distillery: ["Tobermory"],
+  category: "single_malt",
+  statedAge: null,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.84,
+  source: ["vector"],
+};
+
 const redbreastBatchACandidate: BottleCandidate = {
   bottleId: 9101,
   releaseId: null,
@@ -1516,6 +1568,85 @@ describe("createBottleClassifier", () => {
     expect(result.decision).toMatchObject({
       action: "match",
       matchedBottleId: 43236,
+      matchedReleaseId: null,
+      parentBottleId: null,
+      identityScope: "product",
+    });
+    expect(result.decision.rationale).not.toContain(
+      "Server downgraded the existing-match recommendation",
+    );
+  });
+
+  test("keeps a uniquely supported bottle match when the title adds producer context beyond the canonical bottle name", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Ledaig",
+      bottler: null,
+      expression: "Stiuireadair",
+      series: null,
+      distillery: ["Tobermory"],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 88,
+          rationale:
+            "The local bottle aligns on brand, distillery, category, and the distinctive expression name.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 41258,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [41258, 41259],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [
+            ledaigStiuireadairCandidate,
+            ledaigStiuiredairNearDuplicateCandidate,
+          ],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Tobermory Ledaig Stiuireadair Single Malt Scotch Whisky",
+      },
+      extractedIdentity,
+      initialCandidates: [
+        ledaigStiuireadairCandidate,
+        ledaigStiuiredairNearDuplicateCandidate,
+      ],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "match",
+      matchedBottleId: 41258,
       matchedReleaseId: null,
       parentBottleId: null,
       identityScope: "product",
