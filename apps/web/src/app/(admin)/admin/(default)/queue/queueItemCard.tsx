@@ -1,14 +1,17 @@
 "use client";
 
+import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import type { Outputs } from "@peated/server/orpc/router";
 import Button from "@peated/web/components/button";
+import { useFlashMessages } from "@peated/web/components/flash";
 import Link from "@peated/web/components/link";
 import {
   getBottleBottlingPath,
   getNewBottleBottlingPath,
 } from "@peated/web/lib/bottlings";
 import classNames from "@peated/web/lib/classNames";
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
+import { formatPriceMatchQueueLlmExport } from "./llmExport";
 
 export type QueueItem =
   Outputs["prices"]["matchQueue"]["list"]["results"][number];
@@ -745,6 +748,28 @@ function getCreateProposalActions(
   }
 }
 
+async function copyTextToClipboard(value: string): Promise<void> {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(value);
+    return;
+  }
+
+  const textArea = document.createElement("textarea");
+  textArea.value = value;
+  textArea.setAttribute("readonly", "");
+  textArea.style.position = "fixed";
+  textArea.style.opacity = "0";
+  document.body.appendChild(textArea);
+  textArea.select();
+
+  const copied = document.execCommand("copy");
+  document.body.removeChild(textArea);
+
+  if (!copied) {
+    throw new Error("Clipboard copy failed.");
+  }
+}
+
 export default function QueueItemCard({
   isBusy,
   item,
@@ -755,6 +780,8 @@ export default function QueueItemCard({
   onIgnore,
   onRetry,
 }: QueueItemCardProps) {
+  const { flash } = useFlashMessages();
+  const [isCopying, setIsCopying] = useState(false);
   const evidenceBadges = getEvidenceBadges(item);
   const extractedLabelSummary = getExtractedLabelSummary(item);
   const topCandidates = getTopCandidates(item);
@@ -778,6 +805,29 @@ export default function QueueItemCard({
   const queuedAt = formatTimestamp(item.createdAt);
   const processingQueuedAt = formatTimestamp(item.processingQueuedAt);
   const processingExpiresAt = formatTimestamp(item.processingExpiresAt);
+
+  async function handleCopyForLlm(): Promise<void> {
+    setIsCopying(true);
+
+    try {
+      await copyTextToClipboard(formatPriceMatchQueueLlmExport(item));
+      flash(
+        <div>
+          Copied structured match payload for{" "}
+          <strong className="font-bold">{item.price.name}</strong>
+        </div>,
+      );
+    } catch {
+      flash(
+        <div>
+          Unable to copy the match payload for{" "}
+          <strong className="font-bold">{item.price.name}</strong>
+        </div>,
+      );
+    } finally {
+      setIsCopying(false);
+    }
+  }
 
   return (
     <article className="rounded-xl border border-slate-800 bg-slate-950/80 p-4 shadow-sm lg:p-5">
@@ -1108,6 +1158,22 @@ export default function QueueItemCard({
         </section>
 
         <aside className="flex flex-col gap-2">
+          <Button
+            className="self-end"
+            icon={
+              <DocumentDuplicateIcon className="h-5 w-5" aria-hidden="true" />
+            }
+            size="small"
+            disabled={isCopying}
+            loading={isCopying}
+            onClick={async () => {
+              await handleCopyForLlm();
+            }}
+            title="Copy structured listing, identity, evidence, and recommendation data as JSON"
+          >
+            <span className="sr-only">Copy match payload</span>
+          </Button>
+
           {isProcessing ? (
             <div className="rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-3 text-sm text-slate-300">
               Retry lease is active. Review actions return when the retry
