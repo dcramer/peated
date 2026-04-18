@@ -32,6 +32,7 @@ import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
+import { getBottleCandidateById } from "@peated/server/lib/bottleReferenceCandidates";
 import { buildClassifierCreateInputs } from "@peated/server/lib/classifierDecisionCreateInputs";
 import {
   BottleAlreadyExistsError,
@@ -49,7 +50,6 @@ import {
   shouldVerifyStorePriceMatch,
   type StorePriceMatchAutomationAssessment,
 } from "@peated/server/lib/priceMatchingAutomation";
-import { getBottleMatchCandidateById } from "@peated/server/lib/priceMatchingCandidates";
 import {
   hasActiveStorePriceMatchProposalProcessingLease,
   refreshStorePriceMatchProposalProcessingLease,
@@ -59,6 +59,11 @@ import {
   CLOSED_STORE_PRICE_MATCH_PROPOSAL_STATUSES,
   REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES,
 } from "@peated/server/lib/priceMatchingStatus";
+import {
+  listMatchesExpectedValue,
+  normalizeComparableText,
+  textsOverlap,
+} from "@peated/server/lib/priceMatchingText";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import type {
   BottleInputSchema,
@@ -120,63 +125,6 @@ function shouldAutoIgnoreTrivialNonWhiskyListing(name: string): boolean {
   return (
     NON_WHISKY_LISTING_KEYWORDS.test(normalizedName) &&
     !WHISKY_LISTING_KEYWORDS.test(normalizedName)
-  );
-}
-
-function normalizeComparableText(value: string | null | undefined): string {
-  if (!value) {
-    return "";
-  }
-
-  return normalizeString(value).toLowerCase().replace(/_/g, " ").trim();
-}
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function containsComparablePhrase(haystack: string, needle: string): boolean {
-  if (!haystack || !needle) {
-    return false;
-  }
-
-  const pattern = new RegExp(
-    `(^|[^a-z0-9])${escapeRegExp(needle)}($|[^a-z0-9])`,
-  );
-
-  return pattern.test(haystack);
-}
-
-function textsOverlap(
-  left: string | null | undefined,
-  right: string | null | undefined,
-): boolean {
-  const normalizedLeft = normalizeComparableText(left);
-  const normalizedRight = normalizeComparableText(right);
-
-  if (!normalizedLeft || !normalizedRight) {
-    return false;
-  }
-
-  return (
-    normalizedLeft === normalizedRight ||
-    containsComparablePhrase(normalizedLeft, normalizedRight) ||
-    containsComparablePhrase(normalizedRight, normalizedLeft)
-  );
-}
-
-function listMatchesExpectedValue(
-  actualValues: string[],
-  expectedValues: string[],
-): boolean {
-  if (!actualValues.length || !expectedValues.length) {
-    return false;
-  }
-
-  return expectedValues.every((expectedValue) =>
-    actualValues.some((actualValue) =>
-      textsOverlap(actualValue, expectedValue),
-    ),
   );
 }
 
@@ -593,6 +541,7 @@ function getProposalStatus(
   price: StorePrice,
   decision: StorePriceMatchDecision,
   automationAssessment: StorePriceMatchAutomationAssessment | null,
+  candidates: PriceMatchCandidate[],
 ): StorePriceMatchProposal["status"] {
   if (
     automationAssessment &&
@@ -601,7 +550,10 @@ function getProposalStatus(
       price,
       suggestedBottleId: decision.suggestedBottleId,
       suggestedReleaseId: decision.suggestedReleaseId ?? null,
+      modelConfidence: decision.confidence,
       automationScore: automationAssessment.automationScore,
+      automationBlockers: automationAssessment.automationBlockers,
+      candidateBottles: candidates,
     })
   ) {
     return "verified";
@@ -724,7 +676,7 @@ async function maybeResolveTrustedSmwsStorePriceMatch(
   const distiller = await findEntityChoiceByName(details.distiller);
   const existingBottleId = await findTrustedSmwsBottleId(name);
   const existingBottle = existingBottleId
-    ? await getBottleMatchCandidateById(existingBottleId)
+    ? await getBottleCandidateById(existingBottleId)
     : null;
 
   const extractedLabel: ExtractedBottleDetails = {
@@ -1000,7 +952,12 @@ export async function upsertStorePriceMatchProposal({
   const status =
     statusOverride ??
     (decision
-      ? getProposalStatus(price, decision, automationAssessment ?? null)
+      ? getProposalStatus(
+          price,
+          decision,
+          automationAssessment ?? null,
+          candidates,
+        )
       : "errored");
   const creationTarget =
     decision?.action === "create_new"
@@ -1024,6 +981,7 @@ export async function upsertStorePriceMatchProposal({
     proposedBottle: decision?.proposedBottle ?? null,
     proposedRelease: decision?.proposedRelease ?? null,
     searchEvidence: searchEvidence || [],
+    automationAssessment: automationAssessment ?? null,
     rationale: decision?.rationale ?? null,
     model: config.OPENAI_MODEL,
     error: error || null,

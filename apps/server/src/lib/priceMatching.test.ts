@@ -9,11 +9,13 @@ import {
   storePrices,
 } from "@peated/server/db/schema";
 import {
+  findBottleReferenceCandidates,
+  searchBottleCandidates,
+} from "@peated/server/lib/bottleReferenceCandidates";
+import {
   applyApprovedStorePriceMatch,
-  findStorePriceMatchCandidates,
   resolveStorePriceMatchProposal,
 } from "@peated/server/lib/priceMatching";
-import { findBottleMatchCandidates } from "@peated/server/lib/priceMatchingCandidates";
 import { eq, sql } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -210,7 +212,7 @@ describe("priceMatching", () => {
       name: "Fallback Candidate",
     });
 
-    const candidates = await findStorePriceMatchCandidates(
+    const candidates = await findBottleReferenceCandidates(
       {
         name: "Fallback Candidate",
         bottleId: null,
@@ -242,7 +244,7 @@ describe("priceMatching", () => {
       name: "Pure Malt",
     });
 
-    const candidates = await findBottleMatchCandidates({
+    const candidates = await searchBottleCandidates({
       query: "Shibui Pure Malt Whisky 750ml",
       brand: "Shibui",
       expression: "Pure Malt",
@@ -289,7 +291,7 @@ describe("priceMatching", () => {
       name: "Shibui Pure Malt Single Cask",
     });
 
-    const candidates = await findBottleMatchCandidates({
+    const candidates = await searchBottleCandidates({
       query: "Shibui Pure Malt Whisky 750ml",
       brand: "Shibui",
       expression: "Pure Malt",
@@ -346,7 +348,7 @@ describe("priceMatching", () => {
       name: "Founders Cut",
     });
 
-    const candidates = await findBottleMatchCandidates({
+    const candidates = await searchBottleCandidates({
       query: "Founder's Cut",
       brand: null,
       bottler: null,
@@ -395,7 +397,7 @@ describe("priceMatching", () => {
       ],
     }));
 
-    const candidates = await findBottleMatchCandidates({
+    const candidates = await searchBottleCandidates({
       query: "Synthetic Candidate",
       brand: null,
       expression: null,
@@ -500,6 +502,11 @@ describe("priceMatching", () => {
     expect(proposal.status).toBe("pending_review");
     expect(proposal.proposalType).toBe("match_existing");
     expect(proposal.confidence).toBe(88);
+    expect(proposal.automationAssessment).toMatchObject({
+      modelConfidence: 88,
+      automationEligible: false,
+      automationScore: expect.any(Number),
+    });
   });
 
   test("keeps a plain age-statement match instead of drifting into a cask-strength release proposal", async ({
@@ -810,6 +817,100 @@ describe("priceMatching", () => {
       releaseId: null,
       sourceType: "store_price",
     });
+  });
+
+  test("auto approves unmatched exact matches when classifier confidence is extremely high", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const bottle = await fixtures.Bottle();
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Fractional Confidence Candidate",
+      imageUrl: null,
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Confidence Brand",
+      bottler: null,
+      expression: "Reserve",
+      series: null,
+      distillery: ["Confidence Distillery"],
+      category: "single_malt",
+      stated_age: 12,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        decision: {
+          action: "match_existing",
+          confidence: 97,
+          rationale: "The listing exactly matches a canonical alias.",
+          suggestedBottleId: bottle.id,
+          candidateBottleIds: [bottle.id],
+          proposedBottle: null,
+        },
+        searchEvidence: [],
+        candidateBottles: [
+          {
+            bottleId: bottle.id,
+            alias: "Fractional Confidence Candidate",
+            fullName: bottle.fullName,
+            brand: null,
+            bottler: null,
+            series: null,
+            distillery: [],
+            category: null,
+            statedAge: null,
+            edition: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 0.95,
+            source: ["exact"],
+          },
+        ],
+        resolvedEntities: [],
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+
+    expect(proposal).toMatchObject({
+      status: "approved",
+      proposalType: "match_existing",
+      currentBottleId: bottle.id,
+      suggestedBottleId: bottle.id,
+      reviewedById: expect.any(Number),
+    });
+    expect(updatedPrice?.bottleId).toBe(bottle.id);
   });
 
   test("persists classifier-reviewed no_match decisions for unsupported non-exact matches", async ({
@@ -3145,7 +3246,7 @@ describe("priceMatching", () => {
     const executeSpy = vi.spyOn(db, "execute") as any;
     executeSpy.mockResolvedValue({ rows: [] });
 
-    await findBottleMatchCandidates({
+    await searchBottleCandidates({
       query: "Springbank Local Barley",
       brand: "Springbank",
       bottler: "Campbeltown Merchant",
@@ -3234,7 +3335,7 @@ describe("priceMatching", () => {
       })
       .mockResolvedValueOnce({ rows: [] });
 
-    const candidates = await findBottleMatchCandidates({
+    const candidates = await searchBottleCandidates({
       query: "Shibui Pure Malt Whisky 750ml",
       brand: "Shibui",
       expression: "Pure Malt",
@@ -3318,7 +3419,7 @@ describe("priceMatching", () => {
       caskFill: "1st_fill",
     });
 
-    const [candidate] = await findBottleMatchCandidates({
+    const [candidate] = await searchBottleCandidates({
       query: "Independent Label Small Batch Reserve Batch 7",
       brand: brand.name,
       bottler: bottler.name,
@@ -3393,7 +3494,7 @@ describe("priceMatching", () => {
       sql`UPDATE ${bottleReleases} SET search_vector = NULL WHERE ${bottleReleases.id} = ${release.id}`,
     );
 
-    const candidates = await findBottleMatchCandidates({
+    const candidates = await searchBottleCandidates({
       query:
         "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
       brand: lagavulin.name,
@@ -3477,7 +3578,7 @@ describe("priceMatching", () => {
       sql`UPDATE ${bottleReleases} SET search_vector = NULL WHERE ${bottleReleases.id} IN (${springRelease.id}, ${autumnRelease.id})`,
     );
 
-    const candidates = await findBottleMatchCandidates({
+    const candidates = await searchBottleCandidates({
       query:
         "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
       brand: lagavulin.name,
@@ -3544,7 +3645,7 @@ describe("priceMatching", () => {
       name: "The Macallan Sherry Oak Single Malt Scotch 30-year-old",
     });
 
-    const candidates = await findBottleMatchCandidates({
+    const candidates = await searchBottleCandidates({
       query: "The Macallan Sherry Oak Single Malt Scotch 30-year-old",
       brand: brand.name,
       bottler: null,
@@ -3608,7 +3709,7 @@ describe("priceMatching", () => {
       name: "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey Batch 11",
     });
 
-    const candidates = await findBottleMatchCandidates({
+    const candidates = await searchBottleCandidates({
       query:
         "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey (Batch 11)",
       brand: brand.name,
@@ -3686,7 +3787,7 @@ describe("priceMatching", () => {
       })
       .mockResolvedValueOnce({ rows: [] });
 
-    const candidates = await findBottleMatchCandidates({
+    const candidates = await searchBottleCandidates({
       query: "Shibui Pure Malt Batch 1 Whisky 750ml",
       brand: "Shibui",
       expression: "Pure Malt",
@@ -3742,7 +3843,7 @@ describe("priceMatching", () => {
         ],
       });
 
-    const candidates = await findBottleMatchCandidates({
+    const candidates = await searchBottleCandidates({
       query: "Shibui Pure Malt Whisky 750ml",
       brand: "Shibui",
       expression: "Pure Malt",

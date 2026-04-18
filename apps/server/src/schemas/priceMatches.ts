@@ -136,6 +136,16 @@ export const PriceMatchEvidenceCheckSchema = z.object({
 });
 export const BottleEvidenceCheckSchema = PriceMatchEvidenceCheckSchema;
 
+export const StorePriceMatchAutomationAssessmentSchema = z.object({
+  modelConfidence: z.number().nullable(),
+  automationScore: z.number().nullable(),
+  automationEligible: z.boolean().default(false),
+  automationBlockers: z.array(z.string()).default([]),
+  decisiveMatchAttributes: z.array(PriceMatchAttributeEnum).default([]),
+  differentiatingAttributes: z.array(PriceMatchAttributeEnum).default([]),
+  webEvidenceChecks: z.array(PriceMatchEvidenceCheckSchema).default([]),
+});
+
 export const StorePriceMatchProposalStatusEnum = z.enum([
   "verified",
   "pending_review",
@@ -375,13 +385,20 @@ export const StorePriceMatchProposalSchema = z.object({
   status: StorePriceMatchProposalStatusEnum,
   proposalType: StorePriceMatchProposalTypeEnum,
   confidence: z.number().nullable(),
-  modelConfidence: z.number().nullable(),
-  automationScore: z.number().nullable(),
-  automationEligible: z.boolean().default(false),
-  automationBlockers: z.array(z.string()).default([]),
-  decisiveMatchAttributes: z.array(PriceMatchAttributeEnum).default([]),
-  differentiatingAttributes: z.array(PriceMatchAttributeEnum).default([]),
-  webEvidenceChecks: z.array(PriceMatchEvidenceCheckSchema).default([]),
+  modelConfidence:
+    StorePriceMatchAutomationAssessmentSchema.shape.modelConfidence,
+  automationScore:
+    StorePriceMatchAutomationAssessmentSchema.shape.automationScore,
+  automationEligible:
+    StorePriceMatchAutomationAssessmentSchema.shape.automationEligible,
+  automationBlockers:
+    StorePriceMatchAutomationAssessmentSchema.shape.automationBlockers,
+  decisiveMatchAttributes:
+    StorePriceMatchAutomationAssessmentSchema.shape.decisiveMatchAttributes,
+  differentiatingAttributes:
+    StorePriceMatchAutomationAssessmentSchema.shape.differentiatingAttributes,
+  webEvidenceChecks:
+    StorePriceMatchAutomationAssessmentSchema.shape.webEvidenceChecks,
   currentBottleId: z.number().nullable(),
   currentReleaseId: z.number().nullable(),
   suggestedBottleId: z.number().nullable(),

@@ -157,6 +157,9 @@ export const storePriceMatchProposals = pgTable(
       .$type<Record<string, unknown>[]>()
       .default(sql`'[]'::jsonb`)
       .notNull(),
+    automationAssessment: jsonb("automation_assessment").$type<
+      Record<string, unknown>
+    >(),
     rationale: text("rationale"),
     model: text("model"),
     error: text("error"),

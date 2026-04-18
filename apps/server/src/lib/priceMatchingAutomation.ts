@@ -2,6 +2,14 @@ import { normalizeString } from "@peated/bottle-classifier/normalize";
 import { hasSupportiveWebEvidenceForExistingMatch as hasSupportiveBottleEvidence } from "@peated/bottle-classifier/priceMatchingEvidence";
 import type { StorePrice } from "@peated/server/db/schema";
 import {
+  containsComparablePhrase,
+  escapeRegExp,
+  listMatchesExpectedValue,
+  normalizeComparableText,
+  textsOverlap,
+} from "@peated/server/lib/priceMatchingText";
+import type { StorePriceMatchAutomationAssessmentSchema } from "@peated/server/schemas";
+import {
   type BottleCandidateSchema,
   type BottleCreationTargetEnum,
   type BottleEvidenceCheckSchema,
@@ -58,17 +66,15 @@ export function hasSupportiveWebEvidenceForExistingMatch({
   });
 }
 
-export type StorePriceMatchAutomationAssessment = {
-  modelConfidence: number | null;
-  automationScore: number | null;
-  automationEligible: boolean;
-  automationBlockers: string[];
-  decisiveMatchAttributes: MatchAttribute[];
-  differentiatingAttributes: MatchAttribute[];
-  webEvidenceChecks: EvidenceCheck[];
-};
+export type StorePriceMatchAutomationAssessment = z.infer<
+  typeof StorePriceMatchAutomationAssessmentSchema
+>;
 
 const VERIFIED_MATCH_CONFIDENCE_THRESHOLD = 80;
+const UNMATCHED_AUTO_APPROVE_MATCH_SCORE_THRESHOLD =
+  VERIFIED_MATCH_CONFIDENCE_THRESHOLD;
+const HIGH_CONFIDENCE_EXACT_MATCH_SCORE_THRESHOLD = 70;
+const HIGH_CONFIDENCE_EXACT_MATCH_MODEL_CONFIDENCE_THRESHOLD = 95;
 const AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD = 90;
 const AUTHORITATIVE_SOURCE_TIERS = new Set<SourceTier>(["official", "critic"]);
 const CRITIC_DOMAINS = [
@@ -112,48 +118,6 @@ const WEB_VALIDATED_DIFFERENTIATORS = new Set<MatchAttribute>([
 ]);
 function clampScore(score: number) {
   return Math.min(100, Math.max(0, Math.round(score)));
-}
-
-function normalizeComparableText(value: string | null | undefined) {
-  if (!value) {
-    return "";
-  }
-
-  return normalizeString(value).toLowerCase().replace(/_/g, " ").trim();
-}
-
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function containsComparablePhrase(haystack: string, needle: string) {
-  if (!haystack || !needle) {
-    return false;
-  }
-
-  const pattern = new RegExp(
-    `(^|[^a-z0-9])${escapeRegExp(needle)}($|[^a-z0-9])`,
-  );
-
-  return pattern.test(haystack);
-}
-
-function textsOverlap(
-  left: string | null | undefined,
-  right: string | null | undefined,
-) {
-  const normalizedLeft = normalizeComparableText(left);
-  const normalizedRight = normalizeComparableText(right);
-
-  if (!normalizedLeft || !normalizedRight) {
-    return false;
-  }
-
-  return (
-    normalizedLeft === normalizedRight ||
-    containsComparablePhrase(normalizedLeft, normalizedRight) ||
-    containsComparablePhrase(normalizedRight, normalizedLeft)
-  );
 }
 
 function getComparableDomain(url: string | null | undefined) {
@@ -202,21 +166,6 @@ function buildProducerIdentityPhrases({
     ]
       .map((value) => normalizeComparablePhrase(value))
       .filter((value) => value.length >= 4),
-  );
-}
-
-function listMatchesExpectedValue(
-  actualValues: string[],
-  expectedValues: string[],
-) {
-  if (!actualValues.length || !expectedValues.length) {
-    return false;
-  }
-
-  return expectedValues.every((expectedValue) =>
-    actualValues.some((actualValue) =>
-      textsOverlap(actualValue, expectedValue),
-    ),
   );
 }
 
@@ -803,13 +752,11 @@ function getMatchScore({
   candidateBottles: PriceMatchCandidate[];
   extractedLabel: ExtractedBottleDetails | null;
 }) {
-  const target = candidateBottles.find(
-    (candidate) =>
-      candidate.bottleId === suggestedBottleId &&
-      (suggestedReleaseId !== null
-        ? candidate.releaseId === suggestedReleaseId
-        : candidate.releaseId === null || candidate.kind === "bottle"),
-  );
+  const target = getSuggestedMatchCandidate({
+    suggestedBottleId,
+    suggestedReleaseId,
+    candidateBottles,
+  });
   if (!target) {
     return {
       automationScore: null,
@@ -1287,12 +1234,40 @@ export function getStorePriceMatchAutomationAssessment({
   };
 }
 
+function getSuggestedMatchCandidate({
+  suggestedBottleId,
+  suggestedReleaseId,
+  candidateBottles,
+}: {
+  suggestedBottleId: number | null;
+  suggestedReleaseId: number | null;
+  candidateBottles: PriceMatchCandidate[];
+}) {
+  if (suggestedBottleId === null) {
+    return null;
+  }
+
+  return (
+    candidateBottles.find(
+      (candidate) =>
+        candidate.bottleId === suggestedBottleId &&
+        (suggestedReleaseId !== null
+          ? (candidate.releaseId ?? null) === suggestedReleaseId
+          : (candidate.releaseId ?? null) === null ||
+            candidate.kind !== "release"),
+    ) ?? null
+  );
+}
+
 export function shouldVerifyStorePriceMatch({
   action,
   price,
   suggestedBottleId,
   suggestedReleaseId,
+  modelConfidence,
   automationScore,
+  automationBlockers,
+  candidateBottles,
 }: {
   action: MatchAction;
   price: Pick<StorePrice, "bottleId"> & {
@@ -1300,14 +1275,48 @@ export function shouldVerifyStorePriceMatch({
   };
   suggestedBottleId: number | null;
   suggestedReleaseId: number | null;
+  modelConfidence: number | null;
   automationScore: number | null;
+  automationBlockers: string[];
+  candidateBottles: PriceMatchCandidate[];
 }) {
-  return (
+  if (
+    action !== "match_existing" ||
+    suggestedBottleId === null ||
+    automationScore === null
+  ) {
+    return false;
+  }
+
+  const reaffirmsCurrentAssignment =
     price.bottleId !== null &&
-    action === "match_existing" &&
     suggestedBottleId === price.bottleId &&
-    (suggestedReleaseId ?? null) === (price.releaseId ?? null) &&
-    automationScore !== null &&
+    (suggestedReleaseId ?? null) === (price.releaseId ?? null);
+  if (
+    reaffirmsCurrentAssignment &&
     automationScore >= VERIFIED_MATCH_CONFIDENCE_THRESHOLD
+  ) {
+    return true;
+  }
+
+  if (price.bottleId !== null || automationBlockers.length > 0) {
+    return false;
+  }
+
+  if (automationScore >= UNMATCHED_AUTO_APPROVE_MATCH_SCORE_THRESHOLD) {
+    return true;
+  }
+
+  const target = getSuggestedMatchCandidate({
+    suggestedBottleId,
+    suggestedReleaseId,
+    candidateBottles,
+  });
+
+  return (
+    target?.source.includes("exact") === true &&
+    automationScore >= HIGH_CONFIDENCE_EXACT_MATCH_SCORE_THRESHOLD &&
+    modelConfidence !== null &&
+    modelConfidence >= HIGH_CONFIDENCE_EXACT_MATCH_MODEL_CONFIDENCE_THRESHOLD
   );
 }

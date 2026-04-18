@@ -1,10 +1,12 @@
 import { normalizeProposedBottleDraft } from "@peated/bottle-classifier/bottleCreationDrafts";
+import { db } from "@peated/server/db";
 import {
   type Bottle,
   type BottleRelease,
   type ExternalSite,
   type StorePrice,
   type StorePriceMatchProposal,
+  storePriceMatchProposals,
 } from "@peated/server/db/schema";
 import { hasActiveStorePriceMatchProposalProcessingLease } from "@peated/server/lib/priceMatching";
 import { getStorePriceMatchAutomationAssessment } from "@peated/server/lib/priceMatchingAutomation";
@@ -15,6 +17,7 @@ import {
   PriceMatchSearchEvidenceSchema,
   ProposedBottleSchema,
   ProposedReleaseSchema,
+  StorePriceMatchAutomationAssessmentSchema,
   StorePriceMatchProposalSchema,
   StorePriceMatchQueueItemSchema,
 } from "@peated/server/schemas";
@@ -22,6 +25,7 @@ import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
 import { StorePriceWithSiteSerializer } from "@peated/server/serializers/storePrice";
+import { eq } from "drizzle-orm";
 
 type QueueRow = {
   isProcessing?: boolean;
@@ -35,6 +39,115 @@ type StructuredAutomationIssue = {
   message?: unknown;
   path?: unknown;
 };
+
+function getPersistedAutomationAssessment(proposal: StorePriceMatchProposal) {
+  if (!proposal.automationAssessment) {
+    return null;
+  }
+
+  const parsedAssessment = StorePriceMatchAutomationAssessmentSchema.safeParse(
+    proposal.automationAssessment,
+  );
+
+  return parsedAssessment.success ? parsedAssessment.data : null;
+}
+
+function buildAutomationAssessmentFromProposal(
+  proposal: StorePriceMatchProposal,
+  price: StorePrice & { externalSite: ExternalSite },
+) {
+  const candidateBottles = PriceMatchCandidateSchema.array().parse(
+    proposal.candidateBottles,
+  );
+  const extractedLabel = proposal.extractedLabel
+    ? ExtractedBottleDetailsSchema.parse(proposal.extractedLabel)
+    : null;
+  const normalizedProposedBottle = proposal.proposedBottle
+    ? normalizeProposedBottleDraft(
+        ProposedBottleSchema.parse(proposal.proposedBottle),
+      )
+    : null;
+  const proposedRelease = proposal.proposedRelease
+    ? ProposedReleaseSchema.parse(proposal.proposedRelease)
+    : null;
+  const searchEvidence = PriceMatchSearchEvidenceSchema.array().parse(
+    proposal.searchEvidence,
+  );
+
+  return {
+    candidateBottles,
+    extractedLabel,
+    normalizedProposedBottle,
+    proposedRelease,
+    searchEvidence,
+    automationAssessment: getStorePriceMatchAutomationAssessment({
+      action: proposal.proposalType,
+      modelConfidence: proposal.confidence,
+      price,
+      suggestedBottleId: proposal.suggestedBottleId,
+      suggestedReleaseId: proposal.suggestedReleaseId,
+      candidateBottles,
+      extractedLabel,
+      proposedBottle: normalizedProposedBottle,
+      proposedRelease,
+      creationTarget: proposal.creationTarget,
+      searchEvidence,
+    }),
+  };
+}
+
+async function backfillLegacyAutomationAssessments(rows: QueueRow[]) {
+  const rowsToBackfill = rows.flatMap((row) => {
+    if (getPersistedAutomationAssessment(row.proposal)) {
+      return [];
+    }
+
+    const legacyAssessment = buildAutomationAssessmentFromProposal(
+      row.proposal,
+      row.price,
+    ).automationAssessment;
+
+    return [
+      {
+        row,
+        legacyAssessment,
+      },
+    ];
+  });
+
+  if (!rowsToBackfill.length) {
+    return rows;
+  }
+
+  await Promise.all(
+    rowsToBackfill.map(({ row, legacyAssessment }) =>
+      db
+        .update(storePriceMatchProposals)
+        .set({
+          automationAssessment: legacyAssessment,
+        })
+        .where(eq(storePriceMatchProposals.id, row.proposal.id)),
+    ),
+  );
+
+  return rows.map((row) => {
+    const backfilledRow = rowsToBackfill.find(
+      ({ row: candidateRow }) => candidateRow.proposal.id === row.proposal.id,
+    );
+
+    if (!backfilledRow) {
+      return row;
+    }
+
+    return {
+      ...row,
+      proposal: {
+        ...row.proposal,
+        automationAssessment: backfilledRow.legacyAssessment,
+      },
+    };
+  });
+}
 
 function humanizeAutomationIssuePath(path: unknown): string | null {
   const rawParts = Array.isArray(path)
@@ -117,6 +230,9 @@ export async function serializeQueueItems(
   },
   context: Context,
 ) {
+  // Legacy proposals created before the snapshot column existed get a
+  // one-time backfill the first time the admin queue reads them.
+  const normalizedRows = await backfillLegacyAutomationAssessments(rows);
   const bottlesById = Object.fromEntries(
     (
       await serialize(BottleSerializer, bottleList, context.user, [
@@ -133,11 +249,11 @@ export async function serializeQueueItems(
 
   const prices = await serialize(
     StorePriceWithSiteSerializer,
-    rows.map((row) => row.price),
+    normalizedRows.map((row) => row.price),
     context.user,
   );
 
-  return rows.map((row, index) =>
+  return normalizedRows.map((row, index) =>
     StorePriceMatchQueueItemSchema.parse({
       ...serializeProposal(row.proposal, {
         isProcessing: row.isProcessing,
@@ -190,29 +306,31 @@ export function serializeProposal(
   const searchEvidence = PriceMatchSearchEvidenceSchema.array().parse(
     proposal.searchEvidence,
   );
-  const automationAssessment = price
-    ? getStorePriceMatchAutomationAssessment({
-        action: proposal.proposalType,
-        modelConfidence: proposal.confidence,
-        price,
-        suggestedBottleId: proposal.suggestedBottleId,
-        suggestedReleaseId: proposal.suggestedReleaseId,
-        candidateBottles,
-        extractedLabel,
-        proposedBottle: normalizedProposedBottle,
-        proposedRelease,
-        creationTarget: proposal.creationTarget,
-        searchEvidence,
-      })
-    : {
-        modelConfidence: proposal.confidence,
-        automationScore: null,
-        automationEligible: false,
-        automationBlockers: [],
-        decisiveMatchAttributes: [],
-        differentiatingAttributes: [],
-        webEvidenceChecks: [],
-      };
+  const automationAssessment =
+    getPersistedAutomationAssessment(proposal) ??
+    (price
+      ? getStorePriceMatchAutomationAssessment({
+          action: proposal.proposalType,
+          modelConfidence: proposal.confidence,
+          price,
+          suggestedBottleId: proposal.suggestedBottleId,
+          suggestedReleaseId: proposal.suggestedReleaseId,
+          candidateBottles,
+          extractedLabel,
+          proposedBottle: normalizedProposedBottle,
+          proposedRelease,
+          creationTarget: proposal.creationTarget,
+          searchEvidence,
+        })
+      : {
+          modelConfidence: proposal.confidence,
+          automationScore: null,
+          automationEligible: false,
+          automationBlockers: [],
+          decisiveMatchAttributes: [],
+          differentiatingAttributes: [],
+          webEvidenceChecks: [],
+        });
   const automationBlockers =
     proposal.status === "errored" && proposal.error
       ? [
