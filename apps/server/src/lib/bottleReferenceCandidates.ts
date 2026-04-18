@@ -4,10 +4,6 @@ import {
   normalizeBottleBatchNumber,
   normalizeString,
 } from "@peated/bottle-classifier/normalize";
-import {
-  extractFromImage,
-  extractFromText,
-} from "@peated/server/agents/whisky/labelExtractor";
 import config from "@peated/server/config";
 import { CATEGORY_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
@@ -25,7 +21,6 @@ import {
   normalizePotentialProofToAbv,
 } from "@peated/server/lib/abv";
 import { logError } from "@peated/server/lib/log";
-import { absoluteUrl } from "@peated/server/lib/urls";
 import {
   BottleCandidateSchema,
   BottleReferenceIdentitySchema,
@@ -303,8 +298,6 @@ export function mergeBottleCandidate(
   }
 }
 
-export const mergePriceMatchCandidate = mergeBottleCandidate;
-
 function parseNullableNumber(value: number | string | null | undefined) {
   if (value === undefined || value === null) {
     return null;
@@ -347,38 +340,6 @@ function buildBottleCandidate(
     source: [source],
   });
 }
-
-export async function extractBottleReferenceIdentity(
-  price: Pick<StorePrice, "name" | "imageUrl">,
-): Promise<BottleReferenceIdentity | null> {
-  try {
-    const extractedDetails = await (price.imageUrl
-      ? extractFromImage(absoluteUrl(config.API_SERVER, price.imageUrl))
-      : extractFromText(price.name));
-
-    if (!extractedDetails) {
-      return null;
-    }
-
-    const parsedDetails = normalizePotentialProofLikeAbvFields(
-      BottleReferenceIdentitySchema.parse(extractedDetails),
-    );
-
-    return {
-      ...parsedDetails,
-      category: normalizeMatchCategory(parsedDetails.category),
-    };
-  } catch (err) {
-    logError(err, {
-      price: {
-        name: price.name,
-      },
-    });
-    return null;
-  }
-}
-
-export const extractStorePriceBottleDetails = extractBottleReferenceIdentity;
 
 function buildQueryText(
   normalizedName: string,
@@ -1552,8 +1513,6 @@ export async function getBottleCandidateById(
   return (await enrichBottleCandidates([candidate], null))[0] ?? null;
 }
 
-export const getBottleMatchCandidateById = getBottleCandidateById;
-
 async function getExactBottleCandidate(
   normalizedName: string,
 ): Promise<BottleCandidate | null> {
@@ -1764,8 +1723,6 @@ export async function findBottleReferenceCandidates(
   });
 }
 
-export const findStorePriceMatchCandidates = findBottleReferenceCandidates;
-
 export async function searchBottleCandidates(
   rawInput: BottleCandidateSearchInputRequest,
 ) {
@@ -1944,5 +1901,3 @@ export async function searchBottleCandidates(
     )
     .slice(0, input.limit);
 }
-
-export const findBottleMatchCandidates = searchBottleCandidates;

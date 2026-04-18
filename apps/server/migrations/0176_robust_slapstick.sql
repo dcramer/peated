@@ -1,0 +1,1 @@
+ALTER TABLE "store_price_match_proposal" ADD COLUMN "automation_assessment" jsonb;

@@ -237,14 +237,17 @@ Additional rules:
 - `ignored`
 - `errored`
 
-`verified` is driven by deterministic automation checks, not the model confidence alone.
+`verified` is driven by automation policy on top of the classifier result.
+Most verified matches come from strong deterministic evidence.
+For unmatched exact-match proposals, very high classifier confidence may break ties
+once the automation checks find no conflicts.
 
 ## Automation
 
 Automation is schema-first:
 
 - bottle and release confidence are not the same thing
-- model confidence is advisory
+- model confidence is usually advisory
 - release-specific automation requires explicit validation of the release traits
 - originating retailer evidence is never decisive for differentiating traits
 

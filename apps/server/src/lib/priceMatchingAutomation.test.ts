@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 import {
   getStorePriceMatchAutomationAssessment,
   hasSupportiveWebEvidenceForExistingMatch,
+  shouldVerifyStorePriceMatch,
 } from "./priceMatchingAutomation";
 
 type AssessmentInput = Parameters<
@@ -434,5 +435,67 @@ describe("priceMatchingAutomation", () => {
     });
 
     expect(supported).toBe(false);
+  });
+
+  test("auto-approves unmatched strong existing matches when automation is already high", () => {
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        price: {
+          bottleId: null,
+          releaseId: null,
+        },
+        suggestedBottleId: 1,
+        suggestedReleaseId: null,
+        modelConfidence: 86,
+        automationScore: 84,
+        automationBlockers: [],
+        candidateBottles: [buildCandidate()],
+      }),
+    ).toBe(true);
+  });
+
+  test("auto-approves unmatched exact matches when classifier confidence is very high", () => {
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        price: {
+          bottleId: null,
+          releaseId: null,
+        },
+        suggestedBottleId: 1,
+        suggestedReleaseId: null,
+        modelConfidence: 97,
+        automationScore: 70,
+        automationBlockers: [],
+        candidateBottles: [
+          buildCandidate({
+            source: ["exact"],
+          }),
+        ],
+      }),
+    ).toBe(true);
+  });
+
+  test("does not auto-approve unmatched exact matches when blockers remain", () => {
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        price: {
+          bottleId: null,
+          releaseId: null,
+        },
+        suggestedBottleId: 1,
+        suggestedReleaseId: null,
+        modelConfidence: 99,
+        automationScore: 74,
+        automationBlockers: ["candidate age conflicts with extracted label"],
+        candidateBottles: [
+          buildCandidate({
+            source: ["exact"],
+          }),
+        ],
+      }),
+    ).toBe(false);
   });
 });
