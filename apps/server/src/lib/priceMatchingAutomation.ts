@@ -1,5 +1,7 @@
-import { normalizeString } from "@peated/bottle-classifier/normalize";
-import { hasSupportiveWebEvidenceForExistingMatch as hasSupportiveBottleEvidence } from "@peated/bottle-classifier/priceMatchingEvidence";
+import {
+  getExistingMatchIdentityConflicts,
+  hasSupportiveWebEvidenceForExistingMatch as hasSupportiveBottleEvidence,
+} from "@peated/bottle-classifier/priceMatchingEvidence";
 import type { StorePrice } from "@peated/server/db/schema";
 import {
   containsComparablePhrase,
@@ -71,10 +73,8 @@ export type StorePriceMatchAutomationAssessment = z.infer<
 >;
 
 const VERIFIED_MATCH_CONFIDENCE_THRESHOLD = 80;
-const UNMATCHED_AUTO_APPROVE_MATCH_SCORE_THRESHOLD =
-  VERIFIED_MATCH_CONFIDENCE_THRESHOLD;
-const HIGH_CONFIDENCE_EXACT_MATCH_SCORE_THRESHOLD = 70;
 const HIGH_CONFIDENCE_EXACT_MATCH_MODEL_CONFIDENCE_THRESHOLD = 95;
+const HIGH_CONFIDENCE_STRUCTURED_MATCH_MODEL_CONFIDENCE_THRESHOLD = 95;
 const AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD = 90;
 const AUTHORITATIVE_SOURCE_TIERS = new Set<SourceTier>(["official", "critic"]);
 const CRITIC_DOMAINS = [
@@ -116,6 +116,12 @@ const WEB_VALIDATED_DIFFERENTIATORS = new Set<MatchAttribute>([
   "vintageYear",
   "releaseYear",
 ]);
+const HIGH_CONFIDENCE_STRUCTURED_MATCH_REQUIRED_ATTRIBUTES: MatchAttribute[] = [
+  "brand",
+  "name",
+  "distillery",
+  "category",
+];
 function clampScore(score: number) {
   return Math.min(100, Math.max(0, Math.round(score)));
 }
@@ -737,16 +743,117 @@ function evaluateSearchEvidenceChecks({
   });
 }
 
-function getMatchScore({
-  price,
+function getExistingMatchDecisiveAttributes({
+  target,
+  extractedLabel,
+}: {
+  target: PriceMatchCandidate;
+  extractedLabel: ExtractedBottleDetails | null;
+}) {
+  const decisiveMatchAttributes = new Set<MatchAttribute>();
+  const label = extractedLabel;
+
+  if (label?.brand && candidateMatchesBrand(target, label.brand)) {
+    decisiveMatchAttributes.add("brand");
+  }
+
+  if (label?.bottler && candidateMatchesBottler(target, label.bottler)) {
+    decisiveMatchAttributes.add("bottler");
+  }
+
+  if (label?.expression && candidateMatchesName(target, label.expression)) {
+    decisiveMatchAttributes.add("name");
+  }
+
+  if (label?.series && candidateMatchesSeries(target, label.series)) {
+    decisiveMatchAttributes.add("series");
+  }
+
+  if (
+    label?.distillery?.length &&
+    candidateMatchesDistillery(target, label.distillery)
+  ) {
+    decisiveMatchAttributes.add("distillery");
+  }
+
+  if (label?.category && target.category === label.category) {
+    decisiveMatchAttributes.add("category");
+  }
+
+  if (
+    label &&
+    label.stated_age !== null &&
+    target.statedAge === label.stated_age
+  ) {
+    decisiveMatchAttributes.add("statedAge");
+  }
+
+  if (label?.edition && textsOverlap(target.edition, label.edition)) {
+    decisiveMatchAttributes.add("edition");
+  }
+
+  if (label?.cask_type && textsOverlap(target.caskType, label.cask_type)) {
+    decisiveMatchAttributes.add("caskType");
+  }
+
+  if (label?.cask_size && textsOverlap(target.caskSize, label.cask_size)) {
+    decisiveMatchAttributes.add("caskSize");
+  }
+
+  if (label?.cask_fill && textsOverlap(target.caskFill, label.cask_fill)) {
+    decisiveMatchAttributes.add("caskFill");
+  }
+
+  if (
+    label &&
+    label.cask_strength !== null &&
+    target.caskStrength === label.cask_strength
+  ) {
+    decisiveMatchAttributes.add("caskStrength");
+  }
+
+  if (
+    label &&
+    label.single_cask !== null &&
+    target.singleCask === label.single_cask
+  ) {
+    decisiveMatchAttributes.add("singleCask");
+  }
+
+  if (label && label.abv !== null && target.abv !== null) {
+    const difference = Math.abs(target.abv - label.abv);
+    if (difference <= 0.4) {
+      decisiveMatchAttributes.add("abv");
+    }
+  }
+
+  if (
+    label &&
+    label.vintage_year !== null &&
+    target.vintageYear === label.vintage_year
+  ) {
+    decisiveMatchAttributes.add("vintageYear");
+  }
+
+  if (
+    label &&
+    label.release_year !== null &&
+    target.releaseYear === label.release_year
+  ) {
+    decisiveMatchAttributes.add("releaseYear");
+  }
+
+  return Array.from(decisiveMatchAttributes);
+}
+
+function getExistingMatchAssessment({
+  modelConfidence,
   suggestedBottleId,
   suggestedReleaseId,
   candidateBottles,
   extractedLabel,
 }: {
-  price: Pick<StorePrice, "bottleId" | "name" | "url"> & {
-    releaseId?: number | null;
-  };
+  modelConfidence: number | null;
   suggestedBottleId: number | null;
   suggestedReleaseId: number | null;
   candidateBottles: PriceMatchCandidate[];
@@ -761,222 +868,45 @@ function getMatchScore({
     return {
       automationScore: null,
       decisiveMatchAttributes: [] as MatchAttribute[],
+      structuredMatchRequiresStatedAge: false,
       automationBlockers: [] as string[],
     };
   }
 
-  let score = 20;
-  const decisiveMatchAttributes = new Set<MatchAttribute>();
   const automationBlockers: string[] = [];
-  const label = extractedLabel;
-
-  if (target.source.includes("exact")) {
-    score += 50;
-    decisiveMatchAttributes.add("name");
-  }
-
   if (
-    price.bottleId &&
-    price.bottleId === target.bottleId &&
-    (price.releaseId ?? null) === (target.releaseId ?? null)
-  ) {
-    score += 10;
-  }
-
-  if (target.kind === "release") {
-    score += 6;
-  } else if (
     target.releaseId === null &&
     listingCarriesReleaseIdentityBeyondBottle({
       target,
       extractedLabel,
     })
   ) {
-    score -= 10;
     automationBlockers.push(
       "listing looks release-specific but the suggested target is only a bottle",
     );
   }
 
-  if (label?.brand && candidateMatchesBrand(target, label.brand)) {
-    score += 8;
-    decisiveMatchAttributes.add("brand");
-  }
-
-  if (label?.bottler && candidateMatchesBottler(target, label.bottler)) {
-    score += 8;
-    decisiveMatchAttributes.add("bottler");
-  } else if (label?.bottler && target.bottler) {
-    score -= 14;
-    automationBlockers.push("candidate bottler conflicts with extracted label");
-  }
-
-  if (label?.expression && candidateMatchesName(target, label.expression)) {
-    score += 12;
-    decisiveMatchAttributes.add("name");
-  }
-
-  if (label?.series && target.series) {
-    if (candidateMatchesSeries(target, label.series)) {
-      score += 8;
-      decisiveMatchAttributes.add("series");
-    } else {
-      score -= 14;
-      automationBlockers.push(
-        "candidate series conflicts with extracted label",
-      );
-    }
-  }
-
-  if (label?.distillery?.length && target.distillery.length) {
-    if (candidateMatchesDistillery(target, label.distillery)) {
-      score += 10;
-      decisiveMatchAttributes.add("distillery");
-    } else {
-      score -= 16;
-      automationBlockers.push(
-        "candidate distillery conflicts with extracted label",
-      );
-    }
-  }
-
-  if (label?.category && target.category) {
-    if (target.category === label.category) {
-      score += 4;
-      decisiveMatchAttributes.add("category");
-    } else {
-      score -= 8;
-      automationBlockers.push(
-        "candidate category conflicts with extracted label",
-      );
-    }
-  }
-
-  if (label && label.stated_age !== null && target.statedAge !== null) {
-    if (target.statedAge === label.stated_age) {
-      score += 12;
-      decisiveMatchAttributes.add("statedAge");
-    } else {
-      score -= 18;
-      automationBlockers.push("candidate age conflicts with extracted label");
-    }
-  }
-
-  if (label?.edition && target.edition) {
-    if (textsOverlap(target.edition, label.edition)) {
-      score += 14;
-      decisiveMatchAttributes.add("edition");
-    } else {
-      score -= 20;
-      automationBlockers.push(
-        "candidate edition conflicts with extracted label",
-      );
-    }
-  }
-
-  if (label?.cask_type && target.caskType) {
-    if (textsOverlap(target.caskType, label.cask_type)) {
-      score += 12;
-      decisiveMatchAttributes.add("caskType");
-    } else {
-      score -= 18;
-      automationBlockers.push(
-        "candidate cask type conflicts with extracted label",
-      );
-    }
-  }
-
-  if (label?.cask_size && target.caskSize) {
-    if (textsOverlap(target.caskSize, label.cask_size)) {
-      score += 6;
-      decisiveMatchAttributes.add("caskSize");
-    } else {
-      score -= 10;
-      automationBlockers.push(
-        "candidate cask size conflicts with extracted label",
-      );
-    }
-  }
-
-  if (label?.cask_fill && target.caskFill) {
-    if (textsOverlap(target.caskFill, label.cask_fill)) {
-      score += 5;
-      decisiveMatchAttributes.add("caskFill");
-    } else {
-      score -= 8;
-      automationBlockers.push(
-        "candidate cask fill conflicts with extracted label",
-      );
-    }
-  }
-
-  if (label && label.cask_strength !== null && target.caskStrength !== null) {
-    if (target.caskStrength === label.cask_strength) {
-      score += 8;
-      decisiveMatchAttributes.add("caskStrength");
-    } else {
-      score -= 14;
-      automationBlockers.push(
-        "candidate cask-strength flag conflicts with extracted label",
-      );
-    }
-  }
-
-  if (label && label.single_cask !== null && target.singleCask !== null) {
-    if (target.singleCask === label.single_cask) {
-      score += 8;
-      decisiveMatchAttributes.add("singleCask");
-    } else {
-      score -= 14;
-      automationBlockers.push(
-        "candidate single-cask flag conflicts with extracted label",
-      );
-    }
-  }
-
-  if (label && label.abv !== null && target.abv !== null) {
-    const difference = Math.abs(target.abv - label.abv);
-    if (difference <= 0.15) {
-      score += 18;
-      decisiveMatchAttributes.add("abv");
-    } else if (difference <= 0.4) {
-      score += 12;
-      decisiveMatchAttributes.add("abv");
-    } else if (difference >= 1) {
-      score -= 20;
-      automationBlockers.push(
-        "candidate ABV materially conflicts with extracted label",
-      );
-    }
-  }
-
-  if (label && label.vintage_year !== null && target.vintageYear !== null) {
-    if (target.vintageYear === label.vintage_year) {
-      score += 8;
-      decisiveMatchAttributes.add("vintageYear");
-    } else {
-      score -= 14;
-      automationBlockers.push(
-        "candidate vintage year conflicts with extracted label",
-      );
-    }
-  }
-
-  if (label && label.release_year !== null && target.releaseYear !== null) {
-    if (target.releaseYear === label.release_year) {
-      score += 8;
-      decisiveMatchAttributes.add("releaseYear");
-    } else {
-      score -= 14;
-      automationBlockers.push(
-        "candidate release year conflicts with extracted label",
-      );
-    }
-  }
+  automationBlockers.push(
+    ...getExistingMatchIdentityConflicts({
+      target,
+      extractedLabel,
+    }),
+  );
 
   return {
-    automationScore: clampScore(score),
-    decisiveMatchAttributes: Array.from(decisiveMatchAttributes),
+    // For existing matches, the reviewed classifier confidence is the only
+    // signal we trust enough to summarize numerically. Downstream automation
+    // still records blockers and matched attributes, but it does not rescore
+    // bottle identity independently of the classifier.
+    automationScore:
+      modelConfidence === null ? null : clampScore(modelConfidence),
+    decisiveMatchAttributes: getExistingMatchDecisiveAttributes({
+      target,
+      extractedLabel,
+    }),
+    structuredMatchRequiresStatedAge:
+      extractedLabel?.stated_age !== null &&
+      extractedLabel?.stated_age !== undefined,
     automationBlockers: Array.from(new Set(automationBlockers)),
   };
 }
@@ -1198,14 +1128,15 @@ export function getStorePriceMatchAutomationAssessment({
     return {
       modelConfidence,
       ...createScore,
+      structuredMatchRequiresStatedAge: false,
       automationEligible:
         action === "create_new" ? createScore.automationEligible : false,
     };
   }
 
   if (action === "match_existing" || action === "correction") {
-    const matchScore = getMatchScore({
-      price,
+    const matchAssessment = getExistingMatchAssessment({
+      modelConfidence,
       suggestedBottleId,
       suggestedReleaseId: suggestedReleaseId ?? null,
       candidateBottles,
@@ -1214,10 +1145,12 @@ export function getStorePriceMatchAutomationAssessment({
 
     return {
       modelConfidence,
-      automationScore: matchScore.automationScore,
+      automationScore: matchAssessment.automationScore,
       automationEligible: false,
-      automationBlockers: matchScore.automationBlockers,
-      decisiveMatchAttributes: matchScore.decisiveMatchAttributes,
+      automationBlockers: matchAssessment.automationBlockers,
+      decisiveMatchAttributes: matchAssessment.decisiveMatchAttributes,
+      structuredMatchRequiresStatedAge:
+        matchAssessment.structuredMatchRequiresStatedAge,
       differentiatingAttributes: [],
       webEvidenceChecks: [],
     };
@@ -1229,6 +1162,7 @@ export function getStorePriceMatchAutomationAssessment({
     automationEligible: false,
     automationBlockers: [],
     decisiveMatchAttributes: [],
+    structuredMatchRequiresStatedAge: false,
     differentiatingAttributes: [],
     webEvidenceChecks: [],
   };
@@ -1259,14 +1193,30 @@ function getSuggestedMatchCandidate({
   );
 }
 
+function hasHighConfidenceStructuredMatch(
+  decisiveMatchAttributes: MatchAttribute[],
+  structuredMatchRequiresStatedAge: boolean,
+) {
+  const matchedAttributes = new Set(decisiveMatchAttributes);
+
+  const requiredAttributes: MatchAttribute[] = structuredMatchRequiresStatedAge
+    ? [...HIGH_CONFIDENCE_STRUCTURED_MATCH_REQUIRED_ATTRIBUTES, "statedAge"]
+    : HIGH_CONFIDENCE_STRUCTURED_MATCH_REQUIRED_ATTRIBUTES;
+
+  return requiredAttributes.every((attribute) =>
+    matchedAttributes.has(attribute),
+  );
+}
+
 export function shouldVerifyStorePriceMatch({
   action,
   price,
   suggestedBottleId,
   suggestedReleaseId,
   modelConfidence,
-  automationScore,
   automationBlockers,
+  decisiveMatchAttributes,
+  structuredMatchRequiresStatedAge = false,
   candidateBottles,
 }: {
   action: MatchAction;
@@ -1276,35 +1226,17 @@ export function shouldVerifyStorePriceMatch({
   suggestedBottleId: number | null;
   suggestedReleaseId: number | null;
   modelConfidence: number | null;
-  automationScore: number | null;
   automationBlockers: string[];
+  decisiveMatchAttributes: MatchAttribute[];
+  structuredMatchRequiresStatedAge?: boolean;
   candidateBottles: PriceMatchCandidate[];
 }) {
-  if (
-    action !== "match_existing" ||
-    suggestedBottleId === null ||
-    automationScore === null
-  ) {
+  if (action !== "match_existing" || suggestedBottleId === null) {
     return false;
   }
 
-  const reaffirmsCurrentAssignment =
-    price.bottleId !== null &&
-    suggestedBottleId === price.bottleId &&
-    (suggestedReleaseId ?? null) === (price.releaseId ?? null);
-  if (
-    reaffirmsCurrentAssignment &&
-    automationScore >= VERIFIED_MATCH_CONFIDENCE_THRESHOLD
-  ) {
-    return true;
-  }
-
-  if (price.bottleId !== null || automationBlockers.length > 0) {
+  if (modelConfidence === null || automationBlockers.length > 0) {
     return false;
-  }
-
-  if (automationScore >= UNMATCHED_AUTO_APPROVE_MATCH_SCORE_THRESHOLD) {
-    return true;
   }
 
   const target = getSuggestedMatchCandidate({
@@ -1313,10 +1245,38 @@ export function shouldVerifyStorePriceMatch({
     candidateBottles,
   });
 
+  const reaffirmsCurrentAssignment =
+    price.bottleId !== null &&
+    suggestedBottleId === price.bottleId &&
+    (suggestedReleaseId ?? null) === (price.releaseId ?? null);
+  if (
+    reaffirmsCurrentAssignment &&
+    (modelConfidence >= VERIFIED_MATCH_CONFIDENCE_THRESHOLD ||
+      target?.source.includes("exact") === true)
+  ) {
+    return true;
+  }
+
+  if (price.bottleId !== null) {
+    return false;
+  }
+
+  if (
+    // Let the classifier break ties for bottle-only matches once the extracted
+    // identity already confirmed the stable bottle fields we trust.
+    suggestedReleaseId === null &&
+    modelConfidence >=
+      HIGH_CONFIDENCE_STRUCTURED_MATCH_MODEL_CONFIDENCE_THRESHOLD &&
+    hasHighConfidenceStructuredMatch(
+      decisiveMatchAttributes,
+      structuredMatchRequiresStatedAge,
+    )
+  ) {
+    return true;
+  }
+
   return (
     target?.source.includes("exact") === true &&
-    automationScore >= HIGH_CONFIDENCE_EXACT_MATCH_SCORE_THRESHOLD &&
-    modelConfidence !== null &&
     modelConfidence >= HIGH_CONFIDENCE_EXACT_MATCH_MODEL_CONFIDENCE_THRESHOLD
   );
 }

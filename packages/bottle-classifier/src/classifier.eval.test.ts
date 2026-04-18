@@ -110,6 +110,30 @@ function parseClassificationResult(output: string): BottleClassificationResult {
   return JSON.parse(output) as BottleClassificationResult;
 }
 
+function deepContainsSubset(actual: unknown, expected: unknown): boolean {
+  if (expected === null || typeof expected !== "object") {
+    return Object.is(actual, expected);
+  }
+
+  if (Array.isArray(expected)) {
+    if (!Array.isArray(actual) || actual.length < expected.length) {
+      return false;
+    }
+
+    return expected.every((value, index) =>
+      deepContainsSubset(actual[index], value),
+    );
+  }
+
+  if (!actual || typeof actual !== "object") {
+    return false;
+  }
+
+  return Object.entries(expected).every(([key, value]) =>
+    deepContainsSubset((actual as Record<string, unknown>)[key], value),
+  );
+}
+
 function createDecisionShapeScorer() {
   return async ({
     output,
@@ -142,6 +166,24 @@ function createDecisionShapeScorer() {
 
       if (expected.parentBottleId !== undefined) {
         checks.push(result.decision.parentBottleId === expected.parentBottleId);
+      }
+
+      if (expected.proposedBottle !== undefined) {
+        checks.push(
+          deepContainsSubset(
+            result.decision.proposedBottle,
+            expected.proposedBottle,
+          ),
+        );
+      }
+
+      if (expected.proposedRelease !== undefined) {
+        checks.push(
+          deepContainsSubset(
+            result.decision.proposedRelease,
+            expected.proposedRelease,
+          ),
+        );
       }
     }
 

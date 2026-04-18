@@ -22,6 +22,8 @@ export type ClassifierEvalExpectation = {
   matchedBottleId?: number | null;
   matchedReleaseId?: number | null;
   parentBottleId?: number | null;
+  proposedBottle?: Record<string, unknown> | null;
+  proposedRelease?: Record<string, unknown> | null;
   summary: string;
 };
 
@@ -561,6 +563,9 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       action: "create_release",
       identityScope: "product",
       parentBottleId: 620,
+      proposedRelease: {
+        edition: "Batch C923",
+      },
       summary:
         "Treat Batch C923 as release-level detail under the existing Elijah Craig Barrel Proof bottle instead of creating a whole new bottle.",
     },
@@ -665,6 +670,9 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       action: "create_release",
       identityScope: "product",
       parentBottleId: 54082,
+      proposedRelease: {
+        statedAge: 30,
+      },
       summary:
         "Treat the local 30-year-old bottle row as a dirty release-like candidate and create a 30-year-old child release beneath the reusable Macallan Sherry Oak parent bottle instead.",
     },
@@ -916,6 +924,15 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       status: "classified",
       action: "create_bottle_and_release",
       identityScope: "product",
+      proposedBottle: {
+        brand: {
+          name: "Glengoyne",
+        },
+        name: "The Legacy Series",
+      },
+      proposedRelease: {
+        edition: "Chapter Two",
+      },
       summary:
         "Treat Glengoyne The Legacy Series as the reusable parent family and Chapter Two as the child release even when the local candidates are only dirty chapter-specific bottle rows.",
     },
