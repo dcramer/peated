@@ -92,6 +92,7 @@ The rule for package-owned deterministic behavior is strict:
 - deterministic helpers may only own structurally safe, effectively zero-ambiguity behavior
 - if the behavior depends on brand context, marketed family meaning, or program semantics, it stays classifier-owned
 - if the input is too sparse to safely infer a canonical bottle, block instead of guessing
+- prompt changes should encode generalized reasoning patterns, not one-off brand tutoring; concrete family regressions belong in eval fixtures
 - the normalization corpus should record real `peatedBottleIds` when an example came from an observed Peated bottle family
 - ambiguous families should use shared `contrastGroup` keys with differing `contrastOutcome` values so the corpus always carries a real positive/negative contrast
 - live eval coverage should stay narrow and explicit; only classifier-owned ambiguity should opt in
@@ -159,6 +160,7 @@ The reviewed `decision` is generic and bottle-centric:
 - `matchedBottleId` and optional `matchedReleaseId` for safe existing matches
 - `parentBottleId` only for `create_release`
 - `proposedBottle` / `proposedRelease` only for create outcomes
+- `no_match` stays generic at this boundary; downstream consumers own any review or clarification workflow
 - `observation` for non-canonical exact details such as selector names, cask numbers, bottle numbers, outturn, and exclusive wording
 
 `artifacts` contains:
@@ -170,7 +172,7 @@ The reviewed `decision` is generic and bottle-centric:
 
 That result is already reviewed for bottle identity. Downstream consumers may apply their own persistence or automation policy on top of it.
 
-Price matching is the main example: it derives `match_existing`, `correction`, and `create_new` proposal semantics from the reviewed classifier result instead of asking the classifier to reason in price-match terms directly.
+Price matching is the main example: it derives `match_existing`, `correction`, and `create_new` proposal semantics from the reviewed classifier result instead of asking the classifier to reason in price-match terms directly. Those downstream correction drafts may repair bottle metadata such as brand, distillery, bottler, series, category, and other bottle fields while keeping the same base bottle identity.
 
 ## Eval Surface
 

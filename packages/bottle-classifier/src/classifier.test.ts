@@ -22,6 +22,7 @@ function createTestClassifier({
   extractedIdentityFromText,
   extractFromImageError,
   searchBottles = vi.fn(async () => [] as BottleCandidate[]),
+  getBottleCandidateById,
   runBottleClassifierAgent,
 }: {
   extractedIdentity?: BottleExtractedDetails | null;
@@ -31,6 +32,10 @@ function createTestClassifier({
   searchBottles?: ReturnType<
     typeof vi.fn<(args: unknown) => Promise<BottleCandidate[]>>
   >;
+  getBottleCandidateById?: (
+    bottleId: number,
+    releaseId: number | null,
+  ) => Promise<BottleCandidate | null>;
   runBottleClassifierAgent?: (
     args: RunBottleClassifierAgentInput,
   ) => Promise<ReasoningResult>;
@@ -42,6 +47,7 @@ function createTestClassifier({
       maxSearchQueries: 2,
       adapters: {
         searchBottles,
+        getBottleCandidateById,
       },
       overrides: {
         extractFromImage: async () => {
@@ -1390,6 +1396,125 @@ describe("createBottleClassifier", () => {
     });
   });
 
+  test("promotes a parent bottle match into a richer create_release even when an unrelated child release already exists", async () => {
+    const heritageCaskStrengthParentCandidate: BottleCandidate = {
+      bottleId: 99001,
+      releaseId: null,
+      kind: "bottle",
+      alias: null,
+      fullName: "Heritage Cask Strength",
+      bottleFullName: "Heritage Cask Strength",
+      brand: "Example Distillery",
+      bottler: null,
+      series: null,
+      distillery: ["Example Distillery"],
+      category: "single_malt",
+      statedAge: 12,
+      edition: null,
+      caskStrength: null,
+      singleCask: null,
+      abv: null,
+      vintageYear: null,
+      releaseYear: null,
+      caskType: null,
+      caskSize: null,
+      caskFill: null,
+      score: 0.95,
+      source: ["exact"],
+    };
+    const heritageCaskStrengthBatch1Candidate: BottleCandidate = {
+      ...heritageCaskStrengthParentCandidate,
+      releaseId: 88001,
+      kind: "release",
+      fullName: "Heritage Cask Strength - Batch 1",
+      edition: "Batch 1",
+      abv: 56.8,
+      caskStrength: true,
+      releaseYear: 2023,
+      caskType: "bourbon",
+      score: 0.82,
+      source: ["text"],
+    };
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Example Distillery",
+      bottler: null,
+      expression: "Heritage Cask Strength",
+      series: null,
+      distillery: ["Example Distillery"],
+      category: "single_malt",
+      stated_age: 12,
+      abv: 58.2,
+      release_year: 2024,
+      vintage_year: null,
+      cask_type: "oloroso",
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: true,
+      single_cask: null,
+      edition: "Batch 2",
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 94,
+          rationale: "The parent bottle identity is exact.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: heritageCaskStrengthParentCandidate.bottleId,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [heritageCaskStrengthParentCandidate.bottleId],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [
+            heritageCaskStrengthParentCandidate,
+            heritageCaskStrengthBatch1Candidate,
+          ],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Example Distillery Heritage Cask Strength Batch 2",
+      },
+      extractedIdentity,
+      initialCandidates: [
+        heritageCaskStrengthParentCandidate,
+        heritageCaskStrengthBatch1Candidate,
+      ],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "create_release",
+      parentBottleId: heritageCaskStrengthParentCandidate.bottleId,
+      identityScope: "product",
+      proposedRelease: {
+        edition: "Batch 2",
+        statedAge: null,
+        abv: 58.2,
+        caskStrength: true,
+        releaseYear: 2024,
+        caskType: "oloroso",
+      },
+    });
+  });
+
   test("redirects a dirty Macallan age-statement bottle match to the reusable parent bottle", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "The Macallan",
@@ -2274,6 +2399,95 @@ describe("createBottleClassifier", () => {
       identityScope: "product",
     });
     expect(result.decision.rationale).not.toContain(
+      "Server downgraded the existing-match recommendation",
+    );
+  });
+
+  test("does not treat retailer-only off-origin web results as supportive evidence for a parent bottle match", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Lagavulin",
+      bottler: null,
+      expression: "Distillers Edition",
+      series: null,
+      distillery: ["Lagavulin"],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      release_year: 2023,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 89,
+          rationale: "The parent bottle is the closest local candidate.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 44006,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [44006],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [
+            {
+              provider: "openai",
+              query: '"Lagavulin Distillers Edition 2023"',
+              summary:
+                "Retailer results list Lagavulin Distillers Edition 2023 for sale.",
+              results: [
+                {
+                  title: "Lagavulin Distillers Edition 2023 | Buy Online",
+                  url: "https://www.totalwine.com/spirits/scotch/lagavulin-distillers-edition-2023/p/12345",
+                  domain: "totalwine.com",
+                  description:
+                    "Shop Lagavulin Distillers Edition 2023 online at Total Wine.",
+                  extraSnippets: [],
+                },
+              ],
+            },
+          ],
+          candidates: [lagavulinDistillersEditionParentCandidate],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
+        url: "https://shop.example/products/lagavulin-distillers-edition-2023",
+      },
+      extractedIdentity,
+      initialCandidates: [lagavulinDistillersEditionParentCandidate],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "no_match",
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId: null,
+    });
+    expect(result.decision.rationale).toContain(
       "Server downgraded the existing-match recommendation",
     );
   });

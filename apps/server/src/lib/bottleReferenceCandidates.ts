@@ -1492,7 +1492,12 @@ export async function getBottleCandidateById(
         .from(bottleReleases)
         .innerJoin(bottles, eq(bottles.id, bottleReleases.bottleId))
         .innerJoin(entities, eq(entities.id, bottles.brandId))
-        .where(eq(bottleReleases.id, releaseId))
+        .where(
+          and(
+            eq(bottleReleases.id, releaseId),
+            eq(bottleReleases.bottleId, bottleId),
+          ),
+        )
         .limit(1)
     : await db
         .select({

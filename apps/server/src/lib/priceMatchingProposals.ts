@@ -287,6 +287,10 @@ function candidateNeedsExistingBottleRepair(
   candidate: PriceMatchCandidate,
   proposedBottle: ProposedBottle,
 ): boolean {
+  if (!textsOverlap(candidate.brand, proposedBottle.brand.name)) {
+    return true;
+  }
+
   if (
     proposedBottle.category !== null &&
     candidate.category !== proposedBottle.category
