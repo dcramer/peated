@@ -1595,7 +1595,7 @@ describe("createBottleClassifier", () => {
     );
   });
 
-  test("keeps a plain age-statement match instead of redirecting to an unrelated cask-strength family", async () => {
+  test("keeps a plain age-statement match even when the title abbreviates the age wording", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Tomatin",
       bottler: null,
@@ -1649,7 +1649,7 @@ describe("createBottleClassifier", () => {
 
     const result = await classifier.classifyBottleReference({
       reference: {
-        name: "Tomatin Single Malt 12-year-old",
+        name: "Tomatin Single Malt 12 Yr.",
       },
       extractedIdentity,
       initialCandidates: [

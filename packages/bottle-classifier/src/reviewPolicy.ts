@@ -135,6 +135,42 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function getComparableAgeStatementPattern(statedAge: number): RegExp {
+  const age = escapeRegExp(String(statedAge));
+
+  return new RegExp(
+    `\\b${age}(?:\\s|-)?(?:year|yr)s?(?:\\s|-)?old\\b|\\b${age}(?:\\s|-)?(?:year|yr)s?\\b|\\b${age}(?:\\s|-)?y(?:\\.?o\\.?)?\\b`,
+    "i",
+  );
+}
+
+function stripComparableAgeStatement(
+  value: string,
+  statedAge: number | null | undefined,
+): string {
+  if (statedAge === null || statedAge === undefined) {
+    return value;
+  }
+
+  return value
+    .replace(getComparableAgeStatementPattern(statedAge), " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function comparableTextMarketsStatedAge(
+  value: string | null | undefined,
+  statedAge: number | null | undefined,
+): boolean {
+  if (!value || statedAge === null || statedAge === undefined) {
+    return false;
+  }
+
+  return getComparableAgeStatementPattern(statedAge).test(
+    normalizeComparableText(value),
+  );
+}
+
 function containsComparablePhrase(haystack: string, needle: string): boolean {
   if (!haystack || !needle) {
     return false;
@@ -653,12 +689,10 @@ function candidateNameMatchesReferenceVariantsIgnoringStatedAge({
     return false;
   }
 
-  const strippedReferenceName = stripComparablePhrase(
+  const strippedReferenceName = stripComparableAgeStatement(
     normalizeComparableText(referenceName),
-    `${extractedIdentity.stated_age}-year-old`,
-  )
-    .replace(/\s+/g, " ")
-    .trim();
+    extractedIdentity.stated_age,
+  );
   if (!strippedReferenceName) {
     return false;
   }
@@ -728,9 +762,7 @@ function candidateLooksLikeDirtyAgeReleaseBottle({
   }
 
   return getBottleTargetNameCandidates(candidate).some((name) =>
-    new RegExp(`\\b${candidate.statedAge}-year-old\\b`, "i").test(
-      normalizeComparableText(name),
-    ),
+    comparableTextMarketsStatedAge(name, candidate.statedAge),
   );
 }
 

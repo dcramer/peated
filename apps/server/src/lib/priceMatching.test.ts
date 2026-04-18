@@ -2191,8 +2191,6 @@ describe("priceMatching", () => {
   test("auto ignores clearly non-whisky listings", async ({ fixtures }) => {
     config.OPENAI_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
@@ -2201,11 +2199,17 @@ describe("priceMatching", () => {
       imageUrl: null,
     });
 
-    vi.mocked(extractFromText).mockResolvedValue(null);
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        status: "ignored",
+        ignoreReason:
+          "Reference is clearly a non-whisky category match and extraction found no whisky identity.",
+      }),
+    );
 
     const proposal = await resolveStorePriceMatchProposal(price.id);
 
-    expect(classifyBottleReference).not.toHaveBeenCalled();
+    expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal.status).toBe("ignored");
     expect(proposal.proposalType).toBe("no_match");
   });

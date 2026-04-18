@@ -1,8 +1,5 @@
 import { inferBottleCreationTarget } from "@peated/bottle-classifier/bottleCreationDrafts";
-import {
-  normalizeBottle,
-  normalizeString,
-} from "@peated/bottle-classifier/normalize";
+import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import {
   DEFAULT_PRICE_MATCH_CREATION_TARGET,
   getReleaseObservationFacts,
@@ -80,10 +77,6 @@ import type { z } from "zod";
 
 const SMWS_EXTERNAL_SITE_TYPE = "smws";
 const SMWS_BRAND_NAME = "The Scotch Malt Whisky Society";
-const NON_WHISKY_LISTING_KEYWORDS =
-  /\b(vodka|gin|rum|tequila|mezcal|sotol|soju|baijiu|sake|shochu|brandy|cognac|armagnac|liqueur)\b/i;
-const WHISKY_LISTING_KEYWORDS =
-  /\b(whisk(?:e)?y|single malt|single grain|single pot still|bourbon|rye|scotch|malt whisky|malt whiskey)\b/i;
 
 type ExtractedBottleDetails = z.infer<typeof ExtractedBottleDetailsSchema>;
 type PriceMatchCandidate = z.infer<typeof PriceMatchCandidateSchema>;
@@ -115,17 +108,6 @@ export class StorePriceMatchProposalNotReviewableError extends Error {
 function normalizeClassifierConfidence(confidence: number): number {
   const percentageConfidence = confidence <= 1 ? confidence * 100 : confidence;
   return Math.min(100, Math.max(0, Math.round(percentageConfidence)));
-}
-
-function shouldAutoIgnoreTrivialNonWhiskyListing(name: string): boolean {
-  // Keep this fast path limited to obvious non-whisky categories. Flavored
-  // whisky detection intentionally stays model-driven because retailer titles
-  // are too inconsistent for regex heuristics to be reliable there.
-  const normalizedName = normalizeString(name).toLowerCase();
-  return (
-    NON_WHISKY_LISTING_KEYWORDS.test(normalizedName) &&
-    !WHISKY_LISTING_KEYWORDS.test(normalizedName)
-  );
 }
 
 function normalizeClassifierDecisionForPriceMatching(
@@ -551,8 +533,8 @@ function getProposalStatus(
       suggestedBottleId: decision.suggestedBottleId,
       suggestedReleaseId: decision.suggestedReleaseId ?? null,
       modelConfidence: decision.confidence,
-      automationScore: automationAssessment.automationScore,
       automationBlockers: automationAssessment.automationBlockers,
+      decisiveMatchAttributes: automationAssessment.decisiveMatchAttributes,
       candidateBottles: candidates,
     })
   ) {
@@ -1296,17 +1278,6 @@ export async function resolveStorePriceMatchProposal(
     );
     if (trustedSmwsProposal) {
       return trustedSmwsProposal;
-    }
-
-    if (shouldAutoIgnoreTrivialNonWhiskyListing(price.name)) {
-      return await upsertStorePriceMatchProposal({
-        price,
-        extractedLabel,
-        candidates,
-        searchEvidence,
-        statusOverride: "ignored",
-        expectedProcessingToken: processingToken,
-      });
     }
 
     // Price matching consumes the generic bottle classifier and only layers

@@ -43,6 +43,7 @@ function buildCandidate(
     releaseId: null,
     alias: null,
     fullName: "Example Distillery Port Cask 10 Year",
+    bottleFullName: "Example Distillery Port Cask 10 Year",
     brand: "Example Distillery",
     bottler: null,
     series: null,
@@ -81,7 +82,7 @@ describe("priceMatchingAutomation", () => {
       candidateBottles: [buildCandidate()],
     });
 
-    expect(assessment.automationScore).toBeGreaterThanOrEqual(80);
+    expect(assessment.automationScore).toBe(72);
     expect(assessment.decisiveMatchAttributes).toContain("abv");
     expect(assessment.decisiveMatchAttributes).toContain("statedAge");
   });
@@ -129,6 +130,143 @@ describe("priceMatchingAutomation", () => {
       "listing looks release-specific but the suggested target is only a bottle",
     );
     expect(assessment.decisiveMatchAttributes).toContain("statedAge");
+  });
+
+  test("auto-approves high-confidence stable bottle matches from structured identity even below the raw score threshold", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "match_existing",
+      modelConfidence: 97,
+      price: {
+        bottleId: null,
+        name: "The Macallan Double Cask 12-year-old Single Malt Whisky",
+        url: "https://www.reservebar.com/example",
+      },
+      suggestedBottleId: 25,
+      suggestedReleaseId: null,
+      extractedLabel: buildExtractedLabel({
+        brand: "The Macallan",
+        expression: "Double Cask",
+        distillery: ["Macallan"],
+        category: "single_malt",
+        stated_age: 12,
+        abv: null,
+        cask_type: null,
+      }),
+      proposedBottle: null,
+      searchEvidence: [],
+      candidateBottles: [
+        buildCandidate({
+          bottleId: 25,
+          fullName: "The Macallan 12-year-old Double Cask",
+          bottleFullName: "The Macallan 12-year-old Double Cask",
+          brand: "The Macallan",
+          bottler: "The Macallan",
+          distillery: ["The Macallan"],
+          category: "single_malt",
+          statedAge: 12,
+          abv: null,
+          caskType: null,
+          source: ["text", "brand"],
+        }),
+      ],
+    });
+
+    expect(assessment.automationScore).toBe(97);
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        price: {
+          bottleId: null,
+          releaseId: null,
+        },
+        suggestedBottleId: 25,
+        suggestedReleaseId: null,
+        modelConfidence: 97,
+        automationBlockers: assessment.automationBlockers,
+        decisiveMatchAttributes: assessment.decisiveMatchAttributes,
+        candidateBottles: [
+          buildCandidate({
+            bottleId: 25,
+            fullName: "The Macallan 12-year-old Double Cask",
+            bottleFullName: "The Macallan 12-year-old Double Cask",
+            brand: "The Macallan",
+            bottler: "The Macallan",
+            distillery: ["The Macallan"],
+            category: "single_malt",
+            statedAge: 12,
+            abv: null,
+            caskType: null,
+            source: ["text", "brand"],
+          }),
+        ],
+      }),
+    ).toBe(true);
+  });
+
+  test("does not auto-approve plain age-statement bottles from high confidence alone", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "match_existing",
+      modelConfidence: 95,
+      price: {
+        bottleId: null,
+        name: "Tomatin Single Malt 12-year-old",
+        url: "https://example.com/tomatin",
+      },
+      suggestedBottleId: 12,
+      suggestedReleaseId: null,
+      extractedLabel: buildExtractedLabel({
+        brand: "Tomatin",
+        expression: null,
+        distillery: ["Tomatin"],
+        category: "single_malt",
+        stated_age: 12,
+        abv: null,
+        cask_type: null,
+      }),
+      proposedBottle: null,
+      searchEvidence: [],
+      candidateBottles: [
+        buildCandidate({
+          bottleId: 12,
+          fullName: "Tomatin 12-year-old",
+          bottleFullName: "Tomatin 12-year-old",
+          brand: "Tomatin",
+          distillery: ["Tomatin"],
+          category: "single_malt",
+          statedAge: 12,
+          abv: null,
+          caskType: null,
+        }),
+      ],
+    });
+
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        price: {
+          bottleId: null,
+          releaseId: null,
+        },
+        suggestedBottleId: 12,
+        suggestedReleaseId: null,
+        modelConfidence: 95,
+        automationBlockers: assessment.automationBlockers,
+        decisiveMatchAttributes: assessment.decisiveMatchAttributes,
+        candidateBottles: [
+          buildCandidate({
+            bottleId: 12,
+            fullName: "Tomatin 12-year-old",
+            bottleFullName: "Tomatin 12-year-old",
+            brand: "Tomatin",
+            distillery: ["Tomatin"],
+            category: "single_malt",
+            statedAge: 12,
+            abv: null,
+            caskType: null,
+          }),
+        ],
+      }),
+    ).toBe(false);
   });
 
   test("keeps the release-specific blocker when the bottle target does not represent the extracted edition", () => {
@@ -437,7 +575,7 @@ describe("priceMatchingAutomation", () => {
     expect(supported).toBe(false);
   });
 
-  test("auto-approves unmatched strong existing matches when automation is already high", () => {
+  test("does not auto-approve unmatched matches from downstream score alone", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
@@ -448,9 +586,31 @@ describe("priceMatchingAutomation", () => {
         suggestedBottleId: 1,
         suggestedReleaseId: null,
         modelConfidence: 86,
-        automationScore: 84,
         automationBlockers: [],
+        decisiveMatchAttributes: [],
         candidateBottles: [buildCandidate()],
+      }),
+    ).toBe(false);
+  });
+
+  test("auto-approves the current assignment when an exact alias reaffirms it", () => {
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        price: {
+          bottleId: 1,
+          releaseId: null,
+        },
+        suggestedBottleId: 1,
+        suggestedReleaseId: null,
+        modelConfidence: 72,
+        automationBlockers: [],
+        decisiveMatchAttributes: [],
+        candidateBottles: [
+          buildCandidate({
+            source: ["current", "exact"],
+          }),
+        ],
       }),
     ).toBe(true);
   });
@@ -466,8 +626,8 @@ describe("priceMatchingAutomation", () => {
         suggestedBottleId: 1,
         suggestedReleaseId: null,
         modelConfidence: 97,
-        automationScore: 70,
         automationBlockers: [],
+        decisiveMatchAttributes: [],
         candidateBottles: [
           buildCandidate({
             source: ["exact"],
@@ -488,8 +648,8 @@ describe("priceMatchingAutomation", () => {
         suggestedBottleId: 1,
         suggestedReleaseId: null,
         modelConfidence: 99,
-        automationScore: 74,
         automationBlockers: ["candidate age conflicts with extracted label"],
+        decisiveMatchAttributes: [],
         candidateBottles: [
           buildCandidate({
             source: ["exact"],
