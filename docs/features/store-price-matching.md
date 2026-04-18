@@ -241,6 +241,8 @@ Additional rules:
 Most verified matches come from strong deterministic evidence.
 For unmatched exact-match proposals, very high classifier confidence may break ties
 once the automation checks find no conflicts.
+High-confidence bottle-only matches may also verify when authoritative
+off-retailer evidence confirms the reviewed target identity.
 
 ## Automation
 

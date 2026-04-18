@@ -282,6 +282,151 @@ describe("priceMatchingAutomation", () => {
     ).toBe(true);
   });
 
+  test("auto-approves high-confidence bottle matches when off-retailer evidence confirms the product identity", () => {
+    const extractedLabel = buildExtractedLabel({
+      brand: "The Glenlivet",
+      bottler: null,
+      expression: "Caribbean Reserve",
+      distillery: ["The Glenlivet"],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      cask_type: null,
+    });
+    const target = buildCandidate({
+      bottleId: 1760,
+      fullName: "Glenlivet Caribbean Reserve Rum Barrel Selection",
+      bottleFullName: "Glenlivet Caribbean Reserve Rum Barrel Selection",
+      brand: "Glenlivet",
+      bottler: "Glenlivet",
+      distillery: [],
+      category: "single_malt",
+      statedAge: null,
+      abv: null,
+      caskType: null,
+      score: 1,
+      source: ["text"],
+    });
+    const searchEvidence = [
+      {
+        provider: "openai" as const,
+        query: "The Glenlivet Caribbean Reserve official rum barrel selection",
+        summary:
+          "Official Glenlivet sources describe Caribbean Reserve as a single malt selectively finished in Caribbean rum casks.",
+        results: [
+          {
+            title:
+              "Caribbean Reserve Single Malt Scotch Whisky - The Glenlivet US",
+            url: "https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/",
+            domain: "theglenlivet.com",
+            description:
+              "The Glenlivet Caribbean Reserve is a single malt Scotch whisky selectively finished in Caribbean rum casks.",
+            extraSnippets: [],
+          },
+        ],
+      },
+    ];
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "match_existing",
+      modelConfidence: 94,
+      price: {
+        bottleId: null,
+        name: "The Glenlivet Caribbean Reserve",
+        url: "https://www.reservebar.com/products/the-glenlivet-caribbean-reserve/GROUPING-1419170.html",
+      },
+      suggestedBottleId: 1760,
+      suggestedReleaseId: null,
+      extractedLabel,
+      proposedBottle: null,
+      searchEvidence,
+      candidateBottles: [target],
+    });
+
+    expect(assessment.automationBlockers).toEqual([]);
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        price: {
+          bottleId: null,
+          releaseId: null,
+        },
+        priceUrl:
+          "https://www.reservebar.com/products/the-glenlivet-caribbean-reserve/GROUPING-1419170.html",
+        suggestedBottleId: 1760,
+        suggestedReleaseId: null,
+        modelConfidence: 94,
+        automationBlockers: assessment.automationBlockers,
+        decisiveMatchAttributes: assessment.decisiveMatchAttributes,
+        structuredMatchRequiresStatedAge:
+          assessment.structuredMatchRequiresStatedAge,
+        extractedLabel,
+        searchEvidence,
+        candidateBottles: [target],
+      }),
+    ).toBe(true);
+  });
+
+  test("does not auto-approve web-supported bottle matches below the elevated confidence threshold", () => {
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        price: {
+          bottleId: null,
+          releaseId: null,
+        },
+        priceUrl: "https://shop.example/ardbeg-uigeadail",
+        suggestedBottleId: 25,
+        suggestedReleaseId: null,
+        modelConfidence: 93,
+        automationBlockers: [],
+        decisiveMatchAttributes: ["brand", "name", "category"],
+        structuredMatchRequiresStatedAge: false,
+        extractedLabel: buildExtractedLabel({
+          brand: "Ardbeg",
+          expression: "Uigeadail",
+          distillery: ["Ardbeg"],
+          category: "single_malt",
+          stated_age: null,
+          abv: null,
+          cask_type: null,
+        }),
+        searchEvidence: [
+          {
+            provider: "openai",
+            query: '"Ardbeg Uigeadail" official',
+            summary:
+              "Ardbeg's official product page confirms Uigeadail as a single malt Scotch whisky.",
+            results: [
+              {
+                title: "Ardbeg Uigeadail",
+                url: "https://www.ardbeg.com/en-gb/whiskies/ardbeg-uigeadail",
+                domain: "ardbeg.com",
+                description:
+                  "Ardbeg Uigeadail is a single malt Scotch whisky from Ardbeg.",
+                extraSnippets: [],
+              },
+            ],
+          },
+        ],
+        candidateBottles: [
+          buildCandidate({
+            bottleId: 25,
+            fullName: "Ardbeg Uigeadail",
+            bottleFullName: "Ardbeg Uigeadail",
+            brand: "Ardbeg",
+            bottler: null,
+            distillery: [],
+            category: "single_malt",
+            statedAge: null,
+            abv: null,
+            caskType: null,
+            source: ["brand"],
+          }),
+        ],
+      }),
+    ).toBe(false);
+  });
+
   test("does not auto-approve plain age-statement bottles from high confidence alone", () => {
     const assessment = getStorePriceMatchAutomationAssessment({
       action: "match_existing",

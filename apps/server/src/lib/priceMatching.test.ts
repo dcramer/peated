@@ -1152,6 +1152,150 @@ describe("priceMatching", () => {
     );
   });
 
+  test("auto-approves high-confidence existing matches when off-retailer web evidence confirms the bottle identity", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const brand = await fixtures.Entity({
+      name: "Glenlivet",
+      type: ["brand", "distiller"],
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Caribbean Reserve Rum Barrel Selection",
+      category: "single_malt",
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "The Glenlivet Caribbean Reserve",
+      imageUrl: null,
+      url: "https://www.reservebar.com/products/the-glenlivet-caribbean-reserve/GROUPING-1419170.html",
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "The Glenlivet",
+      bottler: null,
+      expression: "Caribbean Reserve",
+      series: null,
+      distillery: ["The Glenlivet"],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        extractedLabel: {
+          brand: "The Glenlivet",
+          bottler: null,
+          expression: "Caribbean Reserve",
+          series: null,
+          distillery: ["The Glenlivet"],
+          category: "single_malt",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        decision: {
+          action: "match_existing",
+          confidence: 94,
+          rationale:
+            "Official Glenlivet sources confirm Caribbean Reserve as the rum-cask-finished single malt release.",
+          suggestedBottleId: bottle.id,
+          candidateBottleIds: [bottle.id],
+          proposedBottle: null,
+        },
+        searchEvidence: [
+          {
+            provider: "openai",
+            query:
+              "The Glenlivet Caribbean Reserve official rum barrel selection",
+            summary:
+              "Official Glenlivet sources describe Caribbean Reserve as a single malt selectively finished in Caribbean rum casks.",
+            results: [
+              {
+                title:
+                  "Caribbean Reserve Single Malt Scotch Whisky - The Glenlivet US",
+                url: "https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/",
+                domain: "theglenlivet.com",
+                description:
+                  "The Glenlivet Caribbean Reserve is a single malt Scotch whisky selectively finished in Caribbean rum casks.",
+                extraSnippets: [],
+              },
+            ],
+          },
+        ],
+        candidateBottles: [
+          {
+            kind: "bottle",
+            bottleId: bottle.id,
+            releaseId: null,
+            alias: null,
+            fullName: "Glenlivet Caribbean Reserve Rum Barrel Selection",
+            bottleFullName: "Glenlivet Caribbean Reserve Rum Barrel Selection",
+            brand: "Glenlivet",
+            bottler: "Glenlivet",
+            series: null,
+            distillery: [],
+            category: "single_malt",
+            statedAge: null,
+            edition: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 1,
+            source: ["text"],
+          },
+        ],
+        resolvedEntities: [],
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+
+    expect(proposal).toMatchObject({
+      status: "approved",
+      proposalType: "match_existing",
+      currentBottleId: bottle.id,
+      suggestedBottleId: bottle.id,
+      reviewedById: expect.any(Number),
+    });
+    expect(updatedPrice?.bottleId).toBe(bottle.id);
+  });
+
   test("keeps exact-ish bottle matches when only generic retailer words differ", async ({
     fixtures,
   }) => {

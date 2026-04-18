@@ -521,15 +521,18 @@ function getProposalType(
 
 function getProposalStatus(
   price: StorePrice,
+  extractedLabel: ExtractedBottleDetails | null,
   decision: StorePriceMatchDecision,
   automationAssessment: StorePriceMatchAutomationAssessment | null,
   candidates: PriceMatchCandidate[],
+  searchEvidence: SearchEvidence[],
 ): StorePriceMatchProposal["status"] {
   if (
     automationAssessment &&
     shouldVerifyStorePriceMatch({
       action: decision.action,
       price,
+      priceUrl: price.url,
       suggestedBottleId: decision.suggestedBottleId,
       suggestedReleaseId: decision.suggestedReleaseId ?? null,
       modelConfidence: decision.confidence,
@@ -537,6 +540,8 @@ function getProposalStatus(
       decisiveMatchAttributes: automationAssessment.decisiveMatchAttributes,
       structuredMatchRequiresStatedAge:
         automationAssessment.structuredMatchRequiresStatedAge,
+      extractedLabel,
+      searchEvidence,
       candidateBottles: candidates,
     })
   ) {
@@ -938,9 +943,11 @@ export async function upsertStorePriceMatchProposal({
     (decision
       ? getProposalStatus(
           price,
+          extractedLabel,
           decision,
           automationAssessment ?? null,
           candidates,
+          searchEvidence ?? [],
         )
       : "errored");
   const creationTarget =
