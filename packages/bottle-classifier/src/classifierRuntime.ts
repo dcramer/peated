@@ -126,6 +126,24 @@ function createIgnoredReferenceClassification(
   });
 }
 
+function hydratedCurrentBottleMatchesReference({
+  currentBottle,
+  bottleId,
+  releaseId,
+}: {
+  currentBottle: BottleCandidate | null;
+  bottleId: number;
+  releaseId: number | null;
+}): boolean {
+  if (!currentBottle || currentBottle.bottleId !== bottleId) {
+    return false;
+  }
+
+  return releaseId !== null
+    ? currentBottle.releaseId === releaseId
+    : currentBottle.releaseId === null || currentBottle.kind === "bottle";
+}
+
 export function createBottleClassifier(
   options: CreateBottleClassifierOptions,
 ): BottleClassifier {
@@ -222,7 +240,7 @@ export function createBottleClassifier(
       mergeBottleCandidate(candidateBottles, candidate);
     }
 
-    const currentBottle = reference.currentBottleId
+    const hydratedCurrentBottle = reference.currentBottleId
       ? options.adapters.getBottleCandidateById
         ? await options.adapters.getBottleCandidateById(
             reference.currentBottleId,
@@ -236,6 +254,15 @@ export function createBottleClassifier(
                 : candidate.releaseId === null || candidate.kind === "bottle"),
           ) ?? null)
       : null;
+    const currentBottle =
+      reference.currentBottleId &&
+      hydratedCurrentBottleMatchesReference({
+        currentBottle: hydratedCurrentBottle,
+        bottleId: reference.currentBottleId,
+        releaseId: reference.currentReleaseId ?? null,
+      })
+        ? hydratedCurrentBottle
+        : null;
     if (currentBottle) {
       mergeBottleCandidate(candidateBottles, currentBottle);
     }

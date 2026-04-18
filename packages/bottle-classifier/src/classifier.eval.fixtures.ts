@@ -307,6 +307,28 @@ const lagavulinDistillersEdition2023Release = buildBottleCandidate({
   source: ["brand", "release"],
 });
 
+const glengoyneLegacySeriesChapterTwo = buildBottleCandidate({
+  bottleId: 2083,
+  fullName: "Glengoyne The Legacy Series Chapter Two",
+  brand: "Glengoyne",
+  distillery: ["Glengoyne"],
+  category: "single_malt",
+  abv: 48,
+  score: 0.96,
+  source: ["exact"],
+});
+
+const glengoyneLegacySeriesChapterOne = buildBottleCandidate({
+  bottleId: 2460,
+  fullName: "Glengoyne The Legacy Series Chapter One",
+  brand: "Glengoyne",
+  distillery: ["Glengoyne"],
+  category: "single_malt",
+  abv: 48,
+  score: 0.91,
+  source: ["text"],
+});
+
 const smwsa41176Match = buildBottleCandidate({
   bottleId: 650,
   fullName: "SMWS 41.176 Baristaliscious",
@@ -868,6 +890,34 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       matchedReleaseId: 78,
       summary:
         "Treat Distillers Edition as the stable parent family, use the bare 2023 year as release identity, and match the existing 2023 child release instead of downgrading to no-match.",
+    },
+  },
+  {
+    name: "store listing: creates a reusable Legacy Series parent when only legacy chapter bottles exist locally",
+    input: {
+      reference: {
+        name: "Glengoyne The Legacy Series Chapter Two",
+        url: "https://shop.example/products/glengoyne-legacy-series-chapter-two",
+      },
+      extractedIdentity: buildExtractedIdentity({
+        brand: "Glengoyne",
+        expression: "The Legacy Series",
+        distillery: ["Glengoyne"],
+        category: "single_malt",
+        abv: 48,
+        edition: "Chapter Two",
+      }),
+      initialCandidates: [
+        glengoyneLegacySeriesChapterTwo,
+        glengoyneLegacySeriesChapterOne,
+      ],
+    },
+    expected: {
+      status: "classified",
+      action: "create_bottle_and_release",
+      identityScope: "product",
+      summary:
+        "Treat Glengoyne The Legacy Series as the reusable parent family and Chapter Two as the child release even when the local candidates are only dirty chapter-specific bottle rows.",
     },
   },
   {

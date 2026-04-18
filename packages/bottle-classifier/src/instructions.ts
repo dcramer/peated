@@ -676,6 +676,8 @@ export function buildWhiskyLabelExtractorInstructions({
       "Age statements should be integers. Normalize age phrases such as `12 Year`, `12 Years Old`, `12 Yr.`, and `12yr` to `stated_age: 12`.",
       "When an age statement belongs in the expression, normalize the phrase to `12-year-old`.",
       "For expression-style fields, follow the bottle's evidenced canonical name. Do not mechanically append retailer style/category words from the title just to make the expression look complete.",
+      "When a stable family phrase is followed by a clearly separate numbered or coded child label, keep the family in `expression` and the varying child label in `edition` instead of collapsing both into one opaque expression.",
+      "Apply that split from the label structure itself, not by memorizing brand-specific examples. If the split is ambiguous, stay less specific instead of guessing.",
       "If `edition`, `release_year`, or `vintage_year` is populated, do not also copy that same batch code or year into `expression`.",
       "Use `release_year` only for explicit release or bottling years, not founding dates or warning text.",
       "If both distillation and bottling years are present, use `vintage_year` for the distillation year and `release_year` for the bottling year.",
@@ -750,6 +752,8 @@ export function buildBottleClassifierInstructions({
     "Local candidates may include structured bottle and release fields such as brand, bottler, distillery, series, category, age, edition, cask type, cask size, cask fill, cask-strength, single-cask, ABV, and release years. Use those fields directly when present instead of inferring everything from the candidate name.",
     "When local candidates already include both a reusable parent bottle and a clean child release under that same bottle, and the extracted release detail uniquely matches the child candidate, prefer matching that existing release over returning a plain parent-bottle match or creating a duplicate release.",
     "For annual-release families such as Distillers Edition, a bare year can be decisive release identity. If one local child release candidate aligns on the correct parent bottle and matching release year, treat that release as the leading existing-match target rather than treating the year as retailer noise.",
+    "If multiple local bottle candidates share the same stable family wording but differ only by likely release-level detail such as a batch code, numbered edition, volume, chapter, or annual release label, treat that as evidence the local data may be storing sibling releases as bottle rows rather than proof that each row is a separate canonical bottle.",
+    "When sibling-specific candidates point to a shared reusable family and no clean parent bottle exists locally, prefer `create_bottle_and_release` over matching one dirty sibling row or collapsing to `no_match`.",
     ...(hasBottleSearch
       ? [
           "When the provided local candidates are thin, conflicting, or missing obvious near matches, call `search_bottles` with the most specific query you can form from the reference and extracted identity.",
@@ -778,6 +782,7 @@ export function buildBottleClassifierInstructions({
     "Missing generic style words like `single malt` are weak evidence. Conflicting age statements, edition codes, or barrel descriptors are strong evidence.",
     "Exact or near-exact ABV is a strong positive signal when the base identity already aligns and competing candidates do not share that ABV.",
     "When ABV sharply separates one candidate from the others, let that raise confidence materially instead of treating it as a minor tiebreaker.",
+    "Apply bottle-versus-release reasoning generically from the evidence in front of you. Do not rely on memorized brand-specific examples to justify a split or a match.",
     "If bottle identity is clear but release identity is not, prefer the bottle-level outcome. Do not force a specific release from weak release evidence.",
     "If the only local candidate is a more specific release or edition than the reference supports, do not match it by default. Treat the candidate as over-specific unless web evidence validates the missing differentiating traits.",
     "Ignore volume, gift-set packaging, added glassware, ratings blurbs, and generic retailer SEO words when deciding bottle identity.",
@@ -887,6 +892,7 @@ export function buildBottleClassifierInstructions({
       "For `create_bottle`, return `proposedBottle` and leave `proposedRelease` and `parentBottleId` null.",
       "For `create_release`, return `parentBottleId` plus `proposedRelease`, and leave `proposedBottle` null.",
       "For `create_bottle_and_release`, return both `proposedBottle` and `proposedRelease` with `parentBottleId = null`.",
+      "For `no_match`, leave match and create fields null.",
       "When bottle identity is certain but release identity is not, prefer `match` or `create_bottle` at the bottle layer instead of inventing a release.",
       "If you return `create_bottle`, `proposedBottle` must include every schema field, using `null` or `[]` when unknown.",
       "For `proposedBottle.name`, follow the bottle's evidenced canonical name, not a mechanically copied source title. Do not append extra style/category words just because they appeared in the source text.",

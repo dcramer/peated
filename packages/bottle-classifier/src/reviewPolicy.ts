@@ -7,6 +7,7 @@ import {
 import { normalizeBottleCreationDrafts } from "./bottleCreationDrafts";
 import {
   BottleClassificationDecisionSchema,
+  CaskTypeEnum,
   type BottleCandidate,
   type BottleClassificationDecision,
   type BottleClassifierAgentDecision,
@@ -19,6 +20,11 @@ import type {
   BottleReference,
 } from "./contract";
 import { BottleClassificationError } from "./error";
+import {
+  AUTHORITATIVE_SOURCE_TIERS,
+  buildProducerIdentityPhrases,
+  classifySourceTier,
+} from "./identityEvidenceCore";
 import { normalizeString } from "./normalize";
 
 const NON_WHISKY_KEYWORDS =
@@ -1492,6 +1498,11 @@ function hasSupportiveWebEvidenceForTarget({
   }
 
   const referenceDomain = getComparableDomain(reference.url ?? null);
+  const producerPhrases = buildProducerIdentityPhrases({
+    proposedBottle: null,
+    extractedLabel: artifacts.extractedIdentity,
+    targetCandidate: target,
+  });
   const targetTokenSets = getTargetNameCandidates(target, decision)
     .map((name) => getComparableNameTokens(name))
     .filter((tokens) => tokens.length > 0);
@@ -1508,6 +1519,15 @@ function hasSupportiveWebEvidenceForTarget({
         (referenceDomain !== null &&
           domainMatches(resultDomain, referenceDomain))
       ) {
+        continue;
+      }
+
+      const sourceTier = classifySourceTier({
+        result,
+        sourceUrl: reference.url ?? "",
+        producerPhrases,
+      });
+      if (!AUTHORITATIVE_SOURCE_TIERS.has(sourceTier)) {
         continue;
       }
 
@@ -1529,6 +1549,76 @@ function hasSupportiveWebEvidenceForTarget({
   }
 
   return false;
+}
+
+function candidateMatchesProposedReleaseDraft({
+  candidate,
+  proposedRelease,
+}: {
+  candidate: BottleCandidate;
+  proposedRelease: ProposedRelease;
+}): boolean {
+  if (candidate.releaseId === null) {
+    return false;
+  }
+
+  const checks: boolean[] = [];
+
+  if (proposedRelease.edition) {
+    checks.push(textsOverlap(candidate.edition, proposedRelease.edition));
+  }
+  if (proposedRelease.statedAge !== null) {
+    checks.push(candidate.statedAge === proposedRelease.statedAge);
+  }
+  if (proposedRelease.abv !== null) {
+    checks.push(candidate.abv === proposedRelease.abv);
+  }
+  if (proposedRelease.caskStrength !== null) {
+    checks.push(candidate.caskStrength === proposedRelease.caskStrength);
+  }
+  if (proposedRelease.singleCask !== null) {
+    checks.push(candidate.singleCask === proposedRelease.singleCask);
+  }
+  if (proposedRelease.vintageYear !== null) {
+    checks.push(candidate.vintageYear === proposedRelease.vintageYear);
+  }
+  if (proposedRelease.releaseYear !== null) {
+    checks.push(candidate.releaseYear === proposedRelease.releaseYear);
+  }
+  if (proposedRelease.caskType !== null) {
+    checks.push(candidate.caskType === proposedRelease.caskType);
+  }
+  if (proposedRelease.caskSize !== null) {
+    checks.push(candidate.caskSize === proposedRelease.caskSize);
+  }
+  if (proposedRelease.caskFill !== null) {
+    checks.push(candidate.caskFill === proposedRelease.caskFill);
+  }
+
+  return checks.length > 0 && checks.every(Boolean);
+}
+
+function findExistingMatchingReleaseCandidates({
+  parentBottleId,
+  proposedRelease,
+  artifacts,
+}: {
+  parentBottleId: number;
+  proposedRelease: ProposedRelease;
+  artifacts: BottleClassificationArtifacts;
+}): BottleCandidate[] {
+  return artifacts.candidates
+    .filter(
+      (candidate) =>
+        candidate.bottleId === parentBottleId && candidate.releaseId !== null,
+    )
+    .filter((candidate) =>
+      candidateMatchesProposedReleaseDraft({
+        candidate,
+        proposedRelease,
+      }),
+    )
+    .sort((left, right) => (right.score ?? 0) - (left.score ?? 0));
 }
 
 function createNoMatchDecision({
@@ -1613,9 +1703,20 @@ function buildReleaseDraftFromExtractedIdentity({
           }))
           ? extractedIdentity.stated_age
           : null,
-      abv: null,
-      caskStrength: null,
-      singleCask: null,
+      abv:
+        extractedIdentity.abv !== null && extractedIdentity.abv !== target.abv
+          ? extractedIdentity.abv
+          : null,
+      caskStrength:
+        extractedIdentity.cask_strength !== null &&
+        extractedIdentity.cask_strength !== target.caskStrength
+          ? extractedIdentity.cask_strength
+          : null,
+      singleCask:
+        extractedIdentity.single_cask !== null &&
+        extractedIdentity.single_cask !== target.singleCask
+          ? extractedIdentity.single_cask
+          : null,
       vintageYear:
         extractedIdentity.vintage_year !== null &&
         extractedIdentity.vintage_year !== target.vintageYear
@@ -1626,9 +1727,29 @@ function buildReleaseDraftFromExtractedIdentity({
         extractedIdentity.release_year !== target.releaseYear
           ? extractedIdentity.release_year
           : null,
-      caskType: null,
-      caskSize: null,
-      caskFill: null,
+      caskType: (() => {
+        if (
+          !extractedIdentity.cask_type ||
+          extractedIdentity.cask_type === target.caskType
+        ) {
+          return null;
+        }
+
+        const parsedCaskType = CaskTypeEnum.safeParse(
+          extractedIdentity.cask_type,
+        );
+        return parsedCaskType.success ? parsedCaskType.data : null;
+      })(),
+      caskSize:
+        extractedIdentity.cask_size !== null &&
+        extractedIdentity.cask_size !== target.caskSize
+          ? extractedIdentity.cask_size
+          : null,
+      caskFill:
+        extractedIdentity.cask_fill !== null &&
+        extractedIdentity.cask_fill !== target.caskFill
+          ? extractedIdentity.cask_fill
+          : null,
       description: null,
       tastingNotes: null,
       imageUrl: null,
@@ -1664,15 +1785,7 @@ function maybePromoteBottleMatchToCreateRelease({
     artifacts,
   });
 
-  if (
-    !parentTarget ||
-    decision.identityScope === "exact_cask" ||
-    artifacts.candidates.some(
-      (candidate) =>
-        candidate.bottleId === parentTarget.bottleId &&
-        candidate.releaseId !== null,
-    )
-  ) {
+  if (!parentTarget || decision.identityScope === "exact_cask") {
     return null;
   }
 
@@ -1682,6 +1795,16 @@ function maybePromoteBottleMatchToCreateRelease({
   });
 
   if (!proposedRelease) {
+    return null;
+  }
+
+  if (
+    findExistingMatchingReleaseCandidates({
+      parentBottleId: parentTarget.bottleId,
+      proposedRelease,
+      artifacts,
+    }).length > 0
+  ) {
     return null;
   }
 
@@ -1897,17 +2020,18 @@ function downgradeUnsafeExistingMatchDecision({
     );
   }
 
+  const downgradedRationale = appendRationale(
+    decision.rationale,
+    `Server downgraded the existing-match recommendation because ${reasons.join(
+      " and ",
+    )}.`,
+  );
   return createNoMatchDecision({
     decision,
     candidateBottleIds: decision.candidateBottleIds,
     observation: decision.observation,
     identityScope: decision.identityScope,
-    rationale: appendRationale(
-      decision.rationale,
-      `Server downgraded the existing-match recommendation because ${reasons.join(
-        " and ",
-      )}.`,
-    ),
+    rationale: downgradedRationale,
   });
 }
 
@@ -2450,27 +2574,24 @@ function sanitizeClassifierDecision({
     };
   }
 
-  return {
-    action: "no_match",
-    confidence: normalizedConfidence,
-    rationale: decision.rationale,
+  return createNoMatchDecision({
+    decision: {
+      confidence: normalizedConfidence,
+      rationale: decision.rationale,
+      identityScope: inferIdentityScope({
+        requestedIdentityScope: decision.identityScope,
+        reference,
+        target: null,
+        extractedIdentity: artifacts.extractedIdentity,
+        proposedBottle: null,
+        hasReleaseIdentity: false,
+        observation,
+      }),
+    },
     candidateBottleIds: filteredCandidateBottleIds,
-    identityScope: inferIdentityScope({
-      requestedIdentityScope: decision.identityScope,
-      reference,
-      target: null,
-      extractedIdentity: artifacts.extractedIdentity,
-      proposedBottle: null,
-      hasReleaseIdentity: false,
-      observation,
-    }),
     observation,
-    matchedBottleId: null,
-    matchedReleaseId: null,
-    parentBottleId: null,
-    proposedBottle: null,
-    proposedRelease: null,
-  };
+    rationale: decision.rationale,
+  });
 }
 
 export function shouldAutoIgnoreBottleReference(

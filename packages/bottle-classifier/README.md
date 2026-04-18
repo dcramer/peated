@@ -105,6 +105,7 @@ These are the rules to preserve when iterating on the classifier:
 
 - Raw bottle references go in; reviewed bottle-centric decisions come out.
 - False positive existing matches are worse than conservative `create_*` or `no_match` results.
+- When the safe outcome is still unresolved, return `no_match` instead of inventing a match or create action. Any follow-up review workflow belongs downstream.
 - The model may only match candidate ids that were actually retrieved.
 - Web evidence can support identity, but web search by itself is not canonical identity storage.
 - Retailer wording and SEO noise are weak evidence; official and independent non-retailer sources are stronger.
@@ -117,6 +118,7 @@ These are the rules to preserve when iterating on the classifier:
 - Deterministic fast paths must stay limited to structurally safe behavior that is effectively zero-ambiguity.
 - If the behavior depends on brand context, marketed family meaning, or program semantics, keep it classifier-owned.
 - If the input is too sparse to safely infer a canonical bottle, block or return `no_match` instead of guessing.
+- Prompt and extractor changes must encode transferable reasoning. Do not add brand-specific tutoring examples just to fix one observed family; keep those regressions in eval fixtures instead.
 
 ## File Map
 
@@ -162,7 +164,8 @@ When changing classifier behavior:
 2. Update the normalization corpus when the behavior changes bottle versus release identity boundaries.
 3. Update or add realistic positive and negative eval fixtures when the behavior is model-sensitive.
 4. Keep prompts, schemas, deterministic review logic, and pure normalization helpers aligned. Do not patch around package behavior in the server wrapper.
-5. Re-run package tests and evals before touching downstream consumers.
+5. Do not solve one failed family by teaching the prompt that exact family name. Generalize the rule in prompt or policy, and use eval fixtures to hold the concrete regression.
+6. Re-run package tests and evals before touching downstream consumers.
 
 When adding a new bottle family or edge case:
 
