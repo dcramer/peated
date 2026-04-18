@@ -172,6 +172,7 @@ describe("priceMatchingAutomation", () => {
     });
 
     expect(assessment.automationScore).toBe(97);
+    expect(assessment.structuredMatchRequiresStatedAge).toBe(true);
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
@@ -184,6 +185,8 @@ describe("priceMatchingAutomation", () => {
         modelConfidence: 97,
         automationBlockers: assessment.automationBlockers,
         decisiveMatchAttributes: assessment.decisiveMatchAttributes,
+        structuredMatchRequiresStatedAge:
+          assessment.structuredMatchRequiresStatedAge,
         candidateBottles: [
           buildCandidate({
             bottleId: 25,
@@ -194,6 +197,82 @@ describe("priceMatchingAutomation", () => {
             distillery: ["The Macallan"],
             category: "single_malt",
             statedAge: 12,
+            abv: null,
+            caskType: null,
+            source: ["text", "brand"],
+          }),
+        ],
+      }),
+    ).toBe(true);
+  });
+
+  test("auto-approves high-confidence NAS bottle matches from structured identity", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "match_existing",
+      modelConfidence: 97,
+      price: {
+        bottleId: null,
+        name: "Wild Turkey Rare Breed Barrel-Proof Kentucky Straight Rye",
+        url: "https://example.com/rare-breed-rye",
+      },
+      suggestedBottleId: 25,
+      suggestedReleaseId: null,
+      extractedLabel: buildExtractedLabel({
+        brand: "Wild Turkey",
+        expression: "Rare Breed",
+        distillery: ["Wild Turkey"],
+        category: "rye",
+        stated_age: null,
+        abv: null,
+        cask_type: null,
+      }),
+      proposedBottle: null,
+      searchEvidence: [],
+      candidateBottles: [
+        buildCandidate({
+          bottleId: 25,
+          fullName: "Wild Turkey Rare Breed Barrel-Proof Kentucky Straight Rye",
+          bottleFullName:
+            "Wild Turkey Rare Breed Barrel-Proof Kentucky Straight Rye",
+          brand: "Wild Turkey",
+          distillery: ["Wild Turkey"],
+          category: "rye",
+          statedAge: null,
+          caskStrength: true,
+          abv: null,
+          caskType: null,
+          source: ["text", "brand"],
+        }),
+      ],
+    });
+
+    expect(assessment.structuredMatchRequiresStatedAge).toBe(false);
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        price: {
+          bottleId: null,
+          releaseId: null,
+        },
+        suggestedBottleId: 25,
+        suggestedReleaseId: null,
+        modelConfidence: 97,
+        automationBlockers: assessment.automationBlockers,
+        decisiveMatchAttributes: assessment.decisiveMatchAttributes,
+        structuredMatchRequiresStatedAge:
+          assessment.structuredMatchRequiresStatedAge,
+        candidateBottles: [
+          buildCandidate({
+            bottleId: 25,
+            fullName:
+              "Wild Turkey Rare Breed Barrel-Proof Kentucky Straight Rye",
+            bottleFullName:
+              "Wild Turkey Rare Breed Barrel-Proof Kentucky Straight Rye",
+            brand: "Wild Turkey",
+            distillery: ["Wild Turkey"],
+            category: "rye",
+            statedAge: null,
+            caskStrength: true,
             abv: null,
             caskType: null,
             source: ["text", "brand"],
@@ -252,6 +331,8 @@ describe("priceMatchingAutomation", () => {
         modelConfidence: 95,
         automationBlockers: assessment.automationBlockers,
         decisiveMatchAttributes: assessment.decisiveMatchAttributes,
+        structuredMatchRequiresStatedAge:
+          assessment.structuredMatchRequiresStatedAge,
         candidateBottles: [
           buildCandidate({
             bottleId: 12,

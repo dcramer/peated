@@ -121,7 +121,6 @@ const HIGH_CONFIDENCE_STRUCTURED_MATCH_REQUIRED_ATTRIBUTES: MatchAttribute[] = [
   "name",
   "distillery",
   "category",
-  "statedAge",
 ];
 function clampScore(score: number) {
   return Math.min(100, Math.max(0, Math.round(score)));
@@ -869,6 +868,7 @@ function getExistingMatchAssessment({
     return {
       automationScore: null,
       decisiveMatchAttributes: [] as MatchAttribute[],
+      structuredMatchRequiresStatedAge: false,
       automationBlockers: [] as string[],
     };
   }
@@ -904,6 +904,9 @@ function getExistingMatchAssessment({
       target,
       extractedLabel,
     }),
+    structuredMatchRequiresStatedAge:
+      extractedLabel?.stated_age !== null &&
+      extractedLabel?.stated_age !== undefined,
     automationBlockers: Array.from(new Set(automationBlockers)),
   };
 }
@@ -1145,6 +1148,8 @@ export function getStorePriceMatchAutomationAssessment({
       automationEligible: false,
       automationBlockers: matchAssessment.automationBlockers,
       decisiveMatchAttributes: matchAssessment.decisiveMatchAttributes,
+      structuredMatchRequiresStatedAge:
+        matchAssessment.structuredMatchRequiresStatedAge,
       differentiatingAttributes: [],
       webEvidenceChecks: [],
     };
@@ -1156,6 +1161,7 @@ export function getStorePriceMatchAutomationAssessment({
     automationEligible: false,
     automationBlockers: [],
     decisiveMatchAttributes: [],
+    structuredMatchRequiresStatedAge: false,
     differentiatingAttributes: [],
     webEvidenceChecks: [],
   };
@@ -1188,11 +1194,16 @@ function getSuggestedMatchCandidate({
 
 function hasHighConfidenceStructuredMatch(
   decisiveMatchAttributes: MatchAttribute[],
+  structuredMatchRequiresStatedAge: boolean,
 ) {
   const matchedAttributes = new Set(decisiveMatchAttributes);
 
-  return HIGH_CONFIDENCE_STRUCTURED_MATCH_REQUIRED_ATTRIBUTES.every(
-    (attribute) => matchedAttributes.has(attribute),
+  const requiredAttributes = structuredMatchRequiresStatedAge
+    ? [...HIGH_CONFIDENCE_STRUCTURED_MATCH_REQUIRED_ATTRIBUTES, "statedAge"]
+    : HIGH_CONFIDENCE_STRUCTURED_MATCH_REQUIRED_ATTRIBUTES;
+
+  return requiredAttributes.every((attribute) =>
+    matchedAttributes.has(attribute),
   );
 }
 
@@ -1204,6 +1215,7 @@ export function shouldVerifyStorePriceMatch({
   modelConfidence,
   automationBlockers,
   decisiveMatchAttributes,
+  structuredMatchRequiresStatedAge = false,
   candidateBottles,
 }: {
   action: MatchAction;
@@ -1215,6 +1227,7 @@ export function shouldVerifyStorePriceMatch({
   modelConfidence: number | null;
   automationBlockers: string[];
   decisiveMatchAttributes: MatchAttribute[];
+  structuredMatchRequiresStatedAge?: boolean;
   candidateBottles: PriceMatchCandidate[];
 }) {
   if (action !== "match_existing" || suggestedBottleId === null) {
@@ -1253,7 +1266,10 @@ export function shouldVerifyStorePriceMatch({
     suggestedReleaseId === null &&
     modelConfidence >=
       HIGH_CONFIDENCE_STRUCTURED_MATCH_MODEL_CONFIDENCE_THRESHOLD &&
-    hasHighConfidenceStructuredMatch(decisiveMatchAttributes)
+    hasHighConfidenceStructuredMatch(
+      decisiveMatchAttributes,
+      structuredMatchRequiresStatedAge,
+    )
   ) {
     return true;
   }

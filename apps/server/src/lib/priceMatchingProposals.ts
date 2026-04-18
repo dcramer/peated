@@ -535,6 +535,8 @@ function getProposalStatus(
       modelConfidence: decision.confidence,
       automationBlockers: automationAssessment.automationBlockers,
       decisiveMatchAttributes: automationAssessment.decisiveMatchAttributes,
+      structuredMatchRequiresStatedAge:
+        automationAssessment.structuredMatchRequiresStatedAge,
       candidateBottles: candidates,
     })
   ) {

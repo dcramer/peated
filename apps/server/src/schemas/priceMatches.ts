@@ -142,6 +142,7 @@ export const StorePriceMatchAutomationAssessmentSchema = z.object({
   automationEligible: z.boolean().default(false),
   automationBlockers: z.array(z.string()).default([]),
   decisiveMatchAttributes: z.array(PriceMatchAttributeEnum).default([]),
+  structuredMatchRequiresStatedAge: z.boolean().default(false),
   differentiatingAttributes: z.array(PriceMatchAttributeEnum).default([]),
   webEvidenceChecks: z.array(PriceMatchEvidenceCheckSchema).default([]),
 });
