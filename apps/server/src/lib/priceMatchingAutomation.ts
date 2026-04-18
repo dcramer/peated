@@ -1128,6 +1128,7 @@ export function getStorePriceMatchAutomationAssessment({
     return {
       modelConfidence,
       ...createScore,
+      structuredMatchRequiresStatedAge: false,
       automationEligible:
         action === "create_new" ? createScore.automationEligible : false,
     };
@@ -1198,7 +1199,7 @@ function hasHighConfidenceStructuredMatch(
 ) {
   const matchedAttributes = new Set(decisiveMatchAttributes);
 
-  const requiredAttributes = structuredMatchRequiresStatedAge
+  const requiredAttributes: MatchAttribute[] = structuredMatchRequiresStatedAge
     ? [...HIGH_CONFIDENCE_STRUCTURED_MATCH_REQUIRED_ATTRIBUTES, "statedAge"]
     : HIGH_CONFIDENCE_STRUCTURED_MATCH_REQUIRED_ATTRIBUTES;
 
