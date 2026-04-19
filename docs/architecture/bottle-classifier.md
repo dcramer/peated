@@ -139,6 +139,7 @@ These rules should remain centralized in the classifier:
 - A flavor-adjacent noun in the expression is not enough to exclude a bottle. Official catalogued whisky expressions can still match when the overall evidence says the product is a real whisky bottle rather than a novelty additive-flavor product.
 - Over-specific local candidates should not be matched unless the missing differentiator is actually supported.
 - Web evidence is support, not identity by itself.
+- Web search should stay narrow and hypothesis-driven. The classifier should usually make at most one web search call, and only spend a second call when the first results are weak or contradictory on a still-decisive trait.
 - Confidence calibration matters because downstream consumers use classifier confidence to decide whether a reviewed existing match is safe to auto-verify or should stay in review.
 - Generic `single cask` / `single barrel` language is not enough to infer `exact_cask`; exact-cask scope needs a stronger marketed-identity signal such as a known program code or numbered cask identity.
 - Downstream consumers should adapt the reviewed classifier result instead of “fixing up” raw model decisions.
@@ -190,11 +191,24 @@ Classifier evals should also score confidence calibration for cases that are mea
 The current package-local eval harness lives in:
 
 - `packages/bottle-classifier/src/classifier.eval.test.ts`
+- `packages/bottle-classifier/src/classifier.eval.scenarios.ts`
 - `packages/bottle-classifier/src/classifier.eval.fixtures.ts`
-- `packages/bottle-classifier/src/normalizationCorpus.eval.test.ts`
 - `packages/bottle-classifier/src/normalizationCorpus.eval.fixtures.ts`
 - `packages/bottle-classifier/src/legacyReleaseRepairResolution.eval.test.ts`
 - `packages/bottle-classifier/src/legacyReleaseRepairResolution.eval.fixtures.ts`
+
+The main live classifier eval runner is organized around workflow scenarios
+instead of separate normalization-versus-classifier files:
+
+- `new bottles`
+- `match existing`
+- `corrections`
+- `ignore or reject`
+
+That grouped runner still uses the same classifier runtime and still includes
+the stricter normalization-boundary corpus cases inside the `new bottles`
+scenario. The difference is organizational: one classifier-facing harness with
+shared cache, reporting, and scenario-level fixture grouping.
 
 Run it from the repo root with:
 
@@ -217,6 +231,11 @@ Local setup for live evals:
 - `OPENAI_HOST`, `OPENAI_ORGANIZATION`, and `OPENAI_PROJECT` are optional for proxy or non-default account routing
 - `BRAVE_API_KEY` is optional; without it the classifier still runs with OpenAI web search only
 - `BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES` is optional and defaults to `3`
+- classifier evals cache normalized web-search tool results under the committed `packages/bottle-classifier/eval-cassettes/web-search/` directory by default, with one JSON cassette per query under tool-specific subdirectories
+- cassette lookup uses canonical per-tool cache keys and remains backward-compatible with older key shapes so incidental cache-key cleanup does not invalidate committed fixtures
+- `BOTTLE_CLASSIFIER_EVAL_WEB_SEARCH_CACHE_MODE` controls the cassette behavior: `replay_or_record` by default, plus `replay_only`, `refresh`, or `live`
+- `BOTTLE_CLASSIFIER_EVAL_WEB_SEARCH_CACHE_DIR` overrides the cassette directory when needed
+- `pnpm evals:web-cache:clear` deletes recorded cassette files while keeping the committed cache root
 
 Notes:
 

@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Four Roses Limited Edition Small Batch 2017 official 2017 limited edition small batch"
+    },
+    "recordedAt": "2026-04-19T16:15:34.922Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Four Roses Limited Edition Small Batch 2017 official 2017 limited edition small batch",
+          "summary": "**Four Roses Limited Edition Small Batch 2017** appears to be the official **2017 Limited Edition Small Batch** release from Four Roses, not the separate **2017 Al Young 50th Anniversary Limited Edition Small Batch**. Four Roses’ official product page identifies it as **107.3 proof** and **aged a minimum of 12–15 years",
+          "results": [
+            {
+              "title": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+              "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+              "domain": "fourrosesbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+              "url": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+              "domain": "distiller.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/blog/cheers-to-a-mellow-year",
+              "url": "https://www.fourrosesbourbon.com/blog/cheers-to-a-mellow-year",
+              "domain": "fourrosesbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+              "url": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+              "domain": "fourrosesbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/Four-Roses-Limited-Edition-Small-Batch-2017-Release-53-95",
+              "url": "https://whiskyadvocate.com/Four-Roses-Limited-Edition-Small-Batch-2017-Release-53-95",
+              "domain": "whiskyadvocate.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/summer-2017-editors-choice-four-roses-2017-small-batch-limited-edition-al-youngs-50th-anniversary",
+              "url": "https://whiskyadvocate.com/summer-2017-editors-choice-four-roses-2017-small-batch-limited-edition-al-youngs-50th-anniversary",
+              "domain": "whiskyadvocate.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Four Roses Limited Edition Small Batch 2017 official 2017 limited edition small batch",
+        "summary": "**Four Roses Limited Edition Small Batch 2017** appears to be the official **2017 Limited Edition Small Batch** release from Four Roses, not the separate **2017 Al Young 50th Anniversary Limited Edition Small Batch**. Four Roses’ official product page identifies it as **107.3 proof** and **aged a minimum of 12–15 years",
+        "results": [
+          {
+            "title": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+            "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+            "domain": "fourrosesbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+            "url": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+            "domain": "distiller.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/blog/cheers-to-a-mellow-year",
+            "url": "https://www.fourrosesbourbon.com/blog/cheers-to-a-mellow-year",
+            "domain": "fourrosesbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+            "url": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+            "domain": "fourrosesbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/Four-Roses-Limited-Edition-Small-Batch-2017-Release-53-95",
+            "url": "https://whiskyadvocate.com/Four-Roses-Limited-Edition-Small-Batch-2017-Release-53-95",
+            "domain": "whiskyadvocate.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/summer-2017-editors-choice-four-roses-2017-small-batch-limited-edition-al-youngs-50th-anniversary",
+            "url": "https://whiskyadvocate.com/summer-2017-editors-choice-four-roses-2017-small-batch-limited-edition-al-youngs-50th-anniversary",
+            "domain": "whiskyadvocate.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

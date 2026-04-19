@@ -1,0 +1,492 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Heaven's Door Bootleg Series Volume 3 official whiskey bourbon"
+    },
+    "recordedAt": "2026-04-19T05:17:44.834Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Heaven's Door Bootleg Series Volume 3 official whiskey bourbon",
+          "summary": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+          "results": [
+            {
+              "title": "https://www.prnewswire.com/news-releases/heavens-door-spirits-announces-release-of-the-bootleg-series-vol-iii-301439092.html",
+              "url": "https://www.prnewswire.com/news-releases/heavens-door-spirits-announces-release-of-the-bootleg-series-vol-iii-301439092.html",
+              "domain": "prnewswire.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.heavensdoor.com/bootleg-series",
+              "url": "https://www.heavensdoor.com/bootleg-series",
+              "domain": "heavensdoor.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+              "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+              "domain": "buy.heavensdoor.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+              "url": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+              "domain": "distiller.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://buy.heavensdoor.com/",
+              "url": "https://buy.heavensdoor.com/",
+              "domain": "buy.heavensdoor.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+              "url": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+              "domain": "breakingbourbon.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.heavensdoor.com/whiskey-collection",
+              "url": "https://www.heavensdoor.com/whiskey-collection",
+              "domain": "heavensdoor.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://buy.heavensdoor.com/products/heavens-door-bootleg-bundle",
+              "url": "https://buy.heavensdoor.com/products/heavens-door-bootleg-bundle",
+              "domain": "buy.heavensdoor.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/vfifyt",
+              "url": "https://www.reddit.com/r/bourbon/comments/vfifyt",
+              "domain": "reddit.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/whiskies/heavens-door/heavens-door-bootleg-series-no3-2021-edition-whiskey/",
+              "url": "https://www.masterofmalt.com/whiskies/heavens-door/heavens-door-bootleg-series-no3-2021-edition-whiskey/",
+              "domain": "masterofmalt.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.frootbat.com/p/328036/Heavens-Door-The-Bootleg-Series-Volume-3-Vino-de-Naranja-Cask-Finish-13-Year-Old-Bourbon-Whiskey",
+              "url": "https://www.frootbat.com/p/328036/Heavens-Door-The-Bootleg-Series-Volume-3-Vino-de-Naranja-Cask-Finish-13-Year-Old-Bourbon-Whiskey",
+              "domain": "frootbat.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.drinkhacker.com/2022/06/28/review-heavens-door-777-blend-and-bootleg-series-vol-iii/",
+              "url": "https://www.drinkhacker.com/2022/06/28/review-heavens-door-777-blend-and-bootleg-series-vol-iii/",
+              "domain": "drinkhacker.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.liquormarts.ca/sites/mbll-lm/files/2024-10/Premium-Spirit-Release-Fall-2024.pdf",
+              "url": "https://www.liquormarts.ca/sites/mbll-lm/files/2024-10/Premium-Spirit-Release-Fall-2024.pdf",
+              "domain": "liquormarts.ca",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.yahoo.com/lifestyle/bob-dylan-whiskey-brand-unveils-222000293.html",
+              "url": "https://www.yahoo.com/lifestyle/bob-dylan-whiskey-brand-unveils-222000293.html",
+              "domain": "yahoo.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://alabcboard.gov/sites/default/files/inline-files/Web_5.pdf",
+              "url": "https://alabcboard.gov/sites/default/files/inline-files/Web_5.pdf",
+              "domain": "alabcboard.gov",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bobdylan/comments/rb7gn3",
+              "url": "https://www.reddit.com/r/bobdylan/comments/rb7gn3",
+              "domain": "reddit.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://denverspiritscomp.com/wp-content/uploads/2024/06/2024_DISC_Win_61224.pdf",
+              "url": "https://denverspiritscomp.com/wp-content/uploads/2024/06/2024_DISC_Win_61224.pdf",
+              "domain": "denverspiritscomp.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/whiskey/comments/1784yyb",
+              "url": "https://www.reddit.com/r/whiskey/comments/1784yyb",
+              "domain": "reddit.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://bbctri.com/assets/RI_flipbook_Mar2025.pdf",
+              "url": "https://bbctri.com/assets/RI_flipbook_Mar2025.pdf",
+              "domain": "bbctri.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/canadawhisky/comments/qc5q4c",
+              "url": "https://www.reddit.com/r/canadawhisky/comments/qc5q4c",
+              "domain": "reddit.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://greenbrierrestaurant.com/wp-content/uploads/2024/03/The-Greenbrier-Bar-Menu-032824.pdf",
+              "url": "https://greenbrierrestaurant.com/wp-content/uploads/2024/03/The-Greenbrier-Bar-Menu-032824.pdf",
+              "domain": "greenbrierrestaurant.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bobdylan/comments/11abn89",
+              "url": "https://www.reddit.com/r/bobdylan/comments/11abn89",
+              "domain": "reddit.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://sandbarameliaisland.com/wp-content/uploads/2023/05/Whiskey.List_.for_.Website.pdf",
+              "url": "https://sandbarameliaisland.com/wp-content/uploads/2023/05/Whiskey.List_.for_.Website.pdf",
+              "domain": "sandbarameliaisland.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/BourbonHunt/comments/11qayv8",
+              "url": "https://www.reddit.com/r/BourbonHunt/comments/11qayv8",
+              "domain": "reddit.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bobdylan/comments/q5fihk",
+              "url": "https://www.reddit.com/r/bobdylan/comments/q5fihk",
+              "domain": "reddit.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/whiskey/comments/1amyunp",
+              "url": "https://www.reddit.com/r/whiskey/comments/1amyunp",
+              "domain": "reddit.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bobdylan/comments/zfiglc",
+              "url": "https://www.reddit.com/r/bobdylan/comments/zfiglc",
+              "domain": "reddit.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/whiskyhispano/comments/1kr5kzo",
+              "url": "https://www.reddit.com/r/whiskyhispano/comments/1kr5kzo",
+              "domain": "reddit.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bobdylan/comments/17ie8l2",
+              "url": "https://www.reddit.com/r/bobdylan/comments/17ie8l2",
+              "domain": "reddit.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/11u6n4l",
+              "url": "https://www.reddit.com/r/bourbon/comments/11u6n4l",
+              "domain": "reddit.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "Bootleg Series Volume III – Heaven's Door",
+              "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai",
+              "domain": "buy.heavensdoor.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "Heaven's Door The Bootleg Series Volume III: Sunday Afternoon",
+              "url": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon?utm_source=openai",
+              "domain": "distiller.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            },
+            {
+              "title": "The Bootleg Series | Heaven's Door Whiskey",
+              "url": "https://www.heavensdoor.com/bootleg-series?utm_source=openai",
+              "domain": "heavensdoor.com",
+              "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Heaven's Door Bootleg Series Volume 3 official whiskey bourbon",
+        "summary": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+        "results": [
+          {
+            "title": "https://www.prnewswire.com/news-releases/heavens-door-spirits-announces-release-of-the-bootleg-series-vol-iii-301439092.html",
+            "url": "https://www.prnewswire.com/news-releases/heavens-door-spirits-announces-release-of-the-bootleg-series-vol-iii-301439092.html",
+            "domain": "prnewswire.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.heavensdoor.com/bootleg-series",
+            "url": "https://www.heavensdoor.com/bootleg-series",
+            "domain": "heavensdoor.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+            "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+            "domain": "buy.heavensdoor.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+            "url": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+            "domain": "distiller.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://buy.heavensdoor.com/",
+            "url": "https://buy.heavensdoor.com/",
+            "domain": "buy.heavensdoor.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+            "url": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+            "domain": "breakingbourbon.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.heavensdoor.com/whiskey-collection",
+            "url": "https://www.heavensdoor.com/whiskey-collection",
+            "domain": "heavensdoor.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://buy.heavensdoor.com/products/heavens-door-bootleg-bundle",
+            "url": "https://buy.heavensdoor.com/products/heavens-door-bootleg-bundle",
+            "domain": "buy.heavensdoor.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/vfifyt",
+            "url": "https://www.reddit.com/r/bourbon/comments/vfifyt",
+            "domain": "reddit.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/whiskies/heavens-door/heavens-door-bootleg-series-no3-2021-edition-whiskey/",
+            "url": "https://www.masterofmalt.com/whiskies/heavens-door/heavens-door-bootleg-series-no3-2021-edition-whiskey/",
+            "domain": "masterofmalt.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.frootbat.com/p/328036/Heavens-Door-The-Bootleg-Series-Volume-3-Vino-de-Naranja-Cask-Finish-13-Year-Old-Bourbon-Whiskey",
+            "url": "https://www.frootbat.com/p/328036/Heavens-Door-The-Bootleg-Series-Volume-3-Vino-de-Naranja-Cask-Finish-13-Year-Old-Bourbon-Whiskey",
+            "domain": "frootbat.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.drinkhacker.com/2022/06/28/review-heavens-door-777-blend-and-bootleg-series-vol-iii/",
+            "url": "https://www.drinkhacker.com/2022/06/28/review-heavens-door-777-blend-and-bootleg-series-vol-iii/",
+            "domain": "drinkhacker.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.liquormarts.ca/sites/mbll-lm/files/2024-10/Premium-Spirit-Release-Fall-2024.pdf",
+            "url": "https://www.liquormarts.ca/sites/mbll-lm/files/2024-10/Premium-Spirit-Release-Fall-2024.pdf",
+            "domain": "liquormarts.ca",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.yahoo.com/lifestyle/bob-dylan-whiskey-brand-unveils-222000293.html",
+            "url": "https://www.yahoo.com/lifestyle/bob-dylan-whiskey-brand-unveils-222000293.html",
+            "domain": "yahoo.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://alabcboard.gov/sites/default/files/inline-files/Web_5.pdf",
+            "url": "https://alabcboard.gov/sites/default/files/inline-files/Web_5.pdf",
+            "domain": "alabcboard.gov",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bobdylan/comments/rb7gn3",
+            "url": "https://www.reddit.com/r/bobdylan/comments/rb7gn3",
+            "domain": "reddit.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://denverspiritscomp.com/wp-content/uploads/2024/06/2024_DISC_Win_61224.pdf",
+            "url": "https://denverspiritscomp.com/wp-content/uploads/2024/06/2024_DISC_Win_61224.pdf",
+            "domain": "denverspiritscomp.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/whiskey/comments/1784yyb",
+            "url": "https://www.reddit.com/r/whiskey/comments/1784yyb",
+            "domain": "reddit.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://bbctri.com/assets/RI_flipbook_Mar2025.pdf",
+            "url": "https://bbctri.com/assets/RI_flipbook_Mar2025.pdf",
+            "domain": "bbctri.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/canadawhisky/comments/qc5q4c",
+            "url": "https://www.reddit.com/r/canadawhisky/comments/qc5q4c",
+            "domain": "reddit.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://greenbrierrestaurant.com/wp-content/uploads/2024/03/The-Greenbrier-Bar-Menu-032824.pdf",
+            "url": "https://greenbrierrestaurant.com/wp-content/uploads/2024/03/The-Greenbrier-Bar-Menu-032824.pdf",
+            "domain": "greenbrierrestaurant.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bobdylan/comments/11abn89",
+            "url": "https://www.reddit.com/r/bobdylan/comments/11abn89",
+            "domain": "reddit.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://sandbarameliaisland.com/wp-content/uploads/2023/05/Whiskey.List_.for_.Website.pdf",
+            "url": "https://sandbarameliaisland.com/wp-content/uploads/2023/05/Whiskey.List_.for_.Website.pdf",
+            "domain": "sandbarameliaisland.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/BourbonHunt/comments/11qayv8",
+            "url": "https://www.reddit.com/r/BourbonHunt/comments/11qayv8",
+            "domain": "reddit.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bobdylan/comments/q5fihk",
+            "url": "https://www.reddit.com/r/bobdylan/comments/q5fihk",
+            "domain": "reddit.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/whiskey/comments/1amyunp",
+            "url": "https://www.reddit.com/r/whiskey/comments/1amyunp",
+            "domain": "reddit.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bobdylan/comments/zfiglc",
+            "url": "https://www.reddit.com/r/bobdylan/comments/zfiglc",
+            "domain": "reddit.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/whiskyhispano/comments/1kr5kzo",
+            "url": "https://www.reddit.com/r/whiskyhispano/comments/1kr5kzo",
+            "domain": "reddit.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bobdylan/comments/17ie8l2",
+            "url": "https://www.reddit.com/r/bobdylan/comments/17ie8l2",
+            "domain": "reddit.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/11u6n4l",
+            "url": "https://www.reddit.com/r/bourbon/comments/11u6n4l",
+            "domain": "reddit.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bootleg Series Volume III – Heaven's Door",
+            "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai",
+            "domain": "buy.heavensdoor.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "Heaven's Door The Bootleg Series Volume III: Sunday Afternoon",
+            "url": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon?utm_source=openai",
+            "domain": "distiller.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Bootleg Series | Heaven's Door Whiskey",
+            "url": "https://www.heavensdoor.com/bootleg-series?utm_source=openai",
+            "domain": "heavensdoor.com",
+            "description": "**Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door whiskey release**, and it is a **bourbon**—specifically a **13-year-old Kentucky bourbon / Kentucky straight bourbon whiskey** finished in **Spanish Vino de Naranja casks**. Official Heaven’s Door sources identify it as the **2021 Bootleg Series release**, and list it at **cask strength**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=openai))\n\nIndependent whiskey sources corroborate those core bottle traits, describing Volume III as the **third annual Bootleg Series ed",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

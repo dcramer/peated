@@ -1,0 +1,786 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "site:smws.com RW6.5 Sauna Smoke SMWS"
+    },
+    "recordedAt": "2026-04-19T05:34:23.165Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "site:smws.com RW6.5 Sauna Smoke SMWS",
+          "summary": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+          "results": [
+            {
+              "title": "https://peated.com/bottles/12207",
+              "url": "https://peated.com/bottles/12207",
+              "domain": "peated.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "SMWS DB - Search Results",
+              "url": "https://www.whiskymeasure.com/smwsdb/query.php",
+              "domain": "whiskymeasure.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://kensingtonwinemarket.com/product/899628/smws-rw6-3-cinnamon-sauna-smoke",
+              "url": "https://kensingtonwinemarket.com/product/899628/smws-rw6-3-cinnamon-sauna-smoke",
+              "domain": "kensingtonwinemarket.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.smws.ca/assets/Uploads/outturns/March-2025-AB.pdf",
+              "url": "https://www.smws.ca/assets/Uploads/outturns/March-2025-AB.pdf",
+              "domain": "smws.ca",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://solo-ielts-toefl.com/testimonials/kings-college-london-ielts-7-0/",
+              "url": "https://solo-ielts-toefl.com/testimonials/kings-college-london-ielts-7-0/",
+              "domain": "solo-ielts-toefl.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://th.smws.com/whisky/smokescape",
+              "url": "https://th.smws.com/whisky/smokescape",
+              "domain": "th.smws.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/Members%20Charter%20A3%20Digital.pdf",
+              "url": "https://smws.com/content/Members%20Charter%20A3%20Digital.pdf",
+              "domain": "smws.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/liquid-medicinal-smoke/",
+              "url": "https://smws.com/liquid-medicinal-smoke/",
+              "domain": "smws.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/smws/comments/m9ade1",
+              "url": "https://www.reddit.com/r/smws/comments/m9ade1",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.metroacademy.ca/wp-content/uploads/2023/04/%E5%8A%A0%E6%8B%BF%E5%A4%A7%E8%BF%88%E6%8B%93%E4%B8%AD%E5%AD%A6%E7%BA%B8%E8%B4%A8%E6%89%8B%E5%86%8C202303.pdf",
+              "url": "https://www.metroacademy.ca/wp-content/uploads/2023/04/%E5%8A%A0%E6%8B%BF%E5%A4%A7%E8%BF%88%E6%8B%93%E4%B8%AD%E5%AD%A6%E7%BA%B8%E8%B4%A8%E6%89%8B%E5%86%8C202303.pdf",
+              "domain": "metroacademy.ca",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=zh-CN",
+              "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=zh-CN",
+              "domain": "whiskybase.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/sip-sherry-in-a-cigar-smokeasy/",
+              "url": "https://smws.com/sip-sherry-in-a-cigar-smokeasy/",
+              "domain": "smws.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/smouldering-mojo/",
+              "url": "https://smws.com/smouldering-mojo/",
+              "domain": "smws.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/all-whisky/whisky/?page=6",
+              "url": "https://smws.com/all-whisky/whisky/?page=6",
+              "domain": "smws.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskylibraryshop.co.za/",
+              "url": "https://whiskylibraryshop.co.za/",
+              "domain": "whiskylibraryshop.co.za",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.smws.ch/wp-content/uploads/2025/10/outturn-2510-en.pdf",
+              "url": "https://www.smws.ch/wp-content/uploads/2025/10/outturn-2510-en.pdf",
+              "domain": "smws.ch",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.sohu.com/a/745660788_110665",
+              "url": "https://www.sohu.com/a/745660788_110665",
+              "domain": "sohu.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.smws.ch/wp-content/uploads/2025/02/outturn-2502-de.pdf",
+              "url": "https://www.smws.ch/wp-content/uploads/2025/02/outturn-2502-de.pdf",
+              "domain": "smws.ch",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyandale.com.au/wp-content/uploads/2023/08/WHISKY-MENU-1608_2023.pdf",
+              "url": "https://whiskyandale.com.au/wp-content/uploads/2023/08/WHISKY-MENU-1608_2023.pdf",
+              "domain": "whiskyandale.com.au",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1430j8n",
+              "url": "https://www.reddit.com/r/Scotch/comments/1430j8n",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/mogeh1",
+              "url": "https://www.reddit.com/r/Scotch/comments/mogeh1",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/te7x0g",
+              "url": "https://www.reddit.com/r/Scotch/comments/te7x0g",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/12gsltz",
+              "url": "https://www.reddit.com/r/Scotch/comments/12gsltz",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1skcg5p/reviews_815_to_820_smws_usa_outturn_april_2026/",
+              "url": "https://www.reddit.com/r/Scotch/comments/1skcg5p/reviews_815_to_820_smws_usa_outturn_april_2026/",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/18m3bm7",
+              "url": "https://www.reddit.com/r/Scotch/comments/18m3bm7",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/10nh326",
+              "url": "https://www.reddit.com/r/Scotch/comments/10nh326",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1fai35l",
+              "url": "https://www.reddit.com/r/Scotch/comments/1fai35l",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1owz0jw/reviews_701_to_706_smws_usa_november_2025_outturn/",
+              "url": "https://www.reddit.com/r/Scotch/comments/1owz0jw/reviews_701_to_706_smws_usa_november_2025_outturn/",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1b12gnb",
+              "url": "https://www.reddit.com/r/Scotch/comments/1b12gnb",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/jvdn50",
+              "url": "https://www.reddit.com/r/Scotch/comments/jvdn50",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "Appley ever after",
+              "url": "https://smws.com/appley-ever-after/",
+              "domain": "smws.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://peated.com/bottles/43260",
+              "url": "https://peated.com/bottles/43260",
+              "domain": "peated.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "Kyrö 2018 SMWS RW6.5 - Ratings and reviews - Whiskybase",
+              "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65",
+              "domain": "whiskybase.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/263247/kyr-2018-smws-rw66",
+              "url": "https://www.whiskybase.com/whiskies/whisky/263247/kyr-2018-smws-rw66",
+              "domain": "whiskybase.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=ko",
+              "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=ko",
+              "domain": "whiskybase.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "Kyrö Distillery",
+              "url": "https://kyrodistillery.com/",
+              "domain": "kyrodistillery.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://peated.com/bottles/43260/releases",
+              "url": "https://peated.com/bottles/43260/releases",
+              "domain": "peated.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskymag.com/articles/kyroe-distillery-company-unveils-its-core-whisky-range/",
+              "url": "https://www.whiskymag.com/articles/kyroe-distillery-company-unveils-its-core-whisky-range/",
+              "domain": "whiskymag.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/archive?distillery_code=594&limit=12&page=168&whisky_flavour=71_78_76",
+              "url": "https://smws.com/archive?distillery_code=594&limit=12&page=168&whisky_flavour=71_78_76",
+              "domain": "smws.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/brands/single-cask-spirits.html?page=8",
+              "url": "https://smws.com/brands/single-cask-spirits.html?page=8",
+              "domain": "smws.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.kyrodistillery.co.uk/collections/limited-edition",
+              "url": "https://www.kyrodistillery.co.uk/collections/limited-edition",
+              "domain": "kyrodistillery.co.uk",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "lay-outturn-2502-a5-en-v2.indd",
+              "url": "https://www.smws.ch/wp-content/uploads/2025/02/outturn-2502-en.pdf",
+              "domain": "smws.ch",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://victoryspirits.com/wp-content/uploads/2025/02/Victory-Spirits-Marketplace.030125-earlybird-Inventory.pdf",
+              "url": "https://victoryspirits.com/wp-content/uploads/2025/02/Victory-Spirits-Marketplace.030125-earlybird-Inventory.pdf",
+              "domain": "victoryspirits.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyshow.com/media/638513/ws25-dram-list-v2.pdf",
+              "url": "https://whiskyshow.com/media/638513/ws25-dram-list-v2.pdf",
+              "domain": "whiskyshow.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whisky.dk/images/WhiskymessenSmaagekatalog2022web.pdf",
+              "url": "https://www.whisky.dk/images/WhiskymessenSmaagekatalog2022web.pdf",
+              "domain": "whisky.dk",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyshow.com/media/638515/dramlist-2025-7.pdf",
+              "url": "https://whiskyshow.com/media/638515/dramlist-2025-7.pdf",
+              "domain": "whiskyshow.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.innsofaurora.com/content/uploads/2023/12/AUR-948_1833_Libations_12-8-23.pdf",
+              "url": "https://www.innsofaurora.com/content/uploads/2023/12/AUR-948_1833_Libations_12-8-23.pdf",
+              "domain": "innsofaurora.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/worldwhisky/comments/1611ace",
+              "url": "https://www.reddit.com/r/worldwhisky/comments/1611ace",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/worldwhisky/comments/1etpt71",
+              "url": "https://www.reddit.com/r/worldwhisky/comments/1etpt71",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/worldwhisky/comments/1ir7wft",
+              "url": "https://www.reddit.com/r/worldwhisky/comments/1ir7wft",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/worldwhisky/comments/10h5hw9",
+              "url": "https://www.reddit.com/r/worldwhisky/comments/10h5hw9",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/worldwhisky/comments/11q8z4i",
+              "url": "https://www.reddit.com/r/worldwhisky/comments/11q8z4i",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/whiskey/comments/lc05wy",
+              "url": "https://www.reddit.com/r/whiskey/comments/lc05wy",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/worldwhisky/comments/11r85wy",
+              "url": "https://www.reddit.com/r/worldwhisky/comments/11r85wy",
+              "domain": "reddit.com",
+              "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "site:smws.com RW6.5 Sauna Smoke SMWS",
+        "summary": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+        "results": [
+          {
+            "title": "https://peated.com/bottles/12207",
+            "url": "https://peated.com/bottles/12207",
+            "domain": "peated.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "SMWS DB - Search Results",
+            "url": "https://www.whiskymeasure.com/smwsdb/query.php",
+            "domain": "whiskymeasure.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://kensingtonwinemarket.com/product/899628/smws-rw6-3-cinnamon-sauna-smoke",
+            "url": "https://kensingtonwinemarket.com/product/899628/smws-rw6-3-cinnamon-sauna-smoke",
+            "domain": "kensingtonwinemarket.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.smws.ca/assets/Uploads/outturns/March-2025-AB.pdf",
+            "url": "https://www.smws.ca/assets/Uploads/outturns/March-2025-AB.pdf",
+            "domain": "smws.ca",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://solo-ielts-toefl.com/testimonials/kings-college-london-ielts-7-0/",
+            "url": "https://solo-ielts-toefl.com/testimonials/kings-college-london-ielts-7-0/",
+            "domain": "solo-ielts-toefl.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://th.smws.com/whisky/smokescape",
+            "url": "https://th.smws.com/whisky/smokescape",
+            "domain": "th.smws.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/Members%20Charter%20A3%20Digital.pdf",
+            "url": "https://smws.com/content/Members%20Charter%20A3%20Digital.pdf",
+            "domain": "smws.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/liquid-medicinal-smoke/",
+            "url": "https://smws.com/liquid-medicinal-smoke/",
+            "domain": "smws.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/smws/comments/m9ade1",
+            "url": "https://www.reddit.com/r/smws/comments/m9ade1",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.metroacademy.ca/wp-content/uploads/2023/04/%E5%8A%A0%E6%8B%BF%E5%A4%A7%E8%BF%88%E6%8B%93%E4%B8%AD%E5%AD%A6%E7%BA%B8%E8%B4%A8%E6%89%8B%E5%86%8C202303.pdf",
+            "url": "https://www.metroacademy.ca/wp-content/uploads/2023/04/%E5%8A%A0%E6%8B%BF%E5%A4%A7%E8%BF%88%E6%8B%93%E4%B8%AD%E5%AD%A6%E7%BA%B8%E8%B4%A8%E6%89%8B%E5%86%8C202303.pdf",
+            "domain": "metroacademy.ca",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=zh-CN",
+            "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=zh-CN",
+            "domain": "whiskybase.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/sip-sherry-in-a-cigar-smokeasy/",
+            "url": "https://smws.com/sip-sherry-in-a-cigar-smokeasy/",
+            "domain": "smws.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/smouldering-mojo/",
+            "url": "https://smws.com/smouldering-mojo/",
+            "domain": "smws.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/all-whisky/whisky/?page=6",
+            "url": "https://smws.com/all-whisky/whisky/?page=6",
+            "domain": "smws.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskylibraryshop.co.za/",
+            "url": "https://whiskylibraryshop.co.za/",
+            "domain": "whiskylibraryshop.co.za",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.smws.ch/wp-content/uploads/2025/10/outturn-2510-en.pdf",
+            "url": "https://www.smws.ch/wp-content/uploads/2025/10/outturn-2510-en.pdf",
+            "domain": "smws.ch",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.sohu.com/a/745660788_110665",
+            "url": "https://www.sohu.com/a/745660788_110665",
+            "domain": "sohu.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.smws.ch/wp-content/uploads/2025/02/outturn-2502-de.pdf",
+            "url": "https://www.smws.ch/wp-content/uploads/2025/02/outturn-2502-de.pdf",
+            "domain": "smws.ch",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyandale.com.au/wp-content/uploads/2023/08/WHISKY-MENU-1608_2023.pdf",
+            "url": "https://whiskyandale.com.au/wp-content/uploads/2023/08/WHISKY-MENU-1608_2023.pdf",
+            "domain": "whiskyandale.com.au",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1430j8n",
+            "url": "https://www.reddit.com/r/Scotch/comments/1430j8n",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/mogeh1",
+            "url": "https://www.reddit.com/r/Scotch/comments/mogeh1",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/te7x0g",
+            "url": "https://www.reddit.com/r/Scotch/comments/te7x0g",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/12gsltz",
+            "url": "https://www.reddit.com/r/Scotch/comments/12gsltz",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1skcg5p/reviews_815_to_820_smws_usa_outturn_april_2026/",
+            "url": "https://www.reddit.com/r/Scotch/comments/1skcg5p/reviews_815_to_820_smws_usa_outturn_april_2026/",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/18m3bm7",
+            "url": "https://www.reddit.com/r/Scotch/comments/18m3bm7",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/10nh326",
+            "url": "https://www.reddit.com/r/Scotch/comments/10nh326",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1fai35l",
+            "url": "https://www.reddit.com/r/Scotch/comments/1fai35l",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1owz0jw/reviews_701_to_706_smws_usa_november_2025_outturn/",
+            "url": "https://www.reddit.com/r/Scotch/comments/1owz0jw/reviews_701_to_706_smws_usa_november_2025_outturn/",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1b12gnb",
+            "url": "https://www.reddit.com/r/Scotch/comments/1b12gnb",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/jvdn50",
+            "url": "https://www.reddit.com/r/Scotch/comments/jvdn50",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "Appley ever after",
+            "url": "https://smws.com/appley-ever-after/",
+            "domain": "smws.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://peated.com/bottles/43260",
+            "url": "https://peated.com/bottles/43260",
+            "domain": "peated.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "Kyrö 2018 SMWS RW6.5 - Ratings and reviews - Whiskybase",
+            "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65",
+            "domain": "whiskybase.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/263247/kyr-2018-smws-rw66",
+            "url": "https://www.whiskybase.com/whiskies/whisky/263247/kyr-2018-smws-rw66",
+            "domain": "whiskybase.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=ko",
+            "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=ko",
+            "domain": "whiskybase.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "Kyrö Distillery",
+            "url": "https://kyrodistillery.com/",
+            "domain": "kyrodistillery.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://peated.com/bottles/43260/releases",
+            "url": "https://peated.com/bottles/43260/releases",
+            "domain": "peated.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskymag.com/articles/kyroe-distillery-company-unveils-its-core-whisky-range/",
+            "url": "https://www.whiskymag.com/articles/kyroe-distillery-company-unveils-its-core-whisky-range/",
+            "domain": "whiskymag.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/archive?distillery_code=594&limit=12&page=168&whisky_flavour=71_78_76",
+            "url": "https://smws.com/archive?distillery_code=594&limit=12&page=168&whisky_flavour=71_78_76",
+            "domain": "smws.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/brands/single-cask-spirits.html?page=8",
+            "url": "https://smws.com/brands/single-cask-spirits.html?page=8",
+            "domain": "smws.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.kyrodistillery.co.uk/collections/limited-edition",
+            "url": "https://www.kyrodistillery.co.uk/collections/limited-edition",
+            "domain": "kyrodistillery.co.uk",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "lay-outturn-2502-a5-en-v2.indd",
+            "url": "https://www.smws.ch/wp-content/uploads/2025/02/outturn-2502-en.pdf",
+            "domain": "smws.ch",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://victoryspirits.com/wp-content/uploads/2025/02/Victory-Spirits-Marketplace.030125-earlybird-Inventory.pdf",
+            "url": "https://victoryspirits.com/wp-content/uploads/2025/02/Victory-Spirits-Marketplace.030125-earlybird-Inventory.pdf",
+            "domain": "victoryspirits.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyshow.com/media/638513/ws25-dram-list-v2.pdf",
+            "url": "https://whiskyshow.com/media/638513/ws25-dram-list-v2.pdf",
+            "domain": "whiskyshow.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whisky.dk/images/WhiskymessenSmaagekatalog2022web.pdf",
+            "url": "https://www.whisky.dk/images/WhiskymessenSmaagekatalog2022web.pdf",
+            "domain": "whisky.dk",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyshow.com/media/638515/dramlist-2025-7.pdf",
+            "url": "https://whiskyshow.com/media/638515/dramlist-2025-7.pdf",
+            "domain": "whiskyshow.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.innsofaurora.com/content/uploads/2023/12/AUR-948_1833_Libations_12-8-23.pdf",
+            "url": "https://www.innsofaurora.com/content/uploads/2023/12/AUR-948_1833_Libations_12-8-23.pdf",
+            "domain": "innsofaurora.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/worldwhisky/comments/1611ace",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/1611ace",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/worldwhisky/comments/1etpt71",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/1etpt71",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/worldwhisky/comments/1ir7wft",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/1ir7wft",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/worldwhisky/comments/10h5hw9",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/10h5hw9",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/worldwhisky/comments/11q8z4i",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/11q8z4i",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/whiskey/comments/lc05wy",
+            "url": "https://www.reddit.com/r/whiskey/comments/lc05wy",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/worldwhisky/comments/11r85wy",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/11r85wy",
+            "domain": "reddit.com",
+            "description": "I found **SMWS RW6.5**, and it is **not “Sauna Smoke.”** The bottle is **“Appley ever after.”** The sources support these release traits:\n\n- **Bottle / cask number:** **RW6.5**\n- **Distillery:** **Kyrö Distillery Company** in **Finland**\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**\n- **Type:** **Rye Whisky**\n- **Age:** **6 years**\n- **Distilled:** **11 January 2018**\n- **Cask:** **1st fill #3 char barrel**\n- **ABV:** **56.0%**\n- **Outturn:** **231 bottles**\n- **Bottled:** **2024** ([smws.com](https://smws.com/appley-ever-after/))\n\nWhat the sources specifically confirm:\n\n- **Officia",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

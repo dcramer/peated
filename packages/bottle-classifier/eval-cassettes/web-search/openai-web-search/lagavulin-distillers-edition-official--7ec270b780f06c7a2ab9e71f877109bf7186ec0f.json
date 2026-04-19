@@ -1,0 +1,324 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Lagavulin Distillers Edition official"
+    },
+    "recordedAt": "2026-04-19T05:15:49.034Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Lagavulin Distillers Edition official",
+          "summary": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+          "results": [
+            {
+              "title": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+              "url": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+              "domain": "malts.com",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-distillers-edition-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-distillers-edition-whisky/",
+              "domain": "masterofmalt.com",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskynotes.be/2015/lagavulin/lagavulin-1999-distillers-edition-2015/",
+              "url": "https://www.whiskynotes.be/2015/lagavulin/lagavulin-1999-distillers-edition-2015/",
+              "domain": "whiskynotes.be",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskynotes.be/2014/lagavulin/lagavulin-1997-2013-distillers-edition/",
+              "url": "https://www.whiskynotes.be/2014/lagavulin/lagavulin-1997-2013-distillers-edition/",
+              "domain": "whiskynotes.be",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-1995-bottled-2011-pedro-ximenez-cask-finish-distillers-edition-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-1995-bottled-2011-pedro-ximenez-cask-finish-distillers-edition-whisky/",
+              "domain": "masterofmalt.com",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskynotes.be/2025/lagavulin/lagavulin-12-year-old-2025/",
+              "url": "https://www.whiskynotes.be/2025/lagavulin/lagavulin-12-year-old-2025/",
+              "domain": "whiskynotes.be",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskynotes.be/2018/lagavulin/lagavulin-distillers-edition-a-1995-2000-vertical-tasting/",
+              "url": "https://www.whiskynotes.be/2018/lagavulin/lagavulin-distillers-edition-a-1995-2000-vertical-tasting/",
+              "domain": "whiskynotes.be",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-2006-bottled-2021-pedro-ximenez-cask-finish-distillers-edition-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-2006-bottled-2021-pedro-ximenez-cask-finish-distillers-edition-whisky/",
+              "domain": "masterofmalt.com",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskynotes.be/2016/lagavulin/lagavulin-distillers-edition-2016/",
+              "url": "https://www.whiskynotes.be/2016/lagavulin/lagavulin-distillers-edition-2016/",
+              "domain": "whiskynotes.be",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "url": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "domain": "malts.com",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://media.diageo.com/diageo-corporate-media/media/4tdjibgr/290_diageo_sf-spirits-competition-2019_final-7-2-19_clean.pdf",
+              "url": "https://media.diageo.com/diageo-corporate-media/media/4tdjibgr/290_diageo_sf-spirits-competition-2019_final-7-2-19_clean.pdf",
+              "domain": "media.diageo.com",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.diageo.com/en/news-and-media/stories/2022/diageo-unveils-2022-special-releases-whisky-collection",
+              "url": "https://www.diageo.com/en/news-and-media/stories/2022/diageo-unveils-2022-special-releases-whisky-collection",
+              "domain": "diageo.com",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskynotes.be/2023/lagavulin/lagavulin-distillers-edition-2022/",
+              "url": "https://www.whiskynotes.be/2023/lagavulin/lagavulin-distillers-edition-2022/",
+              "domain": "whiskynotes.be",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://media.diageo.com/diageo-corporate-media/media/1eohdyvq/633_diageo_sf_spirits_competition_release_final_4_7_15.pdf",
+              "url": "https://media.diageo.com/diageo-corporate-media/media/1eohdyvq/633_diageo_sf_spirits_competition_release_final_4_7_15.pdf",
+              "domain": "media.diageo.com",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://media.diageo.com/diageo-corporate-media/media/0f5f3oso/569_sf_spirits_competition_2016_release_4_6_16_final__2_.pdf",
+              "url": "https://media.diageo.com/diageo-corporate-media/media/0f5f3oso/569_sf_spirits_competition_2016_release_4_6_16_final__2_.pdf",
+              "domain": "media.diageo.com",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskyfun.com/WF-quick-and-dirty-list.pdf",
+              "url": "https://www.whiskyfun.com/WF-quick-and-dirty-list.pdf",
+              "domain": "whiskyfun.com",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://media.diageo.com/diageo-corporate-media/media/4monxcvu/657_diageo_google_business_view_-_global_press_release.pdf",
+              "url": "https://media.diageo.com/diageo-corporate-media/media/4monxcvu/657_diageo_google_business_view_-_global_press_release.pdf",
+              "domain": "media.diageo.com",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "Lagavulin Distillers Edition Single Malt Whisky | Malts US | Malts US",
+              "url": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai",
+              "domain": "malts.com",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "Lagavulin 12 YO Special 2023 & Lagavulin Distillers Edition | Malts",
+              "url": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai",
+              "domain": "malts.com",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "Lagavulin 1999/2015 Distillers Edition | WhiskyNotes review",
+              "url": "https://www.whiskynotes.be/2015/lagavulin/lagavulin-1999-distillers-edition-2015/?utm_source=openai",
+              "domain": "whiskynotes.be",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            },
+            {
+              "title": "Lagavulin 2000/2016 Distillers Edition | WhiskyNotes review",
+              "url": "https://www.whiskynotes.be/2016/lagavulin/lagavulin-distillers-edition-2016/?utm_source=openai",
+              "domain": "whiskynotes.be",
+              "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Lagavulin Distillers Edition official",
+        "summary": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+        "results": [
+          {
+            "title": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+            "url": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+            "domain": "malts.com",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-distillers-edition-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-distillers-edition-whisky/",
+            "domain": "masterofmalt.com",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskynotes.be/2015/lagavulin/lagavulin-1999-distillers-edition-2015/",
+            "url": "https://www.whiskynotes.be/2015/lagavulin/lagavulin-1999-distillers-edition-2015/",
+            "domain": "whiskynotes.be",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskynotes.be/2014/lagavulin/lagavulin-1997-2013-distillers-edition/",
+            "url": "https://www.whiskynotes.be/2014/lagavulin/lagavulin-1997-2013-distillers-edition/",
+            "domain": "whiskynotes.be",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-1995-bottled-2011-pedro-ximenez-cask-finish-distillers-edition-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-1995-bottled-2011-pedro-ximenez-cask-finish-distillers-edition-whisky/",
+            "domain": "masterofmalt.com",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskynotes.be/2025/lagavulin/lagavulin-12-year-old-2025/",
+            "url": "https://www.whiskynotes.be/2025/lagavulin/lagavulin-12-year-old-2025/",
+            "domain": "whiskynotes.be",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskynotes.be/2018/lagavulin/lagavulin-distillers-edition-a-1995-2000-vertical-tasting/",
+            "url": "https://www.whiskynotes.be/2018/lagavulin/lagavulin-distillers-edition-a-1995-2000-vertical-tasting/",
+            "domain": "whiskynotes.be",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-2006-bottled-2021-pedro-ximenez-cask-finish-distillers-edition-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-2006-bottled-2021-pedro-ximenez-cask-finish-distillers-edition-whisky/",
+            "domain": "masterofmalt.com",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskynotes.be/2016/lagavulin/lagavulin-distillers-edition-2016/",
+            "url": "https://www.whiskynotes.be/2016/lagavulin/lagavulin-distillers-edition-2016/",
+            "domain": "whiskynotes.be",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "url": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "domain": "malts.com",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://media.diageo.com/diageo-corporate-media/media/4tdjibgr/290_diageo_sf-spirits-competition-2019_final-7-2-19_clean.pdf",
+            "url": "https://media.diageo.com/diageo-corporate-media/media/4tdjibgr/290_diageo_sf-spirits-competition-2019_final-7-2-19_clean.pdf",
+            "domain": "media.diageo.com",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.diageo.com/en/news-and-media/stories/2022/diageo-unveils-2022-special-releases-whisky-collection",
+            "url": "https://www.diageo.com/en/news-and-media/stories/2022/diageo-unveils-2022-special-releases-whisky-collection",
+            "domain": "diageo.com",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskynotes.be/2023/lagavulin/lagavulin-distillers-edition-2022/",
+            "url": "https://www.whiskynotes.be/2023/lagavulin/lagavulin-distillers-edition-2022/",
+            "domain": "whiskynotes.be",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://media.diageo.com/diageo-corporate-media/media/1eohdyvq/633_diageo_sf_spirits_competition_release_final_4_7_15.pdf",
+            "url": "https://media.diageo.com/diageo-corporate-media/media/1eohdyvq/633_diageo_sf_spirits_competition_release_final_4_7_15.pdf",
+            "domain": "media.diageo.com",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://media.diageo.com/diageo-corporate-media/media/0f5f3oso/569_sf_spirits_competition_2016_release_4_6_16_final__2_.pdf",
+            "url": "https://media.diageo.com/diageo-corporate-media/media/0f5f3oso/569_sf_spirits_competition_2016_release_4_6_16_final__2_.pdf",
+            "domain": "media.diageo.com",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskyfun.com/WF-quick-and-dirty-list.pdf",
+            "url": "https://www.whiskyfun.com/WF-quick-and-dirty-list.pdf",
+            "domain": "whiskyfun.com",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://media.diageo.com/diageo-corporate-media/media/4monxcvu/657_diageo_google_business_view_-_global_press_release.pdf",
+            "url": "https://media.diageo.com/diageo-corporate-media/media/4monxcvu/657_diageo_google_business_view_-_global_press_release.pdf",
+            "domain": "media.diageo.com",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin Distillers Edition Single Malt Whisky | Malts US | Malts US",
+            "url": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai",
+            "domain": "malts.com",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin 12 YO Special 2023 & Lagavulin Distillers Edition | Malts",
+            "url": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai",
+            "domain": "malts.com",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin 1999/2015 Distillers Edition | WhiskyNotes review",
+            "url": "https://www.whiskynotes.be/2015/lagavulin/lagavulin-1999-distillers-edition-2015/?utm_source=openai",
+            "domain": "whiskynotes.be",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin 2000/2016 Distillers Edition | WhiskyNotes review",
+            "url": "https://www.whiskynotes.be/2016/lagavulin/lagavulin-distillers-edition-2016/?utm_source=openai",
+            "domain": "whiskynotes.be",
+            "description": "Official producer source for **Lagavulin Distillers Edition** is the Malts/Diageo product page: it confirms the bottle is **Lagavulin Distillers Edition Single Malt Scotch Whisky**, part of the **Distillers Edition** range, and describes it as **double-matured in ex-bodega Pedro Ximénez cask wood**. The US official page specifically references the **2006** vintage/release shown there. ([malts.com](https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml?utm_source=openai))\n\nAn additional Malts page for a current gift pack version confirms the standard b",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

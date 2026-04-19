@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Maker's Mark Private Selection S2B13 official"
+    },
+    "recordedAt": "2026-04-19T15:46:03.394Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Maker's Mark Private Selection S2B13 official",
+          "summary": "I found an **official Maker’s Mark source**, but it appears to confirm only the **general Private Selection program traits**, not the specific code **S2B13**.\n\n**What the official source confirms**\n- Maker’s Mark **Private Selection** starts with **cask-strength Maker’s Mark** as the base. ([makersmark.com](https://www",
+          "results": [
+            {
+              "title": "MAKER'S MARK PRIVATE SELECTION KENTUCKY BOURBON WHISKY S2B13\n – SwigLab",
+              "url": "https://www.swiglab.com/products/makers-mark-private-selection-kentucky-bourbon-whisky-s2b13",
+              "domain": "swiglab.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "Private Selection Bourbon: Premium Whisky | Maker's Mark®",
+              "url": "https://www.makersmark.com/en-us/bourbons/makers-mark-private-selection",
+              "domain": "makersmark.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "Maker’s Mark Private Selection Topflight S2B13 Review | The Daily Pour",
+              "url": "https://bottleraiders.com/spirit/makers-mark-private-selection-topflight-s2b13/",
+              "domain": "bottleraiders.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://caskcartel.com/es-at/products/makers-mark-private-selection-s2b13-kentucky-straight-bourbon-whisky",
+              "url": "https://caskcartel.com/es-at/products/makers-mark-private-selection-s2b13-kentucky-straight-bourbon-whisky",
+              "domain": "caskcartel.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.breakingbourbon.com/bourbon-whiskey-press-releases/makers-mark-r-private-selection-program-roasted-french-mendiant-stave",
+              "url": "https://www.breakingbourbon.com/bourbon-whiskey-press-releases/makers-mark-r-private-selection-program-roasted-french-mendiant-stave",
+              "domain": "breakingbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.tasteselectrepeat.com/products/makers-mark-private-selection",
+              "url": "https://www.tasteselectrepeat.com/products/makers-mark-private-selection",
+              "domain": "tasteselectrepeat.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Maker's Mark Private Selection S2B13 official",
+        "summary": "I found an **official Maker’s Mark source**, but it appears to confirm only the **general Private Selection program traits**, not the specific code **S2B13**.\n\n**What the official source confirms**\n- Maker’s Mark **Private Selection** starts with **cask-strength Maker’s Mark** as the base. ([makersmark.com](https://www",
+        "results": [
+          {
+            "title": "MAKER'S MARK PRIVATE SELECTION KENTUCKY BOURBON WHISKY S2B13\n – SwigLab",
+            "url": "https://www.swiglab.com/products/makers-mark-private-selection-kentucky-bourbon-whisky-s2b13",
+            "domain": "swiglab.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Private Selection Bourbon: Premium Whisky | Maker's Mark®",
+            "url": "https://www.makersmark.com/en-us/bourbons/makers-mark-private-selection",
+            "domain": "makersmark.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Maker’s Mark Private Selection Topflight S2B13 Review | The Daily Pour",
+            "url": "https://bottleraiders.com/spirit/makers-mark-private-selection-topflight-s2b13/",
+            "domain": "bottleraiders.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://caskcartel.com/es-at/products/makers-mark-private-selection-s2b13-kentucky-straight-bourbon-whisky",
+            "url": "https://caskcartel.com/es-at/products/makers-mark-private-selection-s2b13-kentucky-straight-bourbon-whisky",
+            "domain": "caskcartel.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.breakingbourbon.com/bourbon-whiskey-press-releases/makers-mark-r-private-selection-program-roasted-french-mendiant-stave",
+            "url": "https://www.breakingbourbon.com/bourbon-whiskey-press-releases/makers-mark-r-private-selection-program-roasted-french-mendiant-stave",
+            "domain": "breakingbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.tasteselectrepeat.com/products/makers-mark-private-selection",
+            "url": "https://www.tasteselectrepeat.com/products/makers-mark-private-selection",
+            "domain": "tasteselectrepeat.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

@@ -3,6 +3,7 @@ import {
   buildOpenAIWebSearchRequest,
   extractOpenAISearchEvidence,
 } from "./openaiWebSearch";
+import { buildBottleSearchEvidence } from "./sharedWebSearch";
 
 describe("bottleClassifier web search tools", () => {
   test("extracts OpenAI search evidence from web search call sources when citations are missing", () => {
@@ -100,8 +101,69 @@ describe("bottleClassifier web search tools", () => {
       expect.objectContaining({
         title: "Rare Breed Rye",
         domain: "wildturkeybourbon.com",
+        description: null,
       }),
     ]);
+  });
+
+  test("does not duplicate the top-level summary into each OpenAI result description", () => {
+    const evidence = extractOpenAISearchEvidence("jura 12 official", {
+      output_text: "Jura confirms the 12-year-old core single malt bottling.",
+      output: [
+        {
+          type: "web_search_call",
+          action: {
+            type: "search",
+            query: "jura 12 official",
+            sources: [
+              {
+                type: "url",
+                url: "https://jurawhisky.com/products/12-year-old",
+              },
+              {
+                type: "url",
+                url: "https://www.masterofmalt.com/whiskies/jura/jura-12-year-old-whisky/",
+              },
+            ],
+          },
+        },
+      ],
+    });
+
+    expect(evidence.summary).toBe(
+      "Jura confirms the 12-year-old core single malt bottling.",
+    );
+    expect(evidence.results).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          description: null,
+        }),
+      ]),
+    );
+  });
+
+  test("caps bottle search evidence payload size", () => {
+    const evidence = buildBottleSearchEvidence({
+      provider: "brave",
+      query: "ardbeg traigh bhan 19",
+      summary: "x".repeat(500),
+      results: Array.from({ length: 12 }, (_, index) => ({
+        title: `Result ${index + 1} ${"y".repeat(300)}`,
+        url: `https://example.com/${index + 1}`,
+        domain: "example.com",
+        description: "z".repeat(400),
+        extraSnippets: ["a".repeat(250), "b".repeat(250)],
+      })),
+    });
+
+    expect(evidence.summary).toHaveLength(320);
+    expect(evidence.results).toHaveLength(6);
+    for (const result of evidence.results) {
+      expect(result.title.length).toBeLessThanOrEqual(160);
+      expect((result.description ?? "").length).toBeLessThanOrEqual(220);
+      expect(result.extraSnippets.length).toBeLessThanOrEqual(1);
+      expect((result.extraSnippets[0] ?? "").length).toBeLessThanOrEqual(180);
+    }
   });
 
   test("requests OpenAI web search sources in the response payload", () => {

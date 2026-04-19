@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "The Whistler Bodega Cask official single malt Irish whiskey"
+    },
+    "recordedAt": "2026-04-19T15:43:44.097Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "The Whistler Bodega Cask official single malt Irish whiskey",
+          "summary": "Authoritative sources support **The Whistler Bodega Cask** as a **single malt Irish whiskey** in The Whistler range from **Boann Distillery**. Independent coverage identifies it specifically as the **5 Year Old Bodega Cask Single Malt**, and says it is **triple-distilled** and matured its full term in **Spanish/Oloroso",
+          "results": [
+            {
+              "title": "https://www.wineenthusiast.com/buying-guide/the-whistler-bodega-cask-single-malt-irish-whiskey/",
+              "url": "https://www.wineenthusiast.com/buying-guide/the-whistler-bodega-cask-single-malt-irish-whiskey/",
+              "domain": "wineenthusiast.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.boanndistillery.ie/product/the-whistler-triple-oaked/",
+              "url": "https://www.boanndistillery.ie/product/the-whistler-triple-oaked/",
+              "domain": "boanndistillery.ie",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.boanndistillery.ie/the-merrion-hotel/",
+              "url": "https://www.boanndistillery.ie/the-merrion-hotel/",
+              "domain": "boanndistillery.ie",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.worldwhiskiesawards.com/winner-whisky/category-winner-92-world-whiskies-awards-2021",
+              "url": "https://www.worldwhiskiesawards.com/winner-whisky/category-winner-92-world-whiskies-awards-2021",
+              "domain": "worldwhiskiesawards.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+              "url": "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+              "domain": "thewhiskeywash.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://mainstreetliquor.com/products/the-whistler-5-year-old-bodega-cask-irish-whiskey",
+              "url": "https://mainstreetliquor.com/products/the-whistler-5-year-old-bodega-cask-irish-whiskey",
+              "domain": "mainstreetliquor.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "The Whistler Bodega Cask official single malt Irish whiskey",
+        "summary": "Authoritative sources support **The Whistler Bodega Cask** as a **single malt Irish whiskey** in The Whistler range from **Boann Distillery**. Independent coverage identifies it specifically as the **5 Year Old Bodega Cask Single Malt**, and says it is **triple-distilled** and matured its full term in **Spanish/Oloroso",
+        "results": [
+          {
+            "title": "https://www.wineenthusiast.com/buying-guide/the-whistler-bodega-cask-single-malt-irish-whiskey/",
+            "url": "https://www.wineenthusiast.com/buying-guide/the-whistler-bodega-cask-single-malt-irish-whiskey/",
+            "domain": "wineenthusiast.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.boanndistillery.ie/product/the-whistler-triple-oaked/",
+            "url": "https://www.boanndistillery.ie/product/the-whistler-triple-oaked/",
+            "domain": "boanndistillery.ie",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.boanndistillery.ie/the-merrion-hotel/",
+            "url": "https://www.boanndistillery.ie/the-merrion-hotel/",
+            "domain": "boanndistillery.ie",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.worldwhiskiesawards.com/winner-whisky/category-winner-92-world-whiskies-awards-2021",
+            "url": "https://www.worldwhiskiesawards.com/winner-whisky/category-winner-92-world-whiskies-awards-2021",
+            "domain": "worldwhiskiesawards.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+            "url": "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+            "domain": "thewhiskeywash.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://mainstreetliquor.com/products/the-whistler-5-year-old-bodega-cask-irish-whiskey",
+            "url": "https://mainstreetliquor.com/products/the-whistler-5-year-old-bodega-cask-irish-whiskey",
+            "domain": "mainstreetliquor.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

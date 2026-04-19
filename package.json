@@ -28,6 +28,7 @@
     "test": "turbo test",
     "evals": "pnpm evals:classifier",
     "evals:classifier": "pnpm --filter @peated/bottle-classifier evals",
+    "evals:web-cache:clear": "pnpm --filter @peated/bottle-classifier evals:web-cache:clear",
     "test:ci": "CI=true pnpm -r run test:ci",
     "preinstall": "npx only-allow pnpm",
     "postinstall": "simple-git-hooks",

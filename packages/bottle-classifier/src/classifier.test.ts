@@ -16,6 +16,9 @@ type ReasoningResult = {
   artifacts: BottleClassificationArtifacts;
 };
 
+// Keep this file focused on deterministic classifier boundary behavior.
+// Real-bottle workflow regressions belong in the fixture-driven eval corpus,
+// not in additional mocked classifier behavior tests here.
 function createTestClassifier({
   extractedIdentity = null,
   extractedIdentityFromImage,

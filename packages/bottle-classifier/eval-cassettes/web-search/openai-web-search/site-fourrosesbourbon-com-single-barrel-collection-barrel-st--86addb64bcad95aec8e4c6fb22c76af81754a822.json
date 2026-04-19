@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "site:fourrosesbourbon.com \"Single Barrel Collection\" barrel strength"
+    },
+    "recordedAt": "2026-04-19T16:00:14.790Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "site:fourrosesbourbon.com \"Single Barrel Collection\" barrel strength",
+          "summary": "Here’s the strongest official evidence I found from Four Roses for that reference:\n\n- Four Roses has an official **“Single Barrel Collection”** page, and it describes the collection as **100 proof** and **aged 7–9 years**, listing the releases **OBSV, OESO, OBSF, and OESK**. That indicates the current “Single Barrel Co",
+          "results": [
+            {
+              "title": "https://www.fourrosesbourbon.com/blog/introducing-single-barrel-collection",
+              "url": "https://www.fourrosesbourbon.com/blog/introducing-single-barrel-collection",
+              "domain": "fourrosesbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+              "url": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+              "domain": "fourrosesbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/bourbon/single-barrel-collection",
+              "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel-collection",
+              "domain": "fourrosesbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/blog/elliots-select",
+              "url": "https://www.fourrosesbourbon.com/blog/elliots-select",
+              "domain": "fourrosesbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://store.fourrosesbourbon.com/barware/glassware/single-barrel-tasting-tumbler.html",
+              "url": "https://store.fourrosesbourbon.com/barware/glassware/single-barrel-tasting-tumbler.html",
+              "domain": "store.fourrosesbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+              "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+              "domain": "fourrosesbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "site:fourrosesbourbon.com \"Single Barrel Collection\" barrel strength",
+        "summary": "Here’s the strongest official evidence I found from Four Roses for that reference:\n\n- Four Roses has an official **“Single Barrel Collection”** page, and it describes the collection as **100 proof** and **aged 7–9 years**, listing the releases **OBSV, OESO, OBSF, and OESK**. That indicates the current “Single Barrel Co",
+        "results": [
+          {
+            "title": "https://www.fourrosesbourbon.com/blog/introducing-single-barrel-collection",
+            "url": "https://www.fourrosesbourbon.com/blog/introducing-single-barrel-collection",
+            "domain": "fourrosesbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+            "url": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+            "domain": "fourrosesbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/bourbon/single-barrel-collection",
+            "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel-collection",
+            "domain": "fourrosesbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/blog/elliots-select",
+            "url": "https://www.fourrosesbourbon.com/blog/elliots-select",
+            "domain": "fourrosesbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://store.fourrosesbourbon.com/barware/glassware/single-barrel-tasting-tumbler.html",
+            "url": "https://store.fourrosesbourbon.com/barware/glassware/single-barrel-tasting-tumbler.html",
+            "domain": "store.fourrosesbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+            "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+            "domain": "fourrosesbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

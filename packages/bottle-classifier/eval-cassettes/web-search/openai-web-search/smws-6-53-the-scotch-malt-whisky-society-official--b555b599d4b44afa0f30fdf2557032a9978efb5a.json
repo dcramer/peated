@@ -1,0 +1,1122 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "SMWS 6.53 The Scotch Malt Whisky Society official"
+    },
+    "recordedAt": "2026-04-19T05:29:22.397Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "SMWS 6.53 The Scotch Malt Whisky Society official",
+          "summary": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+          "results": [
+            {
+              "title": "https://newmake.smwsa.com/products/cask-no-6-53",
+              "url": "https://newmake.smwsa.com/products/cask-no-6-53",
+              "domain": "newmake.smwsa.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smwsa.com/products/cask-no-53-379",
+              "url": "https://smwsa.com/products/cask-no-53-379",
+              "domain": "smwsa.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://newmake.smwsa.com/products/the-2023-gathering-collection",
+              "url": "https://newmake.smwsa.com/products/the-2023-gathering-collection",
+              "domain": "newmake.smwsa.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://en.wikipedia.org/wiki/Scotch_Malt_Whisky_Society",
+              "url": "https://en.wikipedia.org/wiki/Scotch_Malt_Whisky_Society",
+              "domain": "en.wikipedia.org",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smwsa.com/products/the-gathering-at-the-vaults",
+              "url": "https://smwsa.com/products/the-gathering-at-the-vaults",
+              "domain": "smwsa.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smwsa.com/products/cask-no-53-389",
+              "url": "https://smwsa.com/products/cask-no-53-389",
+              "domain": "smwsa.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://newmake.smwsa.com/products/cask-no-53-481",
+              "url": "https://newmake.smwsa.com/products/cask-no-53-481",
+              "domain": "newmake.smwsa.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://newmake.smwsa.com/products/cask-no-53-468",
+              "url": "https://newmake.smwsa.com/products/cask-no-53-468",
+              "domain": "newmake.smwsa.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smwsa.com/products/the-heart-of-scotland",
+              "url": "https://smwsa.com/products/the-heart-of-scotland",
+              "domain": "smwsa.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://artisanal-spirits.com/wp-content/uploads/2023/09/FY23-H1-Results-Presentation-FINAL.pdf",
+              "url": "https://artisanal-spirits.com/wp-content/uploads/2023/09/FY23-H1-Results-Presentation-FINAL.pdf",
+              "domain": "artisanal-spirits.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/12gsltz",
+              "url": "https://www.reddit.com/r/Scotch/comments/12gsltz",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://newmake.smwsa.com/products/cask-no-6-52",
+              "url": "https://newmake.smwsa.com/products/cask-no-6-52",
+              "domain": "newmake.smwsa.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smwsa.com/products/distillery-53-rare-release-1",
+              "url": "https://smwsa.com/products/distillery-53-rare-release-1",
+              "domain": "smwsa.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://newmake.smwsa.com/products/cask-no-6-71",
+              "url": "https://newmake.smwsa.com/products/cask-no-6-71",
+              "domain": "newmake.smwsa.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smwsa.com/products/cask-no-66-223",
+              "url": "https://smwsa.com/products/cask-no-66-223",
+              "domain": "smwsa.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/Aug25%20E-Outturn%20UK-Link.pdf",
+              "url": "https://smws.com/content/Aug25%20E-Outturn%20UK-Link.pdf",
+              "domain": "smws.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/2025%20-%20SMOAK%20T%26C%27s.pdf",
+              "url": "https://smws.com/content/2025%20-%20SMOAK%20T%26C%27s.pdf",
+              "domain": "smws.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/Anniversary%20Cask%20Sale%20Contract%20and%20Order%20Form%20-%2017%20Nov%202023.pdf",
+              "url": "https://smws.com/content/Anniversary%20Cask%20Sale%20Contract%20and%20Order%20Form%20-%2017%20Nov%202023.pdf",
+              "domain": "smws.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/The%20Vaults%20Brochure%202020.pdf",
+              "url": "https://smws.com/content/The%20Vaults%20Brochure%202020.pdf",
+              "domain": "smws.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1owz0jw/reviews_701_to_706_smws_usa_november_2025_outturn/",
+              "url": "https://www.reddit.com/r/Scotch/comments/1owz0jw/reviews_701_to_706_smws_usa_november_2025_outturn/",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1f8cq39",
+              "url": "https://www.reddit.com/r/Scotch/comments/1f8cq39",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1e1rgfc",
+              "url": "https://www.reddit.com/r/Scotch/comments/1e1rgfc",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/rum/comments/1lg30ox",
+              "url": "https://www.reddit.com/r/rum/comments/1lg30ox",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1c00l97",
+              "url": "https://www.reddit.com/r/Scotch/comments/1c00l97",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/l82jqf",
+              "url": "https://www.reddit.com/r/Scotch/comments/l82jqf",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/15tn2ug",
+              "url": "https://www.reddit.com/r/Scotch/comments/15tn2ug",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/smws/comments/1bumttb",
+              "url": "https://www.reddit.com/r/smws/comments/1bumttb",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1b12gnb",
+              "url": "https://www.reddit.com/r/Scotch/comments/1b12gnb",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/smws/comments/ui3bhk",
+              "url": "https://www.reddit.com/r/smws/comments/ui3bhk",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1skcg5p/reviews_815_to_820_smws_usa_outturn_april_2026/",
+              "url": "https://www.reddit.com/r/Scotch/comments/1skcg5p/reviews_815_to_820_smws_usa_outturn_april_2026/",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybrother.com/pages/smws-distillery-codes",
+              "url": "https://www.whiskybrother.com/pages/smws-distillery-codes",
+              "domain": "whiskybrother.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://peated.com/bottles/43625",
+              "url": "https://peated.com/bottles/43625",
+              "domain": "peated.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://nigelpentland.co.uk/smws/",
+              "url": "https://nigelpentland.co.uk/smws/",
+              "domain": "nigelpentland.co.uk",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskygeeks.sg/2018/04/07/smws-bottlings-codes-use/",
+              "url": "https://www.whiskygeeks.sg/2018/04/07/smws-bottlings-codes-use/",
+              "domain": "whiskygeeks.sg",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyguide.at/smws-codes",
+              "url": "https://whiskyguide.at/smws-codes",
+              "domain": "whiskyguide.at",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://twowhiskybros.co.uk/blogs/blog/smws-october-2023-outturn-review",
+              "url": "https://twowhiskybros.co.uk/blogs/blog/smws-october-2023-outturn-review",
+              "domain": "twowhiskybros.co.uk",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smwsa.com/about-smwsa/our-whisky",
+              "url": "https://smwsa.com/about-smwsa/our-whisky",
+              "domain": "smwsa.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.slowdrink.de/2011/10/smws-codes/",
+              "url": "https://www.slowdrink.de/2011/10/smws-codes/",
+              "domain": "slowdrink.de",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://malt-musings.blogspot.com/p/smws-codes.html",
+              "url": "https://malt-musings.blogspot.com/p/smws-codes.html",
+              "domain": "malt-musings.blogspot.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskyportal.com/smws/SMWS_codes_1es.asp",
+              "url": "https://www.whiskyportal.com/smws/SMWS_codes_1es.asp",
+              "domain": "whiskyportal.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskyportal.com/smws/",
+              "url": "https://www.whiskyportal.com/smws/",
+              "domain": "whiskyportal.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://ascotonscotch.com/smws-distillery-codes/",
+              "url": "https://ascotonscotch.com/smws-distillery-codes/",
+              "domain": "ascotonscotch.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://en.wikipedia.org/wiki/Macduff_distillery",
+              "url": "https://en.wikipedia.org/wiki/Macduff_distillery",
+              "domain": "en.wikipedia.org",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/whisky/comments/10mqnh0",
+              "url": "https://www.reddit.com/r/whisky/comments/10mqnh0",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/2503%20Cracking%20the%20code%20NEW%20LABEL%20UPDATE.pdf",
+              "url": "https://smws.com/content/2503%20Cracking%20the%20code%20NEW%20LABEL%20UPDATE.pdf",
+              "domain": "smws.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.artisanal-spirits.com/wp-content/uploads/2021/08/MelloMonday-Presentation-July-2021.pdf",
+              "url": "https://www.artisanal-spirits.com/wp-content/uploads/2021/08/MelloMonday-Presentation-July-2021.pdf",
+              "domain": "artisanal-spirits.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyboys.com/wp-content/uploads/2023/09/SMWS-Codes-Sept-2023.pdf",
+              "url": "https://whiskyboys.com/wp-content/uploads/2023/09/SMWS-Codes-Sept-2023.pdf",
+              "domain": "whiskyboys.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://static.spotapps.co/website_images/ab_websites/110152_website/WhiskyMenu_Dec24Scotch.pdf",
+              "url": "https://static.spotapps.co/website_images/ab_websites/110152_website/WhiskyMenu_Dec24Scotch.pdf",
+              "domain": "static.spotapps.co",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.iwsc.net/files/1-iwsc-guide-2017.pdf",
+              "url": "https://www.iwsc.net/files/1-iwsc-guide-2017.pdf",
+              "domain": "iwsc.net",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/rx6twz",
+              "url": "https://www.reddit.com/r/Scotch/comments/rx6twz",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/ls9d81",
+              "url": "https://www.reddit.com/r/Scotch/comments/ls9d81",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1ajstnr",
+              "url": "https://www.reddit.com/r/Scotch/comments/1ajstnr",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/16y10mi",
+              "url": "https://www.reddit.com/r/Scotch/comments/16y10mi",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/l2qrj6",
+              "url": "https://www.reddit.com/r/Scotch/comments/l2qrj6",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1d9hgq6",
+              "url": "https://www.reddit.com/r/Scotch/comments/1d9hgq6",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/zkax5c",
+              "url": "https://www.reddit.com/r/Scotch/comments/zkax5c",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1gi6rei",
+              "url": "https://www.reddit.com/r/Scotch/comments/1gi6rei",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/canadawhisky/comments/wzoi8l",
+              "url": "https://www.reddit.com/r/canadawhisky/comments/wzoi8l",
+              "domain": "reddit.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/203599/macduff-2008-smws-653",
+              "url": "https://www.whiskybase.com/whiskies/whisky/203599/macduff-2008-smws-653",
+              "domain": "whiskybase.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.icheers.tw/iCheers/Spirits/WineDetail/wine_detail/55458",
+              "url": "https://www.icheers.tw/iCheers/Spirits/WineDetail/wine_detail/55458",
+              "domain": "icheers.tw",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://semspub.epa.gov/work/03/2394476.pdf",
+              "url": "https://semspub.epa.gov/work/03/2394476.pdf",
+              "domain": "semspub.epa.gov",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/distillery/154/whiskies?language=zh-CN",
+              "url": "https://www.whiskybase.com/whiskies/distillery/154/whiskies?language=zh-CN",
+              "domain": "whiskybase.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.smws.com.tw/product/list/6?max=8&offset=64",
+              "url": "https://www.smws.com.tw/product/list/6?max=8&offset=64",
+              "domain": "smws.com.tw",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.biochemjournal.com/archives/2026/vol10issue3/PartI/10-3-56-420.pdf",
+              "url": "https://www.biochemjournal.com/archives/2026/vol10issue3/PartI/10-3-56-420.pdf",
+              "domain": "biochemjournal.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.truedungeon.com/forum?catid=583&id=197980&view=topic",
+              "url": "https://www.truedungeon.com/forum?catid=583&id=197980&view=topic",
+              "domain": "truedungeon.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/bottler/77378/scotch-malt-whisky-society",
+              "url": "https://www.whiskybase.com/whiskies/bottler/77378/scotch-malt-whisky-society",
+              "domain": "whiskybase.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.scribd.com/document/959636777/Final-Abstract-Book-NGRTCSA-2025",
+              "url": "https://www.scribd.com/document/959636777/Final-Abstract-Book-NGRTCSA-2025",
+              "domain": "scribd.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://patents.justia.com/patent/10913752",
+              "url": "https://patents.justia.com/patent/10913752",
+              "domain": "patents.justia.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://kopparpannan.se/whisky-topplista/",
+              "url": "https://kopparpannan.se/whisky-topplista/",
+              "domain": "kopparpannan.se",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://numerique.banq.qc.ca/patrimoine/details/52327/4516000",
+              "url": "https://numerique.banq.qc.ca/patrimoine/details/52327/4516000",
+              "domain": "numerique.banq.qc.ca",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://cocktailchem.blogspot.com/2016/09/",
+              "url": "https://cocktailchem.blogspot.com/2016/09/",
+              "domain": "cocktailchem.blogspot.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://fintel.io/ja/i/morgan-stanley",
+              "url": "https://fintel.io/ja/i/morgan-stanley",
+              "domain": "fintel.io",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.free-ebooks.net/fiction/Necessary-Evil/pdf?dl=&preview=&preview%3Fdl=",
+              "url": "https://www.free-ebooks.net/fiction/Necessary-Evil/pdf?dl=&preview=&preview%3Fdl=",
+              "domain": "free-ebooks.net",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://data.epo.org/publication-server/rest/v1.2/publication-dates/19940202/patents/EP0393066NWB1/document.pdf",
+              "url": "https://data.epo.org/publication-server/rest/v1.2/publication-dates/19940202/patents/EP0393066NWB1/document.pdf",
+              "domain": "data.epo.org",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "The Scotch Malt Whisky Society of America",
+              "url": "https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai",
+              "domain": "newmake.smwsa.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "Our Whisky",
+              "url": "https://smwsa.com/about-smwsa/our-whisky?utm_source=openai",
+              "domain": "smwsa.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "SMWS Distillery Codes | Scotch Malt Whisky Society",
+              "url": "https://www.whiskybrother.com/pages/smws-distillery-codes?utm_source=openai",
+              "domain": "whiskybrother.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            },
+            {
+              "title": "Macduff 2008 SMWS 6.53 - Ratings and reviews - Whiskybase",
+              "url": "https://www.whiskybase.com/whiskies/whisky/203599/macduff-2008-smws-653?utm_source=openai",
+              "domain": "whiskybase.com",
+              "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "SMWS 6.53 The Scotch Malt Whisky Society official",
+        "summary": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+        "results": [
+          {
+            "title": "https://newmake.smwsa.com/products/cask-no-6-53",
+            "url": "https://newmake.smwsa.com/products/cask-no-6-53",
+            "domain": "newmake.smwsa.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smwsa.com/products/cask-no-53-379",
+            "url": "https://smwsa.com/products/cask-no-53-379",
+            "domain": "smwsa.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://newmake.smwsa.com/products/the-2023-gathering-collection",
+            "url": "https://newmake.smwsa.com/products/the-2023-gathering-collection",
+            "domain": "newmake.smwsa.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://en.wikipedia.org/wiki/Scotch_Malt_Whisky_Society",
+            "url": "https://en.wikipedia.org/wiki/Scotch_Malt_Whisky_Society",
+            "domain": "en.wikipedia.org",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smwsa.com/products/the-gathering-at-the-vaults",
+            "url": "https://smwsa.com/products/the-gathering-at-the-vaults",
+            "domain": "smwsa.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smwsa.com/products/cask-no-53-389",
+            "url": "https://smwsa.com/products/cask-no-53-389",
+            "domain": "smwsa.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://newmake.smwsa.com/products/cask-no-53-481",
+            "url": "https://newmake.smwsa.com/products/cask-no-53-481",
+            "domain": "newmake.smwsa.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://newmake.smwsa.com/products/cask-no-53-468",
+            "url": "https://newmake.smwsa.com/products/cask-no-53-468",
+            "domain": "newmake.smwsa.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smwsa.com/products/the-heart-of-scotland",
+            "url": "https://smwsa.com/products/the-heart-of-scotland",
+            "domain": "smwsa.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://artisanal-spirits.com/wp-content/uploads/2023/09/FY23-H1-Results-Presentation-FINAL.pdf",
+            "url": "https://artisanal-spirits.com/wp-content/uploads/2023/09/FY23-H1-Results-Presentation-FINAL.pdf",
+            "domain": "artisanal-spirits.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/12gsltz",
+            "url": "https://www.reddit.com/r/Scotch/comments/12gsltz",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://newmake.smwsa.com/products/cask-no-6-52",
+            "url": "https://newmake.smwsa.com/products/cask-no-6-52",
+            "domain": "newmake.smwsa.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smwsa.com/products/distillery-53-rare-release-1",
+            "url": "https://smwsa.com/products/distillery-53-rare-release-1",
+            "domain": "smwsa.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://newmake.smwsa.com/products/cask-no-6-71",
+            "url": "https://newmake.smwsa.com/products/cask-no-6-71",
+            "domain": "newmake.smwsa.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smwsa.com/products/cask-no-66-223",
+            "url": "https://smwsa.com/products/cask-no-66-223",
+            "domain": "smwsa.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/Aug25%20E-Outturn%20UK-Link.pdf",
+            "url": "https://smws.com/content/Aug25%20E-Outturn%20UK-Link.pdf",
+            "domain": "smws.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/2025%20-%20SMOAK%20T%26C%27s.pdf",
+            "url": "https://smws.com/content/2025%20-%20SMOAK%20T%26C%27s.pdf",
+            "domain": "smws.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/Anniversary%20Cask%20Sale%20Contract%20and%20Order%20Form%20-%2017%20Nov%202023.pdf",
+            "url": "https://smws.com/content/Anniversary%20Cask%20Sale%20Contract%20and%20Order%20Form%20-%2017%20Nov%202023.pdf",
+            "domain": "smws.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/The%20Vaults%20Brochure%202020.pdf",
+            "url": "https://smws.com/content/The%20Vaults%20Brochure%202020.pdf",
+            "domain": "smws.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1owz0jw/reviews_701_to_706_smws_usa_november_2025_outturn/",
+            "url": "https://www.reddit.com/r/Scotch/comments/1owz0jw/reviews_701_to_706_smws_usa_november_2025_outturn/",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1f8cq39",
+            "url": "https://www.reddit.com/r/Scotch/comments/1f8cq39",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1e1rgfc",
+            "url": "https://www.reddit.com/r/Scotch/comments/1e1rgfc",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/rum/comments/1lg30ox",
+            "url": "https://www.reddit.com/r/rum/comments/1lg30ox",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1c00l97",
+            "url": "https://www.reddit.com/r/Scotch/comments/1c00l97",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/l82jqf",
+            "url": "https://www.reddit.com/r/Scotch/comments/l82jqf",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/15tn2ug",
+            "url": "https://www.reddit.com/r/Scotch/comments/15tn2ug",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/smws/comments/1bumttb",
+            "url": "https://www.reddit.com/r/smws/comments/1bumttb",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1b12gnb",
+            "url": "https://www.reddit.com/r/Scotch/comments/1b12gnb",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/smws/comments/ui3bhk",
+            "url": "https://www.reddit.com/r/smws/comments/ui3bhk",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1skcg5p/reviews_815_to_820_smws_usa_outturn_april_2026/",
+            "url": "https://www.reddit.com/r/Scotch/comments/1skcg5p/reviews_815_to_820_smws_usa_outturn_april_2026/",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybrother.com/pages/smws-distillery-codes",
+            "url": "https://www.whiskybrother.com/pages/smws-distillery-codes",
+            "domain": "whiskybrother.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://peated.com/bottles/43625",
+            "url": "https://peated.com/bottles/43625",
+            "domain": "peated.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://nigelpentland.co.uk/smws/",
+            "url": "https://nigelpentland.co.uk/smws/",
+            "domain": "nigelpentland.co.uk",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskygeeks.sg/2018/04/07/smws-bottlings-codes-use/",
+            "url": "https://www.whiskygeeks.sg/2018/04/07/smws-bottlings-codes-use/",
+            "domain": "whiskygeeks.sg",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyguide.at/smws-codes",
+            "url": "https://whiskyguide.at/smws-codes",
+            "domain": "whiskyguide.at",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://twowhiskybros.co.uk/blogs/blog/smws-october-2023-outturn-review",
+            "url": "https://twowhiskybros.co.uk/blogs/blog/smws-october-2023-outturn-review",
+            "domain": "twowhiskybros.co.uk",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smwsa.com/about-smwsa/our-whisky",
+            "url": "https://smwsa.com/about-smwsa/our-whisky",
+            "domain": "smwsa.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.slowdrink.de/2011/10/smws-codes/",
+            "url": "https://www.slowdrink.de/2011/10/smws-codes/",
+            "domain": "slowdrink.de",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://malt-musings.blogspot.com/p/smws-codes.html",
+            "url": "https://malt-musings.blogspot.com/p/smws-codes.html",
+            "domain": "malt-musings.blogspot.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskyportal.com/smws/SMWS_codes_1es.asp",
+            "url": "https://www.whiskyportal.com/smws/SMWS_codes_1es.asp",
+            "domain": "whiskyportal.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskyportal.com/smws/",
+            "url": "https://www.whiskyportal.com/smws/",
+            "domain": "whiskyportal.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://ascotonscotch.com/smws-distillery-codes/",
+            "url": "https://ascotonscotch.com/smws-distillery-codes/",
+            "domain": "ascotonscotch.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://en.wikipedia.org/wiki/Macduff_distillery",
+            "url": "https://en.wikipedia.org/wiki/Macduff_distillery",
+            "domain": "en.wikipedia.org",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/whisky/comments/10mqnh0",
+            "url": "https://www.reddit.com/r/whisky/comments/10mqnh0",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/2503%20Cracking%20the%20code%20NEW%20LABEL%20UPDATE.pdf",
+            "url": "https://smws.com/content/2503%20Cracking%20the%20code%20NEW%20LABEL%20UPDATE.pdf",
+            "domain": "smws.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.artisanal-spirits.com/wp-content/uploads/2021/08/MelloMonday-Presentation-July-2021.pdf",
+            "url": "https://www.artisanal-spirits.com/wp-content/uploads/2021/08/MelloMonday-Presentation-July-2021.pdf",
+            "domain": "artisanal-spirits.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyboys.com/wp-content/uploads/2023/09/SMWS-Codes-Sept-2023.pdf",
+            "url": "https://whiskyboys.com/wp-content/uploads/2023/09/SMWS-Codes-Sept-2023.pdf",
+            "domain": "whiskyboys.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://static.spotapps.co/website_images/ab_websites/110152_website/WhiskyMenu_Dec24Scotch.pdf",
+            "url": "https://static.spotapps.co/website_images/ab_websites/110152_website/WhiskyMenu_Dec24Scotch.pdf",
+            "domain": "static.spotapps.co",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.iwsc.net/files/1-iwsc-guide-2017.pdf",
+            "url": "https://www.iwsc.net/files/1-iwsc-guide-2017.pdf",
+            "domain": "iwsc.net",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/rx6twz",
+            "url": "https://www.reddit.com/r/Scotch/comments/rx6twz",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/ls9d81",
+            "url": "https://www.reddit.com/r/Scotch/comments/ls9d81",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1ajstnr",
+            "url": "https://www.reddit.com/r/Scotch/comments/1ajstnr",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/16y10mi",
+            "url": "https://www.reddit.com/r/Scotch/comments/16y10mi",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/l2qrj6",
+            "url": "https://www.reddit.com/r/Scotch/comments/l2qrj6",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1d9hgq6",
+            "url": "https://www.reddit.com/r/Scotch/comments/1d9hgq6",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/zkax5c",
+            "url": "https://www.reddit.com/r/Scotch/comments/zkax5c",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1gi6rei",
+            "url": "https://www.reddit.com/r/Scotch/comments/1gi6rei",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/canadawhisky/comments/wzoi8l",
+            "url": "https://www.reddit.com/r/canadawhisky/comments/wzoi8l",
+            "domain": "reddit.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/203599/macduff-2008-smws-653",
+            "url": "https://www.whiskybase.com/whiskies/whisky/203599/macduff-2008-smws-653",
+            "domain": "whiskybase.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.icheers.tw/iCheers/Spirits/WineDetail/wine_detail/55458",
+            "url": "https://www.icheers.tw/iCheers/Spirits/WineDetail/wine_detail/55458",
+            "domain": "icheers.tw",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://semspub.epa.gov/work/03/2394476.pdf",
+            "url": "https://semspub.epa.gov/work/03/2394476.pdf",
+            "domain": "semspub.epa.gov",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/distillery/154/whiskies?language=zh-CN",
+            "url": "https://www.whiskybase.com/whiskies/distillery/154/whiskies?language=zh-CN",
+            "domain": "whiskybase.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.smws.com.tw/product/list/6?max=8&offset=64",
+            "url": "https://www.smws.com.tw/product/list/6?max=8&offset=64",
+            "domain": "smws.com.tw",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.biochemjournal.com/archives/2026/vol10issue3/PartI/10-3-56-420.pdf",
+            "url": "https://www.biochemjournal.com/archives/2026/vol10issue3/PartI/10-3-56-420.pdf",
+            "domain": "biochemjournal.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.truedungeon.com/forum?catid=583&id=197980&view=topic",
+            "url": "https://www.truedungeon.com/forum?catid=583&id=197980&view=topic",
+            "domain": "truedungeon.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/bottler/77378/scotch-malt-whisky-society",
+            "url": "https://www.whiskybase.com/whiskies/bottler/77378/scotch-malt-whisky-society",
+            "domain": "whiskybase.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.scribd.com/document/959636777/Final-Abstract-Book-NGRTCSA-2025",
+            "url": "https://www.scribd.com/document/959636777/Final-Abstract-Book-NGRTCSA-2025",
+            "domain": "scribd.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://patents.justia.com/patent/10913752",
+            "url": "https://patents.justia.com/patent/10913752",
+            "domain": "patents.justia.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://kopparpannan.se/whisky-topplista/",
+            "url": "https://kopparpannan.se/whisky-topplista/",
+            "domain": "kopparpannan.se",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://numerique.banq.qc.ca/patrimoine/details/52327/4516000",
+            "url": "https://numerique.banq.qc.ca/patrimoine/details/52327/4516000",
+            "domain": "numerique.banq.qc.ca",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://cocktailchem.blogspot.com/2016/09/",
+            "url": "https://cocktailchem.blogspot.com/2016/09/",
+            "domain": "cocktailchem.blogspot.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://fintel.io/ja/i/morgan-stanley",
+            "url": "https://fintel.io/ja/i/morgan-stanley",
+            "domain": "fintel.io",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.free-ebooks.net/fiction/Necessary-Evil/pdf?dl=&preview=&preview%3Fdl=",
+            "url": "https://www.free-ebooks.net/fiction/Necessary-Evil/pdf?dl=&preview=&preview%3Fdl=",
+            "domain": "free-ebooks.net",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://data.epo.org/publication-server/rest/v1.2/publication-dates/19940202/patents/EP0393066NWB1/document.pdf",
+            "url": "https://data.epo.org/publication-server/rest/v1.2/publication-dates/19940202/patents/EP0393066NWB1/document.pdf",
+            "domain": "data.epo.org",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Scotch Malt Whisky Society of America",
+            "url": "https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai",
+            "domain": "newmake.smwsa.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "Our Whisky",
+            "url": "https://smwsa.com/about-smwsa/our-whisky?utm_source=openai",
+            "domain": "smwsa.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "SMWS Distillery Codes | Scotch Malt Whisky Society",
+            "url": "https://www.whiskybrother.com/pages/smws-distillery-codes?utm_source=openai",
+            "domain": "whiskybrother.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          },
+          {
+            "title": "Macduff 2008 SMWS 6.53 - Ratings and reviews - Whiskybase",
+            "url": "https://www.whiskybase.com/whiskies/whisky/203599/macduff-2008-smws-653?utm_source=openai",
+            "domain": "whiskybase.com",
+            "description": "Official SMWS evidence for **SMWS 6.53 “Fresh from the replicator”** is the SMWS America product page. It confirms this bottle is **Cask No. 6.53**, named **“Fresh from the replicator,”** from **Speyside, Deveron**, aged **13 years**, matured in a **second-fill barrel**, **distilled February 2008**, and bottled at **57.9% alcohol/ABV** with a **USA allocation of 126 bottles**. ([newmake.smwsa.com](https://newmake.smwsa.com/products/cask-no-6-53?utm_source=openai))\n\nFor the distillery identity behind the code, SMWS’s own “Our Whisky” page explains that the **first number is the distillery code*",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

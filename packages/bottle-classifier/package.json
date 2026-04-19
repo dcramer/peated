@@ -88,6 +88,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "evals": "sh -c 'if [ \"$1\" = \"--\" ]; then shift; fi; dotenv -e ../../.env -e ../../.env.local -- pnpm exec vitest run \"$@\" --config vitest.evals.config.mts' --",
+    "evals:web-cache:clear": "node ./scripts/clearEvalWebSearchCache.mjs",
     "test": "vitest run --config vitest.config.mts",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },

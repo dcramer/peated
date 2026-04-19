@@ -1,0 +1,268 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "1792 Single Barrel official bourbon Barton 1792"
+    },
+    "recordedAt": "2026-04-19T05:25:01.377Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "1792 Single Barrel official bourbon Barton 1792",
+          "summary": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+          "results": [
+            {
+              "title": "https://1792bourbon.com/single-barrel",
+              "url": "https://1792bourbon.com/single-barrel",
+              "domain": "1792bourbon.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/1792-single-barrel-bourbon",
+              "url": "https://distiller.com/spirits/1792-single-barrel-bourbon",
+              "domain": "distiller.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/articles/bourbon-breakdown-1792-bourbon",
+              "url": "https://distiller.com/articles/bourbon-breakdown-1792-bourbon",
+              "domain": "distiller.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.breakingbourbon.com/review/1792-single-barrel-bourbon-2023-release",
+              "url": "https://www.breakingbourbon.com/review/1792-single-barrel-bourbon-2023-release",
+              "domain": "breakingbourbon.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/1792-bottled-in-bond",
+              "url": "https://distiller.com/spirits/1792-bottled-in-bond",
+              "domain": "distiller.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/1792-single-barrel-bourbon-single-barrel-select",
+              "url": "https://distiller.com/spirits/1792-single-barrel-bourbon-single-barrel-select",
+              "domain": "distiller.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/tastes/1249282",
+              "url": "https://distiller.com/tastes/1249282",
+              "domain": "distiller.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/barton-1792-port-cask-finish-bourbon",
+              "url": "https://distiller.com/spirits/barton-1792-port-cask-finish-bourbon",
+              "domain": "distiller.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/kirkland-single-barrel-reserve-kentucky-bourbon-by-barton-1792/tastes",
+              "url": "https://distiller.com/spirits/kirkland-single-barrel-reserve-kentucky-bourbon-by-barton-1792/tastes",
+              "domain": "distiller.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.breakingbourbon.com/bourbon-whiskey-press-releases/barton-1792-distillery-introduces-12-year-old-small-batch-bourbon",
+              "url": "https://www.breakingbourbon.com/bourbon-whiskey-press-releases/barton-1792-distillery-introduces-12-year-old-small-batch-bourbon",
+              "domain": "breakingbourbon.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.breakingbourbon.com/review/1792-sweet-wheat",
+              "url": "https://www.breakingbourbon.com/review/1792-sweet-wheat",
+              "domain": "breakingbourbon.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskeyconsensus.com/1792-single-barrel-bourbon-review/",
+              "url": "https://whiskeyconsensus.com/1792-single-barrel-bourbon-review/",
+              "domain": "whiskeyconsensus.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://1792bourbon.com/1792-Bourbon-Holiday-Guide.pdf",
+              "url": "https://1792bourbon.com/1792-Bourbon-Holiday-Guide.pdf",
+              "domain": "1792bourbon.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.1792bourbon.com/Cocktails-Crafted-With-1792-Bourbon.pdf",
+              "url": "https://www.1792bourbon.com/Cocktails-Crafted-With-1792-Bourbon.pdf",
+              "domain": "1792bourbon.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            },
+            {
+              "title": "1792 Bourbon Single Barrel Bourbon",
+              "url": "https://1792bourbon.com/single-barrel?utm_source=openai",
+              "domain": "1792bourbon.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            },
+            {
+              "title": "1792 Single Barrel Bourbon",
+              "url": "https://distiller.com/spirits/1792-single-barrel-bourbon?utm_source=openai",
+              "domain": "distiller.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            },
+            {
+              "title": "1792 Single Barrel Bourbon (2023 Release) Review | Breaking Bourbon",
+              "url": "https://www.breakingbourbon.com/review/1792-single-barrel-bourbon-2023-release?utm_source=openai",
+              "domain": "breakingbourbon.com",
+              "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "1792 Single Barrel official bourbon Barton 1792",
+        "summary": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+        "results": [
+          {
+            "title": "https://1792bourbon.com/single-barrel",
+            "url": "https://1792bourbon.com/single-barrel",
+            "domain": "1792bourbon.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/1792-single-barrel-bourbon",
+            "url": "https://distiller.com/spirits/1792-single-barrel-bourbon",
+            "domain": "distiller.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/articles/bourbon-breakdown-1792-bourbon",
+            "url": "https://distiller.com/articles/bourbon-breakdown-1792-bourbon",
+            "domain": "distiller.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.breakingbourbon.com/review/1792-single-barrel-bourbon-2023-release",
+            "url": "https://www.breakingbourbon.com/review/1792-single-barrel-bourbon-2023-release",
+            "domain": "breakingbourbon.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/1792-bottled-in-bond",
+            "url": "https://distiller.com/spirits/1792-bottled-in-bond",
+            "domain": "distiller.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/1792-single-barrel-bourbon-single-barrel-select",
+            "url": "https://distiller.com/spirits/1792-single-barrel-bourbon-single-barrel-select",
+            "domain": "distiller.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/tastes/1249282",
+            "url": "https://distiller.com/tastes/1249282",
+            "domain": "distiller.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/barton-1792-port-cask-finish-bourbon",
+            "url": "https://distiller.com/spirits/barton-1792-port-cask-finish-bourbon",
+            "domain": "distiller.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/kirkland-single-barrel-reserve-kentucky-bourbon-by-barton-1792/tastes",
+            "url": "https://distiller.com/spirits/kirkland-single-barrel-reserve-kentucky-bourbon-by-barton-1792/tastes",
+            "domain": "distiller.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.breakingbourbon.com/bourbon-whiskey-press-releases/barton-1792-distillery-introduces-12-year-old-small-batch-bourbon",
+            "url": "https://www.breakingbourbon.com/bourbon-whiskey-press-releases/barton-1792-distillery-introduces-12-year-old-small-batch-bourbon",
+            "domain": "breakingbourbon.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.breakingbourbon.com/review/1792-sweet-wheat",
+            "url": "https://www.breakingbourbon.com/review/1792-sweet-wheat",
+            "domain": "breakingbourbon.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskeyconsensus.com/1792-single-barrel-bourbon-review/",
+            "url": "https://whiskeyconsensus.com/1792-single-barrel-bourbon-review/",
+            "domain": "whiskeyconsensus.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://1792bourbon.com/1792-Bourbon-Holiday-Guide.pdf",
+            "url": "https://1792bourbon.com/1792-Bourbon-Holiday-Guide.pdf",
+            "domain": "1792bourbon.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.1792bourbon.com/Cocktails-Crafted-With-1792-Bourbon.pdf",
+            "url": "https://www.1792bourbon.com/Cocktails-Crafted-With-1792-Bourbon.pdf",
+            "domain": "1792bourbon.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          },
+          {
+            "title": "1792 Bourbon Single Barrel Bourbon",
+            "url": "https://1792bourbon.com/single-barrel?utm_source=openai",
+            "domain": "1792bourbon.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          },
+          {
+            "title": "1792 Single Barrel Bourbon",
+            "url": "https://distiller.com/spirits/1792-single-barrel-bourbon?utm_source=openai",
+            "domain": "distiller.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          },
+          {
+            "title": "1792 Single Barrel Bourbon (2023 Release) Review | Breaking Bourbon",
+            "url": "https://www.breakingbourbon.com/review/1792-single-barrel-bourbon-2023-release?utm_source=openai",
+            "domain": "breakingbourbon.com",
+            "description": "For **1792 Single Barrel Bourbon**, the strongest web evidence supports this as an **official Barton 1792 Distillery / 1792 Bourbon release**, not a separate non-Barton bottling. The official 1792 product page identifies it as **“Single Barrel”**, labels it **“Limited Edition,”** gives the strength as **46.85% ABV / 93.7 proof**, and states it is **“Distilled and Bottled by the Barton 1792 Distillery, Bardstown, KY.”** ([1792bourbon.com](https://1792bourbon.com/single-barrel?utm_source=openai))\n\nAn independent source, **Distiller**, also lists **1792 Single Barrel Bourbon** under the 1792 bran",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

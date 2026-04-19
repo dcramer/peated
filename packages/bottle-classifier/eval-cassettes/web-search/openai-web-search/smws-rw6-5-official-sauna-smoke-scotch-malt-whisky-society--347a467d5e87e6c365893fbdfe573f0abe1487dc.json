@@ -1,0 +1,674 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "SMWS RW6.5 official Sauna Smoke Scotch Malt Whisky Society"
+    },
+    "recordedAt": "2026-04-19T05:33:21.105Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "SMWS RW6.5 official Sauna Smoke Scotch Malt Whisky Society",
+          "summary": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+          "results": [
+            {
+              "title": "https://smws.com/cinnamon-sauna-smoke/",
+              "url": "https://smws.com/cinnamon-sauna-smoke/",
+              "domain": "smws.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/Members%20Charter%20A3%20Digital.pdf",
+              "url": "https://smws.com/content/Members%20Charter%20A3%20Digital.pdf",
+              "domain": "smws.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/64296/highland-park-1991-smws-4190",
+              "url": "https://www.whiskybase.com/whiskies/whisky/64296/highland-park-1991-smws-4190",
+              "domain": "whiskybase.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/247300/kyr-2017-smws-rw63",
+              "url": "https://www.whiskybase.com/whiskies/whisky/247300/kyr-2017-smws-rw63",
+              "domain": "whiskybase.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=zh-CN",
+              "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=zh-CN",
+              "domain": "whiskybase.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/142118/ardmore-2008-smws-66150",
+              "url": "https://www.whiskybase.com/whiskies/whisky/142118/ardmore-2008-smws-66150",
+              "domain": "whiskybase.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://scotchwhisky.com/magazine/latest-news/15721/exotic-cargo-becomes-first-smws-blended-malt/",
+              "url": "https://scotchwhisky.com/magazine/latest-news/15721/exotic-cargo-becomes-first-smws-blended-malt/",
+              "domain": "scotchwhisky.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/217100/bowmore-2004-smws-3340",
+              "url": "https://www.whiskybase.com/whiskies/whisky/217100/bowmore-2004-smws-3340",
+              "domain": "whiskybase.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/liquid-medicinal-smoke/",
+              "url": "https://smws.com/liquid-medicinal-smoke/",
+              "domain": "smws.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/136925/ardbeg-2008-smws-33137",
+              "url": "https://www.whiskybase.com/whiskies/whisky/136925/ardbeg-2008-smws-33137",
+              "domain": "whiskybase.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://scotchwhisky.com/magazine/latest-news/12867/smws-makeover-champions-age-and-flavour/",
+              "url": "https://scotchwhisky.com/magazine/latest-news/12867/smws-makeover-champions-age-and-flavour/",
+              "domain": "scotchwhisky.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://scotchwhisky.com/magazine/around-the-world/festivals-and-events/9483/feis-ile-2016-off-piste/",
+              "url": "https://scotchwhisky.com/magazine/around-the-world/festivals-and-events/9483/feis-ile-2016-off-piste/",
+              "domain": "scotchwhisky.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/all-whisky/whisky/?page=6",
+              "url": "https://smws.com/all-whisky/whisky/?page=6",
+              "domain": "smws.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/03%20MARCH%202025%20-%20ABERDEEN%20SD%20%282%29.pdf",
+              "url": "https://smws.com/content/03%20MARCH%202025%20-%20ABERDEEN%20SD%20%282%29.pdf",
+              "domain": "smws.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/2025%20-%20SMOAK%20T%26C%27s.pdf",
+              "url": "https://smws.com/content/2025%20-%20SMOAK%20T%26C%27s.pdf",
+              "domain": "smws.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/2503%20Cracking%20the%20code%20NEW%20LABEL%20UPDATE.pdf",
+              "url": "https://smws.com/content/2503%20Cracking%20the%20code%20NEW%20LABEL%20UPDATE.pdf",
+              "domain": "smws.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/EMT%2011.2024%20-%20NEWCASTLE%20-%206%20DRAM%20O%26R%20TASTING%20NOTES.pdf",
+              "url": "https://smws.com/content/EMT%2011.2024%20-%20NEWCASTLE%20-%206%20DRAM%20O%26R%20TASTING%20NOTES.pdf",
+              "domain": "smws.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/TN%20-%20O4%20APRIL%202025%20-%20SPRING%20SPIRITS%20AND%20FESTIVAL%20DREAMS%20%20%282%29.pdf",
+              "url": "https://smws.com/content/TN%20-%20O4%20APRIL%202025%20-%20SPRING%20SPIRITS%20AND%20FESTIVAL%20DREAMS%20%20%282%29.pdf",
+              "domain": "smws.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/appley-ever-after/",
+              "url": "https://smws.com/appley-ever-after/",
+              "domain": "smws.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.eu/appley-ever-after/",
+              "url": "https://smws.eu/appley-ever-after/",
+              "domain": "smws.eu",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/spirit-type/",
+              "url": "https://smws.com/spirit-type/",
+              "domain": "smws.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://peated.com/bottles/43260",
+              "url": "https://peated.com/bottles/43260",
+              "domain": "peated.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65",
+              "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65",
+              "domain": "whiskybase.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://shop.smws.ch/pi/en/Whisky/RW65-APPLEY-EVER-AFTER.html",
+              "url": "https://shop.smws.ch/pi/en/Whisky/RW65-APPLEY-EVER-AFTER.html",
+              "domain": "shop.smws.ch",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/all-whisky/whisky/rye-whisky/",
+              "url": "https://smws.com/all-whisky/whisky/rye-whisky/",
+              "domain": "smws.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.smws.ch/wp-content/uploads/2025/02/outturn-2502-en.pdf",
+              "url": "https://www.smws.ch/wp-content/uploads/2025/02/outturn-2502-en.pdf",
+              "domain": "smws.ch",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.eu/spirit-type/",
+              "url": "https://smws.eu/spirit-type/",
+              "domain": "smws.eu",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/archive?distillery_code=594&limit=12&page=168&whisky_flavour=71_78_76",
+              "url": "https://smws.com/archive?distillery_code=594&limit=12&page=168&whisky_flavour=71_78_76",
+              "domain": "smws.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskylibraryshop.co.za/",
+              "url": "https://whiskylibraryshop.co.za/",
+              "domain": "whiskylibraryshop.co.za",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/brands/single-cask-spirits.html?page=8",
+              "url": "https://smws.com/brands/single-cask-spirits.html?page=8",
+              "domain": "smws.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://visit.kyrodistillery.com/en",
+              "url": "https://visit.kyrodistillery.com/en",
+              "domain": "visit.kyrodistillery.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://kyrodistillery.com/products/kyro-malt-whisky-700ml",
+              "url": "https://kyrodistillery.com/products/kyro-malt-whisky-700ml",
+              "domain": "kyrodistillery.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://visit.kyrodistillery.com/en/pages/tasting",
+              "url": "https://visit.kyrodistillery.com/en/pages/tasting",
+              "domain": "visit.kyrodistillery.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://visit.kyrodistillery.com/en/products/kyro-tynnyrimaistelu-15-10",
+              "url": "https://visit.kyrodistillery.com/en/products/kyro-tynnyrimaistelu-15-10",
+              "domain": "visit.kyrodistillery.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://kyrodistillery.com/",
+              "url": "https://kyrodistillery.com/",
+              "domain": "kyrodistillery.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://visit.kyrodistillery.com/en/pages/kyrofest",
+              "url": "https://visit.kyrodistillery.com/en/pages/kyrofest",
+              "domain": "visit.kyrodistillery.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/kyro-sauna-stories-launch/",
+              "url": "https://www.masterofmalt.com/kyro-sauna-stories-launch/",
+              "domain": "masterofmalt.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://visit.kyrodistillery.com/en/pages/whisky-tasting",
+              "url": "https://visit.kyrodistillery.com/en/pages/whisky-tasting",
+              "domain": "visit.kyrodistillery.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://visit.kyrodistillery.com/en/pages/tapahtumat",
+              "url": "https://visit.kyrodistillery.com/en/pages/tapahtumat",
+              "domain": "visit.kyrodistillery.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/whiskies/kyro-distillery-company/kyro-single-cask-smoked-rye-finished-in-px-cask-mom-exclusive-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/kyro-distillery-company/kyro-single-cask-smoked-rye-finished-in-px-cask-mom-exclusive-whisky/",
+              "domain": "masterofmalt.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://visit.kyrodistillery.com/pages/kyrofest",
+              "url": "https://visit.kyrodistillery.com/pages/kyrofest",
+              "domain": "visit.kyrodistillery.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://loans.kyrodistillery.com/tietosuojaseloste/",
+              "url": "https://loans.kyrodistillery.com/tietosuojaseloste/",
+              "domain": "loans.kyrodistillery.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "Appley ever after",
+              "url": "https://smws.com/appley-ever-after/?utm_source=openai",
+              "domain": "smws.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "Kyrö 2018 SMWS RW6.5 - Ratings and reviews - Whiskybase",
+              "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65?utm_source=openai",
+              "domain": "whiskybase.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "Cinnamon sauna smoke",
+              "url": "https://smws.com/cinnamon-sauna-smoke/?utm_source=openai",
+              "domain": "smws.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            },
+            {
+              "title": "Kyrö Distillery",
+              "url": "https://kyrodistillery.com/?utm_source=openai",
+              "domain": "kyrodistillery.com",
+              "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "SMWS RW6.5 official Sauna Smoke Scotch Malt Whisky Society",
+        "summary": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+        "results": [
+          {
+            "title": "https://smws.com/cinnamon-sauna-smoke/",
+            "url": "https://smws.com/cinnamon-sauna-smoke/",
+            "domain": "smws.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/Members%20Charter%20A3%20Digital.pdf",
+            "url": "https://smws.com/content/Members%20Charter%20A3%20Digital.pdf",
+            "domain": "smws.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/64296/highland-park-1991-smws-4190",
+            "url": "https://www.whiskybase.com/whiskies/whisky/64296/highland-park-1991-smws-4190",
+            "domain": "whiskybase.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/247300/kyr-2017-smws-rw63",
+            "url": "https://www.whiskybase.com/whiskies/whisky/247300/kyr-2017-smws-rw63",
+            "domain": "whiskybase.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=zh-CN",
+            "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=zh-CN",
+            "domain": "whiskybase.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/142118/ardmore-2008-smws-66150",
+            "url": "https://www.whiskybase.com/whiskies/whisky/142118/ardmore-2008-smws-66150",
+            "domain": "whiskybase.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://scotchwhisky.com/magazine/latest-news/15721/exotic-cargo-becomes-first-smws-blended-malt/",
+            "url": "https://scotchwhisky.com/magazine/latest-news/15721/exotic-cargo-becomes-first-smws-blended-malt/",
+            "domain": "scotchwhisky.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/217100/bowmore-2004-smws-3340",
+            "url": "https://www.whiskybase.com/whiskies/whisky/217100/bowmore-2004-smws-3340",
+            "domain": "whiskybase.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/liquid-medicinal-smoke/",
+            "url": "https://smws.com/liquid-medicinal-smoke/",
+            "domain": "smws.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/136925/ardbeg-2008-smws-33137",
+            "url": "https://www.whiskybase.com/whiskies/whisky/136925/ardbeg-2008-smws-33137",
+            "domain": "whiskybase.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://scotchwhisky.com/magazine/latest-news/12867/smws-makeover-champions-age-and-flavour/",
+            "url": "https://scotchwhisky.com/magazine/latest-news/12867/smws-makeover-champions-age-and-flavour/",
+            "domain": "scotchwhisky.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://scotchwhisky.com/magazine/around-the-world/festivals-and-events/9483/feis-ile-2016-off-piste/",
+            "url": "https://scotchwhisky.com/magazine/around-the-world/festivals-and-events/9483/feis-ile-2016-off-piste/",
+            "domain": "scotchwhisky.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/all-whisky/whisky/?page=6",
+            "url": "https://smws.com/all-whisky/whisky/?page=6",
+            "domain": "smws.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/03%20MARCH%202025%20-%20ABERDEEN%20SD%20%282%29.pdf",
+            "url": "https://smws.com/content/03%20MARCH%202025%20-%20ABERDEEN%20SD%20%282%29.pdf",
+            "domain": "smws.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/2025%20-%20SMOAK%20T%26C%27s.pdf",
+            "url": "https://smws.com/content/2025%20-%20SMOAK%20T%26C%27s.pdf",
+            "domain": "smws.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/2503%20Cracking%20the%20code%20NEW%20LABEL%20UPDATE.pdf",
+            "url": "https://smws.com/content/2503%20Cracking%20the%20code%20NEW%20LABEL%20UPDATE.pdf",
+            "domain": "smws.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/EMT%2011.2024%20-%20NEWCASTLE%20-%206%20DRAM%20O%26R%20TASTING%20NOTES.pdf",
+            "url": "https://smws.com/content/EMT%2011.2024%20-%20NEWCASTLE%20-%206%20DRAM%20O%26R%20TASTING%20NOTES.pdf",
+            "domain": "smws.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/TN%20-%20O4%20APRIL%202025%20-%20SPRING%20SPIRITS%20AND%20FESTIVAL%20DREAMS%20%20%282%29.pdf",
+            "url": "https://smws.com/content/TN%20-%20O4%20APRIL%202025%20-%20SPRING%20SPIRITS%20AND%20FESTIVAL%20DREAMS%20%20%282%29.pdf",
+            "domain": "smws.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/appley-ever-after/",
+            "url": "https://smws.com/appley-ever-after/",
+            "domain": "smws.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.eu/appley-ever-after/",
+            "url": "https://smws.eu/appley-ever-after/",
+            "domain": "smws.eu",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/spirit-type/",
+            "url": "https://smws.com/spirit-type/",
+            "domain": "smws.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://peated.com/bottles/43260",
+            "url": "https://peated.com/bottles/43260",
+            "domain": "peated.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65",
+            "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65",
+            "domain": "whiskybase.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://shop.smws.ch/pi/en/Whisky/RW65-APPLEY-EVER-AFTER.html",
+            "url": "https://shop.smws.ch/pi/en/Whisky/RW65-APPLEY-EVER-AFTER.html",
+            "domain": "shop.smws.ch",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/all-whisky/whisky/rye-whisky/",
+            "url": "https://smws.com/all-whisky/whisky/rye-whisky/",
+            "domain": "smws.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.smws.ch/wp-content/uploads/2025/02/outturn-2502-en.pdf",
+            "url": "https://www.smws.ch/wp-content/uploads/2025/02/outturn-2502-en.pdf",
+            "domain": "smws.ch",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.eu/spirit-type/",
+            "url": "https://smws.eu/spirit-type/",
+            "domain": "smws.eu",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/archive?distillery_code=594&limit=12&page=168&whisky_flavour=71_78_76",
+            "url": "https://smws.com/archive?distillery_code=594&limit=12&page=168&whisky_flavour=71_78_76",
+            "domain": "smws.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskylibraryshop.co.za/",
+            "url": "https://whiskylibraryshop.co.za/",
+            "domain": "whiskylibraryshop.co.za",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/brands/single-cask-spirits.html?page=8",
+            "url": "https://smws.com/brands/single-cask-spirits.html?page=8",
+            "domain": "smws.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://visit.kyrodistillery.com/en",
+            "url": "https://visit.kyrodistillery.com/en",
+            "domain": "visit.kyrodistillery.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://kyrodistillery.com/products/kyro-malt-whisky-700ml",
+            "url": "https://kyrodistillery.com/products/kyro-malt-whisky-700ml",
+            "domain": "kyrodistillery.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://visit.kyrodistillery.com/en/pages/tasting",
+            "url": "https://visit.kyrodistillery.com/en/pages/tasting",
+            "domain": "visit.kyrodistillery.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://visit.kyrodistillery.com/en/products/kyro-tynnyrimaistelu-15-10",
+            "url": "https://visit.kyrodistillery.com/en/products/kyro-tynnyrimaistelu-15-10",
+            "domain": "visit.kyrodistillery.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://kyrodistillery.com/",
+            "url": "https://kyrodistillery.com/",
+            "domain": "kyrodistillery.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://visit.kyrodistillery.com/en/pages/kyrofest",
+            "url": "https://visit.kyrodistillery.com/en/pages/kyrofest",
+            "domain": "visit.kyrodistillery.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/kyro-sauna-stories-launch/",
+            "url": "https://www.masterofmalt.com/kyro-sauna-stories-launch/",
+            "domain": "masterofmalt.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://visit.kyrodistillery.com/en/pages/whisky-tasting",
+            "url": "https://visit.kyrodistillery.com/en/pages/whisky-tasting",
+            "domain": "visit.kyrodistillery.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://visit.kyrodistillery.com/en/pages/tapahtumat",
+            "url": "https://visit.kyrodistillery.com/en/pages/tapahtumat",
+            "domain": "visit.kyrodistillery.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/whiskies/kyro-distillery-company/kyro-single-cask-smoked-rye-finished-in-px-cask-mom-exclusive-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/kyro-distillery-company/kyro-single-cask-smoked-rye-finished-in-px-cask-mom-exclusive-whisky/",
+            "domain": "masterofmalt.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://visit.kyrodistillery.com/pages/kyrofest",
+            "url": "https://visit.kyrodistillery.com/pages/kyrofest",
+            "domain": "visit.kyrodistillery.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://loans.kyrodistillery.com/tietosuojaseloste/",
+            "url": "https://loans.kyrodistillery.com/tietosuojaseloste/",
+            "domain": "loans.kyrodistillery.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Appley ever after",
+            "url": "https://smws.com/appley-ever-after/?utm_source=openai",
+            "domain": "smws.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Kyrö 2018 SMWS RW6.5 - Ratings and reviews - Whiskybase",
+            "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65?utm_source=openai",
+            "domain": "whiskybase.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Cinnamon sauna smoke",
+            "url": "https://smws.com/cinnamon-sauna-smoke/?utm_source=openai",
+            "domain": "smws.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Kyrö Distillery",
+            "url": "https://kyrodistillery.com/?utm_source=openai",
+            "domain": "kyrodistillery.com",
+            "description": "The **official SMWS bottle is not “Sauna Smoke” for RW6.5**.  \nFor **SMWS RW6.5**, the official release name is **“Appley ever after.”** The official SMWS listing confirms **cask no. RW6.5**, **ABV 56.0%**, **age 6 years**, **distilled 11 January 2018**, **cask type 1st fill #3 char barrel**, **spirit type rye whisky**, and **region Finland**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n\nAn independent non-retailer source, Whiskybase, matches those same release traits and additionally identifies the **distillery as Kyrö Distillery Company**, the **bottler as The Scotch ",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

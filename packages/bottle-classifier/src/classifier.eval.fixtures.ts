@@ -37,6 +37,8 @@ export type ClassifierEvalCase = {
   expected: ClassifierEvalExpectation;
 };
 
+// Add real-bottle classifier regressions here so the workflow scenarios stay
+// fixture-driven and share one maintainable corpus.
 export function defineClassifierEvalCase(
   testCase: ClassifierEvalCase,
 ): ClassifierEvalCase {

@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Lagavulin Distillers Edition 2023 release year official annual release"
+    },
+    "recordedAt": "2026-04-19T15:44:56.893Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Lagavulin Distillers Edition 2023 release year official annual release",
+          "summary": "Yes — **Lagavulin Distillers Edition is part of Diageo’s official annual Distillers Edition series**, and the **2023 release** is an **official annual release**, not a one-off retailer naming. Diageo’s Malts site says the Distillers Editions “have been an annual release” since 1997, and independent sources specifically",
+          "results": [
+            {
+              "title": "Lagavulin Distillers Edition (2023 Release)",
+              "url": "https://distiller.com/spirits/lagavulin-distillers-edition-2023-release",
+              "domain": "distiller.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://peated.com/bottles/450",
+              "url": "https://peated.com/bottles/450",
+              "domain": "peated.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.forbes.com/sites/joemicallef/2023/07/15/tasting-diageos-2023-distillers-edition-series/",
+              "url": "https://www.forbes.com/sites/joemicallef/2023/07/15/tasting-diageos-2023-distillers-edition-series/",
+              "domain": "forbes.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/250953/lagavulin-the-distillers-edition",
+              "url": "https://www.whiskybase.com/whiskies/whisky/250953/lagavulin-the-distillers-edition",
+              "domain": "whiskybase.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskycast.com/ratings/lagavulin-2023-distillers-edition/",
+              "url": "https://whiskycast.com/ratings/lagavulin-2023-distillers-edition/",
+              "domain": "whiskycast.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "url": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "domain": "malts.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Lagavulin Distillers Edition 2023 release year official annual release",
+        "summary": "Yes — **Lagavulin Distillers Edition is part of Diageo’s official annual Distillers Edition series**, and the **2023 release** is an **official annual release**, not a one-off retailer naming. Diageo’s Malts site says the Distillers Editions “have been an annual release” since 1997, and independent sources specifically",
+        "results": [
+          {
+            "title": "Lagavulin Distillers Edition (2023 Release)",
+            "url": "https://distiller.com/spirits/lagavulin-distillers-edition-2023-release",
+            "domain": "distiller.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://peated.com/bottles/450",
+            "url": "https://peated.com/bottles/450",
+            "domain": "peated.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.forbes.com/sites/joemicallef/2023/07/15/tasting-diageos-2023-distillers-edition-series/",
+            "url": "https://www.forbes.com/sites/joemicallef/2023/07/15/tasting-diageos-2023-distillers-edition-series/",
+            "domain": "forbes.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/250953/lagavulin-the-distillers-edition",
+            "url": "https://www.whiskybase.com/whiskies/whisky/250953/lagavulin-the-distillers-edition",
+            "domain": "whiskybase.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskycast.com/ratings/lagavulin-2023-distillers-edition/",
+            "url": "https://whiskycast.com/ratings/lagavulin-2023-distillers-edition/",
+            "domain": "whiskycast.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "url": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "domain": "malts.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

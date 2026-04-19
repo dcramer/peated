@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "official Lagavulin Distillers Edition Lagavulin"
+    },
+    "recordedAt": "2026-04-19T15:44:10.344Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "official Lagavulin Distillers Edition Lagavulin",
+          "summary": "Official and independent sources support this reference as **Lagavulin Distillers Edition**, an **official bottling** from **Lagavulin / Classic Malts**, **double matured** in **Pedro Ximénez-seasoned cask wood**, and typically bottled at **43% ABV**. The official Malts page specifically identifies a **2006 Lagavulin**",
+          "results": [
+            {
+              "title": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition.html",
+              "url": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition.html",
+              "domain": "whisky.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition-20.html",
+              "url": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition-20.html",
+              "domain": "whisky.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition-1.html",
+              "url": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition-1.html",
+              "domain": "whisky.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition-2019-43-07l.html",
+              "url": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition-2019-43-07l.html",
+              "domain": "whisky.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition-24.html",
+              "url": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition-24.html",
+              "domain": "whisky.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+              "url": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+              "domain": "malts.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "official Lagavulin Distillers Edition Lagavulin",
+        "summary": "Official and independent sources support this reference as **Lagavulin Distillers Edition**, an **official bottling** from **Lagavulin / Classic Malts**, **double matured** in **Pedro Ximénez-seasoned cask wood**, and typically bottled at **43% ABV**. The official Malts page specifically identifies a **2006 Lagavulin**",
+        "results": [
+          {
+            "title": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition.html",
+            "url": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition.html",
+            "domain": "whisky.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition-20.html",
+            "url": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition-20.html",
+            "domain": "whisky.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition-1.html",
+            "url": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition-1.html",
+            "domain": "whisky.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition-2019-43-07l.html",
+            "url": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition-2019-43-07l.html",
+            "domain": "whisky.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition-24.html",
+            "url": "https://www.whisky.com/whisky-database/details/lagavulin-distillers-edition-24.html",
+            "domain": "whisky.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+            "url": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+            "domain": "malts.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

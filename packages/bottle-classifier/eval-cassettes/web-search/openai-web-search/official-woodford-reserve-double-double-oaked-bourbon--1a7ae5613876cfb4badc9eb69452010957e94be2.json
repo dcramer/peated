@@ -1,0 +1,520 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "official Woodford Reserve Double Double Oaked bourbon"
+    },
+    "recordedAt": "2026-04-19T05:20:51.318Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "official Woodford Reserve Double Double Oaked bourbon",
+          "summary": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+          "results": [
+            {
+              "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+              "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+              "domain": "woodfordreserve.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+              "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+              "domain": "woodfordreserve.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.prnewswire.com/news-releases/woodford-reserve-introduces-first-permanent-line-extension-in-15-year-history-137570558.html",
+              "url": "https://www.prnewswire.com/news-releases/woodford-reserve-introduces-first-permanent-line-extension-in-15-year-history-137570558.html",
+              "domain": "prnewswire.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.trendhunter.com/trends/double-double-oaked-bourbon",
+              "url": "https://www.trendhunter.com/trends/double-double-oaked-bourbon",
+              "domain": "trendhunter.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.woodfordreserve.com/fr/notre-whisky/",
+              "url": "https://www.woodfordreserve.com/fr/notre-whisky/",
+              "domain": "woodfordreserve.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.woodfordreserve.com/en-au/whiskey/distillery-series/",
+              "url": "https://www.woodfordreserve.com/en-au/whiskey/distillery-series/",
+              "domain": "woodfordreserve.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/woodford-reserve-double-oaked",
+              "url": "https://distiller.com/spirits/woodford-reserve-double-oaked",
+              "domain": "distiller.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.woodfordreserve.com/our-whiskey/",
+              "url": "https://www.woodfordreserve.com/our-whiskey/",
+              "domain": "woodfordreserve.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.woodfordreserve.com/cocktail/double-oaked-bourbon-orange-fizz/",
+              "url": "https://www.woodfordreserve.com/cocktail/double-oaked-bourbon-orange-fizz/",
+              "domain": "woodfordreserve.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://vinepair.com/booze-news/woodford-reserve-double-double-oaked-release-2024/",
+              "url": "https://vinepair.com/booze-news/woodford-reserve-double-double-oaked-release-2024/",
+              "domain": "vinepair.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.mensjournal.com/drink/woodford-reserve-double-double-oaked-bourbon-release",
+              "url": "https://www.mensjournal.com/drink/woodford-reserve-double-double-oaked-bourbon-release",
+              "domain": "mensjournal.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://americanwhiskeymag.com/reviews/woodford-reserve-double-oaked/",
+              "url": "https://americanwhiskeymag.com/reviews/woodford-reserve-double-oaked/",
+              "domain": "americanwhiskeymag.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.sec.gov/Archives/edgar/data/14693/000001469325000066/bfb-2025ir_v8xadaxsecx.pdf",
+              "url": "https://www.sec.gov/Archives/edgar/data/14693/000001469325000066/bfb-2025ir_v8xadaxsecx.pdf",
+              "domain": "sec.gov",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/1cdn44r/review_279_woodford_reserved_double_oaked_bourbon/",
+              "url": "https://www.reddit.com/r/bourbon/comments/1cdn44r/review_279_woodford_reserved_double_oaked_bourbon/",
+              "domain": "reddit.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/1ifimx3",
+              "url": "https://www.reddit.com/r/bourbon/comments/1ifimx3",
+              "domain": "reddit.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Atlantawhiskey/comments/1i0icwz",
+              "url": "https://www.reddit.com/r/Atlantawhiskey/comments/1i0icwz",
+              "domain": "reddit.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/whiskey/comments/10p556y",
+              "url": "https://www.reddit.com/r/whiskey/comments/10p556y",
+              "domain": "reddit.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/WhiskeyTribe/comments/1j3klg5",
+              "url": "https://www.reddit.com/r/WhiskeyTribe/comments/1j3klg5",
+              "domain": "reddit.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/pdxwhisky/comments/1j4jvpe",
+              "url": "https://www.reddit.com/r/pdxwhisky/comments/1j4jvpe",
+              "domain": "reddit.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/1155gis",
+              "url": "https://www.reddit.com/r/bourbon/comments/1155gis",
+              "domain": "reddit.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/1ik6qqs",
+              "url": "https://www.reddit.com/r/bourbon/comments/1ik6qqs",
+              "domain": "reddit.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/rofig0",
+              "url": "https://www.reddit.com/r/bourbon/comments/rofig0",
+              "domain": "reddit.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/s51k2r",
+              "url": "https://www.reddit.com/r/bourbon/comments/s51k2r",
+              "domain": "reddit.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/110mrol",
+              "url": "https://www.reddit.com/r/bourbon/comments/110mrol",
+              "domain": "reddit.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/DMVWhisky/comments/1i0gs61",
+              "url": "https://www.reddit.com/r/DMVWhisky/comments/1i0gs61",
+              "domain": "reddit.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.hollywoodcasinostlouis.com/-/media/png/midwest/hollywood-st-louis/pdfs/restaurant-menu-pdfs/whiskey-guide-january-2019.pdf?hash=1B6AEAC3DD173462726FA75B04F24923953B4D04&la=en",
+              "url": "https://www.hollywoodcasinostlouis.com/-/media/png/midwest/hollywood-st-louis/pdfs/restaurant-menu-pdfs/whiskey-guide-january-2019.pdf?hash=1B6AEAC3DD173462726FA75B04F24923953B4D04&la=en",
+              "domain": "hollywoodcasinostlouis.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.hancocks.co.nz/pdf/99008.pdf",
+              "url": "https://www.hancocks.co.nz/pdf/99008.pdf",
+              "domain": "hancocks.co.nz",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://alabcboard.gov/sites/default/files/inline-files/SBHM%20Weekly%20schedule%20%26%20Products.pdf",
+              "url": "https://alabcboard.gov/sites/default/files/inline-files/SBHM%20Weekly%20schedule%20%26%20Products.pdf",
+              "domain": "alabcboard.gov",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://cdnc.heyzine.com/files/uploaded/v3/1f89a5bf773d03c5428087988d1809055cc8572d.pdf",
+              "url": "https://cdnc.heyzine.com/files/uploaded/v3/1f89a5bf773d03c5428087988d1809055cc8572d.pdf",
+              "domain": "cdnc.heyzine.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://static1.squarespace.com/static/60bea313a5c6a504c6dfe531/t/6202a150ab86f61002df5d96/1644339559649/DB_FebMar22_Spirits%2BReport%2BBourbonWhiskey.pdf",
+              "url": "https://static1.squarespace.com/static/60bea313a5c6a504c6dfe531/t/6202a150ab86f61002df5d96/1644339559649/DB_FebMar22_Spirits%2BReport%2BBourbonWhiskey.pdf",
+              "domain": "static1.squarespace.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://en.wikipedia.org/wiki/Woodford_Reserve",
+              "url": "https://en.wikipedia.org/wiki/Woodford_Reserve",
+              "domain": "en.wikipedia.org",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://en.wikipedia.org/wiki/Old_Forester",
+              "url": "https://en.wikipedia.org/wiki/Old_Forester",
+              "domain": "en.wikipedia.org",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "Double Double Oaked - Woodford Reserve",
+              "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai",
+              "domain": "woodfordreserve.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "Distillery Series - Woodford Reserve",
+              "url": "https://www.woodfordreserve.com/en-au/whiskey/distillery-series/?utm_source=openai",
+              "domain": "woodfordreserve.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            },
+            {
+              "title": "Woodford Reserve Re-Releases Fan-Favorite Double Double Oaked | VinePair",
+              "url": "https://vinepair.com/booze-news/woodford-reserve-double-double-oaked-release-2024/?utm_source=openai",
+              "domain": "vinepair.com",
+              "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "official Woodford Reserve Double Double Oaked bourbon",
+        "summary": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+        "results": [
+          {
+            "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+            "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.prnewswire.com/news-releases/woodford-reserve-introduces-first-permanent-line-extension-in-15-year-history-137570558.html",
+            "url": "https://www.prnewswire.com/news-releases/woodford-reserve-introduces-first-permanent-line-extension-in-15-year-history-137570558.html",
+            "domain": "prnewswire.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.trendhunter.com/trends/double-double-oaked-bourbon",
+            "url": "https://www.trendhunter.com/trends/double-double-oaked-bourbon",
+            "domain": "trendhunter.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.woodfordreserve.com/fr/notre-whisky/",
+            "url": "https://www.woodfordreserve.com/fr/notre-whisky/",
+            "domain": "woodfordreserve.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.woodfordreserve.com/en-au/whiskey/distillery-series/",
+            "url": "https://www.woodfordreserve.com/en-au/whiskey/distillery-series/",
+            "domain": "woodfordreserve.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/woodford-reserve-double-oaked",
+            "url": "https://distiller.com/spirits/woodford-reserve-double-oaked",
+            "domain": "distiller.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.woodfordreserve.com/our-whiskey/",
+            "url": "https://www.woodfordreserve.com/our-whiskey/",
+            "domain": "woodfordreserve.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.woodfordreserve.com/cocktail/double-oaked-bourbon-orange-fizz/",
+            "url": "https://www.woodfordreserve.com/cocktail/double-oaked-bourbon-orange-fizz/",
+            "domain": "woodfordreserve.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://vinepair.com/booze-news/woodford-reserve-double-double-oaked-release-2024/",
+            "url": "https://vinepair.com/booze-news/woodford-reserve-double-double-oaked-release-2024/",
+            "domain": "vinepair.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.mensjournal.com/drink/woodford-reserve-double-double-oaked-bourbon-release",
+            "url": "https://www.mensjournal.com/drink/woodford-reserve-double-double-oaked-bourbon-release",
+            "domain": "mensjournal.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://americanwhiskeymag.com/reviews/woodford-reserve-double-oaked/",
+            "url": "https://americanwhiskeymag.com/reviews/woodford-reserve-double-oaked/",
+            "domain": "americanwhiskeymag.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.sec.gov/Archives/edgar/data/14693/000001469325000066/bfb-2025ir_v8xadaxsecx.pdf",
+            "url": "https://www.sec.gov/Archives/edgar/data/14693/000001469325000066/bfb-2025ir_v8xadaxsecx.pdf",
+            "domain": "sec.gov",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/1cdn44r/review_279_woodford_reserved_double_oaked_bourbon/",
+            "url": "https://www.reddit.com/r/bourbon/comments/1cdn44r/review_279_woodford_reserved_double_oaked_bourbon/",
+            "domain": "reddit.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/1ifimx3",
+            "url": "https://www.reddit.com/r/bourbon/comments/1ifimx3",
+            "domain": "reddit.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Atlantawhiskey/comments/1i0icwz",
+            "url": "https://www.reddit.com/r/Atlantawhiskey/comments/1i0icwz",
+            "domain": "reddit.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/whiskey/comments/10p556y",
+            "url": "https://www.reddit.com/r/whiskey/comments/10p556y",
+            "domain": "reddit.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/WhiskeyTribe/comments/1j3klg5",
+            "url": "https://www.reddit.com/r/WhiskeyTribe/comments/1j3klg5",
+            "domain": "reddit.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/pdxwhisky/comments/1j4jvpe",
+            "url": "https://www.reddit.com/r/pdxwhisky/comments/1j4jvpe",
+            "domain": "reddit.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/1155gis",
+            "url": "https://www.reddit.com/r/bourbon/comments/1155gis",
+            "domain": "reddit.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/1ik6qqs",
+            "url": "https://www.reddit.com/r/bourbon/comments/1ik6qqs",
+            "domain": "reddit.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/rofig0",
+            "url": "https://www.reddit.com/r/bourbon/comments/rofig0",
+            "domain": "reddit.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/s51k2r",
+            "url": "https://www.reddit.com/r/bourbon/comments/s51k2r",
+            "domain": "reddit.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/110mrol",
+            "url": "https://www.reddit.com/r/bourbon/comments/110mrol",
+            "domain": "reddit.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/DMVWhisky/comments/1i0gs61",
+            "url": "https://www.reddit.com/r/DMVWhisky/comments/1i0gs61",
+            "domain": "reddit.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.hollywoodcasinostlouis.com/-/media/png/midwest/hollywood-st-louis/pdfs/restaurant-menu-pdfs/whiskey-guide-january-2019.pdf?hash=1B6AEAC3DD173462726FA75B04F24923953B4D04&la=en",
+            "url": "https://www.hollywoodcasinostlouis.com/-/media/png/midwest/hollywood-st-louis/pdfs/restaurant-menu-pdfs/whiskey-guide-january-2019.pdf?hash=1B6AEAC3DD173462726FA75B04F24923953B4D04&la=en",
+            "domain": "hollywoodcasinostlouis.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.hancocks.co.nz/pdf/99008.pdf",
+            "url": "https://www.hancocks.co.nz/pdf/99008.pdf",
+            "domain": "hancocks.co.nz",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://alabcboard.gov/sites/default/files/inline-files/SBHM%20Weekly%20schedule%20%26%20Products.pdf",
+            "url": "https://alabcboard.gov/sites/default/files/inline-files/SBHM%20Weekly%20schedule%20%26%20Products.pdf",
+            "domain": "alabcboard.gov",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://cdnc.heyzine.com/files/uploaded/v3/1f89a5bf773d03c5428087988d1809055cc8572d.pdf",
+            "url": "https://cdnc.heyzine.com/files/uploaded/v3/1f89a5bf773d03c5428087988d1809055cc8572d.pdf",
+            "domain": "cdnc.heyzine.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://static1.squarespace.com/static/60bea313a5c6a504c6dfe531/t/6202a150ab86f61002df5d96/1644339559649/DB_FebMar22_Spirits%2BReport%2BBourbonWhiskey.pdf",
+            "url": "https://static1.squarespace.com/static/60bea313a5c6a504c6dfe531/t/6202a150ab86f61002df5d96/1644339559649/DB_FebMar22_Spirits%2BReport%2BBourbonWhiskey.pdf",
+            "domain": "static1.squarespace.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://en.wikipedia.org/wiki/Woodford_Reserve",
+            "url": "https://en.wikipedia.org/wiki/Woodford_Reserve",
+            "domain": "en.wikipedia.org",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://en.wikipedia.org/wiki/Old_Forester",
+            "url": "https://en.wikipedia.org/wiki/Old_Forester",
+            "domain": "en.wikipedia.org",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "Double Double Oaked - Woodford Reserve",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai",
+            "domain": "woodfordreserve.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "Distillery Series - Woodford Reserve",
+            "url": "https://www.woodfordreserve.com/en-au/whiskey/distillery-series/?utm_source=openai",
+            "domain": "woodfordreserve.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Re-Releases Fan-Favorite Double Double Oaked | VinePair",
+            "url": "https://vinepair.com/booze-news/woodford-reserve-double-double-oaked-release-2024/?utm_source=openai",
+            "domain": "vinepair.com",
+            "description": "The **official bottle page** for **Woodford Reserve Double Double Oaked** confirms it is a **double-barreled bourbon** and lists the bottling strength as **90.4 proof**—so the “90.4” is **proof, not ABV**. The official description also says it spends an **extended slumber in a second, custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai))\n\nA second **official Woodford Reserve page** for the **Distillery Series** confirms **Double Double Oaked** as part of that lineup and ind",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

@@ -194,6 +194,8 @@ It may use:
 - local entity search
 - web search
 
+Web search should stay narrow and targeted at a concrete unresolved trait. In normal cases the classifier should stop after one web search call; a second call is reserved for weak or contradictory first-pass results.
+
 It returns a reviewed classification result with:
 
 - `status = ignored | classified`

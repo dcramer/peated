@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Glenglassaugh 1978 Rare Cask Release Batch 1 35 year official"
+    },
+    "recordedAt": "2026-04-19T16:21:39.399Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Glenglassaugh 1978 Rare Cask Release Batch 1 35 year official",
+          "summary": "I found good support that **“Glenglassaugh 1978 Rare Cask Release Batch 1 35 year official”** refers to an **official Glenglassaugh single-cask release** from **Batch 1**, but there are **two different 1978/35yo bottlings** in that batch, not just one:\n\n- **Cask #1803** — **35 years old**, **finished in a Sherry Hogshe",
+          "results": [
+            {
+              "title": "https://www.abbeywhisky.com/blogs/blog/glenglassaugh-rare-cask-releases-batch-1",
+              "url": "https://www.abbeywhisky.com/blogs/blog/glenglassaugh-rare-cask-releases-batch-1",
+              "domain": "abbeywhisky.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://thewhiskyphiles.com/2014/10/01/glenglassaugh-35-year-old-1978-cask-1810-42-9-benriach-glendronach-distilleries/",
+              "url": "https://thewhiskyphiles.com/2014/10/01/glenglassaugh-35-year-old-1978-cask-1810-42-9-benriach-glendronach-distilleries/",
+              "domain": "thewhiskyphiles.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://peated.com/bottles/4070",
+              "url": "https://peated.com/bottles/4070",
+              "domain": "peated.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.thewhiskyexchange.com/p/24154/glenglassaugh-1978-35-year-old-sherry-finish",
+              "url": "https://www.thewhiskyexchange.com/p/24154/glenglassaugh-1978-35-year-old-sherry-finish",
+              "domain": "thewhiskyexchange.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.glenglassaugh.com/glenglassaugh-releases-batch-2-of-its-rare-cask-series/",
+              "url": "https://www.glenglassaugh.com/glenglassaugh-releases-batch-2-of-its-rare-cask-series/",
+              "domain": "glenglassaugh.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.lochfynewhiskies.com/glenglassaugh-1978-batch-1-1803-35-year-old",
+              "url": "https://www.lochfynewhiskies.com/glenglassaugh-1978-batch-1-1803-35-year-old",
+              "domain": "lochfynewhiskies.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Glenglassaugh 1978 Rare Cask Release Batch 1 35 year official",
+        "summary": "I found good support that **“Glenglassaugh 1978 Rare Cask Release Batch 1 35 year official”** refers to an **official Glenglassaugh single-cask release** from **Batch 1**, but there are **two different 1978/35yo bottlings** in that batch, not just one:\n\n- **Cask #1803** — **35 years old**, **finished in a Sherry Hogshe",
+        "results": [
+          {
+            "title": "https://www.abbeywhisky.com/blogs/blog/glenglassaugh-rare-cask-releases-batch-1",
+            "url": "https://www.abbeywhisky.com/blogs/blog/glenglassaugh-rare-cask-releases-batch-1",
+            "domain": "abbeywhisky.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://thewhiskyphiles.com/2014/10/01/glenglassaugh-35-year-old-1978-cask-1810-42-9-benriach-glendronach-distilleries/",
+            "url": "https://thewhiskyphiles.com/2014/10/01/glenglassaugh-35-year-old-1978-cask-1810-42-9-benriach-glendronach-distilleries/",
+            "domain": "thewhiskyphiles.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://peated.com/bottles/4070",
+            "url": "https://peated.com/bottles/4070",
+            "domain": "peated.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.thewhiskyexchange.com/p/24154/glenglassaugh-1978-35-year-old-sherry-finish",
+            "url": "https://www.thewhiskyexchange.com/p/24154/glenglassaugh-1978-35-year-old-sherry-finish",
+            "domain": "thewhiskyexchange.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.glenglassaugh.com/glenglassaugh-releases-batch-2-of-its-rare-cask-series/",
+            "url": "https://www.glenglassaugh.com/glenglassaugh-releases-batch-2-of-its-rare-cask-series/",
+            "domain": "glenglassaugh.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.lochfynewhiskies.com/glenglassaugh-1978-batch-1-1803-35-year-old",
+            "url": "https://www.lochfynewhiskies.com/glenglassaugh-1978-batch-1-1803-35-year-old",
+            "domain": "lochfynewhiskies.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

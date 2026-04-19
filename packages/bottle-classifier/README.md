@@ -150,10 +150,10 @@ These are the rules to preserve when iterating on the classifier:
 - [`src/legacyReleaseRepairResolution.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/legacyReleaseRepairResolution.test.ts): package-local repair-resolution adapter coverage
 - [`src/smws.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/smws.test.ts): package-local SMWS parsing coverage
 - [`src/classifier.eval.fixtures.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifier.eval.fixtures.ts): production-shaped eval cases
-- [`src/classifier.eval.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifier.eval.test.ts): live eval harness
+- [`src/classifier.eval.scenarios.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifier.eval.scenarios.ts): scenario grouping for live classifier evals
+- [`src/classifier.eval.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifier.eval.test.ts): live classifier eval harness grouped into `new bottles`, `match existing`, `corrections`, and `ignore or reject`
 - [`src/normalizationCorpus.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/normalizationCorpus.ts): shared normalization corpus with expected bottle/release boundaries
-- [`src/normalizationCorpus.eval.fixtures.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/normalizationCorpus.eval.fixtures.ts): curated corpus subset for classifier evals
-- [`src/normalizationCorpus.eval.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/normalizationCorpus.eval.test.ts): live corpus eval harness
+- [`src/normalizationCorpus.eval.fixtures.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/normalizationCorpus.eval.fixtures.ts): curated normalization-boundary subset consumed by the `new bottles` live eval scenario
 - [`src/legacyReleaseRepairResolution.eval.fixtures.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/legacyReleaseRepairResolution.eval.fixtures.ts): repair-boundary eval cases derived from the shared corpus and reusable-parent safety rules
 - [`src/legacyReleaseRepairResolution.eval.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/legacyReleaseRepairResolution.eval.test.ts): live repair-boundary eval harness
 
@@ -195,6 +195,24 @@ The eval command loads the repo-root `.env` and then `.env.local`.
 classifier pass. `OPENAI_EVAL_MODEL` defaults to `gpt-5-mini` for judging so
 routine evals stay cheaper by default; override either if you want a different
 cost or quality tradeoff. `BRAVE_API_KEY` is optional.
+
+Live evals now cache classifier web-search tool results under the committed
+`packages/bottle-classifier/eval-cassettes/web-search/` directory so repeat
+runs do not keep paying for the same real-world searches. Each search is stored
+as its own JSON cassette under a tool-specific subdirectory. The default cache
+mode is `replay_or_record`: replay an existing cassette if present, otherwise do
+the live search once and record the normalized search evidence for later runs.
+The cache writes canonical per-tool lookup keys and keeps replay compatibility
+with older cassette keys so prompt/tool cleanup does not force mass cassette
+regeneration just because incidental cache-key fields changed.
+
+Useful cache controls:
+
+- `pnpm evals:web-cache:clear` clears recorded cassette files while keeping the committed cache root
+- `BOTTLE_CLASSIFIER_EVAL_WEB_SEARCH_CACHE_MODE=replay_only` fails on a cache miss instead of hitting the network
+- `BOTTLE_CLASSIFIER_EVAL_WEB_SEARCH_CACHE_MODE=refresh` re-runs live searches and overwrites matching cassettes
+- `BOTTLE_CLASSIFIER_EVAL_WEB_SEARCH_CACHE_MODE=live` bypasses the cache completely
+- `BOTTLE_CLASSIFIER_EVAL_WEB_SEARCH_CACHE_DIR=/custom/cache/dir` overrides the cassette directory
 
 ## Related Docs
 

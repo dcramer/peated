@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Jura 12 official single malt Scotch whisky 40%"
+    },
+    "recordedAt": "2026-04-19T15:43:12.488Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Jura 12 official single malt Scotch whisky 40%",
+          "summary": "I found support that this refers to **Jura 12 Year Old Single Malt Scotch Whisky**, bottled at **40% ABV**.\n\nWhat the sources confirm:\n- **Producer/distillery:** Jura / Isle of Jura Distillery. ([iwsc.net](https://www.iwsc.net/results/detail/89605/12-yo-jura-single-malt-scotch-whisky?utm_source=openai))\n- **Age stateme",
+          "results": [
+            {
+              "title": "https://www.masterofmalt.com/whiskies/jura/jura-12-year-old-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/jura/jura-12-year-old-whisky/",
+              "domain": "masterofmalt.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/jura-12-year",
+              "url": "https://distiller.com/spirits/jura-12-year",
+              "domain": "distiller.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/27591/isle-of-jura-12-year-old",
+              "url": "https://www.whiskybase.com/whiskies/whisky/27591/isle-of-jura-12-year-old",
+              "domain": "whiskybase.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/105304/isle-of-jura-12-year-old",
+              "url": "https://www.whiskybase.com/whiskies/whisky/105304/isle-of-jura-12-year-old",
+              "domain": "whiskybase.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.forbes.com/sites/joemicallef/2025/12/04/the-best-highland-single-malt-whisky-according-to-the-world-whisky-awards/",
+              "url": "https://www.forbes.com/sites/joemicallef/2025/12/04/the-best-highland-single-malt-whisky-according-to-the-world-whisky-awards/",
+              "domain": "forbes.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.falstaff.com/nordics/spirits/jura-single-malt-scotch-whisky-12-yo",
+              "url": "https://www.falstaff.com/nordics/spirits/jura-single-malt-scotch-whisky-12-yo",
+              "domain": "falstaff.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Jura 12 official single malt Scotch whisky 40%",
+        "summary": "I found support that this refers to **Jura 12 Year Old Single Malt Scotch Whisky**, bottled at **40% ABV**.\n\nWhat the sources confirm:\n- **Producer/distillery:** Jura / Isle of Jura Distillery. ([iwsc.net](https://www.iwsc.net/results/detail/89605/12-yo-jura-single-malt-scotch-whisky?utm_source=openai))\n- **Age stateme",
+        "results": [
+          {
+            "title": "https://www.masterofmalt.com/whiskies/jura/jura-12-year-old-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/jura/jura-12-year-old-whisky/",
+            "domain": "masterofmalt.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/jura-12-year",
+            "url": "https://distiller.com/spirits/jura-12-year",
+            "domain": "distiller.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/27591/isle-of-jura-12-year-old",
+            "url": "https://www.whiskybase.com/whiskies/whisky/27591/isle-of-jura-12-year-old",
+            "domain": "whiskybase.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/105304/isle-of-jura-12-year-old",
+            "url": "https://www.whiskybase.com/whiskies/whisky/105304/isle-of-jura-12-year-old",
+            "domain": "whiskybase.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.forbes.com/sites/joemicallef/2025/12/04/the-best-highland-single-malt-whisky-according-to-the-world-whisky-awards/",
+            "url": "https://www.forbes.com/sites/joemicallef/2025/12/04/the-best-highland-single-malt-whisky-according-to-the-world-whisky-awards/",
+            "domain": "forbes.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.falstaff.com/nordics/spirits/jura-single-malt-scotch-whisky-12-yo",
+            "url": "https://www.falstaff.com/nordics/spirits/jura-single-malt-scotch-whisky-12-yo",
+            "domain": "falstaff.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,478 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "SMWS 72.123 \"Big moves and subtle details\""
+    },
+    "recordedAt": "2026-04-19T05:26:37.646Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "SMWS 72.123 \"Big moves and subtle details\"",
+          "summary": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+          "results": [
+            {
+              "title": "https://smws.com/big-moves-and-subtle-details/",
+              "url": "https://smws.com/big-moves-and-subtle-details/",
+              "domain": "smws.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.trustpilot.com/review/smws.com",
+              "url": "https://www.trustpilot.com/review/smws.com",
+              "domain": "trustpilot.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/TN%20-%20YORK%20O%26R.pdf",
+              "url": "https://smws.com/content/TN%20-%20YORK%20O%26R.pdf",
+              "domain": "smws.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskygoodness.com/smws/68/68.124",
+              "url": "https://www.whiskygoodness.com/smws/68/68.124",
+              "domain": "whiskygoodness.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://bottleraiders.com/spirit/mortlach-28yr-smws-74-124-a-symphony-of-oak/",
+              "url": "https://bottleraiders.com/spirit/mortlach-28yr-smws-74-124-a-symphony-of-oak/",
+              "domain": "bottleraiders.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/mpi5te",
+              "url": "https://www.reddit.com/r/Scotch/comments/mpi5te",
+              "domain": "reddit.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/d5r6oj",
+              "url": "https://www.reddit.com/r/Scotch/comments/d5r6oj",
+              "domain": "reddit.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskymeasure.com/smwsdb/query.php",
+              "url": "https://www.whiskymeasure.com/smwsdb/query.php",
+              "domain": "whiskymeasure.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.thedramble.com/tastings/group/smws-september-2022-outturn-review/",
+              "url": "https://www.thedramble.com/tastings/group/smws-september-2022-outturn-review/",
+              "domain": "thedramble.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.gobiernodecanarias.org/cmsgob1/export/sites/hacienda/planificacionypresupuesto/galeria/Presupuestos/2013/TOMO_1_Texto-articulado.pdf",
+              "url": "https://www.gobiernodecanarias.org/cmsgob1/export/sites/hacienda/planificacionypresupuesto/galeria/Presupuestos/2013/TOMO_1_Texto-articulado.pdf",
+              "domain": "gobiernodecanarias.org",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://artisanal-spirits.com/wp-content/uploads/2024/04/44310-ARTISANAL-AR2023-Web-FINAL-040424.pdf",
+              "url": "https://artisanal-spirits.com/wp-content/uploads/2024/04/44310-ARTISANAL-AR2023-Web-FINAL-040424.pdf",
+              "domain": "artisanal-spirits.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.troisdorf.de/de/rathaus-service/finanzen/haushalt/2023/gesamtdokument-haushalt-2023.pdf?cid=1oe5",
+              "url": "https://www.troisdorf.de/de/rathaus-service/finanzen/haushalt/2023/gesamtdokument-haushalt-2023.pdf?cid=1oe5",
+              "domain": "troisdorf.de",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1owz0jw/reviews_701_to_706_smws_usa_november_2025_outturn/",
+              "url": "https://www.reddit.com/r/Scotch/comments/1owz0jw/reviews_701_to_706_smws_usa_november_2025_outturn/",
+              "domain": "reddit.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/archive?distillery_code=630_554&limit=12&page=121",
+              "url": "https://smws.com/archive?distillery_code=630_554&limit=12&page=121",
+              "domain": "smws.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1b12gnb",
+              "url": "https://www.reddit.com/r/Scotch/comments/1b12gnb",
+              "domain": "reddit.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskeryturnip.com/2025/09/16/miltonduff-29-year-1995-smws-72-125-blossom-reverie/",
+              "url": "https://whiskeryturnip.com/2025/09/16/miltonduff-29-year-1995-smws-72-125-blossom-reverie/",
+              "domain": "whiskeryturnip.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyboys.com/wp-content/uploads/2023/09/SMWS-Codes-Sept-2023.pdf",
+              "url": "https://whiskyboys.com/wp-content/uploads/2023/09/SMWS-Codes-Sept-2023.pdf",
+              "domain": "whiskyboys.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://maltrunners.com/2024/06/13/aultmore-24-year-1989-smws-73-62-magical-mellifluous-marvelosity/",
+              "url": "https://maltrunners.com/2024/06/13/aultmore-24-year-1989-smws-73-62-magical-mellifluous-marvelosity/",
+              "domain": "maltrunners.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.wewhisky.com/auction-detail/1152204",
+              "url": "https://www.wewhisky.com/auction-detail/1152204",
+              "domain": "wewhisky.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://thewhiskybarkl.com/wp-content/uploads/WB_Whisky-List_26Nov24_preview.pdf",
+              "url": "https://thewhiskybarkl.com/wp-content/uploads/WB_Whisky-List_26Nov24_preview.pdf",
+              "domain": "thewhiskybarkl.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.slowdrink.de/2014/09/smws/",
+              "url": "https://www.slowdrink.de/2014/09/smws/",
+              "domain": "slowdrink.de",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskystats.com/whisky/247760",
+              "url": "https://www.whiskystats.com/whisky/247760",
+              "domain": "whiskystats.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1ghqebm",
+              "url": "https://www.reddit.com/r/Scotch/comments/1ghqebm",
+              "domain": "reddit.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/hw43zr",
+              "url": "https://www.reddit.com/r/Scotch/comments/hw43zr",
+              "domain": "reddit.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1skcg5p/reviews_815_to_820_smws_usa_outturn_april_2026/",
+              "url": "https://www.reddit.com/r/Scotch/comments/1skcg5p/reviews_815_to_820_smws_usa_outturn_april_2026/",
+              "domain": "reddit.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/smws/comments/ubo4qm",
+              "url": "https://www.reddit.com/r/smws/comments/ubo4qm",
+              "domain": "reddit.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/dwglwi",
+              "url": "https://www.reddit.com/r/Scotch/comments/dwglwi",
+              "domain": "reddit.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/xg96pq",
+              "url": "https://www.reddit.com/r/Scotch/comments/xg96pq",
+              "domain": "reddit.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1gi6rei",
+              "url": "https://www.reddit.com/r/Scotch/comments/1gi6rei",
+              "domain": "reddit.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/zyoejd",
+              "url": "https://www.reddit.com/r/Scotch/comments/zyoejd",
+              "domain": "reddit.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "Big moves and subtle details (72.123) | SMWS",
+              "url": "https://smws.com/big-moves-and-subtle-details/?utm_source=openai",
+              "domain": "smws.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            },
+            {
+              "title": "SMWS DB - Search Results",
+              "url": "https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai",
+              "domain": "whiskymeasure.com",
+              "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "SMWS 72.123 \"Big moves and subtle details\"",
+        "summary": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+        "results": [
+          {
+            "title": "https://smws.com/big-moves-and-subtle-details/",
+            "url": "https://smws.com/big-moves-and-subtle-details/",
+            "domain": "smws.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.trustpilot.com/review/smws.com",
+            "url": "https://www.trustpilot.com/review/smws.com",
+            "domain": "trustpilot.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/TN%20-%20YORK%20O%26R.pdf",
+            "url": "https://smws.com/content/TN%20-%20YORK%20O%26R.pdf",
+            "domain": "smws.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskygoodness.com/smws/68/68.124",
+            "url": "https://www.whiskygoodness.com/smws/68/68.124",
+            "domain": "whiskygoodness.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://bottleraiders.com/spirit/mortlach-28yr-smws-74-124-a-symphony-of-oak/",
+            "url": "https://bottleraiders.com/spirit/mortlach-28yr-smws-74-124-a-symphony-of-oak/",
+            "domain": "bottleraiders.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/mpi5te",
+            "url": "https://www.reddit.com/r/Scotch/comments/mpi5te",
+            "domain": "reddit.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/d5r6oj",
+            "url": "https://www.reddit.com/r/Scotch/comments/d5r6oj",
+            "domain": "reddit.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskymeasure.com/smwsdb/query.php",
+            "url": "https://www.whiskymeasure.com/smwsdb/query.php",
+            "domain": "whiskymeasure.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.thedramble.com/tastings/group/smws-september-2022-outturn-review/",
+            "url": "https://www.thedramble.com/tastings/group/smws-september-2022-outturn-review/",
+            "domain": "thedramble.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.gobiernodecanarias.org/cmsgob1/export/sites/hacienda/planificacionypresupuesto/galeria/Presupuestos/2013/TOMO_1_Texto-articulado.pdf",
+            "url": "https://www.gobiernodecanarias.org/cmsgob1/export/sites/hacienda/planificacionypresupuesto/galeria/Presupuestos/2013/TOMO_1_Texto-articulado.pdf",
+            "domain": "gobiernodecanarias.org",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://artisanal-spirits.com/wp-content/uploads/2024/04/44310-ARTISANAL-AR2023-Web-FINAL-040424.pdf",
+            "url": "https://artisanal-spirits.com/wp-content/uploads/2024/04/44310-ARTISANAL-AR2023-Web-FINAL-040424.pdf",
+            "domain": "artisanal-spirits.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.troisdorf.de/de/rathaus-service/finanzen/haushalt/2023/gesamtdokument-haushalt-2023.pdf?cid=1oe5",
+            "url": "https://www.troisdorf.de/de/rathaus-service/finanzen/haushalt/2023/gesamtdokument-haushalt-2023.pdf?cid=1oe5",
+            "domain": "troisdorf.de",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1owz0jw/reviews_701_to_706_smws_usa_november_2025_outturn/",
+            "url": "https://www.reddit.com/r/Scotch/comments/1owz0jw/reviews_701_to_706_smws_usa_november_2025_outturn/",
+            "domain": "reddit.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/archive?distillery_code=630_554&limit=12&page=121",
+            "url": "https://smws.com/archive?distillery_code=630_554&limit=12&page=121",
+            "domain": "smws.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1b12gnb",
+            "url": "https://www.reddit.com/r/Scotch/comments/1b12gnb",
+            "domain": "reddit.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskeryturnip.com/2025/09/16/miltonduff-29-year-1995-smws-72-125-blossom-reverie/",
+            "url": "https://whiskeryturnip.com/2025/09/16/miltonduff-29-year-1995-smws-72-125-blossom-reverie/",
+            "domain": "whiskeryturnip.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyboys.com/wp-content/uploads/2023/09/SMWS-Codes-Sept-2023.pdf",
+            "url": "https://whiskyboys.com/wp-content/uploads/2023/09/SMWS-Codes-Sept-2023.pdf",
+            "domain": "whiskyboys.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://maltrunners.com/2024/06/13/aultmore-24-year-1989-smws-73-62-magical-mellifluous-marvelosity/",
+            "url": "https://maltrunners.com/2024/06/13/aultmore-24-year-1989-smws-73-62-magical-mellifluous-marvelosity/",
+            "domain": "maltrunners.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.wewhisky.com/auction-detail/1152204",
+            "url": "https://www.wewhisky.com/auction-detail/1152204",
+            "domain": "wewhisky.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://thewhiskybarkl.com/wp-content/uploads/WB_Whisky-List_26Nov24_preview.pdf",
+            "url": "https://thewhiskybarkl.com/wp-content/uploads/WB_Whisky-List_26Nov24_preview.pdf",
+            "domain": "thewhiskybarkl.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.slowdrink.de/2014/09/smws/",
+            "url": "https://www.slowdrink.de/2014/09/smws/",
+            "domain": "slowdrink.de",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskystats.com/whisky/247760",
+            "url": "https://www.whiskystats.com/whisky/247760",
+            "domain": "whiskystats.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1ghqebm",
+            "url": "https://www.reddit.com/r/Scotch/comments/1ghqebm",
+            "domain": "reddit.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/hw43zr",
+            "url": "https://www.reddit.com/r/Scotch/comments/hw43zr",
+            "domain": "reddit.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1skcg5p/reviews_815_to_820_smws_usa_outturn_april_2026/",
+            "url": "https://www.reddit.com/r/Scotch/comments/1skcg5p/reviews_815_to_820_smws_usa_outturn_april_2026/",
+            "domain": "reddit.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/smws/comments/ubo4qm",
+            "url": "https://www.reddit.com/r/smws/comments/ubo4qm",
+            "domain": "reddit.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/dwglwi",
+            "url": "https://www.reddit.com/r/Scotch/comments/dwglwi",
+            "domain": "reddit.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/xg96pq",
+            "url": "https://www.reddit.com/r/Scotch/comments/xg96pq",
+            "domain": "reddit.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1gi6rei",
+            "url": "https://www.reddit.com/r/Scotch/comments/1gi6rei",
+            "domain": "reddit.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/zyoejd",
+            "url": "https://www.reddit.com/r/Scotch/comments/zyoejd",
+            "domain": "reddit.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "Big moves and subtle details (72.123) | SMWS",
+            "url": "https://smws.com/big-moves-and-subtle-details/?utm_source=openai",
+            "domain": "smws.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          },
+          {
+            "title": "SMWS DB - Search Results",
+            "url": "https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai",
+            "domain": "whiskymeasure.com",
+            "description": "SMWS **72.123 “Big moves and subtle details”** is an **SMWS bottling of Miltonduff**; in SMWS’s coding, **cask number 72 = Miltonduff**, and the official product page for 72.123 gives the bottle name and core specs. ([smws.com](https://smws.com/big-moves-and-subtle-details/?utm_source=openai))\n\nWhat the sources confirm for this specific release:\n- **Distillery:** Miltonduff. SMWS number **72** corresponds to Miltonduff in independent SMWS code listings, and the official SMWS page is for **cask no. 72.123**. ([whiskymeasure.com](https://www.whiskymeasure.com/smwsdb/query.php?utm_source=openai))",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,464 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "official Jura 12 year old single malt Scotch whisky ABV Isle of Jura"
+    },
+    "recordedAt": "2026-04-19T05:14:45.115Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "official Jura 12 year old single malt Scotch whisky ABV Isle of Jura",
+          "summary": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+          "results": [
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/115574/isle-of-jura-12-year-old",
+              "url": "https://www.whiskybase.com/whiskies/whisky/115574/isle-of-jura-12-year-old",
+              "domain": "whiskybase.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskymag.com/tastings/jura-12-years-old/",
+              "url": "https://whiskymag.com/tastings/jura-12-years-old/",
+              "domain": "whiskymag.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskymag.com/tastings/isle-of-jura-elixir-12-years-old/",
+              "url": "https://whiskymag.com/tastings/isle-of-jura-elixir-12-years-old/",
+              "domain": "whiskymag.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/jura-12-year",
+              "url": "https://distiller.com/spirits/jura-12-year",
+              "domain": "distiller.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.scotchmaltwhisky.co.uk/jura12yearold.htm",
+              "url": "https://www.scotchmaltwhisky.co.uk/jura12yearold.htm",
+              "domain": "scotchmaltwhisky.co.uk",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/",
+              "url": "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/",
+              "domain": "jurawhisky.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/whiskies/jura/jura-12-year-old-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/jura/jura-12-year-old-whisky/",
+              "domain": "masterofmalt.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskymarketplace.com/whiskies/jura-12-year-old-island-single-malt-scotch",
+              "url": "https://www.whiskymarketplace.com/whiskies/jura-12-year-old-island-single-malt-scotch",
+              "domain": "whiskymarketplace.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://nothingbutwhisky.com/product/jura-12-year-old-elixir",
+              "url": "https://nothingbutwhisky.com/product/jura-12-year-old-elixir",
+              "domain": "nothingbutwhisky.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskyshop.com/jura-12-year-old",
+              "url": "https://www.whiskyshop.com/jura-12-year-old",
+              "domain": "whiskyshop.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://thedrambarron.com/2023/05/16/jura-12-year-old-40/",
+              "url": "https://thedrambarron.com/2023/05/16/jura-12-year-old-40/",
+              "domain": "thedrambarron.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://thewhiskeywash.com/whiskey-news/jura-12-year-old-oloroso-edition-new-sherry-finished-scotch/",
+              "url": "https://thewhiskeywash.com/whiskey-news/jura-12-year-old-oloroso-edition-new-sherry-finished-scotch/",
+              "domain": "thewhiskeywash.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://allianceglobalinc.com/asm2024/sites/default/files/2023-07/Definitive%20Information%20Statement%20for%202023%20ASM.pdf",
+              "url": "https://allianceglobalinc.com/asm2024/sites/default/files/2023-07/Definitive%20Information%20Statement%20for%202023%20ASM.pdf",
+              "domain": "allianceglobalinc.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/i74xq9",
+              "url": "https://www.reddit.com/r/Scotch/comments/i74xq9",
+              "domain": "reddit.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://pub-mediabox-storage.rxweb-prd.com/exhibitor/products/exh-7dd7b99c-c403-4faa-9c2c-a6386eb76dcf/product-documents/pro-07a3a2e9-c447-4492-ac41-5580018d2c8d/4c7e52bf-beea-483c-81f6-2ad846066cd3.pdf",
+              "url": "https://pub-mediabox-storage.rxweb-prd.com/exhibitor/products/exh-7dd7b99c-c403-4faa-9c2c-a6386eb76dcf/product-documents/pro-07a3a2e9-c447-4492-ac41-5580018d2c8d/4c7e52bf-beea-483c-81f6-2ad846066cd3.pdf",
+              "domain": "pub-mediabox-storage.rxweb-prd.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/mhhgyl",
+              "url": "https://www.reddit.com/r/Scotch/comments/mhhgyl",
+              "domain": "reddit.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/dq4038",
+              "url": "https://www.reddit.com/r/Scotch/comments/dq4038",
+              "domain": "reddit.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://4ab30937-0eb4-486e-add9-cc6d52589777.filesusr.com/ugd/890a7f_1f5dcf0df69e409893b6c478cb61ee87.pdf",
+              "url": "https://4ab30937-0eb4-486e-add9-cc6d52589777.filesusr.com/ugd/890a7f_1f5dcf0df69e409893b6c478cb61ee87.pdf",
+              "domain": "4ab30937-0eb4-486e-add9-cc6d52589777.filesusr.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/rcjei4",
+              "url": "https://www.reddit.com/r/Scotch/comments/rcjei4",
+              "domain": "reddit.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://media-cdn.getbento.com/accounts/06eddfdb5447c253b35abe48f22bfb2d/media/accounts/media/G1kmyDNETra3xO0PHsgg_After-Dinner.pdf",
+              "url": "https://media-cdn.getbento.com/accounts/06eddfdb5447c253b35abe48f22bfb2d/media/accounts/media/G1kmyDNETra3xO0PHsgg_After-Dinner.pdf",
+              "domain": "media-cdn.getbento.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1hq4cy7",
+              "url": "https://www.reddit.com/r/Scotch/comments/1hq4cy7",
+              "domain": "reddit.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://ahavasshalom.org/wp-content/uploads/Scotch-Kosher-Listing_-STAR-K.pdf",
+              "url": "https://ahavasshalom.org/wp-content/uploads/Scotch-Kosher-Listing_-STAR-K.pdf",
+              "domain": "ahavasshalom.org",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.johnshouse.co.uk/img/gallery/pdf/4015e38958c058d94e828edb07d55dbe.pdf",
+              "url": "https://www.johnshouse.co.uk/img/gallery/pdf/4015e38958c058d94e828edb07d55dbe.pdf",
+              "domain": "johnshouse.co.uk",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/sb61f3",
+              "url": "https://www.reddit.com/r/Scotch/comments/sb61f3",
+              "domain": "reddit.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/d855g6",
+              "url": "https://www.reddit.com/r/Scotch/comments/d855g6",
+              "domain": "reddit.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1s2yay9/review_jura_10_years_old/",
+              "url": "https://www.reddit.com/r/Scotch/comments/1s2yay9/review_jura_10_years_old/",
+              "domain": "reddit.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/kta9y9",
+              "url": "https://www.reddit.com/r/Scotch/comments/kta9y9",
+              "domain": "reddit.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/189ym7v",
+              "url": "https://www.reddit.com/r/Scotch/comments/189ym7v",
+              "domain": "reddit.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://en.wikipedia.org/wiki/Jura_distillery",
+              "url": "https://en.wikipedia.org/wiki/Jura_distillery",
+              "domain": "en.wikipedia.org",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "Jura 12 Year Old | Jura Single Malt Whisky",
+              "url": "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai",
+              "domain": "jurawhisky.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            },
+            {
+              "title": "Jura 12 Years Old | Whisky Magazine",
+              "url": "https://whiskymag.com/tastings/jura-12-years-old/?utm_source=openai",
+              "domain": "whiskymag.com",
+              "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "official Jura 12 year old single malt Scotch whisky ABV Isle of Jura",
+        "summary": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+        "results": [
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/115574/isle-of-jura-12-year-old",
+            "url": "https://www.whiskybase.com/whiskies/whisky/115574/isle-of-jura-12-year-old",
+            "domain": "whiskybase.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskymag.com/tastings/jura-12-years-old/",
+            "url": "https://whiskymag.com/tastings/jura-12-years-old/",
+            "domain": "whiskymag.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskymag.com/tastings/isle-of-jura-elixir-12-years-old/",
+            "url": "https://whiskymag.com/tastings/isle-of-jura-elixir-12-years-old/",
+            "domain": "whiskymag.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/jura-12-year",
+            "url": "https://distiller.com/spirits/jura-12-year",
+            "domain": "distiller.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.scotchmaltwhisky.co.uk/jura12yearold.htm",
+            "url": "https://www.scotchmaltwhisky.co.uk/jura12yearold.htm",
+            "domain": "scotchmaltwhisky.co.uk",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/",
+            "url": "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/",
+            "domain": "jurawhisky.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/whiskies/jura/jura-12-year-old-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/jura/jura-12-year-old-whisky/",
+            "domain": "masterofmalt.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskymarketplace.com/whiskies/jura-12-year-old-island-single-malt-scotch",
+            "url": "https://www.whiskymarketplace.com/whiskies/jura-12-year-old-island-single-malt-scotch",
+            "domain": "whiskymarketplace.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://nothingbutwhisky.com/product/jura-12-year-old-elixir",
+            "url": "https://nothingbutwhisky.com/product/jura-12-year-old-elixir",
+            "domain": "nothingbutwhisky.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskyshop.com/jura-12-year-old",
+            "url": "https://www.whiskyshop.com/jura-12-year-old",
+            "domain": "whiskyshop.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://thedrambarron.com/2023/05/16/jura-12-year-old-40/",
+            "url": "https://thedrambarron.com/2023/05/16/jura-12-year-old-40/",
+            "domain": "thedrambarron.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://thewhiskeywash.com/whiskey-news/jura-12-year-old-oloroso-edition-new-sherry-finished-scotch/",
+            "url": "https://thewhiskeywash.com/whiskey-news/jura-12-year-old-oloroso-edition-new-sherry-finished-scotch/",
+            "domain": "thewhiskeywash.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://allianceglobalinc.com/asm2024/sites/default/files/2023-07/Definitive%20Information%20Statement%20for%202023%20ASM.pdf",
+            "url": "https://allianceglobalinc.com/asm2024/sites/default/files/2023-07/Definitive%20Information%20Statement%20for%202023%20ASM.pdf",
+            "domain": "allianceglobalinc.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/i74xq9",
+            "url": "https://www.reddit.com/r/Scotch/comments/i74xq9",
+            "domain": "reddit.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://pub-mediabox-storage.rxweb-prd.com/exhibitor/products/exh-7dd7b99c-c403-4faa-9c2c-a6386eb76dcf/product-documents/pro-07a3a2e9-c447-4492-ac41-5580018d2c8d/4c7e52bf-beea-483c-81f6-2ad846066cd3.pdf",
+            "url": "https://pub-mediabox-storage.rxweb-prd.com/exhibitor/products/exh-7dd7b99c-c403-4faa-9c2c-a6386eb76dcf/product-documents/pro-07a3a2e9-c447-4492-ac41-5580018d2c8d/4c7e52bf-beea-483c-81f6-2ad846066cd3.pdf",
+            "domain": "pub-mediabox-storage.rxweb-prd.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/mhhgyl",
+            "url": "https://www.reddit.com/r/Scotch/comments/mhhgyl",
+            "domain": "reddit.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/dq4038",
+            "url": "https://www.reddit.com/r/Scotch/comments/dq4038",
+            "domain": "reddit.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://4ab30937-0eb4-486e-add9-cc6d52589777.filesusr.com/ugd/890a7f_1f5dcf0df69e409893b6c478cb61ee87.pdf",
+            "url": "https://4ab30937-0eb4-486e-add9-cc6d52589777.filesusr.com/ugd/890a7f_1f5dcf0df69e409893b6c478cb61ee87.pdf",
+            "domain": "4ab30937-0eb4-486e-add9-cc6d52589777.filesusr.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/rcjei4",
+            "url": "https://www.reddit.com/r/Scotch/comments/rcjei4",
+            "domain": "reddit.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://media-cdn.getbento.com/accounts/06eddfdb5447c253b35abe48f22bfb2d/media/accounts/media/G1kmyDNETra3xO0PHsgg_After-Dinner.pdf",
+            "url": "https://media-cdn.getbento.com/accounts/06eddfdb5447c253b35abe48f22bfb2d/media/accounts/media/G1kmyDNETra3xO0PHsgg_After-Dinner.pdf",
+            "domain": "media-cdn.getbento.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1hq4cy7",
+            "url": "https://www.reddit.com/r/Scotch/comments/1hq4cy7",
+            "domain": "reddit.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://ahavasshalom.org/wp-content/uploads/Scotch-Kosher-Listing_-STAR-K.pdf",
+            "url": "https://ahavasshalom.org/wp-content/uploads/Scotch-Kosher-Listing_-STAR-K.pdf",
+            "domain": "ahavasshalom.org",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.johnshouse.co.uk/img/gallery/pdf/4015e38958c058d94e828edb07d55dbe.pdf",
+            "url": "https://www.johnshouse.co.uk/img/gallery/pdf/4015e38958c058d94e828edb07d55dbe.pdf",
+            "domain": "johnshouse.co.uk",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/sb61f3",
+            "url": "https://www.reddit.com/r/Scotch/comments/sb61f3",
+            "domain": "reddit.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/d855g6",
+            "url": "https://www.reddit.com/r/Scotch/comments/d855g6",
+            "domain": "reddit.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1s2yay9/review_jura_10_years_old/",
+            "url": "https://www.reddit.com/r/Scotch/comments/1s2yay9/review_jura_10_years_old/",
+            "domain": "reddit.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/kta9y9",
+            "url": "https://www.reddit.com/r/Scotch/comments/kta9y9",
+            "domain": "reddit.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/189ym7v",
+            "url": "https://www.reddit.com/r/Scotch/comments/189ym7v",
+            "domain": "reddit.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://en.wikipedia.org/wiki/Jura_distillery",
+            "url": "https://en.wikipedia.org/wiki/Jura_distillery",
+            "domain": "en.wikipedia.org",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jura 12 Year Old | Jura Single Malt Whisky",
+            "url": "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai",
+            "domain": "jurawhisky.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jura 12 Years Old | Whisky Magazine",
+            "url": "https://whiskymag.com/tastings/jura-12-years-old/?utm_source=openai",
+            "domain": "whiskymag.com",
+            "description": "The **official ABV for Jura 12 Year Old Single Malt Scotch Whisky** is **40% ABV** according to Jura’s official product page. The official page also identifies it as a **12-year-old** expression in the brand’s core range. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nIndependent non-retailer sources match that strength: **Whisky Magazine** lists **Jura 12 Years Old** at **40% ABV**, and an independent review from **Scotch Malt Whisky** says the 2018 core-range Jura 12 was matured in **American white ex-bourbon barrels** and **fini",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

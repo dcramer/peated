@@ -1,0 +1,534 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Woodford Reserve Double Oaked official bourbon"
+    },
+    "recordedAt": "2026-04-19T05:20:26.558Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Woodford Reserve Double Oaked official bourbon",
+          "summary": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+          "results": [
+            {
+              "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+              "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+              "domain": "woodfordreserve.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+              "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+              "domain": "woodfordreserve.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.brown-forman.com/brand/woodford-reserve",
+              "url": "https://www.brown-forman.com/brand/woodford-reserve",
+              "domain": "brown-forman.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+              "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+              "domain": "shop.woodfordreserve.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://shop.woodfordreserve.com/distillery-series-12-year-old-american-single-malt-whiskey/",
+              "url": "https://shop.woodfordreserve.com/distillery-series-12-year-old-american-single-malt-whiskey/",
+              "domain": "shop.woodfordreserve.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/woodford-reserve-double-oaked",
+              "url": "https://distiller.com/spirits/woodford-reserve-double-oaked",
+              "domain": "distiller.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.woodfordreserve.com/fr/notre-whisky/",
+              "url": "https://www.woodfordreserve.com/fr/notre-whisky/",
+              "domain": "woodfordreserve.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.peoplesbourbonreview.com/woodford-reserve-double-oaked",
+              "url": "https://www.peoplesbourbonreview.com/woodford-reserve-double-oaked",
+              "domain": "peoplesbourbonreview.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskymag.com/tastings/woodford-reserve-double-oaked/",
+              "url": "https://whiskymag.com/tastings/woodford-reserve-double-oaked/",
+              "domain": "whiskymag.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.woodfordreserve.com/whiskey/distillery-series/",
+              "url": "https://www.woodfordreserve.com/whiskey/distillery-series/",
+              "domain": "woodfordreserve.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://secretwhiskeysociety.com/woodford-reserve-double-oaked-review/",
+              "url": "https://secretwhiskeysociety.com/woodford-reserve-double-oaked-review/",
+              "domain": "secretwhiskeysociety.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.lawhiskeysociety.com/whiskey-profile/2020/Woodford-Reserve-Double-Oaked",
+              "url": "https://www.lawhiskeysociety.com/whiskey-profile/2020/Woodford-Reserve-Double-Oaked",
+              "domain": "lawhiskeysociety.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/1cdn44r/review_279_woodford_reserved_double_oaked_bourbon/",
+              "url": "https://www.reddit.com/r/bourbon/comments/1cdn44r/review_279_woodford_reserved_double_oaked_bourbon/",
+              "domain": "reddit.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.hollywoodcasinostlouis.com/-/media/png/midwest/hollywood-st-louis/pdfs/restaurant-menu-pdfs/whiskey-guide-january-2019.pdf?hash=1B6AEAC3DD173462726FA75B04F24923953B4D04&la=en",
+              "url": "https://www.hollywoodcasinostlouis.com/-/media/png/midwest/hollywood-st-louis/pdfs/restaurant-menu-pdfs/whiskey-guide-january-2019.pdf?hash=1B6AEAC3DD173462726FA75B04F24923953B4D04&la=en",
+              "domain": "hollywoodcasinostlouis.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/WhiskeyTribe/comments/1j3klg5",
+              "url": "https://www.reddit.com/r/WhiskeyTribe/comments/1j3klg5",
+              "domain": "reddit.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/whiskey/comments/10p556y",
+              "url": "https://www.reddit.com/r/whiskey/comments/10p556y",
+              "domain": "reddit.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/DMVWhisky/comments/1i0gs61",
+              "url": "https://www.reddit.com/r/DMVWhisky/comments/1i0gs61",
+              "domain": "reddit.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/1ifimx3",
+              "url": "https://www.reddit.com/r/bourbon/comments/1ifimx3",
+              "domain": "reddit.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/rofig0",
+              "url": "https://www.reddit.com/r/bourbon/comments/rofig0",
+              "domain": "reddit.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/1ik6qqs",
+              "url": "https://www.reddit.com/r/bourbon/comments/1ik6qqs",
+              "domain": "reddit.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/h8wkzo",
+              "url": "https://www.reddit.com/r/bourbon/comments/h8wkzo",
+              "domain": "reddit.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/1155gis",
+              "url": "https://www.reddit.com/r/bourbon/comments/1155gis",
+              "domain": "reddit.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/lgtar5",
+              "url": "https://www.reddit.com/r/bourbon/comments/lgtar5",
+              "domain": "reddit.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/vckw0w",
+              "url": "https://www.reddit.com/r/bourbon/comments/vckw0w",
+              "domain": "reddit.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/bourbon/comments/s51k2r",
+              "url": "https://www.reddit.com/r/bourbon/comments/s51k2r",
+              "domain": "reddit.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.sec.gov/Archives/edgar/data/14693/000001469325000066/bfb-2025ir_v8xadaxsecx.pdf",
+              "url": "https://www.sec.gov/Archives/edgar/data/14693/000001469325000066/bfb-2025ir_v8xadaxsecx.pdf",
+              "domain": "sec.gov",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://hammondsofknutsford.co.uk/wp-content/uploads/2025/02/product-list-a5-feb-25.pdf",
+              "url": "https://hammondsofknutsford.co.uk/wp-content/uploads/2025/02/product-list-a5-feb-25.pdf",
+              "domain": "hammondsofknutsford.co.uk",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://static1.squarespace.com/static/60bea313a5c6a504c6dfe531/t/6202a150ab86f61002df5d96/1644339559649/DB_FebMar22_Spirits%2BReport%2BBourbonWhiskey.pdf",
+              "url": "https://static1.squarespace.com/static/60bea313a5c6a504c6dfe531/t/6202a150ab86f61002df5d96/1644339559649/DB_FebMar22_Spirits%2BReport%2BBourbonWhiskey.pdf",
+              "domain": "static1.squarespace.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://static.brown-forman.com/wp-content/uploads/2021/07/11201326/BFB_AR2021-Integrated-Annual-Report-Final-ADA.pdf",
+              "url": "https://static.brown-forman.com/wp-content/uploads/2021/07/11201326/BFB_AR2021-Integrated-Annual-Report-Final-ADA.pdf",
+              "domain": "static.brown-forman.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://bondco.co.jp/ocean_dfs_ap/img/Brand%20Information/Woodford%20Reserve.pdf",
+              "url": "https://bondco.co.jp/ocean_dfs_ap/img/Brand%20Information/Woodford%20Reserve.pdf",
+              "domain": "bondco.co.jp",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://en.wikipedia.org/wiki/Woodford_Reserve",
+              "url": "https://en.wikipedia.org/wiki/Woodford_Reserve",
+              "domain": "en.wikipedia.org",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://en.wikipedia.org/wiki/Old_Forester",
+              "url": "https://en.wikipedia.org/wiki/Old_Forester",
+              "domain": "en.wikipedia.org",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "Double Oaked - Woodford Reserve",
+              "url": "https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai",
+              "domain": "woodfordreserve.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "Woodford Reserve | Brown Forman",
+              "url": "https://www.brown-forman.com/brand/woodford-reserve?utm_source=openai",
+              "domain": "brown-forman.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "Woodford Reserve Double Oaked Bourbon",
+              "url": "https://distiller.com/spirits/woodford-reserve-double-oaked?utm_source=openai",
+              "domain": "distiller.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            },
+            {
+              "title": "Double Double Oaked - Woodford Reserve",
+              "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai",
+              "domain": "woodfordreserve.com",
+              "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Woodford Reserve Double Oaked official bourbon",
+        "summary": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+        "results": [
+          {
+            "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+            "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.brown-forman.com/brand/woodford-reserve",
+            "url": "https://www.brown-forman.com/brand/woodford-reserve",
+            "domain": "brown-forman.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+            "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+            "domain": "shop.woodfordreserve.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://shop.woodfordreserve.com/distillery-series-12-year-old-american-single-malt-whiskey/",
+            "url": "https://shop.woodfordreserve.com/distillery-series-12-year-old-american-single-malt-whiskey/",
+            "domain": "shop.woodfordreserve.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/woodford-reserve-double-oaked",
+            "url": "https://distiller.com/spirits/woodford-reserve-double-oaked",
+            "domain": "distiller.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.woodfordreserve.com/fr/notre-whisky/",
+            "url": "https://www.woodfordreserve.com/fr/notre-whisky/",
+            "domain": "woodfordreserve.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.peoplesbourbonreview.com/woodford-reserve-double-oaked",
+            "url": "https://www.peoplesbourbonreview.com/woodford-reserve-double-oaked",
+            "domain": "peoplesbourbonreview.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskymag.com/tastings/woodford-reserve-double-oaked/",
+            "url": "https://whiskymag.com/tastings/woodford-reserve-double-oaked/",
+            "domain": "whiskymag.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.woodfordreserve.com/whiskey/distillery-series/",
+            "url": "https://www.woodfordreserve.com/whiskey/distillery-series/",
+            "domain": "woodfordreserve.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://secretwhiskeysociety.com/woodford-reserve-double-oaked-review/",
+            "url": "https://secretwhiskeysociety.com/woodford-reserve-double-oaked-review/",
+            "domain": "secretwhiskeysociety.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.lawhiskeysociety.com/whiskey-profile/2020/Woodford-Reserve-Double-Oaked",
+            "url": "https://www.lawhiskeysociety.com/whiskey-profile/2020/Woodford-Reserve-Double-Oaked",
+            "domain": "lawhiskeysociety.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/1cdn44r/review_279_woodford_reserved_double_oaked_bourbon/",
+            "url": "https://www.reddit.com/r/bourbon/comments/1cdn44r/review_279_woodford_reserved_double_oaked_bourbon/",
+            "domain": "reddit.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.hollywoodcasinostlouis.com/-/media/png/midwest/hollywood-st-louis/pdfs/restaurant-menu-pdfs/whiskey-guide-january-2019.pdf?hash=1B6AEAC3DD173462726FA75B04F24923953B4D04&la=en",
+            "url": "https://www.hollywoodcasinostlouis.com/-/media/png/midwest/hollywood-st-louis/pdfs/restaurant-menu-pdfs/whiskey-guide-january-2019.pdf?hash=1B6AEAC3DD173462726FA75B04F24923953B4D04&la=en",
+            "domain": "hollywoodcasinostlouis.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/WhiskeyTribe/comments/1j3klg5",
+            "url": "https://www.reddit.com/r/WhiskeyTribe/comments/1j3klg5",
+            "domain": "reddit.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/whiskey/comments/10p556y",
+            "url": "https://www.reddit.com/r/whiskey/comments/10p556y",
+            "domain": "reddit.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/DMVWhisky/comments/1i0gs61",
+            "url": "https://www.reddit.com/r/DMVWhisky/comments/1i0gs61",
+            "domain": "reddit.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/1ifimx3",
+            "url": "https://www.reddit.com/r/bourbon/comments/1ifimx3",
+            "domain": "reddit.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/rofig0",
+            "url": "https://www.reddit.com/r/bourbon/comments/rofig0",
+            "domain": "reddit.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/1ik6qqs",
+            "url": "https://www.reddit.com/r/bourbon/comments/1ik6qqs",
+            "domain": "reddit.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/h8wkzo",
+            "url": "https://www.reddit.com/r/bourbon/comments/h8wkzo",
+            "domain": "reddit.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/1155gis",
+            "url": "https://www.reddit.com/r/bourbon/comments/1155gis",
+            "domain": "reddit.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/lgtar5",
+            "url": "https://www.reddit.com/r/bourbon/comments/lgtar5",
+            "domain": "reddit.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/vckw0w",
+            "url": "https://www.reddit.com/r/bourbon/comments/vckw0w",
+            "domain": "reddit.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/bourbon/comments/s51k2r",
+            "url": "https://www.reddit.com/r/bourbon/comments/s51k2r",
+            "domain": "reddit.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.sec.gov/Archives/edgar/data/14693/000001469325000066/bfb-2025ir_v8xadaxsecx.pdf",
+            "url": "https://www.sec.gov/Archives/edgar/data/14693/000001469325000066/bfb-2025ir_v8xadaxsecx.pdf",
+            "domain": "sec.gov",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://hammondsofknutsford.co.uk/wp-content/uploads/2025/02/product-list-a5-feb-25.pdf",
+            "url": "https://hammondsofknutsford.co.uk/wp-content/uploads/2025/02/product-list-a5-feb-25.pdf",
+            "domain": "hammondsofknutsford.co.uk",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://static1.squarespace.com/static/60bea313a5c6a504c6dfe531/t/6202a150ab86f61002df5d96/1644339559649/DB_FebMar22_Spirits%2BReport%2BBourbonWhiskey.pdf",
+            "url": "https://static1.squarespace.com/static/60bea313a5c6a504c6dfe531/t/6202a150ab86f61002df5d96/1644339559649/DB_FebMar22_Spirits%2BReport%2BBourbonWhiskey.pdf",
+            "domain": "static1.squarespace.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://static.brown-forman.com/wp-content/uploads/2021/07/11201326/BFB_AR2021-Integrated-Annual-Report-Final-ADA.pdf",
+            "url": "https://static.brown-forman.com/wp-content/uploads/2021/07/11201326/BFB_AR2021-Integrated-Annual-Report-Final-ADA.pdf",
+            "domain": "static.brown-forman.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://bondco.co.jp/ocean_dfs_ap/img/Brand%20Information/Woodford%20Reserve.pdf",
+            "url": "https://bondco.co.jp/ocean_dfs_ap/img/Brand%20Information/Woodford%20Reserve.pdf",
+            "domain": "bondco.co.jp",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://en.wikipedia.org/wiki/Woodford_Reserve",
+            "url": "https://en.wikipedia.org/wiki/Woodford_Reserve",
+            "domain": "en.wikipedia.org",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://en.wikipedia.org/wiki/Old_Forester",
+            "url": "https://en.wikipedia.org/wiki/Old_Forester",
+            "domain": "en.wikipedia.org",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "Double Oaked - Woodford Reserve",
+            "url": "https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai",
+            "domain": "woodfordreserve.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve | Brown Forman",
+            "url": "https://www.brown-forman.com/brand/woodford-reserve?utm_source=openai",
+            "domain": "brown-forman.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Oaked Bourbon",
+            "url": "https://distiller.com/spirits/woodford-reserve-double-oaked?utm_source=openai",
+            "domain": "distiller.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          },
+          {
+            "title": "Double Double Oaked - Woodford Reserve",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/?utm_source=openai",
+            "domain": "woodfordreserve.com",
+            "description": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon expression**. The official Woodford Reserve product page identifies it as a **twice-barreled bourbon** and gives the bottling strength as **90.4 proof**, which equals **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nAn official Brown-Forman brand page also lists **“Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey,”** confirming the brand owner/producer family and that this is a standard official release in the Woodford Reserve lineup. ([brow",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}
