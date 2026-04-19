@@ -87,7 +87,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "evals": "dotenv -e ../../.env -e ../../.env.local -- vitest run --config vitest.evals.config.mts --reporter=vitest-evals/reporter",
+    "evals": "sh -c 'if [ \"$1\" = \"--\" ]; then shift; fi; dotenv -e ../../.env -e ../../.env.local -- pnpm exec vitest run \"$@\" --config vitest.evals.config.mts' --",
     "test": "vitest run --config vitest.config.mts",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },

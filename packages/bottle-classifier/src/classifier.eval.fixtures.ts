@@ -24,6 +24,9 @@ export type ClassifierEvalExpectation = {
   parentBottleId?: number | null;
   proposedBottle?: Record<string, unknown> | null;
   proposedRelease?: Record<string, unknown> | null;
+  confidenceAtLeast?: number;
+  confidenceBelow?: number;
+  verifyEligible?: boolean;
   summary: string;
 };
 
@@ -33,6 +36,27 @@ export type ClassifierEvalCase = {
   searchResponses?: SearchResponseFixture[];
   expected: ClassifierEvalExpectation;
 };
+
+export function defineClassifierEvalCase(
+  testCase: ClassifierEvalCase,
+): ClassifierEvalCase {
+  return testCase;
+}
+
+export function expectIgnored(summary: string): ClassifierEvalExpectation {
+  return {
+    status: "ignored",
+    summary,
+  };
+}
+
+export function expectNoMatch(summary: string): ClassifierEvalExpectation {
+  return {
+    status: "classified",
+    action: "no_match",
+    summary,
+  };
+}
 
 const quintaRubanEditionCandidate = buildBottleCandidate({
   bottleId: 401,
@@ -70,6 +94,39 @@ const rareBreedRyeMatch = buildBottleCandidate({
   abv: 56.1,
   score: 0.93,
   source: ["text"],
+});
+
+const buffaloTraceStraightBourbonIdentity = buildExtractedIdentity({
+  brand: "Buffalo Trace",
+  distillery: ["Buffalo Trace"],
+  category: "bourbon",
+});
+
+const blantonsBlooperIdentity = buildExtractedIdentity({
+  brand: "Blanton's",
+  expression: "Blooper Bottle",
+  distillery: ["Buffalo Trace"],
+  category: "bourbon",
+});
+
+const jamesonColdBrewMatch = buildBottleCandidate({
+  bottleId: 13437,
+  fullName: "Jameson Cold Brew",
+  brand: "Jameson",
+  category: "blend",
+  score: 0.99,
+  source: ["text", "brand"],
+});
+
+const glenlivetCaribbeanReserveMatch = buildBottleCandidate({
+  bottleId: 1760,
+  fullName: "Glenlivet Caribbean Reserve Rum Barrel Selection",
+  bottleFullName: "Glenlivet Caribbean Reserve Rum Barrel Selection",
+  brand: "Glenlivet",
+  bottler: "Glenlivet",
+  category: "single_malt",
+  score: 0.95,
+  source: ["text", "brand"],
 });
 
 const smwsRw65Match = buildBottleCandidate({
@@ -401,6 +458,8 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       action: "match",
       identityScope: "product",
       matchedBottleId: 501,
+      confidenceAtLeast: 96,
+      verifyEligible: true,
       summary:
         "Use the web to confirm the omitted barrel-proof trait, rerun local search, and match the canonical Wild Turkey Rare Breed Rye Barrel Proof bottle instead of a looser Rare Breed near-match.",
     },
@@ -433,8 +492,130 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       action: "match",
       identityScope: "product",
       matchedBottleId: 501,
+      confidenceAtLeast: 96,
+      verifyEligible: true,
       summary:
         "Extract the product identity from the raw title, then use the web plus local follow-up search to recover the canonical Wild Turkey Rare Breed Rye Barrel Proof bottle safely.",
+    },
+  },
+  {
+    name: "store listing: Jameson Cold Brew reaches bottle verification confidence from a clear title match",
+    input: {
+      reference: {
+        name: "Jameson Cold Brew Irish Whiskey",
+        url: "https://shop.example/products/jameson-cold-brew",
+      },
+      initialCandidates: [jamesonColdBrewMatch],
+    },
+    searchResponses: [
+      {
+        when: ["jameson", "cold brew"],
+        results: [jamesonColdBrewMatch],
+      },
+    ],
+    expected: {
+      status: "classified",
+      action: "match",
+      identityScope: "product",
+      matchedBottleId: 13437,
+      confidenceAtLeast: 96,
+      verifyEligible: true,
+      summary:
+        "Match Jameson Cold Brew from the raw title alone and calibrate confidence high enough that the downstream verifier can trust the reviewed bottle-level match.",
+    },
+  },
+  {
+    name: "store listing: Glenlivet Caribbean Reserve reaches bottle verification confidence when authoritative web evidence confirms the family",
+    input: {
+      reference: {
+        name: "The Glenlivet Caribbean Reserve",
+        url: "https://shop.example/products/glenlivet-caribbean-reserve",
+      },
+      extractedIdentity: buildExtractedIdentity({
+        brand: "The Glenlivet",
+        expression: "Caribbean Reserve",
+        distillery: ["The Glenlivet"],
+        category: "single_malt",
+      }),
+      initialCandidates: [glenlivetCaribbeanReserveMatch],
+    },
+    searchResponses: [
+      {
+        when: ["glenlivet", "caribbean reserve"],
+        results: [glenlivetCaribbeanReserveMatch],
+      },
+    ],
+    expected: {
+      status: "classified",
+      action: "match",
+      identityScope: "product",
+      matchedBottleId: 1760,
+      confidenceAtLeast: 96,
+      verifyEligible: true,
+      summary:
+        "Use authoritative web evidence to confirm that Caribbean Reserve is the rum-barrel Glenlivet bottle and calibrate confidence high enough for downstream bottle-level verification.",
+    },
+  },
+  {
+    name: "current assignment: a reaffirmed bottle match stays verification-eligible at the lower confidence threshold",
+    input: {
+      reference: {
+        name: "Jameson Cold Brew Irish Whiskey",
+        url: "https://shop.example/products/jameson-cold-brew",
+        currentBottleId: 13437,
+      },
+      initialCandidates: [jamesonColdBrewMatch],
+    },
+    searchResponses: [
+      {
+        when: ["jameson", "cold brew"],
+        results: [jamesonColdBrewMatch],
+      },
+    ],
+    expected: {
+      status: "classified",
+      action: "match",
+      identityScope: "product",
+      matchedBottleId: 13437,
+      confidenceAtLeast: 80,
+      verifyEligible: true,
+      summary:
+        "When the classifier reaffirms the already assigned bottle cleanly, the confidence should remain high enough for lower-risk downstream verification.",
+    },
+  },
+  {
+    name: "current assignment: a bottle correction stays review-only even when the new match is highly confident",
+    input: {
+      reference: {
+        name: "Wild Turkey Rare Breed Rye",
+        url: "https://shop.example/products/rare-breed-rye",
+        currentBottleId: 500,
+      },
+      initialCandidates: [rareBreedNearMatch],
+    },
+    searchResponses: [
+      {
+        when: ["wild turkey", "rare breed", "rye"],
+        results: [rareBreedRyeMatch],
+      },
+      {
+        when: ["rare breed", "rye", "barrel proof"],
+        results: [rareBreedRyeMatch],
+      },
+      {
+        when: ["rare breed", "rye", "cask_strength"],
+        results: [rareBreedRyeMatch],
+      },
+    ],
+    expected: {
+      status: "classified",
+      action: "match",
+      identityScope: "product",
+      matchedBottleId: 501,
+      confidenceAtLeast: 96,
+      verifyEligible: false,
+      summary:
+        "A high-confidence bottle replacement should still stay review-only because downstream price matching treats it as a correction rather than an auto-verifiable existing match.",
     },
   },
   {
@@ -701,6 +882,8 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
       action: "match",
       identityScope: "product",
       matchedBottleId: 65001,
+      confidenceBelow: 96,
+      verifyEligible: false,
       summary:
         "Keep the plain Tomatin 12-year-old bottle match instead of inventing a child release beneath the unrelated Tomatin Cask Strength family.",
     },
@@ -1040,7 +1223,7 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
         "Use the bottle image and fallback title context to recognize the SMWS 41.176 exact-cask bottle and match the existing candidate safely.",
     },
   },
-  {
+  defineClassifierEvalCase({
     name: "store listing: rejects a packaging-only gift set without bottle identity",
     input: {
       reference: {
@@ -1048,13 +1231,11 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
         url: "https://shop.example/products/unknown-bottle-gift-set",
       },
     },
-    expected: {
-      status: "ignored",
-      summary:
-        "Short-circuit packaging-only gift-set listings when the source does not identify a real whisky bottle clearly enough to classify.",
-    },
-  },
-  {
+    expected: expectIgnored(
+      "Short-circuit packaging-only gift-set listings when the source does not identify a real whisky bottle clearly enough to classify.",
+    ),
+  }),
+  defineClassifierEvalCase({
     name: "store listing: ignores a clear non-whisky spirit reference",
     input: {
       reference: {
@@ -1062,28 +1243,49 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
         url: "https://shop.example/products/titos-handmade-vodka",
       },
     },
-    expected: {
-      status: "ignored",
-      summary:
-        "Short-circuit obvious non-whisky spirits instead of searching or trying to classify them as whisky.",
-    },
-  },
-  {
-    name: "store listing: rejects a flavored whisky novelty product",
+    expected: expectIgnored(
+      "Short-circuit obvious non-whisky spirits instead of searching or trying to classify them as whisky.",
+    ),
+  }),
+  defineClassifierEvalCase({
+    name: "store listing: rejects an unsupported novelty flavored-whiskey product",
     input: {
       reference: {
         name: "Skrewball Peanut Butter Whiskey",
         url: "https://shop.example/products/skrewball-peanut-butter-whiskey",
       },
     },
-    expected: {
-      status: "classified",
-      action: "no_match",
-      summary:
-        "Treat flavored whisky novelty products as unsupported and return `no_match` rather than creating or matching a whisky bottle.",
+    expected: expectNoMatch(
+      "Treat unsupported novelty flavored-whiskey products as out of scope and return `no_match` rather than creating or matching a whisky bottle.",
+    ),
+  }),
+  defineClassifierEvalCase({
+    name: "store listing: ignores a bottle multipack even when the bottle identity is clear",
+    input: {
+      reference: {
+        name: "Buffalo Trace Kentucky Straight Bourbon Whiskey 12 Pack",
+        url: "https://shop.example/products/buffalo-trace-12-pack",
+      },
+      extractedIdentity: buffaloTraceStraightBourbonIdentity,
     },
-  },
-  {
+    expected: expectIgnored(
+      "Short-circuit retailer multipacks and cases even when extraction already found the underlying Buffalo Trace bottle identity.",
+    ),
+  }),
+  defineClassifierEvalCase({
+    name: "store listing: ignores a damaged-condition sale listing for an otherwise known bottle",
+    input: {
+      reference: {
+        name: "Blanton's Bourbon Blooper Bottle - Broken Wax Seal (SEE DESCRIPTION)",
+        url: "https://shop.example/products/blantons-broken-wax-seal",
+      },
+      extractedIdentity: blantonsBlooperIdentity,
+    },
+    expected: expectIgnored(
+      "Short-circuit damaged or secondary-market condition listings even when extraction has already latched onto a plausible Blanton's bottle identity.",
+    ),
+  }),
+  defineClassifierEvalCase({
     name: "store listing: rejects a sampler bundle without a single bottle identity",
     input: {
       reference: {
@@ -1091,11 +1293,8 @@ export const EVAL_CASES: ClassifierEvalCase[] = [
         url: "https://shop.example/products/single-malt-sampler-pack",
       },
     },
-    expected: {
-      status: "classified",
-      action: "no_match",
-      summary:
-        "Do not force a bottle identity for a multi-bottle sampler bundle that is not a single canonical whisky record.",
-    },
-  },
+    expected: expectIgnored(
+      "Short-circuit sampler bundles and other multi-bottle packs instead of trying to classify them as one canonical whisky bottle.",
+    ),
+  }),
 ];

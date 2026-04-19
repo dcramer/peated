@@ -29,6 +29,53 @@ type EvidenceCheck = BottleEvidenceCheck;
 type MatchAttribute = EvidenceCheck["attribute"];
 type SourceTier = BottleEvidenceSourceTier;
 
+export const REAFFIRMED_EXISTING_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD = 80;
+export const UNMATCHED_BOTTLE_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD = 96;
+
+export function isExistingMatchConfidenceEligibleForVerification({
+  confidence,
+  currentBottleId,
+  currentReleaseId,
+  matchedBottleId,
+  matchedReleaseId,
+}: {
+  confidence: number;
+  currentBottleId?: null | number;
+  currentReleaseId?: null | number;
+  matchedBottleId: null | number;
+  matchedReleaseId?: null | number;
+}): boolean {
+  // Downstream existing-match verification should be a thin confidence gate.
+  // Exact/title/web evidence should affect classifier confidence upstream rather
+  // than being re-implemented as separate approval heuristics.
+  if (matchedBottleId === null) {
+    return false;
+  }
+
+  const reaffirmsCurrentAssignment =
+    currentBottleId != null &&
+    matchedBottleId === currentBottleId &&
+    (matchedReleaseId ?? null) === (currentReleaseId ?? null);
+
+  if (reaffirmsCurrentAssignment) {
+    return (
+      confidence >= REAFFIRMED_EXISTING_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD
+    );
+  }
+
+  // Replacing an existing assignment is a downstream correction, not an
+  // existing-match verification candidate.
+  if (currentBottleId != null) {
+    return false;
+  }
+
+  if (matchedReleaseId !== null && matchedReleaseId !== undefined) {
+    return false;
+  }
+
+  return confidence >= UNMATCHED_BOTTLE_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD;
+}
+
 function getTargetNameVariants(targetCandidate: BottleCandidate): string[] {
   return Array.from(
     new Set(

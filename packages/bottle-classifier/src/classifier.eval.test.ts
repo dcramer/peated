@@ -15,6 +15,7 @@ import {
   DEFAULT_OPENAI_MODEL,
   getDeterministicOpenAISettings,
 } from "./openaiModelSettings";
+import { isExistingMatchConfidenceEligibleForVerification } from "./priceMatchingEvidence";
 
 const classifierModel = process.env.OPENAI_MODEL ?? DEFAULT_OPENAI_MODEL;
 const judgeModel = process.env.OPENAI_EVAL_MODEL ?? DEFAULT_OPENAI_EVAL_MODEL;
@@ -67,7 +68,25 @@ function buildSearchBottlesAdapter(testCase: ClassifierEvalCase) {
   };
 }
 
+function getDerivedVerifyEligibility(
+  testCase: ClassifierEvalCase,
+  result: BottleClassificationResult,
+): boolean {
+  if (result.status !== "classified" || result.decision.action !== "match") {
+    return false;
+  }
+
+  return isExistingMatchConfidenceEligibleForVerification({
+    confidence: result.decision.confidence,
+    currentBottleId: testCase.input.reference.currentBottleId ?? null,
+    currentReleaseId: testCase.input.reference.currentReleaseId ?? null,
+    matchedBottleId: result.decision.matchedBottleId,
+    matchedReleaseId: result.decision.matchedReleaseId,
+  });
+}
+
 function describeClassificationResult(
+  testCase: ClassifierEvalCase,
   result: BottleClassificationResult,
 ): Record<string, unknown> {
   if (result.status === "ignored") {
@@ -93,6 +112,7 @@ function describeClassificationResult(
     decision: {
       action: result.decision.action,
       confidence: result.decision.confidence,
+      verifyEligible: getDerivedVerifyEligibility(testCase, result),
       identityScope: result.decision.identityScope,
       matchedBottleId: result.decision.matchedBottleId,
       matchedReleaseId: result.decision.matchedReleaseId,
@@ -136,12 +156,15 @@ function deepContainsSubset(actual: unknown, expected: unknown): boolean {
 
 function createDecisionShapeScorer() {
   return async ({
+    input,
     output,
     expected,
   }: {
+    input: string;
     output: string;
     expected: ClassifierEvalExpectation;
   }) => {
+    const testCase = parseEvalCase(input);
     const result = parseClassificationResult(output);
     const checks: boolean[] = [result.status === expected.status];
 
@@ -166,6 +189,21 @@ function createDecisionShapeScorer() {
 
       if (expected.parentBottleId !== undefined) {
         checks.push(result.decision.parentBottleId === expected.parentBottleId);
+      }
+
+      if (expected.confidenceAtLeast !== undefined) {
+        checks.push(result.decision.confidence >= expected.confidenceAtLeast);
+      }
+
+      if (expected.confidenceBelow !== undefined) {
+        checks.push(result.decision.confidence < expected.confidenceBelow);
+      }
+
+      if (expected.verifyEligible !== undefined) {
+        checks.push(
+          getDerivedVerifyEligibility(testCase, result) ===
+            expected.verifyEligible,
+        );
       }
 
       if (expected.proposedBottle !== undefined) {
@@ -215,6 +253,7 @@ function createJudgeScorer() {
     const client = createOpenAIClient();
     const testCase = parseEvalCase(input);
     const result = parseClassificationResult(output);
+    const verifyEligible = getDerivedVerifyEligibility(testCase, result);
     const response = await client.responses.create({
       model: judgeModel!,
       instructions: [
@@ -222,6 +261,8 @@ function createJudgeScorer() {
         "Score from 0.0 to 1.0.",
         "Prioritize whether the classifier identified the correct bottle identity and chose a safe action.",
         "A false positive existing match is worse than a conservative create/no-match result.",
+        "Confidence calibration matters because downstream automatic verification is driven from the classifier's confidence for existing matches.",
+        "If an existing bottle match should be safe for automatic verification, the confidence should clear the expected threshold. If the match should remain review-only, the confidence should stay below that threshold.",
         "For exact-cask code programs such as SMWS, a correct matched bottle id and identity scope should score highly even when the source subtitle remains in observation-level text.",
         "Do not over-penalize selector or subtitle noise when the exact-cask code anchor, matched bottle id, and final action are correct.",
         "Use 1.0 for a clearly correct result, 0.5 for partially correct but materially flawed output, and 0.0 for the wrong bottle or unsafe matching behavior.",
@@ -237,7 +278,8 @@ function createJudgeScorer() {
                 `Case: ${testCase.name}`,
                 `Expected outcome: ${expected.summary}`,
                 `Expected structured constraints: ${JSON.stringify(expected, null, 2)}`,
-                `Actual classifier output: ${JSON.stringify(describeClassificationResult(result), null, 2)}`,
+                `Actual classifier output: ${JSON.stringify(describeClassificationResult(testCase, result), null, 2)}`,
+                `Actual derived verify eligibility: ${verifyEligible}`,
               ].join("\n\n"),
             },
           ],

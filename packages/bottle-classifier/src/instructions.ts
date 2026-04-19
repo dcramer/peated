@@ -139,6 +139,7 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
 export const NON_IDENTITY_LABEL_NOISE = [
   "volume and pack size such as `50ml`, `750ml`, `1L`, or `1.75L`",
   "gift sets, glasses, mugs, tins, holiday packs, minis, and sampler bundles",
+  "condition and defect wording such as `blooper bottle`, `broken wax seal`, `low fill`, `opened bottle`, or `damaged box`",
   "retailer SEO words like `Scotch Whisky`, `Kentucky Bourbon Whisky`, or `American Whiskey` when they only restate the category",
   "awards, ratings, tasting notes, review blurbs, and shelf talker copy",
   "retailer names, navigation breadcrumbs, and web-page chrome",
@@ -262,8 +263,10 @@ export const RETAILER_LABEL_EXAMPLES: RetailerLabelExample[] = [
     source: "Wooden Cork",
     label: "Skrewball Peanut Butter Whiskey",
     notes: [
-      "Novelty flavored whiskey products are not genuine whisky records for this database.",
-      "Treat peanut butter, PB&J, salted caramel, maple, honey, cinnamon, apple, and similar flavored whiskey products as non-whisky and do not create bottles for them.",
+      "Unsupported novelty flavored whiskey and whiskey-liqueur products are not genuine whisky records for this database.",
+      "Treat peanut butter, PB&J, salted caramel, maple, cinnamon, apple, and similar novelty additive-flavor whiskey products as non-whisky and do not create bottles for them.",
+      "Do not overgeneralize this exclusion to every bottle whose expression contains a flavor-adjacent noun. Exclude only when the product itself is clearly the flavored-whiskey or whiskey-liqueur product.",
+      "Coffee, cold brew, chocolate, rum, and similar expression words are not automatic exclusion markers by themselves.",
     ],
   },
   {
@@ -672,7 +675,10 @@ export function buildWhiskyLabelExtractorInstructions({
       "Prefer `[]` over guessing when the producing distillery is unknown.",
       "When a component is ambiguous, leave it `null` or `[]` instead of guessing. Missing data is better than a fabricated identity signal.",
       "If the source text is clearly for a non-whisky spirit such as vodka, gin, rum, tequila, or mezcal, return `null`.",
-      "If the source text is clearly a flavored whisky, whiskey liqueur, or novelty flavor product such as peanut butter, PB&J, salted caramel, maple, honey, cinnamon, or apple whisky, return `null`.",
+      "If the source text is clearly an unsupported novelty flavored whisky, whiskey liqueur, or additive-flavor product such as peanut butter, PB&J, salted caramel, maple, cinnamon, or apple whisky, return `null`.",
+      "Do not exclude a bottle solely because the expression contains a flavor-adjacent noun. Official catalogued whisky expressions can still be valid even when the name includes words like coffee, cold brew, chocolate, rum, or port.",
+      "Use the flavored-product exclusion narrowly. If the input otherwise reads like a branded whisky bottle identity, keep the structured identity instead of nulling it just because the expression sounds infused or flavor-adjacent.",
+      "Treat condition or defect wording such as `blooper bottle`, `broken wax seal`, `low fill`, `opened bottle`, `missing stopper`, or `damaged box` as sale-condition noise, not bottle identity. Do not place it in `expression`, `series`, or `edition`.",
       "Age statements should be integers. Normalize age phrases such as `12 Year`, `12 Years Old`, `12 Yr.`, and `12yr` to `stated_age: 12`.",
       "When an age statement belongs in the expression, normalize the phrase to `12-year-old`.",
       "For expression-style fields, follow the bottle's evidenced canonical name. Do not mechanically append retailer style/category words from the title just to make the expression look complete.",
@@ -786,8 +792,11 @@ export function buildBottleClassifierInstructions({
     "If bottle identity is clear but release identity is not, prefer the bottle-level outcome. Do not force a specific release from weak release evidence.",
     "If the only local candidate is a more specific release or edition than the reference supports, do not match it by default. Treat the candidate as over-specific unless web evidence validates the missing differentiating traits.",
     "Ignore volume, gift-set packaging, added glassware, ratings blurbs, and generic retailer SEO words when deciding bottle identity.",
+    "Treat condition or defect wording such as `blooper bottle`, `broken wax seal`, `low fill`, `opened bottle`, or `damaged box` as non-canonical sale-condition language, not as a distinct whisky expression.",
     "If the reference is clearly another spirit category such as vodka, gin, rum, tequila, or mezcal, return `no_match`. Do not create or assign a whisky bottle for it.",
-    "If the reference is clearly a flavored whisky, whiskey liqueur, or novelty flavor product such as peanut butter, PB&J, salted caramel, maple, honey, cinnamon, or apple whisky, return `no_match`. Do not create or assign a whisky bottle for it.",
+    "If the reference is clearly an unsupported novelty flavored whisky, whiskey liqueur, or additive-flavor product such as peanut butter, PB&J, salted caramel, maple, cinnamon, or apple whisky, return `no_match`. Do not create or assign a whisky bottle for it.",
+    "Do not exclude a bottle solely because the expression contains a flavor-adjacent noun. Official catalogued whisky expressions can still be valid even when the name includes words like coffee, cold brew, chocolate, rum, or port.",
+    "Use the flavored-product exclusion narrowly. If extracted identity plus local candidates already cleanly support a branded whisky bottle, do not override that match just because the expression sounds infused or flavor-adjacent.",
   ];
 
   return [
@@ -886,6 +895,10 @@ export function buildBottleClassifierInstructions({
       "For bare exact-cask program code references such as `SMWS 6.53`, keep the code as the proposed bottle-name anchor instead of replacing it with a web-discovered subtitle.",
       "For dotted marketed expressions such as `Octomore 13.1`, prefer bottle identity unless local candidates clearly establish a reusable parent bottle plus release structure.",
       "Set `confidence` as a percentage from 0 to 100, not a 0-1 decimal.",
+      "Confidence calibration matters. Unmatched existing bottle matches should reach the very high confidence band only when the reviewed bottle identity is safe enough for downstream automatic verification.",
+      "When the raw title or extracted identity cleanly reaffirms one existing bottle candidate with no conflicting release-level traits, confidence of 96+ is appropriate for that reviewed unmatched bottle-level match.",
+      "When authoritative producer, distillery, bottler, or importer evidence confirms the omitted canonical bottle trait for one existing candidate and no competing candidate remains plausible, confidence of 96+ is appropriate for that reviewed unmatched bottle-level match.",
+      "When the decision simply reaffirms the current assignment, confidence in the 80+ range is appropriate if the identity aligns cleanly. For new unmatched bottle matches that should still require review, keep confidence below the automatic-verification band.",
       "Only set `matchedBottleId` to an id from the provided candidates. Set `matchedReleaseId` only when you are matching a specific release candidate.",
       "Use `identityScope = exact_cask` only when the exact cask itself is the marketed bottle identity. Otherwise use `product`.",
       "If `identityScope = exact_cask`, do not use `create_release` or `create_bottle_and_release`. Use `create_bottle` and keep additional exact details in `observation`.",

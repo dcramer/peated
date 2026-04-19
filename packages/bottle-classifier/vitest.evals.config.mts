@@ -5,6 +5,7 @@ export default defineConfig({
     fileParallelism: false,
     include: ["src/**/*.eval.test.ts"],
     maxConcurrency: 1,
+    reporters: ["vitest-evals/reporter"],
     testTimeout: 180000,
   },
 });

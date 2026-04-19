@@ -1,6 +1,7 @@
 import {
   getExistingMatchIdentityConflicts,
   hasSupportiveWebEvidenceForExistingMatch as hasSupportiveBottleEvidence,
+  isExistingMatchConfidenceEligibleForVerification,
 } from "@peated/bottle-classifier/priceMatchingEvidence";
 import type { StorePrice } from "@peated/server/db/schema";
 import {
@@ -72,10 +73,6 @@ export type StorePriceMatchAutomationAssessment = z.infer<
   typeof StorePriceMatchAutomationAssessmentSchema
 >;
 
-const VERIFIED_MATCH_CONFIDENCE_THRESHOLD = 80;
-const HIGH_CONFIDENCE_EXACT_MATCH_MODEL_CONFIDENCE_THRESHOLD = 95;
-const HIGH_CONFIDENCE_STRUCTURED_MATCH_MODEL_CONFIDENCE_THRESHOLD = 95;
-const HIGH_CONFIDENCE_WEB_SUPPORTED_MATCH_MODEL_CONFIDENCE_THRESHOLD = 94;
 const AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD = 90;
 const AUTHORITATIVE_SOURCE_TIERS = new Set<SourceTier>(["official", "critic"]);
 const CRITIC_DOMAINS = [
@@ -117,16 +114,6 @@ const WEB_VALIDATED_DIFFERENTIATORS = new Set<MatchAttribute>([
   "vintageYear",
   "releaseYear",
 ]);
-const HIGH_CONFIDENCE_STRUCTURED_MATCH_REQUIRED_ATTRIBUTES: MatchAttribute[] = [
-  "brand",
-  "name",
-  "distillery",
-  "category",
-];
-const HIGH_CONFIDENCE_WEB_SUPPORTED_MATCH_REQUIRED_ATTRIBUTES: MatchAttribute[] =
-  ["brand", "name"];
-const HIGH_CONFIDENCE_WEB_SUPPORTED_MATCH_SECONDARY_ATTRIBUTES: MatchAttribute[] =
-  ["bottler", "distillery", "category", "series"];
 function clampScore(score: number) {
   return Math.min(100, Math.max(0, Math.round(score)));
 }
@@ -1198,64 +1185,22 @@ function getSuggestedMatchCandidate({
   );
 }
 
-function hasHighConfidenceStructuredMatch(
-  decisiveMatchAttributes: MatchAttribute[],
-  structuredMatchRequiresStatedAge: boolean,
-) {
-  const matchedAttributes = new Set(decisiveMatchAttributes);
-
-  const requiredAttributes: MatchAttribute[] = structuredMatchRequiresStatedAge
-    ? [...HIGH_CONFIDENCE_STRUCTURED_MATCH_REQUIRED_ATTRIBUTES, "statedAge"]
-    : HIGH_CONFIDENCE_STRUCTURED_MATCH_REQUIRED_ATTRIBUTES;
-
-  return requiredAttributes.every((attribute) =>
-    matchedAttributes.has(attribute),
-  );
-}
-
-function hasHighConfidenceWebSupportedMatch(
-  decisiveMatchAttributes: MatchAttribute[],
-) {
-  const matchedAttributes = new Set(decisiveMatchAttributes);
-
-  return (
-    HIGH_CONFIDENCE_WEB_SUPPORTED_MATCH_REQUIRED_ATTRIBUTES.every((attribute) =>
-      matchedAttributes.has(attribute),
-    ) &&
-    HIGH_CONFIDENCE_WEB_SUPPORTED_MATCH_SECONDARY_ATTRIBUTES.some((attribute) =>
-      matchedAttributes.has(attribute),
-    )
-  );
-}
-
 export function shouldVerifyStorePriceMatch({
   action,
-  price,
-  priceUrl,
+  currentBottleId,
+  currentReleaseId,
   suggestedBottleId,
   suggestedReleaseId,
   modelConfidence,
   automationBlockers,
-  decisiveMatchAttributes,
-  structuredMatchRequiresStatedAge = false,
-  extractedLabel = null,
-  searchEvidence = [],
-  candidateBottles,
 }: {
   action: MatchAction;
-  price: Pick<StorePrice, "bottleId"> & {
-    releaseId?: number | null;
-  };
-  priceUrl?: string | null;
+  currentBottleId: null | number;
+  currentReleaseId?: number | null;
   suggestedBottleId: number | null;
   suggestedReleaseId: number | null;
   modelConfidence: number | null;
   automationBlockers: string[];
-  decisiveMatchAttributes: MatchAttribute[];
-  structuredMatchRequiresStatedAge?: boolean;
-  extractedLabel?: ExtractedBottleDetails | null;
-  searchEvidence?: SearchEvidence[];
-  candidateBottles: PriceMatchCandidate[];
 }) {
   if (action !== "match_existing" || suggestedBottleId === null) {
     return false;
@@ -1265,63 +1210,11 @@ export function shouldVerifyStorePriceMatch({
     return false;
   }
 
-  const target = getSuggestedMatchCandidate({
-    suggestedBottleId,
-    suggestedReleaseId,
-    candidateBottles,
+  return isExistingMatchConfidenceEligibleForVerification({
+    confidence: modelConfidence,
+    currentBottleId,
+    currentReleaseId: currentReleaseId ?? null,
+    matchedBottleId: suggestedBottleId,
+    matchedReleaseId: suggestedReleaseId ?? null,
   });
-
-  const reaffirmsCurrentAssignment =
-    price.bottleId !== null &&
-    suggestedBottleId === price.bottleId &&
-    (suggestedReleaseId ?? null) === (price.releaseId ?? null);
-  if (
-    reaffirmsCurrentAssignment &&
-    (modelConfidence >= VERIFIED_MATCH_CONFIDENCE_THRESHOLD ||
-      target?.source.includes("exact") === true)
-  ) {
-    return true;
-  }
-
-  if (price.bottleId !== null) {
-    return false;
-  }
-
-  if (
-    // Let the classifier break ties for bottle-only matches once the extracted
-    // identity already confirmed the stable bottle fields we trust.
-    suggestedReleaseId === null &&
-    modelConfidence >=
-      HIGH_CONFIDENCE_STRUCTURED_MATCH_MODEL_CONFIDENCE_THRESHOLD &&
-    hasHighConfidenceStructuredMatch(
-      decisiveMatchAttributes,
-      structuredMatchRequiresStatedAge,
-    )
-  ) {
-    return true;
-  }
-
-  if (
-    suggestedReleaseId === null &&
-    target &&
-    priceUrl &&
-    extractedLabel &&
-    searchEvidence.length > 0 &&
-    modelConfidence >=
-      HIGH_CONFIDENCE_WEB_SUPPORTED_MATCH_MODEL_CONFIDENCE_THRESHOLD &&
-    hasHighConfidenceWebSupportedMatch(decisiveMatchAttributes) &&
-    hasSupportiveWebEvidenceForExistingMatch({
-      priceUrl,
-      target,
-      extractedLabel,
-      searchEvidence,
-    })
-  ) {
-    return true;
-  }
-
-  return (
-    target?.source.includes("exact") === true &&
-    modelConfidence >= HIGH_CONFIDENCE_EXACT_MATCH_MODEL_CONFIDENCE_THRESHOLD
-  );
 }

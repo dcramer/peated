@@ -54,7 +54,7 @@ describe("bottle-classifier instructions", () => {
     }
   });
 
-  test("treats flavored whisky references as non-whisky in both prompts", () => {
+  test("narrows flavored-whisky exclusions to unsupported novelty products in both prompts", () => {
     const extractorInstructions = buildWhiskyLabelExtractorInstructions({
       mode: "text",
     });
@@ -65,8 +65,21 @@ describe("bottle-classifier instructions", () => {
     expect(extractorInstructions).toContain("Skrewball Peanut Butter Whiskey");
     expect(extractorInstructions).toContain("salted caramel");
     expect(extractorInstructions).toContain("return `null`");
+    expect(extractorInstructions).toContain(
+      "Do not exclude a bottle solely because the expression contains a flavor-adjacent noun.",
+    );
+    expect(extractorInstructions).toContain(
+      "Use the flavored-product exclusion narrowly.",
+    );
     expect(matchInstructions).toContain("Skrewball Peanut Butter Whiskey");
     expect(matchInstructions).toContain("return `no_match`");
+    expect(matchInstructions).toContain(
+      "If extracted identity plus local candidates already cleanly support a branded whisky bottle",
+    );
+    expect(matchInstructions).toContain("confidence of 96+ is appropriate");
+    expect(matchInstructions).toContain(
+      "When the raw title or extracted identity cleanly reaffirms one existing bottle candidate",
+    );
   });
 
   test("builds matching guidance that prefers no-match over a false match", () => {

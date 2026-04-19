@@ -31,6 +31,22 @@ const NON_WHISKY_KEYWORDS =
   /\b(vodka|gin|rum|tequila|mezcal|sotol|soju|baijiu|sake|shochu|brandy|cognac|armagnac|liqueur)\b/i;
 const GIFT_SET_PACKAGING_KEYWORDS =
   /\b(gift set|gift pack|gift box|holiday pack|with glass|with glasses|glassware)\b/i;
+const MULTI_ITEM_REFERENCE_PATTERNS = [
+  GIFT_SET_PACKAGING_KEYWORDS,
+  /\bbundle\b/i,
+  /\b(?:sampler|tasting|variety)\s+(?:pack|set|bundle)\b/i,
+  /\b\d+\s*(?:-|x)?\s*pack\b/i,
+  /\b(?:pack|set|case)\s+of\s+\d+\b/i,
+  /\b\d+\s*x\s*\d+(?:\.\d+)?\s?(?:ml|cl|l|oz)\b/i,
+] as const;
+const NON_STANDARD_CONDITION_REFERENCE_PATTERNS = [
+  /\bblooper bottle\b/i,
+  /\bbroken (?:wax )?seal\b/i,
+  /\b(?:opened|open)\s+bottle\b/i,
+  /\blow fill\b/i,
+  /\bleak(?:ing)?\b/i,
+  /\b(?:damaged|missing|cracked|torn|scuffed)\s+(?:box|tube|tin|wax|seal|stopper|label)\b/i,
+] as const;
 const WHISKY_KEYWORDS =
   /\b(whisk(?:e)?y|single malt|single grain|single pot still|bourbon|rye|scotch|malt whisky|malt whiskey)\b/i;
 const GENERIC_NAME_TOKENS = new Set([
@@ -2640,25 +2656,40 @@ export function getAutoIgnoreBottleReferenceReason(
   referenceName: string,
   extractedIdentity: BottleClassificationArtifacts["extractedIdentity"],
 ): string | null {
-  if (extractedIdentity) {
-    return null;
-  }
-
   const normalizedName = normalizeString(referenceName).toLowerCase();
-  if (
-    NON_WHISKY_KEYWORDS.test(normalizedName) &&
-    !WHISKY_KEYWORDS.test(normalizedName)
-  ) {
-    return "Reference is clearly a non-whisky category match and extraction found no whisky identity.";
+  if (!extractedIdentity) {
+    if (
+      NON_WHISKY_KEYWORDS.test(normalizedName) &&
+      !WHISKY_KEYWORDS.test(normalizedName)
+    ) {
+      return "Reference is clearly a non-whisky category match and extraction found no whisky identity.";
+    }
+
+    if (GIFT_SET_PACKAGING_KEYWORDS.test(normalizedName)) {
+      const identityTokens = getComparableNameTokens(normalizedName).filter(
+        (token) =>
+          !GIFT_SET_PACKAGING_TOKENS.has(token) && !/^\d+$/.test(token),
+      );
+      if (identityTokens.length === 0) {
+        return "Reference is packaging-only gift-set text and extraction found no whisky identity.";
+      }
+    }
   }
 
-  if (GIFT_SET_PACKAGING_KEYWORDS.test(normalizedName)) {
-    const identityTokens = getComparableNameTokens(normalizedName).filter(
-      (token) => !GIFT_SET_PACKAGING_TOKENS.has(token) && !/^\d+$/.test(token),
-    );
-    if (identityTokens.length === 0) {
-      return "Reference is packaging-only gift-set text and extraction found no whisky identity.";
-    }
+  if (
+    MULTI_ITEM_REFERENCE_PATTERNS.some((pattern) =>
+      pattern.test(normalizedName),
+    )
+  ) {
+    return "Reference is a bundle or multi-bottle listing, not a single bottle listing.";
+  }
+
+  if (
+    NON_STANDARD_CONDITION_REFERENCE_PATTERNS.some((pattern) =>
+      pattern.test(normalizedName),
+    )
+  ) {
+    return "Reference describes a damaged or non-standard sale-condition bottle, not a standard bottle listing.";
   }
 
   return null;

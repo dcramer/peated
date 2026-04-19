@@ -121,7 +121,7 @@ Internal server adapters should use the explicit internal namespace:
 The classifier runs in this order:
 
 1. Extract structured whisky identity from the reference image or text.
-2. If extraction fails and the title is trivially non-whisky, return an ignored result.
+2. Deterministically ignore obvious non-whisky references plus clearly non-single-bottle rows such as multipacks, gift sets, sampler bundles, and damaged-condition sale listings.
 3. Retrieve initial local bottle/release candidates.
 4. Run the LLM reasoner with local search, entity search, and web search tools.
 5. Sanitize the returned decision against known candidates and resolved entities.
@@ -135,9 +135,11 @@ These rules should remain centralized in the classifier:
 
 - The model may suggest only known candidate bottle/release ids.
 - Create drafts must be normalized before persistence.
-- Flavored whisky / novelty drink exclusion is model-driven, not regex-driven.
+- Unsupported novelty flavored-whiskey / whiskey-liqueur exclusion is model-driven, not regex-driven.
+- A flavor-adjacent noun in the expression is not enough to exclude a bottle. Official catalogued whisky expressions can still match when the overall evidence says the product is a real whisky bottle rather than a novelty additive-flavor product.
 - Over-specific local candidates should not be matched unless the missing differentiator is actually supported.
 - Web evidence is support, not identity by itself.
+- Confidence calibration matters because downstream consumers use classifier confidence to decide whether a reviewed existing match is safe to auto-verify or should stay in review.
 - Generic `single cask` / `single barrel` language is not enough to infer `exact_cask`; exact-cask scope needs a stronger marketed-identity signal such as a known program code or numbered cask identity.
 - Downstream consumers should adapt the reviewed classifier result instead of “fixing up” raw model decisions.
 - Consumer-specific semantics such as price-match `correction` should be derived outside the generic classifier.
@@ -183,6 +185,7 @@ The classifier contract is intentionally shaped for evals:
 - ignored vs classified outcomes are explicit via `status`
 
 That gives eval harnesses a stable place to score both the final decision and the intermediate evidence without reaching into price-matching persistence code.
+Classifier evals should also score confidence calibration for cases that are meant to remain review-only versus safe for downstream automatic verification.
 
 The current package-local eval harness lives in:
 
@@ -195,7 +198,16 @@ The current package-local eval harness lives in:
 
 Run it from the repo root with:
 
+- `pnpm evals`
+
+Direct package-local runs still work:
+
 - `pnpm evals:classifier`
+
+The root `pnpm evals` entrypoint is the intended way to run live classifier
+evals. It forwards extra Vitest args to the package runner and uses the
+`vitest-evals` reporter configured in
+`packages/bottle-classifier/vitest.evals.config.mts`.
 
 Local setup for live evals:
 

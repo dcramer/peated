@@ -109,6 +109,7 @@ These are the rules to preserve when iterating on the classifier:
 - The model may only match candidate ids that were actually retrieved.
 - Web evidence can support identity, but web search by itself is not canonical identity storage.
 - Retailer wording and SEO noise are weak evidence; official and independent non-retailer sources are stronger.
+- Unsupported novelty flavored-whiskey or whiskey-liqueur products should be rejected, but a flavor-adjacent noun in the expression is not enough by itself to exclude an otherwise valid whisky bottle.
 - Over-specific local candidates should be downgraded if the listing does not support the extra differentiator.
 - Generic `single cask` or `single barrel` wording is not enough for `exact_cask`.
 - `exact_cask` should be reserved for strong marketed identity signals such as SMWS codes, cask numbers, or barrel numbers.
@@ -163,6 +164,7 @@ When changing classifier behavior:
 1. Update or add a focused unit test for deterministic behavior.
 2. Update the normalization corpus when the behavior changes bottle versus release identity boundaries.
 3. Update or add realistic positive and negative eval fixtures when the behavior is model-sensitive.
+   Confidence calibration belongs here too: cases that should be safe for downstream auto-verification need explicit eval expectations for the high-confidence band, while review-only matches should stay below it.
 4. Keep prompts, schemas, deterministic review logic, and pure normalization helpers aligned. Do not patch around package behavior in the server wrapper.
 5. Do not solve one failed family by teaching the prompt that exact family name. Generalize the rule in prompt or policy, and use eval fixtures to hold the concrete regression.
 6. Re-run package tests and evals before touching downstream consumers.
@@ -179,12 +181,20 @@ When adding a new bottle family or edge case:
 Useful commands:
 
 ```bash
+pnpm evals
 pnpm --filter @peated/bottle-classifier typecheck
 pnpm --filter @peated/bottle-classifier test
 pnpm --filter @peated/bottle-classifier evals
 ```
 
-The eval command loads the repo-root `.env` and then `.env.local`. `OPENAI_API_KEY` is required. `OPENAI_MODEL` defaults to `gpt-5.4` for the classifier pass. `OPENAI_EVAL_MODEL` defaults to `gpt-5-mini` for judging so routine evals stay cheaper by default; override either if you want a different cost or quality tradeoff. `BRAVE_API_KEY` is optional.
+`pnpm evals` is the intended repo-root entrypoint. It forwards extra Vitest args
+to the package runner and uses the `vitest-evals` reporter configured in
+[`vitest.evals.config.mts`](/home/dcramer/src/peated/packages/bottle-classifier/vitest.evals.config.mts).
+The eval command loads the repo-root `.env` and then `.env.local`.
+`OPENAI_API_KEY` is required. `OPENAI_MODEL` defaults to `gpt-5.4` for the
+classifier pass. `OPENAI_EVAL_MODEL` defaults to `gpt-5-mini` for judging so
+routine evals stay cheaper by default; override either if you want a different
+cost or quality tradeoff. `BRAVE_API_KEY` is optional.
 
 ## Related Docs
 
