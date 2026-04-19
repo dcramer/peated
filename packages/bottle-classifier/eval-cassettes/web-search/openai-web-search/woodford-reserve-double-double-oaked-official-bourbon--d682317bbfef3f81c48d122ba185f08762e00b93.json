@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Woodford Reserve Double Double Oaked official bourbon"
+    },
+    "recordedAt": "2026-04-19T23:12:48.431Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Woodford Reserve Double Double Oaked official bourbon",
+          "summary": "**Woodford Reserve Double Double Oaked** is an **official Woodford Reserve bourbon release**. On Woodford Reserve’s official product page, it is described as a **double-barreled bourbon** and listed at **90.4 proof**. The brand also says it undergoes an **extended maturation in a second, custom-crafted barrel that is d",
+          "results": [
+            {
+              "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+              "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+              "domain": "woodfordreserve.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+              "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+              "domain": "woodfordreserve.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/woodford-reserve-double-double-oaked",
+              "url": "https://distiller.com/spirits/woodford-reserve-double-double-oaked",
+              "domain": "distiller.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+              "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+              "domain": "shop.woodfordreserve.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://shop.woodfordreserve.com/woodford-reserve-2k-and-5k-mint-julep-cup/",
+              "url": "https://shop.woodfordreserve.com/woodford-reserve-2k-and-5k-mint-julep-cup/",
+              "domain": "shop.woodfordreserve.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.woodfordreserve.com/fr/notre-whisky/",
+              "url": "https://www.woodfordreserve.com/fr/notre-whisky/",
+              "domain": "woodfordreserve.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Woodford Reserve Double Double Oaked official bourbon",
+        "summary": "**Woodford Reserve Double Double Oaked** is an **official Woodford Reserve bourbon release**. On Woodford Reserve’s official product page, it is described as a **double-barreled bourbon** and listed at **90.4 proof**. The brand also says it undergoes an **extended maturation in a second, custom-crafted barrel that is d",
+        "results": [
+          {
+            "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+            "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/woodford-reserve-double-double-oaked",
+            "url": "https://distiller.com/spirits/woodford-reserve-double-double-oaked",
+            "domain": "distiller.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+            "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+            "domain": "shop.woodfordreserve.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://shop.woodfordreserve.com/woodford-reserve-2k-and-5k-mint-julep-cup/",
+            "url": "https://shop.woodfordreserve.com/woodford-reserve-2k-and-5k-mint-julep-cup/",
+            "domain": "shop.woodfordreserve.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.woodfordreserve.com/fr/notre-whisky/",
+            "url": "https://www.woodfordreserve.com/fr/notre-whisky/",
+            "domain": "woodfordreserve.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

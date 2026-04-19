@@ -1,0 +1,296 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "official The Glenlivet Caribbean Reserve Rum Barrel Selection"
+    },
+    "recordedAt": "2026-04-19T05:32:04.895Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "official The Glenlivet Caribbean Reserve Rum Barrel Selection",
+          "summary": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+          "results": [
+            {
+              "title": "https://distiller.com/spirits/the-glenlivet-caribbean-reserve",
+              "url": "https://distiller.com/spirits/the-glenlivet-caribbean-reserve",
+              "domain": "distiller.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.theglenlivet.com/en/whisky/20-year-old-rum-barrel/",
+              "url": "https://www.theglenlivet.com/en/whisky/20-year-old-rum-barrel/",
+              "domain": "theglenlivet.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/",
+              "url": "https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/",
+              "domain": "theglenlivet.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.theglenlivet.com/en-us/fusion-cask/",
+              "url": "https://www.theglenlivet.com/en-us/fusion-cask/",
+              "domain": "theglenlivet.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.theglenlivet.com/en/our-community/articles/types-of-whisky-casks/",
+              "url": "https://www.theglenlivet.com/en/our-community/articles/types-of-whisky-casks/",
+              "domain": "theglenlivet.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.theglenlivet.com/pl-pl/naszej-spolecznosci/articles/cztery-typy-beczek-do-whisky/",
+              "url": "https://www.theglenlivet.com/pl-pl/naszej-spolecznosci/articles/cztery-typy-beczek-do-whisky/",
+              "domain": "theglenlivet.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.theglenlivet.com/en-us/articles/rum-cask-cocktails/",
+              "url": "https://www.theglenlivet.com/en-us/articles/rum-cask-cocktails/",
+              "domain": "theglenlivet.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/glenlivet-rum-bourbon-fusion-cask-selection",
+              "url": "https://distiller.com/spirits/glenlivet-rum-bourbon-fusion-cask-selection",
+              "domain": "distiller.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.theglenlivet.com/de-de/whisky/caribbean-reserve-single-malt-scotch/",
+              "url": "https://www.theglenlivet.com/de-de/whisky/caribbean-reserve-single-malt-scotch/",
+              "domain": "theglenlivet.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.theglenlivet.com/pl-pl/whisky/caribbean-reserve-single-malt-scotch/",
+              "url": "https://www.theglenlivet.com/pl-pl/whisky/caribbean-reserve-single-malt-scotch/",
+              "domain": "theglenlivet.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.theglenlivet.com/en/our-community/rum-vs-whisky/",
+              "url": "https://www.theglenlivet.com/en/our-community/rum-vs-whisky/",
+              "domain": "theglenlivet.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.theglenlivet.com/en-us/sample-room/",
+              "url": "https://www.theglenlivet.com/en-us/sample-room/",
+              "domain": "theglenlivet.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.theglenlivet.com/wp-content/uploads/2026/02/THE-GLENLIVET-LIV-Golf-SA-Promotion-Participating-Store-List.pdf",
+              "url": "https://www.theglenlivet.com/wp-content/uploads/2026/02/THE-GLENLIVET-LIV-Golf-SA-Promotion-Participating-Store-List.pdf",
+              "domain": "theglenlivet.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.theglenlivet.com/wp-content/uploads/2024/03/Grupa-Pernod-Ricard-lista-30-06-2023-r.pdf",
+              "url": "https://www.theglenlivet.com/wp-content/uploads/2024/03/Grupa-Pernod-Ricard-lista-30-06-2023-r.pdf",
+              "domain": "theglenlivet.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.theglenlivet.com/wp-content/uploads/2023/10/TGL_Scorecard.pdf",
+              "url": "https://www.theglenlivet.com/wp-content/uploads/2023/10/TGL_Scorecard.pdf",
+              "domain": "theglenlivet.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/external_resources/press/FreeShippingUKandEU.pdf?srsltid=AfmBOopvRm0zyLo8pWZAgpXkv0-lDLHdWXKWWQaStmS5UtKmjyS4zQ7S",
+              "url": "https://www.masterofmalt.com/external_resources/press/FreeShippingUKandEU.pdf?srsltid=AfmBOopvRm0zyLo8pWZAgpXkv0-lDLHdWXKWWQaStmS5UtKmjyS4zQ7S",
+              "domain": "masterofmalt.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/files/galleries/WhiksyAdvocate-HemisphereTasting.pdf",
+              "url": "https://whiskyadvocate.com/files/galleries/WhiksyAdvocate-HemisphereTasting.pdf",
+              "domain": "whiskyadvocate.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "Caribbean Reserve Single Malt Scotch Whisky - The Glenlivet US",
+              "url": "https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai",
+              "domain": "theglenlivet.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            },
+            {
+              "title": "Glenlivet Caribbean Reserve",
+              "url": "https://distiller.com/spirits/the-glenlivet-caribbean-reserve?utm_source=openai",
+              "domain": "distiller.com",
+              "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "official The Glenlivet Caribbean Reserve Rum Barrel Selection",
+        "summary": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+        "results": [
+          {
+            "title": "https://distiller.com/spirits/the-glenlivet-caribbean-reserve",
+            "url": "https://distiller.com/spirits/the-glenlivet-caribbean-reserve",
+            "domain": "distiller.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.theglenlivet.com/en/whisky/20-year-old-rum-barrel/",
+            "url": "https://www.theglenlivet.com/en/whisky/20-year-old-rum-barrel/",
+            "domain": "theglenlivet.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/",
+            "url": "https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/",
+            "domain": "theglenlivet.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.theglenlivet.com/en-us/fusion-cask/",
+            "url": "https://www.theglenlivet.com/en-us/fusion-cask/",
+            "domain": "theglenlivet.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.theglenlivet.com/en/our-community/articles/types-of-whisky-casks/",
+            "url": "https://www.theglenlivet.com/en/our-community/articles/types-of-whisky-casks/",
+            "domain": "theglenlivet.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.theglenlivet.com/pl-pl/naszej-spolecznosci/articles/cztery-typy-beczek-do-whisky/",
+            "url": "https://www.theglenlivet.com/pl-pl/naszej-spolecznosci/articles/cztery-typy-beczek-do-whisky/",
+            "domain": "theglenlivet.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.theglenlivet.com/en-us/articles/rum-cask-cocktails/",
+            "url": "https://www.theglenlivet.com/en-us/articles/rum-cask-cocktails/",
+            "domain": "theglenlivet.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/glenlivet-rum-bourbon-fusion-cask-selection",
+            "url": "https://distiller.com/spirits/glenlivet-rum-bourbon-fusion-cask-selection",
+            "domain": "distiller.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.theglenlivet.com/de-de/whisky/caribbean-reserve-single-malt-scotch/",
+            "url": "https://www.theglenlivet.com/de-de/whisky/caribbean-reserve-single-malt-scotch/",
+            "domain": "theglenlivet.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.theglenlivet.com/pl-pl/whisky/caribbean-reserve-single-malt-scotch/",
+            "url": "https://www.theglenlivet.com/pl-pl/whisky/caribbean-reserve-single-malt-scotch/",
+            "domain": "theglenlivet.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.theglenlivet.com/en/our-community/rum-vs-whisky/",
+            "url": "https://www.theglenlivet.com/en/our-community/rum-vs-whisky/",
+            "domain": "theglenlivet.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.theglenlivet.com/en-us/sample-room/",
+            "url": "https://www.theglenlivet.com/en-us/sample-room/",
+            "domain": "theglenlivet.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.theglenlivet.com/wp-content/uploads/2026/02/THE-GLENLIVET-LIV-Golf-SA-Promotion-Participating-Store-List.pdf",
+            "url": "https://www.theglenlivet.com/wp-content/uploads/2026/02/THE-GLENLIVET-LIV-Golf-SA-Promotion-Participating-Store-List.pdf",
+            "domain": "theglenlivet.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.theglenlivet.com/wp-content/uploads/2024/03/Grupa-Pernod-Ricard-lista-30-06-2023-r.pdf",
+            "url": "https://www.theglenlivet.com/wp-content/uploads/2024/03/Grupa-Pernod-Ricard-lista-30-06-2023-r.pdf",
+            "domain": "theglenlivet.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.theglenlivet.com/wp-content/uploads/2023/10/TGL_Scorecard.pdf",
+            "url": "https://www.theglenlivet.com/wp-content/uploads/2023/10/TGL_Scorecard.pdf",
+            "domain": "theglenlivet.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/external_resources/press/FreeShippingUKandEU.pdf?srsltid=AfmBOopvRm0zyLo8pWZAgpXkv0-lDLHdWXKWWQaStmS5UtKmjyS4zQ7S",
+            "url": "https://www.masterofmalt.com/external_resources/press/FreeShippingUKandEU.pdf?srsltid=AfmBOopvRm0zyLo8pWZAgpXkv0-lDLHdWXKWWQaStmS5UtKmjyS4zQ7S",
+            "domain": "masterofmalt.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/files/galleries/WhiksyAdvocate-HemisphereTasting.pdf",
+            "url": "https://whiskyadvocate.com/files/galleries/WhiksyAdvocate-HemisphereTasting.pdf",
+            "domain": "whiskyadvocate.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "Caribbean Reserve Single Malt Scotch Whisky - The Glenlivet US",
+            "url": "https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai",
+            "domain": "theglenlivet.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenlivet Caribbean Reserve",
+            "url": "https://distiller.com/spirits/the-glenlivet-caribbean-reserve?utm_source=openai",
+            "domain": "distiller.com",
+            "description": "**Confirmed identity:** **The Glenlivet Caribbean Reserve** — often shown on labels/subtitles as **“Rum Barrel Selection”** or described as a whisky “selectively finished in Caribbean rum casks/barrels.” It is an **official Glenlivet single malt Scotch whisky release**, not an independent bottling. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n\n**What official Glenlivet sources confirm:**\n- **Brand/distillery:** The whisky is a **The Glenlivet** release, i.e. official distillery/brand bottling. ([theglenlivet.com](https:",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

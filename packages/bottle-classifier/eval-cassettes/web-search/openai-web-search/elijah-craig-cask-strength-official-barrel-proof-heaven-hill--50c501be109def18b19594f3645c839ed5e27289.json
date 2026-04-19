@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Elijah Craig Cask Strength official Barrel Proof Heaven Hill"
+    },
+    "recordedAt": "2026-04-19T21:19:52.499Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Elijah Craig Cask Strength official Barrel Proof Heaven Hill",
+          "summary": "This bottle reference matches **Elijah Craig Barrel Proof**, which is an **official Heaven Hill / Elijah Craig release**. Heaven Hill’s official product page confirms it is **Elijah Craig Barrel Proof**, an **uncut bourbon bottled straight from the barrel**, with **batch-specific proof** and listed by release year and ",
+          "results": [
+            {
+              "title": "https://heavenhilldistillery.com/elijah-craig-single-barrel23.php",
+              "url": "https://heavenhilldistillery.com/elijah-craig-single-barrel23.php",
+              "domain": "heavenhilldistillery.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://heavenhilldistillery.com/william-heavenhill.php/distillerys-awards.php",
+              "url": "https://heavenhilldistillery.com/william-heavenhill.php/distillerys-awards.php",
+              "domain": "heavenhilldistillery.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://heavenhilldistillery.com/elijah-craig-barrel-proof-rye.php",
+              "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof-rye.php",
+              "domain": "heavenhilldistillery.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php/barrel.php",
+              "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php/barrel.php",
+              "domain": "heavenhilldistillery.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/Elijah-Craig-Barrel-Proof-s-First-Batch-of-the-Year",
+              "url": "https://whiskyadvocate.com/Elijah-Craig-Barrel-Proof-s-First-Batch-of-the-Year",
+              "domain": "whiskyadvocate.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://heavenhilldistillery.com/elijah-craig-rye.php/kentucky-straight-bourbon-whiskey.php",
+              "url": "https://heavenhilldistillery.com/elijah-craig-rye.php/kentucky-straight-bourbon-whiskey.php",
+              "domain": "heavenhilldistillery.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Elijah Craig Cask Strength official Barrel Proof Heaven Hill",
+        "summary": "This bottle reference matches **Elijah Craig Barrel Proof**, which is an **official Heaven Hill / Elijah Craig release**. Heaven Hill’s official product page confirms it is **Elijah Craig Barrel Proof**, an **uncut bourbon bottled straight from the barrel**, with **batch-specific proof** and listed by release year and ",
+        "results": [
+          {
+            "title": "https://heavenhilldistillery.com/elijah-craig-single-barrel23.php",
+            "url": "https://heavenhilldistillery.com/elijah-craig-single-barrel23.php",
+            "domain": "heavenhilldistillery.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://heavenhilldistillery.com/william-heavenhill.php/distillerys-awards.php",
+            "url": "https://heavenhilldistillery.com/william-heavenhill.php/distillerys-awards.php",
+            "domain": "heavenhilldistillery.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://heavenhilldistillery.com/elijah-craig-barrel-proof-rye.php",
+            "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof-rye.php",
+            "domain": "heavenhilldistillery.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php/barrel.php",
+            "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php/barrel.php",
+            "domain": "heavenhilldistillery.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/Elijah-Craig-Barrel-Proof-s-First-Batch-of-the-Year",
+            "url": "https://whiskyadvocate.com/Elijah-Craig-Barrel-Proof-s-First-Batch-of-the-Year",
+            "domain": "whiskyadvocate.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://heavenhilldistillery.com/elijah-craig-rye.php/kentucky-straight-bourbon-whiskey.php",
+            "url": "https://heavenhilldistillery.com/elijah-craig-rye.php/kentucky-straight-bourbon-whiskey.php",
+            "domain": "heavenhilldistillery.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

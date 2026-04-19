@@ -1,0 +1,13 @@
+{
+  "id": "whistler-bodega-cask-single-malt",
+  "referenceName": "The Whistler Bodega Cask Single Malt Irish Whiskey",
+  "expectedBottleName": "The Whistler Bodega Cask",
+  "summary": "Keep The Whistler Bodega Cask at bottle identity when the source clearly says single malt, even if the only local bottle is mislabeled as a blend. Do not force a wrong existing match or invent a different bottle identity.",
+  "peatedBottleIds": [12953],
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": null
+  }
+}

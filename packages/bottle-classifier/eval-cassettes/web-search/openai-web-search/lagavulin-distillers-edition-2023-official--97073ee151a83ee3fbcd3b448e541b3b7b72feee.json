@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Lagavulin Distillers Edition 2023 official"
+    },
+    "recordedAt": "2026-04-19T15:44:41.514Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Lagavulin Distillers Edition 2023 official",
+          "summary": "I found an official current product page, but not a standalone “Lagavulin Distillers Edition 2023” official release page. The strongest official evidence is that the **current Lagavulin Distillers Edition** on Malts/Diageo is **43% ABV, 70cl**, and is **first matured in refill American and European oak casks**, then gi",
+          "results": [
+            {
+              "title": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-distillers-edition-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-distillers-edition-whisky/",
+              "domain": "masterofmalt.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "url": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "domain": "malts.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/de-de/products/lagavulin-12-jahre-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "url": "https://www.malts.com/de-de/products/lagavulin-12-jahre-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "domain": "malts.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/nl-nl/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "url": "https://www.malts.com/nl-nl/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "domain": "malts.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/227531/lagavulin-the-distillers-edition",
+              "url": "https://www.whiskybase.com/whiskies/whisky/227531/lagavulin-the-distillers-edition",
+              "domain": "whiskybase.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskynotes.be/2023/lagavulin/lagavulin-12-years-2023-special-release/",
+              "url": "https://www.whiskynotes.be/2023/lagavulin/lagavulin-12-years-2023-special-release/",
+              "domain": "whiskynotes.be",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Lagavulin Distillers Edition 2023 official",
+        "summary": "I found an official current product page, but not a standalone “Lagavulin Distillers Edition 2023” official release page. The strongest official evidence is that the **current Lagavulin Distillers Edition** on Malts/Diageo is **43% ABV, 70cl**, and is **first matured in refill American and European oak casks**, then gi",
+        "results": [
+          {
+            "title": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-distillers-edition-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-distillers-edition-whisky/",
+            "domain": "masterofmalt.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "url": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "domain": "malts.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/de-de/products/lagavulin-12-jahre-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "url": "https://www.malts.com/de-de/products/lagavulin-12-jahre-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "domain": "malts.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/nl-nl/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "url": "https://www.malts.com/nl-nl/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "domain": "malts.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/227531/lagavulin-the-distillers-edition",
+            "url": "https://www.whiskybase.com/whiskies/whisky/227531/lagavulin-the-distillers-edition",
+            "domain": "whiskybase.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskynotes.be/2023/lagavulin/lagavulin-12-years-2023-special-release/",
+            "url": "https://www.whiskynotes.be/2023/lagavulin/lagavulin-12-years-2023-special-release/",
+            "domain": "whiskynotes.be",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

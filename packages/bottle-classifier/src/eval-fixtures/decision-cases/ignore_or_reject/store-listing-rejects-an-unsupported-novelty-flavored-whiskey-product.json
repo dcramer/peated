@@ -1,0 +1,15 @@
+{
+  "id": "store-listing-rejects-an-unsupported-novelty-flavored-whiskey-product",
+  "name": "store listing: rejects an unsupported novelty flavored-whiskey product",
+  "input": {
+    "reference": {
+      "name": "Skrewball Peanut Butter Whiskey",
+      "url": "https://shop.example/products/skrewball-peanut-butter-whiskey"
+    }
+  },
+  "expected": {
+    "status": "classified",
+    "action": "no_match",
+    "summary": "Treat unsupported novelty flavored-whiskey products as out of scope and return `no_match` rather than creating or matching a whisky bottle."
+  }
+}

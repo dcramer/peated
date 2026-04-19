@@ -1,0 +1,88 @@
+{
+  "id": "store-listing-matches-an-existing-annual-release-under-distillers-edition",
+  "name": "store listing: matches an existing annual release under Distillers Edition",
+  "input": {
+    "reference": {
+      "name": "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
+      "url": "https://shop.example/products/lagavulin-distillers-edition-2023"
+    },
+    "extractedIdentity": {
+      "brand": "Lagavulin",
+      "bottler": null,
+      "expression": "Distillers Edition",
+      "series": null,
+      "distillery": ["Lagavulin"],
+      "category": "single_malt",
+      "stated_age": null,
+      "abv": null,
+      "release_year": 2023,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Lagavulin Distillers Edition",
+        "brand": "Lagavulin",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Lagavulin"],
+        "category": "single_malt",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.91,
+        "source": ["brand"],
+        "bottleId": 44006,
+        "fullName": "Lagavulin Distillers Edition"
+      },
+      {
+        "kind": "release",
+        "releaseId": 78,
+        "alias": null,
+        "bottleFullName": "Lagavulin Distillers Edition",
+        "brand": "Lagavulin",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Lagavulin"],
+        "category": "single_malt",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": 2023,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.95,
+        "source": ["brand", "release"],
+        "bottleId": 44006,
+        "fullName": "Lagavulin Distillers Edition 2023 Release"
+      }
+    ]
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 44006,
+    "matchedReleaseId": 78,
+    "summary": "Treat Distillers Edition as the stable parent family, use the bare 2023 year as release identity, and match the existing 2023 child release instead of downgrading to no-match."
+  }
+}

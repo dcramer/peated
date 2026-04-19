@@ -1,0 +1,310 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "official Jura 12 year old single malt Scotch whisky"
+    },
+    "recordedAt": "2026-04-19T15:35:46.385Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "official Jura 12 year old single malt Scotch whisky",
+          "summary": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+          "results": [
+            {
+              "title": "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/",
+              "url": "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/",
+              "domain": "jurawhisky.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.jurawhisky.com/en-us/community/feis-ile/",
+              "url": "https://www.jurawhisky.com/en-us/community/feis-ile/",
+              "domain": "jurawhisky.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/Jura-12-year-old-40",
+              "url": "https://whiskyadvocate.com/Jura-12-year-old-40",
+              "domain": "whiskyadvocate.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/jura-12-year-old-garrison-bros-laguna-madre-more-new-releases",
+              "url": "https://whiskyadvocate.com/jura-12-year-old-garrison-bros-laguna-madre-more-new-releases",
+              "domain": "whiskyadvocate.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.jurawhisky.com/us/all-whisky/signature-series/",
+              "url": "https://www.jurawhisky.com/us/all-whisky/signature-series/",
+              "domain": "jurawhisky.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.jurawhisky.com/en-us/distillery/our-tours/",
+              "url": "https://www.jurawhisky.com/en-us/distillery/our-tours/",
+              "domain": "jurawhisky.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/macallan-72-year-old-balvenie-tun-1509-more-new-whisky",
+              "url": "https://whiskyadvocate.com/macallan-72-year-old-balvenie-tun-1509-more-new-whisky",
+              "domain": "whiskyadvocate.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.jurawhisky.com/en-us/previous-releases/travel-retail/the-road/",
+              "url": "https://www.jurawhisky.com/en-us/previous-releases/travel-retail/the-road/",
+              "domain": "jurawhisky.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.jurawhisky.com/en-us/our-whisky/rare-aged/1975-vintage/",
+              "url": "https://www.jurawhisky.com/en-us/our-whisky/rare-aged/1975-vintage/",
+              "domain": "jurawhisky.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.jurawhisky.com/us/distillery/",
+              "url": "https://www.jurawhisky.com/us/distillery/",
+              "domain": "jurawhisky.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://shop-za.jurawhisky.com/products/jura-10yo-750ml",
+              "url": "https://shop-za.jurawhisky.com/products/jura-10yo-750ml",
+              "domain": "shop-za.jurawhisky.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.jurawhisky.com/en-us/our-whisky/core-range/10-year-old/",
+              "url": "https://www.jurawhisky.com/en-us/our-whisky/core-range/10-year-old/",
+              "domain": "jurawhisky.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://fastly.whiskyadvocate.com/wp-content/data/shelf_talker.php?review_id=736",
+              "url": "https://fastly.whiskyadvocate.com/wp-content/data/shelf_talker.php?review_id=736",
+              "domain": "fastly.whiskyadvocate.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/files/galleries/WhiksyAdvocate-HemisphereTasting.pdf",
+              "url": "https://whiskyadvocate.com/files/galleries/WhiksyAdvocate-HemisphereTasting.pdf",
+              "domain": "whiskyadvocate.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://fastly.whiskyadvocate.com/wp-content/data/shelf_talker.php?review_id=1297",
+              "url": "https://fastly.whiskyadvocate.com/wp-content/data/shelf_talker.php?review_id=1297",
+              "domain": "fastly.whiskyadvocate.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/files/galleries/WhiskyAdvocate-HighProofTasting.pdf",
+              "url": "https://whiskyadvocate.com/files/galleries/WhiskyAdvocate-HighProofTasting.pdf",
+              "domain": "whiskyadvocate.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://fastly.whiskyadvocate.com/wp-content/data/shelf_talker.php?review_id=3083",
+              "url": "https://fastly.whiskyadvocate.com/wp-content/data/shelf_talker.php?review_id=3083",
+              "domain": "fastly.whiskyadvocate.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/files/galleries/WhiskyAdvocate-GreatAmericanTasting.pdf",
+              "url": "https://whiskyadvocate.com/files/galleries/WhiskyAdvocate-GreatAmericanTasting.pdf",
+              "domain": "whiskyadvocate.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "Jura 12 Year Old | Jura Single Malt Whisky",
+              "url": "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai",
+              "domain": "jurawhisky.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            },
+            {
+              "title": "Jura 12 year old, 40%",
+              "url": "https://whiskyadvocate.com/Jura-12-year-old-40?utm_source=openai",
+              "domain": "whiskyadvocate.com",
+              "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "official Jura 12 year old single malt Scotch whisky",
+        "summary": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+        "results": [
+          {
+            "title": "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/",
+            "url": "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/",
+            "domain": "jurawhisky.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.jurawhisky.com/en-us/community/feis-ile/",
+            "url": "https://www.jurawhisky.com/en-us/community/feis-ile/",
+            "domain": "jurawhisky.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/Jura-12-year-old-40",
+            "url": "https://whiskyadvocate.com/Jura-12-year-old-40",
+            "domain": "whiskyadvocate.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/jura-12-year-old-garrison-bros-laguna-madre-more-new-releases",
+            "url": "https://whiskyadvocate.com/jura-12-year-old-garrison-bros-laguna-madre-more-new-releases",
+            "domain": "whiskyadvocate.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.jurawhisky.com/us/all-whisky/signature-series/",
+            "url": "https://www.jurawhisky.com/us/all-whisky/signature-series/",
+            "domain": "jurawhisky.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.jurawhisky.com/en-us/distillery/our-tours/",
+            "url": "https://www.jurawhisky.com/en-us/distillery/our-tours/",
+            "domain": "jurawhisky.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/macallan-72-year-old-balvenie-tun-1509-more-new-whisky",
+            "url": "https://whiskyadvocate.com/macallan-72-year-old-balvenie-tun-1509-more-new-whisky",
+            "domain": "whiskyadvocate.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.jurawhisky.com/en-us/previous-releases/travel-retail/the-road/",
+            "url": "https://www.jurawhisky.com/en-us/previous-releases/travel-retail/the-road/",
+            "domain": "jurawhisky.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.jurawhisky.com/en-us/our-whisky/rare-aged/1975-vintage/",
+            "url": "https://www.jurawhisky.com/en-us/our-whisky/rare-aged/1975-vintage/",
+            "domain": "jurawhisky.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.jurawhisky.com/us/distillery/",
+            "url": "https://www.jurawhisky.com/us/distillery/",
+            "domain": "jurawhisky.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://shop-za.jurawhisky.com/products/jura-10yo-750ml",
+            "url": "https://shop-za.jurawhisky.com/products/jura-10yo-750ml",
+            "domain": "shop-za.jurawhisky.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.jurawhisky.com/en-us/our-whisky/core-range/10-year-old/",
+            "url": "https://www.jurawhisky.com/en-us/our-whisky/core-range/10-year-old/",
+            "domain": "jurawhisky.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://fastly.whiskyadvocate.com/wp-content/data/shelf_talker.php?review_id=736",
+            "url": "https://fastly.whiskyadvocate.com/wp-content/data/shelf_talker.php?review_id=736",
+            "domain": "fastly.whiskyadvocate.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/files/galleries/WhiksyAdvocate-HemisphereTasting.pdf",
+            "url": "https://whiskyadvocate.com/files/galleries/WhiksyAdvocate-HemisphereTasting.pdf",
+            "domain": "whiskyadvocate.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://fastly.whiskyadvocate.com/wp-content/data/shelf_talker.php?review_id=1297",
+            "url": "https://fastly.whiskyadvocate.com/wp-content/data/shelf_talker.php?review_id=1297",
+            "domain": "fastly.whiskyadvocate.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/files/galleries/WhiskyAdvocate-HighProofTasting.pdf",
+            "url": "https://whiskyadvocate.com/files/galleries/WhiskyAdvocate-HighProofTasting.pdf",
+            "domain": "whiskyadvocate.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://fastly.whiskyadvocate.com/wp-content/data/shelf_talker.php?review_id=3083",
+            "url": "https://fastly.whiskyadvocate.com/wp-content/data/shelf_talker.php?review_id=3083",
+            "domain": "fastly.whiskyadvocate.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/files/galleries/WhiskyAdvocate-GreatAmericanTasting.pdf",
+            "url": "https://whiskyadvocate.com/files/galleries/WhiskyAdvocate-GreatAmericanTasting.pdf",
+            "domain": "whiskyadvocate.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jura 12 Year Old | Jura Single Malt Whisky",
+            "url": "https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai",
+            "domain": "jurawhisky.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jura 12 year old, 40%",
+            "url": "https://whiskyadvocate.com/Jura-12-year-old-40?utm_source=openai",
+            "domain": "whiskyadvocate.com",
+            "description": "**Official bottle identified:** **Jura 12 Year Old** single malt Scotch whisky from the **Isle of Jura Distillery**. The official Jura product page confirms it is a **12-year-old** expression and says it is **matured in American white oak ex-bourbon casks**. ([jurawhisky.com](https://www.jurawhisky.com/us/all-whisky/signature-series/12-year-old/?utm_source=openai))\n\nAn independent non-retailer source, Whisky Advocate, identifies the current standard bottling as **Jura 12 year old, 40% ABV**, and adds that it is **finished in oloroso sherry casks**. ([whiskyadvocate.com](https://whiskyadvocate.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

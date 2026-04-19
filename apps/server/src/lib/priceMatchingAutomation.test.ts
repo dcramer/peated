@@ -176,32 +176,12 @@ describe("priceMatchingAutomation", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
-        price: {
-          bottleId: null,
-          releaseId: null,
-        },
+        currentBottleId: null,
+        currentReleaseId: null,
         suggestedBottleId: 25,
         suggestedReleaseId: null,
         modelConfidence: 97,
         automationBlockers: assessment.automationBlockers,
-        decisiveMatchAttributes: assessment.decisiveMatchAttributes,
-        structuredMatchRequiresStatedAge:
-          assessment.structuredMatchRequiresStatedAge,
-        candidateBottles: [
-          buildCandidate({
-            bottleId: 25,
-            fullName: "The Macallan 12-year-old Double Cask",
-            bottleFullName: "The Macallan 12-year-old Double Cask",
-            brand: "The Macallan",
-            bottler: "The Macallan",
-            distillery: ["The Macallan"],
-            category: "single_malt",
-            statedAge: 12,
-            abv: null,
-            caskType: null,
-            source: ["text", "brand"],
-          }),
-        ],
       }),
     ).toBe(true);
   });
@@ -250,34 +230,12 @@ describe("priceMatchingAutomation", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
-        price: {
-          bottleId: null,
-          releaseId: null,
-        },
+        currentBottleId: null,
+        currentReleaseId: null,
         suggestedBottleId: 25,
         suggestedReleaseId: null,
         modelConfidence: 97,
         automationBlockers: assessment.automationBlockers,
-        decisiveMatchAttributes: assessment.decisiveMatchAttributes,
-        structuredMatchRequiresStatedAge:
-          assessment.structuredMatchRequiresStatedAge,
-        candidateBottles: [
-          buildCandidate({
-            bottleId: 25,
-            fullName:
-              "Wild Turkey Rare Breed Barrel-Proof Kentucky Straight Rye",
-            bottleFullName:
-              "Wild Turkey Rare Breed Barrel-Proof Kentucky Straight Rye",
-            brand: "Wild Turkey",
-            distillery: ["Wild Turkey"],
-            category: "rye",
-            statedAge: null,
-            caskStrength: true,
-            abv: null,
-            caskType: null,
-            source: ["text", "brand"],
-          }),
-        ],
       }),
     ).toBe(true);
   });
@@ -328,7 +286,7 @@ describe("priceMatchingAutomation", () => {
     ];
     const assessment = getStorePriceMatchAutomationAssessment({
       action: "match_existing",
-      modelConfidence: 94,
+      modelConfidence: 96,
       price: {
         bottleId: null,
         name: "The Glenlivet Caribbean Reserve",
@@ -346,88 +304,31 @@ describe("priceMatchingAutomation", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
-        price: {
-          bottleId: null,
-          releaseId: null,
-        },
-        priceUrl:
-          "https://www.reservebar.com/products/the-glenlivet-caribbean-reserve/GROUPING-1419170.html",
+        currentBottleId: null,
+        currentReleaseId: null,
         suggestedBottleId: 1760,
         suggestedReleaseId: null,
-        modelConfidence: 94,
+        modelConfidence: 96,
         automationBlockers: assessment.automationBlockers,
-        decisiveMatchAttributes: assessment.decisiveMatchAttributes,
-        structuredMatchRequiresStatedAge:
-          assessment.structuredMatchRequiresStatedAge,
-        extractedLabel,
-        searchEvidence,
-        candidateBottles: [target],
       }),
     ).toBe(true);
   });
 
-  test("does not auto-approve web-supported bottle matches below the elevated confidence threshold", () => {
+  test("does not auto-approve unmatched bottle matches below the elevated confidence threshold", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
-        price: {
-          bottleId: null,
-          releaseId: null,
-        },
-        priceUrl: "https://shop.example/ardbeg-uigeadail",
+        currentBottleId: null,
+        currentReleaseId: null,
         suggestedBottleId: 25,
         suggestedReleaseId: null,
-        modelConfidence: 93,
+        modelConfidence: 95,
         automationBlockers: [],
-        decisiveMatchAttributes: ["brand", "name", "category"],
-        structuredMatchRequiresStatedAge: false,
-        extractedLabel: buildExtractedLabel({
-          brand: "Ardbeg",
-          expression: "Uigeadail",
-          distillery: ["Ardbeg"],
-          category: "single_malt",
-          stated_age: null,
-          abv: null,
-          cask_type: null,
-        }),
-        searchEvidence: [
-          {
-            provider: "openai",
-            query: '"Ardbeg Uigeadail" official',
-            summary:
-              "Ardbeg's official product page confirms Uigeadail as a single malt Scotch whisky.",
-            results: [
-              {
-                title: "Ardbeg Uigeadail",
-                url: "https://www.ardbeg.com/en-gb/whiskies/ardbeg-uigeadail",
-                domain: "ardbeg.com",
-                description:
-                  "Ardbeg Uigeadail is a single malt Scotch whisky from Ardbeg.",
-                extraSnippets: [],
-              },
-            ],
-          },
-        ],
-        candidateBottles: [
-          buildCandidate({
-            bottleId: 25,
-            fullName: "Ardbeg Uigeadail",
-            bottleFullName: "Ardbeg Uigeadail",
-            brand: "Ardbeg",
-            bottler: null,
-            distillery: [],
-            category: "single_malt",
-            statedAge: null,
-            abv: null,
-            caskType: null,
-            source: ["brand"],
-          }),
-        ],
       }),
     ).toBe(false);
   });
 
-  test("does not auto-approve plain age-statement bottles from high confidence alone", () => {
+  test("does not auto-approve plain age-statement bottles below the elevated unmatched threshold", () => {
     const assessment = getStorePriceMatchAutomationAssessment({
       action: "match_existing",
       modelConfidence: 95,
@@ -467,30 +368,12 @@ describe("priceMatchingAutomation", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
-        price: {
-          bottleId: null,
-          releaseId: null,
-        },
+        currentBottleId: null,
+        currentReleaseId: null,
         suggestedBottleId: 12,
         suggestedReleaseId: null,
         modelConfidence: 95,
         automationBlockers: assessment.automationBlockers,
-        decisiveMatchAttributes: assessment.decisiveMatchAttributes,
-        structuredMatchRequiresStatedAge:
-          assessment.structuredMatchRequiresStatedAge,
-        candidateBottles: [
-          buildCandidate({
-            bottleId: 12,
-            fullName: "Tomatin 12-year-old",
-            bottleFullName: "Tomatin 12-year-old",
-            brand: "Tomatin",
-            distillery: ["Tomatin"],
-            category: "single_malt",
-            statedAge: 12,
-            abv: null,
-            caskType: null,
-          }),
-        ],
       }),
     ).toBe(false);
   });
@@ -805,82 +688,82 @@ describe("priceMatchingAutomation", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
-        price: {
-          bottleId: null,
-          releaseId: null,
-        },
+        currentBottleId: null,
+        currentReleaseId: null,
         suggestedBottleId: 1,
         suggestedReleaseId: null,
         modelConfidence: 86,
         automationBlockers: [],
-        decisiveMatchAttributes: [],
-        candidateBottles: [buildCandidate()],
       }),
     ).toBe(false);
   });
 
-  test("auto-approves the current assignment when an exact alias reaffirms it", () => {
+  test("auto-approves the current assignment at the lower confidence threshold", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
-        price: {
-          bottleId: 1,
-          releaseId: null,
-        },
+        currentBottleId: 1,
+        currentReleaseId: null,
         suggestedBottleId: 1,
         suggestedReleaseId: null,
-        modelConfidence: 72,
+        modelConfidence: 80,
         automationBlockers: [],
-        decisiveMatchAttributes: [],
-        candidateBottles: [
-          buildCandidate({
-            source: ["current", "exact"],
-          }),
-        ],
       }),
     ).toBe(true);
   });
 
-  test("auto-approves unmatched exact matches when classifier confidence is very high", () => {
+  test("auto-approves unmatched bottle matches when classifier confidence reaches the elevated threshold", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
-        price: {
-          bottleId: null,
-          releaseId: null,
-        },
+        currentBottleId: null,
+        currentReleaseId: null,
         suggestedBottleId: 1,
         suggestedReleaseId: null,
-        modelConfidence: 97,
+        modelConfidence: 96,
         automationBlockers: [],
-        decisiveMatchAttributes: [],
-        candidateBottles: [
-          buildCandidate({
-            source: ["exact"],
-          }),
-        ],
       }),
     ).toBe(true);
   });
 
-  test("does not auto-approve unmatched exact matches when blockers remain", () => {
+  test("does not auto-approve unmatched bottle matches below the elevated threshold even when the title is clear", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
-        price: {
-          bottleId: null,
-          releaseId: null,
-        },
+        currentBottleId: null,
+        currentReleaseId: null,
+        suggestedBottleId: 13437,
+        suggestedReleaseId: null,
+        modelConfidence: 95,
+        automationBlockers: [],
+      }),
+    ).toBe(false);
+  });
+
+  test("does not auto-approve unmatched release matches from confidence alone", () => {
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        currentBottleId: null,
+        currentReleaseId: null,
+        suggestedBottleId: 1,
+        suggestedReleaseId: 10,
+        modelConfidence: 100,
+        automationBlockers: [],
+      }),
+    ).toBe(false);
+  });
+
+  test("does not auto-approve high-confidence matches when blockers remain", () => {
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        currentBottleId: null,
+        currentReleaseId: null,
         suggestedBottleId: 1,
         suggestedReleaseId: null,
         modelConfidence: 99,
         automationBlockers: ["candidate age conflicts with extracted label"],
-        decisiveMatchAttributes: [],
-        candidateBottles: [
-          buildCandidate({
-            source: ["exact"],
-          }),
-        ],
       }),
     ).toBe(false);
   });

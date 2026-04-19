@@ -16,6 +16,9 @@ type ReasoningResult = {
   artifacts: BottleClassificationArtifacts;
 };
 
+// Keep this file focused on deterministic classifier boundary behavior.
+// Real-bottle workflow regressions belong in the fixture-driven eval corpus,
+// not in additional mocked classifier behavior tests here.
 function createTestClassifier({
   extractedIdentity = null,
   extractedIdentityFromImage,
@@ -81,6 +84,44 @@ const wildTurkeyRareBreedRyeIdentity: BottleExtractedDetails = {
   cask_fill: null,
   cask_strength: null,
   single_cask: null,
+  edition: null,
+};
+
+const buffaloTraceStraightBourbonIdentity: BottleExtractedDetails = {
+  brand: "Buffalo Trace",
+  bottler: null,
+  expression: null,
+  series: null,
+  distillery: ["Buffalo Trace"],
+  category: "bourbon",
+  stated_age: null,
+  abv: null,
+  release_year: null,
+  vintage_year: null,
+  cask_type: null,
+  cask_size: null,
+  cask_fill: null,
+  cask_strength: null,
+  single_cask: null,
+  edition: null,
+};
+
+const blantonsOriginalIdentity: BottleExtractedDetails = {
+  brand: "Blanton's",
+  bottler: null,
+  expression: "The Original Single Barrel Bourbon Whiskey",
+  series: null,
+  distillery: ["Buffalo Trace"],
+  category: "bourbon",
+  stated_age: null,
+  abv: null,
+  release_year: null,
+  vintage_year: null,
+  cask_type: null,
+  cask_size: null,
+  cask_fill: null,
+  cask_strength: null,
+  single_cask: true,
   edition: null,
 };
 
@@ -807,6 +848,87 @@ describe("createBottleClassifier", () => {
       status: "ignored",
       artifacts: {
         extractedIdentity: null,
+      },
+    });
+    expect(searchBottles).not.toHaveBeenCalled();
+    expect(runBottleClassifierAgent).not.toHaveBeenCalled();
+  });
+
+  test("auto ignores multi-pack listings even when extraction finds a bottle identity", async () => {
+    const runBottleClassifierAgent = vi.fn();
+    const searchBottles = vi.fn(async () => [] as BottleCandidate[]);
+    const { classifier } = createTestClassifier({
+      extractedIdentity: buffaloTraceStraightBourbonIdentity,
+      searchBottles,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Buffalo Trace Kentucky Straight Bourbon Whiskey 12 Pack",
+      },
+    });
+
+    expect(result).toMatchObject({
+      status: "ignored",
+      reason:
+        "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
+      artifacts: {
+        extractedIdentity: buffaloTraceStraightBourbonIdentity,
+      },
+    });
+    expect(searchBottles).not.toHaveBeenCalled();
+    expect(runBottleClassifierAgent).not.toHaveBeenCalled();
+  });
+
+  test("auto ignores bundle listings even when extraction finds a bottle identity", async () => {
+    const runBottleClassifierAgent = vi.fn();
+    const searchBottles = vi.fn(async () => [] as BottleCandidate[]);
+    const { classifier } = createTestClassifier({
+      extractedIdentity: buffaloTraceStraightBourbonIdentity,
+      searchBottles,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Buffalo Trace Bourbon with Glencairn Set Cigar Bundle",
+      },
+    });
+
+    expect(result).toMatchObject({
+      status: "ignored",
+      reason:
+        "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
+      artifacts: {
+        extractedIdentity: buffaloTraceStraightBourbonIdentity,
+      },
+    });
+    expect(searchBottles).not.toHaveBeenCalled();
+    expect(runBottleClassifierAgent).not.toHaveBeenCalled();
+  });
+
+  test("auto ignores damaged-condition listings even when extraction finds a bottle identity", async () => {
+    const runBottleClassifierAgent = vi.fn();
+    const searchBottles = vi.fn(async () => [] as BottleCandidate[]);
+    const { classifier } = createTestClassifier({
+      extractedIdentity: blantonsOriginalIdentity,
+      searchBottles,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Blanton's Bourbon Blooper Bottle - Broken Wax Seal (SEE DESCRIPTION)",
+      },
+    });
+
+    expect(result).toMatchObject({
+      status: "ignored",
+      reason:
+        "Reference describes a damaged or non-standard sale-condition bottle, not a standard bottle listing.",
+      artifacts: {
+        extractedIdentity: blantonsOriginalIdentity,
       },
     });
     expect(searchBottles).not.toHaveBeenCalled();

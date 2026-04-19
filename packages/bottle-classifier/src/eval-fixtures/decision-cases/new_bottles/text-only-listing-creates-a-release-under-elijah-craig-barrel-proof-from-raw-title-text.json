@@ -1,0 +1,76 @@
+{
+  "id": "text-only-listing-creates-a-release-under-elijah-craig-barrel-proof-from-raw-title-text",
+  "name": "text-only listing: creates a release under Elijah Craig Barrel Proof from raw title text",
+  "input": {
+    "reference": {
+      "name": "Elijah Craig Barrel Proof Batch C923",
+      "url": "https://shop.example/products/elijah-craig-barrel-proof-batch-c923"
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Elijah Craig Barrel Proof",
+        "brand": "Elijah Craig",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Heaven Hill"],
+        "category": "bourbon",
+        "statedAge": 12,
+        "edition": null,
+        "caskStrength": true,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.94,
+        "source": ["exact"],
+        "bottleId": 620,
+        "fullName": "Elijah Craig Barrel Proof"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["elijah", "barrel proof"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Elijah Craig Barrel Proof",
+          "brand": "Elijah Craig",
+          "bottler": null,
+          "series": null,
+          "distillery": ["Heaven Hill"],
+          "category": "bourbon",
+          "statedAge": 12,
+          "edition": null,
+          "caskStrength": true,
+          "singleCask": null,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.94,
+          "source": ["exact"],
+          "bottleId": 620,
+          "fullName": "Elijah Craig Barrel Proof"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "status": "classified",
+    "action": "create_release",
+    "identityScope": "product",
+    "parentBottleId": 620,
+    "summary": "Extract batch-level identity directly from the title and create a child release beneath the existing Elijah Craig Barrel Proof bottle."
+  }
+}

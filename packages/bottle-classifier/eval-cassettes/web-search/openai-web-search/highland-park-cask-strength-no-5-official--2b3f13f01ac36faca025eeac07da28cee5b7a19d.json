@@ -1,0 +1,548 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Highland Park Cask Strength No. 5 official"
+    },
+    "recordedAt": "2026-04-19T05:24:25.648Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Highland Park Cask Strength No. 5 official",
+          "summary": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+          "results": [
+            {
+              "title": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+              "url": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+              "domain": "highlandparkwhisky.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength",
+              "url": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength",
+              "domain": "whiskybase.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/290668/highland-park-cask-strength",
+              "url": "https://www.whiskybase.com/whiskies/whisky/290668/highland-park-cask-strength",
+              "domain": "whiskybase.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/232545/highland-park-cask-strength",
+              "url": "https://www.whiskybase.com/whiskies/whisky/232545/highland-park-cask-strength",
+              "domain": "whiskybase.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/243501/highland-park-cask-strength",
+              "url": "https://www.whiskybase.com/whiskies/whisky/243501/highland-park-cask-strength",
+              "domain": "whiskybase.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/166530/highland-park-cask-strength",
+              "url": "https://www.whiskybase.com/whiskies/whisky/166530/highland-park-cask-strength",
+              "domain": "whiskybase.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/170458/highland-park-cask-strength",
+              "url": "https://www.whiskybase.com/whiskies/whisky/170458/highland-park-cask-strength",
+              "domain": "whiskybase.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/217144/highland-park-cask-strength",
+              "url": "https://www.whiskybase.com/whiskies/whisky/217144/highland-park-cask-strength",
+              "domain": "whiskybase.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/221713/highland-park-cask-strength",
+              "url": "https://www.whiskybase.com/whiskies/whisky/221713/highland-park-cask-strength",
+              "domain": "whiskybase.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://forwhiskeylovers.com/products/highland-park-cask-strength-release-no-5-single-malt-scotch-whisky",
+              "url": "https://forwhiskeylovers.com/products/highland-park-cask-strength-release-no-5-single-malt-scotch-whisky",
+              "domain": "forwhiskeylovers.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.highlandparkwhisky.com/en/ambassadors-choice-10-year-old",
+              "url": "https://www.highlandparkwhisky.com/en/ambassadors-choice-10-year-old",
+              "domain": "highlandparkwhisky.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.highlandparkwhisky.com/en/hillhead",
+              "url": "https://www.highlandparkwhisky.com/en/hillhead",
+              "domain": "highlandparkwhisky.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/external_resources/press/FreeShippingUKandEU.pdf?srsltid=AfmBOoqWRfEuCDLIPlAWVjqV3WDBaECgmPG6PbaJ_KmlTQL_LA9hOnx5",
+              "url": "https://www.masterofmalt.com/external_resources/press/FreeShippingUKandEU.pdf?srsltid=AfmBOoqWRfEuCDLIPlAWVjqV3WDBaECgmPG6PbaJ_KmlTQL_LA9hOnx5",
+              "domain": "masterofmalt.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://blog.thewhiskyexchange.com/core/wp-content/uploads/2016/08/indian-whisky-infographic.pdf",
+              "url": "https://blog.thewhiskyexchange.com/core/wp-content/uploads/2016/08/indian-whisky-infographic.pdf",
+              "domain": "blog.thewhiskyexchange.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.thewhiskyexchange.com/media/resources/The%20Whisky%20Exchange%20Returns%20Form.pdf",
+              "url": "https://www.thewhiskyexchange.com/media/resources/The%20Whisky%20Exchange%20Returns%20Form.pdf",
+              "domain": "thewhiskyexchange.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/external_resources/press/master-of-malt-gift-vouchers-press-release.pdf",
+              "url": "https://www.masterofmalt.com/external_resources/press/master-of-malt-gift-vouchers-press-release.pdf",
+              "domain": "masterofmalt.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/highland-park-cask-strength-release-no-5",
+              "url": "https://distiller.com/spirits/highland-park-cask-strength-release-no-5",
+              "domain": "distiller.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.mensjournal.com/drink/highland-park-number-five-scotch",
+              "url": "https://www.mensjournal.com/drink/highland-park-number-five-scotch",
+              "domain": "mensjournal.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.vaultofspirits.com/whisky/single-malt/highland-park-cask-strength-release-no-5-647/",
+              "url": "https://www.vaultofspirits.com/whisky/single-malt/highland-park-cask-strength-release-no-5-647/",
+              "domain": "vaultofspirits.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.drinkhacker.com/2024/10/18/review-highland-park-cask-strength-release-no-5/",
+              "url": "https://www.drinkhacker.com/2024/10/18/review-highland-park-cask-strength-release-no-5/",
+              "domain": "drinkhacker.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.caskers.com/highland-park-cask-strength-no-5-highland-park-cask-strength-no-5-release/",
+              "url": "https://www.caskers.com/highland-park-cask-strength-no-5-highland-park-cask-strength-no-5-release/",
+              "domain": "caskers.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.thebarreltap.com/products/highland-park-cask-strength-release-no-5-scotch-whisky",
+              "url": "https://www.thebarreltap.com/products/highland-park-cask-strength-release-no-5-scotch-whisky",
+              "domain": "thebarreltap.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.insidehook.com/spirits/best-spirits-spill-awards-2025",
+              "url": "https://www.insidehook.com/spirits/best-spirits-spill-awards-2025",
+              "domain": "insidehook.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://theliquorstore.com/products/highland-park-cask-strength-no-5-single-malt-scotch-whisky-750ml",
+              "url": "https://theliquorstore.com/products/highland-park-cask-strength-no-5-single-malt-scotch-whisky-750ml",
+              "domain": "theliquorstore.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.thebookofbourbon.com/whiskeyreviews/hpcs5",
+              "url": "https://www.thebookofbourbon.com/whiskeyreviews/hpcs5",
+              "domain": "thebookofbourbon.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://aleeksalkohole.pl/pl/p/Whisky-Highland-Park-Cask-Strength-No.5-Release-0%2C7L-64%2C7/8709",
+              "url": "https://aleeksalkohole.pl/pl/p/Whisky-Highland-Park-Cask-Strength-No.5-Release-0%2C7L-64%2C7/8709",
+              "domain": "aleeksalkohole.pl",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://spirit-italia.com/Highland-Park-CASK-STRENGTH-Release-5-647-Vol-07l-in-confezione-regalo",
+              "url": "https://spirit-italia.com/Highland-Park-CASK-STRENGTH-Release-5-647-Vol-07l-in-confezione-regalo",
+              "domain": "spirit-italia.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.themanual.com/food-and-drink/highland-park-whisky-martin-markvardsen-interview/",
+              "url": "https://www.themanual.com/food-and-drink/highland-park-whisky-martin-markvardsen-interview/",
+              "domain": "themanual.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://irp.cdn-website.com/8e13b5fc/files/uploaded/Winnipeg_Whisky_Festival_Product_list_February_7.pdf",
+              "url": "https://irp.cdn-website.com/8e13b5fc/files/uploaded/Winnipeg_Whisky_Festival_Product_list_February_7.pdf",
+              "domain": "irp.cdn-website.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://tokyobarshow.com/pdf/Voucher.pdf",
+              "url": "https://tokyobarshow.com/pdf/Voucher.pdf",
+              "domain": "tokyobarshow.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://nuts-bar.rocks/.cm4all/uproc.php/0/Getr%C3%A4nkekarten/Nuts_Spezialit%C3%A4tenkarte.pdf?_=178d434cf30&cdp=a",
+              "url": "https://nuts-bar.rocks/.cm4all/uproc.php/0/Getr%C3%A4nkekarten/Nuts_Spezialit%C3%A4tenkarte.pdf?_=178d434cf30&cdp=a",
+              "domain": "nuts-bar.rocks",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyshow.com/media/638515/dramlist-2025-7.pdf",
+              "url": "https://whiskyshow.com/media/638515/dramlist-2025-7.pdf",
+              "domain": "whiskyshow.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://slightlytoasted.com/wp-content/uploads/2024/02/DigitalFULLPDF2.7.24.pdf",
+              "url": "https://slightlytoasted.com/wp-content/uploads/2024/02/DigitalFULLPDF2.7.24.pdf",
+              "domain": "slightlytoasted.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://omidistribuciones.com/DESTILADOSREFERENCIASOMI.pdf",
+              "url": "https://omidistribuciones.com/DESTILADOSREFERENCIASOMI.pdf",
+              "domain": "omidistribuciones.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "Cask Strength 5 - Highland Park",
+              "url": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai",
+              "domain": "highlandparkwhisky.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "Highland Park Cask Strength - Ratings and reviews - Whiskybase",
+              "url": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?utm_source=openai",
+              "domain": "whiskybase.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            },
+            {
+              "title": "Highland Park Cask Strength Release No. 5",
+              "url": "https://distiller.com/spirits/highland-park-cask-strength-release-no-5?utm_source=openai",
+              "domain": "distiller.com",
+              "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Highland Park Cask Strength No. 5 official",
+        "summary": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+        "results": [
+          {
+            "title": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+            "url": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+            "domain": "highlandparkwhisky.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength",
+            "url": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength",
+            "domain": "whiskybase.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/290668/highland-park-cask-strength",
+            "url": "https://www.whiskybase.com/whiskies/whisky/290668/highland-park-cask-strength",
+            "domain": "whiskybase.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/232545/highland-park-cask-strength",
+            "url": "https://www.whiskybase.com/whiskies/whisky/232545/highland-park-cask-strength",
+            "domain": "whiskybase.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/243501/highland-park-cask-strength",
+            "url": "https://www.whiskybase.com/whiskies/whisky/243501/highland-park-cask-strength",
+            "domain": "whiskybase.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/166530/highland-park-cask-strength",
+            "url": "https://www.whiskybase.com/whiskies/whisky/166530/highland-park-cask-strength",
+            "domain": "whiskybase.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/170458/highland-park-cask-strength",
+            "url": "https://www.whiskybase.com/whiskies/whisky/170458/highland-park-cask-strength",
+            "domain": "whiskybase.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/217144/highland-park-cask-strength",
+            "url": "https://www.whiskybase.com/whiskies/whisky/217144/highland-park-cask-strength",
+            "domain": "whiskybase.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/221713/highland-park-cask-strength",
+            "url": "https://www.whiskybase.com/whiskies/whisky/221713/highland-park-cask-strength",
+            "domain": "whiskybase.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://forwhiskeylovers.com/products/highland-park-cask-strength-release-no-5-single-malt-scotch-whisky",
+            "url": "https://forwhiskeylovers.com/products/highland-park-cask-strength-release-no-5-single-malt-scotch-whisky",
+            "domain": "forwhiskeylovers.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.highlandparkwhisky.com/en/ambassadors-choice-10-year-old",
+            "url": "https://www.highlandparkwhisky.com/en/ambassadors-choice-10-year-old",
+            "domain": "highlandparkwhisky.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.highlandparkwhisky.com/en/hillhead",
+            "url": "https://www.highlandparkwhisky.com/en/hillhead",
+            "domain": "highlandparkwhisky.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/external_resources/press/FreeShippingUKandEU.pdf?srsltid=AfmBOoqWRfEuCDLIPlAWVjqV3WDBaECgmPG6PbaJ_KmlTQL_LA9hOnx5",
+            "url": "https://www.masterofmalt.com/external_resources/press/FreeShippingUKandEU.pdf?srsltid=AfmBOoqWRfEuCDLIPlAWVjqV3WDBaECgmPG6PbaJ_KmlTQL_LA9hOnx5",
+            "domain": "masterofmalt.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://blog.thewhiskyexchange.com/core/wp-content/uploads/2016/08/indian-whisky-infographic.pdf",
+            "url": "https://blog.thewhiskyexchange.com/core/wp-content/uploads/2016/08/indian-whisky-infographic.pdf",
+            "domain": "blog.thewhiskyexchange.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.thewhiskyexchange.com/media/resources/The%20Whisky%20Exchange%20Returns%20Form.pdf",
+            "url": "https://www.thewhiskyexchange.com/media/resources/The%20Whisky%20Exchange%20Returns%20Form.pdf",
+            "domain": "thewhiskyexchange.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/external_resources/press/master-of-malt-gift-vouchers-press-release.pdf",
+            "url": "https://www.masterofmalt.com/external_resources/press/master-of-malt-gift-vouchers-press-release.pdf",
+            "domain": "masterofmalt.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/highland-park-cask-strength-release-no-5",
+            "url": "https://distiller.com/spirits/highland-park-cask-strength-release-no-5",
+            "domain": "distiller.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.mensjournal.com/drink/highland-park-number-five-scotch",
+            "url": "https://www.mensjournal.com/drink/highland-park-number-five-scotch",
+            "domain": "mensjournal.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.vaultofspirits.com/whisky/single-malt/highland-park-cask-strength-release-no-5-647/",
+            "url": "https://www.vaultofspirits.com/whisky/single-malt/highland-park-cask-strength-release-no-5-647/",
+            "domain": "vaultofspirits.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.drinkhacker.com/2024/10/18/review-highland-park-cask-strength-release-no-5/",
+            "url": "https://www.drinkhacker.com/2024/10/18/review-highland-park-cask-strength-release-no-5/",
+            "domain": "drinkhacker.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.caskers.com/highland-park-cask-strength-no-5-highland-park-cask-strength-no-5-release/",
+            "url": "https://www.caskers.com/highland-park-cask-strength-no-5-highland-park-cask-strength-no-5-release/",
+            "domain": "caskers.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.thebarreltap.com/products/highland-park-cask-strength-release-no-5-scotch-whisky",
+            "url": "https://www.thebarreltap.com/products/highland-park-cask-strength-release-no-5-scotch-whisky",
+            "domain": "thebarreltap.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.insidehook.com/spirits/best-spirits-spill-awards-2025",
+            "url": "https://www.insidehook.com/spirits/best-spirits-spill-awards-2025",
+            "domain": "insidehook.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://theliquorstore.com/products/highland-park-cask-strength-no-5-single-malt-scotch-whisky-750ml",
+            "url": "https://theliquorstore.com/products/highland-park-cask-strength-no-5-single-malt-scotch-whisky-750ml",
+            "domain": "theliquorstore.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.thebookofbourbon.com/whiskeyreviews/hpcs5",
+            "url": "https://www.thebookofbourbon.com/whiskeyreviews/hpcs5",
+            "domain": "thebookofbourbon.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://aleeksalkohole.pl/pl/p/Whisky-Highland-Park-Cask-Strength-No.5-Release-0%2C7L-64%2C7/8709",
+            "url": "https://aleeksalkohole.pl/pl/p/Whisky-Highland-Park-Cask-Strength-No.5-Release-0%2C7L-64%2C7/8709",
+            "domain": "aleeksalkohole.pl",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://spirit-italia.com/Highland-Park-CASK-STRENGTH-Release-5-647-Vol-07l-in-confezione-regalo",
+            "url": "https://spirit-italia.com/Highland-Park-CASK-STRENGTH-Release-5-647-Vol-07l-in-confezione-regalo",
+            "domain": "spirit-italia.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.themanual.com/food-and-drink/highland-park-whisky-martin-markvardsen-interview/",
+            "url": "https://www.themanual.com/food-and-drink/highland-park-whisky-martin-markvardsen-interview/",
+            "domain": "themanual.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://irp.cdn-website.com/8e13b5fc/files/uploaded/Winnipeg_Whisky_Festival_Product_list_February_7.pdf",
+            "url": "https://irp.cdn-website.com/8e13b5fc/files/uploaded/Winnipeg_Whisky_Festival_Product_list_February_7.pdf",
+            "domain": "irp.cdn-website.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://tokyobarshow.com/pdf/Voucher.pdf",
+            "url": "https://tokyobarshow.com/pdf/Voucher.pdf",
+            "domain": "tokyobarshow.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://nuts-bar.rocks/.cm4all/uproc.php/0/Getr%C3%A4nkekarten/Nuts_Spezialit%C3%A4tenkarte.pdf?_=178d434cf30&cdp=a",
+            "url": "https://nuts-bar.rocks/.cm4all/uproc.php/0/Getr%C3%A4nkekarten/Nuts_Spezialit%C3%A4tenkarte.pdf?_=178d434cf30&cdp=a",
+            "domain": "nuts-bar.rocks",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyshow.com/media/638515/dramlist-2025-7.pdf",
+            "url": "https://whiskyshow.com/media/638515/dramlist-2025-7.pdf",
+            "domain": "whiskyshow.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://slightlytoasted.com/wp-content/uploads/2024/02/DigitalFULLPDF2.7.24.pdf",
+            "url": "https://slightlytoasted.com/wp-content/uploads/2024/02/DigitalFULLPDF2.7.24.pdf",
+            "domain": "slightlytoasted.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://omidistribuciones.com/DESTILADOSREFERENCIASOMI.pdf",
+            "url": "https://omidistribuciones.com/DESTILADOSREFERENCIASOMI.pdf",
+            "domain": "omidistribuciones.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "Cask Strength 5 - Highland Park",
+            "url": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai",
+            "domain": "highlandparkwhisky.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength - Ratings and reviews - Whiskybase",
+            "url": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?utm_source=openai",
+            "domain": "whiskybase.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength Release No. 5",
+            "url": "https://distiller.com/spirits/highland-park-cask-strength-release-no-5?utm_source=openai",
+            "domain": "distiller.com",
+            "description": "Yes — the **official producer page** for **Highland Park Cask Strength Release No. 5** is Highland Park’s own site. It confirms this is **Release No. 5**, bottled at **64.7% ABV**, and describes the cask recipe as including **first-fill sherry-seasoned European oak casks**, **Pedro Ximénez sherry casks**, plus **refill casks, bourbon casks, and first-fill sherry-seasoned American oak casks**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nIndependent non-retailer sources line up with that. **Whiskybase** identifies it as a **High",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

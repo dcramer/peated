@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Heaven's Door Bootleg Series Volume 3 whiskey official"
+    },
+    "recordedAt": "2026-04-19T15:46:32.836Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Heaven's Door Bootleg Series Volume 3 whiskey official",
+          "summary": "Authoritative evidence for **Heaven’s Door Bootleg Series Volume III** supports these bottle traits:\n\n- It is the **2021 release** in Heaven’s Door’s annual Bootleg Series. ([heavensdoor.com](https://www.heavensdoor.com/bootleg-series))\n- Heaven’s Door and independent coverage describe it as a **13-year-old Kentucky bo",
+          "results": [
+            {
+              "title": "The Bootleg Series | Heaven's Door Whiskey",
+              "url": "https://www.heavensdoor.com/bootleg-series",
+              "domain": "heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+              "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+              "domain": "buy.heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.heavensdoor.com/",
+              "url": "https://www.heavensdoor.com/",
+              "domain": "heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.htfw.com/heaven-s-door-bob-dylan-bootleg-series-volume-iii-bourbon-2021-edition-13-year-old-whiskey",
+              "url": "https://www.htfw.com/heaven-s-door-bob-dylan-bootleg-series-volume-iii-bourbon-2021-edition-13-year-old-whiskey",
+              "domain": "htfw.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+              "url": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+              "domain": "distiller.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://buy.heavensdoor.com/",
+              "url": "https://buy.heavensdoor.com/",
+              "domain": "buy.heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Heaven's Door Bootleg Series Volume 3 whiskey official",
+        "summary": "Authoritative evidence for **Heaven’s Door Bootleg Series Volume III** supports these bottle traits:\n\n- It is the **2021 release** in Heaven’s Door’s annual Bootleg Series. ([heavensdoor.com](https://www.heavensdoor.com/bootleg-series))\n- Heaven’s Door and independent coverage describe it as a **13-year-old Kentucky bo",
+        "results": [
+          {
+            "title": "The Bootleg Series | Heaven's Door Whiskey",
+            "url": "https://www.heavensdoor.com/bootleg-series",
+            "domain": "heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+            "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+            "domain": "buy.heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.heavensdoor.com/",
+            "url": "https://www.heavensdoor.com/",
+            "domain": "heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.htfw.com/heaven-s-door-bob-dylan-bootleg-series-volume-iii-bourbon-2021-edition-13-year-old-whiskey",
+            "url": "https://www.htfw.com/heaven-s-door-bob-dylan-bootleg-series-volume-iii-bourbon-2021-edition-13-year-old-whiskey",
+            "domain": "htfw.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+            "url": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+            "domain": "distiller.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://buy.heavensdoor.com/",
+            "url": "https://buy.heavensdoor.com/",
+            "domain": "buy.heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

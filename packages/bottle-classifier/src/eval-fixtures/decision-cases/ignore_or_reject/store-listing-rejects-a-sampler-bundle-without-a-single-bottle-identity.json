@@ -1,0 +1,14 @@
+{
+  "id": "store-listing-rejects-a-sampler-bundle-without-a-single-bottle-identity",
+  "name": "store listing: rejects a sampler bundle without a single bottle identity",
+  "input": {
+    "reference": {
+      "name": "Single Malt Scotch Whisky Sampler Pack 5 x 50ml",
+      "url": "https://shop.example/products/single-malt-sampler-pack"
+    }
+  },
+  "expected": {
+    "status": "ignored",
+    "summary": "Short-circuit sampler bundles and other multi-bottle packs instead of trying to classify them as one canonical whisky bottle."
+  }
+}

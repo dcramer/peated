@@ -139,6 +139,7 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
 export const NON_IDENTITY_LABEL_NOISE = [
   "volume and pack size such as `50ml`, `750ml`, `1L`, or `1.75L`",
   "gift sets, glasses, mugs, tins, holiday packs, minis, and sampler bundles",
+  "condition and defect wording such as `blooper bottle`, `broken wax seal`, `low fill`, `opened bottle`, or `damaged box`",
   "retailer SEO words like `Scotch Whisky`, `Kentucky Bourbon Whisky`, or `American Whiskey` when they only restate the category",
   "awards, ratings, tasting notes, review blurbs, and shelf talker copy",
   "retailer names, navigation breadcrumbs, and web-page chrome",
@@ -240,6 +241,7 @@ export const RETAILER_LABEL_EXAMPLES: RetailerLabelExample[] = [
     notes: [
       "Treat `Distillers Edition` as the stable bottle family even when the retailer uses the apostrophe spelling `Distiller's Edition`.",
       "The bare annual year is release identity here, not part of the parent bottle name.",
+      "Apply that same split when the year appears before the family wording, unless the source explicitly says `vintage`, `distilled`, or `distillation`.",
     ],
   },
   {
@@ -262,8 +264,10 @@ export const RETAILER_LABEL_EXAMPLES: RetailerLabelExample[] = [
     source: "Wooden Cork",
     label: "Skrewball Peanut Butter Whiskey",
     notes: [
-      "Novelty flavored whiskey products are not genuine whisky records for this database.",
-      "Treat peanut butter, PB&J, salted caramel, maple, honey, cinnamon, apple, and similar flavored whiskey products as non-whisky and do not create bottles for them.",
+      "Unsupported novelty flavored whiskey and whiskey-liqueur products are not genuine whisky records for this database.",
+      "Treat peanut butter, PB&J, salted caramel, maple, cinnamon, apple, and similar novelty additive-flavor whiskey products as non-whisky and do not create bottles for them.",
+      "Do not overgeneralize this exclusion to every bottle whose expression contains a flavor-adjacent noun. Exclude only when the product itself is clearly the flavored-whiskey or whiskey-liqueur product.",
+      "Coffee, cold brew, chocolate, rum, and similar expression words are not automatic exclusion markers by themselves.",
     ],
   },
   {
@@ -280,6 +284,22 @@ export const RETAILER_LABEL_EXAMPLES: RetailerLabelExample[] = [
     notes: [
       "Retailer titles can omit canonical traits such as `Barrel Proof` even when that trait belongs to the marketed bottle.",
       "Use web evidence to validate the omitted trait, then rerun local bottle search with the enriched structured fields before deciding.",
+    ],
+  },
+  {
+    source: "Generic Retailer",
+    label: "Elijah Craig Cask Strength",
+    notes: [
+      "Retailer shorthand can omit the canonical family wording when the official bottle is marketed under a different stable name.",
+      "If authoritative evidence shows the family is `Barrel Proof`, match or create the canonical family instead of inventing a separate `Cask Strength` bottle.",
+    ],
+  },
+  {
+    source: "Generic Retailer",
+    label: "Four Roses Single Barrel Barrel Strength",
+    notes: [
+      "Generic strength wording appended to an already complete family name is not enough to invent a new canonical bottle or release by itself.",
+      "If local and web evidence do not establish a real barrel-strength family, prefer `no_match` over creating a speculative new bottle.",
     ],
   },
   {
@@ -307,6 +327,24 @@ export const RETAILER_LABEL_EXAMPLES: RetailerLabelExample[] = [
     ],
   },
 ];
+
+// Keep the classifier prompt on a compact archetype set. Broader regressions
+// belong in eval fixtures instead of permanently inflating the stable prompt.
+const CLASSIFIER_RETAILER_EXAMPLE_LABELS = new Set([
+  "Elijah Craig Cask Strength",
+  "Four Roses Single Barrel Barrel Strength",
+  "Glenmorangie Quinta Ruban 14-year-old",
+  "Wild Turkey Rare Breed Rye",
+  "Springbank 12 Cask Strength Batch 24",
+  "Four Roses Limited Edition Small Batch 2017",
+  "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
+  "Skrewball Peanut Butter Whiskey",
+  "SMWS RW6.5 Sauna Smoke",
+]);
+
+const CLASSIFIER_RETAILER_LABEL_EXAMPLES = RETAILER_LABEL_EXAMPLES.filter(
+  (example) => CLASSIFIER_RETAILER_EXAMPLE_LABELS.has(example.label),
+);
 
 const EXTRACTION_EXAMPLES: ExtractionExample[] = [
   {
@@ -605,13 +643,15 @@ function renderComponentGuide() {
   ).join("\n");
 }
 
-function renderRetailerExamples() {
-  return RETAILER_LABEL_EXAMPLES.map(
-    (example) =>
-      `- ${example.source}: \`${example.label}\`\n${example.notes
-        .map((note) => `  - ${note}`)
-        .join("\n")}`,
-  ).join("\n");
+function renderRetailerExamples(examples = RETAILER_LABEL_EXAMPLES) {
+  return examples
+    .map(
+      (example) =>
+        `- ${example.source}: \`${example.label}\`\n${example.notes
+          .map((note) => `  - ${note}`)
+          .join("\n")}`,
+    )
+    .join("\n");
 }
 
 function renderExtractionExamples() {
@@ -672,12 +712,16 @@ export function buildWhiskyLabelExtractorInstructions({
       "Prefer `[]` over guessing when the producing distillery is unknown.",
       "When a component is ambiguous, leave it `null` or `[]` instead of guessing. Missing data is better than a fabricated identity signal.",
       "If the source text is clearly for a non-whisky spirit such as vodka, gin, rum, tequila, or mezcal, return `null`.",
-      "If the source text is clearly a flavored whisky, whiskey liqueur, or novelty flavor product such as peanut butter, PB&J, salted caramel, maple, honey, cinnamon, or apple whisky, return `null`.",
+      "If the source text is clearly an unsupported novelty flavored whisky, whiskey liqueur, or additive-flavor product such as peanut butter, PB&J, salted caramel, maple, cinnamon, or apple whisky, return `null`.",
+      "Do not exclude a bottle solely because the expression contains a flavor-adjacent noun. Official catalogued whisky expressions can still be valid even when the name includes words like coffee, cold brew, chocolate, rum, or port.",
+      "Use the flavored-product exclusion narrowly. If the input otherwise reads like a branded whisky bottle identity, keep the structured identity instead of nulling it just because the expression sounds infused or flavor-adjacent.",
+      "Treat condition or defect wording such as `blooper bottle`, `broken wax seal`, `low fill`, `opened bottle`, `missing stopper`, or `damaged box` as sale-condition noise, not bottle identity. Do not place it in `expression`, `series`, or `edition`.",
       "Age statements should be integers. Normalize age phrases such as `12 Year`, `12 Years Old`, `12 Yr.`, and `12yr` to `stated_age: 12`.",
       "When an age statement belongs in the expression, normalize the phrase to `12-year-old`.",
       "For expression-style fields, follow the bottle's evidenced canonical name. Do not mechanically append retailer style/category words from the title just to make the expression look complete.",
       "When a stable family phrase is followed by a clearly separate numbered or coded child label, keep the family in `expression` and the varying child label in `edition` instead of collapsing both into one opaque expression.",
       "Apply that split from the label structure itself, not by memorizing brand-specific examples. If the split is ambiguous, stay less specific instead of guessing.",
+      "When a stable annual-release family appears with one adjacent bare year and the source does not explicitly say `vintage`, `distilled`, or `distillation`, prefer `release_year` over `vintage_year` even if the year appears before the family wording.",
       "If `edition`, `release_year`, or `vintage_year` is populated, do not also copy that same batch code or year into `expression`.",
       "Use `release_year` only for explicit release or bottling years, not founding dates or warning text.",
       "If both distillation and bottling years are present, use `vintage_year` for the distillation year and `release_year` for the bottling year.",
@@ -732,7 +776,7 @@ export function buildBottleClassifierInstructions({
       : []),
     ...(hasOpenAIWebSearch
       ? [
-          "Use `openai_web_search` as the default web search tool only after local search is still ambiguous or conflicting.",
+          "Use `openai_web_search` sparingly as the default web search tool only after local search is still ambiguous or conflicting on a specific decisive trait.",
         ]
       : []),
     ...(hasBraveWebSearch
@@ -743,17 +787,17 @@ export function buildBottleClassifierInstructions({
   ];
 
   const decisionProcess = [
-    hasBottleSearch
-      ? "Prefer local evidence first: current assignment, exact aliases, vector candidates, text candidates, brand candidates, extracted identity details, and local search tools."
-      : "Prefer local evidence first: current assignment, exact aliases, vector candidates, text candidates, brand candidates, and extracted identity details.",
     "The input includes `localSearch`, which is the server's initial local bottle search result set. If `localSearch.hasExactAliasMatch` is false, no exact alias match was found for the reference.",
     "Local candidates may be either parent bottle targets or child release targets. Use `releaseId` and the candidate `kind` discriminator to tell the difference.",
     "An exact alias can still point at a legacy bottle row that stores batch or annual release detail in the bottle name. If a cleaner parent bottle candidate exists, prefer the parent plus `create_release` instead of matching the legacy specific bottle.",
     "Local candidates may include structured bottle and release fields such as brand, bottler, distillery, series, category, age, edition, cask type, cask size, cask fill, cask-strength, single-cask, ABV, and release years. Use those fields directly when present instead of inferring everything from the candidate name.",
     "When local candidates already include both a reusable parent bottle and a clean child release under that same bottle, and the extracted release detail uniquely matches the child candidate, prefer matching that existing release over returning a plain parent-bottle match or creating a duplicate release.",
     "For annual-release families such as Distillers Edition, a bare year can be decisive release identity. If one local child release candidate aligns on the correct parent bottle and matching release year, treat that release as the leading existing-match target rather than treating the year as retailer noise.",
+    "Apply that annual-release reasoning even when the year appears before the family wording. Do not treat a year-first title as bottle-level year identity by default unless the source explicitly frames it as a vintage or distillation year.",
+    "When authoritative evidence shows a retailer shorthand maps to a differently named canonical bottle family, use the canonical family name for matching or creation and rerun local search with that confirmed trait before creating a new bottle.",
     "If multiple local bottle candidates share the same stable family wording but differ only by likely release-level detail such as a batch code, numbered edition, volume, chapter, or annual release label, treat that as evidence the local data may be storing sibling releases as bottle rows rather than proof that each row is a separate canonical bottle.",
     "When sibling-specific candidates point to a shared reusable family and no clean parent bottle exists locally, prefer `create_bottle_and_release` over matching one dirty sibling row or collapsing to `no_match`.",
+    "When a stable family is already clear and only the annual year or numbered child marker varies, do not leave that differentiator stranded on `proposedBottle`; keep it in `proposedRelease` and use `create_bottle_and_release` when no reusable parent exists locally.",
     ...(hasBottleSearch
       ? [
           "When the provided local candidates are thin, conflicting, or missing obvious near matches, call `search_bottles` with the most specific query you can form from the reference and extracted identity.",
@@ -766,17 +810,6 @@ export function buildBottleClassifierInstructions({
     "Compare the reference against candidate bottles component by component in this order: " +
       MATCH_COMPONENT_PRIORITY.join(", ") +
       ".",
-    ...(hasBottleSearch
-      ? [
-          "Use `search_bottles` iteratively when the first candidate set is thin or missing obvious near matches.",
-        ]
-      : []),
-    ...(hasEntitySearch
-      ? [
-          "Use `search_entities` when brand, distillery, or bottler identity is unclear and that ambiguity blocks a decision.",
-        ]
-      : []),
-    "First determine bottle identity. Then determine whether the reference is confidently specific to one release under that bottle.",
     "For independent bottlings, evaluate `brand`, `bottler`, and `distillery` separately because the label brand and producer can differ.",
     "Treat differences in series, distillery, bottler, age, edition code, store-pick code, cask finish, cask size, cask fill, single-cask status, or cask-strength status as meaningful identity evidence unless the evidence clearly shows source-page noise.",
     "Missing generic style words like `single malt` are weak evidence. Conflicting age statements, edition codes, or barrel descriptors are strong evidence.",
@@ -784,10 +817,35 @@ export function buildBottleClassifierInstructions({
     "When ABV sharply separates one candidate from the others, let that raise confidence materially instead of treating it as a minor tiebreaker.",
     "Apply bottle-versus-release reasoning generically from the evidence in front of you. Do not rely on memorized brand-specific examples to justify a split or a match.",
     "If bottle identity is clear but release identity is not, prefer the bottle-level outcome. Do not force a specific release from weak release evidence.",
+    "If the raw wording only adds a generic strength phrase like `Barrel Strength` or `Cask Strength` onto an otherwise complete family name, do not invent a new bottle or release from that phrase alone.",
+    "Do not call a reference too sparse solely because it is short. If the remaining words read like a self-contained marketed family or expression, keep that bottle identity rather than discarding it for missing brand or category context.",
     "If the only local candidate is a more specific release or edition than the reference supports, do not match it by default. Treat the candidate as over-specific unless web evidence validates the missing differentiating traits.",
     "Ignore volume, gift-set packaging, added glassware, ratings blurbs, and generic retailer SEO words when deciding bottle identity.",
+    "Treat condition or defect wording such as `blooper bottle`, `broken wax seal`, `low fill`, `opened bottle`, or `damaged box` as non-canonical sale-condition language, not as a distinct whisky expression.",
     "If the reference is clearly another spirit category such as vodka, gin, rum, tequila, or mezcal, return `no_match`. Do not create or assign a whisky bottle for it.",
-    "If the reference is clearly a flavored whisky, whiskey liqueur, or novelty flavor product such as peanut butter, PB&J, salted caramel, maple, honey, cinnamon, or apple whisky, return `no_match`. Do not create or assign a whisky bottle for it.",
+    "If the reference is clearly an unsupported novelty flavored whisky, whiskey liqueur, or additive-flavor product such as peanut butter, PB&J, salted caramel, maple, cinnamon, or apple whisky, return `no_match`. Do not create or assign a whisky bottle for it.",
+    "Do not exclude a bottle solely because the expression contains a flavor-adjacent noun. Official catalogued whisky expressions can still be valid even when the name includes words like coffee, cold brew, chocolate, rum, or port.",
+    "Use the flavored-product exclusion narrowly. If extracted identity plus local candidates already cleanly support a branded whisky bottle, do not override that match just because the expression sounds infused or flavor-adjacent.",
+  ];
+  const workflow = [
+    hasBottleSearch
+      ? "Start with the current assignment, extracted identity, exact aliases, and local candidates. Prefer local evidence before web evidence."
+      : "Start with the current assignment, extracted identity, and provided local candidates. This run is closed-set.",
+    "Determine the bottle identity first. Only then decide whether the reference is confidently specific to one reusable release under that bottle.",
+    ...(hasBottleSearch
+      ? [
+          "If the candidate set is thin, conflicting, or missing an obvious near match, use `search_bottles` before concluding there is no safe local target.",
+        ]
+      : []),
+    ...(hasEntitySearch
+      ? [
+          "If producer identity is the blocking ambiguity, use `search_entities` to resolve brand, bottler, or distillery names.",
+        ]
+      : []),
+    hasOpenAIWebSearch || hasBraveWebSearch
+      ? "Use web search to validate decisive missing traits or resolve conflicts that local search cannot settle, not as a substitute for local candidate matching."
+      : "Do not invent missing canonical traits from weak local evidence.",
+    "When decisive traits remain uncertain, step back to a safer bottle-level action or `no_match` instead of forcing a specific match or release.",
   ];
 
   return [
@@ -823,11 +881,14 @@ export function buildBottleClassifierInstructions({
       "Do not infer exact-cask identity from web evidence that mentions multiple casks under one batched or annual release. Multiple cask numbers under the same release are still product-scope release detail, not one exact-cask bottle.",
     ]),
     "",
+    "Workflow:",
+    renderBulletLines(workflow),
+    "",
     "Decision process:",
     renderBulletLines(decisionProcess),
     "",
     "Common retailer failure modes:",
-    renderRetailerExamples(),
+    renderRetailerExamples(CLASSIFIER_RETAILER_LABEL_EXAMPLES),
     ...(hasBottleSearch || hasOpenAIWebSearch || hasBraveWebSearch
       ? [
           "",
@@ -835,19 +896,20 @@ export function buildBottleClassifierInstructions({
           renderBulletLines([
             ...(hasOpenAIWebSearch
               ? [
-                  "Use `openai_web_search` first when local evidence is ambiguous, conflicting, or suggests the current assignment is wrong.",
-                  "Before returning any create action, use `openai_web_search` to validate the bottle traits that make the reference distinct unless local evidence is already decisive.",
+                  "Use `openai_web_search` first when local evidence is ambiguous, conflicting, or suggests the current assignment is wrong, and make the query target the specific decisive trait you need to confirm.",
+                  "Do not use web search just to broadly explore. Use it only when one concrete unresolved trait could still confirm or refute the bottle identity.",
                 ]
               : []),
             ...(hasBraveWebSearch
               ? [
-                  "If `openai_web_search` returns no useful results, only retailer results, or no authoritative producer, importer, or critic domains, use `brave_web_search` before giving up.",
-                  "Use `brave_web_search` when you want a second web opinion from an independent index, especially for generic bottle names or when recall seems weak.",
+                  "If `openai_web_search` returns no useful results, only retailer results, or no authoritative producer, importer, or critic domains, use `brave_web_search` only when the same concrete unresolved trait still matters to the decision.",
+                  "Use `brave_web_search` only as a second web opinion from an independent index, not as a routine follow-up.",
                 ]
               : []),
             ...(hasOpenAIWebSearch || hasBraveWebSearch
               ? [
-                  "When you are leaning toward any create action or `no_match` because local candidates are weak, do at least one web search while search budget remains.",
+                  "Usually make at most one web search call. Spend a second call only when the first results are weak or contradictory and a concrete unresolved trait still matters.",
+                  "Do not spend web-search budget on sparse generic references when you cannot name the decisive trait you are trying to confirm. In those cases prefer the safer bottle-level outcome, create action, or `no_match`.",
                   "When a plausible existing release candidate lacks an exact alias but differs from its parent bottle by a decisive trait such as release year, edition, or batch code, use web search to validate that exact release before falling back to `no_match`.",
                 ]
               : []),
@@ -860,6 +922,7 @@ export function buildBottleClassifierInstructions({
                   "For bare annual releases, search the exact family or expression name plus the year so you can confirm whether the candidate is an existing yearly release rather than a generic parent bottle.",
                   "If the distinctness of the bottle depends on a trait such as `Port Cask Finished`, `Single Cask`, `Barrel Proof`, a specific ABV, `1st Fill`, or `Port Pipe`, the web evidence should explicitly confirm that trait.",
                   "If the raw reference is still just a sparse generic phrase like `Batch Sherry` after extraction and local search, do not invent a branded bottle or release from web similarity alone. Prefer `no_match` unless the source itself provides a strong identity anchor.",
+                  "Do not over-apply that sparse-reference rule to short self-contained family names. If authoritative evidence supports the phrase itself as the marketed bottle family, keep it as bottle identity rather than dropping to `no_match` just because the title is compact.",
                   `You have a combined hard limit of ${maxSearchQueries} web search calls across all web search tools.`,
                 ]
               : []),
@@ -877,7 +940,7 @@ export function buildBottleClassifierInstructions({
       "If the correct outcome is a reusable parent bottle plus release detail but no safe parent bottle exists in the candidate set, use `create_bottle_and_release` instead of `create_release` or `no_match`.",
       ...(hasOpenAIWebSearch || hasBraveWebSearch
         ? [
-            "Do not return a create action from sparse local evidence alone when a web search could still confirm or refute the bottle identity.",
+            "Do not return a create action from sparse local evidence alone when a narrowly targeted web search could still confirm or refute the bottle identity.",
           ]
         : []),
       "If identity evidence is weak, conflicting, or missing on the decisive components, do not force a match.",
@@ -886,6 +949,11 @@ export function buildBottleClassifierInstructions({
       "For bare exact-cask program code references such as `SMWS 6.53`, keep the code as the proposed bottle-name anchor instead of replacing it with a web-discovered subtitle.",
       "For dotted marketed expressions such as `Octomore 13.1`, prefer bottle identity unless local candidates clearly establish a reusable parent bottle plus release structure.",
       "Set `confidence` as a percentage from 0 to 100, not a 0-1 decimal.",
+      "Confidence calibration matters. Unmatched existing bottle matches should reach the very high confidence band only when the reviewed bottle identity is safe enough for downstream automatic verification.",
+      "When the raw title or extracted identity cleanly reaffirms one existing bottle candidate with no conflicting release-level traits, confidence of 96+ is appropriate for that reviewed unmatched bottle-level match.",
+      "When authoritative producer, distillery, bottler, or importer evidence confirms the omitted canonical bottle trait for one existing candidate and no competing candidate remains plausible, confidence of 96+ is appropriate for that reviewed unmatched bottle-level match.",
+      "When the decision simply reaffirms the current assignment, confidence in the 80+ range is appropriate if the identity aligns cleanly. For new unmatched bottle matches that should still require review, keep confidence below the automatic-verification band.",
+      "For unmatched release-level matches, or bottle matches that still have meaningful extracted-identity conflicts or unresolved sibling ambiguity, keep confidence below the automatic-verification band even when the final bottle choice is still the safest reviewed outcome.",
       "Only set `matchedBottleId` to an id from the provided candidates. Set `matchedReleaseId` only when you are matching a specific release candidate.",
       "Use `identityScope = exact_cask` only when the exact cask itself is the marketed bottle identity. Otherwise use `product`.",
       "If `identityScope = exact_cask`, do not use `create_release` or `create_bottle_and_release`. Use `create_bottle` and keep additional exact details in `observation`.",

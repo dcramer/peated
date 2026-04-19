@@ -45,6 +45,7 @@ import {
   createSearchBottlesTool,
   createSearchEntitiesTool,
 } from "./tools";
+import type { BottleWebSearchExecutionCache } from "./tools/sharedWebSearch";
 
 const CLASSIFIER_MAX_TURNS = 8;
 
@@ -86,6 +87,7 @@ export type CreateBottleClassifierOptions = {
       imageUrlOrBase64: string,
     ) => Promise<BottleExtractedDetails | null>;
     extractFromText?: (label: string) => Promise<BottleExtractedDetails | null>;
+    webSearchCache?: BottleWebSearchExecutionCache;
     runBottleClassifierAgent?: (
       input: RunBottleClassifierAgentInput,
     ) => Promise<BottleClassifierReasoningResult>;
@@ -306,7 +308,7 @@ export function createBottleClassifier(
             client: options.client,
             model: options.model,
             budget: webSearchBudget,
-            braveApiKey: options.braveApiKey,
+            cache: options.overrides?.webSearchCache,
             onEvidence: (evidence) => {
               searchEvidence.push(evidence);
             },
@@ -316,6 +318,7 @@ export function createBottleClassifier(
                 createBraveWebSearchTool({
                   apiKey: options.braveApiKey,
                   budget: webSearchBudget,
+                  cache: options.overrides?.webSearchCache,
                   onEvidence: (evidence) => {
                     searchEvidence.push(evidence);
                   },

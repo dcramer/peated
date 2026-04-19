@@ -1,0 +1,464 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Lagavulin Distillers Edition 2023 official release"
+    },
+    "recordedAt": "2026-04-19T05:16:17.921Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Lagavulin Distillers Edition 2023 official release",
+          "summary": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+          "results": [
+            {
+              "title": "https://thewhiskeywash.com/scotch-whiskey/lagavulins-latest-whisky-celebrates-25-years-of-islay-jazz-festival/",
+              "url": "https://thewhiskeywash.com/scotch-whiskey/lagavulins-latest-whisky-celebrates-25-years-of-islay-jazz-festival/",
+              "domain": "thewhiskeywash.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://thewhiskeywash.com/whiskey-articles/lagavulins-most-popular-whiskies-ranked-by-experts/",
+              "url": "https://thewhiskeywash.com/whiskey-articles/lagavulins-most-popular-whiskies-ranked-by-experts/",
+              "domain": "thewhiskeywash.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en/products/special-release-2023-collection-single-malt-scotch-whisky-8x70cl",
+              "url": "https://www.malts.com/en/products/special-release-2023-collection-single-malt-scotch-whisky-8x70cl",
+              "domain": "malts.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-us/products/lagavulin-offerman-2023-charred-oak-cask-edition-single-malts-scotch-whisky-700ml",
+              "url": "https://www.malts.com/en-us/products/lagavulin-offerman-2023-charred-oak-cask-edition-single-malts-scotch-whisky-700ml",
+              "domain": "malts.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-12-year-old-special-release-2023-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-12-year-old-special-release-2023-whisky/",
+              "domain": "masterofmalt.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/de-de/products/lagavulin-12-jahre-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "url": "https://www.malts.com/de-de/products/lagavulin-12-jahre-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "domain": "malts.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/Lagavulin-12-year-old-The-Ink-of-Legends-Diageo-Special-Releases-2023-56-4",
+              "url": "https://whiskyadvocate.com/Lagavulin-12-year-old-The-Ink-of-Legends-Diageo-Special-Releases-2023-56-4",
+              "domain": "whiskyadvocate.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-us/products/lagavulin-12-year-old-special-release-2023-single-malt-scotch-whisky-700ml",
+              "url": "https://www.malts.com/en-us/products/lagavulin-12-year-old-special-release-2023-single-malt-scotch-whisky-700ml",
+              "domain": "malts.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://thewhiskeywash.com/scotch-whiskey/lagavulin-caol-ila-set-to-launch-feis-ile-2023-limited-editions/",
+              "url": "https://thewhiskeywash.com/scotch-whiskey/lagavulin-caol-ila-set-to-launch-feis-ile-2023-limited-editions/",
+              "domain": "thewhiskeywash.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/nl-nl/products/lagavulin-12-year-old-special-release-2023-single-malt-scotch-whisky-70cl",
+              "url": "https://www.malts.com/nl-nl/products/lagavulin-12-year-old-special-release-2023-single-malt-scotch-whisky-70cl",
+              "domain": "malts.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/lagavulin-12-year-ink-of-legends",
+              "url": "https://whiskyadvocate.com/lagavulin-12-year-ink-of-legends",
+              "domain": "whiskyadvocate.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://thewhiskeywash.com/whiskey-news/introducing-lagavulin-sweet-peat-11-year-old/",
+              "url": "https://thewhiskeywash.com/whiskey-news/introducing-lagavulin-sweet-peat-11-year-old/",
+              "domain": "thewhiskeywash.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://media.diageo.com/diageo-corporate-media/media/4tdjibgr/290_diageo_sf-spirits-competition-2019_final-7-2-19_clean.pdf",
+              "url": "https://media.diageo.com/diageo-corporate-media/media/4tdjibgr/290_diageo_sf-spirits-competition-2019_final-7-2-19_clean.pdf",
+              "domain": "media.diageo.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://media.diageo.com/diageo-corporate-media/media/kcgnnmkw/esg-reporting-index-2023.pdf",
+              "url": "https://media.diageo.com/diageo-corporate-media/media/kcgnnmkw/esg-reporting-index-2023.pdf",
+              "domain": "media.diageo.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://media.diageo.com/diageo-corporate-media/media/ik5ixoxn/gri-sasb-index-2023.pdf",
+              "url": "https://media.diageo.com/diageo-corporate-media/media/ik5ixoxn/gri-sasb-index-2023.pdf",
+              "domain": "media.diageo.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://media.diageo.com/diageo-corporate-media/media/hjobdsxg/diageo_norway_account_for_due_diligence_-_june_2023.pdf",
+              "url": "https://media.diageo.com/diageo-corporate-media/media/hjobdsxg/diageo_norway_account_for_due_diligence_-_june_2023.pdf",
+              "domain": "media.diageo.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://media.diageo.com/diageo-corporate-media/media/rqxfs123/our-vibrant-scotch-portfolio-2023.pdf",
+              "url": "https://media.diageo.com/diageo-corporate-media/media/rqxfs123/our-vibrant-scotch-portfolio-2023.pdf",
+              "domain": "media.diageo.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://media.diageo.com/diageo-corporate-media/media/p1bljst1/diageo-annual-report-2023.pdf",
+              "url": "https://media.diageo.com/diageo-corporate-media/media/p1bljst1/diageo-annual-report-2023.pdf",
+              "domain": "media.diageo.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "url": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "domain": "malts.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+              "url": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+              "domain": "malts.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-be/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "url": "https://www.malts.com/en-be/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "domain": "malts.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/nl-nl/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "url": "https://www.malts.com/nl-nl/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+              "domain": "malts.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-gb/products/lagavulin-2021-2022-distillers-edition-single-malt-scotch-whisky-2x70cl/",
+              "url": "https://www.malts.com/en-gb/products/lagavulin-2021-2022-distillers-edition-single-malt-scotch-whisky-2x70cl/",
+              "domain": "malts.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en/products/lagavulin-2021-distillers-edition-single-malt-scotch-whisky-70cl",
+              "url": "https://www.malts.com/en/products/lagavulin-2021-distillers-edition-single-malt-scotch-whisky-70cl",
+              "domain": "malts.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/Ardbeg-BizarreBQ-Bookers-Charlies-Batch-2023-01-More-New-Releases",
+              "url": "https://whiskyadvocate.com/Ardbeg-BizarreBQ-Bookers-Charlies-Batch-2023-01-More-New-Releases",
+              "domain": "whiskyadvocate.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/Peated-Whiskies-Finished-in-Sherry-Casks",
+              "url": "https://whiskyadvocate.com/Peated-Whiskies-Finished-in-Sherry-Casks",
+              "domain": "whiskyadvocate.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/de-de/limited-edition-savings",
+              "url": "https://www.malts.com/de-de/limited-edition-savings",
+              "domain": "malts.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/WhiskyFest-Hollywood-Florida",
+              "url": "https://whiskyadvocate.com/WhiskyFest-Hollywood-Florida",
+              "domain": "whiskyadvocate.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-gb/lagavulin/community",
+              "url": "https://www.malts.com/en-gb/lagavulin/community",
+              "domain": "malts.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "Lagavulin 12 YO Special 2023 & Lagavulin Distillers Edition | Malts",
+              "url": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai",
+              "domain": "malts.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            },
+            {
+              "title": "10 Peated Whiskies Finished in Sherry Casks",
+              "url": "https://whiskyadvocate.com/Peated-Whiskies-Finished-in-Sherry-Casks?utm_source=openai",
+              "domain": "whiskyadvocate.com",
+              "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Lagavulin Distillers Edition 2023 official release",
+        "summary": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+        "results": [
+          {
+            "title": "https://thewhiskeywash.com/scotch-whiskey/lagavulins-latest-whisky-celebrates-25-years-of-islay-jazz-festival/",
+            "url": "https://thewhiskeywash.com/scotch-whiskey/lagavulins-latest-whisky-celebrates-25-years-of-islay-jazz-festival/",
+            "domain": "thewhiskeywash.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://thewhiskeywash.com/whiskey-articles/lagavulins-most-popular-whiskies-ranked-by-experts/",
+            "url": "https://thewhiskeywash.com/whiskey-articles/lagavulins-most-popular-whiskies-ranked-by-experts/",
+            "domain": "thewhiskeywash.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en/products/special-release-2023-collection-single-malt-scotch-whisky-8x70cl",
+            "url": "https://www.malts.com/en/products/special-release-2023-collection-single-malt-scotch-whisky-8x70cl",
+            "domain": "malts.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-us/products/lagavulin-offerman-2023-charred-oak-cask-edition-single-malts-scotch-whisky-700ml",
+            "url": "https://www.malts.com/en-us/products/lagavulin-offerman-2023-charred-oak-cask-edition-single-malts-scotch-whisky-700ml",
+            "domain": "malts.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-12-year-old-special-release-2023-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-12-year-old-special-release-2023-whisky/",
+            "domain": "masterofmalt.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/de-de/products/lagavulin-12-jahre-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "url": "https://www.malts.com/de-de/products/lagavulin-12-jahre-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "domain": "malts.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/Lagavulin-12-year-old-The-Ink-of-Legends-Diageo-Special-Releases-2023-56-4",
+            "url": "https://whiskyadvocate.com/Lagavulin-12-year-old-The-Ink-of-Legends-Diageo-Special-Releases-2023-56-4",
+            "domain": "whiskyadvocate.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-us/products/lagavulin-12-year-old-special-release-2023-single-malt-scotch-whisky-700ml",
+            "url": "https://www.malts.com/en-us/products/lagavulin-12-year-old-special-release-2023-single-malt-scotch-whisky-700ml",
+            "domain": "malts.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://thewhiskeywash.com/scotch-whiskey/lagavulin-caol-ila-set-to-launch-feis-ile-2023-limited-editions/",
+            "url": "https://thewhiskeywash.com/scotch-whiskey/lagavulin-caol-ila-set-to-launch-feis-ile-2023-limited-editions/",
+            "domain": "thewhiskeywash.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/nl-nl/products/lagavulin-12-year-old-special-release-2023-single-malt-scotch-whisky-70cl",
+            "url": "https://www.malts.com/nl-nl/products/lagavulin-12-year-old-special-release-2023-single-malt-scotch-whisky-70cl",
+            "domain": "malts.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/lagavulin-12-year-ink-of-legends",
+            "url": "https://whiskyadvocate.com/lagavulin-12-year-ink-of-legends",
+            "domain": "whiskyadvocate.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://thewhiskeywash.com/whiskey-news/introducing-lagavulin-sweet-peat-11-year-old/",
+            "url": "https://thewhiskeywash.com/whiskey-news/introducing-lagavulin-sweet-peat-11-year-old/",
+            "domain": "thewhiskeywash.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://media.diageo.com/diageo-corporate-media/media/4tdjibgr/290_diageo_sf-spirits-competition-2019_final-7-2-19_clean.pdf",
+            "url": "https://media.diageo.com/diageo-corporate-media/media/4tdjibgr/290_diageo_sf-spirits-competition-2019_final-7-2-19_clean.pdf",
+            "domain": "media.diageo.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://media.diageo.com/diageo-corporate-media/media/kcgnnmkw/esg-reporting-index-2023.pdf",
+            "url": "https://media.diageo.com/diageo-corporate-media/media/kcgnnmkw/esg-reporting-index-2023.pdf",
+            "domain": "media.diageo.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://media.diageo.com/diageo-corporate-media/media/ik5ixoxn/gri-sasb-index-2023.pdf",
+            "url": "https://media.diageo.com/diageo-corporate-media/media/ik5ixoxn/gri-sasb-index-2023.pdf",
+            "domain": "media.diageo.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://media.diageo.com/diageo-corporate-media/media/hjobdsxg/diageo_norway_account_for_due_diligence_-_june_2023.pdf",
+            "url": "https://media.diageo.com/diageo-corporate-media/media/hjobdsxg/diageo_norway_account_for_due_diligence_-_june_2023.pdf",
+            "domain": "media.diageo.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://media.diageo.com/diageo-corporate-media/media/rqxfs123/our-vibrant-scotch-portfolio-2023.pdf",
+            "url": "https://media.diageo.com/diageo-corporate-media/media/rqxfs123/our-vibrant-scotch-portfolio-2023.pdf",
+            "domain": "media.diageo.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://media.diageo.com/diageo-corporate-media/media/p1bljst1/diageo-annual-report-2023.pdf",
+            "url": "https://media.diageo.com/diageo-corporate-media/media/p1bljst1/diageo-annual-report-2023.pdf",
+            "domain": "media.diageo.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "url": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "domain": "malts.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+            "url": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+            "domain": "malts.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-be/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "url": "https://www.malts.com/en-be/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "domain": "malts.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/nl-nl/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "url": "https://www.malts.com/nl-nl/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl",
+            "domain": "malts.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-gb/products/lagavulin-2021-2022-distillers-edition-single-malt-scotch-whisky-2x70cl/",
+            "url": "https://www.malts.com/en-gb/products/lagavulin-2021-2022-distillers-edition-single-malt-scotch-whisky-2x70cl/",
+            "domain": "malts.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en/products/lagavulin-2021-distillers-edition-single-malt-scotch-whisky-70cl",
+            "url": "https://www.malts.com/en/products/lagavulin-2021-distillers-edition-single-malt-scotch-whisky-70cl",
+            "domain": "malts.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/Ardbeg-BizarreBQ-Bookers-Charlies-Batch-2023-01-More-New-Releases",
+            "url": "https://whiskyadvocate.com/Ardbeg-BizarreBQ-Bookers-Charlies-Batch-2023-01-More-New-Releases",
+            "domain": "whiskyadvocate.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/Peated-Whiskies-Finished-in-Sherry-Casks",
+            "url": "https://whiskyadvocate.com/Peated-Whiskies-Finished-in-Sherry-Casks",
+            "domain": "whiskyadvocate.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/de-de/limited-edition-savings",
+            "url": "https://www.malts.com/de-de/limited-edition-savings",
+            "domain": "malts.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/WhiskyFest-Hollywood-Florida",
+            "url": "https://whiskyadvocate.com/WhiskyFest-Hollywood-Florida",
+            "domain": "whiskyadvocate.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-gb/lagavulin/community",
+            "url": "https://www.malts.com/en-gb/lagavulin/community",
+            "domain": "malts.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin 12 YO Special 2023 & Lagavulin Distillers Edition | Malts",
+            "url": "https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai",
+            "domain": "malts.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          },
+          {
+            "title": "10 Peated Whiskies Finished in Sherry Casks",
+            "url": "https://whiskyadvocate.com/Peated-Whiskies-Finished-in-Sherry-Casks?utm_source=openai",
+            "domain": "whiskyadvocate.com",
+            "description": "Yes — there **was a 2023 Lagavulin Distillers Edition release**, but the official evidence suggests it was presented as part of the continuing **Distillers Edition** line rather than a prominently separate “2023 official launch” page like the Special Releases bottles. The most solid official source I found is Malts/Diageo. ([malts.com](https://www.malts.com/en/products/lagavulin-12-year-old-special-release-2023-lagavulin-distillers-edition-2x70cl?utm_source=openai))\n\nWhat the sources confirm about the bottle:\n- **Bottle/release:** **Lagavulin Distillers Edition**  \n- **Distillery:** **Lagavuli",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

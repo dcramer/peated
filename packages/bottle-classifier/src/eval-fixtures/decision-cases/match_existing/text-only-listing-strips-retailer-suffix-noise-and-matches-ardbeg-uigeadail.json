@@ -1,0 +1,76 @@
+{
+  "id": "text-only-listing-strips-retailer-suffix-noise-and-matches-ardbeg-uigeadail",
+  "name": "text-only listing: strips retailer suffix noise and matches Ardbeg Uigeadail",
+  "input": {
+    "reference": {
+      "name": "Ardbeg Uigeadail Single Malt Scotch Whisky 750ml",
+      "url": "https://shop.example/products/ardbeg-uigeadail-750ml"
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Ardbeg Uigeadail",
+        "brand": "Ardbeg",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Ardbeg"],
+        "category": "single_malt",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": 54.2,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.95,
+        "source": ["exact"],
+        "bottleId": 630,
+        "fullName": "Ardbeg Uigeadail"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["ardbeg", "uigeadail"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Ardbeg Uigeadail",
+          "brand": "Ardbeg",
+          "bottler": null,
+          "series": null,
+          "distillery": ["Ardbeg"],
+          "category": "single_malt",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": 54.2,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.95,
+          "source": ["exact"],
+          "bottleId": 630,
+          "fullName": "Ardbeg Uigeadail"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 630,
+    "summary": "Extract the canonical bottle identity from a noisy retailer title and match Ardbeg Uigeadail without needing seeded extraction output."
+  }
+}

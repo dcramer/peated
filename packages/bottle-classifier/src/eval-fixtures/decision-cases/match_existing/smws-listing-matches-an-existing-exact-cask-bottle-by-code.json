@@ -1,0 +1,94 @@
+{
+  "id": "smws-listing-matches-an-existing-exact-cask-bottle-by-code",
+  "name": "SMWS listing: matches an existing exact-cask bottle by code",
+  "input": {
+    "reference": {
+      "name": "SMWS RW6.5 Sauna Smoke",
+      "url": "https://vault.example/products/smws-rw6-5-sauna-smoke"
+    },
+    "extractedIdentity": {
+      "brand": "The Scotch Malt Whisky Society",
+      "bottler": "The Scotch Malt Whisky Society",
+      "expression": "RW6.5 Sauna Smoke",
+      "series": null,
+      "distillery": ["Kyro"],
+      "category": "rye",
+      "stated_age": null,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": true,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "SMWS RW6.5 Appley ever after",
+        "brand": "The Scotch Malt Whisky Society",
+        "bottler": "The Scotch Malt Whisky Society",
+        "series": null,
+        "distillery": ["Kyro"],
+        "category": "rye",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": true,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.98,
+        "source": ["exact"],
+        "bottleId": 610,
+        "fullName": "SMWS RW6.5 Appley ever after"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["rw6.5"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "SMWS RW6.5 Appley ever after",
+          "brand": "The Scotch Malt Whisky Society",
+          "bottler": "The Scotch Malt Whisky Society",
+          "series": null,
+          "distillery": ["Kyro"],
+          "category": "rye",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": true,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.98,
+          "source": ["exact"],
+          "bottleId": 610,
+          "fullName": "SMWS RW6.5 Appley ever after"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "exact_cask",
+    "matchedBottleId": 610,
+    "summary": "Recognize the SMWS code as exact-cask identity and match the existing SMWS RW6.5 bottle even when the subtitle wording in the raw reference is stale or inconsistent."
+  }
+}

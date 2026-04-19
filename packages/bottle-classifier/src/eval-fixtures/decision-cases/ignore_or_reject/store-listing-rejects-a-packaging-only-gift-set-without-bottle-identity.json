@@ -1,0 +1,14 @@
+{
+  "id": "store-listing-rejects-a-packaging-only-gift-set-without-bottle-identity",
+  "name": "store listing: rejects a packaging-only gift set without bottle identity",
+  "input": {
+    "reference": {
+      "name": "Unknown Bottle Gift Set with 2 Glasses",
+      "url": "https://shop.example/products/unknown-bottle-gift-set"
+    }
+  },
+  "expected": {
+    "status": "ignored",
+    "summary": "Short-circuit packaging-only gift-set listings when the source does not identify a real whisky bottle clearly enough to classify."
+  }
+}

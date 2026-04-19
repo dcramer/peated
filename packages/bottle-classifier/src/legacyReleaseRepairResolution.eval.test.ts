@@ -2,8 +2,9 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { describeEval } from "vitest-evals";
 import { z } from "zod";
-import { createBottleClassifier } from "./classifier";
+import { createBottleClassifier } from "./classifierRuntime";
 import type { BottleClassificationResult } from "./contract";
+import { createEvalWebSearchCache } from "./evalWebSearchCache";
 import { resolveLegacyCreateParentClassification } from "./legacyReleaseRepairResolution";
 import {
   LEGACY_RELEASE_REPAIR_RESOLUTION_EVAL_CASES,
@@ -17,6 +18,7 @@ import {
 
 const classifierModel = process.env.OPENAI_MODEL ?? DEFAULT_OPENAI_MODEL;
 const judgeModel = process.env.OPENAI_EVAL_MODEL ?? DEFAULT_OPENAI_EVAL_MODEL;
+const evalWebSearchCache = createEvalWebSearchCache();
 
 type EvaluatedRepairResolution = {
   classification: BottleClassificationResult;
@@ -178,6 +180,9 @@ describeEval("legacy release repair resolution", {
       adapters: {
         searchBottles: async () => [],
         getBottleCandidateById: async () => null,
+      },
+      overrides: {
+        webSearchCache: evalWebSearchCache,
       },
     });
 

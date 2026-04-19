@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Heaven's Door Bootleg Series Volume 3 official bourbon rye Tennessee"
+    },
+    "recordedAt": "2026-04-19T15:53:18.912Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Heaven's Door Bootleg Series Volume 3 official bourbon rye Tennessee",
+          "summary": "**Heaven’s Door Bootleg Series Volume III** is **not** a Tennessee whiskey release. Official Heaven’s Door information identifies it as the **2021 Bootleg Series release**, a **cask-strength 13-year-old Kentucky bourbon** finished in **Vino de Naranja casks**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products",
+          "results": [
+            {
+              "title": "https://www.heavensdoor.com/bootleg-series",
+              "url": "https://www.heavensdoor.com/bootleg-series",
+              "domain": "heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://buy.heavensdoor.com/products/core-3-bundle",
+              "url": "https://buy.heavensdoor.com/products/core-3-bundle",
+              "domain": "buy.heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.heavensdoor.com/whiskey-collection",
+              "url": "https://www.heavensdoor.com/whiskey-collection",
+              "domain": "heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.heavensdoor.com/decade-series",
+              "url": "https://www.heavensdoor.com/decade-series",
+              "domain": "heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+              "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+              "domain": "buy.heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://thewhiskeywash.com/whiskey-articles/experts-answer-your-questions-on-bob-dylans-whiskey-heavens-door/",
+              "url": "https://thewhiskeywash.com/whiskey-articles/experts-answer-your-questions-on-bob-dylans-whiskey-heavens-door/",
+              "domain": "thewhiskeywash.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Heaven's Door Bootleg Series Volume 3 official bourbon rye Tennessee",
+        "summary": "**Heaven’s Door Bootleg Series Volume III** is **not** a Tennessee whiskey release. Official Heaven’s Door information identifies it as the **2021 Bootleg Series release**, a **cask-strength 13-year-old Kentucky bourbon** finished in **Vino de Naranja casks**. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products",
+        "results": [
+          {
+            "title": "https://www.heavensdoor.com/bootleg-series",
+            "url": "https://www.heavensdoor.com/bootleg-series",
+            "domain": "heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://buy.heavensdoor.com/products/core-3-bundle",
+            "url": "https://buy.heavensdoor.com/products/core-3-bundle",
+            "domain": "buy.heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.heavensdoor.com/whiskey-collection",
+            "url": "https://www.heavensdoor.com/whiskey-collection",
+            "domain": "heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.heavensdoor.com/decade-series",
+            "url": "https://www.heavensdoor.com/decade-series",
+            "domain": "heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+            "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+            "domain": "buy.heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://thewhiskeywash.com/whiskey-articles/experts-answer-your-questions-on-bob-dylans-whiskey-heavens-door/",
+            "url": "https://thewhiskeywash.com/whiskey-articles/experts-answer-your-questions-on-bob-dylans-whiskey-heavens-door/",
+            "domain": "thewhiskeywash.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Woodford Reserve Double Double Oaked official"
+    },
+    "recordedAt": "2026-04-19T22:42:54.662Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Woodford Reserve Double Double Oaked official",
+          "summary": "Official source confirms **Woodford Reserve Double Double Oaked** is a Woodford Reserve bourbon expression and lists it at **90.4 proof**; it also says the whiskey gets an **extended maturation in a second custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfor",
+          "results": [
+            {
+              "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+              "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+              "domain": "woodfordreserve.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+              "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+              "domain": "woodfordreserve.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+              "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+              "domain": "shop.woodfordreserve.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/woodford-reserve-double-double-oaked",
+              "url": "https://distiller.com/spirits/woodford-reserve-double-double-oaked",
+              "domain": "distiller.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.brown-forman.com/brand/woodford-reserve",
+              "url": "https://www.brown-forman.com/brand/woodford-reserve",
+              "domain": "brown-forman.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.brown-forman.com/sites/default/files/team_resources/2025-06/BFB-2025%20IR_10K-POST_V8_ADA_REV2%20%281%29-compressed.pdf",
+              "url": "https://www.brown-forman.com/sites/default/files/team_resources/2025-06/BFB-2025%20IR_10K-POST_V8_ADA_REV2%20%281%29-compressed.pdf",
+              "domain": "brown-forman.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Woodford Reserve Double Double Oaked official",
+        "summary": "Official source confirms **Woodford Reserve Double Double Oaked** is a Woodford Reserve bourbon expression and lists it at **90.4 proof**; it also says the whiskey gets an **extended maturation in a second custom-crafted barrel** that is **deeply toasted and lightly charred**. ([woodfordreserve.com](https://www.woodfor",
+        "results": [
+          {
+            "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+            "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+            "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+            "domain": "shop.woodfordreserve.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/woodford-reserve-double-double-oaked",
+            "url": "https://distiller.com/spirits/woodford-reserve-double-double-oaked",
+            "domain": "distiller.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.brown-forman.com/brand/woodford-reserve",
+            "url": "https://www.brown-forman.com/brand/woodford-reserve",
+            "domain": "brown-forman.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.brown-forman.com/sites/default/files/team_resources/2025-06/BFB-2025%20IR_10K-POST_V8_ADA_REV2%20%281%29-compressed.pdf",
+            "url": "https://www.brown-forman.com/sites/default/files/team_resources/2025-06/BFB-2025%20IR_10K-POST_V8_ADA_REV2%20%281%29-compressed.pdf",
+            "domain": "brown-forman.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

@@ -9,7 +9,8 @@ Use this alongside:
 
 - `docs/architecture/whisky-identity-model.md`
 - `docs/architecture/bottle-classifier.md`
-- `packages/bottle-classifier/src/normalizationCorpus.ts`
+- `packages/bottle-classifier/src/eval-fixtures/new-bottles/`
+- `packages/bottle-classifier/src/eval-fixtures/legacy-release-repair/`
 
 ## How To Read This
 
@@ -71,5 +72,5 @@ Use these rules during the cleanup pass:
 - Add new examples whenever a real bottle family causes confusion during the
   cleanup pass.
 - Prefer concrete examples from production data over abstract naming rules.
-- The structured source of truth for executable examples lives in
-  `packages/bottle-classifier/src/normalizationCorpus.ts`.
+- The executable source of truth now lives in file-backed fixtures under
+  `packages/bottle-classifier/src/eval-fixtures/`.

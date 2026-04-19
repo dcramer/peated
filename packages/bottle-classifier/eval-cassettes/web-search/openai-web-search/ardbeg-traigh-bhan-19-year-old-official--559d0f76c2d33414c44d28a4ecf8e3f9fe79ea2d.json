@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Ardbeg Traigh Bhan 19 year old official"
+    },
+    "recordedAt": "2026-04-19T15:47:12.830Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Ardbeg Traigh Bhan 19 year old official",
+          "summary": "Yes — **Ardbeg Traigh Bhan 19 Year Old** is an **official distillery bottling** from Ardbeg. Ardbeg’s own archive lists “Ardbeg Traigh Bhan 19 Years Old Batch 1,” and Ardbeg’s history page says **Batch 1 launched as a small-batch 19-year-old release**. ([ardbeg.com](https://www.ardbeg.com/Ardbeg%2520Traigh%2520Bhan%252",
+          "results": [
+            {
+              "title": "Ardbeg Traigh Bhan - Ratings and reviews - Whiskybase",
+              "url": "https://www.whiskybase.com/whiskies/whisky/147151/ardbeg-traigh-bhan",
+              "domain": "whiskybase.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/252445/ardbeg-traigh-bhan",
+              "url": "https://www.whiskybase.com/whiskies/whisky/252445/ardbeg-traigh-bhan",
+              "domain": "whiskybase.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/261633/ardbeg-traigh-bhan",
+              "url": "https://www.whiskybase.com/whiskies/whisky/261633/ardbeg-traigh-bhan",
+              "domain": "whiskybase.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/232978/ardbeg-traigh-bhan",
+              "url": "https://www.whiskybase.com/whiskies/whisky/232978/ardbeg-traigh-bhan",
+              "domain": "whiskybase.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/265522/ardbeg-traigh-bhan",
+              "url": "https://www.whiskybase.com/whiskies/whisky/265522/ardbeg-traigh-bhan",
+              "domain": "whiskybase.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/274361/ardbeg-traigh-bhan",
+              "url": "https://www.whiskybase.com/whiskies/whisky/274361/ardbeg-traigh-bhan",
+              "domain": "whiskybase.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Ardbeg Traigh Bhan 19 year old official",
+        "summary": "Yes — **Ardbeg Traigh Bhan 19 Year Old** is an **official distillery bottling** from Ardbeg. Ardbeg’s own archive lists “Ardbeg Traigh Bhan 19 Years Old Batch 1,” and Ardbeg’s history page says **Batch 1 launched as a small-batch 19-year-old release**. ([ardbeg.com](https://www.ardbeg.com/Ardbeg%2520Traigh%2520Bhan%252",
+        "results": [
+          {
+            "title": "Ardbeg Traigh Bhan - Ratings and reviews - Whiskybase",
+            "url": "https://www.whiskybase.com/whiskies/whisky/147151/ardbeg-traigh-bhan",
+            "domain": "whiskybase.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/252445/ardbeg-traigh-bhan",
+            "url": "https://www.whiskybase.com/whiskies/whisky/252445/ardbeg-traigh-bhan",
+            "domain": "whiskybase.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/261633/ardbeg-traigh-bhan",
+            "url": "https://www.whiskybase.com/whiskies/whisky/261633/ardbeg-traigh-bhan",
+            "domain": "whiskybase.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/232978/ardbeg-traigh-bhan",
+            "url": "https://www.whiskybase.com/whiskies/whisky/232978/ardbeg-traigh-bhan",
+            "domain": "whiskybase.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/265522/ardbeg-traigh-bhan",
+            "url": "https://www.whiskybase.com/whiskies/whisky/265522/ardbeg-traigh-bhan",
+            "domain": "whiskybase.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/274361/ardbeg-traigh-bhan",
+            "url": "https://www.whiskybase.com/whiskies/whisky/274361/ardbeg-traigh-bhan",
+            "domain": "whiskybase.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Heaven's Door Bootleg Series Volume 3 official"
+    },
+    "recordedAt": "2026-04-19T16:05:16.769Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Heaven's Door Bootleg Series Volume 3 official",
+          "summary": "Heaven’s Door **Bootleg Series Volume III** is an **official 2021 release** from Heaven’s Door. On Heaven’s Door’s official Bootleg Series archive, **Volume III is listed as the 2021 edition**. On the brand’s official product page, it is described as a **cask-strength 13-year-old Kentucky bourbon finished in Vino de Na",
+          "results": [
+            {
+              "title": "https://www.heavensdoor.com/bootleg-series",
+              "url": "https://www.heavensdoor.com/bootleg-series",
+              "domain": "heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+              "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+              "domain": "buy.heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://buy.heavensdoor.com/products/heavens-door-bootleg-bundle",
+              "url": "https://buy.heavensdoor.com/products/heavens-door-bootleg-bundle",
+              "domain": "buy.heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://buy.heavensdoor.com/collections/limited-series",
+              "url": "https://buy.heavensdoor.com/collections/limited-series",
+              "domain": "buy.heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://buy.heavensdoor.com/products/eavens-door",
+              "url": "https://buy.heavensdoor.com/products/eavens-door",
+              "domain": "buy.heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+              "url": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+              "domain": "thewhiskeywash.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Heaven's Door Bootleg Series Volume 3 official",
+        "summary": "Heaven’s Door **Bootleg Series Volume III** is an **official 2021 release** from Heaven’s Door. On Heaven’s Door’s official Bootleg Series archive, **Volume III is listed as the 2021 edition**. On the brand’s official product page, it is described as a **cask-strength 13-year-old Kentucky bourbon finished in Vino de Na",
+        "results": [
+          {
+            "title": "https://www.heavensdoor.com/bootleg-series",
+            "url": "https://www.heavensdoor.com/bootleg-series",
+            "domain": "heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+            "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+            "domain": "buy.heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://buy.heavensdoor.com/products/heavens-door-bootleg-bundle",
+            "url": "https://buy.heavensdoor.com/products/heavens-door-bootleg-bundle",
+            "domain": "buy.heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://buy.heavensdoor.com/collections/limited-series",
+            "url": "https://buy.heavensdoor.com/collections/limited-series",
+            "domain": "buy.heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://buy.heavensdoor.com/products/eavens-door",
+            "url": "https://buy.heavensdoor.com/products/eavens-door",
+            "domain": "buy.heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+            "url": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+            "domain": "thewhiskeywash.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

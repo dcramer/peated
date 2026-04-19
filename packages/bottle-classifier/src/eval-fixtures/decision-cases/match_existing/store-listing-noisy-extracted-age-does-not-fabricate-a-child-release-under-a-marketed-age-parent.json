@@ -1,0 +1,95 @@
+{
+  "id": "store-listing-noisy-extracted-age-does-not-fabricate-a-child-release-under-a-marketed-age-parent",
+  "name": "store listing: noisy extracted age does not fabricate a child release under a marketed-age parent",
+  "input": {
+    "reference": {
+      "name": "Springbank 10-year-old",
+      "url": "https://shop.example/products/springbank-10-year-old"
+    },
+    "extractedIdentity": {
+      "brand": "Springbank",
+      "bottler": null,
+      "expression": "10 Year Old",
+      "series": null,
+      "distillery": ["Springbank"],
+      "category": "single_malt",
+      "stated_age": 12,
+      "abv": 46,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Springbank 10 Year Old",
+        "brand": "Springbank",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Springbank"],
+        "category": "single_malt",
+        "statedAge": 10,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": 46,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.92,
+        "source": ["exact"],
+        "bottleId": 640,
+        "fullName": "Springbank 10 Year Old"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["springbank", "10"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Springbank 10 Year Old",
+          "brand": "Springbank",
+          "bottler": null,
+          "series": null,
+          "distillery": ["Springbank"],
+          "category": "single_malt",
+          "statedAge": 10,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": 46,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.92,
+          "source": ["exact"],
+          "bottleId": 640,
+          "fullName": "Springbank 10 Year Old"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 640,
+    "matchedReleaseId": null,
+    "summary": "Treat a noisy differing age extraction conservatively when the matched bottle explicitly markets 10 years in its name, and keep the Springbank 10 Year Old bottle match instead of fabricating a child release."
+  }
+}

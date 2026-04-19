@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "The Macallan Double Cask official"
+    },
+    "recordedAt": "2026-04-19T15:48:40.215Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "The Macallan Double Cask official",
+          "summary": "Officially, **The Macallan Double Cask** is a **single malt Scotch whisky collection** matured in a combination of **sherry-seasoned American oak and European oak casks**. The Macallan’s official collection page confirms that the range includes **12, 15, 18, and 30 year old** expressions. ([themacallan.com](https://www",
+          "results": [
+            {
+              "title": "https://www.themacallan.com/en/single-malt-scotch-whisky/double-cask",
+              "url": "https://www.themacallan.com/en/single-malt-scotch-whisky/double-cask",
+              "domain": "themacallan.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/double-cask",
+              "url": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/double-cask",
+              "domain": "themacallan.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.themacallan.com/en-us/experience-the-macallan/double-cask-tasting-experience",
+              "url": "https://www.themacallan.com/en-us/experience-the-macallan/double-cask-tasting-experience",
+              "domain": "themacallan.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.themacallan.com/en/double-cask-tasting-experience",
+              "url": "https://www.themacallan.com/en/double-cask-tasting-experience",
+              "domain": "themacallan.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/double-cask-18-years-old-2025-release",
+              "url": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/double-cask-18-years-old-2025-release",
+              "domain": "themacallan.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.themacallan.com/en-us/double-cask-30-years-old-2025-release",
+              "url": "https://www.themacallan.com/en-us/double-cask-30-years-old-2025-release",
+              "domain": "themacallan.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "The Macallan Double Cask official",
+        "summary": "Officially, **The Macallan Double Cask** is a **single malt Scotch whisky collection** matured in a combination of **sherry-seasoned American oak and European oak casks**. The Macallan’s official collection page confirms that the range includes **12, 15, 18, and 30 year old** expressions. ([themacallan.com](https://www",
+        "results": [
+          {
+            "title": "https://www.themacallan.com/en/single-malt-scotch-whisky/double-cask",
+            "url": "https://www.themacallan.com/en/single-malt-scotch-whisky/double-cask",
+            "domain": "themacallan.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/double-cask",
+            "url": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/double-cask",
+            "domain": "themacallan.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.themacallan.com/en-us/experience-the-macallan/double-cask-tasting-experience",
+            "url": "https://www.themacallan.com/en-us/experience-the-macallan/double-cask-tasting-experience",
+            "domain": "themacallan.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.themacallan.com/en/double-cask-tasting-experience",
+            "url": "https://www.themacallan.com/en/double-cask-tasting-experience",
+            "domain": "themacallan.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/double-cask-18-years-old-2025-release",
+            "url": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/double-cask-18-years-old-2025-release",
+            "domain": "themacallan.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.themacallan.com/en-us/double-cask-30-years-old-2025-release",
+            "url": "https://www.themacallan.com/en-us/double-cask-30-years-old-2025-release",
+            "domain": "themacallan.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

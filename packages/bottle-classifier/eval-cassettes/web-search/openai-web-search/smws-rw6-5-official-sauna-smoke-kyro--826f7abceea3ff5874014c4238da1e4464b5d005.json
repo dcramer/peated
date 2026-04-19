@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "SMWS RW6.5 official Sauna Smoke Kyro"
+    },
+    "recordedAt": "2026-04-19T21:25:09.650Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "SMWS RW6.5 official Sauna Smoke Kyro",
+          "summary": "SMWS **RW6.5** is **not** “Sauna Smoke”; the official SMWS bottle title is **“Appley ever after.”** The official SMWS listing identifies it as a **Finland** rye whisky, **age 6 years**, **distilled 11/01/2018**, **56.0% ABV**, and from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_s",
+          "results": [
+            {
+              "title": "https://smws.eu/",
+              "url": "https://smws.eu/",
+              "domain": "smws.eu",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/",
+              "url": "https://smws.com/",
+              "domain": "smws.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/cinnamon-sauna-smoke/",
+              "url": "https://smws.com/cinnamon-sauna-smoke/",
+              "domain": "smws.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/171844/glen-scotia-2010-smws-93151",
+              "url": "https://www.whiskybase.com/whiskies/whisky/171844/glen-scotia-2010-smws-93151",
+              "domain": "whiskybase.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/252609/glenturret-2013-smws-1693",
+              "url": "https://www.whiskybase.com/whiskies/whisky/252609/glenturret-2013-smws-1693",
+              "domain": "whiskybase.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/find-my-whisky/",
+              "url": "https://smws.com/find-my-whisky/",
+              "domain": "smws.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "SMWS RW6.5 official Sauna Smoke Kyro",
+        "summary": "SMWS **RW6.5** is **not** “Sauna Smoke”; the official SMWS bottle title is **“Appley ever after.”** The official SMWS listing identifies it as a **Finland** rye whisky, **age 6 years**, **distilled 11/01/2018**, **56.0% ABV**, and from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_s",
+        "results": [
+          {
+            "title": "https://smws.eu/",
+            "url": "https://smws.eu/",
+            "domain": "smws.eu",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/",
+            "url": "https://smws.com/",
+            "domain": "smws.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/cinnamon-sauna-smoke/",
+            "url": "https://smws.com/cinnamon-sauna-smoke/",
+            "domain": "smws.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/171844/glen-scotia-2010-smws-93151",
+            "url": "https://www.whiskybase.com/whiskies/whisky/171844/glen-scotia-2010-smws-93151",
+            "domain": "whiskybase.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/252609/glenturret-2013-smws-1693",
+            "url": "https://www.whiskybase.com/whiskies/whisky/252609/glenturret-2013-smws-1693",
+            "domain": "whiskybase.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/find-my-whisky/",
+            "url": "https://smws.com/find-my-whisky/",
+            "domain": "smws.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

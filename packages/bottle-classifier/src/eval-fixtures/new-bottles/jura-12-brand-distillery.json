@@ -1,0 +1,13 @@
+{
+  "id": "jura-12-brand-distillery",
+  "referenceName": "Jura 12-year-old Scotch Whisky",
+  "expectedBottleName": "Isle of Jura 12-year-old Single Malt Scotch Whisky",
+  "summary": "Treat Jura 12-year-old as the standard Jura core bottling and keep the existing distillery-qualified local bottle match even when the reference uses the shorter Jura brand wording.",
+  "peatedBottleIds": [3233],
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": null
+  }
+}

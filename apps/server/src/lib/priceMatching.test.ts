@@ -753,7 +753,7 @@ describe("priceMatching", () => {
       buildMockBottleReferenceClassification({
         decision: {
           action: "match_existing",
-          confidence: 72,
+          confidence: 80,
           rationale: "The current bottle identity already matches cleanly.",
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
@@ -892,6 +892,90 @@ describe("priceMatching", () => {
             caskFill: null,
             score: 0.95,
             source: ["exact"],
+          },
+        ],
+        resolvedEntities: [],
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+
+    expect(proposal).toMatchObject({
+      status: "approved",
+      proposalType: "match_existing",
+      currentBottleId: bottle.id,
+      suggestedBottleId: bottle.id,
+      reviewedById: expect.any(Number),
+    });
+    expect(updatedPrice?.bottleId).toBe(bottle.id);
+  });
+
+  test("auto approves unmatched high-confidence text matches when the raw title clearly reaffirms the bottle", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const bottle = await fixtures.Bottle({
+      name: "Cold Brew",
+      fullName: "Jameson Cold Brew",
+      category: "blend",
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Jameson Cold Brew Irish Whiskey",
+      imageUrl: null,
+      url: "https://woodencork.com/collections/whiskey/products/jameson-cold-brew?utm=peated",
+    });
+
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        extractedLabel: null,
+        decision: {
+          action: "match_existing",
+          confidence: 98,
+          rationale:
+            "The raw title directly reaffirms the existing Jameson Cold Brew bottle.",
+          suggestedBottleId: bottle.id,
+          candidateBottleIds: [bottle.id],
+          proposedBottle: null,
+        },
+        searchEvidence: [],
+        candidateBottles: [
+          {
+            kind: "bottle",
+            bottleId: bottle.id,
+            releaseId: null,
+            alias: null,
+            fullName: "Jameson Cold Brew",
+            bottleFullName: "Jameson Cold Brew",
+            brand: "Jameson",
+            bottler: null,
+            series: null,
+            distillery: [],
+            category: "blend",
+            statedAge: null,
+            edition: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 1,
+            source: ["text", "brand"],
           },
         ],
         resolvedEntities: [],
@@ -1223,7 +1307,7 @@ describe("priceMatching", () => {
         },
         decision: {
           action: "match_existing",
-          confidence: 94,
+          confidence: 96,
           rationale:
             "Official Glenlivet sources confirm Caribbean Reserve as the rum-cask-finished single malt release.",
           suggestedBottleId: bottle.id,
@@ -2358,7 +2442,52 @@ describe("priceMatching", () => {
     expect(proposal.proposalType).toBe("no_match");
   });
 
-  test("routes flavored whisky listings through the classifier", async ({
+  test("auto ignored bundle listings clear stale bottle assignments", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const bottle = await fixtures.Bottle({});
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      name: "Buffalo Trace Kentucky Straight Bourbon Whiskey 12 Pack",
+      imageUrl: null,
+    });
+    await db
+      .update(storePrices)
+      .set({
+        releaseId: release.id,
+      })
+      .where(eq(storePrices.id, price.id));
+
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        status: "ignored",
+        ignoreReason:
+          "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+
+    expect(classifyBottleReference).toHaveBeenCalledOnce();
+    expect(proposal.status).toBe("ignored");
+    expect(proposal.proposalType).toBe("no_match");
+    expect(proposal.currentBottleId).toBe(bottle.id);
+    expect(proposal.currentReleaseId).toBe(release.id);
+    expect(updatedPrice?.bottleId).toBeNull();
+    expect(updatedPrice?.releaseId).toBeNull();
+  });
+
+  test("routes unsupported novelty flavored-whiskey listings through the classifier", async ({
     fixtures,
   }) => {
     config.OPENAI_API_KEY = undefined;

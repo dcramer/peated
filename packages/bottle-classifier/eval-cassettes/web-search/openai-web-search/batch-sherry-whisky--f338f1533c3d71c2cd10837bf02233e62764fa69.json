@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "\"Batch Sherry\" whisky"
+    },
+    "recordedAt": "2026-04-19T15:48:13.280Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "\"Batch Sherry\" whisky",
+          "summary": "The phrase **“Batch Sherry”** most plausibly refers to **Johnnie Walker Blender’s Batch Sherry Cask Finish 12 Year Old**, a limited-edition blended Scotch from the Blender’s Batch series. Diageo’s brand materials describe the Blender’s Batch line as a limited-edition series, and independent coverage identifies the spec",
+          "results": [
+            {
+              "title": "https://peated.com/bottles/14179",
+              "url": "https://peated.com/bottles/14179",
+              "domain": "peated.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.dramface.com/news/tamdhu-batch-strength-008",
+              "url": "https://www.dramface.com/news/tamdhu-batch-strength-008",
+              "domain": "dramface.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.oldandrarewhisky.co.uk/products/arran-small-batch-sherry-2009-single-malt-70cl-55-2-abv",
+              "url": "https://www.oldandrarewhisky.co.uk/products/arran-small-batch-sherry-2009-single-malt-70cl-55-2-abv",
+              "domain": "oldandrarewhisky.co.uk",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.worldwhiskiesawards.com/winner-whisky/global-finalist-63807-world-whiskies-awards-2026",
+              "url": "https://www.worldwhiskiesawards.com/winner-whisky/global-finalist-63807-world-whiskies-awards-2026",
+              "domain": "worldwhiskiesawards.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.ots.at/presseaussendung/OTS_20180110_OTS0098/das-neue-jahr-beginnt-mit-einem-neuen-limited-edition-whisky-von-johnnie-walker",
+              "url": "https://www.ots.at/presseaussendung/OTS_20180110_OTS0098/das-neue-jahr-beginnt-mit-einem-neuen-limited-edition-whisky-von-johnnie-walker",
+              "domain": "ots.at",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/Johnnie-Walker-Blenders-Batch-Sherry-Cask-Finish-12-year-old-40",
+              "url": "https://whiskyadvocate.com/Johnnie-Walker-Blenders-Batch-Sherry-Cask-Finish-12-year-old-40",
+              "domain": "whiskyadvocate.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "\"Batch Sherry\" whisky",
+        "summary": "The phrase **“Batch Sherry”** most plausibly refers to **Johnnie Walker Blender’s Batch Sherry Cask Finish 12 Year Old**, a limited-edition blended Scotch from the Blender’s Batch series. Diageo’s brand materials describe the Blender’s Batch line as a limited-edition series, and independent coverage identifies the spec",
+        "results": [
+          {
+            "title": "https://peated.com/bottles/14179",
+            "url": "https://peated.com/bottles/14179",
+            "domain": "peated.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.dramface.com/news/tamdhu-batch-strength-008",
+            "url": "https://www.dramface.com/news/tamdhu-batch-strength-008",
+            "domain": "dramface.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.oldandrarewhisky.co.uk/products/arran-small-batch-sherry-2009-single-malt-70cl-55-2-abv",
+            "url": "https://www.oldandrarewhisky.co.uk/products/arran-small-batch-sherry-2009-single-malt-70cl-55-2-abv",
+            "domain": "oldandrarewhisky.co.uk",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.worldwhiskiesawards.com/winner-whisky/global-finalist-63807-world-whiskies-awards-2026",
+            "url": "https://www.worldwhiskiesawards.com/winner-whisky/global-finalist-63807-world-whiskies-awards-2026",
+            "domain": "worldwhiskiesawards.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.ots.at/presseaussendung/OTS_20180110_OTS0098/das-neue-jahr-beginnt-mit-einem-neuen-limited-edition-whisky-von-johnnie-walker",
+            "url": "https://www.ots.at/presseaussendung/OTS_20180110_OTS0098/das-neue-jahr-beginnt-mit-einem-neuen-limited-edition-whisky-von-johnnie-walker",
+            "domain": "ots.at",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/Johnnie-Walker-Blenders-Batch-Sherry-Cask-Finish-12-year-old-40",
+            "url": "https://whiskyadvocate.com/Johnnie-Walker-Blenders-Batch-Sherry-Cask-Finish-12-year-old-40",
+            "domain": "whiskyadvocate.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

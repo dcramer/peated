@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "SMWS RW6.5 Sauna Smoke official Scotch Malt Whisky Society"
+    },
+    "recordedAt": "2026-04-19T16:19:37.729Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "SMWS RW6.5 Sauna Smoke official Scotch Malt Whisky Society",
+          "summary": "I could not verify **“SMWS RW6.5 Sauna Smoke”** as an official SMWS bottling title.\n\nWhat the official SMWS site does confirm is that **RW6.5** is a **rye whisky** bottling titled **“Appley ever after,”** with **region Finland**, **age 6 years**, **ABV 56.0%**, and **cask type 1st fill #3 char barrel**. ([smws.com](htt",
+          "results": [
+            {
+              "title": "https://smws.com/cinnamon-sauna-smoke/",
+              "url": "https://smws.com/cinnamon-sauna-smoke/",
+              "domain": "smws.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/spirit-type/",
+              "url": "https://smws.com/spirit-type/",
+              "domain": "smws.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=nl",
+              "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=nl",
+              "domain": "whiskybase.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/no-two-sips-are-the-same/",
+              "url": "https://smws.com/no-two-sips-are-the-same/",
+              "domain": "smws.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=zh-CN",
+              "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=zh-CN",
+              "domain": "whiskybase.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/all-whisky/whisky/rye-whisky/",
+              "url": "https://smws.com/all-whisky/whisky/rye-whisky/",
+              "domain": "smws.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "SMWS RW6.5 Sauna Smoke official Scotch Malt Whisky Society",
+        "summary": "I could not verify **“SMWS RW6.5 Sauna Smoke”** as an official SMWS bottling title.\n\nWhat the official SMWS site does confirm is that **RW6.5** is a **rye whisky** bottling titled **“Appley ever after,”** with **region Finland**, **age 6 years**, **ABV 56.0%**, and **cask type 1st fill #3 char barrel**. ([smws.com](htt",
+        "results": [
+          {
+            "title": "https://smws.com/cinnamon-sauna-smoke/",
+            "url": "https://smws.com/cinnamon-sauna-smoke/",
+            "domain": "smws.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/spirit-type/",
+            "url": "https://smws.com/spirit-type/",
+            "domain": "smws.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=nl",
+            "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=nl",
+            "domain": "whiskybase.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/no-two-sips-are-the-same/",
+            "url": "https://smws.com/no-two-sips-are-the-same/",
+            "domain": "smws.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=zh-CN",
+            "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=zh-CN",
+            "domain": "whiskybase.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/all-whisky/whisky/rye-whisky/",
+            "url": "https://smws.com/all-whisky/whisky/rye-whisky/",
+            "domain": "smws.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

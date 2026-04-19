@@ -1,0 +1,95 @@
+{
+  "id": "store-listing-creates-a-reusable-legacy-series-parent-when-only-legacy-chapter-bottles-exist-locally",
+  "name": "store listing: creates a reusable Legacy Series parent when only legacy chapter bottles exist locally",
+  "input": {
+    "reference": {
+      "name": "Glengoyne The Legacy Series Chapter Two",
+      "url": "https://shop.example/products/glengoyne-legacy-series-chapter-two"
+    },
+    "extractedIdentity": {
+      "brand": "Glengoyne",
+      "bottler": null,
+      "expression": "The Legacy Series",
+      "series": null,
+      "distillery": ["Glengoyne"],
+      "category": "single_malt",
+      "stated_age": null,
+      "abv": 48,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": "Chapter Two"
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Glengoyne The Legacy Series Chapter Two",
+        "brand": "Glengoyne",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Glengoyne"],
+        "category": "single_malt",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": 48,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.96,
+        "source": ["exact"],
+        "bottleId": 2083,
+        "fullName": "Glengoyne The Legacy Series Chapter Two"
+      },
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Glengoyne The Legacy Series Chapter One",
+        "brand": "Glengoyne",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Glengoyne"],
+        "category": "single_malt",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": 48,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.91,
+        "source": ["text"],
+        "bottleId": 2460,
+        "fullName": "Glengoyne The Legacy Series Chapter One"
+      }
+    ]
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle_and_release",
+    "identityScope": "product",
+    "proposedBottle": {
+      "brand": {
+        "name": "Glengoyne"
+      },
+      "name": "The Legacy Series"
+    },
+    "proposedRelease": {
+      "edition": "Chapter Two"
+    },
+    "summary": "Treat Glengoyne The Legacy Series as the reusable parent family and Chapter Two as the child release even when the local candidates are only dirty chapter-specific bottle rows."
+  }
+}

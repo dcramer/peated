@@ -1,0 +1,94 @@
+{
+  "id": "store-listing-strips-retailer-suffix-noise-and-matches-the-canonical-bottle",
+  "name": "store listing: strips retailer suffix noise and matches the canonical bottle",
+  "input": {
+    "reference": {
+      "name": "Ardbeg Uigeadail Single Malt Scotch Whisky 750ml",
+      "url": "https://shop.example/products/ardbeg-uigeadail-750ml"
+    },
+    "extractedIdentity": {
+      "brand": "Ardbeg",
+      "bottler": null,
+      "expression": "Uigeadail",
+      "series": null,
+      "distillery": [],
+      "category": "single_malt",
+      "stated_age": null,
+      "abv": 54.2,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Ardbeg Uigeadail",
+        "brand": "Ardbeg",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Ardbeg"],
+        "category": "single_malt",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": 54.2,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.95,
+        "source": ["exact"],
+        "bottleId": 630,
+        "fullName": "Ardbeg Uigeadail"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["ardbeg", "uigeadail"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Ardbeg Uigeadail",
+          "brand": "Ardbeg",
+          "bottler": null,
+          "series": null,
+          "distillery": ["Ardbeg"],
+          "category": "single_malt",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": 54.2,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.95,
+          "source": ["exact"],
+          "bottleId": 630,
+          "fullName": "Ardbeg Uigeadail"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 630,
+    "summary": "Ignore generic retailer suffixes like Single Malt Scotch Whisky and 750ml, then match the canonical Ardbeg Uigeadail bottle."
+  }
+}

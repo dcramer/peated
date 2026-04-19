@@ -1,0 +1,688 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "SMWS RW6.5 official Sauna Smoke"
+    },
+    "recordedAt": "2026-04-19T05:34:56.388Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "SMWS RW6.5 official Sauna Smoke",
+          "summary": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+          "results": [
+            {
+              "title": "https://peated.com/bottles/12207",
+              "url": "https://peated.com/bottles/12207",
+              "domain": "peated.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.smws.ca/assets/Uploads/outturns/March-2025-AB.pdf",
+              "url": "https://www.smws.ca/assets/Uploads/outturns/March-2025-AB.pdf",
+              "domain": "smws.ca",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/smws/comments/m9ade1",
+              "url": "https://www.reddit.com/r/smws/comments/m9ade1",
+              "domain": "reddit.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/247300/kyr-2017-smws-rw63",
+              "url": "https://www.whiskybase.com/whiskies/whisky/247300/kyr-2017-smws-rw63",
+              "domain": "whiskybase.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/Members%20Charter%20A3%20Digital.pdf",
+              "url": "https://smws.com/content/Members%20Charter%20A3%20Digital.pdf",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.moredramslessdrama.com/2024/01/31/ardbeg-ar5-33-140-smws/",
+              "url": "https://www.moredramslessdrama.com/2024/01/31/ardbeg-ar5-33-140-smws/",
+              "domain": "moredramslessdrama.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.thedramble.com/tastings/group/smws-july-2021-outturn-review/",
+              "url": "https://www.thedramble.com/tastings/group/smws-july-2021-outturn-review/",
+              "domain": "thedramble.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=zh-CN",
+              "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=zh-CN",
+              "domain": "whiskybase.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/liquid-medicinal-smoke/",
+              "url": "https://smws.com/liquid-medicinal-smoke/",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskymessen.dk/wp-content/uploads/2025/02/WhiskymessenSmaagekatalog2025.pdf",
+              "url": "https://whiskymessen.dk/wp-content/uploads/2025/02/WhiskymessenSmaagekatalog2025.pdf",
+              "domain": "whiskymessen.dk",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1skcg5p/reviews_815_to_820_smws_usa_outturn_april_2026/",
+              "url": "https://www.reddit.com/r/Scotch/comments/1skcg5p/reviews_815_to_820_smws_usa_outturn_april_2026/",
+              "domain": "reddit.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/archive?distillery_code=617_636&limit=60&page=29&whisky_cask_type_prev_content=168_170",
+              "url": "https://smws.com/archive?distillery_code=617_636&limit=60&page=29&whisky_cask_type_prev_content=168_170",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://maltrunners.com/2021/05/02/two-peated-bunnahabhain-9-year-smws-10-124-10-137/",
+              "url": "https://maltrunners.com/2021/05/02/two-peated-bunnahabhain-9-year-smws-10-124-10-137/",
+              "domain": "maltrunners.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.moredramslessdrama.com/2022/07/31/smws-whisky-festival-2022/",
+              "url": "https://www.moredramslessdrama.com/2022/07/31/smws-whisky-festival-2022/",
+              "domain": "moredramslessdrama.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.smws.ch/wp-content/uploads/2025/07/outturn-2506-a5-en.pdf",
+              "url": "https://www.smws.ch/wp-content/uploads/2025/07/outturn-2506-a5-en.pdf",
+              "domain": "smws.ch",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/mogeh1",
+              "url": "https://www.reddit.com/r/Scotch/comments/mogeh1",
+              "domain": "reddit.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/smws/comments/pso0oc",
+              "url": "https://www.reddit.com/r/smws/comments/pso0oc",
+              "domain": "reddit.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/10nh326",
+              "url": "https://www.reddit.com/r/Scotch/comments/10nh326",
+              "domain": "reddit.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.forbes.com/sites/karlaalindahao/2018/05/01/scotch-malt-whisky-society-wins-best-in-show-at-san-francisco-world-spirits-competition-2018/",
+              "url": "https://www.forbes.com/sites/karlaalindahao/2018/05/01/scotch-malt-whisky-society-wins-best-in-show-at-san-francisco-world-spirits-competition-2018/",
+              "domain": "forbes.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.thedramble.com/tastings/group/smws-september-2022-outturn-review/",
+              "url": "https://www.thedramble.com/tastings/group/smws-september-2022-outturn-review/",
+              "domain": "thedramble.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyandale.com.au/wp-content/uploads/2024/07/WHISKY-MENU-3007_2024.pdf",
+              "url": "https://whiskyandale.com.au/wp-content/uploads/2024/07/WHISKY-MENU-3007_2024.pdf",
+              "domain": "whiskyandale.com.au",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://maltrunners.com/2024/02/13/glenturret-ruadh-maor-9-year-2013-smws-16-88-dressed-to-grill/",
+              "url": "https://maltrunners.com/2024/02/13/glenturret-ruadh-maor-9-year-2013-smws-16-88-dressed-to-grill/",
+              "domain": "maltrunners.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/18m3bm7",
+              "url": "https://www.reddit.com/r/Scotch/comments/18m3bm7",
+              "domain": "reddit.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/fauvnw",
+              "url": "https://www.reddit.com/r/Scotch/comments/fauvnw",
+              "domain": "reddit.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/12gsltz",
+              "url": "https://www.reddit.com/r/Scotch/comments/12gsltz",
+              "domain": "reddit.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1owz0jw/reviews_701_to_706_smws_usa_november_2025_outturn/",
+              "url": "https://www.reddit.com/r/Scotch/comments/1owz0jw/reviews_701_to_706_smws_usa_november_2025_outturn/",
+              "domain": "reddit.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/appley-ever-after/",
+              "url": "https://smws.com/appley-ever-after/",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/truly-a-raw-smoked-barley-experience/",
+              "url": "https://smws.com/truly-a-raw-smoked-barley-experience/",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=ko",
+              "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=ko",
+              "domain": "whiskybase.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/unfiltered/archive",
+              "url": "https://smws.com/unfiltered/archive",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=nl",
+              "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=nl",
+              "domain": "whiskybase.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/archive?limit=60&p=5&page=29",
+              "url": "https://smws.com/archive?limit=60&p=5&page=29",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/archive?distillery_code=535_552&limit=60&page=4&whisky_cask_type_prev_content=168_170",
+              "url": "https://smws.com/archive?distillery_code=535_552&limit=60&page=4&whisky_cask_type_prev_content=168_170",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/sauna-cedar-and-strawberry/",
+              "url": "https://smws.com/sauna-cedar-and-strawberry/",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/archive?limit=60&p=5&page=27",
+              "url": "https://smws.com/archive?limit=60&p=5&page=27",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/archive?distillery_code=535_550&limit=60&page=4&whisky_cask_type_prev_content=168_170",
+              "url": "https://smws.com/archive?distillery_code=535_550&limit=60&page=4&whisky_cask_type_prev_content=168_170",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/archive?distillery_code=665&limit=60&page=4&whisky_flavour=77",
+              "url": "https://smws.com/archive?distillery_code=665&limit=60&page=4&whisky_flavour=77",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/archive?page=25",
+              "url": "https://smws.com/archive?page=25",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/TN%20-%20O4%20APRIL%202025%20-%20SPRING%20SPIRITS%20AND%20FESTIVAL%20DREAMS%20%20%282%29.pdf",
+              "url": "https://smws.com/content/TN%20-%20O4%20APRIL%202025%20-%20SPRING%20SPIRITS%20AND%20FESTIVAL%20DREAMS%20%20%282%29.pdf",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/TN%20-%20MARCH%20EMT%20-%20NEW%20WAVE.pdf",
+              "url": "https://smws.com/content/TN%20-%20MARCH%20EMT%20-%20NEW%20WAVE.pdf",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/EMT%2011.2024%20-%20NEWCASTLE%20-%206%20DRAM%20O%26R%20TASTING%20NOTES.pdf",
+              "url": "https://smws.com/content/EMT%2011.2024%20-%20NEWCASTLE%20-%206%20DRAM%20O%26R%20TASTING%20NOTES.pdf",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/EMT%20MAY%202024%20-%20THE%20VAULTS%20OTR%20LIST.pdf",
+              "url": "https://smws.com/content/EMT%20MAY%202024%20-%20THE%20VAULTS%20OTR%20LIST.pdf",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/TN%20-%20MAY%20EMT%20-%206D3R.pdf",
+              "url": "https://smws.com/content/TN%20-%20MAY%20EMT%20-%206D3R.pdf",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/EMT%20Dram%20Tasting%20Notes%20June%202024.pdf",
+              "url": "https://smws.com/content/EMT%20Dram%20Tasting%20Notes%20June%202024.pdf",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "Appley ever after",
+              "url": "https://smws.com/appley-ever-after/?utm_source=openai",
+              "domain": "smws.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "Kyrö Distillery Company - 위스키베이스 - 위스키에 대한 평가와 리뷰",
+              "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=ko&utm_source=openai",
+              "domain": "whiskybase.com",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            },
+            {
+              "title": "THE SCOTCH MALT",
+              "url": "https://www.smws.ca/assets/Uploads/outturns/March-2025-AB.pdf?utm_source=openai",
+              "domain": "smws.ca",
+              "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "SMWS RW6.5 official Sauna Smoke",
+        "summary": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+        "results": [
+          {
+            "title": "https://peated.com/bottles/12207",
+            "url": "https://peated.com/bottles/12207",
+            "domain": "peated.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.smws.ca/assets/Uploads/outturns/March-2025-AB.pdf",
+            "url": "https://www.smws.ca/assets/Uploads/outturns/March-2025-AB.pdf",
+            "domain": "smws.ca",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/smws/comments/m9ade1",
+            "url": "https://www.reddit.com/r/smws/comments/m9ade1",
+            "domain": "reddit.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/247300/kyr-2017-smws-rw63",
+            "url": "https://www.whiskybase.com/whiskies/whisky/247300/kyr-2017-smws-rw63",
+            "domain": "whiskybase.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/Members%20Charter%20A3%20Digital.pdf",
+            "url": "https://smws.com/content/Members%20Charter%20A3%20Digital.pdf",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.moredramslessdrama.com/2024/01/31/ardbeg-ar5-33-140-smws/",
+            "url": "https://www.moredramslessdrama.com/2024/01/31/ardbeg-ar5-33-140-smws/",
+            "domain": "moredramslessdrama.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.thedramble.com/tastings/group/smws-july-2021-outturn-review/",
+            "url": "https://www.thedramble.com/tastings/group/smws-july-2021-outturn-review/",
+            "domain": "thedramble.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=zh-CN",
+            "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=zh-CN",
+            "domain": "whiskybase.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/liquid-medicinal-smoke/",
+            "url": "https://smws.com/liquid-medicinal-smoke/",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskymessen.dk/wp-content/uploads/2025/02/WhiskymessenSmaagekatalog2025.pdf",
+            "url": "https://whiskymessen.dk/wp-content/uploads/2025/02/WhiskymessenSmaagekatalog2025.pdf",
+            "domain": "whiskymessen.dk",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1skcg5p/reviews_815_to_820_smws_usa_outturn_april_2026/",
+            "url": "https://www.reddit.com/r/Scotch/comments/1skcg5p/reviews_815_to_820_smws_usa_outturn_april_2026/",
+            "domain": "reddit.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/archive?distillery_code=617_636&limit=60&page=29&whisky_cask_type_prev_content=168_170",
+            "url": "https://smws.com/archive?distillery_code=617_636&limit=60&page=29&whisky_cask_type_prev_content=168_170",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://maltrunners.com/2021/05/02/two-peated-bunnahabhain-9-year-smws-10-124-10-137/",
+            "url": "https://maltrunners.com/2021/05/02/two-peated-bunnahabhain-9-year-smws-10-124-10-137/",
+            "domain": "maltrunners.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.moredramslessdrama.com/2022/07/31/smws-whisky-festival-2022/",
+            "url": "https://www.moredramslessdrama.com/2022/07/31/smws-whisky-festival-2022/",
+            "domain": "moredramslessdrama.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.smws.ch/wp-content/uploads/2025/07/outturn-2506-a5-en.pdf",
+            "url": "https://www.smws.ch/wp-content/uploads/2025/07/outturn-2506-a5-en.pdf",
+            "domain": "smws.ch",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/mogeh1",
+            "url": "https://www.reddit.com/r/Scotch/comments/mogeh1",
+            "domain": "reddit.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/smws/comments/pso0oc",
+            "url": "https://www.reddit.com/r/smws/comments/pso0oc",
+            "domain": "reddit.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/10nh326",
+            "url": "https://www.reddit.com/r/Scotch/comments/10nh326",
+            "domain": "reddit.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.forbes.com/sites/karlaalindahao/2018/05/01/scotch-malt-whisky-society-wins-best-in-show-at-san-francisco-world-spirits-competition-2018/",
+            "url": "https://www.forbes.com/sites/karlaalindahao/2018/05/01/scotch-malt-whisky-society-wins-best-in-show-at-san-francisco-world-spirits-competition-2018/",
+            "domain": "forbes.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.thedramble.com/tastings/group/smws-september-2022-outturn-review/",
+            "url": "https://www.thedramble.com/tastings/group/smws-september-2022-outturn-review/",
+            "domain": "thedramble.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyandale.com.au/wp-content/uploads/2024/07/WHISKY-MENU-3007_2024.pdf",
+            "url": "https://whiskyandale.com.au/wp-content/uploads/2024/07/WHISKY-MENU-3007_2024.pdf",
+            "domain": "whiskyandale.com.au",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://maltrunners.com/2024/02/13/glenturret-ruadh-maor-9-year-2013-smws-16-88-dressed-to-grill/",
+            "url": "https://maltrunners.com/2024/02/13/glenturret-ruadh-maor-9-year-2013-smws-16-88-dressed-to-grill/",
+            "domain": "maltrunners.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/18m3bm7",
+            "url": "https://www.reddit.com/r/Scotch/comments/18m3bm7",
+            "domain": "reddit.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/fauvnw",
+            "url": "https://www.reddit.com/r/Scotch/comments/fauvnw",
+            "domain": "reddit.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/12gsltz",
+            "url": "https://www.reddit.com/r/Scotch/comments/12gsltz",
+            "domain": "reddit.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1owz0jw/reviews_701_to_706_smws_usa_november_2025_outturn/",
+            "url": "https://www.reddit.com/r/Scotch/comments/1owz0jw/reviews_701_to_706_smws_usa_november_2025_outturn/",
+            "domain": "reddit.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/appley-ever-after/",
+            "url": "https://smws.com/appley-ever-after/",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/truly-a-raw-smoked-barley-experience/",
+            "url": "https://smws.com/truly-a-raw-smoked-barley-experience/",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=ko",
+            "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=ko",
+            "domain": "whiskybase.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/unfiltered/archive",
+            "url": "https://smws.com/unfiltered/archive",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=nl",
+            "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=nl",
+            "domain": "whiskybase.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/archive?limit=60&p=5&page=29",
+            "url": "https://smws.com/archive?limit=60&p=5&page=29",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/archive?distillery_code=535_552&limit=60&page=4&whisky_cask_type_prev_content=168_170",
+            "url": "https://smws.com/archive?distillery_code=535_552&limit=60&page=4&whisky_cask_type_prev_content=168_170",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/sauna-cedar-and-strawberry/",
+            "url": "https://smws.com/sauna-cedar-and-strawberry/",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/archive?limit=60&p=5&page=27",
+            "url": "https://smws.com/archive?limit=60&p=5&page=27",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/archive?distillery_code=535_550&limit=60&page=4&whisky_cask_type_prev_content=168_170",
+            "url": "https://smws.com/archive?distillery_code=535_550&limit=60&page=4&whisky_cask_type_prev_content=168_170",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/archive?distillery_code=665&limit=60&page=4&whisky_flavour=77",
+            "url": "https://smws.com/archive?distillery_code=665&limit=60&page=4&whisky_flavour=77",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/archive?page=25",
+            "url": "https://smws.com/archive?page=25",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/TN%20-%20O4%20APRIL%202025%20-%20SPRING%20SPIRITS%20AND%20FESTIVAL%20DREAMS%20%20%282%29.pdf",
+            "url": "https://smws.com/content/TN%20-%20O4%20APRIL%202025%20-%20SPRING%20SPIRITS%20AND%20FESTIVAL%20DREAMS%20%20%282%29.pdf",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/TN%20-%20MARCH%20EMT%20-%20NEW%20WAVE.pdf",
+            "url": "https://smws.com/content/TN%20-%20MARCH%20EMT%20-%20NEW%20WAVE.pdf",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/EMT%2011.2024%20-%20NEWCASTLE%20-%206%20DRAM%20O%26R%20TASTING%20NOTES.pdf",
+            "url": "https://smws.com/content/EMT%2011.2024%20-%20NEWCASTLE%20-%206%20DRAM%20O%26R%20TASTING%20NOTES.pdf",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/EMT%20MAY%202024%20-%20THE%20VAULTS%20OTR%20LIST.pdf",
+            "url": "https://smws.com/content/EMT%20MAY%202024%20-%20THE%20VAULTS%20OTR%20LIST.pdf",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/TN%20-%20MAY%20EMT%20-%206D3R.pdf",
+            "url": "https://smws.com/content/TN%20-%20MAY%20EMT%20-%206D3R.pdf",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/EMT%20Dram%20Tasting%20Notes%20June%202024.pdf",
+            "url": "https://smws.com/content/EMT%20Dram%20Tasting%20Notes%20June%202024.pdf",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "Appley ever after",
+            "url": "https://smws.com/appley-ever-after/?utm_source=openai",
+            "domain": "smws.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "Kyrö Distillery Company - 위스키베이스 - 위스키에 대한 평가와 리뷰",
+            "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=ko&utm_source=openai",
+            "domain": "whiskybase.com",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          },
+          {
+            "title": "THE SCOTCH MALT",
+            "url": "https://www.smws.ca/assets/Uploads/outturns/March-2025-AB.pdf?utm_source=openai",
+            "domain": "smws.ca",
+            "description": "I could not verify **“SMWS RW6.5 official Sauna Smoke”** as a real bottle title.\n\nWhat I *could* verify is:\n\n- **RW6.5** is an official SMWS bottling, but the official SMWS page identifies it as **“Appley ever after,”** not “Sauna Smoke.” It is a **6-year-old Finnish rye whisky**, **56.0% ABV**, **distilled 11/01/2018**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- Independent cataloging on Whiskybase matches that same identification for **RW6.5**, listing **Kyrö 2018 SMWS RW6.5 “Appley ever after”**, **6 years**, **56.0%**, with a *",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

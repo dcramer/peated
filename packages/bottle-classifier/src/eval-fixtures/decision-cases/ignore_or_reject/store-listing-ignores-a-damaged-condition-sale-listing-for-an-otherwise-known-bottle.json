@@ -1,0 +1,32 @@
+{
+  "id": "store-listing-ignores-a-damaged-condition-sale-listing-for-an-otherwise-known-bottle",
+  "name": "store listing: ignores a damaged-condition sale listing for an otherwise known bottle",
+  "input": {
+    "reference": {
+      "name": "Blanton's Bourbon Blooper Bottle - Broken Wax Seal (SEE DESCRIPTION)",
+      "url": "https://shop.example/products/blantons-broken-wax-seal"
+    },
+    "extractedIdentity": {
+      "brand": "Blanton's",
+      "bottler": null,
+      "expression": "Blooper Bottle",
+      "series": null,
+      "distillery": ["Buffalo Trace"],
+      "category": "bourbon",
+      "stated_age": null,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    }
+  },
+  "expected": {
+    "status": "ignored",
+    "summary": "Short-circuit damaged or secondary-market condition listings even when extraction has already latched onto a plausible Blanton's bottle identity."
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "id": "store-listing-creates-a-release-under-an-existing-batchable-product",
+  "name": "store listing: creates a release under an existing batchable product",
+  "input": {
+    "reference": {
+      "name": "Elijah Craig Barrel Proof Batch C923",
+      "url": "https://shop.example/products/elijah-craig-barrel-proof-batch-c923"
+    },
+    "extractedIdentity": {
+      "brand": "Elijah Craig",
+      "bottler": null,
+      "expression": "Barrel Proof",
+      "series": null,
+      "distillery": [],
+      "category": "bourbon",
+      "stated_age": 12,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": true,
+      "single_cask": null,
+      "edition": "Batch C923"
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Elijah Craig Barrel Proof",
+        "brand": "Elijah Craig",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Heaven Hill"],
+        "category": "bourbon",
+        "statedAge": 12,
+        "edition": null,
+        "caskStrength": true,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.94,
+        "source": ["exact"],
+        "bottleId": 620,
+        "fullName": "Elijah Craig Barrel Proof"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["elijah", "barrel proof"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Elijah Craig Barrel Proof",
+          "brand": "Elijah Craig",
+          "bottler": null,
+          "series": null,
+          "distillery": ["Heaven Hill"],
+          "category": "bourbon",
+          "statedAge": 12,
+          "edition": null,
+          "caskStrength": true,
+          "singleCask": null,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.94,
+          "source": ["exact"],
+          "bottleId": 620,
+          "fullName": "Elijah Craig Barrel Proof"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "status": "classified",
+    "action": "create_release",
+    "identityScope": "product",
+    "parentBottleId": 620,
+    "proposedRelease": {
+      "edition": "Batch C923"
+    },
+    "summary": "Treat Batch C923 as release-level detail under the existing Elijah Craig Barrel Proof bottle instead of creating a whole new bottle."
+  }
+}

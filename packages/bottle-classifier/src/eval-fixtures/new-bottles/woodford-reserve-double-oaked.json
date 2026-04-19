@@ -1,0 +1,13 @@
+{
+  "id": "woodford-double-oaked",
+  "referenceName": "Woodford Reserve Double Oaked",
+  "expectedBottleName": "Woodford Reserve Double Oaked",
+  "summary": "Treat Woodford Reserve Double Oaked as a distinct bottle identity and avoid mutating it into the separate Double Double Oaked sibling.",
+  "peatedBottleIds": [11855],
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": null
+  }
+}

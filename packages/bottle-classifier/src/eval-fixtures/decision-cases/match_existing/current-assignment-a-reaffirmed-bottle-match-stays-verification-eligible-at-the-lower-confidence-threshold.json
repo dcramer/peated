@@ -1,0 +1,79 @@
+{
+  "id": "current-assignment-a-reaffirmed-bottle-match-stays-verification-eligible-at-the-lower-confidence-threshold",
+  "name": "current assignment: a reaffirmed bottle match stays verification-eligible at the lower confidence threshold",
+  "input": {
+    "reference": {
+      "name": "Jameson Cold Brew Irish Whiskey",
+      "url": "https://shop.example/products/jameson-cold-brew",
+      "currentBottleId": 13437
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Jameson Cold Brew",
+        "brand": "Jameson",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "blend",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.99,
+        "source": ["text", "brand"],
+        "bottleId": 13437,
+        "fullName": "Jameson Cold Brew"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["jameson", "cold brew"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Jameson Cold Brew",
+          "brand": "Jameson",
+          "bottler": null,
+          "series": null,
+          "distillery": [],
+          "category": "blend",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.99,
+          "source": ["text", "brand"],
+          "bottleId": 13437,
+          "fullName": "Jameson Cold Brew"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 13437,
+    "confidenceAtLeast": 80,
+    "verifyEligible": true,
+    "summary": "When the classifier reaffirms the already assigned bottle cleanly, the confidence should remain high enough for lower-risk downstream verification."
+  }
+}

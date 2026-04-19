@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "SMWS RW6.5 official Scotch Malt Whisky Society RW6.5"
+    },
+    "recordedAt": "2026-04-19T21:36:00.844Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "SMWS RW6.5 official Scotch Malt Whisky Society RW6.5",
+          "summary": "I found official and independent support for **SMWS RW6.5 “Appley ever after”**.\n\n**Confirmed bottle traits**\n- **Bottler:** The Scotch Malt Whisky Society. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- **Spirit type:** **Rye whisky**, not Scotch single malt. ([smws.com](https://smws.com/appley-",
+          "results": [
+            {
+              "title": "https://peated.com/bottles/43260",
+              "url": "https://peated.com/bottles/43260",
+              "domain": "peated.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://scotchwhisky.com/magazine/latest-news/16228/smws-prohibits-non-member-purchases/",
+              "url": "https://scotchwhisky.com/magazine/latest-news/16228/smws-prohibits-non-member-purchases/",
+              "domain": "scotchwhisky.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://scotchwhisky.com/magazine/latest-news/15721/exotic-cargo-becomes-first-smws-blended-malt/",
+              "url": "https://scotchwhisky.com/magazine/latest-news/15721/exotic-cargo-becomes-first-smws-blended-malt/",
+              "domain": "scotchwhisky.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://solo-ielts-toefl.com/testimonials/kings-college-london-ielts-7-0/",
+              "url": "https://solo-ielts-toefl.com/testimonials/kings-college-london-ielts-7-0/",
+              "domain": "solo-ielts-toefl.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/about-us",
+              "url": "https://smws.com/about-us",
+              "domain": "smws.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.metroacademy.ca/wp-content/uploads/2023/04/%E5%8A%A0%E6%8B%BF%E5%A4%A7%E8%BF%88%E6%8B%93%E4%B8%AD%E5%AD%A6%E7%BA%B8%E8%B4%A8%E6%89%8B%E5%86%8C202303",
+              "url": "https://www.metroacademy.ca/wp-content/uploads/2023/04/%E5%8A%A0%E6%8B%BF%E5%A4%A7%E8%BF%88%E6%8B%93%E4%B8%AD%E5%AD%A6%E7%BA%B8%E8%B4%A8%E6%89%8B%E5%86%8C202303.pdf",
+              "domain": "metroacademy.ca",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "SMWS RW6.5 official Scotch Malt Whisky Society RW6.5",
+        "summary": "I found official and independent support for **SMWS RW6.5 “Appley ever after”**.\n\n**Confirmed bottle traits**\n- **Bottler:** The Scotch Malt Whisky Society. ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- **Spirit type:** **Rye whisky**, not Scotch single malt. ([smws.com](https://smws.com/appley-",
+        "results": [
+          {
+            "title": "https://peated.com/bottles/43260",
+            "url": "https://peated.com/bottles/43260",
+            "domain": "peated.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://scotchwhisky.com/magazine/latest-news/16228/smws-prohibits-non-member-purchases/",
+            "url": "https://scotchwhisky.com/magazine/latest-news/16228/smws-prohibits-non-member-purchases/",
+            "domain": "scotchwhisky.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://scotchwhisky.com/magazine/latest-news/15721/exotic-cargo-becomes-first-smws-blended-malt/",
+            "url": "https://scotchwhisky.com/magazine/latest-news/15721/exotic-cargo-becomes-first-smws-blended-malt/",
+            "domain": "scotchwhisky.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://solo-ielts-toefl.com/testimonials/kings-college-london-ielts-7-0/",
+            "url": "https://solo-ielts-toefl.com/testimonials/kings-college-london-ielts-7-0/",
+            "domain": "solo-ielts-toefl.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/about-us",
+            "url": "https://smws.com/about-us",
+            "domain": "smws.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.metroacademy.ca/wp-content/uploads/2023/04/%E5%8A%A0%E6%8B%BF%E5%A4%A7%E8%BF%88%E6%8B%93%E4%B8%AD%E5%AD%A6%E7%BA%B8%E8%B4%A8%E6%89%8B%E5%86%8C202303",
+            "url": "https://www.metroacademy.ca/wp-content/uploads/2023/04/%E5%8A%A0%E6%8B%BF%E5%A4%A7%E8%BF%88%E6%8B%93%E4%B8%AD%E5%AD%A6%E7%BA%B8%E8%B4%A8%E6%89%8B%E5%86%8C202303.pdf",
+            "domain": "metroacademy.ca",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

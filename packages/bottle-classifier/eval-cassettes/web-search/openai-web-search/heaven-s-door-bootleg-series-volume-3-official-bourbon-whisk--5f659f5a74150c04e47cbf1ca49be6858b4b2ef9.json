@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Heaven's Door Bootleg Series Volume 3 official bourbon whiskey"
+    },
+    "recordedAt": "2026-04-19T21:14:52.609Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Heaven's Door Bootleg Series Volume 3 official bourbon whiskey",
+          "summary": "I found solid confirmation that **Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door release** and that it is specifically a **bourbon whiskey**.\n\nConfirmed bottle traits:\n- It is the **2021 release** of Heaven’s Door’s Bootleg Series. ([heavensdoor.com](https://www.heavensdoor.com/bootleg-series?",
+          "results": [
+            {
+              "title": "https://www.heavensdoor.com/bootleg-series",
+              "url": "https://www.heavensdoor.com/bootleg-series",
+              "domain": "heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+              "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+              "domain": "buy.heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+              "url": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+              "domain": "thewhiskeywash.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://buy.heavensdoor.com/",
+              "url": "https://buy.heavensdoor.com/",
+              "domain": "buy.heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+              "url": "https://breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+              "domain": "breakingbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.heavensdoor.com/whiskey-collection",
+              "url": "https://www.heavensdoor.com/whiskey-collection",
+              "domain": "heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Heaven's Door Bootleg Series Volume 3 official bourbon whiskey",
+        "summary": "I found solid confirmation that **Heaven’s Door Bootleg Series Volume III** is an **official Heaven’s Door release** and that it is specifically a **bourbon whiskey**.\n\nConfirmed bottle traits:\n- It is the **2021 release** of Heaven’s Door’s Bootleg Series. ([heavensdoor.com](https://www.heavensdoor.com/bootleg-series?",
+        "results": [
+          {
+            "title": "https://www.heavensdoor.com/bootleg-series",
+            "url": "https://www.heavensdoor.com/bootleg-series",
+            "domain": "heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+            "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+            "domain": "buy.heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+            "url": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+            "domain": "thewhiskeywash.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://buy.heavensdoor.com/",
+            "url": "https://buy.heavensdoor.com/",
+            "domain": "buy.heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+            "url": "https://breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+            "domain": "breakingbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.heavensdoor.com/whiskey-collection",
+            "url": "https://www.heavensdoor.com/whiskey-collection",
+            "domain": "heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

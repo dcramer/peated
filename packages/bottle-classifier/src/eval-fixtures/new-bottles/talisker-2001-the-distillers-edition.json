@@ -1,0 +1,16 @@
+{
+  "id": "talisker-distillers-edition-2001",
+  "referenceName": "Talisker 2001 The Distillers Edition",
+  "expectedBottleName": "Talisker The Distillers Edition",
+  "summary": "Treat Talisker 2001 The Distillers Edition as a year-specific release under a stable Distillers Edition bottle family instead of folding the year into the bottle name.",
+  "peatedBottleIds": [4552],
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle_plus_release",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": {
+      "edition": null,
+      "releaseYear": 2001
+    }
+  }
+}

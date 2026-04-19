@@ -7,6 +7,7 @@ import type {
 import {
   getExistingMatchIdentityConflicts,
   hasSupportiveWebEvidenceForExistingMatch,
+  isExistingMatchConfidenceEligibleForVerification,
 } from "./priceMatchingEvidence";
 
 function buildExtractedLabel(
@@ -185,5 +186,71 @@ describe("priceMatchingEvidence", () => {
         "candidate ABV materially conflicts with extracted label",
       ]),
     );
+  });
+
+  test("allows a lower confidence threshold when the classifier reaffirms the current assignment", () => {
+    expect(
+      isExistingMatchConfidenceEligibleForVerification({
+        confidence: 80,
+        currentBottleId: 3,
+        currentReleaseId: null,
+        matchedBottleId: 3,
+        matchedReleaseId: null,
+      }),
+    ).toBe(true);
+    expect(
+      isExistingMatchConfidenceEligibleForVerification({
+        confidence: 79,
+        currentBottleId: 3,
+        currentReleaseId: null,
+        matchedBottleId: 3,
+        matchedReleaseId: null,
+      }),
+    ).toBe(false);
+  });
+
+  test("requires a higher confidence threshold for unmatched bottle-only matches", () => {
+    expect(
+      isExistingMatchConfidenceEligibleForVerification({
+        confidence: 96,
+        currentBottleId: null,
+        currentReleaseId: null,
+        matchedBottleId: 4,
+        matchedReleaseId: null,
+      }),
+    ).toBe(true);
+    expect(
+      isExistingMatchConfidenceEligibleForVerification({
+        confidence: 95,
+        currentBottleId: null,
+        currentReleaseId: null,
+        matchedBottleId: 4,
+        matchedReleaseId: null,
+      }),
+    ).toBe(false);
+  });
+
+  test("does not allow corrections from confidence alone", () => {
+    expect(
+      isExistingMatchConfidenceEligibleForVerification({
+        confidence: 100,
+        currentBottleId: 4,
+        currentReleaseId: null,
+        matchedBottleId: 5,
+        matchedReleaseId: null,
+      }),
+    ).toBe(false);
+  });
+
+  test("does not allow unmatched release-level matches from confidence alone", () => {
+    expect(
+      isExistingMatchConfidenceEligibleForVerification({
+        confidence: 100,
+        currentBottleId: null,
+        currentReleaseId: null,
+        matchedBottleId: 5,
+        matchedReleaseId: 12,
+      }),
+    ).toBe(false);
   });
 });

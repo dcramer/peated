@@ -1,0 +1,35 @@
+{
+  "id": "smws-listing-creates-an-exact-cask-bottle-when-the-code-is-missing-locally",
+  "name": "SMWS listing: creates an exact-cask bottle when the code is missing locally",
+  "input": {
+    "reference": {
+      "name": "SMWS RW6.5 Sauna Smoke",
+      "url": "https://vault.example/products/smws-rw6-5-sauna-smoke"
+    },
+    "extractedIdentity": {
+      "brand": "The Scotch Malt Whisky Society",
+      "bottler": "The Scotch Malt Whisky Society",
+      "expression": "RW6.5 Sauna Smoke",
+      "series": null,
+      "distillery": ["Kyro"],
+      "category": "rye",
+      "stated_age": null,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": true,
+      "edition": null
+    },
+    "initialCandidates": []
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "summary": "Treat the SMWS code as exact-cask identity and create a new exact-cask bottle when no safe local candidate exists."
+  }
+}

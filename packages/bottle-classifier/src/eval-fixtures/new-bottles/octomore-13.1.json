@@ -1,0 +1,13 @@
+{
+  "id": "octomore-dot-expression",
+  "referenceName": "Octomore 13.1",
+  "expectedBottleName": "Octomore 13.1",
+  "summary": "Treat Octomore 13.1 as a distinct bottle identity, not as Octomore 13 with a child release.",
+  "peatedBottleIds": [1535],
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": null
+  }
+}

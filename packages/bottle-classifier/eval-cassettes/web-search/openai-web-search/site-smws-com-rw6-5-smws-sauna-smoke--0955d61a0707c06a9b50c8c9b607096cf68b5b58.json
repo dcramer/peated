@@ -1,0 +1,282 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "site:smws.com RW6.5 SMWS Sauna Smoke"
+    },
+    "recordedAt": "2026-04-19T05:33:47.296Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "site:smws.com RW6.5 SMWS Sauna Smoke",
+          "summary": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+          "results": [
+            {
+              "title": "https://smws.com/cinnamon-sauna-smoke/",
+              "url": "https://smws.com/cinnamon-sauna-smoke/",
+              "domain": "smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/truly-a-raw-smoked-barley-experience/",
+              "url": "https://smws.com/truly-a-raw-smoked-barley-experience/",
+              "domain": "smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "All Whisky - Spirit Type - Scotch Malt Whisky Society",
+              "url": "https://smws.com/spirit-type/",
+              "domain": "smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/Members%20Charter%20A3%20Digital.pdf",
+              "url": "https://smws.com/content/Members%20Charter%20A3%20Digital.pdf",
+              "domain": "smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://th.smws.com/whisky/smokescape",
+              "url": "https://th.smws.com/whisky/smokescape",
+              "domain": "th.smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "Kyrö Distillery Company - Whiskybase - Beoordelingen en reviews voor whisky",
+              "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=nl",
+              "domain": "whiskybase.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/liquid-medicinal-smoke/",
+              "url": "https://smws.com/liquid-medicinal-smoke/",
+              "domain": "smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/archive?distillery_code=617_636&limit=60&page=29&whisky_cask_type_prev_content=168_170",
+              "url": "https://smws.com/archive?distillery_code=617_636&limit=60&page=29&whisky_cask_type_prev_content=168_170",
+              "domain": "smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/all-whisky/whisky/rye-whisky/",
+              "url": "https://smws.com/all-whisky/whisky/rye-whisky/",
+              "domain": "smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/all-whisky/whisky/?page=6",
+              "url": "https://smws.com/all-whisky/whisky/?page=6",
+              "domain": "smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/fire-festival/",
+              "url": "https://smws.com/fire-festival/",
+              "domain": "smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/brands/single-cask-spirits.html?page=8",
+              "url": "https://smws.com/brands/single-cask-spirits.html?page=8",
+              "domain": "smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/all-whisky/whisky/last-drops/?p=9&page=2",
+              "url": "https://smws.com/all-whisky/whisky/last-drops/?p=9&page=2",
+              "domain": "smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/EMT%2011.2024%20-%20NEWCASTLE%20-%206%20DRAM%20O%26R%20TASTING%20NOTES.pdf",
+              "url": "https://smws.com/content/EMT%2011.2024%20-%20NEWCASTLE%20-%206%20DRAM%20O%26R%20TASTING%20NOTES.pdf",
+              "domain": "smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/TN%20-%20O4%20APRIL%202025%20-%20SPRING%20SPIRITS%20AND%20FESTIVAL%20DREAMS%20%20%282%29.pdf",
+              "url": "https://smws.com/content/TN%20-%20O4%20APRIL%202025%20-%20SPRING%20SPIRITS%20AND%20FESTIVAL%20DREAMS%20%20%282%29.pdf",
+              "domain": "smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/03%20MARCH%202025%20-%20ABERDEEN%20SD%20%282%29.pdf",
+              "url": "https://smws.com/content/03%20MARCH%202025%20-%20ABERDEEN%20SD%20%282%29.pdf",
+              "domain": "smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/2410%20-%20Vaults%20On%20the%20Road%20Menu.pdf",
+              "url": "https://smws.com/content/2410%20-%20Vaults%20On%20the%20Road%20Menu.pdf",
+              "domain": "smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/content/EMT%20MAY%202024%20-%20THE%20VAULTS%20OTR%20LIST.pdf",
+              "url": "https://smws.com/content/EMT%20MAY%202024%20-%20THE%20VAULTS%20OTR%20LIST.pdf",
+              "domain": "smws.com",
+              "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "site:smws.com RW6.5 SMWS Sauna Smoke",
+        "summary": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+        "results": [
+          {
+            "title": "https://smws.com/cinnamon-sauna-smoke/",
+            "url": "https://smws.com/cinnamon-sauna-smoke/",
+            "domain": "smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/truly-a-raw-smoked-barley-experience/",
+            "url": "https://smws.com/truly-a-raw-smoked-barley-experience/",
+            "domain": "smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "All Whisky - Spirit Type - Scotch Malt Whisky Society",
+            "url": "https://smws.com/spirit-type/",
+            "domain": "smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/Members%20Charter%20A3%20Digital.pdf",
+            "url": "https://smws.com/content/Members%20Charter%20A3%20Digital.pdf",
+            "domain": "smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://th.smws.com/whisky/smokescape",
+            "url": "https://th.smws.com/whisky/smokescape",
+            "domain": "th.smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "Kyrö Distillery Company - Whiskybase - Beoordelingen en reviews voor whisky",
+            "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=nl",
+            "domain": "whiskybase.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/liquid-medicinal-smoke/",
+            "url": "https://smws.com/liquid-medicinal-smoke/",
+            "domain": "smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/archive?distillery_code=617_636&limit=60&page=29&whisky_cask_type_prev_content=168_170",
+            "url": "https://smws.com/archive?distillery_code=617_636&limit=60&page=29&whisky_cask_type_prev_content=168_170",
+            "domain": "smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/all-whisky/whisky/rye-whisky/",
+            "url": "https://smws.com/all-whisky/whisky/rye-whisky/",
+            "domain": "smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/all-whisky/whisky/?page=6",
+            "url": "https://smws.com/all-whisky/whisky/?page=6",
+            "domain": "smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/fire-festival/",
+            "url": "https://smws.com/fire-festival/",
+            "domain": "smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/brands/single-cask-spirits.html?page=8",
+            "url": "https://smws.com/brands/single-cask-spirits.html?page=8",
+            "domain": "smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/all-whisky/whisky/last-drops/?p=9&page=2",
+            "url": "https://smws.com/all-whisky/whisky/last-drops/?p=9&page=2",
+            "domain": "smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/EMT%2011.2024%20-%20NEWCASTLE%20-%206%20DRAM%20O%26R%20TASTING%20NOTES.pdf",
+            "url": "https://smws.com/content/EMT%2011.2024%20-%20NEWCASTLE%20-%206%20DRAM%20O%26R%20TASTING%20NOTES.pdf",
+            "domain": "smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/TN%20-%20O4%20APRIL%202025%20-%20SPRING%20SPIRITS%20AND%20FESTIVAL%20DREAMS%20%20%282%29.pdf",
+            "url": "https://smws.com/content/TN%20-%20O4%20APRIL%202025%20-%20SPRING%20SPIRITS%20AND%20FESTIVAL%20DREAMS%20%20%282%29.pdf",
+            "domain": "smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/03%20MARCH%202025%20-%20ABERDEEN%20SD%20%282%29.pdf",
+            "url": "https://smws.com/content/03%20MARCH%202025%20-%20ABERDEEN%20SD%20%282%29.pdf",
+            "domain": "smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/2410%20-%20Vaults%20On%20the%20Road%20Menu.pdf",
+            "url": "https://smws.com/content/2410%20-%20Vaults%20On%20the%20Road%20Menu.pdf",
+            "domain": "smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/content/EMT%20MAY%202024%20-%20THE%20VAULTS%20OTR%20LIST.pdf",
+            "url": "https://smws.com/content/EMT%20MAY%202024%20-%20THE%20VAULTS%20OTR%20LIST.pdf",
+            "domain": "smws.com",
+            "description": "I found strong evidence that **RW6.5 is not “Sauna Smoke.”** It appears to be **SMWS RW6.5 “Appley ever after,”** while **“Cinnamon sauna smoke” is RW6.3.** ([smws.com](https://smws.com/spirit-type/))\n\nWhat the sources confirm:\n\n- On SMWS’s official site, the **RW6.5** listing is titled **“Appley ever after”** and shows:\n  - **Cask no. RW6.5**\n  - **Region: Finland**\n  - **Spirit type: Rye Whisky**\n  - **Age: 6 years**\n  - **ABV: 56.0%**\n  - **Cask: 1st fill #3 char barrel** ([smws.com](https://smws.com/spirit-type/))\n\n- The same official SMWS page separately shows **“Cinnamon sauna smoke”** a",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

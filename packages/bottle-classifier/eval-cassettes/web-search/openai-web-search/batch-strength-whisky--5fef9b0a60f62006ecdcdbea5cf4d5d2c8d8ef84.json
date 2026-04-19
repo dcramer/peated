@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "\"Batch Strength\" whisky"
+    },
+    "recordedAt": "2026-04-19T15:47:48.527Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "\"Batch Strength\" whisky",
+          "summary": "“**Batch Strength**” by itself is **not a unique whisky identification**. It’s a release style used on multiple bottles, so I can’t reliably tell which one you mean without more label text.\n\nA few real examples the web supports:\n\n- **Kilchoman Batch Strength** is an **official Kilchoman** release, bottled at **57% ABV*",
+          "results": [
+            {
+              "title": "https://www.masterofmalt.com/whiskies/wemyss-malts/peat-chimney-batch-strength-wemyss-malts-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/wemyss-malts/peat-chimney-batch-strength-wemyss-malts-whisky/",
+              "domain": "masterofmalt.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/whiskies/tamdhu/tamdhu-batch-strength-batch-2-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/tamdhu/tamdhu-batch-strength-batch-2-whisky/",
+              "domain": "masterofmalt.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/whiskies/ian-macleod/the-six-isles-batch-strength-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/ian-macleod/the-six-isles-batch-strength-whisky/",
+              "domain": "masterofmalt.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/whiskies/kilchoman/kilchoman-batch-strength-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/kilchoman/kilchoman-batch-strength-whisky/",
+              "domain": "masterofmalt.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/whiskies/hunter-laing/scarabus-batch-strength-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/hunter-laing/scarabus-batch-strength-whisky/",
+              "domain": "masterofmalt.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/whiskies/tamdhu/tamdhu-batch-strength-batch-4-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/tamdhu/tamdhu-batch-strength-batch-4-whisky/",
+              "domain": "masterofmalt.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "\"Batch Strength\" whisky",
+        "summary": "“**Batch Strength**” by itself is **not a unique whisky identification**. It’s a release style used on multiple bottles, so I can’t reliably tell which one you mean without more label text.\n\nA few real examples the web supports:\n\n- **Kilchoman Batch Strength** is an **official Kilchoman** release, bottled at **57% ABV*",
+        "results": [
+          {
+            "title": "https://www.masterofmalt.com/whiskies/wemyss-malts/peat-chimney-batch-strength-wemyss-malts-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/wemyss-malts/peat-chimney-batch-strength-wemyss-malts-whisky/",
+            "domain": "masterofmalt.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/whiskies/tamdhu/tamdhu-batch-strength-batch-2-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/tamdhu/tamdhu-batch-strength-batch-2-whisky/",
+            "domain": "masterofmalt.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/whiskies/ian-macleod/the-six-isles-batch-strength-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/ian-macleod/the-six-isles-batch-strength-whisky/",
+            "domain": "masterofmalt.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/whiskies/kilchoman/kilchoman-batch-strength-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/kilchoman/kilchoman-batch-strength-whisky/",
+            "domain": "masterofmalt.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/whiskies/hunter-laing/scarabus-batch-strength-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/hunter-laing/scarabus-batch-strength-whisky/",
+            "domain": "masterofmalt.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/whiskies/tamdhu/tamdhu-batch-strength-batch-4-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/tamdhu/tamdhu-batch-strength-batch-4-whisky/",
+            "domain": "masterofmalt.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

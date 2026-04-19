@@ -1,0 +1,968 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Talisker Distillers Edition 2001 official release year double matured"
+    },
+    "recordedAt": "2026-04-19T05:25:52.730Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Talisker Distillers Edition 2001 official release year double matured",
+          "summary": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+          "results": [
+            {
+              "title": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+              "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+              "domain": "thewhiskyvault.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.thewhiskyexchange.com/p/22187/talisker-2001-distillers-edition-bot2012",
+              "url": "https://www.thewhiskyexchange.com/p/22187/talisker-2001-distillers-edition-bot2012",
+              "domain": "thewhiskyexchange.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition",
+              "url": "https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition",
+              "domain": "thewhiskybarrel.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.musthavemalts.com/product/talisker-distillers-edition-2012/",
+              "url": "https://www.musthavemalts.com/product/talisker-distillers-edition-2012/",
+              "domain": "musthavemalts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001",
+              "url": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001",
+              "domain": "whiskybase.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html",
+              "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html",
+              "domain": "whisky.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/39673/talisker-2001",
+              "url": "https://www.whiskybase.com/whiskies/whisky/39673/talisker-2001",
+              "domain": "whiskybase.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.worldwinewhisky.com/us/talisker-1989-2002-the-distillers-edition-double-m.html",
+              "url": "https://www.worldwinewhisky.com/us/talisker-1989-2002-the-distillers-edition-double-m.html",
+              "domain": "worldwinewhisky.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://peated.com/bottles/4552",
+              "url": "https://peated.com/bottles/4552",
+              "domain": "peated.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://libraryofspirits.com/product/talisker-distillers-edition-amoroso-cask/",
+              "url": "https://libraryofspirits.com/product/talisker-distillers-edition-amoroso-cask/",
+              "domain": "libraryofspirits.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.opakcellar.com/products/talisker-distillers-edition-2000-release-bottled-2011",
+              "url": "https://www.opakcellar.com/products/talisker-distillers-edition-2000-release-bottled-2011",
+              "domain": "opakcellar.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://masterquill.com/2016/02/20/talisker-19892002-distillers-edition-45-8-ob-td-s-5dp/",
+              "url": "https://masterquill.com/2016/02/20/talisker-19892002-distillers-edition-45-8-ob-td-s-5dp/",
+              "domain": "masterquill.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.jackrosediningsaloon.com/s/Whiskey-Book-121524.pdf",
+              "url": "https://www.jackrosediningsaloon.com/s/Whiskey-Book-121524.pdf",
+              "domain": "jackrosediningsaloon.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://webdocs.ackerwines.com/222WS_FINAL_WEB.pdf",
+              "url": "https://webdocs.ackerwines.com/222WS_FINAL_WEB.pdf",
+              "domain": "webdocs.ackerwines.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.amathusdrinks.com/productpagepdf/product/printaction/product_id/1908/",
+              "url": "https://www.amathusdrinks.com/productpagepdf/product/printaction/product_id/1908/",
+              "domain": "amathusdrinks.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.thewhiskeyhousesd.com/wp-content/uploads/2018/12/TWHWhiskeyList4.pdf",
+              "url": "https://www.thewhiskeyhousesd.com/wp-content/uploads/2018/12/TWHWhiskeyList4.pdf",
+              "domain": "thewhiskeyhousesd.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://en.wikipedia.org/wiki/Classic_Malts_of_Scotland",
+              "url": "https://en.wikipedia.org/wiki/Classic_Malts_of_Scotland",
+              "domain": "en.wikipedia.org",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyshow.com/media/7494/whiskyshowdramlist2019-2.pdf",
+              "url": "https://whiskyshow.com/media/7494/whiskyshowdramlist2019-2.pdf",
+              "domain": "whiskyshow.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.hongkong.intercontinental.com/wp-content/uploads/sites/33/2023/04/HKWF_Dram_List-1.pdf",
+              "url": "https://www.hongkong.intercontinental.com/wp-content/uploads/sites/33/2023/04/HKWF_Dram_List-1.pdf",
+              "domain": "hongkong.intercontinental.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://en.wikipedia.org/wiki/Talisker_distillery",
+              "url": "https://en.wikipedia.org/wiki/Talisker_distillery",
+              "domain": "en.wikipedia.org",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://fr.wikipedia.org/wiki/Talisker",
+              "url": "https://fr.wikipedia.org/wiki/Talisker",
+              "domain": "fr.wikipedia.org",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://arxiv.org/abs/0807.2522",
+              "url": "https://arxiv.org/abs/0807.2522",
+              "domain": "arxiv.org",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://arxiv.org/abs/1501.00963",
+              "url": "https://arxiv.org/abs/1501.00963",
+              "domain": "arxiv.org",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/kf88xv",
+              "url": "https://www.reddit.com/r/Scotch/comments/kf88xv",
+              "domain": "reddit.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/v97e09",
+              "url": "https://www.reddit.com/r/Scotch/comments/v97e09",
+              "domain": "reddit.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://arxiv.org/abs/1004.1167",
+              "url": "https://arxiv.org/abs/1004.1167",
+              "domain": "arxiv.org",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://it.wikipedia.org/wiki/Talisker",
+              "url": "https://it.wikipedia.org/wiki/Talisker",
+              "domain": "it.wikipedia.org",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+              "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+              "domain": "whisky.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whisky.com/whisky-database/details/talisker-destillers-edition-3.html",
+              "url": "https://www.whisky.com/whisky-database/details/talisker-destillers-edition-3.html",
+              "domain": "whisky.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whisky.com/whisky-database/series/single-casks-release.html?cHash=b09253460381e30b02891cfe617a83da&tx_datamintsflaschendb_pi4%5BcurPage%5D=125",
+              "url": "https://www.whisky.com/whisky-database/series/single-casks-release.html?cHash=b09253460381e30b02891cfe617a83da&tx_datamintsflaschendb_pi4%5BcurPage%5D=125",
+              "domain": "whisky.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+              "url": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+              "domain": "malts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-us/products/glenkinchie-distillers-edition-single-malt-scotch-whisky-750ml",
+              "url": "https://www.malts.com/en-us/products/glenkinchie-distillers-edition-single-malt-scotch-whisky-750ml",
+              "domain": "malts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-us/products/cragganmore-distillers-edition-single-malt-scotch-whisky-750ml",
+              "url": "https://www.malts.com/en-us/products/cragganmore-distillers-edition-single-malt-scotch-whisky-750ml",
+              "domain": "malts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en/products/talisker-special-release-2023-talisker-distillers-edition-2x70cl",
+              "url": "https://www.malts.com/en/products/talisker-special-release-2023-talisker-distillers-edition-2x70cl",
+              "domain": "malts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-us/products/oban-distillers-edition-single-malt-scotch-whisky-750ml",
+              "url": "https://www.malts.com/en-us/products/oban-distillers-edition-single-malt-scotch-whisky-750ml",
+              "domain": "malts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.diageobaracademy.com/es-es/home/explora-todas-las-recetas/australian-hot-toddy",
+              "url": "https://www.diageobaracademy.com/es-es/home/explora-todas-las-recetas/australian-hot-toddy",
+              "domain": "diageobaracademy.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-27.html",
+              "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-27.html",
+              "domain": "whisky.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-gb/products/talisker-2021-distillers-edition-single-malt-scotch-whisky-70cl",
+              "url": "https://www.malts.com/en-gb/products/talisker-2021-distillers-edition-single-malt-scotch-whisky-70cl",
+              "domain": "malts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whisky.com/fileadmin/web_data/katalog/2023/k2024_online.pdf",
+              "url": "https://www.whisky.com/fileadmin/web_data/katalog/2023/k2024_online.pdf",
+              "domain": "whisky.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whisky.com/fileadmin/web_data/katalog/2024/Katalog-2025.pdf",
+              "url": "https://www.whisky.com/fileadmin/web_data/katalog/2024/Katalog-2025.pdf",
+              "domain": "whisky.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whisky.com/fileadmin/web_data/katalog/2025/WDE_Katalog2026_ONLINE.pdf",
+              "url": "https://www.whisky.com/fileadmin/web_data/katalog/2025/WDE_Katalog2026_ONLINE.pdf",
+              "domain": "whisky.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-gb/products/talisker-2020-distillers-edition-single-malt-scotch-whisky-70cl",
+              "url": "https://www.malts.com/en-gb/products/talisker-2020-distillers-edition-single-malt-scotch-whisky-70cl",
+              "domain": "malts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-us/products/dalwhinnie-distillers-edition-single-malt-scotch-whisky-750ml",
+              "url": "https://www.malts.com/en-us/products/dalwhinnie-distillers-edition-single-malt-scotch-whisky-750ml",
+              "domain": "malts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-us/products/talisker-25-year-old-single-malt-scotch-whisky-750ml",
+              "url": "https://www.malts.com/en-us/products/talisker-25-year-old-single-malt-scotch-whisky-750ml",
+              "domain": "malts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-us/products/tescal-x-series-vastness-limited-edition-43-years-old-75cl",
+              "url": "https://www.malts.com/en-us/products/tescal-x-series-vastness-limited-edition-43-years-old-75cl",
+              "domain": "malts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-us/products/talisker-storm-single-malt-scotch-whisky-750ml",
+              "url": "https://www.malts.com/en-us/products/talisker-storm-single-malt-scotch-whisky-750ml",
+              "domain": "malts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-us/products/talisker-10-year-old-single-malt-scotch-whisky-750ml",
+              "url": "https://www.malts.com/en-us/products/talisker-10-year-old-single-malt-scotch-whisky-750ml",
+              "domain": "malts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-gb/products/talisker-2022-distillers-edition-single-malt-scotch-whisky-70cl",
+              "url": "https://www.malts.com/en-gb/products/talisker-2022-distillers-edition-single-malt-scotch-whisky-70cl",
+              "domain": "malts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-us/products/talisker-18-year-old-single-malt-scotch-whisky-750ml",
+              "url": "https://www.malts.com/en-us/products/talisker-18-year-old-single-malt-scotch-whisky-750ml",
+              "domain": "malts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.malts.com/en-us/products/talisker-the-wild-blue",
+              "url": "https://www.malts.com/en-us/products/talisker-the-wild-blue",
+              "domain": "malts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://mwlpdx.com/wp-content/uploads/2020/07/beverage-menu-1.pdf",
+              "url": "https://mwlpdx.com/wp-content/uploads/2020/07/beverage-menu-1.pdf",
+              "domain": "mwlpdx.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://mwlpdx.com/wp-content/uploads/2020/10/bevmenu10.1.20.pdf",
+              "url": "https://mwlpdx.com/wp-content/uploads/2020/10/bevmenu10.1.20.pdf",
+              "domain": "mwlpdx.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyexperts.net/wp-content/uploads/2021/09/2021-Distillers-Editions-Tasting-Notes.pdf",
+              "url": "https://whiskyexperts.net/wp-content/uploads/2021/09/2021-Distillers-Editions-Tasting-Notes.pdf",
+              "domain": "whiskyexperts.net",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://uqrmecdn.s3.us-east-2.amazonaws.com/u/336958/725912-130226636d2b62db6a0eb86720a5e2767ac05d9.pdf",
+              "url": "https://uqrmecdn.s3.us-east-2.amazonaws.com/u/336958/725912-130226636d2b62db6a0eb86720a5e2767ac05d9.pdf",
+              "domain": "uqrmecdn.s3.us-east-2.amazonaws.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.winefields.com/wp-content/uploads/2019/11/WF54_web_1p_Fine-Rare-Spirits_16122019.pdf",
+              "url": "https://www.winefields.com/wp-content/uploads/2019/11/WF54_web_1p_Fine-Rare-Spirits_16122019.pdf",
+              "domain": "winefields.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://de.wikipedia.org/wiki/Talisker",
+              "url": "https://de.wikipedia.org/wiki/Talisker",
+              "domain": "de.wikipedia.org",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/10snshv",
+              "url": "https://www.reddit.com/r/Scotch/comments/10snshv",
+              "domain": "reddit.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/f1dc7l",
+              "url": "https://www.reddit.com/r/Scotch/comments/f1dc7l",
+              "domain": "reddit.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://arxiv.org/abs/2010.00316",
+              "url": "https://arxiv.org/abs/2010.00316",
+              "domain": "arxiv.org",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/whisky/comments/13kmv0y",
+              "url": "https://www.reddit.com/r/whisky/comments/13kmv0y",
+              "domain": "reddit.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/gxaq7y",
+              "url": "https://www.reddit.com/r/Scotch/comments/gxaq7y",
+              "domain": "reddit.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1h6r9ua",
+              "url": "https://www.reddit.com/r/Scotch/comments/1h6r9ua",
+              "domain": "reddit.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/11ojir7",
+              "url": "https://www.reddit.com/r/Scotch/comments/11ojir7",
+              "domain": "reddit.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1gv6qlm",
+              "url": "https://www.reddit.com/r/Scotch/comments/1gv6qlm",
+              "domain": "reddit.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/whiskey/comments/1plcaq2/picked_up_a_talisker_mini_set_with_some/",
+              "url": "https://www.reddit.com/r/whiskey/comments/1plcaq2/picked_up_a_talisker_mini_set_with_some/",
+              "domain": "reddit.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "Talisker - 2001 Distillers Edition - Whisky.com",
+              "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai",
+              "domain": "whisky.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            },
+            {
+              "title": "Talisker Special Release 2023 & Talisker Distillers Edition | Malts",
+              "url": "https://www.malts.com/en/products/talisker-special-release-2023-talisker-distillers-edition-2x70cl?utm_source=openai",
+              "domain": "malts.com",
+              "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Talisker Distillers Edition 2001 official release year double matured",
+        "summary": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+        "results": [
+          {
+            "title": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+            "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+            "domain": "thewhiskyvault.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.thewhiskyexchange.com/p/22187/talisker-2001-distillers-edition-bot2012",
+            "url": "https://www.thewhiskyexchange.com/p/22187/talisker-2001-distillers-edition-bot2012",
+            "domain": "thewhiskyexchange.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition",
+            "url": "https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition",
+            "domain": "thewhiskybarrel.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.musthavemalts.com/product/talisker-distillers-edition-2012/",
+            "url": "https://www.musthavemalts.com/product/talisker-distillers-edition-2012/",
+            "domain": "musthavemalts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001",
+            "url": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001",
+            "domain": "whiskybase.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html",
+            "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html",
+            "domain": "whisky.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/39673/talisker-2001",
+            "url": "https://www.whiskybase.com/whiskies/whisky/39673/talisker-2001",
+            "domain": "whiskybase.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.worldwinewhisky.com/us/talisker-1989-2002-the-distillers-edition-double-m.html",
+            "url": "https://www.worldwinewhisky.com/us/talisker-1989-2002-the-distillers-edition-double-m.html",
+            "domain": "worldwinewhisky.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://peated.com/bottles/4552",
+            "url": "https://peated.com/bottles/4552",
+            "domain": "peated.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://libraryofspirits.com/product/talisker-distillers-edition-amoroso-cask/",
+            "url": "https://libraryofspirits.com/product/talisker-distillers-edition-amoroso-cask/",
+            "domain": "libraryofspirits.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.opakcellar.com/products/talisker-distillers-edition-2000-release-bottled-2011",
+            "url": "https://www.opakcellar.com/products/talisker-distillers-edition-2000-release-bottled-2011",
+            "domain": "opakcellar.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://masterquill.com/2016/02/20/talisker-19892002-distillers-edition-45-8-ob-td-s-5dp/",
+            "url": "https://masterquill.com/2016/02/20/talisker-19892002-distillers-edition-45-8-ob-td-s-5dp/",
+            "domain": "masterquill.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.jackrosediningsaloon.com/s/Whiskey-Book-121524.pdf",
+            "url": "https://www.jackrosediningsaloon.com/s/Whiskey-Book-121524.pdf",
+            "domain": "jackrosediningsaloon.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://webdocs.ackerwines.com/222WS_FINAL_WEB.pdf",
+            "url": "https://webdocs.ackerwines.com/222WS_FINAL_WEB.pdf",
+            "domain": "webdocs.ackerwines.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.amathusdrinks.com/productpagepdf/product/printaction/product_id/1908/",
+            "url": "https://www.amathusdrinks.com/productpagepdf/product/printaction/product_id/1908/",
+            "domain": "amathusdrinks.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.thewhiskeyhousesd.com/wp-content/uploads/2018/12/TWHWhiskeyList4.pdf",
+            "url": "https://www.thewhiskeyhousesd.com/wp-content/uploads/2018/12/TWHWhiskeyList4.pdf",
+            "domain": "thewhiskeyhousesd.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://en.wikipedia.org/wiki/Classic_Malts_of_Scotland",
+            "url": "https://en.wikipedia.org/wiki/Classic_Malts_of_Scotland",
+            "domain": "en.wikipedia.org",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyshow.com/media/7494/whiskyshowdramlist2019-2.pdf",
+            "url": "https://whiskyshow.com/media/7494/whiskyshowdramlist2019-2.pdf",
+            "domain": "whiskyshow.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.hongkong.intercontinental.com/wp-content/uploads/sites/33/2023/04/HKWF_Dram_List-1.pdf",
+            "url": "https://www.hongkong.intercontinental.com/wp-content/uploads/sites/33/2023/04/HKWF_Dram_List-1.pdf",
+            "domain": "hongkong.intercontinental.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://en.wikipedia.org/wiki/Talisker_distillery",
+            "url": "https://en.wikipedia.org/wiki/Talisker_distillery",
+            "domain": "en.wikipedia.org",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://fr.wikipedia.org/wiki/Talisker",
+            "url": "https://fr.wikipedia.org/wiki/Talisker",
+            "domain": "fr.wikipedia.org",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://arxiv.org/abs/0807.2522",
+            "url": "https://arxiv.org/abs/0807.2522",
+            "domain": "arxiv.org",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://arxiv.org/abs/1501.00963",
+            "url": "https://arxiv.org/abs/1501.00963",
+            "domain": "arxiv.org",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/kf88xv",
+            "url": "https://www.reddit.com/r/Scotch/comments/kf88xv",
+            "domain": "reddit.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/v97e09",
+            "url": "https://www.reddit.com/r/Scotch/comments/v97e09",
+            "domain": "reddit.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://arxiv.org/abs/1004.1167",
+            "url": "https://arxiv.org/abs/1004.1167",
+            "domain": "arxiv.org",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://it.wikipedia.org/wiki/Talisker",
+            "url": "https://it.wikipedia.org/wiki/Talisker",
+            "domain": "it.wikipedia.org",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+            "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+            "domain": "whisky.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whisky.com/whisky-database/details/talisker-destillers-edition-3.html",
+            "url": "https://www.whisky.com/whisky-database/details/talisker-destillers-edition-3.html",
+            "domain": "whisky.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whisky.com/whisky-database/series/single-casks-release.html?cHash=b09253460381e30b02891cfe617a83da&tx_datamintsflaschendb_pi4%5BcurPage%5D=125",
+            "url": "https://www.whisky.com/whisky-database/series/single-casks-release.html?cHash=b09253460381e30b02891cfe617a83da&tx_datamintsflaschendb_pi4%5BcurPage%5D=125",
+            "domain": "whisky.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+            "url": "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+            "domain": "malts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-us/products/glenkinchie-distillers-edition-single-malt-scotch-whisky-750ml",
+            "url": "https://www.malts.com/en-us/products/glenkinchie-distillers-edition-single-malt-scotch-whisky-750ml",
+            "domain": "malts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-us/products/cragganmore-distillers-edition-single-malt-scotch-whisky-750ml",
+            "url": "https://www.malts.com/en-us/products/cragganmore-distillers-edition-single-malt-scotch-whisky-750ml",
+            "domain": "malts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en/products/talisker-special-release-2023-talisker-distillers-edition-2x70cl",
+            "url": "https://www.malts.com/en/products/talisker-special-release-2023-talisker-distillers-edition-2x70cl",
+            "domain": "malts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-us/products/oban-distillers-edition-single-malt-scotch-whisky-750ml",
+            "url": "https://www.malts.com/en-us/products/oban-distillers-edition-single-malt-scotch-whisky-750ml",
+            "domain": "malts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.diageobaracademy.com/es-es/home/explora-todas-las-recetas/australian-hot-toddy",
+            "url": "https://www.diageobaracademy.com/es-es/home/explora-todas-las-recetas/australian-hot-toddy",
+            "domain": "diageobaracademy.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-27.html",
+            "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-27.html",
+            "domain": "whisky.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-gb/products/talisker-2021-distillers-edition-single-malt-scotch-whisky-70cl",
+            "url": "https://www.malts.com/en-gb/products/talisker-2021-distillers-edition-single-malt-scotch-whisky-70cl",
+            "domain": "malts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whisky.com/fileadmin/web_data/katalog/2023/k2024_online.pdf",
+            "url": "https://www.whisky.com/fileadmin/web_data/katalog/2023/k2024_online.pdf",
+            "domain": "whisky.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whisky.com/fileadmin/web_data/katalog/2024/Katalog-2025.pdf",
+            "url": "https://www.whisky.com/fileadmin/web_data/katalog/2024/Katalog-2025.pdf",
+            "domain": "whisky.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whisky.com/fileadmin/web_data/katalog/2025/WDE_Katalog2026_ONLINE.pdf",
+            "url": "https://www.whisky.com/fileadmin/web_data/katalog/2025/WDE_Katalog2026_ONLINE.pdf",
+            "domain": "whisky.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-gb/products/talisker-2020-distillers-edition-single-malt-scotch-whisky-70cl",
+            "url": "https://www.malts.com/en-gb/products/talisker-2020-distillers-edition-single-malt-scotch-whisky-70cl",
+            "domain": "malts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-us/products/dalwhinnie-distillers-edition-single-malt-scotch-whisky-750ml",
+            "url": "https://www.malts.com/en-us/products/dalwhinnie-distillers-edition-single-malt-scotch-whisky-750ml",
+            "domain": "malts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-us/products/talisker-25-year-old-single-malt-scotch-whisky-750ml",
+            "url": "https://www.malts.com/en-us/products/talisker-25-year-old-single-malt-scotch-whisky-750ml",
+            "domain": "malts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-us/products/tescal-x-series-vastness-limited-edition-43-years-old-75cl",
+            "url": "https://www.malts.com/en-us/products/tescal-x-series-vastness-limited-edition-43-years-old-75cl",
+            "domain": "malts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-us/products/talisker-storm-single-malt-scotch-whisky-750ml",
+            "url": "https://www.malts.com/en-us/products/talisker-storm-single-malt-scotch-whisky-750ml",
+            "domain": "malts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-us/products/talisker-10-year-old-single-malt-scotch-whisky-750ml",
+            "url": "https://www.malts.com/en-us/products/talisker-10-year-old-single-malt-scotch-whisky-750ml",
+            "domain": "malts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-gb/products/talisker-2022-distillers-edition-single-malt-scotch-whisky-70cl",
+            "url": "https://www.malts.com/en-gb/products/talisker-2022-distillers-edition-single-malt-scotch-whisky-70cl",
+            "domain": "malts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-us/products/talisker-18-year-old-single-malt-scotch-whisky-750ml",
+            "url": "https://www.malts.com/en-us/products/talisker-18-year-old-single-malt-scotch-whisky-750ml",
+            "domain": "malts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.malts.com/en-us/products/talisker-the-wild-blue",
+            "url": "https://www.malts.com/en-us/products/talisker-the-wild-blue",
+            "domain": "malts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://mwlpdx.com/wp-content/uploads/2020/07/beverage-menu-1.pdf",
+            "url": "https://mwlpdx.com/wp-content/uploads/2020/07/beverage-menu-1.pdf",
+            "domain": "mwlpdx.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://mwlpdx.com/wp-content/uploads/2020/10/bevmenu10.1.20.pdf",
+            "url": "https://mwlpdx.com/wp-content/uploads/2020/10/bevmenu10.1.20.pdf",
+            "domain": "mwlpdx.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyexperts.net/wp-content/uploads/2021/09/2021-Distillers-Editions-Tasting-Notes.pdf",
+            "url": "https://whiskyexperts.net/wp-content/uploads/2021/09/2021-Distillers-Editions-Tasting-Notes.pdf",
+            "domain": "whiskyexperts.net",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://uqrmecdn.s3.us-east-2.amazonaws.com/u/336958/725912-130226636d2b62db6a0eb86720a5e2767ac05d9.pdf",
+            "url": "https://uqrmecdn.s3.us-east-2.amazonaws.com/u/336958/725912-130226636d2b62db6a0eb86720a5e2767ac05d9.pdf",
+            "domain": "uqrmecdn.s3.us-east-2.amazonaws.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.winefields.com/wp-content/uploads/2019/11/WF54_web_1p_Fine-Rare-Spirits_16122019.pdf",
+            "url": "https://www.winefields.com/wp-content/uploads/2019/11/WF54_web_1p_Fine-Rare-Spirits_16122019.pdf",
+            "domain": "winefields.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://de.wikipedia.org/wiki/Talisker",
+            "url": "https://de.wikipedia.org/wiki/Talisker",
+            "domain": "de.wikipedia.org",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/10snshv",
+            "url": "https://www.reddit.com/r/Scotch/comments/10snshv",
+            "domain": "reddit.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/f1dc7l",
+            "url": "https://www.reddit.com/r/Scotch/comments/f1dc7l",
+            "domain": "reddit.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://arxiv.org/abs/2010.00316",
+            "url": "https://arxiv.org/abs/2010.00316",
+            "domain": "arxiv.org",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/whisky/comments/13kmv0y",
+            "url": "https://www.reddit.com/r/whisky/comments/13kmv0y",
+            "domain": "reddit.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/gxaq7y",
+            "url": "https://www.reddit.com/r/Scotch/comments/gxaq7y",
+            "domain": "reddit.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1h6r9ua",
+            "url": "https://www.reddit.com/r/Scotch/comments/1h6r9ua",
+            "domain": "reddit.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/11ojir7",
+            "url": "https://www.reddit.com/r/Scotch/comments/11ojir7",
+            "domain": "reddit.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1gv6qlm",
+            "url": "https://www.reddit.com/r/Scotch/comments/1gv6qlm",
+            "domain": "reddit.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/whiskey/comments/1plcaq2/picked_up_a_talisker_mini_set_with_some/",
+            "url": "https://www.reddit.com/r/whiskey/comments/1plcaq2/picked_up_a_talisker_mini_set_with_some/",
+            "domain": "reddit.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker - 2001 Distillers Edition - Whisky.com",
+            "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai",
+            "domain": "whisky.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker Special Release 2023 & Talisker Distillers Edition | Malts",
+            "url": "https://www.malts.com/en/products/talisker-special-release-2023-talisker-distillers-edition-2x70cl?utm_source=openai",
+            "domain": "malts.com",
+            "description": "For **Talisker Distillers Edition “2001”**, the **“2001” is the distillation year, not the official release year**. Independent bottle databases consistently identify this expression as **distilled in 2001 and bottled/released in 2012**, with **45.8% ABV**, **official bottling**, and a **double maturation / finish in Amoroso sherry casks**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html?utm_source=openai))\n\nFrom an official Talisker/Malts source, Talisker Distillers Edition releases are described as an **annual Distillers Edition series** and T",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

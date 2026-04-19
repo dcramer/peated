@@ -1,0 +1,13 @@
+{
+  "id": "traigh-bhan-family",
+  "referenceName": "Ardbeg Traigh Bhan 19-year-old",
+  "expectedBottleName": "Ardbeg Traigh Bhan 19-year-old",
+  "summary": "Keep Traigh Bhan 19-year-old as bottle identity when there is no batch marker instead of inventing a child release from the family alone.",
+  "peatedBottleIds": [44013],
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": null
+  }
+}

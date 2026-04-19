@@ -1,0 +1,73 @@
+{
+  "id": "reuse-makers-private-selection-parent-for-program-coded-release",
+  "name": "repair resolution: reuses the Private Selection parent for program-coded releases",
+  "referenceName": "Maker's Mark Private Selection S2B13",
+  "extractedIdentity": {
+    "brand": "Maker's Mark",
+    "bottler": null,
+    "expression": null,
+    "series": null,
+    "distillery": [],
+    "category": "bourbon",
+    "stated_age": null,
+    "abv": null,
+    "release_year": null,
+    "vintage_year": null,
+    "cask_type": null,
+    "cask_size": null,
+    "cask_fill": null,
+    "cask_strength": null,
+    "single_cask": null,
+    "edition": "S2B13"
+  },
+  "initialCandidates": [
+    {
+      "kind": "bottle",
+      "releaseId": null,
+      "alias": null,
+      "bottleFullName": "Maker's Mark Private Selection",
+      "brand": "Maker's Mark",
+      "bottler": null,
+      "series": null,
+      "distillery": [],
+      "category": "bourbon",
+      "statedAge": null,
+      "edition": null,
+      "caskStrength": null,
+      "singleCask": null,
+      "abv": null,
+      "vintageYear": null,
+      "releaseYear": null,
+      "caskType": null,
+      "caskSize": null,
+      "caskFill": null,
+      "score": null,
+      "source": ["repair_parent"],
+      "bottleId": 730,
+      "fullName": "Maker's Mark Private Selection"
+    }
+  ],
+  "reviewedParentRows": [
+    {
+      "abv": null,
+      "category": "bourbon",
+      "caskFill": null,
+      "caskSize": null,
+      "caskStrength": null,
+      "caskType": null,
+      "edition": null,
+      "fullName": "Maker's Mark Private Selection",
+      "id": 730,
+      "releaseYear": null,
+      "singleCask": null,
+      "statedAge": null,
+      "totalTastings": null,
+      "vintageYear": null
+    }
+  ],
+  "expected": {
+    "resolution": "reuse_existing_parent",
+    "parentBottleId": 730,
+    "summary": "Treat the stave code as release identity under the reusable Maker's Mark Private Selection parent bottle."
+  }
+}

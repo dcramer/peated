@@ -1,0 +1,75 @@
+{
+  "id": "text-only-user-entry-matches-shorthand-springbank-10",
+  "name": "text-only user entry: matches shorthand Springbank 10",
+  "input": {
+    "reference": {
+      "name": "springbank 10 yo"
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Springbank 10 Year Old",
+        "brand": "Springbank",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Springbank"],
+        "category": "single_malt",
+        "statedAge": 10,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": 46,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.92,
+        "source": ["exact"],
+        "bottleId": 640,
+        "fullName": "Springbank 10 Year Old"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["springbank", "10"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Springbank 10 Year Old",
+          "brand": "Springbank",
+          "bottler": null,
+          "series": null,
+          "distillery": ["Springbank"],
+          "category": "single_malt",
+          "statedAge": 10,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": 46,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.92,
+          "source": ["exact"],
+          "bottleId": 640,
+          "fullName": "Springbank 10 Year Old"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 640,
+    "summary": "Parse the shorthand user entry directly from text and match the canonical Springbank 10 Year Old bottle."
+  }
+}

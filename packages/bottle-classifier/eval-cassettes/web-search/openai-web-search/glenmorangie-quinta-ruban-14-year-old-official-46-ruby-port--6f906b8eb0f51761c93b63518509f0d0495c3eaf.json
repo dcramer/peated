@@ -1,0 +1,478 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Glenmorangie Quinta Ruban 14 year old official 46% ruby port"
+    },
+    "recordedAt": "2026-04-19T05:29:59.600Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Glenmorangie Quinta Ruban 14 year old official 46% ruby port",
+          "summary": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+          "results": [
+            {
+              "title": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+              "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+              "domain": "glenmorangie.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/glenmorangie-quinta-ruban-port-cask-finish-14-year",
+              "url": "https://distiller.com/spirits/glenmorangie-quinta-ruban-port-cask-finish-14-year",
+              "domain": "distiller.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://scotchnoob.com/2020/03/16/glenmorangie-quinta-ruban-14-year/",
+              "url": "https://scotchnoob.com/2020/03/16/glenmorangie-quinta-ruban-14-year/",
+              "domain": "scotchnoob.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskeyful.com/reviews/glenmorangie-quinta-ruban-14-year-old-port-finish-highland-whisky",
+              "url": "https://whiskeyful.com/reviews/glenmorangie-quinta-ruban-14-year-old-port-finish-highland-whisky",
+              "domain": "whiskeyful.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.thewhiskybarrel.com/products/glenmorangie-quinta-ruban-14-year-old",
+              "url": "https://www.thewhiskybarrel.com/products/glenmorangie-quinta-ruban-14-year-old",
+              "domain": "thewhiskybarrel.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://thespiritsembassy.com/products/glenmorangie-quinta-ruban-14-port-cask-43-1000ml",
+              "url": "https://thespiritsembassy.com/products/glenmorangie-quinta-ruban-14-port-cask-43-1000ml",
+              "domain": "thespiritsembassy.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/glenmorangie-14-year-old-quinta-ruban",
+              "url": "https://whiskyadvocate.com/glenmorangie-14-year-old-quinta-ruban",
+              "domain": "whiskyadvocate.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.theraremalt.com/products/glenmorangie-14-year-old-port-cask-finish",
+              "url": "https://www.theraremalt.com/products/glenmorangie-14-year-old-port-cask-finish",
+              "domain": "theraremalt.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whisky.com/whisky-database/id/24335",
+              "url": "https://www.whisky.com/whisky-database/id/24335",
+              "domain": "whisky.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://dailydram.co.uk/2020/06/24/glenmorangie-14/",
+              "url": "https://dailydram.co.uk/2020/06/24/glenmorangie-14/",
+              "domain": "dailydram.co.uk",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.tinytipple.com/en-us/products/glenmorangie-the-original-12-year-old-highland-single-malt-scotch-40-abv-50ml-copy",
+              "url": "https://www.tinytipple.com/en-us/products/glenmorangie-the-original-12-year-old-highland-single-malt-scotch-40-abv-50ml-copy",
+              "domain": "tinytipple.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.beaumontdrinks.com/beers-spirits-reviews/glenmorangie-quinta-ruban-port-wood-finish",
+              "url": "https://www.beaumontdrinks.com/beers-spirits-reviews/glenmorangie-quinta-ruban-port-wood-finish",
+              "domain": "beaumontdrinks.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/tz6n5e",
+              "url": "https://www.reddit.com/r/Scotch/comments/tz6n5e",
+              "domain": "reddit.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/ktuzv0",
+              "url": "https://www.reddit.com/r/Scotch/comments/ktuzv0",
+              "domain": "reddit.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/i80o73",
+              "url": "https://www.reddit.com/r/Scotch/comments/i80o73",
+              "domain": "reddit.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/orwpku",
+              "url": "https://www.reddit.com/r/Scotch/comments/orwpku",
+              "domain": "reddit.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/11ryxdr",
+              "url": "https://www.reddit.com/r/Scotch/comments/11ryxdr",
+              "domain": "reddit.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1c5hnoa",
+              "url": "https://www.reddit.com/r/Scotch/comments/1c5hnoa",
+              "domain": "reddit.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/lfbqc0",
+              "url": "https://www.reddit.com/r/Scotch/comments/lfbqc0",
+              "domain": "reddit.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1actmao",
+              "url": "https://www.reddit.com/r/Scotch/comments/1actmao",
+              "domain": "reddit.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/m01dig",
+              "url": "https://www.reddit.com/r/Scotch/comments/m01dig",
+              "domain": "reddit.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/jywcwc",
+              "url": "https://www.reddit.com/r/Scotch/comments/jywcwc",
+              "domain": "reddit.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/oe97mb",
+              "url": "https://www.reddit.com/r/Scotch/comments/oe97mb",
+              "domain": "reddit.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/hys5y5",
+              "url": "https://www.reddit.com/r/Scotch/comments/hys5y5",
+              "domain": "reddit.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.amadorclub.com/wp-content/uploads/2024/01/WingtipBevList11.21.22.pdf",
+              "url": "https://www.amadorclub.com/wp-content/uploads/2024/01/WingtipBevList11.21.22.pdf",
+              "domain": "amadorclub.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://cn.whiskeybm.co.il/warehouse/dynamic/470834.pdf",
+              "url": "https://cn.whiskeybm.co.il/warehouse/dynamic/470834.pdf",
+              "domain": "cn.whiskeybm.co.il",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://thewhiskyedition.com/exports/pdf/glenmorangie-the-quinta-ruban-14.pdf",
+              "url": "https://thewhiskyedition.com/exports/pdf/glenmorangie-the-quinta-ruban-14.pdf",
+              "domain": "thewhiskyedition.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://majestorage.blob.core.windows.net/majestic-live/Content/Images/Uploaded/PDFs/2778_MAR24_Whisky_DM.V2.pdf",
+              "url": "https://majestorage.blob.core.windows.net/majestic-live/Content/Images/Uploaded/PDFs/2778_MAR24_Whisky_DM.V2.pdf",
+              "domain": "majestorage.blob.core.windows.net",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://embury.bar/wp-content/uploads/2022/05/Spirits-Collection-H1-2022.pdf",
+              "url": "https://embury.bar/wp-content/uploads/2022/05/Spirits-Collection-H1-2022.pdf",
+              "domain": "embury.bar",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "The Quinta Ruban 14 Years Old | Glenmorangie",
+              "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai",
+              "domain": "glenmorangie.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "Glenmorangie Quinta Ruban 14 Year",
+              "url": "https://distiller.com/spirits/glenmorangie-quinta-ruban-port-cask-finish-14-year?utm_source=openai",
+              "domain": "distiller.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            },
+            {
+              "title": "Glenmorangie 14 year old Quinta Ruban",
+              "url": "https://whiskyadvocate.com/glenmorangie-14-year-old-quinta-ruban?utm_source=openai",
+              "domain": "whiskyadvocate.com",
+              "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Glenmorangie Quinta Ruban 14 year old official 46% ruby port",
+        "summary": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+        "results": [
+          {
+            "title": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+            "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+            "domain": "glenmorangie.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/glenmorangie-quinta-ruban-port-cask-finish-14-year",
+            "url": "https://distiller.com/spirits/glenmorangie-quinta-ruban-port-cask-finish-14-year",
+            "domain": "distiller.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://scotchnoob.com/2020/03/16/glenmorangie-quinta-ruban-14-year/",
+            "url": "https://scotchnoob.com/2020/03/16/glenmorangie-quinta-ruban-14-year/",
+            "domain": "scotchnoob.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskeyful.com/reviews/glenmorangie-quinta-ruban-14-year-old-port-finish-highland-whisky",
+            "url": "https://whiskeyful.com/reviews/glenmorangie-quinta-ruban-14-year-old-port-finish-highland-whisky",
+            "domain": "whiskeyful.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.thewhiskybarrel.com/products/glenmorangie-quinta-ruban-14-year-old",
+            "url": "https://www.thewhiskybarrel.com/products/glenmorangie-quinta-ruban-14-year-old",
+            "domain": "thewhiskybarrel.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://thespiritsembassy.com/products/glenmorangie-quinta-ruban-14-port-cask-43-1000ml",
+            "url": "https://thespiritsembassy.com/products/glenmorangie-quinta-ruban-14-port-cask-43-1000ml",
+            "domain": "thespiritsembassy.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/glenmorangie-14-year-old-quinta-ruban",
+            "url": "https://whiskyadvocate.com/glenmorangie-14-year-old-quinta-ruban",
+            "domain": "whiskyadvocate.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.theraremalt.com/products/glenmorangie-14-year-old-port-cask-finish",
+            "url": "https://www.theraremalt.com/products/glenmorangie-14-year-old-port-cask-finish",
+            "domain": "theraremalt.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whisky.com/whisky-database/id/24335",
+            "url": "https://www.whisky.com/whisky-database/id/24335",
+            "domain": "whisky.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://dailydram.co.uk/2020/06/24/glenmorangie-14/",
+            "url": "https://dailydram.co.uk/2020/06/24/glenmorangie-14/",
+            "domain": "dailydram.co.uk",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.tinytipple.com/en-us/products/glenmorangie-the-original-12-year-old-highland-single-malt-scotch-40-abv-50ml-copy",
+            "url": "https://www.tinytipple.com/en-us/products/glenmorangie-the-original-12-year-old-highland-single-malt-scotch-40-abv-50ml-copy",
+            "domain": "tinytipple.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.beaumontdrinks.com/beers-spirits-reviews/glenmorangie-quinta-ruban-port-wood-finish",
+            "url": "https://www.beaumontdrinks.com/beers-spirits-reviews/glenmorangie-quinta-ruban-port-wood-finish",
+            "domain": "beaumontdrinks.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/tz6n5e",
+            "url": "https://www.reddit.com/r/Scotch/comments/tz6n5e",
+            "domain": "reddit.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/ktuzv0",
+            "url": "https://www.reddit.com/r/Scotch/comments/ktuzv0",
+            "domain": "reddit.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/i80o73",
+            "url": "https://www.reddit.com/r/Scotch/comments/i80o73",
+            "domain": "reddit.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/orwpku",
+            "url": "https://www.reddit.com/r/Scotch/comments/orwpku",
+            "domain": "reddit.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/11ryxdr",
+            "url": "https://www.reddit.com/r/Scotch/comments/11ryxdr",
+            "domain": "reddit.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1c5hnoa",
+            "url": "https://www.reddit.com/r/Scotch/comments/1c5hnoa",
+            "domain": "reddit.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/lfbqc0",
+            "url": "https://www.reddit.com/r/Scotch/comments/lfbqc0",
+            "domain": "reddit.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1actmao",
+            "url": "https://www.reddit.com/r/Scotch/comments/1actmao",
+            "domain": "reddit.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/m01dig",
+            "url": "https://www.reddit.com/r/Scotch/comments/m01dig",
+            "domain": "reddit.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/jywcwc",
+            "url": "https://www.reddit.com/r/Scotch/comments/jywcwc",
+            "domain": "reddit.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/oe97mb",
+            "url": "https://www.reddit.com/r/Scotch/comments/oe97mb",
+            "domain": "reddit.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/hys5y5",
+            "url": "https://www.reddit.com/r/Scotch/comments/hys5y5",
+            "domain": "reddit.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.amadorclub.com/wp-content/uploads/2024/01/WingtipBevList11.21.22.pdf",
+            "url": "https://www.amadorclub.com/wp-content/uploads/2024/01/WingtipBevList11.21.22.pdf",
+            "domain": "amadorclub.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://cn.whiskeybm.co.il/warehouse/dynamic/470834.pdf",
+            "url": "https://cn.whiskeybm.co.il/warehouse/dynamic/470834.pdf",
+            "domain": "cn.whiskeybm.co.il",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://thewhiskyedition.com/exports/pdf/glenmorangie-the-quinta-ruban-14.pdf",
+            "url": "https://thewhiskyedition.com/exports/pdf/glenmorangie-the-quinta-ruban-14.pdf",
+            "domain": "thewhiskyedition.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://majestorage.blob.core.windows.net/majestic-live/Content/Images/Uploaded/PDFs/2778_MAR24_Whisky_DM.V2.pdf",
+            "url": "https://majestorage.blob.core.windows.net/majestic-live/Content/Images/Uploaded/PDFs/2778_MAR24_Whisky_DM.V2.pdf",
+            "domain": "majestorage.blob.core.windows.net",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://embury.bar/wp-content/uploads/2022/05/Spirits-Collection-H1-2022.pdf",
+            "url": "https://embury.bar/wp-content/uploads/2022/05/Spirits-Collection-H1-2022.pdf",
+            "domain": "embury.bar",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Quinta Ruban 14 Years Old | Glenmorangie",
+            "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai",
+            "domain": "glenmorangie.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie Quinta Ruban 14 Year",
+            "url": "https://distiller.com/spirits/glenmorangie-quinta-ruban-port-cask-finish-14-year?utm_source=openai",
+            "domain": "distiller.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie 14 year old Quinta Ruban",
+            "url": "https://whiskyadvocate.com/glenmorangie-14-year-old-quinta-ruban?utm_source=openai",
+            "domain": "whiskyadvocate.com",
+            "description": "This appears to match **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** with time in **bourbon casks** and **port casks from Portugal**. Glenmorangie’s official product page confirms the bottle name, **14-year age statement**, and **46.0% ABV**, and describes maturation in **bourbon casks and port casks from Portugal**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n\nIndependent whisky references support the same identification. Distiller identifies it as **Glenmoran",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

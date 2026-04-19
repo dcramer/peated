@@ -1,0 +1,422 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "whisky \"Batch Strength\""
+    },
+    "recordedAt": "2026-04-19T05:19:10.950Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "whisky \"Batch Strength\"",
+          "summary": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+          "results": [
+            {
+              "title": "https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/",
+              "url": "https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/",
+              "domain": "kilchomandistillery.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.thespiritsbusiness.com/2023/09/torabhaig-adds-batch-strength-to-legacy-series/",
+              "url": "https://www.thespiritsbusiness.com/2023/09/torabhaig-adds-batch-strength-to-legacy-series/",
+              "domain": "thespiritsbusiness.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/whiskies/wemyss-malts/peat-chimney-batch-strength-wemyss-malts-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/wemyss-malts/peat-chimney-batch-strength-wemyss-malts-whisky/",
+              "domain": "masterofmalt.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whisky.com/whisky-database/details/kilchoman-batch-strength.html",
+              "url": "https://www.whisky.com/whisky-database/details/kilchoman-batch-strength.html",
+              "domain": "whisky.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.spiriteddrinks.com/tamdhu-batch-strength-8/",
+              "url": "https://www.spiriteddrinks.com/tamdhu-batch-strength-8/",
+              "domain": "spiriteddrinks.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://woodencork.com/blogs/uncorked/tamdhu-adds-to-batch-strength-series",
+              "url": "https://woodencork.com/blogs/uncorked/tamdhu-adds-to-batch-strength-series",
+              "domain": "woodencork.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskeypulse.com/whisky-news/whisky/new-releases/kilchoman-releases-latest-core-range-bottle-batch-strength-6603ec079db423741744c777",
+              "url": "https://www.whiskeypulse.com/whisky-news/whisky/new-releases/kilchoman-releases-latest-core-range-bottle-batch-strength-6603ec079db423741744c777",
+              "domain": "whiskeypulse.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/whiskies/tamdhu/tamdhu-batch-strength-batch-7-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/tamdhu/tamdhu-batch-strength-batch-7-whisky/",
+              "domain": "masterofmalt.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.thewhiskyexchange.com/p/28463/tamdhu-batch-strength-batch-no1",
+              "url": "https://www.thewhiskyexchange.com/p/28463/tamdhu-batch-strength-batch-no1",
+              "domain": "thewhiskyexchange.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskycritic.com/tamdhu-adds-to-their-batch-strength-series",
+              "url": "https://whiskycritic.com/tamdhu-adds-to-their-batch-strength-series",
+              "domain": "whiskycritic.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/Tamdhu-Batch-Strength-N002-58-5",
+              "url": "https://whiskyadvocate.com/Tamdhu-Batch-Strength-N002-58-5",
+              "domain": "whiskyadvocate.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/whiskies/wemyss-malts/spice-king-batch-strength-wemyss-malts-56-whisky/",
+              "url": "https://www.masterofmalt.com/whiskies/wemyss-malts/spice-king-batch-strength-wemyss-malts-56-whisky/",
+              "domain": "masterofmalt.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://static1.squarespace.com/static/60bea313a5c6a504c6dfe531/t/665e3fac26df6e1fe85fbcd9/1717452730826/DB_JunJul24_Spirits-Report-Scotch.pdf",
+              "url": "https://static1.squarespace.com/static/60bea313a5c6a504c6dfe531/t/665e3fac26df6e1fe85fbcd9/1717452730826/DB_JunJul24_Spirits-Report-Scotch.pdf",
+              "domain": "static1.squarespace.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1ktl34r",
+              "url": "https://www.reddit.com/r/Scotch/comments/1ktl34r",
+              "domain": "reddit.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://static1.squarespace.com/static/60bea313a5c6a504c6dfe531/t/60d9a6c7aec4b0167baec2a1/1624876756142/DBJJ21%2BSpirits%2BReport%2B-%2BScotch.pdf",
+              "url": "https://static1.squarespace.com/static/60bea313a5c6a504c6dfe531/t/60d9a6c7aec4b0167baec2a1/1624876756142/DBJJ21%2BSpirits%2BReport%2B-%2BScotch.pdf",
+              "domain": "static1.squarespace.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://jigandreel.com/wp-content/uploads/2024/12/Boyds-Jig-Reel-Whisky-Menu-8.pdf",
+              "url": "https://jigandreel.com/wp-content/uploads/2024/12/Boyds-Jig-Reel-Whisky-Menu-8.pdf",
+              "domain": "jigandreel.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskyfest.co.uk/wp-content/uploads/2025/08/Dram-list-Midlands-Whisky-Festival-2025-20250827-1020.pdf",
+              "url": "https://www.whiskyfest.co.uk/wp-content/uploads/2025/08/Dram-list-Midlands-Whisky-Festival-2025-20250827-1020.pdf",
+              "domain": "whiskyfest.co.uk",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.1423.dk/wp-content/uploads/2017/06/Wemyss-Peat-Chimney-Batch-Strength.-Engelsk..pdf",
+              "url": "https://www.1423.dk/wp-content/uploads/2017/06/Wemyss-Peat-Chimney-Batch-Strength.-Engelsk..pdf",
+              "domain": "1423.dk",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://static.spotapps.co/website_images/ab_websites/110152_website/whisky_menu_nov_25_scotch.pdf",
+              "url": "https://static.spotapps.co/website_images/ab_websites/110152_website/whisky_menu_nov_25_scotch.pdf",
+              "domain": "static.spotapps.co",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1dv1s9n",
+              "url": "https://www.reddit.com/r/Scotch/comments/1dv1s9n",
+              "domain": "reddit.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1fqk6hv",
+              "url": "https://www.reddit.com/r/Scotch/comments/1fqk6hv",
+              "domain": "reddit.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1s1i5pt/review_2_tamdhu_distillery_batch_strength_batch/",
+              "url": "https://www.reddit.com/r/Scotch/comments/1s1i5pt/review_2_tamdhu_distillery_batch_strength_batch/",
+              "domain": "reddit.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/uyo4vs",
+              "url": "https://www.reddit.com/r/Scotch/comments/uyo4vs",
+              "domain": "reddit.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/Scotch/comments/1b4ly2a",
+              "url": "https://www.reddit.com/r/Scotch/comments/1b4ly2a",
+              "domain": "reddit.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.reddit.com/r/dcwhisky/comments/1fxmcyf",
+              "url": "https://www.reddit.com/r/dcwhisky/comments/1fxmcyf",
+              "domain": "reddit.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "Batch Strength – Core Range Launch - Kilchoman Distillery",
+              "url": "https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai",
+              "domain": "kilchomandistillery.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "Tamdhu Batch Strength 8 Arrives At 111.6 Proof - Spirited Drinks",
+              "url": "https://www.spiriteddrinks.com/tamdhu-batch-strength-8/?utm_source=openai",
+              "domain": "spiriteddrinks.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            },
+            {
+              "title": "Torabhaig adds Batch Strength to Legacy Series - The Spirits Business",
+              "url": "https://www.thespiritsbusiness.com/2023/09/torabhaig-adds-batch-strength-to-legacy-series/?utm_source=openai",
+              "domain": "thespiritsbusiness.com",
+              "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "whisky \"Batch Strength\"",
+        "summary": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+        "results": [
+          {
+            "title": "https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/",
+            "url": "https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/",
+            "domain": "kilchomandistillery.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.thespiritsbusiness.com/2023/09/torabhaig-adds-batch-strength-to-legacy-series/",
+            "url": "https://www.thespiritsbusiness.com/2023/09/torabhaig-adds-batch-strength-to-legacy-series/",
+            "domain": "thespiritsbusiness.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/whiskies/wemyss-malts/peat-chimney-batch-strength-wemyss-malts-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/wemyss-malts/peat-chimney-batch-strength-wemyss-malts-whisky/",
+            "domain": "masterofmalt.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whisky.com/whisky-database/details/kilchoman-batch-strength.html",
+            "url": "https://www.whisky.com/whisky-database/details/kilchoman-batch-strength.html",
+            "domain": "whisky.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.spiriteddrinks.com/tamdhu-batch-strength-8/",
+            "url": "https://www.spiriteddrinks.com/tamdhu-batch-strength-8/",
+            "domain": "spiriteddrinks.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://woodencork.com/blogs/uncorked/tamdhu-adds-to-batch-strength-series",
+            "url": "https://woodencork.com/blogs/uncorked/tamdhu-adds-to-batch-strength-series",
+            "domain": "woodencork.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskeypulse.com/whisky-news/whisky/new-releases/kilchoman-releases-latest-core-range-bottle-batch-strength-6603ec079db423741744c777",
+            "url": "https://www.whiskeypulse.com/whisky-news/whisky/new-releases/kilchoman-releases-latest-core-range-bottle-batch-strength-6603ec079db423741744c777",
+            "domain": "whiskeypulse.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/whiskies/tamdhu/tamdhu-batch-strength-batch-7-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/tamdhu/tamdhu-batch-strength-batch-7-whisky/",
+            "domain": "masterofmalt.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.thewhiskyexchange.com/p/28463/tamdhu-batch-strength-batch-no1",
+            "url": "https://www.thewhiskyexchange.com/p/28463/tamdhu-batch-strength-batch-no1",
+            "domain": "thewhiskyexchange.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskycritic.com/tamdhu-adds-to-their-batch-strength-series",
+            "url": "https://whiskycritic.com/tamdhu-adds-to-their-batch-strength-series",
+            "domain": "whiskycritic.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/Tamdhu-Batch-Strength-N002-58-5",
+            "url": "https://whiskyadvocate.com/Tamdhu-Batch-Strength-N002-58-5",
+            "domain": "whiskyadvocate.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/whiskies/wemyss-malts/spice-king-batch-strength-wemyss-malts-56-whisky/",
+            "url": "https://www.masterofmalt.com/whiskies/wemyss-malts/spice-king-batch-strength-wemyss-malts-56-whisky/",
+            "domain": "masterofmalt.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://static1.squarespace.com/static/60bea313a5c6a504c6dfe531/t/665e3fac26df6e1fe85fbcd9/1717452730826/DB_JunJul24_Spirits-Report-Scotch.pdf",
+            "url": "https://static1.squarespace.com/static/60bea313a5c6a504c6dfe531/t/665e3fac26df6e1fe85fbcd9/1717452730826/DB_JunJul24_Spirits-Report-Scotch.pdf",
+            "domain": "static1.squarespace.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1ktl34r",
+            "url": "https://www.reddit.com/r/Scotch/comments/1ktl34r",
+            "domain": "reddit.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://static1.squarespace.com/static/60bea313a5c6a504c6dfe531/t/60d9a6c7aec4b0167baec2a1/1624876756142/DBJJ21%2BSpirits%2BReport%2B-%2BScotch.pdf",
+            "url": "https://static1.squarespace.com/static/60bea313a5c6a504c6dfe531/t/60d9a6c7aec4b0167baec2a1/1624876756142/DBJJ21%2BSpirits%2BReport%2B-%2BScotch.pdf",
+            "domain": "static1.squarespace.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://jigandreel.com/wp-content/uploads/2024/12/Boyds-Jig-Reel-Whisky-Menu-8.pdf",
+            "url": "https://jigandreel.com/wp-content/uploads/2024/12/Boyds-Jig-Reel-Whisky-Menu-8.pdf",
+            "domain": "jigandreel.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskyfest.co.uk/wp-content/uploads/2025/08/Dram-list-Midlands-Whisky-Festival-2025-20250827-1020.pdf",
+            "url": "https://www.whiskyfest.co.uk/wp-content/uploads/2025/08/Dram-list-Midlands-Whisky-Festival-2025-20250827-1020.pdf",
+            "domain": "whiskyfest.co.uk",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.1423.dk/wp-content/uploads/2017/06/Wemyss-Peat-Chimney-Batch-Strength.-Engelsk..pdf",
+            "url": "https://www.1423.dk/wp-content/uploads/2017/06/Wemyss-Peat-Chimney-Batch-Strength.-Engelsk..pdf",
+            "domain": "1423.dk",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://static.spotapps.co/website_images/ab_websites/110152_website/whisky_menu_nov_25_scotch.pdf",
+            "url": "https://static.spotapps.co/website_images/ab_websites/110152_website/whisky_menu_nov_25_scotch.pdf",
+            "domain": "static.spotapps.co",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1dv1s9n",
+            "url": "https://www.reddit.com/r/Scotch/comments/1dv1s9n",
+            "domain": "reddit.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1fqk6hv",
+            "url": "https://www.reddit.com/r/Scotch/comments/1fqk6hv",
+            "domain": "reddit.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1s1i5pt/review_2_tamdhu_distillery_batch_strength_batch/",
+            "url": "https://www.reddit.com/r/Scotch/comments/1s1i5pt/review_2_tamdhu_distillery_batch_strength_batch/",
+            "domain": "reddit.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/uyo4vs",
+            "url": "https://www.reddit.com/r/Scotch/comments/uyo4vs",
+            "domain": "reddit.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/Scotch/comments/1b4ly2a",
+            "url": "https://www.reddit.com/r/Scotch/comments/1b4ly2a",
+            "domain": "reddit.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.reddit.com/r/dcwhisky/comments/1fxmcyf",
+            "url": "https://www.reddit.com/r/dcwhisky/comments/1fxmcyf",
+            "domain": "reddit.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Batch Strength – Core Range Launch - Kilchoman Distillery",
+            "url": "https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai",
+            "domain": "kilchomandistillery.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Tamdhu Batch Strength 8 Arrives At 111.6 Proof - Spirited Drinks",
+            "url": "https://www.spiriteddrinks.com/tamdhu-batch-strength-8/?utm_source=openai",
+            "domain": "spiriteddrinks.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Torabhaig adds Batch Strength to Legacy Series - The Spirits Business",
+            "url": "https://www.thespiritsbusiness.com/2023/09/torabhaig-adds-batch-strength-to-legacy-series/?utm_source=openai",
+            "domain": "thespiritsbusiness.com",
+            "description": "“**Batch Strength**” by itself is **not a unique whisky name**. It’s a release style used by multiple brands, so I can’t identify one exact bottle from that phrase alone.\n\nA few real examples:\n- **Kilchoman Batch Strength** — official Kilchoman source says it is a **core range release**, matured in **re-charred red wine casks, oloroso sherry butts, and bourbon barrels**, bottled at **57% ABV**. ([kilchomandistillery.com](https://www.kilchomandistillery.com/distillery-news/batch-strength-core-range-launch/?utm_source=openai))\n- **Tamdhu Batch Strength** — independent coverage and listings show ",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

@@ -19,11 +19,34 @@ export const BottleWebSearchArgsSchema = z.object({
     ),
 });
 
+export const BottleWebSearchErrorSchema = z.object({
+  error: z.string().min(1),
+});
+
+const MAX_BOTTLE_SEARCH_RESULTS = 6;
+const MAX_BOTTLE_SEARCH_SUMMARY_CHARS = 320;
+const MAX_BOTTLE_SEARCH_TITLE_CHARS = 160;
+const MAX_BOTTLE_SEARCH_DESCRIPTION_CHARS = 220;
+const MAX_BOTTLE_SEARCH_EXTRA_SNIPPETS = 1;
+const MAX_BOTTLE_SEARCH_EXTRA_SNIPPET_CHARS = 180;
+
 export type BottleWebSearchBudget = {
   tryConsume: () => boolean;
   getExhaustedError: () => {
     error: string;
   };
+};
+
+export type BottleWebSearchExecutionCache = {
+  execute: <T>({
+    key,
+    schema,
+    live,
+  }: {
+    key: Record<string, unknown>;
+    schema: z.ZodType<T>;
+    live: () => Promise<T>;
+  }) => Promise<T>;
 };
 
 export function createBottleWebSearchBudget(
@@ -66,12 +89,28 @@ export function buildBottleSearchEvidence({
   summary: string | null;
   results: BottleSearchEvidence["results"];
 }): BottleSearchEvidence {
+  const normalizedSummary = normalizeSearchText(
+    summary,
+    MAX_BOTTLE_SEARCH_SUMMARY_CHARS,
+  );
+
   return BottleSearchEvidenceSchema.parse({
     provider,
     query,
-    summary,
-    results,
+    summary: normalizedSummary,
+    results: results.slice(0, MAX_BOTTLE_SEARCH_RESULTS).map((result) =>
+      normalizeBottleSearchResult({
+        result,
+        summary: normalizedSummary,
+      }),
+    ),
   });
+}
+
+export function compactBottleSearchEvidence(
+  evidence: BottleSearchEvidence,
+): BottleSearchEvidence {
+  return buildBottleSearchEvidence(evidence);
 }
 
 export function mergeBottleSearchResults(
@@ -158,5 +197,66 @@ export function summarizeSearchResults(
     return null;
   }
 
-  return snippets.join(" ").slice(0, 600);
+  return snippets.join(" ").slice(0, MAX_BOTTLE_SEARCH_SUMMARY_CHARS);
+}
+
+function normalizeSearchText(
+  value: string | null | undefined,
+  maxChars: number,
+): string | null {
+  const trimmed = value?.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  return trimmed.slice(0, maxChars);
+}
+
+function normalizeSearchComparisonText(
+  value: string | null | undefined,
+): string {
+  return (value ?? "").toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+function normalizeBottleSearchResult({
+  result,
+  summary,
+}: {
+  result: BottleSearchEvidence["results"][number];
+  summary: string | null;
+}): BottleSearchEvidence["results"][number] {
+  const normalizedSummary = normalizeSearchComparisonText(summary);
+  const normalizedDescription = normalizeSearchText(
+    result.description,
+    MAX_BOTTLE_SEARCH_DESCRIPTION_CHARS,
+  );
+  const description =
+    normalizedDescription &&
+    normalizeSearchComparisonText(normalizedDescription) === normalizedSummary
+      ? null
+      : normalizedDescription;
+  const extraSnippets = Array.from(
+    new Set(
+      result.extraSnippets
+        .map((snippet) =>
+          normalizeSearchText(snippet, MAX_BOTTLE_SEARCH_EXTRA_SNIPPET_CHARS),
+        )
+        .filter(
+          (snippet): snippet is string =>
+            Boolean(snippet) &&
+            normalizeSearchComparisonText(snippet) !== normalizedSummary &&
+            normalizeSearchComparisonText(snippet) !==
+              normalizeSearchComparisonText(description),
+        ),
+    ),
+  ).slice(0, MAX_BOTTLE_SEARCH_EXTRA_SNIPPETS);
+
+  return {
+    ...result,
+    title:
+      normalizeSearchText(result.title, MAX_BOTTLE_SEARCH_TITLE_CHARS) ??
+      result.url,
+    description,
+    extraSnippets,
+  };
 }

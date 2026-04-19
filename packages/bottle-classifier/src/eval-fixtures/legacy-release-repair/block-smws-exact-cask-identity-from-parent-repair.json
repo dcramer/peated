@@ -1,0 +1,73 @@
+{
+  "id": "block-smws-exact-cask-identity-from-parent-repair",
+  "name": "repair resolution: blocks exact-cask SMWS identity from reusable-parent repair",
+  "referenceName": "SMWS 41.176",
+  "extractedIdentity": {
+    "brand": "The Scotch Malt Whisky Society",
+    "bottler": "The Scotch Malt Whisky Society",
+    "expression": null,
+    "series": null,
+    "distillery": [],
+    "category": "single_malt",
+    "stated_age": null,
+    "abv": null,
+    "release_year": null,
+    "vintage_year": null,
+    "cask_type": null,
+    "cask_size": null,
+    "cask_fill": null,
+    "cask_strength": null,
+    "single_cask": true,
+    "edition": null
+  },
+  "initialCandidates": [
+    {
+      "kind": "bottle",
+      "releaseId": null,
+      "alias": null,
+      "bottleFullName": "SMWS 41.176 Baristaliscious",
+      "brand": "The Scotch Malt Whisky Society",
+      "bottler": null,
+      "series": null,
+      "distillery": [],
+      "category": "single_malt",
+      "statedAge": 17,
+      "edition": null,
+      "caskStrength": null,
+      "singleCask": true,
+      "abv": null,
+      "vintageYear": null,
+      "releaseYear": null,
+      "caskType": null,
+      "caskSize": null,
+      "caskFill": null,
+      "score": null,
+      "source": ["repair_parent"],
+      "bottleId": 650,
+      "fullName": "SMWS 41.176 Baristaliscious"
+    }
+  ],
+  "reviewedParentRows": [
+    {
+      "abv": null,
+      "category": "single_malt",
+      "caskFill": null,
+      "caskSize": null,
+      "caskStrength": null,
+      "caskType": null,
+      "edition": null,
+      "fullName": "SMWS 41.176 Baristaliscious",
+      "id": 650,
+      "releaseYear": null,
+      "singleCask": true,
+      "statedAge": 17,
+      "totalTastings": null,
+      "vintageYear": null
+    }
+  ],
+  "expected": {
+    "resolution": "blocked",
+    "blockedReason": "classifier_exact_cask",
+    "summary": "SMWS program codes are exact-cask identity and should block reusable-parent repair logic."
+  }
+}

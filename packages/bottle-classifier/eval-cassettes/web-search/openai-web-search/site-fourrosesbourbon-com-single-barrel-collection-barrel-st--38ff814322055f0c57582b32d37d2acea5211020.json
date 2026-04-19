@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "site:fourrosesbourbon.com \"single barrel collection\" barrel strength"
+    },
+    "recordedAt": "2026-04-19T16:16:11.984Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "site:fourrosesbourbon.com \"single barrel collection\" barrel strength",
+          "summary": "Authoritative evidence points to **Four Roses “Single Barrel Collection” as a 100 proof line, not a barrel-strength line**.\n\nWhat the official Four Roses sources confirm:\n- The **Single Barrel Collection** includes **OBSV, OBSF, OESK, and OESO** expressions. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/blog",
+          "results": [
+            {
+              "title": "https://www.fourrosesbourbon.com/blog/introducing-single-barrel-collection",
+              "url": "https://www.fourrosesbourbon.com/blog/introducing-single-barrel-collection",
+              "domain": "fourrosesbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+              "url": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+              "domain": "fourrosesbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.breakingbourbon.com/bourbon-whiskey-press-releases/four-roses-distillery-unveils-single-barrel-collection-honoring-20-years-of-single-barrel-excelle",
+              "url": "https://www.breakingbourbon.com/bourbon-whiskey-press-releases/four-roses-distillery-unveils-single-barrel-collection-honoring-20-years-of-single-barrel-excellence",
+              "domain": "breakingbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/bourbon/single-barrel-collection",
+              "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel-collection",
+              "domain": "fourrosesbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+              "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+              "domain": "fourrosesbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://store.fourrosesbourbon.com/barware/glassware/single-barrel-tasting-tumbler.html",
+              "url": "https://store.fourrosesbourbon.com/barware/glassware/single-barrel-tasting-tumbler.html",
+              "domain": "store.fourrosesbourbon.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "site:fourrosesbourbon.com \"single barrel collection\" barrel strength",
+        "summary": "Authoritative evidence points to **Four Roses “Single Barrel Collection” as a 100 proof line, not a barrel-strength line**.\n\nWhat the official Four Roses sources confirm:\n- The **Single Barrel Collection** includes **OBSV, OBSF, OESK, and OESO** expressions. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/blog",
+        "results": [
+          {
+            "title": "https://www.fourrosesbourbon.com/blog/introducing-single-barrel-collection",
+            "url": "https://www.fourrosesbourbon.com/blog/introducing-single-barrel-collection",
+            "domain": "fourrosesbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+            "url": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+            "domain": "fourrosesbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.breakingbourbon.com/bourbon-whiskey-press-releases/four-roses-distillery-unveils-single-barrel-collection-honoring-20-years-of-single-barrel-excelle",
+            "url": "https://www.breakingbourbon.com/bourbon-whiskey-press-releases/four-roses-distillery-unveils-single-barrel-collection-honoring-20-years-of-single-barrel-excellence",
+            "domain": "breakingbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/bourbon/single-barrel-collection",
+            "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel-collection",
+            "domain": "fourrosesbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+            "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+            "domain": "fourrosesbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://store.fourrosesbourbon.com/barware/glassware/single-barrel-tasting-tumbler.html",
+            "url": "https://store.fourrosesbourbon.com/barware/glassware/single-barrel-tasting-tumbler.html",
+            "domain": "store.fourrosesbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

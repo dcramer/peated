@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "site:smws.com \"SMWS 6.53\""
+    },
+    "recordedAt": "2026-04-19T16:30:07.412Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "site:smws.com \"SMWS 6.53\"",
+          "summary": "I found authoritative support for **SMWS 6.53** and can identify the bottle as follows:\n\n- **SMWS cask 6.53** is titled **“Fresh from the replicator.”** An official SMWSA product page confirms it as a **13-year-old** release, **distilled February 2008**, from the **Speyside, Deveron** region, matured in a **second-fill",
+          "results": [
+            {
+              "title": "https://newmake.smwsa.com/products/cask-no-6-53",
+              "url": "https://newmake.smwsa.com/products/cask-no-6-53",
+              "domain": "newmake.smwsa.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.icheers.tw/iCheers/mSpirits/WineDetail/wine_detail/55458",
+              "url": "https://www.icheers.tw/iCheers/mSpirits/WineDetail/wine_detail/55458",
+              "domain": "icheers.tw",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.icheers.tw/iCheers/Spirits/WineDetail/wine_detail/55458",
+              "url": "https://www.icheers.tw/iCheers/Spirits/WineDetail/wine_detail/55458",
+              "domain": "icheers.tw",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/203599/macduff-2008-smws-653",
+              "url": "https://www.whiskybase.com/whiskies/whisky/203599/macduff-2008-smws-653",
+              "domain": "whiskybase.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://newmake.smwsa.com/products/say-it-with-whisky-1",
+              "url": "https://newmake.smwsa.com/products/say-it-with-whisky-1",
+              "domain": "newmake.smwsa.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.spiritradar.com/whisky-db/brands/the-scotch-malt-whisky-society-2/",
+              "url": "https://www.spiritradar.com/whisky-db/brands/the-scotch-malt-whisky-society-2/",
+              "domain": "spiritradar.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "site:smws.com \"SMWS 6.53\"",
+        "summary": "I found authoritative support for **SMWS 6.53** and can identify the bottle as follows:\n\n- **SMWS cask 6.53** is titled **“Fresh from the replicator.”** An official SMWSA product page confirms it as a **13-year-old** release, **distilled February 2008**, from the **Speyside, Deveron** region, matured in a **second-fill",
+        "results": [
+          {
+            "title": "https://newmake.smwsa.com/products/cask-no-6-53",
+            "url": "https://newmake.smwsa.com/products/cask-no-6-53",
+            "domain": "newmake.smwsa.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.icheers.tw/iCheers/mSpirits/WineDetail/wine_detail/55458",
+            "url": "https://www.icheers.tw/iCheers/mSpirits/WineDetail/wine_detail/55458",
+            "domain": "icheers.tw",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.icheers.tw/iCheers/Spirits/WineDetail/wine_detail/55458",
+            "url": "https://www.icheers.tw/iCheers/Spirits/WineDetail/wine_detail/55458",
+            "domain": "icheers.tw",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/203599/macduff-2008-smws-653",
+            "url": "https://www.whiskybase.com/whiskies/whisky/203599/macduff-2008-smws-653",
+            "domain": "whiskybase.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://newmake.smwsa.com/products/say-it-with-whisky-1",
+            "url": "https://newmake.smwsa.com/products/say-it-with-whisky-1",
+            "domain": "newmake.smwsa.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.spiritradar.com/whisky-db/brands/the-scotch-malt-whisky-society-2/",
+            "url": "https://www.spiritradar.com/whisky-db/brands/the-scotch-malt-whisky-society-2/",
+            "domain": "spiritradar.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

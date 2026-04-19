@@ -1,0 +1,254 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Four Roses Limited Edition Small Batch 2017 official"
+    },
+    "recordedAt": "2026-04-19T05:21:52.775Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Four Roses Limited Edition Small Batch 2017 official",
+          "summary": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+          "results": [
+            {
+              "title": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+              "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+              "domain": "fourrosesbourbon.com",
+              "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+              "url": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+              "domain": "distiller.com",
+              "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/blog/cheers-to-a-mellow-year",
+              "url": "https://www.fourrosesbourbon.com/blog/cheers-to-a-mellow-year",
+              "domain": "fourrosesbourbon.com",
+              "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/blog/2016-limited-edition-small-batch-named-americas-best-kentucky-bourbon",
+              "url": "https://www.fourrosesbourbon.com/blog/2016-limited-edition-small-batch-named-americas-best-kentucky-bourbon",
+              "domain": "fourrosesbourbon.com",
+              "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+              "url": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+              "domain": "fourrosesbourbon.com",
+              "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/four-roses-limited-edition-50th-anniversary-small-batch-bourbon-2017",
+              "url": "https://distiller.com/spirits/four-roses-limited-edition-50th-anniversary-small-batch-bourbon-2017",
+              "domain": "distiller.com",
+              "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/blog/how-our-small-batch-bottle-came-to-be",
+              "url": "https://www.fourrosesbourbon.com/blog/how-our-small-batch-bottle-came-to-be",
+              "domain": "fourrosesbourbon.com",
+              "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/blog/brents-pick-top-moments-from-kentucky-bourbon-festival",
+              "url": "https://www.fourrosesbourbon.com/blog/brents-pick-top-moments-from-kentucky-bourbon-festival",
+              "domain": "fourrosesbourbon.com",
+              "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/blog/celebrate-our-130th-anniversary-limited-edition-small-batch",
+              "url": "https://www.fourrosesbourbon.com/blog/celebrate-our-130th-anniversary-limited-edition-small-batch",
+              "domain": "fourrosesbourbon.com",
+              "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.bourbonbanter.com/four-roses-2017-limited-edition-al-young-50th-anniversary-small-batch-bourbon-review/",
+              "url": "https://www.bourbonbanter.com/four-roses-2017-limited-edition-al-young-50th-anniversary-small-batch-bourbon-review/",
+              "domain": "bourbonbanter.com",
+              "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/blog/four-roses-wins-best-bourbon-of-the-century-so-far-more",
+              "url": "https://www.fourrosesbourbon.com/blog/four-roses-wins-best-bourbon-of-the-century-so-far-more",
+              "domain": "fourrosesbourbon.com",
+              "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.fourrosesbourbon.com/blog/mingle-with-us-at-kentuckys-forecastle-festival",
+              "url": "https://www.fourrosesbourbon.com/blog/mingle-with-us-at-kentuckys-forecastle-festival",
+              "domain": "fourrosesbourbon.com",
+              "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.bourbonbanter.com/content/files/2023/12/Never-Say-Die-Small-Batch-Bourbon-Press-Release.pdf",
+              "url": "https://www.bourbonbanter.com/content/files/2023/12/Never-Say-Die-Small-Batch-Bourbon-Press-Release.pdf",
+              "domain": "bourbonbanter.com",
+              "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+              "extraSnippets": []
+            },
+            {
+              "title": "2017 Four Roses Limited Edition: A Perfect Year | Four Roses",
+              "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai",
+              "domain": "fourrosesbourbon.com",
+              "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+              "extraSnippets": []
+            },
+            {
+              "title": "Cheers to a Mellow Year | Four Roses",
+              "url": "https://www.fourrosesbourbon.com/blog/cheers-to-a-mellow-year?utm_source=openai",
+              "domain": "fourrosesbourbon.com",
+              "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+              "extraSnippets": []
+            },
+            {
+              "title": "Four Roses Limited Edition Small Batch Bourbon (2017)",
+              "url": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017?utm_source=openai",
+              "domain": "distiller.com",
+              "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Four Roses Limited Edition Small Batch 2017 official",
+        "summary": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+        "results": [
+          {
+            "title": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+            "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+            "domain": "fourrosesbourbon.com",
+            "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+            "url": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+            "domain": "distiller.com",
+            "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/blog/cheers-to-a-mellow-year",
+            "url": "https://www.fourrosesbourbon.com/blog/cheers-to-a-mellow-year",
+            "domain": "fourrosesbourbon.com",
+            "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/blog/2016-limited-edition-small-batch-named-americas-best-kentucky-bourbon",
+            "url": "https://www.fourrosesbourbon.com/blog/2016-limited-edition-small-batch-named-americas-best-kentucky-bourbon",
+            "domain": "fourrosesbourbon.com",
+            "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+            "url": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+            "domain": "fourrosesbourbon.com",
+            "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/four-roses-limited-edition-50th-anniversary-small-batch-bourbon-2017",
+            "url": "https://distiller.com/spirits/four-roses-limited-edition-50th-anniversary-small-batch-bourbon-2017",
+            "domain": "distiller.com",
+            "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/blog/how-our-small-batch-bottle-came-to-be",
+            "url": "https://www.fourrosesbourbon.com/blog/how-our-small-batch-bottle-came-to-be",
+            "domain": "fourrosesbourbon.com",
+            "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/blog/brents-pick-top-moments-from-kentucky-bourbon-festival",
+            "url": "https://www.fourrosesbourbon.com/blog/brents-pick-top-moments-from-kentucky-bourbon-festival",
+            "domain": "fourrosesbourbon.com",
+            "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/blog/celebrate-our-130th-anniversary-limited-edition-small-batch",
+            "url": "https://www.fourrosesbourbon.com/blog/celebrate-our-130th-anniversary-limited-edition-small-batch",
+            "domain": "fourrosesbourbon.com",
+            "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.bourbonbanter.com/four-roses-2017-limited-edition-al-young-50th-anniversary-small-batch-bourbon-review/",
+            "url": "https://www.bourbonbanter.com/four-roses-2017-limited-edition-al-young-50th-anniversary-small-batch-bourbon-review/",
+            "domain": "bourbonbanter.com",
+            "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/blog/four-roses-wins-best-bourbon-of-the-century-so-far-more",
+            "url": "https://www.fourrosesbourbon.com/blog/four-roses-wins-best-bourbon-of-the-century-so-far-more",
+            "domain": "fourrosesbourbon.com",
+            "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.fourrosesbourbon.com/blog/mingle-with-us-at-kentuckys-forecastle-festival",
+            "url": "https://www.fourrosesbourbon.com/blog/mingle-with-us-at-kentuckys-forecastle-festival",
+            "domain": "fourrosesbourbon.com",
+            "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.bourbonbanter.com/content/files/2023/12/Never-Say-Die-Small-Batch-Bourbon-Press-Release.pdf",
+            "url": "https://www.bourbonbanter.com/content/files/2023/12/Never-Say-Die-Small-Batch-Bourbon-Press-Release.pdf",
+            "domain": "bourbonbanter.com",
+            "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+            "extraSnippets": []
+          },
+          {
+            "title": "2017 Four Roses Limited Edition: A Perfect Year | Four Roses",
+            "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai",
+            "domain": "fourrosesbourbon.com",
+            "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+            "extraSnippets": []
+          },
+          {
+            "title": "Cheers to a Mellow Year | Four Roses",
+            "url": "https://www.fourrosesbourbon.com/blog/cheers-to-a-mellow-year?utm_source=openai",
+            "domain": "fourrosesbourbon.com",
+            "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Limited Edition Small Batch Bourbon (2017)",
+            "url": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017?utm_source=openai",
+            "domain": "distiller.com",
+            "description": "**Official Four Roses page:** the 2017 **Limited Edition Small Batch** is confirmed as **107.3 proof** and **aged a minimum of 12–15 years**. Four Roses also identifies it as the **2017 Limited Edition Small Batch** release, distinct from the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nA second official Four Roses writeup adds the blend details: this release used **three recipes** — **15-year-old OESK**, **13-year-old OESK**, and **12-year-old OESV** — and says it was the **first",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

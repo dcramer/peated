@@ -1,0 +1,268 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "The Whistler Bodega Cask Single Malt Irish Whiskey official"
+    },
+    "recordedAt": "2026-04-19T15:36:20.252Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "The Whistler Bodega Cask Single Malt Irish Whiskey official",
+          "summary": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+          "results": [
+            {
+              "title": "https://www.boanndistillery.ie/product/the-whistler-triple-oaked/",
+              "url": "https://www.boanndistillery.ie/product/the-whistler-triple-oaked/",
+              "domain": "boanndistillery.ie",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.boanndistillery.ie/the-merrion-hotel/",
+              "url": "https://www.boanndistillery.ie/the-merrion-hotel/",
+              "domain": "boanndistillery.ie",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.boanndistillery.ie/our-whiskeys/single-malts/",
+              "url": "https://www.boanndistillery.ie/our-whiskeys/single-malts/",
+              "domain": "boanndistillery.ie",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.boanndistillery.ie/product/the-whistler-doppelbock-rye-cask-finish-limited-edition-batch-004/",
+              "url": "https://www.boanndistillery.ie/product/the-whistler-doppelbock-rye-cask-finish-limited-edition-batch-004/",
+              "domain": "boanndistillery.ie",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.boanndistillery.ie/product/the-whistler-mosaic-marsala-cask/",
+              "url": "https://www.boanndistillery.ie/product/the-whistler-mosaic-marsala-cask/",
+              "domain": "boanndistillery.ie",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.boanndistillery.ie/product/the-whistler-21-yo-madeira-justinos-collaboration-twin-pack/",
+              "url": "https://www.boanndistillery.ie/product/the-whistler-21-yo-madeira-justinos-collaboration-twin-pack/",
+              "domain": "boanndistillery.ie",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.boanndistillery.ie/product/the-whistler-10-year-old-french-oak-finish-single-malt/",
+              "url": "https://www.boanndistillery.ie/product/the-whistler-10-year-old-french-oak-finish-single-malt/",
+              "domain": "boanndistillery.ie",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.boanndistillery.ie/product/the-whistler-oloroso-sherry-cask-blend/",
+              "url": "https://www.boanndistillery.ie/product/the-whistler-oloroso-sherry-cask-blend/",
+              "domain": "boanndistillery.ie",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+              "url": "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+              "domain": "thewhiskeywash.com",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.boanndistillery.ie/blog/auto-draft-4/",
+              "url": "https://www.boanndistillery.ie/blog/auto-draft-4/",
+              "domain": "boanndistillery.ie",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.boanndistillery.ie/",
+              "url": "https://www.boanndistillery.ie/",
+              "domain": "boanndistillery.ie",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.masterofmalt.com/whiskies/boann/the-whistler-the-good-the-bad-and-the-smoky-irish-whiskey/",
+              "url": "https://www.masterofmalt.com/whiskies/boann/the-whistler-the-good-the-bad-and-the-smoky-irish-whiskey/",
+              "domain": "masterofmalt.com",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://cask.boanndistillery.ie/wp-content/uploads/2022/12/Boann-Whiskey-Brochure_August-2022.pdf",
+              "url": "https://cask.boanndistillery.ie/wp-content/uploads/2022/12/Boann-Whiskey-Brochure_August-2022.pdf",
+              "domain": "cask.boanndistillery.ie",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            },
+            {
+              "title": "https://cask.boanndistillery.ie/wp-content/uploads/2023/09/Boann-Whiskey-Brochure-2023.pdf",
+              "url": "https://cask.boanndistillery.ie/wp-content/uploads/2023/09/Boann-Whiskey-Brochure-2023.pdf",
+              "domain": "cask.boanndistillery.ie",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            },
+            {
+              "title": "The Whistler Bodega Cask Irish Single Malt Whiskey Review: Tasting Notes & Analysis",
+              "url": "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai",
+              "domain": "thewhiskeywash.com",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            },
+            {
+              "title": "Irish Whiskey Crafted with Passion - Boann Distillery",
+              "url": "https://www.boanndistillery.ie/?utm_source=openai",
+              "domain": "boanndistillery.ie",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            },
+            {
+              "title": "The Whistler P.X. I Love You Single Malt Irish Whiskey",
+              "url": "https://www.boanndistillery.ie/our-whiskeys/single-malts/?utm_source=openai",
+              "domain": "boanndistillery.ie",
+              "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "The Whistler Bodega Cask Single Malt Irish Whiskey official",
+        "summary": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+        "results": [
+          {
+            "title": "https://www.boanndistillery.ie/product/the-whistler-triple-oaked/",
+            "url": "https://www.boanndistillery.ie/product/the-whistler-triple-oaked/",
+            "domain": "boanndistillery.ie",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.boanndistillery.ie/the-merrion-hotel/",
+            "url": "https://www.boanndistillery.ie/the-merrion-hotel/",
+            "domain": "boanndistillery.ie",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.boanndistillery.ie/our-whiskeys/single-malts/",
+            "url": "https://www.boanndistillery.ie/our-whiskeys/single-malts/",
+            "domain": "boanndistillery.ie",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.boanndistillery.ie/product/the-whistler-doppelbock-rye-cask-finish-limited-edition-batch-004/",
+            "url": "https://www.boanndistillery.ie/product/the-whistler-doppelbock-rye-cask-finish-limited-edition-batch-004/",
+            "domain": "boanndistillery.ie",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.boanndistillery.ie/product/the-whistler-mosaic-marsala-cask/",
+            "url": "https://www.boanndistillery.ie/product/the-whistler-mosaic-marsala-cask/",
+            "domain": "boanndistillery.ie",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.boanndistillery.ie/product/the-whistler-21-yo-madeira-justinos-collaboration-twin-pack/",
+            "url": "https://www.boanndistillery.ie/product/the-whistler-21-yo-madeira-justinos-collaboration-twin-pack/",
+            "domain": "boanndistillery.ie",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.boanndistillery.ie/product/the-whistler-10-year-old-french-oak-finish-single-malt/",
+            "url": "https://www.boanndistillery.ie/product/the-whistler-10-year-old-french-oak-finish-single-malt/",
+            "domain": "boanndistillery.ie",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.boanndistillery.ie/product/the-whistler-oloroso-sherry-cask-blend/",
+            "url": "https://www.boanndistillery.ie/product/the-whistler-oloroso-sherry-cask-blend/",
+            "domain": "boanndistillery.ie",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+            "url": "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+            "domain": "thewhiskeywash.com",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.boanndistillery.ie/blog/auto-draft-4/",
+            "url": "https://www.boanndistillery.ie/blog/auto-draft-4/",
+            "domain": "boanndistillery.ie",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.boanndistillery.ie/",
+            "url": "https://www.boanndistillery.ie/",
+            "domain": "boanndistillery.ie",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.masterofmalt.com/whiskies/boann/the-whistler-the-good-the-bad-and-the-smoky-irish-whiskey/",
+            "url": "https://www.masterofmalt.com/whiskies/boann/the-whistler-the-good-the-bad-and-the-smoky-irish-whiskey/",
+            "domain": "masterofmalt.com",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://cask.boanndistillery.ie/wp-content/uploads/2022/12/Boann-Whiskey-Brochure_August-2022.pdf",
+            "url": "https://cask.boanndistillery.ie/wp-content/uploads/2022/12/Boann-Whiskey-Brochure_August-2022.pdf",
+            "domain": "cask.boanndistillery.ie",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://cask.boanndistillery.ie/wp-content/uploads/2023/09/Boann-Whiskey-Brochure-2023.pdf",
+            "url": "https://cask.boanndistillery.ie/wp-content/uploads/2023/09/Boann-Whiskey-Brochure-2023.pdf",
+            "domain": "cask.boanndistillery.ie",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whistler Bodega Cask Irish Single Malt Whiskey Review: Tasting Notes & Analysis",
+            "url": "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai",
+            "domain": "thewhiskeywash.com",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Irish Whiskey Crafted with Passion - Boann Distillery",
+            "url": "https://www.boanndistillery.ie/?utm_source=openai",
+            "domain": "boanndistillery.ie",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whistler P.X. I Love You Single Malt Irish Whiskey",
+            "url": "https://www.boanndistillery.ie/our-whiskeys/single-malts/?utm_source=openai",
+            "domain": "boanndistillery.ie",
+            "description": "The official producer appears to be **Boann Distillery**, which owns **The Whistler** brand. I could not find an obvious current official product page for **“The Whistler Bodega Cask Single Malt Irish Whiskey”** itself, but an independent review and Boann materials support the key identity details.\n\nWhat the sources support:\n\n- **Bottle/release name:** *The Whistler Bodega Cask Irish Single Malt* is documented by an independent review. ([thewhiskeywash.com](https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/?utm_source=openai))\n- **Style / category:** ",
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

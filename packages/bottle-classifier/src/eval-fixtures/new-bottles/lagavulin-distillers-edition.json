@@ -1,0 +1,13 @@
+{
+  "id": "lagavulin-distillers-edition-parent",
+  "referenceName": "Lagavulin Distillers Edition",
+  "expectedBottleName": "Lagavulin Distillers Edition",
+  "summary": "Keep Lagavulin Distillers Edition as bottle identity when no release year is present instead of inventing a child annual release from the family wording alone.",
+  "peatedBottleIds": [44006],
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": null
+  }
+}

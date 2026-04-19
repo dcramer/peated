@@ -1,0 +1,77 @@
+{
+  "id": "image-backed-listing-matches-an-existing-exact-cask-bottle-from-image-first-extraction",
+  "name": "image-backed listing: matches an existing exact-cask bottle from image-first extraction",
+  "input": {
+    "reference": {
+      "name": "SMWS 41.176",
+      "url": "https://newmake.smwsa.com/products/cask-no-41-176",
+      "imageUrl": "https://optimise2.assets-servd.host/smw-casper/production/product-assets/Bottle%20Images/41.176-US-web.png?w=391&h=1560&auto=compress%2Cformat&fit=crop&dm=1701177310&s=6befd8c2d4b968942ed306a443c5fe2d"
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "SMWS 41.176 Baristaliscious",
+        "brand": "The Scotch Malt Whisky Society",
+        "bottler": "The Scotch Malt Whisky Society",
+        "series": null,
+        "distillery": ["Dailuaine"],
+        "category": "single_malt",
+        "statedAge": 17,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": true,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.97,
+        "source": ["exact"],
+        "bottleId": 650,
+        "fullName": "SMWS 41.176 Baristaliscious"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["41.176"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "SMWS 41.176 Baristaliscious",
+          "brand": "The Scotch Malt Whisky Society",
+          "bottler": "The Scotch Malt Whisky Society",
+          "series": null,
+          "distillery": ["Dailuaine"],
+          "category": "single_malt",
+          "statedAge": 17,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": true,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.97,
+          "source": ["exact"],
+          "bottleId": 650,
+          "fullName": "SMWS 41.176 Baristaliscious"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "exact_cask",
+    "matchedBottleId": 650,
+    "summary": "Use the bottle image and fallback title context to recognize the SMWS 41.176 exact-cask bottle and match the existing candidate safely."
+  }
+}

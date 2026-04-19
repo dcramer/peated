@@ -1,0 +1,16 @@
+{
+  "id": "four-roses-limited-edition-small-batch-2017",
+  "referenceName": "Four Roses Limited Edition Small Batch 2017",
+  "expectedBottleName": "Four Roses Limited Edition Small Batch",
+  "summary": "Treat Four Roses Limited Edition Small Batch 2017 as the annual 2017 release under the stable family instead of inventing Batch 2017 or truncating the parent bottle name.",
+  "peatedBottleIds": [44010],
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle_plus_release",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": {
+      "edition": null,
+      "releaseYear": 2017
+    }
+  }
+}

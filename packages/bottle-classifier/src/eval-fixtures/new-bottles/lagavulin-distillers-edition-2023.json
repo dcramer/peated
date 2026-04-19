@@ -1,0 +1,16 @@
+{
+  "id": "lagavulin-distillers-edition-2023",
+  "referenceName": "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
+  "expectedBottleName": "Lagavulin Distillers Edition",
+  "summary": "Treat Lagavulin Distiller's Edition 2023 as a year-specific Distillers Edition release instead of keeping the year on the bottle or ignoring it as retailer noise.",
+  "peatedBottleIds": [44006],
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle_plus_release",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": {
+      "edition": null,
+      "releaseYear": 2023
+    }
+  }
+}

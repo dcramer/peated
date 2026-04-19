@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "site:smws.com RW6.5 SMWS Kyro"
+    },
+    "recordedAt": "2026-04-19T16:24:57.644Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "site:smws.com RW6.5 SMWS Kyro",
+          "summary": "I found an official SMWS match for **RW6.5**, and it points to **Kyrö**.\n\n**Confirmed from SMWS official pages:**\n- **Bottle name:** *Appley ever after* ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- **Cask number:** **RW6.5** ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- ",
+          "results": [
+            {
+              "title": "https://smws.com/appley-ever-after/",
+              "url": "https://smws.com/appley-ever-after/",
+              "domain": "smws.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/archive?distillery_code=594&limit=12&page=168&whisky_flavour=71_78_76",
+              "url": "https://smws.com/archive?distillery_code=594&limit=12&page=168&whisky_flavour=71_78_76",
+              "domain": "smws.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/archive?distillery_code=664&page=105",
+              "url": "https://smws.com/archive?distillery_code=664&page=105",
+              "domain": "smws.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/brands/single-cask-spirits.html?page=8",
+              "url": "https://smws.com/brands/single-cask-spirits.html?page=8",
+              "domain": "smws.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/all-whisky/whisky-by-age/under-12-years/?page=3",
+              "url": "https://smws.com/all-whisky/whisky-by-age/under-12-years/?page=3",
+              "domain": "smws.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://smws.com/archive?SID=0s9u156rtl6mjor8b6gg01rqu4&___from_store=default&___store=smws_fr&distillery_code=562&limit=60&page=2",
+              "url": "https://smws.com/archive?SID=0s9u156rtl6mjor8b6gg01rqu4&___from_store=default&___store=smws_fr&distillery_code=562&limit=60&page=2",
+              "domain": "smws.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "site:smws.com RW6.5 SMWS Kyro",
+        "summary": "I found an official SMWS match for **RW6.5**, and it points to **Kyrö**.\n\n**Confirmed from SMWS official pages:**\n- **Bottle name:** *Appley ever after* ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- **Cask number:** **RW6.5** ([smws.com](https://smws.com/appley-ever-after/?utm_source=openai))\n- ",
+        "results": [
+          {
+            "title": "https://smws.com/appley-ever-after/",
+            "url": "https://smws.com/appley-ever-after/",
+            "domain": "smws.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/archive?distillery_code=594&limit=12&page=168&whisky_flavour=71_78_76",
+            "url": "https://smws.com/archive?distillery_code=594&limit=12&page=168&whisky_flavour=71_78_76",
+            "domain": "smws.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/archive?distillery_code=664&page=105",
+            "url": "https://smws.com/archive?distillery_code=664&page=105",
+            "domain": "smws.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/brands/single-cask-spirits.html?page=8",
+            "url": "https://smws.com/brands/single-cask-spirits.html?page=8",
+            "domain": "smws.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/all-whisky/whisky-by-age/under-12-years/?page=3",
+            "url": "https://smws.com/all-whisky/whisky-by-age/under-12-years/?page=3",
+            "domain": "smws.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://smws.com/archive?SID=0s9u156rtl6mjor8b6gg01rqu4&___from_store=default&___store=smws_fr&distillery_code=562&limit=60&page=2",
+            "url": "https://smws.com/archive?SID=0s9u156rtl6mjor8b6gg01rqu4&___from_store=default&___store=smws_fr&distillery_code=562&limit=60&page=2",
+            "domain": "smws.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

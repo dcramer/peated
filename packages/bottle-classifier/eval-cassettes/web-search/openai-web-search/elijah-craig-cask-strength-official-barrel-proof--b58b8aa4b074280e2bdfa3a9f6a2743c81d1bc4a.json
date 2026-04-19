@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Elijah Craig Cask Strength official Barrel Proof"
+    },
+    "recordedAt": "2026-04-19T22:37:19.429Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Elijah Craig Cask Strength official Barrel Proof",
+          "summary": "**Elijah Craig Cask Strength / “official Barrel Proof”** is the official **Elijah Craig Barrel Proof Kentucky Straight Bourbon Whiskey** from Heaven Hill. The official Elijah Craig page says it is **uncut**, **straight from the barrel**, and **without chill filtering**, with **each bottle hand-labeled with its unique p",
+          "results": [
+            {
+              "title": "https://heavenhilldistillery.com/william-heavenhill.php/distillerys-awards.php",
+              "url": "https://heavenhilldistillery.com/william-heavenhill.php/distillerys-awards.php",
+              "domain": "heavenhilldistillery.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://vinepair.com/booze-news/elijah-craig-15-year-old-single-barrel-bourbon-108-proof/",
+              "url": "https://vinepair.com/booze-news/elijah-craig-15-year-old-single-barrel-bourbon-108-proof/",
+              "domain": "vinepair.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://elijahcraig.com/barrel-proof",
+              "url": "https://elijahcraig.com/barrel-proof",
+              "domain": "elijahcraig.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/New-Whiskey-Releases-January-17-2025",
+              "url": "https://whiskyadvocate.com/New-Whiskey-Releases-January-17-2025",
+              "domain": "whiskyadvocate.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php/barrel.php",
+              "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php/barrel.php",
+              "domain": "heavenhilldistillery.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://elijahcraig.com/our-whiskey.php",
+              "url": "https://elijahcraig.com/our-whiskey.php",
+              "domain": "elijahcraig.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Elijah Craig Cask Strength official Barrel Proof",
+        "summary": "**Elijah Craig Cask Strength / “official Barrel Proof”** is the official **Elijah Craig Barrel Proof Kentucky Straight Bourbon Whiskey** from Heaven Hill. The official Elijah Craig page says it is **uncut**, **straight from the barrel**, and **without chill filtering**, with **each bottle hand-labeled with its unique p",
+        "results": [
+          {
+            "title": "https://heavenhilldistillery.com/william-heavenhill.php/distillerys-awards.php",
+            "url": "https://heavenhilldistillery.com/william-heavenhill.php/distillerys-awards.php",
+            "domain": "heavenhilldistillery.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://vinepair.com/booze-news/elijah-craig-15-year-old-single-barrel-bourbon-108-proof/",
+            "url": "https://vinepair.com/booze-news/elijah-craig-15-year-old-single-barrel-bourbon-108-proof/",
+            "domain": "vinepair.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://elijahcraig.com/barrel-proof",
+            "url": "https://elijahcraig.com/barrel-proof",
+            "domain": "elijahcraig.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/New-Whiskey-Releases-January-17-2025",
+            "url": "https://whiskyadvocate.com/New-Whiskey-Releases-January-17-2025",
+            "domain": "whiskyadvocate.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php/barrel.php",
+            "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php/barrel.php",
+            "domain": "heavenhilldistillery.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://elijahcraig.com/our-whiskey.php",
+            "url": "https://elijahcraig.com/our-whiskey.php",
+            "domain": "elijahcraig.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

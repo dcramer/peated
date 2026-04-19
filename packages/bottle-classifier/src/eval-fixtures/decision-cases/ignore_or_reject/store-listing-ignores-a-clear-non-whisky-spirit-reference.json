@@ -1,0 +1,14 @@
+{
+  "id": "store-listing-ignores-a-clear-non-whisky-spirit-reference",
+  "name": "store listing: ignores a clear non-whisky spirit reference",
+  "input": {
+    "reference": {
+      "name": "Tito's Handmade Vodka",
+      "url": "https://shop.example/products/titos-handmade-vodka"
+    }
+  },
+  "expected": {
+    "status": "ignored",
+    "summary": "Short-circuit obvious non-whisky spirits instead of searching or trying to classify them as whisky."
+  }
+}

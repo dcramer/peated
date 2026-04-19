@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Maker's Mark Private Selection official bourbon private selection"
+    },
+    "recordedAt": "2026-04-19T15:45:31.793Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Maker's Mark Private Selection official bourbon private selection",
+          "summary": "**Maker’s Mark Private Selection** is an **official Maker’s Mark bourbon program/release line**, not just a retailer-created name. On Maker’s Mark’s official product page, it’s described as a **customized single-barrel program** built from **cask-strength Maker’s Mark**, then **finished with 10 wood-finishing staves** ",
+          "results": [
+            {
+              "title": "https://www.makersmark.com/en-us/bourbons/makers-mark-private-selection",
+              "url": "https://www.makersmark.com/en-us/bourbons/makers-mark-private-selection",
+              "domain": "makersmark.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.makersmark.com/en-us/bourbons/makers-mark-private-selection/Bam-and-Marilyns-limited-release",
+              "url": "https://www.makersmark.com/en-us/bourbons/makers-mark-private-selection/Bam-and-Marilyns-limited-release",
+              "domain": "makersmark.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.makersmark.com/distillery",
+              "url": "https://www.makersmark.com/distillery",
+              "domain": "makersmark.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.makersmark.com/en-us/los-angeles-dodgers",
+              "url": "https://www.makersmark.com/en-us/los-angeles-dodgers",
+              "domain": "makersmark.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.makersmark.com/en-us/faqs",
+              "url": "https://www.makersmark.com/en-us/faqs",
+              "domain": "makersmark.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/maker-s-mark-private-selection-bourbon",
+              "url": "https://distiller.com/spirits/maker-s-mark-private-selection-bourbon",
+              "domain": "distiller.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Maker's Mark Private Selection official bourbon private selection",
+        "summary": "**Maker’s Mark Private Selection** is an **official Maker’s Mark bourbon program/release line**, not just a retailer-created name. On Maker’s Mark’s official product page, it’s described as a **customized single-barrel program** built from **cask-strength Maker’s Mark**, then **finished with 10 wood-finishing staves** ",
+        "results": [
+          {
+            "title": "https://www.makersmark.com/en-us/bourbons/makers-mark-private-selection",
+            "url": "https://www.makersmark.com/en-us/bourbons/makers-mark-private-selection",
+            "domain": "makersmark.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.makersmark.com/en-us/bourbons/makers-mark-private-selection/Bam-and-Marilyns-limited-release",
+            "url": "https://www.makersmark.com/en-us/bourbons/makers-mark-private-selection/Bam-and-Marilyns-limited-release",
+            "domain": "makersmark.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.makersmark.com/distillery",
+            "url": "https://www.makersmark.com/distillery",
+            "domain": "makersmark.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.makersmark.com/en-us/los-angeles-dodgers",
+            "url": "https://www.makersmark.com/en-us/los-angeles-dodgers",
+            "domain": "makersmark.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.makersmark.com/en-us/faqs",
+            "url": "https://www.makersmark.com/en-us/faqs",
+            "domain": "makersmark.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/maker-s-mark-private-selection-bourbon",
+            "url": "https://distiller.com/spirits/maker-s-mark-private-selection-bourbon",
+            "domain": "distiller.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

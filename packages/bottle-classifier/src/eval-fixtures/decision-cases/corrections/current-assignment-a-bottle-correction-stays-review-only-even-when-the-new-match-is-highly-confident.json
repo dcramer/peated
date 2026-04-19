@@ -1,0 +1,139 @@
+{
+  "id": "current-assignment-a-bottle-correction-stays-review-only-even-when-the-new-match-is-highly-confident",
+  "name": "current assignment: a bottle correction stays review-only even when the new match is highly confident",
+  "input": {
+    "reference": {
+      "name": "Wild Turkey Rare Breed Rye",
+      "url": "https://shop.example/products/rare-breed-rye",
+      "currentBottleId": 500
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Wild Turkey Rare Breed Barrel Proof",
+        "brand": "Wild Turkey",
+        "bottler": null,
+        "series": "Rare Breed",
+        "distillery": [],
+        "category": "bourbon",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": true,
+        "singleCask": null,
+        "abv": 58.4,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.66,
+        "source": ["vector"],
+        "bottleId": 500,
+        "fullName": "Wild Turkey Rare Breed Barrel Proof"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["wild turkey", "rare breed", "rye"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Wild Turkey Rare Breed Rye Barrel Proof",
+          "brand": "Wild Turkey",
+          "bottler": null,
+          "series": "Rare Breed",
+          "distillery": [],
+          "category": "rye",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": true,
+          "singleCask": null,
+          "abv": 56.1,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.93,
+          "source": ["text"],
+          "bottleId": 501,
+          "fullName": "Wild Turkey Rare Breed Rye Barrel Proof"
+        }
+      ]
+    },
+    {
+      "when": ["rare breed", "rye", "barrel proof"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Wild Turkey Rare Breed Rye Barrel Proof",
+          "brand": "Wild Turkey",
+          "bottler": null,
+          "series": "Rare Breed",
+          "distillery": [],
+          "category": "rye",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": true,
+          "singleCask": null,
+          "abv": 56.1,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.93,
+          "source": ["text"],
+          "bottleId": 501,
+          "fullName": "Wild Turkey Rare Breed Rye Barrel Proof"
+        }
+      ]
+    },
+    {
+      "when": ["rare breed", "rye", "cask_strength"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Wild Turkey Rare Breed Rye Barrel Proof",
+          "brand": "Wild Turkey",
+          "bottler": null,
+          "series": "Rare Breed",
+          "distillery": [],
+          "category": "rye",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": true,
+          "singleCask": null,
+          "abv": 56.1,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.93,
+          "source": ["text"],
+          "bottleId": 501,
+          "fullName": "Wild Turkey Rare Breed Rye Barrel Proof"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 501,
+    "confidenceAtLeast": 96,
+    "verifyEligible": false,
+    "summary": "A high-confidence bottle replacement should still stay review-only because downstream price matching treats it as a correction rather than an auto-verifiable existing match."
+  }
+}

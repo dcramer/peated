@@ -1,0 +1,87 @@
+name: Evals
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - labeled
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      evals_requested: ${{ steps.gate.outputs.evals_requested }}
+      openai_ready: ${{ steps.gate.outputs.openai_ready }}
+      should_run: ${{ steps.gate.outputs.should_run }}
+    steps:
+      - id: gate
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          set -euo pipefail
+
+          label_name="trigger-evals"
+          action="$(jq -r '.action // ""' "$GITHUB_EVENT_PATH")"
+
+          evals_requested=false
+          if [[ "$action" == "labeled" ]]; then
+            if [[ "$(jq -r '.label.name // ""' "$GITHUB_EVENT_PATH")" == "$label_name" ]]; then
+              evals_requested=true
+            fi
+          elif jq -e --arg label_name "$label_name" '.pull_request.labels[]?.name | select(. == $label_name)' "$GITHUB_EVENT_PATH" >/dev/null; then
+            evals_requested=true
+          fi
+
+          if [[ -n "${OPENAI_API_KEY:-}" ]]; then
+            openai_ready=true
+          else
+            openai_ready=false
+          fi
+
+          should_run=false
+          if [[ "$evals_requested" == "true" && "$openai_ready" == "true" ]]; then
+            should_run=true
+          fi
+
+          echo "evals_requested=$evals_requested" >> "$GITHUB_OUTPUT"
+          echo "openai_ready=$openai_ready" >> "$GITHUB_OUTPUT"
+          echo "should_run=$should_run" >> "$GITHUB_OUTPUT"
+          {
+            echo "## Eval Gate"
+            echo
+            echo "- label: $label_name"
+            echo "- evals_requested: $evals_requested"
+            echo "- openai_ready: $openai_ready"
+            echo "- will_run: $should_run"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  evals:
+    needs: gate
+    if: needs.gate.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.14.0"
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @peated/bottle-classifier evals

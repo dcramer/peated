@@ -112,7 +112,7 @@ Evaluation order:
 
 1. trusted SMWS fast path
 2. extract structured identity from image or text
-3. auto-ignore obvious non-whisky rows if extraction failed
+3. auto-ignore obvious non-whisky rows plus clearly non-single-bottle listings such as multipacks, gift sets, sampler bundles, and damaged-condition sale listings
 4. build local bottle and release candidates
 5. ask the classifier for `match_existing`, `correction`, `create_new`, or `no_match`
 6. sanitize classifier output against real candidates and resolved entities
@@ -194,6 +194,8 @@ It may use:
 - local entity search
 - web search
 
+Web search should stay narrow and targeted at a concrete unresolved trait. In normal cases the classifier should stop after one web search call; a second call is reserved for weak or contradictory first-pass results.
+
 It returns a reviewed classification result with:
 
 - `status = ignored | classified`
@@ -215,6 +217,8 @@ Additional rules:
 - `matchedReleaseId`, when present, must be a known candidate release id
 - `parentBottleId`, when present for release creation, must be a known candidate bottle id
 - `identityScope` is reviewed as `product | exact_cask`
+- Unsupported novelty flavored-whiskey or whiskey-liqueur products should end in classifier-driven `no_match`, but a flavor-adjacent noun in the title is not enough to exclude a bottle by itself
+- When re-evaluation auto-ignores a bundle or damaged-condition listing, price matching should also clear any stale `store_price.bottleId` / `releaseId` assignment instead of leaving the old match attached
 
 ## Proposal Types
 
@@ -238,24 +242,29 @@ Additional rules:
 - `errored`
 
 `verified` is driven by automation policy on top of the classifier result.
-Most verified matches come from strong deterministic evidence.
-For unmatched exact-match proposals, very high classifier confidence may break ties
-once the automation checks find no conflicts.
-High-confidence bottle-only matches may also verify when authoritative
-off-retailer evidence confirms the reviewed target identity.
+For existing-match proposals, that policy should stay thin:
+
+- deterministic blockers must be empty
+- the classifier confidence must clear the shared verification threshold
+- reaffirming the current bottle/release assignment uses a lower threshold because the risk is lower; today that threshold is `80`
+- new unmatched matches only verify at the higher bottle-only threshold; today that threshold is `96`
+- the classifier should be the layer that decides when a raw-title reaffirmation or authoritative off-retailer confirmation justifies the `96+` confidence band
+
+Evidence such as exact aliases, raw retailer titles, or authoritative off-retailer web confirmation should raise or lower classifier confidence upstream rather than creating separate downstream verify heuristics.
 
 ## Automation
 
 Automation is schema-first:
 
 - bottle and release confidence are not the same thing
-- model confidence is usually advisory
+- existing-match verification should come from classifier confidence plus deterministic blockers, not a second layer of retailer/title/exact-match heuristics
 - release-specific automation requires explicit validation of the release traits
 - originating retailer evidence is never decisive for differentiating traits
 
 Important rule:
 
 - if bottle confidence is high and release confidence is not, persist the bottle and keep `releaseId = null`
+- unmatched release-level matches should not auto-verify from confidence alone
 
 ### Trusted SMWS fast path
 

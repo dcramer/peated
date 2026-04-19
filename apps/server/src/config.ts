@@ -61,12 +61,12 @@ export default {
   BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES: Number(
     process.env.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES ||
       process.env.PRICE_MATCH_MAX_SEARCH_QUERIES ||
-      "5",
+      "3",
   ),
   PRICE_MATCH_MAX_SEARCH_QUERIES: Number(
     process.env.PRICE_MATCH_MAX_SEARCH_QUERIES ||
       process.env.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES ||
-      "5",
+      "3",
   ),
 
   DISCORD_WEBHOOK: process.env.DISCORD_WEBHOOK,

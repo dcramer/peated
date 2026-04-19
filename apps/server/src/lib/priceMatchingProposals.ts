@@ -521,28 +521,19 @@ function getProposalType(
 
 function getProposalStatus(
   price: StorePrice,
-  extractedLabel: ExtractedBottleDetails | null,
   decision: StorePriceMatchDecision,
   automationAssessment: StorePriceMatchAutomationAssessment | null,
-  candidates: PriceMatchCandidate[],
-  searchEvidence: SearchEvidence[],
 ): StorePriceMatchProposal["status"] {
   if (
     automationAssessment &&
     shouldVerifyStorePriceMatch({
       action: decision.action,
-      price,
-      priceUrl: price.url,
+      currentBottleId: price.bottleId,
+      currentReleaseId: price.releaseId ?? null,
       suggestedBottleId: decision.suggestedBottleId,
       suggestedReleaseId: decision.suggestedReleaseId ?? null,
       modelConfidence: decision.confidence,
       automationBlockers: automationAssessment.automationBlockers,
-      decisiveMatchAttributes: automationAssessment.decisiveMatchAttributes,
-      structuredMatchRequiresStatedAge:
-        automationAssessment.structuredMatchRequiresStatedAge,
-      extractedLabel,
-      searchEvidence,
-      candidateBottles: candidates,
     })
   ) {
     return "verified";
@@ -926,6 +917,7 @@ export async function upsertStorePriceMatchProposal({
   error,
   statusOverride,
   expectedProcessingToken,
+  tx = db,
 }: {
   price: StorePrice;
   extractedLabel: ExtractedBottleDetails | null;
@@ -936,19 +928,13 @@ export async function upsertStorePriceMatchProposal({
   error?: string | null;
   statusOverride?: StorePriceMatchProposal["status"] | null;
   expectedProcessingToken?: string;
+  tx?: AnyDatabase;
 }) {
   const proposalType = decision ? getProposalType(price, decision) : "no_match";
   const status =
     statusOverride ??
     (decision
-      ? getProposalStatus(
-          price,
-          extractedLabel,
-          decision,
-          automationAssessment ?? null,
-          candidates,
-          searchEvidence ?? [],
-        )
+      ? getProposalStatus(price, decision, automationAssessment ?? null)
       : "errored");
   const creationTarget =
     decision?.action === "create_new"
@@ -981,7 +967,7 @@ export async function upsertStorePriceMatchProposal({
     reviewedAt: null,
     updatedAt: sql`NOW()`,
   };
-  const [proposal] = await db
+  const [proposal] = await tx
     .insert(storePriceMatchProposals)
     .values({
       priceId: price.id,
@@ -1001,6 +987,20 @@ export async function upsertStorePriceMatchProposal({
   }
 
   return proposal;
+}
+
+async function clearIgnoredStorePriceAssignmentInTransaction(
+  tx: AnyDatabase,
+  priceId: number,
+) {
+  await tx
+    .update(storePrices)
+    .set({
+      bottleId: null,
+      releaseId: null,
+      updatedAt: sql`NOW()`,
+    })
+    .where(eq(storePrices.id, priceId));
 }
 
 async function getExistingBottleReleaseInTransaction(
@@ -1308,13 +1308,22 @@ export async function resolveStorePriceMatchProposal(
     searchEvidence = classification.artifacts.searchEvidence;
 
     if (isIgnoredBottleClassification(classification)) {
-      return await upsertStorePriceMatchProposal({
-        price,
-        extractedLabel,
-        candidates,
-        searchEvidence,
-        statusOverride: "ignored",
-        expectedProcessingToken: processingToken,
+      return await db.transaction(async (tx) => {
+        const proposal = await upsertStorePriceMatchProposal({
+          price,
+          extractedLabel,
+          candidates,
+          searchEvidence,
+          statusOverride: "ignored",
+          expectedProcessingToken: processingToken,
+          tx,
+        });
+
+        if (price.bottleId !== null || price.releaseId !== null) {
+          await clearIgnoredStorePriceAssignmentInTransaction(tx, price.id);
+        }
+
+        return proposal;
       });
     }
 

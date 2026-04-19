@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Woodford Reserve Double Double Oaked official limited release bourbon"
+    },
+    "recordedAt": "2026-04-19T21:18:37.691Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Woodford Reserve Double Double Oaked official limited release bourbon",
+          "summary": "**Woodford Reserve Double Double Oaked** is an **official Woodford Reserve limited release bourbon**. Official Woodford Reserve pages confirm it as a **double-barreled bourbon** bottled at **90.4 proof** and describe it as **fully mature Double Oaked Bourbon finished for an additional two years in a second, heavily toa",
+          "results": [
+            {
+              "title": "https://vinepair.com/booze-news/woodford-reserve-double-double-oaked-available-nationwide/",
+              "url": "https://vinepair.com/booze-news/woodford-reserve-double-double-oaked-available-nationwide/",
+              "domain": "vinepair.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://shop.woodfordreserve.com/distillery-series-12-year-old-american-single-malt-whiskey/",
+              "url": "https://shop.woodfordreserve.com/distillery-series-12-year-old-american-single-malt-whiskey/",
+              "domain": "shop.woodfordreserve.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://shop.woodfordreserve.com/limited-editions/",
+              "url": "https://shop.woodfordreserve.com/limited-editions/",
+              "domain": "shop.woodfordreserve.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+              "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+              "domain": "woodfordreserve.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+              "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+              "domain": "shop.woodfordreserve.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+              "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+              "domain": "woodfordreserve.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Woodford Reserve Double Double Oaked official limited release bourbon",
+        "summary": "**Woodford Reserve Double Double Oaked** is an **official Woodford Reserve limited release bourbon**. Official Woodford Reserve pages confirm it as a **double-barreled bourbon** bottled at **90.4 proof** and describe it as **fully mature Double Oaked Bourbon finished for an additional two years in a second, heavily toa",
+        "results": [
+          {
+            "title": "https://vinepair.com/booze-news/woodford-reserve-double-double-oaked-available-nationwide/",
+            "url": "https://vinepair.com/booze-news/woodford-reserve-double-double-oaked-available-nationwide/",
+            "domain": "vinepair.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://shop.woodfordreserve.com/distillery-series-12-year-old-american-single-malt-whiskey/",
+            "url": "https://shop.woodfordreserve.com/distillery-series-12-year-old-american-single-malt-whiskey/",
+            "domain": "shop.woodfordreserve.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://shop.woodfordreserve.com/limited-editions/",
+            "url": "https://shop.woodfordreserve.com/limited-editions/",
+            "domain": "shop.woodfordreserve.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+            "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+            "domain": "shop.woodfordreserve.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+            "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

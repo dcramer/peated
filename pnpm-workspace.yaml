@@ -27,9 +27,9 @@ catalog:
   typescript: ^5.9.3
   "@types/node": ^22.19.17
   "@types/pg": ^8.18.0
-  vitest: "~3.2.4"
-  "@vitest/coverage-v8": "~3.2.4"
-  "vite-tsconfig-paths": "^6.1.1"
+  vite: ^8.0.8
+  vitest: "~4.1.4"
+  "@vitest/coverage-v8": "~4.1.4"
   zod: ^4.1.8
 
   react: ^18.2.0
