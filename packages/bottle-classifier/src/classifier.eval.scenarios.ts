@@ -13,6 +13,15 @@ export type ClassifierEvalScenario =
   | "corrections"
   | "ignore_or_reject";
 
+export const LIVE_CLASSIFIER_EVAL_SCENARIOS = [
+  "new_bottles",
+  "match_existing",
+  "corrections",
+] as const;
+
+export type LiveClassifierEvalScenario =
+  (typeof LIVE_CLASSIFIER_EVAL_SCENARIOS)[number];
+
 export type DecisionScenarioEvalCase = {
   kind: "decision";
   scenario: ClassifierEvalScenario;
@@ -95,4 +104,10 @@ export function getClassifierScenarioEvalCases(
   return CLASSIFIER_SCENARIO_EVAL_CASES.filter(
     (testCase) => testCase.scenario === scenario,
   );
+}
+
+export function getClassifierLiveEvalCases(
+  scenario: LiveClassifierEvalScenario,
+): ClassifierScenarioEvalCase[] {
+  return getClassifierScenarioEvalCases(scenario);
 }

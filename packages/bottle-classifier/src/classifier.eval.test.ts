@@ -7,9 +7,9 @@ import type {
   SearchResponseFixture,
 } from "./classifier.eval.fixtures";
 import {
-  getClassifierScenarioEvalCases,
-  type ClassifierEvalScenario,
+  getClassifierLiveEvalCases,
   type ClassifierScenarioEvalCase,
+  type LiveClassifierEvalScenario,
 } from "./classifier.eval.scenarios";
 import { createBottleClassifier } from "./classifierRuntime";
 import type { BottleCandidate } from "./classifierTypes";
@@ -35,11 +35,8 @@ function parseEvalCase(value: string): ClassifierScenarioEvalCase {
   return JSON.parse(value) as ClassifierScenarioEvalCase;
 }
 
-function getScenarioEvalName(
-  label: string,
-  testCase: ClassifierScenarioEvalCase,
-): string {
-  return `[${label}] ${testCase.testCase.name}`;
+function getScenarioEvalName(testCase: ClassifierScenarioEvalCase): string {
+  return testCase.testCase.input.reference.name;
 }
 
 function getScenarioEvalSummary(testCase: ClassifierScenarioEvalCase): string {
@@ -541,7 +538,7 @@ async function runScenarioEvalCase(testCase: ClassifierScenarioEvalCase) {
 
 const SCENARIO_CONFIG: Array<{
   label: string;
-  scenario: ClassifierEvalScenario;
+  scenario: LiveClassifierEvalScenario;
   threshold: number;
 }> = [
   {
@@ -559,11 +556,6 @@ const SCENARIO_CONFIG: Array<{
     scenario: "corrections",
     threshold: 0.8,
   },
-  {
-    label: "ignore or reject",
-    scenario: "ignore_or_reject",
-    threshold: 0.8,
-  },
 ];
 
 for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
@@ -571,8 +563,8 @@ for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
     skipIf: () => !process.env.OPENAI_API_KEY,
     timeout: 300000,
     data: async () =>
-      getClassifierScenarioEvalCases(scenario).map((testCase) => ({
-        name: getScenarioEvalName(label, testCase),
+      getClassifierLiveEvalCases(scenario).map((testCase) => ({
+        name: getScenarioEvalName(testCase),
         input: serializeEvalCase(testCase),
         expected: {
           summary: getScenarioEvalSummary(testCase),

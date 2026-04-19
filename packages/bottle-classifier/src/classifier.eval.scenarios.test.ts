@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { CLASSIFIER_SCENARIO_EVAL_CASES } from "./classifier.eval.scenarios";
+import {
+  CLASSIFIER_SCENARIO_EVAL_CASES,
+  LIVE_CLASSIFIER_EVAL_SCENARIOS,
+  getClassifierLiveEvalCases,
+} from "./classifier.eval.scenarios";
 
 describe("classifier eval scenarios", () => {
   test("keeps every workflow scenario populated", () => {
@@ -60,6 +64,14 @@ describe("classifier eval scenarios", () => {
         testCase.testCase.expected.status === "ignored" ||
           testCase.testCase.expected.action === "no_match",
       ).toBe(true);
+    }
+  });
+
+  test("keeps live classifier evals focused on bottle-backed scenarios", () => {
+    expect(LIVE_CLASSIFIER_EVAL_SCENARIOS).not.toContain("ignore_or_reject");
+
+    for (const scenario of LIVE_CLASSIFIER_EVAL_SCENARIOS) {
+      expect(getClassifierLiveEvalCases(scenario).length).toBeGreaterThan(0);
     }
   });
 });
