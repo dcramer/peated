@@ -14,6 +14,7 @@ export {
   applyApprovedStorePriceMatch,
   applyApprovedStorePriceMatchInTransaction,
   applyApprovedStorePriceMatchProposalInTransaction,
+  canClearIgnoredStorePriceAssignment,
   createBottleFromStorePriceMatchProposal,
   getProposalTargets,
   getStorePriceMatchProposalForReviewInTransaction,

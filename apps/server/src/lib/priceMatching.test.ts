@@ -14,6 +14,7 @@ import {
 } from "@peated/server/lib/bottleReferenceCandidates";
 import {
   applyApprovedStorePriceMatch,
+  canClearIgnoredStorePriceAssignment,
   resolveStorePriceMatchProposal,
 } from "@peated/server/lib/priceMatching";
 import { eq, sql } from "drizzle-orm";
@@ -4744,6 +4745,93 @@ describe("priceMatching", () => {
       processingToken: null,
       processingQueuedAt: null,
       processingExpiresAt: null,
+    });
+  });
+
+  test("ignored clear guard requires the active processing lease owner", () => {
+    expect(
+      canClearIgnoredStorePriceAssignment({
+        proposal: {
+          processingToken: "lease-token",
+          processingExpiresAt: new Date(Date.now() + 60_000),
+        },
+        processingToken: "lease-token",
+      }),
+    ).toBe(true);
+
+    expect(
+      canClearIgnoredStorePriceAssignment({
+        proposal: {
+          processingToken: "other-token",
+          processingExpiresAt: new Date(Date.now() + 60_000),
+        },
+        processingToken: "lease-token",
+      }),
+    ).toBe(false);
+
+    expect(
+      canClearIgnoredStorePriceAssignment({
+        proposal: {
+          processingToken: "lease-token",
+          processingExpiresAt: new Date(Date.now() - 60_000),
+        },
+        processingToken: "lease-token",
+      }),
+    ).toBe(false);
+  });
+
+  test("auto ignored bundle listings do not clear assignments that changed during resolution", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const staleBottle = await fixtures.Bottle({});
+    const staleRelease = await fixtures.BottleRelease({
+      bottleId: staleBottle.id,
+    });
+    const replacementBottle = await fixtures.Bottle({});
+    const replacementRelease = await fixtures.BottleRelease({
+      bottleId: replacementBottle.id,
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: staleBottle.id,
+      name: "Buffalo Trace Kentucky Straight Bourbon Whiskey 12 Pack",
+      imageUrl: null,
+    });
+    await db
+      .update(storePrices)
+      .set({
+        releaseId: staleRelease.id,
+      })
+      .where(eq(storePrices.id, price.id));
+
+    vi.mocked(classifyBottleReference).mockImplementationOnce(async () => {
+      await db
+        .update(storePrices)
+        .set({
+          bottleId: replacementBottle.id,
+          releaseId: replacementRelease.id,
+        })
+        .where(eq(storePrices.id, price.id));
+
+      return buildMockBottleReferenceClassification({
+        status: "ignored",
+        ignoreReason:
+          "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
+      });
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+
+    expect(proposal.status).toBe("ignored");
+    expect(updatedPrice).toMatchObject({
+      bottleId: replacementBottle.id,
+      releaseId: replacementRelease.id,
     });
   });
 

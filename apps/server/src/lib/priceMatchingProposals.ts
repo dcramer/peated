@@ -585,6 +585,26 @@ async function reloadStorePriceMatchProposalByPriceId(
   return proposal;
 }
 
+export function canClearIgnoredStorePriceAssignment({
+  proposal,
+  processingToken,
+}: {
+  proposal: Pick<
+    StorePriceMatchProposal,
+    "processingToken" | "processingExpiresAt"
+  >;
+  processingToken?: string;
+}) {
+  if (!processingToken) {
+    return true;
+  }
+
+  return (
+    proposal.processingToken === processingToken &&
+    hasActiveStorePriceMatchProposalProcessingLease(proposal)
+  );
+}
+
 async function canContinueStorePriceMatchProcessing(
   proposalId: number,
   processingToken: string,
@@ -991,7 +1011,15 @@ export async function upsertStorePriceMatchProposal({
 
 async function clearIgnoredStorePriceAssignmentInTransaction(
   tx: AnyDatabase,
-  priceId: number,
+  {
+    priceId,
+    expectedBottleId,
+    expectedReleaseId,
+  }: {
+    priceId: number;
+    expectedBottleId: number | null;
+    expectedReleaseId: number | null;
+  },
 ) {
   await tx
     .update(storePrices)
@@ -1000,7 +1028,15 @@ async function clearIgnoredStorePriceAssignmentInTransaction(
       releaseId: null,
       updatedAt: sql`NOW()`,
     })
-    .where(eq(storePrices.id, priceId));
+    .where(
+      and(
+        eq(storePrices.id, priceId),
+        expectedBottleId === null
+          ? sql`${storePrices.bottleId} IS NULL`
+          : eq(storePrices.bottleId, expectedBottleId),
+        sql`${storePrices.releaseId} IS NOT DISTINCT FROM ${expectedReleaseId}`,
+      ),
+    );
 }
 
 async function getExistingBottleReleaseInTransaction(
@@ -1319,8 +1355,18 @@ export async function resolveStorePriceMatchProposal(
           tx,
         });
 
+        if (
+          !canClearIgnoredStorePriceAssignment({ proposal, processingToken })
+        ) {
+          return proposal;
+        }
+
         if (price.bottleId !== null || price.releaseId !== null) {
-          await clearIgnoredStorePriceAssignmentInTransaction(tx, price.id);
+          await clearIgnoredStorePriceAssignmentInTransaction(tx, {
+            priceId: price.id,
+            expectedBottleId: price.bottleId,
+            expectedReleaseId: price.releaseId ?? null,
+          });
         }
 
         return proposal;
