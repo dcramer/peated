@@ -48,7 +48,7 @@
     "@types/pg": "catalog:",
     "@types/react": "catalog:",
     "@vitest/coverage-v8": "catalog:",
-    "axios": "~1.13.6",
+    "axios": "~1.15.0",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.40.3",
     "cheerio": "1.2.0",
