@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Heaven's Door Bootleg Series Vol 3 official bourbon whiskey"
+    },
+    "recordedAt": "2026-04-19T21:29:17.283Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Heaven's Door Bootleg Series Vol 3 official bourbon whiskey",
+          "summary": "I found authoritative support that **Heaven’s Door Bootleg Series Volume III** is an **official 2021 Heaven’s Door release**, specifically a **13-year-old Kentucky bourbon** finished in **Vino de Naranja casks**. Heaven’s Door’s own product page confirms those core traits and describes it as the 2021 Bootleg Series rel",
+          "results": [
+            {
+              "title": "https://whiskeycaviar.com/products/heavens-door-bootleg-series-vol-iii-vino-de-naranja-13-year-bourbon-whiskey-750-ml",
+              "url": "https://whiskeycaviar.com/products/heavens-door-bootleg-series-vol-iii-vino-de-naranja-13-year-bourbon-whiskey-750-ml",
+              "domain": "whiskeycaviar.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.spiriteddrinks.com/bob-dylans-heavens-door-spirit-unveils-the-bootleg-series-vol-iii/",
+              "url": "https://www.spiriteddrinks.com/bob-dylans-heavens-door-spirit-unveils-the-bootleg-series-vol-iii/",
+              "domain": "spiriteddrinks.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.heavensdoor.com/",
+              "url": "https://www.heavensdoor.com/",
+              "domain": "heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+              "url": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+              "domain": "distiller.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.heavensdoor.com/bootleg-series",
+              "url": "https://www.heavensdoor.com/bootleg-series",
+              "domain": "heavensdoor.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+              "url": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+              "domain": "thewhiskeywash.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Heaven's Door Bootleg Series Vol 3 official bourbon whiskey",
+        "summary": "I found authoritative support that **Heaven’s Door Bootleg Series Volume III** is an **official 2021 Heaven’s Door release**, specifically a **13-year-old Kentucky bourbon** finished in **Vino de Naranja casks**. Heaven’s Door’s own product page confirms those core traits and describes it as the 2021 Bootleg Series rel",
+        "results": [
+          {
+            "title": "https://whiskeycaviar.com/products/heavens-door-bootleg-series-vol-iii-vino-de-naranja-13-year-bourbon-whiskey-750-ml",
+            "url": "https://whiskeycaviar.com/products/heavens-door-bootleg-series-vol-iii-vino-de-naranja-13-year-bourbon-whiskey-750-ml",
+            "domain": "whiskeycaviar.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.spiriteddrinks.com/bob-dylans-heavens-door-spirit-unveils-the-bootleg-series-vol-iii/",
+            "url": "https://www.spiriteddrinks.com/bob-dylans-heavens-door-spirit-unveils-the-bootleg-series-vol-iii/",
+            "domain": "spiriteddrinks.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.heavensdoor.com/",
+            "url": "https://www.heavensdoor.com/",
+            "domain": "heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+            "url": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+            "domain": "distiller.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.heavensdoor.com/bootleg-series",
+            "url": "https://www.heavensdoor.com/bootleg-series",
+            "domain": "heavensdoor.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+            "url": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+            "domain": "thewhiskeywash.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

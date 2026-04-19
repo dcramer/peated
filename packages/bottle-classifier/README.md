@@ -9,7 +9,7 @@ This package takes a bottle reference such as a retailer listing, label OCR resu
 This package owns:
 
 - the public classifier contract
-- the shared bottle normalization corpus and classifier-facing eval fixtures
+- file-backed classifier eval fixtures and their validation
 - whisky-specific extraction prompts and parsing
 - the LLM reasoning loop, including local search, optional entity search, and web search
 - deterministic review and downgrade policy
@@ -69,7 +69,7 @@ normalizeBottleCreationDrafts({
 
 These are the package-owned pure helpers that downstream server code should
 compose instead of re-implementing. They are the main low-cost surface for
-corpus-driven edge-case tests.
+deterministic edge-case tests.
 
 Use the narrow subpath exports for specialized or internal-only surfaces:
 
@@ -78,7 +78,6 @@ import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import { normalizeBottleCreationDrafts } from "@peated/bottle-classifier/bottleCreationDrafts";
 import { deriveLegacyReleaseRepairIdentity } from "@peated/bottle-classifier/legacyReleaseRepairIdentity";
 import { resolveLegacyCreateParentClassification } from "@peated/bottle-classifier/legacyReleaseRepairResolution";
-import { BOTTLE_NORMALIZATION_CORPUS } from "@peated/bottle-classifier/normalizationCorpus";
 import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
 ```
 
@@ -150,11 +149,14 @@ These are the rules to preserve when iterating on the classifier:
 - [`src/legacyReleaseRepairResolution.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/legacyReleaseRepairResolution.test.ts): package-local repair-resolution adapter coverage
 - [`src/smws.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/smws.test.ts): package-local SMWS parsing coverage
 - [`src/classifier.eval.fixtures.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifier.eval.fixtures.ts): production-shaped eval cases
+- [`src/evalFixtureSchemas.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/evalFixtureSchemas.ts): shared schemas and file walkers for JSON-backed eval fixtures
 - [`src/classifier.eval.scenarios.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifier.eval.scenarios.ts): scenario grouping for live classifier evals
 - [`src/classifier.eval.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifier.eval.test.ts): live classifier eval harness grouped into `new bottles`, `match existing`, `corrections`, and `ignore or reject`
-- [`src/normalizationCorpus.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/normalizationCorpus.ts): shared normalization corpus with expected bottle/release boundaries
-- [`src/normalizationCorpus.eval.fixtures.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/normalizationCorpus.eval.fixtures.ts): curated normalization-boundary subset consumed by the `new bottles` live eval scenario
-- [`src/legacyReleaseRepairResolution.eval.fixtures.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/legacyReleaseRepairResolution.eval.fixtures.ts): repair-boundary eval cases derived from the shared corpus and reusable-parent safety rules
+- [`src/eval-fixtures/new-bottles/`](/home/dcramer/src/peated/packages/bottle-classifier/src/eval-fixtures/new-bottles): real-world new-bottle listing fixtures, one JSON file per case
+- [`src/eval-fixtures/decision-cases/`](/home/dcramer/src/peated/packages/bottle-classifier/src/eval-fixtures/decision-cases): decision-shape workflow fixtures grouped by scenario
+- [`src/eval-fixtures/legacy-release-repair/`](/home/dcramer/src/peated/packages/bottle-classifier/src/eval-fixtures/legacy-release-repair): repair-boundary fixtures, one JSON file per case
+- [`src/evalFixtures.validate.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/evalFixtures.validate.test.ts): explicit schema and invariants validation for all file-backed fixtures
+- [`src/legacyReleaseRepairResolution.eval.fixtures.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/legacyReleaseRepairResolution.eval.fixtures.ts): file-backed repair-boundary eval loader
 - [`src/legacyReleaseRepairResolution.eval.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/legacyReleaseRepairResolution.eval.test.ts): live repair-boundary eval harness
 
 ## Iteration Workflow
@@ -162,7 +164,7 @@ These are the rules to preserve when iterating on the classifier:
 When changing classifier behavior:
 
 1. Update or add a focused unit test for deterministic behavior.
-2. Update the normalization corpus when the behavior changes bottle versus release identity boundaries.
+2. Update or add the relevant file-backed eval fixtures when the behavior changes bottle versus release identity boundaries.
 3. Update or add realistic positive and negative eval fixtures when the behavior is model-sensitive.
    Confidence calibration belongs here too: cases that should be safe for downstream auto-verification need explicit eval expectations for the high-confidence band, while review-only matches should stay below it.
 4. Keep prompts, schemas, deterministic review logic, and pure normalization helpers aligned. Do not patch around package behavior in the server wrapper.
@@ -172,16 +174,16 @@ When changing classifier behavior:
 When adding a new bottle family or edge case:
 
 - add both a positive and a negative example when the family is ambiguous enough to regress
-- group those paired examples under a shared `contrastGroup` and use differing `contrastOutcome` values so corpus tests enforce the contrast
 - mark whether the case is `deterministic_safe`, `classifier_required`, or `block_if_uncertain`
-- record `peatedBottleIds` when the example came from a real Peated bottle page so future cleanup can trace back to the observed family
-- opt into `liveEvalCoverage: "required"` only for ambiguous cases that are worth paid classifier validation, plus rare exact-cask observation-detail cases where we need to prove the classifier preserves the program code as canonical identity
+- keep one listing per JSON file under the appropriate `src/eval-fixtures/*` directory
+- record `peatedBottleIds` for real-world new-bottle fixtures so future cleanup can trace back to the observed family
 - do not promote a variable semantic case into deterministic logic just to make a test pass
 
 Useful commands:
 
 ```bash
 pnpm evals
+pnpm --filter @peated/bottle-classifier fixtures:validate
 pnpm --filter @peated/bottle-classifier typecheck
 pnpm --filter @peated/bottle-classifier test
 pnpm --filter @peated/bottle-classifier evals

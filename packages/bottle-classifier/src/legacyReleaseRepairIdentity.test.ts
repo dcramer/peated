@@ -9,7 +9,45 @@ import {
   resolveLegacyReleaseRepairParentMatch,
   type LegacyReleaseRepairParentCandidate,
 } from "./legacyReleaseRepairIdentity";
-import { BOTTLE_NORMALIZATION_CORPUS } from "./normalizationCorpus";
+
+const LEGACY_RELEASE_REPAIR_IDENTITY_CASES = [
+  {
+    expected: {
+      edition: "Batch 24",
+      proposedParentFullName: "Springbank 12 Cask Strength",
+      releaseYear: null,
+    },
+    name: "Springbank 12 Cask Strength Batch 24",
+  },
+  {
+    expected: {
+      edition: null,
+      proposedParentFullName: "Lagavulin Distillers Edition",
+      releaseYear: 2011,
+    },
+    name: "Lagavulin Distillers Edition 2011 Release",
+  },
+  {
+    expected: {
+      edition: "Batch C923",
+      proposedParentFullName: "Elijah Craig Barrel Proof",
+      releaseYear: null,
+    },
+    name: "Elijah Craig Barrel Proof Batch C923",
+  },
+  {
+    expected: null,
+    name: "Maker's Mark Private Selection S2B13",
+  },
+  {
+    expected: null,
+    name: "Talisker 2001 The Distillers Edition",
+  },
+  {
+    expected: null,
+    name: "SMWS 6.53",
+  },
+] as const;
 
 function buildParentCandidate(
   overrides: Partial<LegacyReleaseRepairParentCandidate> = {},
@@ -34,28 +72,18 @@ function buildParentCandidate(
 }
 
 describe("deriveLegacyReleaseRepairIdentity", () => {
-  for (const example of BOTTLE_NORMALIZATION_CORPUS) {
-    test(`${example.id}: ${example.inputName}`, () => {
+  for (const testCase of LEGACY_RELEASE_REPAIR_IDENTITY_CASES) {
+    test(testCase.name, () => {
       const result = deriveLegacyReleaseRepairIdentity({
-        fullName: example.inputName,
+        fullName: testCase.name,
       });
 
-      if (
-        example.expectation.deterministicReleaseExpectation !==
-        "strong_release_marker"
-      ) {
+      if (testCase.expected === null) {
         expect(result).toBeNull();
         return;
       }
 
-      const releaseIdentity = example.expectation.releaseIdentity;
-      expect(releaseIdentity).not.toBeNull();
-
-      expect(result).toMatchObject({
-        proposedParentFullName: example.expectedBottleName,
-        edition: releaseIdentity!.edition,
-        releaseYear: releaseIdentity!.releaseYear,
-      });
+      expect(result).toMatchObject(testCase.expected);
     });
   }
 

@@ -1,0 +1,13 @@
+{
+  "id": "elijah-craig-cask-strength",
+  "referenceName": "Elijah Craig Cask Strength",
+  "expectedBottleName": "Elijah Craig Barrel Proof",
+  "summary": "Normalize Elijah Craig Cask Strength shorthand to the canonical Elijah Craig Barrel Proof bottle family unless there is an actual batch code or release marker.",
+  "peatedBottleIds": [44014],
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": null
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "smws-code-with-name",
+  "referenceName": "SMWS 72.123 Big moves and subtle details",
+  "expectedBottleName": "SMWS 72.123",
+  "summary": "Preserve the SMWS 72.123 code as the canonical exact-cask bottle identity and treat the cask subtitle as observation-only detail.",
+  "peatedBottleIds": [43670],
+  "expected": {
+    "handlingStrategy": "deterministic_safe",
+    "classifierExpectation": "exact_cask",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": null
+  }
+}

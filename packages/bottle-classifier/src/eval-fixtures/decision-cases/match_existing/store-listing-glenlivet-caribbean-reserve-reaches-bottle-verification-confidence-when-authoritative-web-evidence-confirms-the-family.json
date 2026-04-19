@@ -1,0 +1,96 @@
+{
+  "id": "store-listing-glenlivet-caribbean-reserve-reaches-bottle-verification-confidence-when-authoritative-web-evidence-confirms-the-family",
+  "name": "store listing: Glenlivet Caribbean Reserve reaches bottle verification confidence when authoritative web evidence confirms the family",
+  "input": {
+    "reference": {
+      "name": "The Glenlivet Caribbean Reserve",
+      "url": "https://shop.example/products/glenlivet-caribbean-reserve"
+    },
+    "extractedIdentity": {
+      "brand": "The Glenlivet",
+      "bottler": null,
+      "expression": "Caribbean Reserve",
+      "series": null,
+      "distillery": ["The Glenlivet"],
+      "category": "single_malt",
+      "stated_age": null,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Glenlivet Caribbean Reserve Rum Barrel Selection",
+        "brand": "Glenlivet",
+        "bottler": "Glenlivet",
+        "series": null,
+        "distillery": [],
+        "category": "single_malt",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.95,
+        "source": ["text", "brand"],
+        "bottleId": 1760,
+        "fullName": "Glenlivet Caribbean Reserve Rum Barrel Selection"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["glenlivet", "caribbean reserve"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Glenlivet Caribbean Reserve Rum Barrel Selection",
+          "brand": "Glenlivet",
+          "bottler": "Glenlivet",
+          "series": null,
+          "distillery": [],
+          "category": "single_malt",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.95,
+          "source": ["text", "brand"],
+          "bottleId": 1760,
+          "fullName": "Glenlivet Caribbean Reserve Rum Barrel Selection"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 1760,
+    "confidenceAtLeast": 96,
+    "verifyEligible": true,
+    "summary": "Use authoritative web evidence to confirm that Caribbean Reserve is the rum-barrel Glenlivet bottle and calibrate confidence high enough for downstream bottle-level verification."
+  }
+}

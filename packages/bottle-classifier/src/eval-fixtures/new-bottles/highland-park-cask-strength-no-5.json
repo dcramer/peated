@@ -1,0 +1,16 @@
+{
+  "id": "highland-park-cask-strength-no-5",
+  "referenceName": "Highland Park Cask Strength No. 5",
+  "expectedBottleName": "Highland Park Cask Strength",
+  "summary": "Treat Highland Park Cask Strength No. 5 as the Cask Strength parent plus a numbered child release instead of baking No. 5 into the bottle identity.",
+  "peatedBottleIds": [44080],
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle_plus_release",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": {
+      "edition": "No. 5",
+      "releaseYear": null
+    }
+  }
+}

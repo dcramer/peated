@@ -15,9 +15,9 @@ describe("classifier eval scenarios", () => {
     expect(counts.get("ignore_or_reject")).toBeGreaterThan(0);
   });
 
-  test("keeps normalization corpus evals inside the new-bottles workflow", () => {
+  test("keeps real-world new-bottle evals inside the new-bottles workflow", () => {
     for (const testCase of CLASSIFIER_SCENARIO_EVAL_CASES) {
-      if (testCase.kind !== "normalization") {
+      if (testCase.kind !== "new_bottle_fixture") {
         continue;
       }
 

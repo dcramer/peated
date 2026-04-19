@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import type { SearchResponseFixture } from "./classifier.eval.fixtures";
 import type { ClassifyBottleReferenceInput } from "./contract";
 import {
@@ -5,22 +7,24 @@ import {
   buildExtractedIdentity,
 } from "./evalFixtureBuilders";
 import {
-  BOTTLE_NORMALIZATION_CORPUS,
-  type BottleNormalizationCorpusExample,
   type BottleNormalizationExpectation,
-} from "./normalizationCorpus";
+  type RealWorldNewBottleFixture,
+  listFixtureFiles,
+  realWorldNewBottleFixtureSchema,
+} from "./evalFixtureSchemas";
 
-export type NormalizationCorpusEvalCase = {
-  corpusExampleId: string;
+export type RealWorldNewBottleEvalCase = {
+  fixtureId: string;
   name: string;
   input: ClassifyBottleReferenceInput;
   searchResponses?: SearchResponseFixture[];
   expectedBottleName: string;
   expected: BottleNormalizationExpectation;
   summary: string;
+  peatedBottleIds: number[];
 };
 
-type NormalizationEvalOverride = {
+type NewBottleEvalOverride = {
   input?: Omit<Partial<ClassifyBottleReferenceInput>, "reference">;
   searchResponses?: SearchResponseFixture[];
 };
@@ -90,11 +94,8 @@ const singleBarrel1792 = buildBottleCandidate({
   source: ["text"],
 });
 
-// Keep live normalization cases on the same real-bottle fixture path as the
-// main classifier scenarios. Only seed local candidates here when the corpus
-// example is meant to mirror a specific existing bottle family.
-const NORMALIZATION_EVAL_OVERRIDES: Partial<
-  Record<string, NormalizationEvalOverride>
+const REAL_WORLD_NEW_BOTTLE_EVAL_OVERRIDES: Partial<
+  Record<string, NewBottleEvalOverride>
 > = {
   "jura-12-brand-distillery": {
     input: {
@@ -191,52 +192,41 @@ const NORMALIZATION_EVAL_OVERRIDES: Partial<
   },
 };
 
+const fixtureDir = fileURLToPath(
+  new URL("./eval-fixtures/new-bottles/", import.meta.url),
+);
+
+function loadFixtureFiles(): RealWorldNewBottleFixture[] {
+  return listFixtureFiles(fixtureDir).map((filename) => {
+    const rawFixture = JSON.parse(readFileSync(filename, "utf8"));
+
+    return realWorldNewBottleFixtureSchema.parse(
+      rawFixture,
+    ) as RealWorldNewBottleFixture;
+  });
+}
+
 function buildEvalCase(
-  example: BottleNormalizationCorpusExample,
-): NormalizationCorpusEvalCase {
-  const override = NORMALIZATION_EVAL_OVERRIDES[example.id];
+  fixture: RealWorldNewBottleFixture,
+): RealWorldNewBottleEvalCase {
+  const override = REAL_WORLD_NEW_BOTTLE_EVAL_OVERRIDES[fixture.id];
 
   return {
-    corpusExampleId: example.id,
-    name: example.inputName,
+    fixtureId: fixture.id,
+    name: fixture.referenceName,
     input: {
       reference: {
-        name: example.inputName,
+        name: fixture.referenceName,
       },
       ...(override?.input ?? {}),
     },
     searchResponses: override?.searchResponses,
-    expectedBottleName: example.expectedBottleName,
-    expected: example.expectation,
-    summary: example.liveEvalSummary!,
+    expectedBottleName: fixture.expectedBottleName,
+    expected: fixture.expected,
+    summary: fixture.summary,
+    peatedBottleIds: fixture.peatedBottleIds,
   };
 }
 
-function buildClassifierOwnedEvalCase(
-  example: BottleNormalizationCorpusExample,
-): NormalizationCorpusEvalCase {
-  if (
-    !(
-      ["classifier_required", "block_if_uncertain"].includes(
-        example.expectation.handlingStrategy,
-      ) || example.expectation.classifierExpectation === "exact_cask"
-    )
-  ) {
-    throw new Error(
-      `Normalization eval fixtures should stay focused on classifier-owned ambiguity. ${example.id} is ${example.expectation.handlingStrategy}.`,
-    );
-  }
-
-  if (!example.liveEvalSummary) {
-    throw new Error(
-      `Normalization eval fixtures require a liveEvalSummary. ${example.id} is missing one.`,
-    );
-  }
-
-  return buildEvalCase(example);
-}
-
-export const NORMALIZATION_CORPUS_EVAL_CASES: NormalizationCorpusEvalCase[] =
-  BOTTLE_NORMALIZATION_CORPUS.filter(
-    (example) => example.liveEvalCoverage === "required",
-  ).map(buildClassifierOwnedEvalCase);
+export const REAL_WORLD_NEW_BOTTLE_EVAL_CASES =
+  loadFixtureFiles().map(buildEvalCase);

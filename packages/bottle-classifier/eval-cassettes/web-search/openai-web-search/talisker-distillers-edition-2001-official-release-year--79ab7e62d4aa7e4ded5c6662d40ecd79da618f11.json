@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Talisker Distillers Edition 2001 official release year"
+    },
+    "recordedAt": "2026-04-19T21:23:56.460Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Talisker Distillers Edition 2001 official release year",
+          "summary": "The **official release year** for **Talisker Distillers Edition 2001** is **2012**. Independent whisky references identify it specifically as **“Talisker 2001/2012 Distillers Edition”**, confirming the 2001 vintage and 2012 bottling/release, and they also agree on traits such as **45.8% ABV** and an **Amoroso cask fini",
+          "results": [
+            {
+              "title": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+              "url": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+              "domain": "whiskynotes.be",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskynotes.be/2015/talisker/talisker-2005-distillers-edition/",
+              "url": "https://www.whiskynotes.be/2015/talisker/talisker-2005-distillers-edition/",
+              "domain": "whiskynotes.be",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.thewhiskyexchange.com/p/22187/talisker-2001-distillers-edition-bot2012",
+              "url": "https://www.thewhiskyexchange.com/p/22187/talisker-2001-distillers-edition-bot2012",
+              "domain": "thewhiskyexchange.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskyfun.com/Talisker.html",
+              "url": "https://www.whiskyfun.com/Talisker.html",
+              "domain": "whiskyfun.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.thewhiskyexchange.com/p/40990/lagavulin-2001-distillers-edition-bot2017",
+              "url": "https://www.thewhiskyexchange.com/p/40990/lagavulin-2001-distillers-edition-bot2017",
+              "domain": "thewhiskyexchange.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskynotes.be/2019/talisker/talisker-15-years-special-releases/",
+              "url": "https://www.whiskynotes.be/2019/talisker/talisker-15-years-special-releases/",
+              "domain": "whiskynotes.be",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Talisker Distillers Edition 2001 official release year",
+        "summary": "The **official release year** for **Talisker Distillers Edition 2001** is **2012**. Independent whisky references identify it specifically as **“Talisker 2001/2012 Distillers Edition”**, confirming the 2001 vintage and 2012 bottling/release, and they also agree on traits such as **45.8% ABV** and an **Amoroso cask fini",
+        "results": [
+          {
+            "title": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+            "url": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+            "domain": "whiskynotes.be",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskynotes.be/2015/talisker/talisker-2005-distillers-edition/",
+            "url": "https://www.whiskynotes.be/2015/talisker/talisker-2005-distillers-edition/",
+            "domain": "whiskynotes.be",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.thewhiskyexchange.com/p/22187/talisker-2001-distillers-edition-bot2012",
+            "url": "https://www.thewhiskyexchange.com/p/22187/talisker-2001-distillers-edition-bot2012",
+            "domain": "thewhiskyexchange.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskyfun.com/Talisker.html",
+            "url": "https://www.whiskyfun.com/Talisker.html",
+            "domain": "whiskyfun.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.thewhiskyexchange.com/p/40990/lagavulin-2001-distillers-edition-bot2017",
+            "url": "https://www.thewhiskyexchange.com/p/40990/lagavulin-2001-distillers-edition-bot2017",
+            "domain": "thewhiskyexchange.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskynotes.be/2019/talisker/talisker-15-years-special-releases/",
+            "url": "https://www.whiskynotes.be/2019/talisker/talisker-15-years-special-releases/",
+            "domain": "whiskynotes.be",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

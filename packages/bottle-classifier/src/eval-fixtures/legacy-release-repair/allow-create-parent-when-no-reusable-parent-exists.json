@@ -1,0 +1,28 @@
+{
+  "id": "allow-create-parent-when-no-reusable-parent-exists",
+  "name": "repair resolution: allows create-parent when no reusable parent bottle exists",
+  "referenceName": "Elijah Craig Barrel Proof Batch C923",
+  "extractedIdentity": {
+    "brand": "Elijah Craig",
+    "bottler": null,
+    "expression": null,
+    "series": null,
+    "distillery": [],
+    "category": "bourbon",
+    "stated_age": 12,
+    "abv": null,
+    "release_year": null,
+    "vintage_year": null,
+    "cask_type": null,
+    "cask_size": null,
+    "cask_fill": null,
+    "cask_strength": true,
+    "single_cask": null,
+    "edition": "Batch C923"
+  },
+  "reviewedParentRows": [],
+  "expected": {
+    "resolution": "allow_create_parent",
+    "summary": "When no clean reusable parent bottle is available, the repair boundary may allow create-parent rather than forcing an unsafe reuse."
+  }
+}

@@ -1,8 +1,9 @@
-import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
+  resolve: {
+    tsconfigPaths: true,
+  },
   server: {
     watch: {
       ignored: ["**/node_modules/**", "**/dist/**", "**/postgres-data/**"],
@@ -15,14 +16,6 @@ export default defineConfig({
     },
     maxConcurrency: 1,
     pool: "forks",
-    poolOptions: {
-      forks: {
-        singleFork: true,
-      },
-      threads: {
-        singleThread: true,
-      },
-    },
     fileParallelism: false,
     globals: true,
     globalSetup: ["./src/test/global-setup.ts"],

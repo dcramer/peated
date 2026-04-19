@@ -1,0 +1,78 @@
+{
+  "id": "store-listing-jameson-cold-brew-reaches-bottle-verification-confidence-from-a-clear-title-match",
+  "name": "store listing: Jameson Cold Brew reaches bottle verification confidence from a clear title match",
+  "input": {
+    "reference": {
+      "name": "Jameson Cold Brew Irish Whiskey",
+      "url": "https://shop.example/products/jameson-cold-brew"
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Jameson Cold Brew",
+        "brand": "Jameson",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "blend",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.99,
+        "source": ["text", "brand"],
+        "bottleId": 13437,
+        "fullName": "Jameson Cold Brew"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["jameson", "cold brew"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Jameson Cold Brew",
+          "brand": "Jameson",
+          "bottler": null,
+          "series": null,
+          "distillery": [],
+          "category": "blend",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.99,
+          "source": ["text", "brand"],
+          "bottleId": 13437,
+          "fullName": "Jameson Cold Brew"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 13437,
+    "confidenceAtLeast": 96,
+    "verifyEligible": true,
+    "summary": "Match Jameson Cold Brew from the raw title alone and calibrate confidence high enough that the downstream verifier can trust the reviewed bottle-level match."
+  }
+}

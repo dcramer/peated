@@ -1,0 +1,17 @@
+{
+  "id": "text-only-smws-listing-creates-an-exact-cask-bottle-when-the-code-is-missing-locally",
+  "name": "text-only SMWS listing: creates an exact-cask bottle when the code is missing locally",
+  "input": {
+    "reference": {
+      "name": "SMWS RW6.5 Sauna Smoke",
+      "url": "https://vault.example/products/smws-rw6-5-sauna-smoke"
+    },
+    "initialCandidates": []
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "summary": "Extract the SMWS code from raw title text and create the exact-cask bottle when no safe local candidate exists."
+  }
+}

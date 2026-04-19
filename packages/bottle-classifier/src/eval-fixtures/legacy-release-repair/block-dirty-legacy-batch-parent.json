@@ -1,0 +1,73 @@
+{
+  "id": "block-dirty-legacy-batch-parent",
+  "name": "repair resolution: blocks dirty legacy batch bottles even when the classifier matches them",
+  "referenceName": "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
+  "extractedIdentity": {
+    "brand": "Glenmorangie",
+    "bottler": null,
+    "expression": null,
+    "series": null,
+    "distillery": [],
+    "category": "single_malt",
+    "stated_age": 15,
+    "abv": null,
+    "release_year": null,
+    "vintage_year": null,
+    "cask_type": null,
+    "cask_size": null,
+    "cask_fill": null,
+    "cask_strength": null,
+    "single_cask": null,
+    "edition": "Batch 4"
+  },
+  "initialCandidates": [
+    {
+      "kind": "bottle",
+      "releaseId": null,
+      "alias": null,
+      "bottleFullName": "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
+      "brand": "Glenmorangie",
+      "bottler": null,
+      "series": null,
+      "distillery": [],
+      "category": "single_malt",
+      "statedAge": 15,
+      "edition": "Batch 4",
+      "caskStrength": null,
+      "singleCask": null,
+      "abv": null,
+      "vintageYear": null,
+      "releaseYear": null,
+      "caskType": null,
+      "caskSize": null,
+      "caskFill": null,
+      "score": null,
+      "source": ["repair_parent"],
+      "bottleId": 661,
+      "fullName": "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)"
+    }
+  ],
+  "reviewedParentRows": [
+    {
+      "abv": null,
+      "category": "single_malt",
+      "caskFill": null,
+      "caskSize": null,
+      "caskStrength": null,
+      "caskType": null,
+      "edition": "Batch 4",
+      "fullName": "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
+      "id": 661,
+      "releaseYear": null,
+      "singleCask": null,
+      "statedAge": 15,
+      "totalTastings": null,
+      "vintageYear": null
+    }
+  ],
+  "expected": {
+    "resolution": "blocked",
+    "blockedReason": "classifier_dirty_parent_candidate",
+    "summary": "A matched legacy batch bottle is still not a safe reusable parent because it stores release identity on the bottle itself."
+  }
+}

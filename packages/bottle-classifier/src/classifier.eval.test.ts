@@ -15,13 +15,13 @@ import { createBottleClassifier } from "./classifierRuntime";
 import type { BottleCandidate } from "./classifierTypes";
 import type { BottleClassificationResult } from "./contract";
 import { createEvalWebSearchCache } from "./evalWebSearchCache";
-import type { NormalizationCorpusEvalCase } from "./normalizationCorpus.eval.fixtures";
 import {
   DEFAULT_OPENAI_EVAL_MODEL,
   DEFAULT_OPENAI_MODEL,
   getDeterministicOpenAISettings,
 } from "./openaiModelSettings";
 import { isExistingMatchConfidenceEligibleForVerification } from "./priceMatchingEvidence";
+import type { RealWorldNewBottleEvalCase } from "./realWorldNewBottleEval.fixtures";
 
 const classifierModel = process.env.OPENAI_MODEL ?? DEFAULT_OPENAI_MODEL;
 const judgeModel = process.env.OPENAI_EVAL_MODEL ?? DEFAULT_OPENAI_EVAL_MODEL;
@@ -33,6 +33,21 @@ function serializeEvalCase(testCase: ClassifierScenarioEvalCase): string {
 
 function parseEvalCase(value: string): ClassifierScenarioEvalCase {
   return JSON.parse(value) as ClassifierScenarioEvalCase;
+}
+
+function getScenarioEvalName(
+  label: string,
+  testCase: ClassifierScenarioEvalCase,
+): string {
+  return `[${label}] ${testCase.testCase.name}`;
+}
+
+function getScenarioEvalSummary(testCase: ClassifierScenarioEvalCase): string {
+  if (testCase.kind === "new_bottle_fixture") {
+    return testCase.testCase.summary;
+  }
+
+  return testCase.testCase.expected.summary;
 }
 
 function createOpenAIClient() {
@@ -299,7 +314,7 @@ function scoreDecisionShape(
 }
 
 function scoreNormalizationShape(
-  testCase: NormalizationCorpusEvalCase,
+  testCase: RealWorldNewBottleEvalCase,
   result: BottleClassificationResult,
 ): number {
   const expectation = testCase.expected;
@@ -388,7 +403,7 @@ async function judgeDecisionCase(
 }
 
 async function judgeNormalizationCase(
-  testCase: NormalizationCorpusEvalCase,
+  testCase: RealWorldNewBottleEvalCase,
   result: BottleClassificationResult,
 ) {
   const client = createOpenAIClient();
@@ -416,7 +431,7 @@ async function judgeNormalizationCase(
           {
             type: "input_text",
             text: [
-              `Corpus example: ${testCase.corpusExampleId}`,
+              `Fixture id: ${testCase.fixtureId}`,
               `Raw input: ${testCase.input.reference.name}`,
               `Expected bottle name: ${testCase.expectedBottleName}`,
               `Expected classifier expectation: ${testCase.expected.classifierExpectation}`,
@@ -452,7 +467,7 @@ function createShapeScorer() {
 
     return {
       score:
-        testCase.kind === "normalization"
+        testCase.kind === "new_bottle_fixture"
           ? scoreNormalizationShape(testCase.testCase, result)
           : scoreDecisionShape(testCase.testCase, result),
     };
@@ -471,7 +486,7 @@ function createJudgeScorer() {
     const testCase = parseEvalCase(input);
     const result = parseClassificationResult(output);
     const judgement =
-      testCase.kind === "normalization"
+      testCase.kind === "new_bottle_fixture"
         ? await judgeNormalizationCase(testCase.testCase, result)
         : await judgeDecisionCase(testCase.testCase, result);
 
@@ -485,9 +500,10 @@ function createJudgeScorer() {
 }
 
 function buildClassifierAdapters(testCase: ClassifierScenarioEvalCase) {
-  // Normalization cases intentionally share the same local-search fixture path
-  // as the main classifier evals. Do not special-case them into a searchless
-  // harness or the "new bottles" workflow stops reflecting the real agent.
+  // Real-world new-bottle fixtures intentionally share the same local-search
+  // path as the main classifier evals. Do not special-case them into a
+  // searchless harness or the "new bottles" workflow stops reflecting the
+  // real agent.
   const knownCandidates = collectKnownCandidates(testCase.testCase);
 
   return {
@@ -551,21 +567,16 @@ const SCENARIO_CONFIG: Array<{
 ];
 
 for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
-  describeEval(`bottle classifier: ${label}`, {
+  describeEval(label, {
     skipIf: () => !process.env.OPENAI_API_KEY,
     timeout: 300000,
     data: async () =>
       getClassifierScenarioEvalCases(scenario).map((testCase) => ({
-        name: testCase.testCase.name,
+        name: getScenarioEvalName(label, testCase),
         input: serializeEvalCase(testCase),
-        expected:
-          testCase.kind === "normalization"
-            ? {
-                summary: testCase.testCase.summary,
-              }
-            : {
-                summary: testCase.testCase.expected.summary,
-              },
+        expected: {
+          summary: getScenarioEvalSummary(testCase),
+        },
       })),
     task: async (serializedTestCase: string) => {
       const testCase = parseEvalCase(serializedTestCase);

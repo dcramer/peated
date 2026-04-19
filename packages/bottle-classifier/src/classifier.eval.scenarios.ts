@@ -3,9 +3,9 @@ import {
   type ClassifierEvalCase,
 } from "./classifier.eval.fixtures";
 import {
-  NORMALIZATION_CORPUS_EVAL_CASES,
-  type NormalizationCorpusEvalCase,
-} from "./normalizationCorpus.eval.fixtures";
+  REAL_WORLD_NEW_BOTTLE_EVAL_CASES,
+  type RealWorldNewBottleEvalCase,
+} from "./realWorldNewBottleEval.fixtures";
 
 export type ClassifierEvalScenario =
   | "new_bottles"
@@ -19,15 +19,15 @@ export type DecisionScenarioEvalCase = {
   testCase: ClassifierEvalCase;
 };
 
-export type NormalizationScenarioEvalCase = {
-  kind: "normalization";
+export type RealWorldNewBottleScenarioEvalCase = {
+  kind: "new_bottle_fixture";
   scenario: "new_bottles";
-  testCase: NormalizationCorpusEvalCase;
+  testCase: RealWorldNewBottleEvalCase;
 };
 
 export type ClassifierScenarioEvalCase =
   | DecisionScenarioEvalCase
-  | NormalizationScenarioEvalCase;
+  | RealWorldNewBottleScenarioEvalCase;
 
 function inferDecisionScenario(
   testCase: ClassifierEvalCase,
@@ -74,18 +74,18 @@ function wrapDecisionEvalCase(
   };
 }
 
-function wrapNormalizationEvalCase(
-  testCase: NormalizationCorpusEvalCase,
-): NormalizationScenarioEvalCase {
+function wrapRealWorldNewBottleEvalCase(
+  testCase: RealWorldNewBottleEvalCase,
+): RealWorldNewBottleScenarioEvalCase {
   return {
-    kind: "normalization",
+    kind: "new_bottle_fixture",
     scenario: "new_bottles",
     testCase,
   };
 }
 
 export const CLASSIFIER_SCENARIO_EVAL_CASES: ClassifierScenarioEvalCase[] = [
-  ...NORMALIZATION_CORPUS_EVAL_CASES.map(wrapNormalizationEvalCase),
+  ...REAL_WORLD_NEW_BOTTLE_EVAL_CASES.map(wrapRealWorldNewBottleEvalCase),
   ...EVAL_CASES.map(wrapDecisionEvalCase),
 ];
 

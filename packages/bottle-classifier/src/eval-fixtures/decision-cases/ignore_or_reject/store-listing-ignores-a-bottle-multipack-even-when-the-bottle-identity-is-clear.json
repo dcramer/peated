@@ -1,0 +1,32 @@
+{
+  "id": "store-listing-ignores-a-bottle-multipack-even-when-the-bottle-identity-is-clear",
+  "name": "store listing: ignores a bottle multipack even when the bottle identity is clear",
+  "input": {
+    "reference": {
+      "name": "Buffalo Trace Kentucky Straight Bourbon Whiskey 12 Pack",
+      "url": "https://shop.example/products/buffalo-trace-12-pack"
+    },
+    "extractedIdentity": {
+      "brand": "Buffalo Trace",
+      "bottler": null,
+      "expression": null,
+      "series": null,
+      "distillery": ["Buffalo Trace"],
+      "category": "bourbon",
+      "stated_age": null,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    }
+  },
+  "expected": {
+    "status": "ignored",
+    "summary": "Short-circuit retailer multipacks and cases even when extraction already found the underlying Buffalo Trace bottle identity."
+  }
+}

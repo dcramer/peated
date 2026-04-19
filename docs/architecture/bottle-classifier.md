@@ -10,7 +10,8 @@ The implementation lives in:
 - `packages/bottle-classifier/src/classifier.ts`
 - `packages/bottle-classifier/src/classifierRuntime.ts`
 - `packages/bottle-classifier/src/contract.ts`
-- `packages/bottle-classifier/src/normalizationCorpus.ts`
+- `packages/bottle-classifier/src/evalFixtureSchemas.ts`
+- `packages/bottle-classifier/src/eval-fixtures/`
 - `packages/bottle-classifier/README.md`
 - `packages/bottle-classifier/AGENTS.md`
 
@@ -84,7 +85,7 @@ classifier policy and server consumers:
 - `deriveLegacyReleaseRepairIdentity(...)`
 - `resolveLegacyCreateParentClassification(...)`
 
-Those helpers should stay package-owned and corpus-tested so server code can
+Those helpers should stay package-owned and fixture-tested so server code can
 remain focused on retrieval, persistence, and automation policy.
 
 The rule for package-owned deterministic behavior is strict:
@@ -93,8 +94,8 @@ The rule for package-owned deterministic behavior is strict:
 - if the behavior depends on brand context, marketed family meaning, or program semantics, it stays classifier-owned
 - if the input is too sparse to safely infer a canonical bottle, block instead of guessing
 - prompt changes should encode generalized reasoning patterns, not one-off brand tutoring; concrete family regressions belong in eval fixtures
-- the normalization corpus should record real `peatedBottleIds` when an example came from an observed Peated bottle family
-- ambiguous families should use shared `contrastGroup` keys with differing `contrastOutcome` values so the corpus always carries a real positive/negative contrast
+- real-world new-bottle fixtures should record `peatedBottleIds` when the example came from an observed Peated bottle family
+- ambiguous families should still add paired positive and negative fixtures, even though the executable source of truth is now one JSON file per case
 - live eval coverage should stay narrow and explicit; only classifier-owned ambiguity should opt in
 
 For lightweight consumers, prefer the narrow package subpaths:
@@ -103,7 +104,6 @@ For lightweight consumers, prefer the narrow package subpaths:
 - `@peated/bottle-classifier/bottleCreationDrafts`
 - `@peated/bottle-classifier/legacyReleaseRepairIdentity`
 - `@peated/bottle-classifier/legacyReleaseRepairResolution`
-- `@peated/bottle-classifier/normalizationCorpus`
 - `@peated/bottle-classifier/priceMatchingEvidence`
 - `@peated/bottle-classifier/smws`
 - `@peated/bottle-classifier/contract`
@@ -193,7 +193,10 @@ The current package-local eval harness lives in:
 - `packages/bottle-classifier/src/classifier.eval.test.ts`
 - `packages/bottle-classifier/src/classifier.eval.scenarios.ts`
 - `packages/bottle-classifier/src/classifier.eval.fixtures.ts`
-- `packages/bottle-classifier/src/normalizationCorpus.eval.fixtures.ts`
+- `packages/bottle-classifier/src/evalFixtureSchemas.ts`
+- `packages/bottle-classifier/src/eval-fixtures/decision-cases/`
+- `packages/bottle-classifier/src/eval-fixtures/new-bottles/`
+- `packages/bottle-classifier/src/eval-fixtures/legacy-release-repair/`
 - `packages/bottle-classifier/src/legacyReleaseRepairResolution.eval.test.ts`
 - `packages/bottle-classifier/src/legacyReleaseRepairResolution.eval.fixtures.ts`
 
@@ -205,10 +208,10 @@ instead of separate normalization-versus-classifier files:
 - `corrections`
 - `ignore or reject`
 
-That grouped runner still uses the same classifier runtime and still includes
-the stricter normalization-boundary corpus cases inside the `new bottles`
-scenario. The difference is organizational: one classifier-facing harness with
-shared cache, reporting, and scenario-level fixture grouping.
+That grouped runner still uses the same classifier runtime and includes the
+real-world new-bottle boundary cases inside the `new bottles` scenario. The
+difference is organizational: one classifier-facing harness with shared cache,
+reporting, and scenario-level fixture grouping.
 
 Run it from the repo root with:
 
@@ -236,6 +239,7 @@ Local setup for live evals:
 - `BOTTLE_CLASSIFIER_EVAL_WEB_SEARCH_CACHE_MODE` controls the cassette behavior: `replay_or_record` by default, plus `replay_only`, `refresh`, or `live`
 - `BOTTLE_CLASSIFIER_EVAL_WEB_SEARCH_CACHE_DIR` overrides the cassette directory when needed
 - `pnpm evals:web-cache:clear` deletes recorded cassette files while keeping the committed cache root
+- `pnpm --filter @peated/bottle-classifier fixtures:validate` explicitly validates all JSON fixture files against the package schemas
 
 Notes:
 

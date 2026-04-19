@@ -241,6 +241,7 @@ export const RETAILER_LABEL_EXAMPLES: RetailerLabelExample[] = [
     notes: [
       "Treat `Distillers Edition` as the stable bottle family even when the retailer uses the apostrophe spelling `Distiller's Edition`.",
       "The bare annual year is release identity here, not part of the parent bottle name.",
+      "Apply that same split when the year appears before the family wording, unless the source explicitly says `vintage`, `distilled`, or `distillation`.",
     ],
   },
   {
@@ -720,6 +721,7 @@ export function buildWhiskyLabelExtractorInstructions({
       "For expression-style fields, follow the bottle's evidenced canonical name. Do not mechanically append retailer style/category words from the title just to make the expression look complete.",
       "When a stable family phrase is followed by a clearly separate numbered or coded child label, keep the family in `expression` and the varying child label in `edition` instead of collapsing both into one opaque expression.",
       "Apply that split from the label structure itself, not by memorizing brand-specific examples. If the split is ambiguous, stay less specific instead of guessing.",
+      "When a stable annual-release family appears with one adjacent bare year and the source does not explicitly say `vintage`, `distilled`, or `distillation`, prefer `release_year` over `vintage_year` even if the year appears before the family wording.",
       "If `edition`, `release_year`, or `vintage_year` is populated, do not also copy that same batch code or year into `expression`.",
       "Use `release_year` only for explicit release or bottling years, not founding dates or warning text.",
       "If both distillation and bottling years are present, use `vintage_year` for the distillation year and `release_year` for the bottling year.",
@@ -791,9 +793,11 @@ export function buildBottleClassifierInstructions({
     "Local candidates may include structured bottle and release fields such as brand, bottler, distillery, series, category, age, edition, cask type, cask size, cask fill, cask-strength, single-cask, ABV, and release years. Use those fields directly when present instead of inferring everything from the candidate name.",
     "When local candidates already include both a reusable parent bottle and a clean child release under that same bottle, and the extracted release detail uniquely matches the child candidate, prefer matching that existing release over returning a plain parent-bottle match or creating a duplicate release.",
     "For annual-release families such as Distillers Edition, a bare year can be decisive release identity. If one local child release candidate aligns on the correct parent bottle and matching release year, treat that release as the leading existing-match target rather than treating the year as retailer noise.",
+    "Apply that annual-release reasoning even when the year appears before the family wording. Do not treat a year-first title as bottle-level year identity by default unless the source explicitly frames it as a vintage or distillation year.",
     "When authoritative evidence shows a retailer shorthand maps to a differently named canonical bottle family, use the canonical family name for matching or creation and rerun local search with that confirmed trait before creating a new bottle.",
     "If multiple local bottle candidates share the same stable family wording but differ only by likely release-level detail such as a batch code, numbered edition, volume, chapter, or annual release label, treat that as evidence the local data may be storing sibling releases as bottle rows rather than proof that each row is a separate canonical bottle.",
     "When sibling-specific candidates point to a shared reusable family and no clean parent bottle exists locally, prefer `create_bottle_and_release` over matching one dirty sibling row or collapsing to `no_match`.",
+    "When a stable family is already clear and only the annual year or numbered child marker varies, do not leave that differentiator stranded on `proposedBottle`; keep it in `proposedRelease` and use `create_bottle_and_release` when no reusable parent exists locally.",
     ...(hasBottleSearch
       ? [
           "When the provided local candidates are thin, conflicting, or missing obvious near matches, call `search_bottles` with the most specific query you can form from the reference and extracted identity.",
@@ -814,6 +818,7 @@ export function buildBottleClassifierInstructions({
     "Apply bottle-versus-release reasoning generically from the evidence in front of you. Do not rely on memorized brand-specific examples to justify a split or a match.",
     "If bottle identity is clear but release identity is not, prefer the bottle-level outcome. Do not force a specific release from weak release evidence.",
     "If the raw wording only adds a generic strength phrase like `Barrel Strength` or `Cask Strength` onto an otherwise complete family name, do not invent a new bottle or release from that phrase alone.",
+    "Do not call a reference too sparse solely because it is short. If the remaining words read like a self-contained marketed family or expression, keep that bottle identity rather than discarding it for missing brand or category context.",
     "If the only local candidate is a more specific release or edition than the reference supports, do not match it by default. Treat the candidate as over-specific unless web evidence validates the missing differentiating traits.",
     "Ignore volume, gift-set packaging, added glassware, ratings blurbs, and generic retailer SEO words when deciding bottle identity.",
     "Treat condition or defect wording such as `blooper bottle`, `broken wax seal`, `low fill`, `opened bottle`, or `damaged box` as non-canonical sale-condition language, not as a distinct whisky expression.",
@@ -917,6 +922,7 @@ export function buildBottleClassifierInstructions({
                   "For bare annual releases, search the exact family or expression name plus the year so you can confirm whether the candidate is an existing yearly release rather than a generic parent bottle.",
                   "If the distinctness of the bottle depends on a trait such as `Port Cask Finished`, `Single Cask`, `Barrel Proof`, a specific ABV, `1st Fill`, or `Port Pipe`, the web evidence should explicitly confirm that trait.",
                   "If the raw reference is still just a sparse generic phrase like `Batch Sherry` after extraction and local search, do not invent a branded bottle or release from web similarity alone. Prefer `no_match` unless the source itself provides a strong identity anchor.",
+                  "Do not over-apply that sparse-reference rule to short self-contained family names. If authoritative evidence supports the phrase itself as the marketed bottle family, keep it as bottle identity rather than dropping to `no_match` just because the title is compact.",
                   `You have a combined hard limit of ${maxSearchQueries} web search calls across all web search tools.`,
                 ]
               : []),

@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Talisker Distillers Edition 2001 official"
+    },
+    "recordedAt": "2026-04-19T21:34:29.954Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Talisker Distillers Edition 2001 official",
+          "summary": "I found an official Talisker-family source plus two independent non-retailer references for the **Talisker Distillers Edition with 2001 distillation year**.\n\n**Confirmed bottle traits**\n- It is a **Talisker** single malt in the **Distillers Edition** series, and the current official Talisker Distillers Edition descript",
+          "results": [
+            {
+              "title": "https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition",
+              "url": "https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition",
+              "domain": "thewhiskybarrel.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "Talisker - 2001 Distillers Edition - Whisky.com",
+              "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html",
+              "domain": "whisky.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.spiritradar.com/whisky-db/talisker-2001-the-distillers-edition-45.8-percent-700ml/",
+              "url": "https://www.spiritradar.com/whisky-db/talisker-2001-the-distillers-edition-45.8-percent-700ml/",
+              "domain": "spiritradar.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+              "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+              "domain": "thewhiskyvault.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+              "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+              "domain": "whisky.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskymarketplace.com/whiskies/talisker-2001-amoroso-finish-distillers-edition-island-single-malt-scotch",
+              "url": "https://www.whiskymarketplace.com/whiskies/talisker-2001-amoroso-finish-distillers-edition-island-single-malt-scotch",
+              "domain": "whiskymarketplace.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Talisker Distillers Edition 2001 official",
+        "summary": "I found an official Talisker-family source plus two independent non-retailer references for the **Talisker Distillers Edition with 2001 distillation year**.\n\n**Confirmed bottle traits**\n- It is a **Talisker** single malt in the **Distillers Edition** series, and the current official Talisker Distillers Edition descript",
+        "results": [
+          {
+            "title": "https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition",
+            "url": "https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition",
+            "domain": "thewhiskybarrel.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker - 2001 Distillers Edition - Whisky.com",
+            "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html",
+            "domain": "whisky.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.spiritradar.com/whisky-db/talisker-2001-the-distillers-edition-45.8-percent-700ml/",
+            "url": "https://www.spiritradar.com/whisky-db/talisker-2001-the-distillers-edition-45.8-percent-700ml/",
+            "domain": "spiritradar.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+            "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+            "domain": "thewhiskyvault.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+            "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+            "domain": "whisky.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskymarketplace.com/whiskies/talisker-2001-amoroso-finish-distillers-edition-island-single-malt-scotch",
+            "url": "https://www.whiskymarketplace.com/whiskies/talisker-2001-amoroso-finish-distillers-edition-island-single-malt-scotch",
+            "domain": "whiskymarketplace.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

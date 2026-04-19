@@ -1,0 +1,62 @@
+{
+  "id": "store-listing-keeps-a-strong-local-match-when-only-a-standalone-article-differs",
+  "name": "store listing: keeps a strong local match when only a standalone article differs",
+  "input": {
+    "reference": {
+      "name": "Glenmorangie Tale of Ice Cream Single Malt Scotch Whisky",
+      "url": "https://shop.example/products/glenmorangie-tale-of-ice-cream"
+    },
+    "extractedIdentity": {
+      "brand": "Glenmorangie",
+      "bottler": null,
+      "expression": "Tale of Ice Cream",
+      "series": null,
+      "distillery": ["Glenmorangie"],
+      "category": "single_malt",
+      "stated_age": null,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Glenmorangie A Tale of Ice Cream",
+        "brand": "Glenmorangie",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Glenmorangie"],
+        "category": "single_malt",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.9,
+        "source": ["text"],
+        "bottleId": 43236,
+        "fullName": "Glenmorangie A Tale of Ice Cream"
+      }
+    ]
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 43236,
+    "summary": "Treat a standalone article difference plus generic retailer style words as a strong local name variant and keep the Glenmorangie A Tale of Ice Cream bottle match without requiring web evidence."
+  }
+}

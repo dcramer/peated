@@ -1,0 +1,13 @@
+{
+  "id": "1792-single-barrel",
+  "referenceName": "1792 Single Barrel",
+  "expectedBottleName": "1792 Single Barrel",
+  "summary": "Keep 1792 Single Barrel as bottle identity and avoid over-promoting generic single-barrel wording into exact-cask or release identity.",
+  "peatedBottleIds": [16051],
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": null
+  }
+}

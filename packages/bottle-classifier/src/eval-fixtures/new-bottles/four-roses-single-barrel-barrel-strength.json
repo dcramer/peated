@@ -1,0 +1,13 @@
+{
+  "id": "four-roses-single-barrel-barrel-strength",
+  "referenceName": "Four Roses Single Barrel Barrel Strength",
+  "expectedBottleName": "Four Roses Single Barrel",
+  "summary": "Treat Four Roses Single Barrel Barrel Strength as too ambiguous for a confident canonical split and avoid promoting generic strength wording into release identity by itself.",
+  "peatedBottleIds": [428],
+  "expected": {
+    "handlingStrategy": "block_if_uncertain",
+    "classifierExpectation": "review_required",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": null
+  }
+}

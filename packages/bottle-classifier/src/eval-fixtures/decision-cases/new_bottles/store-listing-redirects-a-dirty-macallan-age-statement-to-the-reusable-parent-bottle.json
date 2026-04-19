@@ -1,0 +1,90 @@
+{
+  "id": "store-listing-redirects-a-dirty-macallan-age-statement-to-the-reusable-parent-bottle",
+  "name": "store listing: redirects a dirty Macallan age statement to the reusable parent bottle",
+  "input": {
+    "reference": {
+      "name": "The Macallan Sherry Oak Single Malt Scotch 30-year-old",
+      "url": "https://shop.example/products/macallan-sherry-oak-30"
+    },
+    "extractedIdentity": {
+      "brand": "The Macallan",
+      "bottler": null,
+      "expression": "Sherry Oak",
+      "series": null,
+      "distillery": [],
+      "category": "single_malt",
+      "stated_age": 30,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": "The Macallan Sherry Oak Single Malt Scotch 30-year-old",
+        "bottleFullName": "The Macallan Sherry Oak 30-year-old",
+        "brand": "The Macallan",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "single_malt",
+        "statedAge": 30,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 1,
+        "source": ["exact"],
+        "bottleId": 54083,
+        "fullName": "The Macallan Sherry Oak 30-year-old"
+      },
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "The Macallan Sherry Oak",
+        "brand": "The Macallan",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "single_malt",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.9,
+        "source": ["text"],
+        "bottleId": 54082,
+        "fullName": "The Macallan Sherry Oak"
+      }
+    ]
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_release",
+    "identityScope": "product",
+    "parentBottleId": 54082,
+    "proposedRelease": {
+      "statedAge": 30
+    },
+    "summary": "Treat the local 30-year-old bottle row as a dirty release-like candidate and create a 30-year-old child release beneath the reusable Macallan Sherry Oak parent bottle instead."
+  }
+}

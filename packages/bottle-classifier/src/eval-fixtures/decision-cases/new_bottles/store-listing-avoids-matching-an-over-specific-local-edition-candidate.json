@@ -1,0 +1,75 @@
+{
+  "id": "store-listing-avoids-matching-an-over-specific-local-edition-candidate",
+  "name": "store listing: avoids matching an over-specific local edition candidate",
+  "input": {
+    "reference": {
+      "name": "Glenmorangie Quinta Ruban 14-year-old",
+      "url": "https://shop.example/products/quinta-ruban-14"
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Glenmorangie Quinta Ruban 14 Year Old 4th Edition",
+        "brand": "Glenmorangie",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Glenmorangie"],
+        "category": "single_malt",
+        "statedAge": 14,
+        "edition": "4th Edition",
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": 46,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": "ruby_port",
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.87,
+        "source": ["vector"],
+        "bottleId": 401,
+        "fullName": "Glenmorangie Quinta Ruban 14 Year Old 4th Edition"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["quinta", "ruban"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Glenmorangie Quinta Ruban 14 Year Old 4th Edition",
+          "brand": "Glenmorangie",
+          "bottler": null,
+          "series": null,
+          "distillery": ["Glenmorangie"],
+          "category": "single_malt",
+          "statedAge": 14,
+          "edition": "4th Edition",
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": 46,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": "ruby_port",
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.87,
+          "source": ["vector"],
+          "bottleId": 401,
+          "fullName": "Glenmorangie Quinta Ruban 14 Year Old 4th Edition"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "summary": "Treat this as the base Glenmorangie Quinta Ruban 14-year-old bottle and avoid falsely matching the unsupported 4th Edition candidate."
+  }
+}

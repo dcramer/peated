@@ -1,0 +1,16 @@
+{
+  "id": "heavens-door-bootleg-vol-3",
+  "referenceName": "Heaven's Door Bootleg Vol 3 Whiskey",
+  "expectedBottleName": "Heaven's Door Bootleg Series",
+  "summary": "Treat Heaven's Door Bootleg Vol 3 as the Bootleg Series parent plus a numbered child release instead of keeping Vol 3 in the bottle identity.",
+  "peatedBottleIds": [44067],
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle_plus_release",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": {
+      "edition": "Vol. 3",
+      "releaseYear": null
+    }
+  }
+}

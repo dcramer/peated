@@ -1,0 +1,156 @@
+{
+  "id": "store-listing-uses-web-evidence-plus-local-follow-up-search-to-recover-the-right-bottle",
+  "name": "store listing: uses web evidence plus local follow-up search to recover the right bottle",
+  "input": {
+    "reference": {
+      "name": "Wild Turkey Rare Breed Rye",
+      "url": "https://shop.example/products/rare-breed-rye"
+    },
+    "extractedIdentity": {
+      "brand": "Wild Turkey",
+      "bottler": null,
+      "expression": "Rare Breed Rye",
+      "series": null,
+      "distillery": [],
+      "category": "rye",
+      "stated_age": null,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Wild Turkey Rare Breed Barrel Proof",
+        "brand": "Wild Turkey",
+        "bottler": null,
+        "series": "Rare Breed",
+        "distillery": [],
+        "category": "bourbon",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": true,
+        "singleCask": null,
+        "abv": 58.4,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.66,
+        "source": ["vector"],
+        "bottleId": 500,
+        "fullName": "Wild Turkey Rare Breed Barrel Proof"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["wild turkey", "rare breed", "rye"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Wild Turkey Rare Breed Rye Barrel Proof",
+          "brand": "Wild Turkey",
+          "bottler": null,
+          "series": "Rare Breed",
+          "distillery": [],
+          "category": "rye",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": true,
+          "singleCask": null,
+          "abv": 56.1,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.93,
+          "source": ["text"],
+          "bottleId": 501,
+          "fullName": "Wild Turkey Rare Breed Rye Barrel Proof"
+        }
+      ]
+    },
+    {
+      "when": ["rare breed", "rye", "barrel proof"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Wild Turkey Rare Breed Rye Barrel Proof",
+          "brand": "Wild Turkey",
+          "bottler": null,
+          "series": "Rare Breed",
+          "distillery": [],
+          "category": "rye",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": true,
+          "singleCask": null,
+          "abv": 56.1,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.93,
+          "source": ["text"],
+          "bottleId": 501,
+          "fullName": "Wild Turkey Rare Breed Rye Barrel Proof"
+        }
+      ]
+    },
+    {
+      "when": ["rare breed", "rye", "cask_strength"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Wild Turkey Rare Breed Rye Barrel Proof",
+          "brand": "Wild Turkey",
+          "bottler": null,
+          "series": "Rare Breed",
+          "distillery": [],
+          "category": "rye",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": true,
+          "singleCask": null,
+          "abv": 56.1,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.93,
+          "source": ["text"],
+          "bottleId": 501,
+          "fullName": "Wild Turkey Rare Breed Rye Barrel Proof"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 501,
+    "confidenceAtLeast": 96,
+    "verifyEligible": true,
+    "summary": "Use the web to confirm the omitted barrel-proof trait, rerun local search, and match the canonical Wild Turkey Rare Breed Rye Barrel Proof bottle instead of a looser Rare Breed near-match."
+  }
+}

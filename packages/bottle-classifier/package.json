@@ -31,10 +31,6 @@
       "types": "./src/error.ts",
       "default": "./src/error.ts"
     },
-    "./normalizationCorpus": {
-      "types": "./src/normalizationCorpus.ts",
-      "default": "./src/normalizationCorpus.ts"
-    },
     "./legacyReleaseRepairIdentity": {
       "types": "./src/legacyReleaseRepairIdentity.ts",
       "default": "./src/legacyReleaseRepairIdentity.ts"
@@ -89,6 +85,7 @@
     "dev": "tsc --watch",
     "evals": "sh -c 'if [ \"$1\" = \"--\" ]; then shift; fi; dotenv -e ../../.env -e ../../.env.local -- pnpm exec vitest run \"$@\" --config vitest.evals.config.mts' --",
     "evals:web-cache:clear": "node ./scripts/clearEvalWebSearchCache.mjs",
+    "fixtures:validate": "vitest run --config vitest.config.mts src/evalFixtures.validate.test.ts",
     "test": "vitest run --config vitest.config.mts",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
@@ -102,8 +99,9 @@
     "@types/node": "catalog:",
     "tinyrainbow": "^2.0.0",
     "typescript": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:",
-    "vitest-evals": "^0.7.0"
+    "vitest-evals": "^0.8.0"
   },
   "volta": {
     "extends": "../../package.json"
