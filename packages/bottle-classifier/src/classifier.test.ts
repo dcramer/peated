@@ -673,6 +673,58 @@ const cadbollEstateLegacyBatch2Candidate: BottleCandidate = {
   source: ["text"],
 };
 
+const glengoyneLegacySeriesChapterTwoCandidate: BottleCandidate = {
+  bottleId: 2083,
+  releaseId: null,
+  kind: "bottle",
+  alias: null,
+  fullName: "Glengoyne The Legacy Series Chapter Two",
+  bottleFullName: "Glengoyne The Legacy Series Chapter Two",
+  brand: "Glengoyne",
+  bottler: null,
+  series: null,
+  distillery: ["Glengoyne"],
+  category: "single_malt",
+  statedAge: null,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: 48,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.96,
+  source: ["exact"],
+};
+
+const glengoyneLegacySeriesChapterOneCandidate: BottleCandidate = {
+  bottleId: 2460,
+  releaseId: null,
+  kind: "bottle",
+  alias: null,
+  fullName: "Glengoyne The Legacy Series Chapter One",
+  bottleFullName: "Glengoyne The Legacy Series Chapter One",
+  brand: "Glengoyne",
+  bottler: null,
+  series: null,
+  distillery: ["Glengoyne"],
+  category: "single_malt",
+  statedAge: null,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: 48,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 0.91,
+  source: ["text"],
+};
+
 const cadbollEstateBatch4ReleaseCandidate: BottleCandidate = {
   bottleId: 13442,
   releaseId: 9102,
@@ -2927,6 +2979,91 @@ describe("createBottleClassifier", () => {
     });
     expect(result.decision.rationale).toContain(
       "legacy release-like bottle candidate",
+    );
+  });
+
+  test("creates a reusable parent when exact dirty siblings prove a shared family", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Glengoyne",
+      bottler: null,
+      expression: "The Legacy Series",
+      series: null,
+      distillery: ["Glengoyne"],
+      category: "single_malt",
+      stated_age: null,
+      abv: 48,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: "Chapter Two",
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 95,
+          rationale:
+            "The title exactly matches the existing local Chapter Two bottle.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 2083,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [2083, 2460],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [
+            glengoyneLegacySeriesChapterTwoCandidate,
+            glengoyneLegacySeriesChapterOneCandidate,
+          ],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Glengoyne The Legacy Series Chapter Two",
+      },
+      extractedIdentity,
+      initialCandidates: [
+        glengoyneLegacySeriesChapterTwoCandidate,
+        glengoyneLegacySeriesChapterOneCandidate,
+      ],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "create_bottle_and_release",
+      identityScope: "product",
+      proposedBottle: {
+        brand: {
+          name: "Glengoyne",
+        },
+        name: "The Legacy Series",
+      },
+      proposedRelease: {
+        edition: "Chapter Two",
+      },
+    });
+    expect(result.decision.rationale).toContain(
+      "sibling-specific legacy bottle row",
     );
   });
 

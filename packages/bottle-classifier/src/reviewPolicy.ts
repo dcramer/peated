@@ -1372,6 +1372,85 @@ function maybeCreateParentForDirtyLegacySiblingDecision({
   };
 }
 
+function maybeCreateParentForDirtyLegacySiblingMatch({
+  reference,
+  decision,
+  target,
+  artifacts,
+  candidateBottleIds,
+  observation,
+}: {
+  reference: BottleReference;
+  decision: Pick<
+    BottleClassificationDecision,
+    "confidence" | "rationale" | "identityScope"
+  >;
+  target: BottleCandidate | null;
+  artifacts: BottleClassificationArtifacts;
+  candidateBottleIds: number[];
+  observation: BottleObservation | null;
+}): BottleClassificationDecision | null {
+  if (
+    !target ||
+    decision.identityScope === "exact_cask" ||
+    !candidateLooksLikeLegacyReleaseBottle(target) ||
+    !target.source.includes("exact")
+  ) {
+    return null;
+  }
+
+  const proposedRelease = buildReleaseDraftFromExtractedIdentity({
+    extractedIdentity: artifacts.extractedIdentity,
+    target,
+  });
+  if (!proposedRelease) {
+    return null;
+  }
+
+  const proposedBottle = buildCreateParentBottleDraft({
+    reference,
+    extractedIdentity: artifacts.extractedIdentity,
+    dirtyTarget: target,
+  });
+  if (!proposedBottle) {
+    return null;
+  }
+
+  const hasSiblingFamilySupport = artifacts.candidates.some((candidate) => {
+    if (!candidateLooksLikeLegacyReleaseBottle(candidate)) {
+      return false;
+    }
+
+    return siblingCandidateAddsUnsupportedDifferentiators({
+      candidate,
+      target,
+      referenceName: reference.name,
+      extractedIdentity: artifacts.extractedIdentity,
+    });
+  });
+
+  if (!hasSiblingFamilySupport) {
+    return null;
+  }
+
+  return {
+    action: "create_bottle_and_release",
+    confidence: decision.confidence,
+    rationale: appendRationale(
+      decision.rationale,
+      "Server redirected the bottle match away from a sibling-specific legacy bottle row because other surfaced siblings indicate a reusable parent family but no clean parent exists locally.",
+    ),
+    candidateBottleIds,
+    identityScope: "product",
+    observation,
+    matchedBottleId: null,
+    matchedReleaseId: null,
+    parentBottleId: null,
+    proposedBottle,
+    proposedRelease,
+  };
+}
+
 function siblingCandidateAddsUnsupportedDifferentiators({
   candidate,
   target,
@@ -2339,8 +2418,19 @@ function maybePromoteBottleMatchToCreateRelease({
     artifacts,
   });
 
-  if (!parentTarget || decision.identityScope === "exact_cask") {
+  if (decision.identityScope === "exact_cask") {
     return null;
+  }
+
+  if (!parentTarget) {
+    return maybeCreateParentForDirtyLegacySiblingMatch({
+      reference,
+      decision,
+      target,
+      artifacts,
+      candidateBottleIds,
+      observation,
+    });
   }
 
   const proposedRelease = buildReleaseDraftFromExtractedIdentity({
