@@ -1,11 +1,18 @@
 import { db } from "@peated/server/db";
 import {
+  bottleFlavorProfiles,
+  bottleObservations,
   bottleReleases,
   bottles,
+  bottlesToDistillers,
+  bottleTags,
   bottleTombstones,
+  collectionBottles,
   entities,
+  flightBottles,
+  storePriceMatchProposals,
 } from "@peated/server/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import mergeBottle from "./mergeBottle";
 
@@ -353,5 +360,177 @@ describe("mergeBottle", () => {
     expect(updatedRelease.fullName).toBe(
       "Entity B Duplicate - Batch 1 - 43.0% ABV",
     );
+  });
+
+  it("repoints system-owned references and merges derived bottle data", async ({
+    fixtures,
+  }) => {
+    const sourceBrand = await fixtures.Entity({
+      name: "Source Brand",
+      totalBottles: 1,
+    });
+    const targetBrand = await fixtures.Entity({
+      name: "Target Brand",
+      totalBottles: 1,
+    });
+    const sourceBottle = await fixtures.Bottle({
+      brandId: sourceBrand.id,
+      name: "Source Bottle",
+      category: "single_malt",
+      statedAge: null,
+    });
+    const targetBottle = await fixtures.Bottle({
+      brandId: targetBrand.id,
+      name: "Target Bottle",
+      category: "single_malt",
+      statedAge: null,
+    });
+    const sharedDistiller = await fixtures.Entity({ name: "Shared Distiller" });
+    const sourceOnlyDistiller = await fixtures.Entity({
+      name: "Source Only Distiller",
+    });
+    const price = await fixtures.StorePrice({ bottleId: sourceBottle.id });
+
+    await db.insert(bottlesToDistillers).values([
+      { bottleId: sourceBottle.id, distillerId: sharedDistiller.id },
+      { bottleId: sourceBottle.id, distillerId: sourceOnlyDistiller.id },
+      { bottleId: targetBottle.id, distillerId: sharedDistiller.id },
+    ]);
+
+    await db.insert(bottleTags).values([
+      { bottleId: sourceBottle.id, tag: "smoky", count: 3 },
+      { bottleId: sourceBottle.id, tag: "coastal", count: 2 },
+      { bottleId: targetBottle.id, tag: "smoky", count: 2 },
+    ]);
+
+    await db.insert(bottleFlavorProfiles).values([
+      { bottleId: sourceBottle.id, flavorProfile: "peated", count: 4 },
+      { bottleId: targetBottle.id, flavorProfile: "peated", count: 1 },
+    ]);
+
+    await db.insert(bottleObservations).values({
+      bottleId: sourceBottle.id,
+      sourceType: "store_price",
+      sourceKey: "merge-bottle-observation",
+      sourceName: "Merge Bottle Observation",
+    });
+
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "approved",
+        proposalType: "match_existing",
+        currentBottleId: sourceBottle.id,
+        suggestedBottleId: sourceBottle.id,
+        parentBottleId: sourceBottle.id,
+      })
+      .returning();
+
+    await mergeBottle({
+      fromBottleIds: [sourceBottle.id],
+      toBottleId: targetBottle.id,
+    });
+
+    const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
+      where: eq(storePriceMatchProposals.id, proposal.id),
+    });
+    const observation = await db.query.bottleObservations.findFirst({
+      where: (table, { eq }) => eq(table.sourceKey, "merge-bottle-observation"),
+    });
+    const smokyTag = await db.query.bottleTags.findFirst({
+      where: (table, { and, eq }) =>
+        and(eq(table.bottleId, targetBottle.id), eq(table.tag, "smoky")),
+    });
+    const peatedFlavorProfile = await db.query.bottleFlavorProfiles.findFirst({
+      where: (table, { and, eq }) =>
+        and(
+          eq(table.bottleId, targetBottle.id),
+          eq(table.flavorProfile, "peated"),
+        ),
+    });
+    const targetDistillers = await db
+      .select()
+      .from(bottlesToDistillers)
+      .where(eq(bottlesToDistillers.bottleId, targetBottle.id));
+    const sourceDistillers = await db
+      .select()
+      .from(bottlesToDistillers)
+      .where(eq(bottlesToDistillers.bottleId, sourceBottle.id));
+
+    expect(updatedProposal).toMatchObject({
+      currentBottleId: targetBottle.id,
+      suggestedBottleId: targetBottle.id,
+      parentBottleId: targetBottle.id,
+      status: "approved",
+    });
+    expect(observation?.bottleId).toBe(targetBottle.id);
+    expect(smokyTag?.count).toBe(5);
+    expect(peatedFlavorProfile?.count).toBe(5);
+    expect(
+      targetDistillers.map((row) => row.distillerId).sort((a, b) => a - b),
+    ).toEqual(
+      [sharedDistiller.id, sourceOnlyDistiller.id].sort((a, b) => a - b),
+    );
+    expect(sourceDistillers).toHaveLength(0);
+  });
+
+  it("dedupes collection and flight rows while merging bottles", async ({
+    fixtures,
+  }) => {
+    const sourceBottle = await fixtures.Bottle({
+      name: "Source Dedupe Bottle",
+      category: "single_malt",
+    });
+    const targetBottle = await fixtures.Bottle({
+      name: "Target Dedupe Bottle",
+      category: "single_malt",
+    });
+    const collection = await fixtures.Collection();
+    const flight = await fixtures.Flight();
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: collection.id,
+        bottleId: sourceBottle.id,
+        releaseId: null,
+      },
+      {
+        collectionId: collection.id,
+        bottleId: targetBottle.id,
+        releaseId: null,
+      },
+    ]);
+    await db.insert(flightBottles).values([
+      { flightId: flight.id, bottleId: sourceBottle.id, releaseId: null },
+      { flightId: flight.id, bottleId: targetBottle.id, releaseId: null },
+    ]);
+
+    await mergeBottle({
+      fromBottleIds: [sourceBottle.id],
+      toBottleId: targetBottle.id,
+    });
+
+    const mergedCollectionRows = await db
+      .select()
+      .from(collectionBottles)
+      .where(
+        and(
+          eq(collectionBottles.collectionId, collection.id),
+          eq(collectionBottles.bottleId, targetBottle.id),
+        ),
+      );
+    const mergedFlightRows = await db
+      .select()
+      .from(flightBottles)
+      .where(
+        and(
+          eq(flightBottles.flightId, flight.id),
+          eq(flightBottles.bottleId, targetBottle.id),
+        ),
+      );
+
+    expect(mergedCollectionRows).toHaveLength(1);
+    expect(mergedFlightRows).toHaveLength(1);
   });
 });

@@ -1,6 +1,8 @@
 import { db as defaultDb, type AnyDatabase } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleFlavorProfiles,
+  bottleObservations,
   bottleReleases,
   bottleTags,
   bottleTombstones,
@@ -9,6 +11,7 @@ import {
   collectionBottles,
   flightBottles,
   reviews,
+  storePriceMatchProposals,
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
@@ -16,7 +19,7 @@ import { upsertBottleAlias } from "@peated/server/lib/db";
 import { formatReleaseName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { eq, inArray, sql } from "drizzle-orm";
+import { eq, inArray, or, sql } from "drizzle-orm";
 
 // TODO: this should happen async
 export default async function mergeBottle({
@@ -44,7 +47,116 @@ export default async function mergeBottle({
 
   // TODO: this doesnt handle duplicate bottles
   const updatedAliasNames = new Set<string>();
+  const updatedReleaseIds = new Set<number>();
+  const updatedEntityIds = new Set<number>();
   await db.transaction(async (tx) => {
+    const [
+      sourceBottles,
+      sourceCollectionRows,
+      sourceFlightRows,
+      sourceDistillerRows,
+      targetDistillerRows,
+      existingTags,
+      existingFlavorProfiles,
+    ] = await Promise.all([
+      tx.select().from(bottles).where(inArray(bottles.id, fromBottleIds)),
+      tx
+        .select()
+        .from(collectionBottles)
+        .where(inArray(collectionBottles.bottleId, fromBottleIds)),
+      tx
+        .select()
+        .from(flightBottles)
+        .where(inArray(flightBottles.bottleId, fromBottleIds)),
+      tx
+        .select()
+        .from(bottlesToDistillers)
+        .where(inArray(bottlesToDistillers.bottleId, fromBottleIds)),
+      tx
+        .select()
+        .from(bottlesToDistillers)
+        .where(eq(bottlesToDistillers.bottleId, toBottleId)),
+      tx.query.bottleTags.findMany({
+        where: inArray(bottleTags.bottleId, fromBottleIds),
+      }),
+      tx.query.bottleFlavorProfiles.findMany({
+        where: inArray(bottleFlavorProfiles.bottleId, fromBottleIds),
+      }),
+    ]);
+
+    if (sourceBottles.length !== fromBottleIds.length) {
+      const existingBottleIds = new Set(
+        sourceBottles.map((bottle) => bottle.id),
+      );
+      const missingBottleIds = fromBottleIds.filter(
+        (id) => !existingBottleIds.has(id),
+      );
+      throw new Error(
+        `Source bottle(s) not found: ${missingBottleIds.join(", ")}`,
+      );
+    }
+
+    for (const entityId of [
+      targetBottle.brandId,
+      targetBottle.bottlerId,
+      ...targetDistillerRows.map((row) => row.distillerId),
+    ]) {
+      if (entityId !== null) {
+        updatedEntityIds.add(entityId);
+      }
+    }
+
+    for (const bottle of sourceBottles) {
+      for (const entityId of [bottle.brandId, bottle.bottlerId]) {
+        if (entityId !== null) {
+          updatedEntityIds.add(entityId);
+        }
+      }
+    }
+
+    for (const row of sourceDistillerRows) {
+      updatedEntityIds.add(row.distillerId);
+    }
+
+    if (sourceCollectionRows.length > 0) {
+      await tx
+        .insert(collectionBottles)
+        .values(
+          sourceCollectionRows.map((row) => ({
+            collectionId: row.collectionId,
+            bottleId: toBottleId,
+            releaseId: row.releaseId,
+            createdAt: row.createdAt,
+          })),
+        )
+        .onConflictDoNothing();
+    }
+
+    if (sourceFlightRows.length > 0) {
+      await tx
+        .insert(flightBottles)
+        .values(
+          sourceFlightRows.map((row) => ({
+            flightId: row.flightId,
+            bottleId: toBottleId,
+            releaseId: row.releaseId,
+          })),
+        )
+        .onConflictDoNothing();
+    }
+
+    if (sourceDistillerRows.length > 0) {
+      await tx
+        .insert(bottlesToDistillers)
+        .values(
+          sourceDistillerRows.map((row) => ({
+            bottleId: toBottleId,
+            distillerId: row.distillerId,
+          })),
+        )
+        .onConflictDoNothing();
+    }
+
     await Promise.all([
       tx
         .update(tastings)
@@ -68,18 +180,39 @@ export default async function mergeBottle({
         .where(inArray(reviews.bottleId, fromBottleIds)),
 
       tx
-        .update(flightBottles)
+        .update(bottleObservations)
         .set({
           bottleId: toBottleId,
         })
-        .where(inArray(flightBottles.bottleId, fromBottleIds)),
+        .where(inArray(bottleObservations.bottleId, fromBottleIds)),
 
       tx
-        .update(collectionBottles)
+        .update(storePriceMatchProposals)
         .set({
-          bottleId: toBottleId,
+          currentBottleId: sql`CASE
+            WHEN ${inArray(storePriceMatchProposals.currentBottleId, fromBottleIds)}
+              THEN ${toBottleId}
+            ELSE ${storePriceMatchProposals.currentBottleId}
+          END`,
+          suggestedBottleId: sql`CASE
+            WHEN ${inArray(storePriceMatchProposals.suggestedBottleId, fromBottleIds)}
+              THEN ${toBottleId}
+            ELSE ${storePriceMatchProposals.suggestedBottleId}
+          END`,
+          parentBottleId: sql`CASE
+            WHEN ${inArray(storePriceMatchProposals.parentBottleId, fromBottleIds)}
+              THEN ${toBottleId}
+            ELSE ${storePriceMatchProposals.parentBottleId}
+          END`,
+          updatedAt: sql`NOW()`,
         })
-        .where(inArray(collectionBottles.bottleId, fromBottleIds)),
+        .where(
+          or(
+            inArray(storePriceMatchProposals.currentBottleId, fromBottleIds),
+            inArray(storePriceMatchProposals.suggestedBottleId, fromBottleIds),
+            inArray(storePriceMatchProposals.parentBottleId, fromBottleIds),
+          ),
+        ),
 
       // TODO: handle conflicts
       tx
@@ -89,6 +222,18 @@ export default async function mergeBottle({
         })
         .where(inArray(bottleAliases.bottleId, fromBottleIds)),
     ]);
+
+    if (sourceCollectionRows.length > 0) {
+      await tx
+        .delete(collectionBottles)
+        .where(inArray(collectionBottles.bottleId, fromBottleIds));
+    }
+
+    if (sourceFlightRows.length > 0) {
+      await tx
+        .delete(flightBottles)
+        .where(inArray(flightBottles.bottleId, fromBottleIds));
+    }
 
     // Update bottle releases with new fullName
     const releases = await tx.query.bottleReleases.findMany({
@@ -147,6 +292,7 @@ export default async function mergeBottle({
       }
 
       updatedAliasNames.add(newFullName);
+      updatedReleaseIds.add(release.id);
     }
 
     await Promise.all(
@@ -157,10 +303,6 @@ export default async function mergeBottle({
         }),
       ),
     );
-
-    const existingTags = await tx.query.bottleTags.findMany({
-      where: inArray(bottleTags.bottleId, fromBottleIds),
-    });
 
     await Promise.all(
       existingTags.map((row) =>
@@ -174,7 +316,28 @@ export default async function mergeBottle({
           .onConflictDoUpdate({
             target: [bottleTags.bottleId, bottleTags.tag],
             set: {
-              count: sql<string>`${bottleTags.count} + 1`,
+              count: sql<number>`${bottleTags.count} + ${row.count}`,
+            },
+          }),
+      ),
+    );
+
+    await Promise.all(
+      existingFlavorProfiles.map((row) =>
+        tx
+          .insert(bottleFlavorProfiles)
+          .values({
+            bottleId: toBottleId,
+            flavorProfile: row.flavorProfile,
+            count: row.count,
+          })
+          .onConflictDoUpdate({
+            target: [
+              bottleFlavorProfiles.bottleId,
+              bottleFlavorProfiles.flavorProfile,
+            ],
+            set: {
+              count: sql<number>`${bottleFlavorProfiles.count} + ${row.count}`,
             },
           }),
       ),
@@ -183,6 +346,9 @@ export default async function mergeBottle({
     // wipe old bottles
     await Promise.all([
       tx.delete(bottleTags).where(inArray(bottleTags.bottleId, fromBottleIds)),
+      tx
+        .delete(bottleFlavorProfiles)
+        .where(inArray(bottleFlavorProfiles.bottleId, fromBottleIds)),
       tx
         .delete(bottlesToDistillers)
         .where(inArray(bottlesToDistillers.bottleId, fromBottleIds)),
@@ -202,6 +368,34 @@ export default async function mergeBottle({
       logError(err, {
         alias: {
           name: aliasName,
+        },
+      });
+    }
+  }
+
+  for (const releaseId of updatedReleaseIds) {
+    try {
+      await pushUniqueJob(
+        "OnBottleReleaseChange",
+        { releaseId },
+        { delay: 5000 },
+      );
+    } catch (err) {
+      logError(err, {
+        release: {
+          id: releaseId,
+        },
+      });
+    }
+  }
+
+  for (const entityId of updatedEntityIds) {
+    try {
+      await pushUniqueJob("OnEntityChange", { entityId }, { delay: 5000 });
+    } catch (err) {
+      logError(err, {
+        entity: {
+          id: entityId,
         },
       });
     }
