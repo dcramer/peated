@@ -1185,15 +1185,7 @@ function getSuggestedMatchCandidate({
   );
 }
 
-export function shouldVerifyStorePriceMatch({
-  action,
-  currentBottleId,
-  currentReleaseId,
-  suggestedBottleId,
-  suggestedReleaseId,
-  modelConfidence,
-  automationBlockers,
-}: {
+export function shouldVerifyStorePriceMatch(params: {
   action: MatchAction;
   currentBottleId: null | number;
   currentReleaseId?: number | null;
@@ -1202,11 +1194,23 @@ export function shouldVerifyStorePriceMatch({
   modelConfidence: number | null;
   automationBlockers: string[];
 }) {
+  const {
+    action,
+    currentBottleId,
+    currentReleaseId,
+    suggestedBottleId,
+    suggestedReleaseId,
+    modelConfidence,
+  } = params;
+
   if (action !== "match_existing" || suggestedBottleId === null) {
     return false;
   }
 
-  if (modelConfidence === null || automationBlockers.length > 0) {
+  // Existing-match automation should follow the reviewed classifier
+  // confidence directly. We still persist automation blockers for operator
+  // context, but they do not re-gate approval after review.
+  if (modelConfidence === null) {
     return false;
   }
 

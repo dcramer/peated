@@ -308,7 +308,7 @@ function authoritativeTextSupportsPlainAgeStatementCandidate({
     return false;
   }
 
-  const expectedCategory = extractedLabel.category;
+  const expectedCategory = normalizeComparableCategory(extractedLabel.category);
   if (!expectedCategory) {
     return true;
   }
@@ -328,6 +328,17 @@ function getCategoryKeywords(value: string): string[] {
     default:
       return [value.replace(/_/g, " ")];
   }
+}
+
+// The legacy `spirit` bucket means the category is unknown, not that the
+// bottle is positively identified as a generic spirit family.
+function normalizeComparableCategory(
+  value:
+    | BottleCandidate["category"]
+    | BottleExtractedDetails["category"]
+    | null,
+) {
+  return value === "spirit" ? null : value;
 }
 
 function attributeMatchesText(
@@ -465,9 +476,9 @@ function buildEvidenceChecks({
     {
       attribute: "category",
       expectedValue:
-        proposedBottle?.category ??
-        extractedLabel?.category ??
-        targetCandidate?.category ??
+        normalizeComparableCategory(proposedBottle?.category ?? null) ??
+        normalizeComparableCategory(extractedLabel?.category ?? null) ??
+        normalizeComparableCategory(targetCandidate?.category ?? null) ??
         null,
     },
   ];
@@ -590,6 +601,12 @@ export function getExistingMatchIdentityConflicts({
   }
 
   const conflicts: string[] = [];
+  const extractedCategory = normalizeComparableCategory(
+    extractedLabel?.category ?? null,
+  );
+  const targetCategory = normalizeComparableCategory(
+    targetCandidate.category ?? null,
+  );
 
   if (
     extractedLabel?.brand &&
@@ -616,9 +633,9 @@ export function getExistingMatchIdentityConflicts({
   }
 
   if (
-    extractedLabel?.category &&
-    targetCandidate.category &&
-    extractedLabel.category !== targetCandidate.category
+    extractedCategory &&
+    targetCategory &&
+    extractedCategory !== targetCategory
   ) {
     conflicts.push("category");
   }

@@ -1,0 +1,89 @@
+{
+  "id": "store-listing-legacy-spirit-category-does-not-block-shibui-grain-select",
+  "name": "store listing: legacy spirit category does not block Shibui Grain Select",
+  "input": {
+    "reference": {
+      "name": "Shibui Grain Select Whisky 750ml",
+      "url": "https://woodencork.com/collections/whiskey/products/shibui-grain-select-whisky-750ml?utm=peated"
+    },
+    "extractedIdentity": {
+      "brand": "Shibui",
+      "bottler": null,
+      "expression": "Grain Select",
+      "series": null,
+      "distillery": [],
+      "category": "single_grain",
+      "stated_age": null,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "bottleId": 13025,
+        "releaseId": null,
+        "alias": "Shibui Grain Select",
+        "fullName": "Shibui Grain Select",
+        "bottleFullName": "Shibui Grain Select",
+        "brand": "Shibui",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "spirit",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 1,
+        "source": ["brand", "exact"]
+      },
+      {
+        "kind": "bottle",
+        "bottleId": 44140,
+        "releaseId": null,
+        "alias": "Shibui 10-year-old White Oak Cask",
+        "fullName": "Shibui 10-year-old White Oak Cask",
+        "bottleFullName": "Shibui 10-year-old White Oak Cask",
+        "brand": "Shibui",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Masahiro Distillery"],
+        "category": "single_grain",
+        "statedAge": 10,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": 43,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": "oak",
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.5512119537722439,
+        "source": ["vector"]
+      }
+    ]
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 13025,
+    "confidenceAtLeast": 96,
+    "verifyEligible": true,
+    "summary": "Ignore the legacy generic `spirit` bucket on the stored bottle, then keep the exact-name existing match to Shibui Grain Select at verification-eligible confidence."
+  }
+}

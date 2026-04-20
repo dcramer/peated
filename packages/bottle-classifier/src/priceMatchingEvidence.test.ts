@@ -188,6 +188,30 @@ describe("priceMatchingEvidence", () => {
     );
   });
 
+  test("does not treat the legacy generic spirit category as an existing-match conflict", () => {
+    expect(
+      getExistingMatchIdentityConflicts({
+        target: buildBottleCandidate({
+          bottleId: 13025,
+          fullName: "Shibui Grain Select",
+          bottleFullName: "Shibui Grain Select",
+          brand: "Shibui",
+          category: "spirit",
+          source: ["brand", "exact"],
+        }),
+        extractedLabel: buildExtractedLabel({
+          brand: "Shibui",
+          expression: "Grain Select",
+          distillery: [],
+          category: "single_grain",
+          stated_age: null,
+          abv: null,
+          cask_type: null,
+        }),
+      }),
+    ).not.toContain("candidate category conflicts with extracted label");
+  });
+
   test("allows a lower confidence threshold when the classifier reaffirms the current assignment", () => {
     expect(
       isExistingMatchConfidenceEligibleForVerification({

@@ -240,6 +240,58 @@ describe("priceMatchingAutomation", () => {
     ).toBe(true);
   });
 
+  test("does not let the legacy generic spirit category block a reviewed existing match", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "match_existing",
+      modelConfidence: 97,
+      price: {
+        bottleId: null,
+        name: "Shibui Grain Select Whisky 750ml",
+        url: "https://woodencork.com/products/shibui-grain-select-whisky",
+      },
+      suggestedBottleId: 13025,
+      suggestedReleaseId: null,
+      extractedLabel: buildExtractedLabel({
+        brand: "Shibui",
+        expression: "Grain Select",
+        distillery: [],
+        category: "single_grain",
+        stated_age: null,
+        abv: null,
+        cask_type: null,
+      }),
+      proposedBottle: null,
+      searchEvidence: [],
+      candidateBottles: [
+        buildCandidate({
+          bottleId: 13025,
+          fullName: "Shibui Grain Select",
+          bottleFullName: "Shibui Grain Select",
+          brand: "Shibui",
+          distillery: [],
+          category: "spirit",
+          statedAge: null,
+          abv: null,
+          caskType: null,
+          source: ["brand", "exact"],
+        }),
+      ],
+    });
+
+    expect(assessment.automationBlockers).toEqual([]);
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        currentBottleId: null,
+        currentReleaseId: null,
+        suggestedBottleId: 13025,
+        suggestedReleaseId: null,
+        modelConfidence: 97,
+        automationBlockers: assessment.automationBlockers,
+      }),
+    ).toBe(true);
+  });
+
   test("auto-approves high-confidence bottle matches when off-retailer evidence confirms the product identity", () => {
     const extractedLabel = buildExtractedLabel({
       brand: "The Glenlivet",
@@ -754,7 +806,7 @@ describe("priceMatchingAutomation", () => {
     ).toBe(false);
   });
 
-  test("does not auto-approve high-confidence matches when blockers remain", () => {
+  test("does not let existing-match blockers veto high-confidence reviewed matches", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
@@ -765,6 +817,6 @@ describe("priceMatchingAutomation", () => {
         modelConfidence: 99,
         automationBlockers: ["candidate age conflicts with extracted label"],
       }),
-    ).toBe(false);
+    ).toBe(true);
   });
 });

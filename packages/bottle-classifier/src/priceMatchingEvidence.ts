@@ -149,6 +149,17 @@ function getCategoryKeywords(value: string): string[] {
   }
 }
 
+// The legacy `spirit` bucket is a fallback for missing whisky category data,
+// so it should not count as either supportive identity evidence or a conflict.
+function normalizeComparableCategory(
+  value:
+    | BottleCandidate["category"]
+    | BottleExtractedDetails["category"]
+    | null,
+) {
+  return value === "spirit" ? null : value;
+}
+
 function attributeMatchesText(
   attribute: MatchAttribute,
   expectedValue: string,
@@ -299,6 +310,12 @@ function buildExistingMatchSupportChecks({
   const checks: EvidenceCheck[] = [];
   const differentiatingAttributes = new Set<MatchAttribute>();
   const label = extractedLabel;
+  const comparableLabelCategory = normalizeComparableCategory(
+    label?.category ?? null,
+  );
+  const comparableTargetCategory = normalizeComparableCategory(
+    target.category ?? null,
+  );
 
   if (label?.brand && candidateMatchesBrand(target, label.brand)) {
     addCheckIfPresent(checks, "brand", label.brand, false);
@@ -321,8 +338,11 @@ function buildExistingMatchSupportChecks({
     }
   }
 
-  if (label?.category && target.category === label.category) {
-    addCheckIfPresent(checks, "category", label.category, false);
+  if (
+    comparableLabelCategory &&
+    comparableTargetCategory === comparableLabelCategory
+  ) {
+    addCheckIfPresent(checks, "category", comparableLabelCategory, false);
   }
 
   if (
@@ -402,8 +422,8 @@ function buildExistingMatchSupportChecks({
     differentiatingAttributes.add("distillery");
   }
 
-  if (extractedLabel?.category === null && target.category) {
-    addCheckIfPresent(checks, "category", target.category, true);
+  if (comparableLabelCategory === null && comparableTargetCategory) {
+    addCheckIfPresent(checks, "category", comparableTargetCategory, true);
     differentiatingAttributes.add("category");
   }
 
@@ -620,6 +640,12 @@ export function getExistingMatchIdentityConflicts({
   }
 
   const conflicts: string[] = [];
+  const comparableExtractedCategory = normalizeComparableCategory(
+    extractedLabel.category ?? null,
+  );
+  const comparableTargetCategory = normalizeComparableCategory(
+    target.category ?? null,
+  );
 
   if (
     extractedLabel.bottler &&
@@ -646,9 +672,9 @@ export function getExistingMatchIdentityConflicts({
   }
 
   if (
-    extractedLabel.category &&
-    target.category &&
-    target.category !== extractedLabel.category
+    comparableExtractedCategory &&
+    comparableTargetCategory &&
+    comparableTargetCategory !== comparableExtractedCategory
   ) {
     conflicts.push("candidate category conflicts with extracted label");
   }

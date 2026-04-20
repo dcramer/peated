@@ -347,6 +347,88 @@ function normalizeNameTokenizationText(
     .replace(/\b([a-z0-9]+)s'\b/g, "$1s");
 }
 
+function hasExplicitPossessiveMarker(
+  value: string | null | undefined,
+): boolean {
+  return /\b[a-z0-9]+'s\b|\b[a-z0-9]+s'\b/i.test(
+    normalizeComparableText(value),
+  );
+}
+
+function getComparableNameTokenVariants(
+  value: string | null | undefined,
+  strict = false,
+): string[][] {
+  const rawTokens = normalizeComparableText(value)
+    .replace(/\b\d+(?:\.\d+)?\s?(?:ml|cl|l|oz)\b/g, " ")
+    .split(/[^a-z0-9']+/g)
+    .filter((token) => token.length > 0);
+
+  if (!rawTokens.length) {
+    return [];
+  }
+
+  let variants: string[][] = [[]];
+
+  for (const rawToken of rawTokens) {
+    const tokenVariants = Array.from(
+      new Set(
+        expandComparableEvidenceToken(rawToken).map((token) =>
+          token.replace(/'/g, ""),
+        ),
+      ),
+    ).filter(
+      (token) =>
+        token.length > 0 && (strict || !GENERIC_NAME_TOKENS.has(token)),
+    );
+
+    if (!tokenVariants.length) {
+      continue;
+    }
+
+    variants = variants.flatMap((sequence) =>
+      tokenVariants.map((token) => [...sequence, token]),
+    );
+  }
+
+  return variants;
+}
+
+// Retailer titles often drop possessive punctuation from brand names
+// entirely. Treat that as exactish support for reviewed existing matches
+// without broadening the literal alias fast path.
+function isPossessiveInsensitiveExactNameMatch(
+  referenceName: string,
+  candidateName: string | null | undefined,
+  strict = false,
+): boolean {
+  if (
+    !candidateName ||
+    (!hasExplicitPossessiveMarker(referenceName) &&
+      !hasExplicitPossessiveMarker(candidateName))
+  ) {
+    return false;
+  }
+
+  const referenceVariants = getComparableNameTokenVariants(
+    referenceName,
+    strict,
+  );
+  const candidateVariants = getComparableNameTokenVariants(
+    candidateName,
+    strict,
+  );
+
+  return referenceVariants.some((referenceTokens) =>
+    candidateVariants.some((candidateTokens) =>
+      tokenSequencesMatchAllowingStandaloneArticle(
+        referenceTokens,
+        candidateTokens,
+      ),
+    ),
+  );
+}
+
 function getComparableEvidenceTokens(
   value: string | null | undefined,
 ): string[] {
@@ -510,6 +592,10 @@ function isConservativelySupportedExistingMatchName(
     return true;
   }
 
+  if (isPossessiveInsensitiveExactNameMatch(referenceName, candidateName)) {
+    return true;
+  }
+
   if (!candidateName) {
     return false;
   }
@@ -519,7 +605,14 @@ function isConservativelySupportedExistingMatchName(
     return false;
   }
 
-  return isStrictlyExactNameMatch(referenceName, strippedCandidateName);
+  return (
+    isStrictlyExactNameMatch(referenceName, strippedCandidateName) ||
+    isPossessiveInsensitiveExactNameMatch(
+      referenceName,
+      strippedCandidateName,
+      true,
+    )
+  );
 }
 
 function hasReferenceAnchoredSparseCreateProposal({

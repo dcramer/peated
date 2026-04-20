@@ -444,6 +444,40 @@ describe("bottleClassificationEvidence", () => {
     ).not.toContain("stated_age");
   });
 
+  test("does not treat the legacy generic spirit category as a hard existing-match conflict", () => {
+    expect(
+      getExistingMatchIdentityConflicts({
+        referenceName: "Shibui Grain Select Whisky 750ml",
+        extractedLabel: {
+          brand: "Shibui",
+          bottler: null,
+          expression: "Grain Select",
+          series: null,
+          distillery: [],
+          category: "single_grain",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        targetCandidate: buildBottleCandidate({
+          bottleId: 13025,
+          fullName: "Shibui Grain Select",
+          bottleFullName: "Shibui Grain Select",
+          brand: "Shibui",
+          category: "spirit",
+          source: ["brand", "exact"],
+        }),
+      }),
+    ).not.toContain("category");
+  });
+
   test("flags dirty parent stated-age conflicts only when the bottle name does not market that age", () => {
     expect(
       hasDirtyParentStatedAgeConflict({
