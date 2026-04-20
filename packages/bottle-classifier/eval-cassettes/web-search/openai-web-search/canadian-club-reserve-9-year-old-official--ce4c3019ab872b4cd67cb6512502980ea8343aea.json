@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "\"Canadian Club Reserve\" 9 year old official"
+    },
+    "recordedAt": "2026-04-20T02:29:26.920Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "\"Canadian Club Reserve\" 9 year old official",
+          "summary": "Yes — **“Canadian Club Reserve” 9 Year Old** is an **official Canadian Club core bottling**, not an independent bottling.\n\nWhat the sources support:\n- The official Canadian Club site lists **“Reserve 9 Year Old Canadian Whisky”** as part of its product range. ([canadianclub.com](https://www.canadianclub.com/products/re",
+          "results": [
+            {
+              "title": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+              "url": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+              "domain": "distiller.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.canadianclub.com/us/",
+              "url": "https://www.canadianclub.com/us/",
+              "domain": "canadianclub.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+              "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+              "domain": "canadianclub.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+              "url": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+              "domain": "whiskyadvocate.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.canadianclub.com/html-sitemap",
+              "url": "https://www.canadianclub.com/html-sitemap",
+              "domain": "canadianclub.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.canadianclub.com/products",
+              "url": "https://www.canadianclub.com/products",
+              "domain": "canadianclub.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "\"Canadian Club Reserve\" 9 year old official",
+        "summary": "Yes — **“Canadian Club Reserve” 9 Year Old** is an **official Canadian Club core bottling**, not an independent bottling.\n\nWhat the sources support:\n- The official Canadian Club site lists **“Reserve 9 Year Old Canadian Whisky”** as part of its product range. ([canadianclub.com](https://www.canadianclub.com/products/re",
+        "results": [
+          {
+            "title": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+            "url": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+            "domain": "distiller.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.canadianclub.com/us/",
+            "url": "https://www.canadianclub.com/us/",
+            "domain": "canadianclub.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+            "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+            "domain": "canadianclub.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+            "url": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+            "domain": "whiskyadvocate.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.canadianclub.com/html-sitemap",
+            "url": "https://www.canadianclub.com/html-sitemap",
+            "domain": "canadianclub.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.canadianclub.com/products",
+            "url": "https://www.canadianclub.com/products",
+            "domain": "canadianclub.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

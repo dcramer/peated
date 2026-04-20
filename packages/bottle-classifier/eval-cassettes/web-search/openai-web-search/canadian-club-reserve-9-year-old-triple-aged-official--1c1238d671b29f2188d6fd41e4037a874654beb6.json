@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Canadian Club Reserve 9 year old Triple Aged official"
+    },
+    "recordedAt": "2026-04-20T02:30:50.367Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Canadian Club Reserve 9 year old Triple Aged official",
+          "summary": "I found an official Canadian Club product page plus independent whisky sources for this bottle.\n\n**Bottle identified:** **Canadian Club Reserve 9 Year Old Canadian Whisky**  \n**Confirmed traits:**\n- **Brand/producer:** Canadian Club / Hiram Walker. ([canadianclub.com](https://www.canadianclub.com/products/reserve-9-yea",
+          "results": [
+            {
+              "title": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+              "url": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+              "domain": "connosr.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+              "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+              "domain": "canadianclub.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://therumhowlerblog.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/",
+              "url": "https://therumhowlerblog.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/",
+              "domain": "therumhowlerblog.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://bevmo.com/products/33945",
+              "url": "https://bevmo.com/products/33945",
+              "domain": "bevmo.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+              "url": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+              "domain": "distiller.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.longislandwinespirits.com/products/spirit/rye/canadian-club-reserve-9-yr-old-750ml/",
+              "url": "https://www.longislandwinespirits.com/products/spirit/rye/canadian-club-reserve-9-yr-old-750ml/",
+              "domain": "longislandwinespirits.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Canadian Club Reserve 9 year old Triple Aged official",
+        "summary": "I found an official Canadian Club product page plus independent whisky sources for this bottle.\n\n**Bottle identified:** **Canadian Club Reserve 9 Year Old Canadian Whisky**  \n**Confirmed traits:**\n- **Brand/producer:** Canadian Club / Hiram Walker. ([canadianclub.com](https://www.canadianclub.com/products/reserve-9-yea",
+        "results": [
+          {
+            "title": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+            "url": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+            "domain": "connosr.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+            "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+            "domain": "canadianclub.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://therumhowlerblog.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/",
+            "url": "https://therumhowlerblog.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/",
+            "domain": "therumhowlerblog.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://bevmo.com/products/33945",
+            "url": "https://bevmo.com/products/33945",
+            "domain": "bevmo.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+            "url": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+            "domain": "distiller.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.longislandwinespirits.com/products/spirit/rye/canadian-club-reserve-9-yr-old-750ml/",
+            "url": "https://www.longislandwinespirits.com/products/spirit/rye/canadian-club-reserve-9-yr-old-750ml/",
+            "domain": "longislandwinespirits.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

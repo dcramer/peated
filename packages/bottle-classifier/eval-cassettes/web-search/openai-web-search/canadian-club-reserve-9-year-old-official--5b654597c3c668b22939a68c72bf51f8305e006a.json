@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "entry": {
+    "key": {
+      "cacheKeyVersion": 1,
+      "toolName": "openai_web_search",
+      "model": "gpt-5.4",
+      "query": "Canadian Club Reserve 9 year old official"
+    },
+    "recordedAt": "2026-04-20T02:10:06.893Z",
+    "value": {
+      "emittedEvidence": [
+        {
+          "provider": "openai",
+          "query": "Canadian Club Reserve 9 year old official",
+          "summary": "Yes — **Canadian Club Reserve 9 Year Old** appears to be an **official Canadian Club core product/release**, not just a retailer-created listing.\n\nWhat authoritative sources confirm:\n\n- The **official Canadian Club site** lists **“Reserve 9 Year Old Canadian Whisky”** as a product and describes it as a more mature expr",
+          "results": [
+            {
+              "title": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+              "url": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+              "domain": "distiller.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+              "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+              "domain": "canadianclub.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.whiskybase.com/whiskies/whisky/245183/canadian-club-09-year-old",
+              "url": "https://www.whiskybase.com/whiskies/whisky/245183/canadian-club-09-year-old",
+              "domain": "whiskybase.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.longislandwinespirits.com/products/spirit/rye/canadian-club-reserve-9-yr-old-750ml/",
+              "url": "https://www.longislandwinespirits.com/products/spirit/rye/canadian-club-reserve-9-yr-old-750ml/",
+              "domain": "longislandwinespirits.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+              "url": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+              "domain": "connosr.com",
+              "description": null,
+              "extraSnippets": []
+            },
+            {
+              "title": "https://www.royalbatch.com/canadian-club-9-year-old-reserve-canadian-whisky",
+              "url": "https://www.royalbatch.com/canadian-club-9-year-old-reserve-canadian-whisky",
+              "domain": "royalbatch.com",
+              "description": null,
+              "extraSnippets": []
+            }
+          ]
+        }
+      ],
+      "result": {
+        "provider": "openai",
+        "query": "Canadian Club Reserve 9 year old official",
+        "summary": "Yes — **Canadian Club Reserve 9 Year Old** appears to be an **official Canadian Club core product/release**, not just a retailer-created listing.\n\nWhat authoritative sources confirm:\n\n- The **official Canadian Club site** lists **“Reserve 9 Year Old Canadian Whisky”** as a product and describes it as a more mature expr",
+        "results": [
+          {
+            "title": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+            "url": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+            "domain": "distiller.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+            "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+            "domain": "canadianclub.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.whiskybase.com/whiskies/whisky/245183/canadian-club-09-year-old",
+            "url": "https://www.whiskybase.com/whiskies/whisky/245183/canadian-club-09-year-old",
+            "domain": "whiskybase.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.longislandwinespirits.com/products/spirit/rye/canadian-club-reserve-9-yr-old-750ml/",
+            "url": "https://www.longislandwinespirits.com/products/spirit/rye/canadian-club-reserve-9-yr-old-750ml/",
+            "domain": "longislandwinespirits.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+            "url": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+            "domain": "connosr.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "https://www.royalbatch.com/canadian-club-9-year-old-reserve-canadian-whisky",
+            "url": "https://www.royalbatch.com/canadian-club-9-year-old-reserve-canadian-whisky",
+            "domain": "royalbatch.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    }
+  }
+}

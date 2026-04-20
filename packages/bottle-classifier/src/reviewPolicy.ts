@@ -1585,20 +1585,6 @@ function capReviewOnlyMatchConfidence({
     );
   }
 
-  const hasSiblingAmbiguity = artifacts.candidates.some((candidate) =>
-    siblingCandidateAddsUnsupportedDifferentiators({
-      candidate,
-      target,
-      referenceName: reference.name,
-      extractedIdentity: artifacts.extractedIdentity,
-    }),
-  );
-  if (hasSiblingAmbiguity) {
-    reasons.push(
-      "other surfaced sibling candidates add differentiating traits the reference does not explicitly support",
-    );
-  }
-
   if (!reasons.length) {
     return decision;
   }
@@ -1796,42 +1782,38 @@ function candidateMatchesStructuredBottleExpression({
   );
 }
 
-function candidateLooksLikePlainAgeStatementBottle(
-  candidate: BottleCandidate,
-): boolean {
+function candidateMatchesStructuredBottleStatedAge({
+  candidate,
+  extractedIdentity,
+}: {
+  candidate: BottleCandidate;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+}): boolean {
   if (
+    !extractedIdentity ||
+    extractedIdentity.stated_age === null ||
+    extractedIdentity.stated_age === undefined ||
     candidate.statedAge === null ||
     candidate.statedAge === undefined ||
-    candidate.series ||
-    candidate.edition ||
-    candidate.releaseYear !== null ||
-    candidate.vintageYear !== null
+    candidate.statedAge !== extractedIdentity.stated_age ||
+    !getBottleTargetNameCandidates(candidate).some((name) =>
+      comparableTextMarketsStatedAge(name, candidate.statedAge),
+    )
   ) {
     return false;
   }
 
-  const producerTokens = new Set(
-    [
-      ...getComparableNameTokens(candidate.brand),
-      ...getComparableNameTokens(candidate.bottler),
-      ...candidate.distillery.flatMap((distillery) =>
-        getComparableNameTokens(distillery),
-      ),
-    ].filter((token) => token.length > 0),
+  return (
+    extractedIdentityLooksLikePlainAgeStatementReference(extractedIdentity) ||
+    candidateMatchesStructuredBottleExpression({
+      candidate,
+      expression: extractedIdentity.expression,
+    }) ||
+    Boolean(
+      extractedIdentity.series &&
+      textsOverlap(candidate.series, extractedIdentity.series),
+    )
   );
-  const ageToken = String(candidate.statedAge);
-
-  return getBottleTargetNameCandidates(candidate).some((name) => {
-    const tokens = getComparableNameTokens(name);
-    if (!tokens.includes(ageToken)) {
-      return false;
-    }
-
-    return (
-      tokens.filter((token) => token !== ageToken && !producerTokens.has(token))
-        .length === 0
-    );
-  });
 }
 
 function getMatchingDecisiveBottleSupportFields({
@@ -1887,12 +1869,10 @@ function getMatchingDecisiveBottleSupportFields({
   }
 
   if (
-    extractedIdentityLooksLikePlainAgeStatementReference(extractedIdentity) &&
-    extractedIdentity.stated_age !== null &&
-    extractedIdentity.stated_age !== undefined &&
-    candidate.statedAge !== null &&
-    candidate.statedAge === extractedIdentity.stated_age &&
-    candidateLooksLikePlainAgeStatementBottle(candidate)
+    candidateMatchesStructuredBottleStatedAge({
+      candidate,
+      extractedIdentity,
+    })
   ) {
     matchedFields.push("statedAge");
   }
@@ -1955,16 +1935,10 @@ function candidateMatchesDecisiveBottleSupportFields({
           candidate.category === extractedIdentity.category
         );
       case "statedAge":
-        return Boolean(
-          extractedIdentityLooksLikePlainAgeStatementReference(
-            extractedIdentity,
-          ) &&
-          extractedIdentity.stated_age !== null &&
-          extractedIdentity.stated_age !== undefined &&
-          candidate.statedAge !== null &&
-          candidate.statedAge === extractedIdentity.stated_age &&
-          candidateLooksLikePlainAgeStatementBottle(candidate),
-        );
+        return candidateMatchesStructuredBottleStatedAge({
+          candidate,
+          extractedIdentity,
+        });
       case "expression":
         return candidateMatchesStructuredBottleExpression({
           candidate,

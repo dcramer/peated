@@ -1,0 +1,89 @@
+{
+  "id": "store-listing-broader-sibling-does-not-cap-canadian-club-reserve-9-year-old",
+  "name": "store listing: broader sibling does not cap Canadian Club Reserve 9-year-old",
+  "input": {
+    "reference": {
+      "name": "Canadian Club 9-year-old Reserve Canadian Whisky",
+      "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113.html?utm=peated"
+    },
+    "extractedIdentity": {
+      "brand": "Canadian Club",
+      "bottler": null,
+      "expression": "Reserve",
+      "series": null,
+      "distillery": [],
+      "category": "blend",
+      "stated_age": 9,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "bottleId": 16913,
+        "releaseId": null,
+        "alias": null,
+        "fullName": "Canadian Club Reserve 9-year-old Triple Aged",
+        "bottleFullName": "Canadian Club Reserve 9-year-old Triple Aged",
+        "brand": "Canadian",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "blend",
+        "statedAge": 9,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 1,
+        "source": ["text"]
+      },
+      {
+        "kind": "bottle",
+        "bottleId": 17346,
+        "releaseId": null,
+        "alias": null,
+        "fullName": "Canadian Club Reserve, 40% ABV",
+        "bottleFullName": "Canadian Club Reserve, 40% ABV",
+        "brand": "Canadian",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "blend",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 1,
+        "source": ["text"]
+      }
+    ]
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 16913,
+    "confidenceAtLeast": 96,
+    "verifyEligible": true,
+    "summary": "Do not let a broader sibling like Canadian Club Reserve 40% ABV cap a high-confidence existing match when the agent already identified the stronger 9-year-old Reserve bottle."
+  }
+}

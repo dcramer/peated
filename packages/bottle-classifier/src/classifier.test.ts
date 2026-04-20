@@ -543,6 +543,58 @@ const juraSherryCaskCandidate: BottleCandidate = {
   source: ["text"],
 };
 
+const canadianClubReserve9YearOldCandidate: BottleCandidate = {
+  bottleId: 16913,
+  releaseId: null,
+  kind: "bottle",
+  alias: null,
+  fullName: "Canadian Club Reserve 9-year-old Triple Aged",
+  bottleFullName: "Canadian Club Reserve 9-year-old Triple Aged",
+  brand: "Canadian",
+  bottler: null,
+  series: null,
+  distillery: [],
+  category: "blend",
+  statedAge: 9,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 1,
+  source: ["text"],
+};
+
+const canadianClubReserve40Candidate: BottleCandidate = {
+  bottleId: 17346,
+  releaseId: null,
+  kind: "bottle",
+  alias: null,
+  fullName: "Canadian Club Reserve, 40% ABV",
+  bottleFullName: "Canadian Club Reserve, 40% ABV",
+  brand: "Canadian",
+  bottler: null,
+  series: null,
+  distillery: [],
+  category: "blend",
+  statedAge: null,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 1,
+  source: ["text"],
+};
+
 const redbreastBatchACandidate: BottleCandidate = {
   bottleId: 9101,
   releaseId: null,
@@ -2256,6 +2308,87 @@ describe("createBottleClassifier", () => {
     expect(result.decision).toMatchObject({
       action: "match",
       matchedBottleId: 3233,
+      matchedReleaseId: null,
+      parentBottleId: null,
+      identityScope: "product",
+    });
+    expect(result.decision.rationale).not.toContain(
+      "Server downgraded the existing-match recommendation",
+    );
+  });
+
+  test("keeps a uniquely supported bottle match when a sibling only omits the decisive marketed age statement", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Canadian Club",
+      bottler: null,
+      expression: "Reserve",
+      series: null,
+      distillery: [],
+      category: "blend",
+      stated_age: 9,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 97,
+          rationale:
+            "The 9-year Reserve bottle is the strongest existing match, and Triple Aged reads as extra label wording rather than a separate product family.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 16913,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [16913, 17346],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [
+            canadianClubReserve9YearOldCandidate,
+            canadianClubReserve40Candidate,
+          ],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Canadian Club 9-year-old Reserve Canadian Whisky",
+        url: "https://example.com/products/canadian-club-reserve-9-year-old",
+      },
+      extractedIdentity,
+      initialCandidates: [
+        canadianClubReserve9YearOldCandidate,
+        canadianClubReserve40Candidate,
+      ],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "match",
+      confidence: 97,
+      matchedBottleId: 16913,
       matchedReleaseId: null,
       parentBottleId: null,
       identityScope: "product",
