@@ -1231,6 +1231,7 @@ describe("priceMatching", () => {
 
     expect(proposal.status).toBe("pending_review");
     expect(proposal.proposalType).toBe("match_existing");
+    expect(proposal.enteredQueueAt).not.toBeNull();
     expect(proposal.suggestedBottleId).toBe(bottle.id);
     expect(proposal.rationale).not.toContain(
       "Server downgraded the existing-match recommendation",
@@ -1376,6 +1377,7 @@ describe("priceMatching", () => {
       proposalType: "match_existing",
       currentBottleId: bottle.id,
       suggestedBottleId: bottle.id,
+      enteredQueueAt: null,
       reviewedById: expect.any(Number),
     });
     expect(updatedPrice?.bottleId).toBe(bottle.id);
@@ -2441,6 +2443,7 @@ describe("priceMatching", () => {
     expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal.status).toBe("ignored");
     expect(proposal.proposalType).toBe("no_match");
+    expect(proposal.enteredQueueAt).toBeNull();
   });
 
   test("auto ignored bundle listings clear stale bottle assignments", async ({
@@ -4746,6 +4749,56 @@ describe("priceMatching", () => {
       processingQueuedAt: null,
       processingExpiresAt: null,
     });
+  });
+
+  test("refreshes queue entry time when forced re-resolution requeues a proposal", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const price = await fixtures.StorePrice({
+      name: "Requeue Candidate",
+      imageUrl: null,
+    });
+    const priorQueueEntryAt = new Date("2026-02-01T00:30:00.000Z");
+    const reviewer = await fixtures.User();
+
+    await db.insert(storePriceMatchProposals).values({
+      priceId: price.id,
+      status: "approved",
+      proposalType: "match_existing",
+      enteredQueueAt: priorQueueEntryAt,
+      reviewedById: reviewer.id,
+      reviewedAt: new Date("2026-03-01T00:30:00.000Z"),
+    });
+
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        decision: {
+          action: "no_match",
+          confidence: 35,
+          rationale: "This needs review again.",
+          suggestedBottleId: null,
+          candidateBottleIds: [],
+          proposedBottle: null,
+        },
+        searchEvidence: [],
+        candidateBottles: [],
+        resolvedEntities: [],
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id, {
+      force: true,
+    });
+
+    expect(proposal.status).toBe("pending_review");
+    expect(proposal.enteredQueueAt).not.toBeNull();
+    expect(proposal.enteredQueueAt!.getTime()).toBeGreaterThan(
+      priorQueueEntryAt.getTime(),
+    );
   });
 
   test("ignored clear guard requires the active processing lease owner", () => {

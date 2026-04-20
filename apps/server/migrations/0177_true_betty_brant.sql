@@ -1,0 +1,2 @@
+ALTER TABLE "store_price_match_proposal" ADD COLUMN "entered_queue_at" timestamp;
+CREATE INDEX "store_price_match_proposal_entered_queue_idx" ON "store_price_match_proposal" USING btree ("entered_queue_at");

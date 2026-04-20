@@ -1,5 +1,6 @@
 "use client";
 
+import ReviewWorkbenchStats from "@peated/web/components/admin/reviewWorkbenchStats";
 import WorkbenchCard from "@peated/web/components/admin/workbenchCard";
 import { ADMIN_WORKSTREAMS } from "@peated/web/components/admin/workstreams";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
@@ -139,6 +140,11 @@ export default function Admin() {
       refetchInterval: 5000,
     }),
   );
+  const reviewWorkbenchStatsQuery = useQuery(
+    orpc.admin.reviewWorkbenchStats.queryOptions({
+      refetchInterval: 60_000,
+    }),
+  );
 
   const actionableCount = queueQuery.isError
     ? null
@@ -247,6 +253,12 @@ export default function Admin() {
             queueInfo={queueInfoQuery.data}
           />
         </section>
+
+        <ReviewWorkbenchStats
+          isError={reviewWorkbenchStatsQuery.isError}
+          isLoading={reviewWorkbenchStatsQuery.isLoading}
+          stats={reviewWorkbenchStatsQuery.data}
+        />
 
         <section className="grid gap-4 xl:grid-cols-2">
           <WorkbenchCard

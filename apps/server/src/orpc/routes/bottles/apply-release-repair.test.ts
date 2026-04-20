@@ -274,6 +274,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       name: legacyBottle.fullName,
       volume: 750,
     });
+    const priorQueueEntryAt = new Date("2026-02-01T00:30:00.000Z");
 
     const [proposal] = await db
       .insert(storePriceMatchProposals)
@@ -284,6 +285,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
         currentBottleId: legacyBottle.id,
         suggestedBottleId: legacyBottle.id,
         parentBottleId: legacyBottle.id,
+        enteredQueueAt: priorQueueEntryAt,
         reviewedById: mod.id,
         reviewedAt: new Date(),
       })
@@ -447,6 +449,10 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       reviewedById: null,
       reviewedAt: null,
     });
+    expect(updatedProposal?.enteredQueueAt).not.toBeNull();
+    expect(updatedProposal!.enteredQueueAt!.getTime()).toBeGreaterThan(
+      priorQueueEntryAt.getTime(),
+    );
 
     const [deleteChange] = await db
       .select()

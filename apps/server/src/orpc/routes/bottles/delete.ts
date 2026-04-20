@@ -112,6 +112,11 @@ export default procedure
           .set({
             currentBottleId: sql`CASE WHEN ${storePriceMatchProposals.currentBottleId} = ${bottle.id} THEN NULL ELSE ${storePriceMatchProposals.currentBottleId} END`,
             suggestedBottleId: sql`CASE WHEN ${storePriceMatchProposals.suggestedBottleId} = ${bottle.id} THEN NULL ELSE ${storePriceMatchProposals.suggestedBottleId} END`,
+            enteredQueueAt: sql`CASE
+              WHEN ${storePriceMatchProposals.status} IN ('approved', 'verified')
+                THEN NOW()
+              ELSE ${storePriceMatchProposals.enteredQueueAt}
+            END`,
             status: sql`CASE
               WHEN ${storePriceMatchProposals.status} IN ('approved', 'verified')
                 THEN 'pending_review'::store_price_match_proposal_status

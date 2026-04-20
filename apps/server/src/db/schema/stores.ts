@@ -164,6 +164,7 @@ export const storePriceMatchProposals = pgTable(
     model: text("model"),
     error: text("error"),
     lastEvaluatedAt: timestamp("last_evaluated_at"),
+    enteredQueueAt: timestamp("entered_queue_at"),
     processingToken: text("processing_token"),
     processingQueuedAt: timestamp("processing_queued_at"),
     processingExpiresAt: timestamp("processing_expires_at"),
@@ -186,6 +187,9 @@ export const storePriceMatchProposals = pgTable(
     ),
     index("store_price_match_proposal_processing_expires_idx").on(
       table.processingExpiresAt,
+    ),
+    index("store_price_match_proposal_entered_queue_idx").on(
+      table.enteredQueueAt,
     ),
     index("store_price_match_proposal_suggested_bottle_idx").on(
       table.suggestedBottleId,

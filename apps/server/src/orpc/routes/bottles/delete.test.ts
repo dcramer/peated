@@ -46,6 +46,7 @@ describe("DELETE /bottles/:bottle", () => {
     const bottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({ bottleId: bottle.id });
     const reviewer = await fixtures.User();
+    const priorQueueEntryAt = new Date("2026-03-01T00:30:00.000Z");
 
     const [proposal] = await db
       .insert(storePriceMatchProposals)
@@ -55,6 +56,7 @@ describe("DELETE /bottles/:bottle", () => {
         proposalType: "match_existing",
         currentBottleId: bottle.id,
         suggestedBottleId: bottle.id,
+        enteredQueueAt: priorQueueEntryAt,
         reviewedById: reviewer.id,
         reviewedAt: new Date("2026-03-11T00:30:00.000Z"),
       })
@@ -82,5 +84,9 @@ describe("DELETE /bottles/:bottle", () => {
       reviewedById: null,
       reviewedAt: null,
     });
+    expect(updatedProposal?.enteredQueueAt).not.toBeNull();
+    expect(updatedProposal!.enteredQueueAt!.getTime()).toBeGreaterThan(
+      priorQueueEntryAt.getTime(),
+    );
   });
 });

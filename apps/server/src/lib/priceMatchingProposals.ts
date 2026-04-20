@@ -541,6 +541,26 @@ function getProposalStatus(
   return "pending_review";
 }
 
+function shouldTrackStorePriceQueueEntry(
+  status: StorePriceMatchProposal["status"],
+) {
+  return status === "pending_review" || status === "errored";
+}
+
+function getStorePriceQueueEntryUpdateValue(
+  status: StorePriceMatchProposal["status"],
+) {
+  if (!shouldTrackStorePriceQueueEntry(status)) {
+    return storePriceMatchProposals.enteredQueueAt;
+  }
+
+  return sql`CASE
+    WHEN ${storePriceMatchProposals.status} IN ('pending_review', 'errored')
+      THEN COALESCE(${storePriceMatchProposals.enteredQueueAt}, NOW())
+    ELSE NOW()
+  END`;
+}
+
 function shouldAutoCreateStorePriceMatchProposal({
   decision,
   automationAssessment,
@@ -960,6 +980,9 @@ export async function upsertStorePriceMatchProposal({
     decision?.action === "create_new"
       ? (decision.creationTarget ?? null)
       : null;
+  const enteredQueueAt = shouldTrackStorePriceQueueEntry(status)
+    ? sql`NOW()`
+    : null;
   const proposalValues = {
     status,
     proposalType,
@@ -983,9 +1006,14 @@ export async function upsertStorePriceMatchProposal({
     model: config.OPENAI_MODEL,
     error: error || null,
     lastEvaluatedAt: sql`NOW()`,
+    enteredQueueAt,
     reviewedById: null,
     reviewedAt: null,
     updatedAt: sql`NOW()`,
+  };
+  const updateValues = {
+    ...proposalValues,
+    enteredQueueAt: getStorePriceQueueEntryUpdateValue(status),
   };
   const [proposal] = await tx
     .insert(storePriceMatchProposals)
@@ -998,7 +1026,7 @@ export async function upsertStorePriceMatchProposal({
       setWhere: expectedProcessingToken
         ? sql`${storePriceMatchProposals.processingToken} = ${expectedProcessingToken} AND ${storePriceMatchProposals.processingExpiresAt} IS NOT NULL AND ${storePriceMatchProposals.processingExpiresAt} > NOW()`
         : undefined,
-      set: proposalValues,
+      set: updateValues,
     })
     .returning();
 

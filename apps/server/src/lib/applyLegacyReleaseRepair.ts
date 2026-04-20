@@ -929,6 +929,11 @@ export async function applyLegacyReleaseRepairInTransaction(
       suggestedBottleId: sql`CASE WHEN ${storePriceMatchProposals.suggestedBottleId} = ${legacyBottle.id} THEN NULL ELSE ${storePriceMatchProposals.suggestedBottleId} END`,
       suggestedReleaseId: sql`CASE WHEN ${storePriceMatchProposals.suggestedBottleId} = ${legacyBottle.id} THEN NULL ELSE ${storePriceMatchProposals.suggestedReleaseId} END`,
       parentBottleId: sql`CASE WHEN ${storePriceMatchProposals.parentBottleId} = ${legacyBottle.id} THEN NULL ELSE ${storePriceMatchProposals.parentBottleId} END`,
+      enteredQueueAt: sql`CASE
+        WHEN ${storePriceMatchProposals.status} IN ('approved', 'verified')
+          THEN NOW()
+        ELSE ${storePriceMatchProposals.enteredQueueAt}
+      END`,
       status: sql`CASE
         WHEN ${storePriceMatchProposals.status} IN ('approved', 'verified')
           THEN 'pending_review'::store_price_match_proposal_status
