@@ -1,4 +1,5 @@
 @import "rating.css";
+@import "performance.css";
 
 @tailwind base;
 @tailwind components;
