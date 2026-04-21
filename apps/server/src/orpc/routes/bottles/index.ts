@@ -1,8 +1,10 @@
 import { base } from "@peated/server/orpc";
 import ageRepairCandidates from "./age-repair-candidates";
 import applyAgeRepair from "./apply-age-repair";
+import applyBrandRepair from "./apply-brand-repair";
 import applyDirtyParentReleaseRepair from "./apply-dirty-parent-release-repair";
 import applyReleaseRepair from "./apply-release-repair";
+import brandRepairCandidates from "./brand-repair-candidates";
 import canonRepairCandidates from "./canon-repair-candidates";
 import create from "./create";
 import delete_ from "./delete";
@@ -25,8 +27,10 @@ export default base.tag("bottles").router({
   create,
   update,
   canonRepairCandidates,
+  brandRepairCandidates,
   ageRepairCandidates,
   applyAgeRepair,
+  applyBrandRepair,
   applyDirtyParentReleaseRepair,
   applyReleaseRepair,
   delete: delete_,

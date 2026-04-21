@@ -113,6 +113,9 @@ export default function Admin() {
   const incomingListings = ADMIN_WORKSTREAMS.find(
     (workstream) => workstream.id === "queue",
   )!;
+  const brandRepairs = ADMIN_WORKSTREAMS.find(
+    (workstream) => workstream.id === "brand-repairs",
+  )!;
   const bottleNameRepairs = ADMIN_WORKSTREAMS.find(
     (workstream) => workstream.id === "canon-repairs",
   )!;
@@ -195,6 +198,21 @@ export default function Admin() {
                     className="font-medium text-white underline"
                   >
                     {incomingListings.pageTitle}
+                  </Link>
+                  .
+                </div>
+              </div>
+              <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+                <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  Wrong brand entity
+                </div>
+                <div className="mt-1 text-sm text-slate-300">
+                  Reassign the bottle to the right producer in{" "}
+                  <Link
+                    href={brandRepairs.href}
+                    className="font-medium text-white underline"
+                  >
+                    {brandRepairs.pageTitle}
                   </Link>
                   .
                 </div>
@@ -299,6 +317,14 @@ export default function Admin() {
             summary={incomingListings.summary}
             title={incomingListings.pageTitle}
             whenToUse={incomingListings.whenToUse}
+          />
+          <WorkbenchCard
+            detail="Open this queue to move bottles onto the right brand entity without renaming the bottle titles."
+            href={brandRepairs.href}
+            hrefLabel="Open Brand / Entity Repairs"
+            summary={brandRepairs.summary}
+            title={brandRepairs.pageTitle}
+            whenToUse={brandRepairs.whenToUse}
           />
           <WorkbenchCard
             detail="Open this queue to review the current merge candidates and pick the cleaner bottle name."
