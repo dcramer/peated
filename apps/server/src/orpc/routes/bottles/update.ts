@@ -11,6 +11,7 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
+import { queueEntityCreationVerification } from "@peated/server/lib/catalogVerification";
 import {
   coerceToUpsert,
   upsertBottleAlias,
@@ -163,6 +164,7 @@ export default procedure
           const brandUpsert = await upsertEntity({
             db: tx,
             data: coerceToUpsert(bottleData.brand),
+            creationSource: "manual_entry",
             userId: user.id,
             type: "brand",
           });
@@ -217,6 +219,7 @@ export default procedure
           const bottlerUpsert = await upsertEntity({
             db: tx,
             data: coerceToUpsert(bottleData.bottler),
+            creationSource: "manual_entry",
             userId: user.id,
             type: "bottler",
           });
@@ -255,6 +258,7 @@ export default procedure
             const distUpsert = await upsertEntity({
               db: tx,
               data: coerceToUpsert(distData),
+              creationSource: "manual_entry",
               userId: user.id,
               type: "distiller",
             });
@@ -494,6 +498,19 @@ export default procedure
     for (const entityId of newEntityIds.values()) {
       try {
         await pushUniqueJob("OnEntityChange", { entityId }, { delay: 5000 });
+      } catch (err) {
+        logError(err, {
+          entity: {
+            id: entityId,
+          },
+        });
+      }
+
+      try {
+        await queueEntityCreationVerification({
+          entityId,
+          creationSource: "manual_entry",
+        });
       } catch (err) {
         logError(err, {
           entity: {

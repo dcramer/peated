@@ -4,6 +4,7 @@ export type AdminWorkstream = {
     | "age-repairs"
     | "brand-repairs"
     | "canon-repairs"
+    | "entity-audits"
     | "queue"
     | "release-repairs";
   pageTitle: string;
@@ -22,6 +23,16 @@ export const ADMIN_WORKSTREAMS: AdminWorkstream[] = [
       "Review new or changed retailer listings and approve the bottle or bottling assignment.",
     whenToUse:
       "Use this when a listing is wrong or unmatched, but the catalog bottle itself may still be correct.",
+  },
+  {
+    id: "entity-audits",
+    href: "/admin/entity-audits",
+    pageTitle: "Entity Audits",
+    sidebarLabel: "Entity Audits",
+    summary:
+      "Run agent-backed audits on suspicious producer rows to verify generic names, bad metadata, or bottles that belong under a stronger existing brand.",
+    whenToUse:
+      "Use this when the entity row itself looks suspect and you want the system to gather local and web evidence before deciding whether to repair bottles, fix metadata, or leave it alone.",
   },
   {
     id: "brand-repairs",

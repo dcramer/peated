@@ -34,6 +34,8 @@ import updateBottleStats from "./updateBottleStats";
 import updateCountryStats from "./updateCountryStats";
 import updateEntityStats from "./updateEntityStats";
 import updateRegionStats from "./updateRegionStats";
+import verifyBottleCreation from "./verifyBottleCreation";
+import verifyEntityCreation from "./verifyEntityCreation";
 
 registry.add("CapturePriceImage", capturePriceImage);
 registry.add("GenerateBottleDetails", generateBottleDetails);
@@ -73,3 +75,5 @@ registry.add("UpdateBottleStats", updateBottleStats);
 registry.add("UpdateCountryStats", updateCountryStats);
 registry.add("UpdateEntityStats", updateEntityStats);
 registry.add("UpdateRegionStats", updateRegionStats);
+registry.add("VerifyBottleCreation", verifyBottleCreation);
+registry.add("VerifyEntityCreation", verifyEntityCreation);

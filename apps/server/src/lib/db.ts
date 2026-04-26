@@ -1,4 +1,5 @@
 import { normalizeEntityName } from "@peated/bottle-classifier/normalize";
+import { type CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import type { InferSelectModel, Table } from "drizzle-orm";
 import { and, eq, getTableColumns, inArray, sql } from "drizzle-orm";
 import type { PgTableWithColumns, TableConfig } from "drizzle-orm/pg-core";
@@ -14,6 +15,7 @@ import {
 } from "../db/schema";
 import { type EntityInputSchema, type EntitySchema } from "../schemas";
 import { type EntityInput } from "../types";
+import { getCatalogVerificationCreationMetadata } from "./catalogVerification";
 
 export type UpsertOutcome<T> =
   | {
@@ -241,11 +243,13 @@ export const upsertEntity = async ({
   data,
   userId,
   type,
+  creationSource,
 }: {
   db: AnyDatabase;
   data: EntityInput;
   userId: number;
   type?: EntityType;
+  creationSource?: CatalogVerificationCreationSource;
 }): Promise<UpsertOutcome<Entity>> => {
   if (!data) return undefined;
 
@@ -302,7 +306,15 @@ export const upsertEntity = async ({
       objectId: result.id,
       displayName: result.name,
       type: "add",
-      data: result,
+      data: {
+        ...result,
+        ...(creationSource
+          ? {
+              catalogVerification:
+                getCatalogVerificationCreationMetadata(creationSource),
+            }
+          : {}),
+      },
       createdById: userId,
       createdAt: result.createdAt,
     });

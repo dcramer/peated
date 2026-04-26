@@ -137,12 +137,15 @@ async function applyClassifierCreateDecision({
     try {
       const result = await db.transaction(async (tx) =>
         createBottleInTransaction(tx, {
+          creationSource: "bottle_classifier",
           input,
           context: { user },
         }),
       );
 
-      await finalizeCreatedBottle(result);
+      await finalizeCreatedBottle(result, {
+        creationSource: "bottle_classifier",
+      });
 
       return {
         bottleId: result.bottle.id,
@@ -205,6 +208,7 @@ async function applyClassifierCreateDecision({
 
     try {
       bottleResult = await createBottleInTransaction(tx, {
+        creationSource: "bottle_classifier",
         input,
         context: { user },
       });
@@ -263,7 +267,9 @@ async function applyClassifierCreateDecision({
   });
 
   if (result.bottleResult) {
-    await finalizeCreatedBottle(result.bottleResult);
+    await finalizeCreatedBottle(result.bottleResult, {
+      creationSource: "bottle_classifier",
+    });
   }
   if (result.releaseResult) {
     await finalizeCreatedBottleRelease(result.releaseResult);

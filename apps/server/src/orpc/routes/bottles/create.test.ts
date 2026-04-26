@@ -7,11 +7,38 @@ import {
   changes,
   entities,
 } from "@peated/server/db/schema";
+import type * as catalogVerificationModule from "@peated/server/lib/catalogVerification";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import * as workerClient from "@peated/server/worker/client";
 import { and, eq } from "drizzle-orm";
+import { beforeEach, vi } from "vitest";
+
+const queueBottleCreationVerificationMock = vi.hoisted(() => vi.fn());
+const queueEntityCreationVerificationMock = vi.hoisted(() => vi.fn());
+
+vi.mock("@peated/server/worker/client", () => ({
+  pushJob: vi.fn(),
+  pushUniqueJob: vi.fn(),
+}));
+
+vi.mock("@peated/server/lib/catalogVerification", async () => {
+  const actual = await vi.importActual<typeof catalogVerificationModule>(
+    "@peated/server/lib/catalogVerification",
+  );
+
+  return {
+    ...actual,
+    queueBottleCreationVerification: queueBottleCreationVerificationMock,
+    queueEntityCreationVerification: queueEntityCreationVerificationMock,
+  };
+});
 
 describe("POST /bottles", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
   test("requires authentication", async () => {
     const err = await waitError(
       routerClient.bottles.create(
@@ -52,6 +79,13 @@ describe("POST /bottles", () => {
       .from(bottlesToDistillers)
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
     expect(distillers.length).toBe(0);
+    expect(workerClient.pushJob).toHaveBeenCalledWith("OnBottleChange", {
+      bottleId: bottle.id,
+    });
+    expect(queueBottleCreationVerificationMock).toHaveBeenCalledWith({
+      bottleId: bottle.id,
+      creationSource: "manual_entry",
+    });
   });
 
   test("creates a new bottle with all params", async ({
@@ -193,6 +227,13 @@ describe("POST /bottles", () => {
     expect(brand.createdById).toBe(defaults.user.id);
     expect(brand.countryId).toEqual(country.id);
     expect(brand.regionId).toEqual(region.id);
+    expect(workerClient.pushJob).toHaveBeenCalledWith("OnEntityChange", {
+      entityId: brand.id,
+    });
+    expect(queueEntityCreationVerificationMock).toHaveBeenCalledWith({
+      entityId: brand.id,
+      creationSource: "manual_entry",
+    });
 
     // it should create a change entry for the brand
     const changeList = await db

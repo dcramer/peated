@@ -7,16 +7,30 @@ import {
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
+import type * as catalogVerificationModule from "@peated/server/lib/catalogVerification";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+const queueBottleCreationVerificationMock = vi.hoisted(() => vi.fn());
+
 vi.mock("@peated/server/worker/client", () => ({
   pushJob: vi.fn(),
   pushUniqueJob: vi.fn(),
 }));
+
+vi.mock("@peated/server/lib/catalogVerification", async () => {
+  const actual = await vi.importActual<typeof catalogVerificationModule>(
+    "@peated/server/lib/catalogVerification",
+  );
+
+  return {
+    ...actual,
+    queueBottleCreationVerification: queueBottleCreationVerificationMock,
+  };
+});
 
 describe("price match queue", () => {
   beforeEach(() => {
@@ -1053,6 +1067,10 @@ describe("price match queue", () => {
       reviewedById: user.id,
     });
     expect(listingAlias?.bottleId).toBe(result.bottle.id);
+    expect(queueBottleCreationVerificationMock).toHaveBeenCalledWith({
+      bottleId: result.bottle.id,
+      creationSource: "price_match_review",
+    });
   });
 
   test("creates both bottle and release even when the stored creation target is stale", async ({

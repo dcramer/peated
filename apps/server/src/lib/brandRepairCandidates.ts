@@ -28,24 +28,13 @@ type BrandNameEntry = {
   wordCount: number;
 };
 
-type SupportingReference = {
+export type BrandRepairSupportingReference = {
   currentBrandMatchedName: null | string;
   currentBrandMatchedWordCount: number;
   source: "alias" | "full_name";
   targetMatchedName: string;
   targetMatchedWordCount: number;
   text: string;
-};
-
-type BrandRepairCandidateInternal = BrandRepairCandidate & {
-  sortStrength: [number, number, number, number];
-};
-
-type RankedTargetCandidate = {
-  currentBrand: CandidateBrand;
-  sortStrength: [number, number, number, number];
-  supportingReferences: SupportingReference[];
-  targetBrand: CandidateBrand;
 };
 
 export type BrandRepairCandidate = {
@@ -67,7 +56,7 @@ export type BrandRepairCandidate = {
     id: number;
     name: string;
   };
-  supportingReferences: SupportingReference[];
+  supportingReferences: BrandRepairSupportingReference[];
   targetBrand: {
     id: number;
     name: string;
@@ -75,6 +64,29 @@ export type BrandRepairCandidate = {
     totalBottles: number;
     totalTastings: number;
   };
+};
+
+export type BrandRepairGroup = {
+  candidateCount: number;
+  currentBrand: BrandRepairCandidate["currentBrand"];
+  sampleBottles: Array<{
+    bottle: BrandRepairCandidate["bottle"];
+    supportingReferences: BrandRepairSupportingReference[];
+  }>;
+  suggestedDistillery: BrandRepairCandidate["suggestedDistillery"];
+  targetBrand: BrandRepairCandidate["targetBrand"];
+  totalTastings: number;
+};
+
+type BrandRepairCandidateInternal = BrandRepairCandidate & {
+  sortStrength: [number, number, number, number];
+};
+
+type RankedTargetCandidate = {
+  currentBrand: CandidateBrand;
+  sortStrength: [number, number, number, number];
+  supportingReferences: BrandRepairSupportingReference[];
+  targetBrand: CandidateBrand;
 };
 
 function normalizeComparableText(value: string): string {
@@ -160,8 +172,8 @@ function getBestCurrentBrandMatch({
 }
 
 function compareSupportingReferenceQuality(
-  left: SupportingReference,
-  right: SupportingReference,
+  left: BrandRepairSupportingReference,
+  right: BrandRepairSupportingReference,
 ): number {
   if (right.targetMatchedWordCount !== left.targetMatchedWordCount) {
     return right.targetMatchedWordCount - left.targetMatchedWordCount;
@@ -210,7 +222,97 @@ function compareBrandRepairCandidate(
   return right.bottle.id - left.bottle.id;
 }
 
-async function getCandidateBottles(query: string): Promise<CandidateBottle[]> {
+function toPublicCandidate(
+  candidate: BrandRepairCandidateInternal,
+): BrandRepairCandidate {
+  const { sortStrength: _sortStrength, ...publicCandidate } = candidate;
+  return publicCandidate;
+}
+
+async function getCandidateBottles({
+  currentBrandId,
+  query,
+}: {
+  currentBrandId?: number;
+  query: string;
+}): Promise<CandidateBottle[]> {
+  if (currentBrandId) {
+    if (!query) {
+      return await db
+        .select({
+          brandId: bottles.brandId,
+          fullName: bottles.fullName,
+          id: bottles.id,
+          name: bottles.name,
+          numReleases: bottles.numReleases,
+          totalTastings: bottles.totalTastings,
+        })
+        .from(bottles)
+        .where(eq(bottles.brandId, currentBrandId))
+        .orderBy(desc(bottles.totalTastings), desc(bottles.id))
+        .limit(MAX_SCAN_LIMIT);
+    }
+
+    const [matchingBottleRows, matchingAliasRows] = await Promise.all([
+      db
+        .select({ id: bottles.id })
+        .from(bottles)
+        .where(
+          and(
+            eq(bottles.brandId, currentBrandId),
+            ilike(bottles.fullName, `%${query}%`),
+          ),
+        )
+        .limit(MAX_SCAN_LIMIT),
+      db
+        .select({ bottleId: bottleAliases.bottleId })
+        .from(bottleAliases)
+        .innerJoin(bottles, eq(bottles.id, bottleAliases.bottleId))
+        .where(
+          and(
+            eq(bottles.brandId, currentBrandId),
+            eq(bottleAliases.ignored, false),
+            isNotNull(bottleAliases.bottleId),
+            ilike(bottleAliases.name, `%${query}%`),
+          ),
+        )
+        .limit(MAX_SCAN_LIMIT),
+    ]);
+
+    const bottleIds = new Set<number>();
+    for (const { id } of matchingBottleRows) {
+      bottleIds.add(id);
+    }
+
+    for (const row of matchingAliasRows) {
+      if (row.bottleId !== null) {
+        bottleIds.add(row.bottleId);
+      }
+    }
+
+    if (bottleIds.size === 0) {
+      return [];
+    }
+
+    return await db
+      .select({
+        brandId: bottles.brandId,
+        fullName: bottles.fullName,
+        id: bottles.id,
+        name: bottles.name,
+        numReleases: bottles.numReleases,
+        totalTastings: bottles.totalTastings,
+      })
+      .from(bottles)
+      .where(
+        and(
+          eq(bottles.brandId, currentBrandId),
+          inArray(bottles.id, Array.from(bottleIds).slice(0, MAX_SCAN_LIMIT)),
+        ),
+      )
+      .orderBy(desc(bottles.totalTastings), desc(bottles.id));
+  }
+
   if (!query) {
     return await db
       .select({
@@ -310,27 +412,24 @@ async function getCandidateBottles(query: string): Promise<CandidateBottle[]> {
     .orderBy(desc(bottles.totalTastings), desc(bottles.id));
 }
 
-export async function getBrandRepairCandidates({
-  cursor = 1,
-  limit = 25,
+async function collectBrandRepairCandidates({
+  currentBrandId,
   query = "",
+  targetBrandId,
 }: {
-  cursor?: number;
-  limit?: number;
+  currentBrandId?: number;
   query?: string;
+  targetBrandId?: number;
 }) {
   const trimmedQuery = query.trim();
   const normalizedQuery = normalizeComparableText(trimmedQuery);
-  const candidateBottles = await getCandidateBottles(trimmedQuery);
+  const candidateBottles = await getCandidateBottles({
+    currentBrandId,
+    query: trimmedQuery,
+  });
 
   if (candidateBottles.length === 0) {
-    return {
-      results: [],
-      rel: {
-        nextCursor: null,
-        prevCursor: cursor > 1 ? cursor - 1 : null,
-      },
-    };
+    return [] as BrandRepairCandidateInternal[];
   }
 
   const currentBrandIds = Array.from(
@@ -343,13 +442,7 @@ export async function getBrandRepairCandidates({
   const candidateBottleIds = candidateBottles.map((bottle) => bottle.id);
 
   if (currentBrandIds.length === 0) {
-    return {
-      results: [],
-      rel: {
-        nextCursor: null,
-        prevCursor: cursor > 1 ? cursor - 1 : null,
-      },
-    };
+    return [] as BrandRepairCandidateInternal[];
   }
 
   const [currentBrands, aliasRows, brandRows] = await Promise.all([
@@ -414,6 +507,10 @@ export async function getBrandRepairCandidates({
       continue;
     }
 
+    if (currentBrandId && currentBrand.id !== currentBrandId) {
+      continue;
+    }
+
     const currentBrandNames = brandNamesById.get(currentBrand.id) ?? [];
     const supportingTexts = [
       {
@@ -426,7 +523,7 @@ export async function getBrandRepairCandidates({
       })),
     ];
 
-    const targetSupport = new Map<number, SupportingReference[]>();
+    const targetSupport = new Map<number, BrandRepairSupportingReference[]>();
 
     for (const reference of supportingTexts) {
       const leadingPhrases = getLeadingComparablePhrases(reference.text);
@@ -440,8 +537,11 @@ export async function getBrandRepairCandidates({
       });
       const currentBrandMatchedWordCount = currentBrandMatch?.wordCount ?? 0;
 
-      const bestReferenceSupport = new Map<number, SupportingReference>();
-      for (const phrase of leadingPhrases.reverse()) {
+      const bestReferenceSupport = new Map<
+        number,
+        BrandRepairSupportingReference
+      >();
+      for (const phrase of [...leadingPhrases].reverse()) {
         for (const entry of brandNameIndex.get(phrase) ?? []) {
           if (entry.entityId === currentBrand.id) {
             continue;
@@ -464,29 +564,27 @@ export async function getBrandRepairCandidates({
             continue;
           }
 
-          const existingSupport = bestReferenceSupport.get(entry.entityId);
-          if (
-            existingSupport &&
-            compareSupportingReferenceQuality(existingSupport, {
-              currentBrandMatchedName: currentBrandMatch?.originalName ?? null,
-              currentBrandMatchedWordCount,
-              source: reference.source,
-              targetMatchedName: entry.originalName,
-              targetMatchedWordCount: entry.wordCount,
-              text: reference.text,
-            }) <= 0
-          ) {
-            continue;
-          }
-
-          bestReferenceSupport.set(entry.entityId, {
+          const candidateSupport: BrandRepairSupportingReference = {
             currentBrandMatchedName: currentBrandMatch?.originalName ?? null,
             currentBrandMatchedWordCount,
             source: reference.source,
             targetMatchedName: entry.originalName,
             targetMatchedWordCount: entry.wordCount,
             text: reference.text,
-          });
+          };
+
+          const existingSupport = bestReferenceSupport.get(entry.entityId);
+          if (
+            existingSupport &&
+            compareSupportingReferenceQuality(
+              existingSupport,
+              candidateSupport,
+            ) <= 0
+          ) {
+            continue;
+          }
+
+          bestReferenceSupport.set(entry.entityId, candidateSupport);
         }
       }
 
@@ -574,6 +672,10 @@ export async function getBrandRepairCandidates({
       },
     };
 
+    if (targetBrandId && candidate.targetBrand.id !== targetBrandId) {
+      continue;
+    }
+
     if (normalizedQuery && !candidateMatchesQuery(candidate, normalizedQuery)) {
       continue;
     }
@@ -582,6 +684,45 @@ export async function getBrandRepairCandidates({
   }
 
   results.sort(compareBrandRepairCandidate);
+  return results;
+}
+
+export async function findBrandRepairCandidates({
+  currentBrandId,
+  query = "",
+  targetBrandId,
+}: {
+  currentBrandId?: number;
+  query?: string;
+  targetBrandId?: number;
+}) {
+  const results = await collectBrandRepairCandidates({
+    currentBrandId,
+    query,
+    targetBrandId,
+  });
+
+  return results.map(toPublicCandidate);
+}
+
+export async function getBrandRepairCandidates({
+  cursor = 1,
+  currentBrandId,
+  limit = 25,
+  query = "",
+  targetBrandId,
+}: {
+  cursor?: number;
+  currentBrandId?: number;
+  limit?: number;
+  query?: string;
+  targetBrandId?: number;
+}) {
+  const results = await collectBrandRepairCandidates({
+    currentBrandId,
+    query,
+    targetBrandId,
+  });
 
   const start = (cursor - 1) * limit;
   const pagedResults = results.slice(start, start + limit);
@@ -589,9 +730,104 @@ export async function getBrandRepairCandidates({
   const prevCursor = cursor > 1 ? cursor - 1 : null;
 
   return {
-    results: pagedResults.map(
-      ({ sortStrength: _sortStrength, ...candidate }) => candidate,
-    ),
+    results: pagedResults.map(toPublicCandidate),
+    rel: {
+      nextCursor,
+      prevCursor,
+    },
+  };
+}
+
+export async function getBrandRepairGroups({
+  cursor = 1,
+  currentBrandId,
+  limit = 25,
+  query = "",
+  targetBrandId,
+}: {
+  cursor?: number;
+  currentBrandId?: number;
+  limit?: number;
+  query?: string;
+  targetBrandId?: number;
+}) {
+  const candidates = await collectBrandRepairCandidates({
+    currentBrandId,
+    query,
+    targetBrandId,
+  });
+
+  const groupsByKey = new Map<
+    string,
+    {
+      candidates: BrandRepairCandidateInternal[];
+      currentBrand: BrandRepairCandidate["currentBrand"];
+      suggestedDistillery: BrandRepairCandidate["suggestedDistillery"];
+      targetBrand: BrandRepairCandidate["targetBrand"];
+      totalTastings: number;
+    }
+  >();
+
+  for (const candidate of candidates) {
+    const key = [
+      candidate.currentBrand.id,
+      candidate.targetBrand.id,
+      candidate.suggestedDistillery?.id ?? "none",
+    ].join(":");
+    const currentGroup = groupsByKey.get(key);
+
+    if (!currentGroup) {
+      groupsByKey.set(key, {
+        candidates: [candidate],
+        currentBrand: candidate.currentBrand,
+        suggestedDistillery: candidate.suggestedDistillery,
+        targetBrand: candidate.targetBrand,
+        totalTastings: candidate.bottle.totalTastings ?? 0,
+      });
+      continue;
+    }
+
+    currentGroup.candidates.push(candidate);
+    currentGroup.totalTastings += candidate.bottle.totalTastings ?? 0;
+  }
+
+  const groups = Array.from(groupsByKey.values())
+    .map(
+      (group): BrandRepairGroup => ({
+        candidateCount: group.candidates.length,
+        currentBrand: group.currentBrand,
+        sampleBottles: group.candidates.slice(0, 3).map((candidate) => ({
+          bottle: candidate.bottle,
+          supportingReferences: candidate.supportingReferences,
+        })),
+        suggestedDistillery: group.suggestedDistillery,
+        targetBrand: group.targetBrand,
+        totalTastings: group.totalTastings,
+      }),
+    )
+    .sort((left, right) => {
+      if (right.candidateCount !== left.candidateCount) {
+        return right.candidateCount - left.candidateCount;
+      }
+
+      if (right.totalTastings !== left.totalTastings) {
+        return right.totalTastings - left.totalTastings;
+      }
+
+      if (right.targetBrand.totalBottles !== left.targetBrand.totalBottles) {
+        return right.targetBrand.totalBottles - left.targetBrand.totalBottles;
+      }
+
+      return right.targetBrand.id - left.targetBrand.id;
+    });
+
+  const start = (cursor - 1) * limit;
+  const pagedResults = groups.slice(start, start + limit);
+  const nextCursor = start + limit < groups.length ? cursor + 1 : null;
+  const prevCursor = cursor > 1 ? cursor - 1 : null;
+
+  return {
+    results: pagedResults,
     rel: {
       nextCursor,
       prevCursor,

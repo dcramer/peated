@@ -51,6 +51,17 @@ export default function Page() {
   const [repairingBottleId, setRepairingBottleId] = useState<number | null>(
     null,
   );
+  const [repairingGroupKey, setRepairingGroupKey] = useState<string | null>(
+    null,
+  );
+  const groupListQueryOptions = orpc.bottles.brandRepairGroups.queryOptions({
+    input: {
+      query: currentQuery,
+      cursor: 1,
+      limit: 10,
+    },
+  });
+  const { data: groupList } = useSuspenseQuery(groupListQueryOptions);
   const candidateListQueryOptions =
     orpc.bottles.brandRepairCandidates.queryOptions({
       input: queryParams,
@@ -58,6 +69,9 @@ export default function Page() {
   const { data: candidateList } = useSuspenseQuery(candidateListQueryOptions);
   const applyRepairMutation = useMutation(
     orpc.bottles.applyBrandRepair.mutationOptions(),
+  );
+  const applyGroupRepairMutation = useMutation(
+    orpc.bottles.applyBrandRepairGroup.mutationOptions(),
   );
 
   const applyRepair = async ({
@@ -102,6 +116,53 @@ export default function Page() {
       );
     } finally {
       setRepairingBottleId(null);
+    }
+  };
+
+  const applyGroupRepair = async ({
+    currentBrandId,
+    currentBrandName,
+    distilleryId,
+    distilleryName,
+    targetBrandId,
+    targetBrandName,
+  }: {
+    currentBrandId: number;
+    currentBrandName: string;
+    distilleryId: number | null;
+    distilleryName: string | null;
+    targetBrandId: number;
+    targetBrandName: string;
+  }) => {
+    const groupKey = `${currentBrandId}:${targetBrandId}:${distilleryId ?? "none"}`;
+    setRepairingGroupKey(groupKey);
+    try {
+      const result = await applyGroupRepairMutation.mutateAsync({
+        fromBrand: currentBrandId,
+        toBrand: targetBrandId,
+        distillery: distilleryId,
+        query: currentQuery,
+      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: groupListQueryOptions.queryKey,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: candidateListQueryOptions.queryKey,
+        }),
+      ]);
+      flash(
+        distilleryName
+          ? `Moved ${result.appliedCount} bottles from ${currentBrandName} to ${targetBrandName} and kept ${distilleryName} as a distillery link.`
+          : `Moved ${result.appliedCount} bottles from ${currentBrandName} to ${targetBrandName}.`,
+      );
+    } catch (err) {
+      flash(
+        err instanceof Error ? err.message : "Unable to apply grouped repair.",
+        "error",
+      );
+    } finally {
+      setRepairingGroupKey(null);
     }
   };
 
@@ -164,6 +225,126 @@ export default function Page() {
             </div>
           </div>
         </Form>
+      </div>
+
+      {groupList.results.length > 0 ? (
+        <div className="mb-8 space-y-4">
+          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            Clustered Repairs
+          </div>
+          {groupList.results.map((group) => {
+            const groupKey = `${group.currentBrand.id}:${group.targetBrand.id}:${
+              group.suggestedDistillery?.id ?? "none"
+            }`;
+
+            return (
+              <div
+                key={groupKey}
+                className="rounded-xl border border-slate-800 bg-slate-950 p-5"
+              >
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="min-w-0">
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      <span className="rounded-full border border-sky-500/30 bg-sky-500/10 px-2 py-1 text-xs font-medium text-sky-200">
+                        {group.currentBrand.name} -&gt; {group.targetBrand.name}
+                      </span>
+                      <span className="rounded-full border border-slate-700 bg-slate-900 px-2 py-1 text-xs font-medium text-slate-300">
+                        {group.candidateCount.toLocaleString()} bottles
+                      </span>
+                      <span className="rounded-full border border-slate-700 bg-slate-900 px-2 py-1 text-xs font-medium text-slate-300">
+                        {formatTastingCount(group.totalTastings)} tastings
+                      </span>
+                      {group.suggestedDistillery ? (
+                        <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-200">
+                          Keep {group.suggestedDistillery.name} as distillery
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="text-sm text-slate-300">
+                      These bottles already carry stronger leading producer
+                      evidence for {group.targetBrand.name}. Apply the group to
+                      move the verified subset without touching the survivors
+                      that do not support the same target.
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <Button href={`/entities/${group.currentBrand.id}`}>
+                      Open Current Brand
+                    </Button>
+                    <Button href={`/entities/${group.targetBrand.id}`}>
+                      Open Suggested Brand
+                    </Button>
+                    <Button
+                      color="highlight"
+                      disabled={repairingGroupKey === groupKey}
+                      loading={repairingGroupKey === groupKey}
+                      onClick={() =>
+                        applyGroupRepair({
+                          currentBrandId: group.currentBrand.id,
+                          currentBrandName: group.currentBrand.name,
+                          distilleryId: group.suggestedDistillery?.id ?? null,
+                          distilleryName:
+                            group.suggestedDistillery?.name ?? null,
+                          targetBrandId: group.targetBrand.id,
+                          targetBrandName: group.targetBrand.name,
+                        })
+                      }
+                    >
+                      Apply {group.candidateCount.toLocaleString()} Repairs
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="mt-4 grid gap-3 lg:grid-cols-3">
+                  {group.sampleBottles.map((sample) => (
+                    <div
+                      key={`${groupKey}:${sample.bottle.id}`}
+                      className="rounded-lg border border-slate-800 bg-slate-900 p-4"
+                    >
+                      <Link
+                        href={`/bottles/${sample.bottle.id}`}
+                        className="block text-sm font-medium text-white hover:text-slate-300"
+                      >
+                        {sample.bottle.fullName}
+                      </Link>
+                      <div className="mt-1 text-xs text-slate-400">
+                        {formatTastingCount(sample.bottle.totalTastings)}{" "}
+                        tastings and {sample.bottle.numReleases} child releases
+                      </div>
+                      <div className="mt-3 space-y-2">
+                        {sample.supportingReferences.map((reference, index) => (
+                          <div
+                            key={`${sample.bottle.id}-${reference.source}-${index}`}
+                            className="rounded-lg border border-slate-800 bg-slate-950/70 p-3"
+                          >
+                            <div className="flex flex-wrap gap-2">
+                              <span className="rounded-full border border-slate-700 bg-slate-900 px-2 py-1 text-[11px] font-medium text-slate-300">
+                                {reference.source === "alias"
+                                  ? "Alias"
+                                  : "Full name"}
+                              </span>
+                              <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-[11px] font-medium text-emerald-200">
+                                Matches {reference.targetMatchedName}
+                              </span>
+                            </div>
+                            <div className="mt-2 text-xs text-slate-300">
+                              {reference.text}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+
+      <div className="mb-4 text-xs font-medium uppercase tracking-wide text-slate-500">
+        Individual Bottles
       </div>
 
       {candidateList.results.length === 0 ? (

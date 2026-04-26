@@ -116,6 +116,9 @@ export default function Admin() {
   const brandRepairs = ADMIN_WORKSTREAMS.find(
     (workstream) => workstream.id === "brand-repairs",
   )!;
+  const entityAudits = ADMIN_WORKSTREAMS.find(
+    (workstream) => workstream.id === "entity-audits",
+  )!;
   const bottleNameRepairs = ADMIN_WORKSTREAMS.find(
     (workstream) => workstream.id === "canon-repairs",
   )!;
@@ -198,6 +201,21 @@ export default function Admin() {
                     className="font-medium text-white underline"
                   >
                     {incomingListings.pageTitle}
+                  </Link>
+                  .
+                </div>
+              </div>
+              <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+                <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  Suspect producer row
+                </div>
+                <div className="mt-1 text-sm text-slate-300">
+                  Run an audit first in{" "}
+                  <Link
+                    href={entityAudits.href}
+                    className="font-medium text-white underline"
+                  >
+                    {entityAudits.pageTitle}
                   </Link>
                   .
                 </div>
@@ -317,6 +335,14 @@ export default function Admin() {
             summary={incomingListings.summary}
             title={incomingListings.pageTitle}
             whenToUse={incomingListings.whenToUse}
+          />
+          <WorkbenchCard
+            detail="Open this queue to audit suspicious producer rows before you decide whether to repair bottles, merge duplicates, or fix metadata."
+            href={entityAudits.href}
+            hrefLabel="Open Entity Audits"
+            summary={entityAudits.summary}
+            title={entityAudits.pageTitle}
+            whenToUse={entityAudits.whenToUse}
           />
           <WorkbenchCard
             detail="Open this queue to move bottles onto the right brand entity without renaming the bottle titles."
