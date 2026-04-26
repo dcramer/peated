@@ -101,6 +101,35 @@ function getComparableWords(value: string): string[] {
     .filter(Boolean);
 }
 
+function getNameWordVariants(
+  ...names: Array<null | string | undefined>
+): string[][] {
+  const variants: string[][] = [];
+  const seen = new Set<string>();
+
+  for (const name of names) {
+    const words = getComparableWords(name ?? "");
+    if (words.length === 0) {
+      continue;
+    }
+
+    for (const variant of [
+      words,
+      ...(words[0] === "the" && words.length > 1 ? [words.slice(1)] : []),
+    ]) {
+      const key = variant.join(" ");
+      if (seen.has(key)) {
+        continue;
+      }
+
+      seen.add(key);
+      variants.push(variant);
+    }
+  }
+
+  return variants;
+}
+
 function getLeadingComparablePhrases(value: string): string[] {
   const words = getComparableWords(value);
 
@@ -111,6 +140,75 @@ function getLeadingComparablePhrases(value: string): string[] {
       }).map((_, index) => words.slice(0, index + 1).join(" ")),
     ),
   );
+}
+
+function containsWordSequence(haystack: string[], needle: string[]): boolean {
+  if (needle.length === 0 || needle.length > haystack.length) {
+    return false;
+  }
+
+  return haystack.some((_, index) =>
+    needle.every((word, needleIndex) => haystack[index + needleIndex] === word),
+  );
+}
+
+function targetNameMatchesCurrentBrandIdentity({
+  currentBrand,
+  targetBrand,
+}: {
+  currentBrand: CandidateBrand;
+  targetBrand: CandidateBrand;
+}): boolean {
+  const currentNameVariants = getNameWordVariants(
+    currentBrand.name,
+    currentBrand.shortName,
+  );
+  const targetNameVariants = getNameWordVariants(
+    targetBrand.name,
+    targetBrand.shortName,
+  );
+
+  return currentNameVariants.some((currentWords) =>
+    targetNameVariants.some((targetWords) =>
+      containsWordSequence(currentWords, targetWords),
+    ),
+  );
+}
+
+function hasSafeAliasOnlyBrandRepairSupport({
+  currentBrand,
+  hasCanonicalCurrentBrandMatch,
+  supportingReferences,
+  targetBrand,
+}: {
+  currentBrand: CandidateBrand;
+  hasCanonicalCurrentBrandMatch: boolean;
+  supportingReferences: BrandRepairSupportingReference[];
+  targetBrand: CandidateBrand;
+}): boolean {
+  if (!hasCanonicalCurrentBrandMatch) {
+    return true;
+  }
+
+  if (
+    supportingReferences.some((reference) => reference.source === "full_name")
+  ) {
+    return true;
+  }
+
+  if (
+    supportingReferences.some(
+      (reference) =>
+        reference.source === "alias" &&
+        reference.currentBrandMatchedWordCount > 0,
+    )
+  ) {
+    return true;
+  }
+
+  // Retail aliases often prepend an owner before the actual bottle brand,
+  // such as "Suntory Yamazaki"; that should not rewrite a Yamazaki bottle.
+  return targetNameMatchesCurrentBrandIdentity({ currentBrand, targetBrand });
 }
 
 function registerBrandName(
@@ -597,6 +695,12 @@ async function collectBrandRepairCandidates({
     }
 
     const targetCandidates: RankedTargetCandidate[] = [];
+    const hasCanonicalCurrentBrandMatch =
+      getBestCurrentBrandMatch({
+        brandNames: currentBrandNames,
+        text: bottle.fullName,
+      }) !== null;
+
     for (const [entityId, supportingReferences] of targetSupport.entries()) {
       const targetBrand = allBrandsById.get(entityId);
       if (!targetBrand) {
@@ -608,6 +712,17 @@ async function collectBrandRepairCandidates({
       );
       const strongestSupport = sortedSupportingReferences[0];
       if (!strongestSupport) {
+        continue;
+      }
+
+      if (
+        !hasSafeAliasOnlyBrandRepairSupport({
+          currentBrand,
+          hasCanonicalCurrentBrandMatch,
+          supportingReferences: sortedSupportingReferences,
+          targetBrand,
+        })
+      ) {
         continue;
       }
 

@@ -1,5 +1,7 @@
 "use client";
 
+import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
+import type { Outputs } from "@peated/server/orpc/router";
 import AdminWorkstreamTabs from "@peated/web/components/admin/workstreamTabs";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
@@ -11,6 +13,7 @@ import PaginationButtons from "@peated/web/components/paginationButtons";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import TextInput from "@peated/web/components/textInput";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
+import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { buildQueryString } from "@peated/web/lib/urls";
 import {
@@ -21,8 +24,17 @@ import {
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
+type BrandRepairCandidate =
+  Outputs["bottles"]["brandRepairCandidates"]["results"][number];
+type BrandRepairGroup =
+  Outputs["bottles"]["brandRepairGroups"]["results"][number];
+
 function formatTastingCount(value: null | number): string {
   return (value ?? 0).toLocaleString();
+}
+
+function formatApplyGroupRepairLabel(count: number): string {
+  return count === 1 ? "Apply 1 Brand Change" : `Apply ${count} Brand Changes`;
 }
 
 function buildBrandRepairHref(
@@ -32,6 +44,127 @@ function buildBrandRepairHref(
 ): string {
   const queryString = buildQueryString(searchParams, nextParams);
   return queryString ? `${pathname}?${queryString}` : pathname;
+}
+
+function formatBrandRepairCandidateLlmExport({
+  candidate,
+  query,
+}: {
+  candidate: BrandRepairCandidate;
+  query: string;
+}) {
+  return JSON.stringify(
+    {
+      schemaVersion: 1,
+      source: "peated.admin.brand_repair",
+      queueQuery: query || null,
+      repair: {
+        kind: "individual_bottle",
+        bottle: candidate.bottle,
+        currentBrand: candidate.currentBrand,
+        targetBrand: candidate.targetBrand,
+        suggestedDistillery: candidate.suggestedDistillery,
+        supportingReferences: candidate.supportingReferences,
+      },
+    },
+    null,
+    2,
+  );
+}
+
+function formatBrandRepairGroupLlmExport({
+  group,
+  query,
+}: {
+  group: BrandRepairGroup;
+  query: string;
+}) {
+  return JSON.stringify(
+    {
+      schemaVersion: 1,
+      source: "peated.admin.brand_repair_group",
+      queueQuery: query || null,
+      repair: {
+        kind: "grouped_bottles",
+        currentBrand: group.currentBrand,
+        targetBrand: group.targetBrand,
+        suggestedDistillery: group.suggestedDistillery,
+        candidateCount: group.candidateCount,
+        totalTastings: group.totalTastings,
+        sampleBottles: group.sampleBottles,
+      },
+    },
+    null,
+    2,
+  );
+}
+
+function BrandRepairChangeSummary({
+  count,
+  currentBrand,
+  suggestedDistillery,
+  targetBrand,
+}: {
+  count: number;
+  currentBrand: BrandRepairCandidate["currentBrand"];
+  suggestedDistillery: BrandRepairCandidate["suggestedDistillery"];
+  targetBrand: BrandRepairCandidate["targetBrand"];
+}) {
+  return (
+    <div className="mt-4 rounded-lg border border-slate-800 bg-slate-900 p-4">
+      <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
+        Changes To Apply
+      </div>
+      <div className="mt-3 grid gap-3 text-sm md:grid-cols-2">
+        <div>
+          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            Bottle Scope
+          </div>
+          <div className="mt-1 text-slate-300">
+            {count === 1
+              ? "This bottle row only."
+              : `${count.toLocaleString()} verified bottle rows in this cluster only.`}
+          </div>
+        </div>
+        <div>
+          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            Brand
+          </div>
+          <div className="mt-1 text-slate-300">
+            {currentBrand.name} -&gt; {targetBrand.name}
+          </div>
+        </div>
+        <div>
+          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            Bottle Name
+          </div>
+          <div className="mt-1 text-slate-300">
+            Unchanged. The stored bottle title is not renamed.
+          </div>
+        </div>
+        <div>
+          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            Distillery
+          </div>
+          <div className="mt-1 text-slate-300">
+            {suggestedDistillery
+              ? `Add ${suggestedDistillery.name} as a distillery link when it is missing.`
+              : "No distillery link will be added."}
+          </div>
+        </div>
+        <div className="md:col-span-2">
+          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            Series And Search
+          </div>
+          <div className="mt-1 text-slate-300">
+            If a bottle is attached to a source-brand series, the repair reuses
+            or creates the matching target-brand series and reindexes affected
+            bottles and releases.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function Page() {
@@ -54,6 +187,9 @@ export default function Page() {
   const [repairingGroupKey, setRepairingGroupKey] = useState<string | null>(
     null,
   );
+  const [copyingPayloadKey, setCopyingPayloadKey] = useState<string | null>(
+    null,
+  );
   const groupListQueryOptions = orpc.bottles.brandRepairGroups.queryOptions({
     input: {
       query: currentQuery,
@@ -73,6 +209,38 @@ export default function Page() {
   const applyGroupRepairMutation = useMutation(
     orpc.bottles.applyBrandRepairGroup.mutationOptions(),
   );
+
+  const copyRepairPayload = async ({
+    key,
+    name,
+    payload,
+  }: {
+    key: string;
+    name: string;
+    payload: string;
+  }) => {
+    setCopyingPayloadKey(key);
+
+    try {
+      await copyTextToClipboard(payload);
+      flash(
+        <div>
+          Copied structured brand repair payload for{" "}
+          <strong className="font-bold">{name}</strong>
+        </div>,
+      );
+    } catch {
+      flash(
+        <div>
+          Unable to copy the brand repair payload for{" "}
+          <strong className="font-bold">{name}</strong>
+        </div>,
+        "error",
+      );
+    } finally {
+      setCopyingPayloadKey(null);
+    }
+  };
 
   const applyRepair = async ({
     bottleId,
@@ -269,6 +437,32 @@ export default function Page() {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
+                    <Button
+                      icon={
+                        <DocumentDuplicateIcon
+                          className="h-5 w-5"
+                          aria-hidden="true"
+                        />
+                      }
+                      size="small"
+                      disabled={copyingPayloadKey !== null}
+                      loading={copyingPayloadKey === `group:${groupKey}`}
+                      onClick={async () => {
+                        await copyRepairPayload({
+                          key: `group:${groupKey}`,
+                          name: `${group.currentBrand.name} to ${group.targetBrand.name}`,
+                          payload: formatBrandRepairGroupLlmExport({
+                            group,
+                            query: currentQuery,
+                          }),
+                        });
+                      }}
+                      title="Copy structured grouped repair data as JSON"
+                    >
+                      <span className="sr-only">
+                        Copy grouped repair payload
+                      </span>
+                    </Button>
                     <Button href={`/entities/${group.currentBrand.id}`}>
                       Open Current Brand
                     </Button>
@@ -291,10 +485,17 @@ export default function Page() {
                         })
                       }
                     >
-                      Apply {group.candidateCount.toLocaleString()} Repairs
+                      {formatApplyGroupRepairLabel(group.candidateCount)}
                     </Button>
                   </div>
                 </div>
+
+                <BrandRepairChangeSummary
+                  count={group.candidateCount}
+                  currentBrand={group.currentBrand}
+                  suggestedDistillery={group.suggestedDistillery}
+                  targetBrand={group.targetBrand}
+                />
 
                 <div className="mt-4 grid gap-3 lg:grid-cols-3">
                   {group.sampleBottles.map((sample) => (
@@ -387,6 +588,32 @@ export default function Page() {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
+                  <Button
+                    icon={
+                      <DocumentDuplicateIcon
+                        className="h-5 w-5"
+                        aria-hidden="true"
+                      />
+                    }
+                    size="small"
+                    disabled={copyingPayloadKey !== null}
+                    loading={
+                      copyingPayloadKey === `bottle:${candidate.bottle.id}`
+                    }
+                    onClick={async () => {
+                      await copyRepairPayload({
+                        key: `bottle:${candidate.bottle.id}`,
+                        name: candidate.bottle.fullName,
+                        payload: formatBrandRepairCandidateLlmExport({
+                          candidate,
+                          query: currentQuery,
+                        }),
+                      });
+                    }}
+                    title="Copy structured brand repair data as JSON"
+                  >
+                    <span className="sr-only">Copy brand repair payload</span>
+                  </Button>
                   <Button href={`/bottles/${candidate.bottle.id}`}>
                     Open Bottle
                   </Button>
@@ -414,10 +641,17 @@ export default function Page() {
                       })
                     }
                   >
-                    Apply Repair
+                    Apply Brand Change
                   </Button>
                 </div>
               </div>
+
+              <BrandRepairChangeSummary
+                count={1}
+                currentBrand={candidate.currentBrand}
+                suggestedDistillery={candidate.suggestedDistillery}
+                targetBrand={candidate.targetBrand}
+              />
 
               <div className="mt-4 grid gap-4 lg:grid-cols-2">
                 <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">

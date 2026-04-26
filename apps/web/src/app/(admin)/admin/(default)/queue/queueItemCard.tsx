@@ -10,6 +10,7 @@ import {
   getNewBottleBottlingPath,
 } from "@peated/web/lib/bottlings";
 import classNames from "@peated/web/lib/classNames";
+import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { type ReactNode, useState } from "react";
 import { formatPriceMatchQueueLlmExport } from "./llmExport";
 
@@ -745,28 +746,6 @@ function getCreateProposalActions(
         editLabel: "Edit Bottle Draft",
         editHref: `/addBottle?${queryString}`,
       };
-  }
-}
-
-async function copyTextToClipboard(value: string): Promise<void> {
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(value);
-    return;
-  }
-
-  const textArea = document.createElement("textarea");
-  textArea.value = value;
-  textArea.setAttribute("readonly", "");
-  textArea.style.position = "fixed";
-  textArea.style.opacity = "0";
-  document.body.appendChild(textArea);
-  textArea.select();
-
-  const copied = document.execCommand("copy");
-  document.body.removeChild(textArea);
-
-  if (!copied) {
-    throw new Error("Clipboard copy failed.");
   }
 }
 

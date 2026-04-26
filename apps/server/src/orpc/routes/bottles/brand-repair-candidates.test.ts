@@ -1,6 +1,6 @@
-import waitError from "@peated/server/lib/test/waitError";
 import { db } from "@peated/server/db";
 import { bottles } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
@@ -123,6 +123,41 @@ describe("GET /bottles/brand-repair-candidates", () => {
         },
       },
     ]);
+  });
+
+  test("does not treat owner-prefixed aliases as stronger than the canonical bottle brand", async ({
+    fixtures,
+  }) => {
+    const currentBrand = await fixtures.Entity({
+      name: "Yamazaki",
+      type: ["brand", "distiller"],
+    });
+    await fixtures.Entity({
+      name: "Suntory",
+      type: ["brand"],
+      totalBottles: 50,
+      totalTastings: 500,
+    });
+    const user = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({
+      brandId: currentBrand.id,
+      name: "12-year-old",
+      totalTastings: 3,
+    });
+
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Suntory Yamazaki 12-year-old Whisky",
+    });
+
+    const { results } = await routerClient.bottles.brandRepairCandidates(
+      {
+        query: "Yamazaki",
+      },
+      { context: { user } },
+    );
+
+    expect(results).toEqual([]);
   });
 
   test("surfaces full-name-supported repairs from a distillery-style brand row", async ({
