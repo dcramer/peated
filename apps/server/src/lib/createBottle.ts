@@ -1,3 +1,4 @@
+import { type CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, Entity, NewBottle, User } from "@peated/server/db/schema";
 import {
@@ -8,6 +9,11 @@ import {
   changes,
 } from "@peated/server/db/schema";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
+import {
+  getCatalogVerificationCreationMetadata,
+  queueBottleCreationVerification,
+  queueEntityCreationVerification,
+} from "@peated/server/lib/catalogVerification";
 import {
   coerceToUpsert,
   upsertBottleAlias,
@@ -64,9 +70,11 @@ async function getExistingBottleIdForAlias(
 export async function createBottleInTransaction(
   tx: AnyTransaction,
   {
+    creationSource = "manual_entry",
     input,
     context,
   }: {
+    creationSource?: CatalogVerificationCreationSource;
     input: z.infer<typeof BottleInputSchema>;
     context: Context & { user: User };
   },
@@ -93,6 +101,7 @@ export async function createBottleInTransaction(
   const brandUpsert = await upsertEntity({
     db: tx,
     data: coerceToUpsert(bottleData.brand),
+    creationSource,
     type: "brand",
     userId: user.id,
   });
@@ -109,6 +118,7 @@ export async function createBottleInTransaction(
     const bottlerUpsert = await upsertEntity({
       db: tx,
       data: coerceToUpsert(bottleData.bottler),
+      creationSource,
       type: "bottler",
       userId: user.id,
     });
@@ -144,6 +154,7 @@ export async function createBottleInTransaction(
       const distUpsert = await upsertEntity({
         db: tx,
         data: coerceToUpsert(distData),
+        creationSource,
         userId: user.id,
         type: "distiller",
       });
@@ -217,6 +228,8 @@ export async function createBottleInTransaction(
       data: {
         ...bottle,
         distillerIds,
+        catalogVerification:
+          getCatalogVerificationCreationMetadata(creationSource),
       },
     }),
   ];
@@ -240,14 +253,29 @@ export async function createBottleInTransaction(
   };
 }
 
-export async function finalizeCreatedBottle({
-  bottle,
-  seriesCreated,
-  newAliases,
-  newEntityIds,
-}: CreateBottleResult) {
+export async function finalizeCreatedBottle(
+  { bottle, seriesCreated, newAliases, newEntityIds }: CreateBottleResult,
+  {
+    creationSource = "manual_entry",
+  }: {
+    creationSource?: CatalogVerificationCreationSource;
+  } = {},
+) {
   try {
     await pushJob("OnBottleChange", { bottleId: bottle.id });
+  } catch (err) {
+    logError(err, {
+      bottle: {
+        id: bottle.id,
+      },
+    });
+  }
+
+  try {
+    await queueBottleCreationVerification({
+      bottleId: bottle.id,
+      creationSource,
+    });
   } catch (err) {
     logError(err, {
       bottle: {
@@ -295,24 +323,40 @@ export async function finalizeCreatedBottle({
         },
       });
     }
+
+    try {
+      await queueEntityCreationVerification({
+        entityId,
+        creationSource,
+      });
+    } catch (err) {
+      logError(err, {
+        entity: {
+          id: entityId,
+        },
+      });
+    }
   }
 }
 
 export async function createBottle({
+  creationSource = "manual_entry",
   input,
   context,
 }: {
+  creationSource?: CatalogVerificationCreationSource;
   input: z.infer<typeof BottleInputSchema>;
   context: Context & { user: User };
 }) {
   const result = await db.transaction(async (tx) =>
     createBottleInTransaction(tx, {
+      creationSource,
       input,
       context,
     }),
   );
 
-  await finalizeCreatedBottle(result);
+  await finalizeCreatedBottle(result, { creationSource });
 
   return await serialize(BottleSerializer, result.bottle, context.user);
 }

@@ -34,7 +34,9 @@ export type JobName =
   | "UpdateBottleStats"
   | "UpdateCountryStats"
   | "UpdateEntityStats"
-  | "UpdateRegionStats";
+  | "UpdateRegionStats"
+  | "VerifyBottleCreation"
+  | "VerifyEntityCreation";
 
 type TraceContext = {
   "sentry-trace"?: string;

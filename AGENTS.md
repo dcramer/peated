@@ -38,6 +38,14 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - Database migrations must be created with `pnpm db:generate` (Drizzle Kit); never hand-write migration SQL or edit `apps/server/migrations/meta/*` manually
 - Web app uses Next.js App Router in `apps/web/src/app/`
 
+## API Access
+
+- Production API host: `https://api.peated.com`
+- OpenAPI spec: `https://api.peated.com/spec.json`
+- OpenAPI endpoints are mounted under `https://api.peated.com/v1/*`
+- Most read/list endpoints are anonymous and public; protected write/moderator routes require `Authorization: Bearer <token>`
+- `https://peated.com` is the frontend host, not the API host
+
 ## Policies
 
 - Policy docs live under `docs/policies/`
@@ -50,6 +58,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - `docs/architecture/account-policies.md`
 - `docs/architecture/rating-systems.md`
 - `docs/architecture/bottle-classifier.md`
+- `docs/architecture/entity-classifier.md`
 - `docs/architecture/bottle-normalization-examples.md`
 - `docs/architecture/whisky-identity-model.md`
 - `docs/development/backend-testing.md`

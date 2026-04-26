@@ -1145,6 +1145,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
 
     try {
       createResult = await createBottleInTransaction(tx, {
+        creationSource: "price_match_review",
         input,
         context: {
           user,
@@ -1252,7 +1253,9 @@ export async function createBottleFromStorePriceMatchProposal({
   );
 
   if (result.createResult) {
-    await finalizeCreatedBottle(result.createResult);
+    await finalizeCreatedBottle(result.createResult, {
+      creationSource: "price_match_review",
+    });
   }
   if (result.createReleaseResult) {
     await finalizeCreatedBottleRelease(result.createReleaseResult);

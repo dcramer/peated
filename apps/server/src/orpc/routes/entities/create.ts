@@ -1,4 +1,5 @@
 import { normalizeEntityName } from "@peated/bottle-classifier/normalize";
+import { buildCatalogVerificationCreationMetadata } from "@peated/catalog-verifier";
 import { db } from "@peated/server/db";
 import type { NewEntity } from "@peated/server/db/schema";
 import {
@@ -7,6 +8,7 @@ import {
   entities,
   regions,
 } from "@peated/server/db/schema";
+import { queueEntityCreationVerification } from "@peated/server/lib/catalogVerification";
 import { upsertEntityAliases } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
 import { buildEntitySearchVector } from "@peated/server/lib/search";
@@ -77,7 +79,7 @@ export default procedure
     }
 
     const user = context.user;
-    const entity = await db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const [entity] = await tx
         .insert(entities)
         .values({
@@ -104,7 +106,10 @@ export default procedure
             })
             .where(eq(entities.name, data.name))
             .returning();
-          return updated;
+          return {
+            entity: updated,
+            created: false,
+          };
         }
         return null;
       }
@@ -121,18 +126,27 @@ export default procedure
           type: "add",
           createdAt: entity.createdAt,
           createdById: user.id,
-          data: data,
+          data: {
+            ...data,
+            catalogVerification:
+              buildCatalogVerificationCreationMetadata("manual_entry"),
+          },
         }),
       ]);
 
-      return entity;
+      return {
+        entity,
+        created: true,
+      };
     });
 
-    if (!entity) {
+    if (!result?.entity) {
       throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to create entity.",
       });
     }
+
+    const { entity, created } = result;
 
     try {
       await pushJob("OnEntityChange", { entityId: entity.id });
@@ -142,6 +156,21 @@ export default procedure
           id: entity.id,
         },
       });
+    }
+
+    if (created) {
+      try {
+        await queueEntityCreationVerification({
+          entityId: entity.id,
+          creationSource: "manual_entry",
+        });
+      } catch (err) {
+        logError(err, {
+          entity: {
+            id: entity.id,
+          },
+        });
+      }
     }
 
     return await serialize(EntitySerializer, entity, context.user);
