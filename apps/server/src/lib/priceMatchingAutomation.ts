@@ -1,16 +1,21 @@
 import {
+  AUTHORITATIVE_SOURCE_TIERS,
+  buildProducerIdentityPhrases,
+  classifySourceTier,
+  containsComparablePhrase,
+  escapeRegExp,
+  getAbvSupportLevel,
+  getSearchResultText,
+  listMatchesExpectedValue,
+  normalizeComparableText,
+  textsOverlap,
+} from "@peated/bottle-classifier/identityEvidenceCore";
+import {
   getExistingMatchIdentityConflicts,
   hasSupportiveWebEvidenceForExistingMatch as hasSupportiveBottleEvidence,
   isExistingMatchConfidenceEligibleForVerification,
 } from "@peated/bottle-classifier/priceMatchingEvidence";
 import type { StorePrice } from "@peated/server/db/schema";
-import {
-  containsComparablePhrase,
-  escapeRegExp,
-  listMatchesExpectedValue,
-  normalizeComparableText,
-  textsOverlap,
-} from "@peated/server/lib/priceMatchingText";
 import type { StorePriceMatchAutomationAssessmentSchema } from "@peated/server/schemas";
 import {
   type BottleCandidateSchema,
@@ -74,31 +79,6 @@ export type StorePriceMatchAutomationAssessment = z.infer<
 >;
 
 const AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD = 90;
-const AUTHORITATIVE_SOURCE_TIERS = new Set<SourceTier>(["official", "critic"]);
-const CRITIC_DOMAINS = [
-  "breakingbourbon.com",
-  "distiller.com",
-  "paste.com",
-  "rarebird101.com",
-  "thewhiskeywash.com",
-  "whiskyadvocate.com",
-  "whiskyfun.com",
-  "whiskynotes.be",
-];
-const RETAILER_DOMAINS = [
-  "astorwines.com",
-  "binnys.com",
-  "healthyspirits.com",
-  "klwines.com",
-  "masterofmalt.com",
-  "reservebar.com",
-  "seelbachs.com",
-  "sharedpour.com",
-  "specsonline.com",
-  "thewhiskyexchange.com",
-  "totalwine.com",
-  "woodencork.com",
-];
 const WEB_VALIDATED_DIFFERENTIATORS = new Set<MatchAttribute>([
   "bottler",
   "series",
@@ -116,143 +96,6 @@ const WEB_VALIDATED_DIFFERENTIATORS = new Set<MatchAttribute>([
 ]);
 function clampScore(score: number) {
   return Math.min(100, Math.max(0, Math.round(score)));
-}
-
-function getComparableDomain(url: string | null | undefined) {
-  if (!url) {
-    return null;
-  }
-
-  try {
-    const hostname = new URL(url).hostname.toLowerCase();
-    return hostname.startsWith("www.") ? hostname.slice(4) : hostname;
-  } catch {
-    return null;
-  }
-}
-
-function domainMatches(hostname: string, domain: string) {
-  return hostname === domain || hostname.endsWith(`.${domain}`);
-}
-
-function normalizeComparablePhrase(value: string | null | undefined) {
-  return normalizeComparableText(value)
-    .replace(/[^a-z0-9]+/g, "")
-    .trim();
-}
-
-function buildProducerIdentityPhrases({
-  proposedBottle,
-  extractedLabel,
-  targetCandidate,
-}: {
-  proposedBottle: ProposedBottle | null;
-  extractedLabel: ExtractedBottleDetails | null;
-  targetCandidate?: PriceMatchCandidate | null;
-}) {
-  return new Set(
-    [
-      proposedBottle?.brand.name,
-      proposedBottle?.bottler?.name,
-      ...(proposedBottle?.distillers.map((distiller) => distiller.name) ?? []),
-      extractedLabel?.brand,
-      extractedLabel?.bottler,
-      ...(extractedLabel?.distillery ?? []),
-      targetCandidate?.brand,
-      targetCandidate?.bottler,
-      ...(targetCandidate?.distillery ?? []),
-    ]
-      .map((value) => normalizeComparablePhrase(value))
-      .filter((value) => value.length >= 4),
-  );
-}
-
-function getSearchResultText(
-  evidence: SearchEvidence,
-  result: SearchEvidence["results"][number],
-) {
-  return [
-    evidence.summary,
-    result.title,
-    result.description,
-    ...result.extraSnippets,
-  ]
-    .filter(Boolean)
-    .join(" ");
-}
-
-function classifySourceTier({
-  result,
-  priceUrl,
-  producerPhrases,
-}: {
-  result: SearchEvidence["results"][number];
-  priceUrl: string;
-  producerPhrases: Set<string>;
-}): SourceTier {
-  const resultDomain = result.domain ?? getComparableDomain(result.url);
-  const originDomain = getComparableDomain(priceUrl);
-
-  if (
-    resultDomain &&
-    originDomain &&
-    domainMatches(resultDomain, originDomain)
-  ) {
-    return "origin_retailer";
-  }
-
-  if (
-    resultDomain &&
-    CRITIC_DOMAINS.some((domain) => domainMatches(resultDomain, domain))
-  ) {
-    return "critic";
-  }
-
-  if (
-    resultDomain &&
-    Array.from(producerPhrases).some((phrase) =>
-      resultDomain.replace(/[^a-z0-9]+/g, "").includes(phrase),
-    )
-  ) {
-    return "official";
-  }
-
-  if (
-    resultDomain &&
-    RETAILER_DOMAINS.some((domain) => domainMatches(resultDomain, domain))
-  ) {
-    return "retailer";
-  }
-
-  return "unknown";
-}
-
-function getAbvSupportLevel(
-  text: string,
-  expectedValue: number,
-): "none" | "close" | "exact" {
-  const exactPattern = new RegExp(
-    `\\b${escapeRegExp(expectedValue.toFixed(1))}%?(?:\\s*abv)?\\b|\\b${escapeRegExp(
-      `${Math.round(expectedValue)}`,
-    )}%\\s*abv\\b`,
-    "i",
-  );
-
-  if (exactPattern.test(text)) {
-    return "exact";
-  }
-
-  const match = text.match(/(\d{1,2}(?:\.\d)?)\s*%?\s*abv/i);
-  if (!match) {
-    return "none";
-  }
-
-  const value = Number(match[1]);
-  if (Number.isNaN(value)) {
-    return "none";
-  }
-
-  return Math.abs(value - expectedValue) <= 0.3 ? "close" : "none";
 }
 
 function getCategoryKeywords(value: string) {
@@ -707,7 +550,7 @@ function evaluateSearchEvidenceChecks({
 
         const sourceTier = classifySourceTier({
           result,
-          priceUrl,
+          sourceUrl: priceUrl,
           producerPhrases,
         });
         matchedSourceTiers.add(sourceTier);
@@ -1196,6 +1039,7 @@ export function shouldVerifyStorePriceMatch(params: {
 }) {
   const {
     action,
+    automationBlockers,
     currentBottleId,
     currentReleaseId,
     suggestedBottleId,
@@ -1207,9 +1051,10 @@ export function shouldVerifyStorePriceMatch(params: {
     return false;
   }
 
-  // Existing-match automation should follow the reviewed classifier
-  // confidence directly. We still persist automation blockers for operator
-  // context, but they do not re-gate approval after review.
+  if (automationBlockers.length > 0) {
+    return false;
+  }
+
   if (modelConfidence === null) {
     return false;
   }

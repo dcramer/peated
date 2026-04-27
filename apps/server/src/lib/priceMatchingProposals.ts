@@ -1,10 +1,5 @@
 import { inferBottleCreationTarget } from "@peated/bottle-classifier/bottleCreationDrafts";
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
-import {
-  DEFAULT_PRICE_MATCH_CREATION_TARGET,
-  getReleaseObservationFacts,
-} from "@peated/bottle-classifier/releaseIdentity";
-import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
+import { getReleaseObservationFacts } from "@peated/bottle-classifier/releaseIdentity";
 import {
   BottleClassificationError,
   classifyBottleReference,
@@ -18,7 +13,6 @@ import {
   bottleReleases,
   bottles,
   entities,
-  externalSites,
   storePriceMatchProposals,
   storePrices,
   type StorePrice,
@@ -29,7 +23,6 @@ import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
-import { getBottleCandidateById } from "@peated/server/lib/bottleReferenceCandidates";
 import { buildClassifierCreateInputs } from "@peated/server/lib/classifierDecisionCreateInputs";
 import {
   BottleAlreadyExistsError,
@@ -74,9 +67,6 @@ import type {
 } from "@peated/server/schemas";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import type { z } from "zod";
-
-const SMWS_EXTERNAL_SITE_TYPE = "smws";
-const SMWS_BRAND_NAME = "The Scotch Malt Whisky Society";
 
 type ExtractedBottleDetails = z.infer<typeof ExtractedBottleDetailsSchema>;
 type PriceMatchCandidate = z.infer<typeof PriceMatchCandidateSchema>;
@@ -637,214 +627,6 @@ async function canContinueStorePriceMatchProcessing(
   );
 }
 
-async function findEntityChoiceByName(name: string) {
-  const entity = await db.query.entities.findFirst({
-    where: eq(sql`LOWER(${entities.name})`, name.toLowerCase()),
-  });
-
-  return entity
-    ? {
-        id: entity.id,
-        name: entity.name,
-      }
-    : null;
-}
-
-async function findTrustedSmwsBottleId(name: string): Promise<number | null> {
-  const [match] = await db
-    .select({
-      bottleId: bottles.id,
-    })
-    .from(bottles)
-    .innerJoin(entities, eq(entities.id, bottles.brandId))
-    .where(
-      and(
-        eq(sql`LOWER(${entities.name})`, SMWS_BRAND_NAME.toLowerCase()),
-        eq(sql`LOWER(${bottles.name})`, name.toLowerCase()),
-      ),
-    )
-    .limit(1);
-
-  return match?.bottleId ?? null;
-}
-
-async function maybeResolveTrustedSmwsStorePriceMatch(
-  price: StorePrice,
-  {
-    processingToken,
-  }: {
-    processingToken?: string;
-  } = {},
-): Promise<StorePriceMatchProposal | null> {
-  const site = await db.query.externalSites.findFirst({
-    where: eq(externalSites.id, price.externalSiteId),
-  });
-  if (site?.type !== SMWS_EXTERNAL_SITE_TYPE) {
-    return null;
-  }
-
-  const details = parseDetailsFromName(price.name);
-  if (!details?.distiller || !details.category) {
-    return null;
-  }
-
-  const { name } = normalizeBottle({
-    name: details.name,
-    isFullName: false,
-  });
-  const brand = await findEntityChoiceByName(SMWS_BRAND_NAME);
-  const distiller = await findEntityChoiceByName(details.distiller);
-  const existingBottleId = await findTrustedSmwsBottleId(name);
-  const existingBottle = existingBottleId
-    ? await getBottleCandidateById(existingBottleId)
-    : null;
-
-  const extractedLabel: ExtractedBottleDetails = {
-    brand: brand?.name ?? SMWS_BRAND_NAME,
-    bottler: null,
-    expression: name,
-    series: null,
-    distillery: [distiller?.name ?? details.distiller],
-    category: details.category,
-    stated_age: null,
-    abv: null,
-    release_year: null,
-    vintage_year: null,
-    cask_type: null,
-    cask_size: null,
-    cask_fill: null,
-    cask_strength: null,
-    single_cask: true,
-    edition: null,
-  };
-  const candidates = existingBottle ? [existingBottle] : [];
-  const decision: StorePriceMatchDecision = existingBottleId
-    ? {
-        action:
-          price.bottleId !== null && price.bottleId !== existingBottleId
-            ? "correction"
-            : "match_existing",
-        confidence: 100,
-        rationale: "Deterministic SMWS match from trusted source metadata.",
-        suggestedBottleId: existingBottleId,
-        suggestedReleaseId: null,
-        parentBottleId: null,
-        creationTarget: null,
-        candidateBottleIds: [existingBottleId],
-        proposedBottle: null,
-        proposedRelease: null,
-      }
-    : {
-        action: "create_new",
-        confidence: 100,
-        rationale: "Deterministic SMWS creation from trusted source metadata.",
-        suggestedBottleId: null,
-        suggestedReleaseId: null,
-        parentBottleId: null,
-        creationTarget: DEFAULT_PRICE_MATCH_CREATION_TARGET,
-        candidateBottleIds: [],
-        proposedBottle: {
-          name,
-          series: null,
-          category: details.category,
-          edition: null,
-          statedAge: null,
-          caskStrength: null,
-          singleCask: true,
-          abv: null,
-          vintageYear: null,
-          releaseYear: null,
-          caskType: null,
-          caskSize: null,
-          caskFill: null,
-          brand: {
-            id: brand?.id ?? null,
-            name: brand?.name ?? SMWS_BRAND_NAME,
-          },
-          distillers: [
-            {
-              id: distiller?.id ?? null,
-              name: distiller?.name ?? details.distiller,
-            },
-          ],
-          bottler: {
-            id: brand?.id ?? null,
-            name: brand?.name ?? SMWS_BRAND_NAME,
-          },
-        },
-        proposedRelease: null,
-      };
-
-  const proposal = await upsertStorePriceMatchProposal({
-    price,
-    extractedLabel,
-    candidates,
-    decision,
-    searchEvidence: [],
-    expectedProcessingToken: processingToken,
-  });
-
-  try {
-    const automationUser = await getAutomationModeratorUser();
-
-    if (
-      processingToken &&
-      !(await canContinueStorePriceMatchProcessing(
-        proposal.id,
-        processingToken,
-      ))
-    ) {
-      return await reloadStorePriceMatchProposal(proposal.id);
-    }
-
-    if (existingBottleId) {
-      await applyApprovedStorePriceMatch({
-        proposalId: proposal.id,
-        bottleId: existingBottleId,
-        reviewedById: automationUser.id,
-        expectedProcessingToken: processingToken,
-      });
-    } else {
-      const createInputs = buildStorePriceMatchCreateInputs(decision);
-      if (!createInputs.input && !createInputs.releaseInput) {
-        throw new Error(
-          `Unable to auto-create trusted SMWS proposal without creation inputs (${proposal.id}).`,
-        );
-      }
-
-      await createBottleFromStorePriceMatchProposal({
-        proposalId: proposal.id,
-        ...createInputs,
-        user: automationUser,
-        expectedProcessingToken: processingToken,
-      });
-    }
-
-    return await reloadStorePriceMatchProposal(proposal.id);
-  } catch (err) {
-    logError(err, {
-      price: {
-        id: price.id,
-        name: price.name,
-      },
-      proposal: {
-        id: proposal.id,
-      },
-    });
-
-    return await upsertStorePriceMatchProposal({
-      price,
-      extractedLabel,
-      candidates,
-      decision,
-      searchEvidence: [],
-      error: err instanceof Error ? err.message : "Unknown trusted SMWS error",
-      statusOverride: "errored",
-      expectedProcessingToken: processingToken,
-    });
-  }
-}
-
 function buildStorePriceMatchCreateInputs(decision: StorePriceMatchDecision) {
   if (decision.action !== "create_new") {
     return {
@@ -1346,16 +1128,6 @@ export async function resolveStorePriceMatchProposal(
   let searchEvidence: SearchEvidence[] = [];
 
   try {
-    const trustedSmwsProposal = await maybeResolveTrustedSmwsStorePriceMatch(
-      price,
-      {
-        processingToken,
-      },
-    );
-    if (trustedSmwsProposal) {
-      return trustedSmwsProposal;
-    }
-
     // Price matching consumes the generic bottle classifier and only layers
     // price-specific persistence and automation policy on top of its result.
     const classification = await classifyBottleReference({

@@ -1,4 +1,10 @@
 import { type CatalogVerificationCreationSource } from "@peated/catalog-verifier";
+import {
+  classifyBottleReference,
+  isIgnoredBottleClassification,
+  type BottleExtractedDetails,
+} from "@peated/server/agents/bottleClassifier";
+import config from "@peated/server/config";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, Entity, NewBottle, User } from "@peated/server/db/schema";
 import {
@@ -51,6 +57,128 @@ export type CreateBottleResult = {
   newEntityIds: number[];
   seriesCreated: boolean;
 };
+
+const MANUAL_BOTTLE_REVIEW_CONFIDENCE_THRESHOLD = 80;
+const MANUAL_BOTTLE_RELEASE_REVIEW_CONFIDENCE_THRESHOLD = 90;
+
+function getResolvedEntityName(
+  value: { name?: string | null } | null | undefined,
+) {
+  return value?.name ?? null;
+}
+
+function getResolvedSeriesName(value: unknown) {
+  if (!value || typeof value !== "object" || !("name" in value)) {
+    return null;
+  }
+
+  const name = (value as { name?: unknown }).name;
+  return typeof name === "string" && name.trim() ? name : null;
+}
+
+function buildManualBottleExtractedIdentity(
+  bottleData: BottlePreviewResult & Record<string, any>,
+): BottleExtractedDetails {
+  return {
+    brand: getResolvedEntityName(bottleData.brand),
+    bottler: getResolvedEntityName(bottleData.bottler),
+    expression: bottleData.name || null,
+    series: getResolvedSeriesName(bottleData.series),
+    distillery:
+      bottleData.distillers?.map(
+        (distiller: { name: string }) => distiller.name,
+      ) ?? null,
+    category: bottleData.category ?? null,
+    stated_age: bottleData.statedAge ?? null,
+    abv: bottleData.abv ?? null,
+    release_year: bottleData.releaseYear ?? null,
+    vintage_year: bottleData.vintageYear ?? null,
+    cask_type: bottleData.caskType ?? null,
+    cask_size: bottleData.caskSize ?? null,
+    cask_fill: bottleData.caskFill ?? null,
+    cask_strength: bottleData.caskStrength ?? null,
+    single_cask: bottleData.singleCask ?? null,
+    edition: bottleData.edition ?? null,
+  };
+}
+
+async function reviewManualBottleCreateInput({
+  input,
+  context,
+}: {
+  input: z.infer<typeof BottleInputSchema>;
+  context: Context & { user: User };
+}) {
+  if (!config.OPENAI_API_KEY) {
+    return;
+  }
+
+  const bottleData: BottlePreviewResult & Record<string, any> =
+    await bottleNormalize({ input, context });
+  if (!bottleData.name || !bottleData.brand) {
+    return;
+  }
+
+  const brandName = bottleData.brand.shortName || bottleData.brand.name;
+  const referenceName = formatBottleName({
+    ...bottleData,
+    name: `${brandName} ${bottleData.name}`,
+  });
+
+  try {
+    const classification = await classifyBottleReference({
+      reference: {
+        name: referenceName,
+        imageUrl: input.imageUrl ?? null,
+      },
+      extractedIdentity: buildManualBottleExtractedIdentity(bottleData),
+      candidateExpansion: "open",
+    });
+
+    if (isIgnoredBottleClassification(classification)) {
+      return;
+    }
+
+    const decision = classification.decision;
+    if (
+      decision.action === "match" &&
+      decision.confidence >= MANUAL_BOTTLE_REVIEW_CONFIDENCE_THRESHOLD
+    ) {
+      throw new BottleAlreadyExistsError(decision.matchedBottleId);
+    }
+
+    if (
+      decision.action === "create_release" &&
+      decision.confidence >= MANUAL_BOTTLE_REVIEW_CONFIDENCE_THRESHOLD
+    ) {
+      throw new BottleCreateBadRequestError(
+        "This looks like a specific release of an existing bottle. Add it as a bottling instead of a new bottle.",
+      );
+    }
+
+    if (
+      decision.action === "create_bottle_and_release" &&
+      decision.confidence >= MANUAL_BOTTLE_RELEASE_REVIEW_CONFIDENCE_THRESHOLD
+    ) {
+      throw new BottleCreateBadRequestError(
+        "This looks like a bottle with release-specific details. Split the reusable bottle from the specific bottling before creating it.",
+      );
+    }
+  } catch (err) {
+    if (
+      err instanceof BottleAlreadyExistsError ||
+      err instanceof BottleCreateBadRequestError
+    ) {
+      throw err;
+    }
+
+    logError(err, {
+      bottle: {
+        fullName: referenceName,
+      },
+    });
+  }
+}
 
 async function getExistingBottleIdForAlias(
   tx: AnyTransaction,
@@ -348,6 +476,10 @@ export async function createBottle({
   input: z.infer<typeof BottleInputSchema>;
   context: Context & { user: User };
 }) {
+  if (creationSource === "manual_entry") {
+    await reviewManualBottleCreateInput({ input, context });
+  }
+
   const result = await db.transaction(async (tx) =>
     createBottleInTransaction(tx, {
       creationSource,

@@ -1,3 +1,4 @@
+import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { bottles } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
@@ -5,6 +6,10 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
 describe("PUT /bottles", () => {
+  beforeEach(() => {
+    config.OPENAI_API_KEY = undefined;
+  });
+
   test("requires authentication", async () => {
     const err = await waitError(
       routerClient.bottles.upsert({

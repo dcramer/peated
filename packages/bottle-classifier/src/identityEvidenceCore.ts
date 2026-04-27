@@ -42,6 +42,19 @@ const RETAILER_DOMAINS = [
   "woodencork.com",
 ];
 
+const OFFICIAL_DOMAIN_SUFFIXES = [
+  "bourbon",
+  "distillery",
+  "distilling",
+  "gin",
+  "malt",
+  "rum",
+  "scotch",
+  "spirits",
+  "whiskey",
+  "whisky",
+];
+
 export const AUTHORITATIVE_SOURCE_TIERS = new Set<BottleEvidenceSourceTier>([
   "official",
   "critic",
@@ -111,6 +124,40 @@ export function getComparableDomain(
 
 export function domainMatches(hostname: string, domain: string): boolean {
   return hostname === domain || hostname.endsWith(`.${domain}`);
+}
+
+function getComparableDomainLabel(hostname: string): string | null {
+  const labels = hostname.split(".").filter(Boolean);
+  if (labels.length < 2) {
+    return null;
+  }
+
+  const registrableLabel =
+    labels.length >= 3 &&
+    labels.at(-2)?.length === 2 &&
+    labels.at(-1)?.length === 2
+      ? labels.at(-3)
+      : labels.at(-2);
+
+  return registrableLabel?.replace(/[^a-z0-9]+/g, "") ?? null;
+}
+
+function domainLooksProducerOwned(hostname: string, producerPhrase: string) {
+  const domainLabel = getComparableDomainLabel(hostname);
+  if (!domainLabel || !producerPhrase) {
+    return false;
+  }
+
+  if (domainLabel === producerPhrase) {
+    return true;
+  }
+
+  if (!domainLabel.startsWith(producerPhrase)) {
+    return false;
+  }
+
+  const suffix = domainLabel.slice(producerPhrase.length);
+  return OFFICIAL_DOMAIN_SUFFIXES.includes(suffix);
 }
 
 export function normalizeComparablePhrase(
@@ -206,7 +253,7 @@ export function classifySourceTier({
   if (
     resultDomain &&
     Array.from(producerPhrases).some((phrase) =>
-      resultDomain.replace(/[^a-z0-9]+/g, "").includes(phrase),
+      domainLooksProducerOwned(resultDomain, phrase),
     )
   ) {
     return "official";

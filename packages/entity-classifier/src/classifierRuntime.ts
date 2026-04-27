@@ -1,6 +1,15 @@
 import { Agent, OpenAIProvider, Runner } from "@openai/agents";
 import type OpenAI from "openai";
 import {
+  EntityClassificationDecisionSchema,
+  EntityResolutionSchema,
+  SearchEntitiesArgsSchema,
+  type EntityClassificationDecision,
+  type EntityClassificationReference,
+  type EntityResolution,
+  type SearchEntitiesArgs,
+} from "./classifierTypes";
+import {
   ClassifyEntityInputSchema,
   EntityClassificationResultSchema,
   buildEntityClassificationArtifacts,
@@ -10,16 +19,8 @@ import {
 } from "./contract";
 import { EntityClassificationError } from "./error";
 import { buildEntityClassifierInstructions } from "./instructions";
-import {
-  EntityClassificationDecisionSchema,
-  EntityResolutionSchema,
-  SearchEntitiesArgsSchema,
-  type EntityClassificationDecision,
-  type EntityClassificationReference,
-  type EntityResolution,
-  type SearchEntitiesArgs,
-} from "./classifierTypes";
 import { getDeterministicOpenAISettings } from "./openaiModelSettings";
+import { finalizeEntityClassification } from "./reviewPolicy";
 import { createOpenAIWebSearchTool, createSearchEntitiesTool } from "./tools";
 
 const ENTITY_CLASSIFIER_MAX_TURNS = 8;
@@ -169,16 +170,23 @@ export function createEntityClassifier(
         throw new Error("Agent returned empty output");
       }
 
-      return EntityClassificationResultSchema.parse({
+      const artifacts = buildEntityClassificationArtifacts({
+        resolvedEntities: Array.from(resolvedEntities.values()).sort(
+          (left, right) => (right.score ?? 0) - (left.score ?? 0),
+        ),
+        searchEvidence,
+      });
+      const decision = finalizeEntityClassification({
+        reference,
         decision: EntityClassificationDecisionSchema.parse(
           result.finalOutput as EntityClassificationDecision,
         ),
-        artifacts: buildEntityClassificationArtifacts({
-          resolvedEntities: Array.from(resolvedEntities.values()).sort(
-            (left, right) => (right.score ?? 0) - (left.score ?? 0),
-          ),
-          searchEvidence,
-        }),
+        artifacts,
+      });
+
+      return EntityClassificationResultSchema.parse({
+        decision,
+        artifacts,
       });
     } catch (error) {
       throw new EntityClassificationError(

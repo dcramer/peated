@@ -2535,7 +2535,7 @@ describe("priceMatching", () => {
     expect(proposal.proposalType).toBe("no_match");
   });
 
-  test("auto approves trusted SMWS matches without classifier when aliases differ", async ({
+  test("auto approves SMWS matches through the bottle classifier when aliases differ", async ({
     fixtures,
   }) => {
     config.OPENAI_API_KEY = undefined;
@@ -2576,6 +2576,63 @@ describe("priceMatching", () => {
       await import("@peated/server/agents/whisky/labelExtractor");
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        extractedLabel: {
+          brand: "The Scotch Malt Whisky Society",
+          bottler: "The Scotch Malt Whisky Society",
+          expression: "RW6.5 Sauna Smoke",
+          series: null,
+          distillery: ["Kyrö"],
+          category: "rye",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: true,
+          edition: null,
+        },
+        decision: {
+          action: "match_existing",
+          confidence: 100,
+          rationale: "Classifier matched the SMWS exact-cask code.",
+          suggestedBottleId: bottle.id,
+          candidateBottleIds: [bottle.id],
+          proposedBottle: null,
+        },
+        candidateBottles: [
+          {
+            kind: "bottle",
+            bottleId: bottle.id,
+            releaseId: null,
+            alias: price.name,
+            fullName: bottle.fullName,
+            bottleFullName: bottle.fullName,
+            brand: "The Scotch Malt Whisky Society",
+            bottler: "The Scotch Malt Whisky Society",
+            series: null,
+            distillery: ["Kyrö"],
+            category: "rye",
+            statedAge: null,
+            edition: null,
+            caskStrength: null,
+            singleCask: true,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 1,
+            source: ["exact"],
+          },
+        ],
+      }),
+    );
 
     const proposal = await resolveStorePriceMatchProposal(price.id);
     const updatedPrice = await db.query.storePrices.findFirst({
@@ -2586,7 +2643,7 @@ describe("priceMatching", () => {
     });
 
     expect(extractFromText).not.toHaveBeenCalled();
-    expect(classifyBottleReference).not.toHaveBeenCalled();
+    expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal).toMatchObject({
       status: "approved",
       proposalType: "match_existing",
@@ -2598,7 +2655,7 @@ describe("priceMatching", () => {
     expect(listingAlias?.bottleId).toBe(bottle.id);
   });
 
-  test("auto approves trusted SMWS matches when the price is already linked to the same bottle", async ({
+  test("auto approves SMWS classifier matches when the price is already linked to the same bottle", async ({
     fixtures,
   }) => {
     config.OPENAI_API_KEY = undefined;
@@ -2639,6 +2696,63 @@ describe("priceMatching", () => {
       await import("@peated/server/agents/whisky/labelExtractor");
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        extractedLabel: {
+          brand: "The Scotch Malt Whisky Society",
+          bottler: "The Scotch Malt Whisky Society",
+          expression: "RW6.5 Sauna Smoke",
+          series: null,
+          distillery: ["Kyrö"],
+          category: "rye",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: true,
+          edition: null,
+        },
+        decision: {
+          action: "match_existing",
+          confidence: 100,
+          rationale: "Classifier matched the SMWS exact-cask code.",
+          suggestedBottleId: bottle.id,
+          candidateBottleIds: [bottle.id],
+          proposedBottle: null,
+        },
+        candidateBottles: [
+          {
+            kind: "bottle",
+            bottleId: bottle.id,
+            releaseId: null,
+            alias: price.name,
+            fullName: bottle.fullName,
+            bottleFullName: bottle.fullName,
+            brand: "The Scotch Malt Whisky Society",
+            bottler: "The Scotch Malt Whisky Society",
+            series: null,
+            distillery: ["Kyrö"],
+            category: "rye",
+            statedAge: null,
+            edition: null,
+            caskStrength: null,
+            singleCask: true,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 1,
+            source: ["current", "exact"],
+          },
+        ],
+      }),
+    );
 
     const proposal = await resolveStorePriceMatchProposal(price.id);
     const updatedPrice = await db.query.storePrices.findFirst({
@@ -2649,7 +2763,7 @@ describe("priceMatching", () => {
     });
 
     expect(extractFromText).not.toHaveBeenCalled();
-    expect(classifyBottleReference).not.toHaveBeenCalled();
+    expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal).toMatchObject({
       status: "approved",
       proposalType: "match_existing",
@@ -2661,7 +2775,7 @@ describe("priceMatching", () => {
     expect(listingAlias?.bottleId).toBe(bottle.id);
   });
 
-  test("auto creates trusted SMWS bottles without classifier", async ({
+  test("auto creates SMWS bottles through classifier-reviewed exact-cask identity", async ({
     fixtures,
   }) => {
     config.OPENAI_API_KEY = undefined;
@@ -2694,6 +2808,84 @@ describe("priceMatching", () => {
       await import("@peated/server/agents/whisky/labelExtractor");
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        extractedLabel: {
+          brand: "The Scotch Malt Whisky Society",
+          bottler: "The Scotch Malt Whisky Society",
+          expression: "RW6.5 Sauna Smoke",
+          series: null,
+          distillery: ["Kyrö"],
+          category: "rye",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: true,
+          edition: null,
+        },
+        decision: {
+          action: "create_new",
+          confidence: 95,
+          rationale: "Classifier created the SMWS exact-cask bottle.",
+          creationTarget: "bottle",
+          candidateBottleIds: [],
+          proposedBottle: {
+            name: "RW6.5 Sauna Smoke",
+            series: null,
+            category: "rye",
+            edition: null,
+            statedAge: null,
+            caskStrength: null,
+            singleCask: true,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: brand.id,
+              name: "SMWS",
+            },
+            distillers: [
+              {
+                id: distiller.id,
+                name: "Kyrö",
+              },
+            ],
+            bottler: {
+              id: brand.id,
+              name: "SMWS",
+            },
+          },
+          proposedRelease: null,
+        },
+        searchEvidence: [
+          {
+            provider: "openai",
+            query: "SMWS RW6.5 Sauna Smoke",
+            summary:
+              "The official SMWS page confirms RW6.5 Sauna Smoke as a rye single cask.",
+            results: [
+              {
+                title: "SMWS RW6.5 Sauna Smoke",
+                url: "https://smws.com/rw6-5-sauna-smoke",
+                domain: "smws.com",
+                description:
+                  "SMWS RW6.5 Sauna Smoke is a rye whisky from a single cask.",
+                extraSnippets: [],
+              },
+            ],
+          },
+        ],
+        candidateBottles: [],
+      }),
+    );
 
     const proposal = await resolveStorePriceMatchProposal(price.id);
     const updatedPrice = await db.query.storePrices.findFirst({
@@ -2715,7 +2907,7 @@ describe("priceMatching", () => {
       .where(eq(bottlesToDistillers.bottleId, proposal.suggestedBottleId!));
 
     expect(extractFromText).not.toHaveBeenCalled();
-    expect(classifyBottleReference).not.toHaveBeenCalled();
+    expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal).toMatchObject({
       status: "approved",
       proposalType: "create_new",
@@ -2749,7 +2941,7 @@ describe("priceMatching", () => {
     ]);
   });
 
-  test("trusted SMWS auto approval succeeds while a retry lease is active", async ({
+  test("SMWS classifier auto approval succeeds while a retry lease is active", async ({
     fixtures,
   }) => {
     config.OPENAI_API_KEY = undefined;
@@ -2801,6 +2993,63 @@ describe("priceMatching", () => {
       await import("@peated/server/agents/whisky/labelExtractor");
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        extractedLabel: {
+          brand: "The Scotch Malt Whisky Society",
+          bottler: "The Scotch Malt Whisky Society",
+          expression: "RW6.5 Sauna Smoke",
+          series: null,
+          distillery: ["Kyrö"],
+          category: "rye",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: true,
+          edition: null,
+        },
+        decision: {
+          action: "match_existing",
+          confidence: 100,
+          rationale: "Classifier matched the SMWS exact-cask code.",
+          suggestedBottleId: bottle.id,
+          candidateBottleIds: [bottle.id],
+          proposedBottle: null,
+        },
+        candidateBottles: [
+          {
+            kind: "bottle",
+            bottleId: bottle.id,
+            releaseId: null,
+            alias: price.name,
+            fullName: bottle.fullName,
+            bottleFullName: bottle.fullName,
+            brand: "The Scotch Malt Whisky Society",
+            bottler: "The Scotch Malt Whisky Society",
+            series: null,
+            distillery: ["Kyrö"],
+            category: "rye",
+            statedAge: null,
+            edition: null,
+            caskStrength: null,
+            singleCask: true,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 1,
+            source: ["exact"],
+          },
+        ],
+      }),
+    );
 
     const proposal = await resolveStorePriceMatchProposal(price.id, {
       force: true,
@@ -2814,7 +3063,7 @@ describe("priceMatching", () => {
     });
 
     expect(extractFromText).not.toHaveBeenCalled();
-    expect(classifyBottleReference).not.toHaveBeenCalled();
+    expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal).toMatchObject({
       status: "approved",
       proposalType: "match_existing",
@@ -2833,7 +3082,7 @@ describe("priceMatching", () => {
     expect(updatedPrice?.bottleId).toBe(bottle.id);
   });
 
-  test("trusted SMWS matching requires the canonical bottle name to preserve the parsed cask code", async ({
+  test("SMWS classifier creation preserves the parsed cask code in the canonical bottle name", async ({
     fixtures,
   }) => {
     config.OPENAI_API_KEY = undefined;
@@ -2874,6 +3123,111 @@ describe("priceMatching", () => {
       await import("@peated/server/agents/whisky/labelExtractor");
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        extractedLabel: {
+          brand: "SMWS",
+          bottler: "SMWS",
+          expression: "RW6.5 Sauna Smoke",
+          series: null,
+          distillery: ["Kyrö"],
+          category: "rye",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: true,
+          edition: null,
+        },
+        decision: {
+          action: "create_new",
+          confidence: 95,
+          rationale:
+            "Classifier preserved the SMWS code as the identity anchor.",
+          creationTarget: "bottle",
+          candidateBottleIds: [mismatchedBottle.id],
+          proposedBottle: {
+            name: "RW6.5 Sauna Smoke",
+            series: null,
+            category: "rye",
+            edition: null,
+            statedAge: null,
+            caskStrength: null,
+            singleCask: true,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: brand.id,
+              name: "SMWS",
+            },
+            distillers: [
+              {
+                id: distiller.id,
+                name: "Kyrö",
+              },
+            ],
+            bottler: {
+              id: brand.id,
+              name: "SMWS",
+            },
+          },
+          proposedRelease: null,
+        },
+        searchEvidence: [
+          {
+            provider: "openai",
+            query: "SMWS RW6.5 Sauna Smoke",
+            summary:
+              "The official SMWS page confirms RW6.5 Sauna Smoke as a rye single cask.",
+            results: [
+              {
+                title: "SMWS RW6.5 Sauna Smoke",
+                url: "https://smws.com/rw6-5-sauna-smoke",
+                domain: "smws.com",
+                description:
+                  "SMWS RW6.5 Sauna Smoke is a rye whisky from a single cask.",
+                extraSnippets: [],
+              },
+            ],
+          },
+        ],
+        candidateBottles: [
+          {
+            kind: "bottle",
+            bottleId: mismatchedBottle.id,
+            releaseId: null,
+            alias: null,
+            fullName: mismatchedBottle.fullName,
+            bottleFullName: mismatchedBottle.fullName,
+            brand: "SMWS",
+            bottler: "SMWS",
+            series: null,
+            distillery: ["Kyrö"],
+            category: "rye",
+            statedAge: null,
+            edition: null,
+            caskStrength: null,
+            singleCask: true,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 0.8,
+            source: ["text"],
+          },
+        ],
+      }),
+    );
 
     const proposal = await resolveStorePriceMatchProposal(price.id);
     const createdBottle = await db.query.bottles.findFirst({
@@ -2884,7 +3238,7 @@ describe("priceMatching", () => {
     });
 
     expect(extractFromText).not.toHaveBeenCalled();
-    expect(classifyBottleReference).not.toHaveBeenCalled();
+    expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal).toMatchObject({
       status: "approved",
       proposalType: "create_new",
@@ -4093,7 +4447,7 @@ describe("priceMatching", () => {
     });
   });
 
-  test("filters out different-brand local candidates when a same-brand option exists", async () => {
+  test("ranks same-brand local candidates ahead of cross-brand options", async () => {
     config.OPENAI_API_KEY = undefined;
 
     const executeSpy = vi.spyOn(db, "execute") as any;
@@ -4146,6 +4500,10 @@ describe("priceMatching", () => {
       expect.objectContaining({
         bottleId: 1,
         brand: "Shibui",
+      }),
+      expect.objectContaining({
+        bottleId: 2,
+        brand: "Ichiro's",
       }),
     ]);
   });

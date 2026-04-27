@@ -6,7 +6,6 @@ import {
 import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import { changes, entities } from "@peated/server/db/schema";
-import { arraysEqual } from "@peated/server/lib/equals";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { EntityTypeEnum } from "@peated/server/schemas";
 import { startSpan } from "@sentry/node";
@@ -166,12 +165,6 @@ export default async ({
   }
 
   if (!entity.website && result.website) data.website = result.website;
-
-  if (
-    result.type?.length &&
-    !arraysEqual(result.type.sort(), entity.type.sort())
-  )
-    data.type = result.type;
 
   if (Object.keys(data).length === 0) return;
 

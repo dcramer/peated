@@ -252,7 +252,7 @@ export function normalizeBottle({
 
   if (
     name.match(
-      /\Single Cask|Single Barrel|Cask No.?|Cask Number|Barrel No.?|Barrel Number|Selected Cask\b/i,
+      /\bSingle Cask|Single Barrel|Cask No.?|Cask Number|Barrel No.?|Barrel Number|Selected Cask\b/i,
     )
   ) {
     singleCask = true;

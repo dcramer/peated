@@ -4,6 +4,7 @@ import type {
   BottleExtractedDetails,
   BottleSearchEvidence,
 } from "./classifierTypes";
+import { classifySourceTier } from "./identityEvidenceCore";
 import {
   getExistingMatchIdentityConflicts,
   hasSupportiveWebEvidenceForExistingMatch,
@@ -118,6 +119,22 @@ describe("priceMatchingEvidence", () => {
     });
 
     expect(supported).toBe(true);
+  });
+
+  test("does not classify arbitrary producer-name domains as official evidence", () => {
+    expect(
+      classifySourceTier({
+        result: {
+          title: "Wild Turkey fan notes",
+          url: "https://wildturkeyfans.example/rare-breed-rye",
+          domain: "wildturkeyfans.example",
+          description: "Rare Breed Rye is bottled at barrel proof.",
+          extraSnippets: [],
+        },
+        sourceUrl: "https://shop.example/wild-turkey-rare-breed-rye",
+        producerPhrases: new Set(["wildturkey"]),
+      }),
+    ).toBe("unknown");
   });
 
   test("does not treat evidence as supportive when it confirms only the generic parent and not the missing edition", () => {

@@ -473,6 +473,17 @@ describe("priceMatchingAutomation", () => {
     expect(assessment.automationBlockers).toContain(
       "listing looks release-specific but the suggested target is only a bottle",
     );
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        currentBottleId: null,
+        currentReleaseId: null,
+        suggestedBottleId: 2,
+        suggestedReleaseId: null,
+        modelConfidence: 99,
+        automationBlockers: assessment.automationBlockers,
+      }),
+    ).toBe(false);
   });
 
   test("does not treat originating retailer evidence as decisive for auto-create", () => {
@@ -806,7 +817,7 @@ describe("priceMatchingAutomation", () => {
     ).toBe(false);
   });
 
-  test("does not let existing-match blockers veto high-confidence reviewed matches", () => {
+  test("does not auto-approve existing matches with automation blockers", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
@@ -817,6 +828,6 @@ describe("priceMatchingAutomation", () => {
         modelConfidence: 99,
         automationBlockers: ["candidate age conflicts with extracted label"],
       }),
-    ).toBe(true);
+    ).toBe(false);
   });
 });

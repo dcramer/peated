@@ -27,6 +27,10 @@
       "types": "./src/priceMatchingEvidence.ts",
       "default": "./src/priceMatchingEvidence.ts"
     },
+    "./identityEvidenceCore": {
+      "types": "./src/identityEvidenceCore.ts",
+      "default": "./src/identityEvidenceCore.ts"
+    },
     "./error": {
       "types": "./src/error.ts",
       "default": "./src/error.ts"

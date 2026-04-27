@@ -189,14 +189,6 @@ export default async function ({ bottleId }: { bottleId: number }) {
   }
 
   if (
-    !bottle.category &&
-    result.category &&
-    result.category !== bottle.category
-  ) {
-    data.category = result.category;
-  }
-
-  if (
     !bottle.flavorProfile &&
     result.flavorProfile &&
     result.flavorProfile !== bottle.flavorProfile

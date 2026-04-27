@@ -748,7 +748,8 @@ function getCandidateSortScore(
   return (
     (candidate.score ?? 0) +
     getStructuredCandidateAdjustment(candidate, extractedLabel) +
-    releaseAdjustment
+    releaseAdjustment +
+    getExtractedBrandRankingAdjustment(candidate, extractedLabel)
   );
 }
 
@@ -766,32 +767,15 @@ function candidateMatchesKnownBrand(
   );
 }
 
-function filterCandidatesByKnownBrand(
-  candidates: BottleCandidate[],
+function getExtractedBrandRankingAdjustment(
+  candidate: BottleCandidate,
   extractedLabel: BottleReferenceIdentity | null,
 ) {
   if (!extractedLabel?.brand) {
-    return candidates;
+    return 0;
   }
 
-  const sameBrandCandidateIds = new Set(
-    candidates
-      .filter((candidate) =>
-        candidateMatchesKnownBrand(candidate, extractedLabel.brand!),
-      )
-      .map((candidate) => candidate.bottleId),
-  );
-
-  if (!sameBrandCandidateIds.size) {
-    return candidates;
-  }
-
-  return candidates.filter(
-    (candidate) =>
-      sameBrandCandidateIds.has(candidate.bottleId) ||
-      candidate.source.includes("exact") ||
-      candidate.source.includes("current"),
-  );
+  return candidateMatchesKnownBrand(candidate, extractedLabel.brand) ? 0.03 : 0;
 }
 
 type CandidateBottleMetadataRow = {
@@ -1892,7 +1876,7 @@ export async function searchBottleCandidates(
     extractedLabel,
   );
 
-  return filterCandidatesByKnownBrand(enrichedCandidates, extractedLabel)
+  return enrichedCandidates
     .sort(
       (a, b) =>
         getCandidateSortScore(b, extractedLabel) -
