@@ -15,11 +15,12 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { buildQueryString } from "@peated/web/lib/urls";
 import {
   useMutation,
+  useQuery,
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BottleSelector from "./bottleSelector";
 import QueueItemCard, { type QueueItem } from "./queueItemCard";
 
@@ -86,6 +87,7 @@ export default function Page() {
   const [selectedProposal, setSelectedProposal] = useState<QueueItem | null>(
     null,
   );
+  const [activeRetryRunId, setActiveRetryRunId] = useState<number | null>(null);
 
   const resolveMutation = useMutation(
     orpc.prices.matchQueue.resolve.mutationOptions(),
@@ -99,15 +101,38 @@ export default function Page() {
   const retryAllMutation = useMutation(
     orpc.prices.matchQueue.retryAll.mutationOptions(),
   );
+  const cancelRetryRunMutation = useMutation(
+    orpc.prices.matchQueue.cancelRetryRun.mutationOptions(),
+  );
+  const activeRetryRunListQuery = useQuery(
+    orpc.prices.matchQueue.activeRetryRun.queryOptions({
+      refetchInterval: 5000,
+    }),
+  );
+  const activeRetryRunQuery = useQuery(
+    orpc.prices.matchQueue.retryRunDetails.queryOptions({
+      enabled: activeRetryRunId !== null,
+      input: {
+        run: activeRetryRunId ?? 0,
+      },
+      refetchInterval: activeRetryRunId !== null ? 5000 : false,
+    }),
+  );
 
   const { flash } = useFlashMessages();
   const isBusy =
     createBottleMutation.isPending ||
     resolveMutation.isPending ||
     retryMutation.isPending ||
-    retryAllMutation.isPending;
+    retryAllMutation.isPending ||
+    cancelRetryRunMutation.isPending;
   const canRetryAll = currentState === "actionable";
   const actionableCount = proposalList.stats.actionableCount;
+  const activeRetryRun =
+    activeRetryRunQuery.data ?? activeRetryRunListQuery.data?.run ?? null;
+  const retryRunIsActive =
+    activeRetryRun?.status === "pending" ||
+    activeRetryRun?.status === "running";
 
   async function refreshQueueList(): Promise<void> {
     await queryClient.invalidateQueries({
@@ -115,10 +140,18 @@ export default function Page() {
     });
   }
 
+  useEffect(() => {
+    if (!activeRetryRun || retryRunIsActive) {
+      return;
+    }
+
+    void refreshQueueList();
+  }, [activeRetryRun?.status, retryRunIsActive]);
+
   async function handleRetryAll(): Promise<void> {
     if (
       !window.confirm(
-        `Retry ${actionableCount} actionable search result${actionableCount === 1 ? "" : "s"}?`,
+        `Start a background retry for ${actionableCount} actionable search result${actionableCount === 1 ? "" : "s"}? Web search will be disabled for this pass.`,
       )
     ) {
       return;
@@ -127,18 +160,32 @@ export default function Page() {
     const result = await retryAllMutation.mutateAsync({
       query: currentQuery,
       kind: currentKind,
+      mode: "no_web",
     });
+    setActiveRetryRunId(result.id);
     await refreshQueueList();
     flash(
       <div>
-        Queued <strong className="font-bold">{result.enqueuedCount}</strong>{" "}
-        {result.enqueuedCount === 1 ? "retry." : "retries."}
-        {result.alreadyProcessingCount > 0
-          ? ` ${result.alreadyProcessingCount} skipped because they were already processing.`
-          : ""}
-        {result.enqueueFailedCount > 0
-          ? ` ${result.enqueueFailedCount} failed to enqueue.`
-          : ""}
+        Started retry run <strong className="font-bold">#{result.id}</strong>{" "}
+        for <strong className="font-bold">{result.matchedCount}</strong>{" "}
+        {result.matchedCount === 1 ? "listing." : "listings."}
+      </div>,
+    );
+  }
+
+  async function handleCancelRetryRun(): Promise<void> {
+    if (!activeRetryRun) {
+      return;
+    }
+
+    const result = await cancelRetryRunMutation.mutateAsync({
+      run: activeRetryRun.id,
+    });
+    setActiveRetryRunId(result.id);
+    flash(
+      <div>
+        Cancel requested for retry run{" "}
+        <strong className="font-bold">#{result.id}</strong>.
       </div>,
     );
   }
@@ -379,16 +426,50 @@ export default function Page() {
           <div className="flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-950 px-4 py-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="text-sm text-slate-300">
               {actionableCount > 0
-                ? `${actionableCount} actionable result${actionableCount === 1 ? "" : "s"} match the current search and filter settings.`
+                ? `${actionableCount} actionable result${actionableCount === 1 ? "" : "s"} match the current search and filter settings. Retry runs process in small background batches with web search disabled.`
                 : "No actionable results match the current search and filter settings."}
             </div>
             <Button
               color="primary"
-              disabled={isBusy || actionableCount === 0}
+              disabled={isBusy || retryRunIsActive || actionableCount === 0}
               onClick={handleRetryAll}
             >
-              Retry All Search Results
+              Start Background Retry
             </Button>
+          </div>
+        ) : null}
+
+        {activeRetryRun ? (
+          <div className="rounded-xl border border-slate-800 bg-slate-950 px-4 py-4">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <div className="text-sm font-semibold text-white">
+                  Retry run #{activeRetryRun.id}: {activeRetryRun.status}
+                </div>
+                <div className="mt-1 text-sm text-slate-300">
+                  {activeRetryRun.processedCount} of{" "}
+                  {activeRetryRun.matchedCount} processed.{" "}
+                  {activeRetryRun.resolvedCount} resolved,{" "}
+                  {activeRetryRun.reviewableCount} still reviewable,{" "}
+                  {activeRetryRun.erroredCount} errored,{" "}
+                  {activeRetryRun.skippedCount} skipped.
+                </div>
+              </div>
+              {retryRunIsActive ? (
+                <Button
+                  disabled={isBusy || activeRetryRun.cancelRequestedAt !== null}
+                  onClick={handleCancelRetryRun}
+                >
+                  Cancel
+                </Button>
+              ) : null}
+            </div>
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-800">
+              <div
+                className="bg-highlight h-full transition-all"
+                style={{ width: `${activeRetryRun.progress}%` }}
+              />
+            </div>
           </div>
         ) : null}
       </div>

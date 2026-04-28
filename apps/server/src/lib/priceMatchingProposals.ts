@@ -1,4 +1,8 @@
 import { inferBottleCreationTarget } from "@peated/bottle-classifier/bottleCreationDrafts";
+import type {
+  CandidateExpansionMode,
+  ClassifyBottleReferenceInput,
+} from "@peated/bottle-classifier/contract";
 import { getReleaseObservationFacts } from "@peated/bottle-classifier/releaseIdentity";
 import {
   BottleClassificationError,
@@ -58,13 +62,13 @@ import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import type {
   BottleInputSchema,
   BottleReleaseInputSchema,
-  ExtractedBottleDetailsSchema,
   PriceMatchCandidateSchema,
   PriceMatchSearchEvidenceSchema,
   ProposedBottleSchema,
   ProposedReleaseSchema,
   StorePriceMatchDecisionSchema,
 } from "@peated/server/schemas";
+import { ExtractedBottleDetailsSchema } from "@peated/server/schemas";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import type { z } from "zod";
 
@@ -77,6 +81,19 @@ type StorePriceMatchDecision = z.infer<typeof StorePriceMatchDecisionSchema>;
 type StorePriceMatchProposalForReview = StorePriceMatchProposal & {
   price: StorePrice;
 };
+
+function parseStoredExtractedLabel(
+  proposal: StorePriceMatchProposal | null | undefined,
+): ExtractedBottleDetails | null {
+  if (!proposal?.extractedLabel) {
+    return null;
+  }
+
+  const parsed = ExtractedBottleDetailsSchema.safeParse(
+    proposal.extractedLabel,
+  );
+  return parsed.success ? parsed.data : null;
+}
 
 export class UnknownStorePriceMatchProposalError extends Error {
   constructor(proposalId: number) {
@@ -1071,11 +1088,15 @@ export async function createBottleFromStorePriceMatchProposal({
 export async function resolveStorePriceMatchProposal(
   priceId: number,
   {
+    candidateExpansion = "open",
     force = false,
     processingToken,
+    reuseExistingExtraction = false,
   }: {
+    candidateExpansion?: CandidateExpansionMode;
     force?: boolean;
     processingToken?: string;
+    reuseExistingExtraction?: boolean;
   } = {},
 ) {
   const price = await db.query.storePrices.findFirst({
@@ -1130,7 +1151,7 @@ export async function resolveStorePriceMatchProposal(
   try {
     // Price matching consumes the generic bottle classifier and only layers
     // price-specific persistence and automation policy on top of its result.
-    const classification = await classifyBottleReference({
+    const classificationInput: ClassifyBottleReferenceInput = {
       reference: {
         id: price.id,
         externalSiteId: price.externalSiteId,
@@ -1140,7 +1161,16 @@ export async function resolveStorePriceMatchProposal(
         currentBottleId: price.bottleId ?? null,
         currentReleaseId: price.releaseId ?? null,
       },
-    });
+    };
+    if (candidateExpansion !== "open") {
+      classificationInput.candidateExpansion = candidateExpansion;
+    }
+    if (reuseExistingExtraction) {
+      classificationInput.extractedIdentity =
+        parseStoredExtractedLabel(existingProposal);
+    }
+
+    const classification = await classifyBottleReference(classificationInput);
 
     extractedLabel = classification.artifacts.extractedIdentity;
     candidates = classification.artifacts.candidates;

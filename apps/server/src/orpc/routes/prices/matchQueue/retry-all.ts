@@ -1,128 +1,195 @@
 import { db } from "@peated/server/db";
 import {
   storePriceMatchProposals,
+  storePriceMatchRetryRunItems,
+  storePriceMatchRetryRuns,
   storePrices,
 } from "@peated/server/db/schema";
+import {
+  enqueueStorePriceMatchRetryRunJob,
+  serializeStorePriceMatchRetryRun,
+} from "@peated/server/lib/storePriceMatchRetryRuns";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { and, asc, eq, gt, sql } from "drizzle-orm";
+import { and, asc, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
-import { QueueRetryAllInputSchema, getQueueWhere } from "./filters";
-import { enqueueStorePriceMatchRetry } from "./retry-utils";
+import { QueueKindSchema, getQueueWhere } from "./filters";
+import { PriceMatchRetryRunSchema } from "./retry-run-schema";
 
-const OutputSchema = z.object({
-  matchedCount: z.number().int().min(0),
-  enqueuedCount: z.number().int().min(0),
-  alreadyProcessingCount: z.number().int().min(0),
-  enqueueFailedCount: z.number().int().min(0),
-});
-const RETRY_ALL_BATCH_SIZE = 100;
+const RETRY_RUN_SNAPSHOT_BATCH_SIZE = 500;
+const RETRY_RUN_START_LOCK_ID = 94031817;
+
+const InputSchema = z
+  .object({
+    query: z.string().default(""),
+    kind: QueueKindSchema,
+    mode: z.enum(["no_web", "full"]).default("no_web"),
+  })
+  .default({
+    query: "",
+    kind: null,
+    mode: "no_web",
+  });
 
 export default procedure
   .use(requireMod)
   .route({
     method: "POST",
     path: "/prices/match-queue/retry",
-    summary: "Retry filtered price match queue items",
+    summary: "Start a filtered price match retry run",
     description:
-      "Requeue all actionable price match proposals that match the current search filters. Requires moderator privileges",
+      "Create a background retry run for actionable price match proposals that match the current search filters. Requires moderator privileges",
     operationId: "retryPriceMatchQueueItems",
   })
-  .input(QueueRetryAllInputSchema)
-  .output(OutputSchema)
-  .handler(async function ({ input }) {
-    const actionableWhere = getQueueWhere({
-      ...input,
-      state: "actionable",
-    });
-    const [countRow] = await db
-      .select({
-        matchedCount: sql<number>`count(*)::int`,
-        maxProposalId: sql<
-          number | null
-        >`max(${storePriceMatchProposals.id})::int`,
-      })
-      .from(storePriceMatchProposals)
-      .innerJoin(
-        storePrices,
-        eq(storePrices.id, storePriceMatchProposals.priceId),
-      )
-      .where(actionableWhere);
+  .input(InputSchema)
+  .output(PriceMatchRetryRunSchema)
+  .handler(async function ({ input, context, errors }) {
+    let run = await db.transaction(async (tx) => {
+      await tx.execute(
+        sql`SELECT pg_advisory_xact_lock(${RETRY_RUN_START_LOCK_ID})`,
+      );
 
-    const result = {
-      matchedCount: countRow?.matchedCount ?? 0,
-      enqueuedCount: 0,
-      alreadyProcessingCount: 0,
-      enqueueFailedCount: 0,
-    };
+      const activeRun = await tx.query.storePriceMatchRetryRuns.findFirst({
+        where: inArray(storePriceMatchRetryRuns.status, ["pending", "running"]),
+      });
 
-    let lastProposalId: number | null = null;
-    const maxProposalId = countRow?.maxProposalId ?? null;
+      if (activeRun) {
+        throw errors.CONFLICT({
+          message: `Retry run ${activeRun.id} is already ${activeRun.status}.`,
+        });
+      }
 
-    let hasMore = true;
-
-    while (hasMore) {
-      const batch = await db
+      const actionableWhere = getQueueWhere({
+        ...input,
+        state: "actionable",
+      });
+      const [countRow] = await tx
         .select({
-          proposalId: storePriceMatchProposals.id,
-          priceId: storePriceMatchProposals.priceId,
+          matchedCount: sql<number>`count(*)::int`,
+          maxProposalId: sql<
+            number | null
+          >`max(${storePriceMatchProposals.id})::int`,
         })
         .from(storePriceMatchProposals)
         .innerJoin(
           storePrices,
           eq(storePrices.id, storePriceMatchProposals.priceId),
         )
-        .where(
-          and(
-            actionableWhere,
-            maxProposalId !== null
-              ? sql`${storePriceMatchProposals.id} <= ${maxProposalId}`
-              : undefined,
-            lastProposalId !== null
-              ? gt(storePriceMatchProposals.id, lastProposalId)
-              : undefined,
-          ),
-        )
-        .orderBy(asc(storePriceMatchProposals.id))
-        .limit(RETRY_ALL_BATCH_SIZE);
+        .where(actionableWhere);
+      const matchedCount = countRow?.matchedCount ?? 0;
+      const maxProposalId = countRow?.maxProposalId ?? null;
 
-      hasMore = batch.length === RETRY_ALL_BATCH_SIZE;
+      let [run] = await tx
+        .insert(storePriceMatchRetryRuns)
+        .values({
+          completedAt: matchedCount === 0 ? sql`NOW()` : null,
+          createdById: context.user.id,
+          kind: input.kind,
+          matchedCount,
+          mode: input.mode,
+          query: input.query,
+          status: matchedCount === 0 ? "completed" : "pending",
+        })
+        .returning();
 
-      if (!batch.length) {
-        return result;
+      if (!run) {
+        throw errors.INTERNAL_SERVER_ERROR({
+          message: "Unable to create retry run.",
+        });
       }
 
-      lastProposalId = batch[batch.length - 1]?.proposalId ?? null;
+      let lastProposalId: number | null = null;
+      let hasMore = matchedCount > 0;
+      let snapshottedCount = 0;
 
-      const batchResults = await Promise.all(
-        batch.map(async ({ proposalId, priceId }) => {
-          try {
-            return await enqueueStorePriceMatchRetry({
-              proposalId,
+      while (hasMore) {
+        const batch = await tx
+          .select({
+            priceId: storePriceMatchProposals.priceId,
+            proposalId: storePriceMatchProposals.id,
+          })
+          .from(storePriceMatchProposals)
+          .innerJoin(
+            storePrices,
+            eq(storePrices.id, storePriceMatchProposals.priceId),
+          )
+          .where(
+            and(
+              actionableWhere,
+              maxProposalId !== null
+                ? sql`${storePriceMatchProposals.id} <= ${maxProposalId}`
+                : undefined,
+              lastProposalId !== null
+                ? gt(storePriceMatchProposals.id, lastProposalId)
+                : undefined,
+            ),
+          )
+          .orderBy(asc(storePriceMatchProposals.id))
+          .limit(RETRY_RUN_SNAPSHOT_BATCH_SIZE);
+
+        hasMore = batch.length === RETRY_RUN_SNAPSHOT_BATCH_SIZE;
+
+        if (!batch.length) {
+          break;
+        }
+
+        lastProposalId = batch[batch.length - 1]?.proposalId ?? null;
+
+        await tx
+          .insert(storePriceMatchRetryRunItems)
+          .values(
+            batch.map(({ priceId, proposalId }) => ({
               priceId,
-            });
-          } catch {
-            return {
-              status: "enqueue_failed" as const,
-            };
-          }
-        }),
-      );
+              proposalId,
+              runId: run.id,
+            })),
+          )
+          .onConflictDoNothing();
+        snapshottedCount += batch.length;
+      }
 
-      for (const batchResult of batchResults) {
-        if (batchResult.status === "queued") {
-          result.enqueuedCount += 1;
-          continue;
-        }
+      [run] = await tx
+        .update(storePriceMatchRetryRuns)
+        .set({
+          completedAt: snapshottedCount === 0 ? sql`NOW()` : null,
+          matchedCount: snapshottedCount,
+          status: snapshottedCount === 0 ? "completed" : "pending",
+          updatedAt: sql`NOW()`,
+        })
+        .where(eq(storePriceMatchRetryRuns.id, run.id))
+        .returning();
 
-        if (batchResult.status === "enqueue_failed") {
-          result.enqueueFailedCount += 1;
-          continue;
-        }
+      if (!run) {
+        throw errors.INTERNAL_SERVER_ERROR({
+          message: "Unable to update retry run.",
+        });
+      }
 
-        result.alreadyProcessingCount += 1;
+      return run;
+    });
+
+    if (run.matchedCount > 0) {
+      try {
+        await enqueueStorePriceMatchRetryRunJob({ runId: run.id });
+      } catch (error) {
+        [run] = await db
+          .update(storePriceMatchRetryRuns)
+          .set({
+            error:
+              error instanceof Error
+                ? error.message
+                : "Unable to enqueue retry run.",
+            status: "failed",
+            updatedAt: sql`NOW()`,
+          })
+          .where(eq(storePriceMatchRetryRuns.id, run.id))
+          .returning();
+
+        throw errors.INTERNAL_SERVER_ERROR({
+          message: run?.error ?? "Unable to enqueue retry run.",
+        });
       }
     }
 
-    return result;
+    return serializeStorePriceMatchRetryRun(run);
   });

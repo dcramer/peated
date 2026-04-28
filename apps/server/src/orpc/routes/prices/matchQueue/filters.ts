@@ -36,16 +36,6 @@ export const QueueListInputSchema = z
     limit: 50,
   });
 
-export const QueueRetryAllInputSchema = z
-  .object({
-    query: z.string().default(""),
-    kind: QueueKindSchema,
-  })
-  .default({
-    query: "",
-    kind: null,
-  });
-
 type QueueKind = z.infer<typeof QueueKindSchema>;
 type QueueState = z.infer<typeof QueueStateSchema>;
 

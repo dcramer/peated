@@ -30,6 +30,22 @@ export const storePriceMatchCreationTargetEnum = pgEnum(
   "store_price_match_creation_target",
   ["bottle", "release", "bottle_and_release"],
 );
+export const storePriceMatchRetryRunKindEnum = pgEnum(
+  "store_price_match_retry_run_kind",
+  ["create_new", "match_existing", "correction", "errored"],
+);
+export const storePriceMatchRetryRunModeEnum = pgEnum(
+  "store_price_match_retry_run_mode",
+  ["no_web", "full"],
+);
+export const storePriceMatchRetryRunStatusEnum = pgEnum(
+  "store_price_match_retry_run_status",
+  ["pending", "running", "completed", "failed", "canceled"],
+);
+export const storePriceMatchRetryRunItemStatusEnum = pgEnum(
+  "store_price_match_retry_run_item_status",
+  ["pending", "processing", "completed", "skipped", "failed"],
+);
 
 export const storePrices = pgTable(
   "store_price",
@@ -243,3 +259,113 @@ export type StorePriceMatchProposal =
   typeof storePriceMatchProposals.$inferSelect;
 export type NewStorePriceMatchProposal =
   typeof storePriceMatchProposals.$inferInsert;
+
+export const storePriceMatchRetryRuns = pgTable(
+  "store_price_match_retry_run",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    query: text("query").default("").notNull(),
+    kind: storePriceMatchRetryRunKindEnum("kind"),
+    mode: storePriceMatchRetryRunModeEnum("mode").default("no_web").notNull(),
+    status: storePriceMatchRetryRunStatusEnum("status")
+      .default("pending")
+      .notNull(),
+    matchedCount: integer("matched_count").default(0).notNull(),
+    processedCount: integer("processed_count").default(0).notNull(),
+    resolvedCount: integer("resolved_count").default(0).notNull(),
+    reviewableCount: integer("reviewable_count").default(0).notNull(),
+    erroredCount: integer("errored_count").default(0).notNull(),
+    skippedCount: integer("skipped_count").default(0).notNull(),
+    failedCount: integer("failed_count").default(0).notNull(),
+    error: text("error"),
+    createdById: bigint("created_by_id", { mode: "number" }).references(
+      () => users.id,
+    ),
+    startedAt: timestamp("started_at"),
+    completedAt: timestamp("completed_at"),
+    cancelRequestedAt: timestamp("cancel_requested_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("store_price_match_retry_run_status_idx").on(table.status),
+    index("store_price_match_retry_run_created_by_idx").on(table.createdById),
+    index("store_price_match_retry_run_created_at_idx").on(table.createdAt),
+  ],
+);
+
+export const storePriceMatchRetryRunItems = pgTable(
+  "store_price_match_retry_run_item",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    runId: bigint("run_id", { mode: "number" })
+      .references(() => storePriceMatchRetryRuns.id, { onDelete: "cascade" })
+      .notNull(),
+    proposalId: bigint("proposal_id", { mode: "number" })
+      .references(() => storePriceMatchProposals.id, { onDelete: "cascade" })
+      .notNull(),
+    priceId: bigint("price_id", { mode: "number" })
+      .references(() => storePrices.id, { onDelete: "cascade" })
+      .notNull(),
+    status: storePriceMatchRetryRunItemStatusEnum("status")
+      .default("pending")
+      .notNull(),
+    resultStatus: storePriceMatchProposalStatusEnum("result_status"),
+    error: text("error"),
+    attempts: integer("attempts").default(0).notNull(),
+    startedAt: timestamp("started_at"),
+    completedAt: timestamp("completed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("store_price_match_retry_run_item_unq").on(
+      table.runId,
+      table.proposalId,
+    ),
+    index("store_price_match_retry_run_item_run_status_idx").on(
+      table.runId,
+      table.status,
+    ),
+    index("store_price_match_retry_run_item_proposal_idx").on(table.proposalId),
+    index("store_price_match_retry_run_item_price_idx").on(table.priceId),
+  ],
+);
+
+export const storePriceMatchRetryRunsRelations = relations(
+  storePriceMatchRetryRuns,
+  ({ one, many }) => ({
+    createdBy: one(users, {
+      fields: [storePriceMatchRetryRuns.createdById],
+      references: [users.id],
+    }),
+    items: many(storePriceMatchRetryRunItems),
+  }),
+);
+
+export const storePriceMatchRetryRunItemsRelations = relations(
+  storePriceMatchRetryRunItems,
+  ({ one }) => ({
+    run: one(storePriceMatchRetryRuns, {
+      fields: [storePriceMatchRetryRunItems.runId],
+      references: [storePriceMatchRetryRuns.id],
+    }),
+    proposal: one(storePriceMatchProposals, {
+      fields: [storePriceMatchRetryRunItems.proposalId],
+      references: [storePriceMatchProposals.id],
+    }),
+    price: one(storePrices, {
+      fields: [storePriceMatchRetryRunItems.priceId],
+      references: [storePrices.id],
+    }),
+  }),
+);
+
+export type StorePriceMatchRetryRun =
+  typeof storePriceMatchRetryRuns.$inferSelect;
+export type NewStorePriceMatchRetryRun =
+  typeof storePriceMatchRetryRuns.$inferInsert;
+export type StorePriceMatchRetryRunItem =
+  typeof storePriceMatchRetryRunItems.$inferSelect;
+export type NewStorePriceMatchRetryRunItem =
+  typeof storePriceMatchRetryRunItems.$inferInsert;

@@ -5,6 +5,8 @@ import {
   bottles,
   reviews,
   storePriceMatchProposals,
+  storePriceMatchRetryRunItems,
+  storePriceMatchRetryRuns,
   storePrices,
 } from "@peated/server/db/schema";
 import type * as catalogVerificationModule from "@peated/server/lib/catalogVerification";
@@ -1512,7 +1514,9 @@ describe("price match queue", () => {
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
   });
 
-  test("bulk requeues all actionable search results", async ({ fixtures }) => {
+  test("bulk retry starts a background run for actionable search results", async ({
+    fixtures,
+  }) => {
     const user = await fixtures.User({ mod: true });
     const site = await fixtures.ExternalSiteOrExisting({ type: "smws" });
     const [firstPrice, secondPrice, ignoredPrice] = await Promise.all([
@@ -1556,40 +1560,110 @@ describe("price match queue", () => {
       { query: "SMWS Retry" },
       { context: { user } },
     );
-    const updatedFirstProposal =
-      await db.query.storePriceMatchProposals.findFirst({
-        where: eq(storePriceMatchProposals.id, firstProposal.id),
-      });
-    const updatedSecondProposal =
-      await db.query.storePriceMatchProposals.findFirst({
-        where: eq(storePriceMatchProposals.id, secondProposal.id),
-      });
+    const runItems = await db
+      .select()
+      .from(storePriceMatchRetryRunItems)
+      .where(eq(storePriceMatchRetryRunItems.runId, result.id));
 
-    expect(result).toEqual({
+    expect(result).toMatchObject({
+      id: expect.any(Number),
       matchedCount: 2,
-      enqueuedCount: 2,
-      alreadyProcessingCount: 0,
-      enqueueFailedCount: 0,
+      mode: "no_web",
+      pendingCount: 2,
+      processedCount: 0,
+      progress: 0,
+      query: "SMWS Retry",
+      status: "pending",
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledTimes(2);
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "ResolveStorePriceBottle",
-      expect.objectContaining({
-        priceId: firstPrice.id,
-        force: true,
-        processingToken: expect.any(String),
-      }),
+    expect(runItems).toHaveLength(2);
+    expect(runItems.map((item) => item.proposalId).sort()).toEqual([
+      firstProposal.id,
+      secondProposal.id,
+    ]);
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "ProcessStorePriceMatchRetryRun",
+      {
+        runId: result.id,
+      },
+      {
+        delay: 0,
+        removeOnComplete: true,
+      },
     );
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
-      expect.objectContaining({
-        priceId: secondPrice.id,
-        force: true,
-        processingToken: expect.any(String),
-      }),
+      expect.anything(),
     );
-    expect(updatedFirstProposal?.processingToken).toEqual(expect.any(String));
-    expect(updatedSecondProposal?.processingToken).toEqual(expect.any(String));
+  });
+
+  test("bulk retry rejects starting a second active run", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const [run] = await db
+      .insert(storePriceMatchRetryRuns)
+      .values({
+        createdById: user.id,
+        matchedCount: 1,
+        status: "running",
+      })
+      .returning();
+
+    const err = await waitError(
+      routerClient.prices.matchQueue.retryAll(
+        { query: "SMWS Retry" },
+        { context: { user } },
+      ),
+    );
+
+    expect(err).toMatchObject({
+      message: `Retry run ${run!.id} is already running.`,
+    });
+  });
+
+  test("can read and request cancellation for a retry run", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const [run] = await db
+      .insert(storePriceMatchRetryRuns)
+      .values({
+        createdById: user.id,
+        matchedCount: 3,
+        processedCount: 1,
+        status: "running",
+      })
+      .returning();
+
+    const details = await routerClient.prices.matchQueue.retryRunDetails(
+      { run: run!.id },
+      { context: { user } },
+    );
+    const active = await routerClient.prices.matchQueue.activeRetryRun(
+      undefined,
+      { context: { user } },
+    );
+    const canceled = await routerClient.prices.matchQueue.cancelRetryRun(
+      { run: run!.id },
+      { context: { user } },
+    );
+
+    expect(details).toMatchObject({
+      id: run!.id,
+      matchedCount: 3,
+      pendingCount: 2,
+      progress: 33,
+      status: "running",
+    });
+    expect(active.run).toMatchObject({
+      id: run!.id,
+      status: "running",
+    });
+    expect(canceled).toMatchObject({
+      cancelRequestedAt: expect.any(String),
+      id: run!.id,
+      status: "running",
+    });
   });
 
   test("clears the processing lease if retry enqueue fails", async ({

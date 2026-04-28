@@ -75,6 +75,12 @@ export default {
       process.env.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES ||
       "3",
   ),
+  PRICE_MATCH_RETRY_RUN_BATCH_SIZE: Number(
+    process.env.PRICE_MATCH_RETRY_RUN_BATCH_SIZE || "10",
+  ),
+  PRICE_MATCH_RETRY_RUN_DELAY_MS: Number(
+    process.env.PRICE_MATCH_RETRY_RUN_DELAY_MS || "30000",
+  ),
 
   DISCORD_WEBHOOK: process.env.DISCORD_WEBHOOK,
 };
