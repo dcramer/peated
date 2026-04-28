@@ -27,7 +27,7 @@ export default procedure
     path: "/bottles/brand-repair-groups",
     summary: "List grouped bottle brand/entity repair candidates",
     description:
-      "Retrieve moderator-facing source-brand to target-brand repair clusters, grouped by the verified stronger producer identity found in bottle names or aliases.",
+      "Retrieve moderator-facing source-brand to target-brand repair clusters, grouped by deterministic bottle name and alias evidence.",
     spec: (spec) => ({
       ...spec,
       operationId: "listBottleBrandRepairGroups",

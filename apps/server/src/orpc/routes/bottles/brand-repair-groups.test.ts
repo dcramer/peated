@@ -13,7 +13,7 @@ describe("GET /bottles/brand-repair-groups", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("groups a generic source brand into stronger verified target brands", async ({
+  test("groups a generic source brand into stronger eligible target brands", async ({
     fixtures,
   }) => {
     const currentBrand = await fixtures.Entity({
@@ -120,6 +120,41 @@ describe("GET /bottles/brand-repair-groups", () => {
         ],
       },
     ]);
+  });
+
+  test("does not group ambiguous repairs from an already specific brand", async ({
+    fixtures,
+  }) => {
+    const currentBrand = await fixtures.Entity({
+      name: "Acme",
+      type: ["brand"],
+    });
+    await fixtures.Entity({
+      name: "Acme Heritage",
+      type: ["brand"],
+      totalBottles: 4,
+      totalTastings: 20,
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const bottle = await fixtures.Bottle({
+      brandId: currentBrand.id,
+      name: "12-year-old",
+      totalTastings: 2,
+    });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Acme Heritage 12-year-old",
+    });
+
+    const { results } = await routerClient.bottles.brandRepairGroups(
+      {
+        query: "Acme Heritage",
+      },
+      { context: { user } },
+    );
+
+    expect(results).toEqual([]);
   });
 
   test("does not group branded bottles from producer-style aliases", async ({

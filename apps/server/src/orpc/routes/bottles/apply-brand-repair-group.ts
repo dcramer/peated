@@ -14,7 +14,7 @@ export default procedure
     path: "/bottles/apply-brand-repair-group",
     summary: "Apply grouped bottle brand/entity repair",
     description:
-      "Move every currently verified bottle in a source-brand to target-brand repair cluster, optionally preserving the source entity as a distillery link. Requires moderator privileges",
+      "Move every currently eligible bottle in a source-brand to target-brand repair cluster, optionally preserving the source entity as a distillery link. Requires moderator privileges",
     spec: (spec) => ({
       ...spec,
       operationId: "applyBottleBrandRepairGroup",
@@ -70,17 +70,23 @@ export default procedure
       });
     }
 
-    const candidates = await findBrandRepairCandidates({
-      currentBrandId: fromBrand.id,
-      query: input.query,
-      targetBrandId: toBrand.id,
-    });
+    const candidates = (
+      await findBrandRepairCandidates({
+        currentBrandId: fromBrand.id,
+        query: input.query,
+        targetBrandId: toBrand.id,
+      })
+    ).filter(
+      (candidate) =>
+        (candidate.suggestedDistillery?.id ?? null) ===
+        (distillery?.id ?? null),
+    );
     const bottleIds = candidates.map((candidate) => candidate.bottle.id);
 
     if (bottleIds.length === 0) {
       throw errors.BAD_REQUEST({
         message:
-          "No verified brand repair candidates matched this source and target brand pair.",
+          "No eligible brand repair candidates matched this source and target brand pair.",
       });
     }
 

@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottles, entities } from "@peated/server/db/schema";
+import { findBrandRepairCandidates } from "@peated/server/lib/brandRepairCandidates";
 import { repairBottleBrandDistilleryAssignments } from "@peated/server/lib/repairBottleBrandDistilleryAssignments";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
@@ -89,6 +90,27 @@ export default procedure
     if (bottle.brandId !== fromBrand.id) {
       throw errors.BAD_REQUEST({
         message: "Bottle is no longer attached to the source brand.",
+      });
+    }
+
+    const candidates = await findBrandRepairCandidates({
+      currentBrandId: fromBrand.id,
+      query: bottle.fullName,
+      targetBrandId: toBrand.id,
+    });
+    const candidate = candidates.find(
+      (candidate) => candidate.bottle.id === bottle.id,
+    );
+    if (!candidate) {
+      throw errors.BAD_REQUEST({
+        message: "Bottle is not an eligible brand repair candidate.",
+      });
+    }
+
+    const suggestedDistilleryId = candidate.suggestedDistillery?.id ?? null;
+    if ((distillery?.id ?? null) !== suggestedDistilleryId) {
+      throw errors.BAD_REQUEST({
+        message: "Requested distillery does not match the repair candidate.",
       });
     }
 

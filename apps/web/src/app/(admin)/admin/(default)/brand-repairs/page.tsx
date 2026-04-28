@@ -123,7 +123,7 @@ function BrandRepairChangeSummary({
           <div className="mt-1 text-slate-300">
             {count === 1
               ? "This bottle row only."
-              : `${count.toLocaleString()} verified bottle rows in this cluster only.`}
+              : `${count.toLocaleString()} eligible bottle rows in this cluster only.`}
           </div>
         </div>
         <div>
@@ -429,10 +429,10 @@ export default function Page() {
                       ) : null}
                     </div>
                     <div className="text-sm text-slate-300">
-                      These bottles already carry stronger leading producer
-                      evidence for {group.targetBrand.name}. Apply the group to
-                      move the verified subset without touching the survivors
-                      that do not support the same target.
+                      These bottles match deterministic repair evidence for{" "}
+                      {group.targetBrand.name}. Apply the group to move only the
+                      currently eligible subset without touching survivors that
+                      do not support the same target.
                     </div>
                   </div>
 

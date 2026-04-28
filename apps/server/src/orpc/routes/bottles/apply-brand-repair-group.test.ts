@@ -24,7 +24,7 @@ describe("POST /bottles/apply-brand-repair-group", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("applies only the verified bottles for a grouped repair target", async ({
+  test("applies only the eligible bottles for a grouped repair target", async ({
     fixtures,
   }) => {
     const currentBrand = await fixtures.Entity({

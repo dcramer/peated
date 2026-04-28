@@ -688,9 +688,7 @@ subcommand
 
 subcommand
   .command("repair-brand-distillery")
-  .description(
-    "Preview or apply bulk bottle brand/distillery identity repairs without renaming bottle titles",
-  )
+  .description("Preview or apply bulk bottle brand/distillery identity repairs")
   .requiredOption("--from-brand <entity>", "Source brand entity name or id")
   .requiredOption("--to-brand <entity>", "Target brand entity name or id")
   .option(

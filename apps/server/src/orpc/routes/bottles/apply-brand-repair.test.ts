@@ -41,6 +41,10 @@ describe("POST /bottles/:bottle/apply-brand-repair", () => {
       totalTastings: 10,
       createdById: mod.id,
     });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Jura 12-year-old Single Malt Scotch Whisky",
+    });
 
     const result = await routerClient.bottles.applyBrandRepair(
       {
@@ -74,5 +78,50 @@ describe("POST /bottles/:bottle/apply-brand-repair", () => {
         distillerId: currentBrand.id,
       }),
     ]);
+  });
+
+  test("rejects brand repairs that are not eligible candidates", async ({
+    fixtures,
+  }) => {
+    const currentBrand = await fixtures.Entity({
+      name: "Acme",
+      type: ["brand"],
+    });
+    const targetBrand = await fixtures.Entity({
+      name: "Acme Heritage",
+      type: ["brand"],
+    });
+    const mod = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({
+      brandId: currentBrand.id,
+      name: "12-year-old",
+      createdById: mod.id,
+    });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Acme Heritage 12-year-old",
+    });
+
+    const err = await waitError(
+      routerClient.bottles.applyBrandRepair(
+        {
+          bottle: bottle.id,
+          fromBrand: currentBrand.id,
+          toBrand: targetBrand.id,
+          distillery: null,
+        },
+        { context: { user: mod } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Bottle is not an eligible brand repair candidate.]`,
+    );
+
+    const [unchangedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, bottle.id));
+    expect(unchangedBottle?.brandId).toEqual(currentBrand.id);
   });
 });

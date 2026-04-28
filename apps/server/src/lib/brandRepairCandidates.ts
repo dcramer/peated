@@ -14,8 +14,11 @@ const MAX_SCAN_LIMIT = 2000;
 // These words can appear in real entity names, but prefix expansion alone
 // cannot prove that the bottle brand should move to that entity.
 const GENERIC_BRAND_EXPANSION_WORDS = new Set([
+  "barrel",
+  "batch",
   "bourbon",
   "brandy",
+  "cask",
   "co",
   "cognac",
   "company",
@@ -26,15 +29,76 @@ const GENERIC_BRAND_EXPANSION_WORDS = new Set([
   "liqueur",
   "malt",
   "mezcal",
+  "private",
+  "proof",
+  "reserve",
   "rum",
   "rye",
   "scotch",
+  "select",
   "single",
+  "small",
+  "special",
   "spirit",
   "spirits",
   "straight",
   "tequila",
   "vodka",
+  "whiskey",
+  "whisky",
+]);
+
+const GENERIC_SOURCE_BRAND_NAMES = new Set([
+  "blend",
+  "blended whisky",
+  "blended whiskey",
+  "bourbon",
+  "bourbon whiskey",
+  "canadian whisky",
+  "irish whiskey",
+  "japanese whisky",
+  "rye",
+  "rye whiskey",
+  "scotch whisky",
+  "single grain",
+  "single grain whisky",
+  "single malt",
+  "single malt scotch whisky",
+  "single malt whisky",
+  "single pot still",
+  "single pot still whiskey",
+  "spirit",
+  "straight bourbon whiskey",
+  "straight rye whiskey",
+  "whiskey",
+  "whisky",
+]);
+
+const GENERIC_SOURCE_BRAND_WORDS = new Set([
+  "american",
+  "barrel",
+  "batch",
+  "blend",
+  "blended",
+  "bonded",
+  "bourbon",
+  "canadian",
+  "cask",
+  "grain",
+  "irish",
+  "japanese",
+  "kentucky",
+  "malt",
+  "pot",
+  "reserve",
+  "rye",
+  "scotch",
+  "select",
+  "single",
+  "small",
+  "spirit",
+  "still",
+  "straight",
   "whiskey",
   "whisky",
 ]);
@@ -248,6 +312,41 @@ function isGenericProductBrandExpansion({
         .every((word) => GENERIC_BRAND_EXPANSION_WORDS.has(word));
     }),
   );
+}
+
+function isGenericSourceBrandName(name: null | string | undefined): boolean {
+  const normalizedName = getComparableWords(name ?? "").join(" ");
+  if (!normalizedName) {
+    return false;
+  }
+
+  if (GENERIC_SOURCE_BRAND_NAMES.has(normalizedName)) {
+    return true;
+  }
+
+  return normalizedName
+    .split(" ")
+    .every((word) => GENERIC_SOURCE_BRAND_WORDS.has(word));
+}
+
+function hasDeterministicRepairScope({
+  currentBrand,
+  targetBrand,
+}: {
+  currentBrand: CandidateBrand;
+  targetBrand: CandidateBrand;
+}): boolean {
+  if (
+    isGenericSourceBrandName(currentBrand.name) ||
+    isGenericSourceBrandName(currentBrand.shortName)
+  ) {
+    return true;
+  }
+
+  return targetNameIsCurrentDistilleryBrandContraction({
+    currentBrand,
+    targetBrand,
+  });
 }
 
 function hasSafeAliasOnlyBrandRepairSupport({
@@ -782,6 +881,10 @@ async function collectBrandRepairCandidates({
     for (const [entityId, supportingReferences] of targetSupport.entries()) {
       const targetBrand = allBrandsById.get(entityId);
       if (!targetBrand) {
+        continue;
+      }
+
+      if (!hasDeterministicRepairScope({ currentBrand, targetBrand })) {
         continue;
       }
 

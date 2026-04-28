@@ -74,6 +74,41 @@ describe("GET /bottles/brand-repair-candidates", () => {
     ]);
   });
 
+  test("does not surface ambiguous repairs from an already specific brand", async ({
+    fixtures,
+  }) => {
+    const currentBrand = await fixtures.Entity({
+      name: "Acme",
+      type: ["brand"],
+    });
+    await fixtures.Entity({
+      name: "Acme Heritage",
+      type: ["brand"],
+      totalBottles: 4,
+      totalTastings: 20,
+    });
+    const user = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({
+      brandId: currentBrand.id,
+      name: "12-year-old",
+      totalTastings: 2,
+    });
+
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Acme Heritage 12-year-old",
+    });
+
+    const { results } = await routerClient.bottles.brandRepairCandidates(
+      {
+        query: "Acme Heritage",
+      },
+      { context: { user } },
+    );
+
+    expect(results).toEqual([]);
+  });
+
   test("suggests preserving the source brand as a distillery when appropriate", async ({
     fixtures,
   }) => {
