@@ -11,6 +11,34 @@ import { and, desc, eq, ilike, inArray, isNotNull, or, sql } from "drizzle-orm";
 const MAX_PREFIX_WORDS = 8;
 const MAX_SCAN_LIMIT = 2000;
 
+// These words can appear in real entity names, but prefix expansion alone
+// cannot prove that the bottle brand should move to that entity.
+const GENERIC_BRAND_EXPANSION_WORDS = new Set([
+  "bourbon",
+  "brandy",
+  "co",
+  "cognac",
+  "company",
+  "distiller",
+  "distillery",
+  "gin",
+  "house",
+  "liqueur",
+  "malt",
+  "mezcal",
+  "rum",
+  "rye",
+  "scotch",
+  "single",
+  "spirit",
+  "spirits",
+  "straight",
+  "tequila",
+  "vodka",
+  "whiskey",
+  "whisky",
+]);
+
 type CandidateBottle = Pick<
   typeof bottles.$inferSelect,
   "brandId" | "fullName" | "id" | "name" | "numReleases" | "totalTastings"
@@ -152,26 +180,73 @@ function containsWordSequence(haystack: string[], needle: string[]): boolean {
   );
 }
 
-function targetNameMatchesCurrentBrandIdentity({
+function startsWithWordSequence(haystack: string[], needle: string[]): boolean {
+  if (needle.length === 0 || needle.length > haystack.length) {
+    return false;
+  }
+
+  return needle.every((word, index) => haystack[index] === word);
+}
+
+function targetNameIsCurrentDistilleryBrandContraction({
   currentBrand,
   targetBrand,
 }: {
   currentBrand: CandidateBrand;
   targetBrand: CandidateBrand;
 }): boolean {
+  // Alias-only contractions are safe only when the current entity is also a
+  // distiller; otherwise stale aliases can create reversible brand repairs.
+  if (!currentBrand.type.includes("distiller")) {
+    return false;
+  }
+
   const currentNameVariants = getNameWordVariants(
     currentBrand.name,
     currentBrand.shortName,
   );
-  const targetNameVariants = getNameWordVariants(
-    targetBrand.name,
-    targetBrand.shortName,
-  );
+  const targetNameVariants = [
+    ...getNameWordVariants(targetBrand.name),
+    ...getNameWordVariants(targetBrand.shortName).filter(
+      (words) => words.length > 1,
+    ),
+  ];
 
   return currentNameVariants.some((currentWords) =>
     targetNameVariants.some((targetWords) =>
       containsWordSequence(currentWords, targetWords),
     ),
+  );
+}
+
+function isGenericProductBrandExpansion({
+  currentBrand,
+  targetBrand,
+}: {
+  currentBrand: CandidateBrand;
+  targetBrand: CandidateBrand;
+}): boolean {
+  // Product/category suffixes create brand-vs-product ambiguity, not
+  // deterministic repair evidence.
+  const currentNameVariants = getNameWordVariants(
+    currentBrand.name,
+    currentBrand.shortName,
+  );
+  const targetNameVariants = getNameWordVariants(targetBrand.name);
+
+  return currentNameVariants.some((currentWords) =>
+    targetNameVariants.some((targetWords) => {
+      if (
+        targetWords.length <= currentWords.length ||
+        !startsWithWordSequence(targetWords, currentWords)
+      ) {
+        return false;
+      }
+
+      return targetWords
+        .slice(currentWords.length)
+        .every((word) => GENERIC_BRAND_EXPANSION_WORDS.has(word));
+    }),
   );
 }
 
@@ -206,9 +281,12 @@ function hasSafeAliasOnlyBrandRepairSupport({
     return true;
   }
 
-  // Retail aliases often prepend an owner before the actual bottle brand,
-  // such as "Suntory Yamazaki"; that should not rewrite a Yamazaki bottle.
-  return targetNameMatchesCurrentBrandIdentity({ currentBrand, targetBrand });
+  // Retail aliases often prepend an owner before the actual bottle brand; that
+  // should not rewrite the bottle unless the current entity is a distillery.
+  return targetNameIsCurrentDistilleryBrandContraction({
+    currentBrand,
+    targetBrand,
+  });
 }
 
 function registerBrandName(
@@ -704,6 +782,10 @@ async function collectBrandRepairCandidates({
     for (const [entityId, supportingReferences] of targetSupport.entries()) {
       const targetBrand = allBrandsById.get(entityId);
       if (!targetBrand) {
+        continue;
+      }
+
+      if (isGenericProductBrandExpansion({ currentBrand, targetBrand })) {
         continue;
       }
 

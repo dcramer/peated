@@ -51,6 +51,15 @@ Observation-only facts by default:
 - `series` is a stable range or family, not a batch code or release year.
 - `edition` is the simple human-facing release descriptor. Use it for values like `Batch 24`, `2024 Release`, or `S2B13`.
 
+## Brand And Entity Boundary
+
+- Brand identity is not the longest leading string match. It is the consumer-facing label that should appear in the canonical bottle name.
+- Distillery, bottler, parent company, importer, and owner names may appear in source text, aliases, or marketing copy without becoming the bottle brand.
+- `fullName` and aliases are derived reference strings. They are useful evidence, but they can be stale or source-specific and must not prove a brand repair by themselves.
+- A proposed brand repair must be valid after applying it: the resulting bottle and release names should still describe the marketed bottle without duplicated, missing, or stale brand text.
+- Do not automate brand moves where the only difference is a generic product/entity suffix or prefix such as `Bourbon`, `Whiskey`, `Whisky`, `Distillery`, `House`, or `Company`. Those cases are brand-vs-product-vs-entity ambiguity and belong in classifier or manual review.
+- Examples: `Yamazaki 12-year-old` stays brand `Yamazaki` even when aliases mention owner `Suntory`; `Belle Meade` should not automatically move to `Belle Meade Bourbon` just because the full bottle name starts with those words.
+
 ## Canonicalization Rules
 
 - Create separate bottles when the marketed expression itself changes.

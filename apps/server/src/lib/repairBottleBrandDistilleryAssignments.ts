@@ -12,6 +12,8 @@ import {
   changes,
 } from "@peated/server/db/schema";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
+import { upsertBottleAlias } from "@peated/server/lib/db";
+import { formatBottleName, formatReleaseName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, asc, eq, ilike, inArray, sql } from "drizzle-orm";
@@ -54,10 +56,7 @@ type RepairBottleBrandDistilleryAssignmentOptions = {
 };
 
 type CandidateBottle = typeof bottles.$inferSelect;
-type CandidateRelease = Pick<
-  typeof bottleReleases.$inferSelect,
-  "bottleId" | "id"
->;
+type CandidateRelease = typeof bottleReleases.$inferSelect;
 
 function buildSummary(
   items: RepairBottleBrandDistilleryAssignmentItem[],
@@ -154,6 +153,19 @@ async function ensureTargetSeries({
   };
 }
 
+function buildBottleFullName({
+  bottle,
+  brand,
+}: {
+  bottle: CandidateBottle;
+  brand: Entity;
+}) {
+  return formatBottleName({
+    ...bottle,
+    name: `${brand.shortName || brand.name} ${bottle.name}`,
+  });
+}
+
 export async function repairBottleBrandDistilleryAssignments({
   bottleIds = [],
   db = defaultDb,
@@ -224,10 +236,7 @@ export async function repairBottleBrandDistilleryAssignments({
       .where(inArray(bottlesToDistillers.bottleId, candidateBottleIds)),
     candidateBottleIds.length
       ? db
-          .select({
-            bottleId: bottleReleases.bottleId,
-            id: bottleReleases.id,
-          })
+          .select()
           .from(bottleReleases)
           .where(inArray(bottleReleases.bottleId, candidateBottleIds))
       : Promise.resolve([] as CandidateRelease[]),
@@ -294,6 +303,10 @@ export async function repairBottleBrandDistilleryAssignments({
     const releaseList = releasesByBottleId.get(bottle.id) ?? [];
     const shouldAddDistillery =
       distilleryId !== null && !bottleDistilleryIds.has(distilleryId);
+    const nextBottleFullName = buildBottleFullName({
+      bottle,
+      brand: toBrand,
+    });
 
     let seriesAction: RepairSeriesAction = "none";
     const currentSeries = bottle.seriesId
@@ -309,6 +322,9 @@ export async function repairBottleBrandDistilleryAssignments({
 
     const baseMessage = [
       `brand ${fromBrand.name} -> ${toBrand.name}`,
+      nextBottleFullName !== bottle.fullName
+        ? `rename ${bottle.fullName} -> ${nextBottleFullName}`
+        : null,
       shouldAddDistillery && distilleryId
         ? `add distillery ${
             fromBrand.id === distilleryId ? fromBrand.name : "link"
@@ -324,7 +340,7 @@ export async function repairBottleBrandDistilleryAssignments({
 
     if (dryRun) {
       items.push({
-        bottleFullName: bottle.fullName,
+        bottleFullName: nextBottleFullName,
         bottleId: bottle.id,
         distilleryAdded: shouldAddDistillery,
         message: baseMessage,
@@ -364,14 +380,79 @@ export async function repairBottleBrandDistilleryAssignments({
             .onConflictDoNothing();
         }
 
+        const bottleAlias = await upsertBottleAlias(
+          tx,
+          nextBottleFullName,
+          bottle.id,
+        );
+        if (bottleAlias.bottleId !== bottle.id) {
+          throw new Error(
+            "Target bottle full name already belongs to a different bottle.",
+          );
+        }
+
         await tx
           .update(bottles)
           .set({
             brandId: toBrand.id,
+            fullName: nextBottleFullName,
             seriesId: nextSeriesId,
             updatedAt: sql`NOW()`,
           })
           .where(eq(bottles.id, bottle.id));
+
+        for (const release of releaseList) {
+          const nextReleaseName = formatReleaseName({
+            name: bottle.name,
+            edition: release.edition,
+            abv: release.abv,
+            statedAge: bottle.statedAge ? null : release.statedAge,
+            releaseYear: release.releaseYear,
+            vintageYear: release.vintageYear,
+            singleCask: release.singleCask,
+            caskStrength: release.caskStrength,
+            caskFill: release.caskFill,
+            caskType: release.caskType,
+            caskSize: release.caskSize,
+          });
+          const nextReleaseFullName = formatReleaseName({
+            name: nextBottleFullName,
+            edition: release.edition,
+            abv: release.abv,
+            statedAge: bottle.statedAge ? null : release.statedAge,
+            releaseYear: release.releaseYear,
+            vintageYear: release.vintageYear,
+            singleCask: release.singleCask,
+            caskStrength: release.caskStrength,
+            caskFill: release.caskFill,
+            caskType: release.caskType,
+            caskSize: release.caskSize,
+          });
+
+          const releaseAlias = await upsertBottleAlias(
+            tx,
+            nextReleaseFullName,
+            bottle.id,
+            release.id,
+          );
+          if (
+            releaseAlias.bottleId !== bottle.id ||
+            (releaseAlias.releaseId ?? null) !== release.id
+          ) {
+            throw new Error(
+              "Target release full name already belongs to a different bottle.",
+            );
+          }
+
+          await tx
+            .update(bottleReleases)
+            .set({
+              fullName: nextReleaseFullName,
+              name: nextReleaseName,
+              updatedAt: sql`NOW()`,
+            })
+            .where(eq(bottleReleases.id, release.id));
+        }
 
         if (currentSeries && nextSeriesId !== currentSeries.id) {
           await syncSeriesBottleCount({
@@ -390,10 +471,13 @@ export async function repairBottleBrandDistilleryAssignments({
           objectId: bottle.id,
           objectType: "bottle",
           type: "update",
-          displayName: bottle.fullName,
+          displayName: nextBottleFullName,
           createdById: user!.id,
           data: {
             brandId: toBrand.id,
+            ...(nextBottleFullName !== bottle.fullName
+              ? { fullName: nextBottleFullName }
+              : {}),
             distillerIds:
               shouldAddDistillery && distilleryId ? [distilleryId] : undefined,
             seriesId:
@@ -425,7 +509,7 @@ export async function repairBottleBrandDistilleryAssignments({
       }
 
       items.push({
-        bottleFullName: bottle.fullName,
+        bottleFullName: nextBottleFullName,
         bottleId: bottle.id,
         distilleryAdded: shouldAddDistillery,
         message: baseMessage,

@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  bottleReleases,
   bottleSeries,
   bottles,
   bottlesToDistillers,
@@ -40,6 +41,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       name: "12-year-old Single Malt Scotch Whisky",
       seriesId: sourceSeries.id,
     });
+    const targetBottleFullName = "Jura 12-year-old Single Malt Scotch Whisky";
     await fixtures.BottleRelease({
       bottleId: bottle.id,
       edition: "2024 Release",
@@ -62,11 +64,10 @@ describe("repairBottleBrandDistilleryAssignments", () => {
     });
     expect(result.items).toEqual([
       {
-        bottleFullName: bottle.fullName,
+        bottleFullName: targetBottleFullName,
         bottleId: bottle.id,
         distilleryAdded: true,
-        message:
-          "brand Isle of Jura -> Jura; add distillery Isle of Jura; create series 12-year-old; 1 release(s) reindexed",
+        message: `brand Isle of Jura -> Jura; rename ${bottle.fullName} -> ${targetBottleFullName}; add distillery Isle of Jura; create series 12-year-old; 1 release(s) reindexed`,
         releaseCount: 1,
         seriesAction: "create_new",
         status: "planned",
@@ -78,6 +79,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       .from(bottles)
       .where(eq(bottles.id, bottle.id));
     expect(unchangedBottle.brandId).toEqual(fromBrand.id);
+    expect(unchangedBottle.fullName).toEqual(bottle.fullName);
     expect(unchangedBottle.seriesId).toEqual(sourceSeries.id);
 
     const distilleryLinks = await db
@@ -96,7 +98,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
     expect(pushUniqueJobMock).not.toHaveBeenCalled();
   });
 
-  test("repairs the bottle brand, adds the distillery, and creates a target series without renaming the bottle", async ({
+  test("repairs the bottle brand, canonical names, distillery, and target series", async ({
     fixtures,
   }) => {
     const systemUser = await fixtures.User({ admin: true });
@@ -117,6 +119,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       name: "12-year-old Single Malt Scotch Whisky",
       seriesId: sourceSeries.id,
     });
+    const targetBottleFullName = "Jura 12-year-old Single Malt Scotch Whisky";
     const release = await fixtures.BottleRelease({
       bottleId: bottle.id,
       edition: "2024 Release",
@@ -144,8 +147,19 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       .from(bottles)
       .where(eq(bottles.id, bottle.id));
     expect(updatedBottle.brandId).toEqual(toBrand.id);
-    expect(updatedBottle.fullName).toEqual(bottle.fullName);
+    expect(updatedBottle.fullName).toEqual(targetBottleFullName);
     expect(updatedBottle.seriesId).not.toEqual(sourceSeries.id);
+
+    const [updatedRelease] = await db
+      .select()
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, release.id));
+    expect(updatedRelease.name).toEqual(
+      "12-year-old Single Malt Scotch Whisky - 2024 Release",
+    );
+    expect(updatedRelease.fullName).toEqual(
+      "Jura 12-year-old Single Malt Scotch Whisky - 2024 Release",
+    );
 
     const distilleryLinks = await db
       .select()
@@ -179,6 +193,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
     expect(change?.createdById).toEqual(systemUser.id);
     expect(change?.data).toEqual({
       brandId: toBrand.id,
+      fullName: targetBottleFullName,
       distillerIds: [fromBrand.id],
       seriesId: reindexedSeries.id,
     });
@@ -259,6 +274,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       .from(bottles)
       .where(eq(bottles.id, bottle.id));
     expect(updatedBottle.brandId).toEqual(toBrand.id);
+    expect(updatedBottle.fullName).toEqual("Jura Elixir");
     expect(updatedBottle.seriesId).toEqual(targetSeries.id);
 
     const distilleryLinks = await db

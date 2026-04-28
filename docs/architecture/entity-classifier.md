@@ -88,6 +88,9 @@ The classifier returns:
 - Web evidence should support a decision, not invent one.
 - Bottle reassignment should only include verified bottle ids.
 - Metadata repair should require authoritative support.
+- Brand/entity remediation must distinguish label brand from distillery, owner, bottler, importer, and product/category wording.
+- `fullName` and aliases are weak evidence for reassignment because they may contain stale brand text or source-specific prefixes.
+- Deterministic grouped repairs should only surface zero-ambiguity moves whose after-state is valid; product-suffix expansions and reversible brand moves belong in classifier or manual review.
 
 ## Admin Flow
 

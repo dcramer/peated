@@ -141,11 +141,14 @@ These rules should remain centralized in the classifier:
 - Web evidence is support, not identity by itself.
 - Web search should stay narrow and hypothesis-driven. The classifier should usually make at most one web search call, and only spend a second call when the first results are weak or contradictory on a still-decisive trait.
 - Confidence calibration matters because downstream consumers use classifier confidence to decide whether a reviewed existing match is safe to auto-verify or should stay in review.
+- Brand decisions must distinguish consumer-facing brand from distillery, bottler, owner, importer, and product/category wording. A longer leading string match is not sufficient identity evidence.
+- `fullName` and aliases are weak evidence for brand/entity repairs because they combine brand text with bottle expression text and may be stale.
 - Generic `single cask` / `single barrel` language is not enough to infer `exact_cask`; exact-cask scope needs a stronger marketed-identity signal such as a known program code or numbered cask identity.
 - Downstream consumers should adapt the reviewed classifier result instead of “fixing up” raw model decisions.
 - Consumer-specific semantics such as price-match `correction` should be derived outside the generic classifier.
 - `create_release` only makes sense when the target bottle is acting as a reusable parent expression, not when the bottle is still storing a single known release-like identity on itself.
 - Downstream persistence must not create a child release while keeping the same release-like traits on the parent bottle. Split the bottle explicitly first.
+- Metadata corrections must validate the resulting canonical identity before suggesting or applying them, including brand-derived bottle and release names.
 
 ## Result Shape
 

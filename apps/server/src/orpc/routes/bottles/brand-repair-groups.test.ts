@@ -121,4 +121,115 @@ describe("GET /bottles/brand-repair-groups", () => {
       },
     ]);
   });
+
+  test("does not group branded bottles from producer-style aliases", async ({
+    fixtures,
+  }) => {
+    const currentBrand = await fixtures.Entity({
+      name: "A.D. Laws",
+      type: ["brand"],
+    });
+    await fixtures.Entity({
+      name: "Laws Whiskey House",
+      shortName: "Laws",
+      type: ["brand"],
+      totalBottles: 12,
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const straightBourbonBottle = await fixtures.Bottle({
+      brandId: currentBrand.id,
+      name: "Four Grain Straight Bourbon",
+    });
+    await fixtures.BottleAlias({
+      bottleId: straightBourbonBottle.id,
+      name: "Laws Whiskey House Four Grain Straight Bourbon Whiskey",
+    });
+
+    const caskStrengthBottle = await fixtures.Bottle({
+      brandId: currentBrand.id,
+      name: "Four Grain Straight Bourbon Cask Strength",
+    });
+    await fixtures.BottleAlias({
+      bottleId: caskStrengthBottle.id,
+      name: "Laws Four Grain Straight Bourbon Cask Strength",
+    });
+
+    const { results } = await routerClient.bottles.brandRepairGroups(
+      {
+        query: "Laws",
+      },
+      { context: { user } },
+    );
+
+    expect(results).toEqual([]);
+  });
+
+  test("does not group product-suffix brand expansions", async ({
+    fixtures,
+  }) => {
+    const currentBrand = await fixtures.Entity({
+      name: "Belle Meade",
+      type: ["brand"],
+    });
+    await fixtures.Entity({
+      name: "Belle Meade Bourbon",
+      type: ["brand"],
+      totalBottles: 1,
+      totalTastings: 1,
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const bottle = await fixtures.Bottle({
+      brandId: currentBrand.id,
+      name: "Sour Mash Straight Whiskey",
+      totalTastings: 1,
+    });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Belle Meade Bourbon Sour Mash Straight Whiskey",
+    });
+
+    const { results } = await routerClient.bottles.brandRepairGroups(
+      {
+        query: "Belle Meade",
+      },
+      { context: { user } },
+    );
+
+    expect(results).toEqual([]);
+  });
+
+  test("does not reverse a current brand from stale shorter aliases", async ({
+    fixtures,
+  }) => {
+    const currentBrand = await fixtures.Entity({
+      name: "Belle Meade Bourbon",
+      type: ["brand"],
+    });
+    await fixtures.Entity({
+      name: "Belle Meade",
+      type: ["brand"],
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const bottle = await fixtures.Bottle({
+      brandId: currentBrand.id,
+      name: "Sour Mash Straight Whiskey",
+      totalTastings: 1,
+    });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Belle Meade Sour Mash Straight Whiskey",
+    });
+
+    const { results } = await routerClient.bottles.brandRepairGroups(
+      {
+        query: "Belle Meade",
+      },
+      { context: { user } },
+    );
+
+    expect(results).toEqual([]);
+  });
 });

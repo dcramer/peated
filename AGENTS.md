@@ -29,6 +29,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - `pnpm dev*` and `pnpm cli <cmd>` load `.env.local`; backend tests load `.env.test`
 - Backend testing policy: `docs/development/backend-testing.md`
 - Before finalizing non-trivial code changes, run the full test suite with `pnpm test`; targeted tests are additive, not a substitute
+- Classifier/repair changes: preserve `docs/architecture/whisky-identity-model.md`; brand/entity identity is not prefix matching
 - oRPC route conventions: `docs/development/orpc-routes.md`
 - oRPC client usage: `docs/development/orpc-client.md`
 - Schema conventions: `docs/development/schema-conventions.md`

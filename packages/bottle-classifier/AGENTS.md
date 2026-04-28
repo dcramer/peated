@@ -31,6 +31,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - Deterministic validation, downgrades, and `identityScope` rules live in `src/reviewPolicy.ts`.
 - Prompt-only fixes are incomplete when the invariant is deterministic; fix policy and tests together.
 - Do not add brand-specific prompt or extraction examples just to rescue one observed bottle family. Encode the transferable rule, and keep family-specific regressions in eval fixtures.
+- Brand/entity identity is not a prefix score; validate resulting canonical bottle/release names.
 - False positive existing matches are worse than conservative create or no-match results.
 - Bounded ambiguity should collapse to conservative `no_match` at this boundary. Downstream consumers own any review workflow.
 - `exact_cask` needs strong marketed identity signals such as SMWS codes, cask numbers, or barrel numbers.
