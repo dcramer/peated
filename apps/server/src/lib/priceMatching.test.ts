@@ -127,6 +127,7 @@ function normalizeMockBottleClassifierDecision(decision: Record<string, any>) {
     decision.action === "create_bottle" ||
     decision.action === "create_release" ||
     decision.action === "create_bottle_and_release" ||
+    decision.action === "repair_bottle" ||
     decision.action === "no_match"
   ) {
     return {
@@ -1820,7 +1821,7 @@ describe("priceMatching", () => {
     expect(proposal.rationale).toContain("existing-bottle repair");
   });
 
-  test("treats same-bottle brand metadata conflicts as existing-bottle repairs", async ({
+  test("stores first-class repair decisions as existing-bottle repairs", async ({
     fixtures,
   }) => {
     config.OPENAI_API_KEY = undefined;
@@ -1876,11 +1877,14 @@ describe("priceMatching", () => {
     vi.mocked(classifyBottleReference).mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "create_bottle",
+          action: "repair_bottle",
           confidence: 90,
           rationale:
             "The current bottle identity looks right, but the stored producer metadata does not match the evidence.",
           candidateBottleIds: [currentBottle.id],
+          matchedBottleId: currentBottle.id,
+          matchedReleaseId: null,
+          parentBottleId: null,
           proposedBottle: {
             name: "Bodega Cask",
             series: null,
@@ -1907,6 +1911,7 @@ describe("priceMatching", () => {
             ],
             bottler: null,
           },
+          proposedRelease: null,
         },
         extractedLabel: {
           brand: "The Whistler",
@@ -1989,7 +1994,7 @@ describe("priceMatching", () => {
         },
       ],
     });
-    expect(proposal.rationale).toContain("existing-bottle repair");
+    expect(proposal.rationale).toContain("stored producer metadata");
   });
 
   test("persists normalized proposed bottle drafts from the classifier", async ({

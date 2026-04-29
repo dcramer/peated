@@ -16,6 +16,11 @@ import {
   type LegacyReleaseRepairCandidate,
 } from "@peated/server/lib/legacyReleaseRepairCandidates";
 import { refreshLegacyReleaseRepairReview } from "@peated/server/lib/legacyReleaseRepairReviews";
+import {
+  isActionableReleaseRepairCandidate,
+  isAutomationEligibleAgeRepairCandidate,
+  isAutomationEligibleReleaseRepairCandidate,
+} from "@peated/server/lib/repairBackfillProposals";
 
 const MAX_PAGE_SIZE = 100;
 
@@ -190,29 +195,6 @@ async function applyRepairBackfillProposal(
   }
 }
 
-function isActionableReleaseRepairCandidate(
-  candidate: LegacyReleaseRepairCandidate,
-): candidate is LegacyReleaseRepairCandidate & {
-  repairMode: "create_parent" | "existing_parent";
-} {
-  return (
-    candidate.repairMode === "create_parent" ||
-    candidate.repairMode === "existing_parent"
-  );
-}
-
-function isAutomationEligibleReleaseRepairCandidate(
-  candidate: LegacyReleaseRepairCandidate,
-): candidate is LegacyReleaseRepairCandidate & {
-  repairMode: "existing_parent";
-} {
-  return (
-    candidate.repairMode === "existing_parent" &&
-    (candidate.parentResolutionSource === "heuristic_exact" ||
-      candidate.parentResolutionSource === "classifier_review_persisted")
-  );
-}
-
 function toApplicableReleaseRepairProposal(
   candidate: LegacyReleaseRepairCandidate & {
     repairMode: "create_parent" | "existing_parent";
@@ -246,21 +228,6 @@ function toApplicableAgeRepairProposal(
       fullName: candidate.targetRelease.fullName,
     },
   };
-}
-
-function isAutomationEligibleAgeRepairCandidate(
-  candidate: DirtyParentAgeRepairCandidate,
-): candidate is DirtyParentAgeRepairCandidate & {
-  repairMode: "existing_release";
-  targetRelease: {
-    fullName: string;
-    id: number;
-  };
-} {
-  return (
-    candidate.repairMode === "existing_release" &&
-    candidate.targetRelease.id !== null
-  );
 }
 
 async function collectApplicableRepairCandidates<TCandidate, TProposal>({

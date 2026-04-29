@@ -1,10 +1,10 @@
 import { tool } from "@openai/agents";
+import { EntityResolutionSchema } from "@peated/bottle-classifier/internal/types";
 import { ENTITY_TYPE_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { entities, entityAliases } from "@peated/server/db/schema";
 import { and, eq, ilike, or, sql } from "drizzle-orm";
 import { z } from "zod";
-import { EntityResolutionSchema } from "../schemas";
 
 const SearchEntitiesArgsSchema = z.object({
   query: z

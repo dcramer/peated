@@ -362,6 +362,15 @@ const CreateBottleAndReleaseDecisionSchema =
     proposedRelease: ProposedReleaseSchema,
   });
 
+const RepairBottleDecisionSchema = BottleClassifierDecisionBaseSchema.extend({
+  action: z.literal("repair_bottle"),
+  matchedBottleId: z.number().int(),
+  matchedReleaseId: z.null().default(null),
+  parentBottleId: z.null().default(null),
+  proposedBottle: ProposedBottleSchema,
+  proposedRelease: z.null().default(null),
+});
+
 const NoMatchDecisionSchema = BottleClassifierDecisionBaseSchema.extend({
   action: z.literal("no_match"),
   matchedBottleId: z.null().default(null),
@@ -376,6 +385,7 @@ type BottleClassificationDecisionInput =
   | z.infer<typeof CreateBottleDecisionSchema>
   | z.infer<typeof CreateReleaseDecisionSchema>
   | z.infer<typeof CreateBottleAndReleaseDecisionSchema>
+  | z.infer<typeof RepairBottleDecisionSchema>
   | z.infer<typeof NoMatchDecisionSchema>;
 
 function validateBottleClassificationDecisionShape(
@@ -411,6 +421,7 @@ export const BottleClassificationDecisionSchema = z
     CreateBottleDecisionSchema,
     CreateReleaseDecisionSchema,
     CreateBottleAndReleaseDecisionSchema,
+    RepairBottleDecisionSchema,
     NoMatchDecisionSchema,
   ])
   .superRefine(validateBottleClassificationDecisionShape);
@@ -429,6 +440,7 @@ export const BottleClassifierAgentDecisionSchema = z.object({
     "create_bottle",
     "create_release",
     "create_bottle_and_release",
+    "repair_bottle",
     "no_match",
   ]),
   confidence: z.number().min(0).max(100),

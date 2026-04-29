@@ -141,7 +141,7 @@ async function reviewManualBottleCreateInput({
 
     const decision = classification.decision;
     if (
-      decision.action === "match" &&
+      (decision.action === "match" || decision.action === "repair_bottle") &&
       decision.confidence >= MANUAL_BOTTLE_REVIEW_CONFIDENCE_THRESHOLD
     ) {
       throw new BottleAlreadyExistsError(decision.matchedBottleId);

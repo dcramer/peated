@@ -1,8 +1,11 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleObservations,
   bottleReleases,
+  bottleSeries,
   bottles,
+  bottlesToDistillers,
   reviews,
   storePriceMatchProposals,
   storePriceMatchRetryRunItems,
@@ -364,6 +367,10 @@ describe("price match queue", () => {
       brandId: brand.id,
       name: "Bodega Cask",
       category: "blend",
+      edition: "Port Pipe",
+      abv: 46,
+      caskStrength: true,
+      releaseYear: 2020,
       distillerIds: [],
     });
     const price = await fixtures.StorePrice({
@@ -504,6 +511,224 @@ describe("price match queue", () => {
         }),
       ]),
     });
+  });
+
+  test("applies same-bottle repair drafts and approves the listing", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const brand = await fixtures.Entity({
+      name: "The Whistler",
+      type: ["brand", "bottler"],
+    });
+    const distillery = await fixtures.Entity({
+      name: "Boann Distillery",
+      type: ["distiller"],
+    });
+    const sourceSeries = await fixtures.BottleSeries({
+      brandId: brand.id,
+      name: "Legacy",
+    });
+    const targetSeries = await fixtures.BottleSeries({
+      brandId: brand.id,
+      name: "Bodega",
+    });
+    const currentBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Bodega Cask",
+      seriesId: sourceSeries.id,
+      category: "blend",
+      edition: "Port Pipe",
+      abv: 46,
+      caskStrength: true,
+      releaseYear: 2020,
+      distillerIds: [],
+    });
+    await db
+      .update(bottleSeries)
+      .set({ numReleases: 1 })
+      .where(eq(bottleSeries.id, sourceSeries.id));
+    const price = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "The Whistler Bodega Cask Single Malt Irish Whiskey",
+      bottleId: currentBottle.id,
+    });
+
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "correction",
+        confidence: 92,
+        currentBottleId: currentBottle.id,
+        suggestedBottleId: currentBottle.id,
+        candidateBottles: [
+          {
+            bottleId: currentBottle.id,
+            fullName: currentBottle.fullName,
+            alias: currentBottle.fullName,
+            brand: "The Whistler",
+            bottler: null,
+            series: null,
+            distillery: [],
+            category: "blend",
+            statedAge: null,
+            edition: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 0.99,
+            source: ["exact"],
+          },
+        ],
+        extractedLabel: {
+          brand: "The Whistler",
+          bottler: null,
+          expression: "Bodega Cask",
+          series: null,
+          distillery: ["Boann Distillery"],
+          category: "single_malt",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        proposedBottle: {
+          name: "Bodega Cask",
+          series: {
+            id: targetSeries.id,
+            name: targetSeries.name,
+          },
+          category: "single_malt",
+          edition: null,
+          statedAge: null,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          brand: {
+            id: brand.id,
+            name: "The Whistler",
+          },
+          distillers: [
+            {
+              id: distillery.id,
+              name: "Boann Distillery",
+            },
+          ],
+          bottler: null,
+        },
+        rationale:
+          "The current bottle appears to be the right base identity, but its stored bottle metadata conflicts with the extracted traits.",
+      })
+      .returning();
+
+    const result = await routerClient.prices.matchQueue.applyBottleRepair(
+      { proposal: proposal.id },
+      { context: { user } },
+    );
+
+    expect(result).toMatchObject({
+      id: currentBottle.id,
+      category: "single_malt",
+      distillers: [
+        {
+          id: distillery.id,
+          name: "Boann Distillery",
+        },
+      ],
+    });
+
+    const [
+      updatedBottle,
+      updatedPrice,
+      updatedProposal,
+      distillerRows,
+      updatedSourceSeries,
+      updatedTargetSeries,
+    ] = await Promise.all([
+      db.query.bottles.findFirst({
+        where: eq(bottles.id, currentBottle.id),
+      }),
+      db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+      db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, proposal.id),
+      }),
+      db.query.bottlesToDistillers.findMany({
+        where: eq(bottlesToDistillers.bottleId, currentBottle.id),
+      }),
+      db.query.bottleSeries.findFirst({
+        where: eq(bottleSeries.id, sourceSeries.id),
+      }),
+      db.query.bottleSeries.findFirst({
+        where: eq(bottleSeries.id, targetSeries.id),
+      }),
+    ]);
+
+    expect(updatedBottle).toMatchObject({
+      id: currentBottle.id,
+      seriesId: targetSeries.id,
+      category: "single_malt",
+      edition: "Port Pipe",
+      abv: 46,
+      caskStrength: true,
+      releaseYear: 2020,
+    });
+    expect(updatedPrice).toMatchObject({
+      bottleId: currentBottle.id,
+      releaseId: null,
+    });
+    expect(updatedProposal).toMatchObject({
+      status: "approved",
+      proposalType: "correction",
+      currentBottleId: currentBottle.id,
+      suggestedBottleId: currentBottle.id,
+      reviewedById: user.id,
+    });
+    expect(distillerRows.map((row) => row.distillerId)).toEqual([
+      distillery.id,
+    ]);
+    expect(updatedSourceSeries?.numReleases).toEqual(0);
+    expect(updatedTargetSeries?.numReleases).toEqual(1);
+
+    const observation = await db.query.bottleObservations.findFirst({
+      where: (bottleObservations, { eq }) =>
+        eq(bottleObservations.sourceKey, `store_price:${price.id}`),
+    });
+    expect(observation).toMatchObject({
+      bottleId: currentBottle.id,
+      releaseId: null,
+      facts: expect.objectContaining({
+        proposalType: "correction",
+        proposedBottle: expect.objectContaining({
+          category: "single_malt",
+        }),
+      }),
+    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "OnBottleChange",
+      { bottleId: currentBottle.id },
+      { delay: 5000 },
+    );
   });
 
   test("filters queue items by kind and orders ties by newest id", async ({

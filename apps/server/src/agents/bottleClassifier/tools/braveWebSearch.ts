@@ -1,6 +1,6 @@
 import { tool } from "@openai/agents";
+import type { BottleSearchEvidence } from "@peated/bottle-classifier/internal/types";
 import { z } from "zod";
-import type { BottleSearchEvidence } from "../schemas";
 import {
   BottleWebSearchArgsSchema,
   buildBottleSearchEvidence,

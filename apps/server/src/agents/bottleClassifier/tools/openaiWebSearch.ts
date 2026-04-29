@@ -1,11 +1,11 @@
 import { tool } from "@openai/agents";
+import type { BottleSearchEvidence } from "@peated/bottle-classifier/internal/types";
 import config from "@peated/server/config";
 import type OpenAI from "openai";
 import type {
   ResponseCreateParamsNonStreaming,
   ResponseIncludable,
 } from "openai/resources/responses/responses";
-import type { BottleSearchEvidence } from "../schemas";
 import { runBraveWebSearch } from "./braveWebSearch";
 import {
   BottleWebSearchArgsSchema,

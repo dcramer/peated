@@ -1,4 +1,5 @@
 import activeRetryRun from "./active-retry-run";
+import applyBottleRepair from "./apply-bottle-repair";
 import cancelRetryRun from "./cancel-retry-run";
 import createBottle from "./create-bottle";
 import details from "./details";
@@ -10,6 +11,7 @@ import retryRunDetails from "./retry-run-details";
 
 export default {
   activeRetryRun,
+  applyBottleRepair,
   cancelRetryRun,
   createBottle,
   details,

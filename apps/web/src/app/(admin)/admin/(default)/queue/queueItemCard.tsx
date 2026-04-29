@@ -69,6 +69,7 @@ type QueueItemCardProps = {
   returnTo: string;
   onApproveMatch: (item: QueueItem) => Promise<void>;
   onApplyCreateProposal: (item: QueueItem) => Promise<void>;
+  onApplyBottleRepair: (item: QueueItem) => Promise<void>;
   onChooseBottle: (item: QueueItem) => void;
   onIgnore: (item: QueueItem) => Promise<void>;
   onRetry: (item: QueueItem) => Promise<void>;
@@ -440,7 +441,12 @@ function getBottleRepairChanges(
     label: string,
     current: string | null,
     proposed: string | null,
+    include = true,
   ) => {
+    if (!include) {
+      return;
+    }
+
     if ((current ?? null) === (proposed ?? null)) {
       return;
     }
@@ -458,53 +464,87 @@ function getBottleRepairChanges(
     "Series",
     currentBottle.series?.name ?? null,
     proposedBottle.series?.name ?? null,
+    proposedBottle.series !== null,
   );
-  pushChange("Category", currentBottle.category, proposedBottle.category);
+  pushChange(
+    "Category",
+    currentBottle.category,
+    proposedBottle.category,
+    proposedBottle.category !== null,
+  );
   pushChange(
     "Distillery",
     currentBottle.distillers.map((distiller) => distiller.name).join(", ") ||
       null,
     proposedBottle.distillers.map((distiller) => distiller.name).join(", ") ||
       null,
+    proposedBottle.distillers.length > 0,
   );
   pushChange(
     "Bottler",
     currentBottle.bottler?.name ?? null,
     proposedBottle.bottler?.name ?? null,
+    proposedBottle.bottler !== null,
   );
   pushChange(
     "Age",
     formatAge(currentBottle.statedAge),
     formatAge(proposedBottle.statedAge),
+    proposedBottle.statedAge !== null,
   );
-  pushChange("Edition", currentBottle.edition, proposedBottle.edition);
+  pushChange(
+    "Edition",
+    currentBottle.edition,
+    proposedBottle.edition,
+    proposedBottle.edition !== null,
+  );
   pushChange(
     "ABV",
     formatAbv(currentBottle.abv),
     formatAbv(proposedBottle.abv),
+    proposedBottle.abv !== null,
   );
   pushChange(
     "Cask Strength",
     formatFlag(currentBottle.caskStrength),
     formatFlag(proposedBottle.caskStrength),
+    proposedBottle.caskStrength !== null,
   );
   pushChange(
     "Single Cask",
     formatFlag(currentBottle.singleCask),
     formatFlag(proposedBottle.singleCask),
+    proposedBottle.singleCask !== null,
   );
-  pushChange("Cask", currentBottle.caskType, proposedBottle.caskType);
-  pushChange("Cask Size", currentBottle.caskSize, proposedBottle.caskSize);
-  pushChange("Cask Fill", currentBottle.caskFill, proposedBottle.caskFill);
+  pushChange(
+    "Cask",
+    currentBottle.caskType,
+    proposedBottle.caskType,
+    proposedBottle.caskType !== null,
+  );
+  pushChange(
+    "Cask Size",
+    currentBottle.caskSize,
+    proposedBottle.caskSize,
+    proposedBottle.caskSize !== null,
+  );
+  pushChange(
+    "Cask Fill",
+    currentBottle.caskFill,
+    proposedBottle.caskFill,
+    proposedBottle.caskFill !== null,
+  );
   pushChange(
     "Vintage Year",
     currentBottle.vintageYear?.toString() ?? null,
     proposedBottle.vintageYear?.toString() ?? null,
+    proposedBottle.vintageYear !== null,
   );
   pushChange(
     "Release Year",
     currentBottle.releaseYear?.toString() ?? null,
     proposedBottle.releaseYear?.toString() ?? null,
+    proposedBottle.releaseYear !== null,
   );
 
   return changes;
@@ -643,8 +683,8 @@ function renderRecommendationOutcome(item: QueueItem): ReactNode {
         </div>
 
         <div className="text-xs text-slate-400">
-          Edit the current bottle, then retry this proposal to confirm the
-          repaired metadata.
+          Applying this draft updates the existing bottle and approves the
+          listing match together.
         </div>
       </div>
     );
@@ -754,6 +794,7 @@ export default function QueueItemCard({
   item,
   returnTo,
   onApproveMatch,
+  onApplyBottleRepair,
   onApplyCreateProposal,
   onChooseBottle,
   onIgnore,
@@ -776,6 +817,7 @@ export default function QueueItemCard({
     item.proposalType === "create_new" &&
     (!!item.proposedBottle || !!item.proposedRelease) &&
     !isProcessing;
+  const canApplyRepair = item.status === "pending_review" && repairProposal;
   const createProposalActions = getCreateProposalActions(item, returnTo);
   const repairEditHref =
     repairProposal && item.currentBottle
@@ -1192,8 +1234,21 @@ export default function QueueItemCard({
                 </Button>
               ) : null}
 
+              {canApplyRepair ? (
+                <Button
+                  color="highlight"
+                  fullWidth
+                  disabled={isBusy}
+                  onClick={async () => {
+                    await onApplyBottleRepair(item);
+                  }}
+                >
+                  Apply Repair Draft
+                </Button>
+              ) : null}
+
               {repairEditHref ? (
-                <Button href={repairEditHref} color="highlight" fullWidth>
+                <Button href={repairEditHref} fullWidth>
                   Edit Bottle
                 </Button>
               ) : null}
@@ -1201,7 +1256,10 @@ export default function QueueItemCard({
               <Button
                 fullWidth
                 color={
-                  canApproveMatch || canCreateBottle || repairEditHref
+                  canApproveMatch ||
+                  canCreateBottle ||
+                  canApplyRepair ||
+                  repairEditHref
                     ? "default"
                     : "primary"
                 }

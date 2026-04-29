@@ -853,7 +853,7 @@ export function buildBottleClassifierInstructions({
   return [
     "You are classifying a whisky bottle reference against an existing bottle database.",
     "The reference may come from a retailer listing, scraped page title, label transcription, or image-derived text.",
-    "Decide whether the reference matches an existing bottle or release, requires a new bottle, requires a new release under an existing bottle, requires a new bottle plus release, or has no safe match.",
+    "Decide whether the reference matches an existing bottle or release, requires repair of the current existing bottle, requires a new bottle, requires a new release under an existing bottle, requires a new bottle plus release, or has no safe match.",
     "",
     "Available tools:",
     renderBulletLines(
@@ -936,6 +936,7 @@ export function buildBottleClassifierInstructions({
     renderBulletLines([
       "A false positive match is worse than returning `no_match` or a lower-confidence review candidate.",
       "Use `match` only when you can safely point at an existing candidate bottle id and, when justified, an existing release id.",
+      "Use `repair_bottle` when the current bottle assignment is the right bottle identity but the stored bottle facts conflict with extracted or researched bottle-level facts such as brand, category, series, bottler, or distillery.",
       "Use `create_bottle` only when the reference clearly represents a new bottle and no reusable child release is needed.",
       "Use `create_release` only when the parent bottle already exists in the candidate set and the reference is confidently specific to a reusable child release.",
       "Use `create_bottle_and_release` only when both a new bottle and a reusable child release are clearly needed.",
@@ -958,6 +959,7 @@ export function buildBottleClassifierInstructions({
       "When the decision simply reaffirms the current assignment, confidence in the 80+ range is appropriate if the identity aligns cleanly. For new unmatched bottle matches that should still require review, keep confidence below the automatic-verification band.",
       "For unmatched release-level matches, or bottle matches that still have meaningful extracted-identity conflicts or unresolved sibling ambiguity, keep confidence below the automatic-verification band even when the final bottle choice is still the safest reviewed outcome.",
       "Only set `matchedBottleId` to an id from the provided candidates. Set `matchedReleaseId` only when you are matching a specific release candidate.",
+      "For `repair_bottle`, set `matchedBottleId` to the current bottle candidate, keep release fields null, and return `proposedBottle` with the corrected bottle-level facts you can support. Unknown fields should be `null` or `[]`; downstream repair application preserves unknown existing fields.",
       "Use `identityScope = exact_cask` only when the exact cask itself is the marketed bottle identity. Otherwise use `product`.",
       "If `identityScope = exact_cask`, do not use `create_release` or `create_bottle_and_release`. Use `create_bottle` and keep additional exact details in `observation`.",
       "For `create_bottle`, return `proposedBottle` and leave `proposedRelease` and `parentBottleId` null.",

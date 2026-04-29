@@ -1137,7 +1137,7 @@ function getMatchedTarget(
   decision: BottleClassificationDecision,
   candidates: BottleCandidate[],
 ): BottleCandidate | null {
-  if (decision.action !== "match") {
+  if (decision.action !== "match" && decision.action !== "repair_bottle") {
     return null;
   }
 
@@ -1145,7 +1145,7 @@ function getMatchedTarget(
     candidates.find(
       (candidate) =>
         candidate.bottleId === decision.matchedBottleId &&
-        (decision.matchedReleaseId != null
+        (decision.action === "match" && decision.matchedReleaseId != null
           ? candidate.releaseId === decision.matchedReleaseId
           : candidate.releaseId === null || candidate.kind === "bottle"),
     ) ?? null
@@ -2652,7 +2652,7 @@ function downgradeUnsafeExistingMatchDecision({
   decision: BottleClassificationDecision;
   artifacts: BottleClassificationArtifacts;
 }): BottleClassificationDecision {
-  if (decision.action !== "match") {
+  if (decision.action !== "match" && decision.action !== "repair_bottle") {
     return decision;
   }
 
@@ -3265,6 +3265,101 @@ function sanitizeClassifierDecision({
       parentBottleId: null,
       proposedBottle: normalizedDrafts.proposedBottle,
       proposedRelease: normalizedDrafts.proposedRelease,
+    };
+  }
+
+  if (decision.action === "repair_bottle") {
+    if (decision.matchedBottleId === null) {
+      return createNoMatchDecision({
+        decision: {
+          ...decision,
+          confidence: normalizedConfidence,
+        },
+        candidateBottleIds: filteredCandidateBottleIds,
+        observation,
+        identityScope: "product",
+        rationale: appendRationale(
+          decision.rationale,
+          "Server downgraded repair_bottle because no matched bottle id was returned.",
+        ),
+      });
+    }
+
+    if (!decision.proposedBottle) {
+      return createNoMatchDecision({
+        decision: {
+          ...decision,
+          confidence: normalizedConfidence,
+        },
+        candidateBottleIds: filteredCandidateBottleIds,
+        observation,
+        identityScope: "product",
+        rationale: appendRationale(
+          decision.rationale,
+          "Server downgraded repair_bottle because no proposed bottle repair draft was returned.",
+        ),
+      });
+    }
+
+    const matchedBottleId = decision.matchedBottleId;
+    if (!candidateBottleIds.has(matchedBottleId)) {
+      throw new BottleClassificationError(
+        `Classifier returned unknown repair bottle id (${matchedBottleId}).`,
+        artifacts,
+      );
+    }
+
+    const target =
+      artifacts.candidates.find(
+        (candidate) =>
+          candidate.bottleId === matchedBottleId &&
+          (candidate.releaseId === null || candidate.kind === "bottle"),
+      ) ?? null;
+    const normalizedDrafts = normalizeBottleCreationDrafts({
+      creationTarget: "bottle",
+      proposedBottle: sanitizeProposedBottleDraft(
+        decision.proposedBottle,
+        resolvedEntitiesById,
+      ),
+      proposedRelease: null,
+    });
+
+    if (!normalizedDrafts.proposedBottle) {
+      return createNoMatchDecision({
+        decision: {
+          ...decision,
+          confidence: normalizedConfidence,
+        },
+        candidateBottleIds: filteredCandidateBottleIds,
+        observation,
+        identityScope: "product",
+        rationale: appendRationale(
+          decision.rationale,
+          "Server downgraded repair_bottle because the proposed bottle repair draft could not be normalized.",
+        ),
+      });
+    }
+
+    return {
+      action: "repair_bottle",
+      confidence: normalizedConfidence,
+      rationale: decision.rationale,
+      candidateBottleIds: filteredCandidateBottleIds,
+      identityScope: inferIdentityScope({
+        requestedIdentityScope: decision.identityScope,
+        reference,
+        target,
+        extractedIdentity: artifacts.extractedIdentity,
+        proposedBottle: normalizedDrafts.proposedBottle,
+        hasReleaseIdentity: false,
+        observation,
+      }),
+      observation,
+      matchedBottleId,
+      matchedReleaseId: null,
+      parentBottleId: null,
+      proposedBottle: normalizedDrafts.proposedBottle,
+      proposedRelease: null,
     };
   }
 

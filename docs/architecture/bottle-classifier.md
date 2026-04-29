@@ -125,7 +125,7 @@ The classifier runs in this order:
 3. Retrieve initial local bottle/release candidates.
 4. Run the LLM reasoner with local search, entity search, and web search tools.
 5. Sanitize the returned decision against known candidates and resolved entities.
-6. Normalize create actions into reviewed `create_bottle`, `create_release`, or `create_bottle_and_release` outcomes.
+6. Normalize create and repair actions into reviewed `create_bottle`, `create_release`, `create_bottle_and_release`, or `repair_bottle` outcomes.
 7. Infer `identityScope = product | exact_cask` deterministically.
 8. Downgrade unsafe existing-match recommendations when the candidate is only a loose near-match and there is no exact-name or off-retailer support.
 
@@ -134,7 +134,7 @@ The classifier runs in this order:
 These rules should remain centralized in the classifier:
 
 - The model may suggest only known candidate bottle/release ids.
-- Create drafts must be normalized before persistence.
+- Create and repair drafts must be normalized before persistence.
 - Unsupported novelty flavored-whiskey / whiskey-liqueur exclusion is model-driven, not regex-driven.
 - A flavor-adjacent noun in the expression is not enough to exclude a bottle. Official catalogued whisky expressions can still match when the overall evidence says the product is a real whisky bottle rather than a novelty additive-flavor product.
 - Over-specific local candidates should not be matched unless the missing differentiator is actually supported.
@@ -161,11 +161,12 @@ The classifier returns:
 
 The reviewed `decision` is generic and bottle-centric:
 
-- `action = match | create_bottle | create_release | create_bottle_and_release | no_match`
+- `action = match | repair_bottle | create_bottle | create_release | create_bottle_and_release | no_match`
 - `identityScope = product | exact_cask`
 - `matchedBottleId` and optional `matchedReleaseId` for safe existing matches
+- `matchedBottleId` plus `proposedBottle` for same-bottle metadata repair
 - `parentBottleId` only for `create_release`
-- `proposedBottle` / `proposedRelease` only for create outcomes
+- `proposedBottle` / `proposedRelease` for create outcomes; `repair_bottle` carries only a `proposedBottle` patch draft
 - `no_match` stays generic at this boundary; downstream consumers own any review or clarification workflow
 - `observation` for non-canonical exact details such as selector names, cask numbers, bottle numbers, outturn, and exclusive wording
 

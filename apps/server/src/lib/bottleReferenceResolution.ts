@@ -71,7 +71,7 @@ function assertKnownClassifierTarget(
   const candidateReleaseIds = getKnownCandidateReleaseIds(classification);
 
   if (
-    decision.action === "match" &&
+    (decision.action === "match" || decision.action === "repair_bottle") &&
     !candidateBottleIds.has(decision.matchedBottleId)
   ) {
     throw new Error(
@@ -363,10 +363,16 @@ export async function resolveBottleReferenceTarget({
   try {
     assertKnownClassifierTarget(classification.decision, classification);
 
-    if (classification.decision.action === "match") {
+    if (
+      classification.decision.action === "match" ||
+      classification.decision.action === "repair_bottle"
+    ) {
       return {
         bottleId: classification.decision.matchedBottleId,
-        releaseId: classification.decision.matchedReleaseId,
+        releaseId:
+          classification.decision.action === "match"
+            ? classification.decision.matchedReleaseId
+            : null,
         source: "classifier_match",
         error: null,
       };

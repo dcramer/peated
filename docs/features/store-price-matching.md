@@ -206,6 +206,7 @@ It returns a reviewed classification result with:
 When `status = classified`, the decision must be one of:
 
 - `match`
+- `repair_bottle`
 - `create_bottle`
 - `create_release`
 - `create_bottle_and_release`
@@ -214,6 +215,7 @@ When `status = classified`, the decision must be one of:
 Additional rules:
 
 - `matchedBottleId` must be a known candidate bottle id when `action = match`
+- `matchedBottleId` must be the current known candidate bottle id when `action = repair_bottle`; the proposed bottle draft is a sparse repair draft and unknown fields must not clear existing bottle facts
 - `matchedReleaseId`, when present, must be a known candidate release id
 - `parentBottleId`, when present for release creation, must be a known candidate bottle id
 - `identityScope` is reviewed as `product | exact_cask`

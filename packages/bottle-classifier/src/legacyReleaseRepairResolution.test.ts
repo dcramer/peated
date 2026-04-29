@@ -46,6 +46,63 @@ describe("resolveLegacyCreateParentClassification", () => {
     });
   });
 
+  it("reuses a clean parent bottle for same-bottle repair decisions", () => {
+    const parentRows = [
+      buildLegacyReleaseRepairParentCandidate({
+        id: 620,
+        fullName: "Elijah Craig Barrel Proof",
+      }),
+    ];
+
+    const resolution = resolveLegacyCreateParentClassification({
+      classification: createDecidedBottleClassification({
+        decision: {
+          action: "repair_bottle",
+          candidateBottleIds: [620],
+          confidence: 94,
+          identityScope: "product",
+          matchedBottleId: 620,
+          matchedReleaseId: null,
+          observation: null,
+          parentBottleId: null,
+          proposedBottle: {
+            name: "Barrel Proof",
+            series: null,
+            category: "bourbon",
+            edition: null,
+            statedAge: null,
+            caskStrength: true,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: null,
+              name: "Elijah Craig",
+            },
+            distillers: [],
+            bottler: null,
+          },
+          proposedRelease: null,
+          rationale:
+            "Existing reusable parent is right, but facts need repair.",
+        },
+        artifacts: {},
+      }),
+      parentRows,
+    });
+
+    expect(resolution).toMatchObject({
+      resolution: "reuse_existing_parent",
+      parentBottle: {
+        id: 620,
+      },
+    });
+  });
+
   it("blocks exact-cask decisions", () => {
     const resolution = resolveLegacyCreateParentClassification({
       classification: createDecidedBottleClassification({

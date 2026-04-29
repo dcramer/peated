@@ -1,8 +1,8 @@
-import { z } from "zod";
 import {
   BottleSearchEvidenceSchema,
   type BottleSearchEvidence,
-} from "../schemas";
+} from "@peated/bottle-classifier/internal/types";
+import { z } from "zod";
 
 export const BottleWebSearchProviderSchema = z.enum(["openai", "brave"]);
 export type BottleWebSearchProvider = z.infer<

@@ -56,11 +56,17 @@ export function resolveLegacyCreateParentClassification<
     };
   }
 
-  if (decision.action === "match" || decision.action === "create_release") {
-    const parentBottleId =
-      decision.action === "match"
-        ? decision.matchedBottleId
-        : decision.parentBottleId;
+  if (
+    decision.action === "match" ||
+    decision.action === "repair_bottle" ||
+    decision.action === "create_release"
+  ) {
+    let parentBottleId: number;
+    if (decision.action === "create_release") {
+      parentBottleId = decision.parentBottleId;
+    } else {
+      parentBottleId = decision.matchedBottleId;
+    }
     const parentBottle =
       parentRows.find((row) => row.id === parentBottleId) ?? null;
 

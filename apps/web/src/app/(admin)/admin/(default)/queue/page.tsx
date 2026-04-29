@@ -95,6 +95,9 @@ export default function Page() {
   const createBottleMutation = useMutation(
     orpc.prices.matchQueue.createBottle.mutationOptions(),
   );
+  const applyBottleRepairMutation = useMutation(
+    orpc.prices.matchQueue.applyBottleRepair.mutationOptions(),
+  );
   const retryMutation = useMutation(
     orpc.prices.matchQueue.retry.mutationOptions(),
   );
@@ -122,6 +125,7 @@ export default function Page() {
   const { flash } = useFlashMessages();
   const isBusy =
     createBottleMutation.isPending ||
+    applyBottleRepairMutation.isPending ||
     resolveMutation.isPending ||
     retryMutation.isPending ||
     retryAllMutation.isPending ||
@@ -258,6 +262,22 @@ export default function Page() {
             </Link>
           </>
         ) : null}{" "}
+        for <strong className="font-bold">{item.price.name}</strong>
+      </div>,
+    );
+  }
+
+  async function handleApplyBottleRepair(item: QueueItem): Promise<void> {
+    const bottle = await applyBottleRepairMutation.mutateAsync({
+      proposal: item.id,
+    });
+    await refreshQueueList();
+    flash(
+      <div>
+        Applied repair to{" "}
+        <Link href={`/bottles/${bottle.id}`} className="underline">
+          {bottle.fullName}
+        </Link>{" "}
         for <strong className="font-bold">{item.price.name}</strong>
       </div>,
     );
@@ -484,6 +504,7 @@ export default function Page() {
               returnTo={returnTo}
               onApproveMatch={handleApproveMatch}
               onApplyCreateProposal={handleApplyCreateProposal}
+              onApplyBottleRepair={handleApplyBottleRepair}
               onChooseBottle={(nextProposal) => {
                 setSelectedProposal(nextProposal);
               }}

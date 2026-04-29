@@ -1,10 +1,13 @@
 import { tool } from "@openai/agents";
 import {
+  BottleCandidateSchema,
+  type BottleCandidate,
+} from "@peated/bottle-classifier/internal/types";
+import {
   BottleCandidateSearchInputSchema,
   searchBottleCandidates,
 } from "@peated/server/lib/bottleReferenceCandidates";
 import { z } from "zod";
-import { BottleCandidateSchema, type BottleCandidate } from "../schemas";
 
 const SearchBottlesResultSchema = z.object({
   results: z.array(BottleCandidateSchema),

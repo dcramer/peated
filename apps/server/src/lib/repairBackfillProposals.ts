@@ -168,7 +168,7 @@ function getRepairBackfillProposalActionability(
     : "blocked";
 }
 
-function isActionableReleaseRepairCandidate(
+export function isActionableReleaseRepairCandidate(
   candidate: LegacyReleaseRepairCandidate,
 ): candidate is LegacyReleaseRepairCandidate & {
   repairMode: "create_parent" | "existing_parent";
@@ -179,7 +179,7 @@ function isActionableReleaseRepairCandidate(
   );
 }
 
-function isAutomationEligibleReleaseRepairCandidate(
+export function isAutomationEligibleReleaseRepairCandidate(
   candidate: LegacyReleaseRepairCandidate,
 ): candidate is LegacyReleaseRepairCandidate & {
   repairMode: "existing_parent";
@@ -251,7 +251,7 @@ function getAgeRepairProposalAutomationAssessment(
   };
 }
 
-function isAutomationEligibleAgeRepairCandidate(
+export function isAutomationEligibleAgeRepairCandidate(
   candidate: DirtyParentAgeRepairCandidate,
 ): candidate is DirtyParentAgeRepairCandidate & {
   repairMode: "existing_release";

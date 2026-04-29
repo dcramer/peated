@@ -3860,4 +3860,131 @@ describe("createBottleClassifier", () => {
       },
     });
   });
+
+  test("keeps first-class same-bottle repair decisions", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "The Whistler",
+      bottler: null,
+      expression: "Bodega Cask",
+      series: null,
+      distillery: ["Boann Distillery"],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const currentBottleCandidate: BottleCandidate = {
+      bottleId: 1201,
+      releaseId: null,
+      kind: "bottle",
+      alias: "The Whistler Bodega Cask",
+      fullName: "The Whistler Bodega Cask",
+      bottleFullName: "The Whistler Bodega Cask",
+      brand: "The Whistler",
+      bottler: null,
+      series: null,
+      distillery: [],
+      category: "blend",
+      statedAge: null,
+      edition: null,
+      caskStrength: null,
+      singleCask: null,
+      abv: null,
+      vintageYear: null,
+      releaseYear: null,
+      caskType: null,
+      caskSize: null,
+      caskFill: null,
+      score: 0.99,
+      source: ["exact"],
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "repair_bottle",
+          confidence: 92,
+          rationale:
+            "The bottle identity matches, but the stored distillery and category are wrong.",
+          candidateBottleIds: [currentBottleCandidate.bottleId],
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: currentBottleCandidate.bottleId,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          proposedBottle: {
+            name: "Bodega Cask",
+            series: null,
+            category: "single_malt",
+            edition: null,
+            statedAge: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: null,
+              name: "The Whistler",
+            },
+            distillers: [
+              {
+                id: null,
+                name: "Boann Distillery",
+              },
+            ],
+            bottler: null,
+          },
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [currentBottleCandidate],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "The Whistler Bodega Cask Single Malt",
+      },
+      extractedIdentity,
+      initialCandidates: [currentBottleCandidate],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "repair_bottle",
+      matchedBottleId: currentBottleCandidate.bottleId,
+      matchedReleaseId: null,
+      proposedBottle: {
+        name: "Bodega Cask",
+        category: "single_malt",
+        distillers: [
+          {
+            name: "Boann Distillery",
+          },
+        ],
+      },
+    });
+  });
 });
