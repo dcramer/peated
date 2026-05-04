@@ -192,12 +192,12 @@ pnpm --filter @peated/bottle-classifier evals
 `pnpm evals` is the intended repo-root entrypoint. It forwards extra Vitest args
 to the package runner and uses the `vitest-evals` reporter configured in
 [`vitest.evals.config.mts`](./vitest.evals.config.mts).
-The eval command loads the repo-root `.env` and then `.env.local`, with later
-files overriding earlier ones. `OPENAI_API_KEY` is required. `OPENAI_MODEL`
-defaults to `gpt-5.4` for the classifier pass. `OPENAI_EVAL_MODEL` defaults to
-`gpt-5-mini` for judging so routine evals stay cheaper by default; override
-either if you want a different cost or quality tradeoff. `BRAVE_API_KEY` is
-optional.
+The eval config loads the repo-root `.env` and then `.env.local`, with later
+files overriding earlier ones. Shell-provided env vars still take precedence.
+`OPENAI_API_KEY` is required. `OPENAI_MODEL` defaults to `gpt-5.4` for the
+classifier pass. `OPENAI_EVAL_MODEL` defaults to `gpt-5-mini` for judging so
+routine evals stay cheaper by default; override either if you want a different
+cost or quality tradeoff. `BRAVE_API_KEY` is optional.
 
 The live evals use `vitest-evals` harness-style `run(...)` tests with
 `@vitest-evals/harness-openai-agents` normalization, native harness
