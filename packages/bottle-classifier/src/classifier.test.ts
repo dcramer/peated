@@ -909,7 +909,7 @@ const lagavulinDistillersEdition2023AutumnReleaseCandidate: BottleCandidate = {
 };
 
 describe("createBottleClassifier", () => {
-  test("rebuilds search artifacts from replayed OpenAI Agents tool output", async () => {
+  test("rebuilds search artifacts from OpenAI Agents tool output", async () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
         client: {} as OpenAI,
@@ -927,7 +927,7 @@ describe("createBottleClassifier", () => {
         initialCandidates: [],
       },
     );
-    const replayedEvidence = {
+    const webSearchEvidence = {
       provider: "openai",
       query: "Ardbeg Uigeadail official",
       summary: "Official producer evidence for Ardbeg Uigeadail.",
@@ -962,13 +962,13 @@ describe("createBottleClassifier", () => {
           rawItem: {
             type: "function_call_result",
             name: "openai_web_search",
-            output: JSON.stringify(replayedEvidence),
+            output: JSON.stringify(webSearchEvidence),
           },
         },
       ],
     });
 
-    expect(reasoning.artifacts.searchEvidence).toEqual([replayedEvidence]);
+    expect(reasoning.artifacts.searchEvidence).toEqual([webSearchEvidence]);
   });
 
   test("auto ignores obvious non-whisky references when extraction fails", async () => {
