@@ -1,0 +1,3 @@
+# Eval recordings are committed for local replay, not published runtime data.
+eval-cassettes/
+.vitest-evals/
