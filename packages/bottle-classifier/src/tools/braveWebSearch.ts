@@ -1,18 +1,13 @@
 import { tool } from "@openai/agents";
 import { z } from "zod";
-import {
-  BottleSearchEvidenceSchema,
-  type BottleSearchEvidence,
-} from "../classifierTypes";
+import type { BottleSearchEvidence } from "../classifierTypes";
 import {
   BottleWebSearchArgsSchema,
-  BottleWebSearchErrorSchema,
   buildBottleSearchEvidence,
   compactBottleSearchEvidence,
   getResultDomain,
   summarizeSearchResults,
   type BottleWebSearchBudget,
-  type BottleWebSearchExecutionCache,
 } from "./sharedWebSearch";
 
 const BRAVE_WEB_SEARCH_TIMEOUT_MS = 8000;
@@ -34,16 +29,6 @@ const BraveWebSearchResponseSchema = z.object({
     .default({
       results: [],
     }),
-});
-
-const BraveWebSearchToolResultSchema = z.union([
-  BottleSearchEvidenceSchema,
-  BottleWebSearchErrorSchema,
-]);
-
-const BraveWebSearchToolCachePayloadSchema = z.object({
-  emittedEvidence: z.array(BottleSearchEvidenceSchema),
-  result: BraveWebSearchToolResultSchema,
 });
 
 export function extractBraveSearchEvidence(
@@ -70,12 +55,10 @@ export function extractBraveSearchEvidence(
 export function createBraveWebSearchTool({
   apiKey,
   budget,
-  cache,
   onEvidence,
 }: {
   apiKey: string;
   budget: BottleWebSearchBudget;
-  cache?: BottleWebSearchExecutionCache;
   onEvidence?: (evidence: BottleSearchEvidence) => void;
 }) {
   return tool({
@@ -88,38 +71,15 @@ export function createBraveWebSearchTool({
         return budget.getExhaustedError();
       }
 
-      const runLiveSearch = async () => {
-        const result = await runBraveWebSearch({
-          apiKey,
-          query: args.query,
-        });
-
-        return {
-          emittedEvidence:
-            "error" in result || result.results.length === 0 ? [] : [result],
-          result,
-        };
-      };
-      const cached = cache
-        ? await cache.execute({
-            key: {
-              toolName: "brave_web_search",
-              query: args.query,
-            },
-            schema: BraveWebSearchToolCachePayloadSchema,
-            live: runLiveSearch,
-          })
-        : await runLiveSearch();
-      const emittedEvidence = cached.emittedEvidence.map(
-        compactBottleSearchEvidence,
-      );
+      const result = await runBraveWebSearch({
+        apiKey,
+        query: args.query,
+      });
       const evidence =
-        "error" in cached.result
-          ? cached.result
-          : compactBottleSearchEvidence(cached.result);
+        "error" in result ? result : compactBottleSearchEvidence(result);
 
-      for (const emitted of emittedEvidence) {
-        onEvidence?.(emitted);
+      if (!("error" in evidence) && evidence.results.length > 0) {
+        onEvidence?.(evidence);
       }
 
       if ("error" in evidence) {

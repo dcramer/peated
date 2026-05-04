@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-04T20:44:22.808Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "SMWS 72.123 \"Big moves and subtle details\""
+  },
+  "output": {
+    "provider": "openai",
+    "query": "SMWS 72.123 \"Big moves and subtle details\"",
+    "summary": "SMWS **72.123 “Big moves and subtle details”** is a **Miltonduff** single malt bottled by **The Scotch Malt Whisky Society**. The official SMWS bottle page confirms it is **15 years old**, **58.7% ABV**, distilled **18 December 2009**, and listed with cask type **HTMC New Oak Barrel**; the tasting note also says it was",
+    "results": [
+      {
+        "title": "https://smws.com/big-moves-and-subtle-details/",
+        "url": "https://smws.com/big-moves-and-subtle-details/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.just-whisky.co.uk/product/miltonduff-15-years-old-2009-smws-72123-big-moves-and-subtle-details-1498579",
+        "url": "https://www.just-whisky.co.uk/product/miltonduff-15-years-old-2009-smws-72123-big-moves-and-subtle-details-1498579",
+        "domain": "just-whisky.co.uk",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://peated.com/bottles/43670",
+        "url": "https://peated.com/bottles/43670",
+        "domain": "peated.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.just-whisky.co.uk/product/miltonduff_15_years_old_2009_smws_72123_big_moves_and_subtle_details_1498579",
+        "url": "https://www.just-whisky.co.uk/product/miltonduff_15_years_old_2009_smws_72123_big_moves_and_subtle_details_1498579",
+        "domain": "just-whisky.co.uk",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://caskcartel.com/collections/scotch/products/miltonduff-15-year-old-2009-cask-72-123-the-scotch-malt-whisky-society-single-malt-scotch-whisky-700ml",
+        "url": "https://caskcartel.com/collections/scotch/products/miltonduff-15-year-old-2009-cask-72-123-the-scotch-malt-whisky-society-single-malt-scotch-whisky-700ml",
+        "domain": "caskcartel.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.com/archive?distillery_code=526_591&page=78",
+        "url": "https://smws.com/archive?distillery_code=526_591&page=78",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6d02064b305d51c26485a44a4116bbbb6db7dda4751eae13d581eaa639cc1388",
+    "mode": "record"
+  }
+}

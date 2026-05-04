@@ -1,0 +1,2 @@
+# Eval replay recordings are committed for local replay, not published runtime data.
+.vitest-evals/

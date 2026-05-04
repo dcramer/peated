@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-04T20:31:44.221Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Woodford Reserve Double Double Oaked\" official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Woodford Reserve Double Double Oaked\" official",
+    "summary": "**Official source found:** Woodford Reserve has an official product page for **Double Double Oaked**. It confirms this is a **double-barreled bourbon** that spends an **extended period in a second custom-crafted barrel** described as **deeply toasted and lightly charred**, and it lists the bottle at **90.4 proof**. The",
+    "results": [
+      {
+        "title": "Double Double Oaked - Woodford Reserve",
+        "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/",
+        "url": "https://www.woodfordreserve.com/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/en-au/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/en-au/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskeyshelf.com/woodford-reserve-double-oaked-review/",
+        "url": "https://www.thewhiskeyshelf.com/woodford-reserve-double-oaked-review/",
+        "domain": "thewhiskeyshelf.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://secretwhiskeysociety.com/woodford-reserve-double-oaked-review/",
+        "url": "https://secretwhiskeysociety.com/woodford-reserve-double-oaked-review/",
+        "domain": "secretwhiskeysociety.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Woodford Reserve Double Double Oaked Bourbon (2025) Review & Rating | VinePair",
+        "url": "https://vinepair.com/review/woodford-reserve-double-double-oaked-bourbon/",
+        "domain": "vinepair.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "c8843a4509b2b7106cf44d653f42a1f92a0e6ce484a2082b4e3cf9cb6e2015c2",
+    "mode": "record"
+  }
+}

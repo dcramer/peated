@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-04T20:41:27.875Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Wild Turkey Rare Breed Rye official barrel proof"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Wild Turkey Rare Breed Rye official barrel proof",
+    "summary": "Yes — **Wild Turkey Rare Breed Rye is officially marketed as barrel proof**. On Wild Turkey’s own product page, it’s described as a **“barrel proof” rye whiskey** and as **“uncut and non-chill filtered.”** ([wildturkeybourbon.com](https://www.wildturkeybourbon.com/products/rare-breed-rye/?utm_source=openai))\n\nIndepende",
+    "results": [
+      {
+        "title": "https://www.ryecentral.com/products/wild-turkey-rare-breed-barrel-proof-rye-whiskey-review",
+        "url": "https://www.ryecentral.com/products/wild-turkey-rare-breed-barrel-proof-rye-whiskey-review",
+        "domain": "ryecentral.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "url": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/wild-turkey-rare-breed-barrel-proof-whisky-review-11997",
+        "url": "https://www.connosr.com/wild-turkey-rare-breed-barrel-proof-whisky-review-11997",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.barrelbanter.com/reviews/wild-turkey-rare-breed-rye",
+        "url": "https://www.barrelbanter.com/reviews/wild-turkey-rare-breed-rye",
+        "domain": "barrelbanter.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskyrant.com/wild-turkey-rare-breed-barrel-proof/",
+        "url": "https://www.whiskyrant.com/wild-turkey-rare-breed-barrel-proof/",
+        "domain": "whiskyrant.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "dfb31c966096f0430bda1ce38041d2c627026c3facbae065a740213c640e0597",
+    "mode": "record"
+  }
+}

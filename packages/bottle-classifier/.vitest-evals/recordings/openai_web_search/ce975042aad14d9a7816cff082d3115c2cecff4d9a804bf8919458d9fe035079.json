@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-04T20:33:56.961Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Glenglassaugh 1978 Rare Cask Release Batch 1 35 year official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Glenglassaugh 1978 Rare Cask Release Batch 1 35 year official",
+    "summary": "I found that **“Glenglassaugh 1978 Rare Cask Release Batch 1 35 year official” is not a single unique bottle name by itself**. In Batch 1, there were at least **two official distillery bottlings** matching that description, both distilled in **1978**, bottled at **35 years old**, and released as **Rare Cask Release – B",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/53801/glenglassaugh-1978?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/53801/glenglassaugh-1978?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/53799/glenglassaugh-1978?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/53799/glenglassaugh-1978?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/market/whisky/381104",
+        "url": "https://www.whiskybase.com/market/whisky/381104",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/151/whiskies",
+        "url": "https://www.whiskybase.com/whiskies/distillery/151/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky-online.com/products/glenglassaugh-1978-2014-35-year-old-rare-cask-release-single-cask-1803",
+        "url": "https://www.whisky-online.com/products/glenglassaugh-1978-2014-35-year-old-rare-cask-release-single-cask-1803",
+        "domain": "whisky-online.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/151/whiskies?language=en",
+        "url": "https://www.whiskybase.com/whiskies/distillery/151/whiskies?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "ce975042aad14d9a7816cff082d3115c2cecff4d9a804bf8919458d9fe035079",
+    "mode": "record"
+  }
+}

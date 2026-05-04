@@ -1,6 +1,7 @@
-import OpenAI from "openai";
+import { openaiAgentsHarness } from "@vitest-evals/harness-openai-agents";
 import { zodTextFormat } from "openai/helpers/zod";
-import { describeEval } from "vitest-evals";
+import { describeEval, namedJudge, type JudgeContext } from "vitest-evals";
+import { toJsonValue } from "vitest-evals/harness";
 import { z } from "zod";
 import type {
   ClassifierEvalCase,
@@ -11,29 +12,33 @@ import {
   type ClassifierScenarioEvalCase,
   type LiveClassifierEvalScenario,
 } from "./classifier.eval.scenarios";
-import { createBottleClassifier } from "./classifierRuntime";
-import type { BottleCandidate } from "./classifierTypes";
-import type { BottleClassificationResult } from "./contract";
-import { createEvalWebSearchCache } from "./evalWebSearchCache";
 import {
-  DEFAULT_OPENAI_EVAL_MODEL,
-  DEFAULT_OPENAI_MODEL,
-  getDeterministicOpenAISettings,
-} from "./openaiModelSettings";
+  createBottleClassifier,
+  prepareBottleClassifierAgentRun,
+  type PreparedBottleClassifierAgentRun,
+} from "./classifierRuntime";
+import type { BottleCandidate } from "./classifierTypes";
+import {
+  BottleClassificationResultSchema,
+  ClassifyBottleReferenceInputSchema,
+  buildBottleClassificationArtifacts,
+  createDecidedBottleClassification,
+  type BottleClassificationResult,
+} from "./contract";
+import {
+  createEvalClassifierOptions,
+  createEvalOpenAIClient,
+  evalJudgeModel,
+  getEvalJudgeModelSettings,
+  promptEvalJudgeModel,
+} from "./evalSupport";
 import { isExistingMatchConfidenceEligibleForVerification } from "./priceMatchingEvidence";
 import type { RealWorldNewBottleEvalCase } from "./realWorldNewBottleEval.fixtures";
-
-const classifierModel = process.env.OPENAI_MODEL ?? DEFAULT_OPENAI_MODEL;
-const judgeModel = process.env.OPENAI_EVAL_MODEL ?? DEFAULT_OPENAI_EVAL_MODEL;
-const evalWebSearchCache = createEvalWebSearchCache();
-
-function serializeEvalCase(testCase: ClassifierScenarioEvalCase): string {
-  return JSON.stringify(testCase);
-}
-
-function parseEvalCase(value: string): ClassifierScenarioEvalCase {
-  return JSON.parse(value) as ClassifierScenarioEvalCase;
-}
+import {
+  finalizeBottleReferenceClassification,
+  getAutoIgnoreBottleReferenceReason,
+} from "./reviewPolicy";
+import { buildDefaultBottleSearchInput } from "./runtime/agentInput";
 
 function getScenarioEvalName(testCase: ClassifierScenarioEvalCase): string {
   return testCase.testCase.input.reference.name;
@@ -45,15 +50,6 @@ function getScenarioEvalSummary(testCase: ClassifierScenarioEvalCase): string {
   }
 
   return testCase.testCase.expected.summary;
-}
-
-function createOpenAIClient() {
-  return new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    baseURL: process.env.OPENAI_HOST,
-    organization: process.env.OPENAI_ORGANIZATION,
-    project: process.env.OPENAI_PROJECT,
-  });
 }
 
 type SearchFixtureCase = {
@@ -150,10 +146,6 @@ function describeClassificationResult(
   };
 }
 
-function parseClassificationResult(output: string): BottleClassificationResult {
-  return JSON.parse(output) as BottleClassificationResult;
-}
-
 function deepContainsSubset(actual: unknown, expected: unknown): boolean {
   if (expected === null || typeof expected !== "object") {
     return Object.is(actual, expected);
@@ -241,6 +233,15 @@ function describeNormalizationResult(
         : null,
     matchedCandidateName: matchedCandidate?.fullName ?? null,
   };
+}
+
+function describeScenarioOutput(
+  testCase: ClassifierScenarioEvalCase,
+  result: BottleClassificationResult,
+): Record<string, unknown> {
+  return testCase.kind === "new_bottle_fixture"
+    ? describeNormalizationResult(result)
+    : describeClassificationResult(testCase.testCase, result);
 }
 
 function scoreDecisionShape(
@@ -357,10 +358,10 @@ async function judgeDecisionCase(
   testCase: ClassifierEvalCase,
   result: BottleClassificationResult,
 ) {
-  const client = createOpenAIClient();
+  const client = createEvalOpenAIClient();
   const verifyEligible = getDerivedVerifyEligibility(testCase, result);
   const response = await client.responses.create({
-    model: judgeModel!,
+    model: evalJudgeModel,
     instructions: [
       "You are judging a whisky bottle classifier evaluation.",
       "Score from 0.0 to 1.0.",
@@ -393,7 +394,7 @@ async function judgeDecisionCase(
     text: {
       format: zodTextFormat(JudgeSchema, "ClassifierEvalJudgement"),
     },
-    ...getDeterministicOpenAISettings(judgeModel!),
+    ...getEvalJudgeModelSettings(),
   });
 
   return JudgeSchema.parse(JSON.parse(response.output_text));
@@ -403,10 +404,10 @@ async function judgeNormalizationCase(
   testCase: RealWorldNewBottleEvalCase,
   result: BottleClassificationResult,
 ) {
-  const client = createOpenAIClient();
+  const client = createEvalOpenAIClient();
   const describedResult = describeNormalizationResult(result);
   const response = await client.responses.create({
-    model: judgeModel!,
+    model: evalJudgeModel,
     instructions: [
       "You are judging a whisky bottle normalization evaluation.",
       "Score from 0.0 to 1.0.",
@@ -444,56 +445,16 @@ async function judgeNormalizationCase(
     text: {
       format: zodTextFormat(JudgeSchema, "NormalizationCorpusEvalJudgement"),
     },
-    ...getDeterministicOpenAISettings(judgeModel!),
+    ...getEvalJudgeModelSettings(),
   });
 
   return JudgeSchema.parse(JSON.parse(response.output_text));
 }
 
-function createShapeScorer() {
-  return async ({
-    input,
-    output,
-  }: {
-    input: string;
-    output: string;
-    expected: unknown;
-  }) => {
-    const testCase = parseEvalCase(input);
-    const result = parseClassificationResult(output);
-
-    return {
-      score:
-        testCase.kind === "new_bottle_fixture"
-          ? scoreNormalizationShape(testCase.testCase, result)
-          : scoreDecisionShape(testCase.testCase, result),
-    };
-  };
-}
-
-function createJudgeScorer() {
-  return async ({
-    input,
-    output,
-  }: {
-    input: string;
-    output: string;
-    expected: unknown;
-  }) => {
-    const testCase = parseEvalCase(input);
-    const result = parseClassificationResult(output);
-    const judgement =
-      testCase.kind === "new_bottle_fixture"
-        ? await judgeNormalizationCase(testCase.testCase, result)
-        : await judgeDecisionCase(testCase.testCase, result);
-
-    return {
-      score: judgement.score,
-      metadata: {
-        rationale: judgement.reasoning,
-      },
-    };
-  };
+function parseClassificationRunOutput(
+  output: unknown,
+): BottleClassificationResult {
+  return BottleClassificationResultSchema.parse(output);
 }
 
 function buildClassifierAdapters(testCase: ClassifierScenarioEvalCase) {
@@ -519,22 +480,187 @@ function buildClassifierAdapters(testCase: ClassifierScenarioEvalCase) {
   };
 }
 
-async function runScenarioEvalCase(testCase: ClassifierScenarioEvalCase) {
-  const classifier = createBottleClassifier({
-    client: createOpenAIClient(),
-    model: classifierModel!,
-    maxSearchQueries: Number(
-      process.env.BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES ?? 3,
-    ),
-    braveApiKey: process.env.BRAVE_API_KEY ?? null,
-    adapters: buildClassifierAdapters(testCase),
-    overrides: {
-      webSearchCache: evalWebSearchCache,
-    },
+function createClassifierOptions(testCase: ClassifierScenarioEvalCase) {
+  return createEvalClassifierOptions(buildClassifierAdapters(testCase));
+}
+
+type PreparedScenarioClassifierRun = {
+  agentRun: PreparedBottleClassifierAgentRun;
+  classifyAgentResult: (result: unknown) => BottleClassificationResult;
+};
+
+async function prepareScenarioClassifierRun(
+  testCase: ClassifierScenarioEvalCase,
+): Promise<PreparedScenarioClassifierRun> {
+  const options = createClassifierOptions(testCase);
+  const classifier = createBottleClassifier(options);
+  const parsedInput = ClassifyBottleReferenceInputSchema.parse(
+    testCase.testCase.input,
+  );
+  const extractedIdentity =
+    parsedInput.extractedIdentity !== undefined
+      ? parsedInput.extractedIdentity
+      : await classifier.extractBottleReferenceIdentity(parsedInput.reference);
+  const initialArtifacts = buildBottleClassificationArtifacts({
+    extractedIdentity,
+  });
+  const autoIgnoreReason = getAutoIgnoreBottleReferenceReason(
+    parsedInput.reference.name,
+    initialArtifacts.extractedIdentity,
+  );
+
+  if (autoIgnoreReason) {
+    throw new Error(
+      `Native replay evals require the classifier agent path, but ${parsedInput.reference.name} was auto-ignored: ${autoIgnoreReason}`,
+    );
+  }
+
+  const candidates =
+    parsedInput.initialCandidates ??
+    (options.adapters.findInitialCandidates
+      ? await options.adapters.findInitialCandidates({
+          reference: parsedInput.reference,
+          extractedIdentity,
+        })
+      : await options.adapters.searchBottles(
+          buildDefaultBottleSearchInput({
+            reference: parsedInput.reference,
+            extractedIdentity,
+          }),
+        ));
+  const artifacts = buildBottleClassificationArtifacts({
+    extractedIdentity,
+    candidates,
   });
 
-  return classifier.classifyBottleReference(testCase.testCase.input);
+  const agentRun = await prepareBottleClassifierAgentRun(options, {
+    reference: parsedInput.reference,
+    extractedIdentity: artifacts.extractedIdentity,
+    initialCandidates: artifacts.candidates,
+    candidateExpansion: parsedInput.candidateExpansion,
+  });
+
+  return {
+    agentRun,
+    classifyAgentResult: (result) => {
+      const reasoning = agentRun.getReasoningResult(result);
+      const decision = finalizeBottleReferenceClassification({
+        reference: parsedInput.reference,
+        decision: reasoning.decision,
+        artifacts: reasoning.artifacts,
+      });
+
+      return BottleClassificationResultSchema.parse(
+        createDecidedBottleClassification({
+          decision,
+          artifacts: reasoning.artifacts,
+        }),
+      );
+    },
+  };
 }
+
+type ClassifierHarnessMetadata = {
+  summary: string;
+};
+
+const preparedClassifierRuns = new WeakMap<
+  ClassifierScenarioEvalCase,
+  Promise<PreparedScenarioClassifierRun>
+>();
+
+function getPreparedClassifierRun(input: ClassifierScenarioEvalCase) {
+  let preparedRun = preparedClassifierRuns.get(input);
+  if (!preparedRun) {
+    preparedRun = prepareScenarioClassifierRun(input);
+    preparedClassifierRuns.set(input, preparedRun);
+  }
+
+  return preparedRun;
+}
+
+const classifierHarness = openaiAgentsHarness<
+  PreparedBottleClassifierAgentRun["agent"],
+  ClassifierScenarioEvalCase,
+  ClassifierHarnessMetadata,
+  PreparedBottleClassifierAgentRun["runner"],
+  BottleClassificationResult
+>({
+  name: "bottle-classifier",
+  createAgent: async ({ input }) =>
+    (await getPreparedClassifierRun(input)).agentRun.agent,
+  createRunner: async ({ input }) =>
+    (await getPreparedClassifierRun(input)).agentRun.runner,
+  prompt: promptEvalJudgeModel,
+  runOptions: async ({ input }) => {
+    const { maxTurns } = (await getPreparedClassifierRun(input)).agentRun
+      .runOptions;
+    return {
+      maxTurns,
+      stream: false,
+    };
+  },
+  run: async ({ agent, input, runner, runOptions }) => {
+    if (!runner) {
+      throw new Error("Classifier eval runner was not prepared.");
+    }
+
+    const preparedRun = await getPreparedClassifierRun(input);
+    const result = await runner.run(agent, preparedRun.agentRun.input, {
+      ...runOptions,
+      stream: false,
+    });
+
+    return preparedRun.classifyAgentResult(result);
+  },
+  toolReplay: {
+    openai_web_search: true,
+    brave_web_search: true,
+  },
+  normalize: {
+    output: ({ result }) => toJsonValue(result) ?? null,
+    outputText: ({ input, result }) =>
+      JSON.stringify(describeScenarioOutput(input, result), null, 2),
+  },
+});
+
+type ClassifierJudgeContext = JudgeContext<
+  ClassifierScenarioEvalCase,
+  ClassifierHarnessMetadata,
+  typeof classifierHarness
+>;
+
+const ClassifierShapeJudge = namedJudge<ClassifierJudgeContext>(
+  "ClassifierShapeJudge",
+  ({ inputValue, run }) => {
+    const result = parseClassificationRunOutput(run.output);
+
+    return {
+      score:
+        inputValue.kind === "new_bottle_fixture"
+          ? scoreNormalizationShape(inputValue.testCase, result)
+          : scoreDecisionShape(inputValue.testCase, result),
+    };
+  },
+);
+
+const ClassifierRubricJudge = namedJudge<ClassifierJudgeContext>(
+  "ClassifierRubricJudge",
+  async ({ inputValue, run }) => {
+    const result = parseClassificationRunOutput(run.output);
+    const judgement =
+      inputValue.kind === "new_bottle_fixture"
+        ? await judgeNormalizationCase(inputValue.testCase, result)
+        : await judgeDecisionCase(inputValue.testCase, result);
+
+    return {
+      score: judgement.score,
+      metadata: {
+        rationale: judgement.reasoning,
+      },
+    };
+  },
+);
 
 const SCENARIO_CONFIG: Array<{
   label: string;
@@ -559,25 +685,28 @@ const SCENARIO_CONFIG: Array<{
 ];
 
 for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
-  describeEval(label, {
-    skipIf: () => !process.env.OPENAI_API_KEY,
-    timeout: 300000,
-    data: async () =>
-      getClassifierLiveEvalCases(scenario).map((testCase) => ({
-        name: getScenarioEvalName(testCase),
-        input: serializeEvalCase(testCase),
-        expected: {
-          summary: getScenarioEvalSummary(testCase),
-        },
-      })),
-    task: async (serializedTestCase: string) => {
-      const testCase = parseEvalCase(serializedTestCase);
-
-      return {
-        result: JSON.stringify(await runScenarioEvalCase(testCase)),
-      };
+  describeEval(
+    label,
+    {
+      skipIf: () => !process.env.OPENAI_API_KEY,
+      harness: classifierHarness,
+      judges: [ClassifierShapeJudge, ClassifierRubricJudge],
+      judgeThreshold: threshold,
     },
-    scorers: [createShapeScorer(), createJudgeScorer()],
-    threshold,
-  });
+    (it) => {
+      const cases = getClassifierLiveEvalCases(scenario).map((testCase) => ({
+        name: getScenarioEvalName(testCase),
+        summary: getScenarioEvalSummary(testCase),
+        testCase,
+      }));
+
+      it.for(cases)("$name", async ({ testCase, summary }, { run }) => {
+        await run(testCase, {
+          metadata: {
+            summary,
+          },
+        });
+      });
+    },
+  );
 }

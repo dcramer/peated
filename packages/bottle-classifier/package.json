@@ -87,14 +87,13 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "evals": "sh -c 'if [ \"$1\" = \"--\" ]; then shift; fi; dotenv -e ../../.env -e ../../.env.local -- pnpm exec vitest run \"$@\" --config vitest.evals.config.mts' --",
-    "evals:web-cache:clear": "node ./scripts/clearEvalWebSearchCache.mjs",
+    "evals": "sh -c 'if [ \"$1\" = \"--\" ]; then shift; fi; pnpm exec vitest run \"$@\" --config vitest.evals.config.mts' --",
     "fixtures:validate": "vitest run --config vitest.config.mts src/evalFixtures.validate.test.ts",
     "test": "vitest run --config vitest.config.mts",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@openai/agents": "^0.6.0",
+    "@openai/agents": "^0.8.5",
     "@peated/tsconfig": "workspace:*",
     "openai": "^6.27.0",
     "zod": "catalog:"
@@ -105,7 +104,8 @@
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",
-    "vitest-evals": "^0.8.0"
+    "@vitest-evals/harness-openai-agents": "0.9.0-beta.3",
+    "vitest-evals": "0.9.0-beta.3"
   },
   "volta": {
     "extends": "../../package.json"

@@ -2,6 +2,7 @@ import type OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
 import {
   createBottleClassifier,
+  prepareBottleClassifierAgentRun,
   type RunBottleClassifierAgentInput,
 } from "./classifierRuntime";
 import type {
@@ -908,6 +909,68 @@ const lagavulinDistillersEdition2023AutumnReleaseCandidate: BottleCandidate = {
 };
 
 describe("createBottleClassifier", () => {
+  test("rebuilds search artifacts from OpenAI Agents tool output", async () => {
+    const preparedRun = await prepareBottleClassifierAgentRun(
+      {
+        client: {} as OpenAI,
+        model: "test-model",
+        maxSearchQueries: 2,
+        adapters: {
+          searchBottles: vi.fn(async () => []),
+        },
+      },
+      {
+        reference: {
+          name: "Ardbeg Uigeadail",
+        },
+        extractedIdentity: null,
+        initialCandidates: [],
+      },
+    );
+    const webSearchEvidence = {
+      provider: "openai",
+      query: "Ardbeg Uigeadail official",
+      summary: "Official producer evidence for Ardbeg Uigeadail.",
+      results: [
+        {
+          title: "Ardbeg Uigeadail",
+          url: "https://www.ardbeg.com/en-us/whisky/uigeadail",
+          domain: "ardbeg.com",
+          description: null,
+          extraSnippets: [],
+        },
+      ],
+    };
+
+    const reasoning = preparedRun.getReasoningResult({
+      finalOutput: {
+        action: "no_match",
+        confidence: 72,
+        rationale: "No local candidate was provided.",
+        candidateBottleIds: [],
+        identityScope: "product",
+        observation: null,
+        matchedBottleId: null,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: null,
+        proposedRelease: null,
+      },
+      newItems: [
+        {
+          type: "tool_call_output_item",
+          rawItem: {
+            type: "function_call_result",
+            name: "openai_web_search",
+            output: JSON.stringify(webSearchEvidence),
+          },
+        },
+      ],
+    });
+
+    expect(reasoning.artifacts.searchEvidence).toEqual([webSearchEvidence]);
+  });
+
   test("auto ignores obvious non-whisky references when extraction fails", async () => {
     const runBottleClassifierAgent = vi.fn();
     const searchBottles = vi.fn(async () => [] as BottleCandidate[]);

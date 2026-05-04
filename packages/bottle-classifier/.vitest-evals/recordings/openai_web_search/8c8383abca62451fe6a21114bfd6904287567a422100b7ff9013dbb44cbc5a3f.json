@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-04T20:26:30.860Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Cask Strength official Barrel Proof Heaven Hill"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Cask Strength official Barrel Proof Heaven Hill",
+    "summary": "The official current product name is **Elijah Craig Barrel Proof**, not “Cask Strength.” Heaven Hill’s official Elijah Craig page says it is a **Kentucky Straight Bourbon Whiskey** and that **each bottle is hand-labeled with its unique proof and batch number**, confirming that the number on the bottle is **proof**, not",
+    "results": [
+      {
+        "title": "https://elijahcraig.com/barrel-proof.php",
+        "url": "https://elijahcraig.com/barrel-proof.php",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shopbourbononline.com/elijah-craig-barrel-proof-review-2025/",
+        "url": "https://shopbourbononline.com/elijah-craig-barrel-proof-review-2025/",
+        "domain": "shopbourbononline.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskeyshelf.com/elijah-craig-barrel-proof/",
+        "url": "https://www.thewhiskeyshelf.com/elijah-craig-barrel-proof/",
+        "domain": "thewhiskeyshelf.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://breakingbourbon.com/review/elijah-craig-barrel-proof",
+        "url": "https://breakingbourbon.com/review/elijah-craig-barrel-proof",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://secretwhiskeysociety.com/elijah-craig-barrel-proof-batch-c923-review/",
+        "url": "https://secretwhiskeysociety.com/elijah-craig-barrel-proof-batch-c923-review/",
+        "domain": "secretwhiskeysociety.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://bourboninspector.com/elijah-craig-barrel-proof-review-b521/",
+        "url": "https://bourboninspector.com/elijah-craig-barrel-proof-review-b521/",
+        "domain": "bourboninspector.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "8c8383abca62451fe6a21114bfd6904287567a422100b7ff9013dbb44cbc5a3f",
+    "mode": "record"
+  }
+}

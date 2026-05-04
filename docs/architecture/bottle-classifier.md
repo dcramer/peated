@@ -192,7 +192,7 @@ The classifier contract is intentionally shaped for evals:
 That gives eval harnesses a stable place to score both the final decision and the intermediate evidence without reaching into price-matching persistence code.
 Classifier evals should also score confidence calibration for cases that are meant to remain review-only versus safe for downstream automatic verification.
 
-The current package-local eval harness lives in:
+The current package-local eval surface lives in:
 
 - `packages/bottle-classifier/src/classifier.eval.test.ts`
 - `packages/bottle-classifier/src/classifier.eval.scenarios.ts`
@@ -204,17 +204,21 @@ The current package-local eval harness lives in:
 - `packages/bottle-classifier/src/legacyReleaseRepairResolution.eval.test.ts`
 - `packages/bottle-classifier/src/legacyReleaseRepairResolution.eval.fixtures.ts`
 
+The live evals use `vitest-evals` harness-style `run(...)` tests with the
+`@vitest-evals/harness-openai-agents` adapter for normalized output, reporter
+metadata, named judges, and native harness `toolReplay` for classifier
+web-search tools.
+
 The main live classifier eval runner is organized around workflow scenarios
 instead of separate normalization-versus-classifier files:
 
 - `new bottles`
 - `match existing`
 - `corrections`
-- `ignore or reject`
 
 That grouped runner still uses the same classifier runtime and includes the
 real-world new-bottle boundary cases inside the `new bottles` scenario. The
-difference is organizational: one classifier-facing harness with shared cache,
+difference is organizational: one classifier-facing harness with shared replay,
 reporting, and scenario-level fixture grouping.
 
 Run it from the repo root with:
@@ -232,17 +236,16 @@ evals. It forwards extra Vitest args to the package runner and uses the
 
 Local setup for live evals:
 
-- put `OPENAI_API_KEY` in the repo-root `.env.local`
+- put `OPENAI_API_KEY` in the repo-root `.env` or `.env.local`
+- `vitest.evals.config.mts` loads `.env` and then `.env.local`; shell-provided env vars take precedence over both files
 - `OPENAI_MODEL` is optional for evals and defaults to `gpt-5.4` for the classifier pass
 - `OPENAI_EVAL_MODEL` is optional and defaults to `gpt-5-mini` for judging so routine evals stay cheaper; override it if you want a different cost/quality tradeoff
 - `OPENAI_HOST`, `OPENAI_ORGANIZATION`, and `OPENAI_PROJECT` are optional for proxy or non-default account routing
 - `BRAVE_API_KEY` is optional; without it the classifier still runs with OpenAI web search only
 - `BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES` is optional and defaults to `3`
-- classifier evals cache normalized web-search tool results under the committed `packages/bottle-classifier/eval-cassettes/web-search/` directory by default, with one JSON cassette per query under tool-specific subdirectories
-- cassette lookup uses canonical per-tool cache keys and remains backward-compatible with older key shapes so incidental cache-key cleanup does not invalidate committed fixtures
-- `BOTTLE_CLASSIFIER_EVAL_WEB_SEARCH_CACHE_MODE` controls the cassette behavior: `replay_or_record` by default, plus `replay_only`, `refresh`, or `live`
-- `BOTTLE_CLASSIFIER_EVAL_WEB_SEARCH_CACHE_DIR` overrides the cassette directory when needed
-- `pnpm evals:web-cache:clear` deletes recorded cassette files while keeping the committed cache root
+- classifier evals use `@vitest-evals/harness-openai-agents` native `toolReplay` for `openai_web_search` and `brave_web_search`
+- `VITEST_EVALS_REPLAY_DIR` defaults to the package-local upstream-style `packages/bottle-classifier/.vitest-evals/recordings/` directory through the eval Vitest config
+- `VITEST_EVALS_REPLAY_MODE` defaults to `auto`; use the upstream `strict`, `record`, or `off` modes when needed
 - `pnpm --filter @peated/bottle-classifier fixtures:validate` explicitly validates all JSON fixture files against the package schemas
 
 Notes:

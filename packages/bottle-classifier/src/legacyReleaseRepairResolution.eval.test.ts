@@ -1,95 +1,93 @@
-import OpenAI from "openai";
+import { openaiAgentsHarness } from "@vitest-evals/harness-openai-agents";
 import { zodTextFormat } from "openai/helpers/zod";
-import { describeEval } from "vitest-evals";
+import { describeEval, namedJudge, type JudgeContext } from "vitest-evals";
+import { toJsonValue } from "vitest-evals/harness";
 import { z } from "zod";
-import { createBottleClassifier } from "./classifierRuntime";
-import type { BottleClassificationResult } from "./contract";
-import { createEvalWebSearchCache } from "./evalWebSearchCache";
+import {
+  createBottleClassifier,
+  prepareBottleClassifierAgentRun,
+  type PreparedBottleClassifierAgentRun,
+} from "./classifierRuntime";
+import {
+  BottleClassificationResultSchema,
+  ClassifyBottleReferenceInputSchema,
+  buildBottleClassificationArtifacts,
+  createDecidedBottleClassification,
+} from "./contract";
+import {
+  createEvalClassifierOptions,
+  createEvalOpenAIClient,
+  evalJudgeModel,
+  getEvalJudgeModelSettings,
+  promptEvalJudgeModel,
+} from "./evalSupport";
 import { resolveLegacyCreateParentClassification } from "./legacyReleaseRepairResolution";
 import {
   LEGACY_RELEASE_REPAIR_RESOLUTION_EVAL_CASES,
   type LegacyReleaseRepairResolutionEvalCase,
 } from "./legacyReleaseRepairResolution.eval.fixtures";
 import {
-  DEFAULT_OPENAI_EVAL_MODEL,
-  DEFAULT_OPENAI_MODEL,
-  getDeterministicOpenAISettings,
-} from "./openaiModelSettings";
+  finalizeBottleReferenceClassification,
+  getAutoIgnoreBottleReferenceReason,
+} from "./reviewPolicy";
+import { buildDefaultBottleSearchInput } from "./runtime/agentInput";
 
-const classifierModel = process.env.OPENAI_MODEL ?? DEFAULT_OPENAI_MODEL;
-const judgeModel = process.env.OPENAI_EVAL_MODEL ?? DEFAULT_OPENAI_EVAL_MODEL;
-const evalWebSearchCache = createEvalWebSearchCache();
+const EvaluatedRepairResolutionSchema = z
+  .object({
+    classification: BottleClassificationResultSchema,
+    resolution: z.discriminatedUnion("resolution", [
+      z
+        .object({
+          resolution: z.literal("reuse_existing_parent"),
+          parentBottleId: z.number(),
+        })
+        .strict(),
+      z
+        .object({
+          resolution: z.literal("allow_create_parent"),
+        })
+        .strict(),
+      z
+        .object({
+          resolution: z.literal("blocked"),
+          blockedReason: z.string(),
+        })
+        .strict(),
+    ]),
+  })
+  .strict();
 
-type EvaluatedRepairResolution = {
-  classification: BottleClassificationResult;
-  resolution:
-    | {
-        parentBottleId: number;
-        resolution: "reuse_existing_parent";
-      }
-    | {
-        resolution: "allow_create_parent";
-      }
-    | {
-        blockedReason: string;
-        resolution: "blocked";
-      };
-};
+type EvaluatedRepairResolution = z.infer<
+  typeof EvaluatedRepairResolutionSchema
+>;
 
-function createOpenAIClient() {
-  return new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    baseURL: process.env.OPENAI_HOST,
-    organization: process.env.OPENAI_ORGANIZATION,
-    project: process.env.OPENAI_PROJECT,
-  });
+function parseRepairRunOutput(output: unknown): EvaluatedRepairResolution {
+  return EvaluatedRepairResolutionSchema.parse(output);
 }
 
-function serializeEvalCase(
-  testCase: LegacyReleaseRepairResolutionEvalCase,
-): string {
-  return JSON.stringify(testCase);
-}
+function scoreRepairShape(
+  result: EvaluatedRepairResolution,
+  expected: LegacyReleaseRepairResolutionEvalCase["expected"],
+) {
+  const checks = [result.resolution.resolution === expected.resolution];
 
-function parseEvalCase(value: string): LegacyReleaseRepairResolutionEvalCase {
-  return JSON.parse(value) as LegacyReleaseRepairResolutionEvalCase;
-}
+  if (
+    expected.resolution === "reuse_existing_parent" &&
+    result.resolution.resolution === "reuse_existing_parent"
+  ) {
+    checks.push(result.resolution.parentBottleId === expected.parentBottleId);
+  }
 
-function parseEvalResult(output: string): EvaluatedRepairResolution {
-  return JSON.parse(output) as EvaluatedRepairResolution;
-}
+  if (
+    expected.resolution === "blocked" &&
+    result.resolution.resolution === "blocked"
+  ) {
+    checks.push(result.resolution.blockedReason === expected.blockedReason);
+  }
 
-function createShapeScorer() {
-  return async ({
-    output,
-    expected,
-  }: {
-    output: string;
-    expected: LegacyReleaseRepairResolutionEvalCase["expected"];
-  }) => {
-    const result = parseEvalResult(output);
-    const checks = [result.resolution.resolution === expected.resolution];
-
-    if (
-      expected.resolution === "reuse_existing_parent" &&
-      result.resolution.resolution === "reuse_existing_parent"
-    ) {
-      checks.push(result.resolution.parentBottleId === expected.parentBottleId);
-    }
-
-    if (
-      expected.resolution === "blocked" &&
-      result.resolution.resolution === "blocked"
-    ) {
-      checks.push(result.resolution.blockedReason === expected.blockedReason);
-    }
-
-    return {
-      score:
-        checks.reduce((total, check) => total + (check ? 1 : 0), 0) /
-        checks.length,
-    };
-  };
+  return (
+    checks.reduce((total, check) => total + (check ? 1 : 0), 0) / checks.length
+  );
 }
 
 const JudgeSchema = z.object({
@@ -97,105 +95,134 @@ const JudgeSchema = z.object({
   reasoning: z.string().min(1),
 });
 
-function createJudgeScorer() {
-  return async ({
-    input,
-    output,
-    expected,
-  }: {
-    input: string;
-    output: string;
-    expected: LegacyReleaseRepairResolutionEvalCase["expected"];
-  }) => {
-    const client = createOpenAIClient();
-    const testCase = parseEvalCase(input);
-    const result = parseEvalResult(output);
-    const response = await client.responses.create({
-      model: judgeModel!,
-      instructions: [
-        "You are judging a whisky legacy release repair evaluation.",
-        "Score from 0.0 to 1.0.",
-        "Prioritize whether the classifier leads to the correct repair boundary: reuse an existing parent, allow create-parent, or block.",
-        "False-positive reuse is worse than conservative blocking.",
-        "Exact-cask bottles should block reusable-parent repair behavior.",
-        "Dirty release-like legacy bottles should not be treated as reusable clean parents.",
-        "Score the final repair resolution more heavily than the raw classifier rationale that preceded it.",
-        "If the adapter correctly blocks a dirty legacy bottle or exact-cask candidate, score that highly even when the underlying classifier initially matched the legacy row.",
-        "Return only the structured judgement.",
-      ].join("\n"),
-      input: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "input_text",
-              text: [
-                `Case: ${testCase.name}`,
-                `Reference: ${testCase.input.reference.name}`,
-                `Expected repair outcome: ${expected.summary}`,
-                `Expected structured outcome: ${JSON.stringify(expected, null, 2)}`,
-                `Actual evaluated output: ${JSON.stringify(result, null, 2)}`,
-              ].join("\n\n"),
-            },
-          ],
-        },
-      ],
-      text: {
-        format: zodTextFormat(
-          JudgeSchema,
-          "LegacyReleaseRepairResolutionEvalJudgement",
-        ),
+async function judgeRepairCase(
+  testCase: LegacyReleaseRepairResolutionEvalCase,
+  result: EvaluatedRepairResolution,
+) {
+  const client = createEvalOpenAIClient();
+  const response = await client.responses.create({
+    model: evalJudgeModel,
+    instructions: [
+      "You are judging a whisky legacy release repair evaluation.",
+      "Score from 0.0 to 1.0.",
+      "Prioritize whether the classifier leads to the correct repair boundary: reuse an existing parent, allow create-parent, or block.",
+      "False-positive reuse is worse than conservative blocking.",
+      "Exact-cask bottles should block reusable-parent repair behavior.",
+      "Dirty release-like legacy bottles should not be treated as reusable clean parents.",
+      "Score the final repair resolution more heavily than the raw classifier rationale that preceded it.",
+      "If the adapter correctly blocks a dirty legacy bottle or exact-cask candidate, score that highly even when the underlying classifier initially matched the legacy row.",
+      "Return only the structured judgement.",
+    ].join("\n"),
+    input: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "input_text",
+            text: [
+              `Case: ${testCase.name}`,
+              `Reference: ${testCase.input.reference.name}`,
+              `Expected repair outcome: ${testCase.expected.summary}`,
+              `Expected structured outcome: ${JSON.stringify(testCase.expected, null, 2)}`,
+              `Actual evaluated output: ${JSON.stringify(result, null, 2)}`,
+            ].join("\n\n"),
+          },
+        ],
       },
-      ...getDeterministicOpenAISettings(judgeModel!),
-    });
+    ],
+    text: {
+      format: zodTextFormat(
+        JudgeSchema,
+        "LegacyReleaseRepairResolutionEvalJudgement",
+      ),
+    },
+    ...getEvalJudgeModelSettings(),
+  });
 
-    const judgement = JudgeSchema.parse(JSON.parse(response.output_text));
-    return {
-      score: judgement.score,
-      metadata: {
-        rationale: judgement.reasoning,
-      },
-    };
-  };
+  return JudgeSchema.parse(JSON.parse(response.output_text));
 }
 
-describeEval("legacy release repair resolution", {
-  skipIf: () => !process.env.OPENAI_API_KEY,
-  timeout: 300000,
-  data: async () =>
-    LEGACY_RELEASE_REPAIR_RESOLUTION_EVAL_CASES.map((testCase) => ({
-      name: testCase.name,
-      input: serializeEvalCase(testCase),
-      expected: testCase.expected,
-    })),
-  task: async (serializedTestCase: string) => {
-    const testCase = parseEvalCase(serializedTestCase);
-    const classifier = createBottleClassifier({
-      client: createOpenAIClient(),
-      model: classifierModel!,
-      maxSearchQueries: Number(
-        process.env.BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES ?? 3,
-      ),
-      braveApiKey: process.env.BRAVE_API_KEY ?? null,
-      adapters: {
-        searchBottles: async () => [],
-        getBottleCandidateById: async () => null,
-      },
-      overrides: {
-        webSearchCache: evalWebSearchCache,
-      },
-    });
+function createClassifierOptions() {
+  return createEvalClassifierOptions({
+    searchBottles: async () => [],
+    getBottleCandidateById: async () => null,
+  });
+}
 
-    const classification = await classifier.classifyBottleReference(
-      testCase.input,
+type PreparedRepairResolutionRun = {
+  agentRun: PreparedBottleClassifierAgentRun;
+  evaluateAgentResult: (result: unknown) => EvaluatedRepairResolution;
+};
+
+async function prepareRepairResolutionEvalRun(
+  testCase: LegacyReleaseRepairResolutionEvalCase,
+): Promise<PreparedRepairResolutionRun> {
+  const options = createClassifierOptions();
+  const classifier = createBottleClassifier(options);
+  const parsedInput = ClassifyBottleReferenceInputSchema.parse(testCase.input);
+  const extractedIdentity =
+    parsedInput.extractedIdentity !== undefined
+      ? parsedInput.extractedIdentity
+      : await classifier.extractBottleReferenceIdentity(parsedInput.reference);
+  const initialArtifacts = buildBottleClassificationArtifacts({
+    extractedIdentity,
+  });
+  const autoIgnoreReason = getAutoIgnoreBottleReferenceReason(
+    parsedInput.reference.name,
+    initialArtifacts.extractedIdentity,
+  );
+
+  if (autoIgnoreReason) {
+    throw new Error(
+      `Native replay evals require the classifier agent path, but ${parsedInput.reference.name} was auto-ignored: ${autoIgnoreReason}`,
     );
-    const resolution = resolveLegacyCreateParentClassification({
-      classification,
-      parentRows: testCase.reviewedParentRows,
-    });
+  }
 
-    return {
-      result: JSON.stringify({
+  const candidates =
+    parsedInput.initialCandidates ??
+    (options.adapters.findInitialCandidates
+      ? await options.adapters.findInitialCandidates({
+          reference: parsedInput.reference,
+          extractedIdentity,
+        })
+      : await options.adapters.searchBottles(
+          buildDefaultBottleSearchInput({
+            reference: parsedInput.reference,
+            extractedIdentity,
+          }),
+        ));
+  const artifacts = buildBottleClassificationArtifacts({
+    extractedIdentity,
+    candidates,
+  });
+  const agentRun = await prepareBottleClassifierAgentRun(options, {
+    reference: parsedInput.reference,
+    extractedIdentity: artifacts.extractedIdentity,
+    initialCandidates: artifacts.candidates,
+    candidateExpansion: parsedInput.candidateExpansion,
+  });
+
+  return {
+    agentRun,
+    evaluateAgentResult: (result) => {
+      const reasoning = agentRun.getReasoningResult(result);
+      const decision = finalizeBottleReferenceClassification({
+        reference: parsedInput.reference,
+        decision: reasoning.decision,
+        artifacts: reasoning.artifacts,
+      });
+      const classification = BottleClassificationResultSchema.parse(
+        createDecidedBottleClassification({
+          decision,
+          artifacts: reasoning.artifacts,
+        }),
+      );
+      const resolution = resolveLegacyCreateParentClassification({
+        classification,
+        parentRows: testCase.reviewedParentRows,
+      });
+
+      return EvaluatedRepairResolutionSchema.parse({
         classification,
         resolution:
           resolution.resolution === "reuse_existing_parent"
@@ -211,9 +238,129 @@ describeEval("legacy release repair resolution", {
                   resolution: "blocked",
                   blockedReason: resolution.reason,
                 },
-      } satisfies EvaluatedRepairResolution),
+      });
+    },
+  };
+}
+
+type RepairHarnessMetadata = {
+  expected: LegacyReleaseRepairResolutionEvalCase["expected"];
+};
+
+const preparedRepairRuns = new WeakMap<
+  LegacyReleaseRepairResolutionEvalCase,
+  Promise<PreparedRepairResolutionRun>
+>();
+
+function getPreparedRepairRun(input: LegacyReleaseRepairResolutionEvalCase) {
+  let preparedRun = preparedRepairRuns.get(input);
+  if (!preparedRun) {
+    preparedRun = prepareRepairResolutionEvalRun(input);
+    preparedRepairRuns.set(input, preparedRun);
+  }
+
+  return preparedRun;
+}
+
+const repairHarness = openaiAgentsHarness<
+  PreparedBottleClassifierAgentRun["agent"],
+  LegacyReleaseRepairResolutionEvalCase,
+  RepairHarnessMetadata,
+  PreparedBottleClassifierAgentRun["runner"],
+  EvaluatedRepairResolution
+>({
+  name: "legacy-release-repair-resolution",
+  createAgent: async ({ input }) =>
+    (await getPreparedRepairRun(input)).agentRun.agent,
+  createRunner: async ({ input }) =>
+    (await getPreparedRepairRun(input)).agentRun.runner,
+  prompt: promptEvalJudgeModel,
+  runOptions: async ({ input }) => {
+    const { maxTurns } = (await getPreparedRepairRun(input)).agentRun
+      .runOptions;
+    return {
+      maxTurns,
+      stream: false,
     };
   },
-  scorers: [createShapeScorer(), createJudgeScorer()],
-  threshold: 0.7,
+  run: async ({ agent, input, runner, runOptions }) => {
+    if (!runner) {
+      throw new Error("Repair eval runner was not prepared.");
+    }
+
+    const preparedRun = await getPreparedRepairRun(input);
+    const result = await runner.run(agent, preparedRun.agentRun.input, {
+      ...runOptions,
+      stream: false,
+    });
+
+    return preparedRun.evaluateAgentResult(result);
+  },
+  toolReplay: {
+    openai_web_search: true,
+    brave_web_search: true,
+  },
+  normalize: {
+    output: ({ result }) => toJsonValue(result) ?? null,
+    outputText: ({ result }) => JSON.stringify(result, null, 2),
+  },
 });
+
+type RepairJudgeContext = JudgeContext<
+  LegacyReleaseRepairResolutionEvalCase,
+  RepairHarnessMetadata,
+  typeof repairHarness
+>;
+
+const RepairShapeJudge = namedJudge<RepairJudgeContext>(
+  "RepairShapeJudge",
+  ({ inputValue, run }) => ({
+    score: scoreRepairShape(
+      parseRepairRunOutput(run.output),
+      inputValue.expected,
+    ),
+  }),
+);
+
+const RepairRubricJudge = namedJudge<RepairJudgeContext>(
+  "RepairRubricJudge",
+  async ({ inputValue, run }) => {
+    const judgement = await judgeRepairCase(
+      inputValue,
+      parseRepairRunOutput(run.output),
+    );
+
+    return {
+      score: judgement.score,
+      metadata: {
+        rationale: judgement.reasoning,
+      },
+    };
+  },
+);
+
+describeEval(
+  "legacy release repair resolution",
+  {
+    skipIf: () => !process.env.OPENAI_API_KEY,
+    harness: repairHarness,
+    judges: [RepairShapeJudge, RepairRubricJudge],
+    judgeThreshold: 0.7,
+  },
+  (it) => {
+    const cases = LEGACY_RELEASE_REPAIR_RESOLUTION_EVAL_CASES.map(
+      (testCase) => ({
+        name: testCase.name,
+        testCase,
+      }),
+    );
+
+    it.for(cases)("$name", async ({ testCase }, { run }) => {
+      await run(testCase, {
+        metadata: {
+          expected: testCase.expected,
+        },
+      });
+    });
+  },
+);

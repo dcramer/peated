@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-04T20:27:24.099Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Four Roses Single Barrel Barrel Strength official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Four Roses Single Barrel Barrel Strength official",
+    "summary": "If by **“Four Roses Single Barrel Barrel Strength”** you mean the **official Four Roses barrel-proof single barrel program**, the official/current naming appears to be **Four Roses Private Selection** rather than a permanent shelf item called exactly “Single Barrel Barrel Strength.” Four Roses’ official site emphasizes",
+    "results": [
+      {
+        "title": "https://www.connosr.com/four-roses-single-barrel-barrel-strength-whisky-review-11649",
+        "url": "https://www.connosr.com/four-roses-single-barrel-barrel-strength-whisky-review-11649",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/four-roses-single-barrel-whisky-review-12084",
+        "url": "https://www.connosr.com/four-roses-single-barrel-whisky-review-12084",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/four-roses-single-barrel-whisky-review-4943",
+        "url": "https://www.connosr.com/four-roses-single-barrel-whisky-review-4943",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.liquor.com/four-roses-single-barrel-bourbon-review-5219181",
+        "url": "https://www.liquor.com/four-roses-single-barrel-bourbon-review-5219181",
+        "domain": "liquor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.prnewswire.com/news-releases/four-roses-distillery-unveils-single-barrel-collection-honoring-20-years-of-single-barrel-excellence-302302588.html",
+        "url": "https://www.prnewswire.com/news-releases/four-roses-distillery-unveils-single-barrel-collection-honoring-20-years-of-single-barrel-excellence-302302588.html",
+        "domain": "prnewswire.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://secretwhiskeysociety.com/four-roses-single-barrel-review/",
+        "url": "https://secretwhiskeysociety.com/four-roses-single-barrel-review/",
+        "domain": "secretwhiskeysociety.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2d5820e82983ef51c5f19e7aee5ff4d644b428e71ef7d1675459ac6133d689f2",
+    "mode": "record"
+  }
+}
