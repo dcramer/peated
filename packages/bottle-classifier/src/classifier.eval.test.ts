@@ -2,7 +2,7 @@ import { openaiAgentsHarness } from "@vitest-evals/harness-openai-agents";
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { describeEval, namedJudge, type JudgeContext } from "vitest-evals";
-import { toJsonValue, type JsonValue } from "vitest-evals/harness";
+import { toJsonValue } from "vitest-evals/harness";
 import { z } from "zod";
 import type {
   ClassifierEvalCase,
@@ -622,19 +622,6 @@ function getPreparedClassifierRun(input: ClassifierScenarioEvalCase) {
   return preparedRun;
 }
 
-const webSearchToolReplay = {
-  openai_web_search: {
-    key: (args: JsonValue) => ({
-      args,
-      model: classifierModel,
-    }),
-    version: "bottle-classifier-web-search-v1",
-  },
-  brave_web_search: {
-    version: "bottle-classifier-web-search-v1",
-  },
-};
-
 const classifierHarness = openaiAgentsHarness<
   PreparedBottleClassifierAgentRun["agent"],
   ClassifierScenarioEvalCase,
@@ -669,7 +656,10 @@ const classifierHarness = openaiAgentsHarness<
 
     return preparedRun.classifyAgentResult(result);
   },
-  toolReplay: webSearchToolReplay,
+  toolReplay: {
+    openai_web_search: true,
+    brave_web_search: true,
+  },
   normalize: {
     output: ({ result }) => toJsonValue(result) ?? null,
     outputText: ({ input, result }) =>
