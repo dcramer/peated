@@ -612,8 +612,8 @@ importers:
   packages/bottle-classifier:
     dependencies:
       '@openai/agents':
-        specifier: ^0.6.0
-        version: 0.6.0(ws@8.18.3)(zod@4.3.6)
+        specifier: ^0.8.5
+        version: 0.8.5(ws@8.18.3)(zod@4.3.6)
       '@peated/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -627,6 +627,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 22.19.17
+      '@vitest-evals/harness-openai-agents':
+        specifier: 0.9.0-beta.3
+        version: 0.9.0-beta.3(@openai/agents@0.8.5(ws@8.18.3)(zod@4.3.6))(vitest-evals@0.9.0-beta.3(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6))
       tinyrainbow:
         specifier: ^2.0.0
         version: 2.0.0
@@ -640,8 +643,8 @@ importers:
         specifier: 'catalog:'
         version: 4.1.4(@opentelemetry/api@1.9.0)(@types/node@22.19.17)(@vitest/coverage-v8@4.1.4)(jsdom@25.0.1)(vite@8.0.8(@types/node@22.19.17)(esbuild@0.27.7)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.4.5))
       vitest-evals:
-        specifier: ^0.8.0
-        version: 0.8.0(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6)
+        specifier: 0.9.0-beta.3
+        version: 0.9.0-beta.3(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6)
 
   packages/catalog-verifier:
     dependencies:
@@ -2560,8 +2563,21 @@ packages:
       zod:
         optional: true
 
+  '@openai/agents-core@0.8.5':
+    resolution: {integrity: sha512-qs9mmN+D+UmqEZo3qrvhhIIXIOgSvJPic0v4a+ruq+eYgcQMk3PY8lLcsdQwJit6zf2Wyfv1q2cX5m3jzWZpKw==}
+    peerDependencies:
+      zod: ^4.0.0
+    peerDependenciesMeta:
+      zod:
+        optional: true
+
   '@openai/agents-openai@0.6.0':
     resolution: {integrity: sha512-NTNeC/ycwmEBUQYjmEIuU1qxMJU+ssnfsYwc7KVimk9Xl4rLnRAMnLSvbzNgfC/lYTSk7P8uAWfiBpINrCTBlA==}
+    peerDependencies:
+      zod: ^4.0.0
+
+  '@openai/agents-openai@0.8.5':
+    resolution: {integrity: sha512-cGYmyiVy8ecgf2Vch0L/ekeNo3xuZsuWnRsxyv+w9ai9dgxUifdEQ6G3dtsjMLtmXVHRVGoO7mVBr+tKcilntw==}
     peerDependencies:
       zod: ^4.0.0
 
@@ -2570,8 +2586,18 @@ packages:
     peerDependencies:
       zod: ^4.0.0
 
+  '@openai/agents-realtime@0.8.5':
+    resolution: {integrity: sha512-JqKVsR33OvKtTxRp5Ylhw8WfNvJ49ZIhlhMZlSVKqwR2Ks6JuxqFJ0zM9p7JIbTQDSlAZnmnZJv1qlItaildiQ==}
+    peerDependencies:
+      zod: ^4.0.0
+
   '@openai/agents@0.6.0':
     resolution: {integrity: sha512-1vDTpEu/hxqj4eHZx4cwRz8RKwhzWnJ1+mtIdFhBt20cqCaI3x8NzXB8bG6RPPPYKyWoqlSjDaDhXdauyr584A==}
+    peerDependencies:
+      zod: ^4.0.0
+
+  '@openai/agents@0.8.5':
+    resolution: {integrity: sha512-OFA7XVV1qXE8lzatvQj080KdSArt8utBExFXRfD5B/R7KT0D+AVaKwg6nLoW3Gxb30vRkIUQf+MaW/Wz+gO3Yg==}
     peerDependencies:
       zod: ^4.0.0
 
@@ -4377,6 +4403,12 @@ packages:
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       vite: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
+
+  '@vitest-evals/harness-openai-agents@0.9.0-beta.3':
+    resolution: {integrity: sha512-QFr4I2aGoaJYbWehaoL50G3Wtq+azeKsNtKe/nI65U+rgQbxAOI2xEBcEh5leW6lJMv54MPnzMXdquFV73lYSw==}
+    peerDependencies:
+      '@openai/agents': '>=0.8 <1'
+      vitest-evals: '*'
 
   '@vitest/coverage-v8@4.1.4':
     resolution: {integrity: sha512-x7FptB5oDruxNPDNY2+S8tCh0pcq7ymCe1gTHcsp733jYjrJl8V1gMUlVysuCD9Kz46Xz9t1akkv08dPcYDs1w==}
@@ -9217,8 +9249,8 @@ packages:
       yaml:
         optional: true
 
-  vitest-evals@0.8.0:
-    resolution: {integrity: sha512-R8vOth50ZdSBgFXqBmA0NtOgd1Qt5QB6seT+v9zF3V+7Har7WvpUcph1NaufqpiReINuG8ORLhbRbWqcb4milQ==}
+  vitest-evals@0.9.0-beta.3:
+    resolution: {integrity: sha512-XYv5uBk6fADGd/ZYZONUjxlquXAO0TDavm6xqbzPIu8P6gMuHrwtzvKqD3VqEpGzrRht4UTd95PTY7oxRKCgDg==}
     peerDependencies:
       ai: '>=4 <7'
       tinyrainbow: '>=2 <4'
@@ -11503,10 +11535,33 @@ snapshots:
       - supports-color
       - ws
 
+  '@openai/agents-core@0.8.5(ws@8.18.3)(zod@4.3.6)':
+    dependencies:
+      debug: 4.4.3
+      openai: 6.27.0(ws@8.18.3)(zod@4.3.6)
+    optionalDependencies:
+      '@modelcontextprotocol/sdk': 1.27.1(zod@4.3.6)
+      zod: 4.3.6
+    transitivePeerDependencies:
+      - '@cfworker/json-schema'
+      - supports-color
+      - ws
+
   '@openai/agents-openai@0.6.0(ws@8.18.3)(zod@4.3.6)':
     dependencies:
       '@openai/agents-core': 0.6.0(ws@8.18.3)(zod@4.3.6)
       debug: 4.4.1
+      openai: 6.27.0(ws@8.18.3)(zod@4.3.6)
+      zod: 4.3.6
+    transitivePeerDependencies:
+      - '@cfworker/json-schema'
+      - supports-color
+      - ws
+
+  '@openai/agents-openai@0.8.5(ws@8.18.3)(zod@4.3.6)':
+    dependencies:
+      '@openai/agents-core': 0.8.5(ws@8.18.3)(zod@4.3.6)
+      debug: 4.4.3
       openai: 6.27.0(ws@8.18.3)(zod@4.3.6)
       zod: 4.3.6
     transitivePeerDependencies:
@@ -11527,12 +11582,40 @@ snapshots:
       - supports-color
       - utf-8-validate
 
+  '@openai/agents-realtime@0.8.5(zod@4.3.6)':
+    dependencies:
+      '@openai/agents-core': 0.8.5(ws@8.18.3)(zod@4.3.6)
+      '@types/ws': 8.18.1
+      debug: 4.4.3
+      ws: 8.18.3
+      zod: 4.3.6
+    transitivePeerDependencies:
+      - '@cfworker/json-schema'
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
   '@openai/agents@0.6.0(ws@8.18.3)(zod@4.3.6)':
     dependencies:
       '@openai/agents-core': 0.6.0(ws@8.18.3)(zod@4.3.6)
       '@openai/agents-openai': 0.6.0(ws@8.18.3)(zod@4.3.6)
       '@openai/agents-realtime': 0.6.0(zod@4.3.6)
       debug: 4.4.1
+      openai: 6.27.0(ws@8.18.3)(zod@4.3.6)
+      zod: 4.3.6
+    transitivePeerDependencies:
+      - '@cfworker/json-schema'
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+      - ws
+
+  '@openai/agents@0.8.5(ws@8.18.3)(zod@4.3.6)':
+    dependencies:
+      '@openai/agents-core': 0.8.5(ws@8.18.3)(zod@4.3.6)
+      '@openai/agents-openai': 0.8.5(ws@8.18.3)(zod@4.3.6)
+      '@openai/agents-realtime': 0.8.5(zod@4.3.6)
+      debug: 4.4.3
       openai: 6.27.0(ws@8.18.3)(zod@4.3.6)
       zod: 4.3.6
     transitivePeerDependencies:
@@ -13574,6 +13657,11 @@ snapshots:
       vite: 4.5.14(@types/node@25.6.0)(lightningcss@1.32.0)(terser@5.46.1)
     transitivePeerDependencies:
       - supports-color
+
+  '@vitest-evals/harness-openai-agents@0.9.0-beta.3(@openai/agents@0.8.5(ws@8.18.3)(zod@4.3.6))(vitest-evals@0.9.0-beta.3(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6))':
+    dependencies:
+      '@openai/agents': 0.8.5(ws@8.18.3)(zod@4.3.6)
+      vitest-evals: 0.9.0-beta.3(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6)
 
   '@vitest/coverage-v8@4.1.4(vitest@4.1.4)':
     dependencies:
@@ -19363,7 +19451,7 @@ snapshots:
       tsx: 4.21.0
       yaml: 2.4.5
 
-  vitest-evals@0.8.0(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6):
+  vitest-evals@0.9.0-beta.3(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6):
     dependencies:
       tinyrainbow: 2.0.0
       vitest: 4.1.4(@opentelemetry/api@1.9.0)(@types/node@22.19.17)(@vitest/coverage-v8@4.1.4)(jsdom@25.0.1)(vite@8.0.8(@types/node@22.19.17)(esbuild@0.27.7)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.4.5))

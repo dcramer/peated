@@ -1,8 +1,16 @@
-import { Agent, OpenAIProvider, Runner } from "@openai/agents";
+import {
+  Agent,
+  OpenAIProvider,
+  Runner,
+  type NonStreamRunOptions,
+} from "@openai/agents";
 import type OpenAI from "openai";
 import { normalizePotentialProofLikeDecision } from "./abv";
 import {
+  BottleCandidateSchema,
   BottleClassifierAgentDecisionSchema,
+  BottleSearchEvidenceSchema,
+  EntityResolutionSchema,
   type BottleCandidate,
   type BottleCandidateSearchInput,
   type BottleClassifierAgentDecision,
@@ -45,11 +53,10 @@ import {
   createSearchBottlesTool,
   createSearchEntitiesTool,
 } from "./tools";
-import type { BottleWebSearchExecutionCache } from "./tools/sharedWebSearch";
 
 const CLASSIFIER_MAX_TURNS = 8;
 
-type BottleClassifierReasoningResult = {
+export type BottleClassifierReasoningResult = {
   decision: BottleClassifierAgentDecision;
   artifacts: BottleClassificationArtifacts;
 };
@@ -87,7 +94,6 @@ export type CreateBottleClassifierOptions = {
       imageUrlOrBase64: string,
     ) => Promise<BottleExtractedDetails | null>;
     extractFromText?: (label: string) => Promise<BottleExtractedDetails | null>;
-    webSearchCache?: BottleWebSearchExecutionCache;
     runBottleClassifierAgent?: (
       input: RunBottleClassifierAgentInput,
     ) => Promise<BottleClassifierReasoningResult>;
@@ -144,6 +150,375 @@ function hydratedCurrentBottleMatchesReference({
   return releaseId !== null
     ? currentBottle.releaseId === releaseId
     : currentBottle.releaseId === null || currentBottle.kind === "bottle";
+}
+
+type BottleClassifierAgentRunState = {
+  candidateBottles: Map<string, BottleCandidate>;
+  resolvedEntities: Map<number, EntityResolution>;
+  searchEvidence: BottleClassificationArtifacts["searchEvidence"];
+};
+
+type BottleClassifierAgent = Agent<
+  unknown,
+  typeof BottleClassifierAgentDecisionSchema
+>;
+
+export type PreparedBottleClassifierAgentRun = {
+  agent: BottleClassifierAgent;
+  getArtifacts: () => BottleClassificationArtifacts;
+  getReasoningResult: (result: unknown) => BottleClassifierReasoningResult;
+  input: string;
+  runOptions: NonStreamRunOptions<unknown, BottleClassifierAgent>;
+  runner: Runner;
+};
+
+function mergeSearchEvidence(
+  searchEvidence: BottleClassificationArtifacts["searchEvidence"],
+  evidence: BottleClassificationArtifacts["searchEvidence"][number],
+) {
+  const evidenceKey = JSON.stringify({
+    provider: evidence.provider,
+    query: evidence.query,
+    urls: evidence.results.map((result) => result.url),
+  });
+  const hasExistingEvidence = searchEvidence.some(
+    (candidate) =>
+      JSON.stringify({
+        provider: candidate.provider,
+        query: candidate.query,
+        urls: candidate.results.map((result) => result.url),
+      }) === evidenceKey,
+  );
+
+  if (!hasExistingEvidence) {
+    searchEvidence.push(evidence);
+  }
+}
+
+function sortedBottleCandidates(
+  candidateBottles: Map<string, BottleCandidate>,
+) {
+  return Array.from(candidateBottles.values()).sort(
+    (left, right) => (right.score ?? 0) - (left.score ?? 0),
+  );
+}
+
+function sortedResolvedEntities(
+  resolvedEntities: Map<number, EntityResolution>,
+) {
+  return Array.from(resolvedEntities.values()).sort(
+    (left, right) => (right.score ?? 0) - (left.score ?? 0),
+  );
+}
+
+function buildReasoningArtifacts({
+  extractedIdentity,
+  state,
+}: {
+  extractedIdentity: BottleExtractedDetails | null;
+  state: BottleClassifierAgentRunState;
+}) {
+  return buildBottleClassificationArtifacts({
+    extractedIdentity,
+    searchEvidence: state.searchEvidence,
+    candidates: sortedBottleCandidates(state.candidateBottles),
+    resolvedEntities: sortedResolvedEntities(state.resolvedEntities),
+  });
+}
+
+function parseJsonIfPossible(value: string): unknown {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
+
+function getObjectProperty(value: unknown, propertyName: string) {
+  return value && typeof value === "object"
+    ? (value as Record<string, unknown>)[propertyName]
+    : undefined;
+}
+
+function stringProperty(value: unknown, propertyName: string) {
+  const property = getObjectProperty(value, propertyName);
+  return typeof property === "string" ? property : undefined;
+}
+
+function normalizeToolOutputValue(value: unknown): unknown {
+  if (typeof value === "string") {
+    return parseJsonIfPossible(value);
+  }
+
+  if (value && typeof value === "object") {
+    const outputType = stringProperty(value, "type");
+    const text = stringProperty(value, "text");
+    if (outputType === "text" && text !== undefined) {
+      return parseJsonIfPossible(text);
+    }
+  }
+
+  return value;
+}
+
+function mergeToolOutputArtifacts({
+  state,
+  toolName,
+  output,
+}: {
+  state: BottleClassifierAgentRunState;
+  toolName: string | undefined;
+  output: unknown;
+}) {
+  const normalizedOutput = normalizeToolOutputValue(output);
+
+  if (toolName === "search_bottles") {
+    const results = getObjectProperty(normalizedOutput, "results");
+    if (!Array.isArray(results)) {
+      return;
+    }
+
+    for (const candidate of results) {
+      mergeBottleCandidate(
+        state.candidateBottles,
+        BottleCandidateSchema.parse(candidate),
+      );
+    }
+    return;
+  }
+
+  if (toolName === "search_entities") {
+    const results = getObjectProperty(normalizedOutput, "results");
+    if (!Array.isArray(results)) {
+      return;
+    }
+
+    for (const result of results) {
+      mergeResolvedEntity(
+        state.resolvedEntities,
+        EntityResolutionSchema.parse(result),
+      );
+    }
+    return;
+  }
+
+  if (toolName === "openai_web_search" || toolName === "brave_web_search") {
+    const evidence = BottleSearchEvidenceSchema.safeParse(normalizedOutput);
+    if (evidence.success) {
+      mergeSearchEvidence(state.searchEvidence, evidence.data);
+    }
+  }
+}
+
+function mergeRunResultToolArtifacts(
+  state: BottleClassifierAgentRunState,
+  result: unknown,
+) {
+  const newItems = getObjectProperty(result, "newItems");
+  if (!Array.isArray(newItems)) {
+    return;
+  }
+
+  for (const item of newItems) {
+    if (stringProperty(item, "type") !== "tool_call_output_item") {
+      continue;
+    }
+
+    const rawItem = getObjectProperty(item, "rawItem");
+    mergeToolOutputArtifacts({
+      state,
+      toolName: stringProperty(rawItem, "name") ?? stringProperty(item, "name"),
+      output:
+        getObjectProperty(item, "output") ??
+        getObjectProperty(rawItem, "output"),
+    });
+  }
+}
+
+function getAgentFinalOutput(result: unknown) {
+  return getObjectProperty(result, "finalOutput");
+}
+
+export async function prepareBottleClassifierAgentRun(
+  options: CreateBottleClassifierOptions,
+  {
+    reference,
+    extractedIdentity,
+    initialCandidates = [],
+    candidateExpansion = "open",
+  }: RunBottleClassifierAgentInput,
+): Promise<PreparedBottleClassifierAgentRun> {
+  const state: BottleClassifierAgentRunState = {
+    searchEvidence: [],
+    candidateBottles: new Map<string, BottleCandidate>(),
+    resolvedEntities: new Map<number, EntityResolution>(),
+  };
+  const normalizedExtractedIdentity = extractedIdentity ?? null;
+  const hasExactAliasMatch = initialCandidates.some((candidate) =>
+    candidate.source.includes("exact"),
+  );
+
+  for (const candidate of initialCandidates) {
+    mergeBottleCandidate(state.candidateBottles, candidate);
+  }
+
+  const hydratedCurrentBottle = reference.currentBottleId
+    ? options.adapters.getBottleCandidateById
+      ? await options.adapters.getBottleCandidateById(
+          reference.currentBottleId,
+          reference.currentReleaseId ?? null,
+        )
+      : (initialCandidates.find(
+          (candidate) =>
+            candidate.bottleId === reference.currentBottleId &&
+            (reference.currentReleaseId != null
+              ? candidate.releaseId === reference.currentReleaseId
+              : candidate.releaseId === null || candidate.kind === "bottle"),
+        ) ?? null)
+    : null;
+  const currentBottle =
+    reference.currentBottleId &&
+    hydratedCurrentBottleMatchesReference({
+      currentBottle: hydratedCurrentBottle,
+      bottleId: reference.currentBottleId,
+      releaseId: reference.currentReleaseId ?? null,
+    })
+      ? hydratedCurrentBottle
+      : null;
+  if (currentBottle) {
+    mergeBottleCandidate(state.candidateBottles, currentBottle);
+  }
+
+  const allowCandidateExpansion = candidateExpansion === "open";
+  const webSearchBudget = createBottleWebSearchBudget(options.maxSearchQueries);
+  const instructions = buildBottleClassifierInstructions({
+    maxSearchQueries: options.maxSearchQueries,
+    hasBottleSearch: allowCandidateExpansion,
+    hasOpenAIWebSearch: allowCandidateExpansion,
+    hasBraveWebSearch: allowCandidateExpansion && !!options.braveApiKey,
+    hasEntitySearch:
+      allowCandidateExpansion && !!options.adapters.searchEntities,
+  });
+
+  const tools = allowCandidateExpansion
+    ? [
+        createSearchBottlesTool({
+          searchBottles: options.adapters.searchBottles,
+          onResults: (results) => {
+            for (const candidate of results) {
+              mergeBottleCandidate(state.candidateBottles, candidate);
+            }
+          },
+        }),
+        ...(options.adapters.searchEntities
+          ? [
+              createSearchEntitiesTool({
+                searchEntities: options.adapters.searchEntities,
+                onResults: (results) => {
+                  for (const result of results) {
+                    mergeResolvedEntity(state.resolvedEntities, result);
+                  }
+                },
+              }),
+            ]
+          : []),
+        createOpenAIWebSearchTool({
+          client: options.client,
+          model: options.model,
+          budget: webSearchBudget,
+          onEvidence: (evidence) => {
+            mergeSearchEvidence(state.searchEvidence, evidence);
+          },
+        }),
+        ...(options.braveApiKey
+          ? [
+              createBraveWebSearchTool({
+                apiKey: options.braveApiKey,
+                budget: webSearchBudget,
+                onEvidence: (evidence) => {
+                  mergeSearchEvidence(state.searchEvidence, evidence);
+                },
+              }),
+            ]
+          : []),
+      ]
+    : [];
+
+  const agent: BottleClassifierAgent = new Agent({
+    name: "bottle_classifier_reasoner",
+    instructions,
+    model: options.model,
+    modelSettings: {
+      parallelToolCalls: false,
+      ...getDeterministicOpenAISettings(options.model),
+    },
+    outputType: BottleClassifierAgentDecisionSchema,
+    tools,
+  });
+  const runner = new Runner({
+    modelProvider: new OpenAIProvider({
+      openAIClient: options.client,
+      useResponses: true,
+    }),
+    workflowName: "Bottle Classifier",
+    groupId:
+      reference.id === undefined || reference.id === null
+        ? undefined
+        : `bottle_reference:${reference.id}`,
+    traceMetadata: {
+      source_id:
+        reference.id === undefined || reference.id === null
+          ? "none"
+          : `${reference.id}`,
+      external_site_id:
+        reference.externalSiteId === undefined ||
+        reference.externalSiteId === null
+          ? "none"
+          : `${reference.externalSiteId}`,
+      current_bottle_id: reference.currentBottleId
+        ? `${reference.currentBottleId}`
+        : "none",
+    },
+  });
+  const input = buildAgentInput({
+    reference,
+    extractedIdentity: normalizedExtractedIdentity,
+    initialCandidates,
+    currentBottle,
+    hasExactAliasMatch,
+    candidateExpansion,
+  });
+  const getArtifacts = () =>
+    buildReasoningArtifacts({
+      extractedIdentity: normalizedExtractedIdentity,
+      state,
+    });
+
+  return {
+    agent,
+    runner,
+    input,
+    runOptions: {
+      maxTurns: CLASSIFIER_MAX_TURNS,
+      stream: false,
+    },
+    getArtifacts,
+    getReasoningResult: (result) => {
+      mergeRunResultToolArtifacts(state, result);
+
+      const finalOutput = getAgentFinalOutput(result);
+      if (!finalOutput) {
+        throw new Error("Agent returned empty output");
+      }
+
+      return {
+        decision: parseAgentDecision(
+          finalOutput as BottleClassifierAgentDecision,
+        ),
+        artifacts: getArtifacts(),
+      };
+    },
+  };
 }
 
 export function createBottleClassifier(
@@ -231,184 +606,25 @@ export function createBottleClassifier(
       });
     }
 
-    const searchEvidence: BottleClassificationArtifacts["searchEvidence"] = [];
-    const candidateBottles = new Map<string, BottleCandidate>();
-    const resolvedEntities = new Map<number, EntityResolution>();
-    const hasExactAliasMatch = initialCandidates.some((candidate) =>
-      candidate.source.includes("exact"),
-    );
-
-    for (const candidate of initialCandidates) {
-      mergeBottleCandidate(candidateBottles, candidate);
-    }
-
-    const hydratedCurrentBottle = reference.currentBottleId
-      ? options.adapters.getBottleCandidateById
-        ? await options.adapters.getBottleCandidateById(
-            reference.currentBottleId,
-            reference.currentReleaseId ?? null,
-          )
-        : (initialCandidates.find(
-            (candidate) =>
-              candidate.bottleId === reference.currentBottleId &&
-              (reference.currentReleaseId != null
-                ? candidate.releaseId === reference.currentReleaseId
-                : candidate.releaseId === null || candidate.kind === "bottle"),
-          ) ?? null)
-      : null;
-    const currentBottle =
-      reference.currentBottleId &&
-      hydratedCurrentBottleMatchesReference({
-        currentBottle: hydratedCurrentBottle,
-        bottleId: reference.currentBottleId,
-        releaseId: reference.currentReleaseId ?? null,
-      })
-        ? hydratedCurrentBottle
-        : null;
-    if (currentBottle) {
-      mergeBottleCandidate(candidateBottles, currentBottle);
-    }
-
-    const allowCandidateExpansion = candidateExpansion === "open";
-    const webSearchBudget = createBottleWebSearchBudget(
-      options.maxSearchQueries,
-    );
-    const instructions = buildBottleClassifierInstructions({
-      maxSearchQueries: options.maxSearchQueries,
-      hasBottleSearch: allowCandidateExpansion,
-      hasOpenAIWebSearch: allowCandidateExpansion,
-      hasBraveWebSearch: allowCandidateExpansion && !!options.braveApiKey,
-      hasEntitySearch:
-        allowCandidateExpansion && !!options.adapters.searchEntities,
-    });
-
-    const tools = allowCandidateExpansion
-      ? [
-          createSearchBottlesTool({
-            searchBottles: options.adapters.searchBottles,
-            onResults: (results) => {
-              for (const candidate of results) {
-                mergeBottleCandidate(candidateBottles, candidate);
-              }
-            },
-          }),
-          ...(options.adapters.searchEntities
-            ? [
-                createSearchEntitiesTool({
-                  searchEntities: options.adapters.searchEntities,
-                  onResults: (results) => {
-                    for (const result of results) {
-                      mergeResolvedEntity(resolvedEntities, result);
-                    }
-                  },
-                }),
-              ]
-            : []),
-          createOpenAIWebSearchTool({
-            client: options.client,
-            model: options.model,
-            budget: webSearchBudget,
-            cache: options.overrides?.webSearchCache,
-            onEvidence: (evidence) => {
-              searchEvidence.push(evidence);
-            },
-          }),
-          ...(options.braveApiKey
-            ? [
-                createBraveWebSearchTool({
-                  apiKey: options.braveApiKey,
-                  budget: webSearchBudget,
-                  cache: options.overrides?.webSearchCache,
-                  onEvidence: (evidence) => {
-                    searchEvidence.push(evidence);
-                  },
-                }),
-              ]
-            : []),
-        ]
-      : [];
-
-    const agent = new Agent({
-      name: "bottle_classifier_reasoner",
-      instructions,
-      model: options.model,
-      modelSettings: {
-        parallelToolCalls: false,
-        ...getDeterministicOpenAISettings(options.model),
-      },
-      outputType: BottleClassifierAgentDecisionSchema,
-      tools,
-    });
-    const runner = new Runner({
-      modelProvider: new OpenAIProvider({
-        openAIClient: options.client,
-        useResponses: true,
-      }),
-      workflowName: "Bottle Classifier",
-      groupId:
-        reference.id === undefined || reference.id === null
-          ? undefined
-          : `bottle_reference:${reference.id}`,
-      traceMetadata: {
-        source_id:
-          reference.id === undefined || reference.id === null
-            ? "none"
-            : `${reference.id}`,
-        external_site_id:
-          reference.externalSiteId === undefined ||
-          reference.externalSiteId === null
-            ? "none"
-            : `${reference.externalSiteId}`,
-        current_bottle_id: reference.currentBottleId
-          ? `${reference.currentBottleId}`
-          : "none",
-      },
-    });
-    const input = buildAgentInput({
+    const preparedRun = await prepareBottleClassifierAgentRun(options, {
       reference,
-      extractedIdentity: extractedIdentity ?? null,
       initialCandidates,
-      currentBottle,
-      hasExactAliasMatch,
+      extractedIdentity,
       candidateExpansion,
     });
 
     try {
-      const result = await runner.run(agent, input, {
-        maxTurns: CLASSIFIER_MAX_TURNS,
-      });
-      if (!result.finalOutput) {
-        throw new Error("Agent returned empty output");
-      }
+      const result = await preparedRun.runner.run(
+        preparedRun.agent,
+        preparedRun.input,
+        preparedRun.runOptions,
+      );
 
-      return {
-        decision: parseAgentDecision(
-          result.finalOutput as BottleClassifierAgentDecision,
-        ),
-        artifacts: buildBottleClassificationArtifacts({
-          extractedIdentity: extractedIdentity ?? null,
-          searchEvidence,
-          candidates: Array.from(candidateBottles.values()).sort(
-            (left, right) => (right.score ?? 0) - (left.score ?? 0),
-          ),
-          resolvedEntities: Array.from(resolvedEntities.values()).sort(
-            (left, right) => (right.score ?? 0) - (left.score ?? 0),
-          ),
-        }),
-      };
+      return preparedRun.getReasoningResult(result);
     } catch (error) {
       throw new BottleClassificationError(
         error instanceof Error ? error.message : "Unknown classifier error",
-        {
-          extractedIdentity: extractedIdentity ?? null,
-          searchEvidence,
-          candidates: Array.from(candidateBottles.values()).sort(
-            (left, right) => (right.score ?? 0) - (left.score ?? 0),
-          ),
-          resolvedEntities: Array.from(resolvedEntities.values()).sort(
-            (left, right) => (right.score ?? 0) - (left.score ?? 0),
-          ),
-        },
+        preparedRun.getArtifacts(),
         {
           cause: error,
         },

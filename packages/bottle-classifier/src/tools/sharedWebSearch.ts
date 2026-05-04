@@ -37,18 +37,6 @@ export type BottleWebSearchBudget = {
   };
 };
 
-export type BottleWebSearchExecutionCache = {
-  execute: <T>({
-    key,
-    schema,
-    live,
-  }: {
-    key: Record<string, unknown>;
-    schema: z.ZodType<T>;
-    live: () => Promise<T>;
-  }) => Promise<T>;
-};
-
 export function createBottleWebSearchBudget(
   maxQueries: number,
 ): BottleWebSearchBudget {

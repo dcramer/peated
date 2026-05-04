@@ -151,13 +151,13 @@ These are the rules to preserve when iterating on the classifier:
 - [`src/classifier.eval.fixtures.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifier.eval.fixtures.ts): production-shaped eval cases
 - [`src/evalFixtureSchemas.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/evalFixtureSchemas.ts): shared schemas and file walkers for JSON-backed eval fixtures
 - [`src/classifier.eval.scenarios.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifier.eval.scenarios.ts): scenario grouping for live classifier evals
-- [`src/classifier.eval.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifier.eval.test.ts): live classifier eval harness grouped into `new bottles`, `match existing`, `corrections`, and `ignore or reject`
+- [`src/classifier.eval.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/classifier.eval.test.ts): OpenAI Agents harness-backed live classifier evals grouped into `new bottles`, `match existing`, and `corrections`
 - [`src/eval-fixtures/new-bottles/`](/home/dcramer/src/peated/packages/bottle-classifier/src/eval-fixtures/new-bottles): real-world new-bottle listing fixtures, one JSON file per case
 - [`src/eval-fixtures/decision-cases/`](/home/dcramer/src/peated/packages/bottle-classifier/src/eval-fixtures/decision-cases): decision-shape workflow fixtures grouped by scenario
 - [`src/eval-fixtures/legacy-release-repair/`](/home/dcramer/src/peated/packages/bottle-classifier/src/eval-fixtures/legacy-release-repair): repair-boundary fixtures, one JSON file per case
 - [`src/evalFixtures.validate.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/evalFixtures.validate.test.ts): explicit schema and invariants validation for all file-backed fixtures
 - [`src/legacyReleaseRepairResolution.eval.fixtures.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/legacyReleaseRepairResolution.eval.fixtures.ts): file-backed repair-boundary eval loader
-- [`src/legacyReleaseRepairResolution.eval.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/legacyReleaseRepairResolution.eval.test.ts): live repair-boundary eval harness
+- [`src/legacyReleaseRepairResolution.eval.test.ts`](/home/dcramer/src/peated/packages/bottle-classifier/src/legacyReleaseRepairResolution.eval.test.ts): OpenAI Agents harness-backed live repair-boundary evals
 
 ## Iteration Workflow
 
@@ -198,23 +198,17 @@ classifier pass. `OPENAI_EVAL_MODEL` defaults to `gpt-5-mini` for judging so
 routine evals stay cheaper by default; override either if you want a different
 cost or quality tradeoff. `BRAVE_API_KEY` is optional.
 
-Live evals now cache classifier web-search tool results under the committed
-`packages/bottle-classifier/eval-cassettes/web-search/` directory so repeat
-runs do not keep paying for the same real-world searches. Each search is stored
-as its own JSON cassette under a tool-specific subdirectory. The default cache
-mode is `replay_or_record`: replay an existing cassette if present, otherwise do
-the live search once and record the normalized search evidence for later runs.
-The cache writes canonical per-tool lookup keys and keeps replay compatibility
-with older cassette keys so prompt/tool cleanup does not force mass cassette
-regeneration just because incidental cache-key fields changed.
+The live evals use `vitest-evals` harness-style `run(...)` tests with
+`@vitest-evals/harness-openai-agents` normalization, native harness
+`toolReplay`, and named judges. The classifier opts `openai_web_search` and
+`brave_web_search` into replay at the harness boundary so repeat runs do not
+keep paying for the same real-world searches.
 
-Useful cache controls:
-
-- `pnpm evals:web-cache:clear` clears recorded cassette files while keeping the committed cache root
-- `BOTTLE_CLASSIFIER_EVAL_WEB_SEARCH_CACHE_MODE=replay_only` fails on a cache miss instead of hitting the network
-- `BOTTLE_CLASSIFIER_EVAL_WEB_SEARCH_CACHE_MODE=refresh` re-runs live searches and overwrites matching cassettes
-- `BOTTLE_CLASSIFIER_EVAL_WEB_SEARCH_CACHE_MODE=live` bypasses the cache completely
-- `BOTTLE_CLASSIFIER_EVAL_WEB_SEARCH_CACHE_DIR=/custom/cache/dir` overrides the cassette directory
+Replay recordings default to
+`packages/bottle-classifier/eval-cassettes/replay/` via
+`VITEST_EVALS_REPLAY_DIR`. `VITEST_EVALS_REPLAY_MODE` defaults to `auto`, which
+replays an existing recording and records a new one on a miss. Set it to
+`strict`, `record`, or `off` to use the upstream `vitest-evals` replay modes.
 
 ## Related Docs
 

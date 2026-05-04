@@ -4,7 +4,6 @@ import type {
   ResponseCreateParamsNonStreaming,
   ResponseIncludable,
 } from "openai/resources/responses/responses";
-import { z } from "zod";
 import {
   BottleSearchEvidenceSchema,
   type BottleSearchEvidence,
@@ -12,29 +11,15 @@ import {
 import { getDeterministicOpenAISettings } from "../openaiModelSettings";
 import {
   BottleWebSearchArgsSchema,
-  BottleWebSearchErrorSchema,
   buildBottleSearchEvidence,
   compactBottleSearchEvidence,
   getResultDomain,
   type BottleWebSearchBudget,
-  type BottleWebSearchExecutionCache,
 } from "./sharedWebSearch";
 
 const OPENAI_WEB_SEARCH_RESPONSE_INCLUDES: ResponseIncludable[] = [
   "web_search_call.action.sources",
 ];
-
-const OpenAIWebSearchToolResultSchema = z.union([
-  BottleSearchEvidenceSchema.extend({
-    supplementalError: z.string().optional(),
-  }),
-  BottleWebSearchErrorSchema,
-]);
-
-const OpenAIWebSearchToolCachePayloadSchema = z.object({
-  emittedEvidence: z.array(BottleSearchEvidenceSchema),
-  result: OpenAIWebSearchToolResultSchema,
-});
 
 export function extractOpenAISearchEvidence(
   query: string,
@@ -167,13 +152,11 @@ export function createOpenAIWebSearchTool({
   client,
   model,
   budget,
-  cache,
   onEvidence,
 }: {
   client: OpenAI;
   model: string;
   budget: BottleWebSearchBudget;
-  cache?: BottleWebSearchExecutionCache;
   onEvidence?: (evidence: BottleSearchEvidence) => void;
 }) {
   return tool({
@@ -186,61 +169,30 @@ export function createOpenAIWebSearchTool({
         return budget.getExhaustedError();
       }
 
-      const runLiveSearch = async () => {
-        try {
-          const evidence = await runOpenAIWebSearch({
+      try {
+        const evidence = compactBottleSearchEvidence(
+          await runOpenAIWebSearch({
             client,
             model,
             query: args.query,
             instructions:
               "Search the web for authoritative evidence about a spirits bottle reference. Prefer official producer, distillery, bottler, or importer domains first, then critics, reviewers, or publications. Do not treat the originating retailer or source page as decisive proof. Cite 2 or 3 distinct URLs when available, including at least one official source and one independent non-retailer source when the web supports that. In the cited summary, explicitly mention only the bottle or release traits the sources confirm, such as distillery, bottler, cask finish, cask size, cask fill, ABV, age, edition, release year, or whether a number is proof rather than ABV.",
-          });
+          }),
+        );
 
-          return {
-            emittedEvidence: evidence.results.length > 0 ? [evidence] : [],
-            result: evidence,
-          };
-        } catch (error) {
-          return {
-            emittedEvidence: [],
-            result: {
-              error:
-                error instanceof Error
-                  ? `OpenAI web search failed: ${error.message}`
-                  : "OpenAI web search failed",
-            },
-          };
+        if (evidence.results.length > 0) {
+          onEvidence?.(evidence);
         }
-      };
 
-      const cached = cache
-        ? await cache.execute({
-            key: {
-              toolName: "openai_web_search",
-              model,
-              query: args.query,
-            },
-            schema: OpenAIWebSearchToolCachePayloadSchema,
-            live: runLiveSearch,
-          })
-        : await runLiveSearch();
-      const emittedEvidence = cached.emittedEvidence.map(
-        compactBottleSearchEvidence,
-      );
-      const evidence =
-        "error" in cached.result
-          ? cached.result
-          : compactBottleSearchEvidence(cached.result);
-
-      for (const emitted of emittedEvidence) {
-        onEvidence?.(emitted);
-      }
-
-      if ("error" in evidence) {
         return evidence;
+      } catch (error) {
+        return {
+          error:
+            error instanceof Error
+              ? `OpenAI web search failed: ${error.message}`
+              : "OpenAI web search failed",
+        };
       }
-
-      return evidence;
     },
   });
 }
