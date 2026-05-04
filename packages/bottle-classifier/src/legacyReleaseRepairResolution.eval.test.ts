@@ -1,5 +1,4 @@
 import { openaiAgentsHarness } from "@vitest-evals/harness-openai-agents";
-import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { describeEval, namedJudge, type JudgeContext } from "vitest-evals";
 import { toJsonValue } from "vitest-evals/harness";
@@ -7,7 +6,6 @@ import { z } from "zod";
 import {
   createBottleClassifier,
   prepareBottleClassifierAgentRun,
-  type CreateBottleClassifierOptions,
   type PreparedBottleClassifierAgentRun,
 } from "./classifierRuntime";
 import {
@@ -16,24 +14,23 @@ import {
   buildBottleClassificationArtifacts,
   createDecidedBottleClassification,
 } from "./contract";
+import {
+  createEvalClassifierOptions,
+  createEvalOpenAIClient,
+  evalJudgeModel,
+  getEvalJudgeModelSettings,
+  promptEvalJudgeModel,
+} from "./evalSupport";
 import { resolveLegacyCreateParentClassification } from "./legacyReleaseRepairResolution";
 import {
   LEGACY_RELEASE_REPAIR_RESOLUTION_EVAL_CASES,
   type LegacyReleaseRepairResolutionEvalCase,
 } from "./legacyReleaseRepairResolution.eval.fixtures";
 import {
-  DEFAULT_OPENAI_EVAL_MODEL,
-  DEFAULT_OPENAI_MODEL,
-  getDeterministicOpenAISettings,
-} from "./openaiModelSettings";
-import {
   finalizeBottleReferenceClassification,
   getAutoIgnoreBottleReferenceReason,
 } from "./reviewPolicy";
 import { buildDefaultBottleSearchInput } from "./runtime/agentInput";
-
-const classifierModel = process.env.OPENAI_MODEL ?? DEFAULT_OPENAI_MODEL;
-const judgeModel = process.env.OPENAI_EVAL_MODEL ?? DEFAULT_OPENAI_EVAL_MODEL;
 
 const EvaluatedRepairResolutionSchema = z
   .object({
@@ -63,36 +60,6 @@ const EvaluatedRepairResolutionSchema = z
 type EvaluatedRepairResolution = z.infer<
   typeof EvaluatedRepairResolutionSchema
 >;
-
-function createOpenAIClient() {
-  return new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    baseURL: process.env.OPENAI_HOST,
-    organization: process.env.OPENAI_ORGANIZATION,
-    project: process.env.OPENAI_PROJECT,
-  });
-}
-
-async function promptJudgeModel(input: string, options?: { system?: string }) {
-  const response = await createOpenAIClient().responses.create({
-    model: judgeModel!,
-    ...(options?.system ? { instructions: options.system } : {}),
-    input: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "input_text",
-            text: input,
-          },
-        ],
-      },
-    ],
-    ...getDeterministicOpenAISettings(judgeModel!),
-  });
-
-  return response.output_text;
-}
 
 function parseRepairRunOutput(output: unknown): EvaluatedRepairResolution {
   return EvaluatedRepairResolutionSchema.parse(output);
@@ -132,9 +99,9 @@ async function judgeRepairCase(
   testCase: LegacyReleaseRepairResolutionEvalCase,
   result: EvaluatedRepairResolution,
 ) {
-  const client = createOpenAIClient();
+  const client = createEvalOpenAIClient();
   const response = await client.responses.create({
-    model: judgeModel!,
+    model: evalJudgeModel,
     instructions: [
       "You are judging a whisky legacy release repair evaluation.",
       "Score from 0.0 to 1.0.",
@@ -169,25 +136,17 @@ async function judgeRepairCase(
         "LegacyReleaseRepairResolutionEvalJudgement",
       ),
     },
-    ...getDeterministicOpenAISettings(judgeModel!),
+    ...getEvalJudgeModelSettings(),
   });
 
   return JudgeSchema.parse(JSON.parse(response.output_text));
 }
 
-function createClassifierOptions(): CreateBottleClassifierOptions {
-  return {
-    client: createOpenAIClient(),
-    model: classifierModel!,
-    maxSearchQueries: Number(
-      process.env.BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES ?? 3,
-    ),
-    braveApiKey: process.env.BRAVE_API_KEY ?? null,
-    adapters: {
-      searchBottles: async () => [],
-      getBottleCandidateById: async () => null,
-    },
-  };
+function createClassifierOptions() {
+  return createEvalClassifierOptions({
+    searchBottles: async () => [],
+    getBottleCandidateById: async () => null,
+  });
 }
 
 type PreparedRepairResolutionRun = {
@@ -205,12 +164,12 @@ async function prepareRepairResolutionEvalRun(
     parsedInput.extractedIdentity !== undefined
       ? parsedInput.extractedIdentity
       : await classifier.extractBottleReferenceIdentity(parsedInput.reference);
-  let artifacts = buildBottleClassificationArtifacts({
+  const initialArtifacts = buildBottleClassificationArtifacts({
     extractedIdentity,
   });
   const autoIgnoreReason = getAutoIgnoreBottleReferenceReason(
     parsedInput.reference.name,
-    artifacts.extractedIdentity,
+    initialArtifacts.extractedIdentity,
   );
 
   if (autoIgnoreReason) {
@@ -232,7 +191,7 @@ async function prepareRepairResolutionEvalRun(
             extractedIdentity,
           }),
         ));
-  artifacts = buildBottleClassificationArtifacts({
+  const artifacts = buildBottleClassificationArtifacts({
     extractedIdentity,
     candidates,
   });
@@ -315,7 +274,7 @@ const repairHarness = openaiAgentsHarness<
     (await getPreparedRepairRun(input)).agentRun.agent,
   createRunner: async ({ input }) =>
     (await getPreparedRepairRun(input)).agentRun.runner,
-  prompt: promptJudgeModel,
+  prompt: promptEvalJudgeModel,
   runOptions: async ({ input }) => {
     const { maxTurns } = (await getPreparedRepairRun(input)).agentRun
       .runOptions;

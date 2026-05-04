@@ -236,7 +236,8 @@ evals. It forwards extra Vitest args to the package runner and uses the
 
 Local setup for live evals:
 
-- put `OPENAI_API_KEY` in the repo-root `.env.local`
+- put `OPENAI_API_KEY` in the repo-root `.env` or `.env.local`
+- `.env.local` is loaded after `.env` and overrides it
 - `OPENAI_MODEL` is optional for evals and defaults to `gpt-5.4` for the classifier pass
 - `OPENAI_EVAL_MODEL` is optional and defaults to `gpt-5-mini` for judging so routine evals stay cheaper; override it if you want a different cost/quality tradeoff
 - `OPENAI_HOST`, `OPENAI_ORGANIZATION`, and `OPENAI_PROJECT` are optional for proxy or non-default account routing

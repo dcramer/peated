@@ -1,5 +1,4 @@
 import { openaiAgentsHarness } from "@vitest-evals/harness-openai-agents";
-import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { describeEval, namedJudge, type JudgeContext } from "vitest-evals";
 import { toJsonValue } from "vitest-evals/harness";
@@ -16,7 +15,6 @@ import {
 import {
   createBottleClassifier,
   prepareBottleClassifierAgentRun,
-  type CreateBottleClassifierOptions,
   type PreparedBottleClassifierAgentRun,
 } from "./classifierRuntime";
 import type { BottleCandidate } from "./classifierTypes";
@@ -28,10 +26,12 @@ import {
   type BottleClassificationResult,
 } from "./contract";
 import {
-  DEFAULT_OPENAI_EVAL_MODEL,
-  DEFAULT_OPENAI_MODEL,
-  getDeterministicOpenAISettings,
-} from "./openaiModelSettings";
+  createEvalClassifierOptions,
+  createEvalOpenAIClient,
+  evalJudgeModel,
+  getEvalJudgeModelSettings,
+  promptEvalJudgeModel,
+} from "./evalSupport";
 import { isExistingMatchConfidenceEligibleForVerification } from "./priceMatchingEvidence";
 import type { RealWorldNewBottleEvalCase } from "./realWorldNewBottleEval.fixtures";
 import {
@@ -39,9 +39,6 @@ import {
   getAutoIgnoreBottleReferenceReason,
 } from "./reviewPolicy";
 import { buildDefaultBottleSearchInput } from "./runtime/agentInput";
-
-const classifierModel = process.env.OPENAI_MODEL ?? DEFAULT_OPENAI_MODEL;
-const judgeModel = process.env.OPENAI_EVAL_MODEL ?? DEFAULT_OPENAI_EVAL_MODEL;
 
 function getScenarioEvalName(testCase: ClassifierScenarioEvalCase): string {
   return testCase.testCase.input.reference.name;
@@ -53,36 +50,6 @@ function getScenarioEvalSummary(testCase: ClassifierScenarioEvalCase): string {
   }
 
   return testCase.testCase.expected.summary;
-}
-
-function createOpenAIClient() {
-  return new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    baseURL: process.env.OPENAI_HOST,
-    organization: process.env.OPENAI_ORGANIZATION,
-    project: process.env.OPENAI_PROJECT,
-  });
-}
-
-async function promptJudgeModel(input: string, options?: { system?: string }) {
-  const response = await createOpenAIClient().responses.create({
-    model: judgeModel!,
-    ...(options?.system ? { instructions: options.system } : {}),
-    input: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "input_text",
-            text: input,
-          },
-        ],
-      },
-    ],
-    ...getDeterministicOpenAISettings(judgeModel!),
-  });
-
-  return response.output_text;
 }
 
 type SearchFixtureCase = {
@@ -391,10 +358,10 @@ async function judgeDecisionCase(
   testCase: ClassifierEvalCase,
   result: BottleClassificationResult,
 ) {
-  const client = createOpenAIClient();
+  const client = createEvalOpenAIClient();
   const verifyEligible = getDerivedVerifyEligibility(testCase, result);
   const response = await client.responses.create({
-    model: judgeModel!,
+    model: evalJudgeModel,
     instructions: [
       "You are judging a whisky bottle classifier evaluation.",
       "Score from 0.0 to 1.0.",
@@ -427,7 +394,7 @@ async function judgeDecisionCase(
     text: {
       format: zodTextFormat(JudgeSchema, "ClassifierEvalJudgement"),
     },
-    ...getDeterministicOpenAISettings(judgeModel!),
+    ...getEvalJudgeModelSettings(),
   });
 
   return JudgeSchema.parse(JSON.parse(response.output_text));
@@ -437,10 +404,10 @@ async function judgeNormalizationCase(
   testCase: RealWorldNewBottleEvalCase,
   result: BottleClassificationResult,
 ) {
-  const client = createOpenAIClient();
+  const client = createEvalOpenAIClient();
   const describedResult = describeNormalizationResult(result);
   const response = await client.responses.create({
-    model: judgeModel!,
+    model: evalJudgeModel,
     instructions: [
       "You are judging a whisky bottle normalization evaluation.",
       "Score from 0.0 to 1.0.",
@@ -478,7 +445,7 @@ async function judgeNormalizationCase(
     text: {
       format: zodTextFormat(JudgeSchema, "NormalizationCorpusEvalJudgement"),
     },
-    ...getDeterministicOpenAISettings(judgeModel!),
+    ...getEvalJudgeModelSettings(),
   });
 
   return JudgeSchema.parse(JSON.parse(response.output_text));
@@ -513,18 +480,8 @@ function buildClassifierAdapters(testCase: ClassifierScenarioEvalCase) {
   };
 }
 
-function createClassifierOptions(
-  testCase: ClassifierScenarioEvalCase,
-): CreateBottleClassifierOptions {
-  return {
-    client: createOpenAIClient(),
-    model: classifierModel!,
-    maxSearchQueries: Number(
-      process.env.BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES ?? 3,
-    ),
-    braveApiKey: process.env.BRAVE_API_KEY ?? null,
-    adapters: buildClassifierAdapters(testCase),
-  };
+function createClassifierOptions(testCase: ClassifierScenarioEvalCase) {
+  return createEvalClassifierOptions(buildClassifierAdapters(testCase));
 }
 
 type PreparedScenarioClassifierRun = {
@@ -544,12 +501,12 @@ async function prepareScenarioClassifierRun(
     parsedInput.extractedIdentity !== undefined
       ? parsedInput.extractedIdentity
       : await classifier.extractBottleReferenceIdentity(parsedInput.reference);
-  let artifacts = buildBottleClassificationArtifacts({
+  const initialArtifacts = buildBottleClassificationArtifacts({
     extractedIdentity,
   });
   const autoIgnoreReason = getAutoIgnoreBottleReferenceReason(
     parsedInput.reference.name,
-    artifacts.extractedIdentity,
+    initialArtifacts.extractedIdentity,
   );
 
   if (autoIgnoreReason) {
@@ -571,7 +528,7 @@ async function prepareScenarioClassifierRun(
             extractedIdentity,
           }),
         ));
-  artifacts = buildBottleClassificationArtifacts({
+  const artifacts = buildBottleClassificationArtifacts({
     extractedIdentity,
     candidates,
   });
@@ -634,7 +591,7 @@ const classifierHarness = openaiAgentsHarness<
     (await getPreparedClassifierRun(input)).agentRun.agent,
   createRunner: async ({ input }) =>
     (await getPreparedClassifierRun(input)).agentRun.runner,
-  prompt: promptJudgeModel,
+  prompt: promptEvalJudgeModel,
   runOptions: async ({ input }) => {
     const { maxTurns } = (await getPreparedClassifierRun(input)).agentRun
       .runOptions;
