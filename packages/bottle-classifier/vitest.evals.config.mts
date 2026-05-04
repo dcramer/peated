@@ -6,6 +6,7 @@ import { defineConfig } from "vitest/config";
 
 const packageRoot = fileURLToPath(new URL(".", import.meta.url));
 const workspaceRoot = path.resolve(packageRoot, "../..");
+const replayRoot = path.resolve(packageRoot, ".vitest-evals/recordings");
 
 function createEnvFileLoader(
   targetEnv: NodeJS.ProcessEnv = process.env,
@@ -36,11 +37,12 @@ for (const envFile of [".env", ".env.local"]) {
 }
 
 export default defineConfig({
+  root: packageRoot,
   test: {
     fileParallelism: false,
     env: {
       VITEST_EVALS_REPLAY_DIR:
-        process.env.VITEST_EVALS_REPLAY_DIR ?? "eval-cassettes/replay",
+        process.env.VITEST_EVALS_REPLAY_DIR ?? replayRoot,
       VITEST_EVALS_REPLAY_MODE: process.env.VITEST_EVALS_REPLAY_MODE ?? "auto",
     },
     include: ["src/**/*.eval.test.ts"],

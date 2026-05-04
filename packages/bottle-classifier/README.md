@@ -205,8 +205,8 @@ The live evals use `vitest-evals` harness-style `run(...)` tests with
 `brave_web_search` into replay at the harness boundary so repeat runs do not
 keep paying for the same real-world searches.
 
-Replay recordings default to
-`packages/bottle-classifier/eval-cassettes/replay/` via
+Replay recordings default to the package-local upstream-style
+`packages/bottle-classifier/.vitest-evals/recordings/` directory via
 `VITEST_EVALS_REPLAY_DIR`. `VITEST_EVALS_REPLAY_MODE` defaults to `auto`, which
 replays an existing recording and records a new one on a miss. Set it to
 `strict`, `record`, or `off` to use the upstream `vitest-evals` replay modes.

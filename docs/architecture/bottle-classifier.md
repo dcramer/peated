@@ -244,7 +244,7 @@ Local setup for live evals:
 - `BRAVE_API_KEY` is optional; without it the classifier still runs with OpenAI web search only
 - `BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES` is optional and defaults to `3`
 - classifier evals use `@vitest-evals/harness-openai-agents` native `toolReplay` for `openai_web_search` and `brave_web_search`
-- `VITEST_EVALS_REPLAY_DIR` defaults to `packages/bottle-classifier/eval-cassettes/replay/` through the eval Vitest config
+- `VITEST_EVALS_REPLAY_DIR` defaults to the package-local upstream-style `packages/bottle-classifier/.vitest-evals/recordings/` directory through the eval Vitest config
 - `VITEST_EVALS_REPLAY_MODE` defaults to `auto`; use the upstream `strict`, `record`, or `off` modes when needed
 - `pnpm --filter @peated/bottle-classifier fixtures:validate` explicitly validates all JSON fixture files against the package schemas
 
