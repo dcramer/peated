@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-05-04T20:35:31.342Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "SMWS RW6.5 Sauna Smoke"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "SMWS RW6.5 Sauna Smoke",
+    "summary": "I could not verify **“SMWS RW6.5 Sauna Smoke”** as the correct bottle title.\n\nWhat I *could* verify is:\n\n- **SMWS cask RW6.5** is listed by SMWS as **“Appley ever after,”** not “Sauna Smoke.” SMWS also shows it as a **rye whisky from Finland**, **age 6 years**, **56.0% ABV**, from a **1st fill #3 char barrel**. ([smws.",
+    "results": [
+      {
+        "title": "https://smws.com/cinnamon-sauna-smoke/",
+        "url": "https://smws.com/cinnamon-sauna-smoke/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.com/liquid-medicinal-smoke/",
+        "url": "https://smws.com/liquid-medicinal-smoke/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.com/spirit-type/",
+        "url": "https://smws.com/spirit-type/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.com/Wafts-of-smoke",
+        "url": "https://smws.com/Wafts-of-smoke",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.com/a-hum-of-sweet-smoke/",
+        "url": "https://smws.com/a-hum-of-sweet-smoke/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.com/beachside-smokehouse/",
+        "url": "https://smws.com/beachside-smokehouse/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6928b42da78b60cdff94191b0494e3d5ebcbd7f85318f7ee20d42727db56f379",
+    "version": "bottle-classifier-web-search-v1",
+    "mode": "record"
+  }
+}

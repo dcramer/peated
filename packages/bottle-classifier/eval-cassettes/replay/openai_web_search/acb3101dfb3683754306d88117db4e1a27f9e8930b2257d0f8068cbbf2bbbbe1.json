@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-05-04T20:32:30.605Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "SMWS RW6.5 official Scotch Malt Whisky Society Kyro Sauna Smoke"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "SMWS RW6.5 official Scotch Malt Whisky Society Kyro Sauna Smoke",
+    "summary": "I could not verify **“Kyro Sauna Smoke”** as the official identity of **SMWS RW6.5**.\n\nWhat the sources do support is:\n\n- **SMWS RW6.5** is titled **“Appley ever after”**, not “Kyro Sauna Smoke.” It is listed by SMWS as a **Finland rye whisky**, **6 years old**, **56.0% ABV**, from a **1st fill #3 char barrel**. ([smws",
+    "results": [
+      {
+        "title": "https://smws.com/",
+        "url": "https://smws.com/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.com/brands/asc.html/",
+        "url": "https://smws.com/brands/asc.html/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://th.smws.com/",
+        "url": "https://th.smws.com/",
+        "domain": "th.smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "All Whisky - Spirit Type - Scotch Malt Whisky Society",
+        "url": "https://smws.com/spirit-type/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.com/venues/the-vaults-edinburgh",
+        "url": "https://smws.com/venues/the-vaults-edinburgh",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://th.smws.com/whisky",
+        "url": "https://th.smws.com/whisky",
+        "domain": "th.smws.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "acb3101dfb3683754306d88117db4e1a27f9e8930b2257d0f8068cbbf2bbbbe1",
+    "version": "bottle-classifier-web-search-v1",
+    "mode": "record"
+  }
+}
