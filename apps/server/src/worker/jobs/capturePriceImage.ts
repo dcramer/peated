@@ -1,6 +1,6 @@
 import { defaultHeaders } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import { bottles, storePrices } from "@peated/server/db/schema";
+import { storePrices } from "@peated/server/db/schema";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { logger } from "@sentry/node";
@@ -49,29 +49,12 @@ export default async ({
     return;
   }
 
-  // TODO: we likely want to validate the image is something we'd expect
   await db
     .update(storePrices)
     .set({
       imageUrl: newImageUrl,
     })
     .where(eq(storePrices.id, priceId));
-
-  if (price.bottleId) {
-    const [bottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, price.bottleId));
-
-    if (bottle && !bottle.imageUrl) {
-      await db
-        .update(bottles)
-        .set({
-          imageUrl: newImageUrl,
-        })
-        .where(eq(bottles.id, price.bottleId));
-    }
-  }
 
   await pushUniqueJob("ResolveStorePriceBottle", {
     priceId,

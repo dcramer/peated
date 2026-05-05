@@ -121,6 +121,48 @@ describe("priceMatchingEvidence", () => {
     expect(supported).toBe(true);
   });
 
+  test("does not treat off-origin retailer evidence as existing-match support", () => {
+    const supported = hasSupportiveWebEvidenceForExistingMatch({
+      sourceUrl: "https://shop.example/wild-turkey-rare-breed-rye",
+      target: buildBottleCandidate({
+        bottleId: 1,
+        fullName: "Wild Turkey Rare Breed Barrel-Proof Kentucky Straight Rye",
+        brand: "Wild Turkey",
+        distillery: ["Wild Turkey"],
+        category: "rye",
+        caskStrength: true,
+      }),
+      extractedLabel: buildExtractedLabel({
+        brand: "Wild Turkey",
+        expression: "Rare Breed",
+        distillery: ["Wild Turkey"],
+        category: "rye",
+        stated_age: null,
+        abv: null,
+        cask_type: null,
+      }),
+      searchEvidence: [
+        buildSearchEvidence({
+          query: '"Wild Turkey Rare Breed Rye" barrel proof',
+          summary:
+            "Total Wine lists Wild Turkey Rare Breed Rye as barrel proof.",
+          results: [
+            {
+              title: "Wild Turkey Rare Breed Barrel-Proof Rye Whiskey",
+              url: "https://www.totalwine.com/spirits/american-whiskey/rye-whiskey/wild-turkey-rare-breed-rye/p/222404750",
+              domain: "totalwine.com",
+              description:
+                "Retailer listing for Wild Turkey Rare Breed Barrel-Proof Rye Whiskey.",
+              extraSnippets: [],
+            },
+          ],
+        }),
+      ],
+    });
+
+    expect(supported).toBe(false);
+  });
+
   test("does not classify arbitrary producer-name domains as official evidence", () => {
     expect(
       classifySourceTier({

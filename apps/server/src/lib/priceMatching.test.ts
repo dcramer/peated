@@ -1132,7 +1132,7 @@ describe("priceMatching", () => {
     );
   });
 
-  test("keeps non-exact existing matches when off-retailer web evidence validates an omitted target trait", async ({
+  test("keeps non-exact existing matches when authoritative web evidence validates an omitted target trait", async ({
     fixtures,
   }) => {
     config.OPENAI_API_KEY = undefined;
@@ -1256,7 +1256,7 @@ describe("priceMatching", () => {
     );
   });
 
-  test("auto-approves high-confidence existing matches when off-retailer web evidence confirms the bottle identity", async ({
+  test("auto-approves high-confidence existing matches when authoritative web evidence confirms the bottle identity", async ({
     fixtures,
   }) => {
     config.OPENAI_API_KEY = undefined;

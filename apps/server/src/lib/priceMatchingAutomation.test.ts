@@ -292,7 +292,7 @@ describe("priceMatchingAutomation", () => {
     ).toBe(true);
   });
 
-  test("auto-approves high-confidence bottle matches when off-retailer evidence confirms the product identity", () => {
+  test("auto-approves high-confidence bottle matches when authoritative evidence confirms the product identity", () => {
     const extractedLabel = buildExtractedLabel({
       brand: "The Glenlivet",
       bottler: null,
@@ -353,6 +353,13 @@ describe("priceMatchingAutomation", () => {
     });
 
     expect(assessment.automationBlockers).toEqual([]);
+    expect(
+      assessment.webEvidenceChecks.find((check) => check.attribute === "name"),
+    ).toMatchObject({
+      expectedValue: "Caribbean Reserve",
+      validated: true,
+      matchedSourceTiers: ["official"],
+    });
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",

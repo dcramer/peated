@@ -116,6 +116,40 @@ describe("bottleClassificationEvidence", () => {
     ).toBe(true);
   });
 
+  test("does not treat a generic authoritative producer page as target identity support", () => {
+    const targetCandidate = buildBottleCandidate({
+      bottleId: 2,
+      fullName: "Ardbeg Uigeadail",
+      brand: "Ardbeg",
+      distillery: ["Ardbeg"],
+      category: "single_malt",
+    });
+    const searchEvidence = [
+      buildSearchEvidence({
+        summary:
+          "Ardbeg confirms Ten Years Old is a single malt Scotch whisky.",
+        results: [
+          {
+            title: "Ardbeg Ten Years Old Single Malt Scotch Whisky",
+            url: "https://www.ardbeg.com/en-gb/whiskies/ten-years-old",
+            domain: "ardbeg.com",
+            description: "Official Ardbeg page for Ten Years Old.",
+            extraSnippets: [],
+          },
+        ],
+      }),
+    ];
+
+    expect(
+      hasSupportiveWebEvidenceForExistingMatch({
+        sourceUrl: "https://shop.example/products/ardbeg-uigeadail",
+        searchEvidence,
+        extractedLabel: null,
+        targetCandidate,
+      }),
+    ).toBe(false);
+  });
+
   test("treats authoritative brand-led evidence as support for a distillery-qualified plain age-statement bottle", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 3233,

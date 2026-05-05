@@ -11,6 +11,7 @@ import {
   textsOverlap,
 } from "@peated/bottle-classifier/identityEvidenceCore";
 import {
+  evaluateExistingMatchWebEvidence,
   getExistingMatchIdentityConflicts,
   hasSupportiveWebEvidenceForExistingMatch as hasSupportiveBottleEvidence,
   isExistingMatchConfidenceEligibleForVerification,
@@ -683,16 +684,20 @@ function getExistingMatchDecisiveAttributes({
 
 function getExistingMatchAssessment({
   modelConfidence,
+  price,
   suggestedBottleId,
   suggestedReleaseId,
   candidateBottles,
   extractedLabel,
+  searchEvidence,
 }: {
   modelConfidence: number | null;
+  price: Pick<StorePrice, "url">;
   suggestedBottleId: number | null;
   suggestedReleaseId: number | null;
   candidateBottles: PriceMatchCandidate[];
   extractedLabel: ExtractedBottleDetails | null;
+  searchEvidence: SearchEvidence[];
 }) {
   const target = getSuggestedMatchCandidate({
     suggestedBottleId,
@@ -705,6 +710,8 @@ function getExistingMatchAssessment({
       decisiveMatchAttributes: [] as MatchAttribute[],
       structuredMatchRequiresStatedAge: false,
       automationBlockers: [] as string[],
+      differentiatingAttributes: [] as MatchAttribute[],
+      webEvidenceChecks: [] as EvidenceCheck[],
     };
   }
 
@@ -728,6 +735,13 @@ function getExistingMatchAssessment({
     }),
   );
 
+  const webEvidence = evaluateExistingMatchWebEvidence({
+    sourceUrl: price.url,
+    target,
+    extractedLabel,
+    searchEvidence,
+  });
+
   return {
     // For existing matches, the reviewed classifier confidence is the only
     // signal we trust enough to summarize numerically. Downstream automation
@@ -743,6 +757,8 @@ function getExistingMatchAssessment({
       extractedLabel?.stated_age !== null &&
       extractedLabel?.stated_age !== undefined,
     automationBlockers: Array.from(new Set(automationBlockers)),
+    differentiatingAttributes: webEvidence.differentiatingAttributes,
+    webEvidenceChecks: webEvidence.checks,
   };
 }
 
@@ -972,10 +988,12 @@ export function getStorePriceMatchAutomationAssessment({
   if (action === "match_existing" || action === "correction") {
     const matchAssessment = getExistingMatchAssessment({
       modelConfidence,
+      price,
       suggestedBottleId,
       suggestedReleaseId: suggestedReleaseId ?? null,
       candidateBottles,
       extractedLabel,
+      searchEvidence,
     });
 
     return {
@@ -986,8 +1004,8 @@ export function getStorePriceMatchAutomationAssessment({
       decisiveMatchAttributes: matchAssessment.decisiveMatchAttributes,
       structuredMatchRequiresStatedAge:
         matchAssessment.structuredMatchRequiresStatedAge,
-      differentiatingAttributes: [],
-      webEvidenceChecks: [],
+      differentiatingAttributes: matchAssessment.differentiatingAttributes,
+      webEvidenceChecks: matchAssessment.webEvidenceChecks,
     };
   }
 

@@ -5,7 +5,7 @@ import {
 } from "@peated/server/constants";
 import { logError } from "@peated/server/lib/log";
 import { orpcClient } from "@peated/server/lib/orpc-client/server";
-import type { Currency, ExternalSiteType } from "@peated/server/types";
+import type { ExternalSiteType } from "@peated/server/types";
 import { type Category } from "@peated/server/types";
 import axios from "axios";
 import { existsSync, mkdirSync, statSync } from "fs";
@@ -73,7 +73,6 @@ export async function cacheUrl(
         ...headers,
       },
     }));
-    // gross
     if (typeof data !== "string") data = JSON.stringify(data);
   } catch (err: any) {
     status = err?.response?.status;
@@ -94,7 +93,6 @@ export async function cacheUrl(
   return { data, status };
 }
 
-// TODO: move this function
 export function absoluteUrl(url: string, baseUrl: string) {
   if (url.indexOf("https://") === 0) return url;
   const urlParts = new URL(baseUrl);
@@ -135,13 +133,7 @@ export async function chunked<T>(
   }
 }
 
-export type StorePrice = {
-  name: string;
-  price: number;
-  currency: Currency;
-  url: string;
-  volume: number;
-};
+export type StorePrice = z.infer<typeof StorePriceInputSchema>;
 
 export type BottleReview = {
   name: string;
@@ -183,11 +175,7 @@ export async function handleBottle(
     }
 
     if (price) {
-      const {
-        data: priceResult,
-        error: priceError,
-        isDefined: priceIsDefined,
-      } = await safe(
+      const { error: priceError, isDefined: priceIsDefined } = await safe(
         orpcClient.prices.createBatch({
           site: "smws",
           prices: [price],
@@ -202,9 +190,13 @@ export async function handleBottle(
   }
 }
 
-export type ScrapePricesCallback = (
-  product: z.infer<typeof StorePriceInputSchema>,
-) => Promise<void>;
+export type ScrapePricesCallback = (product: StorePrice) => Promise<void>;
+
+function getScrapedProductKey(product: StorePrice): string {
+  return [product.name.trim().toLowerCase(), String(product.volume)].join(
+    "\u0000",
+  );
+}
 
 export default async function scrapePrices(
   site: ExternalSiteType,
@@ -230,20 +222,20 @@ export default async function scrapePrices(
     hasProducts = false;
     await scrapeProducts(urlFn(page), async (product) => {
       console.log(`${product.name} - ${(product.price / 100).toFixed(2)}`);
-      if (uniqueProducts.has(product.name)) return;
+      const productKey = getScrapedProductKey(product);
+      if (uniqueProducts.has(productKey)) return;
       await workQueue.push(product);
-      uniqueProducts.add(product.name);
+      uniqueProducts.add(productKey);
       hasProducts = true;
     });
     page += 1;
   }
 
-  const products = Array.from(uniqueProducts.values());
-  if (products.length === 0) {
+  if (uniqueProducts.size === 0) {
     throw new Error("Failed to scrape any products.");
   }
 
   await workQueue.processRemaining();
 
-  console.log(`Complete - ${products.length} products found`);
+  console.log(`Complete - ${uniqueProducts.size} products found`);
 }

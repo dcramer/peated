@@ -2710,7 +2710,7 @@ function downgradeUnsafeExistingMatchDecision({
     !hasStructuredBottleSupport
   ) {
     reasons.push(
-      "there is no exact alias, no exactish canonical name match, no uniquely supported structured bottle identity, and no supportive off-retailer web evidence for the matched target",
+      "there is no exact alias, no exactish canonical name match, no uniquely supported structured bottle identity, and no authoritative web evidence supports the matched target",
     );
   }
 

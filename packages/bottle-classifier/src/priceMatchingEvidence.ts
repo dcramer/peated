@@ -19,18 +19,68 @@ import {
   textsOverlap,
 } from "./identityEvidenceCore";
 
-// This module centralizes bottle-identity evidence evaluation that is shared by
-// the generic bottle classifier and downstream consumers such as price-match
-// automation. Keeping this here avoids letting feature-specific policy forks
-// drift on what counts as supportive off-source evidence or a hard identity
-// conflict.
+// Shared bottle-identity evidence checks for classifier and price matching.
 
 type EvidenceCheck = BottleEvidenceCheck;
 type MatchAttribute = EvidenceCheck["attribute"];
 type SourceTier = BottleEvidenceSourceTier;
+type ExistingMatchWebEvidenceEvaluation = {
+  checks: EvidenceCheck[];
+  differentiatingAttributes: MatchAttribute[];
+  hasSupportiveWebEvidence: boolean;
+};
 
 export const REAFFIRMED_EXISTING_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD = 80;
 export const UNMATCHED_BOTTLE_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD = 96;
+const SPECIFIC_IDENTITY_WEB_SUPPORT_ATTRIBUTES = new Set<MatchAttribute>([
+  "bottler",
+  "name",
+  "series",
+  "edition",
+  "caskType",
+  "caskSize",
+  "caskFill",
+  "caskStrength",
+  "singleCask",
+  "abv",
+  "vintageYear",
+  "releaseYear",
+]);
+const PLAIN_AGE_IGNORABLE_NAME_TOKENS = new Set([
+  "american",
+  "and",
+  "bottle",
+  "canadian",
+  "cl",
+  "irish",
+  "japanese",
+  "kentucky",
+  "l",
+  "malt",
+  "ml",
+  "of",
+  "old",
+  "scotch",
+  "single",
+  "spirit",
+  "spirits",
+  "straight",
+  "the",
+  "whiskey",
+  "whisky",
+  "year",
+  "years",
+  "yr",
+  "yrs",
+]);
+const TITLE_IGNORABLE_NAME_TOKENS = new Set([
+  ...PLAIN_AGE_IGNORABLE_NAME_TOKENS,
+  "official",
+  "oz",
+  "website",
+  "whiskies",
+  "world",
+]);
 
 export function isExistingMatchConfidenceEligibleForVerification({
   confidence,
@@ -91,13 +141,20 @@ function getTargetNameVariants(targetCandidate: BottleCandidate): string[] {
   );
 }
 
+function getComparableNameTokens(value: string | null | undefined): string[] {
+  return normalizeComparableText(value)
+    .replace(/\b\d+(?:\.\d+)?\s?(?:ml|cl|l|oz)\b/g, " ")
+    .split(/[^a-z0-9]+/g)
+    .filter((token) => token.length > 0);
+}
+
 function nameMarketsStatedAge({
   name,
   statedAge,
 }: {
   name: string | null | undefined;
   statedAge: number | null | undefined;
-}) {
+}): boolean {
   if (!name || statedAge === null || statedAge === undefined) {
     return false;
   }
@@ -116,7 +173,7 @@ function targetHasDirtyParentStatedAgeConflict({
 }: {
   target: BottleCandidate;
   extractedLabel: BottleExtractedDetails | null;
-}) {
+}): boolean {
   if (
     !extractedLabel ||
     extractedLabel.stated_age === null ||
@@ -134,6 +191,187 @@ function targetHasDirtyParentStatedAgeConflict({
       statedAge: target.statedAge,
     }),
   );
+}
+
+function targetLooksLikePlainAgeStatementBottle(
+  target: BottleCandidate,
+): boolean {
+  if (
+    target.statedAge === null ||
+    target.statedAge === undefined ||
+    target.series ||
+    target.edition ||
+    target.releaseYear !== null ||
+    target.vintageYear !== null
+  ) {
+    return false;
+  }
+
+  const producerTokens = new Set(
+    [target.brand, target.bottler, ...target.distillery].flatMap((value) =>
+      getComparableNameTokens(value),
+    ),
+  );
+  const ageToken = String(target.statedAge);
+
+  return getTargetNameVariants(target).some((name) => {
+    if (!nameMarketsStatedAge({ name, statedAge: target.statedAge })) {
+      return false;
+    }
+
+    const extraTokens = getComparableNameTokens(name).filter(
+      (token) =>
+        token !== ageToken &&
+        !producerTokens.has(token) &&
+        !PLAIN_AGE_IGNORABLE_NAME_TOKENS.has(token),
+    );
+
+    return extraTokens.length === 0;
+  });
+}
+
+function titleSupportsCandidateName(
+  title: string | null | undefined,
+  candidateName: string,
+): boolean {
+  const candidateTokens = getComparableNameTokens(candidateName);
+  if (!candidateTokens.length) {
+    return false;
+  }
+
+  const titleTokens = getComparableNameTokens(title);
+  if (!titleTokens.length) {
+    return false;
+  }
+
+  const candidateSet = new Set(candidateTokens);
+  const titleSet = new Set(titleTokens);
+
+  for (const token of candidateSet) {
+    if (!titleSet.has(token)) {
+      return false;
+    }
+  }
+
+  for (const token of titleSet) {
+    if (candidateSet.has(token)) {
+      continue;
+    }
+
+    if (!TITLE_IGNORABLE_NAME_TOKENS.has(token)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function extractedLabelLooksLikePlainAgeStatement(
+  extractedLabel: BottleExtractedDetails | null,
+): boolean {
+  if (!extractedLabel) {
+    return false;
+  }
+
+  return (
+    extractedLabel.stated_age !== null &&
+    extractedLabel.stated_age !== undefined &&
+    !extractedLabel.expression &&
+    !extractedLabel.series &&
+    !extractedLabel.edition &&
+    extractedLabel.release_year === null &&
+    extractedLabel.vintage_year === null &&
+    extractedLabel.cask_type === null &&
+    extractedLabel.cask_size === null &&
+    extractedLabel.cask_fill === null &&
+    extractedLabel.cask_strength === null &&
+    extractedLabel.single_cask === null &&
+    extractedLabel.abv === null
+  );
+}
+
+function extractedLabelCarriesUnsupportedSpecificity({
+  target,
+  extractedLabel,
+}: {
+  target: BottleCandidate;
+  extractedLabel: BottleExtractedDetails | null;
+}): boolean {
+  if (!extractedLabel) {
+    return false;
+  }
+
+  return (
+    Boolean(extractedLabel.edition && !target.edition) ||
+    Boolean(extractedLabel.cask_type && !target.caskType) ||
+    Boolean(extractedLabel.cask_size && !target.caskSize) ||
+    Boolean(extractedLabel.cask_fill && !target.caskFill) ||
+    (extractedLabel.cask_strength === true && target.caskStrength === null) ||
+    (extractedLabel.single_cask === true && target.singleCask === null) ||
+    (extractedLabel.abv !== null && target.abv === null) ||
+    (extractedLabel.vintage_year !== null && target.vintageYear === null) ||
+    (extractedLabel.release_year !== null && target.releaseYear === null)
+  );
+}
+
+function authoritativeTextSupportsPlainAgeStatementTarget({
+  text,
+  target,
+  extractedLabel,
+}: {
+  text: string | null | undefined;
+  target: BottleCandidate;
+  extractedLabel: BottleExtractedDetails | null;
+}): boolean {
+  if (
+    !text ||
+    !extractedLabelLooksLikePlainAgeStatement(extractedLabel) ||
+    !targetLooksLikePlainAgeStatementBottle(target)
+  ) {
+    return false;
+  }
+
+  const normalizedText = normalizeComparableText(text);
+  if (!normalizedText) {
+    return false;
+  }
+
+  const producerNames = [
+    extractedLabel?.brand,
+    target.brand,
+    ...(extractedLabel?.distillery ?? []),
+    ...target.distillery,
+  ]
+    .filter((value): value is string => Boolean(value))
+    .map((value) => normalizeComparableText(value))
+    .filter((value) => value.length > 0);
+
+  if (
+    !producerNames.some((value) =>
+      containsComparablePhrase(normalizedText, value),
+    )
+  ) {
+    return false;
+  }
+
+  const statedAge = extractedLabel?.stated_age;
+  if (
+    statedAge === null ||
+    statedAge === undefined ||
+    target.statedAge !== statedAge ||
+    !attributeMatchesText("statedAge", String(statedAge), normalizedText)
+  ) {
+    return false;
+  }
+
+  const expectedCategory = normalizeComparableCategory(
+    extractedLabel?.category ?? null,
+  );
+  if (!expectedCategory) {
+    return true;
+  }
+
+  return attributeMatchesText("category", expectedCategory, normalizedText);
 }
 
 function getCategoryKeywords(value: string): string[] {
@@ -549,14 +787,6 @@ function evaluateSearchEvidenceChecks({
   });
 }
 
-function hasOffRetailerSupport(check: EvidenceCheck): boolean {
-  return (
-    check.validated ||
-    (check.weaklySupported &&
-      !check.matchedSourceTiers.includes("origin_retailer"))
-  );
-}
-
 export function hasSupportiveWebEvidenceForExistingMatch({
   sourceUrl,
   target,
@@ -568,6 +798,69 @@ export function hasSupportiveWebEvidenceForExistingMatch({
   extractedLabel: BottleExtractedDetails | null;
   searchEvidence: BottleSearchEvidence[];
 }): boolean {
+  return evaluateExistingMatchWebEvidence({
+    sourceUrl,
+    target,
+    extractedLabel,
+    searchEvidence,
+  }).hasSupportiveWebEvidence;
+}
+
+export function hasAuthoritativeTargetIdentityEvidenceForExistingMatch({
+  sourceUrl,
+  target,
+  extractedLabel,
+  searchEvidence,
+}: {
+  sourceUrl: string;
+  target: BottleCandidate;
+  extractedLabel: BottleExtractedDetails | null;
+  searchEvidence: BottleSearchEvidence[];
+}): boolean {
+  const producerPhrases = buildProducerIdentityPhrases({
+    proposedBottle: null,
+    extractedLabel,
+    targetCandidate: target,
+  });
+  const targetNameVariants = getTargetNameVariants(target);
+
+  return searchEvidence.some((evidence) =>
+    evidence.results.some((result) => {
+      const sourceTier = classifySourceTier({
+        result,
+        sourceUrl,
+        producerPhrases,
+      });
+
+      if (!AUTHORITATIVE_SOURCE_TIERS.has(sourceTier)) {
+        return false;
+      }
+
+      return (
+        targetNameVariants.some((variant) =>
+          titleSupportsCandidateName(result.title, variant),
+        ) ||
+        authoritativeTextSupportsPlainAgeStatementTarget({
+          text: getSearchResultText(evidence, result),
+          target,
+          extractedLabel,
+        })
+      );
+    }),
+  );
+}
+
+export function evaluateExistingMatchWebEvidence({
+  sourceUrl,
+  target,
+  extractedLabel,
+  searchEvidence,
+}: {
+  sourceUrl: string;
+  target: BottleCandidate;
+  extractedLabel: BottleExtractedDetails | null;
+  searchEvidence: BottleSearchEvidence[];
+}): ExistingMatchWebEvidenceEvaluation {
   const { checks, differentiatingAttributes } = buildExistingMatchSupportChecks(
     {
       target,
@@ -576,7 +869,11 @@ export function hasSupportiveWebEvidenceForExistingMatch({
   );
 
   if (!checks.length || !searchEvidence.length) {
-    return false;
+    return {
+      checks,
+      differentiatingAttributes,
+      hasSupportiveWebEvidence: false,
+    };
   }
 
   const evaluatedChecks = evaluateSearchEvidenceChecks({
@@ -587,10 +884,15 @@ export function hasSupportiveWebEvidenceForExistingMatch({
     extractedLabel,
     targetCandidate: target,
   });
-  const supportedChecks = evaluatedChecks.filter(hasOffRetailerSupport);
+  const unsupportedResult = {
+    checks: evaluatedChecks,
+    differentiatingAttributes,
+    hasSupportiveWebEvidence: false,
+  };
+  const supportedChecks = evaluatedChecks.filter((check) => check.validated);
 
   if (!supportedChecks.length) {
-    return false;
+    return unsupportedResult;
   }
 
   const hasBaseIdentitySupport = supportedChecks.some((check) =>
@@ -600,7 +902,33 @@ export function hasSupportiveWebEvidenceForExistingMatch({
   );
 
   if (!hasBaseIdentitySupport) {
-    return false;
+    return unsupportedResult;
+  }
+
+  const hasSpecificIdentitySupport = supportedChecks.some((check) =>
+    SPECIFIC_IDENTITY_WEB_SUPPORT_ATTRIBUTES.has(check.attribute),
+  );
+
+  if (
+    differentiatingAttributes.includes("statedAge") &&
+    !hasSpecificIdentitySupport
+  ) {
+    return unsupportedResult;
+  }
+
+  if (
+    extractedLabelCarriesUnsupportedSpecificity({ target, extractedLabel }) &&
+    !hasSpecificIdentitySupport
+  ) {
+    return unsupportedResult;
+  }
+
+  if (
+    extractedLabelLooksLikePlainAgeStatement(extractedLabel) &&
+    !targetLooksLikePlainAgeStatementBottle(target) &&
+    !hasSpecificIdentitySupport
+  ) {
+    return unsupportedResult;
   }
 
   const requiredSpecificityAttributes = differentiatingAttributes.filter(
@@ -616,16 +944,24 @@ export function hasSupportiveWebEvidenceForExistingMatch({
         !supportedChecks.some((check) => check.attribute === attribute),
     )
   ) {
-    return false;
+    return unsupportedResult;
   }
 
   if (!differentiatingAttributes.length) {
-    return true;
+    return {
+      checks: evaluatedChecks,
+      differentiatingAttributes,
+      hasSupportiveWebEvidence: true,
+    };
   }
 
-  return supportedChecks.some((check) =>
-    differentiatingAttributes.includes(check.attribute),
-  );
+  return {
+    checks: evaluatedChecks,
+    differentiatingAttributes,
+    hasSupportiveWebEvidence: supportedChecks.some((check) =>
+      differentiatingAttributes.includes(check.attribute),
+    ),
+  };
 }
 
 export function getExistingMatchIdentityConflicts({
