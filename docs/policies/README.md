@@ -8,10 +8,16 @@ without turning it into a full architecture document or feature spec.
 Good policy topics:
 
 - code comments and docstrings
+- agent design and automation boundaries
 - testing expectations
 - naming conventions
 - migration hygiene
 - automation safety boundaries
+
+Current policies:
+
+- [agent-design.md](agent-design.md)
+- [code-comments.md](code-comments.md)
 
 Keep policy docs small:
 

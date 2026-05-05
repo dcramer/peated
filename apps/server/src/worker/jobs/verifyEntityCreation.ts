@@ -3,6 +3,7 @@ import {
   getCatalogVerificationSkipReason,
   shouldRunCatalogVerification,
 } from "@peated/catalog-verifier";
+import config from "@peated/server/config";
 import { recordCatalogVerificationResult } from "@peated/server/lib/catalogVerification";
 import {
   getCatalogVerificationDisplayName,
@@ -21,7 +22,12 @@ export default async function ({
     objectType: "entity",
   });
 
-  if (!shouldRunCatalogVerification(creationSource)) {
+  if (
+    !shouldRunCatalogVerification(creationSource, {
+      sampleKey: entityId,
+      sampleRate: config.CATALOG_VERIFICATION_AUTOMATION_SAMPLE_RATE,
+    })
+  ) {
     await recordCatalogVerificationResult({
       displayName,
       objectId: entityId,

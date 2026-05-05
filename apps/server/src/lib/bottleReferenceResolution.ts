@@ -178,7 +178,9 @@ async function applyClassifierCreateDecision({
         }),
       );
 
-      await finalizeCreatedBottleRelease(result);
+      await finalizeCreatedBottleRelease(result, {
+        creationSource: "bottle_classifier",
+      });
 
       return {
         bottleId: result.release.bottleId,
@@ -272,7 +274,9 @@ async function applyClassifierCreateDecision({
     });
   }
   if (result.releaseResult) {
-    await finalizeCreatedBottleRelease(result.releaseResult);
+    await finalizeCreatedBottleRelease(result.releaseResult, {
+      creationSource: "bottle_classifier",
+    });
   }
 
   return {

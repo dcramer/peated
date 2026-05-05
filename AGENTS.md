@@ -70,4 +70,5 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - `docs/features/simple-rating-system.md`
 - `docs/policies/README.md`
 - `docs/policies/policy-template.md`
+- `docs/policies/agent-design.md`
 - `docs/policies/code-comments.md`

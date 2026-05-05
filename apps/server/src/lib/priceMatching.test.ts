@@ -5,6 +5,7 @@ import {
   bottleReleases,
   bottles,
   bottlesToDistillers,
+  storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
@@ -12,13 +13,18 @@ import {
   findBottleReferenceCandidates,
   searchBottleCandidates,
 } from "@peated/server/lib/bottleReferenceCandidates";
+import type * as CatalogVerificationModule from "@peated/server/lib/catalogVerification";
 import {
   applyApprovedStorePriceMatch,
   canClearIgnoredStorePriceAssignment,
+  ignoreStorePriceMatchProposal,
   resolveStorePriceMatchProposal,
 } from "@peated/server/lib/priceMatching";
 import { eq, sql } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+
+const queueBottleCreationVerificationMock = vi.hoisted(() => vi.fn());
+const queueEntityCreationVerificationMock = vi.hoisted(() => vi.fn());
 
 vi.mock("@peated/server/agents/whisky/labelExtractor", () => ({
   extractFromImage: vi.fn(),
@@ -60,6 +66,17 @@ vi.mock("@peated/server/lib/openaiEmbeddings", async () => {
   return {
     ...actual,
     getOpenAIEmbedding: vi.fn(),
+  };
+});
+
+vi.mock("@peated/server/lib/catalogVerification", async () => {
+  const actual = await vi.importActual<typeof CatalogVerificationModule>(
+    "@peated/server/lib/catalogVerification",
+  );
+  return {
+    ...actual,
+    queueBottleCreationVerification: queueBottleCreationVerificationMock,
+    queueEntityCreationVerification: queueEntityCreationVerificationMock,
   };
 });
 
@@ -3273,6 +3290,8 @@ describe("priceMatching", () => {
       await import("@peated/server/agents/whisky/labelExtractor");
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
+    const { queueBottleCreationVerification } =
+      await import("@peated/server/lib/catalogVerification");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Auto Create Candidate",
@@ -3364,6 +3383,10 @@ describe("priceMatching", () => {
     const listingAlias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, price.name),
     });
+    const [attempt] = await db
+      .select()
+      .from(storePriceMatchAttempts)
+      .where(eq(storePriceMatchAttempts.proposalId, proposal.id));
 
     expect(proposal).toMatchObject({
       status: "approved",
@@ -3378,6 +3401,16 @@ describe("priceMatching", () => {
       fullName: "Auto Brand Web Reserve",
     });
     expect(listingAlias?.bottleId).toBe(proposal.suggestedBottleId);
+    expect(attempt).toMatchObject({
+      automationEligible: true,
+      finalStatus: "approved",
+      initialStatus: "pending_review",
+      proposalType: "create_new",
+    });
+    expect(queueBottleCreationVerification).toHaveBeenCalledWith({
+      bottleId: proposal.suggestedBottleId,
+      creationSource: "price_match_automation",
+    });
   });
 
   test("auto creates high-confidence bottles while a retry lease is active", async ({
@@ -4544,6 +4577,90 @@ describe("priceMatching", () => {
       }),
     });
     expect(proposal.status).toBe("errored");
+  });
+
+  test("records price match attempts and moderator outcomes", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const reviewer = await fixtures.User();
+    const bottle = await fixtures.Bottle();
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Attempt Candidate",
+      imageUrl: null,
+    });
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        decision: {
+          action: "match_existing",
+          confidence: 84,
+          rationale: "Local evidence supports this bottle.",
+          suggestedBottleId: bottle.id,
+          candidateBottleIds: [bottle.id],
+          proposedBottle: null,
+        },
+        candidateBottles: [
+          {
+            bottleId: bottle.id,
+            alias: "Attempt Candidate",
+            fullName: bottle.fullName,
+            brand: null,
+            bottler: null,
+            series: null,
+            distillery: [],
+            category: null,
+            statedAge: null,
+            edition: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 1,
+            source: ["exact"],
+          },
+        ],
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const [attempt] = await db
+      .select()
+      .from(storePriceMatchAttempts)
+      .where(eq(storePriceMatchAttempts.proposalId, proposal.id));
+
+    expect(attempt).toMatchObject({
+      priceId: price.id,
+      proposalId: proposal.id,
+      proposalType: "match_existing",
+      initialStatus: "pending_review",
+      finalStatus: null,
+      confidence: 84,
+      suggestedBottleId: bottle.id,
+    });
+
+    await ignoreStorePriceMatchProposal({
+      proposalId: proposal.id,
+      reviewedById: reviewer.id,
+    });
+
+    const [reviewedAttempt] = await db
+      .select()
+      .from(storePriceMatchAttempts)
+      .where(eq(storePriceMatchAttempts.id, attempt!.id));
+
+    expect(reviewedAttempt).toMatchObject({
+      finalStatus: "ignored",
+      reviewedById: reviewer.id,
+    });
   });
 
   test("does not reevaluate closed proposals during automatic resolution", async ({

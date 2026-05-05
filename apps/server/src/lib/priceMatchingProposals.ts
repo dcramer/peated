@@ -7,6 +7,7 @@ import {
   getReleaseObservationFacts,
   isAddingBottleLevelReleaseTraits,
 } from "@peated/bottle-classifier/releaseIdentity";
+import type { CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import {
   BottleClassificationError,
   classifyBottleReference,
@@ -23,6 +24,7 @@ import {
   bottlesToDistillers,
   changes,
   entities,
+  storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
   type StorePrice,
@@ -660,6 +662,78 @@ function shouldTrackStorePriceQueueEntry(
   status: StorePriceMatchProposal["status"],
 ) {
   return status === "pending_review" || status === "errored";
+}
+
+function getInitialAttemptFinalStatus(
+  status: StorePriceMatchProposal["status"],
+): StorePriceMatchProposal["status"] | null {
+  if (status === "pending_review" || status === "verified") {
+    return null;
+  }
+  return status;
+}
+
+async function recordStorePriceMatchAttempt({
+  automationAssessment,
+  proposal,
+  tx = db,
+}: {
+  automationAssessment?: StorePriceMatchAutomationAssessment | null;
+  proposal: StorePriceMatchProposal;
+  tx?: AnyDatabase;
+}) {
+  await tx.insert(storePriceMatchAttempts).values({
+    priceId: proposal.priceId,
+    proposalId: proposal.id,
+    proposalType: proposal.proposalType,
+    initialStatus: proposal.status,
+    finalStatus: getInitialAttemptFinalStatus(proposal.status),
+    confidence: proposal.confidence,
+    currentBottleId: proposal.currentBottleId,
+    currentReleaseId: proposal.currentReleaseId,
+    suggestedBottleId: proposal.suggestedBottleId,
+    suggestedReleaseId: proposal.suggestedReleaseId,
+    parentBottleId: proposal.parentBottleId,
+    creationTarget: proposal.creationTarget,
+    automationEligible: automationAssessment?.automationEligible ?? false,
+    automationScore: automationAssessment?.automationScore ?? null,
+    model: proposal.model,
+    error: proposal.error,
+    reviewedById: proposal.reviewedById,
+    reviewedAt: proposal.reviewedAt,
+  });
+}
+
+async function markLatestStorePriceMatchAttemptFinalInTransaction(
+  tx: AnyDatabase,
+  {
+    proposalId,
+    finalStatus,
+    reviewedById,
+    error,
+  }: {
+    proposalId: number;
+    finalStatus: StorePriceMatchProposal["status"];
+    reviewedById?: number | null;
+    error?: string | null;
+  },
+) {
+  await tx.execute(sql`
+    UPDATE ${storePriceMatchAttempts}
+    SET
+      final_status = ${finalStatus},
+      reviewed_by_id = ${reviewedById ?? null},
+      error = COALESCE(${error ?? null}, error),
+      reviewed_at = NOW(),
+      updated_at = NOW()
+    WHERE id = (
+      SELECT id
+      FROM ${storePriceMatchAttempts}
+      WHERE proposal_id = ${proposalId}
+      ORDER BY id DESC
+      LIMIT 1
+    )
+  `);
 }
 
 function getStorePriceQueueEntryUpdateValue(
@@ -1451,12 +1525,14 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     input,
     releaseInput,
     user,
+    creationSource,
     expectedProcessingToken,
   }: {
     proposalId: number;
     input?: z.infer<typeof BottleInputSchema>;
     releaseInput?: z.infer<typeof BottleReleaseInputSchema>;
     user: User;
+    creationSource: CatalogVerificationCreationSource;
     expectedProcessingToken?: string;
   },
 ) {
@@ -1499,7 +1575,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
 
     try {
       createResult = await createBottleInTransaction(tx, {
-        creationSource: "price_match_review",
+        creationSource,
         input,
         context: {
           user,
@@ -1588,12 +1664,14 @@ export async function createBottleFromStorePriceMatchProposal({
   input,
   releaseInput,
   user,
+  creationSource = "price_match_review",
   expectedProcessingToken,
 }: {
   proposalId: number;
   input?: z.infer<typeof BottleInputSchema>;
   releaseInput?: z.infer<typeof BottleReleaseInputSchema>;
   user: User;
+  creationSource?: CatalogVerificationCreationSource;
   expectedProcessingToken?: string;
 }) {
   const result = await db.transaction(async (tx) =>
@@ -1602,17 +1680,20 @@ export async function createBottleFromStorePriceMatchProposal({
       input,
       releaseInput,
       user,
+      creationSource,
       expectedProcessingToken,
     }),
   );
 
   if (result.createResult) {
     await finalizeCreatedBottle(result.createResult, {
-      creationSource: "price_match_review",
+      creationSource,
     });
   }
   if (result.createReleaseResult) {
-    await finalizeCreatedBottleRelease(result.createReleaseResult);
+    await finalizeCreatedBottleRelease(result.createReleaseResult, {
+      creationSource,
+    });
   }
   const aliasContexts: Record<string, Record<string, any>> = {};
   if (result.createResult) {
@@ -1742,6 +1823,7 @@ export async function resolveStorePriceMatchProposal(
           expectedProcessingToken: processingToken,
           tx,
         });
+        await recordStorePriceMatchAttempt({ proposal, tx });
 
         if (
           !canClearIgnoredStorePriceAssignment({ proposal, processingToken })
@@ -1795,6 +1877,10 @@ export async function resolveStorePriceMatchProposal(
       searchEvidence,
       expectedProcessingToken: processingToken,
     });
+    await recordStorePriceMatchAttempt({
+      proposal,
+      automationAssessment,
+    });
 
     const shouldAutoCreate = shouldAutoCreateStorePriceMatchProposal({
       decision,
@@ -1805,8 +1891,10 @@ export async function resolveStorePriceMatchProposal(
       return proposal;
     }
 
+    let automationUser: User | null = null;
+
     try {
-      const automationUser = await getAutomationModeratorUser();
+      automationUser = await getAutomationModeratorUser();
 
       if (
         processingToken &&
@@ -1847,6 +1935,7 @@ export async function resolveStorePriceMatchProposal(
         proposalId: proposal.id,
         ...createInputs,
         user: automationUser,
+        creationSource: "price_match_automation",
         expectedProcessingToken: processingToken,
       });
 
@@ -1862,7 +1951,7 @@ export async function resolveStorePriceMatchProposal(
         },
       });
 
-      return await upsertStorePriceMatchProposal({
+      const erroredProposal = await upsertStorePriceMatchProposal({
         price,
         extractedLabel,
         candidates,
@@ -1878,6 +1967,15 @@ export async function resolveStorePriceMatchProposal(
         statusOverride: "errored",
         expectedProcessingToken: processingToken,
       });
+      await db.transaction(async (tx) => {
+        await markLatestStorePriceMatchAttemptFinalInTransaction(tx, {
+          proposalId: erroredProposal.id,
+          finalStatus: "errored",
+          reviewedById: automationUser?.id ?? null,
+          error: erroredProposal.error,
+        });
+      });
+      return erroredProposal;
     }
   } catch (err) {
     logError(err, {
@@ -1887,7 +1985,7 @@ export async function resolveStorePriceMatchProposal(
       },
     });
 
-    return await upsertStorePriceMatchProposal({
+    const proposal = await upsertStorePriceMatchProposal({
       price,
       extractedLabel:
         err instanceof BottleClassificationError
@@ -1904,6 +2002,8 @@ export async function resolveStorePriceMatchProposal(
       error: err instanceof Error ? err.message : "Unknown classifier error",
       expectedProcessingToken: processingToken,
     });
+    await recordStorePriceMatchAttempt({ proposal });
+    return proposal;
   } finally {
     if (processingToken && existingProposal) {
       await releaseStorePriceMatchProposalProcessingLease({
@@ -2024,6 +2124,12 @@ async function markApprovedStorePriceMatchProposalsInTransaction(
       error: null,
     })
     .where(eq(storePriceMatchProposals.id, proposalId));
+
+  await markLatestStorePriceMatchAttemptFinalInTransaction(tx, {
+    proposalId,
+    finalStatus: "approved",
+    reviewedById,
+  });
 
   await tx.execute(sql`
     UPDATE ${storePriceMatchProposals}
@@ -2252,6 +2358,12 @@ export async function ignoreStorePriceMatchProposal({
         error: null,
       })
       .where(eq(storePriceMatchProposals.id, proposalId));
+
+    await markLatestStorePriceMatchAttemptFinalInTransaction(tx, {
+      proposalId,
+      finalStatus: "ignored",
+      reviewedById,
+    });
   });
 }
 

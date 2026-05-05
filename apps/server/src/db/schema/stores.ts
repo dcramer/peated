@@ -220,9 +220,90 @@ export const storePriceMatchProposals = pgTable(
   ],
 );
 
+export type StorePriceMatchProposal =
+  typeof storePriceMatchProposals.$inferSelect;
+export type NewStorePriceMatchProposal =
+  typeof storePriceMatchProposals.$inferInsert;
+
+export const storePriceMatchAttempts = pgTable(
+  "store_price_match_attempt",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    priceId: bigint("price_id", { mode: "number" })
+      .references(() => storePrices.id, { onDelete: "cascade" })
+      .notNull(),
+    proposalId: bigint("proposal_id", { mode: "number" })
+      .references(() => storePriceMatchProposals.id, { onDelete: "cascade" })
+      .notNull(),
+    proposalType: storePriceMatchProposalTypeEnum("proposal_type").notNull(),
+    initialStatus:
+      storePriceMatchProposalStatusEnum("initial_status").notNull(),
+    finalStatus: storePriceMatchProposalStatusEnum("final_status"),
+    confidence: integer("confidence"),
+    currentBottleId: bigint("current_bottle_id", { mode: "number" }).references(
+      () => bottles.id,
+      { onDelete: "set null" },
+    ),
+    currentReleaseId: bigint("current_release_id", {
+      mode: "number",
+    }).references(() => bottleReleases.id, { onDelete: "set null" }),
+    suggestedBottleId: bigint("suggested_bottle_id", {
+      mode: "number",
+    }).references(() => bottles.id, { onDelete: "set null" }),
+    suggestedReleaseId: bigint("suggested_release_id", {
+      mode: "number",
+    }).references(() => bottleReleases.id, { onDelete: "set null" }),
+    parentBottleId: bigint("parent_bottle_id", { mode: "number" }).references(
+      () => bottles.id,
+      { onDelete: "set null" },
+    ),
+    creationTarget: storePriceMatchCreationTargetEnum("creation_target"),
+    automationEligible: boolean("automation_eligible").default(false).notNull(),
+    automationScore: integer("automation_score"),
+    model: text("model"),
+    error: text("error"),
+    reviewedById: bigint("reviewed_by_id", { mode: "number" }).references(
+      () => users.id,
+      { onDelete: "set null" },
+    ),
+    reviewedAt: timestamp("reviewed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("store_price_match_attempt_price_idx").on(table.priceId),
+    index("store_price_match_attempt_proposal_idx").on(table.proposalId),
+    index("store_price_match_attempt_created_idx").on(table.createdAt),
+    index("store_price_match_attempt_final_status_idx").on(table.finalStatus),
+  ],
+);
+
+export const storePriceMatchAttemptsRelations = relations(
+  storePriceMatchAttempts,
+  ({ one }) => ({
+    price: one(storePrices, {
+      fields: [storePriceMatchAttempts.priceId],
+      references: [storePrices.id],
+    }),
+    proposal: one(storePriceMatchProposals, {
+      fields: [storePriceMatchAttempts.proposalId],
+      references: [storePriceMatchProposals.id],
+    }),
+    reviewedBy: one(users, {
+      fields: [storePriceMatchAttempts.reviewedById],
+      references: [users.id],
+    }),
+  }),
+);
+
+export type StorePriceMatchAttempt =
+  typeof storePriceMatchAttempts.$inferSelect;
+export type NewStorePriceMatchAttempt =
+  typeof storePriceMatchAttempts.$inferInsert;
+
 export const storePriceMatchProposalsRelations = relations(
   storePriceMatchProposals,
-  ({ one }) => ({
+  ({ many, one }) => ({
     price: one(storePrices, {
       fields: [storePriceMatchProposals.priceId],
       references: [storePrices.id],
@@ -252,13 +333,9 @@ export const storePriceMatchProposalsRelations = relations(
       fields: [storePriceMatchProposals.reviewedById],
       references: [users.id],
     }),
+    attempts: many(storePriceMatchAttempts),
   }),
 );
-
-export type StorePriceMatchProposal =
-  typeof storePriceMatchProposals.$inferSelect;
-export type NewStorePriceMatchProposal =
-  typeof storePriceMatchProposals.$inferInsert;
 
 export const storePriceMatchRetryRuns = pgTable(
   "store_price_match_retry_run",

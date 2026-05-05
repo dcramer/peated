@@ -5,10 +5,12 @@ import {
   hasBlockingBottleLevelReleaseTraits,
   hasDirtyBottleLevelStatedAgeConflict,
 } from "@peated/bottle-classifier/releaseIdentity";
+import type { CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, BottleRelease, User } from "@peated/server/db/schema";
 import { bottleReleases, bottles, changes } from "@peated/server/db/schema";
 import { findExistingBottleReleaseByIdentity } from "@peated/server/lib/bottleReleaseIdentity";
+import { queueBottleCreationVerification } from "@peated/server/lib/catalogVerification";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
 import type { BottleReleaseInputSchema } from "@peated/server/schemas";
@@ -189,10 +191,14 @@ export async function createBottleReleaseInTransaction(
   };
 }
 
-export async function finalizeCreatedBottleRelease({
-  release,
-  newAliases,
-}: CreateBottleReleaseResult) {
+export async function finalizeCreatedBottleRelease(
+  { release, newAliases }: CreateBottleReleaseResult,
+  {
+    creationSource = "manual_entry",
+  }: {
+    creationSource?: CatalogVerificationCreationSource;
+  } = {},
+) {
   for (const aliasName of newAliases) {
     try {
       await pushJob("OnBottleAliasChange", { name: aliasName });
@@ -214,6 +220,22 @@ export async function finalizeCreatedBottleRelease({
     logError(err, {
       release: {
         id: release.id,
+      },
+    });
+  }
+
+  try {
+    await queueBottleCreationVerification({
+      bottleId: release.bottleId,
+      creationSource,
+    });
+  } catch (err) {
+    logError(err, {
+      release: {
+        id: release.id,
+      },
+      bottle: {
+        id: release.bottleId,
       },
     });
   }
