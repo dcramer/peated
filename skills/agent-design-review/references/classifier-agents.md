@@ -34,35 +34,58 @@ If the system has no written schema, taxonomy, or action set, flag that gap firs
 
 ## Bottleneck Clues
 
-| Symptom | Likely bottleneck |
-| --- | --- |
-| The model chooses the wrong item from a good candidate set | Decision policy, prompt clarity, tool descriptions, or calibration |
-| The right item is not present when the model decides | Retrieval, normalization, or candidate generation |
-| Model output looks good but persisted state is wrong | Output schema, validation, or integration bugs |
-| Confidence is high on weak evidence | Thresholding, confidence semantics, or missing abstain rules |
-| Queue load spikes after an "accuracy" change | Threshold regression, auto-action policy, or precision/recall imbalance |
+| Symptom                                                    | Likely bottleneck                                                       |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------- |
+| The model chooses the wrong item from a good candidate set | Decision policy, prompt clarity, tool descriptions, or calibration      |
+| The right item is not present when the model decides       | Retrieval, normalization, or candidate generation                       |
+| Model output looks good but persisted state is wrong       | Output schema, validation, or integration bugs                          |
+| Confidence is high on weak evidence                        | Thresholding, confidence semantics, or missing abstain rules            |
+| Queue load spikes after an "accuracy" change               | Threshold regression, auto-action policy, or precision/recall imbalance |
 
-## Repo Anchor: Peated Bottle Matcher
+## Repo Anchor: Peated Classifiers
 
-When the task is about the current bottle matcher or label extractor, read:
+When the task is about the current bottle classifier, bottle matcher, or label
+extractor, read:
 
-- `docs/development/schema-conventions.md`
-- `apps/server/src/agents/whisky/guidance.ts`
-- `apps/server/src/agents/priceMatch/classifyStorePriceMatch.ts`
+- `docs/architecture/bottle-classifier.md`
+- `packages/bottle-classifier/AGENTS.md`
+- `packages/bottle-classifier/src/contract.ts`
+- `packages/bottle-classifier/src/classifier.ts`
+- `packages/bottle-classifier/src/classifierRuntime.ts`
+- `packages/bottle-classifier/src/instructions.ts`
+- `packages/bottle-classifier/src/reviewPolicy.ts`
+- `packages/bottle-classifier/src/eval-fixtures/`
+- `apps/server/src/agents/bottleClassifier/service.ts`
 - `apps/server/src/lib/priceMatchingProposals.ts`
-- `apps/server/src/schemas/priceMatches.ts`
 - `apps/server/src/lib/priceMatching.test.ts`
-- `apps/server/src/schemas/priceMatches.test.ts`
 
 Then check:
 
 - extraction conservatism: prefer `null` or `[]` over guessing
 - decisive identity fields: producer, distillery, expression, series, edition, age, cask flags, ABV, and years
 - candidate generation before web search
-- action set boundaries: `match_existing`, `correction`, `create_new`, `no_match`
-- confidence normalization and automation thresholds
+- reviewed action boundaries: `match`, `repair_bottle`, `create_bottle`, `create_release`, `create_bottle_and_release`, `no_match`
+- `identityScope` boundaries: `product` versus `exact_cask`
+- deterministic downgrade, validation, and automation thresholds
 - server-side sanitization of ids and proposed entities
 - non-whisky rejection and human-review boundaries
+
+When the task is about the entity classifier, read:
+
+- `docs/architecture/entity-classifier.md`
+- `packages/entity-classifier/src/contract.ts`
+- `packages/entity-classifier/src/classifierRuntime.ts`
+- `packages/entity-classifier/src/classifierTypes.ts`
+- `packages/entity-classifier/src/instructions.ts`
+- `apps/server/src/agents/entityClassifier/service.ts`
+
+Then check:
+
+- queue discovery stays separate from classifier decisioning
+- local entity search precedes web search
+- reassignment includes only verified bottle ids
+- metadata repair has authoritative support
+- brand/entity remediation distinguishes brand, distillery, owner, bottler, importer, and product/category wording
 
 ## Eval Minimum
 
