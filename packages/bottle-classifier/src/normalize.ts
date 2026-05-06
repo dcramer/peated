@@ -4,8 +4,9 @@
  *
  * This layer is limited to low-risk rewrites such as quote cleanup, age/year
  * formatting, batch marker normalization, and other transformations that do not
- * require brand or program semantics. Do not add bottle-family interpretation
- * here; ambiguous meaning belongs to the reviewed classifier.
+ * require brand or program semantics. New semantic rules need authoritative
+ * domain research and a regression test before they belong here; otherwise leave
+ * the value unknown and let the web-enabled classifier decide.
  */
 import { CATEGORY_LIST } from "./classifierTypes";
 
@@ -76,6 +77,10 @@ export function normalizeCategory(
     normalizedName.endsWith("single malt")
   ) {
     return "single_malt";
+  }
+
+  if (/\bsingle pot still\b/.test(normalizedName)) {
+    return "single_pot_still";
   }
 
   for (const category of CATEGORY_LIST) {

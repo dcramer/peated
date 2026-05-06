@@ -13,6 +13,9 @@ describe("instructions", () => {
     expect(instructions).toContain(
       "prefer `release_year` over `vintage_year` even if the year appears before the family wording",
     );
+    expect(instructions).toContain(
+      "Do not collapse `malt whiskey` or `straight malt whiskey` into `single_malt`",
+    );
   });
 
   test("teaches the classifier to keep annual family years at release scope", () => {
@@ -25,6 +28,9 @@ describe("instructions", () => {
     );
     expect(instructions).toContain(
       "do not leave that differentiator stranded on `proposedBottle`",
+    );
+    expect(instructions).toContain(
+      "Use web search to confirm whether a non-enum style actually fits a house category",
     );
   });
 

@@ -8,6 +8,8 @@
  *
  * If a split depends on marketed family meaning or brand/program context, this
  * layer must leave the name untouched and let the reviewed classifier decide.
+ * New semantic hardcoding requires authoritative domain research plus a
+ * regression fixture or unit test.
  */
 import type {
   BottleExtractedDetails,

@@ -1,0 +1,129 @@
+{
+  "id": "store-listing-creates-woodford-reserve-straight-malt-with-null-category",
+  "name": "store listing: creates Woodford Reserve Kentucky Straight Malt without forcing category",
+  "input": {
+    "reference": {
+      "name": "Woodford Reserve Kentucky Straight Malt Whiskey",
+      "url": "https://www.reservebar.com/products/woodford-reserve-kentucky-straight-malt-whiskey/GROUPING-67755.html?utm=peated"
+    },
+    "extractedIdentity": {
+      "brand": "Woodford Reserve",
+      "bottler": null,
+      "expression": "Kentucky Straight Malt",
+      "series": null,
+      "distillery": ["Woodford Reserve"],
+      "category": null,
+      "stated_age": null,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "bottleId": 44150,
+        "releaseId": null,
+        "alias": "Woodford Reserve Kentucky Straight Bourbon Whiskey",
+        "fullName": "Woodford Reserve Kentucky Straight Bourbon Whiskey",
+        "bottleFullName": "Woodford Reserve Kentucky Straight Bourbon Whiskey",
+        "brand": "Woodford Reserve",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Woodford Reserve"],
+        "category": "bourbon",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": 45.2,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.762212521057816,
+        "source": ["vector"]
+      },
+      {
+        "kind": "bottle",
+        "bottleId": 16322,
+        "releaseId": null,
+        "alias": "Woodford Reserve Distiller's Select",
+        "fullName": "Woodford Reserve Distiller's Select Rye",
+        "bottleFullName": "Woodford Reserve Distiller's Select Rye",
+        "brand": "Woodford Reserve",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "rye",
+        "statedAge": null,
+        "edition": "Batch 0037",
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.740795725697738,
+        "source": ["vector"]
+      },
+      {
+        "kind": "bottle",
+        "bottleId": 44022,
+        "releaseId": null,
+        "alias": "Woodford Reserve Double Double Oaked",
+        "fullName": "Woodford Reserve Double Double Oaked",
+        "bottleFullName": "Woodford Reserve Double Double Oaked",
+        "brand": "Woodford Reserve",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Woodford Reserve"],
+        "category": "bourbon",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.7391965914904101,
+        "source": ["vector"]
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["Woodford", "Reserve", "Malt"],
+      "results": []
+    }
+  ],
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "proposedBottle": {
+      "name": "Kentucky Straight Malt Whiskey",
+      "brand": {
+        "name": "Woodford Reserve"
+      },
+      "distillers": [
+        {
+          "name": "Woodford Reserve"
+        }
+      ],
+      "category": null
+    },
+    "summary": "Create the distinct Woodford Reserve Kentucky Straight Malt Whiskey bottle but leave category null because straight malt is not represented by the house category enum."
+  }
+}

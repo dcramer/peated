@@ -88,6 +88,9 @@ describe("normalize", () => {
   test("normalizes simple metadata helpers", () => {
     expect(normalizeString("Maker’s Mark™")).toBe("Maker's Mark");
     expect(normalizeCategory("Single Malt Scotch Whisky")).toBe("single_malt");
+    expect(normalizeCategory("Redbreast Single Pot Still Irish Whiskey")).toBe(
+      "single_pot_still",
+    );
     expect(normalizeEntityName("Maker's Mark Distillery")).toBe(
       "Maker's Mark Distillery",
     );

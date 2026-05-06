@@ -1,5 +1,5 @@
 import type { CaskFill, CaskSize, CaskType, Category } from "./classifierTypes";
-import { CATEGORY_LIST } from "./classifierTypes";
+import { CASK_SIZE_IDS, CASK_TYPE_IDS } from "./classifierTypes";
 
 const FLAVOR_PROFILES = [
   "young_spritely",
@@ -18,8 +18,10 @@ const FLAVOR_PROFILES = [
 
 export type FlavorProfile = (typeof FLAVOR_PROFILES)[number];
 
-// This needs moved into the database and needs to be editable by the community/mods
-// https://www.whiskysaga.com/smws-codes
+// External SMWS code data, not general whisky taxonomy inference. Keep changes
+// backed by a cited source and tests until this moves into an editable database.
+// SMWS code format: https://unfiltered.smws.com/uk/welcome-magazine/smws-101.html
+// Source: https://www.whiskysaga.com/smws-codes
 export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   // Single Malt
   1: "Glenfarclas",
@@ -286,22 +288,22 @@ export const SMWS_CATEGORY_LIST = [
   ["A", "Armagnac"],
 ];
 
-export function getCategoryFromCask(caskNumber: string) {
+export function getCategoryFromCask(caskNumber: string): Category | null {
   if (caskNumber.startsWith("GN")) {
-    return "gin";
+    return null;
   } else if (caskNumber.startsWith("RW")) {
     return "rye";
   } else if (caskNumber.startsWith("CW1")) {
-    // corn - where should it go?
+    // SMWS corn whisky has no current house category, so keep it unknown.
     return null;
   } else if (caskNumber.startsWith("B")) {
     return "bourbon";
   } else if (caskNumber.startsWith("R")) {
-    return "rum";
+    return null;
   } else if (caskNumber.startsWith("A")) {
-    return "armagnac";
+    return null;
   } else if (caskNumber.startsWith("C")) {
-    return "cognac";
+    return null;
   } else if (caskNumber.startsWith("G")) {
     return "single_grain";
   } else if (Number(caskNumber[0]) > 0) {
@@ -338,10 +340,7 @@ export function parseDetailsFromName(name: string): SMWSCaskDetails | null {
     return null;
   }
 
-  const rawCategory = getCategoryFromCask(caskNumber);
-  const category = CATEGORY_LIST.includes(rawCategory as any)
-    ? (rawCategory as Category)
-    : null;
+  const category = getCategoryFromCask(caskNumber);
 
   return {
     category,
@@ -407,10 +406,22 @@ function parseFill(value: string): CaskFill | null {
 
 function parseType(value: string): CaskType | null {
   if (!value) return null;
-  return value
+  const normalizedType = value
     .toLowerCase()
     .replace("px", "pedro_ximenez")
-    .replace(" ", "_") as CaskType;
+    .replace(/\s+/g, "_");
+
+  return CASK_TYPE_IDS.includes(normalizedType as CaskType)
+    ? (normalizedType as CaskType)
+    : null;
+}
+
+function parseSize(value: string): CaskSize | null {
+  const normalizedSize = value.toLowerCase();
+
+  return CASK_SIZE_IDS.includes(normalizedSize as CaskSize)
+    ? (normalizedSize as CaskSize)
+    : null;
 }
 
 export function parseCaskType(
@@ -428,6 +439,6 @@ export function parseCaskType(
   return [
     caskFillMatch ? parseFill(caskFillMatch[1]) : null,
     caskTypeMatch ? parseType(caskTypeMatch[1]) : null,
-    caskSizeMatch ? (caskSizeMatch[1].toLowerCase() as CaskSize) : null,
+    caskSizeMatch ? parseSize(caskSizeMatch[1]) : null,
   ];
 }

@@ -33,6 +33,10 @@ import {
   stripDuplicateBrandPrefixFromBottleName,
 } from "./normalize";
 
+// These deterministic patterns are only reject/scope guards. They must not grow
+// into whisky taxonomy inference: new semantic phrase rules require
+// authoritative research and focused tests, and ambiguous styles belong to the
+// web-enabled classifier.
 const NON_WHISKY_KEYWORDS =
   /\b(vodka|gin|rum|tequila|mezcal|sotol|soju|baijiu|sake|shochu|brandy|cognac|armagnac|liqueur)\b/i;
 const GIFT_SET_PACKAGING_KEYWORDS =

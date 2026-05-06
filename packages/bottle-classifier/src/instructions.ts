@@ -92,6 +92,7 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
     outputField: "`category`",
     guidance: [
       `Normalize into one of ${CATEGORY_VALUES}.`,
+      "Only return `single_malt` when the source explicitly says single malt. Do not collapse `malt whiskey` or `straight malt whiskey` into `single_malt`; leave `category` as `null` if no house value fits.",
       "If the whisky category is unclear, return `null` instead of using a broader fallback bucket.",
     ],
   },
@@ -877,6 +878,7 @@ export function buildBottleClassifierInstructions({
       "`expression` is the core release name after removing producer, age, ABV, and generic style words.",
       "`series` is a stable range or family. `edition` is a batch, store-pick code, release code, or numbered variant.",
       "`category` should be normalized to the house values. If the whisky type is unclear, leave `category` as `null` instead of using a fallback bucket.",
+      "Do not collapse `malt whiskey` or `straight malt whiskey` into `single_malt`. Use web search to confirm whether a non-enum style actually fits a house category when that category matters; if authoritative evidence confirms only a non-house style, leave `category` as `null`.",
       "`cask_size` and `cask_fill` should use the normalized house values only when they are explicitly stated.",
       "`cask_strength` and `single_cask` are true only when the reference states them explicitly. `Barrel Strength`, `Barrel Proof`, `Full Proof`, and `Natural Strength` all imply `caskStrength: true`.",
       "If a decisive component is missing or ambiguous, treat that as uncertainty instead of inventing a cleaner canonical label.",

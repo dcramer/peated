@@ -26,10 +26,18 @@ describe("smws", () => {
       "bourbon",
       "hogshead",
     ]);
+    expect(parseCaskType("refill rum barrel")).toEqual([
+      "refill",
+      null,
+      "barrel",
+    ]);
   });
 
   test("maps SMWS cask codes to categories", () => {
     expect(getCategoryFromCask("RW3.6")).toBe("rye");
     expect(getCategoryFromCask("41.176")).toBe("single_malt");
+    expect(getCategoryFromCask("R2.19")).toBeNull();
+    expect(getCategoryFromCask("A5.6")).toBeNull();
+    expect(getCategoryFromCask("GN1.1")).toBeNull();
   });
 });
