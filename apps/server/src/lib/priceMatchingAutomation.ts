@@ -335,13 +335,72 @@ function bottleTargetRepresentsExtractedReleaseIdentity({
     );
 }
 
-function listingCarriesReleaseIdentityBeyondBottle({
+function isPlainAgeExpression({
+  expression,
+  statedAge,
+}: {
+  expression: string;
+  statedAge: number | null;
+}) {
+  if (statedAge === null) {
+    return false;
+  }
+
+  const normalizedExpression = normalizeComparableText(expression)
+    .replace(/[-\s]+/g, " ")
+    .trim();
+
+  return new RegExp(
+    `^${escapeRegExp(String(statedAge))}\\s*(?:year|yr)s?(?:\\s*old)?$`,
+    "i",
+  ).test(normalizedExpression);
+}
+
+function isCaskFinishCoveredByNamedBottleExpression({
+  target,
+  extractedLabel,
+}: {
+  target: PriceMatchCandidate;
+  extractedLabel: ExtractedBottleDetails;
+}) {
+  const { brand, cask_type, category, expression, stated_age } = extractedLabel;
+
+  if (
+    !cask_type ||
+    !expression ||
+    isPlainAgeExpression({ expression, statedAge: stated_age }) ||
+    !candidateMatchesName(target, expression) ||
+    target.caskType !== null
+  ) {
+    return false;
+  }
+
+  if (brand && !candidateMatchesBrand(target, brand)) {
+    return false;
+  }
+
+  if (category && target.category !== null && target.category !== category) {
+    return false;
+  }
+
+  if (
+    stated_age !== null &&
+    target.statedAge !== null &&
+    target.statedAge !== stated_age
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+function getUnmatchedReleaseIdentityAttributes({
   target,
   extractedLabel,
 }: {
   target: PriceMatchCandidate;
   extractedLabel: ExtractedBottleDetails | null;
-}) {
+}): MatchAttribute[] {
   const extractedReleaseAttributes = [
     {
       attribute: "edition" as const,
@@ -385,17 +444,53 @@ function listingCarriesReleaseIdentityBeyondBottle({
     },
   ];
 
-  return extractedReleaseAttributes.some(({ attribute, value }) => {
+  const unmatchedAttributes: MatchAttribute[] = [];
+  for (const { attribute, value } of extractedReleaseAttributes) {
     if (!hasMeaningfulExtractedReleaseValue(value)) {
-      return false;
+      continue;
     }
 
-    return !bottleTargetRepresentsExtractedReleaseIdentity({
+    if (
+      !bottleTargetRepresentsExtractedReleaseIdentity({
+        target,
+        attribute,
+        expectedValue: value,
+      })
+    ) {
+      unmatchedAttributes.push(attribute);
+    }
+  }
+
+  const onlyUnmatchedAttributeIsCaskType =
+    unmatchedAttributes.length === 1 && unmatchedAttributes[0] === "caskType";
+
+  if (
+    onlyUnmatchedAttributeIsCaskType &&
+    extractedLabel &&
+    isCaskFinishCoveredByNamedBottleExpression({
       target,
-      attribute,
-      expectedValue: value,
-    });
-  });
+      extractedLabel,
+    })
+  ) {
+    return [];
+  }
+
+  return unmatchedAttributes;
+}
+
+function listingCarriesReleaseIdentityBeyondBottle({
+  target,
+  extractedLabel,
+}: {
+  target: PriceMatchCandidate;
+  extractedLabel: ExtractedBottleDetails | null;
+}) {
+  return (
+    getUnmatchedReleaseIdentityAttributes({
+      target,
+      extractedLabel,
+    }).length > 0
+  );
 }
 
 function getCreateNewChecks(

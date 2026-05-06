@@ -1,0 +1,65 @@
+{
+  "id": "store-listing-dewars-japanese-smooth-keeps-mizunara-finish-at-bottle-level",
+  "name": "store listing: Dewar's Japanese Smooth keeps Mizunara finish at bottle level",
+  "input": {
+    "reference": {
+      "name": "Dewar's Blended Scotch Japanese Smooth Mizunara Oak Cask Finish 8-year-old",
+      "url": "https://woodencork.com/collections/whiskey/products/dewars-blended-scotch-japanese-smooth-mizunara-oak-cask-finish-8-yr"
+    },
+    "extractedIdentity": {
+      "brand": "Dewar's",
+      "bottler": null,
+      "expression": "Japanese Smooth",
+      "series": null,
+      "distillery": [],
+      "category": "blend",
+      "stated_age": 8,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": "Mizunara Oak Cask Finish",
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "bottleId": 13058,
+        "releaseId": null,
+        "alias": "Dewar's Japanese Smooth",
+        "fullName": "Dewar's 8-year-old Japanese Smooth",
+        "bottleFullName": "Dewar's 8-year-old Japanese Smooth",
+        "brand": "Dewar's",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "blend",
+        "statedAge": 8,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 1,
+        "source": ["brand", "text", "exact"]
+      }
+    ]
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 13058,
+    "matchedReleaseId": null,
+    "confidenceAtLeast": 96,
+    "verifyEligible": true,
+    "summary": "Treat Mizunara Oak Cask Finish as the stable finishing descriptor for Dewar's Japanese Smooth, not as a child release under the bottle."
+  }
+}

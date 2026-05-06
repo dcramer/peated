@@ -126,10 +126,115 @@ describe("priceMatchingAutomation", () => {
       ],
     });
 
-    expect(assessment.automationBlockers).not.toContain(
+    expect(assessment.automationBlockers).toEqual([]);
+    expect(assessment.decisiveMatchAttributes).toContain("statedAge");
+  });
+
+  test("does not flag a named cask-finished expression as release-specific when the bottle target lacks cask metadata", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "match_existing",
+      modelConfidence: 98,
+      price: {
+        bottleId: null,
+        name: "Dewar's Blended Scotch Japanese Smooth Mizunara Oak Cask Finish 8-year-old",
+        url: "https://woodencork.com/collections/whiskey/products/dewars-blended-scotch-japanese-smooth-mizunara-oak-cask-finish-8-yr",
+      },
+      suggestedBottleId: 13058,
+      suggestedReleaseId: null,
+      extractedLabel: buildExtractedLabel({
+        brand: "Dewar's",
+        expression: "Japanese Smooth",
+        distillery: [],
+        category: "blend",
+        stated_age: 8,
+        abv: null,
+        cask_type: "Mizunara Oak Cask Finish",
+      }),
+      proposedBottle: null,
+      searchEvidence: [],
+      candidateBottles: [
+        buildCandidate({
+          bottleId: 13058,
+          alias: "Dewar's Japanese Smooth",
+          fullName: "Dewar's 8-year-old Japanese Smooth",
+          bottleFullName: "Dewar's 8-year-old Japanese Smooth",
+          brand: "Dewar's",
+          distillery: [],
+          category: "blend",
+          statedAge: 8,
+          abv: null,
+          caskType: null,
+          source: ["brand", "text", "exact"],
+        }),
+      ],
+    });
+
+    expect(assessment.automationBlockers).toEqual([]);
+    expect(assessment.decisiveMatchAttributes).toContain("name");
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        currentBottleId: null,
+        currentReleaseId: null,
+        suggestedBottleId: 13058,
+        suggestedReleaseId: null,
+        modelConfidence: 98,
+        automationBlockers: assessment.automationBlockers,
+      }),
+    ).toBe(true);
+  });
+
+  test("keeps the cask-type blocker when the extracted expression is only an age statement", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "match_existing",
+      modelConfidence: 99,
+      price: {
+        bottleId: null,
+        name: "Example Distillery 10-year-old Tawny Port Cask",
+        url: "https://example.com/example-distillery-10-tawny-port",
+      },
+      suggestedBottleId: 1,
+      suggestedReleaseId: null,
+      extractedLabel: buildExtractedLabel({
+        brand: "Example Distillery",
+        expression: "10-year-old",
+        distillery: ["Example Distillery"],
+        category: "single_malt",
+        stated_age: 10,
+        abv: null,
+        cask_type: "tawny_port",
+      }),
+      proposedBottle: null,
+      searchEvidence: [],
+      candidateBottles: [
+        buildCandidate({
+          bottleId: 1,
+          fullName: "Example Distillery 10-year-old",
+          bottleFullName: "Example Distillery 10-year-old",
+          brand: "Example Distillery",
+          distillery: ["Example Distillery"],
+          category: "single_malt",
+          statedAge: 10,
+          abv: null,
+          caskType: null,
+        }),
+      ],
+    });
+
+    expect(assessment.automationBlockers).toContain(
       "listing looks release-specific but the suggested target is only a bottle",
     );
-    expect(assessment.decisiveMatchAttributes).toContain("statedAge");
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        currentBottleId: null,
+        currentReleaseId: null,
+        suggestedBottleId: 1,
+        suggestedReleaseId: null,
+        modelConfidence: 99,
+        automationBlockers: assessment.automationBlockers,
+      }),
+    ).toBe(false);
   });
 
   test("auto-approves high-confidence stable bottle matches from structured identity even below the raw score threshold", () => {
