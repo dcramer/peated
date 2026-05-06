@@ -1,6 +1,5 @@
 "use client";
 
-import AdminWorkstreamTabs from "@peated/web/components/admin/workstreamTabs";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import { useFlashMessages } from "@peated/web/components/flash";
@@ -348,8 +347,6 @@ export default function Page() {
           one of the repair queues below instead of forcing the listing to carry
           that cleanup.
         </div>
-
-        <AdminWorkstreamTabs />
 
         <Form
           action={pathname}
