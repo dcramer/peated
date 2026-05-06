@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T18:27:33.811Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "SMWS RW6.5 Sauna Smoke Scotch Malt Whisky Society"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "SMWS RW6.5 Sauna Smoke Scotch Malt Whisky Society",
+    "summary": "I found good evidence that **SMWS RW6.5 “Appley ever after”** is **not a Scotch malt whisky**, despite the “SMWS” branding.\n\nWhat the sources support:\n\n- **Bottler:** It is a **Scotch Malt Whisky Society** single-cask release, cask **RW6.5**, titled **“Appley ever after.”** ([smws.com](https://smws.com/all-whisky/whisk",
+    "results": [
+      {
+        "title": "https://shop.smws.ch/pi/en/Whisky/RW65-APPLEY-EVER-AFTER.html",
+        "url": "https://shop.smws.ch/pi/en/Whisky/RW65-APPLEY-EVER-AFTER.html",
+        "domain": "shop.smws.ch",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.smws.ch/en/",
+        "url": "https://www.smws.ch/en/",
+        "domain": "smws.ch",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Rye Whisky",
+        "url": "https://smws.com/all-whisky/whisky/rye-whisky/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskylibraryshop.co.za/products/smws-rw6-5-appley-ever-after",
+        "url": "https://whiskylibraryshop.co.za/products/smws-rw6-5-appley-ever-after",
+        "domain": "whiskylibraryshop.co.za",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://th.smws.com/whisky",
+        "url": "https://th.smws.com/whisky",
+        "domain": "th.smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.strathliquor.com/product/smws-rw6-3-cinnamon-sauna-smoke/",
+        "url": "https://www.strathliquor.com/product/smws-rw6-3-cinnamon-sauna-smoke/",
+        "domain": "strathliquor.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "3980ae25fbd8b9881edab460ff1e3bab29144e2a7dec55178278cf8ac5ae09ec",
+    "mode": "auto"
+  }
+}

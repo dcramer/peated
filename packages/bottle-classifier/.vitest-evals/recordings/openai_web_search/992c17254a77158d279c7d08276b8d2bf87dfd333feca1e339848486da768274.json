@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T19:48:22.170Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Series Volume 3 official bourbon whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Heaven's Door Bootleg Series Volume 3 official bourbon whiskey",
+    "summary": "**Heaven’s Door Bootleg Series Volume 3** is an **official Heaven’s Door release**. On Heaven’s Door’s official Bootleg Series page, Volume III is identified as **“Sunday Afternoon”** and described as a **13-year-old Kentucky bourbon** finished in **Spanish Vino de Naranja casks**. ([heavensdoor.com](https://www.heaven",
+    "results": [
+      {
+        "title": "https://www.heavensdoor.com/bootleg-series",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "url": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://bourbonpursuit.com/2022/05/03/whiskey-quickie-heavens-door-bootleg-volume-3-bourbon-review/",
+        "url": "https://bourbonpursuit.com/2022/05/03/whiskey-quickie-heavens-door-bootleg-volume-3-bourbon-review/",
+        "domain": "bourbonpursuit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.heavensdoor.com/collections/bootlegs",
+        "url": "https://buy.heavensdoor.com/collections/bootlegs",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://breakingbourbon.com/review/heavens-door-bootleg-vol-v",
+        "url": "https://breakingbourbon.com/review/heavens-door-bootleg-vol-v",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+        "url": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "992c17254a77158d279c7d08276b8d2bf87dfd333feca1e339848486da768274",
+    "mode": "auto"
+  }
+}

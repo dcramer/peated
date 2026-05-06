@@ -5,6 +5,7 @@ import { toJsonValue } from "vitest-evals/harness";
 import { z } from "zod";
 import {
   createBottleClassifier,
+  finalizeBottleClassifierReasoningResult,
   prepareBottleClassifierAgentRun,
   type PreparedBottleClassifierAgentRun,
 } from "./classifierRuntime";
@@ -26,10 +27,7 @@ import {
   LEGACY_RELEASE_REPAIR_RESOLUTION_EVAL_CASES,
   type LegacyReleaseRepairResolutionEvalCase,
 } from "./legacyReleaseRepairResolution.eval.fixtures";
-import {
-  finalizeBottleReferenceClassification,
-  getAutoIgnoreBottleReferenceReason,
-} from "./reviewPolicy";
+import { getAutoIgnoreBottleReferenceReason } from "./reviewPolicy";
 import { buildDefaultBottleSearchInput } from "./runtime/agentInput";
 
 const EvaluatedRepairResolutionSchema = z
@@ -151,7 +149,7 @@ function createClassifierOptions() {
 
 type PreparedRepairResolutionRun = {
   agentRun: PreparedBottleClassifierAgentRun;
-  evaluateAgentResult: (result: unknown) => EvaluatedRepairResolution;
+  evaluateAgentResult: (result: unknown) => Promise<EvaluatedRepairResolution>;
 };
 
 async function prepareRepairResolutionEvalRun(
@@ -204,17 +202,20 @@ async function prepareRepairResolutionEvalRun(
 
   return {
     agentRun,
-    evaluateAgentResult: (result) => {
+    evaluateAgentResult: async (result) => {
       const reasoning = agentRun.getReasoningResult(result);
-      const decision = finalizeBottleReferenceClassification({
-        reference: parsedInput.reference,
-        decision: reasoning.decision,
-        artifacts: reasoning.artifacts,
-      });
+      const { decision, artifacts: reasoningArtifacts } =
+        await finalizeBottleClassifierReasoningResult({
+          options,
+          reference: parsedInput.reference,
+          reasoning,
+          candidateExpansion: parsedInput.candidateExpansion,
+          webSearchBudget: agentRun.webSearchBudget,
+        });
       const classification = BottleClassificationResultSchema.parse(
         createDecidedBottleClassification({
           decision,
-          artifacts: reasoning.artifacts,
+          artifacts: reasoningArtifacts,
         }),
       );
       const resolution = resolveLegacyCreateParentClassification({

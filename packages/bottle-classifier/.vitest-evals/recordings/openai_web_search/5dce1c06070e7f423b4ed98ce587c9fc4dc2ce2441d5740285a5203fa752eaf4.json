@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-07T01:49:46.857Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Barrel Proof Batch C923 official batch C923"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Barrel Proof Batch C923 official batch C923",
+    "summary": "For **Elijah Craig Barrel Proof Batch C923**, the strongest official confirmation is Heaven Hill’s own batch list: it identifies **C923** as the **September 2023** release and shows the bottling strength as **133.0 proof**—that number is **proof, not ABV**. Heaven Hill also explains the batch code format, where the fin",
+    "results": [
+      {
+        "title": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php/1000",
+        "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php/1000",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhilldistillery.com/larceny-barrel-proof.php/1000",
+        "url": "https://heavenhilldistillery.com/larceny-barrel-proof.php/1000",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/larceny-barrel-proof-batch-c923",
+        "url": "https://www.breakingbourbon.com/review/larceny-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://breakingbourbon.com/review/elijah-craig-barrel-proof",
+        "url": "https://breakingbourbon.com/review/elijah-craig-barrel-proof",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhilldistillery.com/barrel.php/our-brands.php",
+        "url": "https://heavenhilldistillery.com/barrel.php/our-brands.php",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5dce1c06070e7f423b4ed98ce587c9fc4dc2ce2441d5740285a5203fa752eaf4",
+    "mode": "auto"
+  }
+}

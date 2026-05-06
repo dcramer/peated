@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-07T00:29:05.645Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Canadian Club Reserve 9 year old official 40% Triple Aged"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Canadian Club Reserve 9 year old official 40% Triple Aged",
+    "summary": "This reference appears to point to **Canadian Club Reserve 9 Year Old**, an **official Canadian Club bottling at 40% ABV**, with **“Triple Aged”** used on the label rather than indicating a separate finish or special cask program. The official Canadian Club product page confirms it is **Reserve 9 Year Old Canadian Whis",
+    "results": [
+      {
+        "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "url": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+        "url": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "url": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.walmart.com/ip/126131678",
+        "url": "https://www.walmart.com/ip/126131678",
+        "domain": "walmart.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://bevmo.com/products/33945",
+        "url": "https://bevmo.com/products/33945",
+        "domain": "bevmo.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e2c9077ccab5f2399198cbf2456dde6afe6be6baf3994639b2c1cb55b8f39729",
+    "mode": "auto"
+  }
+}

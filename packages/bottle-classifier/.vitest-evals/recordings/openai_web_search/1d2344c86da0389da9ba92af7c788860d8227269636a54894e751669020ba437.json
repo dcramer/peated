@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T19:19:21.287Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "site:smws.com RW6.5 SMWS rye whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "site:smws.com RW6.5 SMWS rye whisky",
+    "summary": "I found authoritative confirmation for **SMWS RW6.5** as a rye whisky release, and the strongest match is:\n\n- **Name:** *Appley ever after*\n- **Cask no.:** **RW6.5**\n- **Spirit type:** **Rye Whisky**\n- **Region / origin listed by SMWS:** **Finland**\n- **Age:** **6 years**\n- **ABV:** **56.0%**\n- **Cask type:** **1st fil",
+    "results": [
+      {
+        "title": "https://smws.com/all-whisky/whisky/rye-whisky/",
+        "url": "https://smws.com/all-whisky/whisky/rye-whisky/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Appley ever after",
+        "url": "https://smws.com/appley-ever-after/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.eu/all-whisky/whisky/rye-whisky/",
+        "url": "https://smws.eu/all-whisky/whisky/rye-whisky/",
+        "domain": "smws.eu",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Kyrö 2018 SMWS RW6.5 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "1d2344c86da0389da9ba92af7c788860d8227269636a54894e751669020ba437",
+    "mode": "auto"
+  }
+}

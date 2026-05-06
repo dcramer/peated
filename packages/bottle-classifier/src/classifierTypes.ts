@@ -72,6 +72,64 @@ export const EntityTypeEnum = z.enum(ENTITY_TYPE_LIST);
 
 const CURRENT_YEAR = new Date().getFullYear();
 
+export const BOTTLE_RELEASE_TRAIT_FIELDS = [
+  "edition",
+  "statedAge",
+  "releaseYear",
+  "vintageYear",
+  "abv",
+  "singleCask",
+  "caskStrength",
+  "caskFill",
+  "caskType",
+  "caskSize",
+] as const;
+
+const BottleReleaseTraitFieldEnum = z.enum(BOTTLE_RELEASE_TRAIT_FIELDS);
+
+const BottleCandidateReleaseSiblingSchema = z
+  .object({
+    releaseId: z.number().int(),
+    fullName: z.string(),
+    traitFields: z.array(BottleReleaseTraitFieldEnum).default([]),
+    edition: z.string().trim().nullable().default(null),
+    statedAge: z.number().min(0).max(100).nullable().default(null),
+    releaseYear: z
+      .number()
+      .int()
+      .gte(1800)
+      .lte(CURRENT_YEAR + 1)
+      .nullable()
+      .default(null),
+    vintageYear: z
+      .number()
+      .int()
+      .gte(1800)
+      .lte(CURRENT_YEAR)
+      .nullable()
+      .default(null),
+    abv: z.number().min(0).max(100).nullable().default(null),
+    singleCask: z.boolean().nullable().default(null),
+    caskStrength: z.boolean().nullable().default(null),
+    caskFill: CaskFillEnum.nullable().default(null),
+    caskType: CaskTypeEnum.nullable().default(null),
+    caskSize: CaskSizeEnum.nullable().default(null),
+  })
+  .strict();
+
+const BottleCandidateFamilyContextSchema = z
+  .object({
+    parentBottleReleaseTraits: z
+      .array(BottleReleaseTraitFieldEnum)
+      .default([])
+      .describe(
+        "Release-like traits stored on the parent bottle row, usually indicating legacy or single-known-release data rather than clean parent identity.",
+      ),
+    childReleaseCount: z.number().int().min(0).default(0),
+    siblingReleases: z.array(BottleCandidateReleaseSiblingSchema).default([]),
+  })
+  .strict();
+
 export const BottleExtractedDetailsSchema = z.object({
   brand: z.string().nullable().default(null),
   bottler: z.string().nullable().default(null),
@@ -132,6 +190,7 @@ export const BottleCandidateSchema = z.object({
   caskFill: CaskFillEnum.nullable().default(null),
   score: z.number().nullable().default(null),
   source: z.array(z.string()).default([]),
+  familyContext: BottleCandidateFamilyContextSchema.nullable().optional(),
 });
 
 export const BottleSearchResultSchema = z.object({
@@ -317,12 +376,101 @@ export const BottleObservationSchema = z
   })
   .strict();
 
+export const BottleIdentityBasisSchema = z
+  .object({
+    bottleTraits: z
+      .array(z.string().trim().min(1))
+      .default([])
+      .describe(
+        "Traits treated as stable parent bottle identity, such as brand, expression, series, category, and stable age.",
+      ),
+    releaseTraits: z
+      .array(z.string().trim().min(1))
+      .default([])
+      .describe(
+        "Traits treated as reusable child release identity, such as batch, edition, vintage year, release year, release-specific ABV, or cask details.",
+      ),
+    observationTraits: z
+      .array(z.string().trim().min(1))
+      .default([])
+      .describe(
+        "Exact source facts preserved as observations instead of canonical bottle or release identity.",
+      ),
+    yearInterpretation: z
+      .enum([
+        "none",
+        "vintage_year",
+        "release_year",
+        "both",
+        "ambiguous",
+        "not_identity",
+      ])
+      .default("none"),
+    siblingEvidence: z
+      .enum([
+        "none",
+        "single_known_release",
+        "existing_child_releases",
+        "dirty_sibling_candidates",
+        "unclear",
+      ])
+      .default("none"),
+    uncertainties: z.array(z.string().trim().min(1)).default([]),
+  })
+  .strict();
+
+export const BottleConfidenceBasisSchema = z
+  .object({
+    band: z
+      .enum(["low", "review", "auto_verification", "current_assignment"])
+      .default("review")
+      .describe(
+        "Confidence band implied by the evidence. Use auto_verification only when the evidence is strong enough for downstream automatic verification.",
+      ),
+    positiveEvidence: z
+      .array(z.string().trim().min(1))
+      .default([])
+      .describe(
+        "Concrete evidence that increases confidence, such as exact local aliases, unique structured local traits, exact-cask codes, or authoritative web confirmation.",
+      ),
+    unresolvedRisks: z
+      .array(z.string().trim().min(1))
+      .default([])
+      .describe(
+        "Concrete conflicts, missing traits, sibling ambiguity, or weak evidence that keeps confidence below automatic verification.",
+      ),
+    toolsUsed: z
+      .array(
+        z.enum([
+          "initial_local_candidates",
+          "search_bottles",
+          "search_entities",
+          "openai_web_search",
+          "brave_web_search",
+          "none",
+        ]),
+      )
+      .default([])
+      .describe(
+        "Evidence sources actually used to decide confidence. Include search tools only when called.",
+      ),
+    webEvidence: z
+      .enum(["not_needed", "not_used", "supportive", "weak", "conflicting"])
+      .default("not_used")
+      .describe(
+        "How web evidence affected confidence. Use not_needed only when local evidence alone is decisive.",
+      ),
+  })
+  .strict();
+
 const BottleClassifierDecisionBaseSchema = z.object({
   confidence: z.number().min(0).max(100),
   rationale: z.string().nullable().default(null),
   candidateBottleIds: z.array(z.number().int()).default([]),
   identityScope: BottleIdentityScopeEnum.default("product"),
   observation: BottleObservationSchema.nullable().default(null),
+  identityBasis: BottleIdentityBasisSchema.nullable().optional(),
+  confidenceBasis: BottleConfidenceBasisSchema.nullable().optional(),
 });
 
 const MatchDecisionSchema = BottleClassifierDecisionBaseSchema.extend({
@@ -448,6 +596,8 @@ export const BottleClassifierAgentDecisionSchema = z.object({
   candidateBottleIds: z.array(z.number().int()).default([]),
   identityScope: BottleIdentityScopeEnum.nullable().default(null),
   observation: BottleObservationSchema.nullable().default(null),
+  identityBasis: BottleIdentityBasisSchema.nullable().default(null),
+  confidenceBasis: BottleConfidenceBasisSchema.nullable().default(null),
   matchedBottleId: z.number().int().nullable().default(null),
   matchedReleaseId: z.number().int().nullable().default(null),
   parentBottleId: z.number().int().nullable().default(null),
@@ -476,6 +626,8 @@ export const SearchEntitiesResultSchema = z.object({
 export type BottleExtractedDetails = z.infer<
   typeof BottleExtractedDetailsSchema
 >;
+export type BottleConfidenceBasis = z.infer<typeof BottleConfidenceBasisSchema>;
+export type BottleIdentityBasis = z.infer<typeof BottleIdentityBasisSchema>;
 export type BottleEvidenceSourceTier = z.infer<
   typeof BottleEvidenceSourceTierEnum
 >;
@@ -495,6 +647,9 @@ export type BottleClassifierAgentDecision = z.infer<
 >;
 export type BottleClassificationDecision = z.infer<
   typeof BottleClassificationDecisionSchema
+>;
+export type BottleClassifierAgentDecisionInput = z.input<
+  typeof BottleClassifierAgentDecisionSchema
 >;
 export type BottleObservation = z.infer<typeof BottleObservationSchema>;
 export type EntityResolution = z.infer<typeof EntityResolutionSchema>;

@@ -33,6 +33,16 @@ Release identity:
 - `caskType`
 - `caskSize`
 
+Year semantics:
+
+- `vintageYear` is the distillation year.
+- `releaseYear` is the bottling year or marketed annual release year.
+- A bare year is ambiguous until label wording, official evidence, or sibling
+  structure explains it. Do not infer a child release solely because any year is
+  present.
+- Do not compute or infer `statedAge` from vintage and bottling years unless the
+  source states the age.
+
 Observation-only facts by default:
 
 - cask number
@@ -66,12 +76,19 @@ Observation-only facts by default:
 - Create releases when the parent expression is stable and the differentiator is a variant of that expression.
 - Preserve exact source facts as observations first. Do not force a canonical release split just because a retailer page mentions a cask number or similar exact detail.
 - Promote an observation fact into canonical release identity only when it is clearly part of the marketed release or moderators decide it is needed for recurring disambiguation.
+- Classification is intentionally model-led for semantic boundaries. Code may
+  enforce structurally safe validation, but it should not encode brand- or
+  family-specific bottle-versus-release rules.
 
 ## Single Known Release Rule
 
 - If the only currently known marketed form is a single dated, batched, or otherwise specific version and there is no clear reusable parent expression yet, it may live on `bottle` initially.
 - If a second sibling later appears and the shared parent expression becomes clear, split the record into a parent `bottle` plus child `bottle_release` rows and move release-specific traits there.
 - If the year or code is itself the stable marketed product identity rather than optional precision, keep it at the bottle layer instead of forcing a child release.
+- Sibling evidence may come from existing child releases, multiple legacy bottle
+  rows that share a stable family, or authoritative sources that describe a
+  recurring batch/vintage/annual release program. That evidence should inform
+  the classifier; it should not bypass classifier judgment.
 
 ## Precision Layers
 
@@ -102,7 +119,7 @@ Normal user input should focus on:
 - `Maker's Mark Private Selection S2B13`: one bottle, release carries `edition = S2B13`; any more exact barrel data stays in observations unless it becomes canonical.
 - `Mystery Distillery 1990 Release`: if `1990` is the only known marketed form and no reusable parent expression is established yet, one bottle is acceptable. If a `1991 Release` later appears under the same parent expression, split into one bottle plus `1990` and `1991` releases.
 - `Octomore 13.1` vs `Octomore 13.3`: separate bottles under a shared range because drinkers generally treat them as different expressions.
-- `SMWS 6.53`: the SMWS code is part of the bottle identity; additional retailer-only detail stays in observations.
+- `SMWS 6.53`: the SMWS code is the exact-cask bottle identity; different subtitles or retailer names can still be the same bottle/code, and additional wording stays in observations.
 
 ## Matching Rule
 

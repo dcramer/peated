@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-07T00:23:32.963Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Macallan 18 Year Old Sherry Oak 1994 Vintage official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Macallan 18 Year Old Sherry Oak 1994 Vintage official",
+    "summary": "I could not find an **official Macallan product page specifically for the 1994 vintage** on The Macallan’s current site, but the web does support that this is an **official Macallan bottling** and not an indie bottler release.\n\nWhat the sources support:\n\n- **Official producer / bottling:** The bottle is presented as **",
+    "results": [
+      {
+        "title": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-18-year-old-1994-sherry-oak-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-18-year-old-1994-sherry-oak-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/macallan-sherryfass-18j-1994.html",
+        "url": "https://www.whisky.com/whisky-database/details/macallan-sherryfass-18j-1994.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/macallan-1994-18-year-old-sherry-oak-whisky-review-4992",
+        "url": "https://www.connosr.com/macallan-1994-18-year-old-sherry-oak-whisky-review-4992",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.themacallan.com/en-us",
+        "url": "https://www.themacallan.com/en-us",
+        "domain": "themacallan.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://bestofwines.com/whisky/whisky-brands/the-macallan/18-years-old-distilled-1994-43-ob-sherry-oak-1994.htm",
+        "url": "https://bestofwines.com/whisky/whisky-brands/the-macallan/18-years-old-distilled-1994-43-ob-sherry-oak-1994.htm",
+        "domain": "bestofwines.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskystack.com/en/products/macallan-18-years-old-sherry-oak-1994",
+        "url": "https://whiskystack.com/en/products/macallan-18-years-old-sherry-oak-1994",
+        "domain": "whiskystack.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "fb36196605c533c52317e3579b00ff65a9996fe6721999ec4ccc085044a35a53",
+    "mode": "auto"
+  }
+}

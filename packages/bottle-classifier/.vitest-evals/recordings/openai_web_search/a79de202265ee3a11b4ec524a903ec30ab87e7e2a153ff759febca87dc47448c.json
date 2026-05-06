@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-07T01:58:01.763Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Canadian Club Reserve\" \"9 year\" official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Canadian Club Reserve\" \"9 year\" official",
+    "summary": "Official source found: Canadian Club’s product page for **Reserve 9 Year Old Canadian Whisky** confirms this is a **Canadian Club Reserve 9 Year Old** expression and that it is **aged for a full 9 years**. It also describes it as having a **greater rye influence** than Canadian Club 1858. ([canadianclub.com](https://ww",
+    "results": [
+      {
+        "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://toastfried.com/?p=9213",
+        "url": "https://toastfried.com/?p=9213",
+        "domain": "toastfried.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "url": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/canadian-club-reserve-9-year-old-whisky-review-8495",
+        "url": "https://www.connosr.com/canadian-club-reserve-9-year-old-whisky-review-8495",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.penguinliquor.com/p/canadian-club-reserve-9-year-old/21803",
+        "url": "https://www.penguinliquor.com/p/canadian-club-reserve-9-year-old/21803",
+        "domain": "penguinliquor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/70887/canadian-club-reserve-9-year-old",
+        "url": "https://www.thewhiskyexchange.com/p/70887/canadian-club-reserve-9-year-old",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a79de202265ee3a11b4ec524a903ec30ab87e7e2a153ff759febca87dc47448c",
+    "mode": "auto"
+  }
+}

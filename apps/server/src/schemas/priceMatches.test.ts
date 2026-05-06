@@ -76,6 +76,7 @@ describe("StorePriceMatchDecisionSchema", () => {
         "candidateBottleIds",
         "confidence",
         "creationTarget",
+        "identityScope",
         "parentBottleId",
         "proposedBottle",
         "proposedRelease",

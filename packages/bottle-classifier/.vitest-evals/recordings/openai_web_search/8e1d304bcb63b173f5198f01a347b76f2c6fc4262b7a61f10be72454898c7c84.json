@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-07T00:35:02.174Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition 2001 release year vintage annual release official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Talisker Distillers Edition 2001 release year vintage annual release official",
+    "summary": "For **Talisker Distillers Edition 2001**, the **“2001” is the distillation vintage**, and the corresponding **annual release/bottling year is 2012**. Independent bottle databases and reviewers consistently identify it as **Talisker 2001 / 2012 Distillers Edition**, **original bottling**, **45.8% ABV**, with an **Amoros",
+    "results": [
+      {
+        "title": "https://www.connosr.com/talisker-distillers-edition-2001-2012-whisky-review-10968",
+        "url": "https://www.connosr.com/talisker-distillers-edition-2001-2012-whisky-review-10968",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinkhacker.com/2012/05/21/review-talisker-distillers-edition-2012-distilled-2001/",
+        "url": "https://www.drinkhacker.com/2012/05/21/review-talisker-distillers-edition-2012-distilled-2001/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "url": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "domain": "whiskynotes.be",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/39673/talisker-2001",
+        "url": "https://www.whiskybase.com/whiskies/whisky/39673/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/talisker-2001-distillers-edition-2012",
+        "url": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/talisker-2001-distillers-edition-2012",
+        "domain": "whiskyauctioneer.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "8e1d304bcb63b173f5198f01a347b76f2c6fc4262b7a61f10be72454898c7c84",
+    "mode": "auto"
+  }
+}

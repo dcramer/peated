@@ -1,3 +1,7 @@
+import {
+  BOTTLE_RELEASE_TRAIT_FIELDS,
+  mergeBottleCandidateFamilyContext,
+} from "@peated/bottle-classifier/internal/types";
 import { deriveLegacyReleaseRepairIdentity } from "@peated/bottle-classifier/legacyReleaseRepairIdentity";
 import {
   normalizeBottle,
@@ -108,6 +112,11 @@ type BottleCandidateSearchInput = z.infer<
 type BottleCandidateSearchInputRequest = z.input<
   typeof BottleCandidateSearchInputSchema
 >;
+type BottleCandidateFamilyContext = NonNullable<
+  BottleCandidate["familyContext"]
+>;
+type BottleCandidateReleaseTraitField =
+  BottleCandidateFamilyContext["parentBottleReleaseTraits"][number];
 
 const CANDIDATE_METADATA_FIELDS = [
   "bottler",
@@ -124,6 +133,8 @@ const CANDIDATE_METADATA_FIELDS = [
   "caskSize",
   "caskFill",
 ] as const satisfies ReadonlyArray<keyof BottleCandidate>;
+
+const CANDIDATE_FAMILY_CONTEXT_RELEASE_LIMIT = 8;
 
 function getNormalizedPriceName(name: string) {
   return normalizeBottle({
@@ -274,6 +285,11 @@ export function mergeBottleCandidate(
   if (!existing.bottler && candidate.bottler) {
     existing.bottler = candidate.bottler;
   }
+
+  existing.familyContext = mergeBottleCandidateFamilyContext(
+    existing.familyContext,
+    candidate.familyContext,
+  );
 
   if (!existing.distillery.length && candidate.distillery.length) {
     existing.distillery = candidate.distillery;
@@ -812,6 +828,58 @@ type CandidateReleaseMetadataRow = {
   caskFill: BottleCandidate["caskFill"];
 };
 
+function getPopulatedReleaseTraitFields(
+  row: Partial<Record<BottleCandidateReleaseTraitField, unknown>>,
+  {
+    includeStatedAge = true,
+  }: {
+    includeStatedAge?: boolean;
+  } = {},
+): BottleCandidateReleaseTraitField[] {
+  return BOTTLE_RELEASE_TRAIT_FIELDS.filter((field) => {
+    if (field === "statedAge" && !includeStatedAge) {
+      return false;
+    }
+
+    const value = row[field];
+    return value !== null && value !== undefined && value !== "";
+  });
+}
+
+function buildCandidateFamilyContext({
+  bottleMetadata,
+  releases,
+}: {
+  bottleMetadata: CandidateBottleMetadataRow;
+  releases: CandidateReleaseMetadataRow[];
+}): BottleCandidateFamilyContext {
+  return {
+    parentBottleReleaseTraits: getPopulatedReleaseTraitFields(bottleMetadata, {
+      includeStatedAge: false,
+    }),
+    childReleaseCount: releases.length,
+    siblingReleases: releases
+      .slice()
+      .sort((a, b) => a.fullName.localeCompare(b.fullName))
+      .slice(0, CANDIDATE_FAMILY_CONTEXT_RELEASE_LIMIT)
+      .map((release) => ({
+        releaseId: release.releaseId,
+        fullName: release.fullName,
+        traitFields: getPopulatedReleaseTraitFields(release),
+        edition: release.edition,
+        statedAge: release.statedAge,
+        releaseYear: release.releaseYear,
+        vintageYear: release.vintageYear,
+        abv: release.abv,
+        singleCask: release.singleCask,
+        caskStrength: release.caskStrength,
+        caskFill: release.caskFill,
+        caskType: release.caskType,
+        caskSize: release.caskSize,
+      })),
+  };
+}
+
 function hasReleaseSpecificIdentity(
   extractedLabel: BottleReferenceIdentity | null,
 ) {
@@ -1077,6 +1145,10 @@ async function enrichBottleCandidates(
 
     const distilleryNames =
       distilleryNamesByBottleId.get(candidate.bottleId) ?? [];
+    const familyContext = buildCandidateFamilyContext({
+      bottleMetadata,
+      releases: releasesByBottleId.get(candidate.bottleId) ?? [],
+    });
     if (!candidate.distillery.length && distilleryNames.length) {
       candidate.distillery = distilleryNames;
     } else if (distilleryNames.length) {
@@ -1104,6 +1176,10 @@ async function enrichBottleCandidates(
       preferredRelease?.caskSize ?? bottleMetadata.caskSize;
     candidate.caskFill ??=
       preferredRelease?.caskFill ?? bottleMetadata.caskFill;
+    candidate.familyContext = mergeBottleCandidateFamilyContext(
+      candidate.familyContext,
+      familyContext,
+    );
 
     if (
       preferredRelease &&
@@ -1149,6 +1225,7 @@ async function enrichBottleCandidates(
           caskFill: matchedRelease.caskFill,
           score: candidate.score,
           source: Array.from(new Set([...candidate.source, "release"])),
+          familyContext,
         }),
       );
     }

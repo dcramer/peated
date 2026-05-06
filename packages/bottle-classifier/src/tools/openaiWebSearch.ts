@@ -8,7 +8,7 @@ import {
   BottleSearchEvidenceSchema,
   type BottleSearchEvidence,
 } from "../classifierTypes";
-import { getDeterministicOpenAISettings } from "../openaiModelSettings";
+import { getStableOpenAISettings } from "../openaiModelSettings";
 import { runBraveWebSearch } from "./braveWebSearch";
 import {
   BottleWebSearchArgsSchema,
@@ -317,7 +317,7 @@ export function buildOpenAIWebSearchRequest({
       },
     ],
     tools: [{ type: "web_search" }],
-    ...getDeterministicOpenAISettings(model),
+    ...getStableOpenAISettings(model),
   };
 }
 

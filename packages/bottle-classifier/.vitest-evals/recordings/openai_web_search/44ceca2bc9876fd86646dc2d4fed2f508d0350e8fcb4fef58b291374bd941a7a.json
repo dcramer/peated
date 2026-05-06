@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-07T00:41:57.861Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Four Roses Limited Edition Small Batch 2017 official 2017 release"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Four Roses Limited Edition Small Batch 2017 official 2017 release",
+    "summary": "Yes — **Four Roses Limited Edition Small Batch 2017** was an **official 2017 release** from Four Roses. The official producer page says it was announced on **September 1, 2017**, with release beginning that month, and identifies it as the **2017 Limited Edition Small Batch Bourbon**. That same official source confirms ",
+    "results": [
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/celebrate-2017-limited-edition-small-batch-with-us",
+        "url": "https://www.fourrosesbourbon.com/blog/celebrate-2017-limited-edition-small-batch-with-us",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/Four-Roses-Limited-Edition-Small-Batch-2017-Release-53-95",
+        "url": "https://whiskyadvocate.com/Four-Roses-Limited-Edition-Small-Batch-2017-Release-53-95",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/four-roses-small-batch",
+        "url": "https://www.breakingbourbon.com/review/four-roses-small-batch",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/four-roses-wins-best-bourbon-of-the-century-so-far-more",
+        "url": "https://www.fourrosesbourbon.com/blog/four-roses-wins-best-bourbon-of-the-century-so-far-more",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/celebrating-al-youngs-50th-anniversary-with-limited-edition-four-roses-bourbon",
+        "url": "https://www.fourrosesbourbon.com/blog/celebrating-al-youngs-50th-anniversary-with-limited-edition-four-roses-bourbon",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/article/2017-the-year-in-bourbon",
+        "url": "https://www.breakingbourbon.com/article/2017-the-year-in-bourbon",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "44ceca2bc9876fd86646dc2d4fed2f508d0350e8fcb4fef58b291374bd941a7a",
+    "mode": "auto"
+  }
+}

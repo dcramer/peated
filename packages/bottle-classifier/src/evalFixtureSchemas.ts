@@ -35,8 +35,9 @@ export const classifierEvalExpectationSchema = z.object({
   parentBottleId: z.number().int().nullable().optional(),
   proposedBottle: z.record(z.string(), z.unknown()).nullable().optional(),
   proposedRelease: z.record(z.string(), z.unknown()).nullable().optional(),
-  confidenceAtLeast: z.number().optional(),
-  confidenceBelow: z.number().optional(),
+  confidenceBand: z
+    .enum(["low", "review", "auto_verification", "current_assignment"])
+    .optional(),
   verifyEligible: z.boolean().optional(),
   summary: z.string().min(1),
 });

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T23:28:46.166Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "SMWS RW6.5 Sauna Smoke Kyro rye official SMWS"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "SMWS RW6.5 Sauna Smoke Kyro rye official SMWS",
+    "summary": "I found an official SMWS listing for **RW6.5**, but it does **not** match the title **“Sauna Smoke Kyro rye.”** The official SMWS page identifies **RW6.5** as **“Appley ever after”**, a **Finland** rye whisky, **6 years old**, bottled at **56.0% ABV**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/al",
+    "results": [
+      {
+        "title": "Kyrö Distillery Company | Kyrö Wood Smoke Whisky",
+        "url": "https://kyrodistillery.com/products/kyro-wood-smoke-whisky-700ml",
+        "domain": "kyrodistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://kyrodistillery.com/shop/",
+        "url": "https://kyrodistillery.com/shop/",
+        "domain": "kyrodistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Kyrö Wood Smoke Rye Whisky - WhiskyRant",
+        "url": "https://www.whiskyrant.com/kyro-wood-smoke-rye/",
+        "domain": "whiskyrant.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/kyro-sauna-stories-launch/",
+        "url": "https://www.masterofmalt.com/kyro-sauna-stories-launch/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Rye Whisky",
+        "url": "https://smws.com/all-whisky/whisky/rye-whisky/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskymag.com/tastings/kyr-wood-smoke-rye/",
+        "url": "https://www.whiskymag.com/tastings/kyr-wood-smoke-rye/",
+        "domain": "whiskymag.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "0164c48854e90d5a4192653b321abae9301f4bf47c700cc065f0a0b1d7e07ff9",
+    "mode": "auto"
+  }
+}

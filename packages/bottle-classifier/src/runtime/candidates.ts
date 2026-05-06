@@ -1,3 +1,4 @@
+import { mergeBottleCandidateFamilyContext } from "../candidateFamilyContext";
 import type { BottleCandidate, EntityResolution } from "../classifierTypes";
 
 const CANDIDATE_METADATA_FIELDS = [
@@ -63,6 +64,11 @@ export function mergeBottleCandidate(
   if (!existing.bottler && candidate.bottler) {
     existing.bottler = candidate.bottler;
   }
+
+  existing.familyContext = mergeBottleCandidateFamilyContext(
+    existing.familyContext,
+    candidate.familyContext,
+  );
 
   if (!existing.distillery.length && candidate.distillery.length) {
     existing.distillery = candidate.distillery;

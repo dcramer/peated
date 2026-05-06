@@ -1,0 +1,53 @@
+{
+  "writtenAt": "2026-05-06T23:30:54.102Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "\"Macallan 18 Year Old\" \"1994 Vintage\" \"Sherry Oak\""
+  },
+  "output": {
+    "provider": "brave",
+    "query": "\"Macallan 18 Year Old\" \"1994 Vintage\" \"Sherry Oak\"",
+    "summary": "Just one bottle per customer available! The legendary 18 year old from the 1994 vintage distillation. Expect the big Sherry <strong>A well-sherried, full-bodied single malt from The Macallan distillery</strong>. This 1994 vintage matured exclusively in oloroso sherry oak casks from Jerez for just shy of two decades, an",
+    "results": [
+      {
+        "title": "The Macallan 1994 18 Year Old Sherry Oak | Nickolls & Perks",
+        "url": "https://nickollsandperks.com/p/the-macallan-1994-18-year-old-sherry-oak-103340341211/",
+        "domain": "nickollsandperks.com",
+        "description": "Just one bottle per customer available! The legendary 18 year old from the 1994 vintage distillation. Expect the big Sherry",
+        "extraSnippets": []
+      },
+      {
+        "title": "The Macallan 18 Year Old 1994 Sherry Oak 70cl Whisky | Master Of Malt",
+        "url": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-18-year-old-1994-sherry-oak-whisky/",
+        "domain": "masterofmalt.com",
+        "description": "<strong>A well-sherried, full-bodied single malt from The Macallan distillery</strong>. This 1994 vintage matured exclusively in oloroso sherry oak casks from Jerez for just shy of two decades, and is bottled at 43% ABV.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Macallan 1994 - 18 Years Old - Sherry Oak: Price History, Auction Analysis & Valuation Insights",
+        "url": "https://whiskyhunter.net/base/macallan-1994-18-years-old-sherry-oak-700-ml-43-vol",
+        "domain": "whiskyhunter.net",
+        "description": "Being fully matured in ex-sherry casks, this Macallan 18 Year Old <strong>represents the classic heavily-sherried style, which remains the trademark of the distillery</strong>. It was a part of the Sherry Oak series prod",
+        "extraSnippets": []
+      },
+      {
+        "title": "Macallan - 18 Year Old - 1994 Vintage – The Speyside Whisky Shop",
+        "url": "https://thespeysidewhisky.com/products/macallan-18-year-1994",
+        "domain": "thespeysidewhisky.com",
+        "description": "ALC. 43% 70 CL The Macallan 18 Year Old Sherry Oak is <strong>a luxurious single malt Scotch whisky, aged in hand-picked sherry-seasoned oak casks from Jerez, Spain</strong>. This is Macallans most quintessential single",
+        "extraSnippets": []
+      },
+      {
+        "title": "The Macallan 18 Year Old Sherry Oak 1994 Vintage 700ml 43% | The Old Barrelhouse",
+        "url": "https://theoldbarrelhouse.com.au/shop/scottish-whisky/the-macallan/the-macallan-18-year-old-sherry-oak-1994-vintage-700ml-43/",
+        "domain": "theoldbarrelhouse.com.au",
+        "description": "Age: 18 Years Region: Highlands Cask Type: Sherry Bottler: Distillery Bottling Distilled: 1994 Release Date: 2012 Bottling Notes <strong>Rare, distinguished and full of sherry goodness</strong>, this is the Macallan 18-y",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "ee19e6f5353e5e914c9371ff44ebbd990242a9def8f67b0eb96a8212002c62f6",
+    "mode": "auto"
+  }
+}

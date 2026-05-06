@@ -313,6 +313,29 @@ describe("priceMatchingEvidence", () => {
     ).toBe(false);
   });
 
+  test("allows exact-cask code matches at the exact-cask confidence threshold", () => {
+    expect(
+      isExistingMatchConfidenceEligibleForVerification({
+        confidence: 95,
+        currentBottleId: null,
+        currentReleaseId: null,
+        identityScope: "exact_cask",
+        matchedBottleId: 41,
+        matchedReleaseId: null,
+      }),
+    ).toBe(true);
+    expect(
+      isExistingMatchConfidenceEligibleForVerification({
+        confidence: 94,
+        currentBottleId: null,
+        currentReleaseId: null,
+        identityScope: "exact_cask",
+        matchedBottleId: 41,
+        matchedReleaseId: null,
+      }),
+    ).toBe(false);
+  });
+
   test("does not allow corrections from confidence alone", () => {
     expect(
       isExistingMatchConfidenceEligibleForVerification({

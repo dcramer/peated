@@ -99,7 +99,7 @@ describe("deriveLegacyReleaseRepairIdentity", () => {
   test("does not treat Small Batch family wording as a batch marker", () => {
     expect(
       deriveLegacyReleaseRepairIdentity({
-        fullName: "Four Roses Limited Edition Small Batch 2017",
+        fullName: "Example Limited Edition Small Batch 2017",
       }),
     ).toBeNull();
   });

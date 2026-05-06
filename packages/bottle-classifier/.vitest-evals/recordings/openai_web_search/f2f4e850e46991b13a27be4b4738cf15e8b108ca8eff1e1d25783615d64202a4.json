@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-07T01:02:39.800Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Talisker 2001 The Distillers Edition Talisker Distillers Edition 2001 release year vintage yearly release"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Talisker 2001 The Distillers Edition Talisker Distillers Edition 2001 release year vintage yearly release",
+    "summary": "For **Talisker The Distillers Edition “2001”**, the **2001 is the distillation vintage**, not the release year. This bottling is generally referred to as **Talisker Distillers Edition 2001/2012**: distilled in **2001**, bottled/released in **2012**, at **45.8% ABV**, and finished in **Amoroso sherry casks**. The bottle",
+    "results": [
+      {
+        "title": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "url": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "domain": "whiskynotes.be",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/talisker-distillers-edition-2001-2012-whisky-review-10968",
+        "url": "https://www.connosr.com/talisker-distillers-edition-2001-2012-whisky-review-10968",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinkhacker.com/2012/05/21/review-talisker-distillers-edition-2012-distilled-2001/",
+        "url": "https://www.drinkhacker.com/2012/05/21/review-talisker-distillers-edition-2012-distilled-2001/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.spiritradar.com/whisky-db/talisker-2001-the-distillers-edition-45.8-percent-700ml/",
+        "url": "https://www.spiritradar.com/whisky-db/talisker-2001-the-distillers-edition-45.8-percent-700ml/",
+        "domain": "spiritradar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "f2f4e850e46991b13a27be4b4738cf15e8b108ca8eff1e1d25783615d64202a4",
+    "mode": "auto"
+  }
+}

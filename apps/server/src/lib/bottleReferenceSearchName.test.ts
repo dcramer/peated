@@ -6,7 +6,7 @@ describe("stripReleaseIdentityFromSearchName", () => {
   test("strips bare annual release years from parent search names", () => {
     expect(
       stripReleaseIdentityFromSearchName(
-        "Four Roses Limited Edition Small Batch 2017",
+        "Example Limited Edition Small Batch 2017",
         {
           edition: null,
           releaseYear: 2017,
@@ -14,7 +14,7 @@ describe("stripReleaseIdentityFromSearchName", () => {
           vintageYear: null,
         },
       ),
-    ).toBe("Four Roses Limited Edition Small Batch");
+    ).toBe("Example Limited Edition Small Batch");
 
     expect(
       stripReleaseIdentityFromSearchName(

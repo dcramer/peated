@@ -132,8 +132,7 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 501,
-    "confidenceAtLeast": 96,
     "verifyEligible": false,
-    "summary": "A high-confidence bottle replacement should still stay review-only because downstream price matching treats it as a correction rather than an auto-verifiable existing match."
+    "summary": "A bottle replacement should stay review-only because downstream price matching treats it as a correction rather than an auto-verifiable existing match."
   }
 }

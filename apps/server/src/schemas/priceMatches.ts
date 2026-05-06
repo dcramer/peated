@@ -36,6 +36,59 @@ export const ExtractedBottleDetailsSchema = z.object({
 });
 export const BottleReferenceIdentitySchema = ExtractedBottleDetailsSchema;
 
+const BottleReleaseTraitFieldEnum = z.enum([
+  "edition",
+  "statedAge",
+  "releaseYear",
+  "vintageYear",
+  "abv",
+  "singleCask",
+  "caskStrength",
+  "caskFill",
+  "caskType",
+  "caskSize",
+]);
+
+const PriceMatchCandidateReleaseSiblingSchema = z
+  .object({
+    releaseId: z.number().int(),
+    fullName: z.string(),
+    traitFields: z.array(BottleReleaseTraitFieldEnum).default([]),
+    edition: z.string().trim().nullable().default(null),
+    statedAge: z.number().min(0).max(100).nullable().default(null),
+    releaseYear: z
+      .number()
+      .int()
+      .gte(1800)
+      .lte(new Date().getFullYear() + 1)
+      .nullable()
+      .default(null),
+    vintageYear: z
+      .number()
+      .int()
+      .gte(1800)
+      .lte(new Date().getFullYear())
+      .nullable()
+      .default(null),
+    abv: z.number().min(0).max(100).nullable().default(null),
+    singleCask: z.boolean().nullable().default(null),
+    caskStrength: z.boolean().nullable().default(null),
+    caskFill: CaskFillEnum.nullable().default(null),
+    caskType: CaskTypeEnum.nullable().default(null),
+    caskSize: CaskSizeEnum.nullable().default(null),
+  })
+  .strict();
+
+const PriceMatchCandidateFamilyContextSchema = z
+  .object({
+    parentBottleReleaseTraits: z.array(BottleReleaseTraitFieldEnum).default([]),
+    childReleaseCount: z.number().int().min(0).default(0),
+    siblingReleases: z
+      .array(PriceMatchCandidateReleaseSiblingSchema)
+      .default([]),
+  })
+  .strict();
+
 export const PriceMatchCandidateSchema = z.object({
   kind: z
     .enum(["bottle", "release"])
@@ -77,6 +130,7 @@ export const PriceMatchCandidateSchema = z.object({
   caskFill: CaskFillEnum.nullable().default(null),
   score: z.number().nullable().default(null),
   source: z.array(z.string()).default([]),
+  familyContext: PriceMatchCandidateFamilyContextSchema.nullable().optional(),
 });
 export const BottleCandidateSchema = PriceMatchCandidateSchema;
 
@@ -167,6 +221,7 @@ export const PriceMatchCreationTargetEnum = z.enum([
   "bottle_and_release",
 ]);
 export const BottleCreationTargetEnum = PriceMatchCreationTargetEnum;
+export const BottleIdentityScopeEnum = z.enum(["product", "exact_cask"]);
 
 export const StorePriceMatchQueueStateEnum = z.enum([
   "actionable",
@@ -317,6 +372,7 @@ const StorePriceMatchDecisionBaseSchema = z.object({
   confidence: z.number().min(0).max(100),
   rationale: z.string().nullable().default(null),
   candidateBottleIds: z.array(z.number().int()).default([]),
+  identityScope: BottleIdentityScopeEnum.default("product"),
 });
 
 const StorePriceMatchCreateNewDecisionSchema =

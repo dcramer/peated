@@ -82,8 +82,7 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 13025,
-    "confidenceAtLeast": 96,
-    "verifyEligible": true,
-    "summary": "Ignore the legacy generic `spirit` bucket on the stored bottle, then keep the exact-name existing match to Shibui Grain Select at verification-eligible confidence."
+    "confidenceBand": "auto_verification",
+    "summary": "Ignore the legacy generic `spirit` bucket on the stored bottle, then keep the exact-name existing match to Shibui Grain Select."
   }
 }

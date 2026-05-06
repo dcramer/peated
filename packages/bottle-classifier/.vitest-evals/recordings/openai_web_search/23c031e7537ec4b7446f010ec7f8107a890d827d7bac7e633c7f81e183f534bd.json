@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-05-06T21:31:14.166Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Cask Strength official bourbon Heaven Hill"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Cask Strength official bourbon Heaven Hill",
+    "summary": "**Elijah Craig Cask Strength** is the **Elijah Craig Barrel Proof** line from **Heaven Hill Distillery**. Heaven Hill’s official product page confirms it is an **uncut small batch bourbon bottled straight from the barrel**, i.e. cask strength / barrel proof, and identifies it as an Elijah Craig expression made by Heave",
+    "canonicalBottleNames": [],
+    "results": [
+      {
+        "title": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php/1000",
+        "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php/1000",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/pga-2025-championship-commemorative-bottle",
+        "url": "https://elijahcraig.com/pga-2025-championship-commemorative-bottle",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/pga-2026-championship-commemorative-bottle",
+        "url": "https://elijahcraig.com/pga-2026-championship-commemorative-bottle",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhilldistillery.com/barrel.php/our-brands.php",
+        "url": "https://heavenhilldistillery.com/barrel.php/our-brands.php",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.pastemagazine.com/drink/whiskey/elijah-craig-barrel-proof-review-a123-bourbon-flavors-heaven-hill",
+        "url": "https://www.pastemagazine.com/drink/whiskey/elijah-craig-barrel-proof-review-a123-bourbon-flavors-heaven-hill",
+        "domain": "pastemagazine.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhilldistillery.com/our-distillery.php/index.php",
+        "url": "https://heavenhilldistillery.com/our-distillery.php/index.php",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "23c031e7537ec4b7446f010ec7f8107a890d827d7bac7e633c7f81e183f534bd",
+    "mode": "auto"
+  }
+}

@@ -182,8 +182,7 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 39669,
-    "confidenceAtLeast": 96,
-    "verifyEligible": true,
+    "confidenceBand": "auto_verification",
     "summary": "Treat a dropped possessive brand spelling plus retailer suffix noise as harmless title variation, then keep the reviewed match to the canonical Basil Hayden's Kentucky Straight Bourbon bottle."
   }
 }

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T19:38:48.170Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Series Volume 3 bourbon official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Heaven's Door Bootleg Series Volume 3 bourbon official",
+    "summary": "Official and corroborated details for **Heaven’s Door Bootleg Series Volume III**:\n\n- **Producer / brand:** Heaven’s Door. The official Heaven’s Door product page identifies it as **“The Bootleg Series Volume III”**, the **2021 release**, a **cask strength 13-year-old Kentucky Bourbon finished in Vino de Naranja cask**",
+    "results": [
+      {
+        "title": "https://www.heavensdoor.com/bootleg-series",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "url": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.prnewswire.com/news-releases/heavens-door-spirits-announces-release-of-the-bootleg-series-vol-iii-301439092.html",
+        "url": "https://www.prnewswire.com/news-releases/heavens-door-spirits-announces-release-of-the-bootleg-series-vol-iii-301439092.html",
+        "domain": "prnewswire.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+        "url": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.heavensdoor.com/collections/bootlegs",
+        "url": "https://buy.heavensdoor.com/collections/bootlegs",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "46bc3f408dbaa05177b7741af1e927fc2420953924d292fcf638eb36b5fbf129",
+    "mode": "auto"
+  }
+}

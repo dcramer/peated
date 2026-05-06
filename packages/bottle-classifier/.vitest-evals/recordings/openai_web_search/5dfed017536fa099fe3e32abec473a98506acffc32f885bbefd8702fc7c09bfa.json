@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T23:40:51.799Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Maker's Mark Private Selection S2B13 Maker's Mark official private selection stave profile S2B13"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Maker's Mark Private Selection S2B13 Maker's Mark official private selection stave profile S2B13",
+    "summary": "I could confirm the **official Maker’s Mark Private Selection program details**, but I could **not find an official Maker’s Mark page that maps the code “S2B13” itself to a stave recipe**. What the official site does confirm is that **Private Selection** starts with **cask-strength Maker’s Mark**, uses **10 finishing s",
+    "results": [
+      {
+        "title": "Private Selection Bourbon: Premium Whisky | Maker's Mark®",
+        "url": "https://www.makersmark.com/bourbons/makers-mark-private-selection",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Maker’s Mark Private Selection Topflight S2B13 Review | The Daily Pour",
+        "url": "https://thedailypour.com/spirit/makers-mark-private-selection-topflight-s2b13/",
+        "domain": "thedailypour.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.peoplesbourbonreview.com/makers-mark-private-selection",
+        "url": "https://www.peoplesbourbonreview.com/makers-mark-private-selection",
+        "domain": "peoplesbourbonreview.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/199210/makers-mark-private-selection",
+        "url": "https://www.whiskybase.com/whiskies/whisky/199210/makers-mark-private-selection",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/200703/makers-mark-private-selection",
+        "url": "https://www.whiskybase.com/whiskies/whisky/200703/makers-mark-private-selection",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/212887/private-select",
+        "url": "https://www.whiskybase.com/whiskies/whisky/212887/private-select",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5dfed017536fa099fe3e32abec473a98506acffc32f885bbefd8702fc7c09bfa",
+    "mode": "auto"
+  }
+}

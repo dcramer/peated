@@ -14,6 +14,7 @@ import {
 } from "./classifier.eval.scenarios";
 import {
   createBottleClassifier,
+  finalizeBottleClassifierReasoningResult,
   prepareBottleClassifierAgentRun,
   type PreparedBottleClassifierAgentRun,
 } from "./classifierRuntime";
@@ -34,10 +35,7 @@ import {
 } from "./evalSupport";
 import { isExistingMatchConfidenceEligibleForVerification } from "./priceMatchingEvidence";
 import type { RealWorldNewBottleEvalCase } from "./realWorldNewBottleEval.fixtures";
-import {
-  finalizeBottleReferenceClassification,
-  getAutoIgnoreBottleReferenceReason,
-} from "./reviewPolicy";
+import { getAutoIgnoreBottleReferenceReason } from "./reviewPolicy";
 import { buildDefaultBottleSearchInput } from "./runtime/agentInput";
 
 function getScenarioEvalName(testCase: ClassifierScenarioEvalCase): string {
@@ -100,6 +98,7 @@ function getDerivedVerifyEligibility(
     confidence: result.decision.confidence,
     currentBottleId: testCase.input.reference.currentBottleId ?? null,
     currentReleaseId: testCase.input.reference.currentReleaseId ?? null,
+    identityScope: result.decision.identityScope,
     matchedBottleId: result.decision.matchedBottleId,
     matchedReleaseId: result.decision.matchedReleaseId,
   });
@@ -141,6 +140,7 @@ function describeClassificationResult(
       proposedBottle: result.decision.proposedBottle,
       proposedRelease: result.decision.proposedRelease,
       observation: result.decision.observation,
+      confidenceBasis: result.decision.confidenceBasis,
     },
     extractedIdentity: result.artifacts.extractedIdentity,
   };
@@ -272,12 +272,10 @@ function scoreDecisionShape(
       checks.push(result.decision.parentBottleId === expected.parentBottleId);
     }
 
-    if (expected.confidenceAtLeast !== undefined) {
-      checks.push(result.decision.confidence >= expected.confidenceAtLeast);
-    }
-
-    if (expected.confidenceBelow !== undefined) {
-      checks.push(result.decision.confidence < expected.confidenceBelow);
+    if (expected.confidenceBand !== undefined) {
+      checks.push(
+        result.decision.confidenceBasis?.band === expected.confidenceBand,
+      );
     }
 
     if (expected.verifyEligible !== undefined) {
@@ -367,8 +365,9 @@ async function judgeDecisionCase(
       "Score from 0.0 to 1.0.",
       "Prioritize whether the classifier identified the correct bottle identity and chose a safe action.",
       "A false positive existing match is worse than a conservative create/no-match result.",
-      "Confidence calibration matters because downstream automatic verification is driven from the classifier's confidence for existing matches.",
-      "If an existing bottle match should be safe for automatic verification, the confidence should clear the expected threshold. If the match should remain review-only, the confidence should stay below that threshold.",
+      "Confidence should be judged from evidence, not arbitrary numeric precision.",
+      "Use confidenceBasis when present: high confidence should be backed by concrete local, exact-code, or web evidence; review-band confidence is appropriate when unresolvedRisks remain.",
+      "Do not reward a confidence band or score that is not supported by confidenceBasis or tool evidence.",
       "For exact-cask code programs such as SMWS, a correct matched bottle id and identity scope should score highly even when the source subtitle remains in observation-level text.",
       "Do not over-penalize selector or subtitle noise when the exact-cask code anchor, matched bottle id, and final action are correct.",
       "Use 1.0 for a clearly correct result, 0.5 for partially correct but materially flawed output, and 0.0 for the wrong bottle or unsafe matching behavior.",
@@ -486,7 +485,7 @@ function createClassifierOptions(testCase: ClassifierScenarioEvalCase) {
 
 type PreparedScenarioClassifierRun = {
   agentRun: PreparedBottleClassifierAgentRun;
-  classifyAgentResult: (result: unknown) => BottleClassificationResult;
+  classifyAgentResult: (result: unknown) => Promise<BottleClassificationResult>;
 };
 
 async function prepareScenarioClassifierRun(
@@ -542,18 +541,21 @@ async function prepareScenarioClassifierRun(
 
   return {
     agentRun,
-    classifyAgentResult: (result) => {
+    classifyAgentResult: async (result) => {
       const reasoning = agentRun.getReasoningResult(result);
-      const decision = finalizeBottleReferenceClassification({
-        reference: parsedInput.reference,
-        decision: reasoning.decision,
-        artifacts: reasoning.artifacts,
-      });
+      const { decision, artifacts: reasoningArtifacts } =
+        await finalizeBottleClassifierReasoningResult({
+          options,
+          reference: parsedInput.reference,
+          reasoning,
+          candidateExpansion: parsedInput.candidateExpansion,
+          webSearchBudget: agentRun.webSearchBudget,
+        });
 
       return BottleClassificationResultSchema.parse(
         createDecidedBottleClassification({
           decision,
-          artifacts: reasoning.artifacts,
+          artifacts: reasoningArtifacts,
         }),
       );
     },

@@ -89,8 +89,7 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 1760,
-    "confidenceAtLeast": 96,
-    "verifyEligible": true,
-    "summary": "Use authoritative web evidence to confirm that Caribbean Reserve is the rum-barrel Glenlivet bottle and calibrate confidence high enough for downstream bottle-level verification."
+    "confidenceBand": "auto_verification",
+    "summary": "Use authoritative web evidence to confirm that Caribbean Reserve is the rum-barrel Glenlivet bottle and mark the match as evidence-backed."
   }
 }

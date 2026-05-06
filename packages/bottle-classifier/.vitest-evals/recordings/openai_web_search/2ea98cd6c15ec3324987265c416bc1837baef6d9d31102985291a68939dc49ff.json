@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T23:56:07.951Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"The Whistler\" \"Bodega Cask\" Irish Whiskey official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"The Whistler\" \"Bodega Cask\" Irish Whiskey official",
+    "summary": "I found an official producer source for **The Whistler** brand, but not an obvious current official product page specifically for **“Bodega Cask”**. Based on the best available evidence, this bottle is **The Whistler Bodega Cask Irish Single Malt**, associated with **Boann Distillery** and the **Whistler** range. ([boa",
+    "results": [
+      {
+        "title": "https://thewhiskeywash.com/whiskey-styles/irish-whiskey/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+        "url": "https://thewhiskeywash.com/whiskey-styles/irish-whiskey/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/189168/the-whistler-irish-whiskey-bod?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/189168/the-whistler-irish-whiskey-bod?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.boanndistillery.ie/our-spirits/the-whistler-range/",
+        "url": "https://www.boanndistillery.ie/our-spirits/the-whistler-range/",
+        "domain": "boanndistillery.ie",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/irish-whiskey/whiskey-reviews-the-whistler-irish-whiskey-cask-finishes/",
+        "url": "https://thewhiskeywash.com/irish-whiskey/whiskey-reviews-the-whistler-irish-whiskey-cask-finishes/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/irish-whiskey/whiskey-review-the-whistler-p-x-i-love-you-single-malt-irish-whiskey/",
+        "url": "https://thewhiskeywash.com/irish-whiskey/whiskey-review-the-whistler-p-x-i-love-you-single-malt-irish-whiskey/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2ea98cd6c15ec3324987265c416bc1837baef6d9d31102985291a68939dc49ff",
+    "mode": "auto"
+  }
+}

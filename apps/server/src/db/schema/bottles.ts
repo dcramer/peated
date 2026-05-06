@@ -83,7 +83,9 @@ export type NewBottleSeries = typeof bottleSeries.$inferInsert;
  * should aggregate separately across users, prices, and stats.
  *
  * A bottle may temporarily carry release-like traits when only one marketed
- * form is known, or when older data predates an explicit release split.
+ * form is known, or when older data predates an explicit release split. Once
+ * sibling evidence establishes a reusable parent, varying vintage, bottling
+ * year, ABV, edition, and cask traits belong on bottle_release rows.
  *
  * Some fields (description, imageUrl, etc.) are materialized from child
  * releases when they exist.
@@ -255,7 +257,8 @@ export const bottleSeriesRelations = relations(
  *
  * Use this table when the distinction should aggregate across users, searches,
  * prices, and stats. Release rows carry the typed identity traits that are not
- * stable on the parent bottle, such as edition, years, ABV, and cask traits.
+ * stable on the parent bottle, such as edition, distillation/vintage year,
+ * bottling/release year, release-specific age, ABV, and cask traits.
  *
  * If a detail is exact but not yet strong enough to justify a canonical split,
  * preserve it in bottle_observation first.

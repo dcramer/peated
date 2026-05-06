@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-07T00:46:17.428Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "The Whistler Bodega Cask Single Malt Irish Whiskey official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "The Whistler Bodega Cask Single Malt Irish Whiskey official",
+    "summary": "Official sources indicate **The Whistler Bodega Cask** is a **5-year-old single malt Irish whiskey**, **triple distilled**, and **wholly matured in Spanish sherry butts** sourced from **Jerez de la Frontera**. The official bottle page also shows **“86 Proof,” which means 43% ABV**, and describes it as **small batch**. ",
+    "results": [
+      {
+        "title": "https://www.boanndistillery.ie/our-whiskeys/single-grains/",
+        "url": "https://www.boanndistillery.ie/our-whiskeys/single-grains/",
+        "domain": "boanndistillery.ie",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+        "url": "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/distilleries/details/boann.html",
+        "url": "https://www.whisky.com/whisky-database/distilleries/details/boann.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wineenthusiast.com/buying-guide/the-whistler-bodega-cask-single-malt-irish-whiskey/",
+        "url": "https://www.wineenthusiast.com/buying-guide/the-whistler-bodega-cask-single-malt-irish-whiskey/",
+        "domain": "wineenthusiast.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.boanndistillery.ie/",
+        "url": "https://www.boanndistillery.ie/",
+        "domain": "boanndistillery.ie",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wine.com/product/the-whistler-bodega-cask-single-malt-irish-whiskey/949636",
+        "url": "https://www.wine.com/product/the-whistler-bodega-cask-single-malt-irish-whiskey/949636",
+        "domain": "wine.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "abbf437606099eb32302a5ebd363f441121e3e0da47cee9127a877689728f687",
+    "mode": "auto"
+  }
+}

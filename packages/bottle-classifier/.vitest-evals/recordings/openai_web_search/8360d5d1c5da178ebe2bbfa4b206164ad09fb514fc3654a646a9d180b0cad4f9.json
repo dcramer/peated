@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T22:52:51.220Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"SMWS RW6.5\" \"Sauna Smoke\" Kyro"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"SMWS RW6.5\" \"Sauna Smoke\" Kyro",
+    "summary": "I found that **SMWS RW6.5 is not “Sauna Smoke”**. The official SMWS release title for **RW6.5** is **“Appley ever after”**, and it is a **Kyrö Distillery Company** rye whisky from Finland. SMWS’s own bottle page confirms these release traits: **ABV 56.0%**, **age 6 years**, **distilled 11/01/2018**, and **cask type: 1s",
+    "results": [
+      {
+        "title": "https://kyrodistillery.com/products/kyro-peat-smoke-whisky-700ml",
+        "url": "https://kyrodistillery.com/products/kyro-peat-smoke-whisky-700ml",
+        "domain": "kyrodistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.com/cinnamon-sauna-smoke/",
+        "url": "https://smws.com/cinnamon-sauna-smoke/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65",
+        "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://visit.kyrodistillery.com/en/products/kyro-x-lapuan-kankurit-laudeliina",
+        "url": "https://visit.kyrodistillery.com/en/products/kyro-x-lapuan-kankurit-laudeliina",
+        "domain": "visit.kyrodistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://kyrodistillery.com/blogs/news/penicillin",
+        "url": "https://kyrodistillery.com/blogs/news/penicillin",
+        "domain": "kyrodistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://kyrodistillery.com/en-at/pages/story",
+        "url": "https://kyrodistillery.com/en-at/pages/story",
+        "domain": "kyrodistillery.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "8360d5d1c5da178ebe2bbfa4b206164ad09fb514fc3654a646a9d180b0cad4f9",
+    "mode": "auto"
+  }
+}

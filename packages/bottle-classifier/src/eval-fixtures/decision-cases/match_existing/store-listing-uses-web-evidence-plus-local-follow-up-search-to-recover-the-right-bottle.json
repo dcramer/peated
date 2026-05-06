@@ -149,8 +149,7 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 501,
-    "confidenceAtLeast": 96,
-    "verifyEligible": true,
+    "confidenceBand": "auto_verification",
     "summary": "Use the web to confirm the omitted barrel-proof trait, rerun local search, and match the canonical Wild Turkey Rare Breed Rye Barrel Proof bottle instead of a looser Rare Breed near-match."
   }
 }

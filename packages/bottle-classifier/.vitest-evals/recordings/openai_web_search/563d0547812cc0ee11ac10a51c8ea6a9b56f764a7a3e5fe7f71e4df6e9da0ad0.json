@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-07T00:11:06.117Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Barrel Proof Batch C923 official 2023 release 12 year bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Barrel Proof Batch C923 official 2023 release 12 year bourbon",
+    "summary": "No — **Elijah Craig Barrel Proof Batch C923 is an official 2023 release, but it is not a 12-year bourbon**.\n\nWhat the sources support:\n\n- **Official producer source:** Elijah Craig’s batch archive lists **C923** as the **September 2023** release at **133.0 proof** with an age statement of **13 years, 7 months**. It als",
+    "results": [
+      {
+        "title": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/barrel-proof.php",
+        "url": "https://elijahcraig.com/barrel-proof.php",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/whiskey-styles/bourbon/whiskey-review-elijah-craig-barrel-proof-c923/",
+        "url": "https://thewhiskeywash.com/whiskey-styles/bourbon/whiskey-review-elijah-craig-barrel-proof-c923/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/larceny-barrel-proof-batch-c923",
+        "url": "https://www.breakingbourbon.com/review/larceny-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://breakingbourbon.com/review/elijah-craig-barrel-proof",
+        "url": "https://breakingbourbon.com/review/elijah-craig-barrel-proof",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/whiskey-styles/bourbon/whiskey-review-larceny-barrel-proof-bourbon-batch-c923/",
+        "url": "https://thewhiskeywash.com/whiskey-styles/bourbon/whiskey-review-larceny-barrel-proof-bourbon-batch-c923/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "563d0547812cc0ee11ac10a51c8ea6a9b56f764a7a3e5fe7f71e4df6e9da0ad0",
+    "mode": "auto"
+  }
+}

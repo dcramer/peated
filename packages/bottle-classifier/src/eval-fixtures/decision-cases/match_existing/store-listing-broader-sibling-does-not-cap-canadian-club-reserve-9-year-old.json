@@ -82,8 +82,7 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 16913,
-    "confidenceAtLeast": 96,
-    "verifyEligible": true,
-    "summary": "Do not let a broader sibling like Canadian Club Reserve 40% ABV cap a high-confidence existing match when the agent already identified the stronger 9-year-old Reserve bottle."
+    "confidenceBand": "auto_verification",
+    "summary": "Do not let a broader sibling like Canadian Club Reserve 40% ABV cap an evidence-backed existing match when the agent already identified the stronger 9-year-old Reserve bottle."
   }
 }

@@ -48,6 +48,13 @@ It owns:
 
 Everything downstream should treat the classifier output as authoritative for bottle identity reasoning. Use-case-specific policy such as price-match automation should consume that output rather than reshaping the classifier itself.
 
+The classifier is nondeterministic in the important sense: semantic identity
+placement is model-led and evidence-led, not a set of hard-coded whisky-family
+rules. Deterministic code may extract structured facts, retrieve candidates,
+validate ids, normalize drafts, block impossible states, and cap unsafe
+automation confidence. It must not decide that a marketed family is a bottle or
+release just because a brand name, year, or batch-like token matched a regex.
+
 ## Public Contract
 
 The public entrypoint is:
@@ -93,6 +100,9 @@ The rule for package-owned deterministic behavior is strict:
 - deterministic helpers may only own structurally safe, effectively zero-ambiguity behavior
 - if the behavior depends on brand context, marketed family meaning, or program semantics, it stays classifier-owned
 - if the input is too sparse to safely infer a canonical bottle, block instead of guessing
+- local retrieval may expose sibling context, dirty parent traits, and existing
+  child releases, but that context is evidence for the model rather than a
+  deterministic decision rule
 - prompt changes should encode generalized reasoning patterns, not one-off brand tutoring; concrete family regressions belong in eval fixtures
 - real-world new-bottle fixtures should record `peatedBottleIds` when the example came from an observed Peated bottle family
 - ambiguous families should still add paired positive and negative fixtures, even though the executable source of truth is now one JSON file per case
@@ -143,7 +153,7 @@ These rules should remain centralized in the classifier:
 - Confidence calibration matters because downstream consumers use classifier confidence to decide whether a reviewed existing match is safe to auto-verify or should stay in review.
 - Brand decisions must distinguish consumer-facing brand from distillery, bottler, owner, importer, and product/category wording. A longer leading string match is not sufficient identity evidence.
 - `fullName` and aliases are weak evidence for brand/entity repairs because they combine brand text with bottle expression text and may be stale.
-- Generic `single cask` / `single barrel` language is not enough to infer `exact_cask`; exact-cask scope needs a stronger marketed-identity signal such as a known program code or numbered cask identity.
+- Generic `single cask` / `single barrel` language is not enough to infer `exact_cask`; exact-cask scope needs a stronger marketed-identity signal such as a known program code or numbered cask identity. For SMWS, the bottle code is the primary exact-cask anchor even when subtitles differ.
 - Downstream consumers should adapt the reviewed classifier result instead of “fixing up” raw model decisions.
 - Consumer-specific semantics such as price-match `correction` should be derived outside the generic classifier.
 - `create_release` only makes sense when the target bottle is acting as a reusable parent expression, not when the bottle is still storing a single known release-like identity on itself.
@@ -169,6 +179,12 @@ The reviewed `decision` is generic and bottle-centric:
 - `proposedBottle` / `proposedRelease` for create outcomes; `repair_bottle` carries only a `proposedBottle` patch draft
 - `no_match` stays generic at this boundary; downstream consumers own any review or clarification workflow
 - `observation` for non-canonical exact details such as selector names, cask numbers, bottle numbers, outturn, and exclusive wording
+- optional `identityBasis` documenting which traits the agent treated as bottle
+  identity, release identity, observation-only facts, year semantics, sibling
+  evidence, and remaining uncertainty
+- optional `confidenceBasis` documenting the evidence band, positive evidence,
+  unresolved risks, tools actually used, and whether web evidence was not used,
+  not needed, supportive, weak, or conflicting
 
 `artifacts` contains:
 
@@ -176,6 +192,11 @@ The reviewed `decision` is generic and bottle-centric:
 - `candidates`
 - `searchEvidence`
 - `resolvedEntities`
+
+Candidate rows may include `familyContext`, a compact local summary of child
+releases under the same parent and release-like traits still stored on the
+parent row. This is supplied to help the model reason about single-known-release
+and sibling-release cases without moving that judgment into deterministic code.
 
 That result is already reviewed for bottle identity. Downstream consumers may apply their own persistence or automation policy on top of it.
 

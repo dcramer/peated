@@ -15,6 +15,7 @@ import {
   type BottleCandidateSearchInput,
   type BottleClassificationDecision,
   type BottleClassifierAgentDecision,
+  type BottleClassifierAgentDecisionInput,
   type BottleExtractedDetails,
   type EntityResolution,
   type ProposedRelease,
@@ -42,7 +43,7 @@ import {
   textsOverlap,
 } from "./identityEvidenceCore";
 import { buildBottleClassifierInstructions } from "./instructions";
-import { getDeterministicOpenAISettings } from "./openaiModelSettings";
+import { getStableOpenAISettings } from "./openaiModelSettings";
 import {
   finalizeBottleReferenceClassification,
   getAutoIgnoreBottleReferenceReason,
@@ -82,7 +83,7 @@ type ReleaseSearchParts = Pick<
 >;
 
 export type BottleClassifierReasoningResult = {
-  decision: BottleClassifierAgentDecision;
+  decision: BottleClassifierAgentDecisionInput;
   artifacts: BottleClassificationArtifacts;
 };
 
@@ -147,7 +148,7 @@ export type BottleClassifier = {
 };
 
 function parseAgentDecision(
-  decision: BottleClassifierAgentDecision,
+  decision: BottleClassifierAgentDecisionInput,
 ): BottleClassifierAgentDecision {
   return BottleClassifierAgentDecisionSchema.parse(
     normalizePotentialProofLikeDecision(decision),
@@ -543,6 +544,55 @@ async function maybeBackfillCreateDecisionSearchEvidence({
   });
 }
 
+export async function finalizeBottleClassifierReasoningResult({
+  options,
+  reference,
+  reasoning,
+  candidateExpansion,
+  webSearchBudget,
+}: {
+  options: CreateBottleClassifierOptions;
+  reference: BottleReference;
+  reasoning: BottleClassifierReasoningResult;
+  candidateExpansion?: CandidateExpansionMode;
+  webSearchBudget?: BottleWebSearchBudget;
+}): Promise<{
+  decision: BottleClassificationDecision;
+  artifacts: BottleClassificationArtifacts;
+}> {
+  let artifacts = reasoning.artifacts;
+  const normalizedCandidateExpansion = candidateExpansion ?? "open";
+  // Normalize once without the creation-evidence guard so runtime web
+  // backfill can run, then normalize again with the guard enabled.
+  let decision = finalizeBottleReferenceClassification({
+    reference,
+    decision: reasoning.decision,
+    artifacts,
+    options: {
+      enforceCreateWebEvidence: false,
+    },
+  });
+
+  artifacts = await maybeBackfillCreateDecisionSearchEvidence({
+    options,
+    reference,
+    decision,
+    artifacts,
+    candidateExpansion: normalizedCandidateExpansion,
+    webSearchBudget,
+  });
+  decision = finalizeBottleReferenceClassification({
+    reference,
+    decision: reasoning.decision,
+    artifacts,
+  });
+
+  return {
+    decision,
+    artifacts,
+  };
+}
+
 function parseJsonIfPossible(value: string): unknown {
   try {
     return JSON.parse(value);
@@ -768,7 +818,7 @@ export async function prepareBottleClassifierAgentRun(
     model: options.model,
     modelSettings: {
       parallelToolCalls: false,
-      ...getDeterministicOpenAISettings(options.model),
+      ...getStableOpenAISettings(options.model),
     },
     outputType: BottleClassifierAgentDecisionSchema,
     tools,
@@ -832,7 +882,7 @@ export async function prepareBottleClassifierAgentRun(
 
       return {
         decision: parseAgentDecision(
-          finalOutput as BottleClassifierAgentDecision,
+          finalOutput as BottleClassifierAgentDecisionInput,
         ),
         artifacts: getArtifacts(),
       };
@@ -1012,31 +1062,14 @@ export function createBottleClassifier(
         initialCandidates: artifacts.candidates,
         candidateExpansion: parsedInput.candidateExpansion,
       });
-      const { reasoning } = reasoningRun;
-      let reasoningArtifacts = reasoning.artifacts;
-      let decision = finalizeBottleReferenceClassification({
-        reference: parsedInput.reference,
-        decision: reasoning.decision,
-        artifacts: reasoningArtifacts,
-      });
-
-      const backfilledArtifacts =
-        await maybeBackfillCreateDecisionSearchEvidence({
+      const { decision, artifacts: reasoningArtifacts } =
+        await finalizeBottleClassifierReasoningResult({
           options,
           reference: parsedInput.reference,
-          decision,
-          artifacts: reasoningArtifacts,
+          reasoning: reasoningRun.reasoning,
           candidateExpansion: parsedInput.candidateExpansion,
           webSearchBudget: reasoningRun.webSearchBudget,
         });
-      if (backfilledArtifacts !== reasoningArtifacts) {
-        reasoningArtifacts = backfilledArtifacts;
-        decision = finalizeBottleReferenceClassification({
-          reference: parsedInput.reference,
-          decision: reasoning.decision,
-          artifacts: reasoningArtifacts,
-        });
-      }
 
       return BottleClassificationResultSchema.parse(
         createDecidedBottleClassification({

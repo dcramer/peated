@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T23:55:19.779Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition 2001 official release bottled in 2001 or distilled 2001"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Talisker Distillers Edition 2001 official release bottled in 2001 or distilled 2001",
+    "summary": "For **Talisker Distillers Edition “2001”**, the **2001 refers to the distillation year, not the bottling year**. The bottle is a later annual Distillers Edition release, and independent bottle databases/reviews identify the common “2001” release as **distilled in 2001 and bottled in 2012**. The official Talisker/Malts ",
+    "results": [
+      {
+        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker 2001 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinkhacker.com/2012/05/21/review-talisker-distillers-edition-2012-distilled-2001/",
+        "url": "https://www.drinkhacker.com/2012/05/21/review-talisker-distillers-edition-2012-distilled-2001/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "url": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "domain": "whiskynotes.be",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/talisker-distillers-edition-2001-2012-whisky-review-10968",
+        "url": "https://www.connosr.com/talisker-distillers-edition-2001-2012-whisky-review-10968",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b2c2cc70d6d5c9c575724bacc70d7147b03685eca28b2ee996a856a63e6ba5b8",
+    "mode": "auto"
+  }
+}

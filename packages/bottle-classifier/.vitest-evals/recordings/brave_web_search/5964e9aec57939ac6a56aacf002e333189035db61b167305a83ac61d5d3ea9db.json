@@ -1,0 +1,32 @@
+{
+  "writtenAt": "2026-05-06T23:57:56.143Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "site:smws.com RW6.5 \"Sauna Smoke\" OR \"Appley ever after\""
+  },
+  "output": {
+    "provider": "brave",
+    "query": "site:smws.com RW6.5 \"Sauna Smoke\" OR \"Appley ever after\"",
+    "summary": "CASK NO. RW6.3 CASK NO. RW6.5",
+    "results": [
+      {
+        "title": "Cinnamon sauna smoke",
+        "url": "https://smws.com/cinnamon-sauna-smoke/",
+        "domain": "smws.com",
+        "description": "CASK NO. RW6.3",
+        "extraSnippets": []
+      },
+      {
+        "title": "Appley ever after",
+        "url": "https://smws.com/appley-ever-after/",
+        "domain": "smws.com",
+        "description": "CASK NO. RW6.5",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5964e9aec57939ac6a56aacf002e333189035db61b167305a83ac61d5d3ea9db",
+    "mode": "auto"
+  }
+}

@@ -29,6 +29,11 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - Preserve the reviewed boundary in `src/contract.ts` and `src/classifier.ts`.
 - Internal adapter-facing modules should stay behind the `internal/*` package namespace.
 - Deterministic validation, downgrades, and `identityScope` rules live in `src/reviewPolicy.ts`.
+- Bottle-versus-release semantics are model-led. Retrieval may expose sibling
+  context, but do not encode brand/family-specific release splits in
+  deterministic code.
+- Model-sensitive classification examples belong in eval fixtures. Unit tests
+  should cover deterministic validation and post-processing invariants only.
 - Prompt-only fixes are incomplete when the invariant is deterministic; fix policy and tests together.
 - Do not add brand-specific prompt or extraction examples just to rescue one observed bottle family. Encode the transferable rule, and keep family-specific regressions in eval fixtures.
 - Before adding deterministic whisky taxonomy, phrase, or category rules, research authoritative sources and cite the basis in code comments plus focused tests or fixtures. If the rule cannot be verified, leave the field unknown and let the web-enabled classifier reason about it.
@@ -36,7 +41,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - False positive existing matches are worse than conservative create or no-match results.
 - Bounded ambiguity should collapse to conservative `no_match` at this boundary. Downstream consumers own any review workflow.
 - `exact_cask` needs strong marketed identity signals such as SMWS codes, cask numbers, or barrel numbers.
-- Behavior changes should update both unit tests and realistic eval fixtures when model-sensitive.
+- Model-sensitive behavior changes should update realistic eval fixtures; add unit tests only for deterministic invariants changed to support them.
 - Live evals load the repo-root `.env.local`.
 
 ## References

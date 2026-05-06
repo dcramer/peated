@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T18:45:58.573Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "SMWS RW6.5 Sauna Smoke Scotch Malt Whisky Society official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "SMWS RW6.5 Sauna Smoke Scotch Malt Whisky Society official",
+    "summary": "I could not verify **“RW6.5 Sauna Smoke”** as the official SMWS title. The official SMWS listings I found identify **RW6.5** as **“Appley ever after,”** and they classify it as a **rye whisky from Finland**, not a Scotch malt whisky. The official SMWS page confirms **cask no. RW6.5**, **age 6 years**, **ABV 56.0%**, an",
+    "results": [
+      {
+        "title": "https://smws.com/",
+        "url": "https://smws.com/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.com/brands/asc.html/",
+        "url": "https://smws.com/brands/asc.html/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.com/unfiltered/society-flavour-refined",
+        "url": "https://smws.com/unfiltered/society-flavour-refined",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://th.smws.com/",
+        "url": "https://th.smws.com/",
+        "domain": "th.smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.com/spirit-type/",
+        "url": "https://smws.com/spirit-type/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.com/about/awards",
+        "url": "https://smws.com/about/awards",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "802ee2643288ed35d2a5896c4bfa04a418ec0d6da23c41481e1bf489f17dc22d",
+    "mode": "auto"
+  }
+}

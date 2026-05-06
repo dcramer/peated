@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-07T00:47:49.700Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"SMWS RW6.5\" whisky Kyro Sauna Smoke"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"SMWS RW6.5\" whisky Kyro Sauna Smoke",
+    "summary": "I found a specific SMWS listing for this bottle, and it does **not** appear to be called “Kyrö Sauna Smoke.”\n\n**What “SMWS RW6.5” is:**\n- **Bottle/code:** **SMWS RW6.5**\n- **Name:** **“Appley ever after”**\n- **Distillery/producer:** a Finnish **rye whisky** from **Kyrö Distillery**\n- **Age:** **6 years**\n- **ABV:** **5",
+    "results": [
+      {
+        "title": "https://kyrodistillery.com/products/kyro-wood-smoke-whisky-700ml",
+        "url": "https://kyrodistillery.com/products/kyro-wood-smoke-whisky-700ml",
+        "domain": "kyrodistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://kyrodistillery.com/",
+        "url": "https://kyrodistillery.com/",
+        "domain": "kyrodistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/kyro-sauna-stories-launch/",
+        "url": "https://www.masterofmalt.com/kyro-sauna-stories-launch/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyexperts.net/kyroe-distillery-praesentiert-den-weltweit-ersten-sauna-gereiften-whisky-sauna-stories-no-1/",
+        "url": "https://whiskyexperts.net/kyroe-distillery-praesentiert-den-weltweit-ersten-sauna-gereiften-whisky-sauna-stories-no-1/",
+        "domain": "whiskyexperts.net",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/kyro-distillery-company/kyro-sauna-stories-no-1-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/kyro-distillery-company/kyro-sauna-stories-no-1-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://kyrodistillery.it/",
+        "url": "https://kyrodistillery.it/",
+        "domain": "kyrodistillery.it",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "24127c3f3fdb0734c1eb44f8efef320543ff992f463b8e7218d2e1d90720eebb",
+    "mode": "auto"
+  }
+}

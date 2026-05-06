@@ -39,6 +39,7 @@ type MatchAction = "match_existing" | "correction" | "create_new" | "no_match";
 type MatchAttribute = EvidenceCheck["attribute"];
 type SourceTier = EvidenceCheck["matchedSourceTiers"][number];
 type MatchCreationTarget = z.infer<typeof BottleCreationTargetEnum>;
+type MatchIdentityScope = "product" | "exact_cask";
 
 type MatchAutomationInput = {
   action: MatchAction;
@@ -1050,6 +1051,7 @@ export function shouldVerifyStorePriceMatch(params: {
   action: MatchAction;
   currentBottleId: null | number;
   currentReleaseId?: number | null;
+  identityScope?: MatchIdentityScope | null;
   suggestedBottleId: number | null;
   suggestedReleaseId: number | null;
   modelConfidence: number | null;
@@ -1060,6 +1062,7 @@ export function shouldVerifyStorePriceMatch(params: {
     automationBlockers,
     currentBottleId,
     currentReleaseId,
+    identityScope,
     suggestedBottleId,
     suggestedReleaseId,
     modelConfidence,
@@ -1081,6 +1084,7 @@ export function shouldVerifyStorePriceMatch(params: {
     confidence: modelConfidence,
     currentBottleId,
     currentReleaseId: currentReleaseId ?? null,
+    identityScope,
     matchedBottleId: suggestedBottleId,
     matchedReleaseId: suggestedReleaseId ?? null,
   });

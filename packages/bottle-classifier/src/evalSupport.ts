@@ -6,7 +6,7 @@ import type {
 import {
   DEFAULT_OPENAI_EVAL_MODEL,
   DEFAULT_OPENAI_MODEL,
-  getDeterministicOpenAISettings,
+  getStableOpenAISettings,
 } from "./openaiModelSettings";
 
 export const evalClassifierModel =
@@ -38,7 +38,7 @@ export function createEvalClassifierOptions(
 }
 
 export function getEvalJudgeModelSettings() {
-  return getDeterministicOpenAISettings(evalJudgeModel);
+  return getStableOpenAISettings(evalJudgeModel);
 }
 
 export async function promptEvalJudgeModel(

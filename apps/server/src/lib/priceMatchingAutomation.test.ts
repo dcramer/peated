@@ -810,6 +810,21 @@ describe("priceMatchingAutomation", () => {
     ).toBe(false);
   });
 
+  test("auto-approves exact-cask code matches at the exact-cask threshold", () => {
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        currentBottleId: null,
+        currentReleaseId: null,
+        identityScope: "exact_cask",
+        suggestedBottleId: 41,
+        suggestedReleaseId: null,
+        modelConfidence: 95,
+        automationBlockers: [],
+      }),
+    ).toBe(true);
+  });
+
   test("does not auto-approve unmatched release matches from confidence alone", () => {
     expect(
       shouldVerifyStorePriceMatch({

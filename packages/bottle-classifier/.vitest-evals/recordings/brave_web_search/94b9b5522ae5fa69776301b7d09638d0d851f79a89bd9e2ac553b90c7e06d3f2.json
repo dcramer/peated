@@ -1,0 +1,14 @@
+{
+  "writtenAt": "2026-05-07T00:34:35.663Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "\"Maker's Mark Private Selection\" \"S2B13\""
+  },
+  "output": {
+    "error": "Search budget exhausted after 3 queries"
+  },
+  "metadata": {
+    "cacheKey": "94b9b5522ae5fa69776301b7d09638d0d851f79a89bd9e2ac553b90c7e06d3f2",
+    "mode": "auto"
+  }
+}

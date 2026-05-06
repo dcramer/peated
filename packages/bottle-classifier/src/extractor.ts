@@ -2,7 +2,7 @@ import type OpenAI from "openai";
 import { z } from "zod";
 import { BottleExtractedDetailsSchema } from "./classifierTypes";
 import { buildWhiskyLabelExtractorInstructions } from "./instructions";
-import { getDeterministicOpenAISettings } from "./openaiModelSettings";
+import { getStableOpenAISettings } from "./openaiModelSettings";
 
 const ResponseSchema = z.object({
   result: BottleExtractedDetailsSchema.nullable(),
@@ -62,7 +62,7 @@ export async function extractFromImage({
         schema: z.toJSONSchema(ResponseSchema),
       },
     },
-    ...getDeterministicOpenAISettings(model),
+    ...getStableOpenAISettings(model),
   });
 
   const { result } = ResponseSchema.parse(JSON.parse(response.output_text));
@@ -99,7 +99,7 @@ export async function extractFromText({
         schema: z.toJSONSchema(ResponseSchema),
       },
     },
-    ...getDeterministicOpenAISettings(model),
+    ...getStableOpenAISettings(model),
   });
 
   const { result } = ResponseSchema.parse(JSON.parse(response.output_text));

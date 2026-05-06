@@ -71,8 +71,7 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 13437,
-    "confidenceAtLeast": 96,
-    "verifyEligible": true,
-    "summary": "Match Jameson Cold Brew from the raw title alone and calibrate confidence high enough that the downstream verifier can trust the reviewed bottle-level match."
+    "confidenceBand": "auto_verification",
+    "summary": "Match Jameson Cold Brew from the raw title alone and mark the reviewed bottle-level match as evidence-backed."
   }
 }

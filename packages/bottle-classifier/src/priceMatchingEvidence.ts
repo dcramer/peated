@@ -32,6 +32,8 @@ type ExistingMatchWebEvidenceEvaluation = {
 
 export const REAFFIRMED_EXISTING_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD = 80;
 export const UNMATCHED_BOTTLE_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD = 96;
+export const EXACT_CASK_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD = 95;
+type BottleIdentityScope = "product" | "exact_cask";
 const SPECIFIC_IDENTITY_WEB_SUPPORT_ATTRIBUTES = new Set<MatchAttribute>([
   "bottler",
   "name",
@@ -47,6 +49,7 @@ const SPECIFIC_IDENTITY_WEB_SUPPORT_ATTRIBUTES = new Set<MatchAttribute>([
   "releaseYear",
 ]);
 const PLAIN_AGE_IGNORABLE_NAME_TOKENS = new Set([
+  "aged",
   "american",
   "and",
   "bottle",
@@ -86,12 +89,14 @@ export function isExistingMatchConfidenceEligibleForVerification({
   confidence,
   currentBottleId,
   currentReleaseId,
+  identityScope = "product",
   matchedBottleId,
   matchedReleaseId,
 }: {
   confidence: number;
   currentBottleId?: null | number;
   currentReleaseId?: null | number;
+  identityScope?: BottleIdentityScope | null;
   matchedBottleId: null | number;
   matchedReleaseId?: null | number;
 }): boolean {
@@ -121,6 +126,10 @@ export function isExistingMatchConfidenceEligibleForVerification({
 
   if (matchedReleaseId !== null && matchedReleaseId !== undefined) {
     return false;
+  }
+
+  if (identityScope === "exact_cask") {
+    return confidence >= EXACT_CASK_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD;
   }
 
   return confidence >= UNMATCHED_BOTTLE_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD;

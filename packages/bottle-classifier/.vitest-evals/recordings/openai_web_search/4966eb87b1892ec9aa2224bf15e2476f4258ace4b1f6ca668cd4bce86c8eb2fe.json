@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-05-06T22:01:17.522Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Maker's Mark Private Selection S2B13 site:makersmark.com OR site:makersmarkprivatebarrel.com"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Maker's Mark Private Selection S2B13 site:makersmark.com OR site:makersmarkprivatebarrel.com",
+    "summary": "Here’s the strongest evidence I found for **Maker’s Mark Private Selection S2B13**.\n\n### What the official Maker’s Mark source confirms\nMaker’s Mark’s official Private Selection page confirms the core program specs for any Private Selection bottle: it **begins with cask-strength Maker’s Mark**, uses **10 finishing stav",
+    "canonicalBottleNames": [],
+    "results": [
+      {
+        "title": "Private Selection Bourbon: Premium Whisky | Maker's Mark®",
+        "url": "https://www.makersmark.com/bourbons/makers-mark-private-selection",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.makersmark.com/en-us/distillery/know-before-you-go",
+        "url": "https://www.makersmark.com/en-us/distillery/know-before-you-go",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "MAKER’S MARK® PRIVATE SELECTION PROGRAM: ROASTED FRENCH MENDIANT STAVE",
+        "url": "https://www.breakingbourbon.com/bourbon-whiskey-press-releases/makers-mark-r-private-selection-program-roasted-french-mendiant-stave",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.peoplesbourbonreview.com/makers-mark-private-selection",
+        "url": "https://www.peoplesbourbonreview.com/makers-mark-private-selection",
+        "domain": "peoplesbourbonreview.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.makersmark.com/en-us/faqs",
+        "url": "https://www.makersmark.com/en-us/faqs",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Maker’s Mark Private Selection Topflight S2B13 Review | The Daily Pour",
+        "url": "https://thedailypour.com/spirit/makers-mark-private-selection-topflight-s2b13/",
+        "domain": "thedailypour.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "4966eb87b1892ec9aa2224bf15e2476f4258ace4b1f6ca668cd4bce86c8eb2fe",
+    "mode": "auto"
+  }
+}

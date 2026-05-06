@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-07T00:19:56.382Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"The Whistler\" \"Bodega Cask\" single malt Irish whiskey official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"The Whistler\" \"Bodega Cask\" single malt Irish whiskey official",
+    "summary": "Official and independent sources support that **The Whistler Bodega Cask** is a **single malt Irish whiskey** in The Whistler range, and the official producer site states it is a **5-year-old**, **triple-distilled** expression **wholly matured in Spanish sherry butts**. ([thewhistlerwhiskey.com](https://thewhistlerwhis",
+    "results": [
+      {
+        "title": "https://www.irishmalts.com/single-malt/the-whistler-bodega-cask/",
+        "url": "https://www.irishmalts.com/single-malt/the-whistler-bodega-cask/",
+        "domain": "irishmalts.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "The Whistler Bodega Cask Irish Single Malt Whiskey Review: Tasting Notes & Analysis",
+        "url": "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wineenthusiast.com/buying-guide/the-whistler-bodega-cask-single-malt-irish-whiskey/",
+        "url": "https://www.wineenthusiast.com/buying-guide/the-whistler-bodega-cask-single-malt-irish-whiskey/",
+        "domain": "wineenthusiast.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wine.com/product/the-whistler-bodega-cask-single-malt-irish-whiskey/949636",
+        "url": "https://www.wine.com/product/the-whistler-bodega-cask-single-malt-irish-whiskey/949636",
+        "domain": "wine.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.irish-whiskeys.de/p/the-whistler-5-jahre-bodega-cask-irish-single-malt-whiskey-0-7-l",
+        "url": "https://www.irish-whiskeys.de/p/the-whistler-5-jahre-bodega-cask-irish-single-malt-whiskey-0-7-l",
+        "domain": "irish-whiskeys.de",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "The Whistler Whiskey – Sit and Whistle A While",
+        "url": "https://thewhistlerwhiskey.com/",
+        "domain": "thewhistlerwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "c2f9c6b458fbe93202038ace2b89185d38e2c6393555e93288ab73bf8bf08e04",
+    "mode": "auto"
+  }
+}

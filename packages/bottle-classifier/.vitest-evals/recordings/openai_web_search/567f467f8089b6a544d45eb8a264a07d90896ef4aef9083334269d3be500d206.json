@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-05-06T21:43:44.326Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Four Roses Single Barrel Barrel Strength official barrel strength single barrel bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Four Roses Single Barrel Barrel Strength official barrel strength single barrel bourbon",
+    "summary": "This appears to be **Four Roses Single Barrel Bourbon**, the official flagship **single-barrel bourbon**, **not** an official always-on product named “Single Barrel Barrel Strength.” The official Four Roses product page identifies it as **Single Barrel OBSV**, bottled at **100 proof / 50% ABV**, aged **7–9 years**, and",
+    "canonicalBottleNames": [],
+    "results": [
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/single-barrel-obsf",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel-obsf",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/four-roses-single-barrel",
+        "url": "https://www.breakingbourbon.com/review/four-roses-single-barrel",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+        "url": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://checkout.fourrosesbourbon.com/products/four-roses-single-barrel-bourbon",
+        "url": "https://checkout.fourrosesbourbon.com/products/four-roses-single-barrel-bourbon",
+        "domain": "checkout.fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/bourbon-whiskey-press-releases/four-roses-distillery-unveils-single-barrel-collection-honoring-20-years-of-single-barrel-excelle",
+        "url": "https://www.breakingbourbon.com/bourbon-whiskey-press-releases/four-roses-distillery-unveils-single-barrel-collection-honoring-20-years-of-single-barrel-excellence",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "567f467f8089b6a544d45eb8a264a07d90896ef4aef9083334269d3be500d206",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T18:29:22.425Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Canadian Club\" Reserve 9 year old official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Canadian Club\" Reserve 9 year old official",
+    "summary": "Yes — this appears to be an **official bottling** of Canadian Club.\n\nWhat I could confirm from available sources:\n\n- **Name/release:** **Canadian Club 9 Year Reserve**. ([distiller.com](https://distiller.com/spirits/canadian-club-reserve-9-year?utm_source=openai))\n- **Producer/brand:** released under the **Canadian Clu",
+    "results": [
+      {
+        "title": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+        "url": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/canadian-club-reserve-9-year/tastes?page=1&require_note=true&sort=highest_rated&sort=lowest_rated",
+        "url": "https://distiller.com/spirits/canadian-club-reserve-9-year/tastes?page=1&require_note=true&sort=highest_rated&sort=lowest_rated",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/knob-creek-single-barrel-reserve.html",
+        "url": "https://www.whisky.com/whisky-database/details/knob-creek-single-barrel-reserve.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/canadian-club-reserve-9-year/tastes?page=2",
+        "url": "https://distiller.com/spirits/canadian-club-reserve-9-year/tastes?page=2",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/canadian-club-reserve-10",
+        "url": "https://distiller.com/spirits/canadian-club-reserve-10",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/crown-royal-reserve.html",
+        "url": "https://www.whisky.com/whisky-database/details/crown-royal-reserve.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "0b13b2825873be9744cf6e9fbf210758cd999e1bafea8aaa5155fc934d5b8fc9",
+    "mode": "auto"
+  }
+}

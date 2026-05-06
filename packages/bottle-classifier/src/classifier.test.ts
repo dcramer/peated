@@ -7,15 +7,38 @@ import {
 } from "./classifierRuntime";
 import type {
   BottleCandidate,
-  BottleClassifierAgentDecision,
+  BottleClassifierAgentDecisionInput,
   BottleExtractedDetails,
 } from "./classifierTypes";
 import type { BottleClassificationArtifacts } from "./contract";
 
 type ReasoningResult = {
-  decision: BottleClassifierAgentDecision;
+  decision: BottleClassifierAgentDecisionInput;
   artifacts: BottleClassificationArtifacts;
 };
+
+function createAuthoritativeSearchEvidence({
+  query,
+  summary,
+}: {
+  query: string;
+  summary: string;
+}): BottleClassificationArtifacts["searchEvidence"][number] {
+  return {
+    provider: "openai",
+    query,
+    summary,
+    results: [
+      {
+        title: summary,
+        url: "https://www.whiskyadvocate.com/reviews/classifier-evidence",
+        domain: "whiskyadvocate.com",
+        description: summary,
+        extraSnippets: [],
+      },
+    ],
+  };
+}
 
 // Keep this file focused on deterministic classifier boundary behavior.
 // Real-bottle workflow regressions belong in the fixture-driven eval corpus,
@@ -1694,7 +1717,13 @@ describe("createBottleClassifier", () => {
         },
         artifacts: {
           extractedIdentity,
-          searchEvidence: [],
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "Elijah Craig Barrel Proof Batch C923",
+              summary:
+                "Elijah Craig Barrel Proof Batch C923 is a 12 year cask strength bourbon release in the Elijah Craig Barrel Proof family.",
+            }),
+          ],
           candidates: [elijahCraigBarrelProofCandidate],
           resolvedEntities: [],
         },
@@ -1735,7 +1764,7 @@ describe("createBottleClassifier", () => {
       expression: "1978 Rare Cask Release",
       series: null,
       distillery: ["Glenglassaugh"],
-      category: "single_malt",
+      category: null,
       stated_age: 35,
       abv: null,
       release_year: null,
@@ -1764,7 +1793,13 @@ describe("createBottleClassifier", () => {
         },
         artifacts: {
           extractedIdentity,
-          searchEvidence: [],
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "Glenglassaugh 1978 Rare Cask Release Batch 1 35",
+              summary:
+                "Glenglassaugh 1978 Rare Cask Release Batch 1 is a 35 year single malt release in the Glenglassaugh 1978 Rare Cask Release family.",
+            }),
+          ],
           candidates: [glenglassaughRareCaskParentCandidate],
           resolvedEntities: [],
         },
@@ -1795,6 +1830,413 @@ describe("createBottleClassifier", () => {
       proposedRelease: {
         edition: "Batch 1",
         statedAge: 35,
+      },
+    });
+  });
+
+  test("promotes a dirty parent age no-match into create_release with the differing release age", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Glenglassaugh",
+      bottler: null,
+      expression: "1978 Rare Cask Release",
+      series: null,
+      distillery: ["Glenglassaugh"],
+      category: null,
+      stated_age: 35,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: "Batch 1",
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "no_match",
+          confidence: 26,
+          rationale:
+            "The parent candidate has a conflicting structured age, but the age is not marketed in the name.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [2457],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "Glenglassaugh 1978 Rare Cask Release Batch 1 35",
+              summary:
+                "Glenglassaugh 1978 Rare Cask Release Batch 1 is a 35 year single malt release in the Glenglassaugh 1978 Rare Cask Release family.",
+            }),
+          ],
+          candidates: [glenglassaughRareCaskParentCandidate],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Glenglassaugh 1978 Rare Cask Release (Batch 1) 35-year-old",
+      },
+      extractedIdentity,
+      initialCandidates: [glenglassaughRareCaskParentCandidate],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "create_release",
+      parentBottleId: 2457,
+      identityScope: "product",
+      proposedRelease: {
+        edition: "Batch 1",
+        statedAge: 35,
+      },
+    });
+  });
+
+  test("backfills web evidence and promotes no-match when local candidates are over-specific", async () => {
+    const create = vi.fn().mockResolvedValue({
+      output_text:
+        "Glenmorangie The Quinta Ruban 14 Years Old is a single malt matured in bourbon and ruby port casks.",
+      output: [
+        {
+          type: "web_search_call",
+          action: {
+            type: "search",
+            sources: [
+              {
+                type: "url",
+                url: "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+              },
+              {
+                type: "url",
+                url: "https://www.whiskyadvocate.com/ratings-reviews/glenmorangie-quinta-ruban-14-year-old/",
+              },
+            ],
+          },
+        },
+      ],
+    });
+    const quintaRuban4thEditionCandidate: BottleCandidate = {
+      bottleId: 401,
+      releaseId: null,
+      kind: "bottle",
+      alias: null,
+      fullName: "Glenmorangie Quinta Ruban 14 Year Old 4th Edition",
+      bottleFullName: "Glenmorangie Quinta Ruban 14 Year Old 4th Edition",
+      brand: "Glenmorangie",
+      bottler: null,
+      series: null,
+      distillery: ["Glenmorangie"],
+      category: "single_malt",
+      statedAge: 14,
+      edition: "4th Edition",
+      caskStrength: null,
+      singleCask: null,
+      abv: 46,
+      vintageYear: null,
+      releaseYear: null,
+      caskType: "ruby_port",
+      caskSize: null,
+      caskFill: null,
+      score: 0.87,
+      source: ["vector"],
+    };
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Glenmorangie",
+      bottler: null,
+      expression: "Quinta Ruban",
+      series: null,
+      distillery: ["Glenmorangie"],
+      category: null,
+      stated_age: 14,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "no_match",
+          confidence: 82,
+          rationale: "The local candidate adds unsupported 4th Edition detail.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [401],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [quintaRuban4thEditionCandidate],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      client: {
+        responses: {
+          create,
+        },
+      } as unknown as OpenAI,
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Glenmorangie Quinta Ruban 14-year-old",
+        url: "https://shop.example/products/quinta-ruban-14",
+      },
+      extractedIdentity,
+      initialCandidates: [quintaRuban4thEditionCandidate],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(create).toHaveBeenCalledTimes(1);
+    expect(result.decision).toMatchObject({
+      action: "create_bottle",
+      identityScope: "product",
+      proposedBottle: {
+        name: "Quinta Ruban 14-year-old",
+        brand: {
+          name: "Glenmorangie",
+        },
+        statedAge: 14,
+        caskType: null,
+      },
+    });
+  });
+
+  test("does not preserve a guessed house category for unsupported malt whiskey styles", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Woodford Reserve",
+      bottler: null,
+      expression: "Kentucky Straight Malt",
+      series: null,
+      distillery: ["Woodford Reserve"],
+      category: null,
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "create_bottle",
+          confidence: 86,
+          rationale: "Woodford Reserve Kentucky Straight Malt Whiskey exists.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [],
+          proposedBottle: {
+            name: "Malt Whiskey",
+            series: null,
+            category: "single_malt",
+            edition: null,
+            statedAge: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: null,
+              name: "Woodford Reserve",
+            },
+            distillers: [
+              {
+                id: null,
+                name: "Woodford Reserve",
+              },
+            ],
+            bottler: null,
+          },
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "Woodford Reserve Kentucky Straight Malt Whiskey",
+              summary:
+                "Woodford Reserve Kentucky Straight Malt Whiskey is a distinct Woodford Reserve malt whiskey.",
+            }),
+          ],
+          candidates: [],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Woodford Reserve Kentucky Straight Malt Whiskey",
+      },
+      extractedIdentity,
+      initialCandidates: [],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "create_bottle",
+      proposedBottle: {
+        name: "Kentucky Straight Malt Whiskey",
+        category: null,
+      },
+    });
+  });
+
+  test("converts an unsupported malt whiskey match away from conflicting bourbon candidates", async () => {
+    const woodfordBourbonCandidate: BottleCandidate = {
+      bottleId: 44150,
+      releaseId: null,
+      kind: "bottle",
+      alias: "Woodford Reserve Kentucky Straight Bourbon Whiskey",
+      fullName: "Woodford Reserve Kentucky Straight Bourbon Whiskey",
+      bottleFullName: "Woodford Reserve Kentucky Straight Bourbon Whiskey",
+      brand: "Woodford Reserve",
+      bottler: null,
+      series: null,
+      distillery: ["Woodford Reserve"],
+      category: "bourbon",
+      statedAge: null,
+      edition: null,
+      caskStrength: null,
+      singleCask: null,
+      abv: 45.2,
+      vintageYear: null,
+      releaseYear: null,
+      caskType: null,
+      caskSize: null,
+      caskFill: null,
+      score: 0.76,
+      source: ["vector"],
+    };
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Woodford Reserve",
+      bottler: null,
+      expression: "Kentucky Straight Malt",
+      series: null,
+      distillery: ["Woodford Reserve"],
+      category: null,
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 88,
+          rationale: "The brand overlaps a local Woodford candidate.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 44150,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [44150],
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "Woodford Reserve Kentucky Straight Malt Whiskey",
+              summary:
+                "Woodford Reserve Kentucky Straight Malt Whiskey is a distinct Woodford Reserve malt whiskey.",
+            }),
+          ],
+          candidates: [woodfordBourbonCandidate],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Woodford Reserve Kentucky Straight Malt Whiskey",
+      },
+      extractedIdentity,
+      initialCandidates: [woodfordBourbonCandidate],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "create_bottle",
+      matchedBottleId: null,
+      proposedBottle: {
+        name: "Kentucky Straight Malt Whiskey",
+        category: null,
       },
     });
   });
@@ -1873,7 +2315,13 @@ describe("createBottleClassifier", () => {
         },
         artifacts: {
           extractedIdentity,
-          searchEvidence: [],
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "Example Distillery Heritage Cask Strength Batch 2 2024",
+              summary:
+                "Example Distillery Heritage Cask Strength Batch 2 is a 2024 oloroso cask strength release bottled at 58.2% ABV.",
+            }),
+          ],
           candidates: [
             heritageCaskStrengthParentCandidate,
             heritageCaskStrengthBatch1Candidate,
@@ -1954,7 +2402,13 @@ describe("createBottleClassifier", () => {
         },
         artifacts: {
           extractedIdentity,
-          searchEvidence: [],
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "The Macallan Sherry Oak 30 year",
+              summary:
+                "The Macallan Sherry Oak 30 year is a release in The Macallan Sherry Oak single malt family.",
+            }),
+          ],
           candidates: [
             macallanSherryOakLegacy30Candidate,
             macallanSherryOakParentCandidate,
@@ -2166,7 +2620,13 @@ describe("createBottleClassifier", () => {
         },
         artifacts: {
           extractedIdentity,
-          searchEvidence: [],
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "Glenglassaugh 1978 Rare Cask Release Batch 1 35",
+              summary:
+                "Glenglassaugh 1978 Rare Cask Release Batch 1 is a 35 year single cask 1978 vintage 2014 release in the Glenglassaugh Rare Cask Release family.",
+            }),
+          ],
           candidates: [glenglassaughRareCaskParentCandidate],
           resolvedEntities: [],
         },
@@ -2517,7 +2977,7 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 97,
+          confidence: 88,
           rationale:
             "The 9-year Reserve bottle is the strongest existing match, and Triple Aged reads as extra label wording rather than a separate product family.",
           identityScope: "product",
@@ -2564,7 +3024,7 @@ describe("createBottleClassifier", () => {
 
     expect(result.decision).toMatchObject({
       action: "match",
-      confidence: 97,
+      confidence: 88,
       matchedBottleId: 16913,
       matchedReleaseId: null,
       parentBottleId: null,
@@ -2573,6 +3033,108 @@ describe("createBottleClassifier", () => {
     expect(result.decision.rationale).not.toContain(
       "Server downgraded the existing-match recommendation",
     );
+  });
+
+  test("resolves duplicate bottle creation to a safe existing candidate match", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Canadian Club",
+      bottler: null,
+      expression: "Reserve",
+      series: null,
+      distillery: [],
+      category: "blend",
+      stated_age: 9,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "create_bottle",
+          confidence: 97,
+          rationale:
+            "The listing appears to describe Canadian Club Reserve 9-year-old.",
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [16913, 17346],
+          proposedBottle: {
+            name: "Reserve 9-year-old Canadian Whisky",
+            series: null,
+            category: "blend",
+            edition: null,
+            statedAge: 9,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: null,
+              name: "Canadian Club",
+            },
+            distillers: [
+              {
+                id: null,
+                name: "Canadian Club",
+              },
+            ],
+            bottler: null,
+          },
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [
+            canadianClubReserve9YearOldCandidate,
+            canadianClubReserve40Candidate,
+          ],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Canadian Club 9-year-old Reserve Canadian Whisky",
+      },
+      extractedIdentity,
+      initialCandidates: [
+        canadianClubReserve9YearOldCandidate,
+        canadianClubReserve40Candidate,
+      ],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "match",
+      confidence: 97,
+      matchedBottleId: 16913,
+      matchedReleaseId: null,
+      proposedBottle: null,
+      identityScope: "product",
+    });
   });
 
   test("downgrades a plain age parent when the extracted identity includes extra cask detail", async () => {
@@ -3247,7 +3809,13 @@ describe("createBottleClassifier", () => {
         },
         artifacts: {
           extractedIdentity,
-          searchEvidence: [],
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "Glenmorangie Cadboll Estate Batch 4",
+              summary:
+                "Glenmorangie 15 year The Cadboll Estate Batch 4 is a release in the Glenmorangie 15 year The Cadboll Estate family.",
+            }),
+          ],
           candidates: [
             cadbollEstateLegacyBatch4Candidate,
             cadbollEstateParentCandidate,
@@ -3329,7 +3897,13 @@ describe("createBottleClassifier", () => {
         },
         artifacts: {
           extractedIdentity,
-          searchEvidence: [],
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "Glengoyne Legacy Series Chapter Two",
+              summary:
+                "Glengoyne The Legacy Series Chapter Two is a release in the Glengoyne The Legacy Series family.",
+            }),
+          ],
           candidates: [
             glengoyneLegacySeriesChapterTwoCandidate,
             glengoyneLegacySeriesChapterOneCandidate,
@@ -3414,7 +3988,13 @@ describe("createBottleClassifier", () => {
         },
         artifacts: {
           extractedIdentity,
-          searchEvidence: [],
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "Penelope Bourbon Barrel Strength Batch 11",
+              summary:
+                "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey Batch 11 is a release in the Penelope Bourbon Barrel Strength Straight Bourbon Whiskey family.",
+            }),
+          ],
           candidates: [
             penelopeLegacyBatch11Candidate,
             penelopeBarrelStrengthParentCandidate,
@@ -3586,7 +4166,13 @@ describe("createBottleClassifier", () => {
         },
         artifacts: {
           extractedIdentity,
-          searchEvidence: [],
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "SMWS 6.71",
+              summary:
+                "The Scotch Malt Whisky Society 6.71 is a Macduff single cask bottle at 61.2% ABV.",
+            }),
+          ],
           candidates: [],
           resolvedEntities: [],
         },
@@ -3618,7 +4204,7 @@ describe("createBottleClassifier", () => {
 
   test("keeps generic single-barrel bottles in product scope without exact-cask identity signals", async () => {
     const extractedIdentity: BottleExtractedDetails = {
-      brand: "Four Roses",
+      brand: "Example",
       bottler: null,
       expression: "Single Barrel",
       series: null,
@@ -3664,7 +4250,7 @@ describe("createBottleClassifier", () => {
             caskFill: null,
             brand: {
               id: null,
-              name: "Four Roses",
+              name: "Example",
             },
             distillers: [],
             bottler: null,
@@ -3673,7 +4259,13 @@ describe("createBottleClassifier", () => {
         },
         artifacts: {
           extractedIdentity,
-          searchEvidence: [],
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "Example Single Barrel",
+              summary:
+                "Example Single Barrel is a bourbon bottle-level product at 50% ABV.",
+            }),
+          ],
           candidates: [],
           resolvedEntities: [],
         },
@@ -3686,7 +4278,7 @@ describe("createBottleClassifier", () => {
 
     const result = await classifier.classifyBottleReference({
       reference: {
-        name: "Four Roses Single Barrel",
+        name: "Example Single Barrel",
       },
       extractedIdentity,
       initialCandidates: [],
@@ -3760,7 +4352,13 @@ describe("createBottleClassifier", () => {
         },
         artifacts: {
           extractedIdentity,
-          searchEvidence: [],
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "Example Single Barrel 58.4",
+              summary:
+                "Example Single Barrel 58.4 is a barrel strength single barrel bourbon bottle-level product.",
+            }),
+          ],
           candidates: [],
           resolvedEntities: [],
         },
@@ -3874,7 +4472,13 @@ describe("createBottleClassifier", () => {
         },
         artifacts: {
           extractedIdentity,
-          searchEvidence: [],
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "SMWS RW6.5 Appley Ever After",
+              summary:
+                "The Scotch Malt Whisky Society RW6.5 Appley Ever After is a single cask rye bottle with Sauna Smoke as another listed name.",
+            }),
+          ],
           candidates: [],
           resolvedEntities: [],
         },
@@ -3903,7 +4507,7 @@ describe("createBottleClassifier", () => {
       identityScope: "exact_cask",
       proposedRelease: null,
       proposedBottle: {
-        name: "RW6.5 Appley Ever After",
+        name: "RW6.5",
         statedAge: 6,
         abv: 56,
         singleCask: true,
@@ -3922,6 +4526,92 @@ describe("createBottleClassifier", () => {
     expect(result.decision.rationale).toContain(
       "exact-cask identity cannot create a child release beneath the bottle",
     );
+  });
+
+  test("creates an SMWS exact-cask bottle from a supported code even when the model returns no match", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "The Scotch Malt Whisky Society",
+      bottler: "The Scotch Malt Whisky Society",
+      expression: "RW6.5 Sauna Smoke",
+      series: null,
+      distillery: ["Kyro"],
+      category: "rye",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: true,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "no_match",
+          confidence: 82,
+          rationale: "No local candidate matched.",
+          candidateBottleIds: [],
+          identityScope: "exact_cask",
+          observation: null,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "SMWS RW6.5 Sauna Smoke",
+              summary:
+                "The Scotch Malt Whisky Society RW6.5 Sauna Smoke is a rye single cask bottle.",
+            }),
+          ],
+          candidates: [],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "SMWS RW6.5 Sauna Smoke",
+      },
+      extractedIdentity,
+      initialCandidates: [],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "create_bottle",
+      identityScope: "exact_cask",
+      proposedBottle: {
+        name: "RW6.5",
+        category: "rye",
+        singleCask: true,
+        distillers: [
+          {
+            name: "Kyro",
+          },
+        ],
+      },
+      observation: {
+        selector: "Sauna Smoke",
+        caskNumber: "RW6.5",
+      },
+    });
   });
 
   test("keeps bare SMWS code references anchored to the code when creating an exact-cask bottle", async () => {
@@ -3997,7 +4687,13 @@ describe("createBottleClassifier", () => {
         },
         artifacts: {
           extractedIdentity,
-          searchEvidence: [],
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "SMWS 6.53 Fresh from the replicator",
+              summary:
+                "SMWS 6.53 Fresh from the replicator is a 13 year Macduff single cask bottle at 57.9% ABV.",
+            }),
+          ],
           candidates: [],
           resolvedEntities: [],
         },
@@ -4035,6 +4731,122 @@ describe("createBottleClassifier", () => {
         selector: "Fresh from the replicator",
         caskNumber: "6.53",
       },
+    });
+  });
+
+  test("normalizes a legacy generic-category repair into a plain existing match", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Shibui",
+      bottler: null,
+      expression: "Grain Select",
+      series: null,
+      distillery: [],
+      category: "single_grain",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const shibuiGrainSelectCandidate: BottleCandidate = {
+      bottleId: 13025,
+      releaseId: null,
+      kind: "bottle",
+      alias: "Shibui Grain Select",
+      fullName: "Shibui Grain Select",
+      bottleFullName: "Shibui Grain Select",
+      brand: "Shibui",
+      bottler: null,
+      series: null,
+      distillery: [],
+      category: "spirit",
+      statedAge: null,
+      edition: null,
+      caskStrength: null,
+      singleCask: null,
+      abv: null,
+      vintageYear: null,
+      releaseYear: null,
+      caskType: null,
+      caskSize: null,
+      caskFill: null,
+      score: 1,
+      source: ["brand", "exact"],
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "repair_bottle",
+          confidence: 98,
+          rationale:
+            "The exact local bottle matches, but the stored category is generic.",
+          candidateBottleIds: [13025],
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 13025,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          proposedBottle: {
+            name: "Grain Select",
+            series: null,
+            category: "single_grain",
+            edition: null,
+            statedAge: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: null,
+              name: "Shibui",
+            },
+            distillers: [],
+            bottler: null,
+          },
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [shibuiGrainSelectCandidate],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Shibui Grain Select Whisky 750ml",
+      },
+      extractedIdentity,
+      initialCandidates: [shibuiGrainSelectCandidate],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "match",
+      confidence: 98,
+      matchedBottleId: 13025,
+      matchedReleaseId: null,
+      proposedBottle: null,
+      identityScope: "product",
     });
   });
 

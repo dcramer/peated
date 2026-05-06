@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-07T01:23:52.374Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official ruby port 46% edition"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official ruby port 46% edition",
+    "summary": "I found strong support that this bottle is **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** finished in **ruby port casks** and bottled at **46% ABV**. Glenmorangie’s official product page says it is aged for **14 years** in **bourbon casks and port casks from Portugal**, with **46.0%",
+    "results": [
+      {
+        "title": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/glenmorangie/glenmorangie-the-quinta-ruban-14-year-old-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/glenmorangie/glenmorangie-the-quinta-ruban-14-year-old-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskishop.com/blogs/whiski-shop-news-and-blogs/glenmorangie-quinta-ruban-14-review",
+        "url": "https://www.whiskishop.com/blogs/whiski-shop-news-and-blogs/glenmorangie-quinta-ruban-14-review",
+        "domain": "whiskishop.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.filmwhiskey.com/blog/whisky-review-glenmorangie-quinta-ruban-highland-single-malt-scotch/",
+        "url": "https://www.filmwhiskey.com/blog/whisky-review-glenmorangie-quinta-ruban-highland-single-malt-scotch/",
+        "domain": "filmwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskeyful.com/reviews/glenmorangie-quinta-ruban-14-year-old-port-finish-highland-whisky",
+        "url": "https://whiskeyful.com/reviews/glenmorangie-quinta-ruban-14-year-old-port-finish-highland-whisky",
+        "domain": "whiskeyful.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskeyapostle.com/2019/06/glenmorangie-quinta-ruban-14-yrs/",
+        "url": "https://whiskeyapostle.com/2019/06/glenmorangie-quinta-ruban-14-yrs/",
+        "domain": "whiskeyapostle.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "caa7d86bbf704748e507c59cdc15756f1ec85f366ad6347ef0578e2db9290030",
+    "mode": "auto"
+  }
+}

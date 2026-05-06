@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T18:53:47.408Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "SMWS RW6.5 official Sauna Smoke SMWS"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "SMWS RW6.5 official Sauna Smoke SMWS",
+    "summary": "I think the reference is **not** “official Sauna Smoke” for **SMWS RW6.5**.\n\nWhat the sources support is:\n\n- **SMWS RW6.5** is titled **“Appley ever after”**, not “Sauna Smoke.” The official SMWS rye listing shows RW6.5 as a **Finland** rye whisky, **6 years old**, **56.0% ABV**, from a **1st fill #3 char barrel**. ([s",
+    "results": [
+      {
+        "title": "https://smws.com/",
+        "url": "https://smws.com/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://th.smws.com/",
+        "url": "https://th.smws.com/",
+        "domain": "th.smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.smws.ch/en/lightly-peated/",
+        "url": "https://www.smws.ch/en/lightly-peated/",
+        "domain": "smws.ch",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smwsa.com/",
+        "url": "https://smwsa.com/",
+        "domain": "smwsa.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.com/a-splash-of-ash/",
+        "url": "https://smws.com/a-splash-of-ash/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smwsa.com/faqs",
+        "url": "https://smwsa.com/faqs",
+        "domain": "smwsa.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a85d0da89cbe4af9eb817b63cbce293d041d7934c926301203a024165814b2aa",
+    "mode": "auto"
+  }
+}

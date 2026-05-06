@@ -1,0 +1,53 @@
+{
+  "writtenAt": "2026-05-07T00:42:33.246Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "site:fourrosesbourbon.com Four Roses barrel strength single barrel private selection"
+  },
+  "output": {
+    "provider": "brave",
+    "query": "site:fourrosesbourbon.com Four Roses barrel strength single barrel private selection",
+    "summary": "For someone who wants a more complex bourbon experience, Four Roses Single Barrel embodies the uniqueness of an individual barrel hand-selected by our Master Distiller. It achieves a pronounced yet elegant flavor that is worth savoring. One of three new single barrels, OBSF has <strong>lush notes of apple, vanilla, and",
+    "results": [
+      {
+        "title": "Single Barrel OBSV | Four Roses",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+        "domain": "fourrosesbourbon.com",
+        "description": "For someone who wants a more complex bourbon experience, Four Roses Single Barrel embodies the uniqueness of an individual barrel hand-selected by our Master Distiller. It achieves a pronounced yet elegant flavor that is",
+        "extraSnippets": []
+      },
+      {
+        "title": "Single Barrel OBSF | Four Roses",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel-obsf",
+        "domain": "fourrosesbourbon.com",
+        "description": "One of three new single barrels, OBSF has <strong>lush notes of apple, vanilla, and cocoa</strong> greeting the palate with a luxurious richness, while a bright touch of rye and a hint of brown sugar balance things out.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Single Barrel OESO | Four Roses",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel-oeso",
+        "domain": "fourrosesbourbon.com",
+        "description": "<strong>One of three new single barrels</strong>, this bottle&#x27;s rich red fruits bring a vibrant sweetness, while delicate oak and smooth vanilla add depth. A hint of brown sugar enhances the richness, producing a so",
+        "extraSnippets": []
+      },
+      {
+        "title": "Our Bourbons - Single Barrel Collection | Four Roses",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel-collection",
+        "domain": "fourrosesbourbon.com",
+        "description": "Four Roses Single Barrel has been a fan favorite for years, and after its recent win of “World’s Best Single Barrel Bourbon” in the 2024 World Whiskies Awards, the Four Roses OBSV recipe inspired a collection of new sing",
+        "extraSnippets": []
+      },
+      {
+        "title": "Single Barrel OESK | Four Roses",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel-oesk",
+        "domain": "fourrosesbourbon.com",
+        "description": "<strong>One of three new single barrels</strong>, this bottle&#x27;s baking spices introduce a gentle heat complemented by mellow oak and earthy tea leaves. Rich caramel rounds out the profile, creating a bourbon with a",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2b9a3585908e5b6c6d45cd8ca7183614f4b16f74633654b83372987607101d4a",
+    "mode": "auto"
+  }
+}

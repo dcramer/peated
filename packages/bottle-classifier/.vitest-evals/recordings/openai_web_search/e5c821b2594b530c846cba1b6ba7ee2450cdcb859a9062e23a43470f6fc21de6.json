@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T19:46:13.454Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Four Roses Single Barrel Barrel Strength official barrel strength"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Four Roses Single Barrel Barrel Strength official barrel strength",
+    "summary": "“**Four Roses Single Barrel Barrel Strength**” is **not a single fixed official bottling strength**. It refers to Four Roses’ **Private Selection / single-barrel picks bottled at barrel strength**, so the **ABV/proof varies by barrel**. Four Roses’ official Single Barrel shelfer is a different product at **100 proof /",
+    "results": [
+      {
+        "title": "https://www.connosr.com/four-roses-single-barrel-barrel-strength-whisky-review-11649",
+        "url": "https://www.connosr.com/four-roses-single-barrel-barrel-strength-whisky-review-11649",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/four-roses-single-barrel-whisky-review-12084",
+        "url": "https://www.connosr.com/four-roses-single-barrel-whisky-review-12084",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/four-roses-single-barrel-whisky-review-4943",
+        "url": "https://www.connosr.com/four-roses-single-barrel-whisky-review-4943",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://lostcargo.com/whiskey/four-roses-single-barrel/",
+        "url": "https://lostcargo.com/whiskey/four-roses-single-barrel/",
+        "domain": "lostcargo.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.boozemakers.com/articles/four-roses-single-barrel-bourbon-review",
+        "url": "https://www.boozemakers.com/articles/four-roses-single-barrel-bourbon-review",
+        "domain": "boozemakers.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://secretwhiskeysociety.com/four-roses-single-barrel-review/",
+        "url": "https://secretwhiskeysociety.com/four-roses-single-barrel-review/",
+        "domain": "secretwhiskeysociety.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e5c821b2594b530c846cba1b6ba7ee2450cdcb859a9062e23a43470f6fc21de6",
+    "mode": "auto"
+  }
+}

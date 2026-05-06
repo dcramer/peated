@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T22:50:48.141Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition 2001 official release vintage bottled 2001"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Talisker Distillers Edition 2001 official release vintage bottled 2001",
+    "summary": "I could not verify any **Talisker Distillers Edition** release that was both **vintage 2001** and **bottled in 2001**. The evidence I found points the other way: the **“2001” refers to the distillation vintage**, while the bottle was released later, commonly as **2001/2012**. The official Talisker/Malts product pattern",
+    "results": [
+      {
+        "title": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "url": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "domain": "whiskynotes.be",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.malts.com/en-gb/products/talisker-2021-distillers-edition-single-malt-scotch-whisky-70cl",
+        "url": "https://www.malts.com/en-gb/products/talisker-2021-distillers-edition-single-malt-scotch-whisky-70cl",
+        "domain": "malts.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/22187/talisker-2001-distillers-edition-bot2012",
+        "url": "https://www.thewhiskyexchange.com/p/22187/talisker-2001-distillers-edition-bot2012",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskynotes.be/2015/blends/speyside-region-2001-archives/",
+        "url": "https://www.whiskynotes.be/2015/blends/speyside-region-2001-archives/",
+        "domain": "whiskynotes.be",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskynotes.be/2009/bruichladdich/bruichladdich-2001/",
+        "url": "https://www.whiskynotes.be/2009/bruichladdich/bruichladdich-2001/",
+        "domain": "whiskynotes.be",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskynotes.be/2016/talisker/talisker-distillers-edition-1998-vs-2006/",
+        "url": "https://www.whiskynotes.be/2016/talisker/talisker-distillers-edition-1998-vs-2006/",
+        "domain": "whiskynotes.be",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d36f416e3af95b3ccc6c85c883662dc78ebc19636c0a4ebe37e3e50d5884cfe8",
+    "mode": "auto"
+  }
+}

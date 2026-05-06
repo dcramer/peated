@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T19:57:27.167Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Woodford Reserve Double Double Oaked official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Woodford Reserve Double Double Oaked official",
+    "summary": "Official Woodford Reserve sources confirm **Double Double Oaked** is a Woodford Reserve bourbon expression that is **finished for an additional two years in a second new oak barrel** that is **heavily toasted and lightly charred**. The current official product page lists it at **90.4 proof**, which means **45.2% ABV**,",
+    "results": [
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/fr/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/fr/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "domain": "shop.woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/",
+        "url": "https://www.woodfordreserve.com/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+        "url": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d4e7f3e88259406bedd69d8864c5e0f67deee5cf75839afdd3bd17c098e31b41",
+    "mode": "auto"
+  }
+}

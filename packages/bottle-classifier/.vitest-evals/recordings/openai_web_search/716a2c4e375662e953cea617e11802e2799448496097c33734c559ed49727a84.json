@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-05-06T22:05:13.469Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Series Vol. 3 official bourbon whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Heaven's Door Bootleg Series Vol. 3 official bourbon whiskey",
+    "summary": "Heaven’s Door **Bootleg Series Vol. 3** is an official Heaven’s Door release. The official Heaven’s Door Bootleg Series page confirms the Bootleg line is the brand’s series of “rare and unreleased expressions,” and independent whiskey references identify **Volume III** as the **2021** edition. ([heavensdoor.com](https:",
+    "canonicalBottleNames": [],
+    "results": [
+      {
+        "title": "https://www.heavensdoor.com/bootleg-series",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "url": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://bourbonpursuit.com/2022/05/03/whiskey-quickie-heavens-door-bootleg-volume-3-bourbon-review/",
+        "url": "https://bourbonpursuit.com/2022/05/03/whiskey-quickie-heavens-door-bootleg-volume-3-bourbon-review/",
+        "domain": "bourbonpursuit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.heavensdoor.com/collections/bootlegs",
+        "url": "https://buy.heavensdoor.com/collections/bootlegs",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+        "url": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/heavens-door/heavens-door-bootleg-series-no3-2021-edition-whiskey/",
+        "url": "https://www.masterofmalt.com/whiskies/heavens-door/heavens-door-bootleg-series-no3-2021-edition-whiskey/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "716a2c4e375662e953cea617e11802e2799448496097c33734c559ed49727a84",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-05-06T21:42:56.157Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Four Roses Limited Edition Small Batch 2017 official release 2017"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Four Roses Limited Edition Small Batch 2017 official release 2017",
+    "summary": "**Four Roses Limited Edition Small Batch (2017 release)** was officially released in **September 2017**. Four Roses’ own announcement is dated **September 1, 2017**, and says the bottle would be released that month, with a limited on-site sale on **Saturday, September 16, 2017**, followed by rollout to select retailers",
+    "canonicalBottleNames": [],
+    "results": [
+      {
+        "title": "https://whiskyadvocate.com/Four-Roses-Limited-Edition-Small-Batch-2017-Release-53-95",
+        "url": "https://whiskyadvocate.com/Four-Roses-Limited-Edition-Small-Batch-2017-Release-53-95",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/celebrate-2017-limited-edition-small-batch-with-us",
+        "url": "https://www.fourrosesbourbon.com/blog/celebrate-2017-limited-edition-small-batch-with-us",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/summer-2017-editors-choice-four-roses-2017-small-batch-limited-edition-al-youngs-50th-anniversary",
+        "url": "https://whiskyadvocate.com/summer-2017-editors-choice-four-roses-2017-small-batch-limited-edition-al-youngs-50th-anniversary",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/tasting-four-roses-limited-edition-2017-with-al-young",
+        "url": "https://whiskyadvocate.com/tasting-four-roses-limited-edition-2017-with-al-young",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+        "url": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/four-roses-2020-limited-edition-small-batch-high-score-ardbeg-whisky-whiskey",
+        "url": "https://whiskyadvocate.com/four-roses-2020-limited-edition-small-batch-high-score-ardbeg-whisky-whiskey",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "51ea259d297c171d76b90e613b6727aba712ec0be1167dfcfc296fd1e2208fe2",
+    "mode": "auto"
+  }
+}

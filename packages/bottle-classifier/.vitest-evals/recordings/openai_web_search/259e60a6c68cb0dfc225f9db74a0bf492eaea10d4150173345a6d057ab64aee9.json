@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T23:52:12.065Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Series Vol. 3 official bourbon rye details"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Heaven's Door Bootleg Series Vol. 3 official bourbon rye details",
+    "summary": "Here are the **official details for Heaven’s Door Bootleg Series Vol. 3**:\n\n- **Release / edition:** **Volume III (2021)** in Heaven’s Door’s annual Bootleg Series. The official Heaven’s Door Bootleg Series page identifies Vol. III as the **2021** release and labels it a **Straight Rye**. ([heavensdoor.com](https://www",
+    "results": [
+      {
+        "title": "https://www.heavensdoor.com/bootleg-series",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "url": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinksdirect.com/heavens-door-bootleg-series-volume-3-edition-75cl-5978",
+        "url": "https://www.drinksdirect.com/heavens-door-bootleg-series-volume-3-edition-75cl-5978",
+        "domain": "drinksdirect.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+        "url": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+        "url": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "259e60a6c68cb0dfc225f9db74a0bf492eaea10d4150173345a6d057ab64aee9",
+    "mode": "auto"
+  }
+}

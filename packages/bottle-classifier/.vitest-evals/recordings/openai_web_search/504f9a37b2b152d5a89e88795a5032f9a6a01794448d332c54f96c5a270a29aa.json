@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T22:48:00.963Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "site:heavensdoor.com \"Bootleg Series\" \"Volume III\" 2021 cask strength"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "site:heavensdoor.com \"Bootleg Series\" \"Volume III\" 2021 cask strength",
+    "summary": "Authoritative web results support that **Heaven’s Door Bootleg Series Volume III** is the **2021 release**, and that it is a **cask-strength 13-year-old Kentucky bourbon finished in Vino de Naranja casks**. The strongest official source is Heaven’s Door’s Bootleg Series page, which lists **“Volume III (2021)”** in the ",
+    "results": [
+      {
+        "title": "https://www.heavensdoor.com/bootleg-series",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.lanereport.com/149995/2021/12/new-release-bootleg-series-vol-iii/",
+        "url": "https://www.lanereport.com/149995/2021/12/new-release-bootleg-series-vol-iii/",
+        "domain": "lanereport.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "url": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://spirits-lover.com/heavens-doors-2021-bootleg-series-volume-iii/",
+        "url": "https://spirits-lover.com/heavens-doors-2021-bootleg-series-volume-iii/",
+        "domain": "spirits-lover.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.liquorstore-online.com/179932/heavens-door-bootleg-series-volume-iii-bourbon-2021-edition-13-year-old-whiskey-bob-dylan",
+        "url": "https://www.liquorstore-online.com/179932/heavens-door-bootleg-series-volume-iii-bourbon-2021-edition-13-year-old-whiskey-bob-dylan",
+        "domain": "liquorstore-online.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "504f9a37b2b152d5a89e88795a5032f9a6a01794448d332c54f96c5a270a29aa",
+    "mode": "auto"
+  }
+}

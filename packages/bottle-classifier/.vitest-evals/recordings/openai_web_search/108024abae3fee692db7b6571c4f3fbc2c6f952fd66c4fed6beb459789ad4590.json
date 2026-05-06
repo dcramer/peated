@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T19:25:12.539Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "SMWS RW6.5"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "SMWS RW6.5",
+    "summary": "**SMWS RW6.5** is **“Appley ever after,”** an **SMWS single-cask rye whisky from Finland**. The official SMWS listing confirms these bottle traits: **cask no. RW6.5**, **age 6 years**, **distilled 11 January 2018**, **ABV 56.0%**, **cask: 1st fill #3 char barrel**, and **region: Finland**. ([smws.eu](https://smws.eu/ap",
+    "results": [
+      {
+        "title": "https://smws.com/",
+        "url": "https://smws.com/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Kyrö 2018 SMWS RW6.5 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://en.wikipedia.org/wiki/Scotch_Malt_Whisky_Society",
+        "url": "https://en.wikipedia.org/wiki/Scotch_Malt_Whisky_Society",
+        "domain": "en.wikipedia.org",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.smws.ch/en/",
+        "url": "https://www.smws.ch/en/",
+        "domain": "smws.ch",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://peated.com/bottles/43260",
+        "url": "https://peated.com/bottles/43260",
+        "domain": "peated.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://th.smws.com/whisky",
+        "url": "https://th.smws.com/whisky",
+        "domain": "th.smws.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "108024abae3fee692db7b6571c4f3fbc2c6f952fd66c4fed6beb459789ad4590",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "writtenAt": "2026-05-06T22:50:51.006Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "Talisker 2001 Distillers Edition 2001/2012"
+  },
+  "output": {
+    "provider": "brave",
+    "query": "Talisker 2001 Distillers Edition 2001/2012",
+    "summary": "Thankfully, the distillery was completely rebuilt meticulously according to exact copies of the old stills, and five replicas of the original stills were constructed to maintain the preservation of the original whisky flavour. In 1988 Diageo began marketing Talisker single malt as part of its Classic Malts range in 198",
+    "results": [
+      {
+        "title": "Talisker Whisky | Master Of Malt",
+        "url": "https://www.masterofmalt.com/whiskies/talisker/talisker-2001-bottled-2012-amoroso-cask-finish-distillers-edition-whisky/",
+        "domain": "masterofmalt.com",
+        "description": "Thankfully, the distillery was completely rebuilt meticulously according to exact copies of the old stills, and five replicas of the original stills were constructed to maintain the preservation of the original whisky fl",
+        "extraSnippets": []
+      },
+      {
+        "title": "Review: Talisker Distillers Edition 2011 - Distilled 2001",
+        "url": "https://www.drinkhacker.com/2012/05/21/review-talisker-distillers-edition-2012-distilled-2001/",
+        "domain": "drinkhacker.com",
+        "description": "JavaScript is required to access this website · Please enable JavaScript and disable any ad blockers or browser extensions that may interfere · Loading… · Please wait while we verify you&#x27;re not a bot… · Please enabl",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker 2001 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": "Talisker · Bottler · Distillery Bottling · Bottling series · The Distillers Edition · Vintage · 2001 · Bottled · 2012 · Cask Type · <strong>Double Matured in Amoroso Sherry Wood</strong> · Casknumber · TD-S: 5OA · Streng",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker 2001/2012 Distillers Edition 45,8%vol. 0,7l",
+        "url": "https://www.homeofmalts.com/en/13895/talisker-distillers-edition-2001-2012-45.8-vol.-0-7l",
+        "domain": "homeofmalts.com",
+        "description": "Talisker 2001/2012 Distillers Edition 45,8%vol. 0,7l",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker 2001 Distillers Edition | WhiskyNotes review",
+        "url": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "domain": "whiskynotes.be",
+        "description": "All Talisker expressions now have new packaging designs, predominantly blue with pictures of crashing waves and rocky shores. The latest Distillers Edition 2001/2012 also comes in the new disguise.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "452b00ec88f59fe260b2d9570448757347c9a6f59efa56c1e93a7a7538d1d5be",
+    "mode": "auto"
+  }
+}

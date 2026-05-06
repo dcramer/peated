@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T22:48:35.981Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Highland Park Cask Strength No. 5 official release No. 5"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Highland Park Cask Strength No. 5 official release No. 5",
+    "summary": "**Highland Park Cask Strength Release No. 5** is the official name of the bottling; Highland Park’s own product page identifies it as **“Cask Strength 5” / “Cask Strength Release No. 5”**, confirms it is a **Highland Park official distillery release**, and lists the strength at **64.7% ABV**. The distillery also states",
+    "results": [
+      {
+        "title": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+        "url": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+        "domain": "highlandparkwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.highlandparkwhisky.com/en/hillhead",
+        "url": "https://www.highlandparkwhisky.com/en/hillhead",
+        "domain": "highlandparkwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.highlandparkwhisky.com/en-us/21-year-old-2024-release",
+        "url": "https://www.highlandparkwhisky.com/en-us/21-year-old-2024-release",
+        "domain": "highlandparkwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskynotes.be/2025/highland-park/highland-park-cask-strength/",
+        "url": "https://www.whiskynotes.be/2025/highland-park/highland-park-cask-strength/",
+        "domain": "whiskynotes.be",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/highland-park/highland-park-cask-strength-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/highland-park/highland-park-cask-strength-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.highlandparkwhisky.com/en/festive-gift-guide",
+        "url": "https://www.highlandparkwhisky.com/en/festive-gift-guide",
+        "domain": "highlandparkwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "463df4f4a03830f428b3ec4074c924c1acee2f7a315aab90bb8dcd367b5a5805",
+    "mode": "auto"
+  }
+}

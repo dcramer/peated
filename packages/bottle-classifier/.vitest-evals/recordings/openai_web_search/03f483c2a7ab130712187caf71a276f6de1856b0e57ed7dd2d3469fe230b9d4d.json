@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T20:14:25.616Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Bruichladdich Octomore 13.1 official 13.1"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Bruichladdich Octomore 13.1 official 13.1",
+    "summary": "Yes — **Octomore 13.1 is an official original bottling from Bruichladdich**.\n\nConfirmed bottle traits:\n- **Distillery:** Bruichladdich, Islay. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/229738?language=de))\n- **Expression:** **Octomore Edition 13.1**. ([whiskybase.com](https://www.whiskybase.com/whisk",
+    "results": [
+      {
+        "title": "Octomore Edition 13.1 / 137.3 PPM - Bewertungen und Rezensionen - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/229738?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/218659?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/whisky/218659?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.finedrams.com/octomore-13-1-whisky.html",
+        "url": "https://www.finedrams.com/octomore-13-1-whisky.html",
+        "domain": "finedrams.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Octomore 13.1",
+        "url": "https://distiller.com/spirits/octomore-13-1",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/bruichladdich/octomore-13-1-5-year-old-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/bruichladdich/octomore-13-1-5-year-old-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/octomore-editon-131",
+        "url": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/octomore-editon-131",
+        "domain": "whiskyauctioneer.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "03f483c2a7ab130712187caf71a276f6de1856b0e57ed7dd2d3469fe230b9d4d",
+    "mode": "auto"
+  }
+}

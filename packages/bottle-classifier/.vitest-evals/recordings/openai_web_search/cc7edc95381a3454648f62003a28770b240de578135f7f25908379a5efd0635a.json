@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-07T01:18:25.264Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "site:heavensdoor.com \"Bootleg Series Volume III\" ABV proof Kentucky straight bourbon whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "site:heavensdoor.com \"Bootleg Series Volume III\" ABV proof Kentucky straight bourbon whiskey",
+    "summary": "Heaven’s Door’s official Bootleg Series pages confirm that **Bootleg Series Volume III is the 2021 release**. Their product listing identifies it as a **cask-strength 13-year-old Kentucky bourbon finished in Vino de Naranja casks**. ([heavensdoor.com](https://www.heavensdoor.com/bootleg-series?utm_source=openai))\n\nAn i",
+    "results": [
+      {
+        "title": "https://www.heavensdoor.com/bootleg-series",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.klwines.com/products/details/1584880",
+        "url": "https://shop.klwines.com/products/details/1584880",
+        "domain": "shop.klwines.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ubereats.com/product/b/994b43fa-1adb-5e4a-95a4-3d4000f43b88",
+        "url": "https://www.ubereats.com/product/b/994b43fa-1adb-5e4a-95a4-3d4000f43b88",
+        "domain": "ubereats.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://onlineliquor.com/products/heavens-door-bootleg-vol-3-whiskey",
+        "url": "https://onlineliquor.com/products/heavens-door-bootleg-vol-3-whiskey",
+        "domain": "onlineliquor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+        "url": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "cc7edc95381a3454648f62003a28770b240de578135f7f25908379a5efd0635a",
+    "mode": "auto"
+  }
+}

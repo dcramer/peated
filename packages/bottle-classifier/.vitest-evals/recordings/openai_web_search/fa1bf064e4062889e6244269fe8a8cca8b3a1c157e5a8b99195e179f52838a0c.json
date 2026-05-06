@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-07T00:54:53.647Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Springbank 25 year old official 2024 2023 ABV limited edition"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Springbank 25 year old official 2024 2023 ABV limited edition",
+    "summary": "I could confirm the **official Springbank 25 Year Old annual releases for 2023 and 2024 are both bottled at 46% ABV** and are **limited editions**, but the web evidence is uneven because Springbank’s own site does not appear to have a dedicated public product page for the 25yo the way it does for some other annual rele",
+    "results": [
+      {
+        "title": "https://www.springbank.scot/whisky/springbank-range/18yo-2024/",
+        "url": "https://www.springbank.scot/whisky/springbank-range/18yo-2024/",
+        "domain": "springbank.scot",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/springbank/springbank-25-year-old-2024-release-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/springbank/springbank-25-year-old-2024-release-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.springbank.scot/whisky/springbank-range/21yo-2024/",
+        "url": "https://www.springbank.scot/whisky/springbank-range/21yo-2024/",
+        "domain": "springbank.scot",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskynotes.be/2025/springbank/springbank-25-years-directors-special/",
+        "url": "https://www.whiskynotes.be/2025/springbank/springbank-25-years-directors-special/",
+        "domain": "whiskynotes.be",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.dramface.com/all-reviews/springbank-local-barley-2023",
+        "url": "https://www.dramface.com/all-reviews/springbank-local-barley-2023",
+        "domain": "dramface.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.springbank.scot/countdown-collection-2023-release/",
+        "url": "https://www.springbank.scot/countdown-collection-2023-release/",
+        "domain": "springbank.scot",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "fa1bf064e4062889e6244269fe8a8cca8b3a1c157e5a8b99195e179f52838a0c",
+    "mode": "auto"
+  }
+}

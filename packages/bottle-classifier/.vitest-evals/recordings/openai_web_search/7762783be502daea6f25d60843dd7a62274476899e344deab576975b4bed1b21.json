@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-07T00:15:41.316Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Four Roses Limited Edition Small Batch 2017 official 2017 limited edition small batch bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Four Roses Limited Edition Small Batch 2017 official 2017 limited edition small batch bourbon",
+    "summary": "Here’s a sourced identification for **Four Roses Limited Edition Small Batch 2017**:\n\n- **Official Four Roses confirms** this is the **2017 Limited Edition Small Batch Bourbon**, not the separate **2017 Al Young 50th Anniversary** release. It was **bottled at barrel strength, 107.3 proof** and was built from **three lo",
+    "results": [
+      {
+        "title": "https://whiskyadvocate.com/Four-Roses-Limited-Edition-Small-Batch-2017-Release-53-95",
+        "url": "https://whiskyadvocate.com/Four-Roses-Limited-Edition-Small-Batch-2017-Release-53-95",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/celebrate-2017-limited-edition-small-batch-with-us",
+        "url": "https://www.fourrosesbourbon.com/blog/celebrate-2017-limited-edition-small-batch-with-us",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+        "url": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/2016-limited-edition-small-batch-named-americas-best-kentucky-bourbon",
+        "url": "https://www.fourrosesbourbon.com/blog/2016-limited-edition-small-batch-named-americas-best-kentucky-bourbon",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/glenfiddich-grand-cru-four-roses-limited-edition-aberlour-abunadh-alba-more-new-whisky",
+        "url": "https://whiskyadvocate.com/glenfiddich-grand-cru-four-roses-limited-edition-aberlour-abunadh-alba-more-new-whisky",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/2017-al-young-50th-anniversary",
+        "url": "https://www.fourrosesbourbon.com/bourbon/2017-al-young-50th-anniversary",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "7762783be502daea6f25d60843dd7a62274476899e344deab576975b4bed1b21",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T22:53:24.913Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official 46% port casks"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official 46% port casks",
+    "summary": "Official and independent sources support this identification as **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling** at **46% ABV**, matured for **14 years** in **bourbon casks and port casks from Portugal**. Glenmorangie’s own product page explicitly gives the age and strength and says i",
+    "results": [
+      {
+        "title": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.whiskybase.com/us/glenmorangie-14-year-old.html",
+        "url": "https://shop.whiskybase.com/us/glenmorangie-14-year-old.html",
+        "domain": "shop.whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskishop.com/blogs/whiski-shop-news-and-blogs/glenmorangie-quinta-ruban-14-review",
+        "url": "https://www.whiskishop.com/blogs/whiski-shop-news-and-blogs/glenmorangie-quinta-ruban-14-review",
+        "domain": "whiskishop.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/162531/quinta-ruban?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/162531/quinta-ruban?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://monwhisky.fr/gb/whisky/1643-glenmorangie-14-year-old-quinta-ruban-46.html",
+        "url": "https://monwhisky.fr/gb/whisky/1643-glenmorangie-14-year-old-quinta-ruban-46.html",
+        "domain": "monwhisky.fr",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/glenmorangie-quinta-ruban-port-cask-finish-14-year",
+        "url": "https://distiller.com/spirits/glenmorangie-quinta-ruban-port-cask-finish-14-year",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "7396ff1937bbadc9542bac046838a7069c7afa5f54b10c1cd74c1b70e8e01c36",
+    "mode": "auto"
+  }
+}

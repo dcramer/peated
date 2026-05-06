@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T23:07:33.897Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition 2001 official release year double matured"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Talisker Distillers Edition 2001 official release year double matured",
+    "summary": "For **Talisker Distillers Edition “2001”**, the **official release year is 2012**.\n\nWhat the sources support:\n- An official Diageo/Malts product page for the later 2021 edition shows the release pattern clearly: **a vintage year followed by a later Distillers Edition release year**, and confirms Talisker Distillers Edi",
+    "results": [
+      {
+        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker 2001 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/talisker-distillers-edition-2001-2012-whisky-review-10968",
+        "url": "https://www.connosr.com/talisker-distillers-edition-2001-2012-whisky-review-10968",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition",
+        "url": "https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition",
+        "domain": "thewhiskybarrel.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/39673/talisker-2001",
+        "url": "https://www.whiskybase.com/whiskies/whisky/39673/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://peated.com/bottles/4552",
+        "url": "https://peated.com/bottles/4552",
+        "domain": "peated.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "83290c5bf1e456146714855936df330c0666d1bbcafa70a061e6181fbb356f93",
+    "mode": "auto"
+  }
+}

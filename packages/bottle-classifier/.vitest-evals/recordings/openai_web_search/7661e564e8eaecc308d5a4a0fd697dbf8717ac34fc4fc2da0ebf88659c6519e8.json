@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T19:34:56.509Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Canadian Club Reserve\" 9 year old official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Canadian Club Reserve\" 9 year old official",
+    "summary": "Yes — this appears to be an **official Canadian Club bottling**.\n\nWhat the sources support:\n- **Name/release:** **Canadian Club Reserve 9 Year Old Canadian Whisky** is listed on the **official Canadian Club site**. ([canadianclub.com](https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky?utm_source=o",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/75738/canadian-club-09-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/75738/canadian-club-09-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/canadian-club-reserve-9-year-old-whisky-review-8495",
+        "url": "https://www.connosr.com/canadian-club-reserve-9-year-old-whisky-review-8495",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "url": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+        "url": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://toastfried.com/?p=9213",
+        "url": "https://toastfried.com/?p=9213",
+        "domain": "toastfried.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "7661e564e8eaecc308d5a4a0fd697dbf8717ac34fc4fc2da0ebf88659c6519e8",
+    "mode": "auto"
+  }
+}

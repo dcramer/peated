@@ -26,8 +26,11 @@ export type ClassifierEvalExpectation = {
   parentBottleId?: number | null;
   proposedBottle?: Record<string, unknown> | null;
   proposedRelease?: Record<string, unknown> | null;
-  confidenceAtLeast?: number;
-  confidenceBelow?: number;
+  confidenceBand?:
+    | "low"
+    | "review"
+    | "auto_verification"
+    | "current_assignment";
   verifyEligible?: boolean;
   summary: string;
 };

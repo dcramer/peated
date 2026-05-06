@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-06T23:26:48.319Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition 2001 official release vintage bottled in 2001"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Talisker Distillers Edition 2001 official release vintage bottled in 2001",
+    "summary": "If you mean **Talisker Distillers Edition with “2001” on the label**, that is **not** “bottled in 2001.” For this line, the year shown prominently is typically the **distillation year (vintage)**, and the bottling/release year is later. Official Talisker/Diageo product pages for newer Distillers Editions show this form",
+    "results": [
+      {
+        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinkhacker.com/2012/05/21/review-talisker-distillers-edition-2012-distilled-2001/",
+        "url": "https://www.drinkhacker.com/2012/05/21/review-talisker-distillers-edition-2012-distilled-2001/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "url": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "domain": "whiskynotes.be",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.spiritradar.com/whisky-db/talisker-2001-the-distillers-edition-45.8-percent-700ml/",
+        "url": "https://www.spiritradar.com/whisky-db/talisker-2001-the-distillers-edition-45.8-percent-700ml/",
+        "domain": "spiritradar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/talisker-distillers-edition-2001-2012-whisky-review-10968",
+        "url": "https://www.connosr.com/talisker-distillers-edition-2001-2012-whisky-review-10968",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thegrandwhiskyauction.com/lot-671174/talisker-1988-distillers-edition-2001",
+        "url": "https://www.thegrandwhiskyauction.com/lot-671174/talisker-1988-distillers-edition-2001",
+        "domain": "thegrandwhiskyauction.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "21706a020435f3b802c0fa9969c9801d6bde6c3bffddfdee2becca1fa354b5a8",
+    "mode": "auto"
+  }
+}
