@@ -1,5 +1,8 @@
 export { createBraveWebSearchTool } from "./braveWebSearch";
-export { createOpenAIWebSearchTool } from "./openaiWebSearch";
+export {
+  createOpenAIWebSearchTool,
+  runBottleWebEvidenceSearch,
+} from "./openaiWebSearch";
 export { createSearchBottlesTool } from "./searchBottles";
 export {
   createSearchEntitiesTool,

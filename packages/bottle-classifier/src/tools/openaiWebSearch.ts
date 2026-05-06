@@ -9,11 +9,14 @@ import {
   type BottleSearchEvidence,
 } from "../classifierTypes";
 import { getDeterministicOpenAISettings } from "../openaiModelSettings";
+import { runBraveWebSearch } from "./braveWebSearch";
 import {
   BottleWebSearchArgsSchema,
   buildBottleSearchEvidence,
-  compactBottleSearchEvidence,
+  getDistinctResultDomains,
   getResultDomain,
+  isThinBottleSearchEvidence,
+  mergeBottleSearchEvidence,
   type BottleWebSearchBudget,
 } from "./sharedWebSearch";
 
@@ -152,49 +155,139 @@ export function createOpenAIWebSearchTool({
   client,
   model,
   budget,
+  braveApiKey,
   onEvidence,
 }: {
   client: OpenAI;
   model: string;
   budget: BottleWebSearchBudget;
+  braveApiKey?: string | null;
   onEvidence?: (evidence: BottleSearchEvidence) => void;
 }) {
   return tool({
     name: "openai_web_search",
     description:
-      "Search the live web using OpenAI's native web search capability. This is the default web search tool when local bottle and entity search are still ambiguous or conflicting. Use it to validate the bottle or release traits that make a match safe, especially when the source text may have omitted a canonical trait that could bridge a generic reference to a more specific local candidate. Prefer official producer, distillery, bottler, or importer domains first, then critics or publications, and treat retailer pages as weak corroboration. Keep queries narrow. If the returned domains are still thin or weak, decide explicitly whether a follow-up search or `brave_web_search` is worth the remaining budget.",
+      "Search the live web using OpenAI's native web search capability. This is the default web search tool when local bottle and entity search are still ambiguous or conflicting. Use it to validate the bottle or release traits that make a match safe, especially when the source text may have omitted a canonical trait that could bridge a generic reference to a more specific local candidate. Prefer official producer, distillery, bottler, or importer domains first, then critics or publications, and treat retailer pages as weak corroboration. Keep queries narrow. When the first search is thin, this tool automatically tries to gather additional non-retailer evidence within the shared search budget.",
     parameters: BottleWebSearchArgsSchema,
     execute: async (args) => {
-      if (!budget.tryConsume()) {
-        return budget.getExhaustedError();
-      }
-
-      try {
-        const evidence = compactBottleSearchEvidence(
-          await runOpenAIWebSearch({
-            client,
-            model,
-            query: args.query,
-            instructions:
-              "Search the web for authoritative evidence about a spirits bottle reference. Prefer official producer, distillery, bottler, or importer domains first, then critics, reviewers, or publications. Do not treat the originating retailer or source page as decisive proof. Cite 2 or 3 distinct URLs when available, including at least one official source and one independent non-retailer source when the web supports that. In the cited summary, explicitly mention only the bottle or release traits the sources confirm, such as distillery, bottler, cask finish, cask size, cask fill, ABV, age, edition, release year, or whether a number is proof rather than ABV.",
-          }),
-        );
-
-        if (evidence.results.length > 0) {
-          onEvidence?.(evidence);
-        }
-
-        return evidence;
-      } catch (error) {
-        return {
-          error:
-            error instanceof Error
-              ? `OpenAI web search failed: ${error.message}`
-              : "OpenAI web search failed",
-        };
-      }
+      return await runBottleWebEvidenceSearch({
+        client,
+        model,
+        budget,
+        braveApiKey,
+        query: args.query,
+        onEvidence,
+      });
     },
   });
+}
+
+export async function runBottleWebEvidenceSearch({
+  client,
+  model,
+  query,
+  budget,
+  braveApiKey = null,
+  onEvidence,
+}: {
+  client: OpenAI;
+  model: string;
+  query: string;
+  budget: BottleWebSearchBudget;
+  braveApiKey?: string | null;
+  onEvidence?: (evidence: BottleSearchEvidence) => void;
+}): Promise<BottleSearchEvidence | { error: string }> {
+  if (!budget.tryConsume()) {
+    return budget.getExhaustedError();
+  }
+
+  try {
+    const primaryEvidence = await runOpenAIWebSearch({
+      client,
+      model,
+      query,
+      instructions:
+        "Search the web for authoritative evidence about a spirits bottle reference. Prefer official producer, distillery, bottler, or importer domains first, then critics, reviewers, or publications. Do not treat the originating retailer or source page as decisive proof. Cite 2 to 4 distinct URLs when available, including at least one official source and one independent non-retailer source when the web supports that. In the cited summary, explicitly mention which bottle or release traits the sources confirm, such as distillery, bottler, cask finish, cask size, cask fill, ABV, age, edition, release year, or whether a number is proof rather than ABV.",
+    });
+    const openAIEvidences = [primaryEvidence];
+
+    if (isThinBottleSearchEvidence(primaryEvidence) && budget.tryConsume()) {
+      const citedDomains = getDistinctResultDomains(primaryEvidence.results);
+      let supplementalEvidence: BottleSearchEvidence | null = null;
+
+      try {
+        supplementalEvidence = await runOpenAIWebSearch({
+          client,
+          model,
+          query,
+          instructions:
+            "Search the web for additional corroborating sources about the same spirits bottle reference. Prefer domains different from the first pass, especially official producer, distillery, bottler, or importer pages if missing, otherwise independent reviewers, critics, or publications. Avoid retailer-only evidence when possible. Explicitly call out whether the sources confirm proof-style labeling, barrel strength, or a concrete ABV.",
+          extraContext:
+            citedDomains.length > 0
+              ? `Previously cited domains: ${citedDomains.join(", ")}. Find different domains if possible.`
+              : null,
+        });
+      } catch {
+        supplementalEvidence = null;
+      }
+
+      if (supplementalEvidence?.results.length) {
+        openAIEvidences.push(supplementalEvidence);
+      }
+    }
+
+    const openAIEvidence =
+      openAIEvidences.length > 1
+        ? mergeBottleSearchEvidence({
+            provider: "openai",
+            query,
+            evidences: openAIEvidences,
+          })
+        : primaryEvidence;
+
+    if (
+      braveApiKey &&
+      isThinBottleSearchEvidence(openAIEvidence) &&
+      budget.tryConsume()
+    ) {
+      const braveEvidence = await runBraveWebSearch({
+        apiKey: braveApiKey,
+        query,
+      });
+
+      if ("error" in braveEvidence) {
+        if (openAIEvidence.results.length > 0) {
+          onEvidence?.(openAIEvidence);
+        }
+        return openAIEvidence;
+      }
+
+      const mergedEvidence = mergeBottleSearchEvidence({
+        provider: "openai",
+        query,
+        evidences: [openAIEvidence, braveEvidence],
+      });
+
+      if (mergedEvidence.results.length > 0) {
+        onEvidence?.(mergedEvidence);
+      }
+
+      return mergedEvidence;
+    }
+
+    if (openAIEvidence.results.length > 0) {
+      onEvidence?.(openAIEvidence);
+    }
+
+    return openAIEvidence;
+  } catch (error) {
+    return {
+      error:
+        error instanceof Error
+          ? `OpenAI web search failed: ${error.message}`
+          : "OpenAI web search failed",
+    };
+  }
 }
 
 export function buildOpenAIWebSearchRequest({

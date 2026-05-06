@@ -21,18 +21,24 @@ type ReasoningResult = {
 // Real-bottle workflow regressions belong in the fixture-driven eval corpus,
 // not in additional mocked classifier behavior tests here.
 function createTestClassifier({
+  client = {} as OpenAI,
   extractedIdentity = null,
   extractedIdentityFromImage,
   extractedIdentityFromText,
   extractFromImageError,
+  maxSearchQueries = 2,
+  braveApiKey,
   searchBottles = vi.fn(async () => [] as BottleCandidate[]),
   getBottleCandidateById,
   runBottleClassifierAgent,
 }: {
+  client?: OpenAI;
   extractedIdentity?: BottleExtractedDetails | null;
   extractedIdentityFromImage?: BottleExtractedDetails | null;
   extractedIdentityFromText?: BottleExtractedDetails | null;
   extractFromImageError?: Error | null;
+  maxSearchQueries?: number;
+  braveApiKey?: string | null;
   searchBottles?: ReturnType<
     typeof vi.fn<(args: unknown) => Promise<BottleCandidate[]>>
   >;
@@ -46,9 +52,10 @@ function createTestClassifier({
 }) {
   return {
     classifier: createBottleClassifier({
-      client: {} as OpenAI,
+      client,
       model: "test-model",
-      maxSearchQueries: 2,
+      maxSearchQueries,
+      braveApiKey,
       adapters: {
         searchBottles,
         getBottleCandidateById,
@@ -1165,6 +1172,113 @@ describe("createBottleClassifier", () => {
         candidateExpansion: "initial_only",
       }),
     );
+  });
+
+  test("backfills authoritative web evidence for create decisions when the agent skipped search", async () => {
+    const create = vi.fn().mockResolvedValue({
+      output_text:
+        "Festival Distillery confirms Warehouse Session is a single malt whisky.",
+      output: [
+        {
+          type: "web_search_call",
+          action: {
+            type: "search",
+            sources: [
+              {
+                type: "url",
+                url: "https://www.festivaldistillery.com/warehouse-session",
+              },
+              {
+                type: "url",
+                url: "https://www.whiskyadvocate.com/ratings-reviews/festival-distillery-warehouse-session/",
+              },
+            ],
+          },
+        },
+      ],
+    });
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "create_bottle",
+          confidence: 91,
+          rationale: "No local bottle matched the reference.",
+          candidateBottleIds: [],
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          proposedBottle: {
+            name: "Warehouse Session",
+            series: null,
+            category: "single_malt",
+            edition: null,
+            statedAge: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: null,
+              name: "Festival Distillery",
+            },
+            distillers: [
+              {
+                id: null,
+                name: "Festival Distillery",
+              },
+            ],
+            bottler: null,
+          },
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity: null,
+          candidates: [],
+          searchEvidence: [],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      client: {
+        responses: {
+          create,
+        },
+      } as unknown as OpenAI,
+      extractedIdentity: null,
+      maxSearchQueries: 1,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Festival Distillery Warehouse Session Single Malt",
+        url: "https://origin-retailer.example/products/warehouse-session",
+      },
+    });
+
+    expect(create).toHaveBeenCalledTimes(1);
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") return;
+    expect(result.artifacts.searchEvidence).toHaveLength(1);
+    expect(result.artifacts.searchEvidence[0]).toMatchObject({
+      query:
+        "Festival Distillery Warehouse Session Festival Distillery single malt",
+      results: expect.arrayContaining([
+        expect.objectContaining({
+          domain: "festivaldistillery.com",
+        }),
+        expect.objectContaining({
+          domain: "whiskyadvocate.com",
+        }),
+      ]),
+    });
   });
 
   test("falls back to text extraction when image extraction returns null", async () => {

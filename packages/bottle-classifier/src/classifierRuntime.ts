@@ -13,9 +13,11 @@ import {
   EntityResolutionSchema,
   type BottleCandidate,
   type BottleCandidateSearchInput,
+  type BottleClassificationDecision,
   type BottleClassifierAgentDecision,
   type BottleExtractedDetails,
   type EntityResolution,
+  type ProposedRelease,
   type SearchEntitiesArgs,
 } from "./classifierTypes";
 import {
@@ -32,6 +34,13 @@ import {
 } from "./contract";
 import { BottleClassificationError } from "./error";
 import { createWhiskyLabelExtractor } from "./extractor";
+import {
+  AUTHORITATIVE_SOURCE_TIERS,
+  buildProducerIdentityPhrases,
+  classifySourceTier,
+  getSearchResultText,
+  textsOverlap,
+} from "./identityEvidenceCore";
 import { buildBottleClassifierInstructions } from "./instructions";
 import { getDeterministicOpenAISettings } from "./openaiModelSettings";
 import {
@@ -52,13 +61,34 @@ import {
   createOpenAIWebSearchTool,
   createSearchBottlesTool,
   createSearchEntitiesTool,
+  runBottleWebEvidenceSearch,
 } from "./tools";
+import type { BottleWebSearchBudget } from "./tools/sharedWebSearch";
 
 const CLASSIFIER_MAX_TURNS = 8;
+
+type ReleaseSearchParts = Pick<
+  ProposedRelease,
+  | "edition"
+  | "statedAge"
+  | "abv"
+  | "caskStrength"
+  | "singleCask"
+  | "vintageYear"
+  | "releaseYear"
+  | "caskType"
+  | "caskSize"
+  | "caskFill"
+>;
 
 export type BottleClassifierReasoningResult = {
   decision: BottleClassifierAgentDecision;
   artifacts: BottleClassificationArtifacts;
+};
+
+type BottleClassifierReasoningRun = {
+  reasoning: BottleClassifierReasoningResult;
+  webSearchBudget?: BottleWebSearchBudget;
 };
 
 export type RunBottleClassifierAgentInput = {
@@ -170,6 +200,7 @@ export type PreparedBottleClassifierAgentRun = {
   input: string;
   runOptions: NonStreamRunOptions<unknown, BottleClassifierAgent>;
   runner: Runner;
+  webSearchBudget: BottleWebSearchBudget;
 };
 
 function mergeSearchEvidence(
@@ -223,6 +254,292 @@ function buildReasoningArtifacts({
     searchEvidence: state.searchEvidence,
     candidates: sortedBottleCandidates(state.candidateBottles),
     resolvedEntities: sortedResolvedEntities(state.resolvedEntities),
+  });
+}
+
+function hasUsableOpenAIResponsesClient(client: OpenAI): boolean {
+  return (
+    typeof (client as { responses?: { create?: unknown } }).responses
+      ?.create === "function"
+  );
+}
+
+function addSearchPart(
+  parts: string[],
+  value: string | number | null | undefined,
+) {
+  const normalizedValue =
+    typeof value === "number" ? String(value) : value?.trim();
+  if (!normalizedValue) {
+    return;
+  }
+
+  if (
+    !parts.some((part) => part.toLowerCase() === normalizedValue.toLowerCase())
+  ) {
+    parts.push(normalizedValue);
+  }
+}
+
+function addReleaseSearchParts(
+  parts: string[],
+  release: ReleaseSearchParts | null | undefined,
+) {
+  if (!release) {
+    return;
+  }
+
+  addSearchPart(parts, release.edition);
+  if (release.statedAge !== null) {
+    addSearchPart(parts, `${release.statedAge} year old`);
+  }
+  if (release.abv !== null) {
+    addSearchPart(parts, `${release.abv}% ABV`);
+  }
+  if (release.caskStrength) {
+    addSearchPart(parts, "cask strength");
+  }
+  if (release.singleCask) {
+    addSearchPart(parts, "single cask");
+  }
+  if (release.vintageYear !== null) {
+    addSearchPart(parts, `${release.vintageYear} vintage`);
+  }
+  if (release.releaseYear !== null) {
+    addSearchPart(parts, `${release.releaseYear} release`);
+  }
+  addSearchPart(parts, release.caskType?.replace(/_/g, " "));
+  addSearchPart(parts, release.caskSize?.replace(/_/g, " "));
+  addSearchPart(parts, release.caskFill?.replace(/_/g, " "));
+}
+
+function getCreateDecisionParentCandidate({
+  decision,
+  artifacts,
+}: {
+  decision: BottleClassificationDecision;
+  artifacts: BottleClassificationArtifacts;
+}): BottleCandidate | null {
+  if (decision.action !== "create_release") {
+    return null;
+  }
+
+  return (
+    artifacts.candidates.find(
+      (candidate) =>
+        candidate.bottleId === decision.parentBottleId &&
+        candidate.releaseId === null &&
+        candidate.kind !== "release",
+    ) ?? null
+  );
+}
+
+function getCreateDecisionBottleName({
+  decision,
+  artifacts,
+}: {
+  decision: BottleClassificationDecision;
+  artifacts: BottleClassificationArtifacts;
+}): string | null {
+  if (decision.proposedBottle) {
+    return [
+      decision.proposedBottle.brand.name,
+      decision.proposedBottle.series?.name,
+      decision.proposedBottle.name,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+  }
+
+  const parentCandidate = getCreateDecisionParentCandidate({
+    decision,
+    artifacts,
+  });
+  return parentCandidate?.bottleFullName ?? parentCandidate?.fullName ?? null;
+}
+
+function buildCreateDecisionEvidencePhrases({
+  decision,
+  artifacts,
+}: {
+  decision: BottleClassificationDecision;
+  artifacts: BottleClassificationArtifacts;
+}): string[] {
+  const phrases: string[] = [];
+  addSearchPart(
+    phrases,
+    getCreateDecisionBottleName({
+      decision,
+      artifacts,
+    }),
+  );
+
+  if (decision.proposedBottle) {
+    addSearchPart(phrases, decision.proposedBottle.name);
+    addSearchPart(phrases, decision.proposedBottle.series?.name);
+  }
+
+  addSearchPart(phrases, decision.proposedRelease?.edition);
+  addSearchPart(phrases, decision.observation?.caskNumber);
+  addSearchPart(phrases, decision.observation?.barrelNumber);
+
+  return phrases.filter((phrase) => phrase.length >= 4);
+}
+
+function buildCreateDecisionEvidenceQuery({
+  reference,
+  decision,
+  artifacts,
+}: {
+  reference: BottleReference;
+  decision: BottleClassificationDecision;
+  artifacts: BottleClassificationArtifacts;
+}): string | null {
+  if (
+    decision.action !== "create_bottle" &&
+    decision.action !== "create_release" &&
+    decision.action !== "create_bottle_and_release"
+  ) {
+    return null;
+  }
+
+  const parts: string[] = [];
+  addSearchPart(
+    parts,
+    getCreateDecisionBottleName({
+      decision,
+      artifacts,
+    }),
+  );
+
+  if (decision.proposedBottle) {
+    addSearchPart(parts, decision.proposedBottle.bottler?.name);
+    for (const distiller of decision.proposedBottle.distillers) {
+      addSearchPart(parts, distiller.name);
+    }
+    addSearchPart(parts, decision.proposedBottle.category?.replace(/_/g, " "));
+    addReleaseSearchParts(parts, decision.proposedBottle);
+  }
+
+  addReleaseSearchParts(parts, decision.proposedRelease);
+  addSearchPart(parts, decision.observation?.caskNumber);
+  addSearchPart(parts, decision.observation?.barrelNumber);
+
+  if (!parts.length) {
+    addSearchPart(parts, reference.name);
+  }
+
+  return parts.length ? parts.join(" ") : null;
+}
+
+function hasAuthoritativeSearchEvidenceForDecision({
+  reference,
+  decision,
+  artifacts,
+}: {
+  reference: BottleReference;
+  decision: BottleClassificationDecision;
+  artifacts: BottleClassificationArtifacts;
+}): boolean {
+  const targetCandidate = getCreateDecisionParentCandidate({
+    decision,
+    artifacts,
+  });
+  const producerPhrases = buildProducerIdentityPhrases({
+    proposedBottle: decision.proposedBottle,
+    extractedLabel: artifacts.extractedIdentity,
+    targetCandidate,
+  });
+  const evidencePhrases = buildCreateDecisionEvidencePhrases({
+    decision,
+    artifacts,
+  });
+  if (!evidencePhrases.length) {
+    return false;
+  }
+
+  return artifacts.searchEvidence.some((evidence) =>
+    evidence.results.some((result) => {
+      const sourceTier = classifySourceTier({
+        result,
+        sourceUrl: reference.url ?? "",
+        producerPhrases,
+      });
+      if (!AUTHORITATIVE_SOURCE_TIERS.has(sourceTier)) {
+        return false;
+      }
+
+      const resultText = getSearchResultText(evidence, result);
+      return evidencePhrases.some((phrase) => textsOverlap(resultText, phrase));
+    }),
+  );
+}
+
+async function maybeBackfillCreateDecisionSearchEvidence({
+  options,
+  reference,
+  decision,
+  artifacts,
+  candidateExpansion,
+  webSearchBudget,
+}: {
+  options: CreateBottleClassifierOptions;
+  reference: BottleReference;
+  decision: BottleClassificationDecision;
+  artifacts: BottleClassificationArtifacts;
+  candidateExpansion: CandidateExpansionMode;
+  webSearchBudget?: BottleWebSearchBudget;
+}): Promise<BottleClassificationArtifacts> {
+  if (
+    candidateExpansion !== "open" ||
+    options.maxSearchQueries <= 0 ||
+    !hasUsableOpenAIResponsesClient(options.client) ||
+    (decision.action !== "create_bottle" &&
+      decision.action !== "create_release" &&
+      decision.action !== "create_bottle_and_release") ||
+    hasAuthoritativeSearchEvidenceForDecision({
+      reference,
+      decision,
+      artifacts,
+    })
+  ) {
+    return artifacts;
+  }
+
+  const query = buildCreateDecisionEvidenceQuery({
+    reference,
+    decision,
+    artifacts,
+  });
+  if (!query) {
+    return artifacts;
+  }
+
+  const searchEvidence = [...artifacts.searchEvidence];
+  const result = await runBottleWebEvidenceSearch({
+    client: options.client,
+    model: options.model,
+    query,
+    budget:
+      webSearchBudget ?? createBottleWebSearchBudget(options.maxSearchQueries),
+    braveApiKey: options.braveApiKey,
+    onEvidence: (evidence) => {
+      mergeSearchEvidence(searchEvidence, evidence);
+    },
+  });
+
+  if (!("error" in result) && result.results.length > 0) {
+    mergeSearchEvidence(searchEvidence, result);
+  }
+
+  if (searchEvidence.length === artifacts.searchEvidence.length) {
+    return artifacts;
+  }
+
+  return buildBottleClassificationArtifacts({
+    ...artifacts,
+    searchEvidence,
   });
 }
 
@@ -426,6 +743,7 @@ export async function prepareBottleClassifierAgentRun(
           client: options.client,
           model: options.model,
           budget: webSearchBudget,
+          braveApiKey: options.braveApiKey,
           onEvidence: (evidence) => {
             mergeSearchEvidence(state.searchEvidence, evidence);
           },
@@ -502,6 +820,7 @@ export async function prepareBottleClassifierAgentRun(
       maxTurns: CLASSIFIER_MAX_TURNS,
       stream: false,
     },
+    webSearchBudget,
     getArtifacts,
     getReasoningResult: (result) => {
       mergeRunResultToolArtifacts(state, result);
@@ -591,28 +910,9 @@ export function createBottleClassifier(
     );
   };
 
-  const runBottleClassifierAgent = async ({
-    reference,
-    extractedIdentity,
-    initialCandidates = [],
-    candidateExpansion = "open",
-  }: RunBottleClassifierAgentInput): Promise<BottleClassifierReasoningResult> => {
-    if (options.overrides?.runBottleClassifierAgent) {
-      return await options.overrides.runBottleClassifierAgent({
-        reference,
-        extractedIdentity,
-        initialCandidates,
-        candidateExpansion,
-      });
-    }
-
-    const preparedRun = await prepareBottleClassifierAgentRun(options, {
-      reference,
-      initialCandidates,
-      extractedIdentity,
-      candidateExpansion,
-    });
-
+  const runPreparedBottleClassifierAgent = async (
+    preparedRun: PreparedBottleClassifierAgentRun,
+  ): Promise<BottleClassifierReasoningResult> => {
     try {
       const result = await preparedRun.runner.run(
         preparedRun.agent,
@@ -630,6 +930,43 @@ export function createBottleClassifier(
         },
       );
     }
+  };
+
+  const runBottleClassifierAgentWithBudget = async ({
+    reference,
+    extractedIdentity,
+    initialCandidates = [],
+    candidateExpansion = "open",
+  }: RunBottleClassifierAgentInput): Promise<BottleClassifierReasoningRun> => {
+    if (options.overrides?.runBottleClassifierAgent) {
+      return {
+        reasoning: await options.overrides.runBottleClassifierAgent({
+          reference,
+          extractedIdentity,
+          initialCandidates,
+          candidateExpansion,
+        }),
+      };
+    }
+
+    const preparedRun = await prepareBottleClassifierAgentRun(options, {
+      reference,
+      initialCandidates,
+      extractedIdentity,
+      candidateExpansion,
+    });
+
+    return {
+      reasoning: await runPreparedBottleClassifierAgent(preparedRun),
+      webSearchBudget: preparedRun.webSearchBudget,
+    };
+  };
+
+  const runBottleClassifierAgent = async (
+    input: RunBottleClassifierAgentInput,
+  ): Promise<BottleClassifierReasoningResult> => {
+    const { reasoning } = await runBottleClassifierAgentWithBudget(input);
+    return reasoning;
   };
 
   const classifyBottleReference = async (
@@ -669,22 +1006,42 @@ export function createBottleClassifier(
         candidates,
       });
 
-      const reasoning = await runBottleClassifierAgent({
+      const reasoningRun = await runBottleClassifierAgentWithBudget({
         reference: parsedInput.reference,
         extractedIdentity: artifacts.extractedIdentity,
         initialCandidates: artifacts.candidates,
         candidateExpansion: parsedInput.candidateExpansion,
       });
-      const decision = finalizeBottleReferenceClassification({
+      const { reasoning } = reasoningRun;
+      let reasoningArtifacts = reasoning.artifacts;
+      let decision = finalizeBottleReferenceClassification({
         reference: parsedInput.reference,
         decision: reasoning.decision,
-        artifacts: reasoning.artifacts,
+        artifacts: reasoningArtifacts,
       });
+
+      const backfilledArtifacts =
+        await maybeBackfillCreateDecisionSearchEvidence({
+          options,
+          reference: parsedInput.reference,
+          decision,
+          artifacts: reasoningArtifacts,
+          candidateExpansion: parsedInput.candidateExpansion,
+          webSearchBudget: reasoningRun.webSearchBudget,
+        });
+      if (backfilledArtifacts !== reasoningArtifacts) {
+        reasoningArtifacts = backfilledArtifacts;
+        decision = finalizeBottleReferenceClassification({
+          reference: parsedInput.reference,
+          decision: reasoning.decision,
+          artifacts: reasoningArtifacts,
+        });
+      }
 
       return BottleClassificationResultSchema.parse(
         createDecidedBottleClassification({
           decision,
-          artifacts: reasoning.artifacts,
+          artifacts: reasoningArtifacts,
         }),
       );
     } catch (error) {

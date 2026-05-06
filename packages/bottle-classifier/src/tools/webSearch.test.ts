@@ -1,9 +1,15 @@
-import { describe, expect, test } from "vitest";
+import type OpenAI from "openai";
+import { describe, expect, test, vi } from "vitest";
 import {
   buildOpenAIWebSearchRequest,
   extractOpenAISearchEvidence,
+  runBottleWebEvidenceSearch,
 } from "./openaiWebSearch";
-import { buildBottleSearchEvidence } from "./sharedWebSearch";
+import {
+  buildBottleSearchEvidence,
+  createBottleWebSearchBudget,
+  isThinBottleSearchEvidence,
+} from "./sharedWebSearch";
 
 describe("bottleClassifier web search tools", () => {
   test("extracts OpenAI search evidence from web search call sources when citations are missing", () => {
@@ -140,6 +146,147 @@ describe("bottleClassifier web search tools", () => {
         }),
       ]),
     );
+  });
+
+  test("automatically supplements thin OpenAI evidence within the shared budget", async () => {
+    const create = vi
+      .fn()
+      .mockResolvedValueOnce({
+        output_text: "Four Roses confirms Single Barrel Barrel Strength.",
+        output: [
+          {
+            type: "message",
+            content: [
+              {
+                type: "output_text",
+                annotations: [
+                  {
+                    type: "url_citation",
+                    url: "https://www.fourrosesbourbon.com/bourbon/single-barrel-barrel-strength/",
+                    title: "Four Roses Single Barrel Barrel Strength",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      })
+      .mockResolvedValueOnce({
+        output_text:
+          "Breaking Bourbon covers Four Roses barrel strength private selections.",
+        output: [
+          {
+            type: "message",
+            content: [
+              {
+                type: "output_text",
+                annotations: [
+                  {
+                    type: "url_citation",
+                    url: "https://www.breakingbourbon.com/review/four-roses-single-barrel-barrel-strength-private-selection",
+                    title: "Four Roses Single Barrel Barrel Strength Review",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+    const client = {
+      responses: {
+        create,
+      },
+    } as unknown as OpenAI;
+
+    const evidence = await runBottleWebEvidenceSearch({
+      client,
+      model: "gpt-5.4",
+      query: "four roses single barrel barrel strength",
+      budget: createBottleWebSearchBudget(2),
+    });
+
+    expect(create).toHaveBeenCalledTimes(2);
+    expect("error" in evidence).toBe(false);
+    if ("error" in evidence) return;
+    expect(evidence.results).toHaveLength(2);
+    expect(isThinBottleSearchEvidence(evidence)).toBe(false);
+    expect(evidence.summary).toContain("Four Roses confirms");
+    expect(evidence.summary).toContain("Breaking Bourbon covers");
+  });
+
+  test("falls back to Brave for still-thin OpenAI evidence and records merged evidence once", async () => {
+    const create = vi
+      .fn()
+      .mockResolvedValueOnce({
+        output_text: "Official site confirms the bottle.",
+        output: [
+          {
+            type: "message",
+            content: [
+              {
+                type: "output_text",
+                annotations: [
+                  {
+                    type: "url_citation",
+                    url: "https://www.exampledistillery.com/private-cask",
+                    title: "Example Distillery Private Cask",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      })
+      .mockResolvedValueOnce({
+        output_text: "No additional non-retailer source found.",
+        output: [],
+      });
+    const fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        web: {
+          results: [
+            {
+              title: "Example Private Cask Review",
+              url: "https://www.whiskyadvocate.com/example-private-cask-review",
+              description:
+                "Whisky Advocate reviews Example Distillery Private Cask.",
+              extra_snippets: [],
+            },
+          ],
+        },
+      }),
+    });
+    vi.stubGlobal("fetch", fetch);
+    const onEvidence = vi.fn();
+
+    try {
+      const evidence = await runBottleWebEvidenceSearch({
+        client: {
+          responses: {
+            create,
+          },
+        } as unknown as OpenAI,
+        model: "gpt-5.4",
+        query: "example distillery private cask",
+        budget: createBottleWebSearchBudget(3),
+        braveApiKey: "brave-test-key",
+        onEvidence,
+      });
+
+      expect(create).toHaveBeenCalledTimes(2);
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect("error" in evidence).toBe(false);
+      if ("error" in evidence) return;
+      expect(evidence.results).toHaveLength(2);
+      expect(isThinBottleSearchEvidence(evidence)).toBe(false);
+      expect(evidence.summary).toContain("Official site confirms");
+      expect(evidence.summary).toContain("Whisky Advocate reviews");
+      expect(onEvidence).toHaveBeenCalledTimes(1);
+      expect(onEvidence).toHaveBeenCalledWith(evidence);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   test("caps bottle search evidence payload size", () => {
