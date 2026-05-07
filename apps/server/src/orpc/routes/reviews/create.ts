@@ -11,6 +11,11 @@ import {
 } from "@peated/server/lib/bottleAliases";
 import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
 import { mapRows } from "@peated/server/lib/db";
+import {
+  getIncomingBottleDecisionFromResolutionSource,
+  recordIncomingBottleDecisionInTransaction,
+  shouldRecordIncomingBottleDecision,
+} from "@peated/server/lib/incomingBottleDecisionLog";
 import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
@@ -147,6 +152,40 @@ export default procedure
         releaseId,
         name: reviewName,
       });
+
+      const decision = getIncomingBottleDecisionFromResolutionSource(
+        resolution.source,
+      );
+      if (
+        decision !== null &&
+        shouldRecordIncomingBottleDecision({
+          previousBottleId: existingReview?.bottleId,
+          bottleId,
+          decision,
+        })
+      ) {
+        await recordIncomingBottleDecisionInTransaction(tx, {
+          sourceKind: "review",
+          sourceId: review.id,
+          externalSiteId: site.id,
+          name: reviewName,
+          url: input.url,
+          decision,
+          actorType: "system",
+          actorUserId: context.user!.id,
+          bottleId,
+          releaseId,
+          createdBottle: resolution.createdBottle,
+          createdRelease: resolution.createdRelease,
+          confidence: resolution.confidence,
+          model: resolution.model,
+          rationale: resolution.rationale,
+          metadata: {
+            resolutionSource: resolution.source,
+            issue: input.issue,
+          },
+        });
+      }
 
       return { review, aliasAssignment };
     });

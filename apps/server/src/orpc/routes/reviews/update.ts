@@ -5,6 +5,10 @@ import {
   reviews,
   type BottleRelease,
 } from "@peated/server/db/schema";
+import {
+  recordIncomingBottleDecisionInTransaction,
+  shouldRecordIncomingBottleDecision,
+} from "@peated/server/lib/incomingBottleDecisionLog";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { ReviewSchema } from "@peated/server/schemas";
@@ -118,21 +122,46 @@ export default procedure
       return await serialize(ReviewSerializer, targetReview, context.user);
     }
 
-    const [newReview] = await db
-      .update(reviews)
-      .set({
-        ...data,
-        bottleId: resolvedBottleId,
-        releaseId: resolvedReleaseId,
-      })
-      .where(eq(reviews.id, reviewId))
-      .returning();
+    const newReview = await db.transaction(async (tx) => {
+      const [updatedReview] = await tx
+        .update(reviews)
+        .set({
+          ...data,
+          bottleId: resolvedBottleId,
+          releaseId: resolvedReleaseId,
+        })
+        .where(eq(reviews.id, reviewId))
+        .returning();
 
-    if (!newReview) {
-      throw errors.INTERNAL_SERVER_ERROR({
-        message: "Failed to update review.",
-      });
-    }
+      if (!updatedReview) {
+        throw errors.INTERNAL_SERVER_ERROR({
+          message: "Failed to update review.",
+        });
+      }
+
+      if (
+        shouldRecordIncomingBottleDecision({
+          previousBottleId: targetReview.bottleId,
+          bottleId: updatedReview.bottleId,
+          decision: "match_existing",
+        })
+      ) {
+        await recordIncomingBottleDecisionInTransaction(tx, {
+          sourceKind: "review",
+          sourceId: updatedReview.id,
+          externalSiteId: updatedReview.externalSiteId,
+          name: updatedReview.name,
+          url: updatedReview.url,
+          decision: "match_existing",
+          actorType: "user",
+          actorUserId: context.user.id,
+          bottleId: updatedReview.bottleId!,
+          releaseId: updatedReview.releaseId,
+        });
+      }
+
+      return updatedReview;
+    });
 
     return await serialize(ReviewSerializer, newReview, context.user);
   });

@@ -5,6 +5,7 @@ import {
   bottleReleases,
   bottles,
   bottlesToDistillers,
+  incomingBottleDecisionLogs,
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
@@ -20,7 +21,7 @@ import {
   ignoreStorePriceMatchProposal,
   resolveStorePriceMatchProposal,
 } from "@peated/server/lib/priceMatching";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 const queueBottleCreationVerificationMock = vi.hoisted(() => vi.fn());
@@ -930,6 +931,25 @@ describe("priceMatching", () => {
       reviewedById: expect.any(Number),
     });
     expect(updatedPrice?.bottleId).toBe(bottle.id);
+
+    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
+      where: and(
+        eq(incomingBottleDecisionLogs.sourceKind, "store_price"),
+        eq(incomingBottleDecisionLogs.sourceId, price.id),
+      ),
+    });
+    expect(decisionLog).toMatchObject({
+      sourceKind: "store_price",
+      sourceId: price.id,
+      proposalId: proposal.id,
+      decision: "match_existing",
+      actorType: "system",
+      bottleId: bottle.id,
+      releaseId: null,
+      createdBottle: false,
+      createdRelease: false,
+      confidence: 97,
+    });
   });
 
   test("auto approves unmatched high-confidence text matches when the raw title clearly reaffirms the bottle", async ({
@@ -3407,6 +3427,24 @@ describe("priceMatching", () => {
       initialStatus: "pending_review",
       proposalType: "create_new",
     });
+    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
+      where: and(
+        eq(incomingBottleDecisionLogs.sourceKind, "store_price"),
+        eq(incomingBottleDecisionLogs.sourceId, price.id),
+      ),
+    });
+    expect(decisionLog).toMatchObject({
+      sourceKind: "store_price",
+      sourceId: price.id,
+      proposalId: proposal.id,
+      decision: "create_bottle",
+      actorType: "system",
+      bottleId: proposal.suggestedBottleId,
+      releaseId: null,
+      createdBottle: true,
+      createdRelease: false,
+      confidence: 92,
+    });
     expect(queueBottleCreationVerification).toHaveBeenCalledWith({
       bottleId: proposal.suggestedBottleId,
       creationSource: "price_match_automation",
@@ -5560,6 +5598,25 @@ describe("priceMatching", () => {
           caskFill: "1st_fill",
         }),
       }),
+    });
+
+    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
+      where: and(
+        eq(incomingBottleDecisionLogs.sourceKind, "store_price"),
+        eq(incomingBottleDecisionLogs.sourceId, price.id),
+      ),
+    });
+    expect(decisionLog).toMatchObject({
+      sourceKind: "store_price",
+      sourceId: price.id,
+      proposalId: proposal.id,
+      decision: "match_existing",
+      actorType: "user",
+      actorUserId: reviewer.id,
+      bottleId: bottle.id,
+      releaseId: release.id,
+      createdBottle: false,
+      createdRelease: false,
     });
   });
 });
