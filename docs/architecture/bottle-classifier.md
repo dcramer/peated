@@ -98,11 +98,15 @@ remain focused on retrieval, persistence, and automation policy.
 The rule for package-owned deterministic behavior is strict:
 
 - deterministic helpers may only own structurally safe, effectively zero-ambiguity behavior
+- post-model policy may sanitize, normalize, reject, or downgrade model output,
+  but it must not promote semantic actions based on whisky-family heuristics
 - if the behavior depends on brand context, marketed family meaning, or program semantics, it stays classifier-owned
 - if the input is too sparse to safely infer a canonical bottle, block instead of guessing
 - local retrieval may expose sibling context, dirty parent traits, and existing
   child releases, but that context is evidence for the model rather than a
   deterministic decision rule
+- classifier system prompts must stay static; request-specific evidence belongs
+  in runtime input, tools, tool schemas, and post-model validation
 - prompt changes should encode generalized reasoning patterns, not one-off brand tutoring; concrete family regressions belong in eval fixtures
 - real-world new-bottle fixtures should record `peatedBottleIds` when the example came from an observed Peated bottle family
 - ambiguous families should still add paired positive and negative fixtures, even though the executable source of truth is now one JSON file per case
@@ -267,6 +271,7 @@ Local setup for live evals:
 - classifier evals use `@vitest-evals/harness-openai-agents` native `toolReplay` for `openai_web_search` and `brave_web_search`
 - `VITEST_EVALS_REPLAY_DIR` defaults to the package-local upstream-style `packages/bottle-classifier/.vitest-evals/recordings/` directory through the eval Vitest config
 - `VITEST_EVALS_REPLAY_MODE` defaults to `auto`; use the upstream `strict`, `record`, or `off` modes when needed
+- replay JSON is eval evidence, not a local cache; commit only intentional replay changes
 - `pnpm --filter @peated/bottle-classifier fixtures:validate` explicitly validates all JSON fixture files against the package schemas
 
 Notes:

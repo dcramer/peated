@@ -118,6 +118,8 @@ These are the rules to preserve when iterating on the classifier:
 - Deterministic fast paths must stay limited to structurally safe behavior that is effectively zero-ambiguity.
 - If the behavior depends on brand context, marketed family meaning, or program semantics, keep it classifier-owned.
 - If the input is too sparse to safely infer a canonical bottle, block or return `no_match` instead of guessing.
+- Post-model review code may sanitize, normalize, reject, or downgrade unsafe output. It should not promote a semantic action into a different create/repair/match action based on family-specific heuristics.
+- The classifier system prompt should stay static. Request-specific evidence belongs in runtime input, tool results, schemas, and post-model validation.
 - Prompt and extractor changes must encode transferable reasoning. Do not add brand-specific tutoring examples just to fix one observed family; keep those regressions in eval fixtures instead.
 
 ## File Map
@@ -163,13 +165,13 @@ These are the rules to preserve when iterating on the classifier:
 
 When changing classifier behavior:
 
-1. Update or add a focused unit test for deterministic behavior.
+1. Update or add a focused unit test only for deterministic behavior.
 2. Update or add the relevant file-backed eval fixtures when the behavior changes bottle versus release identity boundaries.
 3. Update or add realistic positive and negative eval fixtures when the behavior is model-sensitive.
    Confidence calibration belongs here too: cases that should be safe for downstream auto-verification need explicit eval expectations for the high-confidence band, while review-only matches should stay below it.
 4. Keep prompts, schemas, deterministic review logic, and pure normalization helpers aligned. Do not patch around package behavior in the server wrapper.
 5. Do not solve one failed family by teaching the prompt that exact family name. Generalize the rule in prompt or policy, and use eval fixtures to hold the concrete regression.
-6. Re-run package tests and evals before touching downstream consumers.
+6. Run package typecheck, focused unit tests, and fixture validation for routine changes. Run live evals only when explicitly requested or when doing an intentional scoped eval pass.
 
 When adding a new bottle family or edge case:
 
@@ -182,10 +184,15 @@ When adding a new bottle family or edge case:
 Useful commands:
 
 ```bash
-pnpm evals
 pnpm --filter @peated/bottle-classifier fixtures:validate
 pnpm --filter @peated/bottle-classifier typecheck
 pnpm --filter @peated/bottle-classifier test
+```
+
+Live eval commands:
+
+```bash
+pnpm evals
 pnpm --filter @peated/bottle-classifier evals
 ```
 
@@ -210,9 +217,12 @@ Replay recordings default to the package-local upstream-style
 `VITEST_EVALS_REPLAY_DIR`. `VITEST_EVALS_REPLAY_MODE` defaults to `auto`, which
 replays an existing recording and records a new one on a miss. Set it to
 `strict`, `record`, or `off` to use the upstream `vitest-evals` replay modes.
+Replay JSON is reproducible eval evidence, not a disposable local cache. Review
+and commit replay changes only when they are intentional.
 
 ## Related Docs
 
 - [`docs/architecture/bottle-classifier.md`](../../docs/architecture/bottle-classifier.md)
+- [`docs/architecture/whisky-identity-model.md`](../../docs/architecture/whisky-identity-model.md)
 - [`docs/features/store-price-matching.md`](../../docs/features/store-price-matching.md)
 - [`AGENTS.md`](./AGENTS.md)

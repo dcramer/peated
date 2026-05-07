@@ -48,6 +48,9 @@ When the task is about the current bottle classifier, bottle matcher, or label
 extractor, read:
 
 - `docs/architecture/bottle-classifier.md`
+- `docs/architecture/whisky-identity-model.md`
+- `docs/policies/agent-design.md`
+- `docs/policies/code-comments.md`
 - `packages/bottle-classifier/AGENTS.md`
 - `packages/bottle-classifier/src/contract.ts`
 - `packages/bottle-classifier/src/classifier.ts`
@@ -67,7 +70,15 @@ Then check:
 - reviewed action boundaries: `match`, `repair_bottle`, `create_bottle`, `create_release`, `create_bottle_and_release`, `no_match`
 - `identityScope` boundaries: `product` versus `exact_cask`
 - deterministic downgrade, validation, and automation thresholds
+- post-model policy that sanitizes, rejects, or downgrades unsafe output without
+  turning eval cases into semantic action rewrites
 - server-side sanitization of ids and proposed entities
+- static system prompts, with dynamic evidence supplied through input, tools,
+  tool schemas, and validated output
+- file-backed eval fixtures for model-sensitive cases instead of deterministic
+  unit tests that assert model judgement
+- scoped eval execution; full live evals are expensive and should be run only
+  when requested or intentionally comparing a classifier change
 - non-whisky rejection and human-review boundaries
 
 When the task is about the entity classifier, read:
