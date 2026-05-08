@@ -1,10 +1,13 @@
 import { db } from "@peated/server/db";
 import { reviews } from "@peated/server/db/schema";
-import { assignBottleAlias } from "@peated/server/lib/bottleAliases";
+import {
+  assignBottleAliasInTransaction,
+  finalizeBottleAliasAssignment,
+} from "@peated/server/lib/bottleAliases";
 import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
 import {
   getIncomingBottleDecisionFromResolutionSource,
-  recordIncomingBottleDecision,
+  recordIncomingBottleDecisionInTransaction,
   shouldRecordIncomingBottleDecision,
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
@@ -60,45 +63,59 @@ export default async function createMissingBottles() {
         continue;
       }
 
-      await assignBottleAlias({
-        bottleId: resolution.bottleId,
-        releaseId: resolution.releaseId,
-        name: review.name,
-      });
-
+      const bottleId = resolution.bottleId;
       const decision = getIncomingBottleDecisionFromResolutionSource(
         resolution.source,
       );
-      if (
-        decision !== null &&
-        shouldRecordIncomingBottleDecision({
-          previousBottleId: review.bottleId,
-          bottleId: resolution.bottleId,
-          decision,
-        })
-      ) {
-        await recordIncomingBottleDecision({
-          sourceKind: "review",
-          sourceId: review.id,
-          externalSiteId: review.externalSiteId,
+
+      const aliasAssignment = await db.transaction(async (tx) => {
+        const aliasAssignment = await assignBottleAliasInTransaction(tx, {
+          bottleId,
+          releaseId: resolution.releaseId,
+          name: review.name,
+        });
+
+        if (
+          decision !== null &&
+          shouldRecordIncomingBottleDecision({
+            previousBottleId: review.bottleId,
+            bottleId,
+            decision,
+          })
+        ) {
+          await recordIncomingBottleDecisionInTransaction(tx, {
+            sourceKind: "review",
+            sourceId: review.id,
+            externalSiteId: review.externalSiteId,
+            name: review.name,
+            url: review.url,
+            decision,
+            actorType: "system",
+            actorUserId: systemUser.id,
+            bottleId,
+            releaseId: resolution.releaseId,
+            createdBottle: resolution.createdBottle,
+            createdRelease: resolution.createdRelease,
+            confidence: resolution.confidence,
+            model: resolution.model,
+            rationale: resolution.rationale,
+            metadata: {
+              resolutionSource: resolution.source,
+              issue: review.issue,
+            },
+          });
+        }
+
+        return aliasAssignment;
+      });
+
+      await finalizeBottleAliasAssignment(aliasAssignment, {
+        review: {
+          id: review.id,
           name: review.name,
           url: review.url,
-          decision,
-          actorType: "system",
-          actorUserId: systemUser.id,
-          bottleId: resolution.bottleId,
-          releaseId: resolution.releaseId,
-          createdBottle: resolution.createdBottle,
-          createdRelease: resolution.createdRelease,
-          confidence: resolution.confidence,
-          model: resolution.model,
-          rationale: resolution.rationale,
-          metadata: {
-            resolutionSource: resolution.source,
-            issue: review.issue,
-          },
-        });
-      }
+        },
+      });
     }
   }
 }
