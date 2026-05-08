@@ -387,23 +387,23 @@ describe("priceMatchingAutomation", () => {
     ).toBe(false);
   });
 
-  test("does not auto-approve plain age-statement bottles below the elevated unmatched threshold", () => {
+  test("auto-approves clear plain age-statement bottle matches as a deterministic judgement", () => {
     const assessment = getStorePriceMatchAutomationAssessment({
       action: "match_existing",
-      modelConfidence: 95,
+      modelConfidence: 35,
       price: {
         bottleId: null,
-        name: "Tomatin Single Malt 12-year-old",
-        url: "https://example.com/tomatin",
+        name: "Springbank Aged 25-year-old",
+        url: "https://woodencork.com/products/springbank-aged-25-year-old-750-ml",
       },
-      suggestedBottleId: 12,
+      suggestedBottleId: 469,
       suggestedReleaseId: null,
       extractedLabel: buildExtractedLabel({
-        brand: "Tomatin",
+        brand: "Springbank",
         expression: null,
-        distillery: ["Tomatin"],
-        category: "single_malt",
-        stated_age: 12,
+        distillery: ["Springbank"],
+        category: null,
+        stated_age: 25,
         abv: null,
         cask_type: null,
       }),
@@ -411,28 +411,105 @@ describe("priceMatchingAutomation", () => {
       searchEvidence: [],
       candidateBottles: [
         buildCandidate({
-          bottleId: 12,
-          fullName: "Tomatin 12-year-old",
-          bottleFullName: "Tomatin 12-year-old",
-          brand: "Tomatin",
-          distillery: ["Tomatin"],
+          bottleId: 469,
+          fullName: "Springbank 25-year-old",
+          bottleFullName: "Springbank 25-year-old",
+          brand: "Springbank",
+          bottler: "Springbank",
+          distillery: [],
           category: "single_malt",
-          statedAge: 12,
+          statedAge: 25,
+          abv: null,
+          caskType: null,
+        }),
+        buildCandidate({
+          bottleId: 1563,
+          fullName: "Springbank 25-year-old Limited Edition",
+          bottleFullName: "Springbank 25-year-old Limited Edition",
+          brand: "Springbank",
+          bottler: "Springbank",
+          distillery: [],
+          category: "single_malt",
+          statedAge: 25,
+          abv: null,
+          caskType: null,
+          score: 1,
+          source: ["text"],
+        }),
+      ],
+    });
+
+    expect(assessment.automationBlockers).toEqual([]);
+    expect(assessment.plainAgeBottleAutoVerifyEligible).toBe(true);
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        currentBottleId: null,
+        currentReleaseId: null,
+        suggestedBottleId: 469,
+        suggestedReleaseId: null,
+        modelConfidence: 35,
+        automationBlockers: assessment.automationBlockers,
+        plainAgeBottleAutoVerifyEligible:
+          assessment.plainAgeBottleAutoVerifyEligible,
+      }),
+    ).toBe(true);
+  });
+
+  test("keeps release-specific plain-age listings out of plain-age auto-approval", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "match_existing",
+      modelConfidence: 93,
+      price: {
+        bottleId: null,
+        name: "Springbank 25-year-old Limited Edition",
+        url: "https://example.com/springbank-25-limited",
+      },
+      suggestedBottleId: 469,
+      suggestedReleaseId: null,
+      extractedLabel: buildExtractedLabel({
+        brand: "Springbank",
+        expression: null,
+        distillery: ["Springbank"],
+        category: null,
+        stated_age: 25,
+        edition: "Limited Edition",
+        abv: null,
+        cask_type: null,
+      }),
+      proposedBottle: null,
+      searchEvidence: [],
+      candidateBottles: [
+        buildCandidate({
+          bottleId: 469,
+          fullName: "Springbank 25-year-old",
+          bottleFullName: "Springbank 25-year-old",
+          brand: "Springbank",
+          bottler: "Springbank",
+          distillery: [],
+          category: "single_malt",
+          statedAge: 25,
           abv: null,
           caskType: null,
         }),
       ],
     });
 
+    expect(assessment.plainAgeBottleAutoVerifyEligible).toBe(false);
+    expect(assessment.automationBlockers).toContain(
+      "listing looks release-specific but the suggested target is only a bottle",
+    );
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
         currentBottleId: null,
         currentReleaseId: null,
-        suggestedBottleId: 12,
+        suggestedBottleId: 469,
         suggestedReleaseId: null,
-        modelConfidence: 95,
+        modelConfidence: 93,
         automationBlockers: assessment.automationBlockers,
+        plainAgeBottleAutoVerifyEligible:
+          assessment.plainAgeBottleAutoVerifyEligible,
       }),
     ).toBe(false);
   });

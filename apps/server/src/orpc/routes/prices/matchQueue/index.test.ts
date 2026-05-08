@@ -182,6 +182,7 @@ describe("price match queue", () => {
           automationEligible: false,
           automationBlockers: ["persisted blocker"],
           decisiveMatchAttributes: ["name"],
+          plainAgeBottleAutoVerifyEligible: false,
           differentiatingAttributes: ["distillery"],
           webEvidenceChecks: [
             {

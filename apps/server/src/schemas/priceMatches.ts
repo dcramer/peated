@@ -197,6 +197,7 @@ export const StorePriceMatchAutomationAssessmentSchema = z.object({
   automationBlockers: z.array(z.string()).default([]),
   decisiveMatchAttributes: z.array(PriceMatchAttributeEnum).default([]),
   structuredMatchRequiresStatedAge: z.boolean().default(false),
+  plainAgeBottleAutoVerifyEligible: z.boolean().default(false),
   differentiatingAttributes: z.array(PriceMatchAttributeEnum).default([]),
   webEvidenceChecks: z.array(PriceMatchEvidenceCheckSchema).default([]),
 });
@@ -452,6 +453,9 @@ export const StorePriceMatchProposalSchema = z.object({
     StorePriceMatchAutomationAssessmentSchema.shape.automationBlockers,
   decisiveMatchAttributes:
     StorePriceMatchAutomationAssessmentSchema.shape.decisiveMatchAttributes,
+  plainAgeBottleAutoVerifyEligible:
+    StorePriceMatchAutomationAssessmentSchema.shape
+      .plainAgeBottleAutoVerifyEligible,
   differentiatingAttributes:
     StorePriceMatchAutomationAssessmentSchema.shape.differentiatingAttributes,
   webEvidenceChecks:

@@ -176,6 +176,8 @@ export function formatPriceMatchQueueLlmExport(item: QueueItem) {
           eligible: item.automationEligible,
           blockers: item.automationBlockers,
           decisiveMatchAttributes: item.decisiveMatchAttributes,
+          plainAgeBottleAutoVerifyEligible:
+            item.plainAgeBottleAutoVerifyEligible,
           differentiatingAttributes: item.differentiatingAttributes,
         },
         timestamps: {
