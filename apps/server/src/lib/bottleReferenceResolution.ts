@@ -8,6 +8,7 @@ import type {
   BottleExtractedDetails,
 } from "@peated/bottle-classifier/internal/types";
 import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
+import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import type { BottleRelease, User } from "@peated/server/db/schema";
 import { bottleReleases } from "@peated/server/db/schema";
@@ -22,6 +23,7 @@ import {
   createBottleReleaseInTransaction,
   finalizeCreatedBottleRelease,
 } from "@peated/server/lib/createBottleRelease";
+import { normalizeIncomingBottleDecisionConfidence } from "@peated/server/lib/incomingBottleDecisionLog";
 import { and, eq } from "drizzle-orm";
 import { buildClassifierCreateInputs } from "./classifierDecisionCreateInputs";
 
@@ -38,6 +40,11 @@ export type BottleReferenceResolution = {
   releaseId: number | null;
   source: BottleReferenceResolutionSource;
   error: Error | null;
+  confidence: number | null;
+  model: string | null;
+  rationale: string | null;
+  createdBottle: boolean;
+  createdRelease: boolean;
 };
 
 function getKnownCandidateBottleIds(
@@ -124,7 +131,12 @@ async function applyClassifierCreateDecision({
     }
   >;
   user: User;
-}): Promise<{ bottleId: number; releaseId: number | null }> {
+}): Promise<{
+  bottleId: number;
+  releaseId: number | null;
+  createdBottle: boolean;
+  createdRelease: boolean;
+}> {
   const { input, releaseInput } = buildClassifierCreateInputs(decision);
 
   if (decision.action === "create_bottle") {
@@ -150,12 +162,16 @@ async function applyClassifierCreateDecision({
       return {
         bottleId: result.bottle.id,
         releaseId: null,
+        createdBottle: true,
+        createdRelease: false,
       };
     } catch (err) {
       if (err instanceof BottleAlreadyExistsError) {
         return {
           bottleId: err.bottleId,
           releaseId: null,
+          createdBottle: false,
+          createdRelease: false,
         };
       }
       throw err;
@@ -185,6 +201,8 @@ async function applyClassifierCreateDecision({
       return {
         bottleId: result.release.bottleId,
         releaseId: result.release.id,
+        createdBottle: false,
+        createdRelease: true,
       };
     } catch (err) {
       if (err instanceof BottleReleaseAlreadyExistsError) {
@@ -192,6 +210,8 @@ async function applyClassifierCreateDecision({
         return {
           bottleId: release.bottleId,
           releaseId: release.id,
+          createdBottle: false,
+          createdRelease: false,
         };
       }
       throw err;
@@ -282,6 +302,8 @@ async function applyClassifierCreateDecision({
   return {
     bottleId: result.bottleId,
     releaseId: result.releaseId,
+    createdBottle: !!result.bottleResult,
+    createdRelease: !!result.releaseResult,
   };
 }
 
@@ -316,6 +338,11 @@ export async function resolveBottleReferenceTarget({
         releaseId: target.releaseId,
         source: "exact_alias",
         error: null,
+        confidence: null,
+        model: null,
+        rationale: null,
+        createdBottle: false,
+        createdRelease: false,
       };
     }
   }
@@ -352,6 +379,11 @@ export async function resolveBottleReferenceTarget({
       releaseId: null,
       source: "unresolved",
       error: err instanceof Error ? err : new Error("Classifier failed."),
+      confidence: null,
+      model: config.OPENAI_MODEL,
+      rationale: null,
+      createdBottle: false,
+      createdRelease: false,
     };
   }
 
@@ -361,11 +393,20 @@ export async function resolveBottleReferenceTarget({
       releaseId: null,
       source: "unresolved",
       error: null,
+      confidence: null,
+      model: config.OPENAI_MODEL,
+      rationale: null,
+      createdBottle: false,
+      createdRelease: false,
     };
   }
 
   try {
     assertKnownClassifierTarget(classification.decision, classification);
+    const decisionConfidence = normalizeIncomingBottleDecisionConfidence(
+      classification.decision.confidence,
+    );
+    const decisionRationale = classification.decision.rationale ?? null;
 
     if (
       classification.decision.action === "match" ||
@@ -379,6 +420,11 @@ export async function resolveBottleReferenceTarget({
             : null,
         source: "classifier_match",
         error: null,
+        confidence: decisionConfidence,
+        model: config.OPENAI_MODEL,
+        rationale: decisionRationale,
+        createdBottle: false,
+        createdRelease: false,
       };
     }
 
@@ -388,6 +434,11 @@ export async function resolveBottleReferenceTarget({
         releaseId: null,
         source: "unresolved",
         error: null,
+        confidence: decisionConfidence,
+        model: config.OPENAI_MODEL,
+        rationale: decisionRationale,
+        createdBottle: false,
+        createdRelease: false,
       };
     }
 
@@ -406,6 +457,11 @@ export async function resolveBottleReferenceTarget({
             ? "classifier_create_release"
             : "classifier_create_bottle_and_release",
       error: null,
+      confidence: decisionConfidence,
+      model: config.OPENAI_MODEL,
+      rationale: decisionRationale,
+      createdBottle: result.createdBottle,
+      createdRelease: result.createdRelease,
     };
   } catch (err) {
     return {
@@ -416,6 +472,11 @@ export async function resolveBottleReferenceTarget({
         err instanceof Error
           ? err
           : new Error("Failed to apply classifier decision."),
+      confidence: null,
+      model: config.OPENAI_MODEL,
+      rationale: null,
+      createdBottle: false,
+      createdRelease: false,
     };
   }
 }

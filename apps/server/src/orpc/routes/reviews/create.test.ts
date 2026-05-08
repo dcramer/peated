@@ -1,5 +1,9 @@
 import { db } from "@peated/server/db";
-import { bottleAliases, reviews } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  incomingBottleDecisionLogs,
+  reviews,
+} from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq } from "drizzle-orm";
@@ -179,6 +183,27 @@ describe("POST /reviews", () => {
     expect(bottle?.name).toEqual("Bottle Name");
     expect(bottle?.category).toEqual("single_malt");
     expect(bottle?.brandId).toEqual(brand.id);
+
+    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
+      where: and(
+        eq(incomingBottleDecisionLogs.sourceKind, "review"),
+        eq(incomingBottleDecisionLogs.sourceId, review!.id),
+      ),
+    });
+    expect(decisionLog).toMatchObject({
+      sourceKind: "review",
+      sourceId: review!.id,
+      externalSiteId: site.id,
+      decision: "create_bottle",
+      actorType: "system",
+      actorUserId: adminUser.id,
+      bottleId: bottle!.id,
+      releaseId: null,
+      createdBottle: true,
+      createdRelease: false,
+      confidence: 92,
+      rationale: "test fixture",
+    });
     expect(pushUniqueJobMock).toHaveBeenCalledWith("IndexBottleSearchVectors", {
       bottleId: bottle!.id,
     });
@@ -314,6 +339,21 @@ describe("POST /reviews", () => {
     });
     expect(release?.bottleId).toEqual(bottle.id);
     expect(release?.edition).toEqual("2011 Release");
+
+    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
+      where: and(
+        eq(incomingBottleDecisionLogs.sourceKind, "review"),
+        eq(incomingBottleDecisionLogs.sourceId, review!.id),
+      ),
+    });
+    expect(decisionLog).toMatchObject({
+      decision: "create_release",
+      actorType: "system",
+      bottleId: bottle.id,
+      releaseId: release!.id,
+      createdBottle: false,
+      createdRelease: true,
+    });
   });
 
   test("new review with existing bottle", async ({ fixtures }) => {
@@ -346,6 +386,14 @@ describe("POST /reviews", () => {
     expect(review?.issue).toEqual("Default");
     expect(review?.rating).toEqual(89);
     expect(review?.url).toEqual("https://example.com");
+
+    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
+      where: and(
+        eq(incomingBottleDecisionLogs.sourceKind, "review"),
+        eq(incomingBottleDecisionLogs.sourceId, review!.id),
+      ),
+    });
+    expect(decisionLog).toBeUndefined();
   });
 
   test("new review can match an existing bottle through the classifier", async ({
@@ -413,6 +461,23 @@ describe("POST /reviews", () => {
     });
     expect(review?.bottleId).toEqual(bottle.id);
     expect(review?.releaseId).toBeNull();
+
+    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
+      where: and(
+        eq(incomingBottleDecisionLogs.sourceKind, "review"),
+        eq(incomingBottleDecisionLogs.sourceId, review!.id),
+      ),
+    });
+    expect(decisionLog).toMatchObject({
+      decision: "match_existing",
+      actorType: "system",
+      actorUserId: adminUser.id,
+      bottleId: bottle.id,
+      releaseId: null,
+      createdBottle: false,
+      createdRelease: false,
+      confidence: 92,
+    });
   });
 
   test("new review with existing release", async ({ fixtures }) => {

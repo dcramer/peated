@@ -1,7 +1,12 @@
 import { db } from "@peated/server/db";
-import { bottleAliases, reviews, storePrices } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  incomingBottleDecisionLogs,
+  reviews,
+  storePrices,
+} from "@peated/server/db/schema";
 import createMissingBottles from "@peated/server/worker/jobs/createMissingBottles";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
@@ -127,6 +132,28 @@ describe("createMissingBottles", () => {
       where: eq(storePrices.id, price.id),
     });
     expect(updatedPrice?.bottleId).toEqual(updatedReview?.bottleId);
+
+    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
+      where: and(
+        eq(incomingBottleDecisionLogs.sourceKind, "review"),
+        eq(incomingBottleDecisionLogs.sourceId, review.id),
+      ),
+    });
+    expect(decisionLog).toMatchObject({
+      sourceKind: "review",
+      sourceId: review.id,
+      decision: "create_bottle",
+      actorType: "system",
+      actorUserId: systemUser.id,
+      bottleId: updatedReview?.bottleId,
+      releaseId: null,
+      createdBottle: true,
+      createdRelease: false,
+      confidence: 90,
+      model: expect.any(String),
+      rationale: "test fixture",
+    });
+
     expect(pushUniqueJobMock).toHaveBeenCalledWith("IndexBottleSearchVectors", {
       bottleId: updatedReview?.bottleId,
     });

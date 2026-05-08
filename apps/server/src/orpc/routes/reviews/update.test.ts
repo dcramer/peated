@@ -1,8 +1,12 @@
 import { db } from "@peated/server/db";
-import { externalSites, reviews } from "@peated/server/db/schema";
+import {
+  externalSites,
+  incomingBottleDecisionLogs,
+  reviews,
+} from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("PATCH /reviews/:review", () => {
@@ -89,6 +93,22 @@ describe("PATCH /reviews/:review", () => {
     expect(updatedReview.releaseId).toBe(release.id);
     expect(newReviewData.bottle?.id).toBe(bottle.id);
     expect(newReviewData.release?.id).toBe(release.id);
+
+    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
+      where: and(
+        eq(incomingBottleDecisionLogs.sourceKind, "review"),
+        eq(incomingBottleDecisionLogs.sourceId, review.id),
+      ),
+    });
+    expect(decisionLog).toMatchObject({
+      decision: "match_existing",
+      actorType: "user",
+      actorUserId: user.id,
+      bottleId: bottle.id,
+      releaseId: release.id,
+      createdBottle: false,
+      createdRelease: false,
+    });
   });
 
   test("clears release when changing the bottle without an explicit release", async ({

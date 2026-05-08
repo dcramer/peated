@@ -47,6 +47,12 @@ export default function AdminSidebar() {
                       {workstream.sidebarLabel}
                     </SidebarLink>
                   ))}
+                  <SidebarLink
+                    href="/admin/incoming-decisions"
+                    active={pathname.startsWith("/admin/incoming-decisions")}
+                  >
+                    Decision Log
+                  </SidebarLink>
                 </ul>
               </li>
               <li>

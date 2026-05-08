@@ -57,6 +57,13 @@ import {
   upsertEntity,
 } from "@peated/server/lib/db";
 import { formatBottleName, formatReleaseName } from "@peated/server/lib/format";
+import {
+  getIncomingBottleDecisionFromCreationTarget,
+  recordIncomingBottleDecisionInTransaction,
+  shouldRecordIncomingBottleDecision,
+  type IncomingBottleDecisionActorType,
+  type IncomingBottleDecisionType,
+} from "@peated/server/lib/incomingBottleDecisionLog";
 import { logError } from "@peated/server/lib/log";
 import {
   getStorePriceMatchAutomationAssessment,
@@ -1534,6 +1541,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     releaseInput,
     user,
     creationSource,
+    actorType,
     expectedProcessingToken,
   }: {
     proposalId: number;
@@ -1541,6 +1549,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     releaseInput?: z.infer<typeof BottleReleaseInputSchema>;
     user: User;
     creationSource: CatalogVerificationCreationSource;
+    actorType: IncomingBottleDecisionActorType;
     expectedProcessingToken?: string;
   },
 ) {
@@ -1654,6 +1663,17 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
       bottleId: resolvedBottleId,
       releaseId: resolvedReleaseId,
       reviewedById: user.id,
+      decisionLog: {
+        actorType,
+        decision: getIncomingBottleDecisionFromCreationTarget(creationTarget),
+        createdBottle: !!createResult,
+        createdRelease: !!createReleaseResult,
+        metadata: {
+          creationTarget,
+          creationSource,
+          existingReleaseId: existingRelease?.id ?? null,
+        },
+      },
     },
   );
 
@@ -1673,6 +1693,7 @@ export async function createBottleFromStorePriceMatchProposal({
   releaseInput,
   user,
   creationSource = "price_match_review",
+  actorType = "user",
   expectedProcessingToken,
 }: {
   proposalId: number;
@@ -1680,6 +1701,7 @@ export async function createBottleFromStorePriceMatchProposal({
   releaseInput?: z.infer<typeof BottleReleaseInputSchema>;
   user: User;
   creationSource?: CatalogVerificationCreationSource;
+  actorType?: IncomingBottleDecisionActorType;
   expectedProcessingToken?: string;
 }) {
   const result = await db.transaction(async (tx) =>
@@ -1689,6 +1711,7 @@ export async function createBottleFromStorePriceMatchProposal({
       releaseInput,
       user,
       creationSource,
+      actorType,
       expectedProcessingToken,
     }),
   );
@@ -1926,6 +1949,7 @@ export async function resolveStorePriceMatchProposal(
           bottleId: proposal.suggestedBottleId,
           releaseId: proposal.suggestedReleaseId ?? null,
           reviewedById: automationUser.id,
+          actorType: "system",
           expectedProcessingToken: processingToken,
         });
 
@@ -1944,6 +1968,7 @@ export async function resolveStorePriceMatchProposal(
         ...createInputs,
         user: automationUser,
         creationSource: "price_match_automation",
+        actorType: "system",
         expectedProcessingToken: processingToken,
       });
 
@@ -2176,11 +2201,22 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     bottleId,
     releaseId = null,
     reviewedById,
+    decisionLog = {
+      actorType: "user",
+      decision: "match_existing",
+    },
   }: {
     proposal: StorePriceMatchProposalForReview;
     bottleId: number;
     releaseId?: number | null;
     reviewedById: number;
+    decisionLog?: {
+      actorType: IncomingBottleDecisionActorType;
+      decision: IncomingBottleDecisionType;
+      createdBottle?: boolean;
+      createdRelease?: boolean;
+      metadata?: Record<string, unknown>;
+    };
   },
 ) {
   if (releaseId !== null) {
@@ -2225,6 +2261,38 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     createdById: reviewedById,
   });
 
+  if (
+    shouldRecordIncomingBottleDecision({
+      previousBottleId: proposal.price.bottleId ?? proposal.currentBottleId,
+      bottleId,
+      decision: decisionLog.decision,
+    })
+  ) {
+    await recordIncomingBottleDecisionInTransaction(tx, {
+      sourceKind: "store_price",
+      sourceId: proposal.price.id,
+      proposalId: proposal.id,
+      externalSiteId: proposal.price.externalSiteId,
+      name: proposal.price.name,
+      url: proposal.price.url,
+      decision: decisionLog.decision,
+      actorType: decisionLog.actorType,
+      actorUserId: reviewedById,
+      bottleId,
+      releaseId,
+      createdBottle: decisionLog.createdBottle ?? false,
+      createdRelease: decisionLog.createdRelease ?? false,
+      confidence: proposal.confidence,
+      model: proposal.model,
+      rationale: proposal.rationale,
+      metadata: {
+        proposalType: proposal.proposalType,
+        creationTarget: proposal.creationTarget,
+        ...decisionLog.metadata,
+      },
+    });
+  }
+
   return aliasResult;
 }
 
@@ -2235,12 +2303,14 @@ export async function applyApprovedStorePriceMatchInTransaction(
     bottleId,
     releaseId,
     reviewedById,
+    actorType = "user",
     expectedProcessingToken,
   }: {
     proposalId: number;
     bottleId: number;
     releaseId?: number | null;
     reviewedById: number;
+    actorType?: IncomingBottleDecisionActorType;
     expectedProcessingToken?: string;
   },
 ) {
@@ -2254,6 +2324,10 @@ export async function applyApprovedStorePriceMatchInTransaction(
     bottleId,
     releaseId,
     reviewedById,
+    decisionLog: {
+      actorType,
+      decision: "match_existing",
+    },
   });
 }
 
@@ -2262,12 +2336,14 @@ export async function applyApprovedStorePriceMatch({
   bottleId,
   releaseId,
   reviewedById,
+  actorType = "user",
   expectedProcessingToken,
 }: {
   proposalId: number;
   bottleId: number;
   releaseId?: number | null;
   reviewedById: number;
+  actorType?: IncomingBottleDecisionActorType;
   expectedProcessingToken?: string;
 }) {
   const aliasResult = await db.transaction(async (tx) =>
@@ -2276,6 +2352,7 @@ export async function applyApprovedStorePriceMatch({
       bottleId,
       releaseId,
       reviewedById,
+      actorType,
       expectedProcessingToken,
     }),
   );
