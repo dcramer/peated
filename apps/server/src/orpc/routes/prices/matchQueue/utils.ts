@@ -44,6 +44,9 @@ function getPersistedAutomationAssessment(proposal: StorePriceMatchProposal) {
   if (!proposal.automationAssessment) {
     return null;
   }
+  if (!("plainAgeBottleAutoVerifyEligible" in proposal.automationAssessment)) {
+    return null;
+  }
 
   const parsedAssessment = StorePriceMatchAutomationAssessmentSchema.safeParse(
     proposal.automationAssessment,
@@ -328,6 +331,7 @@ export function serializeProposal(
           automationEligible: false,
           automationBlockers: [],
           decisiveMatchAttributes: [],
+          plainAgeBottleAutoVerifyEligible: false,
           differentiatingAttributes: [],
           webEvidenceChecks: [],
         });
@@ -348,6 +352,8 @@ export function serializeProposal(
     automationEligible: automationAssessment.automationEligible,
     automationBlockers: Array.from(new Set(automationBlockers)),
     decisiveMatchAttributes: automationAssessment.decisiveMatchAttributes,
+    plainAgeBottleAutoVerifyEligible:
+      automationAssessment.plainAgeBottleAutoVerifyEligible,
     differentiatingAttributes: automationAssessment.differentiatingAttributes,
     webEvidenceChecks: automationAssessment.webEvidenceChecks,
     currentBottleId: proposal.currentBottleId,

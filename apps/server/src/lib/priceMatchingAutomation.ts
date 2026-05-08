@@ -15,6 +15,7 @@ import {
   getExistingMatchIdentityConflicts,
   hasSupportiveWebEvidenceForExistingMatch as hasSupportiveBottleEvidence,
   isExistingMatchConfidenceEligibleForVerification,
+  isPlainAgeBottleMatchEligibleForVerification,
 } from "@peated/bottle-classifier/priceMatchingEvidence";
 import type { StorePrice } from "@peated/server/db/schema";
 import type { StorePriceMatchAutomationAssessmentSchema } from "@peated/server/schemas";
@@ -693,7 +694,7 @@ function getExistingMatchAssessment({
   searchEvidence,
 }: {
   modelConfidence: number | null;
-  price: Pick<StorePrice, "url">;
+  price: Pick<StorePrice, "name" | "url">;
   suggestedBottleId: number | null;
   suggestedReleaseId: number | null;
   candidateBottles: PriceMatchCandidate[];
@@ -710,6 +711,7 @@ function getExistingMatchAssessment({
       automationScore: null,
       decisiveMatchAttributes: [] as MatchAttribute[],
       structuredMatchRequiresStatedAge: false,
+      plainAgeBottleAutoVerifyEligible: false,
       automationBlockers: [] as string[],
       differentiatingAttributes: [] as MatchAttribute[],
       webEvidenceChecks: [] as EvidenceCheck[],
@@ -742,12 +744,18 @@ function getExistingMatchAssessment({
     extractedLabel,
     searchEvidence,
   });
+  const plainAgeBottleAutoVerifyEligible =
+    automationBlockers.length === 0 &&
+    isPlainAgeBottleMatchEligibleForVerification({
+      target,
+      candidates: candidateBottles,
+      extractedLabel,
+      referenceName: price.name,
+    });
 
   return {
-    // For existing matches, the reviewed classifier confidence is the only
-    // signal we trust enough to summarize numerically. Downstream automation
-    // still records blockers and matched attributes, but it does not rescore
-    // bottle identity independently of the classifier.
+    // Existing-match score is display/debug context. Verification decisions use
+    // explicit blockers, deterministic lanes, and the legacy confidence gate.
     automationScore:
       modelConfidence === null ? null : clampScore(modelConfidence),
     decisiveMatchAttributes: getExistingMatchDecisiveAttributes({
@@ -757,6 +765,7 @@ function getExistingMatchAssessment({
     structuredMatchRequiresStatedAge:
       extractedLabel?.stated_age !== null &&
       extractedLabel?.stated_age !== undefined,
+    plainAgeBottleAutoVerifyEligible,
     automationBlockers: Array.from(new Set(automationBlockers)),
     differentiatingAttributes: webEvidence.differentiatingAttributes,
     webEvidenceChecks: webEvidence.checks,
@@ -981,6 +990,7 @@ export function getStorePriceMatchAutomationAssessment({
       modelConfidence,
       ...createScore,
       structuredMatchRequiresStatedAge: false,
+      plainAgeBottleAutoVerifyEligible: false,
       automationEligible:
         action === "create_new" ? createScore.automationEligible : false,
     };
@@ -1005,6 +1015,8 @@ export function getStorePriceMatchAutomationAssessment({
       decisiveMatchAttributes: matchAssessment.decisiveMatchAttributes,
       structuredMatchRequiresStatedAge:
         matchAssessment.structuredMatchRequiresStatedAge,
+      plainAgeBottleAutoVerifyEligible:
+        matchAssessment.plainAgeBottleAutoVerifyEligible,
       differentiatingAttributes: matchAssessment.differentiatingAttributes,
       webEvidenceChecks: matchAssessment.webEvidenceChecks,
     };
@@ -1017,6 +1029,7 @@ export function getStorePriceMatchAutomationAssessment({
     automationBlockers: [],
     decisiveMatchAttributes: [],
     structuredMatchRequiresStatedAge: false,
+    plainAgeBottleAutoVerifyEligible: false,
     differentiatingAttributes: [],
     webEvidenceChecks: [],
   };
@@ -1056,6 +1069,7 @@ export function shouldVerifyStorePriceMatch(params: {
   suggestedReleaseId: number | null;
   modelConfidence: number | null;
   automationBlockers: string[];
+  plainAgeBottleAutoVerifyEligible?: boolean;
 }) {
   const {
     action,
@@ -1066,6 +1080,7 @@ export function shouldVerifyStorePriceMatch(params: {
     suggestedBottleId,
     suggestedReleaseId,
     modelConfidence,
+    plainAgeBottleAutoVerifyEligible = false,
   } = params;
 
   if (action !== "match_existing" || suggestedBottleId === null) {
@@ -1074,6 +1089,15 @@ export function shouldVerifyStorePriceMatch(params: {
 
   if (automationBlockers.length > 0) {
     return false;
+  }
+
+  if (
+    currentBottleId === null &&
+    (suggestedReleaseId ?? null) === null &&
+    identityScope !== "exact_cask" &&
+    plainAgeBottleAutoVerifyEligible
+  ) {
+    return true;
   }
 
   if (modelConfidence === null) {

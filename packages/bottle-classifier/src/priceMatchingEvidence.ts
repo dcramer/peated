@@ -299,6 +299,22 @@ function extractedLabelLooksLikePlainAgeStatement(
   );
 }
 
+function bottleCandidateIsPlainAgeAutoVerificationTarget(
+  target: BottleCandidate,
+): boolean {
+  return (
+    target.kind !== "release" &&
+    (target.releaseId ?? null) === null &&
+    target.abv === null &&
+    !target.caskType &&
+    !target.caskSize &&
+    !target.caskFill &&
+    target.caskStrength !== true &&
+    target.singleCask !== true &&
+    targetLooksLikePlainAgeStatementBottle(target)
+  );
+}
+
 function extractedLabelCarriesUnsupportedSpecificity({
   target,
   extractedLabel,
@@ -542,6 +558,34 @@ function candidateMatchesDistillery(
   }
 
   return listMatchesExpectedValue(candidate.distillery, values);
+}
+
+function candidateMatchesPlainAgeStructuredIdentity({
+  candidate,
+  extractedLabel,
+}: {
+  candidate: BottleCandidate;
+  extractedLabel: BottleExtractedDetails | null;
+}): boolean {
+  return (
+    Boolean(extractedLabel?.brand) &&
+    candidateMatchesBrand(candidate, extractedLabel?.brand) &&
+    extractedLabel?.stated_age !== null &&
+    extractedLabel?.stated_age !== undefined &&
+    candidate.statedAge === extractedLabel.stated_age
+  );
+}
+
+function titleSupportsAnyCandidateName({
+  title,
+  candidate,
+}: {
+  title: string;
+  candidate: BottleCandidate;
+}): boolean {
+  return getTargetNameVariants(candidate).some((variant) =>
+    titleSupportsCandidateName(title, variant),
+  );
 }
 
 function buildExistingMatchSupportChecks({
@@ -856,6 +900,42 @@ export function hasAuthoritativeTargetIdentityEvidenceForExistingMatch({
         })
       );
     }),
+  );
+}
+
+export function isPlainAgeBottleMatchEligibleForVerification({
+  target,
+  candidates,
+  extractedLabel,
+  referenceName,
+}: {
+  target: BottleCandidate;
+  candidates: BottleCandidate[];
+  extractedLabel: BottleExtractedDetails | null;
+  referenceName: string;
+}): boolean {
+  if (
+    !extractedLabelLooksLikePlainAgeStatement(extractedLabel) ||
+    !bottleCandidateIsPlainAgeAutoVerificationTarget(target) ||
+    !candidateMatchesPlainAgeStructuredIdentity({
+      candidate: target,
+      extractedLabel,
+    }) ||
+    !titleSupportsAnyCandidateName({ title: referenceName, candidate: target })
+  ) {
+    return false;
+  }
+
+  return !candidates.some(
+    (candidate) =>
+      candidate.bottleId !== target.bottleId &&
+      candidate.kind !== "release" &&
+      (candidate.releaseId ?? null) === null &&
+      candidateMatchesPlainAgeStructuredIdentity({
+        candidate,
+        extractedLabel,
+      }) &&
+      titleSupportsAnyCandidateName({ title: referenceName, candidate }),
   );
 }
 

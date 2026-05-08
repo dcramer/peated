@@ -666,6 +666,8 @@ function getProposalStatus(
       suggestedReleaseId: decision.suggestedReleaseId ?? null,
       modelConfidence: decision.confidence,
       automationBlockers: automationAssessment.automationBlockers,
+      plainAgeBottleAutoVerifyEligible:
+        automationAssessment.plainAgeBottleAutoVerifyEligible,
     })
   ) {
     return "verified";
