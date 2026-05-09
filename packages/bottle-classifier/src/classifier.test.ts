@@ -1304,6 +1304,397 @@ describe("createBottleClassifier", () => {
     });
   });
 
+  test("rejects create decisions when external web evidence does not support the proposed bottle", async () => {
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "create_bottle",
+          confidence: 91,
+          rationale: "No local bottle matched the reference.",
+          candidateBottleIds: [],
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          proposedBottle: {
+            name: "Warehouse Session",
+            series: null,
+            category: "single_malt",
+            edition: null,
+            statedAge: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: null,
+              name: "Festival Distillery",
+            },
+            distillers: [
+              {
+                id: null,
+                name: "Festival Distillery",
+              },
+            ],
+            bottler: null,
+          },
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity: null,
+          candidates: [],
+          searchEvidence: [
+            createAuthoritativeSearchEvidence({
+              query: "Festival Distillery Warehouse Session",
+              summary:
+                "Other Distillery Rainwater Batch is a single malt whisky.",
+            }),
+          ],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity: null,
+      maxSearchQueries: 0,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Festival Distillery Warehouse Session Single Malt",
+        url: "https://origin-retailer.example/products/warehouse-session",
+      },
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") return;
+    expect(result.decision).toMatchObject({
+      action: "no_match",
+      proposedBottle: null,
+    });
+    expect(result.decision.rationale).toContain(
+      "Server downgraded creation because creation requires external web evidence.",
+    );
+  });
+
+  test("retries whisky-like no_match decisions with forced web evidence", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Creag Isle",
+      bottler: null,
+      expression: null,
+      series: null,
+      distillery: [],
+      category: "single_malt",
+      stated_age: 12,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const create = vi.fn().mockResolvedValue({
+      output_text:
+        "Distiller lists Creag Isle 12-year-old Island Single Malt Scotch Whisky as a real 12 year single malt.",
+      output: [
+        {
+          type: "web_search_call",
+          action: {
+            type: "search",
+            sources: [
+              {
+                type: "url",
+                url: "https://distiller.com/spirits/creag-isle-12-year-island-single-malt",
+              },
+            ],
+          },
+        },
+      ],
+    });
+    const searchBottles = vi.fn(async () => [] as BottleCandidate[]);
+    const runBottleClassifierAgent = vi.fn(
+      async ({ searchEvidence }): Promise<ReasoningResult> => {
+        if (searchEvidence?.length) {
+          return {
+            decision: {
+              action: "create_bottle",
+              confidence: 94,
+              rationale:
+                "Web evidence confirms Creag Isle 12-year-old Island Single Malt as a standalone bottle.",
+              candidateBottleIds: [],
+              identityScope: "product",
+              observation: null,
+              matchedBottleId: null,
+              matchedReleaseId: null,
+              parentBottleId: null,
+              proposedBottle: {
+                name: "12-year-old Island Single Malt",
+                series: null,
+                category: "single_malt",
+                edition: null,
+                statedAge: 12,
+                caskStrength: null,
+                singleCask: null,
+                abv: null,
+                vintageYear: null,
+                releaseYear: null,
+                caskType: null,
+                caskSize: null,
+                caskFill: null,
+                brand: {
+                  id: null,
+                  name: "Creag Isle",
+                },
+                distillers: [],
+                bottler: null,
+              },
+              proposedRelease: null,
+            },
+            artifacts: {
+              extractedIdentity,
+              searchEvidence,
+              candidates: [],
+              resolvedEntities: [],
+            },
+          };
+        }
+
+        return {
+          decision: {
+            action: "no_match",
+            confidence: 12,
+            rationale:
+              "No safe local match, and creation was not allowed without web confirmation.",
+            candidateBottleIds: [],
+            identityScope: "product",
+            observation: null,
+            matchedBottleId: null,
+            matchedReleaseId: null,
+            parentBottleId: null,
+            proposedBottle: null,
+            proposedRelease: null,
+          },
+          artifacts: {
+            extractedIdentity,
+            searchEvidence: [],
+            candidates: [],
+            resolvedEntities: [],
+          },
+        };
+      },
+    );
+    const { classifier } = createTestClassifier({
+      client: {
+        responses: {
+          create,
+        },
+      } as unknown as OpenAI,
+      extractedIdentity,
+      maxSearchQueries: 1,
+      searchBottles,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Creag Isle 12-year-old Island Single Malt Scotch Whisky",
+        url: "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-12yr-island-single-malt-scotch-whisky/p/189848750",
+      },
+    });
+
+    expect(create).toHaveBeenCalledTimes(1);
+    expect(searchBottles).toHaveBeenCalledTimes(2);
+    expect(searchBottles).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        query: "Creag Isle 12 year old single malt",
+      }),
+    );
+    expect(runBottleClassifierAgent).toHaveBeenCalledTimes(2);
+    expect(runBottleClassifierAgent).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        investigationHint: expect.stringContaining("fully classify the bottle"),
+        searchEvidence: expect.arrayContaining([
+          expect.objectContaining({
+            query: "Creag Isle 12 year old single malt",
+          }),
+        ]),
+      }),
+    );
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") return;
+    expect(result.decision).toMatchObject({
+      action: "create_bottle",
+      proposedBottle: {
+        brand: {
+          name: "Creag Isle",
+        },
+        name: "12-year-old Island Single Malt",
+      },
+    });
+  });
+
+  test("retries whisky-like no_match decisions that already have authoritative web evidence", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Creag Isle",
+      bottler: null,
+      expression: null,
+      series: null,
+      distillery: [],
+      category: "single_malt",
+      stated_age: 12,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const searchEvidence = [
+      createAuthoritativeSearchEvidence({
+        query: "Creag Isle 12 year old single malt",
+        summary:
+          "Creag Isle 12 Year Island Single Malt is a 12 year old single malt Scotch whisky.",
+      }),
+    ];
+    const create = vi.fn().mockResolvedValue({
+      output_text:
+        "Creag Isle 12-year-old Island Single Malt is a 12 year old single malt Scotch whisky.",
+      output: [
+        {
+          type: "web_search_call",
+          action: {
+            type: "search",
+            sources: [
+              {
+                type: "url",
+                url: "https://distiller.com/spirits/creag-isle-12-year-island-single-malt",
+              },
+            ],
+          },
+        },
+      ],
+    });
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => {
+        if (runBottleClassifierAgent.mock.calls.length > 1) {
+          return {
+            decision: {
+              action: "create_bottle",
+              confidence: 93,
+              rationale:
+                "Authoritative web evidence confirms Creag Isle 12-year-old Island Single Malt.",
+              candidateBottleIds: [],
+              identityScope: "product",
+              observation: null,
+              matchedBottleId: null,
+              matchedReleaseId: null,
+              parentBottleId: null,
+              proposedBottle: {
+                name: "12-year-old Island Single Malt",
+                series: null,
+                category: "single_malt",
+                edition: null,
+                statedAge: 12,
+                caskStrength: null,
+                singleCask: null,
+                abv: null,
+                vintageYear: null,
+                releaseYear: null,
+                caskType: null,
+                caskSize: null,
+                caskFill: null,
+                brand: {
+                  id: null,
+                  name: "Creag Isle",
+                },
+                distillers: [],
+                bottler: null,
+              },
+              proposedRelease: null,
+            },
+            artifacts: {
+              extractedIdentity,
+              searchEvidence,
+              candidates: [],
+              resolvedEntities: [],
+            },
+          };
+        }
+
+        return {
+          decision: {
+            action: "no_match",
+            confidence: 12,
+            rationale: "No safe local match.",
+            candidateBottleIds: [],
+            identityScope: "product",
+            observation: null,
+            matchedBottleId: null,
+            matchedReleaseId: null,
+            parentBottleId: null,
+            proposedBottle: null,
+            proposedRelease: null,
+          },
+          artifacts: {
+            extractedIdentity,
+            searchEvidence,
+            candidates: [],
+            resolvedEntities: [],
+          },
+        };
+      },
+    );
+    const { classifier } = createTestClassifier({
+      client: {
+        responses: {
+          create,
+        },
+      } as unknown as OpenAI,
+      extractedIdentity,
+      maxSearchQueries: 1,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Creag Isle 12-year-old Island Single Malt Scotch Whisky",
+        url: "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-12yr-island-single-malt-scotch-whisky/p/189848750",
+      },
+      initialCandidates: [],
+    });
+
+    expect(runBottleClassifierAgent).toHaveBeenCalledTimes(2);
+    expect(runBottleClassifierAgent).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        investigationHint: expect.stringContaining("fully classify the bottle"),
+        searchEvidence,
+      }),
+    );
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") return;
+    expect(result.decision).toMatchObject({
+      action: "create_bottle",
+      proposedBottle: {
+        brand: {
+          name: "Creag Isle",
+        },
+        name: "12-year-old Island Single Malt",
+      },
+    });
+  });
+
   test("falls back to text extraction when image extraction returns null", async () => {
     const runBottleClassifierAgent = vi.fn(
       async ({ extractedIdentity }): Promise<ReasoningResult> => ({

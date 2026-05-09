@@ -751,6 +751,7 @@ const BOTTLE_CLASSIFIER_INSTRUCTIONS = [
     "Do not guess missing facts. If source text, local candidates, and web evidence do not support a field, leave it unknown and record the risk instead.",
     "Identify the stable bottle first. Add release identity only when reusable bottling traits are supported.",
     "Use local candidates to frame web searches. Use web search for concrete disputed traits, not broad exploration.",
+    "If local candidates are unsafe for a whisky-like reference and web search is available, investigate the web before returning terminal `no_match`.",
     "Before creating a bottle, use `search_bottles` when the initial candidates contain the same brand or family but conflict on category or omit a canonical trait.",
     "Creation requires web evidence. Use web search before any `create_bottle`, `create_release`, or `create_bottle_and_release` decision.",
     "After web confirms an omitted canonical trait, re-run `search_bottles` with that trait before returning a create action.",

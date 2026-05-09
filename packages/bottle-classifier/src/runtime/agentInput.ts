@@ -3,6 +3,7 @@ import {
   type BottleCandidate,
   type BottleCandidateSearchInput,
   type BottleExtractedDetails,
+  type BottleSearchEvidence,
 } from "../classifierTypes";
 import type { BottleReference } from "../contract";
 
@@ -15,6 +16,8 @@ export function buildAgentInput({
   currentBottle,
   hasExactAliasMatch,
   candidateExpansion,
+  searchEvidence = [],
+  investigationHint = null,
 }: {
   reference: BottleReference;
   extractedIdentity: BottleExtractedDetails | null;
@@ -22,6 +25,8 @@ export function buildAgentInput({
   currentBottle: BottleCandidate | null;
   hasExactAliasMatch: boolean;
   candidateExpansion: "initial_only" | "open";
+  searchEvidence?: BottleSearchEvidence[];
+  investigationHint?: string | null;
 }): string {
   /**
    * The model should see the raw reference, the best current extraction, and
@@ -45,6 +50,10 @@ export function buildAgentInput({
         hasExactAliasMatch,
         candidates: initialCandidates,
       },
+      webEvidence: {
+        results: searchEvidence,
+      },
+      investigationHint,
     },
     null,
     2,
