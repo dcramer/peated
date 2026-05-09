@@ -18,6 +18,47 @@ export const searchResponseFixtureSchema = z.object({
   results: z.array(BottleCandidateSchema),
 });
 
+const evalFixtureDbOutcomeSchema = z
+  .object({
+    bottleId: z.number().int().positive().nullable().optional(),
+    releaseId: z.number().int().positive().nullable().optional(),
+    createsBottle: z.boolean().optional(),
+    createsRelease: z.boolean().optional(),
+    summary: z.string().min(1),
+  })
+  .strict();
+
+export const evalFixtureProvenanceSchema = z
+  .object({
+    source: z.enum(["production_miss", "curated_regression", "synthetic"]),
+    verifiedSourceUrls: z.array(z.string().url()).optional(),
+    dbOutcome: evalFixtureDbOutcomeSchema.optional(),
+    notes: z.string().min(1).optional(),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (
+      value.source === "production_miss" &&
+      (value.verifiedSourceUrls === undefined ||
+        value.verifiedSourceUrls.length === 0)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "`production_miss` fixtures must include verified source URLs.",
+        path: ["verifiedSourceUrls"],
+      });
+    }
+
+    if (value.source === "production_miss" && value.dbOutcome === undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "`production_miss` fixtures must include a DB outcome.",
+        path: ["dbOutcome"],
+      });
+    }
+  });
+
 export const classifierEvalExpectationSchema = z.object({
   status: z.enum(["ignored", "classified"]),
   action: z
@@ -55,6 +96,7 @@ export const classifierEvalFixtureSchema = z
       })
       .strict(),
     searchResponses: z.array(searchResponseFixtureSchema).optional(),
+    provenance: evalFixtureProvenanceSchema.optional(),
     expected: classifierEvalExpectationSchema,
   })
   .strict();
@@ -139,6 +181,7 @@ export const realWorldNewBottleFixtureSchema = z
     expectedBottleName: z.string().min(1),
     summary: z.string().min(1),
     peatedBottleIds: z.array(z.number().int().positive()).min(1),
+    provenance: evalFixtureProvenanceSchema.optional(),
     expected: bottleNormalizationExpectationSchema,
   })
   .strict();
