@@ -30,6 +30,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - Backend testing policy: `docs/development/backend-testing.md`
 - Before finalizing non-trivial code changes, run the full test suite with `pnpm test`; targeted tests are additive, not a substitute
 - Classifier/repair changes: preserve `docs/architecture/whisky-identity-model.md`; brand/entity identity is not prefix matching
+- Production-miss classifier evals must verify the real bottle online, state the exact Peated DB outcome, and encode that provenance in the fixture; do not substitute a generalized pretend case for the observed bottle.
 - oRPC route conventions: `docs/development/orpc-routes.md`
 - oRPC client usage: `docs/development/orpc-client.md`
 - Schema conventions: `docs/development/schema-conventions.md`

@@ -1,0 +1,164 @@
+{
+  "id": "store-listing-matches-hudson-back-room-deal-peated-scotch-barrel-finished-as-bottle-identity",
+  "name": "store listing: matches Hudson Back Room Deal Peated Scotch Barrel Finished as bottle identity",
+  "input": {
+    "reference": {
+      "name": "Hudson Whiskey Back Room Deal New York Straight Rye Whiskey Finished In Peated Scotch Barrels",
+      "url": "https://woodencork.com/collections/whiskey/products/hudson-whiskey-back-room-deal-new-york-straight-rye-whiskey-finished-in-peated-scotch-barrels?utm=peated"
+    },
+    "extractedIdentity": {
+      "brand": "Hudson Whiskey",
+      "bottler": null,
+      "expression": "Back Room Deal",
+      "series": null,
+      "distillery": ["Hudson"],
+      "category": "rye",
+      "stated_age": null,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": "Peated Scotch Barrels",
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "bottleId": 11904,
+        "releaseId": null,
+        "alias": null,
+        "fullName": "Hudson Whiskey Back Room Deal Peated Scotch Barrel Finished",
+        "bottleFullName": "Hudson Whiskey Back Room Deal Peated Scotch Barrel Finished",
+        "brand": "Hudson",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "rye",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 1,
+        "source": ["text"]
+      },
+      {
+        "kind": "bottle",
+        "bottleId": 17226,
+        "releaseId": null,
+        "alias": "Hudson Manhattan Straight Rye (Batch 5)",
+        "fullName": "Hudson Manhattan Rye Whiskey",
+        "bottleFullName": "Hudson Manhattan Rye Whiskey",
+        "brand": "Hudson",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "rye",
+        "statedAge": null,
+        "edition": "Batch 5",
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.6679750018368795,
+        "source": ["vector", "release"]
+      },
+      {
+        "kind": "release",
+        "bottleId": 17226,
+        "releaseId": 278,
+        "alias": "Hudson Manhattan Rye Whiskey - Batch 5",
+        "fullName": "Hudson Manhattan Rye Whiskey - Batch 5",
+        "bottleFullName": "Hudson Manhattan Rye Whiskey",
+        "brand": "Hudson",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "rye",
+        "statedAge": null,
+        "edition": "Batch 5",
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.6532670600221517,
+        "source": ["vector", "release"]
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["hudson", "back room deal"],
+      "results": [
+        {
+          "kind": "bottle",
+          "bottleId": 11904,
+          "releaseId": null,
+          "alias": null,
+          "fullName": "Hudson Whiskey Back Room Deal Peated Scotch Barrel Finished",
+          "bottleFullName": "Hudson Whiskey Back Room Deal Peated Scotch Barrel Finished",
+          "brand": "Hudson",
+          "bottler": null,
+          "series": null,
+          "distillery": [],
+          "category": "rye",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 1,
+          "source": ["text"]
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.hudsonwhiskey.com/en-US/our-range/",
+      "https://shop.hudsonwhiskey.com/products/Hudson-Back-Room-Deal-p667109531",
+      "https://whiskyadvocate.com/Hudson-Whiskey-Back-Room-Deal-Peated-Scotch-Barrel-Finished-46",
+      "https://distiller.com/spirits/hudson-whiskey-back-room-deal"
+    ],
+    "dbOutcome": {
+      "bottleId": 11904,
+      "releaseId": null,
+      "createsBottle": false,
+      "createsRelease": false,
+      "summary": "Assign the store price to bottle 11904 with releaseId null. Do not create a bottle_release or a separate generic Back Room Deal parent; preserve the listing's peated Scotch barrel finish wording as source observation evidence."
+    },
+    "notes": "Hudson treats Back Room Deal as a named range product: New York Straight Rye Whiskey finished in peated Scotch barrels at 46% ABV. The finish is part of the marketed bottle identity, not a child-release discriminator."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 11904,
+    "matchedReleaseId": null,
+    "confidenceBand": "auto_verification",
+    "verifyEligible": true,
+    "summary": "Match the exact local Hudson Back Room Deal Peated Scotch Barrel Finished bottle. The peated Scotch barrel finish is part of this bottle identity, so the correct result is product-scope bottle 11904 with no child release."
+  }
+}

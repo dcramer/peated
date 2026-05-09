@@ -44,6 +44,8 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - `exact_cask` needs strong marketed identity signals such as SMWS codes, cask numbers, or barrel numbers.
 - Model-sensitive behavior changes should update realistic eval fixtures; add unit tests only for deterministic invariants changed to support them.
 - Creation requires external web evidence. Never invent evidence or create without source support.
+- Production-miss evals require the exact observed input, independent web verification of the real bottle, and an explicit Peated DB outcome before the expected result is encoded. Use fixture `provenance.source = "production_miss"` with `verifiedSourceUrls` and `dbOutcome`.
+- Expected eval outcomes must name the exact Peated bottle/release ids, exact create action, and auto-verification expectation when those are known. Do not replace a production miss with a generalized or pretend outcome.
 - Live evals are expensive; run full evals only when explicitly asked or when doing an intentional scoped eval pass.
 - Replay JSON under `.vitest-evals/recordings/` is an eval artifact, not a local cache. Commit only deliberate replay changes tied to an eval fixture or harness change.
 - Live evals load the repo-root `.env.local`.

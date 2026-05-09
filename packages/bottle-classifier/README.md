@@ -173,6 +173,16 @@ When changing classifier behavior:
 5. Do not solve one failed family by teaching the prompt that exact family name. Generalize the rule in prompt or policy, and use eval fixtures to hold the concrete regression.
 6. Run package typecheck, focused unit tests, and fixture validation for routine changes. Run live evals only when explicitly requested or when doing an intentional scoped eval pass.
 
+When adding an eval from a real production miss:
+
+1. Start with the exact observed input: listing title, URL, extracted identity, local candidates, current assignment, and the failing classifier or automation outcome.
+2. Web-verify the real bottle before writing the expected result. Use authoritative sources first, such as the producer/brand page or official shop, then a reputable independent source when available. Treat retailer copy as the source listing, not proof by itself.
+3. Decide the Peated DB outcome explicitly: exact `bottleId`, exact `releaseId` or `null`, whether a `bottle_release` should be created, whether a parent split is required, and which source facts should remain observation-only.
+4. Apply `docs/architecture/whisky-identity-model.md`: bottle-first when the product identity is clear, release only for reusable canonical variants, and preserve exact listing details as observations when they are not canonical identity.
+5. Encode the concrete regression, not a generalized pretend case. The fixture should name the real product, carry the real Peated ids or create expectation, and include `expected.confidenceBand` / `expected.verifyEligible` when downstream automation depends on the confidence band.
+6. Add `provenance.source = "production_miss"` with `verifiedSourceUrls` and `dbOutcome` so future reviewers can see the web verification and the intended DB action without rediscovering it from memory.
+7. If the family is ambiguous enough to regress in both directions, add paired positive and negative fixtures rather than a one-sided example.
+
 When adding a new bottle family or edge case:
 
 - add both a positive and a negative example when the family is ambiguous enough to regress

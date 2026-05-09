@@ -259,6 +259,28 @@ evals. It forwards extra Vitest args to the package runner and uses the
 `vitest-evals` reporter configured in
 `packages/bottle-classifier/vitest.evals.config.mts`.
 
+Production-miss eval checklist:
+
+1. Preserve the exact observed case: source title, URL, extracted identity,
+   current assignment, local candidates, and the failing classifier or
+   automation outcome.
+2. Verify the real bottle online before deciding the expected result. Prefer
+   producer or brand pages, official shops, and reputable independent sources.
+   Do not use retailer SEO text alone as proof of canonical identity.
+3. Decide the Peated DB action before encoding the eval: exact `bottleId`,
+   exact `releaseId` or `null`, whether to create a `bottle_release`, whether a
+   parent split is required, and which exact source facts stay in
+   `bottle_observation`.
+4. Encode the expected outcome for the exact real bottle. For existing matches,
+   expected ids should be the actual Peated ids. For create paths, expected
+   drafts should describe the canonical bottle or release that should exist.
+5. Add fixture `provenance.source = "production_miss"` with
+   `verifiedSourceUrls` and `dbOutcome` so the web verification and intended DB
+   result remain attached to the regression.
+6. If a family can fail in both directions, add paired positive and negative
+   fixtures. Do not move brand- or family-specific semantics into deterministic
+   code just to satisfy the eval.
+
 Local setup for live evals:
 
 - put `OPENAI_API_KEY` in the repo-root `.env` or `.env.local`
