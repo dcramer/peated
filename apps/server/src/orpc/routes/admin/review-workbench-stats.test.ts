@@ -39,6 +39,10 @@ function toDateKey(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+function hoursSince(date: Date): number {
+  return Math.round(((Date.now() - date.getTime()) / 3_600_000) * 10) / 10;
+}
+
 async function createProposalFixture(
   {
     createdAt,
@@ -151,10 +155,11 @@ describe("GET /admin/review-workbench/stats", () => {
       },
       { bottleId: bottle.id, storePrice: fixtures.StorePrice },
     );
+    const oldestActionableEnteredQueueAt = daysAgoAt(4, 9);
     await createProposalFixture(
       {
         createdAt: todayQueueErroredAt,
-        enteredQueueAt: daysAgoAt(4, 9),
+        enteredQueueAt: oldestActionableEnteredQueueAt,
         status: "errored",
       },
       { bottleId: bottle.id, storePrice: fixtures.StorePrice },
@@ -215,6 +220,9 @@ describe("GET /admin/review-workbench/stats", () => {
       olderThan72Hours: 1,
     });
     expect(result.snapshot.backlog.oldestHours).not.toBeNull();
-    expect(result.snapshot.backlog.oldestHours!).toBeGreaterThanOrEqual(95);
+    expect(result.snapshot.backlog.oldestHours!).toBeCloseTo(
+      hoursSince(oldestActionableEnteredQueueAt),
+      0,
+    );
   });
 });
