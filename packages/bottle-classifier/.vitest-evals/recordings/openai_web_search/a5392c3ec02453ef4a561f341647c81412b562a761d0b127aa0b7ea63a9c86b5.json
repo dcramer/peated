@@ -1,5 +1,5 @@
 {
-  "writtenAt": "2026-05-09T23:58:34.388Z",
+  "writtenAt": "2026-05-10T20:45:59.172Z",
   "toolName": "openai_web_search",
   "input": {
     "query": "Maker's Mark Private Selection S2B13"
@@ -7,22 +7,8 @@
   "output": {
     "provider": "openai",
     "query": "Maker's Mark Private Selection S2B13",
-    "summary": "I found good evidence that **“Maker’s Mark Private Selection S2B13” is a specific Private Selection barrel recipe/code**, not a standard shelf SKU with one fixed universal proof.\n\nWhat the sources support:\n\n- **Producer facts:** Maker’s Mark says **Private Selection** starts as **cask-strength Maker’s Mark**, is finish",
+    "summary": "Here’s the most solid bottle-specific picture I could confirm for **Maker’s Mark Private Selection S2B13**:\n\n- **Producer / bottler:** Maker’s Mark. ([makersmark.com](https://www.makersmark.com/bourbons/makers-mark-private-selection))\n- **Series / barrel code:** **S2B13 = “Series 2, Barrel No. 13”**, and at least one c",
     "results": [
-      {
-        "title": "Maker's Mark Private Selection - Ratings and reviews - Whiskybase",
-        "url": "https://www.whiskybase.com/whiskies/whisky/199210/makers-mark-private-selection",
-        "domain": "whiskybase.com",
-        "description": null,
-        "extraSnippets": []
-      },
-      {
-        "title": "https://www.whiskybase.com/whiskies/whisky/166147/makers-mark-private-selection?language=en",
-        "url": "https://www.whiskybase.com/whiskies/whisky/166147/makers-mark-private-selection?language=en",
-        "domain": "whiskybase.com",
-        "description": null,
-        "extraSnippets": []
-      },
       {
         "title": "Private Selection Bourbon: Premium Whisky | Maker's Mark®",
         "url": "https://www.makersmark.com/bourbons/makers-mark-private-selection",
@@ -31,23 +17,37 @@
         "extraSnippets": []
       },
       {
-        "title": "https://www.whisky.com/whisky-database/details/makers-mark-mark-private-select.html",
-        "url": "https://www.whisky.com/whisky-database/details/makers-mark-mark-private-select.html",
-        "domain": "whisky.com",
+        "title": "Maker’s Mark Private Selection Topflight S2B13 Review | The Daily Pour",
+        "url": "https://thedailypour.com/spirit/makers-mark-private-selection-topflight-s2b13/",
+        "domain": "thedailypour.com",
         "description": null,
         "extraSnippets": []
       },
       {
-        "title": "https://shop.whiskybase.com/us/brands/makers-mark/",
-        "url": "https://shop.whiskybase.com/us/brands/makers-mark/",
-        "domain": "shop.whiskybase.com",
+        "title": "MAKER'S MARK PRIVATE SELECTION KENTUCKY BOURBON WHISKY S2B13\n – SwigLab",
+        "url": "https://www.swiglab.com/products/makers-mark-private-selection-kentucky-bourbon-whisky-s2b13",
+        "domain": "swiglab.com",
         "description": null,
         "extraSnippets": []
       },
       {
-        "title": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/makers-mark-private-select",
-        "url": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/makers-mark-private-select",
-        "domain": "whiskyauctioneer.com",
+        "title": "https://www.reservebar.com/products/makers-mark-private-selection-kentucky-bourbon-whisky-s2b13/GROUPING-2462904",
+        "url": "https://www.reservebar.com/products/makers-mark-private-selection-kentucky-bourbon-whisky-s2b13/GROUPING-2462904",
+        "domain": "reservebar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.makersmark.com/en-us/bourbons/makers-mark-private-selection/Bam-and-Marilyns-limited-release",
+        "url": "https://www.makersmark.com/en-us/bourbons/makers-mark-private-selection/Bam-and-Marilyns-limited-release",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.bourbonguy.com/blog/2020/2/11/makers-mark-private-select-liquor-barrel-and-lbwc-selection",
+        "url": "https://www.bourbonguy.com/blog/2020/2/11/makers-mark-private-select-liquor-barrel-and-lbwc-selection",
+        "domain": "bourbonguy.com",
         "description": null,
         "extraSnippets": []
       }

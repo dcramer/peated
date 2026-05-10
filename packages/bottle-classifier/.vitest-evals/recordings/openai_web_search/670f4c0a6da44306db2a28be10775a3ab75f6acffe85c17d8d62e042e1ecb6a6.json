@@ -1,5 +1,5 @@
 {
-  "writtenAt": "2026-05-10T05:31:49.368Z",
+  "writtenAt": "2026-05-10T20:26:16.136Z",
   "toolName": "openai_web_search",
   "input": {
     "query": "Talisker 2001 Distillers Edition whisky release year or distillation year"
@@ -7,7 +7,7 @@
   "output": {
     "provider": "openai",
     "query": "Talisker 2001 Distillers Edition whisky release year or distillation year",
-    "summary": "For **Talisker 2001 Distillers Edition**, **2001 is the distillation year**, not the release year. Multiple bottle-specific sources identify it as a Distillers Edition distilled in **2001**, and one corroborating source specifically describes this bottling as **“2001 / 2012”**, indicating a **2012 bottling/release**. (",
+    "summary": "For **Talisker 2001 Distillers Edition**, **2001 is the distillation year**, not the release year. Multiple bottle-specific listings identify it as **“2001 / 2012 Distillers Edition”**, which indicates it was **distilled in 2001** and **released/bottled in 2012**. ([whisky.com](https://www.whisky.com/whisky-database/se",
     "results": [
       {
         "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
@@ -31,13 +31,6 @@
         "extraSnippets": []
       },
       {
-        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-20022013.html",
-        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-20022013.html",
-        "domain": "whisky.com",
-        "description": null,
-        "extraSnippets": []
-      },
-      {
         "title": "https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition",
         "url": "https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition",
         "domain": "thewhiskybarrel.com",
@@ -45,9 +38,16 @@
         "extraSnippets": []
       },
       {
-        "title": "https://www.whiskybase.com/whiskies/whisky/39673/talisker-2001",
-        "url": "https://www.whiskybase.com/whiskies/whisky/39673/talisker-2001",
-        "domain": "whiskybase.com",
+        "title": "https://www.spiritradar.com/whisky-db/talisker-2001-the-distillers-edition-45.8-percent-700ml/",
+        "url": "https://www.spiritradar.com/whisky-db/talisker-2001-the-distillers-edition-45.8-percent-700ml/",
+        "domain": "spiritradar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/series/distillers-edition.html?cHash=cca472d032ea6d31b211512341661e16&tx_datamintsflaschendb_pi4%5BcurPage%5D=51",
+        "url": "https://www.whisky.com/whisky-database/series/distillers-edition.html?cHash=cca472d032ea6d31b211512341661e16&tx_datamintsflaschendb_pi4%5BcurPage%5D=51",
+        "domain": "whisky.com",
         "description": null,
         "extraSnippets": []
       }
@@ -55,6 +55,6 @@
   },
   "metadata": {
     "cacheKey": "670f4c0a6da44306db2a28be10775a3ab75f6acffe85c17d8d62e042e1ecb6a6",
-    "mode": "auto"
+    "mode": "record"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "writtenAt": "2026-05-10T06:13:04.040Z",
+  "writtenAt": "2026-05-10T20:23:08.494Z",
   "toolName": "openai_web_search",
   "input": {
     "query": "Ardbeg Traigh Bhan 19 year old official 19 years old Islay single malt"
@@ -7,39 +7,11 @@
   "output": {
     "provider": "openai",
     "query": "Ardbeg Traigh Bhan 19 year old official 19 years old Islay single malt",
-    "summary": "**Ardbeg Traigh Bhan 19 Year Old** is an **official distillery bottling** from **Ardbeg Distillery, Islay**, released as a **small-batch annual series** rather than a single one-off bottling. Ardbeg’s official pages describe it as a **19-year-old Islay single malt Scotch whisky** and show the standard bottling strength",
+    "summary": "**Ardbeg Traigh Bhan 19 Year Old** is an **official bottling** from **Ardbeg Distillery** on **Islay**, released as a **small-batch 19-year-old Islay single malt Scotch whisky**. Across the series, the standard bottling strength is **46.2% ABV**. ([whiskyauctioneer.com](https://whiskyauctioneer.com/learn/explore-whisky",
     "results": [
       {
-        "title": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
-        "url": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
-        "domain": "ardbeg.com",
-        "description": null,
-        "extraSnippets": []
-      },
-      {
-        "title": "https://www.whiskybase.com/whiskies/brand/81362/whiskies",
-        "url": "https://www.whiskybase.com/whiskies/brand/81362/whiskies",
-        "domain": "whiskybase.com",
-        "description": null,
-        "extraSnippets": []
-      },
-      {
-        "title": "https://shop.whiskybase.com/us/go/product/112959170/",
-        "url": "https://shop.whiskybase.com/us/go/product/112959170/",
-        "domain": "shop.whiskybase.com",
-        "description": null,
-        "extraSnippets": []
-      },
-      {
-        "title": "https://www.whiskybase.com/whiskies/whisky/287113/bruichladdich-19-year-old",
-        "url": "https://www.whiskybase.com/whiskies/whisky/287113/bruichladdich-19-year-old",
-        "domain": "whiskybase.com",
-        "description": null,
-        "extraSnippets": []
-      },
-      {
-        "title": "https://www.whiskybase.com/whiskies/whisky/258358/bruichladdich-19-year-old",
-        "url": "https://www.whiskybase.com/whiskies/whisky/258358/bruichladdich-19-year-old",
+        "title": "https://www.whiskybase.com/whiskies/whisky/274361/ardbeg-traigh-bhan",
+        "url": "https://www.whiskybase.com/whiskies/whisky/274361/ardbeg-traigh-bhan",
         "domain": "whiskybase.com",
         "description": null,
         "extraSnippets": []
@@ -50,11 +22,39 @@
         "domain": "masterofmalt.com",
         "description": null,
         "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/131177/ardbeg-traigh-bhan?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/131177/ardbeg-traigh-bhan?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/252445/ardbeg-traigh-bhan?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/252445/ardbeg-traigh-bhan?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/market/whisky/200201?language=en",
+        "url": "https://www.whiskybase.com/market/whisky/200201?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/ardbeg-traigh-bhan-19y-462-07l.html",
+        "url": "https://www.whisky.com/whisky-database/details/ardbeg-traigh-bhan-19y-462-07l.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
       }
     ]
   },
   "metadata": {
     "cacheKey": "179d361f23e7eae78a87fbea5e3d7aaf6d37195f4b98176352ab081e9bee6bc8",
-    "mode": "auto"
+    "mode": "record"
   }
 }

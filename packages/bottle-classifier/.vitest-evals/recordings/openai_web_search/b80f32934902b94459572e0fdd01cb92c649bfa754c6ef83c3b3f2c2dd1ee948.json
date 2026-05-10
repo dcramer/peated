@@ -1,5 +1,5 @@
 {
-  "writtenAt": "2026-05-10T00:05:17.529Z",
+  "writtenAt": "2026-05-10T20:25:49.131Z",
   "toolName": "openai_web_search",
   "input": {
     "query": "Octomore 13.1 Bruichladdich official 13.1"
@@ -7,47 +7,47 @@
   "output": {
     "provider": "openai",
     "query": "Octomore 13.1 Bruichladdich official 13.1",
-    "summary": "For **Octomore 13.1** — the official **Bruichladdich** bottling in the 13 series — the web evidence supports these bottle traits:\n\n- It is a **Bruichladdich distillery bottling** in the **Octomore 13 series**, with **13.1** being the “backbone” / reference-style release for that annual set. Bruichladdich’s own Octomore",
+    "summary": "**Octomore 13.1 — official / bottle-specific summary**\n\nI couldn’t pull up the exact current official 13.1 product page, but there is strong corroboration from Bruichladdich’s official Octomore series pages plus multiple bottle listings that match on the key specs. ([bruichladdich.com](https://www.bruichladdich.com/col",
     "results": [
       {
-        "title": "https://www.thewhiskyexchange.com/feature/octomore13",
-        "url": "https://www.thewhiskyexchange.com/feature/octomore13",
-        "domain": "thewhiskyexchange.com",
+        "title": "https://www.bruichladdich.com/products/octomore-edition-14-1",
+        "url": "https://www.bruichladdich.com/products/octomore-edition-14-1",
+        "domain": "bruichladdich.com",
         "description": null,
         "extraSnippets": []
       },
       {
-        "title": "https://www.whiskybase.com/whiskies/whisky/229738/octomore-edition-131-1373-ppm",
-        "url": "https://www.whiskybase.com/whiskies/whisky/229738/octomore-edition-131-1373-ppm",
-        "domain": "whiskybase.com",
+        "title": "https://www.bruichladdich.com/products/octomore-edition-12-ten-aged-years",
+        "url": "https://www.bruichladdich.com/products/octomore-edition-12-ten-aged-years",
+        "domain": "bruichladdich.com",
         "description": null,
         "extraSnippets": []
       },
       {
-        "title": "https://www.whiskybase.com/whiskies/whisky/218640/octomore-edition-131-1373-ppm",
-        "url": "https://www.whiskybase.com/whiskies/whisky/218640/octomore-edition-131-1373-ppm",
-        "domain": "whiskybase.com",
+        "title": "https://us.bruichladdich.com/products/the-octomore-1-exploration-set",
+        "url": "https://us.bruichladdich.com/products/the-octomore-1-exploration-set",
+        "domain": "us.bruichladdich.com",
         "description": null,
         "extraSnippets": []
       },
       {
-        "title": "https://www.whiskybase.com/whiskies/whisky/229738?language=nl",
-        "url": "https://www.whiskybase.com/whiskies/whisky/229738?language=nl",
-        "domain": "whiskybase.com",
+        "title": "https://us.bruichladdich.com/collections/octomore-13",
+        "url": "https://us.bruichladdich.com/collections/octomore-13",
+        "domain": "us.bruichladdich.com",
         "description": null,
         "extraSnippets": []
       },
       {
-        "title": "https://www.whiskybase.com/whiskies/whisky/218659/octomore-edition-131-1373-ppm?language=en",
-        "url": "https://www.whiskybase.com/whiskies/whisky/218659/octomore-edition-131-1373-ppm?language=en",
-        "domain": "whiskybase.com",
+        "title": "https://www.bruichladdich.com/collections/octomore?vmcchk=1",
+        "url": "https://www.bruichladdich.com/collections/octomore?vmcchk=1",
+        "domain": "bruichladdich.com",
         "description": null,
         "extraSnippets": []
       },
       {
-        "title": "https://www.whiskybase.com/whiskies/whisky/218659?language=nl",
-        "url": "https://www.whiskybase.com/whiskies/whisky/218659?language=nl",
-        "domain": "whiskybase.com",
+        "title": "https://us.bruichladdich.com/products/octomore-16-1",
+        "url": "https://us.bruichladdich.com/products/octomore-16-1",
+        "domain": "us.bruichladdich.com",
         "description": null,
         "extraSnippets": []
       }
@@ -55,6 +55,6 @@
   },
   "metadata": {
     "cacheKey": "b80f32934902b94459572e0fdd01cb92c649bfa754c6ef83c3b3f2c2dd1ee948",
-    "mode": "auto"
+    "mode": "record"
   }
 }

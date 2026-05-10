@@ -1,5 +1,5 @@
 {
-  "writtenAt": "2026-05-10T06:05:20.075Z",
+  "writtenAt": "2026-05-10T20:24:49.494Z",
   "toolName": "openai_web_search",
   "input": {
     "query": "\"Heaven's Door\" \"Bootleg Series\" \"Vol. 3\" whiskey"
@@ -7,8 +7,22 @@
   "output": {
     "provider": "openai",
     "query": "\"Heaven's Door\" \"Bootleg Series\" \"Vol. 3\" whiskey",
-    "summary": "**Heaven’s Door Bootleg Series Vol. III** is a **2021 limited-release American whiskey** from **Heaven’s Door Spirits**. It is a **13-year-old Kentucky bourbon** that was **finished in Vino de Naranja casks** from southern Spain and **bottled at cask strength**. Heaven’s Door stated the whiskey was bottled at **121.2 p",
+    "summary": "Here’s the bottle-specific info I could confirm for **Heaven’s Door Bootleg Series Vol. 3**:\n\n- **Producer/brand:** Heaven’s Door Spirits. ([prnewswire.com](https://www.prnewswire.com/news-releases/heavens-door-spirits-announces-release-of-the-bootleg-series-vol-iii-301439092.html?utm_source=openai))\n- **Series/edition",
     "results": [
+      {
+        "title": "https://www.heavensdoor.com/bootleg-series",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
       {
         "title": "https://www.prnewswire.com/news-releases/heavens-door-spirits-announces-release-of-the-bootleg-series-vol-iii-301439092.html",
         "url": "https://www.prnewswire.com/news-releases/heavens-door-spirits-announces-release-of-the-bootleg-series-vol-iii-301439092.html",
@@ -17,23 +31,16 @@
         "extraSnippets": []
       },
       {
-        "title": "https://www.kingswineandspirits.com/products/heavens-door-the-bootleg-series-vol-3-2021-limited-edition-750ml",
-        "url": "https://www.kingswineandspirits.com/products/heavens-door-the-bootleg-series-vol-3-2021-limited-edition-750ml",
-        "domain": "kingswineandspirits.com",
+        "title": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+        "url": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+        "domain": "thewhiskeywash.com",
         "description": null,
         "extraSnippets": []
       },
       {
-        "title": "https://whiskeycaviar.com/products/heavens-door-bootleg-series-vol-iii-vino-de-naranja-13-year-bourbon-whiskey-750-ml",
-        "url": "https://whiskeycaviar.com/products/heavens-door-bootleg-series-vol-iii-vino-de-naranja-13-year-bourbon-whiskey-750-ml",
-        "domain": "whiskeycaviar.com",
-        "description": null,
-        "extraSnippets": []
-      },
-      {
-        "title": "https://www.heavensdoor.com/post/gear-patrol-best-things-i-drank-last-month",
-        "url": "https://www.heavensdoor.com/post/gear-patrol-best-things-i-drank-last-month",
-        "domain": "heavensdoor.com",
+        "title": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+        "url": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+        "domain": "thewhiskeywash.com",
         "description": null,
         "extraSnippets": []
       },
@@ -43,18 +50,11 @@
         "domain": "buy.heavensdoor.com",
         "description": null,
         "extraSnippets": []
-      },
-      {
-        "title": "https://www.bremer-weinkolleg.de/heaven-s-door/bootleg-series-vol.-v-18yo/018064-a005",
-        "url": "https://www.bremer-weinkolleg.de/heaven-s-door/bootleg-series-vol.-v-18yo/018064-a005",
-        "domain": "bremer-weinkolleg.de",
-        "description": null,
-        "extraSnippets": []
       }
     ]
   },
   "metadata": {
     "cacheKey": "926096cbd9ef99daedd1f68fa5a3c22eca342f457e440db2f48951f4f74a9675",
-    "mode": "auto"
+    "mode": "record"
   }
 }
