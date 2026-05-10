@@ -51,5 +51,6 @@ describe("smws", () => {
       selector: "Sauna Smoke",
     });
     expect(parseReferenceName("RW6.5 Sauna Smoke")).toBeNull();
+    expect(parseReferenceName("SMWS single cask 54.2% ABV")).toBeNull();
   });
 });

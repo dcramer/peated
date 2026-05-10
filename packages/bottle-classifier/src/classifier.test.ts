@@ -4794,6 +4794,58 @@ describe("createBottleClassifier", () => {
     expect(runBottleClassifierAgent).not.toHaveBeenCalled();
   });
 
+  test("does not treat SMWS ABV values as deterministic cask codes", async () => {
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "no_match",
+          confidence: 0,
+          rationale: "ABV lookalikes need agent review.",
+          candidateBottleIds: [],
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: buildBottleClassificationArtifacts({}),
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "SMWS single cask 54.2% ABV",
+      },
+      extractedIdentity: {
+        brand: "SMWS",
+        bottler: "The Scotch Malt Whisky Society",
+        expression: null,
+        series: null,
+        distillery: [],
+        category: "single_malt",
+        stated_age: null,
+        abv: 54.2,
+        release_year: null,
+        vintage_year: null,
+        cask_type: null,
+        cask_size: null,
+        cask_fill: null,
+        cask_strength: null,
+        single_cask: true,
+        edition: "54.2",
+      },
+      initialCandidates: [],
+    });
+
+    expect(result.status).toBe("classified");
+    expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
+  });
+
   test("normalizes a legacy generic-category repair into a plain existing match", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Shibui",

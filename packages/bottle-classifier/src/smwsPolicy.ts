@@ -106,33 +106,14 @@ export function getSmwsCodeAnchor({
 
 function getSmwsReferenceCodeAnchor({
   reference,
-  artifacts,
 }: {
   reference: BottleReference;
-  artifacts: BottleClassificationArtifacts;
 }): string | null {
-  if (
-    ![
-      reference.name,
-      artifacts.extractedIdentity?.brand,
-      artifacts.extractedIdentity?.bottler,
-    ].some((value) => textLooksSmws(value) || isSmwsIdentityAnchor(value))
-  ) {
+  if (!textLooksSmws(reference.name)) {
     return null;
   }
 
-  for (const value of [
-    reference.name,
-    artifacts.extractedIdentity?.edition,
-    artifacts.extractedIdentity?.expression,
-  ]) {
-    const code = getExactCaskCodeAnchor(value);
-    if (code) {
-      return code;
-    }
-  }
-
-  return null;
+  return getExactCaskCodeAnchor(reference.name);
 }
 
 function getSmwsCodeTargetCandidate({
@@ -373,7 +354,7 @@ export function resolveSmwsExactCaskReference({
   reference: BottleReference;
   artifacts: BottleClassificationArtifacts;
 }): BottleClassificationDecision | null {
-  const smwsCode = getSmwsReferenceCodeAnchor({ reference, artifacts });
+  const smwsCode = getSmwsReferenceCodeAnchor({ reference });
   if (!smwsCode) {
     return null;
   }
