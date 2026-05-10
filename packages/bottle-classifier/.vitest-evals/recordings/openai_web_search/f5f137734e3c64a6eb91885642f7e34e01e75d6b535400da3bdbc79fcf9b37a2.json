@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:03:17.640Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "site:fourrosesbourbon.com Four Roses barrel strength private selection single barrel"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "site:fourrosesbourbon.com Four Roses barrel strength private selection single barrel",
+    "summary": "Here’s the best-supported identification for **Four Roses Barrel Strength Private Selection Single Barrel** based on official and independent sources:\n\n- **Official Four Roses source:** Four Roses’ current **Single Barrel Collection** page distinguishes the standard **Single Barrel OBSV** line at **100 proof, aged 7–9 ",
+    "results": [
+      {
+        "title": "Four Roses Single Barrel - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/225924/four-roses-single-barrel",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.weststwine.com/pages/four-roses-single-barrel-private-selection-bourbon",
+        "url": "https://www.weststwine.com/pages/four-roses-single-barrel-private-selection-bourbon",
+        "domain": "weststwine.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Four Roses Single Barrel Bourbon Review - Bourbon Culture",
+        "url": "https://thebourbonculture.com/whiskey-reviews/four-roses-single-barrel-bourbon-review/",
+        "domain": "thebourbonculture.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+        "url": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/four-roses-single-barrel-100-proof.html",
+        "url": "https://www.whisky.com/whisky-database/details/four-roses-single-barrel-100-proof.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Our Bourbons - Single Barrel Collection | Four Roses",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel-collection",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "f5f137734e3c64a6eb91885642f7e34e01e75d6b535400da3bdbc79fcf9b37a2",
+    "mode": "auto"
+  }
+}

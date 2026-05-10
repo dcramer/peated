@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T01:26:30.244Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition 2001 official release vintage bottling year"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Talisker Distillers Edition 2001 official release vintage bottling year",
+    "summary": "The **Talisker Distillers Edition “2001”** is the **2001 distillation vintage**, and the commonly documented **bottling/release year is 2012**. Independent bottle references identify it as **Talisker 2001 Distillers Edition 2012**, not a 2001 bottling. Whiskybase explicitly lists the bottle as **“Talisker 2001”** and n",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/39673/talisker-2001",
+        "url": "https://www.whiskybase.com/whiskies/whisky/39673/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001",
+        "url": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.whiskybase.com/us/talisker-1991.html",
+        "url": "https://shop.whiskybase.com/us/talisker-1991.html",
+        "domain": "shop.whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e329f94f2889d74fbc123a82ac5d79342fe209e7eaa9759814b5969beb8a295f",
+    "mode": "auto"
+  }
+}

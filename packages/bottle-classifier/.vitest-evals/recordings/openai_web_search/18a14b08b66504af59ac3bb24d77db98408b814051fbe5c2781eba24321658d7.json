@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T01:27:19.235Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"SMWS RW6.5\" Sauna Smoke Kyro Scotch Malt Whisky Society"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"SMWS RW6.5\" Sauna Smoke Kyro Scotch Malt Whisky Society",
+    "summary": "I found good evidence that **SMWS RW6.5** is **not “Sauna Smoke”** and not a Scotch release. It is a **Finnish rye whisky from Kyrö Distillery**, bottled by **The Scotch Malt Whisky Society** as **“Appley ever after.”** The sources consistently confirm these bottle traits:\n\n- **Distillery:** **Kyrö Distillery Company**",
+    "results": [
+      {
+        "title": "https://smws.com/",
+        "url": "https://smws.com/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "All Whisky - Spirit Type - Scotch Malt Whisky Society",
+        "url": "https://smws.com/spirit-type/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Kyrö 2018 SMWS RW6.5 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65?language=zh-CN",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://th.smws.com/",
+        "url": "https://th.smws.com/",
+        "domain": "th.smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smwsa.com/",
+        "url": "https://smwsa.com/",
+        "domain": "smwsa.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.com/all-whisky/flavour-profiles/lightly-peated/",
+        "url": "https://smws.com/all-whisky/flavour-profiles/lightly-peated/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "18a14b08b66504af59ac3bb24d77db98408b814051fbe5c2781eba24321658d7",
+    "mode": "auto"
+  }
+}

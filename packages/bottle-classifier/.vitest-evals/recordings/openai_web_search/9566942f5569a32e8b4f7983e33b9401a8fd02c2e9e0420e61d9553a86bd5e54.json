@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:40:53.674Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Wild Turkey Rare Breed Rye\" rye whiskey official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Wild Turkey Rare Breed Rye\" rye whiskey official",
+    "summary": "**Official bottle:** Wild Turkey **Rare Breed Rye** — official product page here: ([wildturkeybourbon.com](https://www.wildturkeybourbon.com/products/rare-breed-rye/?utm_source=openai))\n\nConfirmed bottle-specific details from the official Wild Turkey page:\n\n- **Producer/brand:** Wild Turkey Distillery. ([wildturkeybour",
+    "results": [
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us/products/rare-breed/",
+        "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us/latest-news/what-is-rye-whiskey/",
+        "url": "https://www.wildturkeybourbon.com/en-us/latest-news/what-is-rye-whiskey/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us/products/",
+        "url": "https://www.wildturkeybourbon.com/en-us/products/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/products/wild-turkey-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/wild-turkey-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us",
+        "url": "https://www.wildturkeybourbon.com/en-us",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9566942f5569a32e8b4f7983e33b9401a8fd02c2e9e0420e61d9553a86bd5e54",
+    "mode": "auto"
+  }
+}

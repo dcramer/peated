@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-09T23:58:34.388Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Maker's Mark Private Selection S2B13"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Maker's Mark Private Selection S2B13",
+    "summary": "I found good evidence that **“Maker’s Mark Private Selection S2B13” is a specific Private Selection barrel recipe/code**, not a standard shelf SKU with one fixed universal proof.\n\nWhat the sources support:\n\n- **Producer facts:** Maker’s Mark says **Private Selection** starts as **cask-strength Maker’s Mark**, is finish",
+    "results": [
+      {
+        "title": "Maker's Mark Private Selection - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/199210/makers-mark-private-selection",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/166147/makers-mark-private-selection?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/166147/makers-mark-private-selection?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Private Selection Bourbon: Premium Whisky | Maker's Mark®",
+        "url": "https://www.makersmark.com/bourbons/makers-mark-private-selection",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/makers-mark-mark-private-select.html",
+        "url": "https://www.whisky.com/whisky-database/details/makers-mark-mark-private-select.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.whiskybase.com/us/brands/makers-mark/",
+        "url": "https://shop.whiskybase.com/us/brands/makers-mark/",
+        "domain": "shop.whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/makers-mark-private-select",
+        "url": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/makers-mark-private-select",
+        "domain": "whiskyauctioneer.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a5392c3ec02453ef4a561f341647c81412b562a761d0b127aa0b7ea63a9c86b5",
+    "mode": "record"
+  }
+}

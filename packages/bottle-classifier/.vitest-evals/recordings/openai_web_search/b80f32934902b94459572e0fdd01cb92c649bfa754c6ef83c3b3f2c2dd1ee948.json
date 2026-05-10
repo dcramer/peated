@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:05:17.529Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Octomore 13.1 Bruichladdich official 13.1"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Octomore 13.1 Bruichladdich official 13.1",
+    "summary": "For **Octomore 13.1** — the official **Bruichladdich** bottling in the 13 series — the web evidence supports these bottle traits:\n\n- It is a **Bruichladdich distillery bottling** in the **Octomore 13 series**, with **13.1** being the “backbone” / reference-style release for that annual set. Bruichladdich’s own Octomore",
+    "results": [
+      {
+        "title": "https://www.thewhiskyexchange.com/feature/octomore13",
+        "url": "https://www.thewhiskyexchange.com/feature/octomore13",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/229738/octomore-edition-131-1373-ppm",
+        "url": "https://www.whiskybase.com/whiskies/whisky/229738/octomore-edition-131-1373-ppm",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/218640/octomore-edition-131-1373-ppm",
+        "url": "https://www.whiskybase.com/whiskies/whisky/218640/octomore-edition-131-1373-ppm",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/229738?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/whisky/229738?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/218659/octomore-edition-131-1373-ppm?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/218659/octomore-edition-131-1373-ppm?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/218659?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/whisky/218659?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b80f32934902b94459572e0fdd01cb92c649bfa754c6ef83c3b3f2c2dd1ee948",
+    "mode": "auto"
+  }
+}

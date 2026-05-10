@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:43:28.595Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Talisker 2001 The Distillers Edition Distillers Edition release year vintage year"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Talisker 2001 The Distillers Edition Distillers Edition release year vintage year",
+    "summary": "For **Talisker 2001 The Distillers Edition**:\n\n- **Vintage / distillation year:** **2001**. ([whisky.com](https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html?utm_source=openai))\n- **Release / bottling year:** **2012**. Multiple bottle databases and reviews identify this specific 2001 Disti",
+    "results": [
+      {
+        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/68685/talisker-2001",
+        "url": "https://www.whiskybase.com/whiskies/whisky/68685/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "url": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "domain": "whiskynotes.be",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details.html?cHash=a47e65234eb5800700f7b3fb92097c0c&tx_datamintsflaschendb_pi4%5Baction%5D=listGeschmacksbeschreibungen&t",
+        "url": "https://www.whisky.com/whisky-database/details.html?cHash=a47e65234eb5800700f7b3fb92097c0c&tx_datamintsflaschendb_pi4%5Baction%5D=listGeschmacksbeschreibungen&tx_datamintsflaschendb_pi4%5Bcontroller%5D=Flaschen&tx_datamintsflaschendb_pi4%5BcurPage%5D=5&tx_datamintsflaschendb_pi4%5Bflasche%5D=5313&tx_datamintsflaschendb_pi4%5BgeschmacksbeschreibungSearchCriteria%5D%5Bbewertung%5D=4&tx_datamintsflaschendb_pi4%5BsammlungReferer%5D=60877",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky-news.com/En/distilleries/Talisker.html",
+        "url": "https://www.whisky-news.com/En/distilleries/Talisker.html",
+        "domain": "whisky-news.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5fc04ba677ec0a43931ac1bff9f55aa6078633cfe34629197ef8149a188b79ba",
+    "mode": "auto"
+  }
+}

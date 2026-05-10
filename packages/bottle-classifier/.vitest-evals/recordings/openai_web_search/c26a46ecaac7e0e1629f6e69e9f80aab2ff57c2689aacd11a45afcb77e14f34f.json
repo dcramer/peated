@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T06:38:40.012Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Four Roses Single Barrel Barrel Strength\" private selection"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Four Roses Single Barrel Barrel Strength\" private selection",
+    "summary": "**Four Roses Single Barrel Barrel Strength Private Selection** is not the standard 100-proof Single Barrel OBSV. In Four Roses’ lineup, “barrel strength single barrels” are the **Private Selection** program: single-barrel, **uncut/non-chill-filtered** bottlings drawn from **any of Four Roses’ 10 recipes**, selected for",
+    "results": [
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/four-roses-single-barrel",
+        "url": "https://www.breakingbourbon.com/review/four-roses-single-barrel",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+        "url": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/introducing-single-barrel-collection",
+        "url": "https://www.fourrosesbourbon.com/blog/introducing-single-barrel-collection",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/single-barrel-collection",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel-collection",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/elliots-select",
+        "url": "https://www.fourrosesbourbon.com/blog/elliots-select",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "c26a46ecaac7e0e1629f6e69e9f80aab2ff57c2689aacd11a45afcb77e14f34f",
+    "mode": "auto"
+  }
+}

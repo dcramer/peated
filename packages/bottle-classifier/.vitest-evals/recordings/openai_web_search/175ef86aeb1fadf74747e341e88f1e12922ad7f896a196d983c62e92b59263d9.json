@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:46:18.798Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Series official volumes 1 2 3 4 release family"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Heaven's Door Bootleg Series official volumes 1 2 3 4 release family",
+    "summary": "Heaven’s Door **Bootleg Series** is the official annual limited-release family that debuted in **2019**. The official archive page lists **Volume I (2019), Volume II (2020), Volume III (2021), and Volume IV (2022)** as part of the series. ([heavensdoor.com](https://www.heavensdoor.com/bootleg-series?utm_source=openai))",
+    "results": [
+      {
+        "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.heavensdoor.com/bootleg-series",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.heavensdoor.com/post/design-a-stunning-blog",
+        "url": "https://www.heavensdoor.com/post/design-a-stunning-blog",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-ii",
+        "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-ii",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.heavensdoor.com/collections/bootlegs",
+        "url": "https://buy.heavensdoor.com/collections/bootlegs",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.heavensdoor.com/products/heavens-door-decade-series-release-02",
+        "url": "https://buy.heavensdoor.com/products/heavens-door-decade-series-release-02",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "175ef86aeb1fadf74747e341e88f1e12922ad7f896a196d983c62e92b59263d9",
+    "mode": "auto"
+  }
+}

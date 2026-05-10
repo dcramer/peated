@@ -167,7 +167,7 @@ export function createOpenAIWebSearchTool({
   return tool({
     name: "openai_web_search",
     description:
-      "Search the live web using OpenAI's native web search capability. This is the default web search tool when local bottle and entity search are still ambiguous or conflicting. Use it to validate the bottle or release traits that make a match safe, especially when the source text may have omitted a canonical trait that could bridge a generic reference to a more specific local candidate. Prefer official producer, distillery, bottler, or importer domains first, then critics or publications, and treat retailer pages as weak corroboration. Keep queries narrow. When the first search is thin, this tool automatically tries to gather additional non-retailer evidence within the shared search budget.",
+      "Search live web evidence for decisive bottle or release traits after local search is insufficient. Keep queries narrow and judge results by source content, independence, specificity, and corroboration.",
     parameters: BottleWebSearchArgsSchema,
     execute: async (args) => {
       return await runBottleWebEvidenceSearch({
@@ -207,7 +207,7 @@ export async function runBottleWebEvidenceSearch({
       model,
       query,
       instructions:
-        "Search the web for authoritative evidence about a spirits bottle reference. Prefer official producer, distillery, bottler, or importer domains first, then critics, reviewers, or publications. Do not treat the originating retailer or source page as decisive proof. Cite 2 to 4 distinct URLs when available, including at least one official source and one independent non-retailer source when the web supports that. In the cited summary, explicitly mention which bottle or release traits the sources confirm, such as distillery, bottler, cask finish, cask size, cask fill, ABV, age, edition, release year, or whether a number is proof rather than ABV.",
+        "Find bottle-specific evidence. Prefer specific, corroborated sources over copied snippets or retailer SEO. Summarize confirmed traits such as producer, bottler, age, ABV, edition, cask, vintage, or release year.",
     });
     const openAIEvidences = [primaryEvidence];
 
@@ -221,7 +221,7 @@ export async function runBottleWebEvidenceSearch({
           model,
           query,
           instructions:
-            "Search the web for additional corroborating sources about the same spirits bottle reference. Prefer domains different from the first pass, especially official producer, distillery, bottler, or importer pages if missing, otherwise independent reviewers, critics, or publications. Avoid retailer-only evidence when possible. Explicitly call out whether the sources confirm proof-style labeling, barrel strength, or a concrete ABV.",
+            "Find additional corroborating sources on different domains when possible. Summarize any confirmed proof, ABV, strength, or release traits.",
           extraContext:
             citedDomains.length > 0
               ? `Previously cited domains: ${citedDomains.join(", ")}. Find different domains if possible.`

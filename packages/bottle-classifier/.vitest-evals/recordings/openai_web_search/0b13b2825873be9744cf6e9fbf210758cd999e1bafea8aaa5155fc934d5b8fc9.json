@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:54:09.637Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Canadian Club\" Reserve 9 year old official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Canadian Club\" Reserve 9 year old official",
+    "summary": "I found good support that **“Canadian Club Reserve 9 Year Old” is an official Canadian Club bottling**, and the sources consistently confirm these bottle traits:\n\n- **Brand/producer:** Canadian Club / Hiram Walker & Sons. The official Canadian Club product page identifies it as **“Reserve 9 Year Old Canadian Whisky”** ",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/75738/canadian-club-09-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/75738/canadian-club-09-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+        "url": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.strathliquor.com/product/canadian-club-reserve-aged-9-years/",
+        "url": "https://www.strathliquor.com/product/canadian-club-reserve-aged-9-years/",
+        "domain": "strathliquor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://tastersclub.com/products/canadian-club-9-year-old-reserve-whisky",
+        "url": "https://tastersclub.com/products/canadian-club-9-year-old-reserve-whisky",
+        "domain": "tastersclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "url": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "0b13b2825873be9744cf6e9fbf210758cd999e1bafea8aaa5155fc934d5b8fc9",
+    "mode": "auto"
+  }
+}

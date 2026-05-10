@@ -111,7 +111,7 @@ These are the rules to preserve when iterating on the classifier:
 - Unsupported novelty flavored-whiskey or whiskey-liqueur products should be rejected, but a flavor-adjacent noun in the expression is not enough by itself to exclude an otherwise valid whisky bottle.
 - Over-specific local candidates should be downgraded if the listing does not support the extra differentiator.
 - Generic `single cask` or `single barrel` wording is not enough for `exact_cask`.
-- `exact_cask` should be reserved for strong marketed identity signals such as SMWS codes, cask numbers, or barrel numbers.
+- `exact_cask` should be reserved for strong marketed identity signals. SMWS codes are deterministic; other cask or barrel numbers still need reviewed evidence that the number is part of the marketed identity.
 - If the parent bottle identity is clear and the new detail is release-level, prefer `create_release` over creating a whole new bottle.
 - Downstream consumers should adapt the reviewed classifier result instead of re-sanitizing raw model output.
 - Price-matching language such as `match_existing`, `correction`, and `create_new` does not belong in this package.
@@ -176,7 +176,7 @@ When changing classifier behavior:
 When adding an eval from a real production miss:
 
 1. Start with the exact observed input: listing title, URL, extracted identity, local candidates, current assignment, and the failing classifier or automation outcome.
-2. Web-verify the real bottle before writing the expected result. Use authoritative sources first, such as the producer/brand page or official shop, then a reputable independent source when available. Treat retailer copy as the source listing, not proof by itself.
+2. Web-verify the real bottle before writing the expected result. Prioritize producer/brand pages, official shops, independent whisky databases, competition records, reviews, and publications whose content specifically confirms the bottle traits. Treat retailer copy as the source listing, not proof by itself.
 3. Decide the Peated DB outcome explicitly: exact `bottleId`, exact `releaseId` or `null`, whether a `bottle_release` should be created, whether a parent split is required, and which source facts should remain observation-only.
 4. Apply `docs/architecture/whisky-identity-model.md`: bottle-first when the product identity is clear, release only for reusable canonical variants, and preserve exact listing details as observations when they are not canonical identity.
 5. Encode the concrete regression, not a generalized pretend case. The fixture should name the real product, carry the real Peated ids or create expectation, and include `expected.confidenceBand` / `expected.verifyEligible` when downstream automation depends on the confidence band.

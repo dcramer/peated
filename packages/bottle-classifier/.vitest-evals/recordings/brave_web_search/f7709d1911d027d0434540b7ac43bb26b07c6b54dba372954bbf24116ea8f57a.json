@@ -1,0 +1,32 @@
+{
+  "writtenAt": "2026-05-09T23:58:36.696Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "\"Maker's Mark\" \"S2B13\" Private Selection"
+  },
+  "output": {
+    "provider": "brave",
+    "query": "\"Maker's Mark\" \"S2B13\" Private Selection",
+    "summary": "Beginning as fully matured Maker&#x27;s Mark® at cask strength, Private Selection is <strong>created by adding ten custom wood finishing staves to each barrel</strong>. It&#x27;s then aged in their limestone cellar to extract a unique, flavorful taste profile. Distilled by Maker&#x27;s Mark, this barrel proof release i",
+    "results": [
+      {
+        "title": "Maker's Mark Private Selection Kentucky Bourbon Whisky S2b13 | ReserveBar",
+        "url": "https://www.reservebar.com/products/makers-mark-private-selection-kentucky-bourbon-whisky-s2b13/GROUPING-2462904",
+        "domain": "reservebar.com",
+        "description": "Beginning as fully matured Maker&#x27;s Mark® at cask strength, Private Selection is <strong>created by adding ten custom wood finishing staves to each barrel</strong>. It&#x27;s then aged in their limestone cellar to ex",
+        "extraSnippets": []
+      },
+      {
+        "title": "Maker’s Mark Private Selection Topflight S2B13 Review | Bottle Raiders",
+        "url": "https://bottleraiders.com/spirit/makers-mark-private-selection-topflight-s2b13/",
+        "domain": "bottleraiders.com",
+        "description": "Distilled by Maker&#x27;s Mark, this barrel proof release is <strong>a Private Selection featuring a unique stave combination, selected by Whiskey Raiders and ReserveBar</strong>.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "f7709d1911d027d0434540b7ac43bb26b07c6b54dba372954bbf24116ea8f57a",
+    "mode": "record"
+  }
+}

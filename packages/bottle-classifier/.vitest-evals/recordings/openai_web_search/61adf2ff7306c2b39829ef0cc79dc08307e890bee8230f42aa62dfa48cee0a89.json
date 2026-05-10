@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T01:33:12.023Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Canadian Club\" Reserve 9 year old whisky Triple Aged"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Canadian Club\" Reserve 9 year old whisky Triple Aged",
+    "summary": "I found good support that this bottle is **Canadian Club Reserve 9 Year Old**, a **Canadian whisky** branded with **“Triple Aged”**, and bottled at **40% ABV**.\n\n- The official Canadian Club product page confirms the bottle/release as **Reserve 9 Year Old Canadian Whisky** and says it is **aged for a full 9 years**. ([",
+    "results": [
+      {
+        "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "url": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.grandwinecellar.com/products/canadian-club-canadian-whisky-reserve-triple-aged-9-years",
+        "url": "https://www.grandwinecellar.com/products/canadian-club-canadian-whisky-reserve-triple-aged-9-years",
+        "domain": "grandwinecellar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "url": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/70887/canadian-club-reserve-9-year-old",
+        "url": "https://www.thewhiskyexchange.com/p/70887/canadian-club-reserve-9-year-old",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://toastfried.com/?p=9213",
+        "url": "https://toastfried.com/?p=9213",
+        "domain": "toastfried.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "61adf2ff7306c2b39829ef0cc79dc08307e890bee8230f42aa62dfa48cee0a89",
+    "mode": "auto"
+  }
+}

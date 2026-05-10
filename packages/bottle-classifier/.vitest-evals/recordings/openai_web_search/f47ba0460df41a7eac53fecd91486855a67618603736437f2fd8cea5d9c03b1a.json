@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:24:13.779Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Talisker 2001 Distillers Edition whisky release year vs vintage Talisker Distillers Edition 2001"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Talisker 2001 Distillers Edition whisky release year vs vintage Talisker Distillers Edition 2001",
+    "summary": "For **Talisker Distillers Edition 2001**, **“2001” is the vintage/distillation year, not the release year**. Multiple bottle-specific sources list it as **distilled in 2001** and **bottled/released in 2012** at **45.8% ABV**, with an **Amoroso sherry cask finish**. ([whisky.com](https://www.whisky.com/whisky-database/d",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/39673/talisker-2001",
+        "url": "https://www.whiskybase.com/whiskies/whisky/39673/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001",
+        "url": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker - 2001 - Whisky.com",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.whiskybase.com/us/talisker-1991.html",
+        "url": "https://shop.whiskybase.com/us/talisker-1991.html",
+        "domain": "shop.whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "f47ba0460df41a7eac53fecd91486855a67618603736437f2fd8cea5d9c03b1a",
+    "mode": "auto"
+  }
+}

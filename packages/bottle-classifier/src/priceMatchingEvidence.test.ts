@@ -78,7 +78,7 @@ function buildSearchEvidence(
 }
 
 describe("priceMatchingEvidence", () => {
-  test("treats critic or official evidence as support when it validates an omitted canonical trait", () => {
+  test("treats official evidence as support when it validates an omitted canonical trait", () => {
     const supported = hasSupportiveWebEvidenceForExistingMatch({
       sourceUrl: "https://shop.example/wild-turkey-rare-breed-rye",
       target: buildBottleCandidate({
@@ -175,6 +175,22 @@ describe("priceMatchingEvidence", () => {
         },
         sourceUrl: "https://shop.example/wild-turkey-rare-breed-rye",
         producerPhrases: new Set(["wildturkey"]),
+      }),
+    ).toBe("unknown");
+  });
+
+  test("does not classify independent review domains from a hardcoded allowlist", () => {
+    expect(
+      classifySourceTier({
+        result: {
+          title: "Independent review notes",
+          url: "https://www.whiskyadvocate.com/reviews/example-bottle",
+          domain: "whiskyadvocate.com",
+          description: "Review notes for Example Distillery Port Cask.",
+          extraSnippets: [],
+        },
+        sourceUrl: "https://shop.example/example-distillery-port-cask",
+        producerPhrases: new Set(["exampledistillery"]),
       }),
     ).toBe("unknown");
   });

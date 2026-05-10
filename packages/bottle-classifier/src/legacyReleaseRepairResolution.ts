@@ -1,8 +1,15 @@
+import type {
+  BottleClassificationDecision,
+  ProposedBottle,
+} from "./classifierTypes";
 import type { BottleClassificationResult } from "./contract";
 import {
+  deriveLegacyReleaseRepairIdentity,
   hasDirtyLegacyReleaseRepairParent,
+  hasVariantLegacyReleaseRepairParentName,
   type LegacyReleaseRepairParentCandidate,
 } from "./legacyReleaseRepairIdentity";
+import { normalizeString } from "./normalize";
 import type { ReleaseIdentityInput } from "./releaseIdentity";
 
 export type LegacyReleaseRepairClassifierBlockedReason =
@@ -28,6 +35,91 @@ export type LegacyReleaseRepairClassifierResolution<
       reason: LegacyReleaseRepairClassifierBlockedReason;
       resolution: "blocked";
     };
+
+function normalizeRepairParentName(value: string): string {
+  return normalizeString(value).trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function formatProposedParentFullName(
+  proposedBottle: ProposedBottle,
+): string | null {
+  const brandName = proposedBottle.brand.name.trim();
+  const bottleName = proposedBottle.name.trim();
+  if (!brandName || !bottleName) {
+    return null;
+  }
+
+  if (
+    normalizeRepairParentName(bottleName).startsWith(
+      `${normalizeRepairParentName(brandName)} `,
+    )
+  ) {
+    return bottleName;
+  }
+
+  return `${brandName} ${bottleName}`;
+}
+
+function repairParentNamesMatch(left: string, right: string): boolean {
+  return (
+    normalizeRepairParentName(left) === normalizeRepairParentName(right) ||
+    hasVariantLegacyReleaseRepairParentName(left, right)
+  );
+}
+
+function hasDirtyCreateParentConflict<
+  TRow extends LegacyReleaseRepairParentCandidate,
+>({
+  decision,
+  parentRows,
+  release,
+}: {
+  decision: BottleClassificationDecision;
+  parentRows: TRow[];
+  release?: Partial<ReleaseIdentityInput>;
+}): boolean {
+  const dirtyRows = parentRows.filter((row) =>
+    hasDirtyLegacyReleaseRepairParent(row, release),
+  );
+  if (!dirtyRows.length) {
+    return false;
+  }
+
+  const candidateBottleIds = new Set(decision.candidateBottleIds);
+  if (dirtyRows.some((row) => candidateBottleIds.has(row.id))) {
+    return true;
+  }
+
+  if (!decision.proposedBottle) {
+    return false;
+  }
+
+  const proposedParentFullName = formatProposedParentFullName(
+    decision.proposedBottle,
+  );
+  if (!proposedParentFullName) {
+    return false;
+  }
+
+  return dirtyRows.some((row) => {
+    if (repairParentNamesMatch(row.fullName, proposedParentFullName)) {
+      return true;
+    }
+
+    const repairIdentity = deriveLegacyReleaseRepairIdentity({
+      fullName: row.fullName,
+      edition: row.edition,
+      releaseYear: row.releaseYear,
+    });
+
+    return repairIdentity
+      ? repairParentNamesMatch(
+          repairIdentity.proposedParentFullName,
+          proposedParentFullName,
+        )
+      : false;
+  });
+}
 
 export function resolveLegacyCreateParentClassification<
   TRow extends LegacyReleaseRepairParentCandidate,
@@ -94,6 +186,19 @@ export function resolveLegacyCreateParentClassification<
     decision.action === "create_bottle" ||
     decision.action === "create_bottle_and_release"
   ) {
+    if (
+      hasDirtyCreateParentConflict({
+        decision,
+        parentRows,
+        release,
+      })
+    ) {
+      return {
+        resolution: "blocked",
+        reason: "classifier_dirty_parent_candidate",
+      };
+    }
+
     return {
       resolution: "allow_create_parent",
     };

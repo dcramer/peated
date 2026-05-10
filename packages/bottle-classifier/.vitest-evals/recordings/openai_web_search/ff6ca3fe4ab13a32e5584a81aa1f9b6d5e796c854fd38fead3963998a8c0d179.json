@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:47:43.038Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official port cask 46% 4th edition"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official port cask 46% 4th edition",
+    "summary": "I found solid support that this bottle is **Glenmorangie The Quinta Ruban 14 Years Old**, an **official distillery bottling**, bottled at **46% ABV**, and matured in **bourbon casks plus port casks from Portugal**. Glenmorangie’s own product page confirms the **14-year age statement** and **46.0% ABV**, and describes m",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/217539/glenmorangie-14-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/217539/glenmorangie-14-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.whiskybase.com/us/glenmorangie-14-year-old.html",
+        "url": "https://shop.whiskybase.com/us/glenmorangie-14-year-old.html",
+        "domain": "shop.whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/glenmorangie-quinta-ruban-port-cask-finish-14-year",
+        "url": "https://distiller.com/spirits/glenmorangie-quinta-ruban-port-cask-finish-14-year",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://spiritory.com/glenmorangie-14-years-old-quinta-ruban-4th-edition-130718",
+        "url": "https://spiritory.com/glenmorangie-14-years-old-quinta-ruban-4th-edition-130718",
+        "domain": "spiritory.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thedistilleryapp.com/bottles/glenmorangie-quinta-ruban-14-year-old",
+        "url": "https://www.thedistilleryapp.com/bottles/glenmorangie-quinta-ruban-14-year-old",
+        "domain": "thedistilleryapp.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "ff6ca3fe4ab13a32e5584a81aa1f9b6d5e796c854fd38fead3963998a8c0d179",
+    "mode": "auto"
+  }
+}

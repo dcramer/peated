@@ -101,10 +101,16 @@ export const classifierEvalFixtureSchema = z
   })
   .strict();
 
-export const bottleNormalizationReleaseIdentitySchema = z.object({
-  edition: z.string().nullable(),
-  releaseYear: z.number().int().nullable(),
-});
+export const bottleNormalizationReleaseIdentitySchema = z
+  .object({
+    edition: z.string().nullable().optional(),
+    releaseYear: z.number().int().nullable().optional(),
+    vintageYear: z.number().int().nullable().optional(),
+  })
+  .strict()
+  .refine((value) => Object.keys(value).length > 0, {
+    message: "`releaseIdentity` must encode at least one required field.",
+  });
 
 export const bottleNormalizationExpectationSchema = z
   .object({

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T15:53:43.418Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Talisker 2001 Distillers Edition distilled 2001 bottled year site:malts.com OR site:thewhiskyexchange.com OR site:masterofmalt.com"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Talisker 2001 Distillers Edition distilled 2001 bottled year site:malts.com OR site:thewhiskyexchange.com OR site:masterofmalt.com",
+    "summary": "I couldn’t find a bottle-specific listing for **Talisker 2001 Distillers Edition** on those three domains, but the strongest evidence from the allowed sources points to the **bottled year being 2011**.\n\n- On Malts’ current Talisker 2021 Distillers Edition page, they describe the release format clearly: the **2021 editi",
+    "results": [
+      {
+        "title": "https://www.thewhiskyexchange.com/p/14922/talisker-2001-10-year-old-old-malt-cask-7409",
+        "url": "https://www.thewhiskyexchange.com/p/14922/talisker-2001-10-year-old-old-malt-cask-7409",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/1820/dalwhinnie-1985-distillers-edition-bot2001",
+        "url": "https://www.thewhiskyexchange.com/p/1820/dalwhinnie-1985-distillers-edition-bot2001",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/4850/talisker-1991-distillers-edition-bot2004",
+        "url": "https://www.thewhiskyexchange.com/p/4850/talisker-1991-distillers-edition-bot2004",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/57094/rockabilly-hoedown-blended-malt-2001-19-years-old-whisky-trail-country",
+        "url": "https://www.thewhiskyexchange.com/p/57094/rockabilly-hoedown-blended-malt-2001-19-years-old-whisky-trail-country",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/37019/oban-2001-distillers-edition",
+        "url": "https://www.thewhiskyexchange.com/p/37019/oban-2001-distillers-edition",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/P-19451.aspx",
+        "url": "https://www.thewhiskyexchange.com/P-19451.aspx",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d6dbb3f68eecf100e5750515783e588c6f666f4c4fc8e1caf606e1fbda5d00ad",
+    "mode": "record"
+  }
+}

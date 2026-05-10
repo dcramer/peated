@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:48:20.716Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"The Whistler Bodega Cask\" ABV Boann"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"The Whistler Bodega Cask\" ABV Boann",
+    "summary": "**The Whistler Bodega Cask** by **Boann Distillery** is **46.0% ABV**. It is commonly listed as a **5-year-old Irish single malt**, bottled in **2020**, with maturation in a **Spanish sherry butt / ex-sherry bodega cask from Jerez**. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodeg",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask",
+        "url": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.bondston.com/the-whistler-bodega-cask-mini-p13576",
+        "url": "https://www.bondston.com/the-whistler-bodega-cask-mini-p13576",
+        "domain": "bondston.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask-bod",
+        "url": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask-bod",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wein-riegger.de/Boann/The-Whistler-Bodega-Cask-Irish-Whiskey.html",
+        "url": "https://www.wein-riegger.de/Boann/The-Whistler-Bodega-Cask-Irish-Whiskey.html",
+        "domain": "wein-riegger.de",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/220715/the-whistler-bodega-cask?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/220715/the-whistler-bodega-cask?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "0e1c344127fe8e802faaaa08bbdce9ce4c3cca9c9770ae8fd0d221a9fdb6eace",
+    "mode": "auto"
+  }
+}

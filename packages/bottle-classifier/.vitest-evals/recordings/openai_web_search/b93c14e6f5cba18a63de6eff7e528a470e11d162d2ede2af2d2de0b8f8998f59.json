@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T01:10:09.180Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Canadian Club\" Reserve 9 year old Triple Aged"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Canadian Club\" Reserve 9 year old Triple Aged",
+    "summary": "I found good evidence that this bottle is **Canadian Club Reserve 9 Year Old Canadian Whisky**, and that **“Triple Aged” is a label/tagline for the 9-year expression**, not a separate cask-finishing program.\n\nWhat the sources support:\n\n- **Official producer page:** Canadian Club’s own product page identifies it as **Re",
+    "results": [
+      {
+        "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/75738/canadian-club-09-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/75738/canadian-club-09-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.grandwinecellar.com/products/canadian-club-canadian-whisky-reserve-triple-aged-9-years",
+        "url": "https://www.grandwinecellar.com/products/canadian-club-canadian-whisky-reserve-triple-aged-9-years",
+        "domain": "grandwinecellar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "url": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://bevmo.com/products/33945",
+        "url": "https://bevmo.com/products/33945",
+        "domain": "bevmo.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.winesdirect.com/products/canadian_club_reserve_9_year_old_canadian_whisky.aspx",
+        "url": "https://www.winesdirect.com/products/canadian_club_reserve_9_year_old_canadian_whisky.aspx",
+        "domain": "winesdirect.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b93c14e6f5cba18a63de6eff7e528a470e11d162d2ede2af2d2de0b8f8998f59",
+    "mode": "auto"
+  }
+}

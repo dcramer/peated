@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:46:24.283Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Woodford Reserve\" \"Double Double Oaked\" official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Woodford Reserve\" \"Double Double Oaked\" official",
+    "summary": "Official source found: **Woodford Reserve Double Double Oaked**. The producer’s official bottle page confirms this is **Woodford Reserve’s “Double Double Oaked”** expression and lists it at **90.4 proof**—that is proof, not ABV. It also states the whiskey is a **double-barreled bourbon** that spends extended time in a ",
+    "results": [
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+        "url": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "domain": "shop.woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/fr/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/fr/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/de/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/de/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6245aaef030b288e034b395bd4d4062ce420f79f8bc22dd6d0cfb759789491a4",
+    "mode": "auto"
+  }
+}

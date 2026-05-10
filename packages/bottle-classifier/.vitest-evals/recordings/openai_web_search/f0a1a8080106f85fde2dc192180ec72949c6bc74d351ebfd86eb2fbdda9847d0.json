@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:14:58.913Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "SMWS RW6.5 \"Sauna Smoke\""
+  },
+  "output": {
+    "provider": "openai",
+    "query": "SMWS RW6.5 \"Sauna Smoke\"",
+    "summary": "I’m not finding evidence that **SMWS RW6.5** is the bottle titled **“Sauna Smoke.”** The web evidence instead points to:\n\n- **RW6.3 = “Cinnamon sauna smoke”** — a Finland rye whisky bottled by **The Scotch Malt Whisky Society**, aged **5 years**, from a **new charred oak barrel**, at **59.2% ABV**, with an outturn of *",
+    "results": [
+      {
+        "title": "https://smws.com/spirit-type/",
+        "url": "https://smws.com/spirit-type/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.smws.ch/pi/en/Whisky/RW65-APPLEY-EVER-AFTER.html",
+        "url": "https://shop.smws.ch/pi/en/Whisky/RW65-APPLEY-EVER-AFTER.html",
+        "domain": "shop.smws.ch",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskylibraryshop.co.za/products/smws-rw6-5-appley-ever-after",
+        "url": "https://whiskylibraryshop.co.za/products/smws-rw6-5-appley-ever-after",
+        "domain": "whiskylibraryshop.co.za",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.strathliquor.com/product/smws-rw6-3-cinnamon-sauna-smoke/",
+        "url": "https://www.strathliquor.com/product/smws-rw6-3-cinnamon-sauna-smoke/",
+        "domain": "strathliquor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://peated.com/bottles/12207",
+        "url": "https://peated.com/bottles/12207",
+        "domain": "peated.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://peated.com/bottles/43260/releases",
+        "url": "https://peated.com/bottles/43260/releases",
+        "domain": "peated.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "f0a1a8080106f85fde2dc192180ec72949c6bc74d351ebfd86eb2fbdda9847d0",
+    "mode": "auto"
+  }
+}

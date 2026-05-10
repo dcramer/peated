@@ -15,7 +15,7 @@ export const BottleWebSearchArgsSchema = z.object({
     .trim()
     .min(1)
     .describe(
-      "A focused web search query for corroborating bottle evidence. Prefer producer, distillery, bottler, or importer terms over broad whisky keywords, and search for the exact trait that needs validation. When the source text may have omitted a canonical trait, search for the exact base bottle name plus the missing trait, such as barrel proof, edition, or ABV.",
+      "Focused query for corroborating bottle evidence. Include the exact bottle name and decisive trait.",
     ),
 });
 

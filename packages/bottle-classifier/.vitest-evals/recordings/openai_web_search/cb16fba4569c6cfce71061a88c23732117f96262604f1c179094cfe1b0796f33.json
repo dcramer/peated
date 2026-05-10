@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:21:07.722Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Wild Turkey Rare Breed Rye official rye barrel proof"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Wild Turkey Rare Breed Rye official rye barrel proof",
+    "summary": "Yes — **Wild Turkey Rare Breed Rye** is an **official barrel proof rye** release from Wild Turkey.\n\nWhat the sources confirm:\n- **Producer/distillery:** Wild Turkey Distillery / Wild Turkey Bourbon. ([wildturkeybourbon.com](https://www.wildturkeybourbon.com/products/rare-breed-rye/?utm_source=openai))\n- **Bottle name/r",
+    "results": [
+      {
+        "title": "https://www.breakingbourbon.com/review/wild-turkey-rare-breed-rye-112-2-proof",
+        "url": "https://www.breakingbourbon.com/review/wild-turkey-rare-breed-rye-112-2-proof",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ryecentral.com/products/wild-turkey-rare-breed-barrel-proof-rye-whiskey-review",
+        "url": "https://www.ryecentral.com/products/wild-turkey-rare-breed-barrel-proof-rye-whiskey-review",
+        "domain": "ryecentral.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.barrelbanter.com/reviews/wild-turkey-rare-breed-rye",
+        "url": "https://www.barrelbanter.com/reviews/wild-turkey-rare-breed-rye",
+        "domain": "barrelbanter.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskeyconsensus.com/wild-turkey-rare-breed-rye-review/",
+        "url": "https://whiskeyconsensus.com/wild-turkey-rare-breed-rye-review/",
+        "domain": "whiskeyconsensus.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinkhacker.com/2020/09/15/review-wild-turkey-rare-breed-rye/",
+        "url": "https://www.drinkhacker.com/2020/09/15/review-wild-turkey-rare-breed-rye/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "cb16fba4569c6cfce71061a88c23732117f96262604f1c179094cfe1b0796f33",
+    "mode": "auto"
+  }
+}

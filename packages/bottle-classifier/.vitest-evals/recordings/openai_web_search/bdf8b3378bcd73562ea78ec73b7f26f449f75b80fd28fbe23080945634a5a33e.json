@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:01:51.569Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Cask Strength Barrel Proof official Heaven Hill"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Cask Strength Barrel Proof official Heaven Hill",
+    "summary": "I found the official Heaven Hill/Elijah Craig page for **Elijah Craig Barrel Proof** here: ([elijahcraig.com](https://elijahcraig.com/barrel-proof.php?utm_source=openai))\n\nWhat those sources confirm:\n- **Brand/producer:** Elijah Craig is a **Heaven Hill** bourbon brand, and Heaven Hill lists **Barrel Proof** as part of",
+    "results": [
+      {
+        "title": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-bourbon-batch-b524",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-bourbon-batch-b524",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/184602/elijah-craig-barrel-proof-release-24?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/184602/elijah-craig-barrel-proof-release-24?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/barrel-proof.php",
+        "url": "https://elijahcraig.com/barrel-proof.php",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/whiskey-styles/bourbon/whiskey-review-elijah-craig-barrel-proof/",
+        "url": "https://thewhiskeywash.com/whiskey-styles/bourbon/whiskey-review-elijah-craig-barrel-proof/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.heavenhill.com/brands-detail.php?brandid=elijah-craig-bourbons",
+        "url": "https://www.heavenhill.com/brands-detail.php?brandid=elijah-craig-bourbons",
+        "domain": "heavenhill.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thebourbonculture.com/whiskey-reviews/elijah-craig-barrel-proof-bourbon-batch-6-140-2-proof-review/",
+        "url": "https://thebourbonculture.com/whiskey-reviews/elijah-craig-barrel-proof-bourbon-batch-6-140-2-proof-review/",
+        "domain": "thebourbonculture.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "bdf8b3378bcd73562ea78ec73b7f26f449f75b80fd28fbe23080945634a5a33e",
+    "mode": "auto"
+  }
+}

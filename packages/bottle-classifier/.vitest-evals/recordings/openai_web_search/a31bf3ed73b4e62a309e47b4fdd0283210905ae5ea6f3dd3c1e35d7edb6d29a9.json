@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:03:05.927Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Four Roses\" \"Single Barrel Barrel Strength\" bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Four Roses\" \"Single Barrel Barrel Strength\" bourbon",
+    "summary": "This reference most likely points to **Four Roses Single Barrel Barrel Strength / Private Selection**, not the standard shelfer **Four Roses Single Barrel**.\n\nWhat the sources support:\n\n- **Official Four Roses Single Barrel** is the regular **OBSV** bottling at **100 proof (50% ABV)** and **aged 7–9 years**. That means",
+    "results": [
+      {
+        "title": "Single Barrel OBSV | Four Roses",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thebourbonculture.com/whiskey-reviews/four-roses-single-barrel-bourbon-review/",
+        "url": "https://thebourbonculture.com/whiskey-reviews/four-roses-single-barrel-bourbon-review/",
+        "domain": "thebourbonculture.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.liquor.com/four-roses-single-barrel-bourbon-review-5219181",
+        "url": "https://www.liquor.com/four-roses-single-barrel-bourbon-review-5219181",
+        "domain": "liquor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.barrelbanter.com/reviews/four-roses-single-barrel-bourbon",
+        "url": "https://www.barrelbanter.com/reviews/four-roses-single-barrel-bourbon",
+        "domain": "barrelbanter.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/four-roses-single-barrel",
+        "url": "https://www.breakingbourbon.com/review/four-roses-single-barrel",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Four Roses - Whiskybase - Ratings and reviews for whisky",
+        "url": "https://www.whiskybase.com/whiskies/brand/81519/whiskies?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a31bf3ed73b4e62a309e47b4fdd0283210905ae5ea6f3dd3c1e35d7edb6d29a9",
+    "mode": "auto"
+  }
+}

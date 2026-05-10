@@ -1,0 +1,53 @@
+{
+  "writtenAt": "2026-05-10T00:05:21.263Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "Bruichladdich Octomore 13.1 official release 13 series"
+  },
+  "output": {
+    "provider": "brave",
+    "query": "Bruichladdich Octomore 13.1 official release 13 series",
+    "summary": "<strong>Distilled in 2016 from a 2015 harvest of Scottish barley</strong>. No surprises here, as this release hits as very sharp and ashy on the nose, punchy with the notes of a big bonfire that’s been piled high with evergreen branches. Time to take a closer look at the 13. series of Octomore ‘uber peated whisky from",
+    "results": [
+      {
+        "title": "Review: Bruichladdich Octomore 13.1, 13.2, and 13.3 - Drinkhacker",
+        "url": "https://www.drinkhacker.com/2022/11/12/review-bruichladdich-octomore-13-1-13-2-and-13-3/",
+        "domain": "drinkhacker.com",
+        "description": "<strong>Distilled in 2016 from a 2015 harvest of Scottish barley</strong>. No surprises here, as this release hits as very sharp and ashy on the nose, punchy with the notes of a big bonfire that’s been piled high with ev",
+        "extraSnippets": []
+      },
+      {
+        "title": "Bruichladdich Octomore 13.1 — Whisky Saga",
+        "url": "https://www.whiskysaga.com/blog/bruichladdich-octomore-131",
+        "domain": "whiskysaga.com",
+        "description": "Time to take a closer look at the 13. series of Octomore ‘uber peated whisky from Bruichladdich. This 13.1 expression clocks in at <strong>137.3 ppm</strong>. It has been matured exclusively in 1st fill ex-bourbon casks,",
+        "extraSnippets": []
+      },
+      {
+        "title": "Octomore 13.1 Whisky",
+        "url": "https://www.finedrams.com/octomore-13-1-whisky.html",
+        "domain": "finedrams.com",
+        "description": "<strong>The first whisky in the new 13 series of Octomore from Bruichladdich distillery</strong>. Like the other .1 Octomores, this dram has been made with 100%...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Bruichladdich Octomore 13.1 | Hedonism Wines",
+        "url": "https://hedonism.co.uk/product/bruichladdich-octomore-131-whisky",
+        "domain": "hedonism.co.uk",
+        "description": "This release forms part of the 13th annual Octomore series from Bruichladdich which features <strong>super heavily-peated single malts</strong>. The 13.1 expression uses 100% Scottish grown Concerto barley which is malte",
+        "extraSnippets": []
+      },
+      {
+        "title": "Octomore 13.1 5 Year Old 70cl Whisky | Master Of Malt",
+        "url": "https://www.masterofmalt.com/whiskies/bruichladdich/octomore-13-1-5-year-old-whisky/",
+        "domain": "masterofmalt.com",
+        "description": "The 13.1 edition in the Octomore ... of the same way as other Octomore releases, with <strong>100% Scottish barley and aged in a mixture of bourbon and Tennessee whiskey casks</strong>....",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "bf747f2317cf9c717fa8fe908dcbbd6d1646acbe5949d5e0e0a4b95156df4c60",
+    "mode": "auto"
+  }
+}

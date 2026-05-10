@@ -6,7 +6,7 @@ import type {
 import { listMatchesExpectedValue, textsOverlap } from "./identityEvidenceCore";
 import { normalizeBottle } from "./normalize";
 import {
-  hasAuthoritativeTargetIdentityEvidenceForExistingMatch,
+  hasOfficialTargetIdentityEvidenceForExistingMatch,
   hasSupportiveWebEvidenceForExistingMatch as hasSharedSupportiveWebEvidenceForExistingMatch,
 } from "./priceMatchingEvidence";
 
@@ -132,7 +132,7 @@ export function hasSupportiveWebEvidenceForExistingMatch({
     return false;
   }
 
-  return hasAuthoritativeTargetIdentityEvidenceForExistingMatch({
+  return hasOfficialTargetIdentityEvidenceForExistingMatch({
     sourceUrl,
     searchEvidence,
     extractedLabel,

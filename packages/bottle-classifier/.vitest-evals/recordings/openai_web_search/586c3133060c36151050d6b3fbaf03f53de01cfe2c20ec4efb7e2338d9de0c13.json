@@ -1,0 +1,14 @@
+{
+  "writtenAt": "2026-05-10T15:53:44.999Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Talisker 2001 Distillers Edition\" whisky"
+  },
+  "output": {
+    "error": "Search budget exhausted after 3 queries"
+  },
+  "metadata": {
+    "cacheKey": "586c3133060c36151050d6b3fbaf03f53de01cfe2c20ec4efb7e2338d9de0c13",
+    "mode": "record"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:18:51.068Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Wild Turkey Rare Breed Rye\" official rye cask strength"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Wild Turkey Rare Breed Rye\" official rye cask strength",
+    "summary": "Yes — **Wild Turkey Rare Breed Rye** is the **official Wild Turkey barrel-proof/cask-strength rye**.\n\nWhat the sources confirm about this bottle:\n- **Distillery/brand:** Wild Turkey Distillery / Wild Turkey. ([wildturkeybourbon.com](https://www.wildturkeybourbon.com/products/rare-breed-rye/?utm_source=openai))\n- **Type",
+    "results": [
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/wild-turkey-rare-breed-rye-112-2-proof",
+        "url": "https://www.breakingbourbon.com/review/wild-turkey-rare-breed-rye-112-2-proof",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us/latest-news/what-is-rye-whiskey/",
+        "url": "https://www.wildturkeybourbon.com/en-us/latest-news/what-is-rye-whiskey/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/american-whiskey/whiskey-review-wild-turkey-rare-breed-rye/",
+        "url": "https://thewhiskeywash.com/american-whiskey/whiskey-review-wild-turkey-rare-breed-rye/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us/latest-news/proof-barrel-proof-cask-strength/",
+        "url": "https://www.wildturkeybourbon.com/en-us/latest-news/proof-barrel-proof-cask-strength/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/products/wild-turkey-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/wild-turkey-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6d81452cf0b2e880107cbe92675a8c6fb358bd260c208b94b49947c6069f4078",
+    "mode": "auto"
+  }
+}

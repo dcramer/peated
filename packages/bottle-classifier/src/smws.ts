@@ -319,6 +319,14 @@ export type SMWSCaskDetails = {
   distiller: string | null;
 };
 
+export type SMWSReferenceDetails = SMWSCaskDetails & {
+  code: string;
+  selector: string | null;
+};
+
+const SMWS_REFERENCE_PATTERN = /\b(?:SMWS|Scotch Malt Whisky Society)\b/i;
+const SMWS_CODE_PATTERN = /\b([A-Z]{0,4}\d+\.\d+)\b/i;
+
 export function parseDetailsFromName(name: string): SMWSCaskDetails | null {
   const caskNumberMatch = name.match(
     /(Cask No\. )?([A-Z0-9]+\.[0-9]+)\s*(.+)?/i,
@@ -346,6 +354,35 @@ export function parseDetailsFromName(name: string): SMWSCaskDetails | null {
     category,
     name: `${caskNumber} ${caskName || ""}`,
     distiller: SMWS_DISTILLERY_CODES[distillerNo],
+  };
+}
+
+export function parseReferenceName(
+  name: string | null | undefined,
+): SMWSReferenceDetails | null {
+  if (!name || !SMWS_REFERENCE_PATTERN.test(name)) {
+    return null;
+  }
+
+  const codeMatch = name.match(SMWS_CODE_PATTERN);
+  if (!codeMatch?.[1]) {
+    return null;
+  }
+
+  const code = codeMatch[1].toUpperCase();
+  const selector =
+    name
+      .replace(SMWS_REFERENCE_PATTERN, "")
+      .replace(new RegExp(`\\b${code}\\b`, "i"), "")
+      .trim() || null;
+  const details = parseDetailsFromName(code);
+
+  return {
+    code,
+    selector,
+    category: details?.category ?? null,
+    distiller: details?.distiller ?? null,
+    name: `${code} ${selector ?? ""}`.trim(),
   };
 }
 

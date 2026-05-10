@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:26:24.802Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Wild Turkey Rare Breed Rye\" official rye barrel proof abv"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Wild Turkey Rare Breed Rye\" official rye barrel proof abv",
+    "summary": "Wild Turkey **Rare Breed Rye** is officially **112.2 proof**, which equals **56.1% ABV**. Wild Turkey’s product page says it is “bottled directly from the barrels at the 112.2 proof it reaches in those barrels,” and describes it as barrel-proof and non-chill filtered. ([wildturkeybourbon.com](https://www.wildturkeybour",
+    "results": [
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us/latest-news/what-is-rye-whiskey/",
+        "url": "https://www.wildturkeybourbon.com/en-us/latest-news/what-is-rye-whiskey/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us/latest-news/proof-barrel-proof-cask-strength/",
+        "url": "https://www.wildturkeybourbon.com/en-us/latest-news/proof-barrel-proof-cask-strength/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye/?bvstate=pg%3A3%2Fct%3Ar",
+        "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye/?bvstate=pg%3A3%2Fct%3Ar",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-bundle/",
+        "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-bundle/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "ec36e8cb8ee4e702034bcd245a348ab65c54e8d2f932bf36dd06fee52f28494c",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:04:16.922Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Highland Park Cask Strength No. 5 official release"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Highland Park Cask Strength No. 5 official release",
+    "summary": "Highland Park **Cask Strength Release No. 5** appears to be the **official 2024 distillery release**.\n\nWhat the sources confirm about this bottle:\n\n- **Official producer source:** Highland Park’s own product page names it **“Cask Strength Release No. 5”** and says the whisky uses **first-fill, sherry-seasoned European ",
+    "results": [
+      {
+        "title": "Highland Park Cask Strength - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Cask Strength 5 - Highland Park",
+        "url": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+        "domain": "highlandparkwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/highland-park-cask-strength-release-no-5",
+        "url": "https://distiller.com/spirits/highland-park-cask-strength-release-no-5",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Review: Highland Park Cask Strength Release No. 5 - Drinkhacker",
+        "url": "https://www.drinkhacker.com/2024/10/18/review-highland-park-cask-strength-release-no-5/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "4bb07c4a23f80031a3cb839f479d53ffe99607acd375aae326ed0588832df744",
+    "mode": "auto"
+  }
+}

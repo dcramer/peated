@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:33:28.623Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Canadian Club\" \"9 year old Reserve\" whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Canadian Club\" \"9 year old Reserve\" whisky",
+    "summary": "Here’s the bottle-specific evidence I could confirm for **Canadian Club “Reserve” 9 Year Old Canadian Whisky**:\n\n- **Producer/brand:** Canadian Club. The official Canadian Club product page lists it as **“Reserve 9 Year Old Canadian Whisky.”** ([canadianclub.com](https://www.canadianclub.com/products/reserve-9-year-old",
+    "results": [
+      {
+        "title": "https://tastersclub.com/products/canadian-club-9-year-old-reserve-whisky",
+        "url": "https://tastersclub.com/products/canadian-club-9-year-old-reserve-whisky",
+        "domain": "tastersclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://specsonline.com/shop/spirits/canadian-club-reserve-9yr-2/",
+        "url": "https://specsonline.com/shop/spirits/canadian-club-reserve-9yr-2/",
+        "domain": "specsonline.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.royalbatch.com/canadian-club-9-year-old-reserve-canadian-whisky",
+        "url": "https://www.royalbatch.com/canadian-club-9-year-old-reserve-canadian-whisky",
+        "domain": "royalbatch.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://dewinespot.co/collections/whiskey/products/canadian-club-9-year-old-reserve-whisky",
+        "url": "https://dewinespot.co/collections/whiskey/products/canadian-club-9-year-old-reserve-whisky",
+        "domain": "dewinespot.co",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://sipwhiskey.com/collections/all/products/canadian-club-9-year-old-reserve",
+        "url": "https://sipwhiskey.com/collections/all/products/canadian-club-9-year-old-reserve",
+        "domain": "sipwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://liquorverse.com/products/canadian-club-9-year-old-reserve-canadian-whisky-750-ml-1",
+        "url": "https://liquorverse.com/products/canadian-club-9-year-old-reserve-canadian-whisky-750-ml-1",
+        "domain": "liquorverse.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "8525245c7f33dfb6c5fe4878236ad7fc20f109308f61f8c08999b5eb4545ad9a",
+    "mode": "auto"
+  }
+}

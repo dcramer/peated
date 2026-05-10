@@ -5,7 +5,7 @@
  * Keep this module structurally safe and brand-agnostic. If a decision depends
  * on marketed family meaning or producer-specific semantics, it belongs in the
  * reviewed classifier, not in these helpers. New hardcoded phrase rules need
- * authoritative domain research and focused tests before being added here.
+ * verified whisky research and focused tests before being added here.
  */
 import type {
   BottleExtractedDetails,

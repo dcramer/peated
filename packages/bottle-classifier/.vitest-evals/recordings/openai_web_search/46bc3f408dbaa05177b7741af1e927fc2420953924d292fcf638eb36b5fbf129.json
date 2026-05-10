@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:03:47.163Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Series Volume 3 bourbon official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Heaven's Door Bootleg Series Volume 3 bourbon official",
+    "summary": "Official and independent sources support that **Heaven’s Door Bootleg Series Volume III** is the **2021 release**, named **“Sunday Afternoon,”** and that it is a **13-year-old Kentucky bourbon** finished in **Spanish Vino de Naranja casks**. Independent sources also consistently list it at **60.6% ABV (121.2 proof)** a",
+    "results": [
+      {
+        "title": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "url": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.heavensdoor.com/bootleg-series",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+        "url": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+        "url": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://spirits-lover.com/heavens-doors-2021-bootleg-series-volume-iii/",
+        "url": "https://spirits-lover.com/heavens-doors-2021-bootleg-series-volume-iii/",
+        "domain": "spirits-lover.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.alliquorshop.com/product/heavens-door-volume-3-limited-edition/",
+        "url": "https://www.alliquorshop.com/product/heavens-door-volume-3-limited-edition/",
+        "domain": "alliquorshop.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "46bc3f408dbaa05177b7741af1e927fc2420953924d292fcf638eb36b5fbf129",
+    "mode": "auto"
+  }
+}

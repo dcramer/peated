@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T15:49:57.777Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Talisker 2001 Distillers Edition whisky release year vs distilled year"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Talisker 2001 Distillers Edition whisky release year vs distilled year",
+    "summary": "For **Talisker Distillers Edition 2001**, the **2001 is the distilled year**, not the release year.\n\nThe bottle-specific evidence I found points to this:\n- Whiskybase entries for **Talisker 2001 Distillers Edition** identify it as **“bottled 2012”**. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/68685/ta",
+    "results": [
+      {
+        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/68685/talisker-2001",
+        "url": "https://www.whiskybase.com/whiskies/whisky/68685/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "url": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "domain": "whiskynotes.be",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001",
+        "url": "https://www.whiskybase.com/whiskies/whisky/37923/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-5.html?cHash=367c555a86588c23ef90125a1ab0be91&tx_datamintsflaschendb_pi4%5Bgeschmacks",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-5.html?cHash=367c555a86588c23ef90125a1ab0be91&tx_datamintsflaschendb_pi4%5BgeschmacksbeschreibungSearchCriteria%5D%5Bbewertung%5D=2&tx_datamintsflaschendb_pi4%5BsammlungReferer%5D=31284",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "db53dbd65f86637776ec32daa608e08e3f8c32bf3c0c39d61f38e5f30917ff93",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:36:22.124Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Barrel Proof Batch C923 official 2023 12 year"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Barrel Proof Batch C923 official 2023 12 year",
+    "summary": "Yes — **Elijah Craig Barrel Proof Batch C923 is an official 2023 release**, but it is **not a 12-year batch**.\n\nWhat the sources support:\n\n- **Batch C923** decodes as the **third batch (“C”) released in September (“9”) 2023 (“23”)**. ([breakingbourbon.com](https://www.breakingbourbon.com/review/elijah-craig-barrel-proo",
+    "results": [
+      {
+        "title": "https://www.drinkhacker.com/2023/12/10/review-elijah-craig-barrel-proof-batch-c923-september-2023/",
+        "url": "https://www.drinkhacker.com/2023/12/10/review-elijah-craig-barrel-proof-batch-c923-september-2023/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/234121/elijah-craig-barrel-proof",
+        "url": "https://www.whiskybase.com/whiskies/whisky/234121/elijah-craig-barrel-proof",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/141547/elijah-craig-barrel-proof?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/whisky/141547/elijah-craig-barrel-proof?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/whiskey-styles/bourbon/elijah-craig-barrel-proof-bourbon-c923-edition-hits-the-market/",
+        "url": "https://thewhiskeywash.com/whiskey-styles/bourbon/elijah-craig-barrel-proof-bourbon-c923-edition-hits-the-market/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thebourbonculture.com/whiskey-essentials/elijah-craig-barrel-proof-c923-finally-revealed-and-wow-look-at-that-proof/",
+        "url": "https://thebourbonculture.com/whiskey-essentials/elijah-craig-barrel-proof-c923-finally-revealed-and-wow-look-at-that-proof/",
+        "domain": "thebourbonculture.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://vinepair.com/review/elijah-craig-barrel-proof-bourbon-batch-c923/",
+        "url": "https://vinepair.com/review/elijah-craig-barrel-proof-bourbon-batch-c923/",
+        "domain": "vinepair.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "cc9c259b8129481c49199dab0771a9ec70dd5e52527e22ceebeffd74f76686cc",
+    "mode": "auto"
+  }
+}

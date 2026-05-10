@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T08:40:04.272Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Hudson Whiskey\" \"Back Room Deal\" peated scotch barrels rye"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Hudson Whiskey\" \"Back Room Deal\" peated scotch barrels rye",
+    "summary": "Confirmed bottle-specific details for **Hudson Whiskey “Back Room Deal”**:\n\n- **Producer / distillery:** **Hudson Whiskey / Tuthilltown Spirits**, Gardiner, New York. ([hudsonwhiskey.com](https://www.hudsonwhiskey.com/en-US/our-range/backroom-deal-peated/?utm_source=openai))\n- **Type:** **New York Straight Rye Whiskey*",
+    "results": [
+      {
+        "title": "https://www.hudsonwhiskey.com/en-US/our-range/backroom-deal-peated/",
+        "url": "https://www.hudsonwhiskey.com/en-US/our-range/backroom-deal-peated/",
+        "domain": "hudsonwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.hudsonwhiskey.com/products/Hudson-Back-Room-Deal-p667109531",
+        "url": "https://shop.hudsonwhiskey.com/products/Hudson-Back-Room-Deal-p667109531",
+        "domain": "shop.hudsonwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/hudson-whiskey-back-room-deal",
+        "url": "https://distiller.com/spirits/hudson-whiskey-back-room-deal",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hudsonwhiskey.com/en-US/whiskey-cocktails/backroom-handshakes/",
+        "url": "https://www.hudsonwhiskey.com/en-US/whiskey-cocktails/backroom-handshakes/",
+        "domain": "hudsonwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hudsonwhiskey.com/en-US/our-range/",
+        "url": "https://www.hudsonwhiskey.com/en-US/our-range/",
+        "domain": "hudsonwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hudsonwhiskey.com/en-US/",
+        "url": "https://www.hudsonwhiskey.com/en-US/",
+        "domain": "hudsonwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6fcc412d51fa33d8e24c5ac9013ab1ed3a9436e2646ce35169a736567bd91fcb",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:08:04.581Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"The Whistler\" \"Bodega Cask\" single malt Irish whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"The Whistler\" \"Bodega Cask\" single malt Irish whiskey",
+    "summary": "I found good support for **The Whistler “Bodega Cask” Single Malt Irish Whiskey**.\n\n**What the sources confirm**\n- It is an **Irish single malt** under **The Whistler** brand from **Boann Distillery / Boann family ownership**. ([bevinfogroup.com](https://bevinfogroup.com/2020/12/10/the-whistler-irish-whiskey-single-mal",
+    "results": [
+      {
+        "title": "https://thewhiskeywash.com/whiskey-styles/irish-whiskey/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+        "url": "https://thewhiskeywash.com/whiskey-styles/irish-whiskey/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wineenthusiast.com/buying-guide/the-whistler-bodega-cask-single-malt-irish-whiskey/",
+        "url": "https://www.wineenthusiast.com/buying-guide/the-whistler-bodega-cask-single-malt-irish-whiskey/",
+        "domain": "wineenthusiast.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wine.com/product/the-whistler-bodega-cask-single-malt-irish-whiskey/949636",
+        "url": "https://www.wine.com/product/the-whistler-bodega-cask-single-malt-irish-whiskey/949636",
+        "domain": "wine.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.irishmalts.com/single-malt/the-whistler-bodega-cask/",
+        "url": "https://www.irishmalts.com/single-malt/the-whistler-bodega-cask/",
+        "domain": "irishmalts.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.bondston.com/the-whistler-single-malt-bodega-cask-p9747",
+        "url": "https://www.bondston.com/the-whistler-single-malt-bodega-cask-p9747",
+        "domain": "bondston.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.caskers.com/the-whistler-bodega-cask-single-malt-irish-whiskey/",
+        "url": "https://www.caskers.com/the-whistler-bodega-cask-single-malt-irish-whiskey/",
+        "domain": "caskers.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e5ee884463c2a4c988f0efc0e5904acb00b2beab4e54c43cc510b162cb2b886e",
+    "mode": "auto"
+  }
+}

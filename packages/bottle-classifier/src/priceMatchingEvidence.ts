@@ -7,7 +7,7 @@ import type {
   ProposedBottle,
 } from "./classifierTypes";
 import {
-  AUTHORITATIVE_SOURCE_TIERS,
+  OFFICIAL_SOURCE_TIERS,
   buildProducerIdentityPhrases,
   classifySourceTier,
   containsComparablePhrase,
@@ -339,7 +339,7 @@ function extractedLabelCarriesUnsupportedSpecificity({
   );
 }
 
-function authoritativeTextSupportsPlainAgeStatementTarget({
+function officialTextSupportsPlainAgeStatementTarget({
   text,
   target,
   extractedLabel,
@@ -821,9 +821,7 @@ function evaluateSearchEvidenceChecks({
     }
 
     const tiers = Array.from(matchedSourceTiers);
-    const validated = tiers.some((tier) =>
-      AUTHORITATIVE_SOURCE_TIERS.has(tier),
-    );
+    const validated = tiers.some((tier) => OFFICIAL_SOURCE_TIERS.has(tier));
     const weaklySupported =
       !validated &&
       tiers.some((tier) =>
@@ -859,7 +857,7 @@ export function hasSupportiveWebEvidenceForExistingMatch({
   }).hasSupportiveWebEvidence;
 }
 
-export function hasAuthoritativeTargetIdentityEvidenceForExistingMatch({
+export function hasOfficialTargetIdentityEvidenceForExistingMatch({
   sourceUrl,
   target,
   extractedLabel,
@@ -885,7 +883,7 @@ export function hasAuthoritativeTargetIdentityEvidenceForExistingMatch({
         producerPhrases,
       });
 
-      if (!AUTHORITATIVE_SOURCE_TIERS.has(sourceTier)) {
+      if (!OFFICIAL_SOURCE_TIERS.has(sourceTier)) {
         return false;
       }
 
@@ -893,7 +891,7 @@ export function hasAuthoritativeTargetIdentityEvidenceForExistingMatch({
         targetNameVariants.some((variant) =>
           titleSupportsCandidateName(result.title, variant),
         ) ||
-        authoritativeTextSupportsPlainAgeStatementTarget({
+        officialTextSupportsPlainAgeStatementTarget({
           text: getSearchResultText(evidence, result),
           target,
           extractedLabel,

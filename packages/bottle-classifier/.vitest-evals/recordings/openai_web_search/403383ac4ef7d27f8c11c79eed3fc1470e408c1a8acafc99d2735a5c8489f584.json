@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T16:07:05.573Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Heaven's Door\" \"Bootleg Series Volume 3\" whiskey bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Heaven's Door\" \"Bootleg Series Volume 3\" whiskey bourbon",
+    "summary": "**Heaven’s Door Bootleg Series Volume III** is a **Kentucky straight bourbon whiskey** in the brand’s annual Bootleg Series. The most bottle-specific, corroborated details I found are: it was the **2021 release**, carries a **13-year age statement**, is **cask strength**, and was **finished in Vino de Naranja casks** f",
+    "results": [
+      {
+        "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+        "url": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.heavensdoor.com/collections/bootlegs",
+        "url": "https://buy.heavensdoor.com/collections/bootlegs",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+        "url": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://qualityliquorstore.com/products/heavens-door-bootleg-series-bourbon-vol-iii",
+        "url": "https://qualityliquorstore.com/products/heavens-door-bootleg-series-bourbon-vol-iii",
+        "domain": "qualityliquorstore.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/heavens-door/heavens-door-bootleg-series-no3-2021-edition-whiskey/",
+        "url": "https://www.masterofmalt.com/whiskies/heavens-door/heavens-door-bootleg-series-no3-2021-edition-whiskey/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "403383ac4ef7d27f8c11c79eed3fc1470e408c1a8acafc99d2735a5c8489f584",
+    "mode": "auto"
+  }
+}

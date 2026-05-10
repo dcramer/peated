@@ -292,7 +292,7 @@ describe("priceMatchingAutomation", () => {
     ).toBe(true);
   });
 
-  test("auto-approves high-confidence bottle matches when authoritative evidence confirms the product identity", () => {
+  test("auto-approves high-confidence bottle matches when official evidence confirms the product identity", () => {
     const extractedLabel = buildExtractedLabel({
       brand: "The Glenlivet",
       bottler: null,
@@ -655,7 +655,7 @@ describe("priceMatchingAutomation", () => {
     });
   });
 
-  test("allows auto-create when authoritative evidence validates differentiating traits", () => {
+  test("allows auto-create when official evidence validates differentiating traits", () => {
     const assessment = getStorePriceMatchAutomationAssessment({
       action: "create_new",
       modelConfidence: 95,
@@ -733,7 +733,7 @@ describe("priceMatchingAutomation", () => {
     });
   });
 
-  test("treats critic or official web evidence as support when it validates an omitted canonical trait", () => {
+  test("treats official web evidence as support when it validates an omitted canonical trait", () => {
     const supported = hasSupportiveWebEvidenceForExistingMatch({
       priceUrl: "https://shop.example/wild-turkey-rare-breed-rye",
       target: buildCandidate({

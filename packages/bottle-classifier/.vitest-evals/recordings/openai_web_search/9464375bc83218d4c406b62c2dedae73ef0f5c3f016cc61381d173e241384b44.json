@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T01:25:58.360Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Wild Turkey Rare Breed Rye\" official rye"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Wild Turkey Rare Breed Rye\" official rye",
+    "summary": "**Wild Turkey Rare Breed Rye** is an **official Wild Turkey rye whiskey** bottling. Wild Turkey’s own product page confirms it as **“Rare Breed Rye,”** a **small-batch barrel-proof blend** of **4-, 6-, and 8-year-old Kentucky Straight Rye**, **non-chill filtered**, bottled at **112.2 proof** (which is **56.1% ABV**). (",
+    "results": [
+      {
+        "title": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "url": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/wild-turkey-rare-breed-rye-112-2-proof",
+        "url": "https://www.breakingbourbon.com/review/wild-turkey-rare-breed-rye-112-2-proof",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/wild-turkey-rare-breed-112-8-proof-bourbon",
+        "url": "https://www.breakingbourbon.com/review/wild-turkey-rare-breed-112-8-proof-bourbon",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/wild-turkey-rye",
+        "url": "https://distiller.com/spirits/wild-turkey-rye",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/american-whiskey/whiskey-review-wild-turkey-rare-breed-rye/",
+        "url": "https://thewhiskeywash.com/american-whiskey/whiskey-review-wild-turkey-rare-breed-rye/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9464375bc83218d4c406b62c2dedae73ef0f5c3f016cc61381d173e241384b44",
+    "mode": "auto"
+  }
+}

@@ -4,6 +4,7 @@ import {
   type BottleCandidateSearchInput,
   type BottleExtractedDetails,
   type BottleSearchEvidence,
+  type EntityResolution,
 } from "../classifierTypes";
 import type { BottleReference } from "../contract";
 
@@ -17,6 +18,7 @@ export function buildAgentInput({
   hasExactAliasMatch,
   candidateExpansion,
   searchEvidence = [],
+  resolvedEntities = [],
   investigationHint = null,
 }: {
   reference: BottleReference;
@@ -26,6 +28,7 @@ export function buildAgentInput({
   hasExactAliasMatch: boolean;
   candidateExpansion: "initial_only" | "open";
   searchEvidence?: BottleSearchEvidence[];
+  resolvedEntities?: EntityResolution[];
   investigationHint?: string | null;
 }): string {
   /**
@@ -52,6 +55,9 @@ export function buildAgentInput({
       },
       webEvidence: {
         results: searchEvidence,
+      },
+      localEntitySearch: {
+        results: resolvedEntities,
       },
       investigationHint,
     },

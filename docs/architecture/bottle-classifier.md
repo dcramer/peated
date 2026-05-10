@@ -41,10 +41,12 @@ It owns:
 
 1. best-effort structured extraction
 2. initial local candidate retrieval
-3. LLM-led reasoning
-4. server-side validation of model output
-5. deterministic downgrade rules
-6. exact-cask versus parent-bottle scope
+3. local entity resolution for extracted brand, bottler, and distillery names
+4. targeted web investigation when local candidates are not exact enough
+5. LLM-led reasoning
+6. server-side validation of model output
+7. deterministic downgrade rules
+8. exact-cask versus parent-bottle scope
 
 Everything downstream should treat the classifier output as authoritative for bottle identity reasoning. Use-case-specific policy such as price-match automation should consume that output rather than reshaping the classifier itself.
 
@@ -137,11 +139,20 @@ The classifier runs in this order:
 1. Extract structured whisky identity from the reference image or text.
 2. Deterministically ignore obvious non-whisky references plus clearly non-single-bottle rows such as multipacks, gift sets, sampler bundles, and damaged-condition sale listings.
 3. Retrieve initial local bottle/release candidates.
-4. Run the LLM reasoner with local search, entity search, and web search tools.
-5. Sanitize the returned decision against known candidates and resolved entities.
-6. Normalize create and repair actions into reviewed `create_bottle`, `create_release`, `create_bottle_and_release`, or `repair_bottle` outcomes.
-7. Infer `identityScope = product | exact_cask` deterministically.
-8. Downgrade unsafe existing-match recommendations when the candidate is only a loose near-match and there is no exact-name or off-retailer support.
+4. Resolve closed-form deterministic identities, currently SMWS code references,
+   before entity search, web search, or agent reasoning.
+5. Seed local entity search results for extracted brand, bottler, and distiller
+   names.
+6. Preload targeted web evidence for whisky-like references that have no exact
+   local candidate and no current assignment.
+7. Run the LLM reasoner with local search, entity search, and web search tools.
+8. Sanitize the returned decision against known candidates and resolved entities.
+9. Normalize create and repair actions into reviewed `create_bottle`,
+   `create_release`, `create_bottle_and_release`, or `repair_bottle` outcomes.
+10. Infer `identityScope = product | exact_cask` deterministically.
+11. Downgrade unsafe existing-match recommendations when the candidate is only
+    a loose near-match and there is no exact-name or validated supporting
+    evidence.
 
 ## Invariants
 
@@ -163,6 +174,39 @@ These rules should remain centralized in the classifier:
 - `create_release` only makes sense when the target bottle is acting as a reusable parent expression, not when the bottle is still storing a single known release-like identity on itself.
 - Downstream persistence must not create a child release while keeping the same release-like traits on the parent bottle. Split the bottle explicitly first.
 - Metadata corrections must validate the resulting canonical identity before suggesting or applying them, including brand-derived bottle and release names.
+
+## Evidence Trust Boundary
+
+Source pages, search results, snippets, and retailer titles are evidence, not
+policy. The classifier does not maintain a critic/reviewer domain allowlist for
+creation or reviewed identity decisions. The agent must judge web evidence from
+content, independence, specificity, and corroboration, then record that judgment
+in `confidenceBasis`.
+
+Post-model code may enforce narrow trust boundaries:
+
+- the originating retailer is not decisive evidence for creation
+- if the agent marks web evidence as `weak` or `conflicting`, creation is
+  downgraded even when text tokens match
+- official producer-like source tiers may support conservative automation checks
+  for omitted traits, but critic, review, community, and database pages are not
+  promoted by hardcoded domain lists
+
+Web search tools should look for sources that help the agent decide; they should
+not encode a finite list of trusted whisky sites.
+
+## Tool Surface
+
+The reasoning agent gets four read-only tools:
+
+- `search_bottles`: local Peated bottle and release candidates
+- `search_entities`: local Peated brand, distillery, and bottler entities
+- `openai_web_search`: primary live web evidence search
+- `brave_web_search`: optional second web index for sparse or weak results
+
+Do not add source-specific web tools unless they return materially better
+structured evidence than general web search and still preserve the same evidence
+trust boundary.
 
 ## Result Shape
 
@@ -232,7 +276,9 @@ The current package-local eval surface lives in:
 The live evals use `vitest-evals` harness-style `run(...)` tests with the
 `@vitest-evals/harness-openai-agents` adapter for normalized output, reporter
 metadata, named judges, and native harness `toolReplay` for classifier
-web-search tools.
+web-search tools. The main classifier expectation judge is deterministic:
+encoded expected fields are scored with normal field matching and local
+normalization, not LLM-as-a-judge.
 
 The main live classifier eval runner is organized around workflow scenarios
 instead of separate normalization-versus-classifier files:
@@ -264,9 +310,11 @@ Production-miss eval checklist:
 1. Preserve the exact observed case: source title, URL, extracted identity,
    current assignment, local candidates, and the failing classifier or
    automation outcome.
-2. Verify the real bottle online before deciding the expected result. Prefer
-   producer or brand pages, official shops, and reputable independent sources.
-   Do not use retailer SEO text alone as proof of canonical identity.
+2. Verify the real bottle online before deciding the expected result. Prioritize
+   producer or brand pages, official shops, independent whisky databases,
+   competition records, reviews, and publications whose content specifically
+   confirms the bottle traits. Do not use retailer SEO text alone as proof of
+   canonical identity.
 3. Decide the Peated DB action before encoding the eval: exact `bottleId`,
    exact `releaseId` or `null`, whether to create a `bottle_release`, whether a
    parent split is required, and which exact source facts stay in
@@ -274,10 +322,13 @@ Production-miss eval checklist:
 4. Encode the expected outcome for the exact real bottle. For existing matches,
    expected ids should be the actual Peated ids. For create paths, expected
    drafts should describe the canonical bottle or release that should exist.
-5. Add fixture `provenance.source = "production_miss"` with
+5. Treat encoded expected fields as required. The shape judge should hard-fail
+   wrong or missing required action, identity, id, bottle, and release fields;
+   only unencoded optional enrichment may be missing without failing the case.
+6. Add fixture `provenance.source = "production_miss"` with
    `verifiedSourceUrls` and `dbOutcome` so the web verification and intended DB
    result remain attached to the regression.
-6. If a family can fail in both directions, add paired positive and negative
+7. If a family can fail in both directions, add paired positive and negative
    fixtures. Do not move brand- or family-specific semantics into deterministic
    code just to satisfy the eval.
 
@@ -286,7 +337,7 @@ Local setup for live evals:
 - put `OPENAI_API_KEY` in the repo-root `.env` or `.env.local`
 - `vitest.evals.config.mts` loads `.env` and then `.env.local`; shell-provided env vars take precedence over both files
 - `OPENAI_MODEL` is optional for evals and defaults to `gpt-5.4` for the classifier pass
-- `OPENAI_EVAL_MODEL` is optional and defaults to `gpt-5-mini` for judging so routine evals stay cheaper; override it if you want a different cost/quality tradeoff
+- `OPENAI_EVAL_MODEL` is optional and defaults to `gpt-5-mini` for evals that still use an LLM judge, such as repair interpretation checks
 - `OPENAI_HOST`, `OPENAI_ORGANIZATION`, and `OPENAI_PROJECT` are optional for proxy or non-default account routing
 - `BRAVE_API_KEY` is optional; without it the classifier still runs with OpenAI web search only
 - `BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES` is optional and defaults to `3`
@@ -299,7 +350,7 @@ Local setup for live evals:
 Notes:
 
 - both `pnpm evals:classifier` and `pnpm --filter @peated/bottle-classifier evals` load the repo-root `.env` and then `.env.local`
-- the eval suite is intentionally a live LLM integration test; each case runs the classifier and then an LLM judge scores the result
+- the main classifier eval suite is intentionally a live classifier integration test, but required action/id/scope/draft expectations are scored deterministically rather than by an LLM judge
 - the fixture set is meant to mirror production-style inputs such as SMWS listings, retailer titles, and user-entered shorthand names
 - the repair eval set specifically scores the repair-facing interpretation layer, not just raw classifier actions, so reusable-parent safety can be tracked separately from generic classification quality
 - new bottle families should add paired positive and negative examples whenever the wording is ambiguous enough to regress
@@ -311,6 +362,7 @@ The classifier is intentionally split into a few narrow modules:
 - `classifier.ts` defines the narrow public classifier factory and public types.
 - `contract.ts` defines the public request/response contract and normalized result artifacts.
 - `classifierRuntime.ts` owns the reviewed orchestration boundary and the raw model/tool loop.
+- `runtime/deterministic.ts` owns the pre-agent deterministic resolver registry.
 - `classifierTypes.ts` owns internal classifier working types and schemas that should not leak through the package root.
 - `reviewPolicy.ts` owns deterministic validation, create normalization, exact-cask scope inference, and downgrade rules.
 - `normalize.ts` owns shared bottle/name/category/volume normalization.

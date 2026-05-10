@@ -12,35 +12,9 @@ import { normalizeString } from "./normalize";
  * price-matching evidence checks.
  *
  * Keep policy decisions in the consumer modules. This file should only hold
- * reusable text normalization, source-tier classification, and evidence
+ * reusable text normalization, source-origin classification, and evidence
  * matching helpers so those consumers do not drift on the basics.
  */
-
-const CRITIC_DOMAINS = [
-  "breakingbourbon.com",
-  "distiller.com",
-  "paste.com",
-  "rarebird101.com",
-  "thewhiskeywash.com",
-  "whiskyadvocate.com",
-  "whiskyfun.com",
-  "whiskynotes.be",
-];
-
-const RETAILER_DOMAINS = [
-  "astorwines.com",
-  "binnys.com",
-  "healthyspirits.com",
-  "klwines.com",
-  "masterofmalt.com",
-  "reservebar.com",
-  "seelbachs.com",
-  "sharedpour.com",
-  "specsonline.com",
-  "thewhiskyexchange.com",
-  "totalwine.com",
-  "woodencork.com",
-];
 
 const OFFICIAL_DOMAIN_SUFFIXES = [
   "bourbon",
@@ -55,9 +29,8 @@ const OFFICIAL_DOMAIN_SUFFIXES = [
   "whisky",
 ];
 
-export const AUTHORITATIVE_SOURCE_TIERS = new Set<BottleEvidenceSourceTier>([
+export const OFFICIAL_SOURCE_TIERS = new Set<BottleEvidenceSourceTier>([
   "official",
-  "critic",
 ]);
 
 export function normalizeComparableText(
@@ -245,25 +218,11 @@ export function classifySourceTier({
 
   if (
     resultDomain &&
-    CRITIC_DOMAINS.some((domain) => domainMatches(resultDomain, domain))
-  ) {
-    return "critic";
-  }
-
-  if (
-    resultDomain &&
     Array.from(producerPhrases).some((phrase) =>
       domainLooksProducerOwned(resultDomain, phrase),
     )
   ) {
     return "official";
-  }
-
-  if (
-    resultDomain &&
-    RETAILER_DOMAINS.some((domain) => domainMatches(resultDomain, domain))
-  ) {
-    return "retailer";
   }
 
   return "unknown";

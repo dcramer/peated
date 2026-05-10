@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:46:38.226Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Highland Park Cask Strength No. 5\" whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Highland Park Cask Strength No. 5\" whisky",
+    "summary": "**Highland Park Cask Strength Release No. 5** is a **Highland Park single malt Scotch whisky** from **Orkney, Scotland**. It is a **NAS** release in the distillery’s ongoing **Cask Strength** series, bottled at **64.7% ABV** with **no chill filtration** and **no added color**. ([distiller.com](https://distiller.com/spi",
+    "results": [
+      {
+        "title": "https://distiller.com/spirits/highland-park-cask-strength-release-no-5",
+        "url": "https://distiller.com/spirits/highland-park-cask-strength-release-no-5",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinkhacker.com/2024/10/18/review-highland-park-cask-strength-release-no-5/",
+        "url": "https://www.drinkhacker.com/2024/10/18/review-highland-park-cask-strength-release-no-5/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.vaultofspirits.com/whisky/single-malt/highland-park-cask-strength-release-no-5-647/",
+        "url": "https://www.vaultofspirits.com/whisky/single-malt/highland-park-cask-strength-release-no-5-647/",
+        "domain": "vaultofspirits.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.compasswines.com/highland-park-cask-strength-no-5-sphpcs5750-49767/",
+        "url": "https://www.compasswines.com/highland-park-cask-strength-no-5-sphpcs5750-49767/",
+        "domain": "compasswines.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskystack.com/en-int/products/highland-park-cask-strength-release-no-5",
+        "url": "https://whiskystack.com/en-int/products/highland-park-cask-strength-release-no-5",
+        "domain": "whiskystack.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.mensjournal.com/food-drink/highland-park-number-five-scotch",
+        "url": "https://www.mensjournal.com/food-drink/highland-park-number-five-scotch",
+        "domain": "mensjournal.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5fc2a09704c5f3c97c273170ffa080f8232a2c154e135d77af399824e62ae9b5",
+    "mode": "auto"
+  }
+}

@@ -297,6 +297,9 @@ const repairHarness = openaiAgentsHarness<
 
     return preparedRun.evaluateAgentResult(result);
   },
+  // vitest-evals strict replay intentionally fails when a prompt/tool change
+  // makes a new web-search call. Record those new tool results with:
+  // VITEST_EVALS_REPLAY_MODE=record pnpm --filter @peated/bottle-classifier evals -- src/legacyReleaseRepairResolution.eval.test.ts
   toolReplay: {
     openai_web_search: true,
     brave_web_search: true,

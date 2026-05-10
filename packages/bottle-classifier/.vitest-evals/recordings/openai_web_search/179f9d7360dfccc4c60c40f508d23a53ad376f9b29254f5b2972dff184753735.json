@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:44:01.685Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"SMWS 72.123\" whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"SMWS 72.123\" whisky",
+    "summary": "**SMWS 72.123** is a **Scotch Malt Whisky Society** single-cask bottling titled **“Big moves and subtle details.”** The official SMWS product page confirms it is **Cask No. 72.123**, **15 years old**, **58.7% ABV**, distilled on **18/12/2009**, from a **HTMC New Oak Barrel**, and in the tasting notes states it was **ma",
+    "results": [
+      {
+        "title": "Big moves and subtle details (72.123) | SMWS",
+        "url": "https://smws.com/big-moves-and-subtle-details/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.com/",
+        "url": "https://smws.com/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://peated.com/bottles/43670",
+        "url": "https://peated.com/bottles/43670",
+        "domain": "peated.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://support.whiskybase.com/support/solutions/articles/33000296429-how-do-i-browse-and-search-on-whiskybase-",
+        "url": "https://support.whiskybase.com/support/solutions/articles/33000296429-how-do-i-browse-and-search-on-whiskybase-",
+        "domain": "support.whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smwsa.com/",
+        "url": "https://smwsa.com/",
+        "domain": "smwsa.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "SMWS codes - Whisky Portal",
+        "url": "https://www.whiskyportal.com/smws/",
+        "domain": "whiskyportal.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "179f9d7360dfccc4c60c40f508d23a53ad376f9b29254f5b2972dff184753735",
+    "mode": "auto"
+  }
+}

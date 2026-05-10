@@ -24,7 +24,7 @@ export function createSearchEntitiesTool(
   return tool({
     name: "search_entities",
     description:
-      "Search the local entity database for brands, distilleries, and bottlers using aliases and full-text search. Use this when producer, bottler, or distillery identity is blocking the decision. Prefer passing a `type` hint when you know what kind of entity you need. Do not use this to search for bottles.",
+      "Search local Peated brand, distillery, and bottler entities. Use when producer identity is blocking a match or create decision. Do not use for bottles.",
     parameters: SearchEntitiesArgsSchema,
     execute: async (args) => {
       const results = await searchEntities(args);

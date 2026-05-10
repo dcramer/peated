@@ -49,7 +49,7 @@ function buildSearchEvidence(
 }
 
 describe("bottleClassificationEvidence", () => {
-  test("does not treat a more specific authoritative result title as support for a looser near-match", () => {
+  test("does not treat a more specific official result title as support for a looser near-match", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 1,
       fullName: "Wild Turkey Rare Breed Barrel Proof",
@@ -84,7 +84,7 @@ describe("bottleClassificationEvidence", () => {
     ).toBe(false);
   });
 
-  test("treats an authoritative title-level name match as supportive evidence", () => {
+  test("treats an official title-level name match as supportive evidence", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 2,
       fullName: "Ardbeg Uigeadail",
@@ -116,7 +116,7 @@ describe("bottleClassificationEvidence", () => {
     ).toBe(true);
   });
 
-  test("does not treat a generic authoritative producer page as target identity support", () => {
+  test("does not treat a generic official producer page as target identity support", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 2,
       fullName: "Ardbeg Uigeadail",
@@ -150,7 +150,7 @@ describe("bottleClassificationEvidence", () => {
     ).toBe(false);
   });
 
-  test("treats authoritative brand-led evidence as support for a distillery-qualified plain age-statement bottle", () => {
+  test("treats official brand-led evidence as support for a distillery-qualified plain age-statement bottle", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 3233,
       fullName: "Isle of Jura 12-year-old Single Malt Scotch Whisky",
@@ -410,7 +410,7 @@ describe("bottleClassificationEvidence", () => {
     ).toBe(false);
   });
 
-  test("does not treat origin-retailer titles as independent authoritative support", () => {
+  test("does not treat origin-retailer titles as independent official support", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 3,
       fullName: "Ardbeg Uigeadail",

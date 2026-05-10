@@ -1,0 +1,53 @@
+{
+  "writtenAt": "2026-05-10T01:18:31.342Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "Talisker 2001 Distillers Edition 2012 45.8% double matured Amoroso casks"
+  },
+  "output": {
+    "provider": "brave",
+    "query": "Talisker 2001 Distillers Edition 2012 45.8% double matured Amoroso casks",
+    "summary": "This Talisker Distillers Edition was <strong>double matured in Amoroso casks for a richer, rounded flavor</strong>. Distilled in 2001 and bottled in 2012. Talisker Island Distillery uses exAmoroso sherry casks from Spain for their version of the Distillers Edition. The result is, compared to the 10-year standard whiske",
+    "results": [
+      {
+        "title": "Talisker Distillers Edition 2012 Amoroso Cask | Oaksliquors.com",
+        "url": "https://www.oaksliquors.com/p/talisker-distillers-edition-2012-amoroso-cask",
+        "domain": "oaksliquors.com",
+        "description": "This Talisker Distillers Edition was <strong>double matured in Amoroso casks for a richer, rounded flavor</strong>. Distilled in 2001 and bottled in 2012.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker 2001/2012 Distillers Edition 45,8%vol. 0,7l",
+        "url": "https://www.homeofmalts.com/en/13895/talisker-distillers-edition-2001-2012-45.8-vol.-0-7l",
+        "domain": "homeofmalts.com",
+        "description": "Talisker Island Distillery uses exAmoroso sherry casks from Spain for their version of the Distillers Edition. The result is, compared to the 10-year standard whiskey, wonderfully rounded, almost oily single malt whiskey",
+        "extraSnippets": []
+      },
+      {
+        "title": "r/Scotch on Reddit: Review #2: Talisker Distillers Edition Double Matured in Amoroso Seasoned American Oak Casks",
+        "url": "https://www.reddit.com/r/Scotch/comments/16dgqiu/review_2_talisker_distillers_edition_double/",
+        "domain": "reddit.com",
+        "description": "Cask: &quot;<strong>Double Matured in Amoroso Seasoned American Oak Casks&quot; - from some googling Amoroso is a sweeter version of Oloroso is a drop of PX Sherry added</strong>. I had never heard of this kind of sherry",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker Distillers Edition - Free Range Wine & Spirits",
+        "url": "https://freerangebrooklyn.com/product/talisker-distillers-edition-amoroso-cask/",
+        "domain": "freerangebrooklyn.com",
+        "description": "Richer than the regular bottling, this wonderfully rounded Distiller&#x27;s Edition double-matured in ex-Amoroso casks has <strong>a lucious, fruity sweetness that perfectly complements the crisp, dry peak-smoke and fami",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker Distillers Edition Double Matured Amoroso Sherry Cask Wood Single Malt Scotch Whisky, Isle of Skye, Scotland | prices, reviews, stores & market trends",
+        "url": "https://www.wine-searcher.com/find/talisker+distil+edition+double+amoroso+sherry+cask+wood+single+malt+scotch+whisky+isle+skye+island+scotland",
+        "domain": "wine-searcher.com",
+        "description": "<strong>Full-bodied on the palate, with spicy smoke, dark chocolate, peaches, and Jaffa orange</strong>; the additional fruitiness courtesy of the amoroso cask influence. Long and softly smoky in the finish, with ginger",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e1ba1a11cbc6d275d645d1d402b48405881fdd3d3d19a268fff7dad56ad76aa4",
+    "mode": "auto"
+  }
+}

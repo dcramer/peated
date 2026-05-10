@@ -1,8 +1,6 @@
 import { openaiAgentsHarness } from "@vitest-evals/harness-openai-agents";
-import { zodTextFormat } from "openai/helpers/zod";
 import { describeEval, namedJudge, type JudgeContext } from "vitest-evals";
 import { toJsonValue } from "vitest-evals/harness";
-import { z } from "zod";
 import type {
   ClassifierEvalCase,
   SearchResponseFixture,
@@ -28,15 +26,22 @@ import {
 } from "./contract";
 import {
   createEvalClassifierOptions,
-  createEvalOpenAIClient,
-  evalJudgeModel,
-  getEvalJudgeModelSettings,
   promptEvalJudgeModel,
 } from "./evalSupport";
 import { isExistingMatchConfidenceEligibleForVerification } from "./priceMatchingEvidence";
 import type { RealWorldNewBottleEvalCase } from "./realWorldNewBottleEval.fixtures";
 import { getAutoIgnoreBottleReferenceReason } from "./reviewPolicy";
 import { buildDefaultBottleSearchInput } from "./runtime/agentInput";
+import {
+  applyDeterministicIdentitySeed,
+  getDeterministicIdentitySeed,
+  resolveDeterministicBottleReference,
+} from "./runtime/deterministic";
+
+type ClassifiedBottleClassificationResult = Extract<
+  BottleClassificationResult,
+  { status: "classified" }
+>;
 
 function getScenarioEvalName(testCase: ClassifierScenarioEvalCase): string {
   return testCase.testCase.input.reference.name;
@@ -170,6 +175,32 @@ function deepContainsSubset(actual: unknown, expected: unknown): boolean {
   );
 }
 
+function evalTextContainsStatedAge(value: string, statedAge: number): boolean {
+  return new RegExp(`\\b${statedAge}\\s+year\\s+old\\b`).test(
+    normalizeEvalText(value),
+  );
+}
+
+function getProposedBottleIdentityText(
+  proposedBottle: NonNullable<
+    ClassifiedBottleClassificationResult["decision"]["proposedBottle"]
+  >,
+): string {
+  let identity = [proposedBottle.brand.name, proposedBottle.name]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+
+  if (
+    proposedBottle.statedAge !== null &&
+    !evalTextContainsStatedAge(identity, proposedBottle.statedAge)
+  ) {
+    identity = `${identity} ${proposedBottle.statedAge}-year-old`;
+  }
+
+  return identity;
+}
+
 function describeNormalizationResult(
   result: BottleClassificationResult,
 ): Record<string, unknown> {
@@ -193,13 +224,7 @@ function describeNormalizationResult(
         );
 
   const proposedBottleFullName = result.decision.proposedBottle
-    ? [
-        result.decision.proposedBottle.brand.name,
-        result.decision.proposedBottle.name,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .trim()
+    ? getProposedBottleIdentityText(result.decision.proposedBottle)
     : null;
 
   return {
@@ -215,11 +240,13 @@ function describeNormalizationResult(
         ? {
             edition: result.decision.proposedRelease.edition,
             releaseYear: result.decision.proposedRelease.releaseYear,
+            vintageYear: result.decision.proposedRelease.vintageYear,
           }
         : matchedCandidate?.releaseId != null
           ? {
               edition: matchedCandidate.edition,
               releaseYear: matchedCandidate.releaseYear,
+              vintageYear: matchedCandidate.vintageYear,
             }
           : null,
     proposedBottle:
@@ -235,6 +262,148 @@ function describeNormalizationResult(
   };
 }
 
+function normalizeEvalText(value: string | null | undefined): string {
+  return (value ?? "")
+    .toLowerCase()
+    .replace(/['’]/g, "")
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter((token) => token.length > 0 && token !== "the")
+    .join(" ");
+}
+
+function normalizeEvalEditionText(value: string | null | undefined): string {
+  const romanNumerals: Record<string, string> = {
+    i: "1",
+    ii: "2",
+    iii: "3",
+    iv: "4",
+    v: "5",
+    vi: "6",
+    vii: "7",
+    viii: "8",
+    ix: "9",
+    x: "10",
+  };
+
+  return normalizeEvalText(value)
+    .split(" ")
+    .map((token) => {
+      if (token === "vol") return "volume";
+      return romanNumerals[token] ?? token;
+    })
+    .join(" ");
+}
+
+function evalTextMatches(
+  actual: string | null | undefined,
+  expected: string,
+): boolean {
+  return normalizeEvalText(actual) === normalizeEvalText(expected);
+}
+
+function getNormalizationBottleIdentity(
+  result: BottleClassificationResult,
+): string | null {
+  if (result.status !== "classified") {
+    return null;
+  }
+
+  const matchedCandidate =
+    result.decision.matchedReleaseId !== null
+      ? result.artifacts.candidates.find(
+          (candidate) =>
+            candidate.releaseId === result.decision.matchedReleaseId,
+        )
+      : result.artifacts.candidates.find((candidate) =>
+          result.decision.action === "create_release"
+            ? candidate.bottleId === result.decision.parentBottleId
+            : candidate.bottleId === result.decision.matchedBottleId,
+        );
+
+  if (matchedCandidate) {
+    return matchedCandidate.bottleFullName ?? matchedCandidate.fullName;
+  }
+
+  if (!result.decision.proposedBottle) {
+    return null;
+  }
+
+  return getProposedBottleIdentityText(result.decision.proposedBottle);
+}
+
+function getNormalizationReleaseIdentity(result: BottleClassificationResult): {
+  edition: string | null;
+  releaseYear: number | null;
+  vintageYear: number | null;
+} | null {
+  if (result.status !== "classified") {
+    return null;
+  }
+
+  if (result.decision.proposedRelease) {
+    return {
+      edition: result.decision.proposedRelease.edition,
+      releaseYear: result.decision.proposedRelease.releaseYear,
+      vintageYear: result.decision.proposedRelease.vintageYear,
+    };
+  }
+
+  const matchedRelease =
+    result.decision.matchedReleaseId !== null
+      ? result.artifacts.candidates.find(
+          (candidate) =>
+            candidate.releaseId === result.decision.matchedReleaseId,
+        )
+      : null;
+  if (!matchedRelease) {
+    return null;
+  }
+
+  return {
+    edition: matchedRelease.edition,
+    releaseYear: matchedRelease.releaseYear,
+    vintageYear: matchedRelease.vintageYear,
+  };
+}
+
+function releaseIdentityMatches(
+  actual: ReturnType<typeof getNormalizationReleaseIdentity>,
+  expected: NonNullable<
+    RealWorldNewBottleEvalCase["expected"]["releaseIdentity"]
+  >,
+): boolean {
+  if (actual === null) {
+    return false;
+  }
+
+  if (
+    "edition" in expected &&
+    normalizeEvalEditionText(actual.edition) !==
+      normalizeEvalEditionText(expected.edition)
+  ) {
+    return false;
+  }
+
+  if (
+    "releaseYear" in expected &&
+    actual.releaseYear !== expected.releaseYear
+  ) {
+    return false;
+  }
+
+  if (
+    "vintageYear" in expected &&
+    actual.vintageYear !== expected.vintageYear
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
 function describeScenarioOutput(
   testCase: ClassifierScenarioEvalCase,
   result: BottleClassificationResult,
@@ -244,210 +413,209 @@ function describeScenarioOutput(
     : describeClassificationResult(testCase.testCase, result);
 }
 
-function scoreDecisionShape(
-  testCase: ClassifierEvalCase,
-  result: BottleClassificationResult,
-): number {
-  const expected = testCase.expected;
-  const checks: boolean[] = [result.status === expected.status];
+type ShapeVerdict = {
+  score: 0 | 1;
+  failures: string[];
+};
 
-  if (expected.status === "classified" && result.status === "classified") {
-    checks.push(result.decision.action === expected.action);
-
-    if (expected.identityScope !== undefined) {
-      checks.push(result.decision.identityScope === expected.identityScope);
-    }
-
-    if (expected.matchedBottleId !== undefined) {
-      checks.push(result.decision.matchedBottleId === expected.matchedBottleId);
-    }
-
-    if (expected.matchedReleaseId !== undefined) {
-      checks.push(
-        result.decision.matchedReleaseId === expected.matchedReleaseId,
-      );
-    }
-
-    if (expected.parentBottleId !== undefined) {
-      checks.push(result.decision.parentBottleId === expected.parentBottleId);
-    }
-
-    if (expected.confidenceBand !== undefined) {
-      checks.push(
-        result.decision.confidenceBasis?.band === expected.confidenceBand,
-      );
-    }
-
-    if (expected.verifyEligible !== undefined) {
-      checks.push(
-        getDerivedVerifyEligibility(testCase, result) ===
-          expected.verifyEligible,
-      );
-    }
-
-    if (expected.proposedBottle !== undefined) {
-      checks.push(
-        deepContainsSubset(
-          result.decision.proposedBottle,
-          expected.proposedBottle,
-        ),
-      );
-    }
-
-    if (expected.proposedRelease !== undefined) {
-      checks.push(
-        deepContainsSubset(
-          result.decision.proposedRelease,
-          expected.proposedRelease,
-        ),
-      );
-    }
-  }
-
-  return (
-    checks.reduce((total, check) => total + (check ? 1 : 0), 0) / checks.length
-  );
+function getShapeVerdict(failures: string[]): ShapeVerdict {
+  return {
+    score: failures.length === 0 ? 1 : 0,
+    failures,
+  };
 }
 
-function scoreNormalizationShape(
-  testCase: RealWorldNewBottleEvalCase,
+function evaluateDecisionShape(
+  testCase: ClassifierEvalCase,
   result: BottleClassificationResult,
-): number {
-  const expectation = testCase.expected;
+): ShapeVerdict {
+  const expected = testCase.expected;
+  const failures: string[] = [];
 
-  if (expectation.classifierExpectation === "review_required") {
-    return result.status === "ignored" ||
-      (result.status === "classified" && result.decision.action === "no_match")
-      ? 1
-      : 0;
+  if (result.status !== expected.status) {
+    failures.push(
+      `status expected ${expected.status} but got ${result.status}`,
+    );
+    return getShapeVerdict(failures);
+  }
+
+  if (expected.status !== "classified") {
+    return getShapeVerdict(failures);
   }
 
   if (result.status !== "classified") {
-    return 0;
+    return getShapeVerdict(failures);
   }
 
+  if (expected.action === undefined) {
+    failures.push("fixture missing expected action for classified case");
+  } else if (result.decision.action !== expected.action) {
+    failures.push(
+      `action expected ${expected.action} but got ${result.decision.action}`,
+    );
+  }
+
+  if (
+    expected.identityScope !== undefined &&
+    result.decision.identityScope !== expected.identityScope
+  ) {
+    failures.push(
+      `identityScope expected ${expected.identityScope} but got ${result.decision.identityScope}`,
+    );
+  }
+
+  if (
+    expected.matchedBottleId !== undefined &&
+    result.decision.matchedBottleId !== expected.matchedBottleId
+  ) {
+    failures.push(
+      `matchedBottleId expected ${expected.matchedBottleId} but got ${result.decision.matchedBottleId}`,
+    );
+  }
+
+  if (
+    expected.matchedReleaseId !== undefined &&
+    result.decision.matchedReleaseId !== expected.matchedReleaseId
+  ) {
+    failures.push(
+      `matchedReleaseId expected ${expected.matchedReleaseId} but got ${result.decision.matchedReleaseId}`,
+    );
+  }
+
+  if (
+    expected.parentBottleId !== undefined &&
+    result.decision.parentBottleId !== expected.parentBottleId
+  ) {
+    failures.push(
+      `parentBottleId expected ${expected.parentBottleId} but got ${result.decision.parentBottleId}`,
+    );
+  }
+
+  if (
+    expected.confidenceBand !== undefined &&
+    result.decision.confidenceBasis?.band !== expected.confidenceBand
+  ) {
+    failures.push(
+      `confidenceBand expected ${expected.confidenceBand} but got ${result.decision.confidenceBasis?.band ?? "missing"}`,
+    );
+  }
+
+  if (
+    expected.verifyEligible !== undefined &&
+    getDerivedVerifyEligibility(testCase, result) !== expected.verifyEligible
+  ) {
+    failures.push(`verifyEligible expected ${expected.verifyEligible}`);
+  }
+
+  if (
+    expected.proposedBottle !== undefined &&
+    !deepContainsSubset(result.decision.proposedBottle, expected.proposedBottle)
+  ) {
+    failures.push("proposedBottle missing expected fields");
+  }
+
+  if (
+    expected.proposedRelease !== undefined &&
+    !deepContainsSubset(
+      result.decision.proposedRelease,
+      expected.proposedRelease,
+    )
+  ) {
+    failures.push("proposedRelease missing expected fields");
+  }
+
+  return getShapeVerdict(failures);
+}
+
+function evaluateNormalizationShape(
+  testCase: RealWorldNewBottleEvalCase,
+  result: BottleClassificationResult,
+): ShapeVerdict {
+  const expectation = testCase.expected;
+  const failures: string[] = [];
+
+  if (expectation.classifierExpectation === "review_required") {
+    if (
+      result.status !== "ignored" &&
+      (result.status !== "classified" || result.decision.action !== "no_match")
+    ) {
+      failures.push("review_required expected ignored or no_match");
+    }
+
+    return getShapeVerdict(failures);
+  }
+
+  if (result.status !== "classified") {
+    failures.push(`status expected classified but got ${result.status}`);
+    return getShapeVerdict(failures);
+  }
+
+  const bottleIdentity = getNormalizationBottleIdentity(result);
+  if (!evalTextMatches(bottleIdentity, testCase.expectedBottleName)) {
+    failures.push(
+      `bottle identity expected ${testCase.expectedBottleName} but got ${bottleIdentity ?? "missing"}`,
+    );
+  }
+
+  const releaseIdentity = getNormalizationReleaseIdentity(result);
+
   if (expectation.classifierExpectation === "exact_cask") {
-    return result.decision.identityScope === "exact_cask" ? 1 : 0;
+    if (result.decision.identityScope !== "exact_cask") {
+      failures.push(
+        `identityScope expected exact_cask but got ${result.decision.identityScope}`,
+      );
+    }
+
+    if (releaseIdentity !== null) {
+      failures.push("exact_cask expected no child release identity");
+    }
+
+    return getShapeVerdict(failures);
   }
 
   if (expectation.classifierExpectation === "bottle_plus_release") {
-    return result.decision.identityScope === "product" &&
-      (result.decision.action === "create_release" ||
-        result.decision.action === "create_bottle_and_release" ||
-        result.decision.matchedReleaseId !== null)
-      ? 1
-      : 0;
+    const hasReleaseAction =
+      result.decision.action === "create_release" ||
+      result.decision.action === "create_bottle_and_release" ||
+      result.decision.matchedReleaseId !== null;
+
+    if (result.decision.identityScope !== "product") {
+      failures.push(
+        `identityScope expected product but got ${result.decision.identityScope}`,
+      );
+    }
+
+    if (!hasReleaseAction) {
+      failures.push("expected a release match or release creation action");
+    }
+
+    if (expectation.releaseIdentity === null) {
+      failures.push("fixture missing expected release identity");
+    } else if (
+      !releaseIdentityMatches(releaseIdentity, expectation.releaseIdentity)
+    ) {
+      failures.push("release identity did not match expected edition/year");
+    }
+
+    return getShapeVerdict(failures);
   }
 
-  return result.decision.identityScope === "product" &&
-    result.decision.action !== "create_release" &&
-    result.decision.action !== "create_bottle_and_release" &&
-    result.decision.matchedReleaseId === null
-    ? 1
-    : 0;
-}
+  if (result.decision.identityScope !== "product") {
+    failures.push(
+      `identityScope expected product but got ${result.decision.identityScope}`,
+    );
+  }
 
-const JudgeSchema = z.object({
-  score: z.number().min(0).max(1),
-  reasoning: z.string().min(1),
-});
+  if (
+    result.decision.action === "create_release" ||
+    result.decision.action === "create_bottle_and_release" ||
+    result.decision.matchedReleaseId !== null ||
+    releaseIdentity !== null
+  ) {
+    failures.push("bottle fixture should not create or match a child release");
+  }
 
-async function judgeDecisionCase(
-  testCase: ClassifierEvalCase,
-  result: BottleClassificationResult,
-) {
-  const client = createEvalOpenAIClient();
-  const verifyEligible = getDerivedVerifyEligibility(testCase, result);
-  const response = await client.responses.create({
-    model: evalJudgeModel,
-    instructions: [
-      "You are judging a whisky bottle classifier evaluation.",
-      "Score from 0.0 to 1.0.",
-      "Prioritize whether the classifier identified the correct bottle identity and chose a safe action.",
-      "A false positive existing match is worse than a conservative create/no-match result.",
-      "Confidence should be judged from evidence, not arbitrary numeric precision.",
-      "Use confidenceBasis when present: high confidence should be backed by concrete local, exact-code, or web evidence; review-band confidence is appropriate when unresolvedRisks remain.",
-      "Do not reward a confidence band or score that is not supported by confidenceBasis or tool evidence.",
-      "For exact-cask code programs such as SMWS, a correct matched bottle id and identity scope should score highly even when the source subtitle remains in observation-level text.",
-      "Do not over-penalize selector or subtitle noise when the exact-cask code anchor, matched bottle id, and final action are correct.",
-      "Use 1.0 for a clearly correct result, 0.5 for partially correct but materially flawed output, and 0.0 for the wrong bottle or unsafe matching behavior.",
-      "Return only the structured judgement.",
-    ].join("\n"),
-    input: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "input_text",
-            text: [
-              `Case: ${testCase.name}`,
-              `Expected outcome: ${testCase.expected.summary}`,
-              `Expected structured constraints: ${JSON.stringify(testCase.expected, null, 2)}`,
-              `Actual classifier output: ${JSON.stringify(describeClassificationResult(testCase, result), null, 2)}`,
-              `Actual derived verify eligibility: ${verifyEligible}`,
-            ].join("\n\n"),
-          },
-        ],
-      },
-    ],
-    text: {
-      format: zodTextFormat(JudgeSchema, "ClassifierEvalJudgement"),
-    },
-    ...getEvalJudgeModelSettings(),
-  });
-
-  return JudgeSchema.parse(JSON.parse(response.output_text));
-}
-
-async function judgeNormalizationCase(
-  testCase: RealWorldNewBottleEvalCase,
-  result: BottleClassificationResult,
-) {
-  const client = createEvalOpenAIClient();
-  const describedResult = describeNormalizationResult(result);
-  const response = await client.responses.create({
-    model: evalJudgeModel,
-    instructions: [
-      "You are judging a whisky bottle normalization evaluation.",
-      "Score from 0.0 to 1.0.",
-      "Prioritize whether the classifier preserved the correct canonical bottle identity boundary.",
-      "Judge bottle identity using the canonical full bottle identity, not just the internal `proposedBottle.name` field in isolation.",
-      "For create decisions, combine the proposed brand and bottle name when reasoning about the final bottle identity.",
-      "For bottle-level cases, penalize invented child releases or exact-cask scope.",
-      "For bottle-plus-release cases, penalize collapsing the release into the bottle name.",
-      "For exact-cask cases, penalize product-scope decisions that discard the exact program identity.",
-      "For exact-cask code programs such as SMWS, treat an exact bottle-identity match on the code as strong evidence of correctness even when extra official bottle facts are also present.",
-      "When a bottle-plus-release case is conservatively downgraded to `no_match`, treat preserved extracted identity and rationale as partial credit rather than a total miss.",
-      "For review-required cases, prefer conservative ignored or no-match outcomes over inventing a specific branded bottle from sparse input.",
-      "Return only the structured judgement.",
-    ].join("\n"),
-    input: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "input_text",
-            text: [
-              `Fixture id: ${testCase.fixtureId}`,
-              `Raw input: ${testCase.input.reference.name}`,
-              `Expected bottle name: ${testCase.expectedBottleName}`,
-              `Expected classifier expectation: ${testCase.expected.classifierExpectation}`,
-              `Expected release identity: ${JSON.stringify(testCase.expected.releaseIdentity)}`,
-              `Expected behavior: ${testCase.summary}`,
-              `Actual evaluated identity: ${JSON.stringify(describedResult, null, 2)}`,
-              `Raw classifier output: ${JSON.stringify(result)}`,
-            ].join("\n\n"),
-          },
-        ],
-      },
-    ],
-    text: {
-      format: zodTextFormat(JudgeSchema, "NormalizationCorpusEvalJudgement"),
-    },
-    ...getEvalJudgeModelSettings(),
-  });
-
-  return JudgeSchema.parse(JSON.parse(response.output_text));
+  return getShapeVerdict(failures);
 }
 
 function parseClassificationRunOutput(
@@ -485,6 +653,7 @@ function createClassifierOptions(testCase: ClassifierScenarioEvalCase) {
 
 type PreparedScenarioClassifierRun = {
   agentRun: PreparedBottleClassifierAgentRun;
+  deterministicResult?: BottleClassificationResult;
   classifyAgentResult: (result: unknown) => Promise<BottleClassificationResult>;
 };
 
@@ -496,10 +665,20 @@ async function prepareScenarioClassifierRun(
   const parsedInput = ClassifyBottleReferenceInputSchema.parse(
     testCase.testCase.input,
   );
-  const extractedIdentity =
+  const deterministicIdentitySeed = getDeterministicIdentitySeed(
+    parsedInput.reference,
+  );
+  const rawExtractedIdentity =
     parsedInput.extractedIdentity !== undefined
-      ? parsedInput.extractedIdentity
-      : await classifier.extractBottleReferenceIdentity(parsedInput.reference);
+      ? (parsedInput.extractedIdentity ?? deterministicIdentitySeed)
+      : (deterministicIdentitySeed ??
+        (await classifier.extractBottleReferenceIdentity(
+          parsedInput.reference,
+        )));
+  const extractedIdentity = applyDeterministicIdentitySeed({
+    reference: parsedInput.reference,
+    extractedIdentity: rawExtractedIdentity,
+  });
   const initialArtifacts = buildBottleClassificationArtifacts({
     extractedIdentity,
   });
@@ -531,6 +710,18 @@ async function prepareScenarioClassifierRun(
     extractedIdentity,
     candidates,
   });
+  const deterministicDecision = resolveDeterministicBottleReference({
+    reference: parsedInput.reference,
+    artifacts,
+  });
+  const deterministicResult = deterministicDecision
+    ? BottleClassificationResultSchema.parse(
+        createDecidedBottleClassification({
+          decision: deterministicDecision,
+          artifacts,
+        }),
+      )
+    : undefined;
 
   const agentRun = await prepareBottleClassifierAgentRun(options, {
     reference: parsedInput.reference,
@@ -541,6 +732,7 @@ async function prepareScenarioClassifierRun(
 
   return {
     agentRun,
+    deterministicResult,
     classifyAgentResult: async (result) => {
       const reasoning = agentRun.getReasoningResult(result);
       const { decision, artifacts: reasoningArtifacts } =
@@ -608,6 +800,10 @@ const classifierHarness = openaiAgentsHarness<
     }
 
     const preparedRun = await getPreparedClassifierRun(input);
+    if (preparedRun.deterministicResult) {
+      return preparedRun.deterministicResult;
+    }
+
     const result = await runner.run(agent, preparedRun.agentRun.input, {
       ...runOptions,
       stream: false,
@@ -615,6 +811,9 @@ const classifierHarness = openaiAgentsHarness<
 
     return preparedRun.classifyAgentResult(result);
   },
+  // vitest-evals strict replay intentionally fails when a prompt/tool change
+  // makes a new web-search call. Record those new tool results with:
+  // VITEST_EVALS_REPLAY_MODE=record pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts
   toolReplay: {
     openai_web_search: true,
     brave_web_search: true,
@@ -632,33 +831,21 @@ type ClassifierJudgeContext = JudgeContext<
   typeof classifierHarness
 >;
 
-const ClassifierShapeJudge = namedJudge<ClassifierJudgeContext>(
-  "ClassifierShapeJudge",
+const ClassifierExpectationJudge = namedJudge<ClassifierJudgeContext>(
+  "ClassifierExpectationJudge",
   ({ inputValue, run }) => {
     const result = parseClassificationRunOutput(run.output);
-
-    return {
-      score:
-        inputValue.kind === "new_bottle_fixture"
-          ? scoreNormalizationShape(inputValue.testCase, result)
-          : scoreDecisionShape(inputValue.testCase, result),
-    };
-  },
-);
-
-const ClassifierRubricJudge = namedJudge<ClassifierJudgeContext>(
-  "ClassifierRubricJudge",
-  async ({ inputValue, run }) => {
-    const result = parseClassificationRunOutput(run.output);
-    const judgement =
+    const verdict =
       inputValue.kind === "new_bottle_fixture"
-        ? await judgeNormalizationCase(inputValue.testCase, result)
-        : await judgeDecisionCase(inputValue.testCase, result);
+        ? evaluateNormalizationShape(inputValue.testCase, result)
+        : evaluateDecisionShape(inputValue.testCase, result);
 
     return {
-      score: judgement.score,
+      score: verdict.score,
       metadata: {
-        rationale: judgement.reasoning,
+        rationale:
+          verdict.failures.join("; ") || "All expected fields matched.",
+        failures: verdict.failures,
       },
     };
   },
@@ -672,17 +859,17 @@ const SCENARIO_CONFIG: Array<{
   {
     label: "new bottles",
     scenario: "new_bottles",
-    threshold: 0.7,
+    threshold: 1,
   },
   {
     label: "match existing",
     scenario: "match_existing",
-    threshold: 0.8,
+    threshold: 1,
   },
   {
     label: "corrections",
     scenario: "corrections",
-    threshold: 0.8,
+    threshold: 1,
   },
 ];
 
@@ -692,7 +879,7 @@ for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
     {
       skipIf: () => !process.env.OPENAI_API_KEY,
       harness: classifierHarness,
-      judges: [ClassifierShapeJudge, ClassifierRubricJudge],
+      judges: [ClassifierExpectationJudge],
       judgeThreshold: threshold,
     },
     (it) => {

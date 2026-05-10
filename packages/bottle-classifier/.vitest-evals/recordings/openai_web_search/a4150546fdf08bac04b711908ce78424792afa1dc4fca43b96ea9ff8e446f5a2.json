@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:21:57.688Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Cask Strength Barrel Proof Heaven Hill official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Cask Strength Barrel Proof Heaven Hill official",
+    "summary": "Official producer evidence points to **Elijah Craig Barrel Proof** as a **Heaven Hill-produced** bourbon, not a separate “cask strength” line with different branding. The official Elijah Craig page says each bottle is **hand labeled with its unique proof and batch number**, confirming it is a **batch-based barrel proof",
+    "results": [
+      {
+        "title": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/larceny-barrel-proof-batch-c923",
+        "url": "https://www.breakingbourbon.com/review/larceny-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/230916/elijah-craig-barrel-proof",
+        "url": "https://www.whiskybase.com/whiskies/whisky/230916/elijah-craig-barrel-proof",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://breakingbourbon.com/review/elijah-craig-barrel-proof",
+        "url": "https://breakingbourbon.com/review/elijah-craig-barrel-proof",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/141547/elijah-craig-barrel-proof?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/141547/elijah-craig-barrel-proof?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/141547/elijah-craig-barrel-proof?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/whisky/141547/elijah-craig-barrel-proof?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a4150546fdf08bac04b711908ce78424792afa1dc4fca43b96ea9ff8e446f5a2",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:47:08.073Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"SMWS RW6.5\" Sauna Smoke"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"SMWS RW6.5\" Sauna Smoke",
+    "summary": "I found good evidence that **SMWS RW6.5 is not “Sauna Smoke.”** The bottle tied to **RW6.5** is **“Appley ever after”**, an **SMWS** bottling from **Kyrö Distillery Company** in Finland, identified as a **rye whisky**, **distilled 11 January 2018**, **bottled in 2024**, **6 years old**, from a **1st fill #3 char barrel",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65",
+        "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65?language=zh-CN",
+        "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65?language=zh-CN",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.smws.ch/pi/en/Whisky/RW65-APPLEY-EVER-AFTER.html",
+        "url": "https://shop.smws.ch/pi/en/Whisky/RW65-APPLEY-EVER-AFTER.html",
+        "domain": "shop.smws.ch",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a680dd7f543d7b87bb14103b8627024cc1649b5e609f25ac193d15c1cf563565",
+    "mode": "auto"
+  }
+}

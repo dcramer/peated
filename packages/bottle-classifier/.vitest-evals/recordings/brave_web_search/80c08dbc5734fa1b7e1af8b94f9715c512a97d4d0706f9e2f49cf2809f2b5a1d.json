@@ -1,0 +1,53 @@
+{
+  "writtenAt": "2026-05-10T05:19:00.965Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "Glenglassaugh 1978 Rare Cask Release Batch 1 35 year old cask 1803"
+  },
+  "output": {
+    "provider": "brave",
+    "query": "Glenglassaugh 1978 Rare Cask Release Batch 1 35 year old cask 1803",
+    "summary": "The first batch of Rare Cask Releases, this single cask Glenglassaugh was <strong>distilled on October 6th 1978 before maturing for 35 years in sherry hogshead</strong>. <strong>35 year old Glenglassaugh single malt Scotch whisky</strong>, bottled as part of their first batch of Rare Cask Releases. <strong>A rare singl",
+    "results": [
+      {
+        "title": "Glenglassaugh 1978 35 Year Old (cask 1803) - Rare Cask Release Batch 1 (70cl, 41.6%) ***sold***",
+        "url": "https://www.caledoniancollectables.co.uk/glenglassaugh-1978-35-yo-70cl416",
+        "domain": "caledoniancollectables.co.uk",
+        "description": "The first batch of Rare Cask Releases, this single cask Glenglassaugh was <strong>distilled on October 6th 1978 before maturing for 35 years in sherry hogshead</strong>.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Glenglassaugh 35 Year Old 1978 (cask 1803) - Rare Cask Release Batch 1 Whisky | Master of Malt",
+        "url": "https://www.masterofmalt.com/whiskies/glenglassaugh/glenglassaugh-35-year-old-1978-cask-1803-rare-cask-release-batch-1-whisky/",
+        "domain": "masterofmalt.com",
+        "description": "<strong>35 year old Glenglassaugh single malt Scotch whisky</strong>, bottled as part of their first batch of Rare Cask Releases.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Glenglassaugh 1978 - 35 Year Old - Single Cask 1803 - Whisky-Online Shop",
+        "url": "https://www.whisky-online.com/products/glenglassaugh-1978-2014-35-year-old-rare-cask-release-single-cask-1803",
+        "domain": "whisky-online.com",
+        "description": "<strong>A rare single cask Glenglassaugh 1978 bottled as a 35-year-old without colouring or chill filtration in 2014</strong> for Batch 1 of the distillery&#x27;s Rare Cask Releases.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Glenglassaugh 1978 35 Year Old Rare Cask No. 1803 - Lot 148636 - Buy/Sell Highland Whisky Online",
+        "url": "https://whisky.auction/auctions/lot/148636/glenglassaugh-1978-35-year-old-rare-cask-no-1803",
+        "domain": "whisky.auction",
+        "description": "This was <strong>distilled on 6 October 1978, finished in a Sherry hogshead and bottled at 41.6% ABV in February 2014</strong> as a Rare Cask Release. This is bottle number 298 of 351; it was bottled from cask number 180",
+        "extraSnippets": []
+      },
+      {
+        "title": "Glenglassaugh 35 Years - 1978 Rare Cask 1803 - Whisky.com",
+        "url": "https://www.whisky.com/whisky-database/details/glenglassaugh-rare-cask-1803.html",
+        "domain": "whisky.com",
+        "description": "FAQ AGB-Community Environmental Protection Privacy Notice Sitemap Contact Us Imprint · Copyright © 1994-2025 · Whisky.com Media GmbH &amp; Co. KG Am Grundwassersee 4 · 82402 Seeshaupt · Germany",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "80c08dbc5734fa1b7e1af8b94f9715c512a97d4d0706f9e2f49cf2809f2b5a1d",
+    "mode": "auto"
+  }
+}

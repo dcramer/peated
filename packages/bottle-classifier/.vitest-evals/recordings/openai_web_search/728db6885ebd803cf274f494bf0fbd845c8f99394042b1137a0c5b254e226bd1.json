@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:34:12.765Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Woodford Reserve\" \"Kentucky Straight Malt Whiskey\" official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Woodford Reserve\" \"Kentucky Straight Malt Whiskey\" official",
+    "summary": "Official and independent sources support this as **Woodford Reserve Kentucky Straight Malt Whiskey**. The official Woodford Reserve page confirms it is a **Kentucky Straight Malt Whiskey**, made from **51% malt** and **aged in new charred oak barrels**, with the bottle listed at **90.4 proof**. ([woodfordreserve.com](h",
+    "results": [
+      {
+        "title": "Malt Whiskey - Woodford Reserve",
+        "url": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/fr/whiskey/malt-whiskey/",
+        "url": "https://www.woodfordreserve.com/fr/whiskey/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/our-whiskey/",
+        "url": "https://www.woodfordreserve.com/our-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/de/whiskey/malt-whiskey/",
+        "url": "https://www.woodfordreserve.com/de/whiskey/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/en-au/",
+        "url": "https://www.woodfordreserve.com/en-au/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://en.wikipedia.org/wiki/Woodford_Reserve",
+        "url": "https://en.wikipedia.org/wiki/Woodford_Reserve",
+        "domain": "en.wikipedia.org",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "728db6885ebd803cf274f494bf0fbd845c8f99394042b1137a0c5b254e226bd1",
+    "mode": "auto"
+  }
+}

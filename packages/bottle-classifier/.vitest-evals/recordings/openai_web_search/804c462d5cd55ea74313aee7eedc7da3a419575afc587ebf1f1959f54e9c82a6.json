@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:17:47.792Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Hudson Whiskey Back Room Deal peated scotch barrel finished rye official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Hudson Whiskey Back Room Deal peated scotch barrel finished rye official",
+    "summary": "Official Hudson sources identify **Back Room Deal** as a **New York Straight Rye Whiskey finished in peated Scotch barrels**. The brand’s product page states that directly, and Hudson’s tasting-notes PDF also confirms **46% alc/vol** and shows it as a Hudson Whiskey release distributed by William Grant & Sons. ([shop.h",
+    "results": [
+      {
+        "title": "https://shop.hudsonwhiskey.com/products/Hudson-Back-Room-Deal-p667109531",
+        "url": "https://shop.hudsonwhiskey.com/products/Hudson-Back-Room-Deal-p667109531",
+        "domain": "shop.hudsonwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/hudson-whiskey-back-room-deal",
+        "url": "https://distiller.com/spirits/hudson-whiskey-back-room-deal",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/Hudson-Whiskey-Back-Room-Deal-Peated-Scotch-Barrel-Finished-46",
+        "url": "https://whiskyadvocate.com/Hudson-Whiskey-Back-Room-Deal-Peated-Scotch-Barrel-Finished-46",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hudsonwhiskey.com/en-US/whiskey-cocktails/backroom-handshakes/",
+        "url": "https://www.hudsonwhiskey.com/en-US/whiskey-cocktails/backroom-handshakes/",
+        "domain": "hudsonwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hudsonwhiskey.com/en-US/",
+        "url": "https://www.hudsonwhiskey.com/en-US/",
+        "domain": "hudsonwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskycast.com/ratings/hudson-whiskey-back-room-deal/",
+        "url": "https://whiskycast.com/ratings/hudson-whiskey-back-room-deal/",
+        "domain": "whiskycast.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "804c462d5cd55ea74313aee7eedc7da3a419575afc587ebf1f1959f54e9c82a6",
+    "mode": "auto"
+  }
+}

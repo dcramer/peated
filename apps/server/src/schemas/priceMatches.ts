@@ -172,6 +172,8 @@ export const PriceMatchAttributeEnum = z.enum([
 
 export const PriceMatchEvidenceSourceTierEnum = z.enum([
   "official",
+  // Retained for legacy serialized evidence checks. Current classifier code
+  // does not assign reviewer or database sources from a domain allowlist.
   "critic",
   "retailer",
   "origin_retailer",

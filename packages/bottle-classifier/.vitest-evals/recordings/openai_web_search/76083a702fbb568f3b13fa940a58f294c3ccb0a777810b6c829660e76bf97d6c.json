@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:44:13.910Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19 Year Old official 46.2 Islay single malt"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Ardbeg Traigh Bhan 19 Year Old official 46.2 Islay single malt",
+    "summary": "**Ardbeg Traigh Bhan 19 Year Old** is an **official bottling** from **Ardbeg Distillery** on **Islay**, bottled at **46.2% ABV**. It was launched as a **small-batch, age-stated release** and described at launch as Ardbeg’s first **permanent age-stated expression in nearly 20 years**. ([scotchwhisky.com](https://scotchw",
+    "results": [
+      {
+        "title": "https://whiskymag.com/tastings/ardbeg-traigh-bhan-19-years-old/",
+        "url": "https://whiskymag.com/tastings/ardbeg-traigh-bhan-19-years-old/",
+        "domain": "whiskymag.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/ardbeg/ardbeg-traigh-bhan-19-year-old-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/ardbeg/ardbeg-traigh-bhan-19-year-old-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskylifestyle.com/ardbeg-traigh-bhan-19-year-old-batch-2/",
+        "url": "https://www.whiskylifestyle.com/ardbeg-traigh-bhan-19-year-old-batch-2/",
+        "domain": "whiskylifestyle.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.passionforwhisky.com/en/whisky/scotch-whisky/single-malt-whisky/islay/ardbeg-whisky-distillery/35425-ardbeg-19-years-traigh-bhan-2022-batch-no4.html",
+        "url": "https://www.passionforwhisky.com/en/whisky/scotch-whisky/single-malt-whisky/islay/ardbeg-whisky-distillery/35425-ardbeg-19-years-traigh-bhan-2022-batch-no4.html",
+        "domain": "passionforwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/ardbeg-traigh-bhan-19y-462-07l.html?cHash=f9b65595b8a7609ce611568de1236790&tx_datamintsflaschendb_pi4%5Bgeschmack",
+        "url": "https://www.whisky.com/whisky-database/details/ardbeg-traigh-bhan-19y-462-07l.html?cHash=f9b65595b8a7609ce611568de1236790&tx_datamintsflaschendb_pi4%5BgeschmacksbeschreibungSearchCriteria%5D%5Bbewertung%5D=3&tx_datamintsflaschendb_pi4%5BsammlungReferer%5D=446799",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://scotchwhisky.com/magazine/latest-news/27070/ardbeg-reveals-19-year-old-traigh-bhan/",
+        "url": "https://scotchwhisky.com/magazine/latest-news/27070/ardbeg-reveals-19-year-old-traigh-bhan/",
+        "domain": "scotchwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "76083a702fbb568f3b13fa940a58f294c3ccb0a777810b6c829660e76bf97d6c",
+    "mode": "auto"
+  }
+}

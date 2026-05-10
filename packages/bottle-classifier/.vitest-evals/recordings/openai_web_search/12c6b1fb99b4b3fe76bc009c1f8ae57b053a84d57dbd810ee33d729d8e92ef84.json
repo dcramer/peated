@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:12:35.984Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Woodford Reserve Kentucky Straight Malt Whiskey official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Woodford Reserve Kentucky Straight Malt Whiskey official",
+    "summary": "Official and independent sources support **Woodford Reserve Kentucky Straight Malt Whiskey** as a standard Woodford Reserve expression. The official Woodford Reserve product page confirms it is a **Kentucky Straight Malt Whiskey**, made with **51% malt** and **aged in new charred oak barrels**. ([woodfordreserve.com](h",
+    "results": [
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+        "url": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thirtyonewhiskey.com/whiskey-review-woodford-reserve-distillers-select-kentucky-straight-malt-whiskey/",
+        "url": "https://www.thirtyonewhiskey.com/whiskey-review-woodford-reserve-distillers-select-kentucky-straight-malt-whiskey/",
+        "domain": "thirtyonewhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://breakingbourbon.com/review/woodford-reserve-straight-malt-whiskey",
+        "url": "https://breakingbourbon.com/review/woodford-reserve-straight-malt-whiskey",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/american-whiskey/whiskey-review-woodford-reserve-straight-malt/",
+        "url": "https://thewhiskeywash.com/american-whiskey/whiskey-review-woodford-reserve-straight-malt/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskymag.com/tastings/woodford-reserve-kentucky-straight-bourbon-whiskey/",
+        "url": "https://www.whiskymag.com/tastings/woodford-reserve-kentucky-straight-bourbon-whiskey/",
+        "domain": "whiskymag.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.diffordsguide.com/beer-wine-spirits/8383/woodford-reserve-straight-malt",
+        "url": "https://www.diffordsguide.com/beer-wine-spirits/8383/woodford-reserve-straight-malt",
+        "domain": "diffordsguide.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "12c6b1fb99b4b3fe76bc009c1f8ae57b053a84d57dbd810ee33d729d8e92ef84",
+    "mode": "auto"
+  }
+}

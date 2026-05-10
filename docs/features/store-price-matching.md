@@ -250,9 +250,13 @@ For existing-match proposals, that policy should stay thin:
 - the classifier confidence must clear the shared verification threshold
 - reaffirming the current bottle/release assignment uses a lower threshold because the risk is lower; today that threshold is `80`
 - new unmatched matches only verify at the higher bottle-only threshold; today that threshold is `96`
-- the classifier should be the layer that decides when a raw-title reaffirmation or authoritative off-retailer confirmation justifies the `96+` confidence band
+- the classifier should be the layer that decides when raw-title
+  reaffirmation, official confirmation, or agent-reviewed corroborating web
+  evidence justifies the `96+` confidence band
 
-Evidence such as exact aliases, raw retailer titles, or authoritative off-retailer web confirmation should raise or lower classifier confidence upstream rather than creating separate downstream verify heuristics.
+Evidence such as exact aliases, raw retailer titles, official pages, or
+agent-reviewed corroborating web confirmation should raise or lower classifier
+confidence upstream rather than creating separate downstream verify heuristics.
 
 ## Automation
 

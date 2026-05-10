@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:40:02.148Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Four Roses \"Limited Edition Small Batch\" 2017 official release"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Four Roses \"Limited Edition Small Batch\" 2017 official release",
+    "summary": "The **official 2017 Four Roses “Limited Edition Small Batch” release** is the **standard 2017 Limited Edition Small Batch**, **not** the separate **2017 Al Young 50th Anniversary Limited Edition Small Batch**. Four Roses’ official release page lists the **2017 Limited Edition Small Batch** at **107.3 proof** and **aged",
+    "results": [
+      {
+        "title": "https://www.whiskeyinmyweddingring.com/reviews/four-roses-2017-limited-edition-small-batch",
+        "url": "https://www.whiskeyinmyweddingring.com/reviews/four-roses-2017-limited-edition-small-batch",
+        "domain": "whiskeyinmyweddingring.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thebourbonbabe.com/2017/09/12/four-roses-2017-limited-edition-small-batch/",
+        "url": "https://thebourbonbabe.com/2017/09/12/four-roses-2017-limited-edition-small-batch/",
+        "domain": "thebourbonbabe.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Four Roses Small Batch - 2017 Limited Edition - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/97716/four-roses-small-batch-2017-limited-edition",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://breakingbourbon.com/article/2017-the-year-in-bourbon",
+        "url": "https://breakingbourbon.com/article/2017-the-year-in-bourbon",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/four-roses-small-batch-limited-edition-2017-release",
+        "url": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/four-roses-small-batch-limited-edition-2017-release",
+        "domain": "whiskyauctioneer.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/summer-2017-editors-choice-four-roses-2017-small-batch-limited-edition-al-youngs-50th-anniversary",
+        "url": "https://whiskyadvocate.com/summer-2017-editors-choice-four-roses-2017-small-batch-limited-edition-al-youngs-50th-anniversary",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "23702d99bf5e33a9fedf99fe469ecf7fea0563fffd69f9d52509286337804f1e",
+    "mode": "auto"
+  }
+}

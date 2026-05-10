@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:40:48.127Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Four Roses Single Barrel Barrel Strength\" bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Four Roses Single Barrel Barrel Strength\" bourbon",
+    "summary": "“**Four Roses Single Barrel Barrel Strength**” is **not the regular standard Four Roses Single Barrel**. The official Four Roses Single Barrel bottling is the **OBSV recipe**, **100 proof / 50% ABV**, and **aged 7–9 years**. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/single-barrel))\n\nWhat people u",
+    "results": [
+      {
+        "title": "Single Barrel OBSV | Four Roses",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.liquor.com/four-roses-single-barrel-bourbon-review-5219181",
+        "url": "https://www.liquor.com/four-roses-single-barrel-bourbon-review-5219181",
+        "domain": "liquor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Four Roses Single Barrel Review | Breaking Bourbon",
+        "url": "https://www.breakingbourbon.com/review/four-roses-single-barrel",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thebourbonculture.com/whiskey-reviews/four-roses-single-barrel-bourbon-review/",
+        "url": "https://thebourbonculture.com/whiskey-reviews/four-roses-single-barrel-bourbon-review/",
+        "domain": "thebourbonculture.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.boozemakers.com/articles/four-roses-single-barrel-bourbon-review",
+        "url": "https://www.boozemakers.com/articles/four-roses-single-barrel-bourbon-review",
+        "domain": "boozemakers.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.barrelbanter.com/reviews/four-roses-single-barrel-bourbon",
+        "url": "https://www.barrelbanter.com/reviews/four-roses-single-barrel-bourbon",
+        "domain": "barrelbanter.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9fd0d4cd6e432f95f9d9e8ec7e30984b63e439c06dc1643961b2f2d4b802b9f1",
+    "mode": "auto"
+  }
+}

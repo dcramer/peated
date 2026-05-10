@@ -1,5 +1,5 @@
 import {
-  AUTHORITATIVE_SOURCE_TIERS,
+  OFFICIAL_SOURCE_TIERS,
   buildProducerIdentityPhrases,
   classifySourceTier,
   containsComparablePhrase,
@@ -562,9 +562,7 @@ function evaluateSearchEvidenceChecks({
     }
 
     const tiers = Array.from(matchedSourceTiers);
-    const validated = tiers.some((tier) =>
-      AUTHORITATIVE_SOURCE_TIERS.has(tier),
-    );
+    const validated = tiers.some((tier) => OFFICIAL_SOURCE_TIERS.has(tier));
     const weaklySupported =
       !validated &&
       tiers.some((tier) =>
@@ -896,7 +894,7 @@ function getCreateNewScore({
     requiredChecks.some((check) => !check.validated && !check.weaklySupported)
   ) {
     automationBlockers.push(
-      "authoritative web evidence did not validate the differentiating bottle traits",
+      "official web evidence did not validate the differentiating bottle traits",
     );
   }
 
@@ -931,10 +929,6 @@ function getCreateNewScore({
     )
   ) {
     score += 8;
-  } else if (
-    evaluatedChecks.some((check) => check.matchedSourceTiers.includes("critic"))
-  ) {
-    score += 4;
   }
 
   const hasBlockers = automationBlockers.length > 0;

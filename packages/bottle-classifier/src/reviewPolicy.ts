@@ -8,7 +8,6 @@ import { normalizeBottleCreationDrafts } from "./bottleCreationDrafts";
 import {
   BottleClassificationDecisionSchema,
   BottleClassifierAgentDecisionSchema,
-  CaskTypeEnum,
   type BottleCandidate,
   type BottleClassificationDecision,
   type BottleClassifierAgentDecision,
@@ -24,7 +23,11 @@ import type {
 } from "./contract";
 import { BottleClassificationError } from "./error";
 import {
-  AUTHORITATIVE_SOURCE_TIERS,
+  candidateHasExactCaskCodeAnchor,
+  getExactCaskCodeAnchor,
+} from "./exactCask";
+import {
+  OFFICIAL_SOURCE_TIERS,
   buildProducerIdentityPhrases,
   classifySourceTier,
 } from "./identityEvidenceCore";
@@ -33,11 +36,20 @@ import {
   normalizeString,
   stripDuplicateBrandPrefixFromBottleName,
 } from "./normalize";
-import { parseDetailsFromName as parseSmwsDetailsFromName } from "./smws";
+import { normalizeObservation } from "./observation";
+import {
+  UNMATCHED_BOTTLE_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD,
+  isExistingMatchConfidenceEligibleForVerification,
+} from "./priceMatchingEvidence";
+import {
+  getSmwsCodeAnchor,
+  maybeResolveSmwsExactCaskCodeDecision,
+  normalizeSmwsExactCaskProposedBottleDraft,
+} from "./smwsPolicy";
 
 // These deterministic patterns are only reject/scope guards. They must not grow
 // into whisky taxonomy inference or semantic action promotion: new phrase rules
-// require authoritative research and focused tests, and ambiguous styles belong
+// require verified whisky research and focused tests, and ambiguous styles belong
 // to the web-enabled classifier.
 const NON_WHISKY_KEYWORDS =
   /\b(vodka|gin|rum|tequila|mezcal|sotol|soju|baijiu|sake|shochu|brandy|cognac|armagnac|liqueur)\b/i;
@@ -137,11 +149,6 @@ const LEGACY_RELEASE_LIKE_NAME_PATTERNS = [
   /\b\d+(?:st|nd|rd|th)\s+edition\b/i,
   /\b(?:chapter|part|vol(?:ume)?\.?)\s+[a-z0-9ivxlcdm.-]+\b/i,
 ] as const;
-const CREATION_EVIDENCE_SOURCE_TIERS = new Set([
-  "official",
-  "critic",
-  "retailer",
-]);
 const CREATION_EVIDENCE_GENERIC_TOKENS = new Set([
   "and",
   "bottle",
@@ -254,246 +261,6 @@ function textsOverlap(
     containsComparablePhrase(normalizedLeft, normalizedRight) ||
     containsComparablePhrase(normalizedRight, normalizedLeft)
   );
-}
-
-const BARE_SMWS_CODE_REFERENCE_PATTERN = /^SMWS\s+([A-Z]*\d+\.\d+)$/i;
-const SMWS_REFERENCE_PATTERN = /\b(?:SMWS|Scotch Malt Whisky Society)\b/i;
-
-function isSmwsIdentityAnchor(value: string | null | undefined): boolean {
-  const normalizedValue = normalizeComparableText(value);
-  return (
-    normalizedValue === "smws" ||
-    normalizedValue === "the scotch malt whisky society" ||
-    normalizedValue === "scotch malt whisky society"
-  );
-}
-
-function getBareSmwsCodeReference(
-  referenceName: string | null | undefined,
-): string | null {
-  const match = normalizeString(referenceName ?? "")
-    .trim()
-    .match(BARE_SMWS_CODE_REFERENCE_PATTERN);
-
-  return match?.[1] ?? null;
-}
-
-function textLooksSmws(value: string | null | undefined): boolean {
-  return SMWS_REFERENCE_PATTERN.test(value ?? "");
-}
-
-function getExactCaskCodeAnchor(
-  value: string | null | undefined,
-): string | null {
-  const match = normalizeString(value ?? "").match(/\b([A-Z]{0,4}\d+\.\d+)\b/i);
-
-  return match?.[1]?.toUpperCase() ?? null;
-}
-
-function candidateHasExactCaskCodeAnchor(
-  candidate: BottleCandidate,
-  anchor: string | null,
-): boolean {
-  if (!anchor || candidate.releaseId !== null || candidate.kind === "release") {
-    return false;
-  }
-
-  return [candidate.alias, candidate.bottleFullName, candidate.fullName].some(
-    (value) => getExactCaskCodeAnchor(value) === anchor,
-  );
-}
-
-function candidateLooksSmws(candidate: BottleCandidate): boolean {
-  return (
-    isSmwsIdentityAnchor(candidate.brand) ||
-    isSmwsIdentityAnchor(candidate.bottler) ||
-    textLooksSmws(candidate.alias) ||
-    textLooksSmws(candidate.bottleFullName) ||
-    textLooksSmws(candidate.fullName)
-  );
-}
-
-function getSmwsCodeAnchor({
-  reference,
-  decision,
-  artifacts,
-}: {
-  reference: BottleReference;
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-}): string | null {
-  if (
-    ![
-      reference.name,
-      artifacts.extractedIdentity?.brand,
-      artifacts.extractedIdentity?.bottler,
-      decision.proposedBottle?.brand.name,
-      decision.proposedBottle?.bottler?.name,
-    ].some((value) => textLooksSmws(value) || isSmwsIdentityAnchor(value))
-  ) {
-    return null;
-  }
-
-  for (const value of [
-    decision.observation?.caskNumber,
-    reference.name,
-    artifacts.extractedIdentity?.edition,
-    artifacts.extractedIdentity?.expression,
-    decision.proposedBottle?.edition,
-    decision.proposedBottle?.name,
-  ]) {
-    const code = getExactCaskCodeAnchor(value);
-    if (code) {
-      return code;
-    }
-  }
-
-  return null;
-}
-
-function getSmwsCodeTargetCandidate({
-  artifacts,
-  code,
-}: {
-  artifacts: BottleClassificationArtifacts;
-  code: string;
-}): BottleCandidate | null {
-  return (
-    artifacts.candidates
-      .filter(
-        (candidate) =>
-          candidateLooksSmws(candidate) &&
-          candidateHasExactCaskCodeAnchor(candidate, code),
-      )
-      .sort((left, right) => {
-        if (left.source.includes("exact") !== right.source.includes("exact")) {
-          return left.source.includes("exact") ? -1 : 1;
-        }
-
-        return (right.score ?? 0) - (left.score ?? 0);
-      })[0] ?? null
-  );
-}
-
-function getSmwsSelectorFromReference({
-  referenceName,
-  code,
-}: {
-  referenceName: string;
-  code: string;
-}): string | null {
-  const selector = referenceName
-    .replace(SMWS_REFERENCE_PATTERN, "")
-    .replace(new RegExp(`\\b${escapeRegExp(code)}\\b`, "i"), "")
-    .trim();
-
-  return selector || null;
-}
-
-function buildSmwsExactCaskBottleDraft({
-  artifacts,
-  code,
-}: {
-  artifacts: BottleClassificationArtifacts;
-  code: string;
-}): NonNullable<BottleClassificationDecision["proposedBottle"]> {
-  const extractedIdentity = artifacts.extractedIdentity;
-  const smwsDetails = parseSmwsDetailsFromName(code);
-  const extractedDistillers = extractedIdentity?.distillery ?? [];
-  const extractedCaskType = CaskTypeEnum.safeParse(
-    extractedIdentity?.cask_type,
-  );
-  const extractedBrand = extractedIdentity?.brand ?? null;
-  const extractedBottler = extractedIdentity?.bottler ?? null;
-  const brandName =
-    extractedBrand && isSmwsIdentityAnchor(extractedBrand)
-      ? extractedBrand
-      : "SMWS";
-  const bottlerName =
-    extractedBottler && isSmwsIdentityAnchor(extractedBottler)
-      ? extractedBottler
-      : "The Scotch Malt Whisky Society";
-  const distillerNames =
-    extractedDistillers.length > 0
-      ? extractedDistillers
-      : [smwsDetails?.distiller ?? null];
-  const distillers = Array.from(new Set(distillerNames))
-    .filter((name): name is string => Boolean(name))
-    .map((name) => ({
-      id: null,
-      name,
-    }));
-
-  return {
-    name: code,
-    series: null,
-    category: extractedIdentity?.category ?? smwsDetails?.category ?? null,
-    edition: null,
-    statedAge: extractedIdentity?.stated_age ?? null,
-    caskStrength: extractedIdentity?.cask_strength ?? null,
-    singleCask: true,
-    abv: extractedIdentity?.abv ?? null,
-    vintageYear: extractedIdentity?.vintage_year ?? null,
-    releaseYear: extractedIdentity?.release_year ?? null,
-    caskType: extractedCaskType.success ? extractedCaskType.data : null,
-    caskSize: extractedIdentity?.cask_size ?? null,
-    caskFill: extractedIdentity?.cask_fill ?? null,
-    brand: {
-      id: null,
-      name: brandName,
-    },
-    distillers,
-    bottler: {
-      id: null,
-      name: bottlerName,
-    },
-  };
-}
-
-function normalizeExactCaskProposedBottleDraft({
-  extractedIdentity,
-  proposedBottle,
-  reference,
-}: {
-  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
-  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
-  reference: BottleReference;
-}): NonNullable<BottleClassificationDecision["proposedBottle"]> {
-  const brandLooksSmws =
-    isSmwsIdentityAnchor(proposedBottle.brand.name) ||
-    isSmwsIdentityAnchor(extractedIdentity?.brand) ||
-    isSmwsIdentityAnchor(extractedIdentity?.bottler);
-
-  if (!brandLooksSmws) {
-    return proposedBottle;
-  }
-
-  const smwsCode =
-    getBareSmwsCodeReference(reference.name) ??
-    getExactCaskCodeAnchor(proposedBottle.edition) ??
-    getExactCaskCodeAnchor(proposedBottle.name) ??
-    getExactCaskCodeAnchor(extractedIdentity?.edition) ??
-    getExactCaskCodeAnchor(extractedIdentity?.expression) ??
-    getExactCaskCodeAnchor(reference.name);
-
-  if (smwsCode) {
-    return {
-      ...proposedBottle,
-      name: smwsCode,
-      edition: null,
-    };
-  }
-
-  const draftCode = proposedBottle.edition ?? extractedIdentity?.edition;
-  if (!draftCode || textsOverlap(proposedBottle.name, draftCode)) {
-    return proposedBottle;
-  }
-
-  return {
-    ...proposedBottle,
-    name: `${draftCode} ${proposedBottle.name}`.trim(),
-    edition: null,
-  };
 }
 
 function getComparableDomain(url: string | null | undefined): string | null {
@@ -1370,6 +1137,73 @@ function buildProposedBottleFromExtracted({
   };
 }
 
+function getReferenceBottleName({
+  reference,
+  brandName,
+  extractedBrand,
+}: {
+  reference: BottleReference;
+  brandName: string;
+  extractedBrand: string | null | undefined;
+}): string {
+  return stripDuplicateBrandPrefixFromBottleName(
+    stripDuplicateBrandPrefixFromBottleName(reference.name, brandName),
+    extractedBrand,
+  ).trim();
+}
+
+function stripReferenceBottleSuffixNoise(name: string): string {
+  return name
+    .replace(/\b(?:scotch\s+)?whisk(?:e)?y\b\.?$/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function restoreSparseAgeOnlyBottleName({
+  reference,
+  extractedIdentity,
+  proposedBottle,
+}: {
+  reference: BottleReference;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
+}): NonNullable<BottleClassificationDecision["proposedBottle"]> {
+  const statedAge = proposedBottle.statedAge ?? extractedIdentity?.stated_age;
+  const normalizedProposedName = normalizeComparableText(proposedBottle.name);
+  const ageStrippedProposedName = stripComparableAgeStatement(
+    normalizedProposedName,
+    statedAge,
+  );
+  const isAgeOnlyName =
+    !ageStrippedProposedName || normalizedProposedName === String(statedAge);
+  if (statedAge === null || statedAge === undefined || !isAgeOnlyName) {
+    return proposedBottle;
+  }
+
+  const referenceBottleName = stripReferenceBottleSuffixNoise(
+    getReferenceBottleName({
+      reference,
+      brandName: proposedBottle.brand.name,
+      extractedBrand: extractedIdentity?.brand,
+    }),
+  );
+  if (
+    !referenceBottleName ||
+    referenceBottleName.length > 120 ||
+    !comparableTextMarketsStatedAge(referenceBottleName, statedAge) ||
+    normalizeComparableText(referenceBottleName) ===
+      normalizeComparableText(proposedBottle.name)
+  ) {
+    return proposedBottle;
+  }
+
+  return {
+    ...proposedBottle,
+    name: referenceBottleName,
+    statedAge,
+  };
+}
+
 function buildRedirectedConfidenceBasis({
   reason,
   artifacts,
@@ -1409,7 +1243,7 @@ function withCreationEvidenceAwareConfidence({
     return decision;
   }
 
-  const hasEvidence = hasSupportiveExternalWebEvidenceForCreation({
+  const hasEvidence = hasCreationEvidence({
     reference,
     decision,
     artifacts,
@@ -1428,6 +1262,69 @@ function withCreationEvidenceAwareConfidence({
             : decision.confidenceBasis.webEvidence,
         }
       : decision.confidenceBasis,
+  };
+}
+
+function maybeCreateBottleFromSupportiveNoMatchEvidence({
+  reference,
+  decision,
+  artifacts,
+}: {
+  reference: BottleReference;
+  decision: BottleClassificationDecision;
+  artifacts: BottleClassificationArtifacts;
+}): BottleClassificationDecision | null {
+  if (
+    decision.action !== "no_match" ||
+    decision.confidenceBasis?.webEvidence !== "supportive" ||
+    !artifacts.extractedIdentity?.brand
+  ) {
+    return null;
+  }
+
+  const brandName = artifacts.extractedIdentity.brand;
+  const referenceBottleName = getReferenceBottleName({
+    reference,
+    brandName,
+    extractedBrand: artifacts.extractedIdentity.brand,
+  });
+  const parentFullName = textLooksLikeUnsupportedHouseCategoryStyle(
+    referenceBottleName,
+  )
+    ? referenceBottleName
+    : null;
+  const proposedBottle = buildProposedBottleFromExtracted({
+    reference,
+    extractedIdentity: artifacts.extractedIdentity,
+    fallbackCandidate: null,
+    parentFullName,
+  });
+  if (!proposedBottle) {
+    return null;
+  }
+  const restoredProposedBottle = restoreSparseAgeOnlyBottleName({
+    reference,
+    extractedIdentity: artifacts.extractedIdentity,
+    proposedBottle,
+  });
+
+  return {
+    action: "create_bottle",
+    confidence: decision.confidence,
+    rationale: appendRationale(
+      decision.rationale,
+      "Server converted no_match to reviewed bottle creation because the classifier supplied supportive web evidence and no safe local match.",
+    ),
+    candidateBottleIds: decision.candidateBottleIds,
+    identityScope: "product",
+    observation: decision.observation,
+    identityBasis: decision.identityBasis,
+    confidenceBasis: decision.confidenceBasis,
+    matchedBottleId: null,
+    matchedReleaseId: null,
+    parentBottleId: null,
+    proposedBottle: restoredProposedBottle,
+    proposedRelease: null,
   };
 }
 
@@ -1562,7 +1459,11 @@ function buildRedirectedCreateBottleDecision({
 
   const normalizedDrafts = normalizeBottleCreationDrafts({
     creationTarget: "bottle",
-    proposedBottle,
+    proposedBottle: restoreSparseAgeOnlyBottleName({
+      reference,
+      extractedIdentity: artifacts.extractedIdentity,
+      proposedBottle,
+    }),
     proposedRelease: null,
   });
   if (!normalizedDrafts.proposedBottle) {
@@ -1754,6 +1655,42 @@ function maybeRedirectLegacyReleaseLikeBottleDecision({
     }
   }
 
+  if (decision.action === "create_bottle" && decision.proposedBottle) {
+    const parentCandidate = findReusableParentCandidate({
+      artifacts,
+    });
+    if (
+      parentCandidate?.source.includes("exact") &&
+      !getSmwsCodeAnchor({ reference, decision, artifacts }) &&
+      candidateMatchesExtractedFamily({
+        candidate: parentCandidate,
+        extractedIdentity: artifacts.extractedIdentity,
+      })
+    ) {
+      const release = buildProposedReleaseFromExtracted({
+        reference,
+        target: parentCandidate,
+        parentCandidate,
+        extractedIdentity: artifacts.extractedIdentity,
+      });
+      if (
+        release &&
+        (extractedIdentityHasReleaseSplitMarker(artifacts.extractedIdentity) ||
+          release.statedAge !== null)
+      ) {
+        return buildRedirectedCreateReleaseDecision({
+          reference,
+          decision,
+          artifacts,
+          parentCandidate,
+          release,
+          reason:
+            "Server redirected bottle creation to a child release because an exact local parent already covers the stable bottle family.",
+        });
+      }
+    }
+  }
+
   if (decision.action === "match" && decision.matchedReleaseId === null) {
     const target = getMatchedTarget(decision, artifacts.candidates);
     if (!target || target.kind === "release" || target.releaseId !== null) {
@@ -1773,6 +1710,11 @@ function maybeRedirectLegacyReleaseLikeBottleDecision({
       parentCandidate,
       extractedIdentity: artifacts.extractedIdentity,
     });
+    const hasDirtyParentAge =
+      artifacts.extractedIdentity?.stated_age != null &&
+      target.statedAge !== null &&
+      target.statedAge !== artifacts.extractedIdentity.stated_age &&
+      !candidateNameMarketsStatedAge(target, target.statedAge);
 
     if (candidateLooksLikeLegacyReleaseBottle(target)) {
       if (!referenceHasReleaseMarker) {
@@ -1846,6 +1788,48 @@ function maybeRedirectLegacyReleaseLikeBottleDecision({
         reason:
           "Server redirected a legacy release-like bottle-row match to create a reusable parent bottle and child release.",
       });
+    }
+
+    if (
+      referenceHasReleaseMarker &&
+      release &&
+      !hasDirtyParentAge &&
+      candidateCanActAsReusableParent(target) &&
+      target.source.includes("exact")
+    ) {
+      return buildRedirectedCreateReleaseDecision({
+        reference,
+        decision,
+        artifacts,
+        parentCandidate: target,
+        release,
+        reason:
+          "Server redirected an exact parent match to create a child release because the source carries a clear release marker.",
+      });
+    }
+
+    if (
+      candidateCanActAsReusableParent(target) &&
+      target.source.includes("exact") &&
+      hasDirtyParentAge
+    ) {
+      const dirtyAgeRelease = buildProposedReleaseFromExtracted({
+        reference,
+        target,
+        parentCandidate: target,
+        extractedIdentity: artifacts.extractedIdentity,
+      });
+      if (dirtyAgeRelease && dirtyAgeRelease.statedAge !== null) {
+        return buildRedirectedCreateReleaseDecision({
+          reference,
+          decision,
+          artifacts,
+          parentCandidate: target,
+          release: dirtyAgeRelease,
+          reason:
+            "Server redirected a dirty parent match to create a child release because the parent row's structured age conflicts with the source age and is not marketed in the parent name.",
+        });
+      }
     }
 
     if (
@@ -2116,21 +2100,51 @@ function hasSupportiveExternalWebEvidenceForCreation({
   decision: BottleClassificationDecision;
   artifacts: BottleClassificationArtifacts;
 }): boolean {
+  if (
+    decision.confidenceBasis &&
+    decision.confidenceBasis.webEvidence !== "supportive"
+  ) {
+    return false;
+  }
+
+  const agentMarkedWebEvidenceSupportive =
+    decision.confidenceBasis?.webEvidence === "supportive";
+  const sourceDomain = getComparableDomain(reference.url ?? "");
+  const targetCandidate =
+    decision.parentBottleId !== null
+      ? (artifacts.candidates.find(
+          (candidate) =>
+            candidate.bottleId === decision.parentBottleId &&
+            candidate.releaseId === null &&
+            candidate.kind !== "release",
+        ) ?? null)
+      : null;
   const producerPhrases = buildProducerIdentityPhrases({
     proposedBottle: decision.proposedBottle,
     extractedLabel: artifacts.extractedIdentity,
-    targetCandidate: getCreateReleaseParentCandidate({ decision, artifacts }),
+    targetCandidate,
   });
 
   for (const evidence of artifacts.searchEvidence) {
     for (const result of evidence.results) {
-      const sourceTier = classifySourceTier({
-        result,
-        sourceUrl: reference.url ?? "",
-        producerPhrases,
-      });
-      if (!CREATION_EVIDENCE_SOURCE_TIERS.has(sourceTier)) {
+      const resultDomain = getComparableDomain(result.url);
+      if (
+        sourceDomain &&
+        resultDomain &&
+        domainMatches(resultDomain, sourceDomain)
+      ) {
         continue;
+      }
+
+      if (!agentMarkedWebEvidenceSupportive) {
+        const sourceTier = classifySourceTier({
+          result,
+          sourceUrl: reference.url ?? "",
+          producerPhrases,
+        });
+        if (!OFFICIAL_SOURCE_TIERS.has(sourceTier)) {
+          continue;
+        }
       }
 
       if (
@@ -2149,6 +2163,55 @@ function hasSupportiveExternalWebEvidenceForCreation({
   }
 
   return false;
+}
+
+function hasSmwsCodeAnchoredCreationEvidence({
+  reference,
+  decision,
+  artifacts,
+}: {
+  reference: BottleReference;
+  decision: BottleClassificationDecision;
+  artifacts: BottleClassificationArtifacts;
+}): boolean {
+  if (
+    decision.action !== "create_bottle" ||
+    decision.identityScope !== "exact_cask" ||
+    !decision.proposedBottle
+  ) {
+    return false;
+  }
+
+  return (
+    getSmwsCodeAnchor({
+      reference,
+      decision,
+      artifacts,
+    }) !== null
+  );
+}
+
+function hasCreationEvidence({
+  reference,
+  decision,
+  artifacts,
+}: {
+  reference: BottleReference;
+  decision: BottleClassificationDecision;
+  artifacts: BottleClassificationArtifacts;
+}): boolean {
+  return (
+    hasSmwsCodeAnchoredCreationEvidence({
+      reference,
+      decision,
+      artifacts,
+    }) ||
+    hasSupportiveExternalWebEvidenceForCreation({
+      reference,
+      decision,
+      artifacts,
+    })
+  );
 }
 
 function hasLocalParentAnchoredReleaseCreationEvidence({
@@ -2240,28 +2303,6 @@ function hasLocalSiblingAnchoredBottleAndReleaseCreationEvidence({
   }).length;
 
   return siblingCount >= 2;
-}
-
-function normalizeObservation(
-  observation: BottleObservation | null | undefined,
-): BottleObservation | null {
-  if (!observation) {
-    return null;
-  }
-
-  const normalized: BottleObservation = {
-    selector: observation.selector?.trim() || null,
-    caskNumber: observation.caskNumber?.trim() || null,
-    barrelNumber: observation.barrelNumber?.trim() || null,
-    bottleNumber: observation.bottleNumber?.trim() || null,
-    outturn: observation.outturn ?? null,
-    market: observation.market?.trim() || null,
-    exclusive: observation.exclusive?.trim() || null,
-  };
-
-  return Object.values(normalized).some((value) => value !== null)
-    ? normalized
-    : null;
 }
 
 function hasSingularCaskObservationValue(
@@ -2531,101 +2572,6 @@ function maybeResolveExactCaskCreateToExistingMatch({
     matchedReleaseId: null,
     parentBottleId: null,
     proposedBottle: null,
-    proposedRelease: null,
-  };
-}
-
-function maybeResolveSmwsExactCaskCodeDecision({
-  reference,
-  decision,
-  artifacts,
-}: {
-  reference: BottleReference;
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-}): BottleClassificationDecision | null {
-  const smwsCode = getSmwsCodeAnchor({
-    reference,
-    decision,
-    artifacts,
-  });
-  if (!smwsCode) {
-    return null;
-  }
-
-  const existingTarget = getSmwsCodeTargetCandidate({
-    artifacts,
-    code: smwsCode,
-  });
-  const currentObservation = decision.observation;
-  const observation = normalizeObservation({
-    barrelNumber: currentObservation?.barrelNumber ?? null,
-    bottleNumber: currentObservation?.bottleNumber ?? null,
-    outturn: currentObservation?.outturn ?? null,
-    market: currentObservation?.market ?? null,
-    exclusive: currentObservation?.exclusive ?? null,
-    selector:
-      currentObservation?.selector ??
-      getSmwsSelectorFromReference({
-        referenceName: reference.name,
-        code: smwsCode,
-      }),
-    caskNumber: currentObservation?.caskNumber ?? smwsCode,
-  });
-
-  if (existingTarget) {
-    return {
-      action: "match",
-      confidence: decision.confidence,
-      rationale: appendRationale(
-        decision.rationale,
-        "Server matched the SMWS exact-cask code because SMWS bottle identity is anchored by code, not subtitle.",
-      ),
-      candidateBottleIds: Array.from(
-        new Set([...decision.candidateBottleIds, existingTarget.bottleId]),
-      ),
-      identityScope: "exact_cask",
-      observation,
-      matchedBottleId: existingTarget.bottleId,
-      matchedReleaseId: null,
-      parentBottleId: null,
-      proposedBottle: null,
-      proposedRelease: null,
-    };
-  }
-
-  if (decision.action !== "no_match") {
-    return null;
-  }
-
-  const proposedBottle = buildSmwsExactCaskBottleDraft({
-    artifacts,
-    code: smwsCode,
-  });
-  if (
-    !hasSupportiveExternalWebEvidenceForCreation({
-      reference,
-      decision,
-      artifacts,
-    })
-  ) {
-    return null;
-  }
-
-  return {
-    action: "create_bottle",
-    confidence: decision.confidence,
-    rationale: appendRationale(
-      decision.rationale,
-      "Server created the SMWS exact-cask bottle because external web evidence supports the code and no local bottle uses it.",
-    ),
-    candidateBottleIds: decision.candidateBottleIds,
-    identityScope: "exact_cask",
-    observation,
-    matchedBottleId: null,
-    matchedReleaseId: null,
-    parentBottleId: null,
-    proposedBottle,
     proposedRelease: null,
   };
 }
@@ -3251,6 +3197,31 @@ function proposedBottleNeedsMaterialTargetRepair({
   return false;
 }
 
+function proposedBottleHasKnownTargetConflict({
+  target,
+  proposedBottle,
+  extractedIdentity,
+}: {
+  target: BottleCandidate;
+  proposedBottle: ProposedBottle;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+}): boolean {
+  return proposedBottleNeedsMaterialTargetRepair({
+    target,
+    proposedBottle: {
+      ...proposedBottle,
+      abv: target.abv === null ? null : proposedBottle.abv,
+      caskStrength:
+        target.caskStrength === null ? null : proposedBottle.caskStrength,
+      singleCask: target.singleCask === null ? null : proposedBottle.singleCask,
+      caskType: target.caskType === null ? null : proposedBottle.caskType,
+      caskSize: target.caskSize === null ? null : proposedBottle.caskSize,
+      caskFill: target.caskFill === null ? null : proposedBottle.caskFill,
+    },
+    extractedIdentity,
+  });
+}
+
 function findDuplicateCreateBottleCandidate({
   reference,
   proposedBottle,
@@ -3286,7 +3257,7 @@ function findDuplicateCreateBottleCandidate({
         }
 
         if (
-          proposedBottleNeedsMaterialTargetRepair({
+          proposedBottleHasKnownTargetConflict({
             target: candidate,
             proposedBottle,
             extractedIdentity: artifacts.extractedIdentity,
@@ -3312,6 +3283,134 @@ function findDuplicateCreateBottleCandidate({
         return (right.score ?? 0) - (left.score ?? 0);
       })[0] ?? null
   );
+}
+
+function findStructuredCreateBottleMatchCandidate({
+  proposedBottle,
+  artifacts,
+}: {
+  proposedBottle: ProposedBottle;
+  artifacts: BottleClassificationArtifacts;
+}): BottleCandidate | null {
+  return (
+    artifacts.candidates
+      .filter((candidate) => {
+        if (
+          candidate.kind !== "bottle" ||
+          candidate.releaseId !== null ||
+          candidateLooksLikeLegacyReleaseBottle(candidate)
+        ) {
+          return false;
+        }
+
+        if (
+          proposedBottleHasKnownTargetConflict({
+            target: candidate,
+            proposedBottle,
+            extractedIdentity: artifacts.extractedIdentity,
+          })
+        ) {
+          return false;
+        }
+
+        return hasUniquelySupportedStructuredBottleMatch({
+          target: candidate,
+          artifacts,
+        });
+      })
+      .sort((left, right) => {
+        if (left.source.includes("exact") !== right.source.includes("exact")) {
+          return left.source.includes("exact") ? -1 : 1;
+        }
+
+        return (right.score ?? 0) - (left.score ?? 0);
+      })[0] ?? null
+  );
+}
+
+function maybeSplitMisScopedExactCaskBottleCreation({
+  reference,
+  decision,
+  artifacts,
+  proposedBottle,
+  observation,
+}: {
+  reference: BottleReference;
+  decision: BottleClassificationDecision;
+  artifacts: BottleClassificationArtifacts;
+  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
+  observation: BottleObservation | null;
+}): BottleClassificationDecision | null {
+  if (
+    decision.action !== "create_bottle" ||
+    decision.identityScope !== "exact_cask" ||
+    getSmwsCodeAnchor({ reference, decision, artifacts }) ||
+    observation?.caskNumber ||
+    observation?.barrelNumber ||
+    (proposedBottle.releaseYear === null && proposedBottle.vintageYear === null)
+  ) {
+    return null;
+  }
+
+  const parentDraft = buildProposedBottleFromExtracted({
+    reference,
+    extractedIdentity: artifacts.extractedIdentity,
+    fallbackCandidate: null,
+    releaseUsesExtractedAge: true,
+  }) ?? {
+    ...proposedBottle,
+    edition: null,
+    statedAge: null,
+    abv: null,
+    caskStrength: null,
+    singleCask: null,
+    vintageYear: null,
+    releaseYear: null,
+    caskType: null,
+    caskSize: null,
+    caskFill: null,
+  };
+  const release: ProposedRelease = {
+    ...buildEmptyProposedRelease(),
+    edition: proposedBottle.edition,
+    statedAge: proposedBottle.statedAge,
+    abv: proposedBottle.abv,
+    caskStrength: proposedBottle.caskStrength,
+    singleCask: proposedBottle.singleCask,
+    vintageYear: proposedBottle.vintageYear,
+    releaseYear: proposedBottle.releaseYear,
+    caskType: proposedBottle.caskType,
+    caskSize: proposedBottle.caskSize,
+    caskFill: proposedBottle.caskFill,
+  };
+  const normalizedDrafts = normalizeBottleCreationDrafts({
+    creationTarget: "bottle_and_release",
+    proposedBottle: parentDraft,
+    proposedRelease: release,
+  });
+
+  if (!normalizedDrafts.proposedBottle || !normalizedDrafts.proposedRelease) {
+    return null;
+  }
+
+  return {
+    action: "create_bottle_and_release",
+    confidence: decision.confidence,
+    rationale: appendRationale(
+      decision.rationale,
+      "Server redirected exact-cask bottle creation to bottle-and-release creation because the non-SMWS identity only had year-level release traits, not an exact cask anchor.",
+    ),
+    candidateBottleIds: decision.candidateBottleIds,
+    identityScope: "product",
+    observation,
+    identityBasis: decision.identityBasis,
+    confidenceBasis: decision.confidenceBasis,
+    matchedBottleId: null,
+    matchedReleaseId: null,
+    parentBottleId: null,
+    proposedBottle: normalizedDrafts.proposedBottle,
+    proposedRelease: normalizedDrafts.proposedRelease,
+  };
 }
 
 function hasSupportiveWebEvidenceForTarget({
@@ -3367,7 +3466,7 @@ function hasSupportiveWebEvidenceForTarget({
         sourceUrl: reference.url ?? "",
         producerPhrases,
       });
-      if (!AUTHORITATIVE_SOURCE_TIERS.has(sourceTier)) {
+      if (!OFFICIAL_SOURCE_TIERS.has(sourceTier)) {
         continue;
       }
 
@@ -3402,7 +3501,9 @@ function createNoMatchDecision({
     BottleClassifierAgentDecision,
     "confidence" | "rationale" | "identityScope"
   > &
-    Partial<Pick<BottleClassifierAgentDecision, "identityBasis">>;
+    Partial<
+      Pick<BottleClassifierAgentDecision, "identityBasis" | "confidenceBasis">
+    >;
   candidateBottleIds: number[];
   rationale: string | null;
   observation: BottleObservation | null;
@@ -3416,6 +3517,7 @@ function createNoMatchDecision({
     identityScope: identityScope ?? decision.identityScope ?? "product",
     observation,
     identityBasis: decision.identityBasis ?? null,
+    confidenceBasis: decision.confidenceBasis ?? null,
     matchedBottleId: null,
     matchedReleaseId: null,
     parentBottleId: null,
@@ -3495,7 +3597,7 @@ function downgradeUnsafeExistingMatchDecision({
     !hasStructuredBottleSupport
   ) {
     reasons.push(
-      "there is no exact alias, no exactish canonical name match, no uniquely supported structured bottle identity, and no authoritative web evidence supports the matched target",
+      "there is no exact alias, no exactish canonical name match, no uniquely supported structured bottle identity, and no validated web evidence supports the matched target",
     );
   }
 
@@ -3537,6 +3639,11 @@ function downgradeCreationWithoutWebEvidence({
       decision,
       artifacts,
     }) ||
+    hasSmwsCodeAnchoredCreationEvidence({
+      reference,
+      decision,
+      artifacts,
+    }) ||
     hasLocalParentAnchoredReleaseCreationEvidence({
       decision,
       artifacts,
@@ -3559,6 +3666,274 @@ function downgradeCreationWithoutWebEvidence({
       "Server downgraded creation because creation requires external web evidence.",
     ),
   });
+}
+
+function capAutoVerificationWithUnresolvedRisks(
+  decision: BottleClassificationDecision,
+): BottleClassificationDecision {
+  const confidenceBasis = decision.confidenceBasis;
+  if (
+    confidenceBasis?.band !== "auto_verification" ||
+    confidenceBasis.unresolvedRisks.length === 0
+  ) {
+    return decision;
+  }
+
+  return {
+    ...decision,
+    confidence: Math.min(decision.confidence, 94),
+    rationale: appendRationale(
+      decision.rationale,
+      "Server moved the decision out of automatic verification because the classifier reported unresolved risks.",
+    ),
+    confidenceBasis: {
+      ...confidenceBasis,
+      band: "review",
+    },
+  };
+}
+
+function tokenSetContainsAll(
+  haystack: ReadonlySet<string>,
+  needles: string[],
+): boolean {
+  return needles.every((token) => haystack.has(token));
+}
+
+function candidateIsReferenceUnsupportedSpecificSibling({
+  referenceName,
+  target,
+  candidate,
+}: {
+  referenceName: string;
+  target: BottleCandidate;
+  candidate: BottleCandidate;
+}): boolean {
+  if (
+    candidate.bottleId === target.bottleId ||
+    candidate.releaseId !== null ||
+    candidate.kind === "release"
+  ) {
+    return false;
+  }
+
+  const referenceTokens = new Set(getComparableNameTokens(referenceName));
+  const targetTokenSets = getBottleTargetNameCandidates(target)
+    .map((name) => getComparableNameTokens(name))
+    .filter((tokens) => tokens.length > 0);
+  const candidateTokenSets = getBottleTargetNameCandidates(candidate)
+    .map((name) => getComparableNameTokens(name))
+    .filter((tokens) => tokens.length > 0);
+
+  return targetTokenSets.some((targetTokens) => {
+    if (!tokenSetContainsAll(referenceTokens, targetTokens)) {
+      return false;
+    }
+
+    const targetTokenSet = new Set(targetTokens);
+    return candidateTokenSets.some((candidateTokens) => {
+      const candidateTokenSet = new Set(candidateTokens);
+      const extraTokens = candidateTokens.filter(
+        (token) => !targetTokenSet.has(token),
+      );
+
+      return (
+        extraTokens.length > 0 &&
+        tokenSetContainsAll(candidateTokenSet, targetTokens) &&
+        extraTokens.every((token) => !referenceTokens.has(token))
+      );
+    });
+  });
+}
+
+function canClearRisksForExistingMatchPromotion({
+  risks,
+  referenceName,
+  target,
+  artifacts,
+  extractedIdentity,
+  hasExactLocalTextSearchHit,
+}: {
+  risks: string[];
+  referenceName: string;
+  target: BottleCandidate;
+  artifacts: BottleClassificationArtifacts;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+  hasExactLocalTextSearchHit: boolean;
+}): boolean {
+  if (!risks.length) {
+    return true;
+  }
+
+  const normalizedRisks = risks.map((risk) => normalizeComparableText(risk));
+  if (
+    normalizedRisks.every(
+      (risk) =>
+        risk.includes("broader sibling") &&
+        risk.includes("omit") &&
+        risk.includes("age"),
+    ) &&
+    candidateMatchesStructuredBottleStatedAge({
+      candidate: target,
+      extractedIdentity,
+    })
+  ) {
+    return true;
+  }
+
+  if (!hasExactLocalTextSearchHit) {
+    return false;
+  }
+
+  return (
+    normalizedRisks.every((risk) => risk.includes("sibling")) &&
+    artifacts.candidates.some((candidate) =>
+      candidateIsReferenceUnsupportedSpecificSibling({
+        referenceName,
+        target,
+        candidate,
+      }),
+    )
+  );
+}
+
+function promoteExistingBottleMatchConfidence({
+  reference,
+  decision,
+  artifacts,
+}: {
+  reference: BottleReference;
+  decision: BottleClassificationDecision;
+  artifacts: BottleClassificationArtifacts;
+}): BottleClassificationDecision {
+  const confidenceBasis = decision.confidenceBasis;
+  if (
+    decision.action !== "match" ||
+    decision.identityScope !== "product" ||
+    decision.matchedBottleId === null ||
+    decision.matchedReleaseId !== null ||
+    !confidenceBasis ||
+    !["review", "auto_verification"].includes(confidenceBasis.band) ||
+    decision.confidence < 90
+  ) {
+    return decision;
+  }
+
+  const verificationConfidence = Math.max(
+    decision.confidence,
+    UNMATCHED_BOTTLE_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD,
+  );
+  if (
+    !isExistingMatchConfidenceEligibleForVerification({
+      confidence: verificationConfidence,
+      currentBottleId: reference.currentBottleId ?? null,
+      currentReleaseId: reference.currentReleaseId ?? null,
+      identityScope: decision.identityScope,
+      matchedBottleId: decision.matchedBottleId,
+      matchedReleaseId: decision.matchedReleaseId,
+    })
+  ) {
+    return decision;
+  }
+
+  const target = getMatchedTarget(decision, artifacts.candidates);
+  if (!target) {
+    return decision;
+  }
+
+  const hasExactLocalTextSearchHit =
+    target.source.includes("text") && (target.score ?? 0) >= 0.99;
+  const hasExactishLocalName = getTargetNameCandidates(target, decision).some(
+    (name) => isConservativelySupportedExistingMatchName(reference.name, name),
+  );
+  const hasStructuredBottleSupport = hasUniquelySupportedStructuredBottleMatch({
+    target,
+    artifacts,
+  });
+  if (
+    !hasExactishLocalName &&
+    !hasExactLocalTextSearchHit &&
+    !hasStructuredBottleSupport
+  ) {
+    return decision;
+  }
+
+  if (
+    !canClearRisksForExistingMatchPromotion({
+      risks: confidenceBasis.unresolvedRisks,
+      referenceName: reference.name,
+      target,
+      artifacts,
+      extractedIdentity: artifacts.extractedIdentity,
+      hasExactLocalTextSearchHit,
+    })
+  ) {
+    return decision;
+  }
+
+  const identityConflicts = getExistingMatchIdentityConflicts({
+    referenceName: reference.name,
+    targetCandidate: target,
+    extractedLabel: artifacts.extractedIdentity,
+  });
+  if (identityConflicts.length) {
+    return decision;
+  }
+
+  return {
+    ...decision,
+    confidence: verificationConfidence,
+    rationale: appendRationale(
+      decision.rationale,
+      "Server moved the existing match into automatic verification because exact local search, exact local naming, or structured evidence uniquely supports the matched bottle.",
+    ),
+    confidenceBasis: {
+      ...confidenceBasis,
+      band: "auto_verification",
+      positiveEvidence: [
+        ...confidenceBasis.positiveEvidence,
+        "Exact local search, exact local naming, or structured evidence uniquely supports the matched bottle.",
+      ],
+      unresolvedRisks: [],
+    },
+  };
+}
+
+function capIneligibleExistingMatchAutoVerification({
+  reference,
+  decision,
+}: {
+  reference: BottleReference;
+  decision: BottleClassificationDecision;
+}): BottleClassificationDecision {
+  const confidenceBasis = decision.confidenceBasis;
+  if (
+    decision.action !== "match" ||
+    confidenceBasis?.band !== "auto_verification" ||
+    isExistingMatchConfidenceEligibleForVerification({
+      confidence: decision.confidence,
+      currentBottleId: reference.currentBottleId ?? null,
+      currentReleaseId: reference.currentReleaseId ?? null,
+      identityScope: decision.identityScope,
+      matchedBottleId: decision.matchedBottleId,
+      matchedReleaseId: decision.matchedReleaseId,
+    })
+  ) {
+    return decision;
+  }
+
+  return {
+    ...decision,
+    confidence: Math.min(decision.confidence, 94),
+    rationale: appendRationale(
+      decision.rationale,
+      "Server moved the existing match out of automatic verification because downstream verification is not eligible for this assignment context.",
+    ),
+    confidenceBasis: {
+      ...confidenceBasis,
+      band: "review",
+    },
+  };
 }
 
 function textLooksLikeUnsupportedHouseCategoryStyle(
@@ -3628,26 +4003,25 @@ function maybeRestoreUnsupportedStyleBottleName({
       decision.action !== "create_bottle_and_release") ||
     !decision.proposedBottle ||
     decision.proposedBottle.category !== null ||
-    !artifacts.extractedIdentity?.expression ||
-    textsOverlap(
-      decision.proposedBottle.name,
-      artifacts.extractedIdentity.expression,
-    )
+    !artifacts.extractedIdentity?.expression
   ) {
     return null;
   }
 
-  const referenceBottleName = stripDuplicateBrandPrefixFromBottleName(
-    stripDuplicateBrandPrefixFromBottleName(
-      reference.name,
-      decision.proposedBottle.brand.name,
-    ),
-    artifacts.extractedIdentity.brand,
-  ).trim();
+  const referenceBottleName = getReferenceBottleName({
+    reference,
+    brandName: decision.proposedBottle.brand.name,
+    extractedBrand: artifacts.extractedIdentity.brand,
+  });
   if (
     !referenceBottleName ||
     referenceBottleName.length > 120 ||
-    !textsOverlap(referenceBottleName, artifacts.extractedIdentity.expression)
+    !textsOverlap(
+      referenceBottleName,
+      artifacts.extractedIdentity.expression,
+    ) ||
+    normalizeComparableText(referenceBottleName) ===
+      normalizeComparableText(decision.proposedBottle.name)
   ) {
     return null;
   }
@@ -3861,12 +4235,16 @@ function sanitizeClassifierDecision({
       });
     }
 
-    const sanitizedBottleDraft = normalizeExactCaskProposedBottleDraft({
+    const sanitizedBottleDraft = normalizeSmwsExactCaskProposedBottleDraft({
       extractedIdentity: artifacts.extractedIdentity,
-      proposedBottle: sanitizeProposedBottleDraft(
-        decision.proposedBottle,
-        resolvedEntitiesById,
-      ),
+      proposedBottle: restoreSparseAgeOnlyBottleName({
+        reference,
+        extractedIdentity: artifacts.extractedIdentity,
+        proposedBottle: sanitizeProposedBottleDraft(
+          decision.proposedBottle,
+          resolvedEntitiesById,
+        ),
+      }),
       reference,
     });
     const normalizedDrafts = normalizeBottleCreationDrafts({
@@ -3889,6 +4267,63 @@ function sanitizeClassifierDecision({
           "Server downgraded create_bottle because the proposed bottle draft could not be normalized.",
         ),
       });
+    }
+
+    const splitExactCaskDecision = maybeSplitMisScopedExactCaskBottleCreation({
+      reference,
+      decision: {
+        ...decision,
+        action: "create_bottle",
+        confidence: normalizedConfidence,
+        identityScope: decision.identityScope ?? "product",
+        matchedBottleId: null,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: normalizedDrafts.proposedBottle,
+        proposedRelease: null,
+      },
+      artifacts,
+      proposedBottle: normalizedDrafts.proposedBottle,
+      observation,
+    });
+    if (splitExactCaskDecision) {
+      return splitExactCaskDecision;
+    }
+
+    const structuredMatchCandidate = findStructuredCreateBottleMatchCandidate({
+      proposedBottle: normalizedDrafts.proposedBottle,
+      artifacts,
+    });
+    if (structuredMatchCandidate) {
+      return {
+        action: "match",
+        confidence: normalizedConfidence,
+        rationale: appendRationale(
+          decision.rationale,
+          "Server resolved bottle creation to an existing local bottle because structured local traits uniquely support that candidate.",
+        ),
+        candidateBottleIds: Array.from(
+          new Set([
+            ...filteredCandidateBottleIds,
+            structuredMatchCandidate.bottleId,
+          ]),
+        ),
+        identityScope: inferIdentityScope({
+          requestedIdentityScope: decision.identityScope,
+          reference,
+          target: structuredMatchCandidate,
+          extractedIdentity: artifacts.extractedIdentity,
+          proposedBottle: null,
+          hasReleaseIdentity: false,
+          observation,
+        }),
+        observation,
+        matchedBottleId: structuredMatchCandidate.bottleId,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: null,
+        proposedRelease: null,
+      };
     }
 
     const duplicateBottleCandidate = findDuplicateCreateBottleCandidate({
@@ -4048,12 +4483,16 @@ function sanitizeClassifierDecision({
       });
     }
 
-    const sanitizedBottleDraft = normalizeExactCaskProposedBottleDraft({
+    const sanitizedBottleDraft = normalizeSmwsExactCaskProposedBottleDraft({
       extractedIdentity: artifacts.extractedIdentity,
-      proposedBottle: sanitizeProposedBottleDraft(
-        decision.proposedBottle,
-        resolvedEntitiesById,
-      ),
+      proposedBottle: restoreSparseAgeOnlyBottleName({
+        reference,
+        extractedIdentity: artifacts.extractedIdentity,
+        proposedBottle: sanitizeProposedBottleDraft(
+          decision.proposedBottle,
+          resolvedEntitiesById,
+        ),
+      }),
       reference,
     });
     const normalizedDrafts = normalizeBottleCreationDrafts({
@@ -4330,6 +4769,8 @@ function sanitizeClassifierDecision({
         hasReleaseIdentity: false,
         observation,
       }),
+      identityBasis: decision.identityBasis,
+      confidenceBasis: decision.confidenceBasis,
     },
     candidateBottleIds: filteredCandidateBottleIds,
     observation,
@@ -4412,12 +4853,18 @@ export function finalizeBottleReferenceClassification({
     decision: parsedDecision,
     artifacts,
   });
-  const unsupportedStyleCategoryAdjustedDecision =
-    maybeRemoveUnsupportedStyleBottleCategory({
+  const supportiveNoMatchAdjustedDecision =
+    maybeCreateBottleFromSupportiveNoMatchEvidence({
       reference,
       decision: sanitizedDecision,
       artifacts,
     }) ?? sanitizedDecision;
+  const unsupportedStyleCategoryAdjustedDecision =
+    maybeRemoveUnsupportedStyleBottleCategory({
+      reference,
+      decision: supportiveNoMatchAdjustedDecision,
+      artifacts,
+    }) ?? supportiveNoMatchAdjustedDecision;
   const unsupportedStyleNameAdjustedDecision =
     maybeRestoreUnsupportedStyleBottleName({
       reference,
@@ -4441,24 +4888,56 @@ export function finalizeBottleReferenceClassification({
       decision: exactCaskAdjustedDecision,
       artifacts,
     }) ?? exactCaskAdjustedDecision;
+  const agentBasisAdjustedDecision = {
+    ...legacyReleaseRedirectedDecision,
+    identityBasis:
+      legacyReleaseRedirectedDecision.identityBasis ??
+      parsedDecision.identityBasis,
+    confidenceBasis:
+      legacyReleaseRedirectedDecision.confidenceBasis ??
+      parsedDecision.confidenceBasis,
+  };
   const evidenceAdjustedDecision = enforceCreateWebEvidence
     ? downgradeCreationWithoutWebEvidence({
         reference,
-        decision: legacyReleaseRedirectedDecision,
+        decision: agentBasisAdjustedDecision,
         artifacts,
       })
-    : legacyReleaseRedirectedDecision;
+    : agentBasisAdjustedDecision;
+  const structuredMatchConfidenceAdjustedDecision =
+    promoteExistingBottleMatchConfidence({
+      reference,
+      decision: evidenceAdjustedDecision,
+      artifacts,
+    });
+  const confidenceAdjustedDecision = capAutoVerificationWithUnresolvedRisks(
+    structuredMatchConfidenceAdjustedDecision,
+  );
+  const verificationEligibleConfidenceAdjustedDecision =
+    capIneligibleExistingMatchAutoVerification({
+      reference,
+      decision: confidenceAdjustedDecision,
+    });
   const reviewedDecision = downgradeUnsafeExistingMatchDecision({
     reference,
-    decision: evidenceAdjustedDecision,
+    decision: verificationEligibleConfidenceAdjustedDecision,
     artifacts,
   });
+  const finalDecision = reviewedDecision.proposedBottle
+    ? {
+        ...reviewedDecision,
+        proposedBottle: restoreSparseAgeOnlyBottleName({
+          reference,
+          extractedIdentity: artifacts.extractedIdentity,
+          proposedBottle: reviewedDecision.proposedBottle,
+        }),
+      }
+    : reviewedDecision;
 
   return BottleClassificationDecisionSchema.parse({
-    ...reviewedDecision,
-    identityBasis:
-      reviewedDecision.identityBasis ?? parsedDecision.identityBasis,
+    ...finalDecision,
+    identityBasis: finalDecision.identityBasis ?? parsedDecision.identityBasis,
     confidenceBasis:
-      reviewedDecision.confidenceBasis ?? parsedDecision.confidenceBasis,
+      finalDecision.confidenceBasis ?? parsedDecision.confidenceBasis,
   });
 }

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:50:38.091Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Glenglassaugh 1978 Rare Cask Release Batch 1 35 year old"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Glenglassaugh 1978 Rare Cask Release Batch 1 35 year old",
+    "summary": "I found solid evidence that **“Glenglassaugh 1978 Rare Cask Release Batch 1 35 year old”** refers to a **Glenglassaugh single malt distilled in 1978, bottled at 35 years old as part of the distillery’s Rare Cask Release Batch 1**, and that at least one confirmed Batch 1 bottling is **cask #1803 at 42.9% ABV**. Independ",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/53799/glenglassaugh-1978",
+        "url": "https://www.whiskybase.com/whiskies/whisky/53799/glenglassaugh-1978",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/glenglassaugh-rare-cask-1803.html",
+        "url": "https://www.whisky.com/whisky-database/details/glenglassaugh-rare-cask-1803.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/151/whiskies?language=en",
+        "url": "https://www.whiskybase.com/whiskies/distillery/151/whiskies?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.lochfynewhiskies.com/glenglassaugh-1978-batch-1-1803-35-year-old",
+        "url": "https://www.lochfynewhiskies.com/glenglassaugh-1978-batch-1-1803-35-year-old",
+        "domain": "lochfynewhiskies.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskybarrel.com/products/glenglassaugh-35-year-old-batch-1-cask-1803",
+        "url": "https://www.thewhiskybarrel.com/products/glenglassaugh-35-year-old-batch-1-cask-1803",
+        "domain": "thewhiskybarrel.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskyshop.com/auctions/a100549-glenglassaugh-1978-35-year-old-single-cask-1803-rare-cask-release",
+        "url": "https://www.whiskyshop.com/auctions/a100549-glenglassaugh-1978-35-year-old-single-cask-1803-rare-cask-release",
+        "domain": "whiskyshop.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2968d9d835ba678f6f37afe76b121a4b0acf4720bfcfeafbcae1c94e3717ab0f",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T06:39:03.648Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Heaven's Door\" \"Bootleg Series\" \"Volume 3\" whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Heaven's Door\" \"Bootleg Series\" \"Volume 3\" whiskey",
+    "summary": "**Heaven’s Door Bootleg Series Volume III** is the **2021** release in the Bootleg Series line from Heaven’s Door. The most reliable bottle-specific details I found are:\n\n- **Producer/Bottler:** Heaven’s Door Spirits. ([buy.heavensdoor.com](https://buy.heavensdoor.com/products/bootleg-series-volume-iii?utm_source=opena",
+    "results": [
+      {
+        "title": "https://www.heavensdoor.com/bootleg-series",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinksdirect.com/heavens-door-bootleg-series-volume-3-edition-75cl-5978",
+        "url": "https://www.drinksdirect.com/heavens-door-bootleg-series-volume-3-edition-75cl-5978",
+        "domain": "drinksdirect.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.standardliquorshop.com/product/heavens-door-volume-3/",
+        "url": "https://www.standardliquorshop.com/product/heavens-door-volume-3/",
+        "domain": "standardliquorshop.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.astorwines.com/item/45526",
+        "url": "https://www.astorwines.com/item/45526",
+        "domain": "astorwines.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wine.com/product/heavens-door-the-bootleg-series-volume-3-american-whiskey-with-gift-box-2021/877716",
+        "url": "https://www.wine.com/product/heavens-door-the-bootleg-series-volume-3-american-whiskey-with-gift-box-2021/877716",
+        "domain": "wine.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "741f04ad0d3c87da5e59f0e5076ed7c75001c126c13b1f341ff05b051d997260",
+    "mode": "auto"
+  }
+}
