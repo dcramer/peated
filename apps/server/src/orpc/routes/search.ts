@@ -166,6 +166,6 @@ export default procedure
 
     return {
       query,
-      results: sortedResults,
+      results: sortedResults.slice(0, limit),
     };
   });
