@@ -170,12 +170,13 @@ export const PriceMatchAttributeEnum = z.enum([
   "releaseYear",
 ]);
 
+// Legacy checks may contain official, critic, retailer, or unknown. Current
+// code only writes external or origin_retailer.
 export const PriceMatchEvidenceSourceTierEnum = z.enum([
   "official",
-  // Retained for legacy serialized evidence checks. Current classifier code
-  // does not assign reviewer or database sources from a domain allowlist.
   "critic",
   "retailer",
+  "external",
   "origin_retailer",
   "unknown",
 ]);

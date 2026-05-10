@@ -208,12 +208,13 @@ export const BottleSearchEvidenceSchema = z.object({
   results: z.array(BottleSearchResultSchema).default([]),
 });
 
+// Legacy checks may contain official, critic, retailer, or unknown. Current
+// code only writes external or origin_retailer.
 export const BottleEvidenceSourceTierEnum = z.enum([
   "official",
-  // Retained for legacy serialized evidence checks. Current classifier code
-  // does not assign reviewer or database sources from a domain allowlist.
   "critic",
   "retailer",
+  "external",
   "origin_retailer",
   "unknown",
 ]);

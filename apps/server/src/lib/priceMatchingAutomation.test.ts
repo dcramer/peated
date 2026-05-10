@@ -292,7 +292,7 @@ describe("priceMatchingAutomation", () => {
     ).toBe(true);
   });
 
-  test("auto-approves high-confidence bottle matches when official evidence confirms the product identity", () => {
+  test("records agent-supported external evidence for high-confidence bottle matches", () => {
     const extractedLabel = buildExtractedLabel({
       brand: "The Glenlivet",
       bottler: null,
@@ -350,6 +350,7 @@ describe("priceMatchingAutomation", () => {
       proposedBottle: null,
       searchEvidence,
       candidateBottles: [target],
+      webEvidenceJudgment: "supportive",
     });
 
     expect(assessment.automationBlockers).toEqual([]);
@@ -358,7 +359,7 @@ describe("priceMatchingAutomation", () => {
     ).toMatchObject({
       expectedValue: "Caribbean Reserve",
       validated: true,
-      matchedSourceTiers: ["official"],
+      matchedSourceTiers: ["external"],
     });
     expect(
       shouldVerifyStorePriceMatch({
@@ -655,7 +656,7 @@ describe("priceMatchingAutomation", () => {
     });
   });
 
-  test("allows auto-create when official evidence validates differentiating traits", () => {
+  test("allows auto-create when agent-supported external evidence validates differentiating traits", () => {
     const assessment = getStorePriceMatchAutomationAssessment({
       action: "create_new",
       modelConfidence: 95,
@@ -720,6 +721,7 @@ describe("priceMatchingAutomation", () => {
           source: ["vector"],
         }),
       ],
+      webEvidenceJudgment: "supportive",
     });
 
     expect(assessment.automationEligible).toBe(true);
@@ -729,11 +731,11 @@ describe("priceMatchingAutomation", () => {
       assessment.webEvidenceChecks.find((check) => check.attribute === "abv"),
     ).toMatchObject({
       validated: true,
-      matchedSourceTiers: expect.arrayContaining(["official"]),
+      matchedSourceTiers: expect.arrayContaining(["external"]),
     });
   });
 
-  test("treats official web evidence as support when it validates an omitted canonical trait", () => {
+  test("treats agent-supported web evidence as support when it validates an omitted canonical trait", () => {
     const supported = hasSupportiveWebEvidenceForExistingMatch({
       priceUrl: "https://shop.example/wild-turkey-rare-breed-rye",
       target: buildCandidate({
@@ -781,6 +783,7 @@ describe("priceMatchingAutomation", () => {
           ],
         },
       ],
+      webEvidenceJudgment: "supportive",
     });
 
     expect(supported).toBe(true);
@@ -826,6 +829,7 @@ describe("priceMatchingAutomation", () => {
           ],
         },
       ],
+      webEvidenceJudgment: "supportive",
     });
 
     expect(supported).toBe(false);

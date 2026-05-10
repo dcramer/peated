@@ -27,11 +27,6 @@ import {
   getExactCaskCodeAnchor,
 } from "./exactCask";
 import {
-  OFFICIAL_SOURCE_TIERS,
-  buildProducerIdentityPhrases,
-  classifySourceTier,
-} from "./identityEvidenceCore";
-import {
   normalizeBottle,
   normalizeString,
   stripDuplicateBrandPrefixFromBottleName,
@@ -2100,30 +2095,11 @@ function hasSupportiveExternalWebEvidenceForCreation({
   decision: BottleClassificationDecision;
   artifacts: BottleClassificationArtifacts;
 }): boolean {
-  if (
-    decision.confidenceBasis &&
-    decision.confidenceBasis.webEvidence !== "supportive"
-  ) {
+  if (decision.confidenceBasis?.webEvidence !== "supportive") {
     return false;
   }
 
-  const agentMarkedWebEvidenceSupportive =
-    decision.confidenceBasis?.webEvidence === "supportive";
   const sourceDomain = getComparableDomain(reference.url ?? "");
-  const targetCandidate =
-    decision.parentBottleId !== null
-      ? (artifacts.candidates.find(
-          (candidate) =>
-            candidate.bottleId === decision.parentBottleId &&
-            candidate.releaseId === null &&
-            candidate.kind !== "release",
-        ) ?? null)
-      : null;
-  const producerPhrases = buildProducerIdentityPhrases({
-    proposedBottle: decision.proposedBottle,
-    extractedLabel: artifacts.extractedIdentity,
-    targetCandidate,
-  });
 
   for (const evidence of artifacts.searchEvidence) {
     for (const result of evidence.results) {
@@ -2134,17 +2110,6 @@ function hasSupportiveExternalWebEvidenceForCreation({
         domainMatches(resultDomain, sourceDomain)
       ) {
         continue;
-      }
-
-      if (!agentMarkedWebEvidenceSupportive) {
-        const sourceTier = classifySourceTier({
-          result,
-          sourceUrl: reference.url ?? "",
-          producerPhrases,
-        });
-        if (!OFFICIAL_SOURCE_TIERS.has(sourceTier)) {
-          continue;
-        }
       }
 
       if (
@@ -3424,6 +3389,10 @@ function hasSupportiveWebEvidenceForTarget({
   reference: BottleReference;
   artifacts: BottleClassificationArtifacts;
 }): boolean {
+  if (decision.confidenceBasis?.webEvidence !== "supportive") {
+    return false;
+  }
+
   if (
     reference.url &&
     hasSupportiveWebEvidenceForExistingMatch({
@@ -3431,17 +3400,13 @@ function hasSupportiveWebEvidenceForTarget({
       targetCandidate: target,
       extractedLabel: artifacts.extractedIdentity,
       searchEvidence: artifacts.searchEvidence,
+      webEvidenceJudgment: decision.confidenceBasis.webEvidence,
     })
   ) {
     return true;
   }
 
   const referenceDomain = getComparableDomain(reference.url ?? null);
-  const producerPhrases = buildProducerIdentityPhrases({
-    proposedBottle: null,
-    extractedLabel: artifacts.extractedIdentity,
-    targetCandidate: target,
-  });
   const targetTokenSets = getTargetNameCandidates(target, decision)
     .map((name) => getComparableNameTokens(name))
     .filter((tokens) => tokens.length > 0);
@@ -3458,15 +3423,6 @@ function hasSupportiveWebEvidenceForTarget({
         (referenceDomain !== null &&
           domainMatches(resultDomain, referenceDomain))
       ) {
-        continue;
-      }
-
-      const sourceTier = classifySourceTier({
-        result,
-        sourceUrl: reference.url ?? "",
-        producerPhrases,
-      });
-      if (!OFFICIAL_SOURCE_TIERS.has(sourceTier)) {
         continue;
       }
 

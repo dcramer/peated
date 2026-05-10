@@ -19,7 +19,6 @@ import {
   type BottleExtractedDetails,
   type BottleSearchEvidence,
   type EntityResolution,
-  type ProposedRelease,
   type SearchEntitiesArgs,
 } from "./classifierTypes";
 import {
@@ -36,13 +35,6 @@ import {
 } from "./contract";
 import { BottleClassificationError } from "./error";
 import { createWhiskyLabelExtractor } from "./extractor";
-import {
-  OFFICIAL_SOURCE_TIERS,
-  buildProducerIdentityPhrases,
-  classifySourceTier,
-  getSearchResultText,
-  textsOverlap,
-} from "./identityEvidenceCore";
 import { buildBottleClassifierInstructions } from "./instructions";
 import { getStableOpenAISettings } from "./openaiModelSettings";
 import {
@@ -75,20 +67,6 @@ import type { BottleWebSearchBudget } from "./tools/sharedWebSearch";
 const CLASSIFIER_MAX_TURNS = 8;
 const WHISKY_REFERENCE_PATTERN =
   /\b(whisk(?:e)?y|single malt|single grain|single pot still|bourbon|rye|scotch|malt whisk(?:e)?y)\b/i;
-
-type ReleaseSearchParts = Pick<
-  ProposedRelease,
-  | "edition"
-  | "statedAge"
-  | "abv"
-  | "caskStrength"
-  | "singleCask"
-  | "vintageYear"
-  | "releaseYear"
-  | "caskType"
-  | "caskSize"
-  | "caskFill"
->;
 
 export type BottleClassifierReasoningResult = {
   decision: BottleClassifierAgentDecisionInput;
@@ -321,158 +299,6 @@ function addSearchPart(
   ) {
     parts.push(normalizedValue);
   }
-}
-
-function addReleaseSearchParts(
-  parts: string[],
-  release: ReleaseSearchParts | null | undefined,
-) {
-  if (!release) {
-    return;
-  }
-
-  addSearchPart(parts, release.edition);
-  if (release.statedAge !== null) {
-    addSearchPart(parts, `${release.statedAge} year old`);
-  }
-  if (release.abv !== null) {
-    addSearchPart(parts, `${release.abv}% ABV`);
-  }
-  if (release.caskStrength) {
-    addSearchPart(parts, "cask strength");
-  }
-  if (release.singleCask) {
-    addSearchPart(parts, "single cask");
-  }
-  if (release.vintageYear !== null) {
-    addSearchPart(parts, `${release.vintageYear} vintage`);
-  }
-  if (release.releaseYear !== null) {
-    addSearchPart(parts, `${release.releaseYear} release`);
-  }
-  addSearchPart(parts, release.caskType?.replace(/_/g, " "));
-  addSearchPart(parts, release.caskSize?.replace(/_/g, " "));
-  addSearchPart(parts, release.caskFill?.replace(/_/g, " "));
-}
-
-function getCreateDecisionParentCandidate({
-  decision,
-  artifacts,
-}: {
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-}): BottleCandidate | null {
-  if (decision.action !== "create_release") {
-    return null;
-  }
-
-  return (
-    artifacts.candidates.find(
-      (candidate) =>
-        candidate.bottleId === decision.parentBottleId &&
-        candidate.releaseId === null &&
-        candidate.kind !== "release",
-    ) ?? null
-  );
-}
-
-function getCreateDecisionBottleName({
-  decision,
-  artifacts,
-}: {
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-}): string | null {
-  if (decision.proposedBottle) {
-    return [
-      decision.proposedBottle.brand.name,
-      decision.proposedBottle.series?.name,
-      decision.proposedBottle.name,
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .trim();
-  }
-
-  const parentCandidate = getCreateDecisionParentCandidate({
-    decision,
-    artifacts,
-  });
-  return parentCandidate?.bottleFullName ?? parentCandidate?.fullName ?? null;
-}
-
-function buildCreateDecisionEvidencePhrases({
-  decision,
-  artifacts,
-}: {
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-}): string[] {
-  const phrases: string[] = [];
-  addSearchPart(
-    phrases,
-    getCreateDecisionBottleName({
-      decision,
-      artifacts,
-    }),
-  );
-
-  if (decision.proposedBottle) {
-    addSearchPart(phrases, decision.proposedBottle.name);
-    addSearchPart(phrases, decision.proposedBottle.series?.name);
-  }
-
-  addSearchPart(phrases, decision.proposedRelease?.edition);
-  addSearchPart(phrases, decision.observation?.caskNumber);
-  addSearchPart(phrases, decision.observation?.barrelNumber);
-
-  return phrases.filter((phrase) => phrase.length >= 4);
-}
-
-function buildCreateDecisionEvidenceQuery({
-  reference,
-  decision,
-  artifacts,
-}: {
-  reference: BottleReference;
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-}): string | null {
-  if (
-    decision.action !== "create_bottle" &&
-    decision.action !== "create_release" &&
-    decision.action !== "create_bottle_and_release"
-  ) {
-    return null;
-  }
-
-  const parts: string[] = [];
-  addSearchPart(
-    parts,
-    getCreateDecisionBottleName({
-      decision,
-      artifacts,
-    }),
-  );
-
-  if (decision.proposedBottle) {
-    addSearchPart(parts, decision.proposedBottle.bottler?.name);
-    for (const distiller of decision.proposedBottle.distillers) {
-      addSearchPart(parts, distiller.name);
-    }
-    addSearchPart(parts, decision.proposedBottle.category?.replace(/_/g, " "));
-    addReleaseSearchParts(parts, decision.proposedBottle);
-  }
-
-  addReleaseSearchParts(parts, decision.proposedRelease);
-  addSearchPart(parts, decision.observation?.caskNumber);
-  addSearchPart(parts, decision.observation?.barrelNumber);
-
-  if (!parts.length) {
-    addSearchPart(parts, reference.name);
-  }
-
-  return parts.length ? parts.join(" ") : null;
 }
 
 function extractedIdentityLooksWebInvestigable({
@@ -745,154 +571,18 @@ async function collectNoMatchWebInvestigationArtifacts({
   });
 }
 
-function hasOfficialSearchEvidenceForDecision({
-  reference,
-  decision,
-  artifacts,
-}: {
-  reference: BottleReference;
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-}): boolean {
-  const targetCandidate = getCreateDecisionParentCandidate({
-    decision,
-    artifacts,
-  });
-  const producerPhrases = buildProducerIdentityPhrases({
-    proposedBottle: decision.proposedBottle,
-    extractedLabel: artifacts.extractedIdentity,
-    targetCandidate,
-  });
-  const evidencePhrases = buildCreateDecisionEvidencePhrases({
-    decision,
-    artifacts,
-  });
-  if (!evidencePhrases.length) {
-    return false;
-  }
-
-  return artifacts.searchEvidence.some((evidence) =>
-    evidence.results.some((result) => {
-      const sourceTier = classifySourceTier({
-        result,
-        sourceUrl: reference.url ?? "",
-        producerPhrases,
-      });
-      if (!OFFICIAL_SOURCE_TIERS.has(sourceTier)) {
-        return false;
-      }
-
-      const resultText = getSearchResultText(evidence, result);
-      return evidencePhrases.some((phrase) => textsOverlap(resultText, phrase));
-    }),
-  );
-}
-
-async function maybeBackfillCreateDecisionSearchEvidence({
-  options,
-  reference,
-  decision,
-  artifacts,
-  candidateExpansion,
-  webSearchBudget,
-}: {
-  options: CreateBottleClassifierOptions;
-  reference: BottleReference;
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-  candidateExpansion: CandidateExpansionMode;
-  webSearchBudget?: BottleWebSearchBudget;
-}): Promise<BottleClassificationArtifacts> {
-  if (
-    candidateExpansion !== "open" ||
-    options.maxSearchQueries <= 0 ||
-    !hasUsableOpenAIResponsesClient(options.client) ||
-    (decision.action !== "create_bottle" &&
-      decision.action !== "create_release" &&
-      decision.action !== "create_bottle_and_release") ||
-    hasOfficialSearchEvidenceForDecision({
-      reference,
-      decision,
-      artifacts,
-    })
-  ) {
-    return artifacts;
-  }
-
-  const query = buildCreateDecisionEvidenceQuery({
-    reference,
-    decision,
-    artifacts,
-  });
-  if (!query) {
-    return artifacts;
-  }
-
-  const searchEvidence = [...artifacts.searchEvidence];
-  const result = await runBottleWebEvidenceSearch({
-    client: options.client,
-    model: options.model,
-    query,
-    budget:
-      webSearchBudget ?? createBottleWebSearchBudget(options.maxSearchQueries),
-    braveApiKey: options.braveApiKey,
-    onEvidence: (evidence) => {
-      mergeSearchEvidence(searchEvidence, evidence);
-    },
-  });
-
-  if (!("error" in result) && result.results.length > 0) {
-    mergeSearchEvidence(searchEvidence, result);
-  }
-
-  if (searchEvidence.length === artifacts.searchEvidence.length) {
-    return artifacts;
-  }
-
-  return buildBottleClassificationArtifacts({
-    ...artifacts,
-    searchEvidence,
-  });
-}
-
 export async function finalizeBottleClassifierReasoningResult({
-  options,
   reference,
   reasoning,
-  candidateExpansion,
-  webSearchBudget,
 }: {
-  options: CreateBottleClassifierOptions;
   reference: BottleReference;
   reasoning: BottleClassifierReasoningResult;
-  candidateExpansion?: CandidateExpansionMode;
-  webSearchBudget?: BottleWebSearchBudget;
 }): Promise<{
   decision: BottleClassificationDecision;
   artifacts: BottleClassificationArtifacts;
 }> {
-  let artifacts = reasoning.artifacts;
-  const normalizedCandidateExpansion = candidateExpansion ?? "open";
-  // Normalize once without the creation-evidence guard so runtime web
-  // backfill can run, then normalize again with the guard enabled.
-  let decision = finalizeBottleReferenceClassification({
-    reference,
-    decision: reasoning.decision,
-    artifacts,
-    options: {
-      enforceCreateWebEvidence: false,
-    },
-  });
-
-  artifacts = await maybeBackfillCreateDecisionSearchEvidence({
-    options,
-    reference,
-    decision,
-    artifacts,
-    candidateExpansion: normalizedCandidateExpansion,
-    webSearchBudget,
-  });
-  decision = finalizeBottleReferenceClassification({
+  const artifacts = reasoning.artifacts;
+  const decision = finalizeBottleReferenceClassification({
     reference,
     decision: reasoning.decision,
     artifacts,
@@ -1475,11 +1165,8 @@ export function createBottleClassifier(
       });
       let { decision, artifacts: reasoningArtifacts } =
         await finalizeBottleClassifierReasoningResult({
-          options,
           reference: parsedInput.reference,
           reasoning: reasoningRun.reasoning,
-          candidateExpansion: parsedInput.candidateExpansion,
-          webSearchBudget: reasoningRun.webSearchBudget,
         });
 
       if (
@@ -1519,11 +1206,8 @@ export function createBottleClassifier(
           });
 
           const retriedResult = await finalizeBottleClassifierReasoningResult({
-            options,
             reference: parsedInput.reference,
             reasoning: retryReasoningRun.reasoning,
-            candidateExpansion: parsedInput.candidateExpansion,
-            webSearchBudget: reasoningRun.webSearchBudget,
           });
           decision = retriedResult.decision;
           reasoningArtifacts = retriedResult.artifacts;

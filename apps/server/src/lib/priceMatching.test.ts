@@ -86,6 +86,14 @@ vi.mock("@peated/server/worker/client", () => ({
   pushUniqueJob: vi.fn(),
 }));
 
+const supportiveWebEvidenceConfidenceBasis = {
+  band: "auto_verification",
+  positiveEvidence: ["Web evidence supports the required bottle identity."],
+  unresolvedRisks: [],
+  toolsUsed: ["openai_web_search"],
+  webEvidence: "supportive",
+};
+
 function buildMockBottleReferenceClassification(
   overrides: Record<string, unknown>,
 ) {
@@ -166,6 +174,8 @@ function normalizeMockBottleClassifierDecision(decision: Record<string, any>) {
       candidateBottleIds: decision.candidateBottleIds ?? [],
       identityScope: decision.identityScope ?? "product",
       observation: decision.observation ?? null,
+      identityBasis: decision.identityBasis ?? null,
+      confidenceBasis: decision.confidenceBasis ?? null,
       matchedBottleId: decision.suggestedBottleId,
       matchedReleaseId: decision.suggestedReleaseId ?? null,
       parentBottleId: null,
@@ -190,6 +200,8 @@ function normalizeMockBottleClassifierDecision(decision: Record<string, any>) {
       candidateBottleIds: decision.candidateBottleIds ?? [],
       identityScope: decision.identityScope ?? "product",
       observation: decision.observation ?? null,
+      identityBasis: decision.identityBasis ?? null,
+      confidenceBasis: decision.confidenceBasis ?? null,
       matchedBottleId: null,
       matchedReleaseId: null,
       parentBottleId:
@@ -3342,6 +3354,7 @@ describe("priceMatching", () => {
           action: "create_new",
           confidence: 92,
           rationale: "Web evidence confirms a distinct release.",
+          confidenceBasis: supportiveWebEvidenceConfidenceBasis,
           suggestedBottleId: null,
           candidateBottleIds: [],
           proposedBottle: {
@@ -3507,6 +3520,7 @@ describe("priceMatching", () => {
           action: "create_new",
           confidence: 92,
           rationale: "Web evidence confirms a distinct release.",
+          confidenceBasis: supportiveWebEvidenceConfidenceBasis,
           suggestedBottleId: null,
           candidateBottleIds: [],
           proposedBottle: {
@@ -3632,6 +3646,7 @@ describe("priceMatching", () => {
           action: "create_new",
           confidence: 95,
           rationale: "Official evidence looks like a distinct bottle.",
+          confidenceBasis: supportiveWebEvidenceConfidenceBasis,
           suggestedBottleId: null,
           candidateBottleIds: [],
           proposedBottle: {
@@ -3744,6 +3759,7 @@ describe("priceMatching", () => {
           action: "create_new",
           confidence: 92,
           rationale: "Web evidence confirms this is a distinct bottling.",
+          confidenceBasis: supportiveWebEvidenceConfidenceBasis,
           suggestedBottleId: null,
           candidateBottleIds: [currentBottle.id],
           proposedBottle: {

@@ -206,11 +206,8 @@ async function prepareRepairResolutionEvalRun(
       const reasoning = agentRun.getReasoningResult(result);
       const { decision, artifacts: reasoningArtifacts } =
         await finalizeBottleClassifierReasoningResult({
-          options,
           reference: parsedInput.reference,
           reasoning,
-          candidateExpansion: parsedInput.candidateExpansion,
-          webSearchBudget: agentRun.webSearchBudget,
         });
       const classification = BottleClassificationResultSchema.parse(
         createDecidedBottleClassification({

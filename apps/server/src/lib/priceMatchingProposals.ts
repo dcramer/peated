@@ -1900,6 +1900,8 @@ export async function resolveStorePriceMatchProposal(
           ? (decision.creationTarget ?? null)
           : null,
       searchEvidence,
+      webEvidenceJudgment:
+        classification.decision.confidenceBasis?.webEvidence ?? null,
     });
     const proposal = await upsertStorePriceMatchProposal({
       price,

@@ -1,7 +1,5 @@
 import {
-  OFFICIAL_SOURCE_TIERS,
-  buildProducerIdentityPhrases,
-  classifySourceTier,
+  classifySearchResultSource,
   containsComparablePhrase,
   escapeRegExp,
   getAbvSupportLevel,
@@ -16,7 +14,9 @@ import {
   hasSupportiveWebEvidenceForExistingMatch as hasSupportiveBottleEvidence,
   isExistingMatchConfidenceEligibleForVerification,
   isPlainAgeBottleMatchEligibleForVerification,
+  type WebEvidenceJudgment,
 } from "@peated/bottle-classifier/priceMatchingEvidence";
+import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
 import type { StorePrice } from "@peated/server/db/schema";
 import type { StorePriceMatchAutomationAssessmentSchema } from "@peated/server/schemas";
 import {
@@ -56,6 +56,7 @@ type MatchAutomationInput = {
   proposedRelease?: ProposedRelease | null;
   creationTarget?: MatchCreationTarget | null;
   searchEvidence: SearchEvidence[];
+  webEvidenceJudgment?: WebEvidenceJudgment;
 };
 
 export function hasSupportiveWebEvidenceForExistingMatch({
@@ -63,17 +64,20 @@ export function hasSupportiveWebEvidenceForExistingMatch({
   target,
   extractedLabel,
   searchEvidence,
+  webEvidenceJudgment,
 }: {
   priceUrl: string;
   target: PriceMatchCandidate;
   extractedLabel: ExtractedBottleDetails | null;
   searchEvidence: SearchEvidence[];
+  webEvidenceJudgment?: WebEvidenceJudgment;
 }) {
   return hasSupportiveBottleEvidence({
     sourceUrl: priceUrl,
     target,
     extractedLabel,
     searchEvidence,
+    webEvidenceJudgment,
   });
 }
 
@@ -515,30 +519,62 @@ function getCreateNewChecks(
   };
 }
 
+function getProposedSmwsCode(
+  proposedBottle: ProposedBottle | null,
+): string | null {
+  if (!proposedBottle) {
+    return null;
+  }
+
+  return (
+    parseSmwsReferenceName(
+      `${proposedBottle.brand.name} ${proposedBottle.name}`,
+    )?.code ??
+    parseSmwsReferenceName(
+      `${proposedBottle.bottler?.name ?? ""} ${proposedBottle.name}`,
+    )?.code ??
+    parseSmwsReferenceName(
+      `${proposedBottle.brand.name} ${proposedBottle.edition ?? ""}`,
+    )?.code ??
+    null
+  );
+}
+
+function isDeterministicSmwsExactCaskCreate({
+  creationTarget,
+  price,
+  proposedBottle,
+}: {
+  creationTarget: MatchCreationTarget | null;
+  price: Pick<StorePrice, "name">;
+  proposedBottle: ProposedBottle | null;
+}) {
+  if (creationTarget !== "bottle") {
+    return false;
+  }
+
+  const sourceCode = parseSmwsReferenceName(price.name)?.code;
+  if (!sourceCode) {
+    return false;
+  }
+
+  return getProposedSmwsCode(proposedBottle) === sourceCode;
+}
+
 function evaluateSearchEvidenceChecks({
   checks,
   searchEvidence,
   priceUrl,
-  proposedBottle,
-  extractedLabel,
-  targetCandidate,
+  webEvidenceJudgment,
 }: {
   checks: EvidenceCheck[];
   searchEvidence: SearchEvidence[];
   priceUrl: string;
-  proposedBottle: ProposedBottle | null;
-  extractedLabel: ExtractedBottleDetails | null;
-  targetCandidate?: PriceMatchCandidate | null;
+  webEvidenceJudgment?: WebEvidenceJudgment;
 }) {
   if (!checks.length || !searchEvidence.length) {
     return checks;
   }
-
-  const producerPhrases = buildProducerIdentityPhrases({
-    proposedBottle,
-    extractedLabel,
-    targetCandidate,
-  });
 
   return checks.map((check) => {
     const matchedSourceTiers = new Set<SourceTier>();
@@ -551,10 +587,9 @@ function evaluateSearchEvidenceChecks({
           continue;
         }
 
-        const sourceTier = classifySourceTier({
+        const sourceTier = classifySearchResultSource({
           result,
           sourceUrl: priceUrl,
-          producerPhrases,
         });
         matchedSourceTiers.add(sourceTier);
         matchedSourceUrls.add(result.url);
@@ -562,12 +597,9 @@ function evaluateSearchEvidenceChecks({
     }
 
     const tiers = Array.from(matchedSourceTiers);
-    const validated = tiers.some((tier) => OFFICIAL_SOURCE_TIERS.has(tier));
-    const weaklySupported =
-      !validated &&
-      tiers.some((tier) =>
-        ["retailer", "origin_retailer", "unknown"].includes(tier),
-      );
+    const validated =
+      webEvidenceJudgment === "supportive" && tiers.includes("external");
+    const weaklySupported = !validated && tiers.length > 0;
 
     return {
       ...check,
@@ -690,6 +722,7 @@ function getExistingMatchAssessment({
   candidateBottles,
   extractedLabel,
   searchEvidence,
+  webEvidenceJudgment,
 }: {
   modelConfidence: number | null;
   price: Pick<StorePrice, "name" | "url">;
@@ -698,6 +731,7 @@ function getExistingMatchAssessment({
   candidateBottles: PriceMatchCandidate[];
   extractedLabel: ExtractedBottleDetails | null;
   searchEvidence: SearchEvidence[];
+  webEvidenceJudgment?: WebEvidenceJudgment;
 }) {
   const target = getSuggestedMatchCandidate({
     suggestedBottleId,
@@ -741,6 +775,7 @@ function getExistingMatchAssessment({
     target,
     extractedLabel,
     searchEvidence,
+    webEvidenceJudgment,
   });
   const plainAgeBottleAutoVerifyEligible =
     automationBlockers.length === 0 &&
@@ -776,18 +811,18 @@ function getCreateNewScore({
   creationTarget,
   candidateBottles,
   searchEvidence,
-  extractedLabel,
   price,
+  webEvidenceJudgment,
 }: {
   proposedBottle: ProposedBottle | null;
   proposedRelease: ProposedRelease | null;
   creationTarget: MatchCreationTarget | null;
   candidateBottles: PriceMatchCandidate[];
   searchEvidence: SearchEvidence[];
-  extractedLabel: ExtractedBottleDetails | null;
   price: Pick<StorePrice, "bottleId" | "name" | "url"> & {
     releaseId?: number | null;
   };
+  webEvidenceJudgment?: WebEvidenceJudgment;
 }) {
   let score = creationTarget === "release" ? 24 : 30;
   const automationBlockers: string[] = [];
@@ -867,12 +902,16 @@ function getCreateNewScore({
     },
     candidateBottles.slice(0, 3),
   );
+  const deterministicSmwsExactCaskCreate = isDeterministicSmwsExactCaskCreate({
+    creationTarget,
+    price,
+    proposedBottle,
+  });
   const evaluatedChecks = evaluateSearchEvidenceChecks({
     checks,
     searchEvidence,
     priceUrl: price.url,
-    proposedBottle,
-    extractedLabel,
+    webEvidenceJudgment,
   });
 
   if (!candidateBottles.length) {
@@ -886,19 +925,24 @@ function getCreateNewScore({
     (check) => check.validated,
   );
 
-  if (!searchEvidence.some((evidence) => evidence.results.length > 0)) {
+  if (
+    !deterministicSmwsExactCaskCreate &&
+    !searchEvidence.some((evidence) => evidence.results.length > 0)
+  ) {
     automationBlockers.push("no web evidence validated this bottle");
   }
 
   if (
+    !deterministicSmwsExactCaskCreate &&
     requiredChecks.some((check) => !check.validated && !check.weaklySupported)
   ) {
     automationBlockers.push(
-      "official web evidence did not validate the differentiating bottle traits",
+      "supportive external web evidence did not validate the differentiating bottle traits",
     );
   }
 
   if (
+    !deterministicSmwsExactCaskCreate &&
     requiredChecks.some(
       (check) =>
         !check.validated &&
@@ -912,26 +956,30 @@ function getCreateNewScore({
   }
 
   if (
+    !deterministicSmwsExactCaskCreate &&
     requiredChecks.length > 0 &&
     validatedRequiredChecks.length === 0 &&
     requiredChecks.some((check) => check.weaklySupported)
   ) {
-    automationBlockers.push(
-      "web evidence only weakly corroborated the match through retailer or unknown sources",
-    );
+    automationBlockers.push("web evidence only weakly corroborated the match");
   }
 
   score += validatedRequiredChecks.length * 12;
 
-  if (
-    evaluatedChecks.some((check) =>
-      check.matchedSourceTiers.includes("official"),
-    )
-  ) {
-    score += 8;
+  const hasBlockers = automationBlockers.length > 0;
+  if (deterministicSmwsExactCaskCreate) {
+    return {
+      automationScore: hasBlockers
+        ? AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD - 1
+        : 100,
+      automationEligible: !hasBlockers,
+      automationBlockers: Array.from(new Set(automationBlockers)),
+      differentiatingAttributes,
+      decisiveMatchAttributes: ["name"] as MatchAttribute[],
+      webEvidenceChecks: evaluatedChecks,
+    };
   }
 
-  const hasBlockers = automationBlockers.length > 0;
   const automationScore = hasBlockers
     ? Math.min(clampScore(score), AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD - 1)
     : clampScore(score);
@@ -965,6 +1013,7 @@ export function getStorePriceMatchAutomationAssessment({
   proposedRelease,
   creationTarget,
   searchEvidence,
+  webEvidenceJudgment,
 }: MatchAutomationInput): StorePriceMatchAutomationAssessment {
   if (
     (action === "create_new" || action === "correction") &&
@@ -976,8 +1025,8 @@ export function getStorePriceMatchAutomationAssessment({
       creationTarget: creationTarget ?? null,
       candidateBottles,
       searchEvidence,
-      extractedLabel,
       price,
+      webEvidenceJudgment,
     });
 
     return {
@@ -999,6 +1048,7 @@ export function getStorePriceMatchAutomationAssessment({
       candidateBottles,
       extractedLabel,
       searchEvidence,
+      webEvidenceJudgment,
     });
 
     return {

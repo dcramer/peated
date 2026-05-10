@@ -1319,7 +1319,7 @@ describe("createBottleClassifier", () => {
     expect(result.status).toBe("classified");
   });
 
-  test("backfills supporting web evidence for create decisions when the agent skipped search", async () => {
+  test("does not post-backfill web evidence for create decisions when the agent skipped search", async () => {
     const create = vi.fn().mockResolvedValue({
       output_text:
         "Festival Distillery confirms Warehouse Session is a single malt whisky.",
@@ -1408,22 +1408,17 @@ describe("createBottleClassifier", () => {
       },
     });
 
-    expect(create).toHaveBeenCalledTimes(1);
+    expect(create).not.toHaveBeenCalled();
     expect(result.status).toBe("classified");
     if (result.status !== "classified") return;
-    expect(result.artifacts.searchEvidence).toHaveLength(1);
-    expect(result.artifacts.searchEvidence[0]).toMatchObject({
-      query:
-        "Festival Distillery Warehouse Session Festival Distillery single malt",
-      results: expect.arrayContaining([
-        expect.objectContaining({
-          domain: "festivaldistillery.com",
-        }),
-        expect.objectContaining({
-          domain: "whiskyadvocate.com",
-        }),
-      ]),
+    expect(result.artifacts.searchEvidence).toHaveLength(0);
+    expect(result.decision).toMatchObject({
+      action: "no_match",
+      proposedBottle: null,
     });
+    expect(result.decision.rationale).toContain(
+      "Server downgraded creation because creation requires external web evidence.",
+    );
   });
 
   test("rejects create decisions when external web evidence does not support the proposed bottle", async () => {
@@ -1699,7 +1694,7 @@ describe("createBottleClassifier", () => {
     );
   });
 
-  test("rejects create decisions when non-official web evidence has not been judged supportive", async () => {
+  test("rejects create decisions when external web evidence has not been judged supportive", async () => {
     const runBottleClassifierAgent = vi.fn(
       async (): Promise<ReasoningResult> => ({
         decision: {

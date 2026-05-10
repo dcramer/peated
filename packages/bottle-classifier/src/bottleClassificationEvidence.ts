@@ -6,8 +6,9 @@ import type {
 import { listMatchesExpectedValue, textsOverlap } from "./identityEvidenceCore";
 import { normalizeBottle } from "./normalize";
 import {
-  hasOfficialTargetIdentityEvidenceForExistingMatch,
+  hasExternalTargetIdentityEvidenceForExistingMatch,
   hasSupportiveWebEvidenceForExistingMatch as hasSharedSupportiveWebEvidenceForExistingMatch,
+  type WebEvidenceJudgment,
 } from "./priceMatchingEvidence";
 
 function getTargetNameVariants(targetCandidate: BottleCandidate): string[] {
@@ -111,11 +112,13 @@ export function hasSupportiveWebEvidenceForExistingMatch({
   searchEvidence,
   extractedLabel,
   targetCandidate,
+  webEvidenceJudgment,
 }: {
   sourceUrl: string;
   searchEvidence: BottleSearchEvidence[];
   extractedLabel: BottleExtractedDetails | null;
   targetCandidate: BottleCandidate | null;
+  webEvidenceJudgment?: WebEvidenceJudgment;
 }) {
   if (!targetCandidate) {
     return false;
@@ -127,16 +130,18 @@ export function hasSupportiveWebEvidenceForExistingMatch({
       searchEvidence,
       extractedLabel,
       target: targetCandidate,
+      webEvidenceJudgment,
     })
   ) {
     return false;
   }
 
-  return hasOfficialTargetIdentityEvidenceForExistingMatch({
+  return hasExternalTargetIdentityEvidenceForExistingMatch({
     sourceUrl,
     searchEvidence,
     extractedLabel,
     target: targetCandidate,
+    webEvidenceJudgment,
   });
 }
 

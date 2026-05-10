@@ -4,7 +4,7 @@ import type {
   BottleExtractedDetails,
   BottleSearchEvidence,
 } from "./classifierTypes";
-import { classifySourceTier } from "./identityEvidenceCore";
+import { classifySearchResultSource } from "./identityEvidenceCore";
 import {
   getExistingMatchIdentityConflicts,
   hasSupportiveWebEvidenceForExistingMatch,
@@ -78,7 +78,7 @@ function buildSearchEvidence(
 }
 
 describe("priceMatchingEvidence", () => {
-  test("treats official evidence as support when it validates an omitted canonical trait", () => {
+  test("treats agent-supported external evidence as support when it validates an omitted canonical trait", () => {
     const supported = hasSupportiveWebEvidenceForExistingMatch({
       sourceUrl: "https://shop.example/wild-turkey-rare-breed-rye",
       target: buildBottleCandidate({
@@ -116,6 +116,7 @@ describe("priceMatchingEvidence", () => {
           ],
         }),
       ],
+      webEvidenceJudgment: "supportive",
     });
 
     expect(supported).toBe(true);
@@ -163,9 +164,9 @@ describe("priceMatchingEvidence", () => {
     expect(supported).toBe(false);
   });
 
-  test("does not classify arbitrary producer-name domains as official evidence", () => {
+  test("classifies search results only by origin relation", () => {
     expect(
-      classifySourceTier({
+      classifySearchResultSource({
         result: {
           title: "Wild Turkey fan notes",
           url: "https://wildturkeyfans.example/rare-breed-rye",
@@ -174,25 +175,21 @@ describe("priceMatchingEvidence", () => {
           extraSnippets: [],
         },
         sourceUrl: "https://shop.example/wild-turkey-rare-breed-rye",
-        producerPhrases: new Set(["wildturkey"]),
       }),
-    ).toBe("unknown");
-  });
+    ).toBe("external");
 
-  test("does not classify independent review domains from a hardcoded allowlist", () => {
     expect(
-      classifySourceTier({
+      classifySearchResultSource({
         result: {
-          title: "Independent review notes",
-          url: "https://www.whiskyadvocate.com/reviews/example-bottle",
-          domain: "whiskyadvocate.com",
-          description: "Review notes for Example Distillery Port Cask.",
+          title: "Shop listing",
+          url: "https://shop.example/example-distillery-port-cask",
+          domain: "shop.example",
+          description: "Retailer listing for Example Distillery Port Cask.",
           extraSnippets: [],
         },
         sourceUrl: "https://shop.example/example-distillery-port-cask",
-        producerPhrases: new Set(["exampledistillery"]),
       }),
-    ).toBe("unknown");
+    ).toBe("origin_retailer");
   });
 
   test("does not treat evidence as supportive when it confirms only the generic parent and not the missing edition", () => {
@@ -234,6 +231,7 @@ describe("priceMatchingEvidence", () => {
           ],
         }),
       ],
+      webEvidenceJudgment: "supportive",
     });
 
     expect(supported).toBe(false);

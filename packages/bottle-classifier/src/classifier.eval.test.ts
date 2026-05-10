@@ -737,11 +737,8 @@ async function prepareScenarioClassifierRun(
       const reasoning = agentRun.getReasoningResult(result);
       const { decision, artifacts: reasoningArtifacts } =
         await finalizeBottleClassifierReasoningResult({
-          options,
           reference: parsedInput.reference,
           reasoning,
-          candidateExpansion: parsedInput.candidateExpansion,
-          webSearchBudget: agentRun.webSearchBudget,
         });
 
       return BottleClassificationResultSchema.parse(
