@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T20:25:10.281Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Highland Park Cask Strength No. 5\" Highland Park official OR review OR whiskybase"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Highland Park Cask Strength No. 5\" Highland Park official OR review OR whiskybase",
+    "summary": "**Highland Park Cask Strength Release No. 5** — confirmed bottle-specific evidence:\n\n- **Official producer page:** Highland Park lists it as **“Cask Strength 5” / “Release No. 5”** in its Cask Strength series. It is **bottled straight from the cask without added water**, and Highland Park says the whisky is matured in ",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength",
+        "url": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+        "url": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+        "domain": "highlandparkwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskymag.com/tastings/highland-park-cask-strength/",
+        "url": "https://www.whiskymag.com/tastings/highland-park-cask-strength/",
+        "domain": "whiskymag.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/255934?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/whisky/255934?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "ec25bda4ed7ef6efbd4b3352cf948999c38f89ee4062d4dcee151e6e70db2dde",
+    "mode": "record"
+  }
+}

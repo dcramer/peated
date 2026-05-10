@@ -1,0 +1,53 @@
+{
+  "writtenAt": "2026-05-10T20:25:51.383Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "\"Octomore 13.1\" Bruichladdich 59.2 5 years 2022"
+  },
+  "output": {
+    "provider": "brave",
+    "query": "\"Octomore 13.1\" Bruichladdich 59.2 5 years 2022",
+    "summary": "This single malt whisky from the Bruichladdich distillery on Islay has been <strong>super heavily peated to 137.3ppm</strong>. The limited edition 2022 release is part of the Octomore series, famous for being some of the peatiest whiskies available. Bruichladdich Octomore 13.1 This balanced whisky is <strong>matured fo",
+    "results": [
+      {
+        "title": "Bruichladdich - 5 year Old (Octomore 13.1)",
+        "url": "https://www.stillspirit.com/en-us/products/bruichladdich-5-year-old-octomore-13-1",
+        "domain": "stillspirit.com",
+        "description": "This single malt whisky from the Bruichladdich distillery on Islay has been <strong>super heavily peated to 137.3ppm</strong>. The limited edition 2022 release is part of the Octomore series, famous for being some of the",
+        "extraSnippets": []
+      },
+      {
+        "title": "Bruichladdich Octomore 13.1 0,7 L 59,2% TIN | Excaliburshop",
+        "url": "https://en.excaliburshop.com/catalog/item/11558/bruichladdich-octomore-13-1-0-7-l-59-2-tin/",
+        "domain": "en.excaliburshop.com",
+        "description": "Bruichladdich Octomore 13.1 This balanced whisky is <strong>matured for five years in first-fill American whiskey casks and 100% matured on the island of Islay</strong>. Only Concerto barley is used, which was harvested",
+        "extraSnippets": []
+      },
+      {
+        "title": "Review #27 - Bruichladdich Octomore 13.1 — Me, My Wife & Whisky",
+        "url": "https://www.memywifeandwhisky.com/reviews/review-27-bruichladdich-octomore-131",
+        "domain": "memywifeandwhisky.com",
+        "description": "The first of three 2022 Octomores, the 13.1 is <strong>peated to 137.3 ppm and aged in ex-bourbon casks</strong>.",
+        "extraSnippets": []
+      },
+      {
+        "title": "r/Scotch on Reddit: Review #27 - Bruichladdich Octomore 13.1",
+        "url": "https://www.reddit.com/r/Scotch/comments/ym1d21/review_27_bruichladdich_octomore_131/",
+        "domain": "reddit.com",
+        "description": "When I ordered a dram of octomore (12.1 I believe) I expected it you blow my eyebrows off with peat smoke. Was a bit disappointed it didn&#x27;t, so I couldn&#x27;t ever give an unbiased review. ... Yeah, they are advert",
+        "extraSnippets": []
+      },
+      {
+        "title": "Bruichladdich Distillery launches 13th annual Octomore series — Dramface",
+        "url": "https://www.dramface.com/news/octomore-13-collection-new",
+        "domain": "dramface.com",
+        "description": "The full Octomore 13 series, including the 13.1, 13.2, and 13.3, is <strong>available online at bruichladdich.com and in specialist whisky retailers from 5 October 2022</strong>.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e18cc53f5db1b6bd0030e63ab693859bbe97a0e8d4ea86df0baa1ecaf75d616d",
+    "mode": "record"
+  }
+}
