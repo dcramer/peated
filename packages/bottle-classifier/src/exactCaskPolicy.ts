@@ -130,10 +130,6 @@ export function hasExactCaskSignals({
     hasSingularCaskObservationValue(observation?.caskNumber) ||
     hasSingularCaskObservationValue(observation?.barrelNumber),
   );
-  const hasSingleCaskTrait =
-    proposedBottle?.singleCask === true ||
-    target?.singleCask === true ||
-    extractedIdentity?.single_cask === true;
   const hasCodeOrNumberSignal = [
     reference.name,
     extractedIdentity?.expression,
@@ -147,10 +143,6 @@ export function hasExactCaskSignals({
       abvValues: comparableAbvValues,
     }),
   );
-
-  if (hasKnownProgramBrand && (hasSingleCaskTrait || hasCodeOrNumberSignal)) {
-    return true;
-  }
 
   return hasSpecificCaskReference || hasCodeOrNumberSignal;
 }
@@ -176,6 +168,10 @@ export function inferBottleIdentityScope({
     return "product";
   }
 
+  if (requestedIdentityScope !== "exact_cask") {
+    return "product";
+  }
+
   if (
     hasExactCaskSignals({
       reference,
@@ -186,10 +182,6 @@ export function inferBottleIdentityScope({
     })
   ) {
     return "exact_cask";
-  }
-
-  if (requestedIdentityScope === "exact_cask") {
-    return "product";
   }
 
   return "product";

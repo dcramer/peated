@@ -116,7 +116,8 @@ Package-specific reminders:
 - [`src/classifier.ts`](./src/classifier.ts): public classifier factory
 - [`src/contract.ts`](./src/contract.ts): public request/result schemas
 - [`src/classifierRuntime.ts`](./src/classifierRuntime.ts): orchestration and tool loop
-- [`src/reviewPolicy.ts`](./src/reviewPolicy.ts): validation, normalization, scope inference, downgrades
+- [`src/reviewPolicy.ts`](./src/reviewPolicy.ts): validation, normalization, and downgrades
+- [`src/exactCaskPolicy.ts`](./src/exactCaskPolicy.ts): generic exact-cask signal validation for reviewed scope
 - [`src/instructions.ts`](./src/instructions.ts): classifier and extractor prompts
 - [`src/extractor.ts`](./src/extractor.ts): bottle-label extraction
 - [`src/normalize.ts`](./src/normalize.ts): bottle/name/category/volume normalization

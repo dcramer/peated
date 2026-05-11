@@ -29,7 +29,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - Preserve the reviewed boundary in `src/contract.ts` and `src/classifier.ts`.
 - Internal adapter-facing modules should stay behind the `internal/*` package namespace.
 - Pre-agent deterministic resolvers live in `src/runtime/deterministic.ts`; only add a resolver when it is correct from closed syntax or curated reference data alone.
-- Deterministic validation, downgrades, and `identityScope` rules live in `src/reviewPolicy.ts`.
+- Deterministic validation and downgrades live in `src/reviewPolicy.ts`; generic `identityScope` signal validation lives in `src/exactCaskPolicy.ts`.
 - Bottle-versus-release semantics are model-led. Retrieval may expose sibling
   context, but do not encode brand/family-specific release splits in
   deterministic code.

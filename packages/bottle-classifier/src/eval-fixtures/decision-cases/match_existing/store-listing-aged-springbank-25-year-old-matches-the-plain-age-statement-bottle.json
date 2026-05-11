@@ -165,7 +165,6 @@
     "identityScope": "product",
     "matchedBottleId": 469,
     "matchedReleaseId": null,
-    "confidenceBand": "auto_verification",
     "summary": "Treat 'Aged' as generic age-statement wording, match the plain Springbank 25-year-old bottle, and avoid the more specific Limited Edition sibling unless the source supports that edition."
   }
 }

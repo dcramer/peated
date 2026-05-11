@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-11T03:49:29.083Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Highland Park Cask Strength No. 5 official release whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Highland Park Cask Strength No. 5 official release whisky",
+    "summary": "**Highland Park Cask Strength Release No. 5** is an **official distillery release** from **Highland Park** in Orkney. On Highland Park’s own product page, it’s presented as **“Cask Strength Release No. 5”** in the brand’s ongoing cask-strength series. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+        "url": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+        "domain": "highlandparkwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/highland-park-cask-strength-release-no-5",
+        "url": "https://distiller.com/spirits/highland-park-cask-strength-release-no-5",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.vaultofspirits.com/whisky/single-malt/highland-park-cask-strength-release-no-5-647/",
+        "url": "https://www.vaultofspirits.com/whisky/single-malt/highland-park-cask-strength-release-no-5-647/",
+        "domain": "vaultofspirits.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6d5c8b4c195d9bbcb4caf034a36def5f4b6cd0f98d80c1989b32a1670988c2f0",
+    "mode": "auto"
+  }
+}

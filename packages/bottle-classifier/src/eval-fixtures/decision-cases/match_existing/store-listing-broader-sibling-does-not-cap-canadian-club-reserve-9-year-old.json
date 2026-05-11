@@ -1,6 +1,6 @@
 {
   "id": "store-listing-broader-sibling-does-not-cap-canadian-club-reserve-9-year-old",
-  "name": "store listing: broader sibling does not cap Canadian Club Reserve 9-year-old",
+  "name": "store listing: broader sibling does not block Canadian Club Reserve 9-year-old",
   "input": {
     "reference": {
       "name": "Canadian Club 9-year-old Reserve Canadian Whisky",
@@ -82,7 +82,6 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 16913,
-    "confidenceBand": "auto_verification",
-    "summary": "Do not let a broader sibling like Canadian Club Reserve 40% ABV cap an evidence-backed existing match when the agent already identified the stronger 9-year-old Reserve bottle."
+    "summary": "Do not let a broader sibling like Canadian Club Reserve 40% ABV block the stronger 9-year-old Reserve bottle match."
   }
 }

@@ -290,9 +290,10 @@ function normalizeEvalEditionText(value: string | null | undefined): string {
 
   return normalizeEvalText(value)
     .split(" ")
-    .map((token) => {
-      if (token === "vol") return "volume";
-      return romanNumerals[token] ?? token;
+    .flatMap((token) => {
+      if (token === "release") return [];
+      if (token === "vol") return ["volume"];
+      return [romanNumerals[token] ?? token];
     })
     .join(" ");
 }

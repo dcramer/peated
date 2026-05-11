@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-11T03:29:37.698Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Four Roses\" \"Limited Edition Small Batch\" 2017 release bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Four Roses\" \"Limited Edition Small Batch\" 2017 release bourbon",
+    "summary": "Here’s the bottle-specific summary for **Four Roses Limited Edition Small Batch Bourbon — 2017 release**:\n\n- **Producer / bottler:** Four Roses Distillery, Kentucky. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n- **Edition:** Annual **Limited Edition Small Bat",
+    "results": [
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+        "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+        "url": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/reviews/whiskey-review-four-roses-2017-limited-edition-small-batch/",
+        "url": "https://thewhiskeywash.com/reviews/whiskey-review-four-roses-2017-limited-edition-small-batch/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/97716/four-roses-small-batch-2017-limited-edition",
+        "url": "https://www.whiskybase.com/whiskies/whisky/97716/four-roses-small-batch-2017-limited-edition",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://drinkhacker.com/2017/10/20/review-four-roses-limited-edition-small-batch-bourbon-2017-edition/",
+        "url": "https://drinkhacker.com/2017/10/20/review-four-roses-limited-edition-small-batch-bourbon-2017-edition/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thebourbonbabe.com/2017/09/12/four-roses-2017-limited-edition-small-batch/",
+        "url": "https://thebourbonbabe.com/2017/09/12/four-roses-2017-limited-edition-small-batch/",
+        "domain": "thebourbonbabe.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6d8810ce67e27612ca52377afbe9fc6e8191d88b974fd259599ad6869b6a7b68",
+    "mode": "auto"
+  }
+}

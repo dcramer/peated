@@ -1,0 +1,53 @@
+{
+  "writtenAt": "2026-05-11T03:30:09.645Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "\"Four Roses Single Barrel Barrel Strength\" \"Private Selection\" Four Roses"
+  },
+  "output": {
+    "provider": "brave",
+    "query": "\"Four Roses Single Barrel Barrel Strength\" \"Private Selection\" Four Roses",
+    "summary": "A unique expression of Four Roses Barrel Strength Single Barrel, this private selection OBSF recipe is a <strong>9 year old single barrel bottled at 107.2-proof</strong> and brings forth a remarkably rich profile with citrus forward notes complementing classic ... A: The standard Four roses single ... selected by our e",
+    "results": [
+      {
+        "title": "Four Roses Single Barrel Barrel Strength Private Selection ...",
+        "url": "https://amsterwine.com/products/four-roses-single-barrel-barrel-strength-ny-edition-750ml",
+        "domain": "amsterwine.com",
+        "description": "A unique expression of Four Roses Barrel Strength Single Barrel, this private selection OBSF recipe is a <strong>9 year old single barrel bottled at 107.2-proof</strong> and brings forth a remarkably rich profile with ci",
+        "extraSnippets": []
+      },
+      {
+        "title": "Four Roses OESV Private Selection Single Barrel 117 Proof",
+        "url": "https://rarefindsliquorstore.com/product/four-roses-single-barrel/",
+        "domain": "rarefindsliquorstore.com",
+        "description": "A: The standard Four roses single ... selected by our experts for its superiority, and bottled at its natural cask strength of <strong>117 proof</strong>....",
+        "extraSnippets": []
+      },
+      {
+        "title": "r/bourbon on Reddit: Review #822: Four Roses Private Selection Barrel Strength Bourbon OBSK (Whole Foods Market, NorCal)",
+        "url": "https://www.reddit.com/r/bourbon/comments/1etp1ra/review_822_four_roses_private_selection_barrel/",
+        "domain": "reddit.com",
+        "description": "Since then, I&#x27;ve seen other Four Roses Private Selections picked by Whole Foods pop up. Usually there are identifiers that will say at least the state that Whole Foods is located in. ... OBSK is a recipe that I outw",
+        "extraSnippets": []
+      },
+      {
+        "title": "Four Roses Single Barrel Private Selection 2024 | Uptown Spirits Barrel Pick",
+        "url": "https://uptownspirits.com/products/four-roses-single-barrel-private-selection-uptown-spirits-barrel-pick-2023",
+        "domain": "uptownspirits.com",
+        "description": "OESQ | 9 Year 5 Months | 116 Proof Discover the bold flavors of Four Roses Single Barrel Barrel Strength Whiskey. <strong>Uncover the woody notes, with hints of graham crackers and vanilla marshmallow</strong>. Savor the",
+        "extraSnippets": []
+      },
+      {
+        "title": "Four Roses Collection – Sip Whiskey",
+        "url": "https://sipwhiskey.com/collections/four-roses-collection",
+        "domain": "sipwhiskey.com",
+        "description": "Four Roses Single Barrel Barrel Strength - A Dozen Roses: Part 2 Bundle · Four Roses · $34999 $349.99 · Quick shop · Add to cart · Four Roses OESK Tier-6 Single Barrel Sip Whiskey X Nestor Liquor Private Selection Bundle",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "ee1c38ff64b52ca0f82cc031b93ee3e6be11db95219d4186d0d37cbc2f4f0927",
+    "mode": "auto"
+  }
+}

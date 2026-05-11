@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T22:57:30.824Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Octomore 13.1\" Bruichladdich 59.2 2022"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Octomore 13.1\" Bruichladdich 59.2 2022",
+    "summary": "Here’s the bottle-specific ID for **Octomore 13.1** based on corroborated sources:\n\n- **Producer / Distillery:** **Bruichladdich**, Islay single malt Scotch whisky. ([distiller.com](https://distiller.com/spirits/octomore-13-1?utm_source=openai))\n- **Expression / Edition:** **Octomore 13.1**, part of the **Series 13** r",
+    "results": [
+      {
+        "title": "https://distiller.com/spirits/octomore-13-1",
+        "url": "https://distiller.com/spirits/octomore-13-1",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/218640/octomore-edition-131-1373-ppm",
+        "url": "https://www.whiskybase.com/whiskies/whisky/218640/octomore-edition-131-1373-ppm",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/218659?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/whisky/218659?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/218659?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/218659?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/218640?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/whisky/218640?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://onemoredram.com/2022/10/14/bruichladdich-launches-octomore-13-series/",
+        "url": "https://onemoredram.com/2022/10/14/bruichladdich-launches-octomore-13-series/",
+        "domain": "onemoredram.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "98850b80187691f3c18d27ddeebd8be9706460824400134cb9460e6294468e80",
+    "mode": "auto"
+  }
+}

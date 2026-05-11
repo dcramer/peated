@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T22:54:45.442Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19 Year Old official committee release batch code"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Ardbeg Traigh Bhan 19 Year Old official committee release batch code",
+    "summary": "Ardbeg **Traigh Bhan 19 Year Old** is an annual **official distillery release** from Ardbeg, not itself a separate “Committee Release” bottling. Ardbeg announced that each yearly batch carries a unique code on the bottle/carton, and official batch pages list the exact “Batch No.” for specific editions. ([scotchwhisky.c",
+    "results": [
+      {
+        "title": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
+        "url": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/en-gb/ardbeg-19-year-old-traigh-bhan-batch-7-1112627.html",
+        "url": "https://www.ardbeg.com/en-gb/ardbeg-19-year-old-traigh-bhan-batch-7-1112627.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Ardbeg Traigh Bhan Batches | Whisky Auctioneer",
+        "url": "https://whiskyauctioneer.com/learn/explore-whisky/series/ardbeg-traigh-bhan-batches",
+        "domain": "whiskyauctioneer.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Ardbeg Traigh Bhan 19 Years Old Batch 2 Single Malt Scotch Whisky | Archive",
+        "url": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%202-2020ARDTB2.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Ardbeg reveals 19 Year Old Traigh Bhan | Scotch Whisky",
+        "url": "https://scotchwhisky.com/magazine/latest-news/27070/ardbeg-reveals-19-year-old-traigh-bhan/",
+        "domain": "scotchwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://islaywhisky.se/whisky/ardbeg-19-year-old-traigh-bhan-batch-1/",
+        "url": "https://islaywhisky.se/whisky/ardbeg-19-year-old-traigh-bhan-batch-1/",
+        "domain": "islaywhisky.se",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "473e6ce6d7ded4d1305fcc956b6569c0a60a20c0b7838cd4b56d89d5b98f6a71",
+    "mode": "auto"
+  }
+}

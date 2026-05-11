@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-11T03:30:07.505Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Four Roses Single Barrel Barrel Strength\" bourbon official barrel strength single barrel"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Four Roses Single Barrel Barrel Strength\" bourbon official barrel strength single barrel",
+    "summary": "Officially, **“Four Roses Single Barrel Barrel Strength” is not the standard core Single Barrel bottle**. The official Four Roses Single Barrel product is **OBSV**, bottled at **100 proof**, and aged **7–9 years**. Four Roses describes it as a single-barrel bourbon and lists it as the flagship Single Barrel expression.",
+    "results": [
+      {
+        "title": "Single Barrel OBSV | Four Roses",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.weststwine.com/pages/four-roses-single-barrel-private-selection-bourbon",
+        "url": "https://www.weststwine.com/pages/four-roses-single-barrel-private-selection-bourbon",
+        "domain": "weststwine.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+        "url": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://en.wikipedia.org/wiki/Four_Roses",
+        "url": "https://en.wikipedia.org/wiki/Four_Roses",
+        "domain": "en.wikipedia.org",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Our Bourbons - Single Barrel Collection | Four Roses",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel-collection",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/four-roses-private-selection-single-barrel-barrel-strength-oesf",
+        "url": "https://distiller.com/spirits/four-roses-private-selection-single-barrel-barrel-strength-oesf",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "07b256ec1c41f278e891154187d844d902bdc3a643a9fb72bc93e1cc44ffc456",
+    "mode": "auto"
+  }
+}

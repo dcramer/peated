@@ -825,7 +825,7 @@ function getCandidateFamilyName(
   ).trim();
 }
 
-function candidateMatchesExtractedFamily({
+function candidateMatchesExtractedBrandAndCategory({
   candidate,
   extractedIdentity,
 }: {
@@ -854,6 +854,29 @@ function candidateMatchesExtractedFamily({
     return false;
   }
 
+  return true;
+}
+
+function candidateMatchesExtractedFamily({
+  candidate,
+  extractedIdentity,
+}: {
+  candidate: BottleCandidate;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+}): boolean {
+  if (!extractedIdentity) {
+    return false;
+  }
+
+  if (
+    !candidateMatchesExtractedBrandAndCategory({
+      candidate,
+      extractedIdentity,
+    })
+  ) {
+    return false;
+  }
+
   if (extractedIdentity.expression) {
     return getBottleTargetNameCandidates(candidate).some((name) =>
       textsOverlap(name, extractedIdentity.expression),
@@ -870,6 +893,34 @@ function candidateMatchesExtractedFamily({
   }
 
   return false;
+}
+
+function candidateHasLocalParentAnchorSource(candidate: BottleCandidate) {
+  return (
+    candidate.source.includes("exact") ||
+    candidate.source.includes("text") ||
+    candidate.source.includes("repair_parent")
+  );
+}
+
+function candidateMatchesLocalParentAnchor({
+  candidate,
+  extractedIdentity,
+}: {
+  candidate: BottleCandidate;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+}) {
+  if (candidate.source.includes("repair_parent")) {
+    return candidateMatchesExtractedBrandAndCategory({
+      candidate,
+      extractedIdentity,
+    });
+  }
+
+  return candidateMatchesExtractedFamily({
+    candidate,
+    extractedIdentity,
+  });
 }
 
 function candidateCanActAsReusableParent(candidate: BottleCandidate): boolean {
@@ -2193,8 +2244,8 @@ function hasLocalParentAnchoredReleaseCreationEvidence({
   });
   if (
     !parentCandidate ||
-    !parentCandidate.source.includes("exact") ||
-    !candidateMatchesExtractedFamily({
+    !candidateHasLocalParentAnchorSource(parentCandidate) ||
+    !candidateMatchesLocalParentAnchor({
       candidate: parentCandidate,
       extractedIdentity: artifacts.extractedIdentity,
     })
@@ -2313,7 +2364,8 @@ function maybeResolveExactCaskCreateToExistingMatch({
 }): BottleClassificationDecision | null {
   if (
     decision.action !== "create_bottle" ||
-    decision.identityScope !== "exact_cask"
+    decision.identityScope !== "exact_cask" ||
+    !decision.proposedBottle
   ) {
     return null;
   }
@@ -2328,10 +2380,21 @@ function maybeResolveExactCaskCreateToExistingMatch({
     return null;
   }
 
+  const proposedBottle = decision.proposedBottle;
   const existingTarget =
     artifacts.candidates
-      .filter((candidate) =>
-        candidateHasExactCaskCodeAnchor(candidate, exactCaskAnchor),
+      .filter(
+        (candidate) =>
+          candidateHasExactCaskCodeAnchor(candidate, exactCaskAnchor) &&
+          candidateMatchesProposedBottleDraftIdentity({
+            target: candidate,
+            proposedBottle,
+          }) &&
+          !proposedBottleHasKnownTargetConflict({
+            target: candidate,
+            proposedBottle,
+            extractedIdentity: artifacts.extractedIdentity,
+          }),
       )
       .sort((left, right) => {
         if (left.source.includes("exact") !== right.source.includes("exact")) {
@@ -3014,13 +3077,16 @@ function findDuplicateCreateBottleCandidate({
   proposedBottle,
   artifacts,
   observation,
+  requestedIdentityScope,
 }: {
   reference: BottleReference;
   proposedBottle: ProposedBottle;
   artifacts: BottleClassificationArtifacts;
   observation: BottleObservation | null;
+  requestedIdentityScope: BottleClassifierAgentDecision["identityScope"] | null;
 }): BottleCandidate | null {
   if (
+    requestedIdentityScope === "exact_cask" &&
     hasExactCaskSignals({
       reference,
       proposedBottle,
@@ -4109,6 +4175,7 @@ function sanitizeClassifierDecision({
       proposedBottle: normalizedDrafts.proposedBottle,
       artifacts,
       observation,
+      requestedIdentityScope: decision.identityScope,
     });
     if (duplicateBottleCandidate) {
       return createNoMatchDecision({
