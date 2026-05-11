@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T01:22:55.631Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "site:smws.com \"RW6.3\" \"Cinnamon sauna smoke\" OR \"Sauna Smoke\""
+  },
+  "output": {
+    "provider": "openai",
+    "query": "site:smws.com \"RW6.3\" \"Cinnamon sauna smoke\" OR \"Sauna Smoke\"",
+    "summary": "I found strong evidence that **SMWS RW6.3 “Cinnamon sauna smoke”** is a **Scotch Malt Whisky Society** single-cask **rye whisky from Kyrö Distillery Company in Finland**, not Scotch. The official SMWS product page confirms **cask no. RW6.3**, the title **“Cinnamon sauna smoke,”** **59.2% ABV**, **5 years old**, **disti",
+    "results": [
+      {
+        "title": "https://smws.com/cinnamon-sauna-smoke/",
+        "url": "https://smws.com/cinnamon-sauna-smoke/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.strathliquor.com/product/smws-rw6-3-cinnamon-sauna-smoke/",
+        "url": "https://www.strathliquor.com/product/smws-rw6-3-cinnamon-sauna-smoke/",
+        "domain": "strathliquor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/247300/kyr-2017-smws-rw63?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/247300/kyr-2017-smws-rw63?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://peated.com/bottles/12207",
+        "url": "https://peated.com/bottles/12207",
+        "domain": "peated.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://smws.eu/cinnamon-sauna-smoke/",
+        "url": "https://smws.eu/cinnamon-sauna-smoke/",
+        "domain": "smws.eu",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/247300/kyr-2017-smws-rw63",
+        "url": "https://www.whiskybase.com/whiskies/whisky/247300/kyr-2017-smws-rw63",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "11cc76a2b7b5689946d1e0dac8df5e19329b7ec7e0fada0b6fb771762aa3d24c",
+    "mode": "auto"
+  }
+}

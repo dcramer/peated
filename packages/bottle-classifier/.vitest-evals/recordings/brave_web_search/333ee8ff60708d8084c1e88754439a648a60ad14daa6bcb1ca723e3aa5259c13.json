@@ -1,0 +1,53 @@
+{
+  "writtenAt": "2026-05-10T00:43:09.771Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "Bruichladdich Octomore 13.1 official series 13 single malt"
+  },
+  "output": {
+    "provider": "brave",
+    "query": "Bruichladdich Octomore 13.1 official series 13 single malt",
+    "summary": "The 13.1 edition in the Octomore ... of the same way as other Octomore releases, with <strong>100% Scottish barley and aged in a mixture of bourbon and Tennessee whiskey casks</strong>.... Bruichladdich Octomore 13.1 is a <strong>single malt Scotch whisky from the Islay region of Scotland</strong>. It is the thirteenth",
+    "results": [
+      {
+        "title": "Octomore 13.1 5 Year Old 70cl Whisky | Master Of Malt",
+        "url": "https://www.masterofmalt.com/whiskies/bruichladdich/octomore-13-1-5-year-old-whisky/",
+        "domain": "masterofmalt.com",
+        "description": "The 13.1 edition in the Octomore ... of the same way as other Octomore releases, with <strong>100% Scottish barley and aged in a mixture of bourbon and Tennessee whiskey casks</strong>....",
+        "extraSnippets": []
+      },
+      {
+        "title": "Bruichladdich Octomore 13.1 Single Malt Scotch | 750ml",
+        "url": "https://www.gasparsliquorshoppe.com/bruichladdich-octomore-13-1-ml.html",
+        "domain": "gasparsliquorshoppe.com",
+        "description": "Bruichladdich Octomore 13.1 is a <strong>single malt Scotch whisky from the Islay region of Scotland</strong>. It is the thirteenth release of the Octomore series, and is made from 100% Scottish barley, which is then pea",
+        "extraSnippets": []
+      },
+      {
+        "title": "Bruichladdich Octomore 13.1 — Whisky Saga",
+        "url": "https://www.whiskysaga.com/blog/bruichladdich-octomore-131",
+        "domain": "whiskysaga.com",
+        "description": "Time to take a closer look at the ... clocks in at 137.3 ppm. It has been <strong>matured exclusively in 1st fill ex-bourbon casks, and produced using 100 % Scottish Concerto barley</strong>....",
+        "extraSnippets": []
+      },
+      {
+        "title": "Octomore 13.1",
+        "url": "https://distiller.com/spirits/octomore-13-1",
+        "domain": "distiller.com",
+        "description": "This is the 13th annual Octomore series from Bruichladdich which features <strong>super heavily-peated single malt</strong>. This 13.1 bottling uses 100% Scottish malted barley (Concerto) which is malted to 137.3 ppm.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Bruichladdich Octomore Edition 13.1 Super Heavily Peated Single Malt Scotch Whisky - Rayans Liquor's Fine Wine Spirits Clark Wilson Uptown Northside, Chicago, I",
+        "url": "https://rayanliquors.com/shop/product/bruichladdich-octomore-edition-13-1-super-heavily-peated-single-malt-scotch-whisky/630a82b679d8507f42254f03?option-id=4d29fd369f85a29687c72cdd55a74d3dcc4490ba27caab1a8f5487abc0ee7fa9",
+        "domain": "rayanliquors.com",
+        "description": "Jump to content Jump to search ... IL 60640 · DOWNLOAD OUR APP · Bruichladdich Octomore Edition 13.1 <strong>Super Heavily Peated Single Malt Scotch Whisky</strong> · Download Our App · Contact Us...",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "333ee8ff60708d8084c1e88754439a648a60ad14daa6bcb1ca723e3aa5259c13",
+    "mode": "auto"
+  }
+}

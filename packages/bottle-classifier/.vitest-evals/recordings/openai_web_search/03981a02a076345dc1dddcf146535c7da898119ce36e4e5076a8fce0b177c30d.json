@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T20:28:08.353Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Macallan 18 Year Old Sherry Oak 1994 Vintage"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Macallan 18 Year Old Sherry Oak 1994 Vintage",
+    "summary": "Here’s the most likely bottle-specific identification for **Macallan 18 Year Old Sherry Oak 1994 Vintage**:\n\n- **Producer:** The Macallan\n- **Expression:** **18 Year Old Sherry Oak**\n- **Vintage / distillation year:** **1994**\n- **Age statement:** **18 years**\n- **ABV:** **43%**\n- **Bottle size:** commonly **70cl**\n- *",
+    "results": [
+      {
+        "title": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-18-year-old-1994-sherry-oak-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-18-year-old-1994-sherry-oak-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskystack.com/products/macallan-18-years-old-sherry-oak-1994",
+        "url": "https://whiskystack.com/products/macallan-18-years-old-sherry-oak-1994",
+        "domain": "whiskystack.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskystack.com/en/products/macallan-18-years-old-sherry-oak-1994",
+        "url": "https://whiskystack.com/en/products/macallan-18-years-old-sherry-oak-1994",
+        "domain": "whiskystack.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.tesco.com/groceries/en-GB/products/326123437",
+        "url": "https://www.tesco.com/groceries/en-GB/products/326123437",
+        "domain": "tesco.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://barrelbroker.net/product/macallan-18-year-old-sherry-oak-single-malt-scotch-whisky-1994/",
+        "url": "https://barrelbroker.net/product/macallan-18-year-old-sherry-oak-single-malt-scotch-whisky-1994/",
+        "domain": "barrelbroker.net",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskymarketplace.com/whiskies/macallan-1994-18-year-old-sherry-speyside-single-malt-scotch",
+        "url": "https://www.whiskymarketplace.com/whiskies/macallan-1994-18-year-old-sherry-speyside-single-malt-scotch",
+        "domain": "whiskymarketplace.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "03981a02a076345dc1dddcf146535c7da898119ce36e4e5076a8fce0b177c30d",
+    "mode": "record"
+  }
+}

@@ -212,6 +212,217 @@ describe("resolveLegacyCreateParentClassification", () => {
     });
   });
 
+  it("blocks create-parent decisions that cite a dirty reviewed parent", () => {
+    const parentRows = [
+      buildLegacyReleaseRepairParentCandidate({
+        id: 661,
+        fullName: "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
+        edition: "Batch 4",
+        statedAge: 15,
+      }),
+    ];
+
+    const resolution = resolveLegacyCreateParentClassification({
+      classification: createDecidedBottleClassification({
+        decision: {
+          action: "create_bottle_and_release",
+          candidateBottleIds: [661],
+          confidence: 87,
+          identityScope: "product",
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          observation: null,
+          parentBottleId: null,
+          proposedBottle: {
+            name: "The Cadboll Estate 15-year-old",
+            series: null,
+            category: "single_malt",
+            edition: null,
+            statedAge: 15,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: null,
+              name: "Glenmorangie",
+            },
+            distillers: [],
+            bottler: null,
+          },
+          proposedRelease: {
+            edition: "Batch 4",
+            statedAge: null,
+            releaseYear: null,
+            vintageYear: null,
+            abv: null,
+            caskStrength: null,
+            singleCask: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            description: null,
+            tastingNotes: null,
+            imageUrl: null,
+          },
+          rationale:
+            "Create a reusable parent and split the batch into a child release.",
+        },
+        artifacts: {},
+      }),
+      parentRows,
+    });
+
+    expect(resolution).toEqual({
+      resolution: "blocked",
+      reason: "classifier_dirty_parent_candidate",
+    });
+  });
+
+  it("blocks create-parent decisions that collide with a derived dirty parent name", () => {
+    const parentRows = [
+      buildLegacyReleaseRepairParentCandidate({
+        id: 661,
+        fullName: "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
+        edition: "Batch 4",
+        statedAge: 15,
+      }),
+    ];
+
+    const resolution = resolveLegacyCreateParentClassification({
+      classification: createDecidedBottleClassification({
+        decision: {
+          action: "create_bottle_and_release",
+          candidateBottleIds: [],
+          confidence: 87,
+          identityScope: "product",
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          observation: null,
+          parentBottleId: null,
+          proposedBottle: {
+            name: "The Cadboll Estate 15-year-old",
+            series: null,
+            category: "single_malt",
+            edition: null,
+            statedAge: 15,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: null,
+              name: "Glenmorangie",
+            },
+            distillers: [],
+            bottler: null,
+          },
+          proposedRelease: {
+            edition: "Batch 4",
+            statedAge: null,
+            releaseYear: null,
+            vintageYear: null,
+            abv: null,
+            caskStrength: null,
+            singleCask: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            description: null,
+            tastingNotes: null,
+            imageUrl: null,
+          },
+          rationale:
+            "Create a reusable parent and split the batch into a child release.",
+        },
+        artifacts: {},
+      }),
+      parentRows,
+    });
+
+    expect(resolution).toEqual({
+      resolution: "blocked",
+      reason: "classifier_dirty_parent_candidate",
+    });
+  });
+
+  it("allows create-parent when dirty reviewed rows do not match the proposed parent", () => {
+    const parentRows = [
+      buildLegacyReleaseRepairParentCandidate({
+        id: 661,
+        fullName: "Glenmorangie A Tale of Cake (Batch 2)",
+        edition: "Batch 2",
+      }),
+    ];
+
+    const resolution = resolveLegacyCreateParentClassification({
+      classification: createDecidedBottleClassification({
+        decision: {
+          action: "create_bottle_and_release",
+          candidateBottleIds: [],
+          confidence: 87,
+          identityScope: "product",
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          observation: null,
+          parentBottleId: null,
+          proposedBottle: {
+            name: "The Cadboll Estate 15-year-old",
+            series: null,
+            category: "single_malt",
+            edition: null,
+            statedAge: 15,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: null,
+              name: "Glenmorangie",
+            },
+            distillers: [],
+            bottler: null,
+          },
+          proposedRelease: {
+            edition: "Batch 4",
+            statedAge: null,
+            releaseYear: null,
+            vintageYear: null,
+            abv: null,
+            caskStrength: null,
+            singleCask: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            description: null,
+            tastingNotes: null,
+            imageUrl: null,
+          },
+          rationale:
+            "Create a reusable parent and split the batch into a child release.",
+        },
+        artifacts: {},
+      }),
+      parentRows,
+    });
+
+    expect(resolution).toEqual({
+      resolution: "allow_create_parent",
+    });
+  });
+
   it("allows create-parent when the classifier cannot reuse an existing bottle", () => {
     const resolution = resolveLegacyCreateParentClassification({
       classification: createDecidedBottleClassification({

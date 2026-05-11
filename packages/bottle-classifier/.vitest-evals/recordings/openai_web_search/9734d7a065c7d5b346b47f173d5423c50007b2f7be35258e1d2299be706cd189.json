@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T23:05:43.897Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Elijah Craig Barrel Proof\" \"Batch C923\" bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Elijah Craig Barrel Proof\" \"Batch C923\" bourbon",
+    "summary": "**Elijah Craig Barrel Proof — Batch C923**\n\nConfirmed bottle-specific details for **Elijah Craig Barrel Proof Batch C923**:\n\n- **Producer / brand:** **Elijah Craig**, made by **Heaven Hill Distillery**. ([breakingbourbon.com](https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923?utm_source=openai)",
+    "results": [
+      {
+        "title": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/larceny-barrel-proof-batch-c923",
+        "url": "https://www.breakingbourbon.com/review/larceny-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskeyfool.com/post/elijah-craig-barrel-proof-bourbon-review-of-batch-c923",
+        "url": "https://www.thewhiskeyfool.com/post/elijah-craig-barrel-proof-bourbon-review-of-batch-c923",
+        "domain": "thewhiskeyfool.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.peoplesbourbonreview.com/reviews/elijah-craig-barrel-proof-batch-c923-review",
+        "url": "https://www.peoplesbourbonreview.com/reviews/elijah-craig-barrel-proof-batch-c923-review",
+        "domain": "peoplesbourbonreview.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://vinepair.com/review/elijah-craig-barrel-proof-bourbon-batch-c923/",
+        "url": "https://vinepair.com/review/elijah-craig-barrel-proof-bourbon-batch-c923/",
+        "domain": "vinepair.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/elijah-craig-barrel-proof-bourbon-batch-c923",
+        "url": "https://distiller.com/spirits/elijah-craig-barrel-proof-bourbon-batch-c923",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9734d7a065c7d5b346b47f173d5423c50007b2f7be35258e1d2299be706cd189",
+    "mode": "auto"
+  }
+}

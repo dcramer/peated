@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T01:24:42.204Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Canadian Club\" \"Reserve\" \"9 year\" whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Canadian Club\" \"Reserve\" \"9 year\" whisky",
+    "summary": "I found good support that this bottle is **Canadian Club Reserve 9 Year Old Canadian Whisky**.\n\nWhat the sources confirm:\n- **Official producer source:** Canadian Club lists **“Reserve 9 Year Old Canadian Whisky”** as an official product/release. ([canadianclub.com](https://www.canadianclub.com/products/reserve-9-year-",
+    "results": [
+      {
+        "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+        "url": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "url": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.canadianclub.com/products",
+        "url": "https://www.canadianclub.com/products",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.luekensliquors.com/product/canadian-club-reserve-9yr-1-75l/",
+        "url": "https://www.luekensliquors.com/product/canadian-club-reserve-9yr-1-75l/",
+        "domain": "luekensliquors.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.strathliquor.com/product/canadian-club-reserve-aged-9-years/",
+        "url": "https://www.strathliquor.com/product/canadian-club-reserve-aged-9-years/",
+        "domain": "strathliquor.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "1538bfe8bf6d826d1752aacac39e0347afb2a313151bf8200bc309baa157a015",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T22:58:40.761Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Woodford Reserve Double Double Oaked\" bourbon official release"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Woodford Reserve Double Double Oaked\" bourbon official release",
+    "summary": "**Official release status:** Woodford Reserve Double Double Oaked is now an **official permanent member of the Woodford Reserve Family of Brands**, not just a Kentucky-only Distillery Series bottle. Brown-Forman states that **in fiscal 2025** it “became a permanent member” of the lineup and that they **launched it acro",
+    "results": [
+      {
+        "title": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+        "url": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Double Double Oaked - Woodford Reserve",
+        "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "domain": "shop.woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/fr/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/fr/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/new-releases/",
+        "url": "https://www.woodfordreserve.com/new-releases/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "516b68fcf643656cb33fdaa12527982a040f1997728ccfc1ee5120fce9472c2f",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:44:53.538Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Elijah Craig Cask Strength\" bourbon Barrel Proof Elijah Craig"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Elijah Craig Cask Strength\" bourbon Barrel Proof Elijah Craig",
+    "summary": "“**Elijah Craig Cask Strength**” and “**Elijah Craig Barrel Proof**” refer to the same core bourbon line: **Elijah Craig Barrel Proof Kentucky Straight Bourbon Whiskey** from **Heaven Hill Distillery**. The brand’s official product page uses **“Barrel Proof”** rather than “Cask Strength.” ([elijahcraig.com](https://eli",
+    "results": [
+      {
+        "title": "https://elijahcraig.com/introducing-elijah-craig-barrel-proof-rye",
+        "url": "https://elijahcraig.com/introducing-elijah-craig-barrel-proof-rye",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/barrel-proof.php",
+        "url": "https://elijahcraig.com/barrel-proof.php",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://en.wikipedia.org/wiki/Elijah_Craig_%28bourbon%29",
+        "url": "https://en.wikipedia.org/wiki/Elijah_Craig_%28bourbon%29",
+        "domain": "en.wikipedia.org",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.gobourbon.com/10-facts-you-may-not-know-about-elijah-craig-barrel-proof/",
+        "url": "https://www.gobourbon.com/10-facts-you-may-not-know-about-elijah-craig-barrel-proof/",
+        "domain": "gobourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.mensjournal.com/drink/elijah-craig-barrel-proof-bourbon-review",
+        "url": "https://www.mensjournal.com/drink/elijah-craig-barrel-proof-bourbon-review",
+        "domain": "mensjournal.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.heavenhill.com/brands-detail.php?brandid=elijah-craig-bourbons",
+        "url": "https://www.heavenhill.com/brands-detail.php?brandid=elijah-craig-bourbons",
+        "domain": "heavenhill.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "40cdb0b74e6536246adde114e196517fa2aa738b7f5e141b8f2b209608bc6110",
+    "mode": "auto"
+  }
+}

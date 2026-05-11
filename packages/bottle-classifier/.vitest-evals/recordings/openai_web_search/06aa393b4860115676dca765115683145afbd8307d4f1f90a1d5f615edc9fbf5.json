@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:16:15.702Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Canadian Club\" Reserve 9 year old Triple Aged official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Canadian Club\" Reserve 9 year old Triple Aged official",
+    "summary": "I found solid support that this bottle is **Canadian Club Reserve 9 Year Old**, an **official Canadian Club bottling**, and that **“Triple Aged”** is part of the release labeling rather than a separate finish or special cask treatment. The official Canadian Club product page confirms it is **aged 9 years** and presents",
+    "results": [
+      {
+        "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/75738/canadian-club-09-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/75738/canadian-club-09-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "url": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "url": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.strathliquor.com/product/canadian-club-reserve-aged-9-years/",
+        "url": "https://www.strathliquor.com/product/canadian-club-reserve-aged-9-years/",
+        "domain": "strathliquor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.walmart.com/ip/126131678",
+        "url": "https://www.walmart.com/ip/126131678",
+        "domain": "walmart.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "06aa393b4860115676dca765115683145afbd8307d4f1f90a1d5f615edc9fbf5",
+    "mode": "auto"
+  }
+}

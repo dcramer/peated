@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T06:27:34.518Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19 Year Old official 46.2 single malt"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Ardbeg Traigh Bhan 19 Year Old official 46.2 single malt",
+    "summary": "**Ardbeg Traigh Bhan 19 Year Old** is an **official bottling** from **Ardbeg Distillery** on **Islay**, bottled at **46.2% ABV** as a **single malt Scotch whisky**. It is a **19-year-old** expression and was introduced as an annual/small-batch age-stated release in Ardbeg’s range. ([scotchwhisky.com](https://scotchwhis",
+    "results": [
+      {
+        "title": "https://whiskymag.com/tastings/ardbeg-traigh-bhan-19-years-old/",
+        "url": "https://whiskymag.com/tastings/ardbeg-traigh-bhan-19-years-old/",
+        "domain": "whiskymag.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/ardbeg/ardbeg-traigh-bhan-19-year-old-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/ardbeg/ardbeg-traigh-bhan-19-year-old-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/Ardbeg-19-year-old-Traigh-Bhan-46-2",
+        "url": "https://whiskyadvocate.com/Ardbeg-19-year-old-Traigh-Bhan-46-2",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskylifestyle.com/ardbeg-traigh-bhan-19-year-old-batch-2/",
+        "url": "https://www.whiskylifestyle.com/ardbeg-traigh-bhan-19-year-old-batch-2/",
+        "domain": "whiskylifestyle.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/ardbeg-traigh-bhan-batch-6.html",
+        "url": "https://www.whisky.com/whisky-database/details/ardbeg-traigh-bhan-batch-6.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.spiritradar.com/whisky-db/ardbeg-traigh-bhan-batch-no.1-small-batch-release-19yo-46.2-percent-700ml/",
+        "url": "https://www.spiritradar.com/whisky-db/ardbeg-traigh-bhan-batch-no.1-small-batch-release-19yo-46.2-percent-700ml/",
+        "domain": "spiritradar.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e745e4276b00998670d451d9c18a95f9721f687d0ee08fad64256b05ab3f18e1",
+    "mode": "auto"
+  }
+}

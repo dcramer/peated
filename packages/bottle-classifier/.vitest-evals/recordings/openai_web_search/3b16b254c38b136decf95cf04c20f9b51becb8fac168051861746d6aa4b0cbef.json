@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T01:37:44.835Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Wild Turkey Rare Breed Rye official barrel proof rye 56.1%"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Wild Turkey Rare Breed Rye official barrel proof rye 56.1%",
+    "summary": "Yes — this appears to be **Wild Turkey Rare Breed Rye**, and **56.1% ABV is the official bottling strength**, i.e. **112.2 proof**, marketed as **barrel proof**. The strongest source is Wild Turkey’s official product page, which says Rare Breed Rye is an **uncut, non-chill filtered Kentucky Straight Rye** bottled at **",
+    "results": [
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ryecentral.com/products/wild-turkey-rare-breed-barrel-proof-rye-whiskey-review",
+        "url": "https://www.ryecentral.com/products/wild-turkey-rare-breed-barrel-proof-rye-whiskey-review",
+        "domain": "ryecentral.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/162441/wild-turkey-rare-breed?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/162441/wild-turkey-rare-breed?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskeyshelf.com/wild-turkey-rare-breed-rye-review/",
+        "url": "https://www.thewhiskeyshelf.com/wild-turkey-rare-breed-rye-review/",
+        "domain": "thewhiskeyshelf.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "url": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/162441/wild-turkey-rare-breed?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/162441/wild-turkey-rare-breed?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "3b16b254c38b136decf95cf04c20f9b51becb8fac168051861746d6aa4b0cbef",
+    "mode": "auto"
+  }
+}

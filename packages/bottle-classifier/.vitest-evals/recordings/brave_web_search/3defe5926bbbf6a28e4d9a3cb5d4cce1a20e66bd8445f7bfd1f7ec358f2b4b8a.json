@@ -1,0 +1,25 @@
+{
+  "writtenAt": "2026-05-10T00:03:19.732Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "\"Four Roses\" \"Single Barrel Collection\" \"barrel strength\""
+  },
+  "output": {
+    "provider": "brave",
+    "query": "\"Four Roses\" \"Single Barrel Collection\" \"barrel strength\"",
+    "summary": "For years, just one of those recipes ... more single-barrel recipes into national distribution, each bottled at a standard <strong>100 proof</strong>....",
+    "results": [
+      {
+        "title": "Every Bottle in the Four Roses Single Barrel Collection, Explained | VinePair",
+        "url": "https://vinepair.com/articles/four-roses-single-barrel-collection-guide/",
+        "domain": "vinepair.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "3defe5926bbbf6a28e4d9a3cb5d4cce1a20e66bd8445f7bfd1f7ec358f2b4b8a",
+    "mode": "auto"
+  }
+}

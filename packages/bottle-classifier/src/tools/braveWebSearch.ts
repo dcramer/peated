@@ -64,7 +64,7 @@ export function createBraveWebSearchTool({
   return tool({
     name: "brave_web_search",
     description:
-      "Search the live web using Brave Search's independent index. Use this after `openai_web_search` when the first search returns sparse results, mostly retailer pages, or lacks authoritative producer or critic domains. Brave is useful as a second opinion from a different index and can return extra snippets for better evidence review.",
+      "Search Brave as a second web index when OpenAI web search is sparse, retailer-heavy, or lacks corroboration.",
     parameters: BottleWebSearchArgsSchema,
     execute: async (args) => {
       if (!budget.tryConsume()) {

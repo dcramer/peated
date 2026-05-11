@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T20:27:08.462Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Woodford Reserve Double Double Oaked\" bourbon official limited release"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Woodford Reserve Double Double Oaked\" bourbon official limited release",
+    "summary": "Yes — **Woodford Reserve Double Double Oaked** is an **official Woodford Reserve limited release**.\n\nWhat’s confirmed from official sources:\n\n- It began as part of Woodford Reserve’s **Distillery Series**, which Woodford describes as limited expressions sold at the distillery and in limited Kentucky retail. Past Distil",
+    "results": [
+      {
+        "title": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+        "url": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/distillery-series/",
+        "url": "https://www.woodfordreserve.com/whiskey/distillery-series/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "domain": "shop.woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/en-au/whiskey/distillery-series/",
+        "url": "https://www.woodfordreserve.com/en-au/whiskey/distillery-series/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a513d5d22ff04d1e0a68056c8faa8927353f1356e702f1aaa023952ce0af4002",
+    "mode": "record"
+  }
+}

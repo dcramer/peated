@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:21:22.945Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19 year old official release batch ABV"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Ardbeg Traigh Bhan 19 year old official release batch ABV",
+    "summary": "Ardbeg **Traigh Bhan 19 Year Old** official batches are bottled at **46.2% ABV**. Ardbeg’s own product page for **Batch 3** identifies it as a **19-year-old** official small-batch release and shows **46.2% ABV**. Independent sources also list **Batch 2** as **19 years old** at **46.2% ABV**, confirming that the batch n",
+    "results": [
+      {
+        "title": "https://shop.whiskybase.com/us/go/product/112959170/",
+        "url": "https://shop.whiskybase.com/us/go/product/112959170/",
+        "domain": "shop.whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky-online.com/products/ardbeg-19-year-old-traigh-bhan-2020-release-batch-2",
+        "url": "https://www.whisky-online.com/products/ardbeg-19-year-old-traigh-bhan-2020-release-batch-2",
+        "domain": "whisky-online.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskymag.com/tastings/ardbeg-traigh-bhan-batch-2/",
+        "url": "https://whiskymag.com/tastings/ardbeg-traigh-bhan-batch-2/",
+        "domain": "whiskymag.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
+        "url": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.sabelwhisky.com/shop/ardbeg/ardbeg-traigh-bhan-batch-2/",
+        "url": "https://www.sabelwhisky.com/shop/ardbeg/ardbeg-traigh-bhan-batch-2/",
+        "domain": "sabelwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskyshop.com/auctions/a44830-ardbeg-19-year-old-traigh-bhan",
+        "url": "https://www.whiskyshop.com/auctions/a44830-ardbeg-19-year-old-traigh-bhan",
+        "domain": "whiskyshop.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "eb1f11e02e5338c684029ab1d87e9d3dc812fba4dec45137103b0ef1580ecaba",
+    "mode": "auto"
+  }
+}

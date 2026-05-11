@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:40:59.555Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "site:fourrosesbourbon.com Four Roses barrel strength single barrel private selection"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "site:fourrosesbourbon.com Four Roses barrel strength single barrel private selection",
+    "summary": "Evidence summary for **Four Roses Single Barrel Private Selection Barrel Strength**:\n\n- **Official Four Roses source:** Four Roses’ Single Barrel collection page confirms the regular Single Barrel line is **100 proof** and aged **7–9 years**, which helps distinguish the standard OBSV bottling from the separate **Privat",
+    "results": [
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+        "url": "https://www.fourrosesbourbon.com/blog/four-roses-new-limited-edition-single-barrel-is-a-toast-to-fans",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wine.com/product/four-roses-single-barrel-oesv-barrel-strength-private-selection-1238-proof/3857005",
+        "url": "https://www.wine.com/product/four-roses-single-barrel-oesv-barrel-strength-private-selection-1238-proof/3857005",
+        "domain": "wine.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Four Roses Single Barrel Private Selection OBSV Bourbon Review | ModernThirst",
+        "url": "https://modernthirst.com/2014/02/24/four-roses-single-barrel-private-selection/",
+        "domain": "modernthirst.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/elliots-select",
+        "url": "https://www.fourrosesbourbon.com/blog/elliots-select",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Four Roses Single Barrel Review | Breaking Bourbon",
+        "url": "https://www.breakingbourbon.com/review/four-roses-single-barrel",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thebourbonculture.com/whiskey-reviews/four-roses-single-barrel-bourbon-review/",
+        "url": "https://thebourbonculture.com/whiskey-reviews/four-roses-single-barrel-bourbon-review/",
+        "domain": "thebourbonculture.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "94a12195a68a3c09246137253e6cd97b34eeb699f94bc7e7dce1c1f01471dd37",
+    "mode": "auto"
+  }
+}

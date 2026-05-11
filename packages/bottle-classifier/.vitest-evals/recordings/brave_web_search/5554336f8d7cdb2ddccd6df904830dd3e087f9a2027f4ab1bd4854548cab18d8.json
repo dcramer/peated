@@ -1,0 +1,53 @@
+{
+  "writtenAt": "2026-05-10T00:36:24.368Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "Elijah Craig Barrel Proof C923 proof age official Heaven Hill"
+  },
+  "output": {
+    "provider": "brave",
+    "query": "Elijah Craig Barrel Proof C923 proof age official Heaven Hill",
+    "summary": "The Schtick: The third and final Elijah Craig Barrel Proof release of 2023, C923 is the oldest batch (via age statement) we&#x27;ve seen to date at <strong>13 years and seven months</strong>, assuaging whiskey enthusiasts&#x27; fears that Heaven Hill would exclusively ... Heaven Hill wisely made a note at the time that",
+    "results": [
+      {
+        "title": "r/bourbon on Reddit: Review #2321 - Elijah Craig Barrel Proof 13 Year C923",
+        "url": "https://www.reddit.com/r/bourbon/comments/1f78skw/review_2321_elijah_craig_barrel_proof_13_year_c923/",
+        "domain": "reddit.com",
+        "description": "The Schtick: The third and final Elijah Craig Barrel Proof release of 2023, C923 is the oldest batch (via age statement) we&#x27;ve seen to date at <strong>13 years and seven months</strong>, assuaging whiskey enthusiast",
+        "extraSnippets": []
+      },
+      {
+        "title": "Elijah Craig Barrel Proof (Batch C923) Review | Breaking Bourbon",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": "Heaven Hill wisely made a note at the time that the final release of 2023 would see the oldest age statement for the brand yet. True to their word, Batch C923 features an impressive <strong>13 year, 7 month</strong> age",
+        "extraSnippets": []
+      },
+      {
+        "title": "Elijah Craig Barrel Proof Batch C923 Review - Whiskey Consensus",
+        "url": "https://whiskeyconsensus.com/elijah-craig-barrel-proof-batch-c923-review/",
+        "domain": "whiskeyconsensus.com",
+        "description": "Named after the founder of bourbon, Reverend Elijah Craig, this whiskey historically packed a 12 year age statement, however, that <strong>age statement was removed by Heaven Hill in an effort to have more variation betw",
+        "extraSnippets": []
+      },
+      {
+        "title": "Heaven Hill Updates: Elijah Craig Barrel Proof C923 Age leaked, Fall 2023 Old Fitzgerald Decanter and 2024 Heaven Hill Heritage Collection - Bourbon Culture",
+        "url": "https://thebourbonculture.com/whiskey-essentials/heaven-hill-updates-elijah-craig-barrel-proof-c923-fall-2023-old-fitzgerald-decanter-and-hh-18-year-bourbon/",
+        "domain": "thebourbonculture.com",
+        "description": "No surprises here as it wears a very old age statement. <strong>20 years</strong> to be exact. The proof also looks stupendous for the age – 120 proof if the TTB filing is to be believed. Oak will probably be pentiful an",
+        "extraSnippets": []
+      },
+      {
+        "title": "Elijah Craig Barrel Proof Batch C923",
+        "url": "https://www.whiskeyinmyweddingring.com/reviews/elijah-craig-barrel-proof-batch-c923",
+        "domain": "whiskeyinmyweddingring.com",
+        "description": "This bottling, marked at <strong>13 years 7 months</strong>, has barrels as old as 15 or 17 in it (admittedly, this is hearsay from my friend Mike at The Bourbon Culture, but I trust his sources).",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5554336f8d7cdb2ddccd6df904830dd3e087f9a2027f4ab1bd4854548cab18d8",
+    "mode": "auto"
+  }
+}

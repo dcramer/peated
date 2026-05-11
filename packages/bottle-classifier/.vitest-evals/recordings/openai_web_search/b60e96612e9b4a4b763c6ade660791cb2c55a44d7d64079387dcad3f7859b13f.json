@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:25:33.057Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Canadian Club\" Reserve 9 year old Canadian Whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Canadian Club\" Reserve 9 year old Canadian Whisky",
+    "summary": "Confirmed bottle details for **Canadian Club Reserve 9 Year Old Canadian Whisky**:\n\n- **Brand / expression:** Canadian Club **Reserve 9 Year Old**. The current Canadian Club products page lists this expression by that name. ([canadianclub.com](https://www.canadianclub.com/products?utm_source=openai))\n- **Category / ori",
+    "results": [
+      {
+        "title": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+        "url": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.strathliquor.com/product/canadian-club-reserve-aged-9-years/",
+        "url": "https://www.strathliquor.com/product/canadian-club-reserve-aged-9-years/",
+        "domain": "strathliquor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/70887/canadian-club-reserve-9-year-old",
+        "url": "https://www.thewhiskyexchange.com/p/70887/canadian-club-reserve-9-year-old",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://specsonline.com/shop/spirits/canadian-club-reserve-9yr-2/",
+        "url": "https://specsonline.com/shop/spirits/canadian-club-reserve-9yr-2/",
+        "domain": "specsonline.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.canadianclub.com/products",
+        "url": "https://www.canadianclub.com/products",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/75738/canadian-club-09-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/75738/canadian-club-09-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b60e96612e9b4a4b763c6ade660791cb2c55a44d7d64079387dcad3f7859b13f",
+    "mode": "auto"
+  }
+}

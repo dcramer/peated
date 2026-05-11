@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:09:22.753Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"SMWS RW6.5\" whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"SMWS RW6.5\" whisky",
+    "summary": "**SMWS RW6.5** is an **SMWS single-cask rye whisky release from Finland**, and independent database evidence identifies the distillery as **Kyrö Distillery Company**. The bottler is **The Scotch Malt Whisky Society**, the bottle name is **“Appley ever after,”** the spirit was **distilled 11 January 2018**, **bottled in",
+    "results": [
+      {
+        "title": "https://smws.com/",
+        "url": "https://smws.com/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://en.wikipedia.org/wiki/Scotch_Malt_Whisky_Society",
+        "url": "https://en.wikipedia.org/wiki/Scotch_Malt_Whisky_Society",
+        "domain": "en.wikipedia.org",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Kyrö 2018 SMWS RW6.5 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65?language=zh-CN",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.smws.ch/",
+        "url": "https://www.smws.ch/",
+        "domain": "smws.ch",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskylibraryshop.co.za/products/smws-rw6-5-appley-ever-after",
+        "url": "https://whiskylibraryshop.co.za/products/smws-rw6-5-appley-ever-after",
+        "domain": "whiskylibraryshop.co.za",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Scotch Malt Whisky Society Spirit Codes | Whiskipedia",
+        "url": "https://whiskipedia.com/smws/spirits/",
+        "domain": "whiskipedia.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6d4ba84aa17ca7305d964d3443bae9afe48da542cf1ab4fb57d5c845b42bd37d",
+    "mode": "auto"
+  }
+}

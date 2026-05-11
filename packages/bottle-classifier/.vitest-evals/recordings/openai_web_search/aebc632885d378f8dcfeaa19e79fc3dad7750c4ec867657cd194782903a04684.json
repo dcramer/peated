@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T20:24:00.976Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Four Roses Limited Edition Small Batch 2017\" bourbon 2017"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Four Roses Limited Edition Small Batch 2017\" bourbon 2017",
+    "summary": "**Four Roses Limited Edition Small Batch (2017 release)** — confirmed bottle details:\n\n- **Producer:** Four Roses Distillery, Kentucky. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n- **Edition / release:** The standard **2017 Limited Edition Small Batch**, rel",
+    "results": [
+      {
+        "title": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+        "url": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.peoplesbourbonreview.com/four-roses-limited-edition-small-batch-2017",
+        "url": "https://www.peoplesbourbonreview.com/four-roses-limited-edition-small-batch-2017",
+        "domain": "peoplesbourbonreview.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/whiskey-styles/bourbon/whiskey-review-four-roses-2017-limited-edition-small-batch/",
+        "url": "https://thewhiskeywash.com/whiskey-styles/bourbon/whiskey-review-four-roses-2017-limited-edition-small-batch/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskymag.com/tastings/four-roses-2017-limited-edition-small-batch-bourbon-barrel-strength/",
+        "url": "https://whiskymag.com/tastings/four-roses-2017-limited-edition-small-batch-bourbon-barrel-strength/",
+        "domain": "whiskymag.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/four-roses-limited-edition-50th-anniversary-small-batch-bourbon-2017",
+        "url": "https://distiller.com/spirits/four-roses-limited-edition-50th-anniversary-small-batch-bourbon-2017",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thebourbonbabe.com/2017/09/12/four-roses-2017-limited-edition-small-batch/",
+        "url": "https://thebourbonbabe.com/2017/09/12/four-roses-2017-limited-edition-small-batch/",
+        "domain": "thebourbonbabe.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "aebc632885d378f8dcfeaa19e79fc3dad7750c4ec867657cd194782903a04684",
+    "mode": "record"
+  }
+}

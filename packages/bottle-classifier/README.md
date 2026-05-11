@@ -100,66 +100,36 @@ and response boundary itself.
 
 ## Behavioral Expectations
 
-These are the rules to preserve when iterating on the classifier:
+The behavior spec lives in
+[`docs/architecture/bottle-classifier.md`](../../docs/architecture/bottle-classifier.md).
+Package-specific reminders:
 
-- Raw bottle references go in; reviewed bottle-centric decisions come out.
-- False positive existing matches are worse than conservative `create_*` or `no_match` results.
-- When the safe outcome is still unresolved, return `no_match` instead of inventing a match or create action. Any follow-up review workflow belongs downstream.
+- Keep price-matching proposal language out of this package.
 - The model may only match candidate ids that were actually retrieved.
-- Web evidence can support identity, but web search by itself is not canonical identity storage.
-- Retailer wording and SEO noise are weak evidence; official and independent non-retailer sources are stronger.
-- Unsupported novelty flavored-whiskey or whiskey-liqueur products should be rejected, but a flavor-adjacent noun in the expression is not enough by itself to exclude an otherwise valid whisky bottle.
-- Over-specific local candidates should be downgraded if the listing does not support the extra differentiator.
-- Generic `single cask` or `single barrel` wording is not enough for `exact_cask`.
-- `exact_cask` should be reserved for strong marketed identity signals such as SMWS codes, cask numbers, or barrel numbers.
-- If the parent bottle identity is clear and the new detail is release-level, prefer `create_release` over creating a whole new bottle.
-- Downstream consumers should adapt the reviewed classifier result instead of re-sanitizing raw model output.
-- Price-matching language such as `match_existing`, `correction`, and `create_new` does not belong in this package.
-- Deterministic fast paths must stay limited to structurally safe behavior that is effectively zero-ambiguity.
-- If the behavior depends on brand context, marketed family meaning, or program semantics, keep it classifier-owned.
-- If the input is too sparse to safely infer a canonical bottle, block or return `no_match` instead of guessing.
-- Post-model review code may sanitize, normalize, reject, or downgrade unsafe output. It should not promote a semantic action into a different create/repair/match action based on family-specific heuristics.
-- The classifier system prompt should stay static. Request-specific evidence belongs in runtime input, tool results, schemas, and post-model validation.
-- Prompt and extractor changes must encode transferable reasoning. Do not add brand-specific tutoring examples just to fix one observed family; keep those regressions in eval fixtures instead.
+- Deterministic helpers must stay limited to structurally safe behavior.
+- SMWS code references are deterministic; most other whisky-family semantics are not.
+- Keep request-specific evidence in runtime input, tool results, schemas, and post-model validation.
+- Use eval fixtures for concrete regressions instead of brand-specific prompt tutoring.
 
 ## File Map
 
-- [`src/classifier.ts`](./src/classifier.ts): narrow public classifier factory and types
-- [`src/contract.ts`](./src/contract.ts): public schemas and result helpers
-- [`src/classifierRuntime.ts`](./src/classifierRuntime.ts): internal orchestration boundary and tool loop, exposed to server adapters as `internal/runtime`
-- [`src/classifierTypes.ts`](./src/classifierTypes.ts): internal classifier working types and schemas, exposed to server adapters as `internal/types`
-- [`src/classifierSchemas.ts`](./src/classifierSchemas.ts): compatibility alias for `classifierTypes`
-- [`src/reviewPolicy.ts`](./src/reviewPolicy.ts): deterministic review, normalization, scope inference, downgrades, exposed to server adapters as `internal/policy`
-- [`src/classificationPolicy.ts`](./src/classificationPolicy.ts): compatibility alias for `reviewPolicy`
-- [`src/normalize.ts`](./src/normalize.ts): pure bottle/name/category/volume normalization helpers
-- [`src/releaseIdentity.ts`](./src/releaseIdentity.ts): pure bottle-versus-release identity policy and canonical release naming helpers
-- [`src/bottleSchemaRules.ts`](./src/bottleSchemaRules.ts): compatibility alias for `releaseIdentity`
-- [`src/bottleSchemaGuidance.ts`](./src/bottleSchemaGuidance.ts): prompt-facing guidance text for bottle versus release identity
-- [`src/bottleCreationDrafts.ts`](./src/bottleCreationDrafts.ts): pure bottle versus release draft normalization helpers
-- [`src/priceMatchingEvidence.ts`](./src/priceMatchingEvidence.ts): pure price-matching evidence and conflict checks
-- [`src/legacyReleaseRepairIdentity.ts`](./src/legacyReleaseRepairIdentity.ts): pure legacy release-repair identity derivation and parent-match heuristics
-- [`src/legacyReleaseRepairResolution.ts`](./src/legacyReleaseRepairResolution.ts): pure repair-facing interpretation of reviewed classifier output
-- [`src/smws.ts`](./src/smws.ts): pure SMWS code, flavor-profile, and cask parsing helpers
-- [`src/extractor.ts`](./src/extractor.ts): bottle-label extraction, exposed to server adapters as `internal/extractor`
-- [`src/instructions.ts`](./src/instructions.ts): classifier and extractor prompts, exposed to server adapters as `internal/prompts`
-- [`src/classifier.test.ts`](./src/classifier.test.ts): policy-level unit coverage
-- [`src/releaseIdentity.test.ts`](./src/releaseIdentity.test.ts): package-local bottle versus release rule coverage
-- [`src/normalize.test.ts`](./src/normalize.test.ts): package-local normalization unit coverage
-- [`src/bottleCreationDrafts.test.ts`](./src/bottleCreationDrafts.test.ts): package-local draft normalization coverage
-- [`src/priceMatchingEvidence.test.ts`](./src/priceMatchingEvidence.test.ts): package-local price-matching evidence coverage
-- [`src/legacyReleaseRepairIdentity.test.ts`](./src/legacyReleaseRepairIdentity.test.ts): package-local release-repair identity coverage
-- [`src/legacyReleaseRepairResolution.test.ts`](./src/legacyReleaseRepairResolution.test.ts): package-local repair-resolution adapter coverage
-- [`src/smws.test.ts`](./src/smws.test.ts): package-local SMWS parsing coverage
-- [`src/classifier.eval.fixtures.ts`](./src/classifier.eval.fixtures.ts): production-shaped eval cases
-- [`src/evalFixtureSchemas.ts`](./src/evalFixtureSchemas.ts): shared schemas and file walkers for JSON-backed eval fixtures
-- [`src/classifier.eval.scenarios.ts`](./src/classifier.eval.scenarios.ts): scenario grouping for live classifier evals
-- [`src/classifier.eval.test.ts`](./src/classifier.eval.test.ts): OpenAI Agents harness-backed live classifier evals grouped into `new bottles`, `match existing`, and `corrections`
-- [`src/eval-fixtures/new-bottles/`](./src/eval-fixtures/new-bottles): real-world new-bottle listing fixtures, one JSON file per case
-- [`src/eval-fixtures/decision-cases/`](./src/eval-fixtures/decision-cases): decision-shape workflow fixtures grouped by scenario
-- [`src/eval-fixtures/legacy-release-repair/`](./src/eval-fixtures/legacy-release-repair): repair-boundary fixtures, one JSON file per case
-- [`src/evalFixtures.validate.test.ts`](./src/evalFixtures.validate.test.ts): explicit schema and invariants validation for all file-backed fixtures
-- [`src/legacyReleaseRepairResolution.eval.fixtures.ts`](./src/legacyReleaseRepairResolution.eval.fixtures.ts): file-backed repair-boundary eval loader
-- [`src/legacyReleaseRepairResolution.eval.test.ts`](./src/legacyReleaseRepairResolution.eval.test.ts): OpenAI Agents harness-backed live repair-boundary evals
+- [`src/classifier.ts`](./src/classifier.ts): public classifier factory
+- [`src/contract.ts`](./src/contract.ts): public request/result schemas
+- [`src/classifierRuntime.ts`](./src/classifierRuntime.ts): orchestration and tool loop
+- [`src/reviewPolicy.ts`](./src/reviewPolicy.ts): validation, normalization, and downgrades
+- [`src/exactCaskPolicy.ts`](./src/exactCaskPolicy.ts): generic exact-cask signal validation for reviewed scope
+- [`src/instructions.ts`](./src/instructions.ts): classifier and extractor prompts
+- [`src/extractor.ts`](./src/extractor.ts): bottle-label extraction
+- [`src/normalize.ts`](./src/normalize.ts): bottle/name/category/volume normalization
+- [`src/releaseIdentity.ts`](./src/releaseIdentity.ts): bottle-versus-release identity helpers
+- [`src/bottleCreationDrafts.ts`](./src/bottleCreationDrafts.ts): create-draft normalization
+- [`src/priceMatchingEvidence.ts`](./src/priceMatchingEvidence.ts): shared evidence checks
+- [`src/legacyReleaseRepairIdentity.ts`](./src/legacyReleaseRepairIdentity.ts): legacy release-repair discovery helpers
+- [`src/legacyReleaseRepairResolution.ts`](./src/legacyReleaseRepairResolution.ts): repair-facing result interpretation
+- [`src/smws.ts`](./src/smws.ts): SMWS parsing and exact-code behavior
+- [`src/eval-fixtures/`](./src/eval-fixtures): file-backed eval fixtures
+- [`src/classifier.eval.test.ts`](./src/classifier.eval.test.ts): live classifier eval runner
+- [`src/legacyReleaseRepairResolution.eval.test.ts`](./src/legacyReleaseRepairResolution.eval.test.ts): live repair-boundary eval runner
 
 ## Iteration Workflow
 
@@ -176,7 +146,7 @@ When changing classifier behavior:
 When adding an eval from a real production miss:
 
 1. Start with the exact observed input: listing title, URL, extracted identity, local candidates, current assignment, and the failing classifier or automation outcome.
-2. Web-verify the real bottle before writing the expected result. Use authoritative sources first, such as the producer/brand page or official shop, then a reputable independent source when available. Treat retailer copy as the source listing, not proof by itself.
+2. Web-verify the real bottle before writing the expected result. Prioritize producer/brand pages, official shops, independent whisky databases, competition records, reviews, and publications whose content specifically confirms the bottle traits. Treat retailer copy as the source listing, not proof by itself.
 3. Decide the Peated DB outcome explicitly: exact `bottleId`, exact `releaseId` or `null`, whether a `bottle_release` should be created, whether a parent split is required, and which source facts should remain observation-only.
 4. Apply `docs/architecture/whisky-identity-model.md`: bottle-first when the product identity is clear, release only for reusable canonical variants, and preserve exact listing details as observations when they are not canonical identity.
 5. Encode the concrete regression, not a generalized pretend case. The fixture should name the real product, carry the real Peated ids or create expectation, and include `expected.confidenceBand` / `expected.verifyEligible` when downstream automation depends on the confidence band.

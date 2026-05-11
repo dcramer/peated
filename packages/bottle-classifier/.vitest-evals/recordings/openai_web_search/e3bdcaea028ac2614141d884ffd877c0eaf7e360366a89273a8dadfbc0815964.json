@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:43:10.015Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Maker's Mark Private Selection\" S2B13"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Maker's Mark Private Selection\" S2B13",
+    "summary": "Here’s the most bottle-specific match I could confirm for **“Maker’s Mark Private Selection” S2B13**:\n\n- **Bottle/edition:** **Maker’s Mark Private Selection Topflight S2B13**. ([bottleraiders.com](https://bottleraiders.com/spirit/makers-mark-private-selection-topflight-s2b13/))\n- **Producer / bottler:** **Maker’s Mark",
+    "results": [
+      {
+        "title": "https://www.makersmark.com/bourbons/makers-mark-private-selection",
+        "url": "https://www.makersmark.com/bourbons/makers-mark-private-selection",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.makersmark.com/en-us/bourbons/makers-mark-private-selection",
+        "url": "https://www.makersmark.com/en-us/bourbons/makers-mark-private-selection",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Maker’s Mark Private Selection Topflight S2B13 Review | The Daily Pour",
+        "url": "https://bottleraiders.com/spirit/makers-mark-private-selection-topflight-s2b13/",
+        "domain": "bottleraiders.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "MAKER'S MARK PRIVATE SELECTION KENTUCKY BOURBON WHISKY S2B13\n – SwigLab",
+        "url": "https://www.swiglab.com/products/makers-mark-private-selection-kentucky-bourbon-whisky-s2b13",
+        "domain": "swiglab.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thedailypour.com/spirit/makers-mark-private-selection-topflight-s2b13/",
+        "url": "https://thedailypour.com/spirit/makers-mark-private-selection-topflight-s2b13/",
+        "domain": "thedailypour.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/makers-mark-private-select",
+        "url": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/makers-mark-private-select",
+        "domain": "whiskyauctioneer.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e3bdcaea028ac2614141d884ffd877c0eaf7e360366a89273a8dadfbc0815964",
+    "mode": "auto"
+  }
+}

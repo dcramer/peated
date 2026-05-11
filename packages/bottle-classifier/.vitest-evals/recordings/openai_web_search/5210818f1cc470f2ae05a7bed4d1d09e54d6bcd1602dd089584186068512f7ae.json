@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:11:56.691Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Creag Isle\" 12 year old Island Single Malt Scotch Whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Creag Isle\" 12 year old Island Single Malt Scotch Whisky",
+    "summary": "I found good corroboration that **“Creag Isle” 12 Year Old Island Single Malt Scotch Whisky** is a **12-year-old, peated island single malt** sold under the **Creag Isle** label, with **42.2% ABV**, and that it is associated with **Quality Spirits International Ltd. (QSI)** rather than a named distillery on-label. Dist",
+    "results": [
+      {
+        "title": "https://distiller.com/spirits/creag-isle-12-year-island-single-malt/tastes",
+        "url": "https://distiller.com/spirits/creag-isle-12-year-island-single-malt/tastes",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/creag-isle-12-year-island-single-malt",
+        "url": "https://distiller.com/spirits/creag-isle-12-year-island-single-malt",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/122192/creag-isle-12-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/122192/creag-isle-12-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/creag-isle-12-year-island-single-malt/tastes?require_rating=true",
+        "url": "https://distiller.com/spirits/creag-isle-12-year-island-single-malt/tastes?require_rating=true",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/creag-isle-12-year-island-single-malt/tastes?require_note=true",
+        "url": "https://distiller.com/spirits/creag-isle-12-year-island-single-malt/tastes?require_note=true",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/creag-isle-12-year-island-single-malt/tastes?require_note=true&sort=highest_rated",
+        "url": "https://distiller.com/spirits/creag-isle-12-year-island-single-malt/tastes?require_note=true&sort=highest_rated",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5210818f1cc470f2ae05a7bed4d1d09e54d6bcd1602dd089584186068512f7ae",
+    "mode": "auto"
+  }
+}

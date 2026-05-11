@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T20:26:43.718Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"The Whistler\" \"Bodega Cask\" single malt Irish whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"The Whistler\" \"Bodega Cask\" single malt Irish whiskey",
+    "summary": "Here’s the bottle-specific evidence I could confirm for **The Whistler “Bodega Cask” Single Malt Irish Whiskey**:\n\n- **Brand / producer:** **The Whistler**, made at **Boann Distillery** in the Boyne Valley, Ireland. Whiskybase also lists the distillery as **Boann Distillery** and the bottling as a distillery bottling. ",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask",
+        "url": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask-bod",
+        "url": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask-bod",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/220715/the-whistler-bodega-cask?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/220715/the-whistler-bodega-cask?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhistlerwhiskey.com/whiskey/bodega-cask/",
+        "url": "https://thewhistlerwhiskey.com/whiskey/bodega-cask/",
+        "domain": "thewhistlerwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.irishmalts.com/single-malt/the-whistler-bodega-cask/",
+        "url": "https://www.irishmalts.com/single-malt/the-whistler-bodega-cask/",
+        "domain": "irishmalts.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e5ee884463c2a4c988f0efc0e5904acb00b2beab4e54c43cc510b162cb2b886e",
+    "mode": "record"
+  }
+}

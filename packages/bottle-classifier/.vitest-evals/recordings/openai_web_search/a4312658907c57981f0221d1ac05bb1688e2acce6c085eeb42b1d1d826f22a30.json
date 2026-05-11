@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:41:15.756Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Wild Turkey Rare Breed Rye\" rye cask strength official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Wild Turkey Rare Breed Rye\" rye cask strength official",
+    "summary": "Yes — **Wild Turkey Rare Breed Rye** is an **official Wild Turkey** release and it is presented as **barrel proof / cask strength** rye whiskey. Wild Turkey’s official product page describes it as a “small batch, barrel proof blend” that is **uncut** and **non-chill filtered**. ([wildturkeybourbon.com](https://www.wild",
+    "results": [
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "url": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://flagstaffliquor.com/products/wild-turkey-rare-breed-rye-750ml",
+        "url": "https://flagstaffliquor.com/products/wild-turkey-rare-breed-rye-750ml",
+        "domain": "flagstaffliquor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.tasteselectrepeat.com/products/wild-turkey-rare-breed-rye",
+        "url": "https://www.tasteselectrepeat.com/products/wild-turkey-rare-breed-rye",
+        "domain": "tasteselectrepeat.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.memywifeandwhisky.com/reviews/review-393-wild-turkey-rare-breed-rye",
+        "url": "https://www.memywifeandwhisky.com/reviews/review-393-wild-turkey-rare-breed-rye",
+        "domain": "memywifeandwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskystudy.com/ryereviews/wild-turkey-rare-breed-rye-shelf-review",
+        "url": "https://thewhiskystudy.com/ryereviews/wild-turkey-rare-breed-rye-shelf-review",
+        "domain": "thewhiskystudy.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a4312658907c57981f0221d1ac05bb1688e2acce6c085eeb42b1d1d826f22a30",
+    "mode": "auto"
+  }
+}

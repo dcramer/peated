@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T20:25:49.131Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Octomore 13.1 Bruichladdich official 13.1"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Octomore 13.1 Bruichladdich official 13.1",
+    "summary": "**Octomore 13.1 — official / bottle-specific summary**\n\nI couldn’t pull up the exact current official 13.1 product page, but there is strong corroboration from Bruichladdich’s official Octomore series pages plus multiple bottle listings that match on the key specs. ([bruichladdich.com](https://www.bruichladdich.com/col",
+    "results": [
+      {
+        "title": "https://www.bruichladdich.com/products/octomore-edition-14-1",
+        "url": "https://www.bruichladdich.com/products/octomore-edition-14-1",
+        "domain": "bruichladdich.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.bruichladdich.com/products/octomore-edition-12-ten-aged-years",
+        "url": "https://www.bruichladdich.com/products/octomore-edition-12-ten-aged-years",
+        "domain": "bruichladdich.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://us.bruichladdich.com/products/the-octomore-1-exploration-set",
+        "url": "https://us.bruichladdich.com/products/the-octomore-1-exploration-set",
+        "domain": "us.bruichladdich.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://us.bruichladdich.com/collections/octomore-13",
+        "url": "https://us.bruichladdich.com/collections/octomore-13",
+        "domain": "us.bruichladdich.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.bruichladdich.com/collections/octomore?vmcchk=1",
+        "url": "https://www.bruichladdich.com/collections/octomore?vmcchk=1",
+        "domain": "bruichladdich.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://us.bruichladdich.com/products/octomore-16-1",
+        "url": "https://us.bruichladdich.com/products/octomore-16-1",
+        "domain": "us.bruichladdich.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b80f32934902b94459572e0fdd01cb92c649bfa754c6ef83c3b3f2c2dd1ee948",
+    "mode": "record"
+  }
+}

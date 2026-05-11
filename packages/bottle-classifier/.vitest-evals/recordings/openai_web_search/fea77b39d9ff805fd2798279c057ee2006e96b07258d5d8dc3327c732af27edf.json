@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T20:42:50.019Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Canadian Club\" Reserve 9 year old Canadian whisky Triple Aged"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Canadian Club\" Reserve 9 year old Canadian whisky Triple Aged",
+    "summary": "Here’s the bottle-specific info I could confirm for **Canadian Club Reserve 9 Year Old Canadian Whisky “Triple Aged”**:\n\n- **Brand / producer:** Canadian Club. The official Canadian Club product page lists it as **“Reserve 9 Year Old Canadian Whisky.”** ([canadianclub.com](https://www.canadianclub.com/products/reserve-",
+    "results": [
+      {
+        "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "url": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.grandwinecellar.com/products/canadian-club-canadian-whisky-reserve-triple-aged-9-years",
+        "url": "https://www.grandwinecellar.com/products/canadian-club-canadian-whisky-reserve-triple-aged-9-years",
+        "domain": "grandwinecellar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "url": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://therumhowlerblog.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/",
+        "url": "https://therumhowlerblog.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/",
+        "domain": "therumhowlerblog.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://bevmo.com/products/33945",
+        "url": "https://bevmo.com/products/33945",
+        "domain": "bevmo.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "fea77b39d9ff805fd2798279c057ee2006e96b07258d5d8dc3327c732af27edf",
+    "mode": "record"
+  }
+}

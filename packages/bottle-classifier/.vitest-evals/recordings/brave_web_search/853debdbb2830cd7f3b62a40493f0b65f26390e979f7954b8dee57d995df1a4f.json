@@ -1,0 +1,46 @@
+{
+  "writtenAt": "2026-05-10T00:47:09.922Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "\"Sauna Smoke\" whisky \"SMWS\""
+  },
+  "output": {
+    "provider": "brave",
+    "query": "\"Sauna Smoke\" whisky \"SMWS\"",
+    "summary": "This 5 year old peated rye whisky from Finland was matured in a new oak charred barrel and has an abv of 59.2%. ... SMWS Tasting Panel&#x27;s tasting note: &quot;In a traditional sauna workshop the aromas of sticky sap from fresh pine and birch mingled with wood glue and leather polish. Then sweet smoke reminiscent of",
+    "results": [
+      {
+        "title": "Kensington Wine Market - SMWS RW6.3 CINNAMON SAUNA SMOKE (899628)",
+        "url": "https://kensingtonwinemarket.com/product/899628/smws-rw6-3-cinnamon-sauna-smoke",
+        "domain": "kensingtonwinemarket.com",
+        "description": "This 5 year old peated rye whisky from Finland was matured in a new oak charred barrel and has an abv of 59.2%. ... SMWS Tasting Panel&#x27;s tasting note: &quot;In a traditional sauna workshop the aromas of sticky sap f",
+        "extraSnippets": []
+      },
+      {
+        "title": "SMWS RW6.3 - Cinnamon Sauna Smoke - Strath Liquor Merchants",
+        "url": "https://www.strathliquor.com/product/smws-rw6-3-cinnamon-sauna-smoke/",
+        "domain": "strathliquor.com",
+        "description": "In a traditional sauna workshop the aromas of sticky sap from fresh pine and birch mingled with wood glue and leather polish. Then sweet smoke reminiscent of burning pencils wafted over a lunchbox of hard pears and salte",
+        "extraSnippets": []
+      },
+      {
+        "title": "SMWS RW6.3 Cinnamon sauna smoke | Peated",
+        "url": "https://peated.com/bottles/12207",
+        "domain": "peated.com",
+        "description": "<strong>Cinnamon and subtle smoke, reminiscent of a cozy sauna</strong>. Palate · Spicy rye notes with a gentle sweetness. Finish · Smooth and lingering with a soft, smoky aftertaste. Brand · The Scotch Malt Whisky Socie",
+        "extraSnippets": []
+      },
+      {
+        "title": "SMWS February 2024 Outturn Review – Two Whisky Bros",
+        "url": "https://twowhiskybros.co.uk/blogs/blog/smws-february-2024-outturn-review",
+        "domain": "twowhiskybros.co.uk",
+        "description": "Name: <strong>Cinnamon sauna smoke</strong> Flavour Profile: SCS - Other Spirit Region: Finland Cask Type: 1st fill charred ex-bourbon barrel ABV: 59.2% Age: 5",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "853debdbb2830cd7f3b62a40493f0b65f26390e979f7954b8dee57d995df1a4f",
+    "mode": "auto"
+  }
+}

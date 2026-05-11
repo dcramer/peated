@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T20:27:32.018Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Woodford Reserve Double Oaked\" bourbon official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Woodford Reserve Double Oaked\" bourbon official",
+    "summary": "**Official bottle:** Woodford Reserve Double Oaked Bourbon. The official Woodford Reserve site describes it as a twice-barreled bourbon, with the whiskey matured in a second, heavily toasted, lightly charred new oak barrel. ([woodfordreserve.com](https://www.woodfordreserve.com/en-au/?utm_source=openai))\n\nConfirmed bot",
+    "results": [
+      {
+        "title": "https://buy.bourbon.com/products/woodford-reserve-double-oaked",
+        "url": "https://buy.bourbon.com/products/woodford-reserve-double-oaked",
+        "domain": "buy.bourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.bourbon.com/products/double-oaked-bourbon",
+        "url": "https://buy.bourbon.com/products/double-oaked-bourbon",
+        "domain": "buy.bourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://en.wikipedia.org/wiki/Woodford_Reserve",
+        "url": "https://en.wikipedia.org/wiki/Woodford_Reserve",
+        "domain": "en.wikipedia.org",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "domain": "shop.woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/ja/",
+        "url": "https://www.woodfordreserve.com/ja/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/en-au/",
+        "url": "https://www.woodfordreserve.com/en-au/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "8c4431d461923272a388e421230bf064c09af2e2af5896b9d70a7544319c3091",
+    "mode": "record"
+  }
+}

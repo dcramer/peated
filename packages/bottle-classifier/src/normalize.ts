@@ -4,8 +4,8 @@
  *
  * This layer is limited to low-risk rewrites such as quote cleanup, age/year
  * formatting, batch marker normalization, and other transformations that do not
- * require brand or program semantics. New semantic rules need authoritative
- * domain research and a regression test before they belong here; otherwise leave
+ * require brand or program semantics. New semantic rules need verified whisky
+ * research and a regression test before they belong here; otherwise leave
  * the value unknown and let the web-enabled classifier decide.
  */
 import { CATEGORY_LIST } from "./classifierTypes";

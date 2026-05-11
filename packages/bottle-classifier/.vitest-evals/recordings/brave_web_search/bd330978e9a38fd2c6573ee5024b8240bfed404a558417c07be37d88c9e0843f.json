@@ -1,0 +1,53 @@
+{
+  "writtenAt": "2026-05-10T01:36:03.474Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "Glenglassaugh 1978 Rare Cask Release Batch 1 cask 1803 42.9%"
+  },
+  "output": {
+    "provider": "brave",
+    "query": "Glenglassaugh 1978 Rare Cask Release Batch 1 cask 1803 42.9%",
+    "summary": "<strong>35 year old Glenglassaugh single malt Scotch whisky</strong>, bottled as part of their first batch of Rare Cask Releases. The first batch of Rare Cask Releases, this single cask Glenglassaugh was <strong>distilled on October 6th 1978 before maturing for 35 years in sherry hogshead</strong>. Taken together, they",
+    "results": [
+      {
+        "title": "Glenglassaugh 35 Year Old 1978 (cask 1803) - Rare Cask Release Batch 1 Whisky | Master of Malt",
+        "url": "https://www.masterofmalt.com/whiskies/glenglassaugh/glenglassaugh-35-year-old-1978-cask-1803-rare-cask-release-batch-1-whisky/",
+        "domain": "masterofmalt.com",
+        "description": "<strong>35 year old Glenglassaugh single malt Scotch whisky</strong>, bottled as part of their first batch of Rare Cask Releases.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Glenglassaugh 1978 35 Year Old (cask 1803) - Rare Cask Release Batch 1 (70cl, 41.6%) ***sold***",
+        "url": "https://www.caledoniancollectables.co.uk/glenglassaugh-1978-35-yo-70cl416",
+        "domain": "caledoniancollectables.co.uk",
+        "description": "The first batch of Rare Cask Releases, this single cask Glenglassaugh was <strong>distilled on October 6th 1978 before maturing for 35 years in sherry hogshead</strong>.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Irish Whiskey Society Forum • View topic - Glenglassaugh Rare Cask Releases Batch 1",
+        "url": "https://forum.irishwhiskeysociety.com/viewtopic.php-f=22&t=2180.html",
+        "domain": "forum.irishwhiskeysociety.com",
+        "description": "Taken together, they are stunning examples of Glenglassaugh at its finest.” 1968 cask # 1601 / 45 years old / Finished in the finest Sherry Hogshead / 44.3% vol - £1,299.99 1972 cask # 2114 / 41 years old / Matured in th",
+        "extraSnippets": []
+      },
+      {
+        "title": "Glenglassaugh 35 Year Old 1978 Port Cask Batch 1 Whisky - 70cl 42.9%",
+        "url": "https://www.cgarsltd.co.uk/glenglassaugh-year-old-1978-port-cask-batch-whisky-70cl-429-p-16001.html",
+        "domain": "cgarsltd.co.uk",
+        "description": "Price: <strong>£420.00</strong> - 35 year old single malt whisky as a first batch (Rare Cask) releases from the Glenglassaugh distillery. It was finished in a Port hogshead, before it was bottled, producing an outrun of",
+        "extraSnippets": []
+      },
+      {
+        "title": "Coastal Whiskies – Glenglassaugh",
+        "url": "https://www.glenglassaugh.com/en-us/products-rare-cask-release/",
+        "domain": "glenglassaugh.com",
+        "description": "When the distillery was reawakened in 2008, after a period of more than twenty years of silence, treasures that slumbered in our coastal warehouses for decades were awakened. Today, these casks form our rarest distillery",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "bd330978e9a38fd2c6573ee5024b8240bfed404a558417c07be37d88c9e0843f",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:45:39.204Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"The Whistler\" \"Bodega Cask\" Irish whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"The Whistler\" \"Bodega Cask\" Irish whiskey",
+    "summary": "Here’s a sourced bottle-ID summary for **The Whistler “Bodega Cask” Irish whiskey**:\n\n- It is a **The Whistler 5 Year Old Bodega Cask Single Malt Irish Whiskey**. The official brand site says it is **triple distilled**, **small batch**, and **wholly matured in Spanish sherry butts** sourced from the **Bodegas of Jerez ",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/199098/the-whistler-irish-whiskey-bod",
+        "url": "https://www.whiskybase.com/whiskies/whisky/199098/the-whistler-irish-whiskey-bod",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/whiskey-styles/irish-whiskey/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+        "url": "https://thewhiskeywash.com/whiskey-styles/irish-whiskey/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/199099/the-whistler-irish-whiskey-bod?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/199099/the-whistler-irish-whiskey-bod?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://irishwhiskeyusa.com/blogs/irish-whiskey-reviews/whistler-calvados-cask-finish",
+        "url": "https://irishwhiskeyusa.com/blogs/irish-whiskey-reviews/whistler-calvados-cask-finish",
+        "domain": "irishwhiskeyusa.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/123112/the-whistler-irish-whiskey-bod?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/123112/the-whistler-irish-whiskey-bod?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "79cdaac4470e9564c317ab92203153fe195fcd9dfe78229b40c04f256d95f3d2",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:51:36.984Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Woodford Reserve Kentucky Straight Malt Whiskey\" official malt whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Woodford Reserve Kentucky Straight Malt Whiskey\" official malt whiskey",
+    "summary": "**Woodford Reserve Kentucky Straight Malt Whiskey** appears to be an **official core Woodford Reserve expression**, listed on the producer’s own site as **“Malt Whiskey.”** Woodford describes it as a **Kentucky Straight Malt Whiskey** made from **51% malt** and **aged in new charred oak barrels**. The official product ",
+    "results": [
+      {
+        "title": "Malt Whiskey - Woodford Reserve",
+        "url": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/",
+        "url": "https://www.woodfordreserve.com/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/woodford-reserve-kentucky-straight-bourbon.html",
+        "url": "https://www.whisky.com/whisky-database/details/woodford-reserve-kentucky-straight-bourbon.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/woodford-reserve-straight-malt",
+        "url": "https://distiller.com/spirits/woodford-reserve-straight-malt",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/woodford-reserve/woodford-reserve-kentucky-straight-malt-whiskey/",
+        "url": "https://www.masterofmalt.com/whiskies/woodford-reserve/woodford-reserve-kentucky-straight-malt-whiskey/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.walmart.com/ip/972949681",
+        "url": "https://www.walmart.com/ip/972949681",
+        "domain": "walmart.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b0f4d24a4b9d8ef623d0aaaac0f558d0d5881c6fc5c269dc89080d44956ba203",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T16:06:42.137Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19 Year Old official Ardbeg single malt"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Ardbeg Traigh Bhan 19 Year Old official Ardbeg single malt",
+    "summary": "**Ardbeg Traigh Bhan 19 Year Old** is an **official Ardbeg bottling** of **Islay single malt Scotch whisky** from the Ardbeg distillery. Ardbeg describes it as a **small-batch 19-year-old** release in the Traigh Bhan series, first released as **Batch 1 in 2019**. ([ardbeg.com](https://www.ardbeg.com/en-gb/Ardbeg%20Trai",
+    "results": [
+      {
+        "title": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
+        "url": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/en-gb/ardbeg-19-year-old-traigh-bhan-batch-6-1107205.html",
+        "url": "https://www.ardbeg.com/en-gb/ardbeg-19-year-old-traigh-bhan-batch-6-1107205.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://bevinfogroup.com/2024/09/26/ardbeg-19-year-old-traigh-bhan-single-malt-scotch-whisky/",
+        "url": "https://bevinfogroup.com/2024/09/26/ardbeg-19-year-old-traigh-bhan-single-malt-scotch-whisky/",
+        "domain": "bevinfogroup.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/de-de/ardbeg-19-years-old-traigh-bhan-batch-4-1092734.html",
+        "url": "https://www.ardbeg.com/de-de/ardbeg-19-years-old-traigh-bhan-batch-4-1092734.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/ardbeg/ardbeg-traigh-bhan-19-year-old-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/ardbeg/ardbeg-traigh-bhan-19-year-old-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%201-2019ARDTB1.html",
+        "url": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%201-2019ARDTB1.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2988402646537fc1f14901a63cf4e2caedcd61d04e1e3f27c6d328558ed79525",
+    "mode": "auto"
+  }
+}

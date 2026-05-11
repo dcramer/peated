@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T15:51:21.851Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Wild Turkey Rare Breed Rye\" rye barrel proof official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Wild Turkey Rare Breed Rye\" rye barrel proof official",
+    "summary": "**Wild Turkey Rare Breed Rye** is an **official** Wild Turkey release and is a **barrel proof rye whiskey**. Wild Turkey’s official product page describes it as **“uncut and non-chill filtered,”** and lists the whiskey at **56.1% ABV / 112.2 proof**. The same page also says the Rare Breed line includes a rye made from ",
+    "results": [
+      {
+        "title": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "url": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.peoplesbourbonreview.com/wild-turkey-rare-breed-rye-barrel-proof",
+        "url": "https://www.peoplesbourbonreview.com/wild-turkey-rare-breed-rye-barrel-proof",
+        "domain": "peoplesbourbonreview.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.camparigroup.com/en/news/2020-06-10/wild-turkeyr-debuts-rare-breed-rye",
+        "url": "https://www.camparigroup.com/en/news/2020-06-10/wild-turkeyr-debuts-rare-breed-rye",
+        "domain": "camparigroup.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ryecentral.com/products/wild-turkey-rare-breed-barrel-proof-rye-whiskey-review",
+        "url": "https://www.ryecentral.com/products/wild-turkey-rare-breed-barrel-proof-rye-whiskey-review",
+        "domain": "ryecentral.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.barrelbanter.com/reviews/wild-turkey-rare-breed-rye",
+        "url": "https://www.barrelbanter.com/reviews/wild-turkey-rare-breed-rye",
+        "domain": "barrelbanter.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye/?bvstate=pg%3A3%2Fct%3Ar",
+        "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye/?bvstate=pg%3A3%2Fct%3Ar",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e6b72dfad492de2f7719a87f9b65b87e02d975eb9ac61683c39bbe038187f1cf",
+    "mode": "auto"
+  }
+}

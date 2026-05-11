@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T06:46:53.701Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official 46% port casks"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official 46% port casks",
+    "summary": "Confirmed bottle details for **Glenmorangie Quinta Ruban 14 Year Old**:\n\n- **Producer / bottler:** Glenmorangie, official distillery bottling. ([glenmorangie.com](https://www.glenmorangie.com/products/the-quinta-ruban?_pos=1&_sid=45cb44c88&_ss=r&utm_source=openai))\n- **Expression:** **The Quinta Ruban 14 Years Old**. (",
+    "results": [
+      {
+        "title": "https://www.whisky.com/whisky-database/details/glenmorangie-quinta-ruban-port-14y-46-07l.html",
+        "url": "https://www.whisky.com/whisky-database/details/glenmorangie-quinta-ruban-port-14y-46-07l.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.caskers.com/glenmorangie-quinta-ruban-14-year-old-single-malt-scotch-whisky/",
+        "url": "https://www.caskers.com/glenmorangie-quinta-ruban-14-year-old-single-malt-scotch-whisky/",
+        "domain": "caskers.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.celticwhiskeyshop.com/Glenmorangie-Quinta-Ruban-14-Year-Old",
+        "url": "https://www.celticwhiskeyshop.com/Glenmorangie-Quinta-Ruban-14-Year-Old",
+        "domain": "celticwhiskeyshop.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskyshop.com/glenmorangie-14-year-old-quinta-ruban",
+        "url": "https://www.whiskyshop.com/glenmorangie-14-year-old-quinta-ruban",
+        "domain": "whiskyshop.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.theraremalt.com/products/glenmorangie-14-year-old-port-cask-finish",
+        "url": "https://www.theraremalt.com/products/glenmorangie-14-year-old-port-cask-finish",
+        "domain": "theraremalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.stillspirit.com/en-us/products/glenmorangie-14-year-old-quinta-ruban",
+        "url": "https://www.stillspirit.com/en-us/products/glenmorangie-14-year-old-quinta-ruban",
+        "domain": "stillspirit.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "7396ff1937bbadc9542bac046838a7069c7afa5f54b10c1cd74c1b70e8e01c36",
+    "mode": "auto"
+  }
+}

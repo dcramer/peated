@@ -4,6 +4,7 @@ import {
   parseCaskType,
   parseDetailsFromName,
   parseFlavorProfile,
+  parseReferenceName,
 } from "./smws";
 
 describe("smws", () => {
@@ -39,5 +40,17 @@ describe("smws", () => {
     expect(getCategoryFromCask("R2.19")).toBeNull();
     expect(getCategoryFromCask("A5.6")).toBeNull();
     expect(getCategoryFromCask("GN1.1")).toBeNull();
+  });
+
+  test("parses SMWS reference titles into code identity and selector", () => {
+    expect(parseReferenceName("SMWS RW6.5 Sauna Smoke")).toEqual({
+      category: "rye",
+      code: "RW6.5",
+      distiller: "Kyrö",
+      name: "RW6.5 Sauna Smoke",
+      selector: "Sauna Smoke",
+    });
+    expect(parseReferenceName("RW6.5 Sauna Smoke")).toBeNull();
+    expect(parseReferenceName("SMWS single cask 54.2% ABV")).toBeNull();
   });
 });

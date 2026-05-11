@@ -19,7 +19,6 @@ import {
   type BottleExtractedDetails,
   type BottleSearchEvidence,
   type EntityResolution,
-  type ProposedRelease,
   type SearchEntitiesArgs,
 } from "./classifierTypes";
 import {
@@ -36,13 +35,6 @@ import {
 } from "./contract";
 import { BottleClassificationError } from "./error";
 import { createWhiskyLabelExtractor } from "./extractor";
-import {
-  AUTHORITATIVE_SOURCE_TIERS,
-  buildProducerIdentityPhrases,
-  classifySourceTier,
-  getSearchResultText,
-  textsOverlap,
-} from "./identityEvidenceCore";
 import { buildBottleClassifierInstructions } from "./instructions";
 import { getStableOpenAISettings } from "./openaiModelSettings";
 import {
@@ -58,6 +50,11 @@ import {
   mergeResolvedEntity,
 } from "./runtime/candidates";
 import {
+  applyDeterministicIdentitySeed,
+  getDeterministicIdentitySeed,
+  resolveDeterministicBottleReference,
+} from "./runtime/deterministic";
+import {
   createBottleWebSearchBudget,
   createBraveWebSearchTool,
   createOpenAIWebSearchTool,
@@ -70,20 +67,6 @@ import type { BottleWebSearchBudget } from "./tools/sharedWebSearch";
 const CLASSIFIER_MAX_TURNS = 8;
 const WHISKY_REFERENCE_PATTERN =
   /\b(whisk(?:e)?y|single malt|single grain|single pot still|bourbon|rye|scotch|malt whisk(?:e)?y)\b/i;
-
-type ReleaseSearchParts = Pick<
-  ProposedRelease,
-  | "edition"
-  | "statedAge"
-  | "abv"
-  | "caskStrength"
-  | "singleCask"
-  | "vintageYear"
-  | "releaseYear"
-  | "caskType"
-  | "caskSize"
-  | "caskFill"
->;
 
 export type BottleClassifierReasoningResult = {
   decision: BottleClassifierAgentDecisionInput;
@@ -101,7 +84,9 @@ export type RunBottleClassifierAgentInput = {
   initialCandidates?: BottleCandidate[];
   candidateExpansion?: CandidateExpansionMode;
   searchEvidence?: BottleSearchEvidence[];
+  resolvedEntities?: EntityResolution[];
   investigationHint?: string | null;
+  webSearchBudget?: BottleWebSearchBudget;
 };
 
 export type BottleClassifierAdapters = {
@@ -316,158 +301,6 @@ function addSearchPart(
   }
 }
 
-function addReleaseSearchParts(
-  parts: string[],
-  release: ReleaseSearchParts | null | undefined,
-) {
-  if (!release) {
-    return;
-  }
-
-  addSearchPart(parts, release.edition);
-  if (release.statedAge !== null) {
-    addSearchPart(parts, `${release.statedAge} year old`);
-  }
-  if (release.abv !== null) {
-    addSearchPart(parts, `${release.abv}% ABV`);
-  }
-  if (release.caskStrength) {
-    addSearchPart(parts, "cask strength");
-  }
-  if (release.singleCask) {
-    addSearchPart(parts, "single cask");
-  }
-  if (release.vintageYear !== null) {
-    addSearchPart(parts, `${release.vintageYear} vintage`);
-  }
-  if (release.releaseYear !== null) {
-    addSearchPart(parts, `${release.releaseYear} release`);
-  }
-  addSearchPart(parts, release.caskType?.replace(/_/g, " "));
-  addSearchPart(parts, release.caskSize?.replace(/_/g, " "));
-  addSearchPart(parts, release.caskFill?.replace(/_/g, " "));
-}
-
-function getCreateDecisionParentCandidate({
-  decision,
-  artifacts,
-}: {
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-}): BottleCandidate | null {
-  if (decision.action !== "create_release") {
-    return null;
-  }
-
-  return (
-    artifacts.candidates.find(
-      (candidate) =>
-        candidate.bottleId === decision.parentBottleId &&
-        candidate.releaseId === null &&
-        candidate.kind !== "release",
-    ) ?? null
-  );
-}
-
-function getCreateDecisionBottleName({
-  decision,
-  artifacts,
-}: {
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-}): string | null {
-  if (decision.proposedBottle) {
-    return [
-      decision.proposedBottle.brand.name,
-      decision.proposedBottle.series?.name,
-      decision.proposedBottle.name,
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .trim();
-  }
-
-  const parentCandidate = getCreateDecisionParentCandidate({
-    decision,
-    artifacts,
-  });
-  return parentCandidate?.bottleFullName ?? parentCandidate?.fullName ?? null;
-}
-
-function buildCreateDecisionEvidencePhrases({
-  decision,
-  artifacts,
-}: {
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-}): string[] {
-  const phrases: string[] = [];
-  addSearchPart(
-    phrases,
-    getCreateDecisionBottleName({
-      decision,
-      artifacts,
-    }),
-  );
-
-  if (decision.proposedBottle) {
-    addSearchPart(phrases, decision.proposedBottle.name);
-    addSearchPart(phrases, decision.proposedBottle.series?.name);
-  }
-
-  addSearchPart(phrases, decision.proposedRelease?.edition);
-  addSearchPart(phrases, decision.observation?.caskNumber);
-  addSearchPart(phrases, decision.observation?.barrelNumber);
-
-  return phrases.filter((phrase) => phrase.length >= 4);
-}
-
-function buildCreateDecisionEvidenceQuery({
-  reference,
-  decision,
-  artifacts,
-}: {
-  reference: BottleReference;
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-}): string | null {
-  if (
-    decision.action !== "create_bottle" &&
-    decision.action !== "create_release" &&
-    decision.action !== "create_bottle_and_release"
-  ) {
-    return null;
-  }
-
-  const parts: string[] = [];
-  addSearchPart(
-    parts,
-    getCreateDecisionBottleName({
-      decision,
-      artifacts,
-    }),
-  );
-
-  if (decision.proposedBottle) {
-    addSearchPart(parts, decision.proposedBottle.bottler?.name);
-    for (const distiller of decision.proposedBottle.distillers) {
-      addSearchPart(parts, distiller.name);
-    }
-    addSearchPart(parts, decision.proposedBottle.category?.replace(/_/g, " "));
-    addReleaseSearchParts(parts, decision.proposedBottle);
-  }
-
-  addReleaseSearchParts(parts, decision.proposedRelease);
-  addSearchPart(parts, decision.observation?.caskNumber);
-  addSearchPart(parts, decision.observation?.barrelNumber);
-
-  if (!parts.length) {
-    addSearchPart(parts, reference.name);
-  }
-
-  return parts.length ? parts.join(" ") : null;
-}
-
 function extractedIdentityLooksWebInvestigable({
   reference,
   extractedIdentity,
@@ -498,55 +331,106 @@ function extractedIdentityLooksWebInvestigable({
   );
 }
 
+function shouldPreloadWebInvestigation({
+  candidateExpansion,
+  artifacts,
+  options,
+  reference,
+}: {
+  candidateExpansion: CandidateExpansionMode;
+  artifacts: BottleClassificationArtifacts;
+  options: CreateBottleClassifierOptions;
+  reference: BottleReference;
+}): boolean {
+  return (
+    candidateExpansion === "open" &&
+    artifacts.searchEvidence.length === 0 &&
+    reference.currentBottleId == null &&
+    reference.currentReleaseId == null &&
+    !artifacts.candidates.some((candidate) =>
+      candidate.source.includes("exact"),
+    ) &&
+    options.maxSearchQueries > 0 &&
+    hasUsableOpenAIResponsesClient(options.client) &&
+    extractedIdentityLooksWebInvestigable({
+      reference,
+      extractedIdentity: artifacts.extractedIdentity,
+    })
+  );
+}
+
+function addEntitySearchRequest(
+  requests: SearchEntitiesArgs[],
+  seen: Set<string>,
+  query: string | null | undefined,
+  type: SearchEntitiesArgs["type"],
+) {
+  const normalizedQuery = query?.trim();
+  if (!normalizedQuery) {
+    return;
+  }
+
+  const key = `${type ?? "any"}:${normalizedQuery.toLowerCase()}`;
+  if (seen.has(key)) {
+    return;
+  }
+
+  seen.add(key);
+  requests.push({
+    query: normalizedQuery,
+    type,
+    limit: 5,
+  });
+}
+
+async function collectInitialResolvedEntities({
+  candidateExpansion,
+  extractedIdentity,
+  options,
+}: {
+  candidateExpansion: CandidateExpansionMode;
+  extractedIdentity: BottleExtractedDetails | null;
+  options: CreateBottleClassifierOptions;
+}): Promise<EntityResolution[]> {
+  if (
+    candidateExpansion !== "open" ||
+    !options.adapters.searchEntities ||
+    !extractedIdentity
+  ) {
+    return [];
+  }
+
+  const requests: SearchEntitiesArgs[] = [];
+  const seen = new Set<string>();
+  addEntitySearchRequest(requests, seen, extractedIdentity.brand, "brand");
+  addEntitySearchRequest(requests, seen, extractedIdentity.bottler, "bottler");
+  for (const distillery of extractedIdentity.distillery ?? []) {
+    addEntitySearchRequest(requests, seen, distillery, "distiller");
+  }
+
+  const searchEntities = options.adapters.searchEntities;
+  const resolvedEntities = new Map<number, EntityResolution>();
+  const results = await Promise.all(
+    requests.map(async (request) => {
+      try {
+        return await searchEntities(request);
+      } catch {
+        return [];
+      }
+    }),
+  );
+
+  for (const result of results.flat()) {
+    mergeResolvedEntity(resolvedEntities, result);
+  }
+
+  return sortedResolvedEntities(resolvedEntities);
+}
+
 function countWebSearchEvidenceResults(searchEvidence: BottleSearchEvidence[]) {
   return searchEvidence.reduce(
     (total, evidence) => total + evidence.results.length,
     0,
-  );
-}
-
-function hasAuthoritativeWebEvidenceForInvestigation({
-  reference,
-  artifacts,
-}: {
-  reference: BottleReference;
-  artifacts: BottleClassificationArtifacts;
-}): boolean {
-  const extractedIdentity = artifacts.extractedIdentity;
-  if (!extractedIdentity?.brand) {
-    return false;
-  }
-
-  const producerPhrases = buildProducerIdentityPhrases({
-    proposedBottle: null,
-    extractedLabel: extractedIdentity,
-    targetCandidate: null,
-  });
-  const evidencePhrases = [
-    extractedIdentity.brand,
-    extractedIdentity.series,
-    extractedIdentity.expression,
-    extractedIdentity.stated_age != null
-      ? `${extractedIdentity.stated_age} year`
-      : null,
-  ]
-    .filter((phrase): phrase is string => Boolean(phrase))
-    .filter((phrase) => phrase.length >= 4);
-
-  return artifacts.searchEvidence.some((evidence) =>
-    evidence.results.some((result) => {
-      const sourceTier = classifySourceTier({
-        result,
-        sourceUrl: reference.url ?? "",
-        producerPhrases,
-      });
-      if (!AUTHORITATIVE_SOURCE_TIERS.has(sourceTier)) {
-        return false;
-      }
-
-      const resultText = getSearchResultText(evidence, result);
-      return evidencePhrases.some((phrase) => textsOverlap(resultText, phrase));
-    }),
   );
 }
 
@@ -687,154 +571,18 @@ async function collectNoMatchWebInvestigationArtifacts({
   });
 }
 
-function hasAuthoritativeSearchEvidenceForDecision({
-  reference,
-  decision,
-  artifacts,
-}: {
-  reference: BottleReference;
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-}): boolean {
-  const targetCandidate = getCreateDecisionParentCandidate({
-    decision,
-    artifacts,
-  });
-  const producerPhrases = buildProducerIdentityPhrases({
-    proposedBottle: decision.proposedBottle,
-    extractedLabel: artifacts.extractedIdentity,
-    targetCandidate,
-  });
-  const evidencePhrases = buildCreateDecisionEvidencePhrases({
-    decision,
-    artifacts,
-  });
-  if (!evidencePhrases.length) {
-    return false;
-  }
-
-  return artifacts.searchEvidence.some((evidence) =>
-    evidence.results.some((result) => {
-      const sourceTier = classifySourceTier({
-        result,
-        sourceUrl: reference.url ?? "",
-        producerPhrases,
-      });
-      if (!AUTHORITATIVE_SOURCE_TIERS.has(sourceTier)) {
-        return false;
-      }
-
-      const resultText = getSearchResultText(evidence, result);
-      return evidencePhrases.some((phrase) => textsOverlap(resultText, phrase));
-    }),
-  );
-}
-
-async function maybeBackfillCreateDecisionSearchEvidence({
-  options,
-  reference,
-  decision,
-  artifacts,
-  candidateExpansion,
-  webSearchBudget,
-}: {
-  options: CreateBottleClassifierOptions;
-  reference: BottleReference;
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-  candidateExpansion: CandidateExpansionMode;
-  webSearchBudget?: BottleWebSearchBudget;
-}): Promise<BottleClassificationArtifacts> {
-  if (
-    candidateExpansion !== "open" ||
-    options.maxSearchQueries <= 0 ||
-    !hasUsableOpenAIResponsesClient(options.client) ||
-    (decision.action !== "create_bottle" &&
-      decision.action !== "create_release" &&
-      decision.action !== "create_bottle_and_release") ||
-    hasAuthoritativeSearchEvidenceForDecision({
-      reference,
-      decision,
-      artifacts,
-    })
-  ) {
-    return artifacts;
-  }
-
-  const query = buildCreateDecisionEvidenceQuery({
-    reference,
-    decision,
-    artifacts,
-  });
-  if (!query) {
-    return artifacts;
-  }
-
-  const searchEvidence = [...artifacts.searchEvidence];
-  const result = await runBottleWebEvidenceSearch({
-    client: options.client,
-    model: options.model,
-    query,
-    budget:
-      webSearchBudget ?? createBottleWebSearchBudget(options.maxSearchQueries),
-    braveApiKey: options.braveApiKey,
-    onEvidence: (evidence) => {
-      mergeSearchEvidence(searchEvidence, evidence);
-    },
-  });
-
-  if (!("error" in result) && result.results.length > 0) {
-    mergeSearchEvidence(searchEvidence, result);
-  }
-
-  if (searchEvidence.length === artifacts.searchEvidence.length) {
-    return artifacts;
-  }
-
-  return buildBottleClassificationArtifacts({
-    ...artifacts,
-    searchEvidence,
-  });
-}
-
 export async function finalizeBottleClassifierReasoningResult({
-  options,
   reference,
   reasoning,
-  candidateExpansion,
-  webSearchBudget,
 }: {
-  options: CreateBottleClassifierOptions;
   reference: BottleReference;
   reasoning: BottleClassifierReasoningResult;
-  candidateExpansion?: CandidateExpansionMode;
-  webSearchBudget?: BottleWebSearchBudget;
 }): Promise<{
   decision: BottleClassificationDecision;
   artifacts: BottleClassificationArtifacts;
 }> {
-  let artifacts = reasoning.artifacts;
-  const normalizedCandidateExpansion = candidateExpansion ?? "open";
-  // Normalize once without the creation-evidence guard so runtime web
-  // backfill can run, then normalize again with the guard enabled.
-  let decision = finalizeBottleReferenceClassification({
-    reference,
-    decision: reasoning.decision,
-    artifacts,
-    options: {
-      enforceCreateWebEvidence: false,
-    },
-  });
-
-  artifacts = await maybeBackfillCreateDecisionSearchEvidence({
-    options,
-    reference,
-    decision,
-    artifacts,
-    candidateExpansion: normalizedCandidateExpansion,
-    webSearchBudget,
-  });
-  decision = finalizeBottleReferenceClassification({
+  const artifacts = reasoning.artifacts;
+  const decision = finalizeBottleReferenceClassification({
     reference,
     decision: reasoning.decision,
     artifacts,
@@ -967,7 +715,9 @@ export async function prepareBottleClassifierAgentRun(
     initialCandidates = [],
     candidateExpansion = "open",
     searchEvidence = [],
+    resolvedEntities = [],
     investigationHint = null,
+    webSearchBudget: inputWebSearchBudget,
   }: RunBottleClassifierAgentInput,
 ): Promise<PreparedBottleClassifierAgentRun> {
   const state: BottleClassifierAgentRunState = {
@@ -985,6 +735,9 @@ export async function prepareBottleClassifierAgentRun(
   }
   for (const candidate of initialCandidates) {
     mergeBottleCandidate(state.candidateBottles, candidate);
+  }
+  for (const entity of resolvedEntities) {
+    mergeResolvedEntity(state.resolvedEntities, entity);
   }
 
   const hydratedCurrentBottle = reference.currentBottleId
@@ -1015,7 +768,9 @@ export async function prepareBottleClassifierAgentRun(
   }
 
   const allowCandidateExpansion = candidateExpansion === "open";
-  const webSearchBudget = createBottleWebSearchBudget(options.maxSearchQueries);
+  const webSearchBudget =
+    inputWebSearchBudget ??
+    createBottleWebSearchBudget(options.maxSearchQueries);
   const instructions = buildBottleClassifierInstructions({
     maxSearchQueries: options.maxSearchQueries,
     hasBottleSearch: allowCandidateExpansion,
@@ -1114,6 +869,7 @@ export async function prepareBottleClassifierAgentRun(
     hasExactAliasMatch,
     candidateExpansion,
     searchEvidence: state.searchEvidence,
+    resolvedEntities: sortedResolvedEntities(state.resolvedEntities),
     investigationHint,
   });
   const getArtifacts = () =>
@@ -1248,7 +1004,9 @@ export function createBottleClassifier(
     initialCandidates = [],
     candidateExpansion = "open",
     searchEvidence = [],
+    resolvedEntities = [],
     investigationHint = null,
+    webSearchBudget,
   }: RunBottleClassifierAgentInput): Promise<BottleClassifierReasoningRun> => {
     if (options.overrides?.runBottleClassifierAgent) {
       const reasoning = await options.overrides.runBottleClassifierAgent({
@@ -1257,7 +1015,9 @@ export function createBottleClassifier(
         initialCandidates,
         candidateExpansion,
         searchEvidence,
+        resolvedEntities,
         investigationHint,
+        webSearchBudget,
       });
 
       return {
@@ -1269,8 +1029,13 @@ export function createBottleClassifier(
               searchEvidence,
               reasoning.artifacts.searchEvidence,
             ),
+            resolvedEntities: [
+              ...resolvedEntities,
+              ...reasoning.artifacts.resolvedEntities,
+            ],
           }),
         },
+        webSearchBudget,
       };
     }
 
@@ -1280,7 +1045,9 @@ export function createBottleClassifier(
       extractedIdentity,
       candidateExpansion,
       searchEvidence,
+      resolvedEntities,
       investigationHint,
+      webSearchBudget,
     });
 
     return {
@@ -1303,10 +1070,18 @@ export function createBottleClassifier(
     let artifacts = buildBottleClassificationArtifacts({});
 
     try {
-      const extractedIdentity =
+      const deterministicIdentitySeed = getDeterministicIdentitySeed(
+        parsedInput.reference,
+      );
+      const rawExtractedIdentity =
         parsedInput.extractedIdentity !== undefined
           ? parsedInput.extractedIdentity
-          : await extractBottleReferenceIdentity(parsedInput.reference);
+          : (deterministicIdentitySeed ??
+            (await extractBottleReferenceIdentity(parsedInput.reference)));
+      const extractedIdentity = applyDeterministicIdentitySeed({
+        reference: parsedInput.reference,
+        extractedIdentity: rawExtractedIdentity,
+      });
 
       artifacts = buildBottleClassificationArtifacts({
         extractedIdentity,
@@ -1333,19 +1108,65 @@ export function createBottleClassifier(
         candidates,
       });
 
+      const deterministicDecision = resolveDeterministicBottleReference({
+        reference: parsedInput.reference,
+        artifacts,
+      });
+      if (deterministicDecision) {
+        return BottleClassificationResultSchema.parse(
+          createDecidedBottleClassification({
+            decision: deterministicDecision,
+            artifacts,
+          }),
+        );
+      }
+
+      const resolvedEntities = await collectInitialResolvedEntities({
+        candidateExpansion: parsedInput.candidateExpansion,
+        extractedIdentity,
+        options,
+      });
+      artifacts = buildBottleClassificationArtifacts({
+        ...artifacts,
+        resolvedEntities,
+      });
+
+      const webSearchBudget = createBottleWebSearchBudget(
+        options.maxSearchQueries,
+      );
+      if (
+        shouldPreloadWebInvestigation({
+          candidateExpansion: parsedInput.candidateExpansion,
+          artifacts,
+          options,
+          reference: parsedInput.reference,
+        })
+      ) {
+        artifacts = await collectNoMatchWebInvestigationArtifacts({
+          options,
+          reference: parsedInput.reference,
+          artifacts,
+          webSearchBudget,
+        });
+      }
+
       const reasoningRun = await runBottleClassifierAgentWithBudget({
         reference: parsedInput.reference,
         extractedIdentity: artifacts.extractedIdentity,
         initialCandidates: artifacts.candidates,
         candidateExpansion: parsedInput.candidateExpansion,
+        searchEvidence: artifacts.searchEvidence,
+        resolvedEntities: artifacts.resolvedEntities,
+        investigationHint:
+          artifacts.searchEvidence.length > 0
+            ? "Initial local candidates were not exact aliases, so web evidence was gathered before the first reasoning pass. Judge source quality from the evidence content, discard weak or irrelevant results, and use local search tools if the evidence suggests a better database candidate."
+            : null,
+        webSearchBudget,
       });
       let { decision, artifacts: reasoningArtifacts } =
         await finalizeBottleClassifierReasoningResult({
-          options,
           reference: parsedInput.reference,
           reasoning: reasoningRun.reasoning,
-          candidateExpansion: parsedInput.candidateExpansion,
-          webSearchBudget: reasoningRun.webSearchBudget,
         });
 
       if (
@@ -1357,27 +1178,20 @@ export function createBottleClassifier(
           reference: parsedInput.reference,
         })
       ) {
-        const alreadyHasAuthoritativeWebEvidence =
-          hasAuthoritativeWebEvidenceForInvestigation({
-            reference: parsedInput.reference,
-            artifacts: reasoningArtifacts,
-          });
         const previousSearchEvidenceResultCount = countWebSearchEvidenceResults(
           reasoningArtifacts.searchEvidence,
         );
-        const investigationArtifacts = alreadyHasAuthoritativeWebEvidence
-          ? reasoningArtifacts
-          : await collectNoMatchWebInvestigationArtifacts({
-              options,
-              reference: parsedInput.reference,
-              artifacts: reasoningArtifacts,
-              webSearchBudget: reasoningRun.webSearchBudget,
-            });
+        const investigationArtifacts =
+          await collectNoMatchWebInvestigationArtifacts({
+            options,
+            reference: parsedInput.reference,
+            artifacts: reasoningArtifacts,
+            webSearchBudget: reasoningRun.webSearchBudget,
+          });
 
         if (
-          alreadyHasAuthoritativeWebEvidence ||
           countWebSearchEvidenceResults(investigationArtifacts.searchEvidence) >
-            previousSearchEvidenceResultCount
+          previousSearchEvidenceResultCount
         ) {
           const retryReasoningRun = await runBottleClassifierAgentWithBudget({
             reference: parsedInput.reference,
@@ -1385,16 +1199,15 @@ export function createBottleClassifier(
             initialCandidates: investigationArtifacts.candidates,
             candidateExpansion: parsedInput.candidateExpansion,
             searchEvidence: investigationArtifacts.searchEvidence,
+            resolvedEntities: investigationArtifacts.resolvedEntities,
             investigationHint:
               "The first pass found no safe local match. Web evidence was gathered because the reference appears to be a real whisky bottle. Use the provided web evidence and local search tools to fully classify the bottle as an existing match, a supported create action, or a justified no_match.",
+            webSearchBudget: reasoningRun.webSearchBudget,
           });
 
           const retriedResult = await finalizeBottleClassifierReasoningResult({
-            options,
             reference: parsedInput.reference,
             reasoning: retryReasoningRun.reasoning,
-            candidateExpansion: parsedInput.candidateExpansion,
-            webSearchBudget: reasoningRun.webSearchBudget,
           });
           decision = retriedResult.decision;
           reasoningArtifacts = retriedResult.artifacts;

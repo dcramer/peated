@@ -4,12 +4,9 @@ import type {
   BottleEvidenceSourceTier,
   BottleExtractedDetails,
   BottleSearchEvidence,
-  ProposedBottle,
 } from "./classifierTypes";
 import {
-  AUTHORITATIVE_SOURCE_TIERS,
-  buildProducerIdentityPhrases,
-  classifySourceTier,
+  classifySearchResultSource,
   containsComparablePhrase,
   escapeRegExp,
   getAbvSupportLevel,
@@ -24,6 +21,14 @@ import {
 type EvidenceCheck = BottleEvidenceCheck;
 type MatchAttribute = EvidenceCheck["attribute"];
 type SourceTier = BottleEvidenceSourceTier;
+export type WebEvidenceJudgment =
+  | "not_needed"
+  | "not_used"
+  | "supportive"
+  | "weak"
+  | "conflicting"
+  | null
+  | undefined;
 type ExistingMatchWebEvidenceEvaluation = {
   checks: EvidenceCheck[];
   differentiatingAttributes: MatchAttribute[];
@@ -339,7 +344,7 @@ function extractedLabelCarriesUnsupportedSpecificity({
   );
 }
 
-function authoritativeTextSupportsPlainAgeStatementTarget({
+function evidenceTextSupportsPlainAgeStatementTarget({
   text,
   target,
   extractedLabel,
@@ -778,26 +783,16 @@ function evaluateSearchEvidenceChecks({
   checks,
   searchEvidence,
   sourceUrl,
-  proposedBottle,
-  extractedLabel,
-  targetCandidate,
+  webEvidenceJudgment,
 }: {
   checks: EvidenceCheck[];
   searchEvidence: BottleSearchEvidence[];
   sourceUrl: string;
-  proposedBottle: ProposedBottle | null;
-  extractedLabel: BottleExtractedDetails | null;
-  targetCandidate?: BottleCandidate | null;
+  webEvidenceJudgment: WebEvidenceJudgment;
 }): EvidenceCheck[] {
   if (!checks.length || !searchEvidence.length) {
     return checks;
   }
-
-  const producerPhrases = buildProducerIdentityPhrases({
-    proposedBottle,
-    extractedLabel,
-    targetCandidate,
-  });
 
   return checks.map((check) => {
     const matchedSourceTiers = new Set<SourceTier>();
@@ -810,10 +805,9 @@ function evaluateSearchEvidenceChecks({
           continue;
         }
 
-        const sourceTier = classifySourceTier({
+        const sourceTier = classifySearchResultSource({
           result,
           sourceUrl,
-          producerPhrases,
         });
         matchedSourceTiers.add(sourceTier);
         matchedSourceUrls.add(result.url);
@@ -821,14 +815,9 @@ function evaluateSearchEvidenceChecks({
     }
 
     const tiers = Array.from(matchedSourceTiers);
-    const validated = tiers.some((tier) =>
-      AUTHORITATIVE_SOURCE_TIERS.has(tier),
-    );
-    const weaklySupported =
-      !validated &&
-      tiers.some((tier) =>
-        ["retailer", "origin_retailer", "unknown"].includes(tier),
-      );
+    const validated =
+      webEvidenceJudgment === "supportive" && tiers.includes("external");
+    const weaklySupported = !validated && tiers.length > 0;
 
     return {
       ...check,
@@ -845,47 +834,50 @@ export function hasSupportiveWebEvidenceForExistingMatch({
   target,
   extractedLabel,
   searchEvidence,
+  webEvidenceJudgment,
 }: {
   sourceUrl: string;
   target: BottleCandidate;
   extractedLabel: BottleExtractedDetails | null;
   searchEvidence: BottleSearchEvidence[];
+  webEvidenceJudgment?: WebEvidenceJudgment;
 }): boolean {
   return evaluateExistingMatchWebEvidence({
     sourceUrl,
     target,
     extractedLabel,
     searchEvidence,
+    webEvidenceJudgment,
   }).hasSupportiveWebEvidence;
 }
 
-export function hasAuthoritativeTargetIdentityEvidenceForExistingMatch({
+export function hasExternalTargetIdentityEvidenceForExistingMatch({
   sourceUrl,
   target,
   extractedLabel,
   searchEvidence,
+  webEvidenceJudgment,
 }: {
   sourceUrl: string;
   target: BottleCandidate;
   extractedLabel: BottleExtractedDetails | null;
   searchEvidence: BottleSearchEvidence[];
+  webEvidenceJudgment?: WebEvidenceJudgment;
 }): boolean {
-  const producerPhrases = buildProducerIdentityPhrases({
-    proposedBottle: null,
-    extractedLabel,
-    targetCandidate: target,
-  });
+  if (webEvidenceJudgment !== "supportive") {
+    return false;
+  }
+
   const targetNameVariants = getTargetNameVariants(target);
 
   return searchEvidence.some((evidence) =>
     evidence.results.some((result) => {
-      const sourceTier = classifySourceTier({
+      const sourceTier = classifySearchResultSource({
         result,
         sourceUrl,
-        producerPhrases,
       });
 
-      if (!AUTHORITATIVE_SOURCE_TIERS.has(sourceTier)) {
+      if (sourceTier !== "external") {
         return false;
       }
 
@@ -893,7 +885,7 @@ export function hasAuthoritativeTargetIdentityEvidenceForExistingMatch({
         targetNameVariants.some((variant) =>
           titleSupportsCandidateName(result.title, variant),
         ) ||
-        authoritativeTextSupportsPlainAgeStatementTarget({
+        evidenceTextSupportsPlainAgeStatementTarget({
           text: getSearchResultText(evidence, result),
           target,
           extractedLabel,
@@ -944,11 +936,13 @@ export function evaluateExistingMatchWebEvidence({
   target,
   extractedLabel,
   searchEvidence,
+  webEvidenceJudgment,
 }: {
   sourceUrl: string;
   target: BottleCandidate;
   extractedLabel: BottleExtractedDetails | null;
   searchEvidence: BottleSearchEvidence[];
+  webEvidenceJudgment?: WebEvidenceJudgment;
 }): ExistingMatchWebEvidenceEvaluation {
   const { checks, differentiatingAttributes } = buildExistingMatchSupportChecks(
     {
@@ -969,9 +963,7 @@ export function evaluateExistingMatchWebEvidence({
     checks,
     searchEvidence,
     sourceUrl,
-    proposedBottle: null,
-    extractedLabel,
-    targetCandidate: target,
+    webEvidenceJudgment,
   });
   const unsupportedResult = {
     checks: evaluatedChecks,

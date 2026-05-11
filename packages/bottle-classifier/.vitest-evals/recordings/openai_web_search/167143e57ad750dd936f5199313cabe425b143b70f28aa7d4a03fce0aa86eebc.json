@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:42:09.534Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Elijah Craig Barrel Proof\" \"Batch C923\" 12 year bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Elijah Craig Barrel Proof\" \"Batch C923\" 12 year bourbon",
+    "summary": "**Elijah Craig Barrel Proof Batch C923** is a **Kentucky straight bourbon whiskey** from **Heaven Hill Distillery** under the Elijah Craig brand. On Elijah Craig’s official Barrel Proof page, the 2023 **C923** batch is listed at **133.0 proof** and **13 years, 7 months** old. ([elijahcraig.com](https://elijahcraig.com/",
+    "results": [
+      {
+        "title": "https://www.peoplesbourbonreview.com/elijah-craig-barrel-proof-batch-c923",
+        "url": "https://www.peoplesbourbonreview.com/elijah-craig-barrel-proof-batch-c923",
+        "domain": "peoplesbourbonreview.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://vinepair.com/review/elijah-craig-barrel-proof-bourbon-batch-c923/",
+        "url": "https://vinepair.com/review/elijah-craig-barrel-proof-bourbon-batch-c923/",
+        "domain": "vinepair.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskeyconsensus.com/elijah-craig-barrel-proof-batch-c923-review/",
+        "url": "https://whiskeyconsensus.com/elijah-craig-barrel-proof-batch-c923-review/",
+        "domain": "whiskeyconsensus.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "url": "https://breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.memywifeandwhisky.com/reviews/review-238-elijah-craig-barrel-proof-batch-c923",
+        "url": "https://www.memywifeandwhisky.com/reviews/review-238-elijah-craig-barrel-proof-batch-c923",
+        "domain": "memywifeandwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/barrel-proof.php",
+        "url": "https://elijahcraig.com/barrel-proof.php",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "167143e57ad750dd936f5199313cabe425b143b70f28aa7d4a03fce0aa86eebc",
+    "mode": "auto"
+  }
+}

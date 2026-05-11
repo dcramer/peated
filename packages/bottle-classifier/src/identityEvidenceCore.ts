@@ -1,9 +1,6 @@
 import type {
-  BottleCandidate,
   BottleEvidenceSourceTier,
-  BottleExtractedDetails,
   BottleSearchEvidence,
-  ProposedBottle,
 } from "./classifierTypes";
 import { normalizeString } from "./normalize";
 
@@ -12,53 +9,9 @@ import { normalizeString } from "./normalize";
  * price-matching evidence checks.
  *
  * Keep policy decisions in the consumer modules. This file should only hold
- * reusable text normalization, source-tier classification, and evidence
+ * reusable text normalization, source-origin classification, and evidence
  * matching helpers so those consumers do not drift on the basics.
  */
-
-const CRITIC_DOMAINS = [
-  "breakingbourbon.com",
-  "distiller.com",
-  "paste.com",
-  "rarebird101.com",
-  "thewhiskeywash.com",
-  "whiskyadvocate.com",
-  "whiskyfun.com",
-  "whiskynotes.be",
-];
-
-const RETAILER_DOMAINS = [
-  "astorwines.com",
-  "binnys.com",
-  "healthyspirits.com",
-  "klwines.com",
-  "masterofmalt.com",
-  "reservebar.com",
-  "seelbachs.com",
-  "sharedpour.com",
-  "specsonline.com",
-  "thewhiskyexchange.com",
-  "totalwine.com",
-  "woodencork.com",
-];
-
-const OFFICIAL_DOMAIN_SUFFIXES = [
-  "bourbon",
-  "distillery",
-  "distilling",
-  "gin",
-  "malt",
-  "rum",
-  "scotch",
-  "spirits",
-  "whiskey",
-  "whisky",
-];
-
-export const AUTHORITATIVE_SOURCE_TIERS = new Set<BottleEvidenceSourceTier>([
-  "official",
-  "critic",
-]);
 
 export function normalizeComparableText(
   value: string | null | undefined,
@@ -126,72 +79,12 @@ export function domainMatches(hostname: string, domain: string): boolean {
   return hostname === domain || hostname.endsWith(`.${domain}`);
 }
 
-function getComparableDomainLabel(hostname: string): string | null {
-  const labels = hostname.split(".").filter(Boolean);
-  if (labels.length < 2) {
-    return null;
-  }
-
-  const registrableLabel =
-    labels.length >= 3 &&
-    labels.at(-2)?.length === 2 &&
-    labels.at(-1)?.length === 2
-      ? labels.at(-3)
-      : labels.at(-2);
-
-  return registrableLabel?.replace(/[^a-z0-9]+/g, "") ?? null;
-}
-
-function domainLooksProducerOwned(hostname: string, producerPhrase: string) {
-  const domainLabel = getComparableDomainLabel(hostname);
-  if (!domainLabel || !producerPhrase) {
-    return false;
-  }
-
-  if (domainLabel === producerPhrase) {
-    return true;
-  }
-
-  if (!domainLabel.startsWith(producerPhrase)) {
-    return false;
-  }
-
-  const suffix = domainLabel.slice(producerPhrase.length);
-  return OFFICIAL_DOMAIN_SUFFIXES.includes(suffix);
-}
-
 export function normalizeComparablePhrase(
   value: string | null | undefined,
 ): string {
   return normalizeComparableText(value)
     .replace(/[^a-z0-9]+/g, "")
     .trim();
-}
-
-export function buildProducerIdentityPhrases({
-  proposedBottle,
-  extractedLabel,
-  targetCandidate,
-}: {
-  proposedBottle: ProposedBottle | null;
-  extractedLabel: BottleExtractedDetails | null;
-  targetCandidate?: BottleCandidate | null;
-}): Set<string> {
-  return new Set(
-    [
-      proposedBottle?.brand.name,
-      proposedBottle?.bottler?.name,
-      ...(proposedBottle?.distillers.map((distiller) => distiller.name) ?? []),
-      extractedLabel?.brand,
-      extractedLabel?.bottler,
-      ...(extractedLabel?.distillery ?? []),
-      targetCandidate?.brand,
-      targetCandidate?.bottler,
-      ...(targetCandidate?.distillery ?? []),
-    ]
-      .map((value) => normalizeComparablePhrase(value))
-      .filter((value) => value.length >= 4),
-  );
 }
 
 export function listMatchesExpectedValue(
@@ -223,14 +116,12 @@ export function getSearchResultText(
     .join(" ");
 }
 
-export function classifySourceTier({
+export function classifySearchResultSource({
   result,
   sourceUrl,
-  producerPhrases,
 }: {
   result: BottleSearchEvidence["results"][number];
   sourceUrl: string;
-  producerPhrases: Set<string>;
 }): BottleEvidenceSourceTier {
   const resultDomain = result.domain ?? getComparableDomain(result.url);
   const sourceDomain = getComparableDomain(sourceUrl);
@@ -243,30 +134,7 @@ export function classifySourceTier({
     return "origin_retailer";
   }
 
-  if (
-    resultDomain &&
-    CRITIC_DOMAINS.some((domain) => domainMatches(resultDomain, domain))
-  ) {
-    return "critic";
-  }
-
-  if (
-    resultDomain &&
-    Array.from(producerPhrases).some((phrase) =>
-      domainLooksProducerOwned(resultDomain, phrase),
-    )
-  ) {
-    return "official";
-  }
-
-  if (
-    resultDomain &&
-    RETAILER_DOMAINS.some((domain) => domainMatches(resultDomain, domain))
-  ) {
-    return "retailer";
-  }
-
-  return "unknown";
+  return "external";
 }
 
 export function getAbvSupportLevel(

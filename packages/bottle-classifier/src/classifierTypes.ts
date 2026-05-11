@@ -208,10 +208,13 @@ export const BottleSearchEvidenceSchema = z.object({
   results: z.array(BottleSearchResultSchema).default([]),
 });
 
+// Legacy checks may contain official, critic, retailer, or unknown. Current
+// code only writes external or origin_retailer.
 export const BottleEvidenceSourceTierEnum = z.enum([
   "official",
   "critic",
   "retailer",
+  "external",
   "origin_retailer",
   "unknown",
 ]);
@@ -425,13 +428,13 @@ export const BottleConfidenceBasisSchema = z
       .enum(["low", "review", "auto_verification", "current_assignment"])
       .default("review")
       .describe(
-        "Confidence band implied by the evidence. Use auto_verification only when the evidence is strong enough for downstream automatic verification.",
+        "Confidence band implied by the evidence. Use auto_verification only when the evidence is strong enough for downstream automatic verification and unresolvedRisks is empty; do not use it for no_match.",
       ),
     positiveEvidence: z
       .array(z.string().trim().min(1))
       .default([])
       .describe(
-        "Concrete evidence that increases confidence, such as exact local aliases, unique structured local traits, exact-cask codes, or authoritative web confirmation.",
+        "Concrete evidence that increases confidence, such as exact local aliases, unique structured local traits, exact-cask codes, or agent-reviewed supportive web evidence.",
       ),
     unresolvedRisks: z
       .array(z.string().trim().min(1))
@@ -458,7 +461,7 @@ export const BottleConfidenceBasisSchema = z
       .enum(["not_needed", "not_used", "supportive", "weak", "conflicting"])
       .default("not_used")
       .describe(
-        "How web evidence affected confidence. Use not_needed only when local evidence alone is decisive.",
+        "How web evidence affected confidence. Use supportive only when web evidence supports a match or create action, not for no_match.",
       ),
   })
   .strict();
@@ -467,7 +470,9 @@ const BottleClassifierDecisionBaseSchema = z.object({
   confidence: z.number().min(0).max(100),
   rationale: z.string().nullable().default(null),
   candidateBottleIds: z.array(z.number().int()).default([]),
-  identityScope: BottleIdentityScopeEnum.default("product"),
+  identityScope: BottleIdentityScopeEnum.default("product").describe(
+    "`product` for stable bottle-family identity; `exact_cask` only when the exact cask itself is the marketed bottle identity. SMWS codes qualify; generic cask/barrel details do not qualify without reliable evidence that the listed product is an exact single-cask identity.",
+  ),
   observation: BottleObservationSchema.nullable().default(null),
   identityBasis: BottleIdentityBasisSchema.nullable().optional(),
   confidenceBasis: BottleConfidenceBasisSchema.nullable().optional(),
@@ -583,14 +588,18 @@ const AgentProposedReleaseSchema = ProposedReleaseSchema.extend({
 });
 
 export const BottleClassifierAgentDecisionSchema = z.object({
-  action: z.enum([
-    "match",
-    "create_bottle",
-    "create_release",
-    "create_bottle_and_release",
-    "repair_bottle",
-    "no_match",
-  ]),
+  action: z
+    .enum([
+      "match",
+      "create_bottle",
+      "create_release",
+      "create_bottle_and_release",
+      "repair_bottle",
+      "no_match",
+    ])
+    .describe(
+      "Decision action. Use no_match only when there is no safe existing match and no web-supported creation. If reliable web evidence supports a real bottle identity and local search finds no safe candidate, choose the appropriate create action.",
+    ),
   confidence: z.number().min(0).max(100),
   rationale: z.string().nullable().default(null),
   candidateBottleIds: z.array(z.number().int()).default([]),
@@ -601,7 +610,11 @@ export const BottleClassifierAgentDecisionSchema = z.object({
   matchedBottleId: z.number().int().nullable().default(null),
   matchedReleaseId: z.number().int().nullable().default(null),
   parentBottleId: z.number().int().nullable().default(null),
-  proposedBottle: AgentProposedBottleSchema.nullable().default(null),
+  proposedBottle: AgentProposedBottleSchema.nullable()
+    .default(null)
+    .describe(
+      "Required for create_bottle, create_bottle_and_release, and repair_bottle. The draft may be minimal: include supported brand/name identity and leave unknown optional fields null.",
+    ),
   proposedRelease: AgentProposedReleaseSchema.nullable().default(null),
 });
 

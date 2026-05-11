@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-09T23:57:25.575Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Barrel Proof Batch C923 official batch C923 ABV"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Barrel Proof Batch C923 official batch C923 ABV",
+    "summary": "Elijah Craig Barrel Proof **Batch C923** is officially listed at **133.0 proof, which equals 66.5% ABV**. The official Elijah Craig Barrel Proof batch table also identifies **C923** as the **2023** “C” batch and gives its age as **13 years, 7 months**. ([elijahcraig.com](https://elijahcraig.com/barrel-proof.php?utm_sou",
+    "results": [
+      {
+        "title": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/elijah-craig-barrel-proof-bourbon-batch-c923",
+        "url": "https://distiller.com/spirits/elijah-craig-barrel-proof-bourbon-batch-c923",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/whiskey-styles/bourbon/whiskey-review-elijah-craig-barrel-proof-c923/",
+        "url": "https://thewhiskeywash.com/whiskey-styles/bourbon/whiskey-review-elijah-craig-barrel-proof-c923/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://en.wikipedia.org/wiki/Elijah_Craig_%28bourbon%29",
+        "url": "https://en.wikipedia.org/wiki/Elijah_Craig_%28bourbon%29",
+        "domain": "en.wikipedia.org",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.peoplesbourbonreview.com/elijah-craig-barrel-proof-batch-c923",
+        "url": "https://www.peoplesbourbonreview.com/elijah-craig-barrel-proof-batch-c923",
+        "domain": "peoplesbourbonreview.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wine.com/product/elijah-craig-barrel-proof-batch-c923-bourbon-whiskey/1863439",
+        "url": "https://www.wine.com/product/elijah-craig-barrel-proof-batch-c923-bourbon-whiskey/1863439",
+        "domain": "wine.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e53147ee912c87ba4bd62472482982221b2c085d949d52d34e266a87bcd6db9b",
+    "mode": "record"
+  }
+}

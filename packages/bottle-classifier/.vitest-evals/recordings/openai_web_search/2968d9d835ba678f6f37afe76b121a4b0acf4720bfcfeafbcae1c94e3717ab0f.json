@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T20:42:21.111Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Glenglassaugh 1978 Rare Cask Release Batch 1 35 year old"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Glenglassaugh 1978 Rare Cask Release Batch 1 35 year old",
+    "summary": "**Glenglassaugh 1978 Rare Cask Release Batch 1 35 Year Old** appears to refer to one of the **Batch 1 single-cask official bottlings** released in **2014** under Glenglassaugh’s **Rare Cask Release** series. Batch 1 included **two different 1978 35-year-olds**, so the exact bottle depends on the **cask number**. ([abbe",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/75402/glenglassaugh-1978",
+        "url": "https://www.whiskybase.com/whiskies/whisky/75402/glenglassaugh-1978",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/glenglassaugh/glenglassaugh-35-year-old-1978-cask-1810-rare-cask-release-batch-1-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/glenglassaugh/glenglassaugh-35-year-old-1978-cask-1810-rare-cask-release-batch-1-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/glenglassaugh-rare-cask-1803.html",
+        "url": "https://www.whisky.com/whisky-database/details/glenglassaugh-rare-cask-1803.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskyphiles.com/2014/10/01/glenglassaugh-35-year-old-1978-cask-1810-42-9-benriach-glendronach-distilleries/",
+        "url": "https://thewhiskyphiles.com/2014/10/01/glenglassaugh-35-year-old-1978-cask-1810-42-9-benriach-glendronach-distilleries/",
+        "domain": "thewhiskyphiles.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.abbeywhisky.com/blogs/blog/glenglassaugh-rare-cask-releases-batch-1",
+        "url": "https://www.abbeywhisky.com/blogs/blog/glenglassaugh-rare-cask-releases-batch-1",
+        "domain": "abbeywhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky-online.com/products/glenglassaugh-1978-2014-35-year-old-rare-cask-release-single-cask-1803",
+        "url": "https://www.whisky-online.com/products/glenglassaugh-1978-2014-35-year-old-rare-cask-release-single-cask-1803",
+        "domain": "whisky-online.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2968d9d835ba678f6f37afe76b121a4b0acf4720bfcfeafbcae1c94e3717ab0f",
+    "mode": "record"
+  }
+}

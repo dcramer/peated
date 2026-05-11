@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T06:41:02.463Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"The Whistler Bodega Cask\" ABV"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"The Whistler Bodega Cask\" ABV",
+    "summary": "**The Whistler Bodega Cask** is **46% ABV**. It’s commonly listed as a **5-year-old Irish single malt** bottled by **Boann Distillery / The Whistler**, with maturation in **Spanish sherry butts from Jerez**. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask?utm_source=openai))",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask",
+        "url": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.bondston.com/the-whistler-bodega-cask-mini-p13576",
+        "url": "https://www.bondston.com/the-whistler-bodega-cask-mini-p13576",
+        "domain": "bondston.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.caskers.com/the-whistler-bodega-cask-single-malt-irish-whiskey/",
+        "url": "https://www.caskers.com/the-whistler-bodega-cask-single-malt-irish-whiskey/",
+        "domain": "caskers.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/whiskey-styles/irish-whiskey/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+        "url": "https://thewhiskeywash.com/whiskey-styles/irish-whiskey/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+        "url": "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wine.com/product/the-whistler-bodega-cask-single-malt-irish-whiskey/949636",
+        "url": "https://www.wine.com/product/the-whistler-bodega-cask-single-malt-irish-whiskey/949636",
+        "domain": "wine.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "c3410d7f44fb06456382b497df184cbbc7edc834a35d53d2564afd64e7675bb0",
+    "mode": "auto"
+  }
+}

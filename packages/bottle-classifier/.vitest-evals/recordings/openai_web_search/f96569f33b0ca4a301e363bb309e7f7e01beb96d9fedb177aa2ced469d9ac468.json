@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:43:07.556Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Octomore 13.1 Bruichladdich official 13.1 59.2"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Octomore 13.1 Bruichladdich official 13.1 59.2",
+    "summary": "I found good support that **Bruichladdich Octomore 13.1** is the official **Series 13 .1 release** and that **59.2 is ABV (alcohol by volume), not proof**.\n\nWhat the sources support:\n- **Bottle/release:** **Octomore 13.1** from **Bruichladdich** / Octomore Series 13. ([onemoredram.com](https://onemoredram.com/2022/10/1",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/229738?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/229738?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/218659?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/whisky/218659?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/octomore-13-1",
+        "url": "https://distiller.com/spirits/octomore-13-1",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/218659?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/218659?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskyshop.com/fr/octomore-13-1",
+        "url": "https://www.whiskyshop.com/fr/octomore-13-1",
+        "domain": "whiskyshop.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.rhumattitude.com/cave/octomore-13-1-592/",
+        "url": "https://www.rhumattitude.com/cave/octomore-13-1-592/",
+        "domain": "rhumattitude.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "f96569f33b0ca4a301e363bb309e7f7e01beb96d9fedb177aa2ced469d9ac468",
+    "mode": "auto"
+  }
+}

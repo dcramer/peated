@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T06:33:43.489Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19 Year Old official committee release batch"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Ardbeg Traigh Bhan 19 Year Old official committee release batch",
+    "summary": "If you mean **Ardbeg Traigh Bhan 19 Year Old** as an **official Ardbeg release**, the key point is:\n\n- **Traigh Bhan is an official Ardbeg annual small-batch 19-year-old series**, not originally a “Committee Release” in the same way as special Ardbeg Day bottlings like Corryvreckan Committee, Heavy Vapours Committee, e",
+    "results": [
+      {
+        "title": "Ardbeg 19 Years Old Traigh Bhan Batch 3 | Ardbeg Single Malt Scotch Whisky",
+        "url": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Ardbeg 19 Years Old Traigh Bhan Batch 7 | Ardbeg Single Malt Scotch Whisky",
+        "url": "https://www.ardbeg.com/en-gb/ardbeg-19-year-old-traigh-bhan-batch-7-1112627.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Ardbeg Traigh Bhan 19 Years Old Batch 2 Single Malt Scotch Whisky | Archive",
+        "url": "https://www.ardbeg.com/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%202-2020ARDTB2.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Ardbeg Traigh Bhan 19 Years Old Batch 1 Single Malt Scotch Whisky | Archive",
+        "url": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%201-2019ARDTB1.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.jrdtt.com/2025/05/27/ardbeg-traigh-bhan-19-year-old-final-batch-launches-with-bold-oloroso-cask-influence/",
+        "url": "https://www.jrdtt.com/2025/05/27/ardbeg-traigh-bhan-19-year-old-final-batch-launches-with-bold-oloroso-cask-influence/",
+        "domain": "jrdtt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky/news/newsdetail/article/ardbeg-19-jahre-traigh-bhan-batch-5-erscheint0.html",
+        "url": "https://www.whisky.com/whisky/news/newsdetail/article/ardbeg-19-jahre-traigh-bhan-batch-5-erscheint0.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2aed8fceadd1022b0c78763f69c3cb5798f4495ab1c8c7c72ef298cfd3e5c650",
+    "mode": "auto"
+  }
+}

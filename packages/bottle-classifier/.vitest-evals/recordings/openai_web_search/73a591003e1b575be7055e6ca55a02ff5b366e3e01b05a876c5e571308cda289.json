@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:27:53.184Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Cask Strength bourbon Barrel Proof official batch release"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Cask Strength bourbon Barrel Proof official batch release",
+    "summary": "**Elijah Craig Barrel Proof / Cask Strength official batch release info**\n\nThe official product name is **Elijah Craig Barrel Proof Kentucky Straight Bourbon Whiskey**. It is produced by **Heaven Hill Distillery**. The brand’s official site states that each batch has a **unique age statement** and **varies in proof** b",
+    "results": [
+      {
+        "title": "https://heavenhill.com/news-and-notes/elijah-craig-launches-its-first-ever-barrel-proof-kentucky-straight-rye-whiskey/",
+        "url": "https://heavenhill.com/news-and-notes/elijah-craig-launches-its-first-ever-barrel-proof-kentucky-straight-rye-whiskey/",
+        "domain": "heavenhill.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Heaven Hill Distilleries to Continue Periodic Releases of Elijah Craig Barrel Proof Bourbon | Heaven Hill Brands",
+        "url": "https://heavenhill.com/news-and-notes/heaven-hill-distilleries-to-continue-periodic-releases-of-elijah-craig-barrel-proof-bourbon/",
+        "domain": "heavenhill.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhilldistillery.com/larceny-barrel-proof.php",
+        "url": "https://heavenhilldistillery.com/larceny-barrel-proof.php",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhill.com/news-and-notes/elijah-craig-introduces-15-year-old-bourbon-a-new-addition-to-its-renowned-single-barrel-lineup/",
+        "url": "https://heavenhill.com/news-and-notes/elijah-craig-introduces-15-year-old-bourbon-a-new-addition-to-its-renowned-single-barrel-lineup/",
+        "domain": "heavenhill.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Heaven Hill Distilleries Offers Limited Edition Elijah Craig Barrel Proof Bourbon to Select Markets Nationwide | Heaven Hill Brands",
+        "url": "https://heavenhill.com/news-and-notes/heaven-hill-distilleries-offers-limited-edition-elijah-craig-barrel-proof-bourbon-to-select-markets-nationwide/",
+        "domain": "heavenhill.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/pga-2026-championship-commemorative-bottle",
+        "url": "https://elijahcraig.com/pga-2026-championship-commemorative-bottle",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "73a591003e1b575be7055e6ca55a02ff5b366e3e01b05a876c5e571308cda289",
+    "mode": "auto"
+  }
+}

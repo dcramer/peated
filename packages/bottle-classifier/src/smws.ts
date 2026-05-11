@@ -1,5 +1,7 @@
 import type { CaskFill, CaskSize, CaskType, Category } from "./classifierTypes";
 import { CASK_SIZE_IDS, CASK_TYPE_IDS } from "./classifierTypes";
+import { getExactCaskCodeAnchor } from "./exactCask";
+import { escapeRegExp } from "./identityEvidenceCore";
 
 const FLAVOR_PROFILES = [
   "young_spritely",
@@ -319,6 +321,13 @@ export type SMWSCaskDetails = {
   distiller: string | null;
 };
 
+export type SMWSReferenceDetails = SMWSCaskDetails & {
+  code: string;
+  selector: string | null;
+};
+
+const SMWS_REFERENCE_PATTERN = /\b(?:SMWS|Scotch Malt Whisky Society)\b/i;
+
 export function parseDetailsFromName(name: string): SMWSCaskDetails | null {
   const caskNumberMatch = name.match(
     /(Cask No\. )?([A-Z0-9]+\.[0-9]+)\s*(.+)?/i,
@@ -346,6 +355,34 @@ export function parseDetailsFromName(name: string): SMWSCaskDetails | null {
     category,
     name: `${caskNumber} ${caskName || ""}`,
     distiller: SMWS_DISTILLERY_CODES[distillerNo],
+  };
+}
+
+export function parseReferenceName(
+  name: string | null | undefined,
+): SMWSReferenceDetails | null {
+  if (!name || !SMWS_REFERENCE_PATTERN.test(name)) {
+    return null;
+  }
+
+  const code = getExactCaskCodeAnchor(name);
+  if (!code) {
+    return null;
+  }
+
+  const selector =
+    name
+      .replace(SMWS_REFERENCE_PATTERN, "")
+      .replace(new RegExp(`\\b${escapeRegExp(code)}\\b`, "i"), "")
+      .trim() || null;
+  const details = parseDetailsFromName(code);
+
+  return {
+    code,
+    selector,
+    category: details?.category ?? null,
+    distiller: details?.distiller ?? null,
+    name: `${code} ${selector ?? ""}`.trim(),
   };
 }
 

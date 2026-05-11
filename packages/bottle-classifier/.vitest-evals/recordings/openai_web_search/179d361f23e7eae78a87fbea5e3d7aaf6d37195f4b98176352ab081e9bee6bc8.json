@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T20:23:08.494Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19 year old official 19 years old Islay single malt"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Ardbeg Traigh Bhan 19 year old official 19 years old Islay single malt",
+    "summary": "**Ardbeg Traigh Bhan 19 Year Old** is an **official bottling** from **Ardbeg Distillery** on **Islay**, released as a **small-batch 19-year-old Islay single malt Scotch whisky**. Across the series, the standard bottling strength is **46.2% ABV**. ([whiskyauctioneer.com](https://whiskyauctioneer.com/learn/explore-whisky",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/274361/ardbeg-traigh-bhan",
+        "url": "https://www.whiskybase.com/whiskies/whisky/274361/ardbeg-traigh-bhan",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/ardbeg/ardbeg-traigh-bhan-19-year-old-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/ardbeg/ardbeg-traigh-bhan-19-year-old-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/131177/ardbeg-traigh-bhan?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/131177/ardbeg-traigh-bhan?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/252445/ardbeg-traigh-bhan?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/252445/ardbeg-traigh-bhan?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/market/whisky/200201?language=en",
+        "url": "https://www.whiskybase.com/market/whisky/200201?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/ardbeg-traigh-bhan-19y-462-07l.html",
+        "url": "https://www.whisky.com/whisky-database/details/ardbeg-traigh-bhan-19y-462-07l.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "179d361f23e7eae78a87fbea5e3d7aaf6d37195f4b98176352ab081e9bee6bc8",
+    "mode": "record"
+  }
+}

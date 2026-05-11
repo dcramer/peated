@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T20:28:48.189Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Woodford Reserve Kentucky Straight Malt Whiskey\" official 45.2%"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Woodford Reserve Kentucky Straight Malt Whiskey\" official 45.2%",
+    "summary": "Confirmed from Woodford Reserve’s official product page:\n\n- **Product:** Woodford Reserve **Kentucky Straight Malt Whiskey** ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/malt-whiskey/?utm_source=openai))\n- **Official ABV:** **45.2% alc./vol.** (90.4 proof) ([woodfordreserve.com](https://www.woodfordre",
+    "results": [
+      {
+        "title": "https://www.wine.com/product/woodford-reserve-kentucky-straight-malt-whiskey/531054",
+        "url": "https://www.wine.com/product/woodford-reserve-kentucky-straight-malt-whiskey/531054",
+        "domain": "wine.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/cocktail_type/malt-whiskey/",
+        "url": "https://www.woodfordreserve.com/cocktail_type/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+        "url": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.htfw.com/woodford-reserve-distiller-s-select-kentucky-straight-malt-whiskey",
+        "url": "https://www.htfw.com/woodford-reserve-distiller-s-select-kentucky-straight-malt-whiskey",
+        "domain": "htfw.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.bswliquor.com/products/woodford-reserve-straight-malt",
+        "url": "https://www.bswliquor.com/products/woodford-reserve-straight-malt",
+        "domain": "bswliquor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/our-whiskey/product-locator/",
+        "url": "https://www.woodfordreserve.com/our-whiskey/product-locator/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "c934698f954a2f16755019bfef624c7fcc6c23b6daf544526a3c508a61c7626c",
+    "mode": "record"
+  }
+}

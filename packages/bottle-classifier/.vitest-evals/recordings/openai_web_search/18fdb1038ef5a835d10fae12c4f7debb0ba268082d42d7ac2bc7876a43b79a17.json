@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:05:58.063Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"SMWS 72.123\" \"Big moves and subtle details\""
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"SMWS 72.123\" \"Big moves and subtle details\"",
+    "summary": "SMWS **72.123** is **Miltonduff**, titled **“Big moves and subtle details.”** The official SMWS bottle page confirms it is a **15-year-old Speyside** release at **58.7% ABV**, distilled on **18 December 2009**, with cask type listed as **HTMC New Oak Barrel**. The detailed notes on the same page say it was **matured 12",
+    "results": [
+      {
+        "title": "https://smws.com/big-moves-and-subtle-details/",
+        "url": "https://smws.com/big-moves-and-subtle-details/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://peated.com/bottles/43670",
+        "url": "https://peated.com/bottles/43670",
+        "domain": "peated.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.just-whisky.co.uk/product/miltonduff-15-years-old-2009-smws-72123-big-moves-and-subtle-details-1498579",
+        "url": "https://www.just-whisky.co.uk/product/miltonduff-15-years-old-2009-smws-72123-big-moves-and-subtle-details-1498579",
+        "domain": "just-whisky.co.uk",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/284513/miltonduff-2009-smws-72123",
+        "url": "https://www.whiskybase.com/whiskies/whisky/284513/miltonduff-2009-smws-72123",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.just-whisky.co.uk/product/miltonduff_15_years_old_2009_smws_72123_big_moves_and_subtle_details_1498579",
+        "url": "https://www.just-whisky.co.uk/product/miltonduff_15_years_old_2009_smws_72123_big_moves_and_subtle_details_1498579",
+        "domain": "just-whisky.co.uk",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/284513",
+        "url": "https://www.whiskybase.com/whiskies/whisky/284513",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "18fdb1038ef5a835d10fae12c4f7debb0ba268082d42d7ac2bc7876a43b79a17",
+    "mode": "auto"
+  }
+}

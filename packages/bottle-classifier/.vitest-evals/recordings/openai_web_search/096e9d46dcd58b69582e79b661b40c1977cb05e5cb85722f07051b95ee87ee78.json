@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:45:26.702Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Four Roses Limited Edition Small Batch 2017\" bourbon official 2017"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Four Roses Limited Edition Small Batch 2017\" bourbon official 2017",
+    "summary": "**Four Roses Limited Edition Small Batch 2017 — official 2017 bottling**\n\nConfirmed from Four Roses’ official site:\n\n- **Producer/Bottler:** Four Roses Distillery. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n- **Name/Edition:** **2017 Limited Edition Small Ba",
+    "results": [
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+        "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+        "url": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/2017-al-young-50th-anniversary",
+        "url": "https://www.fourrosesbourbon.com/bourbon/2017-al-young-50th-anniversary",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/2016-limited-edition-small-batch-named-americas-best-kentucky-bourbon",
+        "url": "https://www.fourrosesbourbon.com/blog/2016-limited-edition-small-batch-named-americas-best-kentucky-bourbon",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/celebrate-our-130th-anniversary-limited-edition-small-batch",
+        "url": "https://www.fourrosesbourbon.com/blog/celebrate-our-130th-anniversary-limited-edition-small-batch",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/four-roses-wins-best-bourbon-of-the-century-so-far-more",
+        "url": "https://www.fourrosesbourbon.com/blog/four-roses-wins-best-bourbon-of-the-century-so-far-more",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "096e9d46dcd58b69582e79b661b40c1977cb05e5cb85722f07051b95ee87ee78",
+    "mode": "auto"
+  }
+}

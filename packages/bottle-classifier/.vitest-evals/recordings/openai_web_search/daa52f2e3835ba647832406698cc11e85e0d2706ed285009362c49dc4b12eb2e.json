@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:45:46.999Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "site:thewhistlerwhiskey.com \"Bodega Cask\""
+  },
+  "output": {
+    "provider": "openai",
+    "query": "site:thewhistlerwhiskey.com \"Bodega Cask\"",
+    "summary": "I found an official product page for **The Whistler Bodega Cask** on The Whistler’s site, plus an independent whisky database entry.\n\nWhat the sources support:\n\n- **Bottle/release name:** **The Whistler Bodega Cask**. ([thewhistlerwhiskey.com](https://thewhistlerwhiskey.com/whiskey/bodega-cask/?utm_source=openai))\n- **",
+    "results": [
+      {
+        "title": "https://thewhistlerwhiskey.com/whiskey/bodega-cask/",
+        "url": "https://thewhistlerwhiskey.com/whiskey/bodega-cask/",
+        "domain": "thewhistlerwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask",
+        "url": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhistlerwhiskey.com/",
+        "url": "https://thewhistlerwhiskey.com/",
+        "domain": "thewhistlerwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhistlerwhiskey.com/our-whiskey/",
+        "url": "https://thewhistlerwhiskey.com/our-whiskey/",
+        "domain": "thewhistlerwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask-bod",
+        "url": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask-bod",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "daa52f2e3835ba647832406698cc11e85e0d2706ed285009362c49dc4b12eb2e",
+    "mode": "auto"
+  }
+}

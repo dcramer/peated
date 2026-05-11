@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T06:37:41.026Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Elijah Craig Cask Strength\" bourbon Barrel Proof Elijah Craig official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Elijah Craig Cask Strength\" bourbon Barrel Proof Elijah Craig official",
+    "summary": "**Elijah Craig Barrel Proof / Cask Strength Bourbon** is the official full-strength expression from the Elijah Craig brand. The official product page identifies it as **Elijah Craig Barrel Proof**, made by **Heaven Hill Distillery**, and describes it as **bottled straight from the barrel without chill filtering or proo",
+    "results": [
+      {
+        "title": "https://elijahcraig.com/barrel-proof.php",
+        "url": "https://elijahcraig.com/barrel-proof.php",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://en.wikipedia.org/wiki/Elijah_Craig_%28bourbon%29",
+        "url": "https://en.wikipedia.org/wiki/Elijah_Craig_%28bourbon%29",
+        "domain": "en.wikipedia.org",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.gobourbon.com/10-facts-you-may-not-know-about-elijah-craig-barrel-proof/",
+        "url": "https://www.gobourbon.com/10-facts-you-may-not-know-about-elijah-craig-barrel-proof/",
+        "domain": "gobourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/toasted-rye-launch",
+        "url": "https://elijahcraig.com/toasted-rye-launch",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/limited-edition-toasted-barrel-commemorates-the-2023-ryder-cup",
+        "url": "https://elijahcraig.com/limited-edition-toasted-barrel-commemorates-the-2023-ryder-cup",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "073ff68e44f038920c1a7be05c4d0f314ccb9a09997331dbae058148d55aaf9d",
+    "mode": "auto"
+  }
+}

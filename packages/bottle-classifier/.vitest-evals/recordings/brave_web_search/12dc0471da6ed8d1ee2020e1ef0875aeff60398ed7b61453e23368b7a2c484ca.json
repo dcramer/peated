@@ -1,0 +1,17 @@
+{
+  "writtenAt": "2026-05-10T00:09:24.461Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "\"RW6.5\" \"Sauna Smoke\" whisky"
+  },
+  "output": {
+    "provider": "brave",
+    "query": "\"RW6.5\" \"Sauna Smoke\" whisky",
+    "summary": null,
+    "results": []
+  },
+  "metadata": {
+    "cacheKey": "12dc0471da6ed8d1ee2020e1ef0875aeff60398ed7b61453e23368b7a2c484ca",
+    "mode": "auto"
+  }
+}

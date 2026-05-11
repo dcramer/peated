@@ -206,11 +206,8 @@ async function prepareRepairResolutionEvalRun(
       const reasoning = agentRun.getReasoningResult(result);
       const { decision, artifacts: reasoningArtifacts } =
         await finalizeBottleClassifierReasoningResult({
-          options,
           reference: parsedInput.reference,
           reasoning,
-          candidateExpansion: parsedInput.candidateExpansion,
-          webSearchBudget: agentRun.webSearchBudget,
         });
       const classification = BottleClassificationResultSchema.parse(
         createDecidedBottleClassification({
@@ -297,6 +294,9 @@ const repairHarness = openaiAgentsHarness<
 
     return preparedRun.evaluateAgentResult(result);
   },
+  // vitest-evals strict replay intentionally fails when a prompt/tool change
+  // makes a new web-search call. Record those new tool results with:
+  // VITEST_EVALS_REPLAY_MODE=record pnpm --filter @peated/bottle-classifier evals -- src/legacyReleaseRepairResolution.eval.test.ts
   toolReplay: {
     openai_web_search: true,
     brave_web_search: true,

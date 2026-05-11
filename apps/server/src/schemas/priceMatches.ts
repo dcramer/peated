@@ -170,10 +170,13 @@ export const PriceMatchAttributeEnum = z.enum([
   "releaseYear",
 ]);
 
+// Legacy checks may contain official, critic, retailer, or unknown. Current
+// code only writes external or origin_retailer.
 export const PriceMatchEvidenceSourceTierEnum = z.enum([
   "official",
   "critic",
   "retailer",
+  "external",
   "origin_retailer",
   "unknown",
 ]);

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:08:59.675Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Woodford Reserve Double Oaked official bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Woodford Reserve Double Oaked official bourbon",
+    "summary": "**Woodford Reserve Double Oaked** is an **official Woodford Reserve bourbon** expression. The official producer page identifies it as a **twice-barreled / double-oaked bourbon**, and lists the bottling strength as **90.4 proof**—which is **proof, not ABV** (equivalent to **45.2% ABV**). ([woodfordreserve.com](https://w",
+    "results": [
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/woodford-reserve-double-oaked-bourbon",
+        "url": "https://www.breakingbourbon.com/review/woodford-reserve-double-oaked-bourbon",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/fr/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/fr/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/",
+        "url": "https://www.woodfordreserve.com/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://breakingbourbon.com/review/woodford-reserve-double-double-oak-bourbon",
+        "url": "https://breakingbourbon.com/review/woodford-reserve-double-double-oak-bourbon",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "561716683ceb0ce081f1829dd7c6894b859413a6e82fb1870e3a49c4fef0115f",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T06:28:11.109Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Heaven's Door\" \"Bootleg Series Vol. 3\" whiskey bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Heaven's Door\" \"Bootleg Series Vol. 3\" whiskey bourbon",
+    "summary": "**Heaven’s Door Bootleg Series Vol. III** is a **2021 limited-release bourbon** in Heaven’s Door’s annual Bootleg Series. On the producer’s archive page, Volume III is listed as the **2021** release. ([heavensdoor.com](https://www.heavensdoor.com/bootleg-series))\n\nConfirmed bottle details:\n- **Brand/producer:** Heaven’",
+    "results": [
+      {
+        "title": "The Bootleg Series | Heaven's Door Whiskey",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "url": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "url": "https://buy.heavensdoor.com/products/bootleg-series-volume-iii",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+        "url": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinkhacker.com/2022/06/28/review-heavens-door-777-blend-and-bootleg-series-vol-iii/",
+        "url": "https://www.drinkhacker.com/2022/06/28/review-heavens-door-777-blend-and-bootleg-series-vol-iii/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://bourbonpursuit.com/2022/05/03/whiskey-quickie-heavens-door-bootleg-volume-3-bourbon-review/",
+        "url": "https://bourbonpursuit.com/2022/05/03/whiskey-quickie-heavens-door-bootleg-volume-3-bourbon-review/",
+        "domain": "bourbonpursuit.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "130dbf13b39b1e92c98d0f89bfcb93431ca2637849c399cb52a3ef7450b92417",
+    "mode": "auto"
+  }
+}

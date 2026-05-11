@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T22:55:30.289Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Four Roses\" \"Limited Edition Small Batch\" 2017 bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Four Roses\" \"Limited Edition Small Batch\" 2017 bourbon",
+    "summary": "**Four Roses Limited Edition Small Batch (2017)** is the regular 2017 annual limited release from **Four Roses Distillery** in Kentucky, not the separate **2017 Al Young 50th Anniversary** bottling. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n\nConfirmed bottl",
+    "results": [
+      {
+        "title": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+        "url": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+        "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/celebrate-2017-limited-edition-small-batch-with-us",
+        "url": "https://www.fourrosesbourbon.com/blog/celebrate-2017-limited-edition-small-batch-with-us",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/four-roses-limited-edition-50th-anniversary-small-batch-bourbon-2017",
+        "url": "https://distiller.com/spirits/four-roses-limited-edition-50th-anniversary-small-batch-bourbon-2017",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://commons.wikimedia.org/wiki/File%3AFour_Roses_Limited_Edition_Small_Batch.jpg",
+        "url": "https://commons.wikimedia.org/wiki/File%3AFour_Roses_Limited_Edition_Small_Batch.jpg",
+        "domain": "commons.wikimedia.org",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://sipnbourbon.com/product/four-roses-limited-edition-small-batch-barrel-strength-2017/",
+        "url": "https://sipnbourbon.com/product/four-roses-limited-edition-small-batch-barrel-strength-2017/",
+        "domain": "sipnbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "f423f9df05cd184be300dbb320929a3903b28eb6f985dbb1eb79866807b65aaf",
+    "mode": "auto"
+  }
+}

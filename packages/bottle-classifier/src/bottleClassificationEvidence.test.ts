@@ -49,7 +49,7 @@ function buildSearchEvidence(
 }
 
 describe("bottleClassificationEvidence", () => {
-  test("does not treat a more specific authoritative result title as support for a looser near-match", () => {
+  test("does not treat a more specific external result title as support for a looser near-match", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 1,
       fullName: "Wild Turkey Rare Breed Barrel Proof",
@@ -80,11 +80,12 @@ describe("bottleClassificationEvidence", () => {
         searchEvidence,
         extractedLabel: null,
         targetCandidate,
+        webEvidenceJudgment: "supportive",
       }),
     ).toBe(false);
   });
 
-  test("treats an authoritative title-level name match as supportive evidence", () => {
+  test("treats an agent-supported external title-level name match as supportive evidence", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 2,
       fullName: "Ardbeg Uigeadail",
@@ -112,11 +113,12 @@ describe("bottleClassificationEvidence", () => {
         searchEvidence,
         extractedLabel: null,
         targetCandidate,
+        webEvidenceJudgment: "supportive",
       }),
     ).toBe(true);
   });
 
-  test("does not treat a generic authoritative producer page as target identity support", () => {
+  test("does not treat a generic external producer page as target identity support", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 2,
       fullName: "Ardbeg Uigeadail",
@@ -146,11 +148,12 @@ describe("bottleClassificationEvidence", () => {
         searchEvidence,
         extractedLabel: null,
         targetCandidate,
+        webEvidenceJudgment: "supportive",
       }),
     ).toBe(false);
   });
 
-  test("treats authoritative brand-led evidence as support for a distillery-qualified plain age-statement bottle", () => {
+  test("treats agent-supported brand-led evidence as support for a distillery-qualified plain age-statement bottle", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 3233,
       fullName: "Isle of Jura 12-year-old Single Malt Scotch Whisky",
@@ -198,6 +201,7 @@ describe("bottleClassificationEvidence", () => {
           edition: null,
         },
         targetCandidate,
+        webEvidenceJudgment: "supportive",
       }),
     ).toBe(true);
   });
@@ -250,6 +254,7 @@ describe("bottleClassificationEvidence", () => {
           edition: null,
         },
         targetCandidate,
+        webEvidenceJudgment: "supportive",
       }),
     ).toBe(false);
   });
@@ -302,6 +307,7 @@ describe("bottleClassificationEvidence", () => {
           edition: "Batch 4",
         },
         targetCandidate,
+        webEvidenceJudgment: "supportive",
       }),
     ).toBe(false);
   });
@@ -354,6 +360,7 @@ describe("bottleClassificationEvidence", () => {
           edition: null,
         },
         targetCandidate,
+        webEvidenceJudgment: "supportive",
       }),
     ).toBe(false);
   });
@@ -406,11 +413,12 @@ describe("bottleClassificationEvidence", () => {
           edition: null,
         },
         targetCandidate,
+        webEvidenceJudgment: "supportive",
       }),
     ).toBe(false);
   });
 
-  test("does not treat origin-retailer titles as independent authoritative support", () => {
+  test("does not treat origin-retailer titles as independent support", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 3,
       fullName: "Ardbeg Uigeadail",
@@ -437,6 +445,7 @@ describe("bottleClassificationEvidence", () => {
         ],
         extractedLabel: null,
         targetCandidate,
+        webEvidenceJudgment: "supportive",
       }),
     ).toBe(false);
   });

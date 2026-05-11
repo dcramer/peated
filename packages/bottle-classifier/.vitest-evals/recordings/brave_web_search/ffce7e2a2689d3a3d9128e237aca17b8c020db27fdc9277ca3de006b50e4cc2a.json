@@ -1,0 +1,53 @@
+{
+  "writtenAt": "2026-05-10T00:44:40.872Z",
+  "toolName": "brave_web_search",
+  "input": {
+    "query": "Talisker 2001 Distillers Edition 2001 2012 double matured amoroso"
+  },
+  "output": {
+    "provider": "brave",
+    "query": "Talisker 2001 Distillers Edition 2001 2012 double matured amoroso",
+    "summary": "Talisker · Bottler · Distillery Bottling · Bottling series · The Distillers Edition · Vintage · 2001 · Bottled · 2012 · Cask Type · <strong>Double Matured in Amoroso Sherry Wood</strong> · Casknumber · TD-S: 5OA · Strength · 45.8 % Size · 200 ... <strong>Double matured Amoroso sherry casks. Talisker Talisker Distillery",
+    "results": [
+      {
+        "title": "Talisker 2001 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": "Talisker · Bottler · Distillery Bottling · Bottling series · The Distillers Edition · Vintage · 2001 · Bottled · 2012 · Cask Type · <strong>Double Matured in Amoroso Sherry Wood</strong> · Casknumber · TD-S: 5OA · Streng",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker 2001 Distillers Edition - The Whisky Barrel",
+        "url": "https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition",
+        "domain": "thewhiskybarrel.com",
+        "description": "<strong>Double matured Amoroso sherry casks. Talisker Talisker Distillery was established at Carbost on the Isle of Skye off the west coast of Scotland in 1830</strong>. Soaking up its own reflection from Loch Harport on",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker Distillers Edition 2012 Amoroso Cask | Oaksliquors.com",
+        "url": "https://www.oaksliquors.com/p/talisker-distillers-edition-2012-amoroso-cask",
+        "domain": "oaksliquors.com",
+        "description": "This Talisker Distillers Edition was <strong>double matured in Amoroso casks for a richer, rounded flavor</strong>. Distilled in 2001 and bottled in 2012.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker The Distiller's Edition Double Bottle Set Double Matured in Amoroso Cask Wood 700ml | Whisky Liquor Store",
+        "url": "https://www.whiskyliquorstore.com/132039/talisker-the-distillers-edition-double-bottle-set-double-matured-in-amoroso-cask-wood",
+        "domain": "whiskyliquorstore.com",
+        "description": "Distilled in 2001 Bottled in 2012 <strong>An interesting Talisker that has been finished in Spanish sweet Amoroso wine casks</strong>. This is a refined and complex version of this legendary malt.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Where to buy 2001 Talisker Distillers Edition Double Matured Amoroso Sherry Cask Wood Single Malt Scotch Whisky, Isle of Skye | prices & local stores in USA",
+        "url": "https://www.wine-searcher.com/find/talisker+distil+edition+double+amoroso+sherry+cask+wood+single+malt+scotch+whisky+isle+skye+scotland/2001",
+        "domain": "wine-searcher.com",
+        "description": "Rate 2001 Talisker Distillers Edition Double Matured Amoroso Sherry Cask Wood Single Malt Scotch Whisky · Vintage Critics Score Avg. Price (ex-tax) All 91 / 100 $ 98 2023 – $ 102 2022 – $ 99 2021 – $ 105 2020 – $ 98 2019",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "ffce7e2a2689d3a3d9128e237aca17b8c020db27fdc9277ca3de006b50e4cc2a",
+    "mode": "auto"
+  }
+}

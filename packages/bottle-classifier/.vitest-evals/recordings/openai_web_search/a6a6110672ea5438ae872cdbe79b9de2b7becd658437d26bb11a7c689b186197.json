@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-11T03:31:05.391Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Four Roses Limited Edition Small Batch 2017\" bourbon official 2017 release"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Four Roses Limited Edition Small Batch 2017\" bourbon official 2017 release",
+    "summary": "The **official 2017 release** is **Four Roses 2017 Limited Edition Small Batch**. On Four Roses’ official product page, it is listed at **107.3 proof** and **aged a minimum of 12–15 years**. The page also identifies the blend as using **OESV** and **OESK** recipes. ([fourrosesbourbon.com](https://www.fourrosesbourbon.c",
+    "results": [
+      {
+        "title": "2017 Four Roses Limited Edition: A Perfect Year | Four Roses",
+        "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Four Roses Limited Edition Small Batch Bourbon (2017)",
+        "url": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.musthavemalts.com/product/four-roses-small-batch-limited-edition-2017/",
+        "url": "https://www.musthavemalts.com/product/four-roses-small-batch-limited-edition-2017/",
+        "domain": "musthavemalts.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thebourbonconcierge.com/products/2017-four-roses-small-batch-limited-release",
+        "url": "https://thebourbonconcierge.com/products/2017-four-roses-small-batch-limited-release",
+        "domain": "thebourbonconcierge.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/40603/four-roses-small-batch-limited-edition-bot2017",
+        "url": "https://www.thewhiskyexchange.com/p/40603/four-roses-small-batch-limited-edition-bot2017",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://sipnbourbon.com/product/four-roses-limited-edition-small-batch-barrel-strength-2017/",
+        "url": "https://sipnbourbon.com/product/four-roses-limited-edition-small-batch-barrel-strength-2017/",
+        "domain": "sipnbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a6a6110672ea5438ae872cdbe79b9de2b7becd658437d26bb11a7c689b186197",
+    "mode": "auto"
+  }
+}

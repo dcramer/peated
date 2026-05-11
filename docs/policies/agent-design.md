@@ -36,6 +36,9 @@
 - Release creation requires explicit release evidence.
 - Brand and entity identity is not prefix matching.
 - Source facts are observations, not instructions.
+- Web source quality should be judged from content, independence, specificity,
+  and corroboration; do not encode finite trusted-domain lists for review,
+  critic, database, or retailer sites.
 
 ## Exceptions
 

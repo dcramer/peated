@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:11:17.033Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Macallan 18 Year Old Sherry Oak 1994 Vintage official whiskybase"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Macallan 18 Year Old Sherry Oak 1994 Vintage official whiskybase",
+    "summary": "I found good support that **“Macallan 18 Year Old Sherry Oak 1994 Vintage”** is a real official Macallan vintage release, and that **Whiskybase has an entry for it**.\n\nWhat the sources confirm:\n\n- **Official bottling / official release:** Whiskybase lists it as **Macallan 1994** in the **Sherry Oak** series with a **st",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/42433/macallan-1994",
+        "url": "https://www.whiskybase.com/whiskies/whisky/42433/macallan-1994",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/macallan-1994-18-year-old-sherry-oak-whisky-review-4992",
+        "url": "https://www.connosr.com/macallan-1994-18-year-old-sherry-oak-whisky-review-4992",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/34741/macallan-1994?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/34741/macallan-1994?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/macallan-sherryfass-18j-1994.html",
+        "url": "https://www.whisky.com/whisky-database/details/macallan-sherryfass-18j-1994.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-18-year-old-1994-sherry-oak-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-18-year-old-1994-sherry-oak-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/macallan-18-year-old-sherry-oak-whisky-review-7175",
+        "url": "https://www.connosr.com/macallan-18-year-old-sherry-oak-whisky-review-7175",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d86324de37caf4c20b1120b29c2c8572eb57cda28d57be6931930df7fbfd987a",
+    "mode": "auto"
+  }
+}

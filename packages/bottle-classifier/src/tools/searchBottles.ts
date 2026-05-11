@@ -25,10 +25,10 @@ export function createSearchBottlesTool({
   return tool({
     name: "search_bottles",
     description:
-      "Search the local bottle database using exact alias matching, embeddings, full-text search, and producer-aware heuristics. Results may be either parent bottle targets or specific child release targets. Candidate `familyContext` summarizes existing child releases and release-like traits stored on the parent so you can judge sibling evidence without inventing deterministic rules. Use this before web search when local candidates are thin, conflicting, or missing obvious near matches. Re-run it after web search when the web confirms a missing canonical trait such as Barrel Proof, Single Cask, a batch code, or a producer/distillery detail that could recover a better local match. Provide the most specific bottle identity you know, including brand, bottler, distillery, expression, series, edition, age, ABV, cask details, and years. Do not include packaging, volume, pricing, or retailer SEO noise in the query.",
+      "Search local Peated bottle and release candidates. Use before web search when local matches are missing or conflicting, and again after web evidence reveals a canonical trait that could recover a better local candidate.",
     parameters: BottleCandidateSearchInputSchema.extend({
       query: BottleCandidateSearchInputSchema.shape.query.describe(
-        "Raw bottle reference text or fallback search text. Exclude volume, pack-size, gift-set, and price noise when possible.",
+        "Bottle search text. Exclude volume, pack-size, gift-set, and price noise.",
       ),
       brand: BottleCandidateSearchInputSchema.shape.brand.describe(
         "Most prominent consumer-facing brand on the label. For independent bottlings, this is usually the bottler label, not the distillery.",
@@ -71,7 +71,7 @@ export function createSearchBottlesTool({
         "True only when the reference explicitly says single cask, single barrel, or a specific cask selection.",
       ),
       edition: BottleCandidateSearchInputSchema.shape.edition.describe(
-        "Batch label, store-pick code, release code, or numbered edition such as Batch 3 or S2B13.",
+        "Batch label, store-pick code, release code, or numbered edition.",
       ),
       vintage_year:
         BottleCandidateSearchInputSchema.shape.vintage_year.describe(

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T22:56:42.481Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Highland Park Cask Strength No. 5\" official OR whiskybase OR master of malt"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Highland Park Cask Strength No. 5\" official OR whiskybase OR master of malt",
+    "summary": "**Highland Park Cask Strength No. 5** — confirmed from the **official Highland Park page** and **Whiskybase**:\n\n- **Producer / bottler:** Highland Park, **Distillery Bottling**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n- **Edition / release:** **Cask",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+        "url": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+        "domain": "highlandparkwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/166530/highland-park-cask-strength",
+        "url": "https://www.whiskybase.com/whiskies/whisky/166530/highland-park-cask-strength",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/275881/highland-park-cask-strength?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/275881/highland-park-cask-strength?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/203346/highland-park-cask-strength?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/203346/highland-park-cask-strength?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/232545/highland-park-cask-strength?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/232545/highland-park-cask-strength?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "37e5e5218e466526c10a31706e4745a358f2cc3b078589c7f71bdc1dac31e1d6",
+    "mode": "auto"
+  }
+}

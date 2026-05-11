@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T00:41:58.863Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Highland Park Cask Strength No. 5 official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Highland Park Cask Strength No. 5 official",
+    "summary": "Official page: Highland Park’s own product page for **Cask Strength Release No. 5** is here: ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5?utm_source=openai))\n\nWhat the sources confirm about this bottle:\n- **Producer/distillery:** It is an official **Highland Park** release ",
+    "results": [
+      {
+        "title": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+        "url": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+        "domain": "highlandparkwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/highland-park-cask-strength-release-no-5",
+        "url": "https://distiller.com/spirits/highland-park-cask-strength-release-no-5",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinkhacker.com/2024/10/18/review-highland-park-cask-strength-release-no-5/",
+        "url": "https://www.drinkhacker.com/2024/10/18/review-highland-park-cask-strength-release-no-5/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskeyshelf.com/highland-park-cask-strength-batch-5-review/",
+        "url": "https://www.thewhiskeyshelf.com/highland-park-cask-strength-batch-5-review/",
+        "domain": "thewhiskeyshelf.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.vaultofspirits.com/whisky/single-malt/highland-park-cask-strength-release-no-5-647/",
+        "url": "https://www.vaultofspirits.com/whisky/single-malt/highland-park-cask-strength-release-no-5-647/",
+        "domain": "vaultofspirits.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://onemoredram.com/2024/06/06/highland-park-launches-cask-strength-release-no-5/",
+        "url": "https://onemoredram.com/2024/06/06/highland-park-launches-cask-strength-release-no-5/",
+        "domain": "onemoredram.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "96ff0a9cc78b406d2ad4773184b84f456c6861eaebf329a2ccbbae8d5c6a5f7e",
+    "mode": "auto"
+  }
+}

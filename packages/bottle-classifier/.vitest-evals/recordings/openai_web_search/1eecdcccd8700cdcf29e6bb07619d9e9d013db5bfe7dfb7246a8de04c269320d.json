@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T06:38:12.273Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Four Roses Limited Edition Small Batch 2017\" Four Roses official 2017 limited edition small batch"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Four Roses Limited Edition Small Batch 2017\" Four Roses official 2017 limited edition small batch",
+    "summary": "Here’s the **official Four Roses 2017 Limited Edition Small Batch** info, based on Four Roses’ own site:\n\n- **Product:** Four Roses **2017 Limited Edition Small Batch**. ([fourrosesbourbon.com](https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch?utm_source=openai))\n- **Producer/Bottler:** **Four Roses**. ([fou",
+    "results": [
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/celebrate-2017-limited-edition-small-batch-with-us",
+        "url": "https://www.fourrosesbourbon.com/blog/celebrate-2017-limited-edition-small-batch-with-us",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+        "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+        "url": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/2016-limited-edition-small-batch-named-americas-best-kentucky-bourbon",
+        "url": "https://www.fourrosesbourbon.com/blog/2016-limited-edition-small-batch-named-americas-best-kentucky-bourbon",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/2017-al-young-50th-anniversary",
+        "url": "https://www.fourrosesbourbon.com/bourbon/2017-al-young-50th-anniversary",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/limited-edition-drawing-and-conditions",
+        "url": "https://www.fourrosesbourbon.com/limited-edition-drawing-and-conditions",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "1eecdcccd8700cdcf29e6bb07619d9e9d013db5bfe7dfb7246a8de04c269320d",
+    "mode": "auto"
+  }
+}

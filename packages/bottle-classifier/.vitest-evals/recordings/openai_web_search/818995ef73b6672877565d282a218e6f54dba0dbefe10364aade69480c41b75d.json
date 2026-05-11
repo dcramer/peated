@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:22:40.104Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "site:fourrosesbourbon.com 2017 Limited Edition Small Batch Four Roses"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "site:fourrosesbourbon.com 2017 Limited Edition Small Batch Four Roses",
+    "summary": "I found the official Four Roses page for the **2017 Limited Edition Small Batch** and independent references that back up the key bottle traits.\n\n**What the sources confirm about this bottle**\n- It is the **Four Roses 2017 Limited Edition Small Batch** release. The official producer page lists it at **107.3 proof** and",
+    "results": [
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+        "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+        "url": "https://distiller.com/spirits/four-roses-limited-edition-small-batch-bourbon-2017",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/four-roses-small-batch",
+        "url": "https://www.breakingbourbon.com/review/four-roses-small-batch",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/Four-Roses-Limited-Edition-Small-Batch-2017-Release-53-95",
+        "url": "https://whiskyadvocate.com/Four-Roses-Limited-Edition-Small-Batch-2017-Release-53-95",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/how-our-small-batch-bottle-came-to-be",
+        "url": "https://www.fourrosesbourbon.com/blog/how-our-small-batch-bottle-came-to-be",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/cheers-to-a-mellow-year",
+        "url": "https://www.fourrosesbourbon.com/blog/cheers-to-a-mellow-year",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "818995ef73b6672877565d282a218e6f54dba0dbefe10364aade69480c41b75d",
+    "mode": "auto"
+  }
+}

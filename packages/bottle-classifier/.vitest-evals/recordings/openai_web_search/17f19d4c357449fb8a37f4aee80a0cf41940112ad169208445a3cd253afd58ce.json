@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T06:35:01.525Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Barrel Proof Batch C923 12 year 2023 official batch"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Barrel Proof Batch C923 12 year 2023 official batch",
+    "summary": "The **official batch details** for **Elijah Craig Barrel Proof C923** are:\n\n- **Brand / expression:** Elijah Craig Barrel Proof Bourbon\n- **Producer / distillery:** **Heaven Hill Distillery** ([elijahcraig.com](https://elijahcraig.com/barrel-proof.php?utm_source=openai))\n- **Batch:** **C923**\n- **Release timing:** **Se",
+    "results": [
+      {
+        "title": "https://bevinfogroup.com/2023/09/13/elijah-craig-barrel-proof-c923-heaven-hill/",
+        "url": "https://bevinfogroup.com/2023/09/13/elijah-craig-barrel-proof-c923-heaven-hill/",
+        "domain": "bevinfogroup.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/barrel-proof.php",
+        "url": "https://elijahcraig.com/barrel-proof.php",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskeyconsensus.com/elijah-craig-barrel-proof-batch-c923-review/",
+        "url": "https://whiskeyconsensus.com/elijah-craig-barrel-proof-batch-c923-review/",
+        "domain": "whiskeyconsensus.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/elijah-craig-barrel-proof-bourbon-batch-c923",
+        "url": "https://distiller.com/spirits/elijah-craig-barrel-proof-bourbon-batch-c923",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "url": "https://breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhill.com/news-and-notes/heaven-hill-distillery-named-2023-global-icon-of-whisky-distiller-of-the-year/",
+        "url": "https://heavenhill.com/news-and-notes/heaven-hill-distillery-named-2023-global-icon-of-whisky-distiller-of-the-year/",
+        "domain": "heavenhill.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "17f19d4c357449fb8a37f4aee80a0cf41940112ad169208445a3cd253afd58ce",
+    "mode": "auto"
+  }
+}

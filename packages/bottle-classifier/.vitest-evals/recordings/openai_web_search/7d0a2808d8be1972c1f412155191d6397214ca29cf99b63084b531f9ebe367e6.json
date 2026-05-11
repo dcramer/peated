@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T06:41:38.258Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Woodford Reserve Double Double Oaked\" bourbon distillery series release official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Woodford Reserve Double Double Oaked\" bourbon distillery series release official",
+    "summary": "Yes — **Woodford Reserve Double Double Oaked** was released as an **official Distillery Series** bottling by Woodford Reserve. Woodford Reserve’s own Distillery Series page lists past expressions including **Double Double Oaked 2015, 2017, 2018, 2019, and 2020**, confirming it as part of that official series. ([woodfor",
+    "results": [
+      {
+        "title": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+        "url": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "domain": "shop.woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/distillery-series-toasted-oak-four-grain/",
+        "url": "https://www.woodfordreserve.com/whiskey/distillery-series-toasted-oak-four-grain/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/en-au/whiskey/distillery-series/",
+        "url": "https://www.woodfordreserve.com/en-au/whiskey/distillery-series/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "7d0a2808d8be1972c1f412155191d6397214ca29cf99b63084b531f9ebe367e6",
+    "mode": "auto"
+  }
+}

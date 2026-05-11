@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T06:37:15.462Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19 year old official release annual batches ABV"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Ardbeg Traigh Bhan 19 year old official release annual batches ABV",
+    "summary": "Ardbeg **Traigh Bhan 19 Year Old** official annual batches and ABV, from Ardbeg’s own product/archive pages:\n\n- **Batch 1** — **46.2% ABV** ([ardbeg.com](https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%201-2019ARDTB1.html?utm_source=openai))\n- **Batch 2** — **46.2% ABV** ([ardbeg.com](htt",
+    "results": [
+      {
+        "title": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
+        "url": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/Ardbeg%252019%2520Years%2520Old%2520Traigh%2520Bhan%2520Batch%25203-1092734.html",
+        "url": "https://www.ardbeg.com/Ardbeg%252019%2520Years%2520Old%2520Traigh%2520Bhan%2520Batch%25203-1092734.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%202-2020ARDTB2.html",
+        "url": "https://www.ardbeg.com/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%202-2020ARDTB2.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%201-2019ARDTB1.html",
+        "url": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%201-2019ARDTB1.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%204-2022ARDTB4.html",
+        "url": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%204-2022ARDTB4.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/de-de/ardbeg-traigh-bhan-19-years-old-batch-1-2019ARDTB1.html",
+        "url": "https://www.ardbeg.com/de-de/ardbeg-traigh-bhan-19-years-old-batch-1-2019ARDTB1.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5daeb46d55e55b73b664f8425353678cea4e98d4b48ea09e3357e9ecd4282e0e",
+    "mode": "auto"
+  }
+}

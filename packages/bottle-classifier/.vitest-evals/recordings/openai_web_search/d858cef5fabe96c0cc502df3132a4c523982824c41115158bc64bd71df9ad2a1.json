@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T07:14:20.181Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Woodford Reserve Kentucky Straight Malt Whiskey\" ABV official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Woodford Reserve Kentucky Straight Malt Whiskey\" ABV official",
+    "summary": "The official ABV for **Woodford Reserve Kentucky Straight Malt Whiskey** is **45.2% ABV**. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/malt-whiskey/?utm_source=openai))\n\nIf you want, I can also give you the **official proof**, **mash bill**, or a **bottle-specific summary** for this expression.",
+    "results": [
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+        "url": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://en.wikipedia.org/wiki/Woodford_Reserve",
+        "url": "https://en.wikipedia.org/wiki/Woodford_Reserve",
+        "domain": "en.wikipedia.org",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/straight-bourbon-whiskey/",
+        "url": "https://www.woodfordreserve.com/whiskey/straight-bourbon-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/en-au/whiskey/malt-whiskey/",
+        "url": "https://www.woodfordreserve.com/en-au/whiskey/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/woodford-reserve-straight-malt",
+        "url": "https://distiller.com/spirits/woodford-reserve-straight-malt",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wine.com/product/woodford-reserve-kentucky-straight-wheat-whiskey/767650",
+        "url": "https://www.wine.com/product/woodford-reserve-kentucky-straight-wheat-whiskey/767650",
+        "domain": "wine.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d858cef5fabe96c0cc502df3132a4c523982824c41115158bc64bd71df9ad2a1",
+    "mode": "auto"
+  }
+}

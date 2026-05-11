@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:49:52.777Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official 4th Edition"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official 4th Edition",
+    "summary": "I could confirm the bottle itself, but I **could not verify that “official 4th Edition” is an official Glenmorangie designation** from the producer.\n\n**Confirmed bottle-specific details**\n- **Producer / distillery:** Glenmorangie, Highland single malt Scotch whisky. ([glenmorangie.com](https://www.glenmorangie.com/en-u",
+    "results": [
+      {
+        "title": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.stillspirit.com/en-us/products/glenmorangie-14-year-old-quinta-ruban",
+        "url": "https://www.stillspirit.com/en-us/products/glenmorangie-14-year-old-quinta-ruban",
+        "domain": "stillspirit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thedistilleryapp.com/bottles/glenmorangie-quinta-ruban-14-year-old",
+        "url": "https://www.thedistilleryapp.com/bottles/glenmorangie-quinta-ruban-14-year-old",
+        "domain": "thedistilleryapp.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.celticwhiskeyshop.com/Glenmorangie-Quinta-Ruban-14-Year-Old",
+        "url": "https://www.celticwhiskeyshop.com/Glenmorangie-Quinta-Ruban-14-Year-Old",
+        "domain": "celticwhiskeyshop.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.liquorliquidators.com/product-page/glenmorangie-quinta-ruban-14-year-old-750ml",
+        "url": "https://www.liquorliquidators.com/product-page/glenmorangie-quinta-ruban-14-year-old-750ml",
+        "domain": "liquorliquidators.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskyshop.com/glenmorangie-14-year-old-quinta-ruban",
+        "url": "https://www.whiskyshop.com/glenmorangie-14-year-old-quinta-ruban",
+        "domain": "whiskyshop.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "3e58812f90c7d8af8696f791feeba248c84d22c37dbca0d59471afc5f67c9835",
+    "mode": "auto"
+  }
+}

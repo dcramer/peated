@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T01:17:53.497Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"SMWS\" \"RW6.5\" \"Sauna Smoke\""
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"SMWS\" \"RW6.5\" \"Sauna Smoke\"",
+    "summary": "I found strong evidence that **“Sauna Smoke” refers to SMWS cask RW6.3, not RW6.5**.\n\n- On SMWS’s official rye whisky listings, **RW6.5** is titled **“Appley ever after”**, and SMWS lists it as a **Finland rye whisky**, **6 years old**, **56.0% ABV**, from a **1st fill #3 char barrel**. ([smws.com](https://smws.com/all",
+    "results": [
+      {
+        "title": "https://peated.com/bottles/43260",
+        "url": "https://peated.com/bottles/43260",
+        "domain": "peated.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskylibraryshop.co.za/products/smws-rw6-5-appley-ever-after",
+        "url": "https://whiskylibraryshop.co.za/products/smws-rw6-5-appley-ever-after",
+        "domain": "whiskylibraryshop.co.za",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Rye Whisky",
+        "url": "https://smws.com/all-whisky/whisky/rye-whisky/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.mineshop.ch/Prodipe-Studiomonitor-Pro7-V4-RW/1837127",
+        "url": "https://www.mineshop.ch/Prodipe-Studiomonitor-Pro7-V4-RW/1837127",
+        "domain": "mineshop.ch",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://peated.com/bottles/43260/releases",
+        "url": "https://peated.com/bottles/43260/releases",
+        "domain": "peated.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "SMWS RW6.3 - Cinnamon Sauna Smoke - Strath Liquor Merchants",
+        "url": "https://www.strathliquor.com/product/smws-rw6-3-cinnamon-sauna-smoke/",
+        "domain": "strathliquor.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "60f6572a3e1127ff7c30335d8d96ea839ff1b2426716a25c766d35a4d148449c",
+    "mode": "auto"
+  }
+}

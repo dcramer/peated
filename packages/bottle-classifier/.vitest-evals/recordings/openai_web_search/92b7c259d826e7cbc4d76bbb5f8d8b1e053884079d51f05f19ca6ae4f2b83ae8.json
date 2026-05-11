@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-05-10T05:20:21.738Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Wild Turkey Rare Breed Rye official rye whiskey barrel proof"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Wild Turkey Rare Breed Rye official rye whiskey barrel proof",
+    "summary": "**Wild Turkey Rare Breed Rye** is the **official Wild Turkey rye whiskey in the Rare Breed line**, and the official producer page describes it as a **small-batch, barrel proof blend of rye whiskey** that is **uncut** and **non-chill filtered**. ([wildturkeybourbon.com](https://www.wildturkeybourbon.com/products/rare-br",
+    "results": [
+      {
+        "title": "https://www.breakingbourbon.com/review/wild-turkey-rare-breed-rye-112-2-proof",
+        "url": "https://www.breakingbourbon.com/review/wild-turkey-rare-breed-rye-112-2-proof",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "url": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskeyconsensus.com/wild-turkey-rare-breed-rye-review/",
+        "url": "https://whiskeyconsensus.com/wild-turkey-rare-breed-rye-review/",
+        "domain": "whiskeyconsensus.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskeyfool.com/post/wild-turkey-rare-breed-rye-rye-whiskey-review",
+        "url": "https://www.thewhiskeyfool.com/post/wild-turkey-rare-breed-rye-rye-whiskey-review",
+        "domain": "thewhiskeyfool.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thebarreltap.com/products/wild-turkey-rare-breed-rye-whiskey-750ml",
+        "url": "https://www.thebarreltap.com/products/wild-turkey-rare-breed-rye-whiskey-750ml",
+        "domain": "thebarreltap.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "92b7c259d826e7cbc4d76bbb5f8d8b1e053884079d51f05f19ca6ae4f2b83ae8",
+    "mode": "auto"
+  }
+}
