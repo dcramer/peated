@@ -69,7 +69,7 @@
     "@types/react-dom": "catalog:",
     "eslint": "catalog:",
     "eslint-config-next": "14.2.4",
-    "postcss": "^8.5.9",
+    "postcss": "^8.5.10",
     "tailwind-scrollbar": "^3.1.0",
     "tailwindcss": "catalog:",
     "typescript": "catalog:"
