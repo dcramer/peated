@@ -18,6 +18,7 @@ Current policies:
 
 - [agent-design.md](agent-design.md)
 - [code-comments.md](code-comments.md)
+- [web-route-layouts.md](web-route-layouts.md)
 
 Keep policy docs small:
 

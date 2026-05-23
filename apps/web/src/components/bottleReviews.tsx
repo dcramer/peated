@@ -1,3 +1,5 @@
+"use client";
+
 import { TrophyIcon } from "@heroicons/react/24/outline";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useORPC } from "../lib/orpc/context";
@@ -10,7 +12,13 @@ function RatingIcon({ rating }: { rating: number }) {
   return null;
 }
 
-export default function BottleReviews({ bottleId }: { bottleId: number }) {
+export default function BottleReviews({
+  bottleId,
+  releaseId,
+}: {
+  bottleId: number;
+  releaseId?: number;
+}) {
   const orpc = useORPC();
   const {
     data: { results },
@@ -18,6 +26,7 @@ export default function BottleReviews({ bottleId }: { bottleId: number }) {
     orpc.reviews.list.queryOptions({
       input: {
         bottle: bottleId,
+        ...(releaseId ? { release: releaseId } : {}),
       },
     }),
   );

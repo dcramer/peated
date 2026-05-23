@@ -25,6 +25,23 @@ describe("GET /tastings", () => {
     expect(results[0].id).toEqual(tasting.id);
   });
 
+  test("lists tastings with release", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+    const tasting = await fixtures.Tasting({
+      bottleId: bottle.id,
+      releaseId: release.id,
+    });
+    await fixtures.Tasting({ bottleId: bottle.id });
+
+    const { results } = await routerClient.tastings.list({
+      release: release.id,
+    });
+
+    expect(results.length).toBe(1);
+    expect(results[0].id).toEqual(tasting.id);
+  });
+
   test("lists tastings with user", async ({ defaults, fixtures }) => {
     const tasting = await fixtures.Tasting({
       createdById: defaults.user.id,

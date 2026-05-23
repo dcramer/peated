@@ -27,7 +27,8 @@ export default procedure
   .input(
     z
       .object({
-        bottle: z.coerce.number().optional(),
+        bottle: z.coerce.number().gte(1).optional(),
+        release: z.coerce.number().gte(1).optional(),
         entity: z.coerce.number().optional(),
         user: z
           .union([z.coerce.number(), z.literal("me"), z.string()])
@@ -54,6 +55,10 @@ export default procedure
     const where: (SQL<unknown> | undefined)[] = [];
     if (input.bottle) {
       where.push(eq(tastings.bottleId, input.bottle));
+    }
+
+    if (input.release) {
+      where.push(eq(tastings.releaseId, input.release));
     }
 
     if (input.entity) {
