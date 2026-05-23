@@ -16,6 +16,7 @@ const InputSchema = z
   .object({
     site: ExternalSiteTypeEnum.optional(),
     bottle: z.coerce.number().optional(),
+    release: z.coerce.number().optional(),
     query: z.string().default(""),
     onlyUnknown: z.coerce.boolean().optional(),
     cursor: z.coerce.number().gte(1).default(1),
@@ -65,7 +66,18 @@ export default procedure
 
     if (input.bottle) {
       where.push(eq(reviews.bottleId, input.bottle));
-    } else if (!context.user?.admin && !context.user?.mod) {
+    }
+
+    if (input.release) {
+      where.push(eq(reviews.releaseId, input.release));
+    }
+
+    if (
+      !input.bottle &&
+      !input.release &&
+      !context.user?.admin &&
+      !context.user?.mod
+    ) {
       console.error(
         `User requested reviewList without mod: ${context.user?.id}`,
       );

@@ -50,6 +50,29 @@ describe("GET /reviews", () => {
     expect(results[0].id).toEqual(review.id);
   });
 
+  test("lists reviews by release", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+    const site = await fixtures.ExternalSiteOrExisting();
+    const review = await fixtures.Review({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      externalSiteId: site.id,
+    });
+    await fixtures.Review({
+      bottleId: bottle.id,
+      externalSiteId: site.id,
+      issue: "Other",
+    });
+
+    const { results } = await routerClient.reviews.list({
+      release: release.id,
+    });
+
+    expect(results.length).toBe(1);
+    expect(results[0].id).toEqual(review.id);
+  });
+
   test("errors on site without mod", async ({ fixtures }) => {
     const user = await fixtures.User();
     const site = await fixtures.ExternalSiteOrExisting();

@@ -32,6 +32,7 @@ type ItemProps = {
   active?: boolean;
   count?: number;
   controlled?: boolean;
+  match?: "exact" | "prefix";
   desktopOnly?: boolean;
 };
 
@@ -43,6 +44,7 @@ export function TabItem<E extends ElementType = typeof defaultElement>({
   count,
   children,
   controlled,
+  match = "exact",
   desktopOnly,
   ...props
 }: PolymorphicProps<E, ItemProps>) {
@@ -55,7 +57,12 @@ export function TabItem<E extends ElementType = typeof defaultElement>({
     "border-transparent text-muted hover:border-muted hover:text-slate-400";
 
   if ("href" in props) {
-    if (controlled) active = pathname === props.href;
+    if (controlled && typeof props.href === "string") {
+      active =
+        match === "prefix"
+          ? pathname === props.href || pathname.startsWith(`${props.href}/`)
+          : pathname === props.href;
+    }
   }
 
   const className = classNames(
