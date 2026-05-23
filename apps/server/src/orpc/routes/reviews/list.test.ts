@@ -73,6 +73,23 @@ describe("GET /reviews", () => {
     expect(results[0].id).toEqual(review.id);
   });
 
+  test("errors on unknown release reviews without mod", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+
+    const err = await waitError(
+      routerClient.reviews.list({
+        release: release.id,
+        onlyUnknown: true,
+      }),
+    );
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Must be a moderator to list all reviews.]`,
+    );
+  });
+
   test("errors on site without mod", async ({ fixtures }) => {
     const user = await fixtures.User();
     const site = await fixtures.ExternalSiteOrExisting();

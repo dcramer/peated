@@ -91,6 +91,41 @@ function getBottlingHighlights(bottling: Bottling) {
   ].filter(Boolean);
 }
 
+function parseRouteId(value: string) {
+  const id = Number(value);
+
+  if (!Number.isInteger(id) || id < 1) {
+    notFound();
+  }
+
+  return id;
+}
+
+async function getBottlingPageData({
+  bottleId,
+  bottlingId,
+}: {
+  bottleId: string;
+  bottlingId: string;
+}) {
+  const { client } = await getServerClient();
+  const parsedBottleId = parseRouteId(bottleId);
+  const parsedBottlingId = parseRouteId(bottlingId);
+
+  const [bottle, bottling] = await Promise.all([
+    resolveOrNotFound(client.bottles.details({ bottle: parsedBottleId })),
+    resolveOrNotFound(
+      client.bottleReleases.details({ release: parsedBottlingId }),
+    ),
+  ]);
+
+  if (bottling.bottleId !== bottle.id) {
+    notFound();
+  }
+
+  return { bottle, bottling, client };
+}
+
 function ReleaseStat({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="border-y border-slate-800 py-3">
@@ -319,14 +354,10 @@ export async function generateMetadata({
 }: {
   params: { bottleId: string; bottlingId: string };
 }): Promise<Metadata> {
-  const { client } = await getServerClient();
-
-  const [bottle, bottling] = await Promise.all([
-    resolveOrNotFound(client.bottles.details({ bottle: Number(bottleId) })),
-    resolveOrNotFound(
-      client.bottleReleases.details({ release: Number(bottlingId) }),
-    ),
-  ]);
+  const { bottle, bottling } = await getBottlingPageData({
+    bottleId,
+    bottlingId,
+  });
 
   const title = `${getReleaseTitle(bottling)} - ${bottle.fullName}`;
   const description = getReleaseDescription(bottle, bottling);
@@ -352,26 +383,16 @@ export default async function Page({
 }: {
   params: { bottleId: string; bottlingId: string };
 }) {
-  const { client } = await getServerClient();
+  const { bottle, bottling, client } = await getBottlingPageData({
+    bottleId,
+    bottlingId,
+  });
 
-  const [bottle, bottling] = await Promise.all([
-    resolveOrNotFound(client.bottles.details({ bottle: Number(bottleId) })),
-    resolveOrNotFound(
-      client.bottleReleases.details({ release: Number(bottlingId) }),
-    ),
-  ]);
-
-  if (bottling.bottleId !== bottle.id) {
-    notFound();
-  }
-
-  const [tastingList] = await Promise.all([
-    client.tastings.list({
-      bottle: bottle.id,
-      release: bottling.id,
-      limit: 10,
-    }),
-  ]);
+  const tastingList = await client.tastings.list({
+    bottle: bottle.id,
+    release: bottling.id,
+    limit: 10,
+  });
 
   const releaseTitle = getReleaseTitle(bottling);
   const description = getReleaseDescription(bottle, bottling);

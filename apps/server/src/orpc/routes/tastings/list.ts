@@ -27,8 +27,8 @@ export default procedure
   .input(
     z
       .object({
-        bottle: z.coerce.number().optional(),
-        release: z.coerce.number().optional(),
+        bottle: z.coerce.number().gte(1).optional(),
+        release: z.coerce.number().gte(1).optional(),
         entity: z.coerce.number().optional(),
         user: z
           .union([z.coerce.number(), z.literal("me"), z.string()])
