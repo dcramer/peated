@@ -53,6 +53,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - Policy docs live under `docs/policies/`
 - Read relevant policy docs before changing code in that area
 - `docs/policies/code-comments.md` applies by default for code changes and inline documentation
+- `docs/policies/web-route-layouts.md` applies to user-facing web route and layout changes
 
 ## Docs Index
 
@@ -73,3 +74,4 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - `docs/policies/policy-template.md`
 - `docs/policies/agent-design.md`
 - `docs/policies/code-comments.md`
+- `docs/policies/web-route-layouts.md`
