@@ -1,10 +1,12 @@
 "use client";
 
 import Table from "@peated/web/components/table";
+import TableSkeleton from "@peated/web/components/tableSkeleton";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { Suspense } from "react";
 
-export default function Page() {
+function AllRegionsTable() {
   const orpc = useORPC();
   const { data: countryList } = useSuspenseQuery(
     orpc.countries.list.queryOptions({
@@ -35,5 +37,13 @@ export default function Page() {
         },
       ]}
     />
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<TableSkeleton rows={20} columns={3} />}>
+      <AllRegionsTable />
+    </Suspense>
   );
 }
