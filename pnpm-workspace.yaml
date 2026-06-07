@@ -30,6 +30,7 @@ catalog:
   vite: ^8.0.8
   vitest: "~4.1.4"
   "@vitest/coverage-v8": "~4.1.4"
+  "@playwright/test": "^1.60.0"
   zod: ^4.1.8
 
   react: ^18.2.0

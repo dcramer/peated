@@ -4,6 +4,7 @@ import AppFooter from "./appFooter";
 import AppHeader from "./appHeader";
 import Footer from "./footer";
 import Header from "./header";
+import RightSidebarSkeleton from "./rightSidebarSkeleton";
 import Sidebar from "./sidebar";
 
 export default function Layout({
@@ -42,7 +43,9 @@ export default function Layout({
 
         {rightSidebar ? (
           <div className="hidden lg:z-20 lg:w-96 lg:flex-col xl:flex">
-            <Suspense>{rightSidebar}</Suspense>
+            <Suspense fallback={<RightSidebarSkeleton />}>
+              {rightSidebar}
+            </Suspense>
           </div>
         ) : null}
       </div>
