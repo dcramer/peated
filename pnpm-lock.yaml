@@ -91,7 +91,7 @@ catalogs:
       specifier: ^8.0.8
       version: 8.0.8
     vitest:
-      specifier: ~4.1.4
+      specifier: ~4.1.0
       version: 4.1.4
     zod:
       specifier: ^4.1.8
