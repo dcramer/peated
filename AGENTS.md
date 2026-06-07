@@ -48,12 +48,19 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - Most read/list endpoints are anonymous and public; protected write/moderator routes require `Authorization: Bearer <token>`
 - `https://peated.com` is the frontend host, not the API host
 
+## Local UI Verification Playbook
+
+- Use `docs/development/local-ui-verification.md` when a browser-agent or Playwright check needs local login, moderator access, or a fallback port.
+
 ## Policies
 
 - Policy docs live under `docs/policies/`
 - Read relevant policy docs before changing code in that area
 - `docs/policies/code-comments.md` applies by default for code changes and inline documentation
 - `docs/policies/web-route-layouts.md` applies to user-facing web route and layout changes
+- `docs/policies/frontend-components.md` applies to shared UI components and form workflows
+- `docs/policies/background-work.md` applies to slow post-save work, queues, uploads, and retries
+- `docs/policies/runtime-boundaries.md` applies to API, queue, storage, AI, and other async/external boundaries
 
 ## Docs Index
 
@@ -65,13 +72,18 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - `docs/architecture/bottle-normalization-examples.md`
 - `docs/architecture/whisky-identity-model.md`
 - `docs/development/backend-testing.md`
+- `docs/development/local-ui-verification.md`
 - `docs/development/orpc-client.md`
 - `docs/development/orpc-routes.md`
 - `docs/development/schema-conventions.md`
+- `docs/features/bottle-entry-workflow.md`
 - `docs/features/store-price-matching.md`
 - `docs/features/simple-rating-system.md`
 - `docs/policies/README.md`
 - `docs/policies/policy-template.md`
 - `docs/policies/agent-design.md`
+- `docs/policies/background-work.md`
 - `docs/policies/code-comments.md`
+- `docs/policies/frontend-components.md`
+- `docs/policies/runtime-boundaries.md`
 - `docs/policies/web-route-layouts.md`

@@ -8,6 +8,9 @@ without turning it into a full architecture document or feature spec.
 Good policy topics:
 
 - code comments and docstrings
+- frontend component ownership
+- background work and retry boundaries
+- runtime boundary schemas and ownership context
 - agent design and automation boundaries
 - testing expectations
 - naming conventions
@@ -17,8 +20,16 @@ Good policy topics:
 Current policies:
 
 - [agent-design.md](agent-design.md)
+- [background-work.md](background-work.md)
 - [code-comments.md](code-comments.md)
+- [frontend-components.md](frontend-components.md)
+- [runtime-boundaries.md](runtime-boundaries.md)
 - [web-route-layouts.md](web-route-layouts.md)
+
+Backend testing expectations live in
+[../development/backend-testing.md](../development/backend-testing.md). Keep
+that integration-first test style as the source of truth instead of duplicating
+it here.
 
 Keep policy docs small:
 

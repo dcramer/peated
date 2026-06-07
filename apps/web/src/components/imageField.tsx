@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import { forwardRef, useEffect, useRef, useState } from "react";
 
 import { PhotoIcon } from "@heroicons/react/20/solid";
-import { rejects } from "assert";
 import setRef from "../lib/setRef";
 import Button from "./button";
 import FormField from "./formField";

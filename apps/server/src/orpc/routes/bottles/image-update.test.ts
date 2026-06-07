@@ -26,6 +26,24 @@ describe("POST /bottles/:bottle/image", () => {
     );
   });
 
+  test("can update another user's bottle as mod", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const otherUser = await fixtures.User();
+    const bottle = await fixtures.Bottle({ createdById: otherUser.id });
+
+    const response = await routerClient.bottles.imageUpdate(
+      {
+        bottle: bottle.id,
+        file: await fixtures.SampleSquareImage(),
+      },
+      {
+        context: { user },
+      },
+    );
+
+    expect(response.imageUrl).toBeDefined();
+  });
+
   test("bottle image does resize down", async ({ fixtures, defaults }) => {
     const bottle = await fixtures.Bottle({
       createdById: defaults.user.id,

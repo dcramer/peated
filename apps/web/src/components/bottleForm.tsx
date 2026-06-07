@@ -182,6 +182,22 @@ export default function BottleForm({
     toOption(initialData.series),
   );
 
+  const previewData = {
+    name: watch("name"),
+    category: watch("category"),
+    statedAge: watch("statedAge"),
+    distillers: distillersValue,
+    brand: brandValue,
+  };
+  const showPreview =
+    Boolean(
+      previewData.name ||
+      previewData.category ||
+      previewData.brand ||
+      previewData.distillers.length,
+    ) ||
+    (previewData.statedAge !== null && previewData.statedAge !== undefined);
+
   return (
     <FormScreen
       title={title}
@@ -212,17 +228,11 @@ export default function BottleForm({
         </div>
       </div>
 
-      <div className="lg:mb-8 lg:p-0">
-        <PreviewBottleCard
-          data={{
-            name: watch("name"),
-            category: watch("category"),
-            statedAge: watch("statedAge"),
-            distillers: distillersValue,
-            brand: brandValue,
-          }}
-        />
-      </div>
+      {showPreview && (
+        <div className="lg:mb-8 lg:p-0">
+          <PreviewBottleCard data={previewData} />
+        </div>
+      )}
 
       {error && <FormError values={[error]} />}
 

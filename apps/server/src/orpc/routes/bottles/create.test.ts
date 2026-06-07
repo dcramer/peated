@@ -507,25 +507,44 @@ describe("POST /bottles", () => {
     expect(changeList.length).toBe(1);
   });
 
-  test("rejects manual creates when the classifier finds an existing bottle", async ({
+  test("does not run the classifier synchronously for manual creates", async ({
     defaults,
     fixtures,
   }) => {
     config.OPENAI_API_KEY = "test-key";
 
     const brand = await fixtures.Entity({ name: "Yamazaki" });
-    const existingBottle = await fixtures.Bottle({
+    classifyBottleReferenceMock.mockRejectedValue(
+      new Error("classifier should not run in the request path"),
+    );
+
+    const data = await routerClient.bottles.create(
+      {
+        name: "Yamazaki 12-year-old",
+        brand: brand.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data.id).toBeDefined();
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    expect(queueBottleCreationVerificationMock).toHaveBeenCalledWith({
+      bottleId: data.id,
+      creationSource: "manual_entry",
+    });
+  });
+
+  test("rejects exact duplicate bottle aliases without the classifier", async ({
+    defaults,
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = "test-key";
+
+    const brand = await fixtures.Entity({ name: "Yamazaki" });
+    await fixtures.Bottle({
       brandId: brand.id,
       name: "12-year-old",
       statedAge: 12,
-    });
-    classifyBottleReferenceMock.mockResolvedValue({
-      status: "classified",
-      decision: {
-        action: "match",
-        confidence: 85,
-        matchedBottleId: existingBottle.id,
-      },
     });
 
     const err = await waitError(
@@ -539,56 +558,7 @@ describe("POST /bottles", () => {
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Bottle already exists.]`);
-    expect(classifyBottleReferenceMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        candidateExpansion: "open",
-        extractedIdentity: expect.objectContaining({
-          brand: "Yamazaki",
-          expression: "12-year-old",
-          stated_age: 12,
-        }),
-        reference: expect.objectContaining({
-          name: "Yamazaki 12-year-old",
-        }),
-      }),
-    );
-  });
-
-  test("rejects manual creates when the classifier sees a release", async ({
-    defaults,
-    fixtures,
-  }) => {
-    config.OPENAI_API_KEY = "test-key";
-
-    const brand = await fixtures.Entity({ name: "Springbank" });
-    const parentBottle = await fixtures.Bottle({
-      brandId: brand.id,
-      name: "Local Barley",
-    });
-    classifyBottleReferenceMock.mockResolvedValue({
-      status: "classified",
-      decision: {
-        action: "create_release",
-        confidence: 88,
-        parentBottleId: parentBottle.id,
-      },
-    });
-
-    const err = await waitError(
-      routerClient.bottles.create(
-        {
-          name: "Local Barley 2024 57.2%",
-          brand: brand.id,
-          releaseYear: 2024,
-          abv: 57.2,
-        },
-        { context: { user: defaults.user } },
-      ),
-    );
-
-    expect(err).toMatchInlineSnapshot(
-      `[Error: This looks like a specific release of an existing bottle. Add it as a bottling instead of a new bottle.]`,
-    );
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
   test("updates statedAge bottle w/ age signal", async ({

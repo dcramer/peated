@@ -54,7 +54,11 @@ export default procedure
       });
     }
 
-    if (targetBottle.createdById !== context.user.id && !context.user.admin) {
+    if (
+      targetBottle.createdById !== context.user.id &&
+      !context.user.admin &&
+      !context.user.mod
+    ) {
       throw errors.FORBIDDEN({
         message: "You don't have permission to update this bottle.",
       });

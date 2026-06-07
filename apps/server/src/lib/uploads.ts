@@ -180,7 +180,11 @@ export const storeFile = async ({
                 name: newFilename,
               },
               async () => {
-                const writeStream = file.createWriteStream();
+                // Current callers pass processed image streams; avoid GCS
+                // resumable-session startup for these small writes.
+                const writeStream = file.createWriteStream({
+                  resumable: false,
+                });
                 await pipeline(stream, writeStream);
               },
             );
