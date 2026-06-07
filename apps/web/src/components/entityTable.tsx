@@ -56,7 +56,7 @@ export default function EntityTable({
         {
           name: "bottles",
           value: (item) => item.totalBottles.toLocaleString(),
-          className: "sm:w-1/10",
+          className: "sm:w-[10%]",
           sortDefaultOrder: "desc",
         },
         ...(withTastings
@@ -64,7 +64,7 @@ export default function EntityTable({
               {
                 name: "tastings",
                 value: (item) => item.totalTastings.toLocaleString(),
-                className: "sm:w-1/10",
+                className: "sm:w-[10%]",
                 sortDefaultOrder: "desc",
               },
             ] as Column<Entity>[])
@@ -97,7 +97,7 @@ export default function EntityTable({
                     )}
                   </>
                 ),
-                className: "sm:w-3/10",
+                className: "sm:w-[30%]",
                 sortDefaultOrder: "desc",
               },
             ] as Column<Entity>[])
