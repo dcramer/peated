@@ -8,13 +8,13 @@ export default {
         ? "development"
         : "test",
   DEBUG: !!process.env.DEBUG,
-  PORT: process.env.PORT || 4000,
+  PORT: Number(process.env.PORT || "4300"),
   HOST: process.env.HOST || "localhost",
-  CORS_HOST: process.env.CORS_HOST || "http://localhost:3000",
+  CORS_HOST: process.env.CORS_HOST || "http://localhost:3200",
   JWT_SECRET: process.env.JWT_SECRET || "",
-  API_SERVER: process.env.API_SERVER || "http://localhost:4000",
-  URL_PREFIX: process.env.URL_PREFIX || "http://localhost:3000",
-  REDIS_URL: process.env.REDIS_URL || "redis://@localhost:6379",
+  API_SERVER: process.env.API_SERVER || "http://localhost:4300",
+  URL_PREFIX: process.env.URL_PREFIX || "http://localhost:3200",
+  REDIS_URL: process.env.REDIS_URL || "redis://@localhost:16379",
 
   SKIP_EMAIL_VERIFICATION: !!process.env.SKIP_EMAIL_VERIFICATION,
 

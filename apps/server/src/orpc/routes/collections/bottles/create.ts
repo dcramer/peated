@@ -6,7 +6,11 @@ import {
   collections,
 } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
-import { getDefaultCollection } from "@peated/server/lib/db";
+import {
+  getReservedCollection,
+  isReservedCollectionSlug,
+  reservedCollectionSlugs,
+} from "@peated/server/lib/db";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -29,7 +33,7 @@ export default procedure
   })
   .input(
     CollectionBottleInputSchema.extend({
-      collection: z.union([z.literal("default"), z.coerce.number()]),
+      collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
       user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
     }),
   )
@@ -48,13 +52,14 @@ export default procedure
       });
     }
 
-    const collection =
-      input.collection === "default"
-        ? await getDefaultCollection(db, user.id)
-        : await db.query.collections.findFirst({
-            where: (collections, { eq }) =>
-              eq(collections.id, input.collection as number),
-          });
+    const collection = isReservedCollectionSlug(input.collection)
+      ? await getReservedCollection(db, user.id, input.collection, {
+          create: true,
+        })
+      : await db.query.collections.findFirst({
+          where: (collections, { eq }) =>
+            eq(collections.id, input.collection as number),
+        });
 
     if (!collection) {
       throw errors.NOT_FOUND({

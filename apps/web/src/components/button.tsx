@@ -21,6 +21,7 @@ type BaseProps = {
   fullHeight?: boolean;
   className?: string;
   title?: string;
+  [dataAttribute: `data-${string}`]: string | number | boolean | undefined;
 };
 
 type ConditionalProps =

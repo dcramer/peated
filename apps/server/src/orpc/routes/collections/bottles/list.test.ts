@@ -21,6 +21,24 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     expect(err).toMatchInlineSnapshot(`[Error: User's profile is private.]`);
   });
 
+  test("cannot list private library without friend", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const otherUser = await fixtures.User({ private: true });
+
+    const err = await waitError(() =>
+      routerClient.collections.bottles.list(
+        {
+          user: otherUser.id,
+          collection: "library",
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(`[Error: User's profile is private.]`);
+  });
+
   test("can list private with friend", async ({ defaults, fixtures }) => {
     const otherUser = await fixtures.User({ private: true });
     await fixtures.Follow({
@@ -105,6 +123,160 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     expect(bottle2Result).toBeDefined();
     expect(bottle1Result?.bottle.name).toBe(bottle1.name);
     expect(bottle2Result?.bottle.name).toBe(bottle2.name);
+  });
+
+  test("can list own library bottles with me parameter", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle1 = await fixtures.Bottle();
+    const bottle2 = await fixtures.Bottle();
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: libraryCollection.id,
+        bottleId: bottle1.id,
+        releaseId: null,
+      },
+      {
+        collectionId: libraryCollection.id,
+        bottleId: bottle2.id,
+        releaseId: null,
+      },
+    ]);
+
+    const { results } = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "library",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(results.map((r) => r.bottle.id).sort()).toEqual(
+      [bottle1.id, bottle2.id].sort(),
+    );
+  });
+
+  test("lists legacy non-library collection for default alias", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const favoriteBottle = await fixtures.Bottle();
+    const libraryBottle = await fixtures.Bottle();
+    const legacyCollection = await fixtures.Collection({
+      name: "Personal Favorites",
+      createdById: defaults.user.id,
+    });
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: legacyCollection.id,
+        bottleId: favoriteBottle.id,
+        releaseId: null,
+      },
+      {
+        collectionId: libraryCollection.id,
+        bottleId: libraryBottle.id,
+        releaseId: null,
+      },
+    ]);
+
+    const { results } = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "default",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(results.map((r) => r.bottle.id)).toEqual([favoriteBottle.id]);
+  });
+
+  test("does not create missing reserved collection on read", async ({
+    defaults,
+  }) => {
+    const { results } = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "library",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    const libraryCollection = await db.query.collections.findFirst({
+      where: (collections, { and, eq }) =>
+        and(
+          eq(collections.createdById, defaults.user.id),
+          eq(collections.name, "Library"),
+        ),
+    });
+
+    expect(results).toHaveLength(0);
+    expect(libraryCollection).toBeUndefined();
+  });
+
+  test("keeps favorites and library entries independent", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const defaultCollection = await fixtures.Collection({
+      name: "Default",
+      createdById: defaults.user.id,
+    });
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+
+    await db.insert(collectionBottles).values({
+      collectionId: defaultCollection.id,
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+
+    const favoritesOnly = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "default",
+      },
+      { context: { user: defaults.user } },
+    );
+    const emptyLibrary = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "library",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(favoritesOnly.results.map((r) => r.bottle.id)).toEqual([bottle.id]);
+    expect(emptyLibrary.results).toHaveLength(0);
+
+    await db.insert(collectionBottles).values({
+      collectionId: libraryCollection.id,
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+
+    const library = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "library",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(library.results.map((r) => r.bottle.id)).toEqual([bottle.id]);
   });
 
   test("can filter collection bottles by exact bottle", async ({

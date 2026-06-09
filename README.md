@@ -57,11 +57,15 @@ Load some mock data:
 pnpm cli mocks load-all you@example.com
 ```
 
-Run the dev server, which spins up both the `web` and the `api` services:
+Run the dev server, which spins up the `web`, API, and worker services:
 
 ```
-npm run dev
+pnpm dev
 ```
+
+The worker requires Redis. The default local Redis URL is
+`redis://@localhost:16379`, matching `docker-compose.yml`. For API-only local
+checks, use `pnpm dev:server:api`.
 
 ## Runbooks
 

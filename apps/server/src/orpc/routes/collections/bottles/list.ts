@@ -5,7 +5,11 @@ import {
   collectionBottles,
 } from "@peated/server/db/schema";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
-import { getDefaultCollection } from "@peated/server/lib/db";
+import {
+  getReservedCollection,
+  isReservedCollectionSlug,
+  reservedCollectionSlugs,
+} from "@peated/server/lib/db";
 import { procedure } from "@peated/server/orpc";
 import { CollectionBottleSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -25,7 +29,7 @@ export default procedure
   })
   .input(
     z.object({
-      collection: z.union([z.literal("default"), z.coerce.number()]),
+      collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
       user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
       bottle: z.coerce.number().optional(),
       release: z.coerce.number().optional(),
@@ -52,18 +56,30 @@ export default procedure
       });
     }
 
-    const collection =
-      input.collection === "default"
-        ? await getDefaultCollection(db, user.id)
-        : await db.query.collections.findFirst({
-            where: (collections, { and, eq }) =>
-              and(
-                eq(collections.createdById, user.id),
-                eq(collections.id, input.collection as number),
-              ),
-          });
+    const reservedCollection = isReservedCollectionSlug(input.collection)
+      ? input.collection
+      : null;
+    const collection = reservedCollection
+      ? await getReservedCollection(db, user.id, reservedCollection)
+      : await db.query.collections.findFirst({
+          where: (collections, { and, eq }) =>
+            and(
+              eq(collections.createdById, user.id),
+              eq(collections.id, input.collection as number),
+            ),
+        });
 
     if (!collection) {
+      if (reservedCollection) {
+        return {
+          results: [],
+          rel: {
+            nextCursor: null,
+            prevCursor: null,
+          },
+        };
+      }
+
       throw errors.NOT_FOUND({
         message: "Collection not found.",
       });

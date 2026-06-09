@@ -80,7 +80,14 @@ export default async function Layout({
 
         <div className="my-8 flex flex-col justify-center gap-2 sm:flex-row lg:justify-start">
           <div className="flex flex-grow justify-center gap-4 gap-x-2 lg:justify-start">
-            <Suspense fallback={<SkeletonButton className="w-10" />}>
+            <Suspense
+              fallback={
+                <>
+                  <SkeletonButton className="w-10" />
+                  <SkeletonButton className="w-10" />
+                </>
+              }
+            >
               <CollectionAction bottleId={bottle.id} />
             </Suspense>
 

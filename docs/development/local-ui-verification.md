@@ -5,15 +5,20 @@ Use this playbook when validating protected Peated web flows with
 
 ## Servers
 
-- Start the API with `pnpm dev:server`; the local API defaults to
-  `http://localhost:4000`.
-- Start the web app with `pnpm dev:web`.
-- If `localhost:3000` is occupied, use a matched fallback API/web pair so
+- Start the API and worker with `pnpm dev:server`; the local API defaults to
+  `http://localhost:4300`.
+- Start the web app with `pnpm dev:web`; the local web app defaults to
+  `http://localhost:3200`.
+- Ensure Redis is running with `docker compose up -d redis`; the local Redis
+  URL defaults to `redis://@localhost:16379`.
+- For UI checks that intentionally do not need worker jobs, use
+  `pnpm dev:server:api`.
+- If `localhost:3200` is occupied, use a matched fallback API/web pair so
   browser RPC calls pass CORS:
   - API:
-    `PORT=4001 CORS_HOST=http://localhost:3002 API_SERVER=http://localhost:4001 URL_PREFIX=http://localhost:3002 pnpm exec dotenv -e .env.local -- pnpm --filter @peated/server start:api`
+    `PORT=4301 CORS_HOST=http://localhost:3202 API_SERVER=http://localhost:4301 URL_PREFIX=http://localhost:3202 pnpm exec dotenv -e .env.local -- pnpm --filter @peated/server start:api`
   - Web:
-    `API_SERVER=http://localhost:4001 URL_PREFIX=http://localhost:3002 pnpm exec dotenv -e .env.local -- pnpm --dir apps/web exec next dev -p 3002`
+    `API_SERVER=http://localhost:4301 URL_PREFIX=http://localhost:3202 pnpm exec dotenv -e .env.local -- pnpm --dir apps/web exec next dev -p 3202`
 
 ## Login
 

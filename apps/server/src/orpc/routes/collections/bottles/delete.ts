@@ -1,7 +1,11 @@
 import { db } from "@peated/server/db";
 import { collectionBottles, collections } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
-import { getDefaultCollection } from "@peated/server/lib/db";
+import {
+  getReservedCollection,
+  isReservedCollectionSlug,
+  reservedCollectionSlugs,
+} from "@peated/server/lib/db";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -24,7 +28,7 @@ export default procedure
   })
   .input(
     CollectionBottleInputSchema.extend({
-      collection: z.union([z.coerce.number(), z.literal("default")]),
+      collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
       user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
       baseOnly: z.coerce.boolean().optional(),
     }),
@@ -44,15 +48,21 @@ export default procedure
       });
     }
 
-    const collection =
-      input.collection === "default"
-        ? await getDefaultCollection(db, context.user.id)
-        : await db.query.collections.findFirst({
-            where: (collections, { eq }) =>
-              eq(collections.id, input.collection as number),
-          });
+    const reservedCollection = isReservedCollectionSlug(input.collection)
+      ? input.collection
+      : null;
+    const collection = reservedCollection
+      ? await getReservedCollection(db, context.user.id, reservedCollection)
+      : await db.query.collections.findFirst({
+          where: (collections, { eq }) =>
+            eq(collections.id, input.collection as number),
+        });
 
     if (!collection) {
+      if (reservedCollection) {
+        return {};
+      }
+
       throw errors.NOT_FOUND({
         message: "Collection not found.",
       });

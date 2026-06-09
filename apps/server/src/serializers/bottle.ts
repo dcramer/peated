@@ -13,6 +13,7 @@ import {
   entities,
   tastings,
 } from "../db/schema";
+import { RESERVED_COLLECTIONS } from "../lib/db";
 import { notEmpty } from "../lib/filter";
 import { absoluteUrl } from "../lib/urls";
 import { type BottleSchema } from "../schemas";
@@ -119,7 +120,7 @@ export const BottleSerializer = serializer({
               .where(
                 and(
                   inArray(collectionBottles.bottleId, itemIds),
-                  sql`LOWER(${collections.name}) = 'default'`,
+                  sql`LOWER(${collections.name}) = ${RESERVED_COLLECTIONS.default.name.toLowerCase()}`,
                   eq(collections.createdById, currentUser.id),
                 ),
               )

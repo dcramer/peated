@@ -170,6 +170,14 @@ export default async function Layout({
               >
                 Favorites
               </TabItem>
+              <TabItem
+                as={Link}
+                href={`/users/${user.username}/library`}
+                controlled
+                desktopOnly
+              >
+                Library
+              </TabItem>
             </Tabs>
           </div>
           {children}

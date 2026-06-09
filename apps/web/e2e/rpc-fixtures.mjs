@@ -14,6 +14,13 @@ export const testUser = {
   mod: false,
   createdAt: timestamp,
   termsAcceptedAt: timestamp,
+  friendStatus: "none",
+  stats: {
+    tastings: 0,
+    bottles: 0,
+    collected: 0,
+    contributions: 0,
+  },
 };
 
 export const testAccessToken = "peated-playwright-access-token";
@@ -46,6 +53,7 @@ export function buildBottle({
   name = "16-year-old",
   brand = testBrand,
   totalTastings = 0,
+  people = 0,
   hasTasted = false,
 } = {}) {
   return {
@@ -87,7 +95,10 @@ export function buildBottle({
       },
     },
     totalTastings,
+    people,
     numReleases: 0,
+    lastPrice: null,
+    createdBy: null,
     createdAt: timestamp,
     updatedAt: timestamp,
     isFavorite: false,
@@ -96,6 +107,17 @@ export function buildBottle({
 }
 
 export const existingBottle = buildBottle();
+
+export function buildCollectionBottle({
+  id = 1,
+  bottle = existingBottle,
+} = {}) {
+  return {
+    id,
+    bottle,
+    release: null,
+  };
+}
 
 export function buildTasting({
   id = createdTastingId,

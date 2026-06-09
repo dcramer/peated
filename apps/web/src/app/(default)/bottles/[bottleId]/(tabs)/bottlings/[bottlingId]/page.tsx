@@ -450,7 +450,14 @@ export default async function Page({
           </div>
 
           <div className="flex flex-wrap gap-2 lg:justify-end">
-            <Suspense fallback={<SkeletonButton className="w-10" />}>
+            <Suspense
+              fallback={
+                <>
+                  <SkeletonButton className="w-10" />
+                  <SkeletonButton className="w-10" />
+                </>
+              }
+            >
               <CollectionAction bottleId={bottle.id} releaseId={bottling.id} />
             </Suspense>
             <Button
