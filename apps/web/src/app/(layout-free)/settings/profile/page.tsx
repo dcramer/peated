@@ -1,6 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { isDefinedError } from "@orpc/client";
 import { UserInputSchema } from "@peated/server/schemas";
 import BooleanField from "@peated/web/components/booleanField";
@@ -18,6 +17,7 @@ import useAuthRequired from "@peated/web/hooks/useAuthRequired";
 import { updateSession } from "@peated/web/lib/auth.actions";
 import { toBlob } from "@peated/web/lib/blobs";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";

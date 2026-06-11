@@ -1,4 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { CATEGORY_LIST } from "@peated/server/constants";
 import { CategoryCheckConfigSchema } from "@peated/server/lib/badges/checks/categoryCheck";
 import { notEmpty } from "@peated/server/lib/filter";
@@ -6,6 +5,7 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import Fieldset from "@peated/web/components/fieldset";
 import Form from "@peated/web/components/form";
 import SelectField from "@peated/web/components/selectField";
+import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";

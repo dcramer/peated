@@ -1,7 +1,6 @@
 "use client";
 
 import { BoltIcon } from "@heroicons/react/20/solid";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { CountryInputSchema } from "@peated/server/schemas";
 import { type Country } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
@@ -10,6 +9,7 @@ import FormScreen from "@peated/web/components/formScreen";
 import TextField from "@peated/web/components/textField";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";

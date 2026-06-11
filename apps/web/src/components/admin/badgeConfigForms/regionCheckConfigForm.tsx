@@ -1,10 +1,10 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { RegionCheckConfigSchema } from "@peated/server/lib/badges/checks/regionCheck";
 import CountryField from "@peated/web/components/countryField";
 import Fieldset from "@peated/web/components/fieldset";
 import Form from "@peated/web/components/form";
 import RegionField from "@peated/web/components/regionField";
 import type { Option } from "@peated/web/components/selectField";
+import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";

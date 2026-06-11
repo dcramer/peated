@@ -1,5 +1,7 @@
 import { expect, type Locator, type Page, test } from "@playwright/test";
 
+import { expectNoHorizontalOverflow } from "./assertions";
+
 type LoadingRoute = {
   columns: number;
   desktopColumnWidthRatios?: number[];
@@ -71,20 +73,6 @@ test.describe("list route loading fallbacks", () => {
     });
   }
 });
-
-async function expectNoHorizontalOverflow(page: Page) {
-  await expect
-    .poll(
-      () =>
-        page.evaluate(
-          () =>
-            document.documentElement.scrollWidth -
-            document.documentElement.clientWidth,
-        ),
-      { message: "page should not create horizontal overflow" },
-    )
-    .toBeLessThanOrEqual(1);
-}
 
 function isDesktop(page: Page) {
   return (page.viewportSize()?.width ?? 0) >= 640;

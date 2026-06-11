@@ -1,4 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { CASK_FILLS, CASK_SIZES, CASK_TYPES } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { BottleReleaseInputSchema } from "@peated/server/schemas";
@@ -10,6 +9,7 @@ import FormScreen from "@peated/web/components/formScreen";
 import SelectField from "@peated/web/components/selectField";
 import TextField from "@peated/web/components/textField";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
+import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";

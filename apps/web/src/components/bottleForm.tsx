@@ -1,7 +1,6 @@
 "use client";
 
 import { BoltIcon } from "@heroicons/react/20/solid";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   CASK_FILLS,
   CASK_SIZES,
@@ -36,6 +35,7 @@ import {
   toOptionList,
 } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

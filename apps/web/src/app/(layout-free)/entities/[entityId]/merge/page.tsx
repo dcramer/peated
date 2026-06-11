@@ -1,6 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { EntityMergeSchema } from "@peated/server/schemas";
 import ChoiceField from "@peated/web/components/choiceField";
 import EntityField from "@peated/web/components/entityField";
@@ -13,6 +12,7 @@ import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { zodResolver } from "@peated/web/lib/zodResolver";
 import {
   useMutation,
   useQueryClient,
