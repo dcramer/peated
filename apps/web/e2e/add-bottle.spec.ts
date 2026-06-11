@@ -1,16 +1,14 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
+import { expectNoHorizontalOverflow } from "./assertions";
 import {
   createdBottleId,
   createdBottleName,
-  createdTastingId,
-  existingBottle,
-  tastingNotes,
   testBrand,
 } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
-test.describe("entry flows", () => {
+test.describe("add bottle", () => {
   test("adds a bottle with an existing fixture brand", async ({
     context,
     page,
@@ -43,36 +41,27 @@ test.describe("entry flows", () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test("records a tasting for a fixture bottle", async ({ context, page }) => {
+  test("shows validation when saving without a brand", async ({
+    context,
+    page,
+  }) => {
+    const pageErrors: Error[] = [];
+    page.on("pageerror", (error) => pageErrors.push(error));
+
     await signIn(context);
 
-    await page.goto(`/bottles/${existingBottle.id}/addTasting`);
+    await page.goto(`/addBottle?name=${encodeURIComponent("Hogback")}`);
 
     await expect(
-      page.getByRole("heading", { name: "Record Tasting" }),
+      page.getByRole("heading", { name: "Add Bottle" }),
     ).toBeVisible();
-    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
-
-    await page.getByRole("button", { name: "Savor" }).click();
-    await page.getByLabel("Comments").fill(tastingNotes);
     await page.getByRole("button", { name: "Save" }).click();
 
-    await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
-    await expect(page.getByText(tastingNotes)).toBeVisible();
+    await expect(page.getByText("Brand is required.")).toBeVisible();
+    await page.getByText("e.g. Laphroaig").click();
+    await expect(page.getByPlaceholder("Search")).toBeVisible();
+    await expect(page).toHaveURL(/\/addBottle\?name=Hogback$/);
+    expect(pageErrors).toEqual([]);
     await expectNoHorizontalOverflow(page);
   });
 });
-
-async function expectNoHorizontalOverflow(page: Page) {
-  await expect
-    .poll(
-      () =>
-        page.evaluate(
-          () =>
-            document.documentElement.scrollWidth -
-            document.documentElement.clientWidth,
-        ),
-      { message: "page should not create horizontal overflow" },
-    )
-    .toBeLessThanOrEqual(1);
-}

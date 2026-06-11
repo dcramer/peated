@@ -1,6 +1,6 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { BottleSeriesInputSchema } from "@peated/server/schemas";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import Fieldset from "./fieldset";

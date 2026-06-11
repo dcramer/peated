@@ -1,5 +1,4 @@
 import { BoltIcon } from "@heroicons/react/20/solid";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { type Entity } from "@peated/server/types";
@@ -13,6 +12,7 @@ import TextField from "@peated/web/components/textField";
 import useAuth from "@peated/web/hooks/useAuth";
 import { getFormErrorMessage, toOption } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";

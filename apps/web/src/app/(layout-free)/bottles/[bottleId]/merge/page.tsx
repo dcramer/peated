@@ -1,6 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { BottleMergeSchema } from "@peated/server/schemas";
 import BottleField from "@peated/web/components/bottleField";
 import ChoiceField from "@peated/web/components/choiceField";
@@ -14,6 +13,7 @@ import Layout from "@peated/web/components/layout";
 import type { Option } from "@peated/web/components/selectField";
 import { useModRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { zodResolver } from "@peated/web/lib/zodResolver";
 import {
   useMutation,
   useQuery,

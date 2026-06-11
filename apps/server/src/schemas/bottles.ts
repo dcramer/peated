@@ -201,6 +201,13 @@ const EntityChoice = z.union([
   }),
   z.number(),
 ]);
+const BrandChoice = z
+  .union([EntityChoice, z.null(), z.undefined()])
+  .refine(
+    (value): value is z.infer<typeof EntityChoice> =>
+      value !== null && value !== undefined,
+    { message: "Brand is required." },
+  );
 
 export const BottleInputSchema = BottleSchema.omit({
   id: true,
@@ -232,7 +239,7 @@ export const BottleInputSchema = BottleSchema.omit({
     .nullable()
     .default(null)
     .optional(),
-  brand: EntityChoice,
+  brand: BrandChoice,
   distillers: z.array(EntityChoice).default([]).optional(),
   bottler: EntityChoice.nullable().default(null).optional(),
   image: z.null().optional().describe("Optional image upload for the bottle"),

@@ -1,6 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { EventInputSchema } from "@peated/server/schemas";
 import { type Event } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
@@ -8,6 +7,7 @@ import FormError from "@peated/web/components/formError";
 import FormScreen from "@peated/web/components/formScreen";
 import TextField from "@peated/web/components/textField";
 import { getFormErrorMessage, toOption } from "@peated/web/lib/formHelpers";
+import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";

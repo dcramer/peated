@@ -1,6 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   BADGE_CHECK_TYPE_LIST,
   BADGE_FORMULA_LIST,
@@ -16,6 +15,7 @@ import FormError from "@peated/web/components/formError";
 import FormScreen from "@peated/web/components/formScreen";
 import TextField from "@peated/web/components/textField";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
+import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";

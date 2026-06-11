@@ -1,8 +1,8 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { CASK_FILLS, CASK_SIZES, CASK_TYPES } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { BottleReleaseInputSchema } from "@peated/server/schemas";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { zodResolver } from "@peated/web/lib/zodResolver";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import BooleanField from "./booleanField";

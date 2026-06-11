@@ -1,9 +1,9 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { BottleCheckConfigSchema } from "@peated/server/lib/badges/checks/bottleCheck";
 import BottleField from "@peated/web/components/bottleField";
 import Fieldset from "@peated/web/components/fieldset";
 import Form from "@peated/web/components/form";
 import type { Option } from "@peated/web/components/selectField";
+import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
