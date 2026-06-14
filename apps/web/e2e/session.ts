@@ -7,11 +7,21 @@ export const sessionSecret =
   process.env.SESSION_SECRET ??
   "peated-playwright-session-secret-for-local-browser-tests";
 
-export async function signIn(context: BrowserContext) {
+/**
+ * Seal a local iron-session cookie for e2e tests. Token/user overrides let
+ * specs isolate mock API state while exercising the real session reader.
+ */
+export async function signIn(
+  context: BrowserContext,
+  {
+    accessToken = testAccessToken,
+    user = testUser,
+  }: { accessToken?: string; user?: typeof testUser } = {},
+) {
   const value = await sealData(
     {
-      user: testUser,
-      accessToken: testAccessToken,
+      user,
+      accessToken,
       ts: Date.now(),
     },
     {

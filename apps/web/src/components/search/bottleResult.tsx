@@ -1,7 +1,7 @@
-import { CheckBadgeIcon, StarIcon } from "@heroicons/react/24/outline";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
+import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import { formatBottlingCountLabel } from "@peated/web/lib/bottlings";
 import { type ReactNode } from "react";
@@ -53,12 +53,7 @@ export default function BottleResultRow({
               )}
             </div>
           </Link>
-          {bottle.isFavorite && (
-            <StarIcon className="h-4 w-4" aria-hidden="true" />
-          )}
-          {bottle.hasTasted && (
-            <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
-          )}
+          <BottleStatusIcons bottle={bottle} />
         </div>
         <div className="text-muted mt-1 flex gap-x-1 truncate text-sm leading-5">
           {metadata.length ? (

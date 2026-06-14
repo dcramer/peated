@@ -52,6 +52,41 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
     expect(updatedCollection.totalBottles).toBe(0);
   });
 
+  test("delete bottle from library", async ({ fixtures, defaults }) => {
+    const bottle = await fixtures.Bottle();
+    const collection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+      totalBottles: 1,
+    });
+    await db.insert(collectionBottles).values({
+      bottleId: bottle.id,
+      collectionId: collection.id,
+    });
+
+    await routerClient.collections.bottles.delete(
+      {
+        user: "me",
+        collection: "library",
+        bottle: bottle.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    const bottleList = await db
+      .select()
+      .from(collectionBottles)
+      .where(eq(collectionBottles.bottleId, bottle.id));
+
+    expect(bottleList).toHaveLength(0);
+
+    const [updatedCollection] = await db
+      .select()
+      .from(collections)
+      .where(eq(collections.id, collection.id));
+    expect(updatedCollection.totalBottles).toBe(0);
+  });
+
   test("delete bottle with release", async ({ fixtures, defaults }) => {
     const bottle = await fixtures.Bottle();
     const release = await fixtures.BottleRelease({ bottleId: bottle.id });
@@ -290,5 +325,53 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
       .from(collectionBottles)
       .where(eq(collectionBottles.bottleId, bottle.id));
     expect(bottleList.length).toBe(0);
+  });
+
+  test("deleting from missing library is a no-op", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle();
+
+    await routerClient.collections.bottles.delete(
+      {
+        user: "me",
+        collection: "library",
+        bottle: bottle.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    const libraryCollection = await db.query.collections.findFirst({
+      where: (collections, { and, eq }) =>
+        and(
+          eq(collections.createdById, defaults.user.id),
+          eq(collections.name, "Library"),
+        ),
+    });
+
+    expect(libraryCollection).toBeUndefined();
+  });
+
+  test("prevents deleting from another user's library", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const otherUser = await fixtures.User();
+
+    const err = await waitError(() =>
+      routerClient.collections.bottles.delete(
+        {
+          user: otherUser.id,
+          collection: "library",
+          bottle: bottle.id,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Cannot modify another user's collection.]`,
+    );
   });
 });

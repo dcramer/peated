@@ -1,11 +1,11 @@
 import { normalizeEntityName } from "@peated/bottle-classifier/normalize";
 import { type CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import type { InferSelectModel, Table } from "drizzle-orm";
-import { and, eq, getTableColumns, inArray, sql } from "drizzle-orm";
+import { and, eq, getTableColumns, inArray, ne, sql } from "drizzle-orm";
 import type { PgTableWithColumns, TableConfig } from "drizzle-orm/pg-core";
 import { type z } from "zod";
 import type { AnyDatabase } from "../db";
-import type { BottleAlias, Entity, EntityType } from "../db/schema";
+import type { BottleAlias, Collection, Entity, EntityType } from "../db/schema";
 import {
   bottleAliases,
   changes,
@@ -24,6 +24,32 @@ export type UpsertOutcome<T> =
       created: boolean;
     }
   | undefined;
+
+export const reservedCollectionSlugs = ["default", "library"] as const;
+
+export type ReservedCollectionSlug = (typeof reservedCollectionSlugs)[number];
+export type ReservedCollection = Pick<Collection, "id" | "createdById">;
+
+export const RESERVED_COLLECTIONS: Record<
+  ReservedCollectionSlug,
+  {
+    name: string;
+  }
+> = {
+  // `default` is the historical API token for the user-facing Favorites list.
+  default: {
+    name: "Default",
+  },
+  library: {
+    name: "Library",
+  },
+};
+
+export function isReservedCollectionSlug(
+  value: unknown,
+): value is ReservedCollectionSlug {
+  return reservedCollectionSlugs.includes(value as ReservedCollectionSlug);
+}
 
 export function coerceToUpsert({
   country,
@@ -340,16 +366,46 @@ export const upsertEntity = async ({
   throw new Error("We should never hit this case in upsert");
 };
 
-export const getDefaultCollection = async (db: AnyDatabase, userId: number) => {
-  return (
+/**
+ * Resolve a reserved saved-bottle collection alias for a user. Writes can opt
+ * into creation; reads stay lookup-only. The historical `default` alias keeps a
+ * compatibility fallback to the user's earliest non-Library collection.
+ */
+export const getReservedCollection = async (
+  db: AnyDatabase,
+  userId: number,
+  slug: ReservedCollectionSlug,
+  { create = false }: { create?: boolean } = {},
+): Promise<ReservedCollection | null> => {
+  const collectionConfig = RESERVED_COLLECTIONS[slug];
+  const collection =
     (await db.query.collections.findFirst({
-      where: (collections, { eq }) => eq(collections.createdById, userId),
-    })) ||
+      where: (collections, { and, eq }) =>
+        and(
+          eq(collections.createdById, userId),
+          sql`LOWER(${collections.name}) = ${collectionConfig.name.toLowerCase()}`,
+        ),
+    })) || null;
+
+  if (collection || !create) {
+    return (
+      collection ||
+      (slug === "default" ? await getLegacyDefaultCollection(db, userId) : null)
+    );
+  }
+
+  const legacyDefault =
+    slug === "default" ? await getLegacyDefaultCollection(db, userId) : null;
+  if (legacyDefault) {
+    return legacyDefault;
+  }
+
+  return (
     (
       await db
         .insert(collections)
         .values({
-          name: "Default",
+          name: collectionConfig.name,
           createdById: userId,
         })
         .onConflictDoNothing()
@@ -359,11 +415,39 @@ export const getDefaultCollection = async (db: AnyDatabase, userId: number) => {
       where: (collections, { eq }) =>
         and(
           eq(collections.createdById, userId),
-          sql`LOWER(${collections.name}) = 'default'`,
+          sql`LOWER(${collections.name}) = ${collectionConfig.name.toLowerCase()}`,
         ),
-    }))
+    })) ||
+    null
   );
 };
+
+export const getDefaultCollection = async (
+  db: AnyDatabase,
+  userId: number,
+): Promise<ReservedCollection | null> =>
+  getReservedCollection(db, userId, "default", { create: true });
+
+async function getLegacyDefaultCollection(
+  db: AnyDatabase,
+  userId: number,
+): Promise<ReservedCollection | null> {
+  // Preserve the historical `default` behavior for users whose earliest
+  // non-Library collection predates the reserved backing name.
+  return (
+    (await db.query.collections.findFirst({
+      where: (collections, { and, eq }) =>
+        and(
+          eq(collections.createdById, userId),
+          ne(
+            sql`LOWER(${collections.name})`,
+            RESERVED_COLLECTIONS.library.name.toLowerCase(),
+          ),
+        ),
+      orderBy: (collections, { asc }) => asc(collections.id),
+    })) || null
+  );
+}
 
 export async function upsertBottleAlias(
   db: AnyDatabase,

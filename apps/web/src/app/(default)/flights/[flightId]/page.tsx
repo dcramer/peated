@@ -1,9 +1,9 @@
 "use client";
 
-import { CheckBadgeIcon } from "@heroicons/react/20/solid";
-import { ArrowsPointingOutIcon, StarIcon } from "@heroicons/react/24/outline";
+import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
 import { formatCategoryName } from "@peated/server/lib/format";
 import BottleLink from "@peated/web/components/bottleLink";
+import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Button from "@peated/web/components/button";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -70,12 +70,7 @@ export default function Page({
                   />
                   <div className="flex items-center gap-x-1 group-hover:underline">
                     <div className="font-semibold">{bottle.fullName}</div>
-                    {bottle.isFavorite && (
-                      <StarIcon className="h-4 w-4" aria-hidden="true" />
-                    )}
-                    {bottle.hasTasted && (
-                      <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
-                    )}
+                    <BottleStatusIcons bottle={bottle} />
                   </div>
                   <div className="text-muted text-sm">
                     {formatCategoryName(bottle.category)}

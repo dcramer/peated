@@ -1,9 +1,9 @@
 import { db } from "@peated/server/db";
-import { collectionBottles } from "@peated/server/db/schema";
+import { collectionBottles, collections } from "@peated/server/db/schema";
 import { getDefaultCollection } from "@peated/server/lib/db";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("POST /users/:user/collections/:collection/bottles", () => {
@@ -36,6 +36,78 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
       .where(eq(collectionBottles.bottleId, bottle.id));
 
     expect(bottleList.length).toBe(1);
+  });
+
+  test("adds bottle to library collection", async ({ fixtures, defaults }) => {
+    const bottle = await fixtures.Bottle();
+
+    await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "library",
+        bottle: bottle.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    const libraryCollection = await db.query.collections.findFirst({
+      where: (collections, { and, eq }) =>
+        and(
+          eq(collections.createdById, defaults.user.id),
+          eq(collections.name, "Library"),
+        ),
+    });
+    if (!libraryCollection) {
+      throw new Error("Library collection not found");
+    }
+
+    const bottleList = await db
+      .select()
+      .from(collectionBottles)
+      .where(eq(collectionBottles.bottleId, bottle.id));
+
+    expect(bottleList).toHaveLength(1);
+    expect(bottleList[0].collectionId).toBe(libraryCollection.id);
+  });
+
+  test("uses legacy non-library collection for default alias", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const legacyCollection = await fixtures.Collection({
+      name: "Personal Favorites",
+      createdById: defaults.user.id,
+    });
+    await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const bottle = await fixtures.Bottle();
+
+    await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "default",
+        bottle: bottle.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    const bottleList = await db
+      .select()
+      .from(collectionBottles)
+      .where(eq(collectionBottles.bottleId, bottle.id));
+    const defaultCollection = await db.query.collections.findFirst({
+      where: (collections, { and, eq }) =>
+        and(
+          eq(collections.createdById, defaults.user.id),
+          eq(collections.name, "Default"),
+        ),
+    });
+
+    expect(bottleList).toHaveLength(1);
+    expect(bottleList[0].collectionId).toBe(legacyCollection.id);
+    expect(defaultCollection).toBeUndefined();
   });
 
   test("adds multiple bottles without releases to default collection", async ({
@@ -107,6 +179,32 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
       .where(eq(collectionBottles.bottleId, bottle.id));
 
     expect(bottleList.length).toBe(1);
+    expect(bottleList[0].releaseId).toBe(release.id);
+  });
+
+  test("adds bottle with release to library collection", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+
+    await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "library",
+        bottle: bottle.id,
+        release: release.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    const bottleList = await db
+      .select()
+      .from(collectionBottles)
+      .where(eq(collectionBottles.bottleId, bottle.id));
+
+    expect(bottleList).toHaveLength(1);
     expect(bottleList[0].releaseId).toBe(release.id);
   });
 
@@ -219,5 +317,71 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
     expect(err).toMatchInlineSnapshot(
       `[Error: Cannot modify another user's collection.]`,
     );
+  });
+
+  test("prevents modifying another user's library", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const otherUser = await fixtures.User();
+
+    const err = await waitError(() =>
+      routerClient.collections.bottles.create(
+        {
+          user: otherUser.id,
+          collection: "library",
+          bottle: bottle.id,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Cannot modify another user's collection.]`,
+    );
+  });
+
+  test("resolves default and library by reserved name", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const defaultCollection = await fixtures.Collection({
+      name: "Default",
+      createdById: defaults.user.id,
+    });
+    const favoriteBottle = await fixtures.Bottle();
+    const libraryBottle = await fixtures.Bottle();
+
+    await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "default",
+        bottle: favoriteBottle.id,
+      },
+      { context: { user: defaults.user } },
+    );
+    await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "library",
+        bottle: libraryBottle.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    const bottleList = await db.select().from(collectionBottles);
+
+    expect(
+      bottleList.find((item) => item.bottleId === favoriteBottle.id)
+        ?.collectionId,
+    ).toBe(defaultCollection.id);
+    expect(
+      bottleList.find((item) => item.bottleId === libraryBottle.id)
+        ?.collectionId,
+    ).toBe(libraryCollection.id);
   });
 });

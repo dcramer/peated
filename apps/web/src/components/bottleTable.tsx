@@ -1,6 +1,5 @@
 "use client";
 
-import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type {
   Bottle,
@@ -8,6 +7,7 @@ import type {
   CollectionBottle,
   PagingRel,
 } from "@peated/server/types";
+import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import type { ComponentProps } from "react";
 import { formatBottlingName } from "../lib/bottlings";
@@ -63,12 +63,7 @@ export default function BottleTable({
                     {item.bottle.brand.shortName || item.bottle.brand.name}{" "}
                     {item.bottle.name}
                   </BottleLink>
-                  {item.bottle.isFavorite && (
-                    <StarIcon className="h-4 w-4" aria-hidden="true" />
-                  )}
-                  {item.bottle.hasTasted && (
-                    <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
-                  )}
+                  <BottleStatusIcons bottle={item.bottle} />
                   {!item.release && item.bottle.singleCask && (
                     <SingleCaskChip />
                   )}

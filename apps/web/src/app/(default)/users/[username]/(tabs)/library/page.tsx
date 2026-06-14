@@ -5,7 +5,7 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function UserFavorites({
+export default function UserLibrary({
   params: { username },
 }: {
   params: { username: string };
@@ -15,7 +15,7 @@ export default function UserFavorites({
     orpc.collections.bottles.list.queryOptions({
       input: {
         user: username,
-        collection: "default",
+        collection: "library",
       },
     }),
   );
@@ -23,6 +23,6 @@ export default function UserFavorites({
   return bottles.results.length ? (
     <BottleTable bottleList={bottles.results} rel={bottles.rel} />
   ) : (
-    <EmptyActivity>No favorites recorded yet.</EmptyActivity>
+    <EmptyActivity>No library bottles recorded yet.</EmptyActivity>
   );
 }

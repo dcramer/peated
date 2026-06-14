@@ -64,7 +64,7 @@ Useful overrides:
 ```shell
 PLAYWRIGHT_PORT=3201 pnpm test:e2e
 PLAYWRIGHT_API_PORT=5000 pnpm test:e2e
-PLAYWRIGHT_BASE_URL=http://127.0.0.1:3000 pnpm test:e2e
+PLAYWRIGHT_BASE_URL=http://127.0.0.1:3200 pnpm test:e2e
 ```
 
 `PLAYWRIGHT_BASE_URL` skips starting Next, so only use it when an equivalent

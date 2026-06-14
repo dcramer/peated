@@ -13,6 +13,7 @@ import {
   entities,
   tastings,
 } from "../db/schema";
+import { getReservedCollection, type ReservedCollectionSlug } from "../lib/db";
 import { notEmpty } from "../lib/filter";
 import { absoluteUrl } from "../lib/urls";
 import { type BottleSchema } from "../schemas";
@@ -21,6 +22,7 @@ import { EntitySerializer } from "./entity";
 
 type Attrs = {
   isFavorite: boolean;
+  isLibrary: boolean;
   hasTasted: boolean;
   numReleases: number;
   brand: ReturnType<(typeof EntitySerializer)["item"]>;
@@ -106,26 +108,41 @@ export const BottleSerializer = serializer({
       else distillersByBottleId[d.bottleId].push(entitiesById[d.distillerId]);
     });
 
-    const favoriteSet = currentUser
-      ? new Set(
-          (
-            await db
-              .selectDistinct({ bottleId: collectionBottles.bottleId })
-              .from(collectionBottles)
-              .innerJoin(
-                collections,
-                eq(collectionBottles.collectionId, collections.id),
-              )
-              .where(
-                and(
-                  inArray(collectionBottles.bottleId, itemIds),
-                  sql`LOWER(${collections.name}) = 'default'`,
-                  eq(collections.createdById, currentUser.id),
-                ),
-              )
-          ).map((r) => r.bottleId),
-        )
-      : new Set();
+    const getReservedCollectionBottleSet = async (
+      collectionSlug: ReservedCollectionSlug,
+    ) => {
+      if (!currentUser || !itemIds.length) {
+        return new Set<number>();
+      }
+
+      const collection = await getReservedCollection(
+        db,
+        currentUser.id,
+        collectionSlug,
+      );
+      if (!collection) {
+        return new Set<number>();
+      }
+
+      return new Set(
+        (
+          await db
+            .selectDistinct({ bottleId: collectionBottles.bottleId })
+            .from(collectionBottles)
+            .where(
+              and(
+                inArray(collectionBottles.bottleId, itemIds),
+                eq(collectionBottles.collectionId, collection.id),
+              ),
+            )
+        ).map((r) => r.bottleId),
+      );
+    };
+
+    const [favoriteSet, librarySet] = await Promise.all([
+      getReservedCollectionBottleSet("default"),
+      getReservedCollectionBottleSet("library"),
+    ]);
 
     // identify bottles which have a tasting recorded for the current user
     // note: this is contextual based on the query - if they're asking for a flight,
@@ -163,6 +180,7 @@ export const BottleSerializer = serializer({
           item.id,
           {
             isFavorite: favoriteSet.has(item.id),
+            isLibrary: librarySet.has(item.id),
             hasTasted: tastedSet.has(item.id),
             numReleases: releaseCountByBottleId[item.id] ?? 0,
             brand: entitiesById[item.brandId],
@@ -223,6 +241,7 @@ export const BottleSerializer = serializer({
 
       suggestedTags: item.suggestedTags,
       isFavorite: attrs.isFavorite,
+      isLibrary: attrs.isLibrary,
       hasTasted: attrs.hasTasted,
 
       createdAt: item.createdAt.toISOString(),

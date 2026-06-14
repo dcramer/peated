@@ -1,10 +1,10 @@
 "use client";
 
-import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/lib/format";
 import { type Currency } from "@peated/server/types";
 import BetaNotice from "@peated/web/components/betaNotice";
 import BottleLink from "@peated/web/components/bottleLink";
+import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import Price from "@peated/web/components/price";
 import classNames from "@peated/web/lib/classNames";
@@ -64,15 +64,7 @@ export default function PriceChanges() {
                       >
                         {bottle.fullName}
                       </BottleLink>
-                      {bottle.isFavorite && (
-                        <StarIcon className="h-4 w-4" aria-hidden="true" />
-                      )}
-                      {bottle.hasTasted && (
-                        <CheckBadgeIcon
-                          className="h-4 w-4"
-                          aria-hidden="true"
-                        />
-                      )}
+                      <BottleStatusIcons bottle={bottle} />
                     </div>
                     {!!bottle.category && (
                       <div className="text-muted text-sm">

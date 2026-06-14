@@ -189,6 +189,12 @@ export const BottleSchema = z.object({
     .boolean()
     .readonly()
     .describe("Whether the current user has marked this bottle as a favorite"),
+  isLibrary: z
+    .boolean()
+    .readonly()
+    .describe(
+      "Whether the current user has saved this bottle to their library",
+    ),
   hasTasted: z
     .boolean()
     .readonly()
@@ -219,6 +225,7 @@ export const BottleInputSchema = BottleSchema.omit({
   createdAt: true,
   updatedAt: true,
   isFavorite: true,
+  isLibrary: true,
   hasTasted: true,
   numReleases: true,
 }).extend({

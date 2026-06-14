@@ -51,6 +51,7 @@
     "VERCEL_URL",
     "CORS_HOST",
     "DATABASE_URL",
+    "REDIS_URL",
     "JWT_SECRET",
     "SESSION_SECRET",
     "GOOGLE_CLIENT_SECRET",

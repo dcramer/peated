@@ -39,7 +39,7 @@ describe("POST /auth/passkey/authenticate/verify", () => {
           JSON.stringify({
             type: "webauthn.get",
             challenge: "test-challenge",
-            origin: "http://localhost:3000",
+            origin: "http://localhost:3200",
           }),
         ).toString("base64") as any,
         authenticatorData: "mock-auth-data",
@@ -56,7 +56,7 @@ describe("POST /auth/passkey/authenticate/verify", () => {
         credentialDeviceType: "singleDevice",
         credentialBackedUp: false,
         userVerified: true,
-        origin: "http://localhost:3000",
+        origin: "http://localhost:3200",
         rpID: "localhost",
       },
     });
@@ -94,7 +94,7 @@ describe("POST /auth/passkey/authenticate/verify", () => {
           JSON.stringify({
             type: "webauthn.get",
             challenge: "test-challenge",
-            origin: "http://localhost:3000",
+            origin: "http://localhost:3200",
           }),
         ).toString("base64") as any,
         authenticatorData: "mock-auth-data",
@@ -111,7 +111,7 @@ describe("POST /auth/passkey/authenticate/verify", () => {
         credentialDeviceType: "singleDevice",
         credentialBackedUp: false,
         userVerified: true,
-        origin: "http://localhost:3000",
+        origin: "http://localhost:3200",
         rpID: "localhost",
       },
     });
@@ -142,7 +142,7 @@ describe("POST /auth/passkey/authenticate/verify", () => {
           JSON.stringify({
             type: "webauthn.get",
             challenge: "test-challenge",
-            origin: "http://localhost:3000",
+            origin: "http://localhost:3200",
           }),
         ).toString("base64") as any,
         authenticatorData: "mock-auth-data",
@@ -181,7 +181,7 @@ describe("POST /auth/passkey/authenticate/verify", () => {
           JSON.stringify({
             type: "webauthn.get",
             challenge: "test-challenge",
-            origin: "http://localhost:3000",
+            origin: "http://localhost:3200",
           }),
         ).toString("base64") as any,
         authenticatorData: "mock-auth-data",
@@ -198,7 +198,7 @@ describe("POST /auth/passkey/authenticate/verify", () => {
         credentialDeviceType: "singleDevice",
         credentialBackedUp: false,
         userVerified: true,
-        origin: "http://localhost:3000",
+        origin: "http://localhost:3200",
         rpID: "localhost",
       },
     });
@@ -230,7 +230,7 @@ describe("POST /auth/passkey/authenticate/verify", () => {
           JSON.stringify({
             type: "webauthn.get",
             challenge: "test-challenge",
-            origin: "http://localhost:3000",
+            origin: "http://localhost:3200",
           }),
         ).toString("base64") as any,
         authenticatorData: "mock-auth-data",
