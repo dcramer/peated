@@ -95,6 +95,12 @@ The system SHALL provide separate bottle save actions for Favorites and Library 
 - **WHEN** a user toggles the Library action on a bottle or release
 - **THEN** the system adds or removes that bottle or release from collection alias `library`
 
+#### Scenario: Library status marker on bottle labels
+
+- **GIVEN** an authenticated user has saved a bottle to Library
+- **WHEN** the system renders bottle labels that show saved status markers
+- **THEN** the label includes a filled monochrome Library marker that is distinct from the Favorites marker
+
 #### Scenario: Unauthenticated save action
 
 - **WHEN** a signed-out visitor activates either save action

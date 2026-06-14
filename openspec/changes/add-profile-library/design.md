@@ -42,13 +42,13 @@ Alternative considered: inline `input.collection === "default" || "library"` che
 
 Extend collection bottle route schemas from `z.literal("default")` to a reserved collection alias enum plus numeric custom collection IDs. Existing custom collection ID behavior remains unchanged.
 
-Profile Favorites and Library pages should use `collections.bottles.list` with `collection: "default"` or `collection: "library"` rather than relying on bottle list filters. This keeps profile pages aligned with the saved-collection API and avoids adding a new `isInLibrary` bottle serializer field just to render the profile tab.
+Profile Favorites and Library pages should use `collections.bottles.list` with `collection: "default"` or `collection: "library"` rather than relying on bottle list filters. This keeps profile pages aligned with the saved-collection API. Bottle responses should also expose contextual `isLibrary` status, parallel to `isFavorite`, so shared bottle label surfaces can render Library markers without extra collection probes.
 
 Alternative considered: add `collection: "favorites" | "library"` to `bottles.list`. That may be useful later for search/filter workflows, but it is not necessary for profile collection pages and would mix saved-collection semantics into the general bottle search endpoint.
 
 ### Add separate action components for Favorites and Library
 
-Keep the existing star/Favorites behavior, then add a Library action using a distinct icon and label, such as Heroicons `BookmarkIcon`. The two controls can share internal toggle plumbing, but the user-facing buttons should remain visually distinct.
+Keep the existing star/Favorites behavior, then add a Library action using a distinct book-like icon and label, such as Heroicons `BookOpenIcon`. The two controls can share internal toggle plumbing, but the user-facing buttons should remain visually distinct.
 
 Alternative considered: replace the single Favorites button with a collection picker. That would scale to arbitrary collections, but it is heavier than this request and less direct for the two first-class actions.
 

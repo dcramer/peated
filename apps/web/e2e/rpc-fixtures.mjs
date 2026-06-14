@@ -102,6 +102,7 @@ export function buildBottle({
     createdAt: timestamp,
     updatedAt: timestamp,
     isFavorite: false,
+    isLibrary: false,
     hasTasted,
   };
 }

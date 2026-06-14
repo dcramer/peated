@@ -93,11 +93,14 @@ async function handleRpcRequest({ request, response, url }) {
       if (input?.bottle === createdBottleId) {
         sendRpcResponse(
           response,
-          buildBottle({
-            id: createdBottleId,
-            name: createdBottleName,
-            brand: testBrand,
-          }),
+          withCollectionStatus(
+            request,
+            buildBottle({
+              id: createdBottleId,
+              name: createdBottleName,
+              brand: testBrand,
+            }),
+          ),
         );
         return true;
       }
@@ -109,9 +112,12 @@ async function handleRpcRequest({ request, response, url }) {
 
       sendRpcResponse(
         response,
-        input.bottle === existingBottleId
-          ? existingBottle
-          : buildBottleForId(input.bottle),
+        withCollectionStatus(
+          request,
+          input.bottle === existingBottleId
+            ? existingBottle
+            : buildBottleForId(input.bottle),
+        ),
       );
       return true;
     }
@@ -302,6 +308,25 @@ function mutateCollectionBottle(request, input, action) {
   }
 }
 
+/**
+ * Mirrors authenticated bottle status fields from the mock collection state.
+ */
+function withCollectionStatus(request, bottle) {
+  const state = getCollectionState(request);
+
+  return {
+    ...bottle,
+    isFavorite: hasBottleInCollection(state.default, bottle.id),
+    isLibrary: hasBottleInCollection(state.library, bottle.id),
+  };
+}
+
+function hasBottleInCollection(collection, bottleId) {
+  return Array.from(collection.keys()).some((key) =>
+    key.startsWith(`${bottleId}:`),
+  );
+}
+
 function buildBottleForId(id) {
   return buildBottle({
     id,
@@ -315,10 +340,16 @@ function listCollectionBottles(request, input) {
   const entries = Array.from(state[collection].entries());
   const results =
     input?.bottle === undefined
-      ? entries.map(([, entry]) => entry)
+      ? entries.map(([, entry]) => ({
+          ...entry,
+          bottle: withCollectionStatus(request, entry.bottle),
+        }))
       : entries
           .filter(([key]) => key === getCollectionKey(input))
-          .map(([, entry]) => entry);
+          .map(([, entry]) => ({
+            ...entry,
+            bottle: withCollectionStatus(request, entry.bottle),
+          }));
 
   return {
     results,

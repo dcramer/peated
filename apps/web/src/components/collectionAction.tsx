@@ -1,10 +1,10 @@
 "use client";
 
 import {
-  BookmarkIcon as BookmarkIconFilled,
+  BookOpenIcon as BookOpenIconFilled,
   StarIcon as StarIconFilled,
 } from "@heroicons/react/20/solid";
-import { BookmarkIcon, StarIcon } from "@heroicons/react/24/outline";
+import { BookOpenIcon, StarIcon } from "@heroicons/react/24/outline";
 import { isORPCClientError } from "@peated/orpc/client/errors";
 import {
   useMutation,
@@ -46,9 +46,9 @@ const COLLECTION_ACTIONS: Record<
   },
   library: {
     collection: "library",
-    color: "default",
-    Icon: BookmarkIcon,
-    ActiveIcon: BookmarkIconFilled,
+    color: "primary",
+    Icon: BookOpenIcon,
+    ActiveIcon: BookOpenIconFilled,
   },
 };
 
@@ -151,6 +151,7 @@ function SavedCollectionActionAuthenticated({
       color={action.color}
       size={size}
       title={resolvedTitle}
+      aria-pressed={isCollected}
       data-collection-action={kind}
     >
       {isCollected ? (

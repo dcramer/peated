@@ -1,9 +1,9 @@
-import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import {
   formatBottleName,
   formatCategoryName,
 } from "@peated/server/lib/format";
 import type { Bottle, BottleRelease } from "@peated/server/types";
+import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import type { ComponentPropsWithoutRef } from "react";
 import { formatBottlingName } from "../lib/bottlings";
@@ -142,12 +142,7 @@ export default function BottleCard({
                 {bottle.fullName}
               </BottleLink>
             </h4>
-            {bottle.isFavorite && (
-              <StarIcon className="inline w-4" aria-hidden="true" />
-            )}
-            {bottle.hasTasted && (
-              <CheckBadgeIcon className="inline w-4" aria-hidden="true" />
-            )}
+            <BottleStatusIcons bottle={bottle} className="inline h-4 w-4" />
             {!release && bottle.singleCask && <SingleCaskChip />}
           </div>
         </div>

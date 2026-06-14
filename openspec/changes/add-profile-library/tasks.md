@@ -17,8 +17,9 @@
 
 - [x] 3.1 Refactor the existing collection action so Favorites and Library can share mutation/query plumbing without losing distinct labels, icons, and active states.
 - [x] 3.2 Keep the Favorites action using the star icon and `default` alias.
-- [x] 3.3 Add a Library action using a distinct icon, such as `BookmarkIcon`, and the `library` alias.
+- [x] 3.3 Add a Library action using a distinct book-like icon, such as `BookOpenIcon`, and the `library` alias.
 - [x] 3.4 Render both actions on bottle and release save surfaces that currently expose Favorites, including unauthenticated login redirects.
+- [x] 3.5 Render a filled monochrome Library status marker on bottle label surfaces that already show Favorites status.
 
 ## 4. Profile Library UI
 
@@ -33,3 +34,4 @@
 - [x] 5.2 Run relevant web checks for the changed profile/action files.
 - [x] 5.3 Run `pnpm test` before finalizing the implementation.
 - [x] 5.4 Add and run e2e coverage for saving a bottle to Library and viewing it on the profile Library route without adding it to Favorites.
+- [x] 5.5 Extend e2e coverage to prove the profile Library bottle row shows the Library marker and not the Favorites marker.

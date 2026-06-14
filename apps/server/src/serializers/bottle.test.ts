@@ -10,6 +10,7 @@ import {
   entities,
   users,
 } from "../db/schema";
+import { RESERVED_COLLECTIONS } from "../lib/db";
 import { Entity, User } from "../lib/test/fixtures";
 import { BottleSerializer } from "./bottle";
 
@@ -51,7 +52,7 @@ describe("BottleSerializer", () => {
       const [collection] = await db
         .insert(collections)
         .values({
-          name: "Default",
+          name: RESERVED_COLLECTIONS.default.name,
           createdById: favoriter.id,
         })
         .returning();
@@ -66,6 +67,68 @@ describe("BottleSerializer", () => {
       const [result] = await serialize(BottleSerializer, [bottle], viewer);
 
       // The bottle should not be marked as favorite for the viewer
+      expect(result.isFavorite).toBe(false);
+    });
+  });
+
+  describe("isLibrary", () => {
+    it("should reflect the current user's library collection only", async () => {
+      const owner = await User();
+      const viewer = await User();
+
+      const brand = await Entity({
+        name: "Library Brand",
+        type: ["brand"],
+        createdById: owner.id,
+      });
+
+      const [bottle] = await db
+        .insert(bottles)
+        .values({
+          brandId: brand.id,
+          name: "Library Bottle",
+          fullName: "Library Brand Library Bottle",
+          createdById: owner.id,
+        })
+        .returning();
+
+      const [ownerLibrary] = await db
+        .insert(collections)
+        .values({
+          name: RESERVED_COLLECTIONS.library.name,
+          createdById: owner.id,
+        })
+        .returning();
+
+      await db.insert(collectionBottles).values({
+        bottleId: bottle.id,
+        collectionId: ownerLibrary.id,
+      });
+
+      const [otherUserResult] = await serialize(
+        BottleSerializer,
+        [bottle],
+        viewer,
+      );
+
+      expect(otherUserResult.isLibrary).toBe(false);
+
+      const [viewerLibrary] = await db
+        .insert(collections)
+        .values({
+          name: RESERVED_COLLECTIONS.library.name,
+          createdById: viewer.id,
+        })
+        .returning();
+
+      await db.insert(collectionBottles).values({
+        bottleId: bottle.id,
+        collectionId: viewerLibrary.id,
+      });
+
+      const [result] = await serialize(BottleSerializer, [bottle], viewer);
+
+      expect(result.isLibrary).toBe(true);
       expect(result.isFavorite).toBe(false);
     });
   });

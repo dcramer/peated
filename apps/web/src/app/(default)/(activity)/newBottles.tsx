@@ -1,8 +1,8 @@
 "use client";
 
-import { CheckBadgeIcon, StarIcon } from "@heroicons/react/20/solid";
 import { formatCategoryName } from "@peated/server/lib/format";
 import BottleLink from "@peated/web/components/bottleLink";
+import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -59,12 +59,7 @@ export default function NewBottles() {
                     >
                       {`${bottle.brand.shortName || bottle.brand.name} ${bottle.name}`}
                     </BottleLink>
-                    {bottle.isFavorite && (
-                      <StarIcon className="h-4 w-4" aria-hidden="true" />
-                    )}
-                    {bottle.hasTasted && (
-                      <CheckBadgeIcon className="h-4 w-4" aria-hidden="true" />
-                    )}
+                    <BottleStatusIcons bottle={bottle} />
                   </div>
                   <div className="text-muted flex gap-x-1 text-sm">
                     {bottle.category && (

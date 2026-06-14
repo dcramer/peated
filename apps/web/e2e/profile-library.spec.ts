@@ -43,15 +43,28 @@ test.describe("profile library", () => {
     await expect(libraryButton).toBeVisible();
     await expect(favoritesButton).toBeEnabled();
     await expect(libraryButton).toBeEnabled();
+    await expect(favoritesButton).toHaveAttribute("aria-pressed", "false");
+    await expect(libraryButton).toHaveAttribute("aria-pressed", "false");
 
     await libraryButton.click();
+    await expect(libraryButton).toHaveAttribute("aria-pressed", "true");
+    await expect(favoritesButton).toHaveAttribute("aria-pressed", "false");
 
     await page.goto(`/users/${testUser.username}/library`, {
       waitUntil: "commit",
     });
+    const savedBottleRow = page.locator("tr").filter({
+      hasText: savedBottleName,
+    });
     await expect(
       page.getByRole("link", { name: savedBottleName }).first(),
     ).toBeVisible();
+    await expect(
+      savedBottleRow.getByRole("img", { name: "In Library" }),
+    ).toBeVisible();
+    await expect(
+      savedBottleRow.getByRole("img", { name: "Favorite" }),
+    ).toHaveCount(0);
     await expect(
       page.getByText("No library bottles recorded yet."),
     ).toHaveCount(0);
