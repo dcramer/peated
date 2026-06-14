@@ -13,7 +13,7 @@ import {
   entities,
   tastings,
 } from "../db/schema";
-import { RESERVED_COLLECTIONS, type ReservedCollectionSlug } from "../lib/db";
+import { getReservedCollection, type ReservedCollectionSlug } from "../lib/db";
 import { notEmpty } from "../lib/filter";
 import { absoluteUrl } from "../lib/urls";
 import { type BottleSchema } from "../schemas";
@@ -115,22 +115,24 @@ export const BottleSerializer = serializer({
         return new Set<number>();
       }
 
-      const collectionName = RESERVED_COLLECTIONS[collectionSlug].name;
+      const collection = await getReservedCollection(
+        db,
+        currentUser.id,
+        collectionSlug,
+      );
+      if (!collection) {
+        return new Set<number>();
+      }
 
       return new Set(
         (
           await db
             .selectDistinct({ bottleId: collectionBottles.bottleId })
             .from(collectionBottles)
-            .innerJoin(
-              collections,
-              eq(collectionBottles.collectionId, collections.id),
-            )
             .where(
               and(
                 inArray(collectionBottles.bottleId, itemIds),
-                sql`LOWER(${collections.name}) = ${collectionName.toLowerCase()}`,
-                eq(collections.createdById, currentUser.id),
+                eq(collectionBottles.collectionId, collection.id),
               ),
             )
         ).map((r) => r.bottleId),

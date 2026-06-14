@@ -69,6 +69,44 @@ describe("BottleSerializer", () => {
       // The bottle should not be marked as favorite for the viewer
       expect(result.isFavorite).toBe(false);
     });
+
+    it("should reflect the current user's legacy default collection", async () => {
+      const viewer = await User();
+
+      const brand = await Entity({
+        name: "Legacy Brand",
+        type: ["brand"],
+        createdById: viewer.id,
+      });
+
+      const [bottle] = await db
+        .insert(bottles)
+        .values({
+          brandId: brand.id,
+          name: "Legacy Bottle",
+          fullName: "Legacy Brand Legacy Bottle",
+          createdById: viewer.id,
+        })
+        .returning();
+
+      const [legacyCollection] = await db
+        .insert(collections)
+        .values({
+          name: "Personal Favorites",
+          createdById: viewer.id,
+        })
+        .returning();
+
+      await db.insert(collectionBottles).values({
+        bottleId: bottle.id,
+        collectionId: legacyCollection.id,
+      });
+
+      const [result] = await serialize(BottleSerializer, [bottle], viewer);
+
+      expect(result.isFavorite).toBe(true);
+      expect(result.isLibrary).toBe(false);
+    });
   });
 
   describe("isLibrary", () => {

@@ -390,7 +390,7 @@ export const getReservedCollection = async (
   if (collection || !create) {
     return (
       collection ||
-      (slug === "default" ? getLegacyDefaultCollection(db, userId) : null)
+      (slug === "default" ? await getLegacyDefaultCollection(db, userId) : null)
     );
   }
 
