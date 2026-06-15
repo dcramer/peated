@@ -361,6 +361,11 @@ export default procedure
             newFullName,
             bottle.id,
             release.id,
+            {
+              assignmentSource: "canonical",
+              assignmentTrusted: true,
+              assignedById: user.id,
+            },
           );
           if (
             releaseAlias.bottleId !== bottle.id ||
@@ -385,7 +390,17 @@ export default procedure
 
       let alias;
       if (bottleData.fullName) {
-        alias = await upsertBottleAlias(tx, bottleData.fullName, bottle.id);
+        alias = await upsertBottleAlias(
+          tx,
+          bottleData.fullName,
+          bottle.id,
+          null,
+          {
+            assignmentSource: "canonical",
+            assignmentTrusted: true,
+            assignedById: user.id,
+          },
+        );
         // alias.bottleId is always set, but I don't want to deal w/ TS
         if (alias.bottleId && alias.bottleId !== bottle.id) {
           const [existingBottle] = await tx

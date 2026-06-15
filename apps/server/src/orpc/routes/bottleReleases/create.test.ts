@@ -202,7 +202,7 @@ describe("POST /bottle-releases", () => {
     defaults,
   }) {
     const bottle = await fixtures.Bottle({
-      name: "10",
+      name: "10-year-old",
       statedAge: 10,
     });
 

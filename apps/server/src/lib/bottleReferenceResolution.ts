@@ -12,7 +12,7 @@ import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import type { BottleRelease, User } from "@peated/server/db/schema";
 import { bottleReleases } from "@peated/server/db/schema";
-import { findBottleTarget } from "@peated/server/lib/bottleFinder";
+import { findTrustedBottleTarget } from "@peated/server/lib/bottleFinder";
 import {
   BottleAlreadyExistsError,
   createBottleInTransaction,
@@ -317,21 +317,25 @@ async function applyClassifierCreateDecision({
  */
 export async function resolveBottleReferenceTarget({
   reference,
-  aliasLookupNames = [],
+  trustedAliasLookupNames,
   extractedIdentity = null,
   user,
 }: {
   reference: BottleReference;
-  aliasLookupNames?: string[];
+  trustedAliasLookupNames?: string[];
   extractedIdentity?: Partial<BottleExtractedDetails> | null;
   user: User;
 }): Promise<BottleReferenceResolution> {
   const uniqueAliasLookupNames = Array.from(
-    new Set(aliasLookupNames.map((name) => name.trim()).filter(Boolean)),
+    new Set(
+      (trustedAliasLookupNames ?? [])
+        .map((name) => name.trim())
+        .filter(Boolean),
+    ),
   );
 
   for (const aliasName of uniqueAliasLookupNames) {
-    const target = await findBottleTarget(aliasName);
+    const target = await findTrustedBottleTarget(aliasName);
     if (target) {
       return {
         bottleId: target.bottleId,

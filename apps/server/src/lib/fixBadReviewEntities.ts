@@ -61,7 +61,7 @@ export async function fixBadReviewEntities({
       // Review cleanup uses the same conservative alias rule as live ingest:
       // normalized fallback aliases can erase release markers before the
       // classifier sees the real reference title.
-      aliasLookupNames: [review.name],
+      trustedAliasLookupNames: [review.name],
       user,
     });
 
@@ -86,6 +86,13 @@ export async function fixBadReviewEntities({
         bottleId: targetBottleId,
         releaseId: targetReleaseId,
         name: review.name,
+        ...(resolution.source !== "exact_alias"
+          ? {
+              assignmentSource: "classifier_approved" as const,
+              assignmentTrusted: true,
+              assignedById: user.id,
+            }
+          : {}),
       });
 
       summary.unchanged += 1;
@@ -96,6 +103,13 @@ export async function fixBadReviewEntities({
       bottleId: targetBottleId,
       releaseId: targetReleaseId,
       name: review.name,
+      ...(resolution.source !== "exact_alias"
+        ? {
+            assignmentSource: "classifier_approved" as const,
+            assignmentTrusted: true,
+            assignedById: user.id,
+          }
+        : {}),
     });
 
     summary.reassigned += 1;

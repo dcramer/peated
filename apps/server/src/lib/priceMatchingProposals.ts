@@ -1114,7 +1114,17 @@ async function applyBottleRepairDraftInTransaction(
   const fullNameChanged = fullName !== bottle.fullName;
   const nameChanged = bottleData.name !== bottle.name;
   const statedAgeChanged = bottleData.statedAge !== bottle.statedAge;
-  const canonicalAlias = await upsertBottleAlias(tx, fullName, bottle.id);
+  const canonicalAlias = await upsertBottleAlias(
+    tx,
+    fullName,
+    bottle.id,
+    null,
+    {
+      assignmentSource: "canonical",
+      assignmentTrusted: true,
+      assignedById: user.id,
+    },
+  );
   if (canonicalAlias.bottleId && canonicalAlias.bottleId !== bottle.id) {
     throw new BottleAlreadyExistsError(canonicalAlias.bottleId);
   }
@@ -1168,6 +1178,11 @@ async function applyBottleRepairDraftInTransaction(
         nextReleaseFullName,
         bottle.id,
         release.id,
+        {
+          assignmentSource: "canonical",
+          assignmentTrusted: true,
+          assignedById: user.id,
+        },
       );
       if (
         releaseAlias.bottleId !== bottle.id ||
@@ -2244,6 +2259,9 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     externalSiteId: proposal.price.externalSiteId,
     name: proposal.price.name,
     volume: proposal.price.volume,
+    assignmentSource: "source_approved",
+    assignmentTrusted: true,
+    assignedById: reviewedById,
   });
 
   await markApprovedStorePriceMatchProposalsInTransaction(tx, {

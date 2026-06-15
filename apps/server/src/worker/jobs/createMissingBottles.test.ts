@@ -126,7 +126,12 @@ describe("createMissingBottles", () => {
     const alias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, review.name),
     });
-    expect(alias?.bottleId).toEqual(updatedReview?.bottleId);
+    expect(alias).toMatchObject({
+      bottleId: updatedReview?.bottleId,
+      assignmentSource: "classifier_approved",
+      assignmentTrusted: true,
+      assignedById: systemUser.id,
+    });
 
     const updatedPrice = await db.query.storePrices.findFirst({
       where: eq(storePrices.id, price.id),

@@ -61,7 +61,7 @@ export default procedure
       // Normalized review titles can strip release markers like year or batch
       // detail, so only the raw exact alias is safe to trust before the
       // classifier has a chance to review the full reference.
-      aliasLookupNames: [rawName],
+      trustedAliasLookupNames: [rawName],
       extractedIdentity: {
         category: input.category,
       },
@@ -142,6 +142,8 @@ export default procedure
           .insert(bottleAliases)
           .values({
             name: reviewName,
+            assignmentSource: "generated",
+            assignmentTrusted: false,
           })
           .onConflictDoNothing();
         return { review, aliasAssignment: null };
@@ -151,6 +153,13 @@ export default procedure
         bottleId,
         releaseId,
         name: reviewName,
+        ...(resolution.source !== "exact_alias"
+          ? {
+              assignmentSource: "classifier_approved" as const,
+              assignmentTrusted: true,
+              assignedById: context.user!.id,
+            }
+          : {}),
       });
 
       const decision = getIncomingBottleDecisionFromResolutionSource(

@@ -66,6 +66,13 @@ describe("fixBadReviewEntities", () => {
       vintageYear: null,
       releaseYear: null,
     });
+    await db
+      .update(bottleAliases)
+      .set({
+        assignmentSource: "generated",
+        assignmentTrusted: false,
+      })
+      .where(eq(bottleAliases.name, correctBottle.fullName));
     const site = await fixtures.ExternalSiteOrExisting();
     const [review] = await db
       .insert(reviews)
@@ -155,7 +162,12 @@ describe("fixBadReviewEntities", () => {
     const alias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, review.name),
     });
-    expect(alias?.bottleId).toEqual(correctBottle.id);
+    expect(alias).toMatchObject({
+      bottleId: correctBottle.id,
+      assignmentSource: "classifier_approved",
+      assignmentTrusted: true,
+      assignedById: user.id,
+    });
 
     const siblingReview = await db.query.reviews.findFirst({
       where: eq(reviews.id, sameNameReview.id),

@@ -1,5 +1,8 @@
 import { db, type AnyDatabase } from "@peated/server/db";
-import type { BottleAlias } from "@peated/server/db/schema";
+import type {
+  BottleAlias,
+  BottleAliasAssignmentSource,
+} from "@peated/server/db/schema";
 import {
   bottleAliases,
   bottles,
@@ -24,6 +27,67 @@ export class FailedToSaveBottleAliasError extends Error {
   }
 }
 
+type AcceptedBottleAliasAssignmentSource = Exclude<
+  BottleAliasAssignmentSource,
+  "generated"
+>;
+
+type BottleAliasAssignmentOptions =
+  | {
+      assignmentSource?: AcceptedBottleAliasAssignmentSource;
+      assignmentTrusted?: true;
+      assignedById?: number | null;
+    }
+  | {
+      assignmentSource: "generated";
+      assignmentTrusted: false;
+      assignedById?: null;
+    };
+
+type BottleAliasAssignmentValues = {
+  assignmentSource?: BottleAliasAssignmentSource;
+  assignmentTrusted?: boolean;
+  assignedById?: number | null;
+};
+
+function hasExplicitAssignmentOptions(options: BottleAliasAssignmentValues) {
+  return (
+    options.assignmentSource !== undefined ||
+    options.assignmentTrusted !== undefined ||
+    options.assignedById !== undefined
+  );
+}
+
+function getAssignmentInsertValues({
+  assignmentSource = "legacy",
+  assignmentTrusted = true,
+  assignedById = null,
+}: BottleAliasAssignmentValues) {
+  return {
+    assignmentSource,
+    assignmentTrusted,
+    assignedById,
+  };
+}
+
+function getAssignmentUpdateValues(options: BottleAliasAssignmentValues) {
+  return {
+    ...(options.assignmentSource !== undefined
+      ? { assignmentSource: options.assignmentSource }
+      : {}),
+    ...(options.assignmentTrusted !== undefined
+      ? { assignmentTrusted: options.assignmentTrusted }
+      : {}),
+    ...(options.assignedById !== undefined
+      ? { assignedById: options.assignedById }
+      : {}),
+  };
+}
+
+/**
+ * Assigns an exact alias inside an existing transaction and records who trusted
+ * the mapping. Omitted provenance preserves the legacy trusted default.
+ */
 export async function assignBottleAliasInTransaction(
   tx: AnyDatabase,
   {
@@ -33,6 +97,9 @@ export async function assignBottleAliasInTransaction(
     externalSiteId,
     name,
     volume,
+    assignmentSource,
+    assignmentTrusted,
+    assignedById,
   }: {
     bottleId: number;
     releaseId?: number | null;
@@ -40,8 +107,13 @@ export async function assignBottleAliasInTransaction(
     externalSiteId?: number;
     name: string;
     volume?: number;
-  },
+  } & BottleAliasAssignmentOptions,
 ): Promise<{ alias: BottleAlias; isNew: boolean }> {
+  const assignmentOptions: BottleAliasAssignmentValues = {
+    assignmentSource,
+    assignmentTrusted,
+    assignedById,
+  };
   const existingAlias = await tx.query.bottleAliases.findFirst({
     where: eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()),
   });
@@ -60,15 +132,18 @@ export async function assignBottleAliasInTransaction(
     aliasReleaseId === null;
 
   if (hasMatchingBottle && hasMatchingRelease) {
+    const assignmentUpdateValues = getAssignmentUpdateValues(assignmentOptions);
     if (
       existingAlias.name !== name ||
-      (existingAlias.releaseId ?? null) !== nextAliasReleaseId
+      (existingAlias.releaseId ?? null) !== nextAliasReleaseId ||
+      hasExplicitAssignmentOptions(assignmentOptions)
     ) {
       [alias] = await tx
         .update(bottleAliases)
         .set({
           name,
           releaseId: nextAliasReleaseId,
+          ...assignmentUpdateValues,
         })
         .where(eq(bottleAliases.name, existingAlias.name))
         .returning();
@@ -82,6 +157,7 @@ export async function assignBottleAliasInTransaction(
         name,
         bottleId,
         releaseId: aliasReleaseId,
+        ...getAssignmentInsertValues(assignmentOptions),
       })
       .returning();
     isNew = true;
@@ -91,6 +167,7 @@ export async function assignBottleAliasInTransaction(
       .set({
         bottleId,
         releaseId: aliasReleaseId,
+        ...getAssignmentInsertValues(assignmentOptions),
       })
       .where(eq(bottleAliases.name, existingAlias.name))
       .returning();
@@ -179,33 +256,23 @@ export async function finalizeBottleAliasAssignment(
   }
 }
 
+/**
+ * Assigns an alias and runs the post-commit indexing/notification side effects.
+ * Provenance options are forwarded to the transactional assignment.
+ */
 export async function assignBottleAlias(
-  {
-    bottleId,
-    releaseId = null,
-    aliasReleaseId = releaseId,
-    externalSiteId,
-    name,
-    volume,
-  }: {
+  params: {
     bottleId: number;
     releaseId?: number | null;
     aliasReleaseId?: number | null;
     externalSiteId?: number;
     name: string;
     volume?: number;
-  },
+  } & BottleAliasAssignmentOptions,
   contexts?: Record<string, Record<string, any>>,
 ) {
   const result = await db.transaction(async (tx) =>
-    assignBottleAliasInTransaction(tx, {
-      bottleId,
-      releaseId,
-      aliasReleaseId,
-      externalSiteId,
-      name,
-      volume,
-    }),
+    assignBottleAliasInTransaction(tx, params),
   );
 
   await finalizeBottleAliasAssignment(result, contexts);

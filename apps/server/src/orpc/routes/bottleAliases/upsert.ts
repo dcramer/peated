@@ -23,7 +23,7 @@ export default procedure
   })
   .input(BottleAliasSchema)
   .output(z.object({}))
-  .handler(async function ({ input, errors }) {
+  .handler(async function ({ input, context, errors }) {
     const [bottle] = await db
       .select()
       .from(bottles)
@@ -40,6 +40,9 @@ export default procedure
         {
           bottleId: input.bottle,
           name: input.name,
+          assignmentSource: "human_approved",
+          assignmentTrusted: true,
+          assignedById: context.user.id,
         },
         {
           bottle: {
