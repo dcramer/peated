@@ -39,6 +39,8 @@ describe("POST /bottle-aliases", () => {
 
     expect(alias).toBeDefined();
     expect(alias?.bottleId).toBe(bottle.id);
+    expect(alias?.assignmentSource).toBe("human_approved");
+    expect(alias?.assignedById).toBe(user.id);
   });
 
   test("updates store prices with matching name", async ({ fixtures }) => {

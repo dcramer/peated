@@ -128,7 +128,9 @@ describe("PUT /bottles/:bottle", () => {
     expect(bottle2.category).toBe(null);
   });
 
-  test("manipulates name to conform with age", async ({ fixtures }) => {
+  test("does not rewrite bare numeric expressions to conform with age", async ({
+    fixtures,
+  }) => {
     const brand = await fixtures.Entity();
     const bottle = await fixtures.Bottle({
       brandId: brand.id,
@@ -155,7 +157,7 @@ describe("PUT /bottles/:bottle", () => {
       .where(eq(bottles.id, bottle.id));
 
     expect(bottle2.statedAge).toBe(10);
-    expect(bottle2.name).toBe("Delicious 10-year-old");
+    expect(bottle2.name).toBe("Delicious 10");
     expect(bottle2.fullName).toBe(`${brand.name} ${bottle2.name}`);
   });
 

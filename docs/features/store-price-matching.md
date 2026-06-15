@@ -76,10 +76,10 @@ The system persists one `store_price_match_proposal` row per `store_price`.
 
 There are two matching modes:
 
-1. Deterministic trusted-source matching.
+1. Deterministic accepted-source matching.
 2. General matching through extraction, local retrieval, classifier decisioning, and automation checks.
 
-Trusted structured sources should bypass the general matcher when they already provide enough identity.
+Accepted structured sources should bypass the general matcher when they already provide enough identity.
 
 ## Scope
 
@@ -99,9 +99,9 @@ This system does not keep a durable per-attempt history. Retrying a proposal ove
 `POST /external-sites/{site}/prices`:
 
 - normalizes the incoming listing name
-- does an exact alias lookup with `findBottleTarget(name)`
+- does an exact alias lookup for the raw incoming listing name
 - if an exact alias exists, pre-fills `bottleId` and, when the alias is canonical to a release, `releaseId`
-- always enqueues `ResolveStorePriceBottle`
+- enqueues `ResolveStorePriceBottle` only when no exact alias target exists
 - optionally enqueues `CapturePriceImage`
 
 ### 2. Matching evaluation

@@ -8,6 +8,7 @@ import {
   index,
   integer,
   jsonb,
+  pgEnum,
   pgTable,
   primaryKey,
   smallint,
@@ -36,6 +37,19 @@ type TastingNotes = {
 };
 
 const OBSERVATION_SOURCE_TYPES = ["store_price"] as const;
+export const BOTTLE_ALIAS_ASSIGNMENT_SOURCES = [
+  "legacy",
+  "canonical",
+  "source_approved",
+  "classifier_approved",
+  "human_approved",
+] as const;
+export type BottleAliasAssignmentSource =
+  (typeof BOTTLE_ALIAS_ASSIGNMENT_SOURCES)[number];
+export const bottleAliasAssignmentSourceEnum = pgEnum(
+  "bottle_alias_assignment_source",
+  BOTTLE_ALIAS_ASSIGNMENT_SOURCES,
+);
 
 /**
  * Represents a series of bottles from a brand.
@@ -496,8 +510,14 @@ export const bottleAliases = pgTable(
     ),
     name: varchar("name", { length: 255 }).notNull(),
     embedding: vector("embedding", { length: 3072 }),
-    // ignored is used to hide this alias from matches
+    // Ignored aliases are retained for audit/history but excluded from exact matching.
     ignored: boolean("ignored").default(false),
+    assignmentSource: bottleAliasAssignmentSourceEnum("assignment_source")
+      .default("legacy")
+      .notNull(),
+    assignedById: bigint("assigned_by_id", { mode: "number" }).references(
+      () => users.id,
+    ),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
@@ -518,6 +538,10 @@ export const bottleAliasesRelations = relations(bottleAliases, ({ one }) => ({
   release: one(bottleReleases, {
     fields: [bottleAliases.releaseId],
     references: [bottleReleases.id],
+  }),
+  assignedBy: one(users, {
+    fields: [bottleAliases.assignedById],
+    references: [users.id],
   }),
 }));
 

@@ -1,10 +1,6 @@
 import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
-import {
-  bottleAliases,
-  externalSites,
-  reviews,
-} from "@peated/server/db/schema";
+import { externalSites, reviews } from "@peated/server/db/schema";
 import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
@@ -58,8 +54,7 @@ export default procedure
         currentBottleId: null,
         currentReleaseId: null,
       },
-      // Normalized review titles can strip release markers like year or batch
-      // detail, so only the raw exact alias is safe to trust before the
+      // Normalized review titles can strip release markers before the
       // classifier has a chance to review the full reference.
       aliasLookupNames: [rawName],
       extractedIdentity: {
@@ -137,20 +132,18 @@ export default procedure
         [review] = mapRows(rows, reviews);
       }
 
-      if (!bottleId) {
-        await tx
-          .insert(bottleAliases)
-          .values({
-            name: reviewName,
-          })
-          .onConflictDoNothing();
-        return { review, aliasAssignment: null };
-      }
+      if (!bottleId) return { review, aliasAssignment: null };
 
       const aliasAssignment = await assignBottleAliasInTransaction(tx, {
         bottleId,
         releaseId,
         name: reviewName,
+        ...(resolution.source !== "exact_alias"
+          ? {
+              assignmentSource: "classifier_approved" as const,
+              assignedById: context.user!.id,
+            }
+          : {}),
       });
 
       const decision = getIncomingBottleDecisionFromResolutionSource(

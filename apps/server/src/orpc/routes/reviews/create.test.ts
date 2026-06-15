@@ -137,6 +137,11 @@ describe("POST /reviews", () => {
     expect(review?.issue).toEqual("Default");
     expect(review?.rating).toEqual(89);
     expect(review?.url).toEqual("https://example.com");
+
+    const alias = await db.query.bottleAliases.findFirst({
+      where: (table, { eq }) => eq(table.name, "Bottle Name"),
+    });
+    expect(alias).toBeUndefined();
   });
 
   test("new review with classifier-backed bottle creation", async ({
@@ -183,6 +188,15 @@ describe("POST /reviews", () => {
     expect(bottle?.name).toEqual("Bottle Name");
     expect(bottle?.category).toEqual("single_malt");
     expect(bottle?.brandId).toEqual(brand.id);
+
+    const alias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, `${brand.name} Bottle Name`),
+    });
+    expect(alias).toMatchObject({
+      bottleId: bottle!.id,
+      assignmentSource: "classifier_approved",
+      assignedById: adminUser.id,
+    });
 
     const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
       where: and(

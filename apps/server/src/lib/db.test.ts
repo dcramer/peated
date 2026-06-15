@@ -6,14 +6,24 @@ import { upsertBottleAlias } from "./db";
 describe("upsertBottleAlias", () => {
   test("does not change conflicting alias", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle({ name: "A" });
-    const alias = await fixtures.BottleAlias({ bottleId: bottle.id });
+    const originalAssignedBy = await fixtures.User({ mod: true });
+    const alias = await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      assignmentSource: "human_approved",
+      assignedById: originalAssignedBy.id,
+    });
     const newBottle = await fixtures.Bottle({ name: "B" });
     const otherAlias = await fixtures.BottleAlias({ bottleId: null });
 
-    const result = await upsertBottleAlias(db, alias.name, newBottle.id);
+    const result = await upsertBottleAlias(db, alias.name, newBottle.id, null, {
+      assignmentSource: "source_approved",
+      assignedById: newBottle.createdById,
+    });
     expect(result).toBeDefined();
     expect(result.bottleId).toEqual(bottle.id);
     expect(result.name).toEqual(alias.name);
+    expect(result.assignmentSource).toEqual("human_approved");
+    expect(result.assignedById).toEqual(originalAssignedBy.id);
 
     const [newOtherAlias] = await db
       .select()
@@ -43,6 +53,81 @@ describe("upsertBottleAlias", () => {
     expect(newOtherAlias.bottleId).toEqual(otherAlias.bottleId);
   });
 
+  test("updates provenance for existing bound row when target matches", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "A" });
+    const alias = await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      assignmentSource: "legacy",
+    });
+
+    const result = await upsertBottleAlias(db, alias.name, bottle.id, null, {
+      assignmentSource: "source_approved",
+      assignedById: bottle.createdById,
+    });
+
+    expect(result).toMatchObject({
+      bottleId: bottle.id,
+      assignmentSource: "source_approved",
+      assignedById: bottle.createdById,
+    });
+  });
+
+  test("updates provenance when claiming a release for the same bottle", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "A" });
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+    const alias = await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      releaseId: null,
+      assignmentSource: "legacy",
+      assignedById: null,
+    });
+
+    const result = await upsertBottleAlias(
+      db,
+      alias.name,
+      bottle.id,
+      release.id,
+      {
+        assignmentSource: "canonical",
+        assignedById: bottle.createdById,
+      },
+    );
+
+    expect(result).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      assignmentSource: "canonical",
+      assignedById: bottle.createdById,
+    });
+  });
+
+  test("can explicitly clear assignment attribution for the same target", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "A" });
+    const assignedBy = await fixtures.User({ mod: true });
+    const alias = await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      assignmentSource: "human_approved",
+      assignedById: assignedBy.id,
+    });
+
+    const result = await upsertBottleAlias(db, alias.name, bottle.id, null, {
+      assignmentSource: "canonical",
+      assignedById: null,
+    });
+
+    expect(result).toMatchObject({
+      bottleId: bottle.id,
+      assignmentSource: "canonical",
+      assignedById: null,
+    });
+  });
+
   test("works with existing unbound row", async ({ fixtures }) => {
     const otherAlias = await fixtures.BottleAlias({
       bottleId: null,
@@ -62,15 +147,29 @@ describe("upsertBottleAlias", () => {
     expect(newOtherAlias.bottleId).toEqual(otherAlias.bottleId);
   });
 
+  test("creates unbound alias reservations with legacy provenance", async () => {
+    const result = await upsertBottleAlias(db, "Unbound Placeholder");
+    expect(result).toMatchObject({
+      bottleId: null,
+      assignmentSource: "legacy",
+      assignedById: null,
+    });
+  });
+
   test("binds alias without conflict", async ({ fixtures }) => {
     const alias = await fixtures.BottleAlias({ bottleId: null });
     const otherAlias = await fixtures.BottleAlias({ bottleId: null });
     const newBottle = await fixtures.Bottle({ name: "B" });
 
-    const result = await upsertBottleAlias(db, alias.name, newBottle.id);
+    const result = await upsertBottleAlias(db, alias.name, newBottle.id, null, {
+      assignmentSource: "canonical",
+      assignedById: newBottle.createdById,
+    });
     expect(result).toBeDefined();
     expect(result.bottleId).toEqual(newBottle.id);
     expect(result.name).toEqual(alias.name);
+    expect(result.assignmentSource).toBe("canonical");
+    expect(result.assignedById).toBe(newBottle.createdById);
 
     const [newOtherAlias] = await db
       .select()

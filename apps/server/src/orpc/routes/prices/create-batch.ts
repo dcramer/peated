@@ -36,7 +36,7 @@ export default procedure
     }),
   )
   .output(z.object({}))
-  .handler(async function ({ input, errors }) {
+  .handler(async function ({ input, context, errors }) {
     const site = await db.query.externalSites.findFirst({
       where: eq(externalSites.type, input.site),
     });
@@ -54,9 +54,9 @@ export default procedure
         prices.map(async (sp) => {
           const [price] = await db.transaction(async (tx) => {
             const { name } = normalizeBottle({ name: sp.name });
-            const target =
-              (await findBottleTarget(sp.name, tx)) ??
-              (sp.name === name ? null : await findBottleTarget(name, tx));
+            // Exact alias assignment uses the raw scraped title; the normalized
+            // store_price name is for storage/de-duping, not identity proof.
+            const target = await findBottleTarget(sp.name, tx);
             const bottleId = target?.bottleId ?? null;
             const releaseId = target?.releaseId ?? null;
 
@@ -90,10 +90,13 @@ export default procedure
               .onConflictDoNothing();
 
             if (bottleId) {
-              await upsertBottleAlias(tx, name, bottleId, releaseId);
+              await upsertBottleAlias(tx, sp.name, bottleId, releaseId, {
+                assignmentSource: "source_approved",
+                assignedById: context.user.id,
+              });
             }
 
-            return [{ id: priceId, imageUrl }];
+            return [{ id: priceId, imageUrl, hasExactAliasTarget: !!target }];
           });
 
           if (!price.imageUrl && sp.imageUrl) {
@@ -103,9 +106,11 @@ export default procedure
             });
           }
 
-          await pushUniqueJob("ResolveStorePriceBottle", {
-            priceId: price.id,
-          });
+          if (!price.hasExactAliasTarget) {
+            await pushUniqueJob("ResolveStorePriceBottle", {
+              priceId: price.id,
+            });
+          }
         }),
       );
     });
