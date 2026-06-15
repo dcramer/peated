@@ -150,7 +150,11 @@ export async function createBottleReleaseInTransaction(
 
   const newAliases: string[] = [];
   for (const aliasName of getCanonicalReleaseAliasNames({ fullName })) {
-    const alias = await upsertBottleAlias(tx, aliasName, bottleId, release.id);
+    const alias = await upsertBottleAlias(tx, aliasName, bottleId, release.id, {
+      assignmentSource: "canonical",
+      assignmentTrusted: true,
+      assignedById: user.id,
+    });
     if (
       alias.bottleId !== bottleId ||
       (alias.releaseId ?? null) !== release.id

@@ -68,6 +68,10 @@ Observation-only facts by default:
 - `fullName` and aliases are derived reference strings. They are useful evidence, but they can be stale or source-specific and must not prove a brand repair by themselves.
 - A proposed brand repair must be valid after applying it: the resulting bottle and release names should still describe the marketed bottle without duplicated, missing, or stale brand text.
 - Do not automate brand moves where the only difference is a generic product/entity suffix or prefix such as `Bourbon`, `Whiskey`, `Whisky`, `Distillery`, `House`, or `Company`. Those cases are brand-vs-product-vs-entity ambiguity and belong in classifier or manual review.
+- Do not mechanically rewrite a bare numeric expression into an age-statement
+  expression only because `statedAge` has the same value. `The Last Drop 42`
+  with `statedAge = 42` may still have canonical name `42`; explicit age
+  wording, classifier judgment, or moderator review must justify `42-year-old`.
 - Examples: `Yamazaki 12-year-old` stays brand `Yamazaki` even when aliases mention owner `Suntory`; `Belle Meade` should not automatically move to `Belle Meade Bourbon` just because the full bottle name starts with those words.
 
 ## Canonicalization Rules

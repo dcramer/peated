@@ -6,7 +6,7 @@ import {
   storePriceHistories,
   storePrices,
 } from "@peated/server/db/schema";
-import { findBottleTarget } from "@peated/server/lib/bottleFinder";
+import { findTrustedBottleTarget } from "@peated/server/lib/bottleFinder";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { chunked } from "@peated/server/lib/scraper";
 import { procedure } from "@peated/server/orpc";
@@ -36,7 +36,7 @@ export default procedure
     }),
   )
   .output(z.object({}))
-  .handler(async function ({ input, errors }) {
+  .handler(async function ({ input, context, errors }) {
     const site = await db.query.externalSites.findFirst({
       where: eq(externalSites.type, input.site),
     });
@@ -54,9 +54,7 @@ export default procedure
         prices.map(async (sp) => {
           const [price] = await db.transaction(async (tx) => {
             const { name } = normalizeBottle({ name: sp.name });
-            const target =
-              (await findBottleTarget(sp.name, tx)) ??
-              (sp.name === name ? null : await findBottleTarget(name, tx));
+            const target = await findTrustedBottleTarget(sp.name, tx);
             const bottleId = target?.bottleId ?? null;
             const releaseId = target?.releaseId ?? null;
 
@@ -90,10 +88,14 @@ export default procedure
               .onConflictDoNothing();
 
             if (bottleId) {
-              await upsertBottleAlias(tx, name, bottleId, releaseId);
+              await upsertBottleAlias(tx, sp.name, bottleId, releaseId, {
+                assignmentSource: "source_approved",
+                assignmentTrusted: true,
+                assignedById: context.user.id,
+              });
             }
 
-            return [{ id: priceId, imageUrl }];
+            return [{ id: priceId, imageUrl, hasTrustedTarget: !!target }];
           });
 
           if (!price.imageUrl && sp.imageUrl) {
@@ -103,9 +105,11 @@ export default procedure
             });
           }
 
-          await pushUniqueJob("ResolveStorePriceBottle", {
-            priceId: price.id,
-          });
+          if (!price.hasTrustedTarget) {
+            await pushUniqueJob("ResolveStorePriceBottle", {
+              priceId: price.id,
+            });
+          }
         }),
       );
     });

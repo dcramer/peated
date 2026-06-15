@@ -265,6 +265,11 @@ export default procedure
         fullName,
         bottle.id,
         updatedRelease.id,
+        {
+          assignmentSource: "canonical",
+          assignmentTrusted: true,
+          assignedById: user.id,
+        },
       );
 
       if (

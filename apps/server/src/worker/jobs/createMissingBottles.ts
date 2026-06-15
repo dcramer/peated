@@ -47,7 +47,7 @@ export default async function createMissingBottles() {
         // Backfill uses the same conservative rule as live review ingestion:
         // only raw exact aliases are trusted before classifier review because a
         // normalized fallback can collapse real release detail to the parent.
-        aliasLookupNames: [review.name],
+        trustedAliasLookupNames: [review.name],
         user: systemUser,
       });
 
@@ -73,6 +73,13 @@ export default async function createMissingBottles() {
           bottleId,
           releaseId: resolution.releaseId,
           name: review.name,
+          ...(resolution.source !== "exact_alias"
+            ? {
+                assignmentSource: "classifier_approved" as const,
+                assignmentTrusted: true,
+                assignedById: systemUser.id,
+              }
+            : {}),
         });
 
         if (

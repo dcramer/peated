@@ -194,6 +194,9 @@ export async function createBottleInTransaction(
     .update(bottleAliases)
     .set({
       bottleId: bottle.id,
+      assignmentSource: "canonical",
+      assignmentTrusted: true,
+      assignedById: user.id,
     })
     .where(
       and(
