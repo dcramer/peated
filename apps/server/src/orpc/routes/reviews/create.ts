@@ -58,7 +58,7 @@ export default procedure
         currentBottleId: null,
         currentReleaseId: null,
       },
-      aliasLookupNames: [aliasKey],
+      aliasLookupNames: [aliasKey, rawName],
       extractedIdentity: {
         category: input.category,
       },

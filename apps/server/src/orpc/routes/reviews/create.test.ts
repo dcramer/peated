@@ -4,6 +4,7 @@ import {
   incomingBottleDecisionLogs,
   reviews,
 } from "@peated/server/db/schema";
+import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq } from "drizzle-orm";
@@ -439,6 +440,54 @@ describe("POST /reviews", () => {
       bottleId: bottle.id,
       releaseId: null,
       name: bottle.fullName,
+    });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("new review falls back to existing raw aliases before classifier", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle({
+      name: "10-year-old",
+      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+    });
+    const rawName = "Ardbeg 10 years old";
+    const aliasKey = normalizeBottleAliasKey(rawName);
+    expect(aliasKey).not.toBe(rawName);
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: rawName,
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: rawName,
+        issue: "Default",
+        rating: 89,
+        url: "https://example.com/ardbeg-10-legacy",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: (table, { eq }) => eq(table.id, data.id),
+    });
+    const alias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, aliasKey),
+    });
+
+    expect(review).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      name: bottle.fullName,
+    });
+    expect(alias).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
