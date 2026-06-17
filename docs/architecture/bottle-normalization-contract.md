@@ -106,6 +106,7 @@ safe to remove before review.
 
 Alias lookup and alias writes must use the same accepted key for a workflow.
 That key may be raw source text or an identity-preserving normalized form.
+Code should build that form through `normalizeBottleAliasKey`.
 
 If normalization is lossy or semantic, it is not a safe deterministic alias key.
 Use it for search or classifier evidence instead.

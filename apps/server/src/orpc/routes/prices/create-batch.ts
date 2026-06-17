@@ -1,4 +1,7 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import {
+  normalizeBottle,
+  normalizeBottleAliasKey,
+} from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import type { StorePrice } from "@peated/server/db/schema";
 import {
@@ -54,9 +57,8 @@ export default procedure
         prices.map(async (sp) => {
           const [price] = await db.transaction(async (tx) => {
             const { name } = normalizeBottle({ name: sp.name });
-            // Exact alias assignment uses the raw scraped title; the normalized
-            // store_price name is for storage/de-duping, not identity proof.
-            const target = await findBottleTarget(sp.name, tx);
+            const aliasKey = normalizeBottleAliasKey(sp.name);
+            const target = await findBottleTarget(aliasKey, tx);
             const bottleId = target?.bottleId ?? null;
             const releaseId = target?.releaseId ?? null;
 
@@ -90,7 +92,7 @@ export default procedure
               .onConflictDoNothing();
 
             if (bottleId) {
-              await upsertBottleAlias(tx, sp.name, bottleId, releaseId, {
+              await upsertBottleAlias(tx, aliasKey, bottleId, releaseId, {
                 assignmentSource: "source_approved",
                 assignedById: context.user.id,
               });

@@ -410,6 +410,72 @@ describe("POST /reviews", () => {
     expect(decisionLog).toBeUndefined();
   });
 
+  test("new review uses identity-preserving alias keys before classifier", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle({
+      name: "10-year-old",
+      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: "Ardbeg 10 years old",
+        issue: "Default",
+        rating: 89,
+        url: "https://example.com/ardbeg-10",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: (table, { eq }) => eq(table.id, data.id),
+    });
+    expect(review).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      name: bottle.fullName,
+    });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("new review does not use lossy normalized names as exact aliases", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle({
+      name: "Distillers Edition",
+      brandId: (await fixtures.Entity({ name: "Lagavulin" })).id,
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: "Lagavulin Distillers Edition 2011 Release",
+        issue: "Default",
+        rating: 89,
+        url: "https://example.com/lagavulin-2011",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: (table, { eq }) => eq(table.id, data.id),
+    });
+    expect(review).toMatchObject({
+      bottleId: null,
+      releaseId: null,
+      name: bottle.fullName,
+    });
+    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+  });
+
   test("new review can match an existing bottle through the classifier", async ({
     fixtures,
   }) => {

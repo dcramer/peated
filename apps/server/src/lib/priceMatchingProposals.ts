@@ -65,6 +65,7 @@ import {
   type IncomingBottleDecisionType,
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { logError } from "@peated/server/lib/log";
+import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import {
   getStorePriceMatchAutomationAssessment,
   shouldVerifyStorePriceMatch,
@@ -2248,14 +2249,15 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     }
   }
 
-  // Store listing names stay bottle-level unless an existing canonical release
+  const aliasKey = normalizeBottleAliasKey(proposal.price.name);
+  // Store listing keys stay bottle-level unless an existing canonical release
   // alias already owns the same text, which assignBottleAliasInTransaction preserves.
   const aliasResult = await assignBottleAliasInTransaction(tx, {
     bottleId,
     releaseId,
     aliasReleaseId: null,
     externalSiteId: proposal.price.externalSiteId,
-    name: proposal.price.name,
+    name: aliasKey,
     volume: proposal.price.volume,
     assignmentSource: "source_approved",
     assignedById: reviewedById,
