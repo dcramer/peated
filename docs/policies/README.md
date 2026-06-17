@@ -37,5 +37,4 @@ Keep policy docs small:
 - state the default rule clearly
 - call out only the meaningful exceptions
 
-Use [policy-template.md](/home/dcramer/src/peated/docs/policies/policy-template.md)
-for new policies.
+Use [policy-template.md](policy-template.md) for new policies.

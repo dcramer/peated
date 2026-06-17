@@ -10,6 +10,12 @@ are useful but not normalized to Peated's bottle and release model. The system
 should use cheap deterministic checks when they are safe, and should rely on the
 reviewed bottle classifier when semantic identity is unresolved.
 
+Related policy:
+
+- [Whisky Identity Model](./whisky-identity-model.md)
+- [Bottle Normalization Contract](./bottle-normalization-contract.md)
+- [Bottle Classifier](./bottle-classifier.md)
+
 ## Goals
 
 - Reuse prior accepted matches without paying for a classifier call.
@@ -145,13 +151,14 @@ creates canonical identity, or creates an alias.
 All source references should follow the same conceptual pipeline.
 
 1. Preserve raw source facts.
-2. Check exact accepted aliases for the raw reference string.
-3. Apply closed-form deterministic resolvers only when available.
-4. If no accepted match exists, retrieve candidates.
-5. Run the classifier.
-6. Validate classifier output structurally.
-7. Apply shared automation policy.
-8. Persist the result, queue review, or leave unresolved.
+2. Build the workflow's deterministic alias key from the source reference.
+3. Check exact accepted aliases for that key.
+4. Apply closed-form deterministic resolvers only when available.
+5. If no accepted match exists, retrieve candidates.
+6. Run the classifier.
+7. Validate classifier output structurally.
+8. Apply shared automation policy.
+9. Persist the result, queue review, or leave unresolved.
 
 Candidate retrieval may use:
 
@@ -167,16 +174,20 @@ Candidate retrieval may use:
 Candidate retrieval is not a final decision. It supplies evidence to the
 classifier.
 
-### Raw Alias Rule
+### Alias Key Rule
 
-For no-agent exact matching, lookup the raw source reference string first.
-Mechanically normalized names may collapse release detail, age wording, cask
-markers, or batch codes before the classifier has reviewed the full reference.
+For no-agent exact matching, the alias lookup key and the alias write key must
+be the same accepted reference string for that workflow.
 
-Normalized text can still be used for storage, search, retrieval, or classifier
-evidence. It should not create a deterministic assignment unless the normalized
-string already exists as an accepted alias and the caller has explicitly chosen
-that lookup as safe for the workflow.
+That key may be raw source text or an identity-preserving normalized form. The
+normalization must satisfy the
+[Bottle Normalization Contract](./bottle-normalization-contract.md): it can make
+the text comparable, but it cannot infer age, year, batch, cask, release, brand,
+or entity identity.
+
+Lossy or semantic normalized text can still be used for storage, search,
+retrieval, or classifier evidence. It must not create a deterministic assignment
+unless that exact string has already been accepted as an alias.
 
 ## Classifier Ownership
 
@@ -227,9 +238,9 @@ Store price ingestion should:
 1. Preserve the raw retailer listing name and URL.
 2. Normalize the stored price name only for the price record's display/search
    needs.
-3. Try exact accepted alias lookup on the raw listing name.
+3. Build the deterministic alias key from the listing name.
 4. If an alias target exists, assign the price immediately and write/update the
-   raw listing alias as `source_approved`.
+   same alias key as `source_approved`.
 5. If no alias target exists, create/update the price without a bottle target
    and enqueue resolver work.
 
@@ -242,10 +253,10 @@ store-specific packaging, SEO, exclusive wording, or partial release detail.
 Review ingestion should:
 
 1. Preserve the raw review title and issue.
-2. Try exact accepted alias lookup on the raw review title.
+2. Build the deterministic alias key from the review title.
 3. If no alias target exists, run the classifier.
 4. If the classifier matches or creates a target, assign the review and create a
-   `classifier_approved` alias for the raw accepted title.
+   `classifier_approved` alias for the same accepted key.
 5. If the classifier cannot resolve the target, store the review unresolved and
    do not create a `bottle_alias` row.
 
@@ -310,7 +321,7 @@ Automation may create or assign a bottle/release only when:
 Automation should leave records unresolved when:
 
 - required identity components conflict
-- the target depends on normalized text alone
+- the target depends on lossy or semantic normalized text alone
 - release detail is present but ambiguous
 - the classifier returns `no_match`, low confidence, or an unsafe create/repair
   decision
@@ -325,17 +336,18 @@ Core deterministic tests should cover:
 - unresolved review does not create a `bottle_alias` row
 - classifier-approved review creates alias provenance
 - source-approved store price creates alias provenance
-- raw exact alias pre-fills store price
-- normalized store-price or review name does not auto-assign unless explicitly
-  looked up as an accepted alias
+- exact accepted alias key pre-fills store price
+- alias lookup and alias write use the same workflow key
+- lossy normalized store-price or review text does not auto-assign unless it was
+  explicitly accepted as an alias
 - canonical release alias preserves release id
 - store listing alias remains bottle-level unless a canonical release alias
   already owns the same text
 - alias upsert preserves existing targets and updates provenance only when the
   target is the same or previously unbound
 - duplicate alias conflicts block unsafe bottle/release creation
-- numeric normalization does not rewrite names like `The Last Drop 42` to
-  `42-year-old` solely because the age field is also 42
+- deterministic normalization follows the
+  [Bottle Normalization Contract](./bottle-normalization-contract.md)
 
 Classifier/eval coverage should include:
 
@@ -355,7 +367,7 @@ Classifier/eval coverage should include:
 4. Remove generated/unresolved alias writes from review ingestion.
 5. Preserve raw source facts on reviews, prices, observations, and decision logs.
 6. Ensure accepted classifier/source/manual assignments write alias provenance.
-7. Keep no-agent lookup limited to exact accepted aliases and closed-form
+7. Keep no-agent lookup limited to exact accepted alias keys and closed-form
    deterministic resolvers.
 8. Expand eval fixtures around normalization failures, release detail, and
    production misses.
@@ -364,8 +376,6 @@ Classifier/eval coverage should include:
 
 ## Open Questions
 
-- Should normalized exact alias lookup be allowed in any ingestion path after raw
-  lookup fails, or should normalized strings always require classifier review?
 - Should legacy unbound aliases be migrated into a separate proposal/evidence
   table once that table exists?
 - Which source-approved flows should be allowed to write release-level aliases,

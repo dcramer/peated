@@ -1,65 +1,28 @@
 # Store Price Matching
 
-This document reflects the store-price matching flow as implemented on March 15, 2026.
+This document describes how store prices are resolved to bottles and releases.
 
-The authoritative identity model lives in [docs/architecture/whisky-identity-model.md](/home/dcramer/src/peated/docs/architecture/whisky-identity-model.md).
+Authoritative policy lives in:
 
-The classifier contract lives in [docs/architecture/bottle-classifier.md](/home/dcramer/src/peated/docs/architecture/bottle-classifier.md).
-Price matching is one consumer of that bottle-classifier boundary.
+- [Whisky Identity Model](../architecture/whisky-identity-model.md)
+- [Bottle Normalization Contract](../architecture/bottle-normalization-contract.md)
+- [Bottle Creation And Alias System](../architecture/bottle-creation-alias-system.md)
+- [Bottle Classifier](../architecture/bottle-classifier.md)
 
-## Core Schema Rules
+Price matching is one consumer of the generic bottle-reference classifier. It
+adds store-price persistence, queueing, moderation, and automation policy around
+that classifier boundary.
 
-These rules are the anchor for matching, automation, aliases, and moderator flows.
+## Local Contract
 
-1. `bottle` is the stable parent product.
-2. `bottle_release` is optional and only exists under a bottle.
-3. `store_price` should follow the same shape as tastings and collections:
-   `bottleId` required when matched, `releaseId` optional.
-4. Bottle identity and release identity are not interchangeable.
-5. Exact source facts should be preserved as observations before they are promoted into canonical release identity.
-6. Observation persistence is currently bottle-reference-only.
-
-Bottle identity lives on the parent bottle:
-
-- brand
-- bottler
-- distillery
-- expression / `name`
-- series
-- category
-
-Release identity lives on the child release:
-
-- edition
-- stated age when release-specific
-- ABV
-- release year
-- vintage year
-- single-cask
-- cask-strength
-- cask fill
-- cask type
-- cask size
-
-Observation-first facts:
-
-- exact cask or barrel numbers
-- outturn
-- bottle numbers
-- exclusive wording
-- unmodeled raw maturation text
-
-Operational rule:
-
-- If bottle identity is clear but release identity is not, match the bottle and leave `releaseId = null`.
-- Do not force a release from weak evidence.
-- Preserve the exact source facts as a `bottle_observation` row instead.
-- If a bottle is still carrying a single known release-like identity on itself, do not also create a child `bottle_release`. Split the parent bottle first.
-
-Alias rule:
-
-- Retailer listing aliases are bottle-level evidence unless they exactly match a canonical release alias.
-- Canonical release aliases should come from actual release records, not from arbitrary retailer titles.
+- `store_price.bottleId` is required when a listing is matched.
+- `store_price.releaseId` is optional precision under that bottle.
+- If bottle identity is clear but release identity is weak, match the bottle and
+  leave `releaseId = null`.
+- Preserve exact source facts as `bottle_observation` before promoting them into
+  canonical release identity.
+- Retailer listing aliases stay bottle-level unless the accepted alias key
+  already belongs to a canonical release alias.
 
 ## Goal
 
@@ -99,7 +62,8 @@ This system does not keep a durable per-attempt history. Retrying a proposal ove
 `POST /external-sites/{site}/prices`:
 
 - normalizes the incoming listing name
-- does an exact alias lookup for the raw incoming listing name
+- builds the deterministic alias key from the listing name
+- does an exact alias lookup for that accepted key
 - if an exact alias exists, pre-fills `bottleId` and, when the alias is canonical to a release, `releaseId`
 - enqueues `ResolveStorePriceBottle` only when no exact alias target exists
 - optionally enqueues `CapturePriceImage`
@@ -126,7 +90,7 @@ Every approved bottle-reference match writes one `bottle_observation` keyed by `
 
 That observation stores:
 
-- the raw store title and source URL
+- the store title and source URL
 - the parsed extracted identity
 - the proposal type and creation target
 - normalized release facts when they exist
@@ -250,11 +214,11 @@ For existing-match proposals, that policy should stay thin:
 - the classifier confidence must clear the shared verification threshold
 - reaffirming the current bottle/release assignment uses a lower threshold because the risk is lower; today that threshold is `80`
 - new unmatched matches only verify at the higher bottle-only threshold; today that threshold is `96`
-- the classifier should be the layer that decides when raw-title
+- the classifier should be the layer that decides when listing-title
   reaffirmation, official confirmation, or agent-reviewed corroborating web
   evidence justifies the `96+` confidence band
 
-Evidence such as exact aliases, raw retailer titles, official pages, or
+Evidence such as exact aliases, retailer titles, official pages, or
 agent-reviewed corroborating web confirmation should raise or lower classifier
 confidence upstream rather than creating separate downstream verify heuristics.
 
@@ -318,11 +282,11 @@ Current UI limitation:
 Approving a price proposal does two separate things:
 
 1. updates the matched `store_price` rows for the same site / listing / volume
-2. stores a reusable alias for the listing name
+2. stores a reusable alias for the accepted listing key
 
 Schema-first alias rule:
 
-- price listing aliases should stay bottle-level unless the listing name is exactly a canonical release alias
+- price listing aliases should stay bottle-level unless the accepted listing key is exactly a canonical release alias
 - canonical release aliases should be created from the release record itself
 
 This prevents a retailer-specific title from globally turning into an exact release alias.

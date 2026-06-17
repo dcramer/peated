@@ -1,6 +1,8 @@
 # Schema Conventions
 
-The authoritative model lives in [docs/architecture/whisky-identity-model.md](/home/dcramer/src/peated/docs/architecture/whisky-identity-model.md). This document focuses on extraction and normalization terms.
+The authoritative model lives in
+[Whisky Identity Model](../architecture/whisky-identity-model.md). This document
+focuses on extraction and normalization terms.
 
 ## Identity Layers
 
