@@ -67,7 +67,7 @@ describe("resolveBottleReferenceTarget", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("does not use normalized names as fast-path alias matches", async ({
+  test("does not normalize alias lookup names internally", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
