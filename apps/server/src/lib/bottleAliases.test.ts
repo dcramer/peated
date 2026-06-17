@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { bottleAliases, reviews } from "@peated/server/db/schema";
+import { bottleAliases, reviews, storePrices } from "@peated/server/db/schema";
 import { assignBottleAliasInTransaction } from "@peated/server/lib/bottleAliases";
 import { eq } from "drizzle-orm";
 
@@ -67,6 +67,58 @@ describe("assignBottleAliasInTransaction", () => {
     expect(updatedReview).toMatchObject({
       bottleId: bottle.id,
       releaseId: release.id,
+    });
+  });
+
+  test("backfills stored reference names that differ from the alias name", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const storedName = `${bottle.fullName} 2011 Release`;
+    const aliasName = `${storedName} Imported Label`;
+    const review = await fixtures.Review({
+      bottleId: null,
+      releaseId: null,
+      name: storedName,
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      releaseId: null,
+      name: storedName,
+      volume: 750,
+    });
+
+    await db.transaction(async (tx) => {
+      await assignBottleAliasInTransaction(tx, {
+        bottleId: bottle.id,
+        name: aliasName,
+        backfillNames: [storedName],
+        externalSiteId: price.externalSiteId,
+        volume: price.volume,
+      });
+    });
+
+    const updatedReview = await db.query.reviews.findFirst({
+      where: eq(reviews.id, review.id),
+    });
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+    const alias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, aliasName),
+    });
+
+    expect(alias).toMatchObject({
+      bottleId: bottle.id,
+      name: aliasName,
+    });
+    expect(updatedReview).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+    expect(updatedPrice).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
     });
   });
 

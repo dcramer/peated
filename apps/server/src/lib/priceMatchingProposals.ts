@@ -2258,6 +2258,7 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     aliasReleaseId: null,
     externalSiteId: proposal.price.externalSiteId,
     name: aliasKey,
+    backfillNames: [proposal.price.name],
     volume: proposal.price.volume,
     assignmentSource: "source_approved",
     assignedById: reviewedById,

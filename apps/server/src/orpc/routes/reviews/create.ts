@@ -140,6 +140,7 @@ export default procedure
         bottleId,
         releaseId,
         name: aliasKey,
+        backfillNames: [reviewName, normalizedName],
         ...(resolution.source !== "exact_alias"
           ? {
               assignmentSource: "classifier_approved" as const,

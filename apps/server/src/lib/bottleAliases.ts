@@ -11,7 +11,7 @@ import {
 } from "@peated/server/db/schema";
 import { logError } from "@peated/server/lib/log";
 import { pushJob, pushUniqueJob } from "@peated/server/worker/client";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 
 export class DuplicateBottleAliasError extends Error {
   constructor(readonly bottleId: number) {
@@ -76,6 +76,7 @@ export async function assignBottleAliasInTransaction(
     aliasReleaseId = releaseId,
     externalSiteId,
     name,
+    backfillNames = [],
     volume,
     assignmentSource,
     assignedById,
@@ -85,6 +86,7 @@ export async function assignBottleAliasInTransaction(
     aliasReleaseId?: number | null;
     externalSiteId?: number;
     name: string;
+    backfillNames?: string[];
     volume?: number;
   } & BottleAliasAssignmentOptions,
 ): Promise<{ alias: BottleAlias; isNew: boolean }> {
@@ -157,6 +159,16 @@ export async function assignBottleAliasInTransaction(
     throw new FailedToSaveBottleAliasError();
   }
 
+  const backfillLookupNames = Array.from(
+    new Set(
+      [name, ...backfillNames].map((value) => value.trim().toLowerCase()),
+    ),
+  ).filter(Boolean);
+  const backfillNameFilter = or(
+    ...backfillLookupNames.map((value) =>
+      eq(sql`LOWER(${storePrices.name})`, value),
+    ),
+  );
   const matchingPrices = await tx
     .update(storePrices)
     .set({
@@ -164,9 +176,13 @@ export async function assignBottleAliasInTransaction(
       releaseId,
     })
     .where(
-      sql`LOWER(${storePrices.name}) = ${name.toLowerCase()}
-        ${externalSiteId ? sql`AND ${storePrices.externalSiteId} = ${externalSiteId}` : sql``}
-        ${volume ? sql`AND ${storePrices.volume} = ${volume}` : sql``}`,
+      and(
+        backfillNameFilter,
+        externalSiteId !== undefined
+          ? eq(storePrices.externalSiteId, externalSiteId)
+          : undefined,
+        volume !== undefined ? eq(storePrices.volume, volume) : undefined,
+      ),
     )
     .returning({
       imageUrl: storePrices.imageUrl,
@@ -197,7 +213,13 @@ export async function assignBottleAliasInTransaction(
       bottleId,
       releaseId: nextAliasReleaseId,
     })
-    .where(eq(sql`LOWER(${reviews.name})`, name.toLowerCase()));
+    .where(
+      or(
+        ...backfillLookupNames.map((value) =>
+          eq(sql`LOWER(${reviews.name})`, value),
+        ),
+      ),
+    );
 
   return {
     alias,
@@ -245,6 +267,7 @@ export async function assignBottleAlias(
     aliasReleaseId?: number | null;
     externalSiteId?: number;
     name: string;
+    backfillNames?: string[];
     volume?: number;
   } & BottleAliasAssignmentOptions,
   contexts?: Record<string, Record<string, any>>,
