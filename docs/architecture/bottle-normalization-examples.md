@@ -1,14 +1,13 @@
 # Bottle Normalization Examples
 
-This document is a working corpus for one-time cleanup and future normalization
-decisions. The goal is not to model every edge case up front. The goal is to
-capture real bottle families we see in the wild and make the expected mapping to
-Peated's identity model explicit.
+This document is a working corpus for real bottle families that stress Peated's
+identity model. It is not the normalization policy. The policy lives in
+[Bottle Normalization Contract](./bottle-normalization-contract.md).
 
 Use this alongside:
 
-- `docs/architecture/whisky-identity-model.md`
-- `docs/architecture/bottle-classifier.md`
+- [Whisky Identity Model](./whisky-identity-model.md)
+- [Bottle Classifier](./bottle-classifier.md)
 - `packages/bottle-classifier/src/eval-fixtures/new-bottles/`
 - `packages/bottle-classifier/src/eval-fixtures/legacy-release-repair/`
 
@@ -43,9 +42,10 @@ Use this alongside:
 | `SMWS 6.53`                                         | `SMWS 6.53`                                        | none                             | Society code is part of the bottle identity itself.                                                                                                                       |
 | `Octomore 13.1`                                     | `Octomore 13.1`                                    | none                             | This is generally a distinct bottle expression, not a child release of `Octomore 13`.                                                                                     |
 
-## Practical Rules For Cleanup
+## Practical Rules
 
-Use these rules during the cleanup pass:
+Use these rules when adding examples or translating production misses into
+fixtures:
 
 1. Prefer bottle-level identity when the title looks like a stable marketed
    expression.
