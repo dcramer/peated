@@ -44,9 +44,8 @@ export default async function createMissingBottles() {
           currentBottleId: review.bottleId,
           currentReleaseId: review.releaseId,
         },
-        // Backfill uses the same conservative rule as live review ingestion:
-        // only raw exact aliases are trusted before classifier review because a
-        // normalized fallback can collapse real release detail to the parent.
+        // Normalized fallback aliases can collapse real release detail to the
+        // parent before the classifier reviews the full reference title.
         aliasLookupNames: [review.name],
         user: systemUser,
       });
@@ -73,6 +72,12 @@ export default async function createMissingBottles() {
           bottleId,
           releaseId: resolution.releaseId,
           name: review.name,
+          ...(resolution.source !== "exact_alias"
+            ? {
+                assignmentSource: "classifier_approved" as const,
+                assignedById: systemUser.id,
+              }
+            : {}),
         });
 
         if (

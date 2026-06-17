@@ -121,6 +121,10 @@ export type NormalizedBottle = {
   singleCask?: boolean | null;
 };
 
+/**
+ * Normalizes explicit age wording and extracts stated age from those phrases.
+ * Bare numeric names are preserved even when a structured age is supplied.
+ */
 export function normalizeBottleAge({
   name,
   statedAge = null,
@@ -132,13 +136,6 @@ export function normalizeBottleAge({
   name = name.replace(AGE_EXTRACT_REGEXP, (match, p1) => {
     return convertWordToNumber(p1) + "-year-old";
   });
-
-  if (statedAge) {
-    name = name.replace(
-      new RegExp(`(^|\\s)(${statedAge})($|\\s)`),
-      `$1${statedAge}${ageSuffix}$3`,
-    );
-  }
 
   const match = name.match(/\b(\d{1,2})-year-old($|\s|,)/i);
   if (!statedAge && match) {
@@ -184,17 +181,6 @@ export function normalizeBottle({
   singleCask?: boolean | null;
   isFullName?: boolean;
 }): NormalizedBottle {
-  if (statedAge && name == `${statedAge}`) {
-    return {
-      name: `${statedAge}${ageSuffix}`,
-      statedAge,
-      vintageYear,
-      releaseYear,
-      caskStrength,
-      singleCask,
-    };
-  }
-
   const currentYear = new Date().getFullYear();
 
   name = normalizeString(name);

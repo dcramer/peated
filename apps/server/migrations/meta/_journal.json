@@ -1268,6 +1268,13 @@
       "when": 1778130140568,
       "tag": "0180_silent_justin_hammer",
       "breakpoints": false
+    },
+    {
+      "idx": 181,
+      "version": "7",
+      "when": 1781625297724,
+      "tag": "0181_majestic_hellfire_club",
+      "breakpoints": false
     }
   ]
 }

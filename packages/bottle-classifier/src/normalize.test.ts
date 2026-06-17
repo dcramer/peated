@@ -44,6 +44,28 @@ describe("normalize", () => {
     });
   });
 
+  test("does not rewrite bare numeric expressions into age statements", () => {
+    expect(
+      normalizeBottleAge({
+        name: "The Last Drop 42",
+        statedAge: 42,
+      }),
+    ).toEqual({
+      name: "The Last Drop 42",
+      statedAge: 42,
+    });
+
+    expect(
+      normalizeBottle({
+        name: "42",
+        statedAge: 42,
+      }),
+    ).toMatchObject({
+      name: "42",
+      statedAge: 42,
+    });
+  });
+
   test("normalizes coded batch wording but leaves generic batch names alone", () => {
     expect(
       normalizeBottle({

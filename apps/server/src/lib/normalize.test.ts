@@ -10,7 +10,7 @@ describe("normalizeBottle", () => {
       name: "10",
       statedAge: 10,
     });
-    expect(name).toMatchInlineSnapshot(`"10-year-old"`);
+    expect(name).toMatchInlineSnapshot(`"10"`);
     expect(statedAge).toBe(10);
   });
 
@@ -19,7 +19,7 @@ describe("normalizeBottle", () => {
       name: "Delicious 10",
       statedAge: 10,
     });
-    expect(name).toMatchInlineSnapshot(`"Delicious 10-year-old"`);
+    expect(name).toMatchInlineSnapshot(`"Delicious 10"`);
     expect(statedAge).toBe(10);
   });
 
@@ -37,7 +37,7 @@ describe("normalizeBottle", () => {
       name: "10 Wood",
       statedAge: 10,
     });
-    expect(name).toMatchInlineSnapshot(`"10-year-old Wood"`);
+    expect(name).toMatchInlineSnapshot(`"10 Wood"`);
     expect(statedAge).toBe(10);
   });
 

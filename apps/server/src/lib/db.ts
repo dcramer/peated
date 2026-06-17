@@ -5,7 +5,13 @@ import { and, eq, getTableColumns, inArray, ne, sql } from "drizzle-orm";
 import type { PgTableWithColumns, TableConfig } from "drizzle-orm/pg-core";
 import { type z } from "zod";
 import type { AnyDatabase } from "../db";
-import type { BottleAlias, Collection, Entity, EntityType } from "../db/schema";
+import type {
+  BottleAlias,
+  BottleAliasAssignmentSource,
+  Collection,
+  Entity,
+  EntityType,
+} from "../db/schema";
 import {
   bottleAliases,
   changes,
@@ -449,18 +455,33 @@ async function getLegacyDefaultCollection(
   );
 }
 
+/**
+ * Upserts a bottle alias without stealing an existing target. Targeted aliases
+ * default to legacy assertions unless explicit provenance is supplied.
+ */
 export async function upsertBottleAlias(
   db: AnyDatabase,
   name: string,
   bottleId: number | null = null,
   releaseId: number | null = null,
+  options: {
+    assignmentSource?: BottleAliasAssignmentSource;
+    assignedById?: number | null;
+  } = {},
 ) {
-  // both branches force a harmless update so RETURNING works
+  const { assignmentSource, assignedById } = options;
+  const hasExplicitAssignmentOptions =
+    assignmentSource !== undefined || "assignedById" in options;
+  const nextAssignmentSource = assignmentSource ?? "legacy";
+  const nextAssignedById = assignedById ?? null;
+
+  // Preserve existing targets on conflicts. Explicit provenance may update an
+  // already-bound alias only when the incoming target is the same target.
   const query =
     bottleId || releaseId
       ? await db.execute<BottleAlias>(
-          sql`INSERT INTO ${bottleAliases} (bottle_id, release_id, name)
-      VALUES (${bottleId}, ${releaseId}, ${name})
+          sql`INSERT INTO ${bottleAliases} (bottle_id, release_id, name, assignment_source, assigned_by_id)
+      VALUES (${bottleId}, ${releaseId}, ${name}, ${nextAssignmentSource}, ${nextAssignedById})
       ON CONFLICT (LOWER(name))
       DO UPDATE SET
         bottle_id = CASE
@@ -472,35 +493,42 @@ export async function upsertBottleAlias(
           WHEN ${bottleAliases.releaseId} IS NULL
             THEN EXCLUDED.release_id
             ELSE ${bottleAliases.releaseId}
+          END,
+        assignment_source = CASE
+          WHEN ${bottleAliases.bottleId} IS NULL OR (
+            ${hasExplicitAssignmentOptions}
+            AND ${bottleAliases.bottleId} IS NOT DISTINCT FROM EXCLUDED.bottle_id
+            AND (
+              ${bottleAliases.releaseId} IS NULL
+              OR ${bottleAliases.releaseId} IS NOT DISTINCT FROM EXCLUDED.release_id
+            )
+          )
+            THEN EXCLUDED.assignment_source
+            ELSE ${bottleAliases.assignmentSource}
+          END,
+        assigned_by_id = CASE
+          WHEN ${bottleAliases.bottleId} IS NULL OR (
+            ${hasExplicitAssignmentOptions}
+            AND ${bottleAliases.bottleId} IS NOT DISTINCT FROM EXCLUDED.bottle_id
+            AND (
+              ${bottleAliases.releaseId} IS NULL
+              OR ${bottleAliases.releaseId} IS NOT DISTINCT FROM EXCLUDED.release_id
+            )
+          )
+            THEN EXCLUDED.assigned_by_id
+            ELSE ${bottleAliases.assignedById}
           END
       RETURNING *`,
         )
       : await db.execute<BottleAlias>(
-          sql`INSERT INTO ${bottleAliases} (bottle_id, release_id, name)
-      VALUES (${bottleId}, ${releaseId}, ${name})
+          sql`INSERT INTO ${bottleAliases} (bottle_id, release_id, name, assignment_source, assigned_by_id)
+      VALUES (${bottleId}, ${releaseId}, ${name}, ${nextAssignmentSource}, ${nextAssignedById})
       ON CONFLICT (LOWER(name))
       DO UPDATE SET name = ${bottleAliases.name}
       RETURNING *`,
         );
 
   return mapRows(query.rows, bottleAliases)[0];
-
-  // TODO: target does not yet support our constraint ref
-  // await tx
-  //   .insert(bottleAliases)
-  //   .values({
-  //     bottleId: bottle.id,
-  //     name: aliasName,
-  //     createdAt: bottle.createdAt,
-  //   })
-  //   .onConflictDoUpdate({
-  //     target: sql`LOWER($bottleAliases.name})`,
-  //     targetWhere: sql`LOWER(${bottleAliases.name}) = ${aliasName}`,
-  //     set: {
-  //       bottleId: bottle.id,
-  //     },
-  //     setWhere: isNull(bottleAliases.bottleId),
-  //   });
 }
 
 export function mapRows<T extends TableConfig>(

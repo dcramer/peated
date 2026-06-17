@@ -266,7 +266,7 @@ describe("PATCH /bottle-releases/:release", () => {
     const modUser = await fixtures.User({ mod: true });
 
     const bottle = await fixtures.Bottle({
-      name: "10",
+      name: "10-year-old",
       statedAge: 10,
     });
 

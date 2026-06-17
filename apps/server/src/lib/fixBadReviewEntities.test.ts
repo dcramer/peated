@@ -52,7 +52,7 @@ describe("fixBadReviewEntities", () => {
     );
   });
 
-  test("reassigns a mismatched review to the classifier-selected bottle", async ({
+  test("reassigns a mismatched review to the exact alias target", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
@@ -155,7 +155,10 @@ describe("fixBadReviewEntities", () => {
     const alias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, review.name),
     });
-    expect(alias?.bottleId).toEqual(correctBottle.id);
+    expect(alias).toMatchObject({
+      bottleId: correctBottle.id,
+      assignmentSource: "legacy",
+    });
 
     const siblingReview = await db.query.reviews.findFirst({
       where: eq(reviews.id, sameNameReview.id),

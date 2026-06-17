@@ -70,6 +70,32 @@ describe("assignBottleAliasInTransaction", () => {
     });
   });
 
+  test("stores assignment provenance when assigning an alias", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const assignedBy = await fixtures.User({ mod: true });
+
+    await db.transaction(async (tx) => {
+      await assignBottleAliasInTransaction(tx, {
+        bottleId: bottle.id,
+        name: "Moderator Alias",
+        assignmentSource: "human_approved",
+        assignedById: assignedBy.id,
+      });
+    });
+
+    const alias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, "Moderator Alias"),
+    });
+
+    expect(alias).toMatchObject({
+      bottleId: bottle.id,
+      assignmentSource: "human_approved",
+      assignedById: assignedBy.id,
+    });
+  });
+
   test("preserves existing release matches when the alias stays release-owned", async ({
     fixtures,
   }) => {
