@@ -90,6 +90,10 @@ export async function assignBottleAliasInTransaction(
     volume?: number;
   } & BottleAliasAssignmentOptions,
 ): Promise<{ alias: BottleAlias; isNew: boolean }> {
+  if (!name.trim()) {
+    throw new FailedToSaveBottleAliasError();
+  }
+
   const assignmentOptions: BottleAliasAssignmentValues = {
     assignmentSource,
     assignedById,

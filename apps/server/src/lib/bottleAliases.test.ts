@@ -122,6 +122,53 @@ describe("assignBottleAliasInTransaction", () => {
     });
   });
 
+  test("rejects blank aliases without backfilling references", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const storedName = `${bottle.fullName} 2011 Release`;
+    const review = await fixtures.Review({
+      bottleId: null,
+      releaseId: null,
+      name: storedName,
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      releaseId: null,
+      name: storedName,
+      volume: 750,
+    });
+
+    await expect(
+      db.transaction(async (tx) =>
+        assignBottleAliasInTransaction(tx, {
+          bottleId: bottle.id,
+          name: "   ",
+        }),
+      ),
+    ).rejects.toThrow("Failed to save alias.");
+
+    const updatedReview = await db.query.reviews.findFirst({
+      where: eq(reviews.id, review.id),
+    });
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+    const alias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, "   "),
+    });
+
+    expect(alias).toBeUndefined();
+    expect(updatedReview).toMatchObject({
+      bottleId: null,
+      releaseId: null,
+    });
+    expect(updatedPrice).toMatchObject({
+      bottleId: null,
+      releaseId: null,
+    });
+  });
+
   test("stores assignment provenance when assigning an alias", async ({
     fixtures,
   }) => {
