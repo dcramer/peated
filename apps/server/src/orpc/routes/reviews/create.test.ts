@@ -4,6 +4,7 @@ import {
   incomingBottleDecisionLogs,
   reviews,
 } from "@peated/server/db/schema";
+import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq } from "drizzle-orm";
@@ -408,6 +409,171 @@ describe("POST /reviews", () => {
       ),
     });
     expect(decisionLog).toBeUndefined();
+  });
+
+  test("new review uses identity-preserving alias keys before classifier", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle({
+      name: "10-year-old",
+      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: "Ardbeg 10 years old",
+        issue: "Default",
+        rating: 89,
+        url: "https://example.com/ardbeg-10",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: (table, { eq }) => eq(table.id, data.id),
+    });
+    expect(review).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      name: bottle.fullName,
+    });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("new review falls back to existing raw aliases before classifier", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle({
+      name: "10-year-old",
+      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+    });
+    const rawName = "Ardbeg 10 years old";
+    const aliasKey = normalizeBottleAliasKey(rawName);
+    expect(aliasKey).not.toBe(rawName);
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: rawName,
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: rawName,
+        issue: "Default",
+        rating: 89,
+        url: "https://example.com/ardbeg-10-legacy",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: (table, { eq }) => eq(table.id, data.id),
+    });
+    const alias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, aliasKey),
+    });
+
+    expect(review).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      name: bottle.fullName,
+    });
+    expect(alias).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("new review does not use lossy normalized names as exact aliases", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const brand = await fixtures.Entity({ name: "Lagavulin" });
+    const bottle = await fixtures.Bottle({
+      name: "Distillers Edition",
+      brandId: brand.id,
+    });
+    const classifierBottle = await fixtures.Bottle({
+      name: "Distillers Edition 2011 Release",
+      brandId: brand.id,
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: classifierBottle.id,
+          matchedReleaseId: null,
+          candidateBottleIds: [classifierBottle.id],
+        },
+        {
+          candidates: [
+            {
+              bottleId: classifierBottle.id,
+              releaseId: null,
+              fullName: classifierBottle.fullName,
+              bottleFullName: classifierBottle.fullName,
+              alias: classifierBottle.fullName,
+              brand: null,
+              bottler: null,
+              series: null,
+              distillery: [],
+              category: classifierBottle.category,
+              statedAge: classifierBottle.statedAge,
+              edition: null,
+              caskStrength: classifierBottle.caskStrength,
+              singleCask: classifierBottle.singleCask,
+              abv: classifierBottle.abv,
+              vintageYear: classifierBottle.vintageYear,
+              releaseYear: classifierBottle.releaseYear,
+              caskType: classifierBottle.caskType,
+              caskSize: classifierBottle.caskSize,
+              caskFill: classifierBottle.caskFill,
+            },
+          ],
+        },
+      ),
+    );
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: "Lagavulin Distillers Edition 2011 Release",
+        issue: "Default",
+        rating: 89,
+        url: "https://example.com/lagavulin-2011",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: (table, { eq }) => eq(table.id, data.id),
+    });
+    expect(review).toMatchObject({
+      bottleId: classifierBottle.id,
+      releaseId: null,
+      name: bottle.fullName,
+    });
+    const alias = await db.query.bottleAliases.findFirst({
+      where: eq(
+        bottleAliases.name,
+        normalizeBottleAliasKey("Lagavulin Distillers Edition 2011 Release"),
+      ),
+    });
+    expect(alias).toMatchObject({
+      bottleId: classifierBottle.id,
+      releaseId: null,
+    });
   });
 
   test("new review can match an existing bottle through the classifier", async ({

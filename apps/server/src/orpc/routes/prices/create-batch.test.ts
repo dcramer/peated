@@ -1,6 +1,9 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import {
+  normalizeBottle,
+  normalizeBottleAliasKey,
+} from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
-import { bottleAliases, storePrices } from "@peated/server/db/schema";
+import { bottleAliases, reviews, storePrices } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
@@ -238,7 +241,7 @@ describe("POST /external-sites/:site/prices", () => {
     );
   });
 
-  test("does not trust normalized aliases as exact matches", async ({
+  test("uses identity-preserving alias keys as exact matches", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
@@ -271,18 +274,118 @@ describe("POST /external-sites/:site/prices", () => {
       .where(eq(storePrices.externalSiteId, site.id));
 
     expect(prices.length).toBe(1);
-    expect(prices[0].bottleId).toBeNull();
+    expect(prices[0].bottleId).toBe(bottle.id);
     expect(prices[0].releaseId).toBeNull();
     expect(prices[0].name).toBe("Ardbeg 10-year-old");
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  });
+
+  test("falls back to existing raw aliases for legacy exact matches", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const bottle = await fixtures.Bottle({
+      name: "10-year-old",
+      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+    });
+    const rawName = "Ardbeg 10 years old";
+    const aliasKey = normalizeBottleAliasKey(rawName);
+    expect(aliasKey).not.toBe(rawName);
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: rawName,
+    });
+    const rawReview = await fixtures.Review({
+      bottleId: null,
+      releaseId: null,
+      name: rawName,
+    });
+    const user = await fixtures.User({ admin: true });
+
+    await routerClient.prices.createBatch(
+      {
+        site: site.type,
+        prices: [
+          {
+            name: rawName,
+            price: 3999,
+            currency: "usd",
+            volume: 750,
+            url: "http://example.com/legacy-raw-alias",
+          },
+        ],
+      },
+      { context: { user } },
+    );
+
+    const [price] = await db
+      .select()
+      .from(storePrices)
+      .where(eq(storePrices.externalSiteId, site.id));
+    const alias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, aliasKey),
+    });
+    const updatedRawReview = await db.query.reviews.findFirst({
+      where: eq(reviews.id, rawReview.id),
+    });
+
+    expect(price.bottleId).toBe(bottle.id);
+    expect(updatedRawReview).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+    expect(alias).toMatchObject({
+      bottleId: bottle.id,
+      assignmentSource: "source_approved",
+      assignedById: user.id,
+    });
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  });
+
+  test("does not use lossy normalized listing names as exact matches", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const bottle = await fixtures.Bottle({
+      name: "Distillers Edition",
+      brandId: (await fixtures.Entity({ name: "Lagavulin" })).id,
+    });
+    expect(bottle.fullName).toBe("Lagavulin Distillers Edition");
+    const user = await fixtures.User({ admin: true });
+
+    await routerClient.prices.createBatch(
+      {
+        site: site.type,
+        prices: [
+          {
+            name: "Lagavulin Distillers Edition 2011 Release",
+            price: 3999,
+            currency: "usd",
+            volume: 750,
+            url: "http://example.com/lossy-normalized-alias",
+          },
+        ],
+      },
+      { context: { user } },
+    );
+
+    const [price] = await db
+      .select()
+      .from(storePrices)
+      .where(eq(storePrices.externalSiteId, site.id));
+
+    expect(price.bottleId).toBeNull();
+    expect(price.releaseId).toBeNull();
+    expect(price.name).toBe(bottle.fullName);
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       {
-        priceId: prices[0].id,
+        priceId: price.id,
       },
     );
   });
 
-  test("trusts only the raw source alias that exactly matched", async ({
+  test("writes the same accepted alias key used for lookup", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
@@ -291,12 +394,12 @@ describe("POST /external-sites/:site/prices", () => {
       brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
     });
     const rawName = "Ardbeg 10 years old Whisky";
-    const normalizedName = normalizeBottle({ name: rawName }).name;
-    expect(normalizedName).not.toBe(rawName);
+    const aliasKey = normalizeBottleAliasKey(rawName);
+    expect(aliasKey).not.toBe(rawName);
 
     await fixtures.BottleAlias({
       bottleId: bottle.id,
-      name: rawName,
+      name: aliasKey,
     });
     const user = await fixtures.User({ admin: true });
 
@@ -316,17 +419,17 @@ describe("POST /external-sites/:site/prices", () => {
       { context: { user } },
     );
 
-    const rawAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, rawName),
+    const alias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, aliasKey),
     });
-    expect(rawAlias).toMatchObject({
+    expect(alias).toMatchObject({
       bottleId: bottle.id,
       assignmentSource: "source_approved",
       assignedById: user.id,
     });
     expect(
       await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, normalizedName),
+        where: eq(bottleAliases.name, rawName),
       }),
     ).toBeUndefined();
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();

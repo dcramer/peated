@@ -1,4 +1,7 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import {
+  normalizeBottle,
+  normalizeBottleAliasKey,
+} from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import type { StorePrice } from "@peated/server/db/schema";
 import {
@@ -6,8 +9,8 @@ import {
   storePriceHistories,
   storePrices,
 } from "@peated/server/db/schema";
+import { assignBottleAliasInTransaction } from "@peated/server/lib/bottleAliases";
 import { findBottleTarget } from "@peated/server/lib/bottleFinder";
-import { upsertBottleAlias } from "@peated/server/lib/db";
 import { chunked } from "@peated/server/lib/scraper";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
@@ -54,9 +57,14 @@ export default procedure
         prices.map(async (sp) => {
           const [price] = await db.transaction(async (tx) => {
             const { name } = normalizeBottle({ name: sp.name });
-            // Exact alias assignment uses the raw scraped title; the normalized
-            // store_price name is for storage/de-duping, not identity proof.
-            const target = await findBottleTarget(sp.name, tx);
+            const aliasKey = normalizeBottleAliasKey(sp.name);
+            // New assignments use the deterministic key, but lookup still
+            // accepts legacy raw aliases created before alias keys existed.
+            const target =
+              (await findBottleTarget(aliasKey, tx)) ??
+              (aliasKey !== sp.name
+                ? await findBottleTarget(sp.name, tx)
+                : null);
             const bottleId = target?.bottleId ?? null;
             const releaseId = target?.releaseId ?? null;
 
@@ -90,7 +98,13 @@ export default procedure
               .onConflictDoNothing();
 
             if (bottleId) {
-              await upsertBottleAlias(tx, sp.name, bottleId, releaseId, {
+              await assignBottleAliasInTransaction(tx, {
+                name: aliasKey,
+                backfillNames: [name, sp.name],
+                bottleId,
+                releaseId,
+                externalSiteId: site.id,
+                volume: sp.volume,
                 assignmentSource: "source_approved",
                 assignedById: context.user.id,
               });

@@ -15,6 +15,7 @@ import {
   searchBottleCandidates,
 } from "@peated/server/lib/bottleReferenceCandidates";
 import type * as CatalogVerificationModule from "@peated/server/lib/catalogVerification";
+import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import {
   applyApprovedStorePriceMatch,
   canClearIgnoredStorePriceAssignment,
@@ -828,6 +829,9 @@ describe("priceMatching", () => {
       where: eq(storePrices.id, price.id),
     });
     const listingAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    });
+    const rawListingAlias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, price.name),
     });
     const observation = await db.query.bottleObservations.findFirst({
@@ -844,6 +848,7 @@ describe("priceMatching", () => {
     });
     expect(updatedPrice?.bottleId).toBe(bottle.id);
     expect(listingAlias?.bottleId).toBe(bottle.id);
+    expect(rawListingAlias).toBeUndefined();
     expect(observation).toMatchObject({
       bottleId: bottle.id,
       releaseId: null,
@@ -2693,7 +2698,7 @@ describe("priceMatching", () => {
       where: eq(storePrices.id, price.id),
     });
     const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, price.name),
+      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
     });
 
     expect(extractFromText).not.toHaveBeenCalled();
@@ -2813,7 +2818,7 @@ describe("priceMatching", () => {
       where: eq(storePrices.id, price.id),
     });
     const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, price.name),
+      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
     });
 
     expect(extractFromText).not.toHaveBeenCalled();
@@ -2949,7 +2954,7 @@ describe("priceMatching", () => {
       where: eq(bottles.id, proposal.suggestedBottleId!),
     });
     const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, price.name),
+      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
     });
     const observation = await db.query.bottleObservations.findFirst({
       where: (bottleObservations, { eq }) =>
@@ -3414,7 +3419,7 @@ describe("priceMatching", () => {
       where: eq(bottles.id, proposal.suggestedBottleId!),
     });
     const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, price.name),
+      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
     });
     const [attempt] = await db
       .select()

@@ -1,4 +1,7 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import {
+  normalizeBottle,
+  normalizeBottleAliasKey,
+} from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import { externalSites, reviews } from "@peated/server/db/schema";
 import {
@@ -45,6 +48,9 @@ export default procedure
 
     const rawName = input.name;
     const { name: normalizedName } = normalizeBottle({ name: rawName });
+    const aliasKey = normalizeBottleAliasKey(rawName);
+    // New assignments use the deterministic key, while exact lookup also
+    // accepts legacy raw aliases created before alias keys existed.
     const resolution = await resolveBottleReferenceTarget({
       reference: {
         externalSiteId: site.id,
@@ -54,9 +60,7 @@ export default procedure
         currentBottleId: null,
         currentReleaseId: null,
       },
-      // Normalized review titles can strip release markers before the
-      // classifier has a chance to review the full reference.
-      aliasLookupNames: [rawName],
+      aliasLookupNames: [aliasKey, rawName],
       extractedIdentity: {
         category: input.category,
       },
@@ -137,7 +141,9 @@ export default procedure
       const aliasAssignment = await assignBottleAliasInTransaction(tx, {
         bottleId,
         releaseId,
-        name: reviewName,
+        name: aliasKey,
+        backfillNames: [reviewName, rawName],
+        externalSiteId: site.id,
         ...(resolution.source !== "exact_alias"
           ? {
               assignmentSource: "classifier_approved" as const,

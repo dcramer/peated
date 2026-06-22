@@ -11,7 +11,7 @@ import {
 } from "@peated/server/db/schema";
 import { logError } from "@peated/server/lib/log";
 import { pushJob, pushUniqueJob } from "@peated/server/worker/client";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 
 export class DuplicateBottleAliasError extends Error {
   constructor(readonly bottleId: number) {
@@ -66,7 +66,8 @@ function getAssignmentUpdateValues(options: BottleAliasAssignmentValues) {
 
 /**
  * Assigns a confirmed exact alias inside an existing transaction and records
- * where that assignment came from.
+ * where that assignment came from. `name` is the accepted alias key;
+ * `backfillNames` are legacy or raw stored references that should be repaired.
  */
 export async function assignBottleAliasInTransaction(
   tx: AnyDatabase,
@@ -76,6 +77,7 @@ export async function assignBottleAliasInTransaction(
     aliasReleaseId = releaseId,
     externalSiteId,
     name,
+    backfillNames = [],
     volume,
     assignmentSource,
     assignedById,
@@ -85,9 +87,14 @@ export async function assignBottleAliasInTransaction(
     aliasReleaseId?: number | null;
     externalSiteId?: number;
     name: string;
+    backfillNames?: string[];
     volume?: number;
   } & BottleAliasAssignmentOptions,
 ): Promise<{ alias: BottleAlias; isNew: boolean }> {
+  if (!name.trim()) {
+    throw new FailedToSaveBottleAliasError();
+  }
+
   const assignmentOptions: BottleAliasAssignmentValues = {
     assignmentSource,
     assignedById,
@@ -157,6 +164,16 @@ export async function assignBottleAliasInTransaction(
     throw new FailedToSaveBottleAliasError();
   }
 
+  const backfillLookupNames = Array.from(
+    new Set(
+      [name, ...backfillNames].map((value) => value.trim().toLowerCase()),
+    ),
+  ).filter(Boolean);
+  const backfillNameFilter = or(
+    ...backfillLookupNames.map((value) =>
+      eq(sql`LOWER(${storePrices.name})`, value),
+    ),
+  );
   const matchingPrices = await tx
     .update(storePrices)
     .set({
@@ -164,9 +181,13 @@ export async function assignBottleAliasInTransaction(
       releaseId,
     })
     .where(
-      sql`LOWER(${storePrices.name}) = ${name.toLowerCase()}
-        ${externalSiteId ? sql`AND ${storePrices.externalSiteId} = ${externalSiteId}` : sql``}
-        ${volume ? sql`AND ${storePrices.volume} = ${volume}` : sql``}`,
+      and(
+        backfillNameFilter,
+        externalSiteId !== undefined
+          ? eq(storePrices.externalSiteId, externalSiteId)
+          : undefined,
+        volume !== undefined ? eq(storePrices.volume, volume) : undefined,
+      ),
     )
     .returning({
       imageUrl: storePrices.imageUrl,
@@ -195,9 +216,20 @@ export async function assignBottleAliasInTransaction(
     .update(reviews)
     .set({
       bottleId,
-      releaseId: nextAliasReleaseId,
+      releaseId: releaseId ?? nextAliasReleaseId,
     })
-    .where(eq(sql`LOWER(${reviews.name})`, name.toLowerCase()));
+    .where(
+      and(
+        or(
+          ...backfillLookupNames.map((value) =>
+            eq(sql`LOWER(${reviews.name})`, value),
+          ),
+        ),
+        externalSiteId !== undefined
+          ? eq(reviews.externalSiteId, externalSiteId)
+          : undefined,
+      ),
+    );
 
   return {
     alias,
@@ -245,6 +277,7 @@ export async function assignBottleAlias(
     aliasReleaseId?: number | null;
     externalSiteId?: number;
     name: string;
+    backfillNames?: string[];
     volume?: number;
   } & BottleAliasAssignmentOptions,
   contexts?: Record<string, Record<string, any>>,
