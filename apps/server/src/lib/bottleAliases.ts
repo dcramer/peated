@@ -66,7 +66,8 @@ function getAssignmentUpdateValues(options: BottleAliasAssignmentValues) {
 
 /**
  * Assigns a confirmed exact alias inside an existing transaction and records
- * where that assignment came from.
+ * where that assignment came from. `name` is the accepted alias key;
+ * `backfillNames` are legacy or raw stored references that should be repaired.
  */
 export async function assignBottleAliasInTransaction(
   tx: AnyDatabase,
@@ -215,13 +216,18 @@ export async function assignBottleAliasInTransaction(
     .update(reviews)
     .set({
       bottleId,
-      releaseId: nextAliasReleaseId,
+      releaseId: releaseId ?? nextAliasReleaseId,
     })
     .where(
-      or(
-        ...backfillLookupNames.map((value) =>
-          eq(sql`LOWER(${reviews.name})`, value),
+      and(
+        or(
+          ...backfillLookupNames.map((value) =>
+            eq(sql`LOWER(${reviews.name})`, value),
+          ),
         ),
+        externalSiteId !== undefined
+          ? eq(reviews.externalSiteId, externalSiteId)
+          : undefined,
       ),
     );
 

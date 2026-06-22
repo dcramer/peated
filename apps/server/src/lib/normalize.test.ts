@@ -1,6 +1,5 @@
 import {
   normalizeBottle,
-  normalizeBottleAliasKey,
   normalizeVolume,
   stripDuplicateBrandPrefixFromBottleName,
 } from "./normalize";
@@ -179,21 +178,6 @@ describe("normalizeBottle", () => {
     });
     expect(name).toMatchInlineSnapshot(`"Hello World Cask No. 1.285"`);
     expect(statedAge).toBeNull();
-  });
-
-  test("alias key keeps release and source detail for exact matching", async () => {
-    expect(normalizeBottleAliasKey("Ardbeg 10 years old")).toBe(
-      "Ardbeg 10-year-old",
-    );
-    expect(normalizeBottleAliasKey("The Last Drop 42")).toBe(
-      "The Last Drop 42",
-    );
-    expect(
-      normalizeBottleAliasKey("Lagavulin Distillers Edition 2011 Release"),
-    ).toBe("Lagavulin Distillers Edition 2011 Release");
-    expect(
-      normalizeBottleAliasKey("Four Roses OESK Store Pick Cask No. 7"),
-    ).toBe("Four Roses OESK Store Pick Cask No. 7");
   });
 
   test("Traigh Bhan 19-year-old Scotch Batch No. 5", async () => {

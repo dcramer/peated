@@ -9,8 +9,8 @@ import {
   storePriceHistories,
   storePrices,
 } from "@peated/server/db/schema";
+import { assignBottleAliasInTransaction } from "@peated/server/lib/bottleAliases";
 import { findBottleTarget } from "@peated/server/lib/bottleFinder";
-import { upsertBottleAlias } from "@peated/server/lib/db";
 import { chunked } from "@peated/server/lib/scraper";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
@@ -58,6 +58,8 @@ export default procedure
           const [price] = await db.transaction(async (tx) => {
             const { name } = normalizeBottle({ name: sp.name });
             const aliasKey = normalizeBottleAliasKey(sp.name);
+            // New assignments use the deterministic key, but lookup still
+            // accepts legacy raw aliases created before alias keys existed.
             const target =
               (await findBottleTarget(aliasKey, tx)) ??
               (aliasKey !== sp.name
@@ -96,7 +98,13 @@ export default procedure
               .onConflictDoNothing();
 
             if (bottleId) {
-              await upsertBottleAlias(tx, aliasKey, bottleId, releaseId, {
+              await assignBottleAliasInTransaction(tx, {
+                name: aliasKey,
+                backfillNames: [name, sp.name],
+                bottleId,
+                releaseId,
+                externalSiteId: site.id,
+                volume: sp.volume,
                 assignmentSource: "source_approved",
                 assignedById: context.user.id,
               });

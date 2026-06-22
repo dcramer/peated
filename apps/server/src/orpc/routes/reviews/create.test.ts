@@ -496,11 +496,53 @@ describe("POST /reviews", () => {
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
+    const brand = await fixtures.Entity({ name: "Lagavulin" });
     const bottle = await fixtures.Bottle({
       name: "Distillers Edition",
-      brandId: (await fixtures.Entity({ name: "Lagavulin" })).id,
+      brandId: brand.id,
+    });
+    const classifierBottle = await fixtures.Bottle({
+      name: "Distillers Edition 2011 Release",
+      brandId: brand.id,
     });
     const adminUser = await fixtures.User({ admin: true });
+
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: classifierBottle.id,
+          matchedReleaseId: null,
+          candidateBottleIds: [classifierBottle.id],
+        },
+        {
+          candidates: [
+            {
+              bottleId: classifierBottle.id,
+              releaseId: null,
+              fullName: classifierBottle.fullName,
+              bottleFullName: classifierBottle.fullName,
+              alias: classifierBottle.fullName,
+              brand: null,
+              bottler: null,
+              series: null,
+              distillery: [],
+              category: classifierBottle.category,
+              statedAge: classifierBottle.statedAge,
+              edition: null,
+              caskStrength: classifierBottle.caskStrength,
+              singleCask: classifierBottle.singleCask,
+              abv: classifierBottle.abv,
+              vintageYear: classifierBottle.vintageYear,
+              releaseYear: classifierBottle.releaseYear,
+              caskType: classifierBottle.caskType,
+              caskSize: classifierBottle.caskSize,
+              caskFill: classifierBottle.caskFill,
+            },
+          ],
+        },
+      ),
+    );
 
     const data = await routerClient.reviews.create(
       {
@@ -518,11 +560,20 @@ describe("POST /reviews", () => {
       where: (table, { eq }) => eq(table.id, data.id),
     });
     expect(review).toMatchObject({
-      bottleId: null,
+      bottleId: classifierBottle.id,
       releaseId: null,
       name: bottle.fullName,
     });
-    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+    const alias = await db.query.bottleAliases.findFirst({
+      where: eq(
+        bottleAliases.name,
+        normalizeBottleAliasKey("Lagavulin Distillers Edition 2011 Release"),
+      ),
+    });
+    expect(alias).toMatchObject({
+      bottleId: classifierBottle.id,
+      releaseId: null,
+    });
   });
 
   test("new review can match an existing bottle through the classifier", async ({

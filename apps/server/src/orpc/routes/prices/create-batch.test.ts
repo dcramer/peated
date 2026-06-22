@@ -3,7 +3,7 @@ import {
   normalizeBottleAliasKey,
 } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
-import { bottleAliases, storePrices } from "@peated/server/db/schema";
+import { bottleAliases, reviews, storePrices } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
@@ -295,6 +295,11 @@ describe("POST /external-sites/:site/prices", () => {
       bottleId: bottle.id,
       name: rawName,
     });
+    const rawReview = await fixtures.Review({
+      bottleId: null,
+      releaseId: null,
+      name: rawName,
+    });
     const user = await fixtures.User({ admin: true });
 
     await routerClient.prices.createBatch(
@@ -320,8 +325,15 @@ describe("POST /external-sites/:site/prices", () => {
     const alias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, aliasKey),
     });
+    const updatedRawReview = await db.query.reviews.findFirst({
+      where: eq(reviews.id, rawReview.id),
+    });
 
     expect(price.bottleId).toBe(bottle.id);
+    expect(updatedRawReview).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+    });
     expect(alias).toMatchObject({
       bottleId: bottle.id,
       assignmentSource: "source_approved",

@@ -70,22 +70,63 @@ describe("assignBottleAliasInTransaction", () => {
     });
   });
 
+  test("updates matching reviews with the accepted release when alias stays bottle-level", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Batch 1",
+    });
+    const review = await fixtures.Review({
+      bottleId: null,
+      releaseId: null,
+      name: release.fullName,
+    });
+
+    await db.transaction(async (tx) => {
+      await assignBottleAliasInTransaction(tx, {
+        bottleId: bottle.id,
+        releaseId: release.id,
+        aliasReleaseId: null,
+        name: release.fullName,
+      });
+    });
+
+    const alias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, release.fullName),
+    });
+    const updatedReview = await db.query.reviews.findFirst({
+      where: eq(reviews.id, review.id),
+    });
+
+    expect(alias).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+    expect(updatedReview).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: release.id,
+    });
+  });
+
   test("backfills stored reference names that differ from the alias name", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
     const storedName = `${bottle.fullName} 2011 Release`;
     const aliasName = `${storedName} Imported Label`;
-    const review = await fixtures.Review({
-      bottleId: null,
-      releaseId: null,
-      name: storedName,
-    });
     const price = await fixtures.StorePrice({
       bottleId: null,
       releaseId: null,
       name: storedName,
       volume: 750,
+    });
+    const review = await fixtures.Review({
+      bottleId: null,
+      releaseId: null,
+      name: storedName,
+      externalSiteId: price.externalSiteId,
     });
 
     await db.transaction(async (tx) => {
@@ -118,6 +159,61 @@ describe("assignBottleAliasInTransaction", () => {
     });
     expect(updatedPrice).toMatchObject({
       bottleId: bottle.id,
+      releaseId: null,
+    });
+  });
+
+  test("scopes stored reference backfills by external site", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const storedName = `${bottle.fullName} 2011 Release`;
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const otherSite = await fixtures.ExternalSiteOrExisting({
+      type: "astorwines",
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      releaseId: null,
+      name: storedName,
+      volume: 750,
+      externalSiteId: site.id,
+    });
+    const matchingReview = await fixtures.Review({
+      bottleId: null,
+      releaseId: null,
+      name: storedName,
+      externalSiteId: site.id,
+    });
+    const otherSiteReview = await fixtures.Review({
+      bottleId: null,
+      releaseId: null,
+      name: storedName,
+      externalSiteId: otherSite.id,
+    });
+
+    await db.transaction(async (tx) => {
+      await assignBottleAliasInTransaction(tx, {
+        bottleId: bottle.id,
+        name: storedName,
+        externalSiteId: price.externalSiteId,
+        volume: price.volume,
+      });
+    });
+
+    const updatedMatchingReview = await db.query.reviews.findFirst({
+      where: eq(reviews.id, matchingReview.id),
+    });
+    const updatedOtherSiteReview = await db.query.reviews.findFirst({
+      where: eq(reviews.id, otherSiteReview.id),
+    });
+
+    expect(updatedMatchingReview).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+    expect(updatedOtherSiteReview).toMatchObject({
+      bottleId: null,
       releaseId: null,
     });
   });

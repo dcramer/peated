@@ -5,6 +5,7 @@ import {
   reviews,
   storePrices,
 } from "@peated/server/db/schema";
+import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import createMissingBottles from "@peated/server/worker/jobs/createMissingBottles";
 import { and, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -124,7 +125,7 @@ describe("createMissingBottles", () => {
     expect(bottle?.fullName).toEqual("Springbank Bottle Name");
 
     const alias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, review.name),
+      where: eq(bottleAliases.name, normalizeBottleAliasKey(review.name)),
     });
     expect(alias).toMatchObject({
       bottleId: updatedReview?.bottleId,

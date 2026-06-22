@@ -10,6 +10,7 @@ import {
   recordIncomingBottleDecisionInTransaction,
   shouldRecordIncomingBottleDecision,
 } from "@peated/server/lib/incomingBottleDecisionLog";
+import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import { and, asc, gt, isNull } from "drizzle-orm";
 
@@ -33,6 +34,7 @@ export default async function createMissingBottles() {
 
     for (const review of missingInReviews) {
       cursor = review.id;
+      const aliasKey = normalizeBottleAliasKey(review.name);
 
       const resolution = await resolveBottleReferenceTarget({
         reference: {
@@ -46,7 +48,7 @@ export default async function createMissingBottles() {
         },
         // Normalized fallback aliases can collapse real release detail to the
         // parent before the classifier reviews the full reference title.
-        aliasLookupNames: [review.name],
+        aliasLookupNames: [aliasKey, review.name],
         user: systemUser,
       });
 
@@ -71,7 +73,9 @@ export default async function createMissingBottles() {
         const aliasAssignment = await assignBottleAliasInTransaction(tx, {
           bottleId,
           releaseId: resolution.releaseId,
-          name: review.name,
+          name: aliasKey,
+          backfillNames: [review.name],
+          externalSiteId: review.externalSiteId,
           ...(resolution.source !== "exact_alias"
             ? {
                 assignmentSource: "classifier_approved" as const,

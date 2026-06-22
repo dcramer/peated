@@ -49,6 +49,8 @@ export default procedure
     const rawName = input.name;
     const { name: normalizedName } = normalizeBottle({ name: rawName });
     const aliasKey = normalizeBottleAliasKey(rawName);
+    // New assignments use the deterministic key, while exact lookup also
+    // accepts legacy raw aliases created before alias keys existed.
     const resolution = await resolveBottleReferenceTarget({
       reference: {
         externalSiteId: site.id,
@@ -140,7 +142,8 @@ export default procedure
         bottleId,
         releaseId,
         name: aliasKey,
-        backfillNames: [reviewName, normalizedName],
+        backfillNames: [reviewName, rawName],
+        externalSiteId: site.id,
         ...(resolution.source !== "exact_alias"
           ? {
               assignmentSource: "classifier_approved" as const,
