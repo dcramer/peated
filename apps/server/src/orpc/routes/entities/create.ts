@@ -9,7 +9,10 @@ import {
   regions,
 } from "@peated/server/db/schema";
 import { queueEntityCreationVerification } from "@peated/server/lib/catalogVerification";
-import { upsertEntityAliases } from "@peated/server/lib/db";
+import {
+  DuplicateEntityAliasError,
+  upsertEntityAliases,
+} from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
 import { buildEntitySearchVector } from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
@@ -114,25 +117,34 @@ export default procedure
         return null;
       }
 
-      await Promise.all([
-        upsertEntityAliases({
+      try {
+        await upsertEntityAliases({
           db: tx,
           entity,
-        }),
-        tx.insert(changes).values({
-          objectType: "entity",
-          objectId: entity.id,
-          displayName: entity.name,
-          type: "add",
-          createdAt: entity.createdAt,
-          createdById: user.id,
-          data: {
-            ...data,
-            catalogVerification:
-              buildCatalogVerificationCreationMetadata("manual_entry"),
-          },
-        }),
-      ]);
+        });
+      } catch (err) {
+        if (err instanceof DuplicateEntityAliasError) {
+          throw errors.CONFLICT({
+            message: err.message,
+            cause: err,
+          });
+        }
+        throw err;
+      }
+
+      await tx.insert(changes).values({
+        objectType: "entity",
+        objectId: entity.id,
+        displayName: entity.name,
+        type: "add",
+        createdAt: entity.createdAt,
+        createdById: user.id,
+        data: {
+          ...data,
+          catalogVerification:
+            buildCatalogVerificationCreationMetadata("manual_entry"),
+        },
+      });
 
       return {
         entity,

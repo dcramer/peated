@@ -184,11 +184,16 @@ export const SMWS_DISTILLERY_CODES: Record<string, string> = {
   156: "Glasgow Distillery",
   157: "Armorik",
   158: "Yuza",
-  159: "Komagatake",
-  160: "Tsunuki",
-  161: "Mc'nean Distillery",
-  162: "",
+  159: "Mars Shinshu",
+  160: "Mars Tsunuki",
+  161: "Nc'nean Distillery",
+  162: "Isle of Raasay Distillery",
   163: "Isle of Harris Distillery",
+  164: "Penderyn Distillery", // double distilled
+  165: "Wolfburn", // peated
+  166: "Torabhaig",
+  167: "The Clydeside Distillery",
+  168: "InchDairnie Distillery", // KinGlassie
 
   // Single Grain
   G1: "North British",

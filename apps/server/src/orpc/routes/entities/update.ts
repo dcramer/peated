@@ -9,7 +9,10 @@ import {
   entities,
   regions,
 } from "@peated/server/db/schema";
-import { upsertEntityAliases } from "@peated/server/lib/db";
+import {
+  DuplicateEntityAliasError,
+  upsertEntityAliases,
+} from "@peated/server/lib/db";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
@@ -182,11 +185,21 @@ export default procedure
       if (!newEntity) return;
 
       if (data.name || data.shortName !== undefined) {
-        await upsertEntityAliases({
-          db: tx,
-          entity: newEntity,
-          previousEntity: entity,
-        });
+        try {
+          await upsertEntityAliases({
+            db: tx,
+            entity: newEntity,
+            previousEntity: entity,
+          });
+        } catch (err) {
+          if (err instanceof DuplicateEntityAliasError) {
+            throw errors.CONFLICT({
+              message: err.message,
+              cause: err,
+            });
+          }
+          throw err;
+        }
       }
 
       if (data.name || data.shortName !== undefined) {
