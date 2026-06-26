@@ -78,6 +78,16 @@ export function coerceToUpsert({
   return rv;
 }
 
+export class DuplicateEntityAliasError extends Error {
+  constructor(
+    readonly entityId: number,
+    readonly aliasName: string,
+  ) {
+    super(`Duplicate entity alias found (${entityId}) for "${aliasName}".`);
+    this.name = "DuplicateEntityAliasError";
+  }
+}
+
 function getEntityAliasNames({
   name,
   shortName,
@@ -243,9 +253,7 @@ export async function upsertEntityAliases({
       continue;
     }
 
-    throw new Error(
-      `Duplicate entity alias found (${existingAlias.entityId}) for "${aliasName}".`,
-    );
+    throw new DuplicateEntityAliasError(existingAlias.entityId, aliasName);
   }
 
   if (!previousEntity) {

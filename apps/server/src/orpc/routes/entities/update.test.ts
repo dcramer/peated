@@ -396,6 +396,47 @@ describe("PATCH /entities/:entity", () => {
     expect(preservedShortNameAlias?.entityId).toEqual(entity.id);
   });
 
+  test("rejects a rename that would claim another entity alias", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Original Distillery",
+    });
+    const aliasOwner = await fixtures.Entity({
+      name: "Alias Owner",
+    });
+    await fixtures.EntityAlias({
+      entityId: aliasOwner.id,
+      name: "Mars Shinshu",
+    });
+
+    const modUser = await fixtures.User({ mod: true });
+    const err = await waitError(
+      routerClient.entities.update(
+        {
+          entity: entity.id,
+          name: "Mars Shinshu",
+        },
+        { context: { user: modUser } },
+      ),
+    );
+
+    expect(err.message).toBe(
+      `Duplicate entity alias found (${aliasOwner.id}) for "Mars Shinshu".`,
+    );
+
+    const [unchangedEntity] = await db
+      .select()
+      .from(entities)
+      .where(eq(entities.id, entity.id));
+    expect(unchangedEntity.name).toBe("Original Distillery");
+
+    const conflictingAlias = await db.query.entityAliases.findFirst({
+      where: eq(entityAliases.name, "Mars Shinshu"),
+    });
+    expect(conflictingAlias?.entityId).toBe(aliasOwner.id);
+  });
+
   test("changing short name retires the old entity alias", async ({
     fixtures,
   }) => {

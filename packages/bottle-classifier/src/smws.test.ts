@@ -50,6 +50,36 @@ describe("smws", () => {
       name: "RW6.5 Sauna Smoke",
       selector: "Sauna Smoke",
     });
+    expect(parseReferenceName("SMWS 162.1 Island intrigue")).toMatchObject({
+      category: "single_malt",
+      code: "162.1",
+      distiller: "Isle of Raasay Distillery",
+    });
+    expect(parseReferenceName("SMWS 164.1 Welsh rarity")).toMatchObject({
+      category: "single_malt",
+      code: "164.1",
+      distiller: "Penderyn Distillery",
+    });
+    expect(parseReferenceName("SMWS 165.1 Northern peat")).toMatchObject({
+      category: "single_malt",
+      code: "165.1",
+      distiller: "Wolfburn",
+    });
+    expect(parseReferenceName("SMWS 166.1 Island smoke")).toMatchObject({
+      category: "single_malt",
+      code: "166.1",
+      distiller: "Torabhaig",
+    });
+    expect(parseReferenceName("SMWS 167.1 Riverside dram")).toMatchObject({
+      category: "single_malt",
+      code: "167.1",
+      distiller: "The Clydeside Distillery",
+    });
+    expect(parseReferenceName("SMWS 168.1 KinGlassie preview")).toMatchObject({
+      category: "single_malt",
+      code: "168.1",
+      distiller: "InchDairnie Distillery",
+    });
     expect(parseReferenceName("RW6.5 Sauna Smoke")).toBeNull();
     expect(parseReferenceName("SMWS single cask 54.2% ABV")).toBeNull();
   });
