@@ -19,6 +19,7 @@ export type ClassifierEvalExpectation = {
     | "create_bottle"
     | "create_release"
     | "create_bottle_and_release"
+    | "repair_parent_and_create_release"
     | "no_match";
   identityScope?: "product" | "exact_cask";
   matchedBottleId?: number | null;

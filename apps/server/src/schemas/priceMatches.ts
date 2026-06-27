@@ -390,36 +390,81 @@ const StorePriceMatchCreateNewDecisionSchema =
     proposedRelease: ProposedReleaseSchema.nullable().optional(),
   }).superRefine(validateCreateNewDecisionShape);
 
-export const StorePriceMatchDecisionSchema = z.discriminatedUnion("action", [
-  StorePriceMatchDecisionBaseSchema.extend({
-    action: z.literal("match_existing"),
-    suggestedBottleId: z.number().int(),
-    suggestedReleaseId: z.number().int().nullable().optional(),
-    parentBottleId: z.null().optional(),
-    creationTarget: z.null().optional(),
-    proposedBottle: z.null().default(null),
-    proposedRelease: z.null().optional(),
-  }),
-  StorePriceMatchDecisionBaseSchema.extend({
-    action: z.literal("correction"),
-    suggestedBottleId: z.number().int(),
-    suggestedReleaseId: z.number().int().nullable().optional(),
-    parentBottleId: z.null().optional(),
-    creationTarget: z.null().optional(),
-    proposedBottle: ProposedBottleSchema.nullable().default(null),
-    proposedRelease: z.null().optional(),
-  }),
-  StorePriceMatchCreateNewDecisionSchema,
-  StorePriceMatchDecisionBaseSchema.extend({
-    action: z.literal("no_match"),
-    suggestedBottleId: z.null().default(null),
-    suggestedReleaseId: z.null().optional(),
-    parentBottleId: z.null().optional(),
-    creationTarget: z.null().optional(),
-    proposedBottle: z.null().default(null),
-    proposedRelease: z.null().optional(),
-  }),
-]);
+export const StorePriceMatchDecisionSchema = z
+  .discriminatedUnion("action", [
+    StorePriceMatchDecisionBaseSchema.extend({
+      action: z.literal("match_existing"),
+      suggestedBottleId: z.number().int(),
+      suggestedReleaseId: z.number().int().nullable().optional(),
+      parentBottleId: z.null().optional(),
+      creationTarget: z.null().optional(),
+      proposedBottle: z.null().default(null),
+      proposedRelease: z.null().optional(),
+    }),
+    StorePriceMatchDecisionBaseSchema.extend({
+      action: z.literal("correction"),
+      suggestedBottleId: z.number().int(),
+      suggestedReleaseId: z.number().int().nullable().optional(),
+      parentBottleId: z.null().optional(),
+      creationTarget: z.null().optional(),
+      proposedBottle: ProposedBottleSchema.nullable().default(null),
+      proposedRelease: z.null().optional(),
+    }),
+    StorePriceMatchCreateNewDecisionSchema,
+    StorePriceMatchDecisionBaseSchema.extend({
+      action: z.literal("no_match"),
+      suggestedBottleId: z.null().default(null),
+      suggestedReleaseId: z.null().optional(),
+      parentBottleId: z.number().int().nullable().optional(),
+      creationTarget: z.null().optional(),
+      proposedBottle: ProposedBottleSchema.nullable().default(null),
+      proposedRelease: ProposedReleaseSchema.nullable().optional(),
+    }),
+  ])
+  .superRefine((value, ctx) => {
+    if (value.action !== "no_match") {
+      return;
+    }
+
+    // Plain no-match proposals are empty; compound parent repairs are
+    // review-only bundles and must preserve all drafts together.
+    const parentBottleId = value.parentBottleId ?? null;
+    const proposedBottle = value.proposedBottle ?? null;
+    const proposedRelease = value.proposedRelease ?? null;
+    const hasCompoundRepairDraft =
+      parentBottleId !== null ||
+      proposedBottle !== null ||
+      proposedRelease !== null;
+
+    if (!hasCompoundRepairDraft) {
+      return;
+    }
+
+    if (parentBottleId === null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["parentBottleId"],
+        message:
+          "Review-only parent repair proposals must include a parent bottle.",
+      });
+    }
+    if (!proposedBottle) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["proposedBottle"],
+        message:
+          "Review-only parent repair proposals must include a proposed bottle repair.",
+      });
+    }
+    if (!proposedRelease) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["proposedRelease"],
+        message:
+          "Review-only parent repair proposals must include a proposed release.",
+      });
+    }
+  });
 export const BottleClassificationDecisionSchema = StorePriceMatchDecisionSchema;
 
 export const StorePriceMatchAgentDecisionSchema =

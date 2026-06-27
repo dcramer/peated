@@ -1,7 +1,6 @@
 import { describe, expect, test } from "vitest";
 import {
   getExistingMatchIdentityConflicts,
-  hasDirtyParentStatedAgeConflict,
   hasSupportiveWebEvidenceForExistingMatch,
 } from "./bottleClassificationEvidence";
 import type { BottleCandidate, BottleSearchEvidence } from "./classifierTypes";
@@ -450,7 +449,7 @@ describe("bottleClassificationEvidence", () => {
     ).toBe(false);
   });
 
-  test("does not treat a differing age as a hard conflict for dirty parent bottle candidates", () => {
+  test("treats a differing age as a hard conflict for dirty parent bottle candidates", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 2457,
       fullName: "Glenglassaugh 1978 Rare Cask Release",
@@ -484,7 +483,7 @@ describe("bottleClassificationEvidence", () => {
         },
         targetCandidate,
       }),
-    ).not.toContain("stated_age");
+    ).toContain("stated_age");
   });
 
   test("does not treat the legacy generic spirit category as a hard existing-match conflict", () => {
@@ -519,66 +518,6 @@ describe("bottleClassificationEvidence", () => {
         }),
       }),
     ).not.toContain("category");
-  });
-
-  test("flags dirty parent stated-age conflicts only when the bottle name does not market that age", () => {
-    expect(
-      hasDirtyParentStatedAgeConflict({
-        targetCandidate: buildBottleCandidate({
-          bottleId: 11,
-          fullName: "Maker's Mark Private Selection",
-          bottleFullName: "Maker's Mark Private Selection",
-          statedAge: 10,
-        }),
-        extractedLabel: {
-          brand: "Maker's Mark",
-          bottler: null,
-          expression: "Private Selection",
-          series: null,
-          distillery: ["Maker's Mark"],
-          category: "bourbon",
-          stated_age: 12,
-          abv: null,
-          release_year: null,
-          vintage_year: null,
-          cask_type: null,
-          cask_size: null,
-          cask_fill: null,
-          cask_strength: null,
-          single_cask: null,
-          edition: null,
-        },
-      }),
-    ).toBe(true);
-
-    expect(
-      hasDirtyParentStatedAgeConflict({
-        targetCandidate: buildBottleCandidate({
-          bottleId: 12,
-          fullName: "Springbank 10yo",
-          bottleFullName: "Springbank 10yo",
-          statedAge: 10,
-        }),
-        extractedLabel: {
-          brand: "Springbank",
-          bottler: null,
-          expression: "10yo",
-          series: null,
-          distillery: ["Springbank"],
-          category: "single_malt",
-          stated_age: 12,
-          abv: null,
-          release_year: null,
-          vintage_year: null,
-          cask_type: null,
-          cask_size: null,
-          cask_fill: null,
-          cask_strength: null,
-          single_cask: null,
-          edition: null,
-        },
-      }),
-    ).toBe(false);
   });
 
   test("treats compact marketed ages like 10yo as a real stated-age conflict", () => {

@@ -67,6 +67,7 @@ export const classifierEvalExpectationSchema = z.object({
       "create_bottle",
       "create_release",
       "create_bottle_and_release",
+      "repair_parent_and_create_release",
       "no_match",
     ])
     .optional(),
@@ -99,7 +100,42 @@ export const classifierEvalFixtureSchema = z
     provenance: evalFixtureProvenanceSchema.optional(),
     expected: classifierEvalExpectationSchema,
   })
-  .strict();
+  .strict()
+  .superRefine((value, ctx) => {
+    if (value.provenance?.source !== "production_miss") {
+      return;
+    }
+
+    if (!value.input.reference.url) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "`production_miss` fixtures must preserve the observed reference URL.",
+        path: ["input", "reference", "url"],
+      });
+    }
+
+    if (value.input.extractedIdentity == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "`production_miss` fixtures must preserve the observed extracted identity.",
+        path: ["input", "extractedIdentity"],
+      });
+    }
+
+    if (
+      value.input.initialCandidates === undefined ||
+      value.input.initialCandidates.length === 0
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "`production_miss` fixtures must preserve observed local candidates.",
+        path: ["input", "initialCandidates"],
+      });
+    }
+  });
 
 export const bottleNormalizationReleaseIdentitySchema = z
   .object({

@@ -740,6 +740,11 @@ const SCENARIO_CONFIG: Array<{
     scenario: "corrections",
     threshold: 1,
   },
+  {
+    label: "parent repair releases",
+    scenario: "parent_repair_releases",
+    threshold: 1,
+  },
 ];
 
 for (const { label, scenario, threshold } of SCENARIO_CONFIG) {

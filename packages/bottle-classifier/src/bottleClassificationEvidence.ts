@@ -45,33 +45,6 @@ function nameMarketsStatedAge({
   return new RegExp(`\\b${statedAge}-year-old\\b`, "i").test(normalizedName);
 }
 
-export function hasDirtyParentStatedAgeConflict({
-  targetCandidate,
-  extractedLabel,
-}: {
-  targetCandidate: BottleCandidate;
-  extractedLabel: BottleExtractedDetails | null | undefined;
-}): boolean {
-  if (
-    !extractedLabel ||
-    extractedLabel.stated_age === null ||
-    extractedLabel.stated_age === undefined ||
-    targetCandidate.kind === "release" ||
-    targetCandidate.releaseId !== null ||
-    targetCandidate.statedAge === null ||
-    targetCandidate.statedAge === extractedLabel.stated_age
-  ) {
-    return false;
-  }
-
-  return !getTargetNameVariants(targetCandidate).some((name) =>
-    nameMarketsStatedAge({
-      name,
-      statedAge: targetCandidate.statedAge,
-    }),
-  );
-}
-
 export function extractedIdentityLooksLikePlainAgeStatementReference(
   extractedLabel: BottleExtractedDetails | null | undefined,
 ): boolean {
@@ -214,9 +187,9 @@ export function getExistingMatchIdentityConflicts({
     extractedLabel?.stated_age !== undefined &&
     targetCandidate.statedAge !== null &&
     extractedLabel.stated_age !== targetCandidate.statedAge &&
-    !hasDirtyParentStatedAgeConflict({
-      targetCandidate,
-      extractedLabel,
+    !nameMarketsStatedAge({
+      name: referenceName,
+      statedAge: targetCandidate.statedAge,
     })
   ) {
     conflicts.push("stated_age");
@@ -233,6 +206,17 @@ export function getExistingMatchIdentityConflicts({
   if (
     extractedLabel?.expression &&
     targetCandidate.fullName &&
+    !(
+      targetCandidate.statedAge !== null &&
+      nameMarketsStatedAge({
+        name: extractedLabel.expression,
+        statedAge: targetCandidate.statedAge,
+      }) &&
+      nameMarketsStatedAge({
+        name: referenceName,
+        statedAge: targetCandidate.statedAge,
+      })
+    ) &&
     !textsOverlap(extractedLabel.expression, targetCandidate.fullName) &&
     !textsOverlap(extractedLabel.expression, referenceName)
   ) {

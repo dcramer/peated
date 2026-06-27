@@ -154,6 +154,7 @@ function normalizeMockBottleClassifierDecision(decision: Record<string, any>) {
     decision.action === "create_bottle" ||
     decision.action === "create_release" ||
     decision.action === "create_bottle_and_release" ||
+    decision.action === "repair_parent_and_create_release" ||
     decision.action === "repair_bottle" ||
     decision.action === "no_match"
   ) {
@@ -2503,6 +2504,208 @@ describe("priceMatching", () => {
     expect(proposal.status).toBe("ignored");
     expect(proposal.proposalType).toBe("no_match");
     expect(proposal.enteredQueueAt).toBeNull();
+  });
+
+  test("maps parent repair plus release creation to review-safe no match", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const shieldaig = await fixtures.Entity({
+      name: "Shieldaig",
+      type: ["brand"],
+    });
+    const parentBottle = await fixtures.Bottle({
+      brandId: shieldaig.id,
+      name: "Speyside",
+      category: "single_malt",
+      statedAge: 18,
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Shieldaig Speyside Single Malt 21-year-old Scotch Whisky",
+      imageUrl: null,
+    });
+
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        decision: {
+          action: "repair_parent_and_create_release",
+          confidence: 90,
+          rationale:
+            "The local Shieldaig Speyside parent has a conflicting bottle-level age and must be repaired before creating the 21-year release.",
+          candidateBottleIds: [parentBottle.id],
+          identityScope: "product",
+          observation: null,
+          identityBasis: null,
+          confidenceBasis: null,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: parentBottle.id,
+          proposedBottle: {
+            name: "Speyside",
+            brand: {
+              name: "Shieldaig",
+            },
+            category: "single_malt",
+            statedAge: null,
+          },
+          proposedRelease: {
+            statedAge: 21,
+          },
+        },
+        searchEvidence: [],
+        candidateBottles: [
+          {
+            kind: "bottle",
+            bottleId: parentBottle.id,
+            releaseId: null,
+            alias: "Shieldaig Speyside",
+            fullName: "Shieldaig Speyside",
+            bottleFullName: "Shieldaig Speyside",
+            brand: "Shieldaig",
+            bottler: null,
+            series: null,
+            distillery: [],
+            category: "single_malt",
+            statedAge: 18,
+            edition: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 1,
+            source: ["exact"],
+          },
+        ],
+        resolvedEntities: [],
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(classifyBottleReference).toHaveBeenCalledOnce();
+    expect(proposal.status).toBe("pending_review");
+    expect(proposal.proposalType).toBe("no_match");
+    expect(proposal.suggestedBottleId).toBeNull();
+    expect(proposal.suggestedReleaseId).toBeNull();
+    expect(proposal.parentBottleId).toBe(parentBottle.id);
+    expect(proposal.creationTarget).toBeNull();
+    expect(proposal.proposedBottle).toMatchObject({
+      name: "Speyside",
+      brand: {
+        name: "Shieldaig",
+      },
+      category: "single_malt",
+      statedAge: null,
+    });
+    expect(proposal.proposedRelease).toMatchObject({
+      statedAge: 21,
+    });
+    expect(proposal.rationale).toContain(
+      "requires repairing the existing parent bottle before creating a release",
+    );
+  });
+
+  test("keeps parent repair plus release creation as no match for assigned prices", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const shieldaig = await fixtures.Entity({
+      name: "Shieldaig",
+      type: ["brand"],
+    });
+    const parentBottle = await fixtures.Bottle({
+      brandId: shieldaig.id,
+      name: "Speyside",
+      category: "single_malt",
+      statedAge: 18,
+    });
+    const assignedBottle = await fixtures.Bottle({});
+    const price = await fixtures.StorePrice({
+      bottleId: assignedBottle.id,
+      name: "Shieldaig Speyside Single Malt 21-year-old Scotch Whisky",
+      imageUrl: null,
+    });
+
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        decision: {
+          action: "repair_parent_and_create_release",
+          confidence: 90,
+          rationale:
+            "The local Shieldaig Speyside parent has a conflicting bottle-level age and must be repaired before creating the 21-year release.",
+          candidateBottleIds: [parentBottle.id],
+          identityScope: "product",
+          observation: null,
+          identityBasis: null,
+          confidenceBasis: null,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: parentBottle.id,
+          proposedBottle: {
+            name: "Speyside",
+            brand: {
+              name: "Shieldaig",
+            },
+            category: "single_malt",
+            statedAge: null,
+          },
+          proposedRelease: {
+            statedAge: 21,
+          },
+        },
+        candidateBottles: [
+          {
+            kind: "bottle",
+            bottleId: parentBottle.id,
+            releaseId: null,
+            alias: "Shieldaig Speyside",
+            fullName: "Shieldaig Speyside",
+            bottleFullName: "Shieldaig Speyside",
+            brand: "Shieldaig",
+            bottler: null,
+            series: null,
+            distillery: [],
+            category: "single_malt",
+            statedAge: 18,
+            edition: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 1,
+            source: ["exact"],
+          },
+        ],
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(proposal.status).toBe("pending_review");
+    expect(proposal.proposalType).toBe("no_match");
+    expect(proposal.currentBottleId).toBe(assignedBottle.id);
+    expect(proposal.parentBottleId).toBe(parentBottle.id);
+    expect(proposal.proposedBottle).toMatchObject({
+      statedAge: null,
+    });
+    expect(proposal.proposedRelease).toMatchObject({
+      statedAge: 21,
+    });
   });
 
   test("auto ignored bundle listings clear stale bottle assignments", async ({
