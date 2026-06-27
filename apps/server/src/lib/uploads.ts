@@ -1,4 +1,3 @@
-import { Storage } from "@google-cloud/storage";
 import { createId } from "@paralleldrive/cuid2";
 import { createWriteStream } from "node:fs";
 import sharp from "sharp";
@@ -7,6 +6,7 @@ import { startSpan } from "@sentry/node";
 import type { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import config from "../config";
+import { getStorage } from "./gcs";
 
 export const compressAndResizeImage = (
   stream: Readable,
@@ -83,10 +83,7 @@ export async function copyFile({
           bucketName,
         });
 
-        const cloudStorage = new Storage({
-          credentials: config.GCP_CREDENTIALS,
-        });
-
+        const cloudStorage = getStorage();
         const dest = cloudStorage
           .bucket(bucketName)
           .file(`${bucketPath}${output}`);
@@ -157,10 +154,6 @@ export const storeFile = async ({
           ? `${config.GCS_BUCKET_PATH}/`
           : "";
 
-        const cloudStorage = new Storage({
-          credentials: config.GCP_CREDENTIALS,
-        });
-
         await startSpan(
           {
             op: "gcs.file",
@@ -170,7 +163,7 @@ export const storeFile = async ({
             span?.setAttributes({
               bucketName,
             });
-            const file = cloudStorage
+            const file = getStorage()
               .bucket(bucketName)
               .file(`${bucketPath}${newFilename}`);
 
