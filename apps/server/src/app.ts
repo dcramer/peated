@@ -1,4 +1,3 @@
-import { Storage } from "@google-cloud/storage";
 import { getConnInfo } from "@hono/node-server/conninfo";
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
@@ -26,12 +25,14 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import { contentType } from "mime-types";
+import { Readable } from "node:stream";
 import { setTimeout } from "node:timers/promises";
 import { format } from "path";
 import type { ZodIssue } from "zod";
 import { ZodError } from "zod";
 import config from "./config";
 import { getUserFromHeader } from "./lib/auth";
+import { getStorage } from "./lib/gcs";
 import { logError } from "./lib/log";
 import router from "./orpc/router";
 import {
@@ -206,17 +207,14 @@ export const app = new Hono()
   .get("/uploads/:filename", async (c) => {
     const filename = c.req.param("filename");
 
-    let stream;
+    let stream: Readable;
     if (process.env.USE_GCS_STORAGE) {
       const bucketName = process.env.GCS_BUCKET_NAME as string;
       const bucketPath = process.env.GCS_BUCKET_PATH
         ? `${process.env.GCS_BUCKET_PATH}/`
         : "";
 
-      const cloudStorage = new Storage({
-        credentials: config.GCP_CREDENTIALS,
-      });
-      const file = cloudStorage
+      const file = getStorage()
         .bucket(bucketName)
         .file(`${bucketPath}${filename}`);
 
@@ -242,9 +240,7 @@ export const app = new Hono()
       contentType(filename) || "application/octet-stream",
     );
 
-    // Return the stream
-    // TODO: fix this
-    return c.body(stream as any);
+    return c.body(Readable.toWeb(stream) as ReadableStream<Uint8Array>);
   })
   .get("/", async (c) => {
     return c.html(`
