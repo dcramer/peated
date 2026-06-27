@@ -1,6 +1,6 @@
 import { openaiAgentsHarness } from "@vitest-evals/harness-openai-agents";
-import { describeEval, namedJudge, type JudgeContext } from "vitest-evals";
-import { toJsonValue } from "vitest-evals/harness";
+import { createJudge, describeEval, type JudgeContext } from "vitest-evals";
+import { toJsonValue, type JsonValue } from "vitest-evals/harness";
 import type {
   ClassifierEvalCase,
   SearchResponseFixture,
@@ -24,10 +24,7 @@ import {
   createDecidedBottleClassification,
   type BottleClassificationResult,
 } from "./contract";
-import {
-  createEvalClassifierOptions,
-  promptEvalJudgeModel,
-} from "./evalSupport";
+import { createEvalClassifierOptions } from "./evalSupport";
 import { isExistingMatchConfidenceEligibleForVerification } from "./priceMatchingEvidence";
 import type { RealWorldNewBottleEvalCase } from "./realWorldNewBottleEval.fixtures";
 import { getAutoIgnoreBottleReferenceReason } from "./reviewPolicy";
@@ -45,14 +42,6 @@ type ClassifiedBottleClassificationResult = Extract<
 
 function getScenarioEvalName(testCase: ClassifierScenarioEvalCase): string {
   return testCase.testCase.input.reference.name;
-}
-
-function getScenarioEvalSummary(testCase: ClassifierScenarioEvalCase): string {
-  if (testCase.kind === "new_bottle_fixture") {
-    return testCase.testCase.summary;
-  }
-
-  return testCase.testCase.expected.summary;
 }
 
 type SearchFixtureCase = {
@@ -109,48 +98,6 @@ function getDerivedVerifyEligibility(
   });
 }
 
-function describeClassificationResult(
-  testCase: ClassifierEvalCase,
-  result: BottleClassificationResult,
-): Record<string, unknown> {
-  if (result.status === "ignored") {
-    return {
-      status: result.status,
-      reason: result.reason,
-      extractedIdentity: result.artifacts.extractedIdentity,
-    };
-  }
-
-  const matchedCandidate =
-    result.decision.matchedReleaseId !== null
-      ? result.artifacts.candidates.find(
-          (candidate) =>
-            candidate.releaseId === result.decision.matchedReleaseId,
-        )
-      : result.artifacts.candidates.find(
-          (candidate) => candidate.bottleId === result.decision.matchedBottleId,
-        );
-
-  return {
-    status: result.status,
-    decision: {
-      action: result.decision.action,
-      confidence: result.decision.confidence,
-      verifyEligible: getDerivedVerifyEligibility(testCase, result),
-      identityScope: result.decision.identityScope,
-      matchedBottleId: result.decision.matchedBottleId,
-      matchedReleaseId: result.decision.matchedReleaseId,
-      parentBottleId: result.decision.parentBottleId,
-      matchedCandidateName: matchedCandidate?.fullName ?? null,
-      proposedBottle: result.decision.proposedBottle,
-      proposedRelease: result.decision.proposedRelease,
-      observation: result.decision.observation,
-      confidenceBasis: result.decision.confidenceBasis,
-    },
-    extractedIdentity: result.artifacts.extractedIdentity,
-  };
-}
-
 function deepContainsSubset(actual: unknown, expected: unknown): boolean {
   if (expected === null || typeof expected !== "object") {
     return Object.is(actual, expected);
@@ -199,67 +146,6 @@ function getProposedBottleIdentityText(
   }
 
   return identity;
-}
-
-function describeNormalizationResult(
-  result: BottleClassificationResult,
-): Record<string, unknown> {
-  if (result.status === "ignored") {
-    return {
-      status: "ignored",
-      reason: result.reason,
-    };
-  }
-
-  const matchedCandidate =
-    result.decision.matchedReleaseId !== null
-      ? result.artifacts.candidates.find(
-          (candidate) =>
-            candidate.releaseId === result.decision.matchedReleaseId,
-        )
-      : result.artifacts.candidates.find((candidate) =>
-          result.decision.action === "create_release"
-            ? candidate.bottleId === result.decision.parentBottleId
-            : candidate.bottleId === result.decision.matchedBottleId,
-        );
-
-  const proposedBottleFullName = result.decision.proposedBottle
-    ? getProposedBottleIdentityText(result.decision.proposedBottle)
-    : null;
-
-  return {
-    status: "classified",
-    action: result.decision.action,
-    identityScope: result.decision.identityScope,
-    bottleIdentity:
-      matchedCandidate?.bottleFullName ??
-      matchedCandidate?.fullName ??
-      proposedBottleFullName,
-    releaseIdentity:
-      result.decision.proposedRelease !== null
-        ? {
-            edition: result.decision.proposedRelease.edition,
-            releaseYear: result.decision.proposedRelease.releaseYear,
-            vintageYear: result.decision.proposedRelease.vintageYear,
-          }
-        : matchedCandidate?.releaseId != null
-          ? {
-              edition: matchedCandidate.edition,
-              releaseYear: matchedCandidate.releaseYear,
-              vintageYear: matchedCandidate.vintageYear,
-            }
-          : null,
-    proposedBottle:
-      result.decision.proposedBottle !== null
-        ? {
-            brand: result.decision.proposedBottle.brand.name,
-            name: result.decision.proposedBottle.name,
-            fullName: proposedBottleFullName,
-            series: result.decision.proposedBottle.series?.name ?? null,
-          }
-        : null,
-    matchedCandidateName: matchedCandidate?.fullName ?? null,
-  };
 }
 
 function normalizeEvalText(value: string | null | undefined): string {
@@ -403,15 +289,6 @@ function releaseIdentityMatches(
   }
 
   return true;
-}
-
-function describeScenarioOutput(
-  testCase: ClassifierScenarioEvalCase,
-  result: BottleClassificationResult,
-): Record<string, unknown> {
-  return testCase.kind === "new_bottle_fixture"
-    ? describeNormalizationResult(result)
-    : describeClassificationResult(testCase.testCase, result);
 }
 
 type ShapeVerdict = {
@@ -752,10 +629,6 @@ async function prepareScenarioClassifierRun(
   };
 }
 
-type ClassifierHarnessMetadata = {
-  summary: string;
-};
-
 const preparedClassifierRuns = new WeakMap<
   ClassifierScenarioEvalCase,
   Promise<PreparedScenarioClassifierRun>
@@ -774,16 +647,16 @@ function getPreparedClassifierRun(input: ClassifierScenarioEvalCase) {
 const classifierHarness = openaiAgentsHarness<
   PreparedBottleClassifierAgentRun["agent"],
   ClassifierScenarioEvalCase,
-  ClassifierHarnessMetadata,
   PreparedBottleClassifierAgentRun["runner"],
-  BottleClassificationResult
+  BottleClassificationResult,
+  unknown,
+  JsonValue
 >({
   name: "bottle-classifier",
-  createAgent: async ({ input }) =>
+  agent: async ({ input }) =>
     (await getPreparedClassifierRun(input)).agentRun.agent,
-  createRunner: async ({ input }) =>
+  runner: async ({ input }) =>
     (await getPreparedClassifierRun(input)).agentRun.runner,
-  prompt: promptEvalJudgeModel,
   runOptions: async ({ input }) => {
     const { maxTurns } = (await getPreparedClassifierRun(input)).agentRun
       .runOptions;
@@ -809,34 +682,32 @@ const classifierHarness = openaiAgentsHarness<
 
     return preparedRun.classifyAgentResult(result);
   },
+  output: ({ result }) => {
+    return toJsonValue(result) ?? null;
+  },
   // vitest-evals strict replay intentionally fails when a prompt/tool change
   // makes a new web-search call. Record those new tool results with:
   // VITEST_EVALS_REPLAY_MODE=record pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts
   toolReplay: {
     openai_web_search: true,
-    brave_web_search: true,
-  },
-  normalize: {
-    output: ({ result }) => toJsonValue(result) ?? null,
-    outputText: ({ input, result }) =>
-      JSON.stringify(describeScenarioOutput(input, result), null, 2),
+    ...(process.env.BRAVE_API_KEY ? { brave_web_search: true } : {}),
   },
 });
 
 type ClassifierJudgeContext = JudgeContext<
   ClassifierScenarioEvalCase,
-  ClassifierHarnessMetadata,
+  JsonValue,
   typeof classifierHarness
 >;
 
-const ClassifierExpectationJudge = namedJudge<ClassifierJudgeContext>(
+const ClassifierExpectationJudge = createJudge<ClassifierJudgeContext>(
   "ClassifierExpectationJudge",
-  ({ inputValue, run }) => {
+  ({ input, run }) => {
     const result = parseClassificationRunOutput(run.output);
     const verdict =
-      inputValue.kind === "new_bottle_fixture"
-        ? evaluateNormalizationShape(inputValue.testCase, result)
-        : evaluateDecisionShape(inputValue.testCase, result);
+      input.kind === "new_bottle_fixture"
+        ? evaluateNormalizationShape(input.testCase, result)
+        : evaluateDecisionShape(input.testCase, result);
 
     return {
       score: verdict.score,
@@ -883,16 +754,11 @@ for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
     (it) => {
       const cases = getClassifierLiveEvalCases(scenario).map((testCase) => ({
         name: getScenarioEvalName(testCase),
-        summary: getScenarioEvalSummary(testCase),
         testCase,
       }));
 
-      it.for(cases)("$name", async ({ testCase, summary }, { run }) => {
-        await run(testCase, {
-          metadata: {
-            summary,
-          },
-        });
+      it.for(cases)("$name", async ({ testCase }, { run }) => {
+        await run(testCase);
       });
     },
   );

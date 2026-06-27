@@ -100,12 +100,12 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "@vitest-evals/harness-openai-agents": "0.14.0",
     "tinyrainbow": "^2.0.0",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",
-    "@vitest-evals/harness-openai-agents": "0.9.0-beta.3",
-    "vitest-evals": "0.9.0-beta.3"
+    "vitest-evals": "0.14.0"
   },
   "volta": {
     "extends": "../../package.json"

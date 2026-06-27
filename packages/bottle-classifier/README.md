@@ -188,9 +188,10 @@ cost or quality tradeoff. `BRAVE_API_KEY` is optional.
 
 The live evals use `vitest-evals` harness-style `run(...)` tests with
 `@vitest-evals/harness-openai-agents` normalization, native harness
-`toolReplay`, and named judges. The classifier opts `openai_web_search` and
-`brave_web_search` into replay at the harness boundary so repeat runs do not
-keep paying for the same real-world searches.
+`toolReplay`, and named judges. The classifier always opts `openai_web_search`
+into replay at the harness boundary. `brave_web_search` is also replayed when
+`BRAVE_API_KEY` enables that tool, so repeat runs do not keep paying for the
+same real-world searches.
 
 Replay recordings default to the package-local upstream-style
 `packages/bottle-classifier/.vitest-evals/recordings/` directory via

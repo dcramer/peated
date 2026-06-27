@@ -1,7 +1,7 @@
 import { openaiAgentsHarness } from "@vitest-evals/harness-openai-agents";
 import { zodTextFormat } from "openai/helpers/zod";
-import { describeEval, namedJudge, type JudgeContext } from "vitest-evals";
-import { toJsonValue } from "vitest-evals/harness";
+import { createJudge, describeEval, type JudgeContext } from "vitest-evals";
+import { toJsonValue, type JsonValue } from "vitest-evals/harness";
 import { z } from "zod";
 import {
   createBottleClassifier,
@@ -20,7 +20,6 @@ import {
   createEvalOpenAIClient,
   evalJudgeModel,
   getEvalJudgeModelSettings,
-  promptEvalJudgeModel,
 } from "./evalSupport";
 import { resolveLegacyCreateParentClassification } from "./legacyReleaseRepairResolution";
 import {
@@ -241,10 +240,6 @@ async function prepareRepairResolutionEvalRun(
   };
 }
 
-type RepairHarnessMetadata = {
-  expected: LegacyReleaseRepairResolutionEvalCase["expected"];
-};
-
 const preparedRepairRuns = new WeakMap<
   LegacyReleaseRepairResolutionEvalCase,
   Promise<PreparedRepairResolutionRun>
@@ -263,16 +258,16 @@ function getPreparedRepairRun(input: LegacyReleaseRepairResolutionEvalCase) {
 const repairHarness = openaiAgentsHarness<
   PreparedBottleClassifierAgentRun["agent"],
   LegacyReleaseRepairResolutionEvalCase,
-  RepairHarnessMetadata,
   PreparedBottleClassifierAgentRun["runner"],
-  EvaluatedRepairResolution
+  EvaluatedRepairResolution,
+  unknown,
+  JsonValue
 >({
   name: "legacy-release-repair-resolution",
-  createAgent: async ({ input }) =>
+  agent: async ({ input }) =>
     (await getPreparedRepairRun(input)).agentRun.agent,
-  createRunner: async ({ input }) =>
+  runner: async ({ input }) =>
     (await getPreparedRepairRun(input)).agentRun.runner,
-  prompt: promptEvalJudgeModel,
   runOptions: async ({ input }) => {
     const { maxTurns } = (await getPreparedRepairRun(input)).agentRun
       .runOptions;
@@ -294,40 +289,36 @@ const repairHarness = openaiAgentsHarness<
 
     return preparedRun.evaluateAgentResult(result);
   },
+  output: ({ result }) => {
+    return toJsonValue(result) ?? null;
+  },
   // vitest-evals strict replay intentionally fails when a prompt/tool change
   // makes a new web-search call. Record those new tool results with:
   // VITEST_EVALS_REPLAY_MODE=record pnpm --filter @peated/bottle-classifier evals -- src/legacyReleaseRepairResolution.eval.test.ts
   toolReplay: {
     openai_web_search: true,
-    brave_web_search: true,
-  },
-  normalize: {
-    output: ({ result }) => toJsonValue(result) ?? null,
-    outputText: ({ result }) => JSON.stringify(result, null, 2),
+    ...(process.env.BRAVE_API_KEY ? { brave_web_search: true } : {}),
   },
 });
 
 type RepairJudgeContext = JudgeContext<
   LegacyReleaseRepairResolutionEvalCase,
-  RepairHarnessMetadata,
+  JsonValue,
   typeof repairHarness
 >;
 
-const RepairShapeJudge = namedJudge<RepairJudgeContext>(
+const RepairShapeJudge = createJudge<RepairJudgeContext>(
   "RepairShapeJudge",
-  ({ inputValue, run }) => ({
-    score: scoreRepairShape(
-      parseRepairRunOutput(run.output),
-      inputValue.expected,
-    ),
+  ({ input, run }) => ({
+    score: scoreRepairShape(parseRepairRunOutput(run.output), input.expected),
   }),
 );
 
-const RepairRubricJudge = namedJudge<RepairJudgeContext>(
+const RepairRubricJudge = createJudge<RepairJudgeContext>(
   "RepairRubricJudge",
-  async ({ inputValue, run }) => {
+  async ({ input, run }) => {
     const judgement = await judgeRepairCase(
-      inputValue,
+      input,
       parseRepairRunOutput(run.output),
     );
 
@@ -357,11 +348,7 @@ describeEval(
     );
 
     it.for(cases)("$name", async ({ testCase }, { run }) => {
-      await run(testCase, {
-        metadata: {
-          expected: testCase.expected,
-        },
-      });
+      await run(testCase);
     });
   },
 );

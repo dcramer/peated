@@ -637,8 +637,8 @@ importers:
         specifier: 'catalog:'
         version: 22.19.17
       '@vitest-evals/harness-openai-agents':
-        specifier: 0.9.0-beta.3
-        version: 0.9.0-beta.3(@openai/agents@0.8.5(ws@8.18.3)(zod@4.3.6))(vitest-evals@0.9.0-beta.3(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6))
+        specifier: 0.14.0
+        version: 0.14.0(@openai/agents@0.8.5(ws@8.18.3)(zod@4.3.6))(vitest-evals@0.14.0(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6))
       tinyrainbow:
         specifier: ^2.0.0
         version: 2.0.0
@@ -652,8 +652,8 @@ importers:
         specifier: 'catalog:'
         version: 4.1.4(@opentelemetry/api@1.9.0)(@types/node@22.19.17)(@vitest/coverage-v8@4.1.4)(jsdom@25.0.1)(vite@8.0.8(@types/node@22.19.17)(esbuild@0.27.7)(jiti@1.21.7)(terser@5.48.0)(tsx@4.21.0)(yaml@2.4.5))
       vitest-evals:
-        specifier: 0.9.0-beta.3
-        version: 0.9.0-beta.3(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6)
+        specifier: 0.14.0
+        version: 0.14.0(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6)
 
   packages/catalog-verifier:
     dependencies:
@@ -4498,11 +4498,17 @@ packages:
     peerDependencies:
       vite: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
 
-  '@vitest-evals/harness-openai-agents@0.9.0-beta.3':
-    resolution: {integrity: sha512-QFr4I2aGoaJYbWehaoL50G3Wtq+azeKsNtKe/nI65U+rgQbxAOI2xEBcEh5leW6lJMv54MPnzMXdquFV73lYSw==}
+  '@vitest-evals/core@0.14.0':
+    resolution: {integrity: sha512-N7Weau1IdLADKKsyiieNptYBsOLuzv96C/Ki3qxT0u3+TbAnnVxAR1Aruz+pAwsK1Nks5pJ+4GbrAmrgaDWS3g==}
+
+  '@vitest-evals/harness-openai-agents@0.14.0':
+    resolution: {integrity: sha512-t0DLNSgo6WXIV6GdLJwcoGkWuYsAzNxnS03kuqHdTBtpsBhkckCLAyUnx+u1SxUA83wfHNiShJeK26QeqHe5Iw==}
     peerDependencies:
       '@openai/agents': '>=0.8 <1'
       vitest-evals: '*'
+
+  '@vitest-evals/report-ui@0.14.0':
+    resolution: {integrity: sha512-TfkL4/i4bE9Q1+8KMFmxP9v8oOBvcR70wOMYhfB3Ziv4f+pUlKbUkcgrggRjukzdm8g6P7qHvTGrx2mGCvaj0A==}
 
   '@vitest/coverage-v8@4.1.4':
     resolution: {integrity: sha512-x7FptB5oDruxNPDNY2+S8tCh0pcq7ymCe1gTHcsp733jYjrJl8V1gMUlVysuCD9Kz46Xz9t1akkv08dPcYDs1w==}
@@ -9421,8 +9427,9 @@ packages:
       yaml:
         optional: true
 
-  vitest-evals@0.9.0-beta.3:
-    resolution: {integrity: sha512-XYv5uBk6fADGd/ZYZONUjxlquXAO0TDavm6xqbzPIu8P6gMuHrwtzvKqD3VqEpGzrRht4UTd95PTY7oxRKCgDg==}
+  vitest-evals@0.14.0:
+    resolution: {integrity: sha512-CugWWm6LMgCknSMBOFy2Y1RkbScbAqJ6c61+kU9EEerq1ELMH0AurvDGU36lkaXrmz6CPRABNx5CzBvwEUh3+w==}
+    hasBin: true
     peerDependencies:
       ai: '>=4 <7'
       tinyrainbow: '>=2 <4'
@@ -13945,10 +13952,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest-evals/harness-openai-agents@0.9.0-beta.3(@openai/agents@0.8.5(ws@8.18.3)(zod@4.3.6))(vitest-evals@0.9.0-beta.3(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6))':
+  '@vitest-evals/core@0.14.0':
+    dependencies:
+      zod: 3.25.76
+
+  '@vitest-evals/harness-openai-agents@0.14.0(@openai/agents@0.8.5(ws@8.18.3)(zod@4.3.6))(vitest-evals@0.14.0(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6))':
     dependencies:
       '@openai/agents': 0.8.5(ws@8.18.3)(zod@4.3.6)
-      vitest-evals: 0.9.0-beta.3(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6)
+      vitest-evals: 0.14.0(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6)
+
+  '@vitest-evals/report-ui@0.14.0':
+    dependencies:
+      '@vitest-evals/core': 0.14.0
 
   '@vitest/coverage-v8@4.1.4(vitest@4.1.4)':
     dependencies:
@@ -19791,8 +19806,10 @@ snapshots:
       tsx: 4.21.0
       yaml: 2.4.5
 
-  vitest-evals@0.9.0-beta.3(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6):
+  vitest-evals@0.14.0(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6):
     dependencies:
+      '@vitest-evals/core': 0.14.0
+      '@vitest-evals/report-ui': 0.14.0
       tinyrainbow: 2.0.0
       vitest: 4.1.4(@opentelemetry/api@1.9.0)(@types/node@22.19.17)(@vitest/coverage-v8@4.1.4)(jsdom@25.0.1)(vite@8.0.8(@types/node@22.19.17)(esbuild@0.27.7)(jiti@1.21.7)(terser@5.48.0)(tsx@4.21.0)(yaml@2.4.5))
     optionalDependencies:
