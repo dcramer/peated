@@ -92,11 +92,11 @@ import type {
   PriceMatchCandidateSchema,
   PriceMatchSearchEvidenceSchema,
   ProposedReleaseSchema,
-  StorePriceMatchDecisionSchema,
 } from "@peated/server/schemas";
 import {
   ExtractedBottleDetailsSchema,
   ProposedBottleSchema,
+  StorePriceMatchDecisionSchema,
 } from "@peated/server/schemas";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, eq, inArray, sql } from "drizzle-orm";
@@ -196,6 +196,17 @@ function normalizeClassifierDecisionForPriceMatching(
   ) {
     throw new Error(
       `Classifier returned unknown parent bottle id (${decision.parentBottleId}).`,
+    );
+  }
+
+  if (
+    decision.action === "repair_parent_and_create_release" &&
+    !candidates.some(
+      (candidate) => candidate.bottleId === decision.parentBottleId,
+    )
+  ) {
+    throw new Error(
+      `Classifier returned unknown repair parent bottle id (${decision.parentBottleId}).`,
     );
   }
 
@@ -588,6 +599,27 @@ function toStorePriceMatchDecision({
     };
   }
 
+  if (decision.action === "repair_parent_and_create_release") {
+    // Price matching cannot apply this compound mutation yet, but review still
+    // needs the parent repair and child release drafts intact.
+    return {
+      action: "no_match",
+      confidence: decision.confidence,
+      rationale: appendRationale(
+        decision.rationale,
+        "Classifier found that the safe outcome requires repairing the existing parent bottle before creating a release; price matching cannot persist that compound repair yet.",
+      ),
+      candidateBottleIds: decision.candidateBottleIds,
+      identityScope: decision.identityScope,
+      suggestedBottleId: null,
+      suggestedReleaseId: null,
+      parentBottleId: decision.parentBottleId,
+      creationTarget: null,
+      proposedBottle: decision.proposedBottle,
+      proposedRelease: decision.proposedRelease,
+    };
+  }
+
   return {
     action: "no_match",
     confidence: decision.confidence,
@@ -601,6 +633,20 @@ function toStorePriceMatchDecision({
     proposedBottle: null,
     proposedRelease: null,
   };
+}
+
+function isReviewOnlyParentRepairDecision(
+  decision: StorePriceMatchDecision,
+): boolean {
+  return (
+    decision.action === "no_match" &&
+    decision.parentBottleId !== null &&
+    decision.parentBottleId !== undefined &&
+    decision.proposedBottle !== null &&
+    decision.proposedBottle !== undefined &&
+    decision.proposedRelease !== null &&
+    decision.proposedRelease !== undefined
+  );
 }
 
 export class StorePriceMatchProposalAlreadyProcessingError extends Error {
@@ -634,6 +680,12 @@ function getProposalType(
   price: StorePrice,
   decision: StorePriceMatchDecision,
 ): StorePriceMatchProposal["proposalType"] {
+  // Compound parent repair proposals stay unresolved even when the price has a
+  // current assignment; correction apply paths only handle simple bottle repair.
+  if (isReviewOnlyParentRepairDecision(decision)) {
+    return "no_match";
+  }
+
   if (decision.action === "create_new") {
     return "create_new";
   }
@@ -1429,15 +1481,20 @@ export async function upsertStorePriceMatchProposal({
   expectedProcessingToken?: string;
   tx?: AnyDatabase;
 }) {
-  const proposalType = decision ? getProposalType(price, decision) : "no_match";
+  const parsedDecision = decision
+    ? StorePriceMatchDecisionSchema.parse(decision)
+    : null;
+  const proposalType = parsedDecision
+    ? getProposalType(price, parsedDecision)
+    : "no_match";
   const status =
     statusOverride ??
-    (decision
-      ? getProposalStatus(price, decision, automationAssessment ?? null)
+    (parsedDecision
+      ? getProposalStatus(price, parsedDecision, automationAssessment ?? null)
       : "errored");
   const creationTarget =
-    decision?.action === "create_new"
-      ? (decision.creationTarget ?? null)
+    parsedDecision?.action === "create_new"
+      ? (parsedDecision.creationTarget ?? null)
       : null;
   const enteredQueueAt = shouldTrackStorePriceQueueEntry(status)
     ? sql`NOW()`
@@ -1445,23 +1502,20 @@ export async function upsertStorePriceMatchProposal({
   const proposalValues = {
     status,
     proposalType,
-    confidence: decision?.confidence ?? null,
+    confidence: parsedDecision?.confidence ?? null,
     currentBottleId: price.bottleId,
     currentReleaseId: price.releaseId ?? null,
-    suggestedBottleId: decision?.suggestedBottleId ?? null,
-    suggestedReleaseId: decision?.suggestedReleaseId ?? null,
-    parentBottleId:
-      decision?.action === "create_new"
-        ? (decision.parentBottleId ?? null)
-        : null,
+    suggestedBottleId: parsedDecision?.suggestedBottleId ?? null,
+    suggestedReleaseId: parsedDecision?.suggestedReleaseId ?? null,
+    parentBottleId: parsedDecision?.parentBottleId ?? null,
     creationTarget,
     candidateBottles: candidates,
     extractedLabel,
-    proposedBottle: decision?.proposedBottle ?? null,
-    proposedRelease: decision?.proposedRelease ?? null,
+    proposedBottle: parsedDecision?.proposedBottle ?? null,
+    proposedRelease: parsedDecision?.proposedRelease ?? null,
     searchEvidence: searchEvidence || [],
     automationAssessment: automationAssessment ?? null,
-    rationale: decision?.rationale ?? null,
+    rationale: parsedDecision?.rationale ?? null,
     model: config.OPENAI_MODEL,
     error: error || null,
     lastEvaluatedAt: sql`NOW()`,

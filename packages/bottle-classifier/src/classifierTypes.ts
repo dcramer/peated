@@ -515,6 +515,20 @@ const CreateBottleAndReleaseDecisionSchema =
     proposedRelease: ProposedReleaseSchema,
   });
 
+const RepairParentAndCreateReleaseDecisionSchema =
+  BottleClassifierDecisionBaseSchema.extend({
+    action: z.literal("repair_parent_and_create_release"),
+    matchedBottleId: z.null().default(null),
+    matchedReleaseId: z.null().default(null),
+    parentBottleId: z.number().int(),
+    proposedBottle: ProposedBottleSchema.describe(
+      "Repair draft for the existing parent bottle after moving release-specific traits off the parent identity.",
+    ),
+    proposedRelease: ProposedReleaseSchema.describe(
+      "New release identity to create under the repaired parent.",
+    ),
+  });
+
 const RepairBottleDecisionSchema = BottleClassifierDecisionBaseSchema.extend({
   action: z.literal("repair_bottle"),
   matchedBottleId: z.number().int(),
@@ -538,6 +552,7 @@ type BottleClassificationDecisionInput =
   | z.infer<typeof CreateBottleDecisionSchema>
   | z.infer<typeof CreateReleaseDecisionSchema>
   | z.infer<typeof CreateBottleAndReleaseDecisionSchema>
+  | z.infer<typeof RepairParentAndCreateReleaseDecisionSchema>
   | z.infer<typeof RepairBottleDecisionSchema>
   | z.infer<typeof NoMatchDecisionSchema>;
 
@@ -548,7 +563,8 @@ function validateBottleClassificationDecisionShape(
   if (
     value.identityScope === "exact_cask" &&
     (value.action === "create_release" ||
-      value.action === "create_bottle_and_release")
+      value.action === "create_bottle_and_release" ||
+      value.action === "repair_parent_and_create_release")
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -574,6 +590,7 @@ export const BottleClassificationDecisionSchema = z
     CreateBottleDecisionSchema,
     CreateReleaseDecisionSchema,
     CreateBottleAndReleaseDecisionSchema,
+    RepairParentAndCreateReleaseDecisionSchema,
     RepairBottleDecisionSchema,
     NoMatchDecisionSchema,
   ])
@@ -594,6 +611,7 @@ export const BottleClassifierAgentDecisionSchema = z.object({
       "create_bottle",
       "create_release",
       "create_bottle_and_release",
+      "repair_parent_and_create_release",
       "repair_bottle",
       "no_match",
     ])
@@ -613,7 +631,7 @@ export const BottleClassifierAgentDecisionSchema = z.object({
   proposedBottle: AgentProposedBottleSchema.nullable()
     .default(null)
     .describe(
-      "Required for create_bottle, create_bottle_and_release, and repair_bottle. The draft may be minimal: include supported brand/name identity and leave unknown optional fields null.",
+      "Required for create_bottle, create_bottle_and_release, repair_parent_and_create_release, and repair_bottle. The draft may be minimal: include supported brand/name identity and leave unknown optional fields null.",
     ),
   proposedRelease: AgentProposedReleaseSchema.nullable().default(null),
 });

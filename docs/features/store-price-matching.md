@@ -78,8 +78,8 @@ Evaluation order:
 2. extract structured identity from image or text
 3. auto-ignore obvious non-whisky rows plus clearly non-single-bottle listings such as multipacks, gift sets, sampler bundles, and damaged-condition sale listings
 4. build local bottle and release candidates
-5. ask the classifier for `match_existing`, `correction`, `create_new`, or `no_match`
-6. sanitize classifier output against real candidates and resolved entities
+5. ask the generic bottle classifier for bottle-centric actions (`match`, `repair_bottle`, `create_bottle`, `create_release`, `create_bottle_and_release`, `repair_parent_and_create_release`, or `no_match`)
+6. map and sanitize classifier output against real candidates and resolved entities
 7. compute automation eligibility from deterministic checks
 8. upsert the proposal row
 9. auto-create only when the deterministic gate says it is safe
@@ -174,6 +174,7 @@ When `status = classified`, the decision must be one of:
 - `create_bottle`
 - `create_release`
 - `create_bottle_and_release`
+- `repair_parent_and_create_release`
 - `no_match`
 
 Additional rules:
@@ -182,6 +183,13 @@ Additional rules:
 - `matchedBottleId` must be the current known candidate bottle id when `action = repair_bottle`; the proposed bottle draft is a sparse repair draft and unknown fields must not clear existing bottle facts
 - `matchedReleaseId`, when present, must be a known candidate release id
 - `parentBottleId`, when present for release creation, must be a known candidate bottle id
+- `repair_parent_and_create_release` must include a known-candidate
+  `parentBottleId`, a parent repair draft in `proposedBottle`, and a child
+  release draft in `proposedRelease`
+- `repair_parent_and_create_release` means the classifier found a supported
+  child release but the local parent must be repaired first; price matching
+  currently records this as a review-safe unresolved/no-match proposal rather
+  than persisting a compound repair-and-create operation
 - `identityScope` is reviewed as `product | exact_cask`
 - Unsupported novelty flavored-whiskey or whiskey-liqueur products should end in classifier-driven `no_match`, but a flavor-adjacent noun in the title is not enough to exclude a bottle by itself
 - When re-evaluation auto-ignores a bundle or damaged-condition listing, price matching should also clear any stale `store_price.bottleId` / `releaseId` assignment instead of leaving the old match attached
@@ -192,6 +200,10 @@ Additional rules:
 - `correction`
 - `create_new`
 - `no_match`
+
+`no_match` may carry a complete review-only parent repair plus release draft
+when the classifier returned `repair_parent_and_create_release`; the row remains
+unresolved because price matching cannot yet apply that compound operation.
 
 `create_new` may target:
 

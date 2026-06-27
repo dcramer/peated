@@ -67,6 +67,32 @@ const repairParentCandidate: BottleCandidate = {
   source: ["repair_parent"],
 };
 
+const ageBearingParentCandidate: BottleCandidate = {
+  bottleId: 44175,
+  releaseId: null,
+  kind: "bottle",
+  alias: "Shieldaig Speyside",
+  fullName: "Shieldaig Speyside",
+  bottleFullName: "Shieldaig Speyside",
+  brand: "Shieldaig",
+  bottler: null,
+  series: null,
+  distillery: [],
+  category: "single_malt",
+  statedAge: 18,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  score: 1,
+  source: ["exact"],
+};
+
 describe("finalizeBottleReferenceClassification", () => {
   test("does not let generic cask details bypass duplicate product creation checks", () => {
     const decision: BottleClassifierAgentDecisionInput = {
@@ -121,7 +147,7 @@ describe("finalizeBottleReferenceClassification", () => {
         candidates: [existingPrivateCask],
       }),
       options: {
-        enforceCreateWebEvidence: false,
+        enforceCreateWebEvidence: true,
       },
     });
 
@@ -286,6 +312,168 @@ describe("finalizeBottleReferenceClassification", () => {
       proposedBottle: null,
       proposedRelease: {
         edition: "S2B13",
+      },
+    });
+  });
+
+  test("downgrades release creation when the parent has conflicting bottle-level release traits", () => {
+    const decision: BottleClassifierAgentDecisionInput = {
+      action: "create_release",
+      confidence: 90,
+      rationale:
+        "The local parent matches the family, but the source age differs.",
+      candidateBottleIds: [ageBearingParentCandidate.bottleId],
+      identityScope: "product",
+      observation: null,
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId: ageBearingParentCandidate.bottleId,
+      proposedBottle: null,
+      proposedRelease: {
+        edition: null,
+        statedAge: 21,
+        abv: null,
+        releaseYear: null,
+        vintageYear: null,
+        caskStrength: null,
+        singleCask: null,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+      },
+    };
+
+    const result = finalizeBottleReferenceClassification({
+      reference: {
+        name: "Shieldaig Speyside Single Malt 21-year-old Scotch Whisky",
+      },
+      decision,
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [ageBearingParentCandidate],
+        extractedIdentity: {
+          brand: "Shieldaig",
+          bottler: null,
+          expression: "Speyside",
+          series: null,
+          distillery: [],
+          category: "single_malt",
+          stated_age: 21,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+      }),
+      options: {
+        enforceCreateWebEvidence: false,
+      },
+    });
+
+    expect(result).toMatchObject({
+      action: "no_match",
+      matchedBottleId: null,
+      parentBottleId: null,
+      proposedRelease: null,
+    });
+    expect(result.rationale).toContain("repair_parent_and_create_release");
+  });
+
+  test("keeps parent repair plus release creation decisions", () => {
+    const decision: BottleClassifierAgentDecisionInput = {
+      action: "repair_parent_and_create_release",
+      confidence: 90,
+      rationale:
+        "The existing parent should be repaired into a clean reusable Shieldaig Speyside bottle before creating the supported 21-year-old child release.",
+      candidateBottleIds: [ageBearingParentCandidate.bottleId],
+      identityScope: "product",
+      observation: null,
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId: ageBearingParentCandidate.bottleId,
+      proposedBottle: {
+        name: "Speyside",
+        brand: {
+          name: "Shieldaig",
+        },
+        bottler: null,
+        series: null,
+        category: "single_malt",
+        statedAge: null,
+        abv: null,
+        caskStrength: null,
+        singleCask: null,
+        vintageYear: null,
+        releaseYear: null,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+        edition: null,
+        distillers: [],
+      },
+      proposedRelease: {
+        edition: null,
+        statedAge: 21,
+        abv: null,
+        releaseYear: null,
+        vintageYear: null,
+        caskStrength: null,
+        singleCask: null,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+      },
+    };
+
+    const result = finalizeBottleReferenceClassification({
+      reference: {
+        name: "Shieldaig Speyside Single Malt 21-year-old Scotch Whisky",
+      },
+      decision,
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [ageBearingParentCandidate],
+        extractedIdentity: {
+          brand: "Shieldaig",
+          bottler: null,
+          expression: "Speyside",
+          series: null,
+          distillery: [],
+          category: "single_malt",
+          stated_age: 21,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+      }),
+      options: {
+        enforceCreateWebEvidence: true,
+      },
+    });
+
+    expect(result).toMatchObject({
+      action: "repair_parent_and_create_release",
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId: ageBearingParentCandidate.bottleId,
+      proposedBottle: {
+        name: "Speyside",
+        brand: {
+          name: "Shieldaig",
+        },
+        statedAge: null,
+      },
+      proposedRelease: {
+        statedAge: 21,
       },
     });
   });

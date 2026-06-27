@@ -314,6 +314,59 @@ describe("StorePriceMatchDecisionSchema", () => {
     ).toBe(true);
   });
 
+  test("allows no-match proposals to carry complete review-only parent repair drafts", () => {
+    const result = StorePriceMatchDecisionSchema.safeParse({
+      action: "no_match",
+      confidence: 90,
+      rationale:
+        "Parent bottle metadata must be repaired before this release can be created.",
+      suggestedBottleId: null,
+      suggestedReleaseId: null,
+      parentBottleId: 123,
+      creationTarget: null,
+      candidateBottleIds: [123],
+      proposedBottle: baseProposedBottle,
+      proposedRelease: baseProposedRelease,
+    });
+
+    if (!result.success) {
+      throw new Error(
+        "Expected complete parent repair no-match draft to parse.",
+      );
+    }
+
+    expect(result.data.parentBottleId).toBe(123);
+    expect(result.data.proposedBottle).toEqual(baseProposedBottle);
+    expect(result.data.proposedRelease).toEqual(baseProposedRelease);
+  });
+
+  test("rejects partial no-match parent repair drafts", () => {
+    const result = StorePriceMatchDecisionSchema.safeParse({
+      action: "no_match",
+      confidence: 90,
+      rationale: "Incomplete compound repair.",
+      suggestedBottleId: null,
+      suggestedReleaseId: null,
+      parentBottleId: 123,
+      creationTarget: null,
+      candidateBottleIds: [123],
+      proposedBottle: baseProposedBottle,
+      proposedRelease: null,
+    });
+
+    if (result.success) {
+      throw new Error("Expected partial parent repair no-match draft to fail.");
+    }
+
+    expect(result.error.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          path: ["proposedRelease"],
+        }),
+      ]),
+    );
+  });
+
   test("rejects fractional ids in classifier output", () => {
     const result = StorePriceMatchDecisionSchema.safeParse({
       action: "create_new",

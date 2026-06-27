@@ -16,6 +16,7 @@ describe("classifier eval scenarios", () => {
     expect(counts.get("new_bottles")).toBeGreaterThan(0);
     expect(counts.get("match_existing")).toBeGreaterThan(0);
     expect(counts.get("corrections")).toBeGreaterThan(0);
+    expect(counts.get("parent_repair_releases")).toBeGreaterThan(0);
     expect(counts.get("ignore_or_reject")).toBeGreaterThan(0);
   });
 
@@ -64,6 +65,28 @@ describe("classifier eval scenarios", () => {
         testCase.testCase.expected.status === "ignored" ||
           testCase.testCase.expected.action === "no_match",
       ).toBe(true);
+    }
+  });
+
+  test("keeps parent repair release cases tied to compound repair decisions", () => {
+    for (const testCase of CLASSIFIER_SCENARIO_EVAL_CASES) {
+      if (
+        testCase.kind !== "decision" ||
+        testCase.scenario !== "parent_repair_releases"
+      ) {
+        continue;
+      }
+
+      expect(testCase.testCase.expected.status).toBe("classified");
+      expect(testCase.testCase.expected.action).toBe(
+        "repair_parent_and_create_release",
+      );
+      expect(testCase.testCase.expected.parentBottleId).not.toBeNull();
+      expect(testCase.testCase.expected.parentBottleId).toBeDefined();
+      expect(testCase.testCase.expected.proposedBottle).not.toBeNull();
+      expect(testCase.testCase.expected.proposedBottle).toBeDefined();
+      expect(testCase.testCase.expected.proposedRelease).not.toBeNull();
+      expect(testCase.testCase.expected.proposedRelease).toBeDefined();
     }
   });
 

@@ -120,4 +120,40 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     expect(decision.identityBasis?.yearInterpretation).toBe("vintage_year");
     expect(decision.confidenceBasis?.band).toBe("review");
   });
+
+  test("parses parent repair plus release creation decisions", () => {
+    const decision = BottleClassificationDecisionSchema.parse({
+      action: "repair_parent_and_create_release",
+      confidence: 90,
+      rationale:
+        "The existing parent has a bottle-level age that must move before adding the sibling age statement.",
+      candidateBottleIds: [44175],
+      parentBottleId: 44175,
+      proposedBottle: {
+        name: "Speyside",
+        brand: {
+          id: 3943,
+          name: "Shieldaig",
+        },
+        category: "single_malt",
+        statedAge: null,
+      },
+      proposedRelease: {
+        statedAge: 21,
+      },
+    });
+
+    expect(decision).toMatchObject({
+      action: "repair_parent_and_create_release",
+      parentBottleId: 44175,
+      matchedBottleId: null,
+      proposedBottle: {
+        name: "Speyside",
+        statedAge: null,
+      },
+      proposedRelease: {
+        statedAge: 21,
+      },
+    });
+  });
 });

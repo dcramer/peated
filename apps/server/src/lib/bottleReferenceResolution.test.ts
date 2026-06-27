@@ -140,4 +140,59 @@ describe("resolveBottleReferenceTarget", () => {
     });
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
   });
+
+  test("treats parent repair plus release creation as unresolved without an error", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ admin: true });
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification({
+        action: "repair_parent_and_create_release",
+        confidence: 90,
+        rationale:
+          "The parent must be repaired into a reusable bottle before creating the supported child release.",
+        candidateBottleIds: [44175],
+        identityScope: "product",
+        observation: null,
+        identityBasis: null,
+        confidenceBasis: null,
+        matchedBottleId: null,
+        matchedReleaseId: null,
+        parentBottleId: 44175,
+        proposedBottle: {
+          name: "Speyside",
+          brand: {
+            name: "Shieldaig",
+          },
+          category: "single_malt",
+          statedAge: null,
+        },
+        proposedRelease: {
+          statedAge: 21,
+        },
+      }),
+    );
+
+    const result = await resolveBottleReferenceTarget({
+      reference: {
+        name: "Shieldaig Speyside Single Malt 21-year-old Scotch Whisky",
+        url: null,
+        imageUrl: null,
+        currentBottleId: null,
+        currentReleaseId: null,
+      },
+      aliasLookupNames: [],
+      user,
+    });
+
+    expect(result).toMatchObject({
+      bottleId: null,
+      releaseId: null,
+      source: "unresolved",
+      error: null,
+      confidence: 90,
+      createdBottle: false,
+      createdRelease: false,
+    });
+  });
 });

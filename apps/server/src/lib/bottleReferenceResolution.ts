@@ -442,6 +442,20 @@ export async function resolveBottleReferenceTarget({
       };
     }
 
+    if (classification.decision.action === "repair_parent_and_create_release") {
+      return {
+        bottleId: null,
+        releaseId: null,
+        source: "unresolved",
+        error: null,
+        confidence: decisionConfidence,
+        model: config.OPENAI_MODEL,
+        rationale: decisionRationale,
+        createdBottle: false,
+        createdRelease: false,
+      };
+    }
+
     const result = await applyClassifierCreateDecision({
       decision: classification.decision,
       user,

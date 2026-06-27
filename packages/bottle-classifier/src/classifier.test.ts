@@ -3440,7 +3440,7 @@ describe("createBottleClassifier", () => {
     );
   });
 
-  test("redirects duplicate bottle creation to a child release under an exact local parent", async () => {
+  test("does not redirect duplicate bottle creation to a child release under an exact local parent", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Glenglassaugh",
       bottler: null,
@@ -3545,17 +3545,14 @@ describe("createBottleClassifier", () => {
     }
 
     expect(result.decision).toMatchObject({
-      action: "create_release",
-      identityScope: "product",
-      parentBottleId: 2457,
-      proposedRelease: {
-        edition: "Batch 1",
-        statedAge: 35,
-      },
+      action: "create_bottle",
+      identityScope: "exact_cask",
+      parentBottleId: null,
+      proposedRelease: null,
     });
   });
 
-  test("redirects a dirty parent age match to a child release", async () => {
+  test("downgrades a dirty parent age match instead of redirecting it to a child release", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Glenglassaugh",
       bottler: null,
@@ -3626,14 +3623,15 @@ describe("createBottleClassifier", () => {
     }
 
     expect(result.decision).toMatchObject({
-      action: "create_release",
+      action: "no_match",
       identityScope: "product",
-      parentBottleId: 2457,
-      proposedRelease: {
-        edition: "Batch 1",
-        statedAge: 35,
-      },
+      matchedBottleId: null,
+      parentBottleId: null,
+      proposedRelease: null,
     });
+    expect(result.decision.rationale).toContain(
+      "Server downgraded the existing-match recommendation",
+    );
   });
 
   test("splits non-SMWS year-marked exact-cask bottle creation into bottle and release", async () => {

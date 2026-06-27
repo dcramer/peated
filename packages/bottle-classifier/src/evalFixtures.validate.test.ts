@@ -46,6 +46,10 @@ function inferDecisionScenario(
     if (fixture.expected.action === "match") {
       return "match_existing";
     }
+
+    if (fixture.expected.action === "repair_parent_and_create_release") {
+      return "parent_repair_releases";
+    }
   }
 
   return "new_bottles";
@@ -104,6 +108,44 @@ describe("eval fixture validation", () => {
 
     expect(ids.length).toBeGreaterThan(0);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  test("rejects production-miss decision fixtures without observed input context", () => {
+    const result = classifierEvalFixtureSchema.safeParse({
+      id: "missing-observed-input",
+      name: "Missing observed input",
+      input: {
+        reference: {
+          name: "Shieldaig Speyside Single Malt 21-year-old Scotch Whisky",
+        },
+      },
+      provenance: {
+        source: "production_miss",
+        verifiedSourceUrls: ["https://example.com/shieldaig"],
+        dbOutcome: {
+          summary: "The observed DB outcome was a compound parent repair.",
+        },
+      },
+      expected: {
+        status: "classified",
+        action: "repair_parent_and_create_release",
+        summary: "Should reject before judging the outcome.",
+      },
+    });
+
+    if (result.success) {
+      throw new Error(
+        "Expected production-miss fixture without context to fail.",
+      );
+    }
+
+    expect(result.error.issues.map((issue) => issue.path.join("."))).toEqual(
+      expect.arrayContaining([
+        "input.reference.url",
+        "input.extractedIdentity",
+        "input.initialCandidates",
+      ]),
+    );
   });
 
   test("keeps file-backed eval fixture ids globally unique", () => {

@@ -23,7 +23,8 @@ It returns either `ignored` with a reason, or `classified` with:
 - resolved brand, bottler, and distillery entities
 
 Decision actions are `match`, `repair_bottle`, `create_bottle`,
-`create_release`, `create_bottle_and_release`, and `no_match`.
+`create_release`, `create_bottle_and_release`,
+`repair_parent_and_create_release`, and `no_match`.
 
 The classifier is bottle-centric. Price-match terms such as `match_existing`,
 `correction`, and `create_new` are downstream proposal policy, not classifier
@@ -41,6 +42,9 @@ reference.
   applies.
 - Repair only when the existing bottle identity is right but stored canonical
   fields conflict with evidence.
+- Use `repair_parent_and_create_release` when a supported child release cannot
+  safely be created until an existing parent bottle is repaired into a clean
+  reusable parent.
 - Return `no_match` when evidence is missing, weak, contradictory, or not yet
   mappable to the local database.
 
