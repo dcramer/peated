@@ -1,5 +1,7 @@
 import { createId } from "@paralleldrive/cuid2";
 import { createWriteStream } from "node:fs";
+import { copyFile as copyLocalFile, mkdir, unlink } from "node:fs/promises";
+import path from "node:path";
 import sharp from "sharp";
 
 import { startSpan } from "@sentry/node";
@@ -53,12 +55,10 @@ interface MultipartFile {
 export async function copyFile({
   input,
   output,
-  namespace,
   urlPrefix,
 }: {
   input: string;
   output: string;
-  namespace: string;
   urlPrefix: string;
 }) {
   return await startSpan(
@@ -70,7 +70,6 @@ export async function copyFile({
       span?.setAttributes({
         input,
         output,
-        namespace,
       });
 
       if (process.env.USE_GCS_STORAGE) {
@@ -88,29 +87,56 @@ export async function copyFile({
           .bucket(bucketName)
           .file(`${bucketPath}${output}`);
 
-        cloudStorage
+        await cloudStorage
           .bucket(bucketName)
           .file(`${bucketPath}${input}`)
           .copy(dest);
       } else {
-        throw new Error();
-        // const uploadPath = `${config.UPLOAD_PATH}/${input}`;
-
-        // await startSpan(
-        //   {
-        //     op: "file.write-stream",
-        //     name: newFilename,
-        //   },
-        //   async () => {
-        //     const writeStream = createWriteStream(uploadPath);
-        //     await pipeline(stream, writeStream);
-        //   },
-        // );
-
-        // console.info(`File written to ${uploadPath}`);
+        const inputPath = path.join(config.UPLOAD_PATH, input);
+        const outputPath = path.join(config.UPLOAD_PATH, output);
+        await mkdir(path.dirname(outputPath), { recursive: true });
+        await copyLocalFile(inputPath, outputPath);
       }
 
       return `${urlPrefix}/${output}`;
+    },
+  );
+}
+
+export async function deleteFile({
+  filename,
+}: {
+  filename: string;
+}): Promise<void> {
+  await startSpan(
+    {
+      op: "peated.delete-file",
+      name: filename,
+    },
+    async (span) => {
+      span?.setAttributes({
+        filename,
+      });
+
+      if (process.env.USE_GCS_STORAGE) {
+        const bucketName = config.GCS_BUCKET_NAME as string;
+        const bucketPath = config.GCS_BUCKET_PATH
+          ? `${config.GCS_BUCKET_PATH}/`
+          : "";
+
+        await getStorage()
+          .bucket(bucketName)
+          .file(`${bucketPath}${filename}`)
+          .delete({ ignoreNotFound: true });
+      } else {
+        try {
+          await unlink(path.join(config.UPLOAD_PATH, filename));
+        } catch (err: any) {
+          if (err?.code !== "ENOENT") {
+            throw err;
+          }
+        }
+      }
     },
   );
 }
@@ -120,6 +146,7 @@ export const storeFile = async ({
   namespace,
   urlPrefix,
   onProcess,
+  directory,
 }: {
   data:
     | MultipartFile
@@ -130,11 +157,15 @@ export const storeFile = async ({
   namespace: string;
   urlPrefix: string;
   onProcess?: ProcessCallback;
+  directory?: string;
 }) => {
   const tmpFilename = `${namespace}-${createId()}`;
   const { stream, filename: newFilename } = onProcess
     ? onProcess(data.file, tmpFilename)
     : { stream: data.file, filename: tmpFilename };
+  const outputFilename = directory
+    ? `${directory}/${newFilename}`
+    : newFilename;
 
   return await startSpan(
     {
@@ -146,6 +177,7 @@ export const storeFile = async ({
         filename: data.filename,
         namespace,
         onProcess: Boolean(onProcess),
+        directory,
       });
 
       if (process.env.USE_GCS_STORAGE) {
@@ -165,12 +197,12 @@ export const storeFile = async ({
             });
             const file = getStorage()
               .bucket(bucketName)
-              .file(`${bucketPath}${newFilename}`);
+              .file(`${bucketPath}${outputFilename}`);
 
             await startSpan(
               {
                 op: "gcs.file.write-stream",
-                name: newFilename,
+                name: outputFilename,
               },
               async () => {
                 // Current callers pass processed image streams; avoid GCS
@@ -184,14 +216,15 @@ export const storeFile = async ({
           },
         );
       } else {
-        const uploadPath = `${config.UPLOAD_PATH}/${newFilename}`;
+        const uploadPath = `${config.UPLOAD_PATH}/${outputFilename}`;
 
         await startSpan(
           {
             op: "file.write-stream",
-            name: newFilename,
+            name: outputFilename,
           },
           async () => {
+            await mkdir(path.dirname(uploadPath), { recursive: true });
             const writeStream = createWriteStream(uploadPath);
             await pipeline(stream, writeStream);
           },
@@ -200,7 +233,7 @@ export const storeFile = async ({
         console.info(`File written to ${uploadPath}`);
       }
 
-      return `${urlPrefix}/${newFilename}`;
+      return `${urlPrefix}/${outputFilename}`;
     },
   );
 };

@@ -128,6 +128,9 @@ export async function runWorker() {
   // dont run the scraper in dev
   if (config.ENV === "production") {
     scheduledJob("*/5 * * * *", "schedule-scrapers", scheduleScrapers);
+    scheduledJob("0 * * * *", "cleanup-pending-uploads", async () => {
+      await runJob("CleanupPendingUploads");
+    });
   }
 
   const connection = await getConnection();

@@ -14,6 +14,7 @@ export * from "./identities";
 export * from "./incomingBottleDecisionLogs";
 export * from "./notifications";
 export * from "./passkeys";
+export * from "./pendingUploads";
 export * from "./regions";
 export * from "./repairs";
 export * from "./reviews";

@@ -6,7 +6,7 @@ import {
   createUser,
   generatePasswordHash,
 } from "@peated/server/lib/auth";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 const subcommand = program.command("users");
 
@@ -17,17 +17,55 @@ subcommand
   .argument("<password>")
   .option("-a, --admin")
   .option("-v, --verified")
+  .option("--accept-terms")
+  .option("--if-exists", "Update and reuse an existing user with this email")
   .action(async (email, password, options) => {
-    const user = await createUser(db, {
-      email,
-      username: email.split("@")[0],
-      passwordHash: generatePasswordHash(password),
-      admin: options.admin || false,
-      mod: options.admin || false,
-      verified: options.verified || false,
-    });
+    let user;
+    try {
+      user = await createUser(db, {
+        email,
+        username: email.split("@")[0],
+        passwordHash: generatePasswordHash(password),
+        admin: options.admin || false,
+        mod: options.admin || false,
+        verified: options.verified || false,
+        termsAcceptedAt: options.acceptTerms ? new Date() : null,
+      });
+    } catch (err: any) {
+      if (
+        !options.ifExists ||
+        err?.code !== "23505" ||
+        !["user_email_unq", "user_username_unq"].includes(err?.constraint)
+      ) {
+        throw err;
+      }
 
-    console.log(`${user.email} created.`);
+      const updatedFields: Partial<typeof users.$inferInsert> = {
+        passwordHash: generatePasswordHash(password),
+      };
+      if (options.admin) {
+        updatedFields.admin = true;
+        updatedFields.mod = true;
+      }
+      if (options.verified) {
+        updatedFields.verified = true;
+      }
+      if (options.acceptTerms) {
+        updatedFields.termsAcceptedAt = new Date();
+      }
+
+      const [existingUser] = await db
+        .update(users)
+        .set(updatedFields)
+        .where(eq(sql`LOWER(${users.email})`, email.toLowerCase()))
+        .returning();
+      if (!existingUser) {
+        throw new Error(`Unknown user: ${email}.`);
+      }
+      user = existingUser;
+    }
+
+    console.log(`${user.email} ready.`);
   });
 
 subcommand

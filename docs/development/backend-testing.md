@@ -112,6 +112,13 @@ pnpm --filter=./apps/server test --run
 pnpm --filter=./apps/server test --run routes/entities/list.test.ts
 ```
 
+For local PR preparation, run the backend tests that cover the touched behavior
+plus the relevant typecheck or lint command. Run broader package or repo suites
+when the change touches shared infrastructure, schema contracts, auth, storage,
+or other high-blast-radius paths. Pull request CI is the required full-repo
+validation gate, so local development does not need to rerun every unrelated
+test before opening a PR.
+
 `apps/server/.env.test` follows the repo's default local Docker ports. If your
 services are published on different host ports, add an untracked
 `apps/server/.env.test.local` to override `DATABASE_URL` and `REDIS_URL` for

@@ -17,6 +17,7 @@ import externalSites from "./external-sites";
 import flights from "./flights";
 import friends from "./friends";
 import notifications from "./notifications";
+import pendingUploads from "./pendingUploads";
 import prices from "./prices";
 import regions from "./regions";
 import reviews from "./reviews";
@@ -50,6 +51,7 @@ export interface Router {
   flights: typeof flights;
   friends: typeof friends;
   notifications: typeof notifications;
+  pendingUploads: typeof pendingUploads;
   prices: typeof prices;
   regions: typeof regions;
   reviews: typeof reviews;
@@ -85,6 +87,7 @@ export default {
   friends,
   smws,
   notifications,
+  pendingUploads,
   prices,
   regions,
   reviews,

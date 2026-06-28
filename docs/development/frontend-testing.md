@@ -39,9 +39,11 @@ pnpm test:e2e:install
   accessible roles, props, and route loading component output.
 - Use Playwright when the browser matters: CSS layout, responsive states,
   streamed loading UI, page overflow, focus behavior, or navigation.
-- For user-facing web route/layout changes, run `pnpm test:e2e` in addition to
-  `pnpm test:web`.
-- Before handing off non-trivial UI work, run `pnpm test:all`.
+- For user-facing web route/layout changes, run the related Vitest coverage and
+  `pnpm test:e2e` checks that cover the changed workflow.
+- Before opening a PR, run targeted tests/typechecks/lint for the touched web
+  surface. Use `pnpm test:all` when the change has broad UI or routing impact;
+  otherwise PR CI is the required full-repo validation gate.
 
 ## Playwright Setup
 

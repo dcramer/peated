@@ -1,0 +1,1 @@
+ALTER TABLE "pending_upload" ADD COLUMN "object_deleted_at" timestamp;
