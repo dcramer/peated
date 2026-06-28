@@ -1,6 +1,6 @@
 {
-  "id": "store-listing-requires-parent-repair-before-creating-shieldaig-speyside-21-year-old",
-  "name": "store listing: requires parent repair before creating Shieldaig Speyside 21-year-old",
+  "id": "store-listing-creates-shieldaig-speyside-21-year-old-with-age-in-bottle-name",
+  "name": "store listing: creates Shieldaig Speyside 21-year-old with age in bottle name",
   "input": {
     "reference": {
       "name": "Shieldaig Speyside Single Malt 21-year-old Scotch Whisky",
@@ -420,28 +420,25 @@
       "releaseId": null,
       "createsBottle": false,
       "createsRelease": false,
-      "summary": "Peated bottle 44175 is Shieldaig Speyside with a dirty structured age of 18. The correct reviewed outcome is to repair that parent into a reusable Shieldaig Speyside bottle and then create a 21-year-old child release, not to create a 21-year bottling under the age-bearing parent."
+      "summary": "Production proposal 28 selected bottle 44175, a Shieldaig Speyside row with a conflicting structured age of 18, as the parent for a 21-year child release. The corrected outcome is a separate Shieldaig Speyside 21-year-old bottle, not a release under the 18-year product."
     },
-    "notes": "Production match queue proposal 28 redirected the supported 21-year source listing to a child release under bottle 44175 even though the parent row carried conflicting statedAge 18. The observed web evidence included Total Wine plus independent Shieldaig Speyside 21-year pages; the mocked searchResponses are local search_bottles responses, not web evidence."
+    "notes": "Production match queue proposal 28 redirected the supported 21-year source listing to a child release under bottle 44175 even though the parent row carried conflicting statedAge 18. The observed web evidence included Total Wine plus independent Shieldaig Speyside 21-year pages; the mocked searchResponses are local search_bottles responses, not web evidence. Age is a marketed bottle-level differentiator for this Shieldaig Speyside family, so the display name must include the age."
   },
   "expected": {
     "status": "classified",
-    "action": "repair_parent_and_create_release",
+    "action": "create_bottle",
     "identityScope": "product",
-    "parentBottleId": 44175,
     "proposedBottle": {
-      "name": "Speyside",
+      "name": "Speyside 21-year-old",
       "brand": {
         "name": "Shieldaig"
       },
       "category": "single_malt",
-      "statedAge": null
-    },
-    "proposedRelease": {
       "statedAge": 21
     },
+    "proposedRelease": null,
     "confidenceBand": "review",
     "verifyEligible": false,
-    "summary": "Repair the dirty Shieldaig Speyside parent by removing the unsupported bottle-level age, then create the supported 21-year-old child release."
+    "summary": "Create a separate Shieldaig Speyside 21-year-old bottle and keep the age statement in the displayed bottle identity because same-family aged bottles would otherwise be confusing."
   }
 }

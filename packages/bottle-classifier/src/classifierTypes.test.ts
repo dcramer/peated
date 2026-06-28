@@ -75,6 +75,14 @@ describe("BottleClassifierAgentDecisionSchema", () => {
       familyContext: {
         parentBottleReleaseTraits: ["vintageYear"],
         childReleaseCount: 2,
+        siblingBottles: [
+          {
+            bottleId: 101,
+            fullName: "Example 21-year-old",
+            traitFields: ["statedAge"],
+            statedAge: 21,
+          },
+        ],
         siblingReleases: [
           {
             releaseId: 200,
@@ -117,6 +125,7 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     });
 
     expect(candidate.familyContext?.siblingReleases[0]?.vintageYear).toBe(1993);
+    expect(candidate.familyContext?.siblingBottles[0]?.statedAge).toBe(21);
     expect(decision.identityBasis?.yearInterpretation).toBe("vintage_year");
     expect(decision.confidenceBasis?.band).toBe("review");
   });

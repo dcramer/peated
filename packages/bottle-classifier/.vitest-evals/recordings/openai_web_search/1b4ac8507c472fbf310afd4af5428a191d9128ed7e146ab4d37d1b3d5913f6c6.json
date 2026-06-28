@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-06-28T17:10:41.753Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Shieldaig Speyside 30 year old single malt Scotch whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Shieldaig Speyside 30 year old single malt Scotch whisky",
+    "summary": "Here’s the most solid bottle-specific info I could confirm for **Shieldaig Speyside 30 Year Old Single Malt Scotch Whisky**:\n\n- **Brand / label:** Shieldaig 30-year-old. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/198422/shieldaig-30-year-old))\n- **Style:** **Single Malt Scotch Whisky** from **Speyside",
+    "results": [
+      {
+        "title": "https://www.masterofmalt.com/whiskies/master-of-malt-30-year-old-speyside-whisky-fourth-edition/",
+        "url": "https://www.masterofmalt.com/whiskies/master-of-malt-30-year-old-speyside-whisky-fourth-edition/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/master-of-malt-30-year-old-speyside-5th-edition-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/master-of-malt-30-year-old-speyside-5th-edition-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskymag.com/tastings/master-of-malt-secret-bottlings-series-30-years-old/",
+        "url": "https://whiskymag.com/tastings/master-of-malt-secret-bottlings-series-30-years-old/",
+        "domain": "whiskymag.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://scotchspirit.com/macallan-30-year-old-1988-single-cask-master-of-malt-whisky-2/",
+        "url": "https://scotchspirit.com/macallan-30-year-old-1988-single-cask-master-of-malt-whisky-2/",
+        "domain": "scotchspirit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinkhacker.com/2013/02/16/review-master-malt-30-year-speyside-5th-edition/",
+        "url": "https://www.drinkhacker.com/2013/02/16/review-master-malt-30-year-speyside-5th-edition/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskymarketplace.com/whisky/glenfiddich-30-year-old-speyside-single-malt-scotch",
+        "url": "https://www.whiskymarketplace.com/whisky/glenfiddich-30-year-old-speyside-single-malt-scotch",
+        "domain": "whiskymarketplace.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "1b4ac8507c472fbf310afd4af5428a191d9128ed7e146ab4d37d1b3d5913f6c6",
+    "mode": "record"
+  }
+}

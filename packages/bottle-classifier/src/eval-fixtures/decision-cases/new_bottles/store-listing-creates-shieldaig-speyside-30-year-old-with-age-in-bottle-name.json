@@ -1,0 +1,93 @@
+{
+  "id": "store-listing-creates-shieldaig-speyside-30-year-old-with-age-in-bottle-name",
+  "name": "store listing: creates Shieldaig Speyside 30-year-old with age in bottle name",
+  "input": {
+    "reference": {
+      "name": "Shieldaig Speyside Sin Malt 30-year-old Scotch Whisky",
+      "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-sin-malt-30yr-scotch-whisky/p/219106750"
+    },
+    "extractedIdentity": {
+      "brand": "Shieldaig",
+      "bottler": null,
+      "expression": "Speyside",
+      "series": null,
+      "distillery": [],
+      "category": "single_malt",
+      "stated_age": 30,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "bottleId": 44175,
+        "releaseId": null,
+        "alias": "Shieldaig Speyside 18-year-old",
+        "fullName": "Shieldaig Speyside 18-year-old",
+        "bottleFullName": "Shieldaig Speyside 18-year-old",
+        "brand": "Shieldaig",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "single_malt",
+        "statedAge": 18,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.94,
+        "source": ["vector", "brand", "text"]
+      }
+    ],
+    "candidateExpansion": "open"
+  },
+  "searchResponses": [
+    {
+      "when": ["Shieldaig Speyside", "30"],
+      "results": []
+    }
+  ],
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-sin-malt-30yr-scotch-whisky/p/219106750"
+    ],
+    "dbOutcome": {
+      "bottleId": 44266,
+      "releaseId": null,
+      "createsBottle": true,
+      "createsRelease": false,
+      "summary": "Peated now contains bottle 44266 as Shieldaig Speyside 30-year-old. The regression being protected is the earlier classifier-created draft that used the confusing display name Shieldaig Speyside while storing the 30-year age only as structured bottle metadata."
+    },
+    "notes": "Total Wine markets this as Shieldaig Speyside Sin Malt 30Yr Scotch Whisky and describes it as matured for at least 30 years. The eval simulates the pre-creation local-search state: the 30-year bottle is absent, but a same-family Shieldaig Speyside 18-year-old bottle exists, so the agent must include the bottle-level age in the new bottle display name instead of hiding it only in statedAge."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "proposedBottle": {
+      "name": "Speyside 30-year-old",
+      "brand": {
+        "name": "Shieldaig"
+      },
+      "category": "single_malt",
+      "statedAge": 30
+    },
+    "proposedRelease": null,
+    "confidenceBand": "review",
+    "verifyEligible": false,
+    "summary": "Create a new Shieldaig Speyside 30-year-old bottle and keep the age statement in the displayed bottle identity because same-family aged bottles would otherwise be confusing."
+  }
+}
