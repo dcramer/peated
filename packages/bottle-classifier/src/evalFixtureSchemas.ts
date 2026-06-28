@@ -12,6 +12,7 @@ import {
   BottleReferenceSchema,
   CandidateExpansionModeSchema,
 } from "./contract";
+import { LocalCatalogSchema } from "./localCatalog";
 
 export const searchResponseFixtureSchema = z.object({
   when: z.array(z.string().min(1)).min(1),
@@ -97,11 +98,32 @@ export const classifierEvalFixtureSchema = z
       })
       .strict(),
     searchResponses: z.array(searchResponseFixtureSchema).optional(),
+    localCatalog: LocalCatalogSchema.optional(),
     provenance: evalFixtureProvenanceSchema.optional(),
     expected: classifierEvalExpectationSchema,
   })
   .strict()
   .superRefine((value, ctx) => {
+    if (value.localCatalog !== undefined) {
+      if (value.input.initialCandidates !== undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "`localCatalog` fixtures must derive candidates from the catalog, not precompute `input.initialCandidates`.",
+          path: ["input", "initialCandidates"],
+        });
+      }
+
+      if (value.searchResponses !== undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "`localCatalog` fixtures must use the catalog-backed search adapter, not `searchResponses`.",
+          path: ["searchResponses"],
+        });
+      }
+    }
+
     if (value.provenance?.source !== "production_miss") {
       return;
     }
@@ -125,14 +147,29 @@ export const classifierEvalFixtureSchema = z
     }
 
     if (
-      value.input.initialCandidates === undefined ||
-      value.input.initialCandidates.length === 0
+      value.localCatalog === undefined &&
+      (value.input.initialCandidates === undefined ||
+        value.input.initialCandidates.length === 0)
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          "`production_miss` fixtures must preserve observed local candidates.",
+          "`production_miss` fixtures must preserve observed local candidates or local catalog state.",
         path: ["input", "initialCandidates"],
+      });
+    }
+
+    if (
+      value.localCatalog !== undefined &&
+      value.input.initialCandidates === undefined &&
+      value.localCatalog.bottles.length === 0 &&
+      value.localCatalog.releases.length === 0
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "`production_miss` localCatalog fixtures must include at least one local bottle or release row.",
+        path: ["localCatalog"],
       });
     }
   });

@@ -155,6 +155,10 @@ async function prepareRepairResolutionEvalRun(
   testCase: LegacyReleaseRepairResolutionEvalCase,
 ): Promise<PreparedRepairResolutionRun> {
   const options = createClassifierOptions();
+  const dataSource = options.dataSource ?? options.adapters;
+  if (!dataSource) {
+    throw new Error("Legacy release repair eval requires a data source.");
+  }
   const classifier = createBottleClassifier(options);
   const parsedInput = ClassifyBottleReferenceInputSchema.parse(testCase.input);
   const extractedIdentity =
@@ -177,12 +181,12 @@ async function prepareRepairResolutionEvalRun(
 
   const candidates =
     parsedInput.initialCandidates ??
-    (options.adapters.findInitialCandidates
-      ? await options.adapters.findInitialCandidates({
+    (dataSource.findInitialCandidates
+      ? await dataSource.findInitialCandidates({
           reference: parsedInput.reference,
           extractedIdentity,
         })
-      : await options.adapters.searchBottles(
+      : await dataSource.searchBottles(
           buildDefaultBottleSearchInput({
             reference: parsedInput.reference,
             extractedIdentity,

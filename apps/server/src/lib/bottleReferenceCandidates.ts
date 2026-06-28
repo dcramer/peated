@@ -812,6 +812,10 @@ type CandidateBottleMetadataRow = {
   caskFill: BottleCandidate["caskFill"];
 };
 
+type CandidateBottleSiblingRow = CandidateBottleMetadataRow & {
+  fullName: string;
+};
+
 type CandidateReleaseMetadataRow = {
   releaseId: number;
   bottleId: number;
@@ -849,15 +853,18 @@ function getPopulatedReleaseTraitFields(
 function buildCandidateFamilyContext({
   bottleMetadata,
   releases,
+  siblingBottles,
 }: {
   bottleMetadata: CandidateBottleMetadataRow;
   releases: CandidateReleaseMetadataRow[];
+  siblingBottles: BottleCandidateFamilyContext["siblingBottles"];
 }): BottleCandidateFamilyContext {
   return {
     parentBottleReleaseTraits: getPopulatedReleaseTraitFields(bottleMetadata, {
       includeStatedAge: false,
     }),
     childReleaseCount: releases.length,
+    siblingBottles,
     siblingReleases: releases
       .slice()
       .sort((a, b) => a.fullName.localeCompare(b.fullName))
@@ -878,6 +885,110 @@ function buildCandidateFamilyContext({
         caskSize: release.caskSize,
       })),
   };
+}
+
+function buildBottleSiblingFamilyKey(
+  bottleMetadata: CandidateBottleSiblingRow,
+): string {
+  const signals: BottleReferenceSearchSignals = {
+    edition: bottleMetadata.edition,
+    statedAge: bottleMetadata.statedAge,
+    releaseYear: bottleMetadata.releaseYear,
+    vintageYear: bottleMetadata.vintageYear,
+  };
+  const strippedFullName = stripReleaseIdentityFromSearchName(
+    bottleMetadata.fullName,
+    signals,
+  );
+
+  return normalizeComparableText(
+    [
+      bottleMetadata.brand,
+      bottleMetadata.series,
+      strippedFullName || bottleMetadata.fullName,
+    ]
+      .filter(Boolean)
+      .join(" "),
+  );
+}
+
+function buildBottleSiblingContext(
+  candidates: BottleCandidate[],
+  bottleMetadataById: Map<number, CandidateBottleMetadataRow>,
+): Map<number, BottleCandidateFamilyContext["siblingBottles"]> {
+  const bottleSiblingRowsById = new Map<number, CandidateBottleSiblingRow>();
+
+  for (const candidate of candidates) {
+    const bottleMetadata = bottleMetadataById.get(candidate.bottleId);
+    if (!bottleMetadata || bottleSiblingRowsById.has(candidate.bottleId)) {
+      continue;
+    }
+    const fullName = [
+      candidate.bottleFullName,
+      candidate.fullName,
+      candidate.alias,
+    ].find((name): name is string => Boolean(name));
+    if (!fullName) {
+      continue;
+    }
+
+    bottleSiblingRowsById.set(candidate.bottleId, {
+      ...bottleMetadata,
+      fullName,
+    });
+  }
+
+  const bottleRowsByFamilyKey = new Map<string, CandidateBottleSiblingRow[]>();
+
+  for (const bottleMetadata of bottleSiblingRowsById.values()) {
+    const familyKey = buildBottleSiblingFamilyKey(bottleMetadata);
+    if (!familyKey) {
+      continue;
+    }
+
+    const siblings = bottleRowsByFamilyKey.get(familyKey) ?? [];
+    siblings.push(bottleMetadata);
+    bottleRowsByFamilyKey.set(familyKey, siblings);
+  }
+
+  const siblingContextByBottleId = new Map<
+    number,
+    BottleCandidateFamilyContext["siblingBottles"]
+  >();
+  for (const bottleMetadata of bottleSiblingRowsById.values()) {
+    const familyKey = buildBottleSiblingFamilyKey(bottleMetadata);
+    const siblingRows = (bottleRowsByFamilyKey.get(familyKey) ?? []).filter(
+      (sibling) => sibling.bottleId !== bottleMetadata.bottleId,
+    );
+    if (!siblingRows.length) {
+      siblingContextByBottleId.set(bottleMetadata.bottleId, []);
+      continue;
+    }
+
+    siblingContextByBottleId.set(
+      bottleMetadata.bottleId,
+      siblingRows
+        .sort((left, right) => left.fullName.localeCompare(right.fullName))
+        .slice(0, CANDIDATE_FAMILY_CONTEXT_RELEASE_LIMIT)
+        .map((sibling) => ({
+          bottleId: sibling.bottleId,
+          fullName: sibling.fullName,
+          traitFields: getPopulatedReleaseTraitFields(sibling),
+          statedAge: sibling.statedAge,
+          edition: sibling.edition,
+          releaseYear: sibling.releaseYear,
+          vintageYear: sibling.vintageYear,
+          abv: sibling.abv,
+          singleCask: sibling.singleCask,
+          caskStrength: sibling.caskStrength,
+          caskFill: sibling.caskFill,
+          caskType: sibling.caskType,
+          caskSize: sibling.caskSize,
+        })),
+    );
+  }
+
+  return siblingContextByBottleId;
 }
 
 function hasReleaseSpecificIdentity(
@@ -1054,6 +1165,10 @@ async function enrichBottleCandidates(
   const bottleMetadataById = new Map<number, CandidateBottleMetadataRow>(
     bottleRows.map((row) => [row.bottleId, row]),
   );
+  const siblingBottlesByBottleId = buildBottleSiblingContext(
+    candidates,
+    bottleMetadataById,
+  );
 
   const distilleryRows = await db
     .select({
@@ -1148,6 +1263,7 @@ async function enrichBottleCandidates(
     const familyContext = buildCandidateFamilyContext({
       bottleMetadata,
       releases: releasesByBottleId.get(candidate.bottleId) ?? [],
+      siblingBottles: siblingBottlesByBottleId.get(candidate.bottleId) ?? [],
     });
     if (!candidate.distillery.length && distilleryNames.length) {
       candidate.distillery = distilleryNames;

@@ -93,7 +93,286 @@ const ageBearingParentCandidate: BottleCandidate = {
   source: ["exact"],
 };
 
+const shieldaigSiblingAgeCandidate: BottleCandidate = {
+  ...ageBearingParentCandidate,
+  bottleId: 44176,
+  alias: "Shieldaig Speyside 25-year-old",
+  fullName: "Shieldaig Speyside 25-year-old",
+  bottleFullName: "Shieldaig Speyside 25-year-old",
+  statedAge: 25,
+  familyContext: {
+    parentBottleReleaseTraits: [],
+    childReleaseCount: 0,
+    siblingBottles: [
+      {
+        bottleId: 44175,
+        fullName: "Shieldaig Speyside 18-year-old",
+        traitFields: ["statedAge"],
+        statedAge: 18,
+        edition: null,
+        releaseYear: null,
+        vintageYear: null,
+        abv: null,
+        caskStrength: null,
+        singleCask: null,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+      },
+    ],
+    siblingReleases: [],
+  },
+};
+
+function buildShieldaigAgeCreationDecision(
+  proposedBottleName: string,
+): BottleClassifierAgentDecisionInput {
+  return {
+    action: "create_bottle",
+    confidence: 87,
+    rationale:
+      "The source supports a new Shieldaig Speyside 30-year-old bottle distinct from existing age-stated siblings.",
+    candidateBottleIds: [ageBearingParentCandidate.bottleId],
+    identityScope: "product",
+    observation: null,
+    identityBasis: {
+      bottleTraits: ["brand", "expression", "statedAge"],
+      releaseTraits: [],
+      observationTraits: [],
+      siblingEvidence: "dirty_sibling_candidates",
+    },
+    confidenceBasis: {
+      band: "review",
+      positiveEvidence: ["source title states 30-year-old"],
+      unresolvedRisks: ["same-family aged bottle siblings exist"],
+      toolsUsed: ["initial_local_candidates"],
+      webEvidence: "not_used",
+    },
+    matchedBottleId: null,
+    matchedReleaseId: null,
+    parentBottleId: null,
+    proposedBottle: {
+      name: proposedBottleName,
+      series: null,
+      category: "single_malt",
+      edition: null,
+      statedAge: 30,
+      caskStrength: null,
+      singleCask: null,
+      abv: null,
+      vintageYear: null,
+      releaseYear: null,
+      caskType: null,
+      caskSize: null,
+      caskFill: null,
+      brand: {
+        id: null,
+        name: "Shieldaig",
+      },
+      distillers: [],
+      bottler: null,
+    },
+    proposedRelease: null,
+  };
+}
+
+function classifyShieldaigAgeCreation(
+  decision: BottleClassifierAgentDecisionInput,
+) {
+  return finalizeBottleReferenceClassification({
+    reference: {
+      name: "Shieldaig Speyside Sin Malt 30-year-old Scotch Whisky",
+    },
+    decision,
+    artifacts: buildBottleClassificationArtifacts({
+      candidates: [ageBearingParentCandidate, shieldaigSiblingAgeCandidate],
+      extractedIdentity: {
+        brand: "Shieldaig",
+        bottler: null,
+        expression: "Speyside",
+        series: null,
+        distillery: [],
+        category: "single_malt",
+        stated_age: 30,
+        abv: null,
+        release_year: null,
+        vintage_year: null,
+        cask_type: null,
+        cask_size: null,
+        cask_fill: null,
+        cask_strength: null,
+        single_cask: null,
+        edition: null,
+      },
+    }),
+    options: {
+      enforceCreateWebEvidence: false,
+    },
+  });
+}
+
+function classifyAgeCreationWithoutSiblingConflict(
+  decision: BottleClassifierAgentDecisionInput,
+) {
+  return finalizeBottleReferenceClassification({
+    reference: {
+      name: "Shieldaig Speyside Sin Malt 30-year-old Scotch Whisky",
+    },
+    decision,
+    artifacts: buildBottleClassificationArtifacts({
+      candidates: [],
+      extractedIdentity: {
+        brand: "Shieldaig",
+        bottler: null,
+        expression: "Speyside",
+        series: null,
+        distillery: [],
+        category: "single_malt",
+        stated_age: 30,
+        abv: null,
+        release_year: null,
+        vintage_year: null,
+        cask_type: null,
+        cask_size: null,
+        cask_fill: null,
+        cask_strength: null,
+        single_cask: null,
+        edition: null,
+      },
+    }),
+    options: {
+      enforceCreateWebEvidence: false,
+    },
+  });
+}
+
 describe("finalizeBottleReferenceClassification", () => {
+  test("downgrades bottle creation when bottle-level age is omitted from display name", () => {
+    const result = classifyShieldaigAgeCreation(
+      buildShieldaigAgeCreationDecision("Speyside"),
+    );
+
+    expect(result).toMatchObject({
+      action: "no_match",
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      proposedBottle: null,
+      proposedRelease: null,
+    });
+    expect(result.rationale).toContain(
+      "proposed bottle display name omits bottle-level traits (statedAge)",
+    );
+  });
+
+  test("does not downgrade omitted bottle age without same-family age conflict evidence", () => {
+    const result = classifyAgeCreationWithoutSiblingConflict(
+      buildShieldaigAgeCreationDecision("Speyside"),
+    );
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      proposedBottle: {
+        name: "Speyside",
+        statedAge: 30,
+      },
+    });
+  });
+
+  test("keeps bottle creation when bottle-level age is present in display name", () => {
+    const result = classifyShieldaigAgeCreation(
+      buildShieldaigAgeCreationDecision("Speyside 30-year-old"),
+    );
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      proposedBottle: {
+        name: "Speyside 30-year-old",
+        statedAge: 30,
+      },
+    });
+  });
+
+  test("keeps bottle creation when bottle-level age is displayed as a word-age name", () => {
+    const decision = buildShieldaigAgeCreationDecision("Speyside Thirty");
+    if (!decision.proposedBottle) {
+      throw new Error("Expected a proposed bottle draft");
+    }
+    decision.proposedBottle = {
+      ...decision.proposedBottle,
+      name: "Speyside Twenty One",
+      statedAge: 21,
+    };
+
+    const result = finalizeBottleReferenceClassification({
+      reference: {
+        name: "Shieldaig Speyside 21-year-old Scotch Whisky",
+      },
+      decision,
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [ageBearingParentCandidate, shieldaigSiblingAgeCandidate],
+        extractedIdentity: {
+          brand: "Shieldaig",
+          bottler: null,
+          expression: "Speyside",
+          series: null,
+          distillery: [],
+          category: "single_malt",
+          stated_age: 21,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+      }),
+      options: {
+        enforceCreateWebEvidence: false,
+      },
+    });
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      proposedBottle: {
+        name: "Speyside Twenty One",
+        statedAge: 21,
+      },
+    });
+  });
+
+  test("downgrades bottle-and-release creation when bottle-level age is omitted from parent display name", () => {
+    const decision = {
+      ...buildShieldaigAgeCreationDecision("Speyside"),
+      action: "create_bottle_and_release",
+      proposedRelease: {
+        edition: "Batch 1",
+        statedAge: null,
+        abv: null,
+        caskStrength: null,
+        singleCask: null,
+        vintageYear: null,
+        releaseYear: null,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+      },
+    } satisfies BottleClassifierAgentDecisionInput;
+
+    const result = classifyShieldaigAgeCreation(decision);
+
+    expect(result).toMatchObject({
+      action: "no_match",
+      proposedBottle: null,
+      proposedRelease: null,
+    });
+    expect(result.rationale).toContain(
+      "proposed bottle display name omits bottle-level traits (statedAge)",
+    );
+  });
+
   test("does not let generic cask details bypass duplicate product creation checks", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "create_bottle",

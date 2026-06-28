@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-06-28T18:41:57.888Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Shieldaig Speyside Single Malt 21 year old Scotch Whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Shieldaig Speyside Single Malt 21 year old Scotch Whisky",
+    "summary": "Here’s the **bottle-specific evidence I could confirm** for **Shieldaig Speyside Single Malt 21 Year Old Scotch Whisky**:\n\n- **Brand/label:** Shieldaig ([totalwine.com](https://www.totalwine.com/theme/shieldaig-single-malt-whiskey?utm_source=openai))\n- **Style:** **Speyside Single Malt Scotch Whisky** ([totalwine.com](",
+    "results": [
+      {
+        "title": "https://www.thewhiskyexchange.com/p/48318/linkwood-1997-21-year-old-collective-21",
+        "url": "https://www.thewhiskyexchange.com/p/48318/linkwood-1997-21-year-old-collective-21",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/43645/imperial-1997-21-year-old-single-malts-of-scotland",
+        "url": "https://www.thewhiskyexchange.com/p/43645/imperial-1997-21-year-old-single-malts-of-scotland",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/53083/linkwood-1997-21-year-old-cask-4242-signatory",
+        "url": "https://www.thewhiskyexchange.com/p/53083/linkwood-1997-21-year-old-cask-4242-signatory",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/54401/caperdonich-21-year-old-peated-secret-speyside",
+        "url": "https://www.thewhiskyexchange.com/p/54401/caperdonich-21-year-old-peated-secret-speyside",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/34788/ardbeg-twenty-one-21-year-old",
+        "url": "https://www.thewhiskyexchange.com/p/34788/ardbeg-twenty-one-21-year-old",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/64527/highland-single-malt-2000-21-year-old-watt-whisky",
+        "url": "https://www.thewhiskyexchange.com/p/64527/highland-single-malt-2000-21-year-old-watt-whisky",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "ba3e356cb1747b1852ab5a0249d13dc1cbf41684b77185ebb6d2ed00b99f157e",
+    "mode": "record"
+  }
+}

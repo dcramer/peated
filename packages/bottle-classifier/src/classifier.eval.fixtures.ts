@@ -6,6 +6,7 @@ import {
   classifierEvalFixtureSchema,
   listFixtureFiles,
 } from "./evalFixtureSchemas";
+import type { LocalCatalog } from "./localCatalog";
 
 export type SearchResponseFixture = {
   when: string[];
@@ -40,6 +41,7 @@ export type ClassifierEvalCase = {
   fixtureId: string;
   name: string;
   input: ClassifyBottleReferenceInput;
+  localCatalog?: LocalCatalog;
   searchResponses?: SearchResponseFixture[];
   expected: ClassifierEvalExpectation;
 };
@@ -57,6 +59,7 @@ function loadFixtureFiles(): ClassifierEvalCase[] {
       fixtureId: fixture.id,
       name: fixture.name,
       input: fixture.input,
+      localCatalog: fixture.localCatalog,
       searchResponses: fixture.searchResponses,
       expected: fixture.expected,
     };

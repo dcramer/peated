@@ -46,6 +46,23 @@ describe("buildAgentInput", () => {
             familyContext: {
               parentBottleReleaseTraits: ["statedAge"],
               childReleaseCount: 1,
+              siblingBottles: [
+                {
+                  bottleId: 44176,
+                  fullName: "Shieldaig Speyside 25-year-old",
+                  traitFields: ["statedAge"],
+                  statedAge: 25,
+                  edition: null,
+                  releaseYear: null,
+                  vintageYear: null,
+                  abv: null,
+                  caskStrength: null,
+                  singleCask: null,
+                  caskType: null,
+                  caskSize: null,
+                  caskFill: null,
+                },
+              ],
               siblingReleases: [
                 {
                   releaseId: 9001,
@@ -71,6 +88,7 @@ describe("buildAgentInput", () => {
             familyContext: {
               parentBottleReleaseTraits: [],
               childReleaseCount: 0,
+              siblingBottles: [],
               siblingReleases: [],
             },
           }),
@@ -85,6 +103,23 @@ describe("buildAgentInput", () => {
     expect(input.localSearch.candidates[0].familyContext).toEqual({
       parentBottleReleaseTraits: ["statedAge"],
       childReleaseCount: 1,
+      siblingBottles: [
+        {
+          bottleId: 44176,
+          fullName: "Shieldaig Speyside 25-year-old",
+          traitFields: ["statedAge"],
+          statedAge: 25,
+          edition: null,
+          releaseYear: null,
+          vintageYear: null,
+          abv: null,
+          caskStrength: null,
+          singleCask: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+        },
+      ],
       siblingReleases: [
         {
           releaseId: 9001,

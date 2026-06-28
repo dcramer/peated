@@ -25,6 +25,7 @@ import {
   type BottleClassificationResult,
 } from "./contract";
 import { createEvalClassifierOptions } from "./evalSupport";
+import { createLocalCatalogDataSource } from "./localCatalog";
 import { isExistingMatchConfidenceEligibleForVerification } from "./priceMatchingEvidence";
 import type { RealWorldNewBottleEvalCase } from "./realWorldNewBottleEval.fixtures";
 import { getAutoIgnoreBottleReferenceReason } from "./reviewPolicy";
@@ -503,10 +504,13 @@ function parseClassificationRunOutput(
 }
 
 function buildClassifierAdapters(testCase: ClassifierScenarioEvalCase) {
-  // Real-world new-bottle fixtures intentionally share the same local-search
-  // path as the main classifier evals. Do not special-case them into a
-  // searchless harness or the "new bottles" workflow stops reflecting the
-  // real agent.
+  if (testCase.kind === "decision" && testCase.testCase.localCatalog) {
+    return createLocalCatalogDataSource(testCase.testCase.localCatalog);
+  }
+
+  // Legacy and captured fixtures still use flattened candidate/search
+  // responses. Keep them on the agent's local-search tool path instead of a
+  // searchless harness so replayed workflows still reflect agent behavior.
   const knownCandidates = collectKnownCandidates(testCase.testCase);
 
   return {
@@ -539,6 +543,10 @@ async function prepareScenarioClassifierRun(
   testCase: ClassifierScenarioEvalCase,
 ): Promise<PreparedScenarioClassifierRun> {
   const options = createClassifierOptions(testCase);
+  const dataSource = options.dataSource ?? options.adapters;
+  if (!dataSource) {
+    throw new Error("Classifier eval requires a data source.");
+  }
   const classifier = createBottleClassifier(options);
   const parsedInput = ClassifyBottleReferenceInputSchema.parse(
     testCase.testCase.input,
@@ -573,12 +581,12 @@ async function prepareScenarioClassifierRun(
 
   const candidates =
     parsedInput.initialCandidates ??
-    (options.adapters.findInitialCandidates
-      ? await options.adapters.findInitialCandidates({
+    (dataSource.findInitialCandidates
+      ? await dataSource.findInitialCandidates({
           reference: parsedInput.reference,
           extractedIdentity,
         })
-      : await options.adapters.searchBottles(
+      : await dataSource.searchBottles(
           buildDefaultBottleSearchInput({
             reference: parsedInput.reference,
             extractedIdentity,

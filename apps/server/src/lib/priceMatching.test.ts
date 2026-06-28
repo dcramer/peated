@@ -4607,6 +4607,14 @@ describe("priceMatching", () => {
         expect.objectContaining({
           bottleId: dirtyAgeBottle.id,
           source: expect.arrayContaining(["exact"]),
+          familyContext: expect.objectContaining({
+            siblingBottles: expect.arrayContaining([
+              expect.objectContaining({
+                bottleId: cleanParent.id,
+                fullName: "The Macallan Sherry Oak",
+              }),
+            ]),
+          }),
         }),
         expect.objectContaining({
           bottleId: cleanParent.id,

@@ -148,6 +148,65 @@ describe("eval fixture validation", () => {
     );
   });
 
+  test("rejects production-miss local catalog fixtures without local rows", () => {
+    const result = classifierEvalFixtureSchema.safeParse({
+      id: "empty-local-catalog",
+      name: "Empty local catalog",
+      input: {
+        reference: {
+          name: "Shieldaig Speyside Single Malt 21-year-old Scotch Whisky",
+          url: "https://example.com/shieldaig",
+        },
+        extractedIdentity: {
+          brand: "Shieldaig",
+          bottler: null,
+          expression: "Speyside",
+          series: null,
+          distillery: [],
+          category: "single_malt",
+          stated_age: 21,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+      },
+      localCatalog: {
+        entities: [{ id: 1, name: "Shieldaig", type: ["brand"] }],
+        bottles: [],
+        releases: [],
+        aliases: [],
+      },
+      provenance: {
+        source: "production_miss",
+        verifiedSourceUrls: ["https://example.com/shieldaig"],
+        dbOutcome: {
+          summary: "The observed DB outcome used a conflicting local row.",
+        },
+      },
+      expected: {
+        status: "classified",
+        action: "create_bottle",
+        summary: "Should reject before judging the outcome.",
+      },
+    });
+
+    if (result.success) {
+      throw new Error(
+        "Expected production-miss fixture without local rows to fail.",
+      );
+    }
+
+    expect(result.error.issues.map((issue) => issue.path.join("."))).toContain(
+      "localCatalog",
+    );
+  });
+
   test("keeps file-backed eval fixture ids globally unique", () => {
     const ids = [
       ...listFixtureFiles(decisionFixtureDir).map(

@@ -786,7 +786,7 @@ const BOTTLE_CLASSIFIER_INSTRUCTIONS = [
       MATCH_COMPONENT_PRIORITY.join(", ") +
       ".",
     "Candidates can be bottle or release targets. Use `kind` and `releaseId`.",
-    "`familyContext` highlights parent release-like traits and known child releases; it is retrieved evidence, not a rule.",
+    "`familyContext` highlights parent release-like traits, same-family sibling bottles, and known child releases; it is retrieved evidence, not a rule.",
     "Use structured candidate fields when present; use full candidate names when structured fields are sparse.",
     "No exact alias is not a risk when candidate name plus structured fields uniquely cover decisive traits.",
     "Legacy generic `spirit` category with otherwise exact whisky identity is a safe match, not repair.",
@@ -844,6 +844,8 @@ const BOTTLE_CLASSIFIER_INSTRUCTIONS = [
     "Always fill `identityBasis`: stable parent facts in `bottleTraits`, reusable bottling facts in `releaseTraits`, exact listing-only facts in `observationTraits`.",
     "Use `observation` for selector names, cask numbers, bottle numbers, outturn, market/exclusive wording, and exact facts that should not force canonical release split.",
     "For `proposedBottle.name`, use evidenced canonical name, not copied retailer title.",
+    "For `create_bottle`, `proposedBottle.name` is the displayed canonical bottle identity. If `identityBasis.bottleTraits` puts a marketed differentiator such as age, vintage, release year, edition, cask strength, or single-cask status on the bottle, include that differentiator in the proposed bottle name when omitting it would collide with or confuse same-family sibling bottles.",
+    "Do not hide decisive bottle-level traits only in structured fields. If a trait belongs to a child release instead, use `create_release`, `create_bottle_and_release`, or `repair_parent_and_create_release` rather than `create_bottle`.",
     "Return `{ id, name }` objects for `brand`, `distillers`, `bottler`, and `series`; use `id: null` when unknown.",
     "Never invent websites, relationships, release details, or proof numbers.",
   ]),

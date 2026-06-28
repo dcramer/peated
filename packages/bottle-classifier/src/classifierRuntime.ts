@@ -89,7 +89,7 @@ export type RunBottleClassifierAgentInput = {
   webSearchBudget?: BottleWebSearchBudget;
 };
 
-export type BottleClassifierAdapters = {
+export type BottleClassifierDataSource = {
   findInitialCandidates?: (args: {
     reference: BottleReference;
     extractedIdentity: BottleExtractedDetails | null;
@@ -104,12 +104,13 @@ export type BottleClassifierAdapters = {
   searchEntities?: (args: SearchEntitiesArgs) => Promise<EntityResolution[]>;
 };
 
-export type CreateBottleClassifierOptions = {
+export type BottleClassifierAdapters = BottleClassifierDataSource;
+
+type BaseCreateBottleClassifierOptions = {
   client: OpenAI;
   model: string;
   maxSearchQueries: number;
   braveApiKey?: string | null;
-  adapters: BottleClassifierAdapters;
   overrides?: {
     extractFromImage?: (
       imageUrlOrBase64: string,
@@ -120,6 +121,18 @@ export type CreateBottleClassifierOptions = {
     ) => Promise<BottleClassifierReasoningResult>;
   };
 };
+
+export type CreateBottleClassifierOptions = BaseCreateBottleClassifierOptions &
+  (
+    | {
+        dataSource: BottleClassifierDataSource;
+        adapters?: never;
+      }
+    | {
+        adapters: BottleClassifierDataSource;
+        dataSource?: never;
+      }
+  );
 
 export type BottleClassifier = {
   classifyBottleReference: (
@@ -178,6 +191,16 @@ type BottleClassifierAgentRunState = {
   resolvedEntities: Map<number, EntityResolution>;
   searchEvidence: BottleClassificationArtifacts["searchEvidence"];
 };
+
+function getBottleClassifierDataSource(
+  options: CreateBottleClassifierOptions,
+): BottleClassifierDataSource {
+  const dataSource = options.dataSource ?? options.adapters;
+  if (!dataSource) {
+    throw new Error("Bottle classifier requires a data source.");
+  }
+  return dataSource;
+}
 
 type BottleClassifierAgent = Agent<
   unknown,
@@ -392,9 +415,10 @@ async function collectInitialResolvedEntities({
   extractedIdentity: BottleExtractedDetails | null;
   options: CreateBottleClassifierOptions;
 }): Promise<EntityResolution[]> {
+  const dataSource = getBottleClassifierDataSource(options);
   if (
     candidateExpansion !== "open" ||
-    !options.adapters.searchEntities ||
+    !dataSource.searchEntities ||
     !extractedIdentity
   ) {
     return [];
@@ -408,7 +432,7 @@ async function collectInitialResolvedEntities({
     addEntitySearchRequest(requests, seen, distillery, "distiller");
   }
 
-  const searchEntities = options.adapters.searchEntities;
+  const searchEntities = dataSource.searchEntities;
   const resolvedEntities = new Map<number, EntityResolution>();
   const results = await Promise.all(
     requests.map(async (request) => {
@@ -549,10 +573,11 @@ async function collectNoMatchWebInvestigationArtifacts({
   mergeSearchEvidence(searchEvidence, result);
 
   let candidates = artifacts.candidates;
+  const dataSource = getBottleClassifierDataSource(options);
   try {
     candidates = mergeCandidateLists(
       candidates,
-      await options.adapters.searchBottles({
+      await dataSource.searchBottles({
         ...buildDefaultBottleSearchInput({
           reference,
           extractedIdentity: artifacts.extractedIdentity,
@@ -720,6 +745,7 @@ export async function prepareBottleClassifierAgentRun(
     webSearchBudget: inputWebSearchBudget,
   }: RunBottleClassifierAgentInput,
 ): Promise<PreparedBottleClassifierAgentRun> {
+  const dataSource = getBottleClassifierDataSource(options);
   const state: BottleClassifierAgentRunState = {
     searchEvidence: [],
     candidateBottles: new Map<string, BottleCandidate>(),
@@ -741,8 +767,8 @@ export async function prepareBottleClassifierAgentRun(
   }
 
   const hydratedCurrentBottle = reference.currentBottleId
-    ? options.adapters.getBottleCandidateById
-      ? await options.adapters.getBottleCandidateById(
+    ? dataSource.getBottleCandidateById
+      ? await dataSource.getBottleCandidateById(
           reference.currentBottleId,
           reference.currentReleaseId ?? null,
         )
@@ -776,24 +802,23 @@ export async function prepareBottleClassifierAgentRun(
     hasBottleSearch: allowCandidateExpansion,
     hasOpenAIWebSearch: allowCandidateExpansion,
     hasBraveWebSearch: allowCandidateExpansion && !!options.braveApiKey,
-    hasEntitySearch:
-      allowCandidateExpansion && !!options.adapters.searchEntities,
+    hasEntitySearch: allowCandidateExpansion && !!dataSource.searchEntities,
   });
 
   const tools = allowCandidateExpansion
     ? [
         createSearchBottlesTool({
-          searchBottles: options.adapters.searchBottles,
+          searchBottles: dataSource.searchBottles,
           onResults: (results) => {
             for (const candidate of results) {
               mergeBottleCandidate(state.candidateBottles, candidate);
             }
           },
         }),
-        ...(options.adapters.searchEntities
+        ...(dataSource.searchEntities
           ? [
               createSearchEntitiesTool({
-                searchEntities: options.adapters.searchEntities,
+                searchEntities: dataSource.searchEntities,
                 onResults: (results) => {
                   for (const result of results) {
                     mergeResolvedEntity(state.resolvedEntities, result);
@@ -957,18 +982,19 @@ export function createBottleClassifier(
   }: Pick<ClassifyBottleReferenceInput, "reference" | "initialCandidates"> & {
     extractedIdentity: BottleExtractedDetails | null;
   }): Promise<BottleCandidate[]> => {
+    const dataSource = getBottleClassifierDataSource(options);
     if (initialCandidates !== undefined) {
       return initialCandidates;
     }
 
-    if (options.adapters.findInitialCandidates) {
-      return await options.adapters.findInitialCandidates({
+    if (dataSource.findInitialCandidates) {
+      return await dataSource.findInitialCandidates({
         reference,
         extractedIdentity,
       });
     }
 
-    return await options.adapters.searchBottles(
+    return await dataSource.searchBottles(
       buildDefaultBottleSearchInput({
         reference,
         extractedIdentity,

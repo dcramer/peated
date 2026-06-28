@@ -98,7 +98,37 @@ const BottleCandidateReleaseSiblingSchema = z
       .number()
       .int()
       .gte(1800)
-      .lte(CURRENT_YEAR + 1)
+      .lte(CURRENT_YEAR)
+      .nullable()
+      .default(null),
+    vintageYear: z
+      .number()
+      .int()
+      .gte(1800)
+      .lte(CURRENT_YEAR)
+      .nullable()
+      .default(null),
+    abv: z.number().min(0).max(100).nullable().default(null),
+    singleCask: z.boolean().nullable().default(null),
+    caskStrength: z.boolean().nullable().default(null),
+    caskFill: CaskFillEnum.nullable().default(null),
+    caskType: CaskTypeEnum.nullable().default(null),
+    caskSize: CaskSizeEnum.nullable().default(null),
+  })
+  .strict();
+
+const BottleCandidateBottleSiblingSchema = z
+  .object({
+    bottleId: z.number().int(),
+    fullName: z.string(),
+    traitFields: z.array(BottleReleaseTraitFieldEnum).default([]),
+    statedAge: z.number().min(0).max(100).nullable().default(null),
+    edition: z.string().trim().nullable().default(null),
+    releaseYear: z
+      .number()
+      .int()
+      .gte(1800)
+      .lte(CURRENT_YEAR)
       .nullable()
       .default(null),
     vintageYear: z
@@ -127,6 +157,12 @@ const BottleCandidateFamilyContextSchema = z
       ),
     childReleaseCount: z.number().int().min(0).default(0),
     siblingReleases: z.array(BottleCandidateReleaseSiblingSchema).default([]),
+    siblingBottles: z
+      .array(BottleCandidateBottleSiblingSchema)
+      .default([])
+      .describe(
+        "Same-family bottle rows returned by local search, useful when deciding whether a source trait must stay in displayed bottle identity or move to a child release.",
+      ),
   })
   .strict();
 

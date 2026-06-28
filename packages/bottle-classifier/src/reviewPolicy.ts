@@ -158,6 +158,40 @@ const CREATION_EVIDENCE_GENERIC_TOKENS = new Set([
   "yr",
   "yrs",
 ]);
+const AGE_WORD_ONES = [
+  "",
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+] as const;
+const AGE_WORD_TEENS = [
+  "ten",
+  "eleven",
+  "twelve",
+  "thirteen",
+  "fourteen",
+  "fifteen",
+  "sixteen",
+  "seventeen",
+  "eighteen",
+  "nineteen",
+] as const;
+const AGE_WORD_TENS: Record<number, string> = {
+  20: "twenty",
+  30: "thirty",
+  40: "forty",
+  50: "fifty",
+  60: "sixty",
+  70: "seventy",
+  80: "eighty",
+  90: "ninety",
+};
 function normalizeClassifierConfidence(confidence: number): number {
   const percentageConfidence = confidence <= 1 ? confidence * 100 : confidence;
   return Math.min(100, Math.max(0, Math.round(percentageConfidence)));
@@ -1211,6 +1245,226 @@ function restoreSparseAgeOnlyBottleName({
     name: referenceBottleName,
     statedAge,
   };
+}
+
+function sourceMarketsProposedBottleAge({
+  reference,
+  extractedIdentity,
+  statedAge,
+}: {
+  reference: BottleReference;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+  statedAge: number | null | undefined;
+}): boolean {
+  if (statedAge === null || statedAge === undefined) {
+    return false;
+  }
+
+  return (
+    comparableTextMarketsStatedAge(reference.name, statedAge) ||
+    extractedIdentity?.stated_age === statedAge
+  );
+}
+
+function proposedBottleNameMarketsStatedAge({
+  proposedBottle,
+  statedAge,
+}: {
+  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
+  statedAge: number | null | undefined;
+}): boolean {
+  if (statedAge === null || statedAge === undefined) {
+    return false;
+  }
+
+  return (
+    comparableTextMarketsStatedAge(proposedBottle.name, statedAge) ||
+    comparableTextMarketsWordAge(proposedBottle.name, statedAge) ||
+    comparableTextMarketsStatedAge(
+      normalizeBottle({
+        name: proposedBottle.name,
+        statedAge: null,
+      }).name,
+      statedAge,
+    )
+  );
+}
+
+function getComparableAgeWordPhrase(statedAge: number): string | null {
+  if (statedAge >= 1 && statedAge < 10) {
+    return AGE_WORD_ONES[statedAge] ?? null;
+  }
+
+  if (statedAge >= 10 && statedAge < 20) {
+    return AGE_WORD_TEENS[statedAge - 10] ?? null;
+  }
+
+  if (statedAge >= 20 && statedAge < 100) {
+    const tens = Math.floor(statedAge / 10) * 10;
+    const ones = statedAge % 10;
+    const tensWord = AGE_WORD_TENS[tens];
+    const onesWord = AGE_WORD_ONES[ones];
+    if (!tensWord) {
+      return null;
+    }
+
+    return onesWord ? `${tensWord} ${onesWord}` : tensWord;
+  }
+
+  return null;
+}
+
+function comparableTextMarketsWordAge(
+  value: string | null | undefined,
+  statedAge: number | null | undefined,
+): boolean {
+  if (!value || statedAge === null || statedAge === undefined) {
+    return false;
+  }
+
+  const ageWords = getComparableAgeWordPhrase(statedAge);
+  if (!ageWords) {
+    return false;
+  }
+
+  const normalizedValue = normalizeComparableText(value).replace(/-/g, " ");
+  return containsComparablePhrase(normalizedValue, ageWords);
+}
+
+function getComparableBottleFamilyName({
+  name,
+  brandName,
+  statedAge,
+}: {
+  name: string;
+  brandName: string;
+  statedAge: number | null | undefined;
+}): string {
+  const ageStrippedName = stripComparableAgeStatement(name, statedAge);
+  const normalizedName = normalizeComparableText(ageStrippedName);
+  const normalizedBrandName = normalizeComparableText(brandName);
+
+  if (
+    normalizedBrandName &&
+    normalizedName.startsWith(`${normalizedBrandName} `)
+  ) {
+    return normalizedName.slice(normalizedBrandName.length).trim();
+  }
+
+  return normalizedName;
+}
+
+function bottleFamilyNamesOverlap(
+  left: string | null | undefined,
+  right: string | null | undefined,
+): boolean {
+  if (!left || !right) {
+    return false;
+  }
+
+  return left === right || containsComparablePhrase(left, right);
+}
+
+function hasSameFamilyBottleAgeConflict({
+  artifacts,
+  proposedBottle,
+  statedAge,
+}: {
+  artifacts: BottleClassificationArtifacts;
+  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
+  statedAge: number | null | undefined;
+}): boolean {
+  if (statedAge === null || statedAge === undefined) {
+    return false;
+  }
+
+  const proposedFamilyName = getComparableBottleFamilyName({
+    name: proposedBottle.name,
+    brandName: proposedBottle.brand.name,
+    statedAge,
+  });
+  if (!proposedFamilyName) {
+    return false;
+  }
+
+  const siblingRows = new Map<
+    number,
+    {
+      fullName: string;
+      statedAge: number | null | undefined;
+    }
+  >();
+
+  for (const candidate of artifacts.candidates) {
+    siblingRows.set(candidate.bottleId, {
+      fullName: candidate.bottleFullName ?? candidate.fullName,
+      statedAge: candidate.statedAge,
+    });
+
+    for (const sibling of candidate.familyContext?.siblingBottles ?? []) {
+      siblingRows.set(sibling.bottleId, {
+        fullName: sibling.fullName,
+        statedAge: sibling.statedAge,
+      });
+    }
+  }
+
+  for (const sibling of siblingRows.values()) {
+    if (
+      sibling.statedAge === null ||
+      sibling.statedAge === undefined ||
+      sibling.statedAge === statedAge
+    ) {
+      continue;
+    }
+
+    const siblingFamilyName = getComparableBottleFamilyName({
+      name: sibling.fullName,
+      brandName: proposedBottle.brand.name,
+      statedAge: sibling.statedAge,
+    });
+    if (bottleFamilyNamesOverlap(proposedFamilyName, siblingFamilyName)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function getCreateBottleDisplayIdentityMissingTraits({
+  reference,
+  extractedIdentity,
+  artifacts,
+  proposedBottle,
+}: {
+  reference: BottleReference;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+  artifacts: BottleClassificationArtifacts;
+  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
+}): string[] {
+  const missingTraits: string[] = [];
+  const statedAge = proposedBottle.statedAge;
+
+  if (
+    sourceMarketsProposedBottleAge({
+      reference,
+      extractedIdentity,
+      statedAge,
+    }) &&
+    hasSameFamilyBottleAgeConflict({
+      artifacts,
+      proposedBottle,
+      statedAge,
+    }) &&
+    !proposedBottleNameMarketsStatedAge({
+      proposedBottle,
+      statedAge,
+    })
+  ) {
+    missingTraits.push("statedAge");
+  }
+
+  return missingTraits;
 }
 
 function getLegacyReleaseParentNameCandidate(
@@ -3455,6 +3709,33 @@ function sanitizeClassifierDecision({
       };
     }
 
+    if ((decision.identityScope ?? "product") !== "exact_cask") {
+      const displayIdentityMissingTraits =
+        getCreateBottleDisplayIdentityMissingTraits({
+          reference,
+          extractedIdentity: artifacts.extractedIdentity,
+          artifacts,
+          proposedBottle: normalizedDrafts.proposedBottle,
+        });
+      if (displayIdentityMissingTraits.length > 0) {
+        return createNoMatchDecision({
+          decision: {
+            ...decision,
+            confidence: normalizedConfidence,
+          },
+          candidateBottleIds: filteredCandidateBottleIds,
+          observation,
+          identityScope: "product",
+          rationale: appendRationale(
+            decision.rationale,
+            `Server downgraded create_bottle because the proposed bottle display name omits bottle-level traits (${displayIdentityMissingTraits.join(
+              "; ",
+            )}) that the source markets and the agent put on the bottle; choose a release action or include those traits in proposedBottle.name.`,
+          ),
+        });
+      }
+    }
+
     const duplicateBottleCandidate = findDuplicateCreateBottleCandidate({
       reference,
       proposedBottle: normalizedDrafts.proposedBottle,
@@ -3762,7 +4043,35 @@ function sanitizeClassifierDecision({
       });
     }
 
+    const displayIdentityMissingTraits =
+      (decision.identityScope ?? "product") === "exact_cask"
+        ? []
+        : getCreateBottleDisplayIdentityMissingTraits({
+            reference,
+            extractedIdentity: artifacts.extractedIdentity,
+            artifacts,
+            proposedBottle: normalizedDrafts.proposedBottle,
+          });
+
     if (!normalizedDrafts.proposedRelease) {
+      if (displayIdentityMissingTraits.length > 0) {
+        return createNoMatchDecision({
+          decision: {
+            ...decision,
+            confidence: normalizedConfidence,
+          },
+          candidateBottleIds: filteredCandidateBottleIds,
+          observation,
+          identityScope: "product",
+          rationale: appendRationale(
+            decision.rationale,
+            `Server downgraded bottle-and-release creation because the normalized bottle display name omits bottle-level traits (${displayIdentityMissingTraits.join(
+              "; ",
+            )}) that the source markets and the agent put on the bottle; choose a release action or include those traits in proposedBottle.name.`,
+          ),
+        });
+      }
+
       return {
         action: "create_bottle",
         confidence: normalizedConfidence,
@@ -3787,6 +4096,24 @@ function sanitizeClassifierDecision({
         proposedBottle: normalizedDrafts.proposedBottle,
         proposedRelease: null,
       };
+    }
+
+    if (displayIdentityMissingTraits.length > 0) {
+      return createNoMatchDecision({
+        decision: {
+          ...decision,
+          confidence: normalizedConfidence,
+        },
+        candidateBottleIds: filteredCandidateBottleIds,
+        observation,
+        identityScope: "product",
+        rationale: appendRationale(
+          decision.rationale,
+          `Server downgraded bottle-and-release creation because the proposed bottle display name omits bottle-level traits (${displayIdentityMissingTraits.join(
+            "; ",
+          )}) that the source markets and the agent put on the bottle; choose a release action or include those traits in proposedBottle.name.`,
+        ),
+      });
     }
 
     if (

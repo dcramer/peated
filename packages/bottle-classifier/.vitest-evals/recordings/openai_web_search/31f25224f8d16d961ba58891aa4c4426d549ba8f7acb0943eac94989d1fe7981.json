@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-06-28T19:01:07.669Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "\"Shieldaig Speyside\" 30 year old single malt Scotch whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "\"Shieldaig Speyside\" 30 year old single malt Scotch whisky",
+    "summary": "Here’s the most solid bottle-specific evidence I could confirm for **Shieldaig Speyside 30 Year Old Single Malt Scotch Whisky**:\n\n- **Name/age:** Shieldaig **30-year-old** single malt Scotch whisky. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/198422/shieldaig-30-year-old))\n- **Style/region:** **Single ",
+    "results": [
+      {
+        "title": "Shieldaig Speyside Single Malt",
+        "url": "https://distiller.com/spirits/shieldaig-speyside-single-malt",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.caskers.com/shieldaig-speyside-single-malt-scotch-whisky/",
+        "url": "https://www.caskers.com/shieldaig-speyside-single-malt-scotch-whisky/",
+        "domain": "caskers.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/speyside/spey-30-year-old-whisky/?sku=138061",
+        "url": "https://www.masterofmalt.com/whiskies/speyside/spey-30-year-old-whisky/?sku=138061",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Shieldaig 30-year-old - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/198422/shieldaig-30-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.shipt.com/shop/products/66a06c82-d949-11ef-820a-7727809dae14",
+        "url": "https://www.shipt.com/shop/products/66a06c82-d949-11ef-820a-7727809dae14",
+        "domain": "shipt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/shieldaig-speyside-finest-old.html",
+        "url": "https://www.whisky.com/whisky-database/details/shieldaig-speyside-finest-old.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "31f25224f8d16d961ba58891aa4c4426d549ba8f7acb0943eac94989d1fe7981",
+    "mode": "record"
+  }
+}

@@ -36,11 +36,30 @@ for (const envFile of [".env", ".env.local"]) {
   applyEnvFile(path.resolve(workspaceRoot, envFile));
 }
 
+function pickDefinedEnv(keys: string[]): Record<string, string> {
+  return Object.fromEntries(
+    keys.flatMap((key) => {
+      const value = process.env[key];
+      return value === undefined ? [] : [[key, value]];
+    }),
+  );
+}
+
 export default defineConfig({
   root: packageRoot,
   test: {
     fileParallelism: false,
     env: {
+      ...pickDefinedEnv([
+        "OPENAI_API_KEY",
+        "OPENAI_HOST",
+        "OPENAI_ORGANIZATION",
+        "OPENAI_PROJECT",
+        "OPENAI_EVAL_MODEL",
+        "OPENAI_MODEL",
+        "BRAVE_API_KEY",
+        "BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES",
+      ]),
       VITEST_EVALS_REPLAY_DIR:
         process.env.VITEST_EVALS_REPLAY_DIR ?? replayRoot,
       VITEST_EVALS_REPLAY_MODE: process.env.VITEST_EVALS_REPLAY_MODE ?? "auto",
