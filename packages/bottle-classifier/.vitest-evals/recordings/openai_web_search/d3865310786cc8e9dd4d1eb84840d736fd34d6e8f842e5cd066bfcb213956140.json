@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-06-28T19:00:50.199Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Shieldaig Speyside Single Malt 21 year old Scotch Whisky Total Wine Shieldaig 21"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Shieldaig Speyside Single Malt 21 year old Scotch Whisky Total Wine Shieldaig 21",
+    "summary": "Here’s the bottle-specific picture I could confirm for **Shieldaig Speyside Single Malt 21 Year Old** sold at **Total Wine**:\n\n- It is a **Speyside single malt Scotch whisky** with a stated age of **21 years**. ([thedailypour.com](https://thedailypour.com/spirit/shieldaig-speyside-single-malt-scotch-whisky-21-year/))\n-",
+    "results": [
+      {
+        "title": "https://corktreewineandliquors.com/products/shieldaig-speyside-21-year",
+        "url": "https://corktreewineandliquors.com/products/shieldaig-speyside-21-year",
+        "domain": "corktreewineandliquors.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Shieldaig Speyside Single Malt Scotch Whisky 21 Year Review | The Daily Pour",
+        "url": "https://thedailypour.com/spirit/shieldaig-speyside-single-malt-scotch-whisky-21-year/",
+        "domain": "thedailypour.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.shipt.com/shop/products/38a315b4-d949-11ef-ad6c-0ff3b48cac1a",
+        "url": "https://www.shipt.com/shop/products/38a315b4-d949-11ef-ad6c-0ff3b48cac1a",
+        "domain": "shipt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.douglaslaing.com/en-us/collections/private-stock/products/private-stock-speyside-21-years-old",
+        "url": "https://www.douglaslaing.com/en-us/collections/private-stock/products/private-stock-speyside-21-years-old",
+        "domain": "douglaslaing.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.liquorstore-online.com/134855/glenfiddich-21-year-old-gran-reserva-speyside-single-malt-scotch-whisky-70cl-40-abv",
+        "url": "https://www.liquorstore-online.com/134855/glenfiddich-21-year-old-gran-reserva-speyside-single-malt-scotch-whisky-70cl-40-abv",
+        "domain": "liquorstore-online.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://woodencork.com/collections/top-shelf-whiskey/products/aultmore-single-malt-scotch-21-yr",
+        "url": "https://woodencork.com/collections/top-shelf-whiskey/products/aultmore-single-malt-scotch-21-yr",
+        "domain": "woodencork.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d3865310786cc8e9dd4d1eb84840d736fd34d6e8f842e5cd066bfcb213956140",
+    "mode": "record"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-06-28T18:42:19.229Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Shieldaig Speyside single malt 30 year old Scotch Whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Shieldaig Speyside single malt 30 year old Scotch Whisky",
+    "summary": "Here’s the most defensible bottle-specific summary I could confirm for **Shieldaig Speyside Single Malt 30 Year Old Scotch Whisky**:\n\n- **Brand/label:** Shieldaig Speyside Single Malt 30 Year Old. ([shipt.com](https://www.shipt.com/shop/products/66a06c82-d949-11ef-820a-7727809dae14))\n- **Category/region:** **Single mal",
+    "results": [
+      {
+        "title": "https://www.htfw.com/macphail-s-speyside-single-malt-scotch-30-year-old-whisky",
+        "url": "https://www.htfw.com/macphail-s-speyside-single-malt-scotch-30-year-old-whisky",
+        "domain": "htfw.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.htfw.com/glenallachie-speyside-single-malt-batch-1-30-year-old-whisky",
+        "url": "https://www.htfw.com/glenallachie-speyside-single-malt-batch-1-30-year-old-whisky",
+        "domain": "htfw.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Shieldaig Speyside Single Malt 30 Year Old | Shipt",
+        "url": "https://www.shipt.com/shop/products/66a06c82-d949-11ef-820a-7727809dae14",
+        "domain": "shipt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.htfw.com/glenfiddich-pure-single-malt-scotch-30-year-old-whisky",
+        "url": "https://www.htfw.com/glenfiddich-pure-single-malt-scotch-30-year-old-whisky",
+        "domain": "htfw.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky-online.com/products/undisclosed-speyside-1992-2022-30-year-old-infrequent-flyers-single-cask-4823",
+        "url": "https://www.whisky-online.com/products/undisclosed-speyside-1992-2022-30-year-old-infrequent-flyers-single-cask-4823",
+        "domain": "whisky-online.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Shieldaig 30-year-old - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/198422/shieldaig-30-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "20d525302b99d95343ee0a3e328c67029dc550e2a3954aaaa940aedaa2f59a92",
+    "mode": "record"
+  }
+}

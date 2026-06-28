@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import type {
-  BottleClassifierAdapters,
+  BottleClassifierDataSource,
   CreateBottleClassifierOptions,
 } from "./classifierRuntime";
 import {
@@ -24,7 +24,7 @@ export function createEvalOpenAIClient() {
 }
 
 export function createEvalClassifierOptions(
-  adapters: BottleClassifierAdapters,
+  dataSource: BottleClassifierDataSource,
 ): CreateBottleClassifierOptions {
   return {
     client: createEvalOpenAIClient(),
@@ -33,7 +33,7 @@ export function createEvalClassifierOptions(
       process.env.BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES ?? 3,
     ),
     braveApiKey: process.env.BRAVE_API_KEY ?? null,
-    adapters,
+    dataSource,
   };
 }
 
