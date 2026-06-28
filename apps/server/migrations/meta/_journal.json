@@ -1275,6 +1275,20 @@
       "when": 1781625297724,
       "tag": "0181_majestic_hellfire_club",
       "breakpoints": false
+    },
+    {
+      "idx": 182,
+      "version": "7",
+      "when": 1782678955460,
+      "tag": "0182_abnormal_luke_cage",
+      "breakpoints": false
+    },
+    {
+      "idx": 183,
+      "version": "7",
+      "when": 1782679050009,
+      "tag": "0183_tired_moondragon",
+      "breakpoints": false
     }
   ]
 }

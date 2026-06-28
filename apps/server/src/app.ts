@@ -24,10 +24,10 @@ import { cache } from "hono/cache";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
-import { contentType } from "mime-types";
+import { lookup } from "mime-types";
 import { Readable } from "node:stream";
 import { setTimeout } from "node:timers/promises";
-import { format } from "path";
+import path from "path";
 import type { ZodIssue } from "zod";
 import { ZodError } from "zod";
 import config from "./config";
@@ -204,8 +204,12 @@ export const app = new Hono()
     return c.text("User-agent: *\nDisallow: /");
   })
   // File upload handler
-  .get("/uploads/:filename", async (c) => {
-    const filename = c.req.param("filename");
+  .get("/uploads/*", async (c) => {
+    const filename = c.req.path.slice("/uploads/".length);
+
+    if (!filename || filename.includes("..") || path.isAbsolute(filename)) {
+      return c.notFound();
+    }
 
     let stream: Readable;
     if (process.env.USE_GCS_STORAGE) {
@@ -220,10 +224,7 @@ export const app = new Hono()
 
       stream = file.createReadStream();
     } else {
-      const filepath = format({
-        dir: config.UPLOAD_PATH,
-        base: filename,
-      });
+      const filepath = path.join(config.UPLOAD_PATH, filename);
 
       try {
         const fd = await open(filepath, "r");
@@ -235,10 +236,7 @@ export const app = new Hono()
 
     // Set appropriate headers
     c.header("Cache-Control", `public, max-age=${ONE_DAY}`);
-    c.header(
-      "Content-Type",
-      contentType(filename) || "application/octet-stream",
-    );
+    c.header("Content-Type", lookup(filename) || "application/octet-stream");
 
     return c.body(Readable.toWeb(stream) as ReadableStream<Uint8Array>);
   })

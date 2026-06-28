@@ -29,7 +29,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - `pnpm dev*` and `pnpm cli <cmd>` load `.env.local`; backend tests load `.env.test`
 - Backend testing policy: `docs/development/backend-testing.md`
 - Frontend testing policy: `docs/development/frontend-testing.md`
-- Before finalizing non-trivial code changes, run the full test suite with `pnpm test`; targeted tests are additive, not a substitute
+- Before opening a PR, run targeted tests/typechecks/lint for the touched surface; PR CI is the required full-repo `pnpm test` gate
 - Classifier/repair changes: preserve `docs/architecture/whisky-identity-model.md`; brand/entity identity is not prefix matching
 - Production-miss classifier evals must verify the real bottle online, state the exact Peated DB outcome, and encode that provenance in the fixture; do not substitute a generalized pretend case for the observed bottle.
 - oRPC route conventions: `docs/development/orpc-routes.md`
@@ -81,6 +81,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - `docs/development/orpc-routes.md`
 - `docs/development/schema-conventions.md`
 - `docs/features/bottle-entry-workflow.md`
+- `docs/features/photo-tasting-entry.md`
 - `docs/features/store-price-matching.md`
 - `docs/features/simple-rating-system.md`
 - `docs/policies/README.md`
