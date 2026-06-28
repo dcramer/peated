@@ -105,6 +105,17 @@ export async function createPendingImageUpload({
     onProcess,
   });
 
+  const deleteStoredUpload = async () => {
+    try {
+      await deleteFile({ filename: filenameFromUploadUrl(imageUrl) });
+    } catch (cleanupErr) {
+      logError(cleanupErr, {
+        source: "pending_upload_cleanup_after_create_failure",
+        imageUrl,
+      });
+    }
+  };
+
   let pendingUpload: PendingUpload | undefined;
   try {
     [pendingUpload] = await db
@@ -122,8 +133,9 @@ export async function createPendingImageUpload({
       })
       .returning();
   } catch (err) {
+    await deleteStoredUpload();
+
     if (idempotencyKey && isPendingUploadIdempotencyConflict(err)) {
-      await deleteFile({ filename: filenameFromUploadUrl(imageUrl) });
       const existing = await findPendingUploadByIdempotencyKey({
         createdById,
         purpose,

@@ -96,6 +96,30 @@ describe("pending uploads", () => {
     ).rejects.toBeInstanceOf(PendingUploadExpiredError);
   });
 
+  test("deletes the stored object when pending upload row creation fails", async ({
+    fixtures,
+    defaults,
+  }) => {
+    let storedFilename = "";
+
+    await expect(
+      createPendingImageUpload({
+        file: await fixtures.SampleSquareImage(),
+        createdById: defaults.user.id,
+        purpose: "invalid_purpose" as any,
+        onProcess: (stream, filename) => {
+          storedFilename = `${filename}.jpg`;
+          return { stream, filename: storedFilename };
+        },
+      }),
+    ).rejects.toThrow();
+
+    expect(storedFilename).toBeTruthy();
+    await expect(
+      access(path.join(config.UPLOAD_PATH, "pending-uploads", storedFilename)),
+    ).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
   test("cleanup expires pending rows and deletes attached pending objects", async ({
     fixtures,
     defaults,
