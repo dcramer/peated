@@ -110,8 +110,10 @@ export async function createPendingImageUpload({
       await deleteFile({ filename: filenameFromUploadUrl(imageUrl) });
     } catch (cleanupErr) {
       logError(cleanupErr, {
-        source: "pending_upload_cleanup_after_create_failure",
-        imageUrl,
+        pendingUpload: {
+          source: "pending_upload_cleanup_after_create_failure",
+          imageUrl,
+        },
       });
     }
   };
