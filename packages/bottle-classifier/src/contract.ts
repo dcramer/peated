@@ -6,8 +6,32 @@ import {
   BottleSearchEvidenceSchema,
   EntityResolutionSchema,
 } from "./classifierTypes";
+import { ImageBottleEvidenceSchema } from "./imageEvidence";
 
-const BottleReferenceUrlSchema = z.preprocess((value) => {
+export {
+  ImageBottleEvidenceConflictSchema,
+  ImageBottleEvidenceSchema,
+  ImageBottleFieldCandidatesSchema,
+  ImageEvidenceExtractorKindSchema,
+  ImageEvidenceExtractorOutputSchema,
+  ImageEvidenceExtractorSchema,
+  ImagePhotoSuitabilitySchema,
+  ImageTextRegionSchema,
+  ImageTextSpanSchema,
+} from "./imageEvidence";
+export type {
+  ImageBottleEvidence,
+  ImageBottleEvidenceConflict,
+  ImageBottleFieldCandidates,
+  ImageEvidenceExtractorAdapter,
+  ImageEvidenceExtractorKind,
+  ImageEvidenceExtractorOutput,
+  ImagePhotoSuitability,
+  ImageTextRegion,
+  ImageTextSpan,
+} from "./imageEvidence";
+
+function normalizeHttpUrl(value: unknown) {
   if (value === undefined) {
     return undefined;
   }
@@ -26,11 +50,38 @@ const BottleReferenceUrlSchema = z.preprocess((value) => {
   }
 
   try {
-    return new URL(trimmedValue).toString();
+    const url = new URL(trimmedValue);
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return null;
+    }
+    return url.toString();
   } catch {
     return null;
   }
-}, z.string().url().nullable().optional());
+}
+
+const DataImageUrlSchema = z
+  .string()
+  .regex(/^data:image\/(?:gif|jpe?g|png|webp);base64,[a-z0-9+/]+={0,2}$/i);
+
+const BottleReferenceUrlSchema = z.preprocess(
+  normalizeHttpUrl,
+  z.string().url().nullable().optional(),
+);
+
+const BottleReferenceImageUrlSchema = z.preprocess(
+  (value) => {
+    if (typeof value === "string") {
+      const trimmedValue = value.trim();
+      if (DataImageUrlSchema.safeParse(trimmedValue).success) {
+        return trimmedValue;
+      }
+    }
+
+    return normalizeHttpUrl(value);
+  },
+  z.union([z.string().url(), DataImageUrlSchema]).nullable().optional(),
+);
 
 export const BottleReferenceSchema = z
   .object({
@@ -38,7 +89,7 @@ export const BottleReferenceSchema = z
     externalSiteId: z.number().int().nullable().optional(),
     name: z.string().trim().min(1),
     url: BottleReferenceUrlSchema,
-    imageUrl: BottleReferenceUrlSchema,
+    imageUrl: BottleReferenceImageUrlSchema,
     currentBottleId: z.number().int().nullable().optional(),
     currentReleaseId: z.number().int().nullable().optional(),
   })
@@ -47,6 +98,9 @@ export const BottleReferenceSchema = z
 export const BottleClassificationArtifactsSchema = z
   .object({
     extractedIdentity: BottleExtractedDetailsSchema.nullable().default(null),
+    // Direct artifact fixtures may omit image evidence; the builder normalizes
+    // that compatibility path to null for runtime consumers.
+    imageEvidence: ImageBottleEvidenceSchema.nullable().optional(),
     candidates: z.array(BottleCandidateSchema).default([]),
     searchEvidence: z.array(BottleSearchEvidenceSchema).default([]),
     resolvedEntities: z.array(EntityResolutionSchema).default([]),
@@ -59,6 +113,7 @@ export const ClassifyBottleReferenceInputSchema = z
   .object({
     reference: BottleReferenceSchema,
     extractedIdentity: BottleExtractedDetailsSchema.nullable().optional(),
+    imageEvidence: ImageBottleEvidenceSchema.nullable().optional(),
     initialCandidates: z.array(BottleCandidateSchema).optional(),
     candidateExpansion: CandidateExpansionModeSchema.default("open"),
   })
@@ -95,6 +150,7 @@ export type CandidateExpansionMode = z.infer<
 export type ClassifyBottleReferenceInput = {
   reference: BottleReference;
   extractedIdentity?: null | z.infer<typeof BottleExtractedDetailsSchema>;
+  imageEvidence?: null | z.infer<typeof ImageBottleEvidenceSchema>;
   initialCandidates?: z.infer<typeof BottleCandidateSchema>[];
   candidateExpansion?: CandidateExpansionMode;
 };
@@ -113,6 +169,7 @@ export function buildBottleClassificationArtifacts(
 ): BottleClassificationArtifacts {
   return BottleClassificationArtifactsSchema.parse({
     extractedIdentity: null,
+    imageEvidence: null,
     candidates: [],
     searchEvidence: [],
     resolvedEntities: [],

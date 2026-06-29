@@ -33,6 +33,28 @@ export type {
 } from "./contract";
 export { BottleClassificationError } from "./error";
 export { createWhiskyLabelExtractor } from "./extractor";
+export {
+  ImageBottleEvidenceConflictSchema,
+  ImageBottleEvidenceSchema,
+  ImageBottleFieldCandidatesSchema,
+  ImageEvidenceExtractorKindSchema,
+  ImageEvidenceExtractorOutputSchema,
+  ImageEvidenceExtractorSchema,
+  ImagePhotoSuitabilitySchema,
+  ImageTextRegionSchema,
+  ImageTextSpanSchema,
+} from "./imageEvidence";
+export type {
+  ImageBottleEvidence,
+  ImageBottleEvidenceConflict,
+  ImageBottleFieldCandidates,
+  ImageEvidenceExtractorAdapter,
+  ImageEvidenceExtractorKind,
+  ImageEvidenceExtractorOutput,
+  ImagePhotoSuitability,
+  ImageTextRegion,
+  ImageTextSpan,
+} from "./imageEvidence";
 export { normalizeBottle, type NormalizedBottle } from "./normalize";
 export {
   formatCanonicalReleaseName,

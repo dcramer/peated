@@ -1,0 +1,87 @@
+{
+  "id": "image-backed-photo-matches-ardbeg-uigeadail-from-label",
+  "name": "image-backed photo: matches Ardbeg Uigeadail from label evidence",
+  "input": {
+    "reference": {
+      "name": "Bottle photo upload",
+      "url": "https://thedrinksociety.com.au/products/ardbeg-uigeadail-islay-single-malt-scotch-whisky-700ml",
+      "imageUrl": "https://thedrinksociety.com.au/cdn/shop/files/tds-ardbeg-uigeadail-new_1400x.jpg?v=1719634107"
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Ardbeg Uigeadail",
+        "brand": "Ardbeg",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Ardbeg"],
+        "category": "single_malt",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": 54.2,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.95,
+        "source": ["exact"],
+        "bottleId": 630,
+        "fullName": "Ardbeg Uigeadail"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["ardbeg", "uigeadail"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Ardbeg Uigeadail",
+          "brand": "Ardbeg",
+          "bottler": null,
+          "series": null,
+          "distillery": ["Ardbeg"],
+          "category": "single_malt",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": 54.2,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.95,
+          "source": ["exact"],
+          "bottleId": 630,
+          "fullName": "Ardbeg Uigeadail"
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.ardbeg.com/whisky/Core%20Range/Ardbeg%20Uigeadail/",
+      "https://thedrinksociety.com.au/products/ardbeg-uigeadail-islay-single-malt-scotch-whisky-700ml"
+    ],
+    "notes": "Added after live CLI QA confirmed the image extractor read brand, expression, distillery, category, and 54.2% ABV from this product image."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 630,
+    "confidenceBand": "auto_verification",
+    "verifyEligible": true,
+    "summary": "Use the uploaded bottle photo, not the generic reference name, to extract Ardbeg Uigeadail and match the existing Ardbeg Uigeadail bottle."
+  }
+}

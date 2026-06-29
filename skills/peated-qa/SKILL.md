@@ -69,6 +69,34 @@ Keep the printed token out of committed docs and final reports. Use
 5. For destructive commands, use dry-run/help first when available; otherwise use local throwaway data only.
 6. If a CLI command drives server logic, also QA the matching API route or DB result.
 
+## Classifier QA
+
+Use this for changes under `packages/bottle-classifier/**` or
+`apps/server/src/agents/bottleClassifier/**`.
+
+1. For bottle-name checks, run:
+   `pnpm cli classifier run "Ardbeg Uigeadail"`.
+2. For image checks, run:
+   `pnpm cli classifier run --image /path/to/bottle.jpg` or
+   `pnpm cli classifier run --image https://example.com/bottle.jpg`.
+3. For exact contract payloads, run:
+   `pnpm cli classifier run --input-file /tmp/classifier-input.json`.
+4. Use `--initial-only` when the check should stay closed-set and avoid follow-up
+   bottle/web search.
+5. Live classifier runs use `.env.local`, local DB adapters, and OpenAI config.
+   They may call OpenAI and local search depending on the reference.
+6. Pair manual classifier smoke checks with package validation:
+   `pnpm --filter @peated/bottle-classifier typecheck` and focused tests or evals.
+
+Minimal input-file payload:
+
+```json
+{
+  "reference": { "name": "Ardbeg Uigeadail" },
+  "candidateExpansion": "initial_only"
+}
+```
+
 ## UI QA
 
 1. Start API and web with matched origins.

@@ -139,4 +139,63 @@ describe("buildAgentInput", () => {
       ],
     });
   });
+
+  test("serializes image evidence for photo-backed reasoning", () => {
+    const input = JSON.parse(
+      buildAgentInput({
+        reference: {
+          name: "Ardbeg Uigeadail",
+          imageUrl: "https://example.com/uploads/pending-uploads/photo.webp",
+        },
+        extractedIdentity: {
+          brand: "Ardbeg",
+          bottler: null,
+          expression: "Uigeadail",
+          series: null,
+          distillery: [],
+          category: null,
+          stated_age: null,
+          abv: 54.2,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        imageEvidence: {
+          sourceImageId: "pending-upload-1",
+          extractors: [
+            {
+              kind: "ocr",
+              confidence: 0.86,
+              textSpans: [{ text: "Uigeadail", confidence: 0.91 }],
+              observations: [],
+            },
+          ],
+          fieldCandidates: {
+            expression: { value: "Uigeadail", confidence: 0.91 },
+          },
+          photoSuitability: {
+            isSingleBottlePhoto: true,
+            labelReadable: true,
+            suitableAsTastingImage: true,
+            suitableAsBottleImage: true,
+          },
+          conflicts: [],
+        },
+        initialCandidates: [],
+        currentBottle: null,
+        hasExactAliasMatch: false,
+        candidateExpansion: "initial_only",
+      }),
+    );
+
+    expect(input.imageEvidence.sourceImageId).toBe("pending-upload-1");
+    expect(input.imageEvidence.fieldCandidates.expression.value).toBe(
+      "Uigeadail",
+    );
+  });
 });
