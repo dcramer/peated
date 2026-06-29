@@ -4663,6 +4663,83 @@ describe("createBottleClassifier", () => {
     expect(runBottleClassifierAgent).not.toHaveBeenCalled();
   });
 
+  test("passes image evidence through to classifier agent overrides", async () => {
+    const imageEvidence = {
+      sourceImageId: "pending-upload-1",
+      extractors: [
+        {
+          kind: "ocr" as const,
+          confidence: 0.86,
+          textSpans: [{ text: "Ardbeg Uigeadail", confidence: 0.91 }],
+          observations: [],
+        },
+      ],
+      fieldCandidates: {
+        brand: { value: "Ardbeg", confidence: 0.96 },
+      },
+      photoSuitability: {
+        isSingleBottlePhoto: true,
+        labelReadable: true,
+        suitableAsTastingImage: true,
+        suitableAsBottleImage: true,
+      },
+      conflicts: [],
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "no_match",
+          confidence: 70,
+          rationale: "Needs user confirmation.",
+          candidateBottleIds: [],
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: buildBottleClassificationArtifacts({ imageEvidence }),
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity: {
+        brand: "Ardbeg",
+        bottler: null,
+        expression: "Uigeadail",
+        series: null,
+        distillery: [],
+        category: null,
+        stated_age: null,
+        abv: null,
+        release_year: null,
+        vintage_year: null,
+        cask_type: null,
+        cask_size: null,
+        cask_fill: null,
+        cask_strength: null,
+        single_cask: null,
+        edition: null,
+      },
+      runBottleClassifierAgent,
+    });
+
+    await classifier.classifyBottleReference({
+      reference: {
+        name: "Ardbeg Uigeadail",
+      },
+      imageEvidence,
+      candidateExpansion: "initial_only",
+    });
+
+    expect(runBottleClassifierAgent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        imageEvidence,
+      }),
+    );
+  });
+
   test("matches existing SMWS bottles by code without running the classifier agent", async () => {
     const existingSmwsBottle: BottleCandidate = {
       bottleId: 6505,

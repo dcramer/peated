@@ -169,6 +169,18 @@ pnpm --filter @peated/bottle-classifier typecheck
 pnpm --filter @peated/bottle-classifier test
 ```
 
+Manual classifier smoke commands:
+
+```bash
+pnpm cli classifier run "Ardbeg Uigeadail"
+pnpm cli classifier run --image /tmp/bottle.jpg
+pnpm cli classifier run --input-file /tmp/classifier-input.json
+```
+
+The CLI uses the server adapters, local DB, and `.env.local` OpenAI config to
+run the real classifier. Local image paths are sent to the extractor as data
+URLs; public image URLs are passed through as image references.
+
 Live eval commands:
 
 ```bash

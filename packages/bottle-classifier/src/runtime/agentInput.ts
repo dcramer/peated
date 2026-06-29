@@ -7,12 +7,14 @@ import {
   type EntityResolution,
 } from "../classifierTypes";
 import type { BottleReference } from "../contract";
+import type { ImageBottleEvidence } from "../imageEvidence";
 
 const DEFAULT_MATCH_CANDIDATE_LIMIT = 15;
 
 export function buildAgentInput({
   reference,
   extractedIdentity,
+  imageEvidence,
   initialCandidates,
   currentBottle,
   hasExactAliasMatch,
@@ -23,6 +25,7 @@ export function buildAgentInput({
 }: {
   reference: BottleReference;
   extractedIdentity: BottleExtractedDetails | null;
+  imageEvidence?: ImageBottleEvidence | null;
   initialCandidates: BottleCandidate[];
   currentBottle: BottleCandidate | null;
   hasExactAliasMatch: boolean;
@@ -32,8 +35,8 @@ export function buildAgentInput({
   investigationHint?: string | null;
 }): string {
   /**
-   * The model should see the raw reference, the best current extraction, and
-   * the local candidate context in one stable envelope. Keeping this serialized
+   * The model should see the raw reference, extracted identity, photo evidence,
+   * and local candidate context in one stable envelope. Keeping this serialized
    * input shape explicit makes evals and downstream debugging much easier.
    */
   return JSON.stringify(
@@ -49,6 +52,7 @@ export function buildAgentInput({
       candidateExpansion,
       currentBottle,
       extractedIdentity,
+      imageEvidence: imageEvidence ?? null,
       localSearch: {
         hasExactAliasMatch,
         candidates: initialCandidates,

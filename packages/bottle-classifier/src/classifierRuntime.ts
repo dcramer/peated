@@ -35,6 +35,7 @@ import {
 } from "./contract";
 import { BottleClassificationError } from "./error";
 import { createWhiskyLabelExtractor } from "./extractor";
+import type { ImageBottleEvidence } from "./imageEvidence";
 import { buildBottleClassifierInstructions } from "./instructions";
 import { getStableOpenAISettings } from "./openaiModelSettings";
 import {
@@ -81,6 +82,7 @@ type BottleClassifierReasoningRun = {
 export type RunBottleClassifierAgentInput = {
   reference: BottleReference;
   extractedIdentity?: BottleExtractedDetails | null;
+  imageEvidence?: ImageBottleEvidence | null;
   initialCandidates?: BottleCandidate[];
   candidateExpansion?: CandidateExpansionMode;
   searchEvidence?: BottleSearchEvidence[];
@@ -287,13 +289,16 @@ function mergeCandidateLists(
 
 function buildReasoningArtifacts({
   extractedIdentity,
+  imageEvidence,
   state,
 }: {
   extractedIdentity: BottleExtractedDetails | null;
+  imageEvidence: ImageBottleEvidence | null;
   state: BottleClassifierAgentRunState;
 }) {
   return buildBottleClassificationArtifacts({
     extractedIdentity,
+    imageEvidence,
     searchEvidence: state.searchEvidence,
     candidates: sortedBottleCandidates(state.candidateBottles),
     resolvedEntities: sortedResolvedEntities(state.resolvedEntities),
@@ -737,6 +742,7 @@ export async function prepareBottleClassifierAgentRun(
   {
     reference,
     extractedIdentity,
+    imageEvidence,
     initialCandidates = [],
     candidateExpansion = "open",
     searchEvidence = [],
@@ -752,6 +758,7 @@ export async function prepareBottleClassifierAgentRun(
     resolvedEntities: new Map<number, EntityResolution>(),
   };
   const normalizedExtractedIdentity = extractedIdentity ?? null;
+  const normalizedImageEvidence = imageEvidence ?? null;
   const hasExactAliasMatch = initialCandidates.some((candidate) =>
     candidate.source.includes("exact"),
   );
@@ -889,6 +896,7 @@ export async function prepareBottleClassifierAgentRun(
   const input = buildAgentInput({
     reference,
     extractedIdentity: normalizedExtractedIdentity,
+    imageEvidence: normalizedImageEvidence,
     initialCandidates,
     currentBottle,
     hasExactAliasMatch,
@@ -900,6 +908,7 @@ export async function prepareBottleClassifierAgentRun(
   const getArtifacts = () =>
     buildReasoningArtifacts({
       extractedIdentity: normalizedExtractedIdentity,
+      imageEvidence: normalizedImageEvidence,
       state,
     });
 
@@ -1027,6 +1036,7 @@ export function createBottleClassifier(
   const runBottleClassifierAgentWithBudget = async ({
     reference,
     extractedIdentity,
+    imageEvidence,
     initialCandidates = [],
     candidateExpansion = "open",
     searchEvidence = [],
@@ -1038,6 +1048,7 @@ export function createBottleClassifier(
       const reasoning = await options.overrides.runBottleClassifierAgent({
         reference,
         extractedIdentity,
+        imageEvidence,
         initialCandidates,
         candidateExpansion,
         searchEvidence,
@@ -1069,6 +1080,7 @@ export function createBottleClassifier(
       reference,
       initialCandidates,
       extractedIdentity,
+      imageEvidence,
       candidateExpansion,
       searchEvidence,
       resolvedEntities,
@@ -1111,6 +1123,7 @@ export function createBottleClassifier(
 
       artifacts = buildBottleClassificationArtifacts({
         extractedIdentity,
+        imageEvidence: parsedInput.imageEvidence ?? null,
       });
 
       const autoIgnoreReason = getAutoIgnoreBottleReferenceReason(
@@ -1131,6 +1144,7 @@ export function createBottleClassifier(
 
       artifacts = buildBottleClassificationArtifacts({
         extractedIdentity,
+        imageEvidence: parsedInput.imageEvidence ?? null,
         candidates,
       });
 
@@ -1179,6 +1193,7 @@ export function createBottleClassifier(
       const reasoningRun = await runBottleClassifierAgentWithBudget({
         reference: parsedInput.reference,
         extractedIdentity: artifacts.extractedIdentity,
+        imageEvidence: artifacts.imageEvidence,
         initialCandidates: artifacts.candidates,
         candidateExpansion: parsedInput.candidateExpansion,
         searchEvidence: artifacts.searchEvidence,

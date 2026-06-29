@@ -34,6 +34,41 @@ describe("bottle-classifier contract", () => {
     expect(parsed.candidateExpansion).toBe("initial_only");
   });
 
+  test("parses optional image evidence on classifier input", () => {
+    const parsed = ClassifyBottleReferenceInputSchema.parse({
+      reference: {
+        name: "Ardbeg Uigeadail",
+      },
+      extractedIdentity: {
+        brand: "Ardbeg",
+        expression: "Uigeadail",
+      },
+      imageEvidence: {
+        sourceImageId: "pending-upload-1",
+        extractors: [
+          {
+            kind: "ocr",
+            confidence: 0.86,
+            textSpans: [{ text: "Uigeadail", confidence: 0.91 }],
+          },
+        ],
+        fieldCandidates: {
+          brand: { value: "Ardbeg", confidence: 0.96 },
+        },
+        photoSuitability: {
+          isSingleBottlePhoto: true,
+          labelReadable: true,
+          suitableAsTastingImage: true,
+          suitableAsBottleImage: true,
+        },
+      },
+      candidateExpansion: "initial_only",
+    });
+
+    expect(parsed.imageEvidence?.fieldCandidates.brand?.value).toBe("Ardbeg");
+    expect(parsed.extractedIdentity?.category).toBeNull();
+  });
+
   test("builds discriminated results with normalized artifacts", () => {
     const ignored = createIgnoredBottleClassification({
       reason: "non-whisky",
@@ -54,6 +89,25 @@ describe("bottle-classifier contract", () => {
         proposedRelease: null,
       },
       artifacts: {
+        imageEvidence: {
+          sourceImageId: "pending-upload-1",
+          extractors: [
+            {
+              kind: "vision",
+              confidence: 0.8,
+              textSpans: [],
+              observations: [],
+            },
+          ],
+          fieldCandidates: {},
+          photoSuitability: {
+            isSingleBottlePhoto: true,
+            labelReadable: true,
+            suitableAsTastingImage: true,
+            suitableAsBottleImage: false,
+          },
+          conflicts: [],
+        },
         candidates: [],
       },
     });
@@ -62,6 +116,9 @@ describe("bottle-classifier contract", () => {
     expect(BottleClassificationResultSchema.parse(classified)).toMatchObject({
       status: "classified",
       artifacts: {
+        imageEvidence: {
+          sourceImageId: "pending-upload-1",
+        },
         candidates: [],
         searchEvidence: [],
       },

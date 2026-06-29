@@ -15,6 +15,10 @@
       "types": "./src/contract.ts",
       "default": "./src/contract.ts"
     },
+    "./imageEvidence": {
+      "types": "./src/imageEvidence.ts",
+      "default": "./src/imageEvidence.ts"
+    },
     "./normalize": {
       "types": "./src/normalize.ts",
       "default": "./src/normalize.ts"

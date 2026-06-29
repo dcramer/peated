@@ -6,6 +6,30 @@ import {
   BottleSearchEvidenceSchema,
   EntityResolutionSchema,
 } from "./classifierTypes";
+import { ImageBottleEvidenceSchema } from "./imageEvidence";
+
+export {
+  ImageBottleEvidenceConflictSchema,
+  ImageBottleEvidenceSchema,
+  ImageBottleFieldCandidatesSchema,
+  ImageEvidenceExtractorKindSchema,
+  ImageEvidenceExtractorOutputSchema,
+  ImageEvidenceExtractorSchema,
+  ImagePhotoSuitabilitySchema,
+  ImageTextRegionSchema,
+  ImageTextSpanSchema,
+} from "./imageEvidence";
+export type {
+  ImageBottleEvidence,
+  ImageBottleEvidenceConflict,
+  ImageBottleFieldCandidates,
+  ImageEvidenceExtractorAdapter,
+  ImageEvidenceExtractorKind,
+  ImageEvidenceExtractorOutput,
+  ImagePhotoSuitability,
+  ImageTextRegion,
+  ImageTextSpan,
+} from "./imageEvidence";
 
 const BottleReferenceUrlSchema = z.preprocess((value) => {
   if (value === undefined) {
@@ -47,6 +71,9 @@ export const BottleReferenceSchema = z
 export const BottleClassificationArtifactsSchema = z
   .object({
     extractedIdentity: BottleExtractedDetailsSchema.nullable().default(null),
+    // Direct artifact fixtures may omit image evidence; the builder normalizes
+    // that compatibility path to null for runtime consumers.
+    imageEvidence: ImageBottleEvidenceSchema.nullable().optional(),
     candidates: z.array(BottleCandidateSchema).default([]),
     searchEvidence: z.array(BottleSearchEvidenceSchema).default([]),
     resolvedEntities: z.array(EntityResolutionSchema).default([]),
@@ -59,6 +86,7 @@ export const ClassifyBottleReferenceInputSchema = z
   .object({
     reference: BottleReferenceSchema,
     extractedIdentity: BottleExtractedDetailsSchema.nullable().optional(),
+    imageEvidence: ImageBottleEvidenceSchema.nullable().optional(),
     initialCandidates: z.array(BottleCandidateSchema).optional(),
     candidateExpansion: CandidateExpansionModeSchema.default("open"),
   })
@@ -95,6 +123,7 @@ export type CandidateExpansionMode = z.infer<
 export type ClassifyBottleReferenceInput = {
   reference: BottleReference;
   extractedIdentity?: null | z.infer<typeof BottleExtractedDetailsSchema>;
+  imageEvidence?: null | z.infer<typeof ImageBottleEvidenceSchema>;
   initialCandidates?: z.infer<typeof BottleCandidateSchema>[];
   candidateExpansion?: CandidateExpansionMode;
 };
@@ -113,6 +142,7 @@ export function buildBottleClassificationArtifacts(
 ): BottleClassificationArtifacts {
   return BottleClassificationArtifactsSchema.parse({
     extractedIdentity: null,
+    imageEvidence: null,
     candidates: [],
     searchEvidence: [],
     resolvedEntities: [],
