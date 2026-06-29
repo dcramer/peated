@@ -70,7 +70,10 @@ function buildImageEvidence(sourceImageId: string) {
   };
 }
 
-function buildClassification(decision: Record<string, unknown>) {
+function buildClassification(
+  decision: Record<string, unknown>,
+  artifacts: Record<string, unknown> = {},
+) {
   return BottleClassificationResultSchema.parse({
     status: "classified" as const,
     decision: {
@@ -85,6 +88,7 @@ function buildClassification(decision: Record<string, unknown>) {
       candidates: [],
       searchEvidence: [],
       resolvedEntities: [],
+      ...artifacts,
     },
   });
 }
@@ -153,11 +157,33 @@ describe("POST /tastings/photo-identification", () => {
       }),
     );
     classifyBottleReferenceMock.mockResolvedValue(
-      buildClassification({
-        action: "match",
-        matchedBottleId: matchedBottle.id,
-        matchedReleaseId: null,
-      }),
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: matchedBottle.id,
+          matchedReleaseId: null,
+        },
+        {
+          candidates: [
+            {
+              kind: "bottle",
+              bottleId: matchedBottle.id,
+              releaseId: null,
+              fullName: "Ardbeg Uigeadail",
+              bottleFullName: "Ardbeg Uigeadail",
+              brand: "Ardbeg",
+              score: 0.98,
+              source: ["exact"],
+            },
+          ],
+          searchEvidence: [
+            {
+              query: "Ardbeg Uigeadail",
+              results: [],
+            },
+          ],
+        },
+      ),
     );
 
     const response = await routerClient.tastings.photoIdentification(
@@ -177,6 +203,33 @@ describe("POST /tastings/photo-identification", () => {
     expect(response.imageEvidence.sourceImageId).toBe(response.pendingImage.id);
     expect(response.classification.status).toBe("classified");
     expect(response.suggestedNextStep).toBe("confirm_match");
+    expect(response.classification).toMatchObject({
+      decision: {
+        action: "match",
+        matchedBottleId: matchedBottle.id,
+        matchedReleaseId: null,
+      },
+      artifacts: {
+        candidates: [
+          {
+            bottleId: matchedBottle.id,
+            releaseId: null,
+            bottleFullName: "Ardbeg Uigeadail",
+            fullName: "Ardbeg Uigeadail",
+          },
+        ],
+      },
+    });
+    expect(response.classification.artifacts).toEqual({
+      candidates: [
+        {
+          bottleId: matchedBottle.id,
+          releaseId: null,
+          bottleFullName: "Ardbeg Uigeadail",
+          fullName: "Ardbeg Uigeadail",
+        },
+      ],
+    });
 
     expect(classifyBottleReferenceMock).toHaveBeenCalledWith({
       reference: {

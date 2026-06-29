@@ -356,6 +356,50 @@ Input:
 Output:
 
 ```ts
+type PhotoIdentificationCandidate = {
+  bottleId: number;
+  releaseId?: number | null;
+  bottleFullName?: string | null;
+  fullName: string;
+};
+
+type PhotoIdentificationDecision =
+  | {
+      action: "match";
+      matchedBottleId: number;
+      matchedReleaseId: number | null;
+    }
+  | {
+      action: "create_bottle";
+      proposedBottle: {
+        name: string;
+        brand: { name: string };
+      };
+    }
+  | {
+      action: "create_release";
+      parentBottleId: number;
+      proposedRelease: {
+        edition: string | null;
+      };
+    }
+  | {
+      action: "create_bottle_and_release";
+      proposedBottle: {
+        name: string;
+        brand: { name: string };
+      };
+      proposedRelease: {
+        edition: string | null;
+      };
+    }
+  | {
+      action:
+        | "repair_parent_and_create_release"
+        | "repair_bottle"
+        | "no_match";
+    };
+
 {
   pendingImage: {
     id: string;
@@ -363,7 +407,21 @@ Output:
     expiresAt: string;
   };
   imageEvidence: ImageBottleEvidence;
-  classification: BottleClassifierResult;
+  classification:
+    | {
+        status: "ignored";
+        reason: string;
+        artifacts: {
+          candidates: PhotoIdentificationCandidate[];
+        };
+      }
+    | {
+        status: "classified";
+        decision: PhotoIdentificationDecision;
+        artifacts: {
+          candidates: PhotoIdentificationCandidate[];
+        };
+      };
   suggestedNextStep:
     | "confirm_match"
     | "confirm_create"
@@ -374,7 +432,9 @@ Output:
 ```
 
 This route intentionally has no permanent side effects beyond creating the
-pending upload record and traceable extraction/classification artifacts.
+pending upload record. The public response should return bounded
+photo-identification data; full classifier artifacts remain server-owned
+diagnostics instead of browser payload.
 
 The route should support idempotency for client retries. If the same user retries
 with the same `idempotencyKey`, return the existing pending upload and current
