@@ -110,7 +110,10 @@ Minimal input-file payload:
 3. Verify desktop and mobile widths for changed user-facing flows.
 4. Prefer normal login:
    `/login?redirectTo=/addBottle` -> `Sign in with Email` -> `Or sign in with a password`.
-5. For local protected checks, seed a throwaway verified active user with `termsAcceptedAt`.
+5. For local protected UI checks, seed a throwaway verified active user with
+   `termsAcceptedAt`, then log in through the UI. Do not use bearer-token API
+   setup or a manually sealed `_session` cookie for UI QA unless normal UI login
+   is blocked by unrelated local service noise.
 6. For moderator flows, set that throwaway user `mod: true`.
 7. For bottle entry changes, check `/addBottle` and `/bottles/<id>/edit`.
 8. Inspect rendered state, network/API outcome, persistence after reload, and error/empty/loading states when changed.
