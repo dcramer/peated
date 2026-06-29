@@ -20,15 +20,14 @@ const AuthContext = createContext<Auth>({
 });
 
 export const AuthProvider = ({
-  isLoading = false,
   user = null,
   children,
 }: {
-  isLoading?: boolean;
   user: User | null;
   children: any;
 }) => {
   const [value, setValue] = useState<User | null>(user);
+  const isLoading = value?.id !== user?.id;
 
   useEffect(() => {
     setValue(user);

@@ -10,6 +10,10 @@ import { getSession } from "../session.server";
 import type { ClientContext } from "./client";
 import { getLink } from "./link";
 
+/**
+ * Creates a server oRPC client, using the session token unless explicitly
+ * overridden; pass `accessToken: null` for anonymous server reads.
+ */
 export async function createServerClient(
   context: ClientContext = {},
 ): Promise<{ client: RouterClient<Router, ClientContext> }> {
@@ -24,7 +28,8 @@ export async function createServerClient(
     };
   }
   const link = getLink({
-    accessToken: context.accessToken ?? accessToken,
+    accessToken:
+      context.accessToken === undefined ? accessToken : context.accessToken,
     // https://peated.sentry.io/share/issue/c6bccda67b0648caa6949aed4d72abb3/
     batch: false,
     apiServer: config.API_SERVER,

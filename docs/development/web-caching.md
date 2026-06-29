@@ -89,13 +89,13 @@ The first shared-cache targets are:
 
 - `/bottles/[bottleId]` and nested public bottle tabs.
 - `/entities/[entityId]` and nested public entity tabs.
-- Sitemap route handlers under `/sitemaps/*`.
+- Sitemap route handlers at `/sitemap.xml` and under `/sitemaps/*`.
 
 Bottle and entity detail pages should use dynamic SSR and anonymous server data
 fetching. Public HTML cache headers for those pages are intentionally blocked
-until the deployed edge cache behavior is verified. Sitemap route handlers may
-use explicit public XML cache headers because they do not have authenticated
-variants.
+until the deployed edge cache behavior is verified. All sitemap route handlers
+should use explicit public XML cache headers because they do not have
+authenticated variants.
 
 ## Verification
 

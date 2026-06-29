@@ -6,6 +6,9 @@ import type { ReactNode } from "react";
 import { redirectToAuth } from "../lib/auth";
 import useAuth from "./useAuth";
 
+/**
+ * Redirects anonymous users to auth after the server session reaches the client.
+ */
 export default function useAuthRequired() {
   const { isLoading, isLoggedIn } = useAuth();
   const pathname = usePathname();
@@ -19,10 +22,11 @@ export default function useAuthRequired() {
       searchParams,
     });
   }
-
-  return true;
 }
 
+/**
+ * Redirects anonymous users to auth and non-moderators to the forbidden page.
+ */
 export function useModRequired() {
   const { isLoading, user } = useAuth();
   const pathname = usePathname();
@@ -40,10 +44,11 @@ export function useModRequired() {
   if (!user?.mod && !user?.admin) {
     redirect("/errors/unauthorized");
   }
-
-  return true;
 }
 
+/**
+ * Redirects anonymous users to auth and non-admins to the forbidden page.
+ */
 export function useAdminRequired() {
   const { isLoading, user } = useAuth();
   const pathname = usePathname();
@@ -61,10 +66,11 @@ export function useAdminRequired() {
   if (!user?.admin) {
     redirect("/errors/unauthorized");
   }
-
-  return true;
 }
 
+/**
+ * Redirects anonymous users to auth and unverified users to verification.
+ */
 export function useVerifiedRequired() {
   const { isLoading, user } = useAuth();
   const pathname = usePathname();
@@ -82,18 +88,28 @@ export function useVerifiedRequired() {
   if (!user?.verified) {
     redirect("/verify");
   }
-
-  return true;
 }
 
+/**
+ * Holds child hooks until the authenticated session is available client-side.
+ */
 export function AuthRequired({ children }: { children: ReactNode }) {
-  return useAuthRequired() ? <>{children}</> : <Spinner />;
+  if (useAuthRequired() === false) return <Spinner />;
+  return <>{children}</>;
 }
 
+/**
+ * Holds child hooks until a moderator session is available client-side.
+ */
 export function ModRequired({ children }: { children: ReactNode }) {
-  return useModRequired() ? <>{children}</> : <Spinner />;
+  if (useModRequired() === false) return <Spinner />;
+  return <>{children}</>;
 }
 
+/**
+ * Holds child hooks until a verified session is available client-side.
+ */
 export function VerifiedRequired({ children }: { children: ReactNode }) {
-  return useVerifiedRequired() ? <>{children}</> : <Spinner />;
+  if (useVerifiedRequired() === false) return <Spinner />;
+  return <>{children}</>;
 }

@@ -213,9 +213,7 @@ function SavedCollectionAction({
   kind,
   ...props
 }: CollectionActionProps & { kind: CollectionActionKind }) {
-  const { isLoading, user } = useAuth();
-
-  if (isLoading) return null;
+  const { user } = useAuth();
 
   if (!user) {
     return <SavedCollectionActionUnauthenticated {...props} kind={kind} />;

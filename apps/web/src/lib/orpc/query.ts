@@ -8,7 +8,7 @@ import {
 
 // https://tanstack.com/query/latest/docs/framework/react/guides/advanced-ssr
 const createQueryClient = () => {
-  const queryClient = new QueryClient({
+  const queryClient: QueryClient = new QueryClient({
     defaultOptions: {
       queries: {
         refetchOnMount: false,
