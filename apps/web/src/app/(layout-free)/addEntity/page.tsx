@@ -2,14 +2,20 @@
 
 import { type EntityType } from "@peated/server/types";
 import EntityForm from "@peated/web/components/entityForm";
-import { useVerifiedRequired } from "@peated/web/hooks/useAuthRequired";
+import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AddEntity() {
-  useVerifiedRequired();
+  return (
+    <VerifiedRequired>
+      <AddEntityForm />
+    </VerifiedRequired>
+  );
+}
 
+function AddEntityForm() {
   const router = useRouter();
   const orpc = useORPC();
 

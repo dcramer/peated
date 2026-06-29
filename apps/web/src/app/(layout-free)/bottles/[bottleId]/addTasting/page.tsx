@@ -3,8 +3,9 @@
 import BadgeImage from "@peated/web/components/badgeImage";
 import { useFlashMessages } from "@peated/web/components/flash";
 import Link from "@peated/web/components/link";
+import Spinner from "@peated/web/components/spinner";
 import TastingForm from "@peated/web/components/tastingForm";
-import useAuthRequired from "@peated/web/hooks/useAuthRequired";
+import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -21,8 +22,14 @@ export default function AddTasting({
 }: {
   params: { bottleId: string };
 }) {
-  useAuthRequired();
+  return (
+    <AuthRequired>
+      <AddTastingForm bottleId={bottleId} />
+    </AuthRequired>
+  );
+}
 
+function AddTastingForm({ bottleId }: { bottleId: string }) {
   const router = useRouter();
   const orpc = useORPC();
 

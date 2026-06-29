@@ -1,7 +1,7 @@
 "use client";
 
 import RegionForm from "@peated/web/components/admin/regionForm";
-import { useModRequired } from "@peated/web/hooks/useAuthRequired";
+import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   useMutation,
@@ -15,8 +15,20 @@ export default function Page({
 }: {
   params: { countrySlug: string; regionSlug: string };
 }) {
-  useModRequired();
+  return (
+    <ModRequired>
+      <RegionEditForm countrySlug={countrySlug} regionSlug={regionSlug} />
+    </ModRequired>
+  );
+}
 
+function RegionEditForm({
+  countrySlug,
+  regionSlug,
+}: {
+  countrySlug: string;
+  regionSlug: string;
+}) {
   const orpc = useORPC();
   const { data: region } = useSuspenseQuery(
     orpc.regions.details.queryOptions({

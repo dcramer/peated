@@ -10,6 +10,10 @@ export default function UserLibrary({
 }: {
   params: { username: string };
 }) {
+  return <UserLibraryTable username={username} />;
+}
+
+function UserLibraryTable({ username }: { username: string }) {
   const orpc = useORPC();
   const { data: bottles } = useSuspenseQuery(
     orpc.collections.bottles.list.queryOptions({

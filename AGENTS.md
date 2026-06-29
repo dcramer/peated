@@ -80,6 +80,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - `docs/development/orpc-client.md`
 - `docs/development/orpc-routes.md`
 - `docs/development/schema-conventions.md`
+- `docs/development/web-caching.md`
 - `docs/features/bottle-entry-workflow.md`
 - `docs/features/photo-tasting-entry.md`
 - `docs/features/store-price-matching.md`

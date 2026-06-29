@@ -1,4 +1,4 @@
-import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { type ReactNode } from "react";
 
@@ -7,7 +7,7 @@ export async function generateMetadata({
 }: {
   params: { entityId: string };
 }) {
-  const { client } = await getServerClient();
+  const { client } = await getAnonymousServerClient();
 
   const entity = await resolveOrNotFound(
     client.entities.details({

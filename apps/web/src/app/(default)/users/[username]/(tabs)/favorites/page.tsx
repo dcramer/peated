@@ -10,6 +10,10 @@ export default function UserFavorites({
 }: {
   params: { username: string };
 }) {
+  return <UserFavoritesTable username={username} />;
+}
+
+function UserFavoritesTable({ username }: { username: string }) {
   const orpc = useORPC();
   const { data: bottles } = useSuspenseQuery(
     orpc.collections.bottles.list.queryOptions({

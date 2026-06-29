@@ -2,7 +2,7 @@ import Button from "@peated/web/components/button";
 import EntityHeader from "@peated/web/components/entityHeader";
 import ShareButton from "@peated/web/components/shareButton";
 import { summarize } from "@peated/web/lib/markdown";
-import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { getCanonicalRouteRedirectPath } from "@peated/web/lib/tombstoneRedirect";
 import { redirect } from "next/navigation";
@@ -15,7 +15,7 @@ export async function generateMetadata({
 }: {
   params: { entityId: string };
 }) {
-  const { client } = await getServerClient();
+  const { client } = await getAnonymousServerClient();
 
   const entity = await resolveOrNotFound(
     client.entities.details({
@@ -45,7 +45,7 @@ export default async function Layout({
   params: Record<string, any>;
   children: ReactNode;
 }) {
-  const { client } = await getServerClient();
+  const { client } = await getAnonymousServerClient();
 
   const entityId = Number(params.entityId);
   const entity = await resolveOrNotFound(

@@ -2,7 +2,7 @@
 
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import PaginationButtons from "@peated/web/components/paginationButtons";
-import useAuthRequired from "@peated/web/hooks/useAuthRequired";
+import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import FriendListItem from "./friendListItem";
@@ -10,8 +10,14 @@ import FriendListItem from "./friendListItem";
 export const fetchCache = "default-no-store";
 
 export default function Page() {
-  useAuthRequired();
+  return (
+    <AuthRequired>
+      <FriendsPage />
+    </AuthRequired>
+  );
+}
 
+function FriendsPage() {
   const orpc = useORPC();
   const { data: friendList } = useSuspenseQuery(
     orpc.friends.list.queryOptions({

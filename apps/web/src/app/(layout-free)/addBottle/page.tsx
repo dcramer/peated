@@ -7,7 +7,7 @@ import BottleForm, {
 import { useFlashMessages } from "@peated/web/components/flash";
 import Spinner from "@peated/web/components/spinner";
 import useAuth from "@peated/web/hooks/useAuth";
-import { useVerifiedRequired } from "@peated/web/hooks/useAuthRequired";
+import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { getNewBottleBottlingPath } from "@peated/web/lib/bottlings";
 import { logError } from "@peated/web/lib/log";
@@ -17,8 +17,14 @@ import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function AddBottle() {
-  useVerifiedRequired();
+  return (
+    <VerifiedRequired>
+      <AddBottleForm />
+    </VerifiedRequired>
+  );
+}
 
+function AddBottleForm() {
   const { user } = useAuth();
   const router = useRouter();
   const orpc = useORPC();

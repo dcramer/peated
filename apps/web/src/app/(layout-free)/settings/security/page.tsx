@@ -5,12 +5,18 @@ import Collapsable from "@peated/web/components/collapsable";
 import Fieldset from "@peated/web/components/fieldset";
 import PasskeyManager from "@peated/web/components/passkeyManager";
 import TextField from "@peated/web/components/textField";
-import useAuthRequired from "@peated/web/hooks/useAuthRequired";
+import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import { useState } from "react";
 
 export default function SecuritySettingsPage() {
-  useAuthRequired();
+  return (
+    <AuthRequired>
+      <SecuritySettings />
+    </AuthRequired>
+  );
+}
 
+function SecuritySettings() {
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [passkeysOpen, setPasskeysOpen] = useState(true);
 

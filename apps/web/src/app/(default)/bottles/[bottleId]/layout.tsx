@@ -6,7 +6,7 @@ import FlavorProfile from "@peated/web/components/flavorProfile";
 import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
 import { summarize } from "@peated/web/lib/markdown";
-import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { getCanonicalRouteRedirectPath } from "@peated/web/lib/tombstoneRedirect";
 import { redirect } from "next/navigation";
@@ -21,7 +21,7 @@ export default async function Layout({
   params: Record<string, any>;
   children: ReactNode;
 }) {
-  const { client } = await getServerClient();
+  const { client } = await getAnonymousServerClient();
 
   const bottleId = Number(params.bottleId);
   const bottle = await resolveOrNotFound(

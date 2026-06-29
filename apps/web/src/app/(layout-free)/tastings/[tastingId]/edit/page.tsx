@@ -2,7 +2,7 @@
 
 import { useFlashMessages } from "@peated/web/components/flash";
 import TastingForm from "@peated/web/components/tastingForm";
-import useAuthRequired from "@peated/web/hooks/useAuthRequired";
+import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -14,8 +14,14 @@ export default function Page({
 }: {
   params: { tastingId: string };
 }) {
-  useAuthRequired();
+  return (
+    <AuthRequired>
+      <TastingEditForm tastingId={tastingId} />
+    </AuthRequired>
+  );
+}
 
+function TastingEditForm({ tastingId }: { tastingId: string }) {
   const orpc = useORPC();
 
   // TODO: run these queries in parallel

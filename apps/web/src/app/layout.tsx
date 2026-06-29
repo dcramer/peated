@@ -8,12 +8,9 @@ import type { Metadata, Viewport } from "next";
 import React from "react";
 import Providers from "./providers/providers";
 
-// default behavior is to disable cache, as it breaks quite a few flows
-// which are fairly dynamic (e.g. add tasting, add bottle, etc)
+export const dynamic = "force-dynamic";
 
 export const fetchCache = "default-no-store";
-
-export const dynamic = "force-dynamic";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -46,7 +43,7 @@ export default async function RootLayout({
   children: React.ReactNode;
   // auth: React.ReactNode;
 }>) {
-  let session = await getSession();
+  const session = await getSession();
 
   // we need to bind the user on the server, but we also do this in providers
   // so it stays updated on the client appropriately

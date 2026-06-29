@@ -13,7 +13,7 @@ import PendingTosAlert from "@peated/web/components/pendingTosAlert";
 import PendingVerificationAlert from "@peated/web/components/pendingVerificationAlert";
 import TextField from "@peated/web/components/textField";
 import useAuth from "@peated/web/hooks/useAuth";
-import useAuthRequired from "@peated/web/hooks/useAuthRequired";
+import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import { updateSession } from "@peated/web/lib/auth.actions";
 import { toBlob } from "@peated/web/lib/blobs";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -28,8 +28,14 @@ import type { z } from "zod";
 type FormSchemaType = z.infer<typeof UserInputSchema>;
 
 export default function ProfileSettingsPage() {
-  useAuthRequired();
+  return (
+    <AuthRequired>
+      <ProfileSettingsForm />
+    </AuthRequired>
+  );
+}
 
+function ProfileSettingsForm() {
   const { setUser } = useAuth();
   const orpc = useORPC();
   const router = useRouter();

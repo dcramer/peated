@@ -10,7 +10,7 @@ import FormError from "@peated/web/components/formError";
 import FormHeader from "@peated/web/components/formHeader";
 import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
-import { useModRequired } from "@peated/web/hooks/useAuthRequired";
+import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import {
@@ -31,8 +31,14 @@ export default function Page({
 }: {
   params: { entityId: string };
 }) {
-  useModRequired();
+  return (
+    <ModRequired>
+      <EntityMergeForm entityId={entityId} />
+    </ModRequired>
+  );
+}
 
+function EntityMergeForm({ entityId }: { entityId: string }) {
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const { data: entity } = useSuspenseQuery(

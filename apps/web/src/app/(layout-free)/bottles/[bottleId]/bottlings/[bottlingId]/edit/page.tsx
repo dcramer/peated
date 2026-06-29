@@ -1,7 +1,7 @@
 "use client";
 
 import ReleaseForm from "@peated/web/components/releaseForm";
-import { useModRequired } from "@peated/web/hooks/useAuthRequired";
+import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { getBottleBottlingsPath } from "@peated/web/lib/bottlings";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
@@ -12,8 +12,20 @@ export default function Page({
 }: {
   params: { bottleId: string; bottlingId: string };
 }) {
-  useModRequired();
+  return (
+    <ModRequired>
+      <BottlingEditForm bottleId={bottleId} bottlingId={bottlingId} />
+    </ModRequired>
+  );
+}
 
+function BottlingEditForm({
+  bottleId,
+  bottlingId,
+}: {
+  bottleId: string;
+  bottlingId: string;
+}) {
   const orpc = useORPC();
   const { data: bottle } = useSuspenseQuery(
     orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),

@@ -5,7 +5,7 @@ import { type Router } from "@peated/server/orpc/router";
 import { getTraceData } from "@sentry/core";
 import { QueryClientProvider } from "@tanstack/react-query";
 import type { ComponentProps } from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ORPCContext } from "./context";
 import { getLink } from "./link";
 import { getQueryClient } from "./query";
@@ -21,8 +21,16 @@ export default function ORPCProvider({
   const queryClient = getQueryClient(false);
   const traceData = getTraceData();
   const accessTokenRef = useRef(accessToken);
+  const previousAccessTokenRef = useRef(accessToken);
 
   accessTokenRef.current = accessToken;
+
+  useEffect(() => {
+    if (previousAccessTokenRef.current !== accessToken) {
+      queryClient.removeQueries({ type: "inactive" });
+      previousAccessTokenRef.current = accessToken;
+    }
+  }, [accessToken, queryClient]);
 
   const [client] = useState<RouterClient<Router>>(() =>
     createORPCClient(

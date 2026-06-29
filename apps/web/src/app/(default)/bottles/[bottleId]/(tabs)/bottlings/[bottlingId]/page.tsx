@@ -23,7 +23,7 @@ import {
   getBottleBottlingsPath,
 } from "@peated/web/lib/bottlings";
 import { summarize } from "@peated/web/lib/markdown";
-import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -108,7 +108,7 @@ async function getBottlingPageData({
   bottleId: string;
   bottlingId: string;
 }) {
-  const { client } = await getServerClient();
+  const { client } = await getAnonymousServerClient();
   const parsedBottleId = parseRouteId(bottleId);
   const parsedBottlingId = parseRouteId(bottlingId);
 

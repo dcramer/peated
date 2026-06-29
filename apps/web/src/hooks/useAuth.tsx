@@ -4,12 +4,14 @@ import type { User } from "@peated/server/types";
 import { createContext, useContext, useEffect, useState } from "react";
 
 type Auth = {
+  isLoading: boolean;
   setUser: (user: User | null) => void;
   user: User | null;
   isLoggedIn: boolean;
 };
 
 const AuthContext = createContext<Auth>({
+  isLoading: false,
   setUser: () => {
     throw new Error("Missing AuthProvider");
   },
@@ -25,6 +27,7 @@ export const AuthProvider = ({
   children: any;
 }) => {
   const [value, setValue] = useState<User | null>(user);
+  const isLoading = value?.id !== user?.id;
 
   useEffect(() => {
     setValue(user);
@@ -33,6 +36,7 @@ export const AuthProvider = ({
   return (
     <AuthContext.Provider
       value={{
+        isLoading,
         user: value,
         setUser: setValue,
         isLoggedIn: !!value,

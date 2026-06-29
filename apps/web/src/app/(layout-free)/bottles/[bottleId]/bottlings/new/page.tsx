@@ -4,7 +4,7 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import ReleaseForm from "@peated/web/components/releaseForm";
 import Spinner from "@peated/web/components/spinner";
 import useAuth from "@peated/web/hooks/useAuth";
-import { useVerifiedRequired } from "@peated/web/hooks/useAuthRequired";
+import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { getBottleBottlingsPath } from "@peated/web/lib/bottlings";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
@@ -15,8 +15,14 @@ export default function AddBottling({
 }: {
   params: { bottleId: string };
 }) {
-  useVerifiedRequired();
+  return (
+    <VerifiedRequired>
+      <AddBottlingForm bottleId={bottleId} />
+    </VerifiedRequired>
+  );
+}
 
+function AddBottlingForm({ bottleId }: { bottleId: string }) {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
