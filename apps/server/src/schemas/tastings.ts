@@ -134,7 +134,7 @@ export const PhotoIdentificationInputSchema = z.object({
 
 export const PhotoIdentificationDiagnosticsSchema = z.object({
   extraction: z.object({
-    status: z.enum(["found", "empty", "failed", "timed_out"]),
+    status: z.enum(["found", "empty"]),
     summary: z.string().nullable().default(null),
   }),
   candidates: z.object({

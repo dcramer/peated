@@ -23,18 +23,10 @@ vi.mock(
   }),
 );
 
-vi.mock("@peated/server/lib/photoIdentification", async () => {
-  const actual = await vi.importActual<typeof photoIdentificationModule>(
-    "@peated/server/lib/photoIdentification",
-  );
-
-  return {
-    ...actual,
-    extractPhotoBottleEvidence: extractPhotoBottleEvidenceMock,
-    withPhotoIdentificationTimeout: <T>(work: Promise<T>, fallback: () => T) =>
-      actual.withPhotoIdentificationTimeout(work, fallback, 10),
-  };
-});
+vi.mock("@peated/server/lib/photoIdentification", async (importOriginal) => ({
+  ...(await importOriginal<typeof photoIdentificationModule>()),
+  extractPhotoBottleEvidence: extractPhotoBottleEvidenceMock,
+}));
 
 function buildImageEvidence(sourceImageId: string) {
   return {
@@ -346,60 +338,28 @@ describe("POST /tastings/photo-identification", () => {
     expect(response.suggestedNextStep).toBe("manual_search");
   });
 
-  test("returns pending image with manual search fallback when extraction fails", async ({
-    fixtures,
-    defaults,
-  }) => {
+  test("rejects when extraction fails", async ({ fixtures, defaults }) => {
     extractPhotoBottleEvidenceMock.mockRejectedValue(
       new Error("vision provider unavailable"),
     );
 
-    const response = await routerClient.tastings.photoIdentification(
-      {
-        file: await fixtures.SampleSquareImage(),
-        idempotencyKey: "photo-identification-extraction-failure",
-      },
-      {
-        context: { user: defaults.user },
-      },
+    const err = await waitError(
+      routerClient.tastings.photoIdentification(
+        {
+          file: await fixtures.SampleSquareImage(),
+          idempotencyKey: "photo-identification-extraction-failure",
+        },
+        {
+          context: { user: defaults.user },
+        },
+      ),
     );
 
-    expect(response.pendingImage.id).toBeDefined();
-    expect(response.suggestedNextStep).toBe("manual_search");
-    expect(response.classification).toMatchObject({
-      status: "ignored",
-      reason: "Photo identification could not produce a reviewed bottle match.",
-    });
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Unable to identify bottle from photo.]`,
+    );
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
-
-  test("returns pending image with manual search fallback when identification times out", async ({
-    fixtures,
-    defaults,
-  }) => {
-    extractPhotoBottleEvidenceMock.mockImplementation(
-      () => new Promise(() => undefined),
-    );
-
-    const response = await routerClient.tastings.photoIdentification(
-      {
-        file: await fixtures.SampleSquareImage(),
-        idempotencyKey: "photo-identification-timeout",
-      },
-      {
-        context: { user: defaults.user },
-      },
-    );
-
-    expect(response.pendingImage.id).toBeDefined();
-    expect(response.suggestedNextStep).toBe("manual_search");
-    expect(response.classification).toMatchObject({
-      status: "ignored",
-      reason:
-        "Photo identification timed out before a reviewed bottle match was available.",
-    });
-    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
-  }, 15_000);
 
   test("creates bottle and release from a reviewed photo identification proposal", async ({
     defaults,

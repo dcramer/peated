@@ -440,8 +440,9 @@ The route should support idempotency for client retries. If the same user retrie
 with the same `idempotencyKey`, return the existing pending upload and current
 identification state instead of creating duplicate pending objects.
 
-The route should have a bounded timeout. On timeout, return the pending image and
-manual-search seed data if available rather than failing the whole entry flow.
+If extraction or classification fails or times out, the route should fail the
+photo-identification request. The client keeps the local preview visible and
+lets the user continue by manually searching for the bottle.
 
 ### Create Tasting With Selected Picture
 
@@ -803,15 +804,15 @@ Scope:
 - call the bottle classifier with extracted identity and image evidence
 - return pending image, evidence summary, classification, and suggested next step
 - support idempotency keys
-- enforce file size, processed image size, timeout, and rate limits
+- enforce file size, processed image size, and rate limits
 
 API integration tests:
 
 - valid photo-identification request returns pending image and classifier result
 - idempotent retry returns the same pending image/result state
 - oversized upload fails before model calls
-- timeout returns pending image and manual-search fallback when possible
-- rate-limited request falls back cleanly
+- extraction or classifier failure rejects the photo-identification request
+- rate-limited request fails cleanly
 - route does not create bottles, releases, or tastings
 
 Classifier calls in route tests should use a test adapter/fake at the server

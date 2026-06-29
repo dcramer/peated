@@ -2,8 +2,6 @@ import { createWhiskyLabelExtractor } from "@peated/bottle-classifier";
 import {
   BottleExtractedDetailsSchema,
   ImageBottleEvidenceSchema,
-  createIgnoredBottleClassification,
-  type BottleClassificationResult,
   type BottleExtractedDetails,
   type ImageBottleEvidence,
 } from "@peated/server/agents/bottleClassifier";
@@ -13,8 +11,6 @@ import {
   withSentryConversation,
 } from "@peated/server/lib/openaiClient";
 import { readFile } from "@peated/server/lib/uploads";
-
-const PHOTO_IDENTIFICATION_TIMEOUT_MS = 60_000;
 
 type PhotoIdentificationPendingImage = {
   id: string;
@@ -186,52 +182,4 @@ export function buildPhotoReferenceName(
   ].filter(Boolean);
 
   return parts.length ? parts.join(" ") : "Bottle photo upload";
-}
-
-/**
- * Creates the classifier-shaped fallback result used when the photo flow should
- * preserve the pending image and continue through manual search.
- */
-export function createManualSearchPhotoClassification({
-  imageEvidence,
-  reason = "Photo identification could not produce a reviewed bottle match.",
-}: {
-  imageEvidence: ImageBottleEvidence;
-  reason?: string;
-}): BottleClassificationResult {
-  return createIgnoredBottleClassification({
-    reason,
-    artifacts: {
-      extractedIdentity: null,
-      imageEvidence,
-      candidates: [],
-      searchEvidence: [],
-      resolvedEntities: [],
-    },
-  });
-}
-
-/**
- * Bounds the user-visible identification wait while returning a caller-owned
- * fallback result instead of failing the pending upload.
- */
-export async function withPhotoIdentificationTimeout<T>(
-  work: Promise<T>,
-  fallback: () => T,
-  timeoutMs = PHOTO_IDENTIFICATION_TIMEOUT_MS,
-): Promise<T> {
-  let timeout: NodeJS.Timeout | undefined;
-
-  try {
-    return await Promise.race([
-      work,
-      new Promise<T>((resolve) => {
-        timeout = setTimeout(() => resolve(fallback()), timeoutMs);
-      }),
-    ]);
-  } finally {
-    if (timeout) {
-      clearTimeout(timeout);
-    }
-  }
 }
