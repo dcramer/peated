@@ -27,6 +27,22 @@ export default function Providers({
     setSession(initialSession);
   }, [initialSession.accessToken, initialSession.ts]);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    ensureSessionSynced()
+      .then((updated) => {
+        if (isMounted) setSession(updated);
+      })
+      .catch(() => {
+        // Transient errors: preserve current session state
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Periodic session refresh
   useInterval(async () => {
     try {

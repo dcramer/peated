@@ -38,3 +38,19 @@ export async function createServerClient(
 
 // TODO: this is a little risky to cache given its variable based on the session
 export const getServerClient = cache(createServerClient);
+
+export async function createAnonymousServerClient(): Promise<{
+  client: RouterClient<Router, ClientContext>;
+}> {
+  const link = getLink({
+    accessToken: null,
+    batch: false,
+    apiServer: config.API_SERVER,
+    userAgent: "@peated/web (orpc/server-anonymous)",
+  });
+
+  const client: RouterClient<Router, ClientContext> = createORPCClient(link);
+  return { client };
+}
+
+export const getAnonymousServerClient = cache(createAnonymousServerClient);

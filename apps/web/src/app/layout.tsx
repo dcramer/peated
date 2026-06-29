@@ -1,19 +1,16 @@
 import "@fontsource/raleway/index.css";
 import Fathom from "@peated/web/components/fathom";
 import config from "@peated/web/config";
-import { getSession } from "@peated/web/lib/session.server";
+import { defaultSession } from "@peated/web/lib/session.server";
 import "@peated/web/styles/index.css";
 import * as Sentry from "@sentry/nextjs";
 import type { Metadata, Viewport } from "next";
 import React from "react";
 import Providers from "./providers/providers";
 
-// default behavior is to disable cache, as it breaks quite a few flows
-// which are fairly dynamic (e.g. add tasting, add bottle, etc)
+export const dynamic = "force-dynamic";
 
 export const fetchCache = "default-no-store";
-
-export const dynamic = "force-dynamic";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -46,28 +43,14 @@ export default async function RootLayout({
   children: React.ReactNode;
   // auth: React.ReactNode;
 }>) {
-  let session = await getSession();
-
-  // we need to bind the user on the server, but we also do this in providers
-  // so it stays updated on the client appropriately
-  Sentry.setUser(
-    session.user
-      ? {
-          id: `${session.user.id}`,
-          username: session.user.username,
-          email: session.user.email,
-        }
-      : null,
-  );
-
   return (
     <html lang="en">
       <body className="h-full">
         <Providers
           session={{
-            user: session.user,
-            accessToken: session.accessToken,
-            ts: session.ts,
+            user: defaultSession.user,
+            accessToken: defaultSession.accessToken,
+            ts: defaultSession.ts,
           }}
         >
           {children}

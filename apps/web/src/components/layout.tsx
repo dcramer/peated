@@ -28,11 +28,17 @@ export default function Layout({
         header
       ) : (
         <Header>
-          <AppHeader />
+          <Suspense>
+            <AppHeader />
+          </Suspense>
         </Header>
       )}
 
-      {sidebar ?? <Sidebar />}
+      {sidebar ?? (
+        <Suspense>
+          <Sidebar />
+        </Suspense>
+      )}
 
       <div className="flex">
         <main className="w-full max-w-7xl flex-auto lg:pl-64">
@@ -54,7 +60,9 @@ export default function Layout({
         footer
       ) : (
         <Footer mobileOnly>
-          <AppFooter />
+          <Suspense>
+            <AppFooter />
+          </Suspense>
         </Footer>
       )}
     </>

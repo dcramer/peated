@@ -5,7 +5,7 @@ import config from "@peated/web/config";
 import { getLink } from "./link";
 
 export interface ClientContext {
-  accessToken?: string;
+  accessToken?: string | null;
   traceContext?: {
     sentryTrace?: string | null;
     baggage?: string | null;

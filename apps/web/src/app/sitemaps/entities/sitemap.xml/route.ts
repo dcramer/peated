@@ -1,5 +1,10 @@
-import { createServerClient } from "@peated/web/lib/orpc/client.server";
+import { createAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { buildSitemapIndex } from "@peated/web/lib/sitemaps";
+
+const SITEMAP_CACHE_CONTROL =
+  "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800";
+
+export const dynamic = "force-dynamic";
 
 const PAGE_LIMIT = 1000;
 
@@ -17,7 +22,7 @@ function range(start: number, end?: number): number[] {
 }
 
 export async function GET() {
-  const { client } = await createServerClient();
+  const { client } = await createAnonymousServerClient();
 
   const { totalEntities } = await client.stats();
   const sitemapIndexXML = await buildSitemapIndex(
@@ -28,6 +33,7 @@ export async function GET() {
 
   return new Response(sitemapIndexXML, {
     headers: {
+      "Cache-Control": SITEMAP_CACHE_CONTROL,
       "Content-Type": "application/xml",
     },
   });

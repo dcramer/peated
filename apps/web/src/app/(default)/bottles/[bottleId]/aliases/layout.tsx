@@ -1,5 +1,5 @@
 import SimpleHeader from "@peated/web/components/simpleHeader";
-import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { type ReactNode } from "react";
 
@@ -8,7 +8,7 @@ export async function generateMetadata({
 }: {
   params: { bottleId: string };
 }) {
-  const { client } = await getServerClient();
+  const { client } = await getAnonymousServerClient();
   const bottle = await resolveOrNotFound(
     client.bottles.details({
       bottle: Number(bottleId),

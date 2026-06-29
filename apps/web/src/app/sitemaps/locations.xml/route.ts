@@ -1,12 +1,13 @@
-import { createServerClient } from "@peated/web/lib/orpc/client.server";
+import { createAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { buildPagesSitemap, type Sitemap } from "@peated/web/lib/sitemaps";
+
+const SITEMAP_CACHE_CONTROL =
+  "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800";
 
 export const dynamic = "force-dynamic";
 
-export const revalidate = 86400;
-
 export async function GET() {
-  const { client } = await createServerClient();
+  const { client } = await createAnonymousServerClient();
 
   let cursor: number | null = 1;
   const pages: Sitemap = [{ url: "/locations" }];
@@ -28,6 +29,7 @@ export async function GET() {
 
   return new Response(pagesSitemapXML, {
     headers: {
+      "Cache-Control": SITEMAP_CACHE_CONTROL,
       "Content-Type": "application/xml",
     },
   });
