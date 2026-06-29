@@ -1,5 +1,7 @@
-import { ImageBottleEvidenceSchema } from "@peated/bottle-classifier/contract";
-import { BottleCandidateSchema } from "@peated/server/agents/bottleClassifier";
+import {
+  BottleCandidateSchema,
+  ImageBottleEvidenceSchema,
+} from "@peated/bottle-classifier/contract";
 import { z } from "zod";
 import { SIMPLE_RATING_VALUES } from "../constants";
 import { BadgeAwardSchema } from "./badges";

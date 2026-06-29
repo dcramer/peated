@@ -8,6 +8,7 @@ import {
 } from "./classifierTypes";
 import { ImageBottleEvidenceSchema } from "./imageEvidence";
 
+export { BottleCandidateSchema } from "./classifierTypes";
 export {
   ImageBottleEvidenceConflictSchema,
   ImageBottleEvidenceSchema,
