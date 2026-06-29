@@ -17,8 +17,14 @@ import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function AddBottle() {
-  useVerifiedRequired();
+  const isAuthorized = useVerifiedRequired();
 
+  if (!isAuthorized) return <Spinner />;
+
+  return <AddBottleForm />;
+}
+
+function AddBottleForm() {
   const { user } = useAuth();
   const router = useRouter();
   const orpc = useORPC();

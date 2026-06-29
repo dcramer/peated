@@ -146,6 +146,9 @@ function SavedCollectionActionAuthenticated({
         await queryClient.invalidateQueries({
           queryKey: collectionStatusQuery.queryKey,
         });
+        queryClient.removeQueries({
+          queryKey: orpc.collections.bottles.list.key(),
+        });
       }}
       disabled={isAnyLoading}
       color={action.color}
@@ -192,7 +195,9 @@ function SavedCollectionAction({
   kind,
   ...props
 }: CollectionActionProps & { kind: CollectionActionKind }) {
-  const { user } = useAuth();
+  const { isLoading, user } = useAuth();
+
+  if (isLoading) return null;
 
   if (!user) {
     return <SavedCollectionActionUnauthenticated {...props} kind={kind} />;

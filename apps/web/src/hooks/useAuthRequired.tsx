@@ -5,9 +5,11 @@ import { redirectToAuth } from "../lib/auth";
 import useAuth from "./useAuth";
 
 export default function useAuthRequired() {
-  const { isLoggedIn } = useAuth();
+  const { isLoading, isLoggedIn } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  if (isLoading) return false;
 
   if (!isLoggedIn) {
     redirectToAuth({
@@ -15,12 +17,16 @@ export default function useAuthRequired() {
       searchParams,
     });
   }
+
+  return true;
 }
 
 export function useModRequired() {
-  const { user } = useAuth();
+  const { isLoading, user } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  if (isLoading) return false;
 
   if (!user) {
     redirectToAuth({
@@ -32,12 +38,16 @@ export function useModRequired() {
   if (!user?.mod && !user?.admin) {
     redirect("/errors/unauthorized");
   }
+
+  return true;
 }
 
 export function useAdminRequired() {
-  const { user } = useAuth();
+  const { isLoading, user } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  if (isLoading) return false;
 
   if (!user) {
     redirectToAuth({
@@ -49,12 +59,16 @@ export function useAdminRequired() {
   if (!user?.admin) {
     redirect("/errors/unauthorized");
   }
+
+  return true;
 }
 
 export function useVerifiedRequired() {
-  const { user } = useAuth();
+  const { isLoading, user } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  if (isLoading) return false;
 
   if (!user) {
     redirectToAuth({
@@ -66,4 +80,6 @@ export function useVerifiedRequired() {
   if (!user?.verified) {
     redirect("/verify");
   }
+
+  return true;
 }

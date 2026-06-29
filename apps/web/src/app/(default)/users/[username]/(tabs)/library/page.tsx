@@ -2,6 +2,8 @@
 
 import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
+import Spinner from "@peated/web/components/spinner";
+import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -10,6 +12,14 @@ export default function UserLibrary({
 }: {
   params: { username: string };
 }) {
+  const { isLoading } = useAuth();
+
+  if (isLoading) return <Spinner />;
+
+  return <UserLibraryTable username={username} />;
+}
+
+function UserLibraryTable({ username }: { username: string }) {
   const orpc = useORPC();
   const { data: bottles } = useSuspenseQuery(
     orpc.collections.bottles.list.queryOptions({

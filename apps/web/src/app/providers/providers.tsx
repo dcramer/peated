@@ -21,10 +21,16 @@ export default function Providers({
   session: SessionData;
 }) {
   const [session, setSession] = useState<SessionData>(initialSession);
+  const [isSessionReady, setIsSessionReady] = useState(
+    Boolean(initialSession.user || initialSession.ts),
+  );
 
   // Sync from server props on navigation
   useEffect(() => {
-    setSession(initialSession);
+    if (initialSession.user || initialSession.ts) {
+      setSession(initialSession);
+      setIsSessionReady(true);
+    }
   }, [initialSession.accessToken, initialSession.ts]);
 
   useEffect(() => {
@@ -32,10 +38,14 @@ export default function Providers({
 
     ensureSessionSynced()
       .then((updated) => {
-        if (isMounted) setSession(updated);
+        if (isMounted) {
+          setSession(updated);
+          setIsSessionReady(true);
+        }
       })
       .catch(() => {
         // Transient errors: preserve current session state
+        if (isMounted) setIsSessionReady(true);
       });
 
     return () => {
@@ -71,7 +81,7 @@ export default function Providers({
       >
         <ReactQueryStreamedHydration>
           <OnlineStatusProvider>
-            <AuthProvider user={session.user}>
+            <AuthProvider user={session.user} isLoading={!isSessionReady}>
               <FlashMessages>{children}</FlashMessages>
             </AuthProvider>
           </OnlineStatusProvider>
