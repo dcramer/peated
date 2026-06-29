@@ -3,6 +3,7 @@ import {
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
+import * as log from "@peated/server/lib/log";
 import * as workerClient from "@peated/server/worker/client";
 import "@peated/server/worker/jobs";
 import reconcileStorePriceMatchProposals from "@peated/server/worker/jobs/reconcileStorePriceMatchProposals";
@@ -12,6 +13,10 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 vi.mock("@peated/server/worker/client", () => ({
   pushJob: vi.fn(),
+}));
+
+vi.mock("@peated/server/lib/log", () => ({
+  logError: vi.fn(),
 }));
 
 async function agePrice(priceId: number, minutes: number) {
@@ -117,6 +122,50 @@ describe("reconcileStorePriceMatchProposals", () => {
         priceId: freshPrice.id,
       },
     );
+  });
+
+  test("continues queueing prices after a dispatch failure", async ({
+    fixtures,
+  }) => {
+    const newerPrice = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Newer Unmatched Store Listing",
+    });
+    const olderPrice = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Older Unmatched Store Listing",
+    });
+    await agePrice(newerPrice.id, 60);
+    await agePrice(olderPrice.id, 120);
+
+    const error = new Error("queue unavailable");
+    vi.mocked(workerClient.pushJob)
+      .mockRejectedValueOnce(error)
+      .mockResolvedValueOnce(undefined);
+
+    const result = await reconcileStorePriceMatchProposals();
+
+    expect(result).toEqual({ queuedCount: 1 });
+    expect(workerClient.pushJob).toHaveBeenCalledTimes(2);
+    expect(workerClient.pushJob).toHaveBeenNthCalledWith(
+      1,
+      "ResolveStorePriceBottle",
+      {
+        priceId: newerPrice.id,
+      },
+    );
+    expect(workerClient.pushJob).toHaveBeenNthCalledWith(
+      2,
+      "ResolveStorePriceBottle",
+      {
+        priceId: olderPrice.id,
+      },
+    );
+    expect(log.logError).toHaveBeenCalledWith(error, {
+      price: {
+        id: newerPrice.id,
+      },
+    });
   });
 
   test("is registered as a worker job", () => {

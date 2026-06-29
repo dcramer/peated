@@ -47,6 +47,8 @@ export default async function reconcileStorePriceMatchProposals({
     .orderBy(desc(storePrices.updatedAt), desc(storePrices.id))
     .limit(limit);
 
+  let queuedCount = 0;
+
   for (const price of prices) {
     // Bypass unique enqueue here: stale unique BullMQ ids are one reason these
     // legacy rows can be missing proposals in the first place.
@@ -54,23 +56,23 @@ export default async function reconcileStorePriceMatchProposals({
       await pushJob("ResolveStorePriceBottle", {
         priceId: price.id,
       });
+      queuedCount += 1;
     } catch (error) {
       logError(error, {
         price: {
           id: price.id,
         },
       });
-      throw error;
     }
   }
 
-  if (prices.length > 0) {
+  if (queuedCount > 0) {
     console.log(
-      `Queued ${prices.length} unmatched store price${prices.length === 1 ? "" : "s"} without match proposals`,
+      `Queued ${queuedCount} unmatched store price${queuedCount === 1 ? "" : "s"} without match proposals`,
     );
   }
 
   return {
-    queuedCount: prices.length,
+    queuedCount,
   };
 }
