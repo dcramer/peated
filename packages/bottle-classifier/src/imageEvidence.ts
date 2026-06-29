@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-const CURRENT_YEAR = new Date().getFullYear();
-
 const ConfidenceSchema = z.number().min(0).max(1);
 
 export const ImageTextRegionSchema = z
@@ -68,8 +66,24 @@ const EvidenceAgeFieldSchema = createEvidenceFieldSchema(
 const EvidenceAbvFieldSchema = createEvidenceFieldSchema(
   z.number().positive().max(100),
 );
+const EvidenceYearValueSchema = z
+  .number()
+  .int()
+  .gte(1800)
+  .superRefine((year, ctx) => {
+    const currentYear = new Date().getFullYear();
+    if (year > currentYear) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.too_big,
+        maximum: currentYear,
+        inclusive: true,
+        origin: "number",
+        message: `Year must be less than or equal to ${currentYear}`,
+      });
+    }
+  });
 const EvidenceYearFieldSchema = createEvidenceFieldSchema(
-  z.number().int().gte(1800).lte(CURRENT_YEAR),
+  EvidenceYearValueSchema,
 );
 
 export const ImageBottleFieldCandidatesSchema = z

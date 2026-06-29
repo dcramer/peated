@@ -124,6 +124,10 @@ describe("image evidence contract", () => {
         fieldCandidates: {
           statedAge: { value: 140, confidence: 0.7 },
           abv: { value: 104, confidence: 0.7 },
+          releaseYear: {
+            value: new Date().getFullYear() + 1,
+            confidence: 0.7,
+          },
         },
         photoSuitability: readablePhotoSuitability,
       }),
