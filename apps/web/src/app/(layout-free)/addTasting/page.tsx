@@ -419,7 +419,14 @@ function AddTastingForm() {
       });
       setPhotoResult(result);
     } catch (err) {
-      logError(err);
+      logError(err, {
+        context: "add_tasting_photo_identification",
+        rpc: "tastings.photoIdentification",
+        file: {
+          size: file.size,
+          type: file.type || null,
+        },
+      });
       setError(
         "We couldn't read that photo. You can still find the bottle manually.",
       );

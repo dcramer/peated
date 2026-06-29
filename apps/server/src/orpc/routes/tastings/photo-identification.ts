@@ -4,14 +4,10 @@
 import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
-import { logError } from "@peated/server/lib/log";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import {
-  buildPhotoEvidenceFromExtractedIdentity,
   buildPhotoReferenceName,
-  createManualSearchPhotoClassification,
   extractPhotoBottleEvidence,
-  withPhotoIdentificationTimeout,
 } from "@peated/server/lib/photoIdentification";
 import { humanizeBytes } from "@peated/server/lib/strings";
 import { compressAndResizeImage } from "@peated/server/lib/uploads";
@@ -63,37 +59,6 @@ function getSuggestedNextStep(
     case "no_match":
       return "manual_search";
   }
-}
-
-function buildFallbackIdentificationResult({
-  pendingImage,
-  reason,
-  extractionStatus,
-}: {
-  pendingImage: Awaited<ReturnType<typeof createPendingImageUpload>>;
-  reason: string;
-  extractionStatus: z.infer<
-    typeof PhotoIdentificationDiagnosticsSchema
-  >["extraction"]["status"];
-}) {
-  const imageEvidence = buildPhotoEvidenceFromExtractedIdentity({
-    pendingUpload: pendingImage,
-    extractedIdentity: null,
-  });
-  const classification = createManualSearchPhotoClassification({
-    imageEvidence,
-    reason,
-  });
-
-  return {
-    imageEvidence,
-    classification,
-    diagnostics: buildPhotoIdentificationDiagnostics({
-      extractionStatus,
-      extractionSummary: reason,
-      classification,
-    }),
-  };
 }
 
 function summarizeExtraction(
@@ -258,7 +223,7 @@ export async function identifyPendingImage({
 }: {
   pendingImage: Awaited<ReturnType<typeof createPendingImageUpload>>;
 }) {
-  const identification = (async () => {
+  return await (async () => {
     const { extractedIdentity, imageEvidence } =
       await extractPhotoBottleEvidence({
         pendingUpload: pendingImage,
@@ -284,32 +249,7 @@ export async function identifyPendingImage({
         classification,
       }),
     };
-  })().catch((err) => {
-    logError(err, {
-      pendingUpload: {
-        id: pendingImage.id,
-        source: "photo_identification",
-      },
-    });
-    throw err;
-  });
-
-  try {
-    return await withPhotoIdentificationTimeout(identification, () =>
-      buildFallbackIdentificationResult({
-        pendingImage,
-        reason:
-          "Photo identification timed out before a reviewed bottle match was available.",
-        extractionStatus: "timed_out",
-      }),
-    );
-  } catch {
-    return buildFallbackIdentificationResult({
-      pendingImage,
-      reason: "Photo identification could not produce a reviewed bottle match.",
-      extractionStatus: "failed",
-    });
-  }
+  })();
 }
 
 export default procedure
@@ -343,10 +283,19 @@ export default procedure
       onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
     });
 
-    const { imageEvidence, classification, diagnostics } =
-      await identifyPendingImage({
+    let identification: Awaited<ReturnType<typeof identifyPendingImage>>;
+    try {
+      identification = await identifyPendingImage({
         pendingImage,
       });
+    } catch (err) {
+      throw errors.INTERNAL_SERVER_ERROR({
+        message: "Unable to identify bottle from photo.",
+        cause: err,
+      });
+    }
+
+    const { imageEvidence, classification, diagnostics } = identification;
     const suggestedNextStep = getSuggestedNextStep(classification);
 
     return {
