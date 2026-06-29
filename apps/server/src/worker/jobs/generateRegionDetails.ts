@@ -2,6 +2,7 @@ import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { regions } from "@peated/server/db/schema";
 import { getStructuredResponse } from "@peated/server/lib/openai";
+import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { type Region } from "@peated/server/types";
 import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
@@ -33,32 +34,40 @@ export type GeneratedRegionDetails = z.infer<typeof OpenAIRegionDetailsSchema>;
 export async function getGeneratedRegionDetails(
   region: InputRegion,
 ): Promise<GeneratedRegionDetails | null> {
-  return await startSpan(
-    {
-      op: "ai.pipeline",
-      name: "getGeneratedRegionDetails",
-    },
-    async (span) => {
-      return await getStructuredResponse(
-        "getGeneratedRegionDetails",
-        generatePrompt(region),
-        OpenAIRegionDetailsSchema,
-        undefined,
-        undefined,
+  const conversationId = region.id
+    ? `region_details:${region.id}`
+    : `ai:region_lookup:${region.slug ?? region.name ?? "draft"}`;
+
+  return await withSentryConversation(
+    conversationId,
+    async () =>
+      await startSpan(
         {
-          region: {
-            id: region.id,
-            slug: region.slug,
-            name: region.name,
-          },
-          country: {
-            id: region.country.id,
-            slug: region.country.slug,
-            name: region.country.slug,
-          },
+          op: "ai.pipeline",
+          name: "getGeneratedRegionDetails",
         },
-      );
-    },
+        async (span) => {
+          return await getStructuredResponse(
+            "getGeneratedRegionDetails",
+            generatePrompt(region),
+            OpenAIRegionDetailsSchema,
+            undefined,
+            undefined,
+            {
+              region: {
+                id: region.id,
+                slug: region.slug,
+                name: region.name,
+              },
+              country: {
+                id: region.country.id,
+                slug: region.country.slug,
+                name: region.country.slug,
+              },
+            },
+          );
+        },
+      ),
   );
 }
 

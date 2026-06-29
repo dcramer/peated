@@ -8,18 +8,12 @@ import {
 } from "@peated/entity-classifier";
 import config from "@peated/server/config";
 import { searchClassifierEntities } from "@peated/server/lib/classifierEntitySearch";
-import OpenAI from "openai";
+import {
+  createOpenAIClient,
+  withSentryConversation,
+} from "@peated/server/lib/openaiClient";
 
 let entityClassifier: ReturnType<typeof createEntityClassifier> | null = null;
-
-function createOpenAIClient(): OpenAI {
-  return new OpenAI({
-    apiKey: config.OPENAI_API_KEY,
-    baseURL: config.OPENAI_HOST,
-    organization: config.OPENAI_ORGANIZATION,
-    project: config.OPENAI_PROJECT,
-  });
-}
 
 async function searchEntityClassifierEntities(args: SearchEntitiesArgs) {
   const parsedArgs = SearchEntitiesArgsSchema.parse(args);
@@ -46,11 +40,17 @@ export function getEntityClassifier() {
 }
 
 export async function classifyEntity(input: ClassifyEntityInput) {
-  return await getEntityClassifier().classifyEntity(input);
+  return await withSentryConversation(
+    `entity:${input.reference.entity.id}`,
+    async () => await getEntityClassifier().classifyEntity(input),
+  );
 }
 
 export async function runEntityClassifierAgent(
   input: RunEntityClassifierAgentInput,
 ) {
-  return await getEntityClassifier().runEntityClassifierAgent(input);
+  return await withSentryConversation(
+    `entity:${input.reference.entity.id}`,
+    async () => await getEntityClassifier().runEntityClassifierAgent(input),
+  );
 }

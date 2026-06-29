@@ -4,16 +4,7 @@ import {
   extractFromText as extractFromTextWithClient,
 } from "@peated/bottle-classifier/internal/extractor";
 import config from "@peated/server/config";
-import OpenAI from "openai";
-
-function createOpenAIClient() {
-  return new OpenAI({
-    apiKey: config.OPENAI_API_KEY,
-    baseURL: config.OPENAI_HOST,
-    organization: config.OPENAI_ORGANIZATION,
-    project: config.OPENAI_PROJECT,
-  });
-}
+import { createOpenAIClient } from "@peated/server/lib/openaiClient";
 
 export const extractFromImage = async (imageUrlOrBase64: string) =>
   await extractFromImageWithClient({

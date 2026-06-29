@@ -11,6 +11,7 @@ import { arraysEqual, objectsShallowEqual } from "@peated/server/lib/equals";
 import { notesForProfile } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
+import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { CategoryEnum, FlavorProfileEnum } from "@peated/server/schemas";
 import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
@@ -94,26 +95,34 @@ export async function getGeneratedBottleDetails(
   bottle: Partial<Bottle>,
   tagList: string[],
 ): Promise<GeneratedBottleDetails | null> {
-  return await startSpan(
-    {
-      op: "ai.pipeline",
-      name: "generateBottleDetails",
-    },
-    async (span) => {
-      return await getStructuredResponse(
-        "generateBottleDetails",
-        generatePrompt(bottle, tagList),
-        OpenAIBottleDetailsSchema,
-        OpenAIBottleDetailsValidationSchema,
-        undefined,
+  const conversationId = bottle.id
+    ? `bottle_details:${bottle.id}`
+    : `ai:bottle_lookup:${bottle.fullName ?? bottle.name ?? "draft"}`;
+
+  return await withSentryConversation(
+    conversationId,
+    async () =>
+      await startSpan(
         {
-          bottle: {
-            id: bottle.id,
-            fullName: bottle.fullName,
-          },
+          op: "ai.pipeline",
+          name: "generateBottleDetails",
         },
-      );
-    },
+        async (span) => {
+          return await getStructuredResponse(
+            "generateBottleDetails",
+            generatePrompt(bottle, tagList),
+            OpenAIBottleDetailsSchema,
+            OpenAIBottleDetailsValidationSchema,
+            undefined,
+            {
+              bottle: {
+                id: bottle.id,
+                fullName: bottle.fullName,
+              },
+            },
+          );
+        },
+      ),
   );
 }
 

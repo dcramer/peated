@@ -7,6 +7,7 @@ import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import { changes, entities } from "@peated/server/db/schema";
 import { getStructuredResponse } from "@peated/server/lib/openai";
+import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { EntityTypeEnum } from "@peated/server/schemas";
 import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
@@ -91,26 +92,34 @@ export type GeneratedEntityDetails = z.infer<typeof OpenAIEntityDetailsSchema>;
 export async function getGeneratedEntityDetails(
   entity: InputEntity,
 ): Promise<GeneratedEntityDetails | null> {
-  return await startSpan(
-    {
-      op: "ai.pipeline",
-      name: "getGeneratedEntityDetails",
-    },
-    async (span) => {
-      return await getStructuredResponse(
-        "getGeneratedEntityDetails",
-        generatePrompt(entity),
-        OpenAIEntityDetailsSchema,
-        OpenAIEntityDetailsValidationSchema,
-        undefined,
+  const conversationId = entity.id
+    ? `entity_details:${entity.id}`
+    : `ai:entity_lookup:${entity.name ?? "draft"}`;
+
+  return await withSentryConversation(
+    conversationId,
+    async () =>
+      await startSpan(
         {
-          entity: {
-            id: entity.id,
-            name: entity.name,
-          },
+          op: "ai.pipeline",
+          name: "getGeneratedEntityDetails",
         },
-      );
-    },
+        async (span) => {
+          return await getStructuredResponse(
+            "getGeneratedEntityDetails",
+            generatePrompt(entity),
+            OpenAIEntityDetailsSchema,
+            OpenAIEntityDetailsValidationSchema,
+            undefined,
+            {
+              entity: {
+                id: entity.id,
+                name: entity.name,
+              },
+            },
+          );
+        },
+      ),
   );
 }
 
