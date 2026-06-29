@@ -1237,6 +1237,7 @@ export function createBottleClassifier(
           const retryReasoningRun = await runBottleClassifierAgentWithBudget({
             reference: parsedInput.reference,
             extractedIdentity: investigationArtifacts.extractedIdentity,
+            imageEvidence: investigationArtifacts.imageEvidence,
             initialCandidates: investigationArtifacts.candidates,
             candidateExpansion: parsedInput.candidateExpansion,
             searchEvidence: investigationArtifacts.searchEvidence,

@@ -16,6 +16,7 @@ import {
   buildBottleClassificationArtifacts,
   type BottleClassificationArtifacts,
 } from "./contract";
+import { buildBottleCandidate } from "./evalFixtureBuilders";
 
 type ReasoningResult = {
   decision: BottleClassifierAgentDecisionInput;
@@ -2036,6 +2037,193 @@ describe("createBottleClassifier", () => {
         searchEvidence: expect.arrayContaining([
           expect.objectContaining({
             query: "Creag Isle 12 year old single malt",
+          }),
+        ]),
+      }),
+    );
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") return;
+    expect(result.decision).toMatchObject({
+      action: "no_match",
+    });
+  });
+
+  test("preserves image evidence when retrying no_match with web investigation", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Ardbeg",
+      bottler: null,
+      expression: "Eureka!",
+      series: null,
+      distillery: ["Ardbeg"],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const imageEvidence = {
+      sourceImageId: "pending-upload-eureka",
+      extractors: [
+        {
+          kind: "vision" as const,
+          confidence: 0.82,
+          textSpans: [{ text: "Ardbeg Eureka!", confidence: 0.88 }],
+          observations: ["front label identifies Ardbeg Eureka"],
+        },
+      ],
+      fieldCandidates: {
+        brand: { value: "Ardbeg", confidence: 0.9 },
+        expression: { value: "Eureka!", confidence: 0.86 },
+      },
+      photoSuitability: {
+        isSingleBottlePhoto: true,
+        labelReadable: true,
+        suitableAsTastingImage: true,
+        suitableAsBottleImage: true,
+      },
+      conflicts: [],
+    };
+    const create = vi.fn().mockResolvedValue({
+      output_text:
+        "Ardbeg Eureka! is an official Ardbeg single malt whisky release.",
+      output: [
+        {
+          type: "web_search_call",
+          action: {
+            type: "search",
+            sources: [
+              {
+                type: "url",
+                url: "https://www.ardbegjp.com/products/ardbeg-eureka",
+              },
+            ],
+          },
+        },
+      ],
+    });
+    const exactButWrongCandidate = buildBottleCandidate({
+      bottleId: 999,
+      fullName: "Ardbeg Ten",
+      brand: "Ardbeg",
+      category: "single_malt",
+      source: ["exact"],
+    });
+    const runBottleClassifierAgent = vi.fn(
+      async ({ imageEvidence, searchEvidence }): Promise<ReasoningResult> => {
+        if (searchEvidence?.length) {
+          return {
+            decision: {
+              action: "create_bottle",
+              confidence: 91,
+              rationale: "Web evidence confirms Ardbeg Eureka.",
+              candidateBottleIds: [],
+              identityScope: "product",
+              observation: null,
+              confidenceBasis: supportiveWebEvidenceConfidenceBasis,
+              matchedBottleId: null,
+              matchedReleaseId: null,
+              parentBottleId: null,
+              proposedBottle: {
+                name: "Eureka!",
+                series: null,
+                category: "single_malt",
+                edition: null,
+                statedAge: null,
+                caskStrength: null,
+                singleCask: null,
+                abv: null,
+                vintageYear: null,
+                releaseYear: null,
+                caskType: null,
+                caskSize: null,
+                caskFill: null,
+                brand: {
+                  id: null,
+                  name: "Ardbeg",
+                },
+                distillers: [],
+                bottler: null,
+              },
+              proposedRelease: null,
+            },
+            artifacts: {
+              extractedIdentity,
+              imageEvidence,
+              searchEvidence,
+              candidates: [],
+              resolvedEntities: [],
+            },
+          };
+        }
+
+        return {
+          decision: {
+            action: "no_match",
+            confidence: 30,
+            rationale: "No safe local match.",
+            candidateBottleIds: [],
+            identityScope: "product",
+            observation: null,
+            matchedBottleId: null,
+            matchedReleaseId: null,
+            parentBottleId: null,
+            proposedBottle: null,
+            proposedRelease: null,
+          },
+          artifacts: {
+            extractedIdentity,
+            imageEvidence,
+            searchEvidence: [],
+            candidates: [exactButWrongCandidate],
+            resolvedEntities: [],
+          },
+        };
+      },
+    );
+    const { classifier } = createTestClassifier({
+      client: {
+        responses: {
+          create,
+        },
+      } as unknown as OpenAI,
+      extractedIdentity,
+      maxSearchQueries: 1,
+      searchBottles: vi.fn(async () => [] as BottleCandidate[]),
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Ardbeg Eureka!",
+        url: "https://www.ardbegjp.com/products/ardbeg-eureka",
+      },
+      imageEvidence,
+      initialCandidates: [exactButWrongCandidate],
+    });
+
+    expect(runBottleClassifierAgent).toHaveBeenCalledTimes(2);
+    expect(runBottleClassifierAgent).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        imageEvidence,
+      }),
+    );
+    expect(runBottleClassifierAgent).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        imageEvidence,
+        investigationHint: expect.stringContaining(
+          "first pass found no safe local match",
+        ),
+        searchEvidence: expect.arrayContaining([
+          expect.objectContaining({
+            query: expect.stringContaining("Ardbeg Eureka"),
           }),
         ]),
       }),
