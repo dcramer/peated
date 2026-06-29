@@ -58,7 +58,7 @@ export default function Page({
           try {
             await tastingImageUpdateMutation.mutateAsync({
               tasting: tasting.id,
-              file: await toBlob(image),
+              file: image instanceof File ? image : await toBlob(image),
             });
           } catch (err) {
             logError(err);

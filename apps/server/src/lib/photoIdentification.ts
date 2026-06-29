@@ -8,15 +8,32 @@ import {
   type ImageBottleEvidence,
 } from "@peated/server/agents/bottleClassifier";
 import config from "@peated/server/config";
-import { absoluteUrl } from "@peated/server/lib/urls";
+import { readFile } from "@peated/server/lib/uploads";
 import OpenAI from "openai";
 
-const PHOTO_IDENTIFICATION_TIMEOUT_MS = 10_000;
+const PHOTO_IDENTIFICATION_TIMEOUT_MS = 60_000;
 
 type PhotoIdentificationPendingImage = {
   id: string;
   imageUrl: string;
 };
+
+function filenameFromUploadUrl(imageUrl: string): string {
+  if (!imageUrl.startsWith("/uploads/")) {
+    throw new Error("Pending image URL is not an upload URL.");
+  }
+  return imageUrl.slice("/uploads/".length);
+}
+
+export async function getPhotoExtractionImageInput({
+  pendingUpload,
+}: {
+  pendingUpload: PhotoIdentificationPendingImage;
+}) {
+  const filename = filenameFromUploadUrl(pendingUpload.imageUrl);
+  const image = await readFile({ filename });
+  return `data:image/webp;base64,${image.toString("base64")}`;
+}
 
 function createOpenAIClient(): OpenAI {
   return new OpenAI({
@@ -140,7 +157,7 @@ export async function extractPhotoBottleEvidence({
   });
   const extractedIdentity = BottleExtractedDetailsSchema.nullable().parse(
     await extractor.extractFromImage(
-      absoluteUrl(config.API_SERVER, pendingUpload.imageUrl),
+      await getPhotoExtractionImageInput({ pendingUpload }),
     ),
   );
 

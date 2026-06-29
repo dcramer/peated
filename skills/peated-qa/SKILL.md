@@ -19,12 +19,18 @@ Use after Peated code changes need manual behavior checks. This is not a test/li
 
 ## Start Local Runtime
 
-| Need         | Command                                         | URL                     |
-| ------------ | ----------------------------------------------- | ----------------------- |
-| API only     | `pnpm dev:server:api`                           | `http://localhost:4300` |
-| API + worker | `docker compose up -d redis`; `pnpm dev:server` | `http://localhost:4300` |
-| Web          | `pnpm dev:web`                                  | `http://localhost:3200` |
-| CLI          | `pnpm cli <cmd>`                                | loads `.env.local`      |
+For normal web UI QA, prefer the root `pnpm dev` command. It starts the web
+app, API, worker, package watchers, and shared `.env.local` setup together,
+which matches the expected local development runtime. Use the narrower commands
+below only when intentionally isolating one surface.
+
+| Need         | Command                                         | URL                                                        |
+| ------------ | ----------------------------------------------- | ---------------------------------------------------------- |
+| Full app     | `pnpm dev`                                      | web: `http://localhost:3200`, API: `http://localhost:4300` |
+| API only     | `pnpm dev:server:api`                           | `http://localhost:4300`                                    |
+| API + worker | `docker compose up -d redis`; `pnpm dev:server` | `http://localhost:4300`                                    |
+| Web          | `pnpm dev:web`                                  | `http://localhost:3200`                                    |
+| CLI          | `pnpm cli <cmd>`                                | loads `.env.local`                                         |
 
 Fallback paired ports when `3200` is busy:
 

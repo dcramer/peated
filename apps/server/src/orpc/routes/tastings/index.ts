@@ -7,6 +7,7 @@ import imageDelete from "./image-delete";
 import imageUpdate from "./image-update";
 import list from "./list";
 import photoIdentification from "./photo-identification";
+import photoIdentificationCreate from "./photo-identification-create";
 import update from "./update";
 
 export default base.tag("tastings").router({
@@ -19,4 +20,5 @@ export default base.tag("tastings").router({
   imageUpdate,
   imageDelete,
   photoIdentification,
+  photoIdentificationCreate,
 });

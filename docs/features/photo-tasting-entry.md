@@ -4,12 +4,21 @@
 
 Draft for product and implementation iteration.
 
+Initial rollout should be a new standalone record-tasting experience, not a
+replacement for the existing bottle-scoped tasting flow. Build and vet the new
+photo-first flow at `/addTasting` while keeping the current
+`/bottles/[bottleId]/addTasting` path unchanged.
+
 ## Goal
 
 Let a user record a tasting by taking or uploading a bottle photo instead of
 starting with text search. The photo-assisted path should identify the bottle,
 let the user confirm or correct the match, and then create the same tasting
-record the existing search path creates.
+record the existing search path creates. Like the existing search-based bottle
+picker, the photo path must be able to land on either an existing bottle/release
+or a new bottle/release proposal. Ideally, a clear label photo should drive the
+new-bottle path automatically enough that the user reviews fields instead of
+starting from scratch.
 
 The uploaded photo may also become the tasting image. If the flow creates a new
 bottle or release, or finds an existing bottle or release without an image, the
@@ -49,26 +58,43 @@ measure each phase separately before optimizing prompts or models.
 
 ## Product Flow
 
-The add-tasting flow has two entry paths:
+The new record-tasting flow has two entry paths:
 
-1. Search for a bottle by text.
-2. Add a bottle photo.
+1. Take or upload a bottle photo.
+2. Find a bottle manually, using the existing `/search?tasting` path.
 
-The photo path should converge back to the same confirmed tasting form:
+The first screen should make photo capture the primary action while keeping
+manual bottle search immediately available. This is a new experience for
+choosing a bottle before the tasting form, not a modal or minor enhancement
+inside the existing bottle detail page flow.
+
+The photo path should identify what bottle target the tasting belongs to before
+the user reaches the tasting form. That target may be an existing bottle/release
+or a reviewed new bottle/release proposal:
 
 1. User uploads or takes a photo.
 2. Server stores a pending processed image.
 3. Server extracts label evidence from the image.
 4. Server classifies the bottle reference using the existing bottle classifier.
 5. UI shows the photo, extracted evidence, and suggested bottle/release outcome.
-6. User confirms the suggestion, searches manually, or chooses another candidate.
-7. User records tasting notes, rating, tags, serving style, flight, and friends.
-8. Server creates the tasting and attaches the pending image if selected.
-9. Server may promote the image to a bottle or release image under deterministic
-   policy.
+6. User confirms an existing match, opens full bottle search, chooses another
+   candidate, or reviews the proposed new bottle/release fields.
+7. Server creates any approved new bottle/release before tasting save when the
+   confirmed photo-identification result is a creation proposal.
+8. User records tasting notes, rating, tags, serving style, flight, and friends.
+9. Server creates the tasting and attaches the pending image if selected.
+10. Server may promote the image to a bottle or release image under deterministic
+    policy.
 
-Low-confidence photo identification should fall back to seeded manual search
+Low-confidence photo identification should fall back to seeded full search
 rather than forcing a create or match decision.
+
+Manual search from this page should reuse the existing `/search?tasting`
+experience instead of embedding a narrower local search. That route already
+handles selecting existing bottles and starting the add-bottle path when no
+match exists. The user should be able to finish a tasting without taking a
+photo. A failed photo lookup should keep a local preview visible on `/addTasting`
+with actions to start over or open full bottle search.
 
 ## User Experience
 
@@ -77,11 +103,16 @@ not like a separate moderation workflow.
 
 ### Entry Point
 
-On add tasting, show the existing bottle search as the primary path with a
-camera/upload action nearby:
+Expose the new experience at `/addTasting` and route general record-tasting
+entry points there. Keep existing bottle-scoped deep links that already know the
+target bottle or bottling on `/bottles/[bottleId]/addTasting`.
 
-- Search field for bottle lookup.
-- Camera/upload button for photo lookup.
+On the new page, show a photo-first choice with manual search as the explicit
+fallback:
+
+- A large camera/upload target for photo lookup as the primary action.
+- A secondary search callout that opens `/search?tasting` for users who want to
+  find or add a bottle manually.
 - Recent or suggested bottles can remain below the search path if they already
   exist in the current UI.
 
@@ -93,12 +124,10 @@ The camera action should work well on mobile and desktop:
 ### Identification Progress
 
 After a photo is selected, show the image immediately and keep the user on the
-same task. The progress state should name the current phase without exposing
-implementation details:
-
-1. Preparing photo.
-2. Reading label.
-3. Looking for matching bottles.
+same task. The progress state should feel like a centered loading screen with
+the selected image as a thumbnail, a spinner, and short whisky-themed loading
+messages. Avoid numbered step indicators or implementation-specific phase
+names.
 
 If identification takes longer than expected, keep the uploaded photo visible
 and let the user switch to manual search without losing the pending image.
@@ -117,10 +146,9 @@ When identification succeeds, show a compact confirmation view:
 - confidence or review state in plain language
 - extracted key facts, such as brand, expression, age, vintage, ABV, and edition
 - a clear primary action to continue with the proposed bottle
-- secondary actions to search manually, choose another result, or retake/upload a
-  different photo
+- secondary actions to search bottles or start over
 
-The UI should distinguish these outcomes:
+The UI should distinguish these photo-identification outcomes:
 
 - matched existing bottle/release
 - proposed new bottle
@@ -128,19 +156,22 @@ The UI should distinguish these outcomes:
 - uncertain result requiring manual search
 
 When the result proposes creation, the UI should show the proposed canonical
-name and important fields before the user continues. The user should not need to
-understand classifier internals, but they should be able to spot obvious errors
-such as the wrong age statement or brand.
+name and important fields before the user continues. A strong photo result
+should prefill as much of the new bottle/release proposal as possible, including
+brand, series, expression, category, age, ABV, vintage, release year, edition,
+and cask details when visible. The user should not need to understand classifier
+internals, but they should be able to spot obvious errors such as the wrong age
+statement or brand.
 
 ### Low Confidence And Multiple Candidates
 
 If the classifier is uncertain, show seeded search results instead of a hard
 failure:
 
-- keep the extracted search text in the search box
-- show likely bottle/release candidates
-- make manual search the primary next step
-- preserve the uploaded photo so it can still attach to the tasting
+- seed `/search?tasting` with extracted search text when available
+- make full bottle search the primary next step
+- keep the uploaded photo visible on the result screen until the user starts
+  over or leaves for full search
 
 If the photo appears to contain multiple bottles, do not auto-select a result.
 Ask the user to choose from candidates or retake the photo.
@@ -152,23 +183,34 @@ bottle and tasting fields intact. The UI should explain that the photo expired
 and offer to re-upload before save.
 
 If the identification request fails, keep the local preview while the page is
-open and switch to manual search. The user should not have to restart the
-tasting entry flow.
+open and offer full bottle search plus start over. The user should not have to
+restart the tasting entry flow just to try another photo.
 
 ### Tasting Form
 
-After the user confirms or manually selects a bottle, continue to the normal
-tasting form with the bottle/release fixed at the top. The photo should remain
-visible as a pending tasting image.
+After the user confirms, manually selects, or approves creation of a
+bottle/release, continue to the normal tasting form with the resolved
+bottle/release fixed at the top. The uploaded photo should appear in the normal
+tasting picture field as the default selected image, as if the user had already
+chosen it in that field.
 
-The form should include image choices:
+Be careful implementing this default image behavior. The photo picker should not
+be a second, independent attachment system that can drift from the form state.
+Prefer representing the pending upload as the initial value for the existing
+picture control, while preserving the user's ability to replace it, remove it,
+or save without a picture. Saving the tasting should attach the image only if the
+picture field still references the pending upload at submit time.
 
-- attach this photo to my tasting
-- use as bottle image if the bottle has no image
+If policy allows using the same photo as a bottle or release image, expose that
+as a separate secondary choice from the tasting picture field. Hide or disable
+the promotion option when policy says promotion is not allowed, such as when the
+existing bottle already has an image or the photo is unsuitable as a canonical
+bottle image.
 
-The bottle-image option should be hidden or disabled when policy says promotion
-is not allowed, such as when the existing bottle already has an image or the
-photo is unsuitable as a canonical bottle image.
+For the first standalone version, the form may reuse the existing tasting form
+component if it can support a bottle chosen inside the page. Avoid changing the
+legacy bottle-scoped form contract unless the change is backwards-compatible for
+the existing route.
 
 ### Save Result
 
@@ -327,6 +369,7 @@ Output:
     | "confirm_create"
     | "manual_search"
     | "needs_review";
+  diagnostics: PhotoIdentificationDiagnostics;
 }
 ```
 
@@ -340,9 +383,17 @@ identification state instead of creating duplicate pending objects.
 The route should have a bounded timeout. On timeout, return the pending image and
 manual-search seed data if available rather than failing the whole entry flow.
 
-### Create Tasting With Pending Image
+### Create Tasting With Selected Picture
 
-Extend the existing tasting create input with:
+For the first standalone version, keep tasting creation on the existing tasting
+create route. When the user confirms a photo result, the client should seed the
+normal tasting `Picture` field with the uploaded local file. If the user leaves
+that field selected, the client uploads it through the existing tasting image
+update route after the tasting is created. If the user removes or replaces the
+picture field value, submit that current field state instead.
+
+This means the first version should not extend tasting create with pending-image
+fields:
 
 ```ts
 {
@@ -353,20 +404,22 @@ Extend the existing tasting create input with:
 }
 ```
 
-The route should:
+Those fields remain a future option if the flow needs server-side pending-image
+reuse after leaving `/addTasting`. The current route should:
 
-- validate ownership of `pendingImageId`
 - create the tasting through the existing deterministic path
-- copy the pending image into the tasting namespace when selected
+- upload the selected picture through the existing image update path when
+  selected
 - promote the image to a bottle or release only after the tasting and any
   required bottle/release creation are durable
 - return partial-success information if image copy or promotion fails after the
   tasting is created
 - avoid re-running image identification during final tasting save
 
-`photoIdentificationId` links the user-confirmed choice back to the extraction
-and classifier trace for audit, eval sampling, and future debugging. It should
-not be required for manual search flows that only reuse a pending image.
+Future `photoIdentificationId` support may link the user-confirmed choice back
+to the extraction and classifier trace for audit, eval sampling, and debugging.
+It should not be required for manual search flows that only reuse a local
+picture field value.
 
 ## Image Evidence Contract
 
@@ -743,8 +796,8 @@ Scope:
 - show immediate local preview
 - show identification progress states
 - show confirmation state for match, create proposal, or manual-search fallback
-- preserve pending image while user searches manually
-- add attach/promote controls in the tasting form
+- seed the uploaded photo into the normal tasting picture field
+- allow the user to remove or replace that picture field value
 - show partial-success save messaging
 
 UI verification:
@@ -754,7 +807,7 @@ UI verification:
 - slow identification with manual fallback
 - low-confidence result
 - successful existing-bottle match
-- image attach disabled because pending image expired
+- uploaded photo appears in the tasting picture field by default
 - text does not overflow compact mobile controls
 
 Browser verification should use the local UI verification playbook when auth or

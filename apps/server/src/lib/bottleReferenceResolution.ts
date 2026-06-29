@@ -120,7 +120,7 @@ async function getExistingRelease(releaseId: number): Promise<BottleRelease> {
   return release;
 }
 
-async function applyClassifierCreateDecision({
+export async function applyClassifierCreateDecision({
   decision,
   user,
 }: {

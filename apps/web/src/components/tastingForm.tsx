@@ -37,6 +37,7 @@ import NoResultsFoundEntry from "./selectField/noResultsFoundEntry";
 import ServingStyleIcon from "./servingStyleIcon";
 
 type FormSchemaType = z.infer<typeof TastingInputSchema>;
+type ImageValue = HTMLCanvasElement | File | null | undefined;
 
 function formatServingStyle(style: ServingStyle) {
   return toTitleCase(style);
@@ -73,17 +74,21 @@ function toReleaseOption(
 export default function TastingForm({
   onSubmit,
   initialData,
+  initialImageFile,
+  showReleasePickerDefault = false,
   title,
   suggestedTags,
 }: {
   onSubmit: SubmitHandler<
     Omit<FormSchemaType, "image"> & {
-      image: HTMLCanvasElement | null | undefined;
+      image: ImageValue;
     }
   >;
   initialData: Partial<z.infer<typeof TastingSchema>> & {
     bottle: Bottle;
   };
+  initialImageFile?: File | null;
+  showReleasePickerDefault?: boolean;
   title: string;
   suggestedTags: Paginated<SuggestedTag>;
 }) {
@@ -107,14 +112,12 @@ export default function TastingForm({
   });
 
   const [error, setError] = useState<string | undefined>();
-  const [image, setImage] = useState<HTMLCanvasElement | null | undefined>(
-    null,
-  );
+  const [image, setImage] = useState<ImageValue>(initialImageFile);
   const [friendsValue, setFriendsValue] = useState<Option[]>(
     initialData.friends ? initialData.friends.map(userToOption) : [],
   );
   const [showReleasePicker, setShowReleasePicker] = useState(
-    Boolean(initialData.release),
+    showReleasePickerDefault || Boolean(initialData.release),
   );
   const [releaseValue, setReleaseValue] = useState<ReleaseOption | undefined>(
     toReleaseOption(initialData.release),
@@ -167,7 +170,7 @@ export default function TastingForm({
           <Controller
             name="release"
             control={control}
-            render={({ field: { onChange, value, ref, ...field } }) =>
+            render={({ field: { onChange, ref, ...field } }) =>
               showReleasePicker ? (
                 <div className="space-y-3">
                   <SelectField<ReleaseOption>
@@ -204,7 +207,9 @@ export default function TastingForm({
                     onClick={() => {
                       onChange(null);
                       setReleaseValue(undefined);
-                      setShowReleasePicker(false);
+                      if (!showReleasePickerDefault) {
+                        setShowReleasePicker(false);
+                      }
                     }}
                   >
                     Use Bottle Instead
@@ -307,6 +312,7 @@ export default function TastingForm({
             name="image"
             label="Picture"
             value={initialData.imageUrl}
+            initialFile={initialImageFile}
             onChange={(value) => setImage(value)}
             imageWidth={1024 / 2}
             imageHeight={768 / 2}
