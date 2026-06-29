@@ -10,11 +10,17 @@ interface RateLimitOptions {
   keyPrefix?: string; // Optional prefix for the rate limit key
 }
 
-export function createRateLimit(options: RateLimitOptions) {
+/**
+ * Builds reusable rate-limit middleware while preserving any route-specific
+ * context narrowing applied before this middleware runs.
+ */
+export function createRateLimit<TContext extends Context = Context>(
+  options: RateLimitOptions,
+) {
   const { windowMs, maxRequests, keyPrefix = "rl" } = options;
 
   return base
-    .$context<Context>()
+    .$context<TContext>()
     .middleware(async ({ context, next, errors }) => {
       // Use user ID for authenticated users, IP for anonymous
       const identifier = context.user?.id?.toString() || context.ip;

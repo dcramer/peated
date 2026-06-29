@@ -1,9 +1,14 @@
+import {
+  BottleClassificationResultSchema,
+  ImageBottleEvidenceSchema,
+} from "@peated/bottle-classifier/contract";
 import { z } from "zod";
 import { SIMPLE_RATING_VALUES } from "../constants";
 import { BadgeAwardSchema } from "./badges";
 import { BottleReleaseSchema } from "./bottleReleases";
 import { BottleSchema } from "./bottles";
 import { ServingStyleEnum, zDatetime } from "./common";
+import { PendingUploadSchema } from "./pendingUploads";
 import { UserSchema } from "./users";
 
 export const TastingSchema = z.object({
@@ -108,4 +113,32 @@ export const TastingInputSchema = TastingSchema.omit({
     .array(z.number())
     .default([])
     .describe("Array of friend user IDs who were present"),
+});
+
+export const PhotoIdentificationSuggestedNextStepEnum = z.enum([
+  "confirm_match",
+  "confirm_create",
+  "manual_search",
+  "needs_review",
+]);
+
+export const PhotoIdentificationInputSchema = z.object({
+  file: z.instanceof(Blob).describe("Bottle label image to identify"),
+  idempotencyKey: z
+    .string()
+    .trim()
+    .min(1)
+    .max(128)
+    .describe("Client retry key for reusing an existing pending upload"),
+});
+
+export const PhotoIdentificationSchema = z.object({
+  pendingImage: PendingUploadSchema.pick({
+    id: true,
+    imageUrl: true,
+    expiresAt: true,
+  }),
+  imageEvidence: ImageBottleEvidenceSchema,
+  classification: BottleClassificationResultSchema,
+  suggestedNextStep: PhotoIdentificationSuggestedNextStepEnum,
 });
