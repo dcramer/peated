@@ -174,6 +174,42 @@ function getCreateProposalLabel(result: PhotoIdentification | null) {
   };
 }
 
+function getManualResultCopy(result: PhotoIdentification | null) {
+  const action =
+    result?.classification.status === "classified"
+      ? result.classification.decision.action
+      : null;
+
+  if (result?.suggestedNextStep === "needs_review") {
+    return {
+      title: "Needs manual review",
+      description:
+        "This photo points at a catalog repair case. Search for the bottle to keep going.",
+    };
+  }
+
+  if (action === "match") {
+    return {
+      title: "Use search instead",
+      description:
+        "We found a possible match, but it was not confident enough to use automatically.",
+    };
+  }
+
+  if (action === "no_match") {
+    return {
+      title: "Use search instead",
+      description:
+        "We could not find a confident Peated match from this photo.",
+    };
+  }
+
+  return {
+    title: "Use search instead",
+    description: "Search for the bottle to keep recording this tasting.",
+  };
+}
+
 function EvidencePills({ result }: { result: PhotoIdentification | null }) {
   const fields = [
     ["Brand", getFieldValue(result, "brand")],
@@ -482,6 +518,7 @@ export default function AddTasting() {
   const createProposalLabel = getCreateProposalLabel(photoResult);
   const searchSeed = getSearchSeed(photoResult);
   const searchHref = getSearchHref(searchSeed);
+  const manualResultCopy = getManualResultCopy(photoResult);
 
   return (
     <Layout
@@ -683,11 +720,10 @@ export default function AddTasting() {
                       </div>
                       <div>
                         <div className="font-semibold text-white">
-                          Needs manual review
+                          {manualResultCopy.title}
                         </div>
                         <div className="text-muted mt-1 text-sm">
-                          We kept the photo. Search for the bottle to keep
-                          going.
+                          {manualResultCopy.description}
                         </div>
                       </div>
                     </div>
@@ -714,6 +750,19 @@ export default function AddTasting() {
                       )}
                     </div>
                   )}
+
+                  {!matchedBottleId &&
+                    !createDecision &&
+                    photoResult.diagnostics.classification.reason && (
+                      <div className="rounded border border-slate-800 bg-slate-950 p-3">
+                        <div className="text-muted text-xs uppercase tracking-wide">
+                          Result
+                        </div>
+                        <div className="text-muted mt-2 line-clamp-3 text-sm">
+                          {photoResult.diagnostics.classification.reason}
+                        </div>
+                      </div>
+                    )}
                 </div>
                 <div className="mx-auto grid w-full gap-2 sm:w-1/2">
                   {matchedBottleId && (
