@@ -1,7 +1,7 @@
 import config from "@peated/server/config";
 import { logError } from "@peated/server/lib/log";
+import { createOpenAIClient } from "@peated/server/lib/openaiClient";
 import { startSpan } from "@sentry/node";
-import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { type ZodSchema, type z } from "zod";
 
@@ -58,12 +58,7 @@ export async function getStructuredResponse<
   model = DEFAULT_MODEL,
   logContext?: Record<string, Record<string, any>>,
 ): Promise<z.infer<FullSchema> | null> {
-  const openai = new OpenAI({
-    apiKey: config.OPENAI_API_KEY,
-    baseURL: config.OPENAI_HOST,
-    organization: config.OPENAI_ORGANIZATION,
-    project: config.OPENAI_PROJECT,
-  });
+  const openai = createOpenAIClient();
 
   const responseSchema = (fullSchema || schema) as ZodSchema<any>;
   const input = typeof prompt === "string" ? prompt : prompt;

@@ -6,6 +6,7 @@ if (config.ENV !== "test") {
     dsn: config.SENTRY_DSN,
     release: config.VERSION,
     tracesSampleRate: 1.0,
+    streamGenAiSpans: true,
     tracePropagationTargets: ["localhost", "api.peated.com", "peated.com"],
     includeLocalVariables: true,
     sendDefaultPii: true,

@@ -2,6 +2,7 @@ import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { countries } from "@peated/server/db/schema";
 import { getStructuredResponse } from "@peated/server/lib/openai";
+import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { type Country } from "@peated/server/types";
 import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
@@ -40,26 +41,30 @@ export type GeneratedCountryDetails = z.infer<
 export async function getGeneratedCountryDetails(
   country: InputCountry,
 ): Promise<GeneratedCountryDetails | null> {
-  return await startSpan(
-    {
-      op: "ai.pipeline",
-      name: "getGeneratedCountryDetails",
-    },
-    async (span) => {
-      return await getStructuredResponse(
-        "getGeneratedCountryDetails",
-        generatePrompt(country),
-        OpenAICountryDetailsSchema,
-        undefined,
-        undefined,
+  return await withSentryConversation(
+    `country_details:${country.slug ?? country.name ?? "draft"}`,
+    async () =>
+      await startSpan(
         {
-          country: {
-            id: country.slug,
-            name: country.name,
-          },
+          op: "ai.pipeline",
+          name: "getGeneratedCountryDetails",
         },
-      );
-    },
+        async (span) => {
+          return await getStructuredResponse(
+            "getGeneratedCountryDetails",
+            generatePrompt(country),
+            OpenAICountryDetailsSchema,
+            undefined,
+            undefined,
+            {
+              country: {
+                id: country.slug,
+                name: country.name,
+              },
+            },
+          );
+        },
+      ),
   );
 }
 

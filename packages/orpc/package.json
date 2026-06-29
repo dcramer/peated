@@ -26,10 +26,10 @@
   },
   "dependencies": {
     "@peated/tsconfig": "workspace:*",
-    "@sentry/core": "*"
+    "@sentry/core": "catalog:"
   },
   "peerDependencies": {
-    "@sentry/core": "*"
+    "@sentry/core": "catalog:"
   },
   "volta": {
     "extends": "../../package.json"

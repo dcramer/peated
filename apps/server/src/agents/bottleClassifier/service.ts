@@ -16,19 +16,13 @@ import {
   searchBottleCandidates,
 } from "@peated/server/lib/bottleReferenceCandidates";
 import { searchClassifierEntities } from "@peated/server/lib/classifierEntitySearch";
+import {
+  createOpenAIClient,
+  withSentryConversation,
+} from "@peated/server/lib/openaiClient";
 import { absoluteUrl } from "@peated/server/lib/urls";
-import OpenAI from "openai";
 
 let bottleClassifier: ReturnType<typeof createBottleClassifier> | null = null;
-
-function createOpenAIClient(): OpenAI {
-  return new OpenAI({
-    apiKey: config.OPENAI_API_KEY,
-    baseURL: config.OPENAI_HOST,
-    organization: config.OPENAI_ORGANIZATION,
-    project: config.OPENAI_PROJECT,
-  });
-}
 
 async function searchBottleClassifierEntities(args: SearchEntitiesArgs) {
   const parsedArgs = SearchEntitiesArgsSchema.parse(args);
@@ -84,17 +78,33 @@ export function getBottleClassifier() {
 export async function classifyBottleReference(
   input: ClassifyBottleReferenceInput,
 ) {
-  return await getBottleClassifier().classifyBottleReference({
-    ...input,
-    reference: normalizeReferenceForClassifier(input.reference),
+  const reference = normalizeReferenceForClassifier(input.reference);
+  const conversationId =
+    reference.id === undefined || reference.id === null
+      ? `bottle_classifier:${reference.name}`
+      : `bottle_reference:${reference.id}`;
+
+  return await withSentryConversation(conversationId, async () => {
+    return await getBottleClassifier().classifyBottleReference({
+      ...input,
+      reference,
+    });
   });
 }
 
 export async function runBottleClassifierAgent(
   input: RunBottleClassifierAgentInput,
 ) {
-  return await getBottleClassifier().runBottleClassifierAgent({
-    ...input,
-    reference: normalizeReferenceForClassifier(input.reference),
+  const reference = normalizeReferenceForClassifier(input.reference);
+  const conversationId =
+    reference.id === undefined || reference.id === null
+      ? `bottle_classifier:${reference.name}`
+      : `bottle_reference:${reference.id}`;
+
+  return await withSentryConversation(conversationId, async () => {
+    return await getBottleClassifier().runBottleClassifierAgent({
+      ...input,
+      reference,
+    });
   });
 }

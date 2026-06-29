@@ -8,8 +8,11 @@ import {
   type ImageBottleEvidence,
 } from "@peated/server/agents/bottleClassifier";
 import config from "@peated/server/config";
+import {
+  createOpenAIClient,
+  withSentryConversation,
+} from "@peated/server/lib/openaiClient";
 import { readFile } from "@peated/server/lib/uploads";
-import OpenAI from "openai";
 
 const PHOTO_IDENTIFICATION_TIMEOUT_MS = 60_000;
 
@@ -33,15 +36,6 @@ export async function getPhotoExtractionImageInput({
   const filename = filenameFromUploadUrl(pendingUpload.imageUrl);
   const image = await readFile({ filename });
   return `data:image/webp;base64,${image.toString("base64")}`;
-}
-
-function createOpenAIClient(): OpenAI {
-  return new OpenAI({
-    apiKey: config.OPENAI_API_KEY,
-    baseURL: config.OPENAI_HOST,
-    organization: config.OPENAI_ORGANIZATION,
-    project: config.OPENAI_PROJECT,
-  });
 }
 
 function maybeField<T extends string | number>(
@@ -151,14 +145,19 @@ export async function extractPhotoBottleEvidence({
     };
   }
 
-  const extractor = createWhiskyLabelExtractor({
-    client: createOpenAIClient(),
-    model: config.OPENAI_MODEL,
-  });
-  const extractedIdentity = BottleExtractedDetailsSchema.nullable().parse(
-    await extractor.extractFromImage(
-      await getPhotoExtractionImageInput({ pendingUpload }),
-    ),
+  const extractedIdentity = await withSentryConversation(
+    `photo_identification:${pendingUpload.id}`,
+    async () => {
+      const extractor = createWhiskyLabelExtractor({
+        client: createOpenAIClient(),
+        model: config.OPENAI_MODEL,
+      });
+      return BottleExtractedDetailsSchema.nullable().parse(
+        await extractor.extractFromImage(
+          await getPhotoExtractionImageInput({ pendingUpload }),
+        ),
+      );
+    },
   );
 
   return {
