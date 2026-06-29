@@ -3,13 +3,19 @@
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import NotificationList from "@peated/web/components/notifications/list";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import useAuthRequired from "@peated/web/hooks/useAuthRequired";
+import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function Page() {
-  useAuthRequired();
+  return (
+    <AuthRequired>
+      <UnreadNotifications />
+    </AuthRequired>
+  );
+}
 
+function UnreadNotifications() {
   const queryParams = useApiQueryParams({
     numericFields: ["cursor", "limit"],
     overrides: {

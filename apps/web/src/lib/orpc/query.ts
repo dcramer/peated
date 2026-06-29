@@ -3,7 +3,6 @@ import {
   defaultShouldDehydrateQuery,
   isServer,
 } from "@tanstack/react-query";
-import { bustAppCache } from "../cache.actions";
 // TODO: only in react 19
 // import { cache } from "react";
 
@@ -25,12 +24,9 @@ const createQueryClient = () => {
           query.state.status === "pending",
       },
       mutations: {
-        onSuccess: async (data, variables, context) => {
+        onSuccess: () => {
           // Invalidate all queries in the react-query cache:
-          await queryClient.invalidateQueries();
-
-          // call a server action to bust our global cache
-          await bustAppCache();
+          void queryClient.invalidateQueries();
         },
       },
     },

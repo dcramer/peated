@@ -27,7 +27,7 @@ export default function ORPCProvider({
 
   useEffect(() => {
     if (previousAccessTokenRef.current !== accessToken) {
-      queryClient.clear();
+      queryClient.removeQueries({ type: "inactive" });
       previousAccessTokenRef.current = accessToken;
     }
   }, [accessToken, queryClient]);

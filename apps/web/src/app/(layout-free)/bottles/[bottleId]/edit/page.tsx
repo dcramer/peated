@@ -2,7 +2,7 @@
 
 import BottleForm from "@peated/web/components/bottleForm";
 import { useFlashMessages } from "@peated/web/components/flash";
-import { useModRequired } from "@peated/web/hooks/useAuthRequired";
+import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -14,8 +14,14 @@ export default function Page({
 }: {
   params: { bottleId: string };
 }) {
-  useModRequired();
+  return (
+    <ModRequired>
+      <BottleEditForm bottleId={bottleId} />
+    </ModRequired>
+  );
+}
 
+function BottleEditForm({ bottleId }: { bottleId: string }) {
   const orpc = useORPC();
   const { data: bottle } = useSuspenseQuery(
     orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),

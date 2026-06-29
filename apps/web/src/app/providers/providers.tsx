@@ -21,37 +21,11 @@ export default function Providers({
   session: SessionData;
 }) {
   const [session, setSession] = useState<SessionData>(initialSession);
-  const [isSessionReady, setIsSessionReady] = useState(
-    Boolean(initialSession.user || initialSession.ts),
-  );
 
   // Sync from server props on navigation
   useEffect(() => {
-    if (initialSession.user || initialSession.ts) {
-      setSession(initialSession);
-      setIsSessionReady(true);
-    }
+    setSession(initialSession);
   }, [initialSession.accessToken, initialSession.ts]);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    ensureSessionSynced()
-      .then((updated) => {
-        if (isMounted) {
-          setSession(updated);
-          setIsSessionReady(true);
-        }
-      })
-      .catch(() => {
-        // Transient errors: preserve current session state
-        if (isMounted) setIsSessionReady(true);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   // Periodic session refresh
   useInterval(async () => {
@@ -81,7 +55,7 @@ export default function Providers({
       >
         <ReactQueryStreamedHydration>
           <OnlineStatusProvider>
-            <AuthProvider user={session.user} isLoading={!isSessionReady}>
+            <AuthProvider user={session.user}>
               <FlashMessages>{children}</FlashMessages>
             </AuthProvider>
           </OnlineStatusProvider>

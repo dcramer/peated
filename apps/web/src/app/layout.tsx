@@ -1,7 +1,7 @@
 import "@fontsource/raleway/index.css";
 import Fathom from "@peated/web/components/fathom";
 import config from "@peated/web/config";
-import { defaultSession } from "@peated/web/lib/session.server";
+import { getSession } from "@peated/web/lib/session.server";
 import "@peated/web/styles/index.css";
 import * as Sentry from "@sentry/nextjs";
 import type { Metadata, Viewport } from "next";
@@ -43,14 +43,28 @@ export default async function RootLayout({
   children: React.ReactNode;
   // auth: React.ReactNode;
 }>) {
+  const session = await getSession();
+
+  // we need to bind the user on the server, but we also do this in providers
+  // so it stays updated on the client appropriately
+  Sentry.setUser(
+    session.user
+      ? {
+          id: `${session.user.id}`,
+          username: session.user.username,
+          email: session.user.email,
+        }
+      : null,
+  );
+
   return (
     <html lang="en">
       <body className="h-full">
         <Providers
           session={{
-            user: defaultSession.user,
-            accessToken: defaultSession.accessToken,
-            ts: defaultSession.ts,
+            user: session.user,
+            accessToken: session.accessToken,
+            ts: session.ts,
           }}
         >
           {children}

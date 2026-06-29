@@ -1,6 +1,8 @@
 "use client";
 
+import Spinner from "@peated/web/components/spinner";
 import { redirect, usePathname, useSearchParams } from "next/navigation";
+import type { ReactNode } from "react";
 import { redirectToAuth } from "../lib/auth";
 import useAuth from "./useAuth";
 
@@ -82,4 +84,16 @@ export function useVerifiedRequired() {
   }
 
   return true;
+}
+
+export function AuthRequired({ children }: { children: ReactNode }) {
+  return useAuthRequired() ? <>{children}</> : <Spinner />;
+}
+
+export function ModRequired({ children }: { children: ReactNode }) {
+  return useModRequired() ? <>{children}</> : <Spinner />;
+}
+
+export function VerifiedRequired({ children }: { children: ReactNode }) {
+  return useVerifiedRequired() ? <>{children}</> : <Spinner />;
 }

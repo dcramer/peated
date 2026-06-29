@@ -77,6 +77,7 @@ function SavedCollectionActionAuthenticated({
   title,
   kind,
 }: CollectionActionProps & { kind: CollectionActionKind }) {
+  const { user } = useAuth();
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const action = COLLECTION_ACTIONS[kind];
@@ -146,9 +147,26 @@ function SavedCollectionActionAuthenticated({
         await queryClient.invalidateQueries({
           queryKey: collectionStatusQuery.queryKey,
         });
-        queryClient.removeQueries({
-          queryKey: orpc.collections.bottles.list.key(),
-        });
+        if (user) {
+          await queryClient.invalidateQueries({
+            queryKey: orpc.collections.bottles.list.key({
+              input: {
+                user: "me",
+                collection: action.collection,
+              },
+            }),
+            exact: true,
+          });
+          await queryClient.invalidateQueries({
+            queryKey: orpc.collections.bottles.list.key({
+              input: {
+                user: user.username,
+                collection: action.collection,
+              },
+            }),
+            exact: true,
+          });
+        }
       }}
       disabled={isAnyLoading}
       color={action.color}

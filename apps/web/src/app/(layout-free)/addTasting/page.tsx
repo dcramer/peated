@@ -10,7 +10,7 @@ import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
 import Link from "@peated/web/components/link";
 import TastingForm from "@peated/web/components/tastingForm";
-import useAuthRequired from "@peated/web/hooks/useAuthRequired";
+import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -304,8 +304,14 @@ function SearchBottleCallout() {
 }
 
 export default function AddTasting() {
-  useAuthRequired();
+  return (
+    <AuthRequired>
+      <AddTastingForm />
+    </AuthRequired>
+  );
+}
 
+function AddTastingForm() {
   const router = useRouter();
   const orpc = useORPC();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
