@@ -69,6 +69,31 @@ describe("bottle-classifier contract", () => {
     expect(parsed.extractedIdentity?.category).toBeNull();
   });
 
+  test("accepts local image data URLs only on image references", () => {
+    const dataImageUrl = "data:image/jpeg;base64,/9j/4AAQSkZJRg==";
+    const parsed = ClassifyBottleReferenceInputSchema.parse({
+      reference: {
+        name: "Local image",
+        url: dataImageUrl,
+        imageUrl: dataImageUrl,
+      },
+    });
+
+    expect(parsed.reference.url).toBeNull();
+    expect(parsed.reference.imageUrl).toBe(dataImageUrl);
+  });
+
+  test("rejects non-image data URLs on image references", () => {
+    const parsed = ClassifyBottleReferenceInputSchema.parse({
+      reference: {
+        name: "Local image",
+        imageUrl: "data:text/plain;base64,SGVsbG8=",
+      },
+    });
+
+    expect(parsed.reference.imageUrl).toBeNull();
+  });
+
   test("builds discriminated results with normalized artifacts", () => {
     const ignored = createIgnoredBottleClassification({
       reason: "non-whisky",

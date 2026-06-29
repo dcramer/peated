@@ -31,7 +31,9 @@ function getImageMimeType(path: string) {
     case ".gif":
       return "image/gif";
     default:
-      return "application/octet-stream";
+      throw new Error(
+        "Unsupported image extension. Use .jpg, .jpeg, .png, .webp, or .gif.",
+      );
   }
 }
 
