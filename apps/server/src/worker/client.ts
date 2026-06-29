@@ -128,6 +128,13 @@ export async function runWorker() {
   // dont run the scraper in dev
   if (config.ENV === "production") {
     scheduledJob("*/5 * * * *", "schedule-scrapers", scheduleScrapers);
+    scheduledJob(
+      "17 * * * *",
+      "reconcile-store-price-match-proposals",
+      async () => {
+        await runJob("ReconcileStorePriceMatchProposals");
+      },
+    );
     scheduledJob("0 * * * *", "cleanup-pending-uploads", async () => {
       await runJob("CleanupPendingUploads");
     });

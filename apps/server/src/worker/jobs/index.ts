@@ -23,6 +23,7 @@ import onBottleReleaseChange from "./onBottleReleaseChange";
 import onEntityChange from "./onEntityChange";
 import processNotification from "./processNotification";
 import processStorePriceMatchRetryRun from "./processStorePriceMatchRetryRun";
+import reconcileStorePriceMatchProposals from "./reconcileStorePriceMatchProposals";
 import resolveStorePriceBottle from "./resolveStorePriceBottle";
 import scrapeAstorWines from "./scrapeAstorWines";
 import scrapeHealthySpirits from "./scrapeHealthySpirits";
@@ -65,6 +66,10 @@ registry.add("OnBottleReleaseChange", onBottleReleaseChange);
 registry.add("OnEntityChange", onEntityChange);
 registry.add("ProcessNotification", processNotification);
 registry.add("ProcessStorePriceMatchRetryRun", processStorePriceMatchRetryRun);
+registry.add(
+  "ReconcileStorePriceMatchProposals",
+  reconcileStorePriceMatchProposals,
+);
 registry.add("ResolveStorePriceBottle", resolveStorePriceBottle);
 registry.add("ScrapeAstorWines", scrapeAstorWines);
 registry.add("ScrapeHealthySpirits", scrapeHealthySpirits);
