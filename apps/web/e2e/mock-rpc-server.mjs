@@ -164,6 +164,97 @@ async function handleRpcRequest({ request, response, url }) {
       });
       return true;
     }
+    case "tastings/photoIdentification":
+      sendRpcResponse(response, {
+        pendingImage: {
+          id: "playwright-photo-upload",
+          imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
+          expiresAt: "2026-06-07T13:00:00.000Z",
+        },
+        imageEvidence: {
+          sourceImageId: "playwright-photo-upload",
+          sourceImageHash: "playwright-photo-hash",
+          extractors: [
+            {
+              kind: "vision",
+              model: "playwright",
+              confidence: 0.95,
+              textSpans: [
+                {
+                  text: "Lagavulin 16",
+                  confidence: 0.95,
+                },
+              ],
+              observations: ["Single bottle label is readable."],
+            },
+          ],
+          fieldCandidates: {
+            brand: {
+              value: testBrand.name,
+              confidence: 0.98,
+              sourceExtractorIndexes: [0],
+            },
+            expression: {
+              value: existingBottle.name,
+              confidence: 0.94,
+              sourceExtractorIndexes: [0],
+            },
+            statedAge: {
+              value: 16,
+              confidence: 0.94,
+              sourceExtractorIndexes: [0],
+            },
+          },
+          photoSuitability: {
+            isSingleBottlePhoto: true,
+            labelReadable: true,
+            suitableAsTastingImage: true,
+            suitableAsBottleImage: true,
+            reason: null,
+          },
+          conflicts: [],
+        },
+        classification: {
+          status: "classified",
+          decision: {
+            action: "match",
+            matchedBottleId: existingBottleId,
+            matchedReleaseId: null,
+          },
+          artifacts: {
+            candidates: [
+              {
+                bottleId: existingBottleId,
+                releaseId: null,
+                bottleFullName: existingBottle.fullName,
+                fullName: existingBottle.fullName,
+              },
+            ],
+          },
+        },
+        suggestedNextStep: "confirm_match",
+        diagnostics: {
+          extraction: {
+            status: "found",
+            summary: "Lagavulin 16",
+          },
+          candidates: {
+            count: 1,
+          },
+          classification: {
+            status: "classified",
+            action: "match",
+            confidence: 95,
+            reason: "Matched the fixture bottle.",
+          },
+        },
+      });
+      return true;
+    case "tastings/imageUpdate":
+      sendRpcResponse(response, {
+        imageUrl: "http://127.0.0.1:4999/uploads/tasting.webp",
+      });
+      return true;
     case "tastings/details":
       if (input?.tasting !== createdTastingId) {
         sendRpcError(response, "Unexpected tasting details payload");
@@ -368,6 +459,15 @@ async function readRpcInput(request, url) {
 
   if (request.method === "GET" || request.method === "HEAD") {
     return undefined;
+  }
+
+  const contentType = request.headers["content-type"] ?? "";
+  if (
+    typeof contentType === "string" &&
+    !contentType.includes("application/json")
+  ) {
+    request.resume();
+    return {};
   }
 
   const body = await readBody(request);

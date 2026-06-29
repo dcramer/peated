@@ -1,5 +1,5 @@
 import {
-  BottleClassificationResultSchema,
+  BottleCandidateSchema,
   ImageBottleEvidenceSchema,
 } from "@peated/bottle-classifier/contract";
 import { z } from "zod";
@@ -148,6 +148,78 @@ export const PhotoIdentificationDiagnosticsSchema = z.object({
   }),
 });
 
+const PhotoIdentificationCandidateSchema = BottleCandidateSchema.pick({
+  bottleId: true,
+  releaseId: true,
+  bottleFullName: true,
+  fullName: true,
+});
+
+const PhotoIdentificationProposedBottleSchema = z.object({
+  name: z.string().trim().min(1),
+  brand: z.object({
+    name: z.string().trim().min(1),
+  }),
+});
+
+const PhotoIdentificationProposedReleaseSchema = z.object({
+  edition: z.string().nullable(),
+});
+
+export const PhotoIdentificationDecisionSchema = z.discriminatedUnion(
+  "action",
+  [
+    z.object({
+      action: z.literal("match"),
+      matchedBottleId: z.number().int(),
+      matchedReleaseId: z.number().int().nullable(),
+    }),
+    z.object({
+      action: z.literal("create_bottle"),
+      proposedBottle: PhotoIdentificationProposedBottleSchema,
+    }),
+    z.object({
+      action: z.literal("create_release"),
+      parentBottleId: z.number().int(),
+      proposedRelease: PhotoIdentificationProposedReleaseSchema,
+    }),
+    z.object({
+      action: z.literal("create_bottle_and_release"),
+      proposedBottle: PhotoIdentificationProposedBottleSchema,
+      proposedRelease: PhotoIdentificationProposedReleaseSchema,
+    }),
+    z.object({
+      action: z.literal("repair_parent_and_create_release"),
+    }),
+    z.object({
+      action: z.literal("repair_bottle"),
+    }),
+    z.object({
+      action: z.literal("no_match"),
+    }),
+  ],
+);
+
+export const PhotoIdentificationClassificationSchema = z.discriminatedUnion(
+  "status",
+  [
+    z.object({
+      status: z.literal("ignored"),
+      reason: z.string().min(1),
+      artifacts: z.object({
+        candidates: z.array(PhotoIdentificationCandidateSchema),
+      }),
+    }),
+    z.object({
+      status: z.literal("classified"),
+      decision: PhotoIdentificationDecisionSchema,
+      artifacts: z.object({
+        candidates: z.array(PhotoIdentificationCandidateSchema),
+      }),
+    }),
+  ],
+);
+
 export const PhotoIdentificationSchema = z.object({
   pendingImage: PendingUploadSchema.pick({
     id: true,
@@ -155,7 +227,7 @@ export const PhotoIdentificationSchema = z.object({
     expiresAt: true,
   }),
   imageEvidence: ImageBottleEvidenceSchema,
-  classification: BottleClassificationResultSchema,
+  classification: PhotoIdentificationClassificationSchema,
   suggestedNextStep: PhotoIdentificationSuggestedNextStepEnum,
   diagnostics: PhotoIdentificationDiagnosticsSchema,
 });

@@ -108,6 +108,103 @@ function summarizeExtraction(
   return text || null;
 }
 
+/**
+ * Strips server-owned classifier internals from the browser response while
+ * preserving the fields the photo tasting flow needs to continue.
+ */
+function serializePhotoIdentificationClassification(
+  classification: Awaited<ReturnType<typeof classifyBottleReference>>,
+): z.infer<typeof PhotoIdentificationSchema>["classification"] {
+  const artifacts = {
+    candidates: classification.artifacts.candidates.map((candidate) => ({
+      bottleId: candidate.bottleId,
+      releaseId: candidate.releaseId,
+      bottleFullName: candidate.bottleFullName,
+      fullName: candidate.fullName,
+    })),
+  };
+
+  if (classification.status === "ignored") {
+    return {
+      status: "ignored",
+      reason: classification.reason,
+      artifacts,
+    };
+  }
+
+  const { decision } = classification;
+  type SerializedDecision = Extract<
+    z.infer<typeof PhotoIdentificationSchema>["classification"],
+    { status: "classified" }
+  >["decision"];
+  let serializedDecision: SerializedDecision;
+
+  switch (decision.action) {
+    case "match":
+      serializedDecision = {
+        action: "match",
+        matchedBottleId: decision.matchedBottleId,
+        matchedReleaseId: decision.matchedReleaseId,
+      };
+      break;
+    case "create_bottle":
+      serializedDecision = {
+        action: "create_bottle",
+        proposedBottle: {
+          name: decision.proposedBottle.name,
+          brand: {
+            name: decision.proposedBottle.brand.name,
+          },
+        },
+      };
+      break;
+    case "create_release":
+      serializedDecision = {
+        action: "create_release",
+        parentBottleId: decision.parentBottleId,
+        proposedRelease: {
+          edition: decision.proposedRelease.edition,
+        },
+      };
+      break;
+    case "create_bottle_and_release":
+      serializedDecision = {
+        action: "create_bottle_and_release",
+        proposedBottle: {
+          name: decision.proposedBottle.name,
+          brand: {
+            name: decision.proposedBottle.brand.name,
+          },
+        },
+        proposedRelease: {
+          edition: decision.proposedRelease.edition,
+        },
+      };
+      break;
+    case "repair_parent_and_create_release":
+      serializedDecision = {
+        action: "repair_parent_and_create_release",
+      };
+      break;
+    case "repair_bottle":
+      serializedDecision = {
+        action: "repair_bottle",
+      };
+      break;
+    case "no_match":
+      serializedDecision = {
+        action: "no_match",
+      };
+      break;
+  }
+
+  return {
+    status: "classified",
+    decision: serializedDecision,
+    artifacts,
+  };
+}
+
 function buildPhotoIdentificationDiagnostics({
   extractionStatus,
   extractionSummary,
@@ -259,7 +356,8 @@ export default procedure
         expiresAt: pendingImage.expiresAt.toISOString(),
       },
       imageEvidence,
-      classification,
+      classification:
+        serializePhotoIdentificationClassification(classification),
       suggestedNextStep,
       diagnostics,
     };
