@@ -157,7 +157,7 @@ export async function createPendingImageUpload({
   return pendingUpload;
 }
 
-async function getUsablePendingUpload({
+export async function getUsablePendingUpload({
   id,
   userId,
   now = new Date(),

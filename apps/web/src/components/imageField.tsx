@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 
 import { PhotoIcon } from "@heroicons/react/20/solid";
 import setRef from "../lib/setRef";
@@ -27,6 +27,7 @@ type Props = Omit<
   imageWidth?: number;
   imageHeight?: number;
   noEditor?: boolean;
+  initialFile?: File | null;
 };
 
 const fileToDataUrl = (file: File): Promise<string> => {
@@ -81,6 +82,7 @@ export default forwardRef<HTMLInputElement, Props>(
       imageWidth = 600,
       imageHeight = 600,
       noEditor,
+      initialFile,
     },
     ref,
   ) => {
@@ -89,13 +91,33 @@ export default forwardRef<HTMLInputElement, Props>(
     const [_isHover, setHover] = useState(false);
     const [imageSrc, setImageSrc] = useState<string | null>();
     const [finalImage, setFinalImage] = useState<HTMLCanvasElement | null>();
+    const onChangeRef = useRef(onChange);
 
     const [editorOpen, setEditorOpen] = useState(false);
+
+    useEffect(() => {
+      onChangeRef.current = onChange;
+    }, [onChange]);
+
+    const onSave = useCallback((image: HTMLCanvasElement | null) => {
+      setFinalImage(image);
+      onChangeRef.current(image);
+    }, []);
 
     useEffect(() => {
       setImageSrc(value || "");
       setFinalImage(null);
     }, [value]);
+
+    useEffect(() => {
+      if (!initialFile) return;
+
+      (async () => {
+        const imageSrc = await fileToDataUrl(initialFile);
+        setImageSrc(imageSrc);
+        onSave(await fileDataToCanvas(initialFile));
+      })();
+    }, [initialFile, onSave]);
 
     const updateImageSrc = () => {
       const file = Array.from(fileRef.current?.files || []).find(() => true);
@@ -111,11 +133,6 @@ export default forwardRef<HTMLInputElement, Props>(
         setImageSrc("");
         onSave(null);
       }
-    };
-
-    const onSave = (image: HTMLCanvasElement | null) => {
-      setFinalImage(image);
-      if (onChange) onChange(image);
     };
 
     return (

@@ -132,6 +132,22 @@ export const PhotoIdentificationInputSchema = z.object({
     .describe("Client retry key for reusing an existing pending upload"),
 });
 
+export const PhotoIdentificationDiagnosticsSchema = z.object({
+  extraction: z.object({
+    status: z.enum(["found", "empty", "failed", "timed_out"]),
+    summary: z.string().nullable().default(null),
+  }),
+  candidates: z.object({
+    count: z.number().int().min(0),
+  }),
+  classification: z.object({
+    status: z.enum(["ignored", "classified"]),
+    action: z.string().nullable().default(null),
+    confidence: z.number().nullable().default(null),
+    reason: z.string().nullable().default(null),
+  }),
+});
+
 export const PhotoIdentificationSchema = z.object({
   pendingImage: PendingUploadSchema.pick({
     id: true,
@@ -141,4 +157,5 @@ export const PhotoIdentificationSchema = z.object({
   imageEvidence: ImageBottleEvidenceSchema,
   classification: BottleClassificationResultSchema,
   suggestedNextStep: PhotoIdentificationSuggestedNextStepEnum,
+  diagnostics: PhotoIdentificationDiagnosticsSchema,
 });

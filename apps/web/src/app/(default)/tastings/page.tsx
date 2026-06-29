@@ -61,7 +61,7 @@ function TastingList() {
           rel={data.rel}
         />
       ) : (
-        <EmptyActivity href="/search?tasting">
+        <EmptyActivity href="/addTasting">
           <Glyph className="h-16 w-16" />
 
           <div className="mt-4 font-semibold">What are you drinking?</div>

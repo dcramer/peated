@@ -26,6 +26,7 @@ import {
 import {
   PhotoIdentificationInputSchema,
   PhotoIdentificationSchema,
+  type PhotoIdentificationDiagnosticsSchema,
   type PhotoIdentificationSuggestedNextStepEnum,
 } from "@peated/server/schemas";
 import type { z } from "zod";
@@ -67,25 +68,95 @@ function getSuggestedNextStep(
 function buildFallbackIdentificationResult({
   pendingImage,
   reason,
+  extractionStatus,
 }: {
   pendingImage: Awaited<ReturnType<typeof createPendingImageUpload>>;
   reason: string;
+  extractionStatus: z.infer<
+    typeof PhotoIdentificationDiagnosticsSchema
+  >["extraction"]["status"];
 }) {
   const imageEvidence = buildPhotoEvidenceFromExtractedIdentity({
     pendingUpload: pendingImage,
     extractedIdentity: null,
   });
+  const classification = createManualSearchPhotoClassification({
+    imageEvidence,
+    reason,
+  });
 
   return {
     imageEvidence,
-    classification: createManualSearchPhotoClassification({
-      imageEvidence,
-      reason,
+    classification,
+    diagnostics: buildPhotoIdentificationDiagnostics({
+      extractionStatus,
+      extractionSummary: reason,
+      classification,
     }),
   };
 }
 
-async function identifyPendingImage({
+function summarizeExtraction(
+  imageEvidence: z.infer<typeof PhotoIdentificationSchema>["imageEvidence"],
+) {
+  const text = imageEvidence.extractors
+    .flatMap((extractor) => extractor.textSpans.map((span) => span.text))
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+
+  return text || null;
+}
+
+function buildPhotoIdentificationDiagnostics({
+  extractionStatus,
+  extractionSummary,
+  classification,
+}: {
+  extractionStatus: z.infer<
+    typeof PhotoIdentificationDiagnosticsSchema
+  >["extraction"]["status"];
+  extractionSummary: string | null;
+  classification: Awaited<ReturnType<typeof classifyBottleReference>>;
+}): z.infer<typeof PhotoIdentificationDiagnosticsSchema> {
+  const artifacts = classification.artifacts;
+
+  if (classification.status === "ignored") {
+    return {
+      extraction: {
+        status: extractionStatus,
+        summary: extractionSummary,
+      },
+      candidates: {
+        count: artifacts.candidates.length,
+      },
+      classification: {
+        status: "ignored",
+        action: null,
+        confidence: null,
+        reason: classification.reason,
+      },
+    };
+  }
+
+  return {
+    extraction: {
+      status: extractionStatus,
+      summary: extractionSummary,
+    },
+    candidates: {
+      count: artifacts.candidates.length,
+    },
+    classification: {
+      status: "classified",
+      action: classification.decision.action,
+      confidence: classification.decision.confidence,
+      reason: classification.decision.rationale,
+    },
+  };
+}
+
+export async function identifyPendingImage({
   pendingImage,
 }: {
   pendingImage: Awaited<ReturnType<typeof createPendingImageUpload>>;
@@ -107,7 +178,15 @@ async function identifyPendingImage({
       imageEvidence,
     });
 
-    return { imageEvidence, classification };
+    return {
+      imageEvidence,
+      classification,
+      diagnostics: buildPhotoIdentificationDiagnostics({
+        extractionStatus: extractedIdentity ? "found" : "empty",
+        extractionSummary: summarizeExtraction(imageEvidence),
+        classification,
+      }),
+    };
   })().catch((err) => {
     logError(err, {
       pendingUpload: {
@@ -124,12 +203,14 @@ async function identifyPendingImage({
         pendingImage,
         reason:
           "Photo identification timed out before a reviewed bottle match was available.",
+        extractionStatus: "timed_out",
       }),
     );
   } catch {
     return buildFallbackIdentificationResult({
       pendingImage,
       reason: "Photo identification could not produce a reviewed bottle match.",
+      extractionStatus: "failed",
     });
   }
 }
@@ -165,9 +246,11 @@ export default procedure
       onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
     });
 
-    const { imageEvidence, classification } = await identifyPendingImage({
-      pendingImage,
-    });
+    const { imageEvidence, classification, diagnostics } =
+      await identifyPendingImage({
+        pendingImage,
+      });
+    const suggestedNextStep = getSuggestedNextStep(classification);
 
     return {
       pendingImage: {
@@ -177,6 +260,7 @@ export default procedure
       },
       imageEvidence,
       classification,
-      suggestedNextStep: getSuggestedNextStep(classification),
+      suggestedNextStep,
+      diagnostics,
     };
   });

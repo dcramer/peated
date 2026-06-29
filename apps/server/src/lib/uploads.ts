@@ -1,6 +1,11 @@
 import { createId } from "@paralleldrive/cuid2";
 import { createWriteStream } from "node:fs";
-import { copyFile as copyLocalFile, mkdir, unlink } from "node:fs/promises";
+import {
+  copyFile as copyLocalFile,
+  mkdir,
+  readFile as readLocalFile,
+  unlink,
+} from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 
@@ -137,6 +142,39 @@ export async function deleteFile({
           }
         }
       }
+    },
+  );
+}
+
+export async function readFile({
+  filename,
+}: {
+  filename: string;
+}): Promise<Buffer> {
+  return await startSpan(
+    {
+      op: "peated.read-file",
+      name: filename,
+    },
+    async (span) => {
+      span?.setAttributes({
+        filename,
+      });
+
+      if (process.env.USE_GCS_STORAGE) {
+        const bucketName = config.GCS_BUCKET_NAME as string;
+        const bucketPath = config.GCS_BUCKET_PATH
+          ? `${config.GCS_BUCKET_PATH}/`
+          : "";
+
+        const [contents] = await getStorage()
+          .bucket(bucketName)
+          .file(`${bucketPath}${filename}`)
+          .download();
+        return contents;
+      }
+
+      return await readLocalFile(path.join(config.UPLOAD_PATH, filename));
     },
   );
 }

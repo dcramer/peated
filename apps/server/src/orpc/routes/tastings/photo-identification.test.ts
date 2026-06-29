@@ -1,3 +1,4 @@
+import { BottleClassificationResultSchema } from "@peated/server/agents/bottleClassifier/contract";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
@@ -30,6 +31,8 @@ vi.mock("@peated/server/lib/photoIdentification", async () => {
   return {
     ...actual,
     extractPhotoBottleEvidence: extractPhotoBottleEvidenceMock,
+    withPhotoIdentificationTimeout: <T>(work: Promise<T>, fallback: () => T) =>
+      actual.withPhotoIdentificationTimeout(work, fallback, 10),
   };
 });
 
@@ -68,7 +71,7 @@ function buildImageEvidence(sourceImageId: string) {
 }
 
 function buildClassification(decision: Record<string, unknown>) {
-  return {
+  return BottleClassificationResultSchema.parse({
     status: "classified" as const,
     decision: {
       confidence: 90,
@@ -83,7 +86,7 @@ function buildClassification(decision: Record<string, unknown>) {
       searchEvidence: [],
       resolvedEntities: [],
     },
-  };
+  });
 }
 
 async function countRows() {
@@ -344,4 +347,107 @@ describe("POST /tastings/photo-identification", () => {
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   }, 15_000);
+
+  test("creates bottle and release from a reviewed photo identification proposal", async ({
+    defaults,
+    fixtures,
+  }) => {
+    extractPhotoBottleEvidenceMock.mockImplementation(
+      async ({ pendingUpload }) => ({
+        extractedIdentity: {
+          brand: "Pōkeno Photo Test",
+          expression: "Totara Cask",
+          series: "Exploration Series",
+          distillery: "Pōkeno Photo Test",
+          bottler: null,
+          category: "single_malt",
+          stated_age: null,
+          abv: 43,
+          vintage_year: null,
+          release_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: "Exploration Series No. 1",
+        },
+        imageEvidence: buildImageEvidence(pendingUpload.id),
+      }),
+    );
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification({
+        action: "create_bottle_and_release",
+        confidence: 91,
+        rationale: "Reliable web evidence supports the product identity.",
+        proposedBottle: {
+          name: "Totara Cask",
+          series: {
+            id: null,
+            name: "Exploration Series",
+          },
+          category: "single_malt",
+          edition: null,
+          statedAge: null,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          brand: {
+            id: null,
+            name: "Pōkeno Photo Test",
+          },
+          distillers: [
+            {
+              id: null,
+              name: "Pōkeno Photo Test",
+            },
+          ],
+          bottler: null,
+        },
+        proposedRelease: {
+          edition: "Exploration Series No. 1",
+          statedAge: null,
+          abv: 43,
+          caskStrength: null,
+          singleCask: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+        },
+      }),
+    );
+
+    const identification = await routerClient.tastings.photoIdentification(
+      {
+        file: await fixtures.SampleSquareImage(),
+        idempotencyKey: "photo-identification-create",
+      },
+      {
+        context: { user: defaults.user },
+      },
+    );
+
+    const response = await routerClient.tastings.photoIdentificationCreate(
+      {
+        pendingImageId: identification.pendingImage.id,
+      },
+      {
+        context: { user: defaults.user },
+      },
+    );
+
+    expect(response.bottle.fullName).toBe("Pōkeno Photo Test Totara Cask");
+    expect(response.release).toMatchObject({
+      bottleId: response.bottle.id,
+      edition: "Exploration Series No. 1",
+      abv: 43,
+    });
+  });
 });

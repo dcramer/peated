@@ -1,0 +1,143 @@
+{
+  "id": "image-backed-photo-matches-pokeno-exploration-series-totara-cask",
+  "name": "image-backed photo: matches Pokeno Exploration Series No. 1 Totara Cask from label evidence",
+  "input": {
+    "reference": {
+      "name": "Bottle photo upload",
+      "url": "https://api.peated.com/uploads/tastings-tcpwlgq69tkvom09zlx0e1gy.webp",
+      "imageUrl": "https://api.peated.com/uploads/tastings-tcpwlgq69tkvom09zlx0e1gy.webp"
+    },
+    "extractedIdentity": {
+      "brand": "Pōkeno",
+      "bottler": null,
+      "expression": "Exploration Series No. 1 Totara Cask",
+      "series": "Exploration Series",
+      "distillery": ["Pōkeno"],
+      "category": "single_malt",
+      "stated_age": null,
+      "abv": 40,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": "totara",
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Pōkeno Exploration Series No. 1 Totara Cask",
+        "brand": "Pōkeno",
+        "bottler": null,
+        "series": "Exploration Series",
+        "distillery": ["Pōkeno"],
+        "category": "single_malt",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "score": 0.98,
+        "source": ["exact"],
+        "bottleId": 44263,
+        "fullName": "Pōkeno Exploration Series No. 1 Totara Cask"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["pokeno", "totara"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Pōkeno Exploration Series No. 1 Totara Cask",
+          "brand": "Pōkeno",
+          "bottler": null,
+          "series": "Exploration Series",
+          "distillery": ["Pōkeno"],
+          "category": "single_malt",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.98,
+          "source": ["exact"],
+          "bottleId": 44263,
+          "fullName": "Pōkeno Exploration Series No. 1 Totara Cask"
+        }
+      ]
+    },
+    {
+      "when": ["pokeno", "exploration", "totara"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Pōkeno Exploration Series No. 1 Totara Cask",
+          "brand": "Pōkeno",
+          "bottler": null,
+          "series": "Exploration Series",
+          "distillery": ["Pōkeno"],
+          "category": "single_malt",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskType": null,
+          "caskSize": null,
+          "caskFill": null,
+          "score": 0.98,
+          "source": ["exact"],
+          "bottleId": 44263,
+          "fullName": "Pōkeno Exploration Series No. 1 Totara Cask"
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://pokenowhisky.com/product/pokeno-totara-cask/",
+      "https://pokenowhisky.com/blogs/pokeno-whiskys-exploration-series-features-totara-cask-finish-single-malt/"
+    ],
+    "dbOutcome": {
+      "bottleId": 44263,
+      "releaseId": null,
+      "createsBottle": false,
+      "createsRelease": false,
+      "summary": "Assign the photo tasting to existing Peated bottle 44263, Pōkeno Exploration Series No. 1 Totara Cask, with releaseId null. Do not create a new Pōkeno bottle or release for this photo."
+    },
+    "notes": "Added from a failed /addTasting photo-identification attempt using the preserved uploaded image. The label visibly shows Pōkeno Aotearoa New Zealand Single Malt Whisky, Exploration Series No. 01, Totara Cask, 700ml, 40% ABV. The official Pokeno product page and blog verify Totara Cask as part of the Exploration Series."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 44263,
+    "matchedReleaseId": null,
+    "confidenceBand": "auto_verification",
+    "verifyEligible": true,
+    "summary": "Use the uploaded bottle photo label evidence to match the existing Pōkeno Exploration Series No. 1 Totara Cask bottle. This is an existing-bottle tasting flow case, not a new-bottle creation case."
+  }
+}

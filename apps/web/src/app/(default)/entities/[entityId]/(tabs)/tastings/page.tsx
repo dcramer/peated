@@ -25,7 +25,7 @@ export default function EntityTastings({
       {tastingList.results.length ? (
         <TastingList values={tastingList.results} />
       ) : (
-        <EmptyActivity href={`/search?tasting`}>
+        <EmptyActivity href="/addTasting">
           <span className="mt-2 block font-semibold ">
             Are you enjoying a dram?
           </span>
