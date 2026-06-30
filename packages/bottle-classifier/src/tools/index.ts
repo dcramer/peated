@@ -1,4 +1,8 @@
-export { createBraveWebSearchTool } from "./braveWebSearch";
+export {
+  createFirecrawlWebSearchTool,
+  extractFirecrawlSearchEvidence,
+  runFirecrawlWebSearch,
+} from "./firecrawlWebSearch";
 export {
   createOpenAIWebSearchTool,
   runBottleWebEvidenceSearch,

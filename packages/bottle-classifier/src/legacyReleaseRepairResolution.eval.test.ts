@@ -299,9 +299,12 @@ const repairHarness = openaiAgentsHarness<
   // vitest-evals strict replay intentionally fails when a prompt/tool change
   // makes a new web-search call. Record those new tool results with:
   // VITEST_EVALS_REPLAY_MODE=record pnpm --filter @peated/bottle-classifier evals -- src/legacyReleaseRepairResolution.eval.test.ts
+  // The harness rejects replay policies for tools absent from the prepared
+  // agent, so keep this aligned with Firecrawl-vs-OpenAI tool selection.
   toolReplay: {
-    openai_web_search: true,
-    ...(process.env.BRAVE_API_KEY ? { brave_web_search: true } : {}),
+    ...(process.env.FIRECRAWL_API_KEY
+      ? { firecrawl_web_search: true }
+      : { openai_web_search: true }),
   },
 });
 

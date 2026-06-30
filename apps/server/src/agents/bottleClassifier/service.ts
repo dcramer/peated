@@ -55,7 +55,8 @@ export function getBottleClassifier() {
     client,
     model: config.OPENAI_MODEL,
     maxSearchQueries: config.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES,
-    braveApiKey: config.BRAVE_API_KEY,
+    firecrawlApiKey: config.FIRECRAWL_API_KEY,
+    firecrawlApiUrl: config.FIRECRAWL_API_URL,
     adapters: {
       findInitialCandidates: async ({ reference, extractedIdentity }) =>
         await findBottleReferenceCandidates(

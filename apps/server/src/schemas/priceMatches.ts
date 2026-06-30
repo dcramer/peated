@@ -175,7 +175,11 @@ export const PriceMatchSearchResultSchema = z.object({
 export const BottleSearchResultSchema = PriceMatchSearchResultSchema;
 
 export const PriceMatchSearchEvidenceSchema = z.object({
-  provider: z.enum(["openai", "brave"]).default("openai"),
+  // Legacy proposals may contain Brave evidence; runtime no longer writes it.
+  provider: z
+    .enum(["openai", "firecrawl", "brave"])
+    .default("openai")
+    .transform((provider) => (provider === "brave" ? "openai" : provider)),
   query: z.string(),
   summary: z.string().nullable().default(null),
   results: z.array(PriceMatchSearchResultSchema).default([]),

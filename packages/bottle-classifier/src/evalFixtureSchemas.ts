@@ -33,6 +33,7 @@ export const evalFixtureProvenanceSchema = z
   .object({
     source: z.enum(["production_miss", "curated_regression", "synthetic"]),
     verifiedSourceUrls: z.array(z.string().url()).optional(),
+    fixtureImagePath: z.string().trim().min(1).optional(),
     dbOutcome: evalFixtureDbOutcomeSchema.optional(),
     notes: z.string().min(1).optional(),
   })

@@ -51,7 +51,8 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - Main classifier eval scoring is deterministic: encoded expected fields are required, unencoded optional enrichment is ignored, and LLM judges should not decide pass/fail for field-level expectations.
 - Live evals are expensive; run full evals only when explicitly asked or when doing an intentional scoped eval pass.
 - Replay JSON under `.vitest-evals/recordings/` is an eval artifact, not a local cache. Commit only deliberate replay changes tied to an eval fixture or harness change.
-- Live evals load the repo-root `.env.local`.
+- Live evals load repo-root `.env`/`.env.local`, then package-root
+  `.env`/`.env.local`; shell-provided env vars still take precedence.
 
 ## References
 

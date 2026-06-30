@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { z } from "zod";
 
 import {
+  PriceMatchSearchEvidenceSchema,
   StorePriceMatchAgentResponseSchema,
   StorePriceMatchDecisionSchema,
 } from "./priceMatches";
@@ -45,6 +46,17 @@ const baseProposedRelease = {
 };
 
 describe("StorePriceMatchDecisionSchema", () => {
+  test("normalizes legacy Brave search evidence providers on read", () => {
+    const parsed = PriceMatchSearchEvidenceSchema.parse({
+      provider: "brave",
+      query: "example bottle",
+      summary: "Legacy Brave evidence",
+      results: [],
+    });
+
+    expect(parsed.provider).toBe("openai");
+  });
+
   test("uses a flat agent response schema without a decision union", () => {
     const jsonSchema = z.toJSONSchema(
       StorePriceMatchAgentResponseSchema,

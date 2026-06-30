@@ -32,7 +32,8 @@ export function createEvalClassifierOptions(
     maxSearchQueries: Number(
       process.env.BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES ?? 3,
     ),
-    braveApiKey: process.env.BRAVE_API_KEY ?? null,
+    firecrawlApiKey: process.env.FIRECRAWL_API_KEY ?? null,
+    firecrawlApiUrl: process.env.FIRECRAWL_API_URL ?? null,
     dataSource,
   };
 }

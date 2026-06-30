@@ -1,6 +1,10 @@
 import type OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
 import {
+  extractFirecrawlSearchEvidence,
+  runFirecrawlWebSearch,
+} from "./firecrawlWebSearch";
+import {
   buildOpenAIWebSearchRequest,
   extractOpenAISearchEvidence,
   runBottleWebEvidenceSearch,
@@ -214,76 +218,81 @@ describe("bottleClassifier web search tools", () => {
     expect(evidence.summary).toContain("Breaking Bourbon covers");
   });
 
-  test("falls back to Brave for still-thin OpenAI evidence and records merged evidence once", async () => {
-    const create = vi
-      .fn()
-      .mockResolvedValueOnce({
-        output_text: "Official site confirms the bottle.",
-        output: [
-          {
-            type: "message",
-            content: [
-              {
-                type: "output_text",
-                annotations: [
-                  {
-                    type: "url_citation",
-                    url: "https://www.exampledistillery.com/private-cask",
-                    title: "Example Distillery Private Cask",
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      })
-      .mockResolvedValueOnce({
-        output_text: "No additional non-retailer source found.",
-        output: [],
-      });
-    const fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        web: {
-          results: [
+  test("extracts Firecrawl search evidence with scraped page markdown", () => {
+    const evidence = extractFirecrawlSearchEvidence(
+      "example distillery private cask",
+      {
+        success: true,
+        data: {
+          web: [
             {
               title: "Example Private Cask Review",
               url: "https://www.whiskyadvocate.com/example-private-cask-review",
               description:
                 "Whisky Advocate reviews Example Distillery Private Cask.",
-              extra_snippets: [],
+              markdown:
+                "# Example Private Cask\n\nA single cask bottling at 57.1% ABV.",
+            },
+          ],
+        },
+      },
+    );
+
+    expect(evidence).toMatchObject({
+      provider: "firecrawl",
+      query: "example distillery private cask",
+      summary: expect.stringContaining("57.1% ABV"),
+      results: [
+        expect.objectContaining({
+          title: "Example Private Cask Review",
+          domain: "whiskyadvocate.com",
+          extraSnippets: [expect.stringContaining("single cask bottling")],
+        }),
+      ],
+    });
+  });
+
+  test("runs Firecrawl search against the v2 search endpoint", async () => {
+    const fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: {
+          web: [
+            {
+              title: "Example Private Cask Review",
+              url: "https://www.whiskyadvocate.com/example-private-cask-review",
+              description:
+                "Whisky Advocate reviews Example Distillery Private Cask.",
+              markdown: "Example Distillery Private Cask is 57.1% ABV.",
             },
           ],
         },
       }),
     });
     vi.stubGlobal("fetch", fetch);
-    const onEvidence = vi.fn();
 
     try {
-      const evidence = await runBottleWebEvidenceSearch({
-        client: {
-          responses: {
-            create,
-          },
-        } as unknown as OpenAI,
-        model: "gpt-5.4",
+      const evidence = await runFirecrawlWebSearch({
+        apiKey: "firecrawl-test-key",
         query: "example distillery private cask",
-        budget: createBottleWebSearchBudget(3),
-        braveApiKey: "brave-test-key",
-        onEvidence,
       });
 
-      expect(create).toHaveBeenCalledTimes(2);
       expect(fetch).toHaveBeenCalledTimes(1);
+      expect(fetch).toHaveBeenCalledWith(
+        new URL("https://api.firecrawl.dev/v2/search"),
+        expect.objectContaining({
+          method: "POST",
+          headers: expect.objectContaining({
+            Authorization: "Bearer firecrawl-test-key",
+          }),
+          body: expect.stringContaining("example distillery private cask"),
+        }),
+      );
       expect("error" in evidence).toBe(false);
       if ("error" in evidence) return;
-      expect(evidence.results).toHaveLength(2);
-      expect(isThinBottleSearchEvidence(evidence)).toBe(false);
-      expect(evidence.summary).toContain("Official site confirms");
+      expect(evidence.results).toHaveLength(1);
       expect(evidence.summary).toContain("Whisky Advocate reviews");
-      expect(onEvidence).toHaveBeenCalledTimes(1);
-      expect(onEvidence).toHaveBeenCalledWith(evidence);
     } finally {
       vi.unstubAllGlobals();
     }
@@ -291,7 +300,7 @@ describe("bottleClassifier web search tools", () => {
 
   test("caps bottle search evidence payload size", () => {
     const evidence = buildBottleSearchEvidence({
-      provider: "brave",
+      provider: "firecrawl",
       query: "ardbeg traigh bhan 19",
       summary: "x".repeat(500),
       results: Array.from({ length: 12 }, (_, index) => ({

@@ -196,14 +196,14 @@ files overriding earlier ones. Shell-provided env vars still take precedence.
 `OPENAI_API_KEY` is required. `OPENAI_MODEL` defaults to `gpt-5.4` for the
 classifier pass. `OPENAI_EVAL_MODEL` defaults to `gpt-5-mini` for judging so
 routine evals stay cheaper by default; override either if you want a different
-cost or quality tradeoff. `BRAVE_API_KEY` is optional.
+cost or quality tradeoff. `FIRECRAWL_API_KEY` enables live web evidence search;
+`FIRECRAWL_API_URL` can override the default Firecrawl API host.
 
 The live evals use `vitest-evals` harness-style `run(...)` tests with
 `@vitest-evals/harness-openai-agents` normalization, native harness
-`toolReplay`, and named judges. The classifier always opts `openai_web_search`
-into replay at the harness boundary. `brave_web_search` is also replayed when
-`BRAVE_API_KEY` enables that tool, so repeat runs do not keep paying for the
-same real-world searches.
+`toolReplay`, and named judges. The classifier replays `firecrawl_web_search`
+when `FIRECRAWL_API_KEY` enables that tool; otherwise it replays
+`openai_web_search` for fallback runs.
 
 Replay recordings default to the package-local upstream-style
 `packages/bottle-classifier/.vitest-evals/recordings/` directory via
