@@ -28,7 +28,7 @@ catalog:
   "@types/node": ^24.13.2
   "@types/pg": ^8.18.0
   vite: ^8.0.8
-  vitest: "~4.1.4"
+  vitest: "~3.2.6"
   "@vitest/coverage-v8": "~4.1.4"
   "@playwright/test": "^1.60.0"
   zod: ^4.1.8
