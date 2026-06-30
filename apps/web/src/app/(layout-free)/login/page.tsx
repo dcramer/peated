@@ -9,11 +9,10 @@ export const metadata: Metadata = {
   title: "Login",
 };
 
-export default async function Login({
-  searchParams,
-}: {
-  searchParams: { redirectTo?: string };
+export default async function Login(props: {
+  searchParams: Promise<{ redirectTo?: string }>;
 }) {
+  const searchParams = await props.searchParams;
   const session = await getSession();
   if (session.user) {
     redirect(getSafeRedirect(searchParams?.redirectTo ?? "/"));

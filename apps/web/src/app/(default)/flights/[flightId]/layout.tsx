@@ -3,11 +3,13 @@ import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import type { ReactNode } from "react";
 
-export async function generateMetadata({
-  params: { flightId },
-}: {
-  params: { flightId: string };
+export async function generateMetadata(props: {
+  params: Promise<{ flightId: string }>;
 }) {
+  const params = await props.params;
+
+  const { flightId } = params;
+
   const { client } = await getServerClient();
 
   const flight = await resolveOrNotFound(

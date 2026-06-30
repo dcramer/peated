@@ -13,13 +13,15 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { useState, type FormEvent } from "react";
+import { use, useState, type FormEvent } from "react";
 
-export default function EntityAliases({
-  params: { entityId },
-}: {
-  params: { entityId: string };
+export default function EntityAliases(props: {
+  params: Promise<{ entityId: string }>;
 }) {
+  const params = use(props.params);
+
+  const { entityId } = params;
+
   const { user } = useAuth();
   const orpc = useORPC();
   const queryClient = useQueryClient();

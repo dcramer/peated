@@ -6,14 +6,14 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Suspense } from "react";
+import { Suspense, use } from "react";
 import Leaderboard from "./leaderboard";
 
-export default function Page({
-  params: { badgeId },
-}: {
-  params: { badgeId: string };
-}) {
+export default function Page(props: { params: Promise<{ badgeId: string }> }) {
+  const params = use(props.params);
+
+  const { badgeId } = params;
+
   const { user } = useAuth();
   const orpc = useORPC();
   const { data: badge } = useSuspenseQuery(

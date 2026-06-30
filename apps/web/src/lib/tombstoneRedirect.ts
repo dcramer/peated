@@ -6,9 +6,11 @@ type CanonicalRouteRedirectOptions = {
   currentId: number | string;
 };
 
-function getRequestedPathname() {
+async function getRequestedPathname() {
   // Next forwards the rendered request path to app routes via x-invoke-path.
-  const pathname = headers().get("x-invoke-path") ?? headers().get("next-url");
+  const reqHeaders = await headers();
+  const pathname =
+    reqHeaders.get("x-invoke-path") ?? reqHeaders.get("next-url");
 
   if (!pathname) {
     return null;
@@ -21,14 +23,14 @@ function getRequestedPathname() {
   }
 }
 
-export function getCanonicalRouteRedirectPath({
+export async function getCanonicalRouteRedirectPath({
   canonicalId,
   collectionPath,
   currentId,
 }: CanonicalRouteRedirectOptions) {
   const currentPrefix = `${collectionPath}/${currentId}`;
   const canonicalPrefix = `${collectionPath}/${canonicalId}`;
-  const requestedPathname = getRequestedPathname();
+  const requestedPathname = await getRequestedPathname();
 
   if (!requestedPathname) {
     return `${canonicalPrefix}/`;

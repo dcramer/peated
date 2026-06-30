@@ -1,15 +1,18 @@
 "use client";
+import { use } from "react";
 
 import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function UserFavorites({
-  params: { username },
-}: {
-  params: { username: string };
+export default function UserFavorites(props: {
+  params: Promise<{ username: string }>;
 }) {
+  const params = use(props.params);
+
+  const { username } = params;
+
   return <UserFavoritesTable username={username} />;
 }
 

@@ -7,15 +7,18 @@ import PageHeader from "@peated/web/components/pageHeader";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { type ReactNode } from "react";
+import { type ReactNode, use } from "react";
 
-export default function Page({
-  params: { countrySlug },
-  children,
-}: {
-  params: { countrySlug: string };
+export default function Page(props: {
+  params: Promise<{ countrySlug: string }>;
   children: ReactNode;
 }) {
+  const params = use(props.params);
+
+  const { countrySlug } = params;
+
+  const { children } = props;
+
   const orpc = useORPC();
   const { data: country } = useSuspenseQuery(
     orpc.countries.details.queryOptions({

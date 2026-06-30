@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import RegionForm from "@peated/web/components/admin/regionForm";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
@@ -10,11 +11,13 @@ import {
 } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function Page({
-  params: { countrySlug, regionSlug },
-}: {
-  params: { countrySlug: string; regionSlug: string };
+export default function Page(props: {
+  params: Promise<{ countrySlug: string; regionSlug: string }>;
 }) {
+  const params = use(props.params);
+
+  const { countrySlug, regionSlug } = params;
+
   return (
     <ModRequired>
       <RegionEditForm countrySlug={countrySlug} regionSlug={regionSlug} />

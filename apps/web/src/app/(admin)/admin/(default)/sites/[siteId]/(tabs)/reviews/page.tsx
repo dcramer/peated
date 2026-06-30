@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { type ExternalSiteType } from "@peated/server/types";
 import ReviewTable from "@peated/web/components/admin/reviewTable";
@@ -7,11 +8,13 @@ import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function Page({
-  params: { siteId },
-}: {
-  params: { siteId: ExternalSiteType };
+export default function Page(props: {
+  params: Promise<{ siteId: ExternalSiteType }>;
 }) {
+  const params = use(props.params);
+
+  const { siteId } = params;
+
   const queryParams = useApiQueryParams({
     overrides: {
       site: siteId,

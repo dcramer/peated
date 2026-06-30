@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 import { useRef, useState } from "react";
 import { useOnClickOutside } from "usehooks-ts";
 import classNames from "../lib/classNames";
@@ -20,10 +20,10 @@ export default function Tooltip({
   className,
   style,
 }: Props) {
-  const ref = useRef(null);
+  const ref = useRef<HTMLSpanElement>(null);
   const [visible, setVisible] = useState(false);
 
-  useOnClickOutside(ref, () => setVisible(false));
+  useOnClickOutside(ref as RefObject<HTMLElement>, () => setVisible(false));
 
   return (
     <div

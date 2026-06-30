@@ -1,6 +1,6 @@
 "use client";
 
-import type { ChangeEvent, FormEvent, ReactNode } from "react";
+import type { ChangeEvent, ReactNode } from "react";
 import { forwardRef, useState } from "react";
 import type { FieldError } from "react-hook-form";
 import FormField from "./formField";
@@ -18,12 +18,6 @@ type Props = {
   step?: string | number;
   error?: FieldError;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
-};
-
-type InputEvent = FormEvent<HTMLInputElement> & {
-  target: {
-    value: string;
-  };
 };
 
 export default forwardRef<HTMLInputElement, Props>(
@@ -77,10 +71,10 @@ export default forwardRef<HTMLInputElement, Props>(
           className="range range-sm mb-6 block h-1 w-full cursor-pointer"
           {...props}
           onInput={(e) => {
-            setValue(parseFloat((e as InputEvent).target.value));
+            setValue(parseFloat(e.currentTarget.value));
           }}
           onChange={(e) => {
-            setValue(parseFloat(e.target.value));
+            setValue(parseFloat(e.currentTarget.value));
             onChange && onChange(e);
           }}
         />

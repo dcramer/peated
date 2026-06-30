@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import FlightForm from "@peated/web/components/flightForm";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -9,11 +10,11 @@ import {
 } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-export default function Page({
-  params: { flightId },
-}: {
-  params: { flightId: string };
-}) {
+export default function Page(props: { params: Promise<{ flightId: string }> }) {
+  const params = use(props.params);
+
+  const { flightId } = params;
+
   const orpc = useORPC();
   const { data: flight } = useSuspenseQuery(
     orpc.flights.details.queryOptions({

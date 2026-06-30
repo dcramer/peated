@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import EntityForm from "@peated/web/components/entityForm";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
@@ -6,11 +7,11 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-export default function Page({
-  params: { entityId },
-}: {
-  params: { entityId: string };
-}) {
+export default function Page(props: { params: Promise<{ entityId: string }> }) {
+  const params = use(props.params);
+
+  const { entityId } = params;
+
   return (
     <ModRequired>
       <EntityEditForm entityId={entityId} />

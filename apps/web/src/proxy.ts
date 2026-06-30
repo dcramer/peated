@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 const PRIVATE_CACHE_CONTROL =
   "private, no-cache, no-store, max-age=0, must-revalidate";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const response = NextResponse.next();
 
   if (request.cookies.has("_session")) {

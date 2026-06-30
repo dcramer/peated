@@ -349,11 +349,13 @@ function TastingNotes({ bottling }: { bottling: Bottling }) {
   );
 }
 
-export async function generateMetadata({
-  params: { bottleId, bottlingId },
-}: {
-  params: { bottleId: string; bottlingId: string };
+export async function generateMetadata(props: {
+  params: Promise<{ bottleId: string; bottlingId: string }>;
 }): Promise<Metadata> {
+  const params = await props.params;
+
+  const { bottleId, bottlingId } = params;
+
   const { bottle, bottling } = await getBottlingPageData({
     bottleId,
     bottlingId,
@@ -378,11 +380,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({
-  params: { bottleId, bottlingId },
-}: {
-  params: { bottleId: string; bottlingId: string };
+export default async function Page(props: {
+  params: Promise<{ bottleId: string; bottlingId: string }>;
 }) {
+  const params = await props.params;
+
+  const { bottleId, bottlingId } = params;
+
   const { bottle, bottling, client } = await getBottlingPageData({
     bottleId,
     bottlingId,

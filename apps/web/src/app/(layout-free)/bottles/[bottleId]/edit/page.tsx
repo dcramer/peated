@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import BottleForm from "@peated/web/components/bottleForm";
 import { useFlashMessages } from "@peated/web/components/flash";
@@ -9,11 +10,11 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-export default function Page({
-  params: { bottleId },
-}: {
-  params: { bottleId: string };
-}) {
+export default function Page(props: { params: Promise<{ bottleId: string }> }) {
+  const params = use(props.params);
+
+  const { bottleId } = params;
+
   return (
     <ModRequired>
       <BottleEditForm bottleId={bottleId} />

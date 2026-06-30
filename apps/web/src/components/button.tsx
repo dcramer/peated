@@ -1,6 +1,5 @@
 import Link from "@peated/web/components/link";
-import type { ForwardedRef, ReactNode } from "react";
-import { forwardRef } from "react";
+import React, { forwardRef, type ForwardedRef, type ReactNode } from "react";
 import { type UrlObject } from "url";
 import classNames from "../lib/classNames";
 
@@ -136,6 +135,7 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
           loading ? "animate-pulse" : "",
           textColor,
         )}
+        disabled={disabled}
         type={type || "button"}
         ref={ref as ForwardedRef<HTMLButtonElement | null>}
         {...props}

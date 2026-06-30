@@ -1,6 +1,11 @@
 "use client";
 
-import { LazyMotion, domAnimation, m } from "framer-motion";
+import {
+  LazyMotion,
+  domAnimation,
+  m,
+  type TargetAndTransition,
+} from "framer-motion";
 import { type ReactNode } from "react";
 
 export default function Collapsable({
@@ -10,7 +15,7 @@ export default function Collapsable({
   open: boolean;
   children: ReactNode;
 }) {
-  const animate = {
+  const animate: TargetAndTransition = {
     transition: { type: "tween" },
     height: open ? "auto" : 0,
     //opacity: open ? 1 : .5

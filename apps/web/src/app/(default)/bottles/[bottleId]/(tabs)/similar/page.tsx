@@ -1,15 +1,16 @@
 "use client";
+import { use } from "react";
 
 import BetaNotice from "@peated/web/components/betaNotice";
 import BottleTable from "@peated/web/components/bottleTable";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function Page({
-  params: { bottleId },
-}: {
-  params: { bottleId: string };
-}) {
+export default function Page(props: { params: Promise<{ bottleId: string }> }) {
+  const params = use(props.params);
+
+  const { bottleId } = params;
+
   const orpc = useORPC();
   const { data: bottleList } = useSuspenseQuery(
     orpc.bottles.similar.queryOptions({

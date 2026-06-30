@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { toTitleCase } from "@peated/server/lib/strings";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
@@ -6,11 +7,11 @@ import Button from "@peated/web/components/button";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function Page({
-  params: { tagId },
-}: {
-  params: { tagId: string };
-}) {
+export default function Page(props: { params: Promise<{ tagId: string }> }) {
+  const params = use(props.params);
+
+  const { tagId } = params;
+
   const orpc = useORPC();
   const { data: tag } = useSuspenseQuery(
     orpc.tags.details.queryOptions({

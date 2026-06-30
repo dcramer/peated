@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import Chip from "@peated/web/components/chip";
 import ConfirmationButton from "@peated/web/components/confirmationButton";
@@ -8,11 +9,13 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 
-export default function BottleAliases({
-  params: { bottleId },
-}: {
-  params: { bottleId: string };
+export default function BottleAliases(props: {
+  params: Promise<{ bottleId: string }>;
 }) {
+  const params = use(props.params);
+
+  const { bottleId } = params;
+
   const { user } = useAuth();
   const orpc = useORPC();
   const { data: aliasList } = useSuspenseQuery(

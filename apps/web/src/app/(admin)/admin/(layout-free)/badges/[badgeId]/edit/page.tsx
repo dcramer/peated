@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import BadgeForm from "@peated/web/components/admin/badgeForm";
 import { useFlashMessages } from "@peated/web/components/flash";
@@ -8,11 +9,11 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-export default function Page({
-  params: { badgeId },
-}: {
-  params: { badgeId: string };
-}) {
+export default function Page(props: { params: Promise<{ badgeId: string }> }) {
+  const params = use(props.params);
+
+  const { badgeId } = params;
+
   const orpc = useORPC();
   const { data: badge } = useSuspenseQuery(
     orpc.badges.details.queryOptions({

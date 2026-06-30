@@ -14,13 +14,14 @@ import { Suspense, type ReactNode } from "react";
 import type { Product, WithContext } from "schema-dts";
 import ModActions from "./modActions";
 
-export default async function Layout({
-  params,
-  children,
-}: {
-  params: Record<string, any>;
+export default async function Layout(props: {
+  params: Promise<Record<string, any>>;
   children: ReactNode;
 }) {
+  const params = await props.params;
+
+  const { children } = props;
+
   const { client } = await getAnonymousServerClient();
 
   const bottleId = Number(params.bottleId);
@@ -33,7 +34,7 @@ export default async function Layout({
   // tombstone path - redirect to the absolute url to ensure search engines dont get mad
   if (bottle.id !== bottleId) {
     return redirect(
-      getCanonicalRouteRedirectPath({
+      await getCanonicalRouteRedirectPath({
         currentId: bottleId,
         canonicalId: bottle.id,
         collectionPath: "/bottles",

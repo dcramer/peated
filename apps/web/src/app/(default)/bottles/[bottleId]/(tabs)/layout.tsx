@@ -6,11 +6,13 @@ import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { type ReactNode } from "react";
 
-export async function generateMetadata({
-  params: { bottleId },
-}: {
-  params: { bottleId: string };
+export async function generateMetadata(props: {
+  params: Promise<{ bottleId: string }>;
 }) {
+  const params = await props.params;
+
+  const { bottleId } = params;
+
   const { client } = await getAnonymousServerClient();
 
   const bottle = await resolveOrNotFound(
@@ -37,13 +39,14 @@ export async function generateMetadata({
   };
 }
 
-export default async function Layout({
-  params,
-  children,
-}: {
-  params: Record<string, any>;
+export default async function Layout(props: {
+  params: Promise<Record<string, any>>;
   children: ReactNode;
 }) {
+  const params = await props.params;
+
+  const { children } = props;
+
   const { client } = await getAnonymousServerClient();
 
   const bottleId = Number(params.bottleId);

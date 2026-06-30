@@ -3,9 +3,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
-  experimental: {
-    instrumentationHook: true,
-  },
+  allowedDevOrigins: ["127.0.0.1"],
   env: {
     DEBUG: process.env.DEBUG ? "true" : "",
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
@@ -17,6 +15,14 @@ const nextConfig = {
     VERSION: process.env.VERSION || process.env.VERCEL_GIT_COMMIT_SHA,
     GITHUB_REPO: "https://github.com/dcramer/peated",
     DISCORD_LINK: "https://discord.gg/d7GFPfy88Z",
+  },
+  turbopack: {
+    rules: {
+      "*.svg": {
+        loaders: ["@svgr/webpack"],
+        as: "*.js",
+      },
+    },
   },
   webpack(config) {
     config.module.rules.push({

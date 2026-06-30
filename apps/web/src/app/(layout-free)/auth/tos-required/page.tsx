@@ -11,11 +11,10 @@ export const metadata: Metadata = {
   title: "Terms Required",
 };
 
-export default async function TOSRequired({
-  searchParams,
-}: {
-  searchParams: { redirectTo?: string };
+export default async function TOSRequired(props: {
+  searchParams: Promise<{ redirectTo?: string }>;
 }) {
+  const searchParams = await props.searchParams;
   const redirectTo = getSafeRedirect(searchParams?.redirectTo ?? "/");
   const session = await getSession();
 

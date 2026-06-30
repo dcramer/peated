@@ -1,15 +1,18 @@
 "use client";
+import { use } from "react";
 
 import BottleTable from "@peated/web/components/bottleTable";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function EntityTastings({
-  params: { entityId },
-}: {
-  params: { entityId: string };
+export default function EntityTastings(props: {
+  params: Promise<{ entityId: string }>;
 }) {
+  const params = use(props.params);
+
+  const { entityId } = params;
+
   const orpc = useORPC();
   const queryParams = useApiQueryParams({
     defaults: {

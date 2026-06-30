@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
@@ -12,11 +13,11 @@ import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function Page({
-  params: { eventId },
-}: {
-  params: { eventId: string };
-}) {
+export default function Page(props: { params: Promise<{ eventId: string }> }) {
+  const params = use(props.params);
+
+  const { eventId } = params;
+
   const orpc = useORPC();
   const { data: event } = useSuspenseQuery(
     orpc.events.details.queryOptions({

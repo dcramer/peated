@@ -72,7 +72,9 @@ test.describe("profile library", () => {
     await page.goto(`/users/${testUser.username}/favorites`, {
       waitUntil: "commit",
     });
-    await expect(page.getByText("No favorites recorded yet.")).toBeVisible();
+    await expect(
+      page.getByText("No favorites recorded yet.").filter({ visible: true }),
+    ).toBeVisible();
     await expect(page.getByRole("link", { name: savedBottleName })).toHaveCount(
       0,
     );

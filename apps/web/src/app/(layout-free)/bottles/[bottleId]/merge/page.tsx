@@ -21,18 +21,20 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
 type FormSchemaType = z.infer<typeof BottleMergeSchema>;
 
-export default function MergeBottle({
-  params: { bottleId },
-}: {
-  params: { bottleId: string };
+export default function MergeBottle(props: {
+  params: Promise<{ bottleId: string }>;
 }) {
+  const params = use(props.params);
+
+  const { bottleId } = params;
+
   return (
     <ModRequired>
       <MergeBottleForm bottleId={bottleId} />

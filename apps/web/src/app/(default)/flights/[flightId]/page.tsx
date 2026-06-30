@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
 import { formatCategoryName } from "@peated/server/lib/format";
@@ -9,11 +10,11 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import ModActions from "./modActions";
 
-export default function Page({
-  params: { flightId },
-}: {
-  params: { flightId: string };
-}) {
+export default function Page(props: { params: Promise<{ flightId: string }> }) {
+  const params = use(props.params);
+
+  const { flightId } = params;
+
   const orpc = useORPC();
   const { data: flight } = useSuspenseQuery(
     orpc.flights.details.queryOptions({

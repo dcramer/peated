@@ -21,7 +21,7 @@ export async function createServerClient(
   const accessToken = session.accessToken;
 
   if (context.traceContext === undefined) {
-    const reqHeaders = headers();
+    const reqHeaders = await headers();
     context.traceContext = {
       sentryTrace: reqHeaders.get("sentry-trace"),
       baggage: reqHeaders.get("baggage"),

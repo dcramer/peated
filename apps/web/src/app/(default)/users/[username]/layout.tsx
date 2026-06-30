@@ -18,11 +18,13 @@ import { UserBadgeList } from "./userBadgeList";
 
 export const fetchCache = "default-no-store";
 
-export async function generateMetadata({
-  params: { username },
-}: {
-  params: { username: string };
+export async function generateMetadata(props: {
+  params: Promise<{ username: string }>;
 }) {
+  const params = await props.params;
+
+  const { username } = params;
+
   const { client } = await createServerClient();
   const user = await resolveOrNotFound(
     client.users.details({ user: username }),
@@ -39,13 +41,16 @@ export async function generateMetadata({
   };
 }
 
-export default async function Layout({
-  params: { username },
-  children,
-}: {
-  params: { username: string };
+export default async function Layout(props: {
+  params: Promise<{ username: string }>;
   children: ReactNode;
 }) {
+  const params = await props.params;
+
+  const { username } = params;
+
+  const { children } = props;
+
   const { client } = await createServerClient();
   const user = await resolveOrNotFound(
     client.users.details({

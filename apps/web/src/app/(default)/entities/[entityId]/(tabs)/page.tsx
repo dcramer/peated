@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { MapIcon } from "@heroicons/react/24/outline";
 import RobotImage from "@peated/web/assets/robot.png";
@@ -9,11 +10,13 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { parseDomain } from "@peated/web/lib/urls";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function EntityDetails({
-  params: { entityId },
-}: {
-  params: { entityId: string };
+export default function EntityDetails(props: {
+  params: Promise<{ entityId: string }>;
 }) {
+  const params = use(props.params);
+
+  const { entityId } = params;
+
   const orpc = useORPC();
   const { data: entity } = useSuspenseQuery(
     orpc.entities.details.queryOptions({

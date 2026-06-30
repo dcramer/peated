@@ -1,15 +1,16 @@
 "use client";
+import { use } from "react";
 
 import EventForm from "@peated/web/components/admin/eventForm";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-export default function Page({
-  params: { eventId },
-}: {
-  params: { eventId: string };
-}) {
+export default function Page(props: { params: Promise<{ eventId: string }> }) {
+  const params = use(props.params);
+
+  const { eventId } = params;
+
   const orpc = useORPC();
   const { data: event } = useSuspenseQuery(
     orpc.events.details.queryOptions({

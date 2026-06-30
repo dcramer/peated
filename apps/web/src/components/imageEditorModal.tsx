@@ -5,7 +5,7 @@ import {
   ArrowPathRoundedSquareIcon,
   XMarkIcon,
 } from "@heroicons/react/20/solid";
-import { useRef, useState } from "react";
+import { type ComponentRef, useRef, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import { useWindowSize } from "usehooks-ts";
 import Button from "./button";
@@ -29,7 +29,7 @@ export default function ImageEditorModal({
   width?: number;
   height?: number;
 }) {
-  const ref = useRef<AvatarEditor>(null);
+  const ref = useRef<ComponentRef<typeof AvatarEditor>>(null);
   const windowSize = useWindowSize();
   const [rotate, setRotate] = useState(0);
   const [scale, setScale] = useState(1);
@@ -65,7 +65,7 @@ export default function ImageEditorModal({
                     value={scale}
                     className="range range-sm mb-6 block h-1 w-full cursor-pointer"
                     onInput={(e) => {
-                      setScale(parseFloat((e as any).target.value));
+                      setScale(parseFloat(e.currentTarget.value));
                     }}
                   />
                   <div className="flex gap-x-2">

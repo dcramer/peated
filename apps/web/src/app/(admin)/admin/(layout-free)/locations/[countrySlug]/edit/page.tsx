@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import CountryForm from "@peated/web/components/admin/countryForm";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
@@ -10,11 +11,13 @@ import {
 } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function Page({
-  params: { countrySlug },
-}: {
-  params: { countrySlug: string };
+export default function Page(props: {
+  params: Promise<{ countrySlug: string }>;
 }) {
+  const params = use(props.params);
+
+  const { countrySlug } = params;
+
   return (
     <ModRequired>
       <CountryEditForm countrySlug={countrySlug} />

@@ -10,11 +10,13 @@ import { type ReactNode } from "react";
 import type { Organization, WithContext } from "schema-dts";
 import ModActions from "./modActions";
 
-export async function generateMetadata({
-  params: { entityId },
-}: {
-  params: { entityId: string };
+export async function generateMetadata(props: {
+  params: Promise<{ entityId: string }>;
 }) {
+  const params = await props.params;
+
+  const { entityId } = params;
+
   const { client } = await getAnonymousServerClient();
 
   const entity = await resolveOrNotFound(
@@ -38,13 +40,14 @@ export async function generateMetadata({
   };
 }
 
-export default async function Layout({
-  params,
-  children,
-}: {
-  params: Record<string, any>;
+export default async function Layout(props: {
+  params: Promise<Record<string, any>>;
   children: ReactNode;
 }) {
+  const params = await props.params;
+
+  const { children } = props;
+
   const { client } = await getAnonymousServerClient();
 
   const entityId = Number(params.entityId);
@@ -57,7 +60,7 @@ export default async function Layout({
   // tombstone path - redirect to the absolute url to ensure search engines dont get mad
   if (entity.id !== entityId) {
     return redirect(
-      getCanonicalRouteRedirectPath({
+      await getCanonicalRouteRedirectPath({
         currentId: entityId,
         canonicalId: entity.id,
         collectionPath: "/entities",
