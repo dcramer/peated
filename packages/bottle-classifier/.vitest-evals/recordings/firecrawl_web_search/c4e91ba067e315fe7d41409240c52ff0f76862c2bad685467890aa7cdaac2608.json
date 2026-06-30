@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-06-30T19:42:37.164Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "\"The Exclusive Malts\" Islay 8 year old 2007 57.1% cask 1661 Creative Whisky Company"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "\"The Exclusive Malts\" Islay 8 year old 2007 57.1% cask 1661 Creative Whisky Company",
+    "summary": "... Creative Whisky Company. The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%). $194.99. In stock. The Exclusive Malts - Islay Distillery - 2007 ... ![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age?",
+    "results": [
+      {
+        "title": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%)",
+        "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/",
+        "domain": "norfolkwineandspirits.com",
+        "description": "... Creative Whisky Company. The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%). $194.99. In stock. The Exclusive Malts - Islay Distillery - 2007 ...",
+        "extraSnippets": [
+          "![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](https://norfolkw"
+        ]
+      },
+      {
+        "title": "The Creative Whisky Co. 'The Exclusive Malts' Islay Distillery 8 Year ...",
+        "url": "https://www.wine-searcher.com/find/the+creative+whisky+co+exclusive+malts+distil+eight+old+single+malt+scotch+islay+scotland?srsltid=AfmBOopty2LLBf8m0aWff8x8d5fkUuvasOglAt6WqQJl9jsCpelvpghp",
+        "domain": "wine-searcher.com",
+        "description": "Find the best local price for The Creative Whisky Co. 'The Exclusive Malts' Islay Distillery 8 Year Old Single Malt Scotch Whisky, Islay, Scotland.",
+        "extraSnippets": [
+          "~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at"
+        ]
+      },
+      {
+        "title": "The Exclusive Malts “Islay” 8 Year 2007 (57.1% abv)",
+        "url": "https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/",
+        "domain": "maltimpostor.com",
+        "description": "The Exclusive Malts “Islay” 8 Year 2007 57% is Cash and Cary–In reference to Cary Grant and his second wife, Barbara Woolworth Hutton, heiress ...",
+        "extraSnippets": [
+          "[MENU](https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/#) _![](http://maltimpostor.com/wp-content/uploads/2017/01/Exclusive-Malts-Islay-8-Year-2007-26"
+        ]
+      },
+      {
+        "title": "Creative Whisky Company The Exclusive Malts Islay 2007 8 Year ...",
+        "url": "https://www.whiskimen.com/product/creative-whisky-company-the-exclusive-malts-islay-2007-8-years-old-single-malt-whisky/",
+        "domain": "whiskimen.com",
+        "description": "Creative Whisky Company The Exclusive Malts Islay 2007 8 Year Old Single Malt Whisky. $1,550. In stock. Purchase this product now and earn 15 Points!",
+        "extraSnippets": [
+          "[Skip to content](https://www.whiskimen.com/product/creative-whisky-company-the-exclusive-malts-islay-2007-8-years-old-single-malt-whisky/#content) ## keep in touch ## with our lat"
+        ]
+      },
+      {
+        "title": "Islay 2007 CWC - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/82715/islay-2007-cwc",
+        "domain": "whiskybase.com",
+        "description": "Creative Whisky Company (CWC); Bottling series: The Exclusive Malts; Vintage: 17.10.2007; Bottled: 04.2016; Stated Age: 08 years; Cask number ...",
+        "extraSnippets": [
+          "**Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/82715/islay-2007-cwc?__cf_chl_f_tk=10Nk7o.mvmjmIxQM5lfokFYLXWVlWxSCw8GGZWhi"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "c4e91ba067e315fe7d41409240c52ff0f76862c2bad685467890aa7cdaac2608",
+    "mode": "auto"
+  }
+}

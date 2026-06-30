@@ -393,6 +393,21 @@ function evaluateDecisionShape(
     failures.push("proposedBottle missing expected fields");
   }
 
+  if (expected.proposedBottleNameIncludes !== undefined) {
+    const proposedBottleName = result.decision.proposedBottle?.name ?? "";
+    for (const requiredText of expected.proposedBottleNameIncludes) {
+      if (
+        !normalizeEvalText(proposedBottleName).includes(
+          normalizeEvalText(requiredText),
+        )
+      ) {
+        failures.push(
+          `proposedBottle.name expected to include ${requiredText}`,
+        );
+      }
+    }
+  }
+
   if (
     expected.proposedRelease !== undefined &&
     !deepContainsSubset(
@@ -565,8 +580,10 @@ async function prepareScenarioClassifierRun(
     reference: parsedInput.reference,
     extractedIdentity: rawExtractedIdentity,
   });
+  const imageEvidence = parsedInput.imageEvidence ?? null;
   const initialArtifacts = buildBottleClassificationArtifacts({
     extractedIdentity,
+    imageEvidence,
   });
   const autoIgnoreReason = getAutoIgnoreBottleReferenceReason(
     parsedInput.reference.name,
@@ -594,6 +611,7 @@ async function prepareScenarioClassifierRun(
         ));
   const artifacts = buildBottleClassificationArtifacts({
     extractedIdentity,
+    imageEvidence,
     candidates,
   });
   const deterministicDecision = resolveDeterministicBottleReference({
@@ -612,6 +630,7 @@ async function prepareScenarioClassifierRun(
   const agentRun = await prepareBottleClassifierAgentRun(options, {
     reference: parsedInput.reference,
     extractedIdentity: artifacts.extractedIdentity,
+    imageEvidence: artifacts.imageEvidence,
     initialCandidates: artifacts.candidates,
     candidateExpansion: parsedInput.candidateExpansion,
   });

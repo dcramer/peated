@@ -12,6 +12,7 @@ import {
   BottleReferenceSchema,
   CandidateExpansionModeSchema,
 } from "./contract";
+import { ImageBottleEvidenceSchema } from "./imageEvidence";
 import { LocalCatalogSchema } from "./localCatalog";
 
 export const searchResponseFixtureSchema = z.object({
@@ -78,6 +79,7 @@ export const classifierEvalExpectationSchema = z.object({
   matchedReleaseId: z.number().int().nullable().optional(),
   parentBottleId: z.number().int().nullable().optional(),
   proposedBottle: z.record(z.string(), z.unknown()).nullable().optional(),
+  proposedBottleNameIncludes: z.array(z.string().min(1)).optional(),
   proposedRelease: z.record(z.string(), z.unknown()).nullable().optional(),
   confidenceBand: z
     .enum(["low", "review", "auto_verification", "current_assignment"])
@@ -94,6 +96,7 @@ export const classifierEvalFixtureSchema = z
       .object({
         reference: BottleReferenceSchema,
         extractedIdentity: BottleExtractedDetailsSchema.nullable().optional(),
+        imageEvidence: ImageBottleEvidenceSchema.nullable().optional(),
         initialCandidates: z.array(BottleCandidateSchema).optional(),
         candidateExpansion: CandidateExpansionModeSchema.optional(),
       })

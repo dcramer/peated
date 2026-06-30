@@ -27,6 +27,7 @@ export type ClassifierEvalExpectation = {
   matchedReleaseId?: number | null;
   parentBottleId?: number | null;
   proposedBottle?: Record<string, unknown> | null;
+  proposedBottleNameIncludes?: string[];
   proposedRelease?: Record<string, unknown> | null;
   confidenceBand?:
     | "low"
