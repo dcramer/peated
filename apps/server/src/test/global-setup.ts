@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg, { Client } from "pg";
+import { normalizePostgresConnectionString } from "../db/connection";
 import { migrate } from "../db/migrate";
 import * as schema from "../db/schema";
 
@@ -59,7 +60,9 @@ async function setupDatabase(): Promise<void> {
 export default async function globalSetup(): Promise<() => Promise<void>> {
   const migrationPool = new pg.Pool({
     application_name: TEST_DB_APPLICATION_NAME,
-    connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.DATABASE_URL
+      ? normalizePostgresConnectionString(process.env.DATABASE_URL)
+      : undefined,
   });
   const migrationDb = drizzle(migrationPool, {
     schema,
