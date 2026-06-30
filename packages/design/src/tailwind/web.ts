@@ -21,8 +21,6 @@ export default {
         fadeIn: "0.5s fadeIn forwards",
         fadeOut: "0.5s fadeOut forwards",
       },
-
-      // that is actual animation
       keyframes: (theme) => ({
         fadeIn: {
           "0%": { opacity: "0", transform: "translate(-20px, 0)" },

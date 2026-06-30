@@ -124,10 +124,12 @@ The camera action should work well on mobile and desktop:
 ### Identification Progress
 
 After a photo is selected, show the image immediately and keep the user on the
-same task. The progress state should feel like a centered loading screen with
-the selected image as a thumbnail, a spinner, and short whisky-themed loading
-messages. Avoid numbered step indicators or implementation-specific phase
-names.
+same task. On mobile, the progress state should feel like a centered loading
+screen with the selected image as a thumbnail, a spinner, and short
+whisky-themed loading messages. On desktop, keep the progress state in the
+normal page flow with a larger selected-image preview and a subtle animated
+loading phrase instead of a standalone spinner. Avoid numbered step indicators
+or implementation-specific phase names.
 
 If identification takes longer than expected, keep the uploaded photo visible
 and let the user switch to manual search without losing the pending image.
