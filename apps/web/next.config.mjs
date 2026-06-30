@@ -3,6 +3,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  allowedDevOrigins: ["127.0.0.1"],
   env: {
     DEBUG: process.env.DEBUG ? "true" : "",
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",

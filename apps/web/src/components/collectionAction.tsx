@@ -11,7 +11,13 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import type { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
+import React, {
+  useEffect,
+  useState,
+  type ForwardRefExoticComponent,
+  type RefAttributes,
+  type SVGProps,
+} from "react";
 import useAuth from "../hooks/useAuth";
 import { useORPC } from "../lib/orpc/context";
 import Button from "./button";
@@ -80,6 +86,7 @@ function SavedCollectionActionAuthenticated({
   const { user } = useAuth();
   const orpc = useORPC();
   const queryClient = useQueryClient();
+  const [isMounted, setIsMounted] = useState(false);
   const action = COLLECTION_ACTIONS[kind];
   const Icon = action.Icon;
   const ActiveIcon = action.ActiveIcon;
@@ -91,6 +98,10 @@ function SavedCollectionActionAuthenticated({
   const unfavoriteBottleMutation = useMutation(
     orpc.collections.bottles.delete.mutationOptions(),
   );
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   let isCollected = false;
   let isLoading = false;
@@ -123,6 +134,7 @@ function SavedCollectionActionAuthenticated({
   }
 
   const isAnyLoading =
+    !isMounted ||
     isLoading ||
     favoriteBottleMutation.isPending ||
     unfavoriteBottleMutation.isPending;
