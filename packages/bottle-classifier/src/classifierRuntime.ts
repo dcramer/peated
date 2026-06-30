@@ -1462,6 +1462,17 @@ export function createBottleClassifier(
           }),
         );
       }
+      if (deterministicDecision) {
+        return BottleClassificationResultSchema.parse(
+          createDecidedBottleClassification({
+            decision: createLocalIdentificationNoMatch({
+              decision: deterministicDecision,
+              artifacts,
+            }),
+            artifacts,
+          }),
+        );
+      }
 
       const reasoningRun = await runBottleClassifierAgentWithBudget({
         reference: parsedInput.reference,

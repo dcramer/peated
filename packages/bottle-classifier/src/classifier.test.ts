@@ -1427,6 +1427,48 @@ describe("createBottleClassifier", () => {
     });
   });
 
+  test("short-circuits deterministic local create decisions to no_match", async () => {
+    const extractFromText = vi.fn(async (): Promise<BottleExtractedDetails> => {
+      throw new Error(
+        "SMWS deterministic references should not need extraction",
+      );
+    });
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => {
+        throw new Error(
+          "Deterministic local create decisions should not need the agent",
+        );
+      },
+    );
+    const { classifier } = createTestClassifier({
+      extractFromText,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.identifyExistingBottleReference({
+      reference: {
+        name: "SMWS RW6.5 Sauna Smoke",
+      },
+      initialCandidates: [springbank10YearOldCandidate],
+    });
+
+    expect(result).toMatchObject({
+      status: "classified",
+      decision: {
+        action: "no_match",
+        confidence: 70,
+        matchedBottleId: null,
+        proposedBottle: null,
+        confidenceBasis: {
+          toolsUsed: ["initial_local_candidates"],
+          webEvidence: "not_used",
+        },
+      },
+    });
+    expect(extractFromText).not.toHaveBeenCalled();
+    expect(runBottleClassifierAgent).not.toHaveBeenCalled();
+  });
+
   test("seeds local entity results for the reasoning pass", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Bothan",
