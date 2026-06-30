@@ -9,7 +9,6 @@ import {
   type BottleSearchEvidence,
 } from "../classifierTypes";
 import { getStableOpenAISettings } from "../openaiModelSettings";
-import { runBraveWebSearch } from "./braveWebSearch";
 import {
   BottleWebSearchArgsSchema,
   buildBottleSearchEvidence,
@@ -155,13 +154,11 @@ export function createOpenAIWebSearchTool({
   client,
   model,
   budget,
-  braveApiKey,
   onEvidence,
 }: {
   client: OpenAI;
   model: string;
   budget: BottleWebSearchBudget;
-  braveApiKey?: string | null;
   onEvidence?: (evidence: BottleSearchEvidence) => void;
 }) {
   return tool({
@@ -174,7 +171,6 @@ export function createOpenAIWebSearchTool({
         client,
         model,
         budget,
-        braveApiKey,
         query: args.query,
         onEvidence,
       });
@@ -187,14 +183,12 @@ export async function runBottleWebEvidenceSearch({
   model,
   query,
   budget,
-  braveApiKey = null,
   onEvidence,
 }: {
   client: OpenAI;
   model: string;
   query: string;
   budget: BottleWebSearchBudget;
-  braveApiKey?: string | null;
   onEvidence?: (evidence: BottleSearchEvidence) => void;
 }): Promise<BottleSearchEvidence | { error: string }> {
   if (!budget.tryConsume()) {
@@ -244,36 +238,6 @@ export async function runBottleWebEvidenceSearch({
             evidences: openAIEvidences,
           })
         : primaryEvidence;
-
-    if (
-      braveApiKey &&
-      isThinBottleSearchEvidence(openAIEvidence) &&
-      budget.tryConsume()
-    ) {
-      const braveEvidence = await runBraveWebSearch({
-        apiKey: braveApiKey,
-        query,
-      });
-
-      if ("error" in braveEvidence) {
-        if (openAIEvidence.results.length > 0) {
-          onEvidence?.(openAIEvidence);
-        }
-        return openAIEvidence;
-      }
-
-      const mergedEvidence = mergeBottleSearchEvidence({
-        provider: "openai",
-        query,
-        evidences: [openAIEvidence, braveEvidence],
-      });
-
-      if (mergedEvidence.results.length > 0) {
-        onEvidence?.(mergedEvidence);
-      }
-
-      return mergedEvidence;
-    }
 
     if (openAIEvidence.results.length > 0) {
       onEvidence?.(openAIEvidence);

@@ -118,12 +118,14 @@ other web results; it must not infer truth from a hardcoded domain class.
 The originating retailer can support extraction, but it is not decisive creation
 evidence by itself.
 
-The agent has four read-only tools:
+The agent has read-only tools for local candidates, local entities, and live web
+evidence:
 
 - `search_bottles`: local Peated bottle and release candidates
 - `search_entities`: local Peated brand, distillery, and bottler entities
-- `openai_web_search`: primary live web evidence search
-- `brave_web_search`: optional second web index for sparse or weak results
+- `firecrawl_web_search`: configured default live web evidence search with
+  scraped page excerpts
+- `openai_web_search`: no-Firecrawl fallback web evidence search
 
 Tool descriptions should state what the tool searches, what arguments mean, what
 it returns, and any hard limits. Put classifier policy in the stable prompt or

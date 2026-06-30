@@ -57,7 +57,8 @@ export default {
   OPENAI_ORGANIZATION:
     process.env.OPENAI_ORGANIZATION || "org-c11AVkF35wixZcGri1YBH9Pq",
   OPENAI_PROJECT: process.env.OPENAI_PROJECT || null,
-  BRAVE_API_KEY: process.env.BRAVE_API_KEY || null,
+  FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY || null,
+  FIRECRAWL_API_URL: process.env.FIRECRAWL_API_URL || null,
   BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES: Number(
     process.env.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES ||
       process.env.PRICE_MATCH_MAX_SEARCH_QUERIES ||

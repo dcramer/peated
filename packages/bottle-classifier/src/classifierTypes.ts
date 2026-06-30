@@ -238,7 +238,7 @@ export const BottleSearchResultSchema = z.object({
 });
 
 export const BottleSearchEvidenceSchema = z.object({
-  provider: z.enum(["openai", "brave"]).default("openai"),
+  provider: z.enum(["openai", "firecrawl"]).default("openai"),
   query: z.string(),
   summary: z.string().nullable().default(null),
   results: z.array(BottleSearchResultSchema).default([]),
@@ -485,7 +485,7 @@ export const BottleConfidenceBasisSchema = z
           "search_bottles",
           "search_entities",
           "openai_web_search",
-          "brave_web_search",
+          "firecrawl_web_search",
           "none",
         ]),
       )

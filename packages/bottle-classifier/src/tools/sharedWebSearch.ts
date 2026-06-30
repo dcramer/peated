@@ -4,7 +4,7 @@ import {
   type BottleSearchEvidence,
 } from "../classifierTypes";
 
-export const BottleWebSearchProviderSchema = z.enum(["openai", "brave"]);
+export const BottleWebSearchProviderSchema = z.enum(["openai", "firecrawl"]);
 export type BottleWebSearchProvider = z.infer<
   typeof BottleWebSearchProviderSchema
 >;

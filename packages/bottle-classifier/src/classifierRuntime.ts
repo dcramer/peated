@@ -57,11 +57,12 @@ import {
 } from "./runtime/deterministic";
 import {
   createBottleWebSearchBudget,
-  createBraveWebSearchTool,
+  createFirecrawlWebSearchTool,
   createOpenAIWebSearchTool,
   createSearchBottlesTool,
   createSearchEntitiesTool,
   runBottleWebEvidenceSearch,
+  runFirecrawlWebSearch,
 } from "./tools";
 import type { BottleWebSearchBudget } from "./tools/sharedWebSearch";
 
@@ -112,7 +113,8 @@ type BaseCreateBottleClassifierOptions = {
   client: OpenAI;
   model: string;
   maxSearchQueries: number;
-  braveApiKey?: string | null;
+  firecrawlApiKey?: string | null;
+  firecrawlApiUrl?: string | null;
   overrides?: {
     extractFromImage?: (
       imageUrlOrBase64: string,
@@ -556,17 +558,22 @@ async function collectNoMatchWebInvestigationArtifacts({
   }
 
   const searchEvidence = [...artifacts.searchEvidence];
-  const result = await runBottleWebEvidenceSearch({
-    client: options.client,
-    model: options.model,
-    query,
-    budget:
-      webSearchBudget ?? createBottleWebSearchBudget(options.maxSearchQueries),
-    braveApiKey: options.braveApiKey,
-    onEvidence: (evidence) => {
-      mergeSearchEvidence(searchEvidence, evidence);
-    },
-  });
+  const budget =
+    webSearchBudget ?? createBottleWebSearchBudget(options.maxSearchQueries);
+  const result = options.firecrawlApiKey
+    ? budget.tryConsume()
+      ? await runFirecrawlWebSearch({
+          apiKey: options.firecrawlApiKey,
+          apiUrl: options.firecrawlApiUrl ?? undefined,
+          query,
+        })
+      : budget.getExhaustedError()
+    : await runBottleWebEvidenceSearch({
+        client: options.client,
+        model: options.model,
+        query,
+        budget,
+      });
 
   if ("error" in result || result.results.length === 0) {
     return buildBottleClassificationArtifacts({
@@ -700,7 +707,7 @@ function mergeToolOutputArtifacts({
     return;
   }
 
-  if (toolName === "openai_web_search" || toolName === "brave_web_search") {
+  if (toolName === "openai_web_search" || toolName === "firecrawl_web_search") {
     const evidence = BottleSearchEvidenceSchema.safeParse(normalizedOutput);
     if (evidence.success) {
       mergeSearchEvidence(state.searchEvidence, evidence.data);
@@ -804,11 +811,11 @@ export async function prepareBottleClassifierAgentRun(
   const webSearchBudget =
     inputWebSearchBudget ??
     createBottleWebSearchBudget(options.maxSearchQueries);
+  const useFirecrawlWebSearch =
+    allowCandidateExpansion && !!options.firecrawlApiKey;
   const instructions = buildBottleClassifierInstructions({
     maxSearchQueries: options.maxSearchQueries,
     hasBottleSearch: allowCandidateExpansion,
-    hasOpenAIWebSearch: allowCandidateExpansion,
-    hasBraveWebSearch: allowCandidateExpansion && !!options.braveApiKey,
     hasEntitySearch: allowCandidateExpansion && !!dataSource.searchEntities,
   });
 
@@ -834,19 +841,23 @@ export async function prepareBottleClassifierAgentRun(
               }),
             ]
           : []),
-        createOpenAIWebSearchTool({
-          client: options.client,
-          model: options.model,
-          budget: webSearchBudget,
-          braveApiKey: options.braveApiKey,
-          onEvidence: (evidence) => {
-            mergeSearchEvidence(state.searchEvidence, evidence);
-          },
-        }),
-        ...(options.braveApiKey
+        ...(options.firecrawlApiKey
           ? [
-              createBraveWebSearchTool({
-                apiKey: options.braveApiKey,
+              createFirecrawlWebSearchTool({
+                apiKey: options.firecrawlApiKey,
+                apiUrl: options.firecrawlApiUrl ?? undefined,
+                budget: webSearchBudget,
+                onEvidence: (evidence) => {
+                  mergeSearchEvidence(state.searchEvidence, evidence);
+                },
+              }),
+            ]
+          : []),
+        ...(!useFirecrawlWebSearch
+          ? [
+              createOpenAIWebSearchTool({
+                client: options.client,
+                model: options.model,
                 budget: webSearchBudget,
                 onEvidence: (evidence) => {
                   mergeSearchEvidence(state.searchEvidence, evidence);

@@ -1,0 +1,138 @@
+{
+  "id": "image-backed-photo-creates-exclusive-malts-islay-single-cask-as-bottle",
+  "name": "image-backed photo: creates The Exclusive Malts Islay single-cask details as a bottle",
+  "input": {
+    "reference": {
+      "name": "The Exclusive Malts Islay 8 year old 2007",
+      "url": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/exclusive-malts-islay-2007.jpg",
+      "imageUrl": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/exclusive-malts-islay-2007.jpg"
+    },
+    "extractedIdentity": {
+      "brand": "The Exclusive Malts",
+      "bottler": "Creative Whisky Company",
+      "expression": "Islay",
+      "series": null,
+      "distillery": [],
+      "category": "single_malt",
+      "stated_age": 8,
+      "abv": 57.1,
+      "release_year": 2016,
+      "vintage_year": 2007,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": true,
+      "single_cask": true,
+      "edition": null
+    }
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/exclusive-malts-islay-2007.jpg"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/exclusive-malts-islay-2007.jpg",
+    "dbOutcome": {
+      "bottleId": 44274,
+      "releaseId": 407,
+      "createsBottle": true,
+      "createsRelease": true,
+      "summary": "Production photo identification created bottle 44274 as the generic parent The Exclusive Malts Islay, then created release 407 with the observed 8-year age, 2007 vintage, 2016 release year, 57.1% ABV, cask-strength flag, and uploaded image. The parent bottle page therefore displayed null age and null vintage/ABV despite the label-specific identity being the only useful marketed form."
+    },
+    "notes": "The checked-in fixture image is the observed source. Text search did not find a reliable public product page for this exact cask, so the fixture preserves the photo itself as verification rather than inventing external evidence. The label reads The Exclusive Malts Scotch Single Malt Whisky, 2007, aged 8 years, distilled at an Islay distillery, Islay, distilled 17 October 2007, bottled May 2016, cask no. 1661, one of 312 bottles, 750ml, 57.1%, cask strength, natural colour. The desired outcome keeps this one-off independent bottling as a single canonical bottle instead of creating a weak generic parent plus one child release."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "proposedBottle": {
+      "name": "Islay 8-year-old 2007",
+      "brand": {
+        "name": "The Exclusive Malts"
+      },
+      "bottler": {
+        "name": "Creative Whisky Company"
+      },
+      "category": "single_malt",
+      "statedAge": 8,
+      "abv": 57.1,
+      "vintageYear": 2007,
+      "releaseYear": 2016,
+      "caskStrength": true,
+      "singleCask": true
+    },
+    "proposedRelease": null,
+    "confidenceBand": "review",
+    "verifyEligible": false,
+    "summary": "Create one bottle for this The Exclusive Malts undisclosed Islay single-cask bottling. A generic The Exclusive Malts Islay parent is too weak to describe the marketed identity, and the age, vintage, ABV, and cask-strength/single-cask facts should not be hidden in a lone child release."
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 5569,
+        "name": "Creative Whisky Company",
+        "type": ["brand", "bottler"]
+      },
+      {
+        "id": 1355,
+        "name": "Speyside",
+        "type": ["brand", "distiller"]
+      },
+      {
+        "id": 1056,
+        "name": "Invergordon",
+        "type": ["brand", "distiller"]
+      },
+      {
+        "id": 90001,
+        "name": "A Distillery in Ireland",
+        "type": ["brand", "distiller"]
+      }
+    ],
+    "bottles": [
+      {
+        "id": 3321,
+        "name": "2007 CWC Single Cask Exclusives",
+        "fullName": "Speyside 2007 CWC Single Cask Exclusives",
+        "brandId": 1355,
+        "bottlerId": 5569,
+        "category": "single_malt",
+        "statedAge": 12,
+        "singleCask": true
+      },
+      {
+        "id": 3798,
+        "name": "1984 CWC 10th Anniversary of Creative Whisky Company 2005-2015",
+        "fullName": "Invergordon 1984 CWC 10th Anniversary of Creative Whisky Company 2005-2015",
+        "brandId": 1056,
+        "bottlerId": 5569,
+        "category": "single_grain",
+        "statedAge": 10
+      },
+      {
+        "id": 2629,
+        "name": "2003 CWC The Exclusive Malts",
+        "fullName": "A Distillery in Ireland 2003 CWC The Exclusive Malts",
+        "brandId": 90001,
+        "bottlerId": 5569,
+        "category": "single_malt",
+        "statedAge": 10
+      }
+    ],
+    "releases": [],
+    "aliases": [
+      {
+        "name": "Speyside 2007 CWC Single Cask Exclusives",
+        "bottleId": 3321
+      },
+      {
+        "name": "Invergordon 1984 CWC 10th Anniversary of Creative Whisky Company 2005-2015",
+        "bottleId": 3798
+      },
+      {
+        "name": "A Distillery in Ireland 2003 CWC The Exclusive Malts",
+        "bottleId": 2629
+      }
+    ]
+  }
+}

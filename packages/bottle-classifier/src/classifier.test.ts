@@ -69,7 +69,6 @@ function createTestClassifier({
   extractFromText,
   extractFromImageError,
   maxSearchQueries = 2,
-  braveApiKey,
   searchBottles = vi.fn(async () => [] as BottleCandidate[]),
   searchEntities,
   getBottleCandidateById,
@@ -82,7 +81,6 @@ function createTestClassifier({
   extractFromText?: (label: string) => Promise<BottleExtractedDetails | null>;
   extractFromImageError?: Error | null;
   maxSearchQueries?: number;
-  braveApiKey?: string | null;
   searchBottles?: ReturnType<
     typeof vi.fn<(args: unknown) => Promise<BottleCandidate[]>>
   >;
@@ -100,7 +98,6 @@ function createTestClassifier({
       client,
       model: "test-model",
       maxSearchQueries,
-      braveApiKey,
       adapters: {
         searchBottles,
         searchEntities,
@@ -963,6 +960,57 @@ const lagavulinDistillersEdition2023AutumnReleaseCandidate: BottleCandidate = {
 };
 
 describe("createBottleClassifier", () => {
+  test("uses Firecrawl web search instead of OpenAI web search when configured", async () => {
+    const preparedRun = await prepareBottleClassifierAgentRun(
+      {
+        client: {} as OpenAI,
+        model: "test-model",
+        maxSearchQueries: 2,
+        firecrawlApiKey: "firecrawl-test-key",
+        adapters: {
+          searchBottles: vi.fn(async () => []),
+        },
+      },
+      {
+        reference: {
+          name: "Ardbeg Uigeadail",
+        },
+        extractedIdentity: null,
+        initialCandidates: [],
+      },
+    );
+
+    const toolNames = preparedRun.agent.tools.map((tool) => tool.name);
+
+    expect(toolNames).toContain("firecrawl_web_search");
+    expect(toolNames).not.toContain("openai_web_search");
+  });
+
+  test("uses OpenAI web search as the no-Firecrawl fallback", async () => {
+    const preparedRun = await prepareBottleClassifierAgentRun(
+      {
+        client: {} as OpenAI,
+        model: "test-model",
+        maxSearchQueries: 2,
+        adapters: {
+          searchBottles: vi.fn(async () => []),
+        },
+      },
+      {
+        reference: {
+          name: "Ardbeg Uigeadail",
+        },
+        extractedIdentity: null,
+        initialCandidates: [],
+      },
+    );
+
+    const toolNames = preparedRun.agent.tools.map((tool) => tool.name);
+
+    expect(toolNames).toContain("openai_web_search");
+    expect(toolNames).not.toContain("firecrawl_web_search");
+  });
+
   test("rebuilds search artifacts from OpenAI Agents tool output", async () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {

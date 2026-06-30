@@ -32,8 +32,13 @@ function createEnvFileLoader(
 }
 
 const applyEnvFile = createEnvFileLoader();
-for (const envFile of [".env", ".env.local"]) {
-  applyEnvFile(path.resolve(workspaceRoot, envFile));
+for (const envFile of [
+  path.resolve(workspaceRoot, ".env"),
+  path.resolve(workspaceRoot, ".env.local"),
+  path.resolve(packageRoot, ".env"),
+  path.resolve(packageRoot, ".env.local"),
+]) {
+  applyEnvFile(envFile);
 }
 
 function pickDefinedEnv(keys: string[]): Record<string, string> {
@@ -57,7 +62,8 @@ export default defineConfig({
         "OPENAI_PROJECT",
         "OPENAI_EVAL_MODEL",
         "OPENAI_MODEL",
-        "BRAVE_API_KEY",
+        "FIRECRAWL_API_KEY",
+        "FIRECRAWL_API_URL",
         "BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES",
       ]),
       VITEST_EVALS_REPLAY_DIR:
