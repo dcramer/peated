@@ -2,7 +2,7 @@
 
 ## Package Manager
 
-- Use `pnpm@10.3.0` with Node `22.14.x`
+- Use `pnpm@10.3.0` with Node `24.18.0`
 - Core commands: `pnpm install`, `pnpm dev`, `pnpm dev:server`, `pnpm dev:web`, `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm format`
 
 ## File-Scoped Commands

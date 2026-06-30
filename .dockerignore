@@ -11,6 +11,9 @@
 # production
 **/build
 **/dist
+**/.next
+**/.turbo
+**/.playwright
 
 # misc
 **/.DS_Store
