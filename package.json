@@ -26,7 +26,7 @@
     "user": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli users",
     "start": "dotenv -e .env.local -- turbo start",
     "typecheck": "turbo typecheck",
-    "lint": "oxlint .",
+    "lint": "github-actionlint && oxlint .",
     "test": "turbo test",
     "test:all": "turbo test && pnpm --dir apps/web test:e2e",
     "test:web": "pnpm --dir apps/web test",
@@ -56,6 +56,7 @@
     "typescript": "catalog:"
   },
   "devDependencies": {
+    "github-actionlint": "1.7.12",
     "lint-staged": "^14.0.1",
     "oxlint": "^1.72.0",
     "prettier": "catalog:",
@@ -81,6 +82,9 @@
   "lint-staged": {
     "!(CLAUDE.md|.claude/**)": [
       "prettier --write --cache --ignore-unknown"
+    ],
+    ".github/workflows/*.{yml,yaml}": [
+      "github-actionlint"
     ],
     "{apps,packages}/**/*.{ts,tsx}": [
       "oxlint --fix"

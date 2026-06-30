@@ -52,9 +52,11 @@ jobs:
             should_run=true
           fi
 
-          echo "evals_requested=$evals_requested" >> "$GITHUB_OUTPUT"
-          echo "openai_ready=$openai_ready" >> "$GITHUB_OUTPUT"
-          echo "should_run=$should_run" >> "$GITHUB_OUTPUT"
+          {
+            echo "evals_requested=$evals_requested"
+            echo "openai_ready=$openai_ready"
+            echo "should_run=$should_run"
+          } >> "$GITHUB_OUTPUT"
           {
             echo "## Eval Gate"
             echo
