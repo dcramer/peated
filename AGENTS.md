@@ -9,7 +9,7 @@
 
 | Task                     | Command                                                         |
 | ------------------------ | --------------------------------------------------------------- |
-| Lint file                | `pnpm exec eslint path/to/file.ts --fix`                        |
+| Lint file                | `pnpm exec oxlint path/to/file.ts --fix`                        |
 | Format file              | `pnpm exec prettier --write path/to/file.ts`                    |
 | Test one backend file    | `pnpm --filter @peated/server test -- src/path/to/file.test.ts` |
 | Typecheck server package | `pnpm --filter @peated/server typecheck`                        |

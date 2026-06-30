@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "oxc", "react", "nextjs"],
+  "settings": {
+    "next": {
+      "rootDir": ["apps/web/"]
+    }
+  },
+  "rules": {
+    "nextjs/no-img-element": "off",
+    "no-unused-expressions": "off",
+    "no-unused-vars": "off",
+    "react/exhaustive-deps": "off",
+    "typescript/consistent-type-imports": "error"
+  },
+  "ignorePatterns": [
+    "tailwind.config.ts",
+    "dev-dist/",
+    "dist/",
+    "build/",
+    "pnpm-lock.yaml"
+  ]
+}

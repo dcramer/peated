@@ -8,7 +8,7 @@ Use `pnpm`: `pnpm --filter @peated/bottle-classifier typecheck`, `pnpm --filter 
 
 | Task                     | Command                                                                        |
 | ------------------------ | ------------------------------------------------------------------------------ |
-| Lint file                | `pnpm exec eslint packages/bottle-classifier/src/path/to/file.ts --fix`        |
+| Lint file                | `pnpm exec oxlint packages/bottle-classifier/src/path/to/file.ts --fix`        |
 | Format file              | `pnpm exec prettier --write packages/bottle-classifier/src/path/to/file.ts`    |
 | Test one file            | `pnpm --filter @peated/bottle-classifier test -- src/path/to/file.test.ts`     |
 | Run eval file when asked | `pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts` |
