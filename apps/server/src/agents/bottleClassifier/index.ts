@@ -60,3 +60,4 @@ export type {
   EntityResolution,
 } from "@peated/bottle-classifier/internal/types";
 export { classifyBottleReference } from "./classifyBottleReference";
+export { identifyExistingBottleReference } from "./identifyExistingBottleReference";

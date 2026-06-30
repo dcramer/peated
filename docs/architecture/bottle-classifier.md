@@ -1,10 +1,23 @@
 # Bottle Classifier
 
-This spec defines the reviewed boundary for turning a raw bottle reference into a
-Peated bottle identity decision. Price matching, review ingestion, repair tools,
-and other consumers should use this result instead of redoing identity reasoning.
+This spec defines the reviewed boundaries for turning a raw bottle reference
+into Peated bottle identity evidence or a Peated DB outcome. Price matching,
+review ingestion, repair tools, and other consumers should use these boundaries
+instead of redoing identity reasoning.
 
 ## Contract
+
+The package has three distinct contracts:
+
+- `extractBottleReferenceIdentity(...)`: reads bottle identity facts from image
+  or text. It does not decide whether the facts are canonical Peated identity.
+- `identifyExistingBottleReference(...)`: proposed match-only local
+  identification. It can return only `match` or `no_match`, must use local
+  Peated candidates, and must not create, repair, or infer missing canonical
+  identity.
+- `classifyBottleReference(...)`: full reviewed classification. It can match,
+  create, repair, or decline after considering local candidates, entity
+  resolution, and web evidence when required.
 
 `classifyBottleReference(...)` accepts a generic reference:
 
@@ -51,7 +64,23 @@ reference.
 False positive existing-bottle matches are worse than `no_match` or reviewed
 creation.
 
+Existing-bottle identification and full canonical classification have different
+evidence bars:
+
+- Local identification may stop at an existing match when local evidence is
+  sufficient for the requested workflow. It must return `no_match` when the
+  local evidence is ambiguous, incomplete, or requires canonical interpretation.
+- Full classification is required when the caller wants a create, repair,
+  release, parent-repair, or other canonical DB outcome.
+- Web evidence is not required for every existing local match. It is required
+  when the full classifier needs external support for missing canonical
+  identity; creation and release outcomes may also be supported by closed-form
+  deterministic anchors or explicit local parent/sibling evidence where policy
+  allows them.
+
 ## Execution
+
+### Full Classification
 
 The pipeline is:
 
@@ -71,6 +100,24 @@ The pipeline is:
 Downstream code may gate persistence and automation. It should not promote a
 semantic identity decision the classifier did not make.
 
+### Local Identification
+
+The proposed match-only local identification pipeline is:
+
+1. Accept already-extracted identity and image/text evidence.
+2. Retrieve local bottle/release candidates.
+3. Return a strict deterministic match only for an unambiguous literal stored
+   alias or other closed-form local id assertion.
+4. Otherwise run a local-identification agent with local bottle search tools
+   only.
+5. Return `match` only when an existing bottle or release safely covers the
+   marketed identity; otherwise return `no_match`.
+
+Local identification must not use web search, create bottles, create releases,
+repair bottles, repair parents, or normalize a missing bottle into existence.
+If the caller needs those outcomes, it should fall through to full
+classification.
+
 ## Determinism
 
 Deterministic code is allowed for closed-form behavior:
@@ -81,11 +128,18 @@ Deterministic code is allowed for closed-form behavior:
 - impossible-state blocking
 - confidence caps and automation gates
 - exact identity anchors such as SMWS bottle codes
+- unambiguous literal stored alias lookup for match-only local identification
 
 Deterministic code is not allowed for whisky-family semantics. Brand prefixes,
 years, batch-like tokens, `single cask`, `barrel`, producer names, domain names,
-and retailer wording are not enough to choose bottle versus release scope or to
-create canonical identity.
+retailer wording, vector similarity, text-search rank, fuzzy aliases, and
+comparable-name matches are not enough to choose bottle versus release scope,
+create canonical identity, or bypass agent judgment.
+
+A literal stored alias shortcut is allowed only when the normalized input
+matches a non-ignored stored alias attached to exactly one bottle or release. If
+there are multiple targets, fuzzy/comparable-only matches, release-parent
+ambiguity, or any required whisky interpretation, fall through to the agent.
 
 If behavior depends on brand context, marketed family meaning, source quality,
 or whether a fact is canonical versus observational, it belongs to the agent and
@@ -100,10 +154,11 @@ Use the agent for:
 - source fact versus canonical identity
 - over-specific candidate detection
 - supportive, weak, conflicting, or unnecessary web-evidence judgment
+- match decisions that are not closed-form local id assertions
 
-The agent must fill `identityBasis` and `confidenceBasis` for reviewed
-decisions. `confidenceBasis.webEvidence = supportive` is required before
-automation can treat web-backed create evidence as validated.
+The full classifier agent must fill `identityBasis` and `confidenceBasis` for
+reviewed decisions. `confidenceBasis.webEvidence = supportive` is required
+before automation can treat web-backed create evidence as validated.
 
 ## Evidence And Tools
 
@@ -118,8 +173,8 @@ other web results; it must not infer truth from a hardcoded domain class.
 The originating retailer can support extraction, but it is not decisive creation
 evidence by itself.
 
-The agent has read-only tools for local candidates, local entities, and live web
-evidence:
+The full classifier agent has read-only tools for local candidates, local
+entities, and live web evidence:
 
 - `search_bottles`: local Peated bottle and release candidates
 - `search_entities`: local Peated brand, distillery, and bottler entities
@@ -133,6 +188,11 @@ review policy, not in tool prose.
 
 Add source-specific tools only when they return materially better structured
 evidence than general web search and preserve the same trust boundary.
+
+A local-identification agent should have a narrower tool set: local bottle
+search, and entity search only when it materially improves matching. It should
+not have web-search tools because it is not allowed to create, repair, or assert
+new canonical identity.
 
 ## Identity Scope
 
@@ -151,6 +211,12 @@ Classifier evals should score final action, ids, create drafts, release scope,
 required fields, incorrect fields, and confidence calibration. Encoded expected
 fields are required. Missing unencoded optional enrichment can be tolerated;
 wrong required identity fields should fail.
+
+Local-identification evals should be scored separately from full
+classification evals. They should cover exact alias matches, safe non-exact
+local matches, ambiguous local candidates, missing local bottles, and cases that
+require full classification. A local-identification eval must fail if the result
+creates, repairs, searches the web, or matches an ambiguous candidate.
 
 Production-miss evals must preserve the observed reference, URL, extracted
 identity, current assignment, local candidates, and failed outcome. Verify the
@@ -176,4 +242,6 @@ Keep responsibilities narrow:
 - `apps/server/src/agents/bottleClassifier/service.ts`: server adapter wiring
 
 `classifyBottleReference` means the full reviewed pipeline.
+`identifyExistingBottleReference` means a proposed match-only local
+identification pipeline.
 `runBottleClassifierAgent` means only the raw LLM/tool pass.
