@@ -10,6 +10,8 @@ import {
   emptyList,
   existingBottle,
   existingBottleId,
+  failingTastingNotes,
+  photoTastingNotes,
   suggestedTags,
   tastingNotes,
   testBrand,
@@ -133,9 +135,25 @@ async function handleRpcRequest({ request, response, url }) {
       if (
         ![createdBottleId, existingBottleId].includes(input?.bottle) ||
         input?.rating !== 2 ||
-        input?.notes !== tastingNotes
+        ![tastingNotes, photoTastingNotes, failingTastingNotes].includes(
+          input?.notes,
+        )
       ) {
         sendRpcError(response, "Unexpected tasting create payload");
+        return true;
+      }
+
+      if (
+        input?.notes === photoTastingNotes &&
+        input?.pendingImageId !== "playwright-photo-upload"
+      ) {
+        sendRpcError(response, "Expected pending image for photo tasting");
+        return true;
+      }
+
+      if (input?.notes === failingTastingNotes) {
+        await delay(500);
+        sendRpcError(response, "Forced tasting create failure.");
         return true;
       }
 
@@ -486,6 +504,10 @@ function readBody(request) {
     request.on("end", () => resolve(body));
     request.on("error", reject);
   });
+}
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function sendRpcResponse(response, data) {

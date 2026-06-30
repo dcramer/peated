@@ -12,6 +12,7 @@ import Link from "@peated/web/components/link";
 import TastingForm from "@peated/web/components/tastingForm";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
+import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
@@ -24,6 +25,7 @@ import {
   Plus,
   RotateCcw,
   Search,
+  SearchX,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -37,6 +39,8 @@ type SelectedTarget = {
   suggestedTags: SuggestedTags;
 };
 
+type SubmitStage = "saving" | "preparing-photo" | "uploading-photo" | "done";
+
 const loadingMessages = [
   "Holding it up to the light",
   "Letting the label breathe",
@@ -44,6 +48,26 @@ const loadingMessages = [
   "Asking the tasting room",
   "Comparing the fine print",
 ];
+
+const submitStageCopy: Record<SubmitStage, { title: string; detail: string }> =
+  {
+    saving: {
+      title: "Saving tasting",
+      detail: "Recording the bottle, rating, notes, and awards.",
+    },
+    "preparing-photo": {
+      title: "Preparing photo",
+      detail: "Optimizing the image before upload.",
+    },
+    "uploading-photo": {
+      title: "Uploading photo",
+      detail: "Attaching the photo to your tasting.",
+    },
+    done: {
+      title: "Finishing up",
+      detail: "Taking you to the tasting page.",
+    },
+  };
 
 function createIdempotencyKey() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -182,31 +206,32 @@ function getManualResultCopy(result: PhotoIdentification | null) {
 
   if (result?.suggestedNextStep === "needs_review") {
     return {
-      title: "Needs manual review",
+      title: "This one needs a human squint",
       description:
-        "This photo points at a catalog repair case. Search for the bottle to keep going.",
+        "We got close, but not close enough to trust it. Search can still find the right bottle.",
     };
   }
 
   if (action === "match") {
     return {
-      title: "Possible match needs review",
+      title: "Almost, but not quite",
       description:
-        "We found a possible match, but it was not confident enough to use automatically.",
+        "We spotted a possible match, but it was too wobbly to use automatically.",
     };
   }
 
   if (action === "no_match") {
     return {
-      title: "No match found",
+      title: "We couldn't identify the bottle",
       description:
-        "We couldn't find a confident Peated match from this photo. Search with the details we could read, or start over with a clearer photo.",
+        "That label kept its poker face. Search can still find it, or start over with a clearer photo.",
     };
   }
 
   return {
-    title: "Use search instead",
-    description: "Search for the bottle to keep recording this tasting.",
+    title: "We couldn't identify the bottle",
+    description:
+      "The label kept its secrets. Search can still find it, or start over with another photo.",
   };
 }
 
@@ -285,6 +310,84 @@ function OrDivider() {
   );
 }
 
+function PhotoFailurePanel({
+  previewUrl,
+  title,
+  description,
+  searchHref,
+  onStartOver,
+  variant,
+}: {
+  previewUrl: string | null;
+  title: string;
+  description: string;
+  searchHref: string;
+  onStartOver: () => void;
+  variant: "error" | "no-match";
+}) {
+  const isError = variant === "error";
+
+  return (
+    <div
+      className={`rounded border p-4 lg:p-6 ${
+        isError
+          ? "border-red-900/70 bg-red-950/20"
+          : "border-slate-800 bg-slate-950/50"
+      }`}
+    >
+      <div className="space-y-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+          {previewUrl && (
+            <img
+              src={previewUrl}
+              alt="Selected bottle label"
+              className="h-24 w-24 rounded object-cover"
+            />
+          )}
+          <div className="min-w-0 flex-1 space-y-4">
+            <div className="flex items-start gap-3">
+              <div
+                className={`rounded-full p-2 ${
+                  isError
+                    ? "bg-red-900/60 text-red-100"
+                    : "text-highlight bg-slate-800"
+                }`}
+              >
+                {isError ? (
+                  <AlertTriangle className="h-5 w-5" />
+                ) : (
+                  <SearchX className="h-5 w-5" />
+                )}
+              </div>
+              <div>
+                <div className="font-semibold text-white">{title}</div>
+                <div className="text-muted mt-1 text-sm">{description}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="grid w-full gap-3 sm:grid-cols-2">
+          <Button
+            href={searchHref}
+            color="highlight"
+            fullWidth
+            icon={<Search className="h-4 w-4" />}
+          >
+            Search Bottles
+          </Button>
+          <Button
+            fullWidth
+            onClick={onStartOver}
+            icon={<RotateCcw className="h-4 w-4" />}
+          >
+            Start Over
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FallbackActions({
   searchHref,
   onStartOver,
@@ -339,6 +442,75 @@ function SearchBottleCallout() {
   );
 }
 
+function TastingSubmitProgressPanel({
+  previewUrl,
+  stage,
+}: {
+  previewUrl: string | null;
+  stage: SubmitStage;
+}) {
+  const copy = submitStageCopy[stage];
+  const [imageFailed, setImageFailed] = useState(false);
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [previewUrl]);
+
+  return (
+    <Layout
+      footer={null}
+      header={
+        <Header>
+          <div className="flex w-full items-center gap-3">
+            <h1 className="text-2xl font-bold">Record Tasting</h1>
+          </div>
+        </Header>
+      }
+    >
+      <section
+        className="flex min-h-[calc(100vh-12rem)] items-center justify-center px-3 py-8 text-center sm:py-10"
+        role="status"
+        aria-live="polite"
+      >
+        <div className="mx-auto max-w-md space-y-5 sm:flex sm:max-w-3xl sm:items-center sm:gap-8 sm:space-y-0 sm:text-left">
+          {previewUrl && !imageFailed && (
+            <img
+              src={previewUrl}
+              alt="Selected bottle label"
+              className="mx-auto h-28 w-28 rounded object-cover sm:mx-0 sm:h-56 sm:w-56"
+              onError={() => setImageFailed(true)}
+            />
+          )}
+          <div>
+            <LoaderCircle className="text-highlight mx-auto h-8 w-8 animate-spin sm:hidden" />
+            <h2 className="add-tasting-loading-shimmer via-highlight mt-4 inline-block bg-gradient-to-r from-white to-white bg-[length:200%_100%] bg-clip-text text-xl font-semibold text-transparent sm:mt-0">
+              {copy.title}
+            </h2>
+            <p className="text-muted mt-2 text-sm">{copy.detail}</p>
+            <p className="text-muted mt-1 text-sm">
+              Keep this page open while we finish.
+            </p>
+          </div>
+        </div>
+      </section>
+      <style jsx global>{`
+        @keyframes add-tasting-loading-shimmer {
+          0% {
+            background-position: 200% 0;
+          }
+          100% {
+            background-position: -200% 0;
+          }
+        }
+
+        .add-tasting-loading-shimmer {
+          animation: add-tasting-loading-shimmer 2.4s ease-in-out infinite;
+        }
+      `}</style>
+    </Layout>
+  );
+}
+
 export default function AddTasting() {
   return (
     <AuthRequired>
@@ -351,10 +523,11 @@ function AddTastingForm() {
   const router = useRouter();
   const orpc = useORPC();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const submitPreviewObjectUrlRef = useRef<string | null>(null);
   const createdAt = useMemo(() => new Date().toISOString(), []);
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [submitPreviewUrl, setSubmitPreviewUrl] = useState<string | null>(null);
   const [photoResult, setPhotoResult] = useState<PhotoIdentification | null>(
     null,
   );
@@ -362,6 +535,9 @@ function AddTastingForm() {
     null,
   );
   const [error, setError] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | undefined>();
+  const [submitStage, setSubmitStage] = useState<SubmitStage | null>(null);
 
   const { flash } = useFlashMessages();
   const photoIdentificationMutation = useMutation(
@@ -384,6 +560,14 @@ function AddTastingForm() {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (submitPreviewObjectUrlRef.current) {
+        URL.revokeObjectURL(submitPreviewObjectUrlRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!isIdentifying) {
@@ -439,8 +623,8 @@ function AddTastingForm() {
 
   async function identifyPhoto(file: File) {
     setError(null);
+    setPhotoError(null);
     setPhotoResult(null);
-    setPhotoFile(file);
 
     const nextPreviewUrl = URL.createObjectURL(file);
     setPreviewUrl((current) => {
@@ -463,8 +647,8 @@ function AddTastingForm() {
           type: file.type || null,
         },
       });
-      setError(
-        "We couldn't read that photo. You can still find the bottle manually.",
+      setPhotoError(
+        "Our label reader had a wobble. Search can still find the bottle, or you can try another photo.",
       );
     }
   }
@@ -478,12 +662,12 @@ function AddTastingForm() {
 
   function startOver() {
     setError(null);
+    setPhotoError(null);
     setPhotoResult(null);
     setPreviewUrl((current) => {
       if (current) URL.revokeObjectURL(current);
       return null;
     });
-    setPhotoFile(null);
   }
 
   async function submitTasting({
@@ -492,71 +676,127 @@ function AddTastingForm() {
   }: Parameters<React.ComponentProps<typeof TastingForm>["onSubmit"]>[0]) {
     if (!selectedTarget) return;
 
-    const { tasting, awards } = await tastingCreateMutation.mutateAsync({
-      ...data,
-      bottle: selectedTarget.bottle.id,
-      release:
-        data.release === undefined
-          ? (selectedTarget.release?.id ?? null)
-          : data.release,
-      createdAt,
-    });
-
-    if (!tasting) return;
-
-    const imageFile =
-      image instanceof File ? image : image ? await toBlob(image) : null;
-
-    if (imageFile) {
-      try {
-        await tastingImageUpdateMutation.mutateAsync({
-          tasting: tasting.id,
-          file: imageFile,
-        });
-      } catch (err) {
-        logError(err);
-        flash(
-          "There was an error uploading your image, but the tasting was saved.",
-          "error",
-        );
-      }
+    setSubmitError(undefined);
+    if (submitPreviewObjectUrlRef.current) {
+      URL.revokeObjectURL(submitPreviewObjectUrlRef.current);
+      submitPreviewObjectUrlRef.current = null;
     }
-
-    for (const award of awards) {
-      if (award.level != award.prevLevel && award.level) {
-        flash(
-          <div className="relative flex flex-row items-center gap-x-3">
-            <Link
-              href={`/badges/${award.badge.id}`}
-              className="absolute inset-0"
-            />
-            <BadgeImage badge={award.badge} size={48} level={award.level} />
-            <div className="flex flex-col">
-              <h5 className="font-semibold">{award.badge.name}</h5>
-              <p className="font-normal">You've reached level {award.level}!</p>
-            </div>
-          </div>,
-          "info",
-        );
-      }
+    if (image instanceof File) {
+      const imageUrl = URL.createObjectURL(image);
+      submitPreviewObjectUrlRef.current = imageUrl;
+      setSubmitPreviewUrl(imageUrl);
+    } else if (image instanceof HTMLCanvasElement) {
+      setSubmitPreviewUrl(image.toDataURL());
+    } else if (image === undefined) {
+      setSubmitPreviewUrl(photoResult?.pendingImage.imageUrl ?? previewUrl);
+    } else {
+      setSubmitPreviewUrl(null);
     }
+    setSubmitStage("saving");
 
-    router.push(`/tastings/${tasting.id}`);
+    try {
+      const shouldUsePendingImage =
+        image === undefined && photoResult?.pendingImage.id;
+
+      const { tasting, awards } = await tastingCreateMutation.mutateAsync({
+        ...data,
+        bottle: selectedTarget.bottle.id,
+        release:
+          data.release === undefined
+            ? (selectedTarget.release?.id ?? null)
+            : data.release,
+        createdAt,
+        pendingImageId: shouldUsePendingImage
+          ? photoResult.pendingImage.id
+          : undefined,
+      });
+
+      if (!tasting) {
+        setSubmitStage(null);
+        setSubmitError("We couldn't save that tasting. Try again.");
+        return;
+      }
+
+      if (image && !(image instanceof File)) {
+        setSubmitStage("preparing-photo");
+      }
+      const imageFile =
+        image instanceof File ? image : image ? await toBlob(image) : null;
+
+      if (imageFile) {
+        try {
+          setSubmitStage("uploading-photo");
+          await tastingImageUpdateMutation.mutateAsync({
+            tasting: tasting.id,
+            file: imageFile,
+          });
+        } catch (err) {
+          logError(err);
+          flash(
+            "There was an error uploading your image, but the tasting was saved.",
+            "error",
+          );
+        }
+      }
+
+      setSubmitStage("done");
+
+      for (const award of awards) {
+        if (award.level != award.prevLevel && award.level) {
+          flash(
+            <div className="relative flex flex-row items-center gap-x-3">
+              <Link
+                href={`/badges/${award.badge.id}`}
+                className="absolute inset-0"
+              />
+              <BadgeImage badge={award.badge} size={48} level={award.level} />
+              <div className="flex flex-col">
+                <h5 className="font-semibold">{award.badge.name}</h5>
+                <p className="font-normal">
+                  You've reached level {award.level}!
+                </p>
+              </div>
+            </div>,
+            "info",
+          );
+        }
+      }
+
+      router.push(`/tastings/${tasting.id}`);
+    } catch (err) {
+      setSubmitStage(null);
+      setSubmitError(
+        getFormErrorMessage(err, {
+          expectedErrorNames: ["BAD_REQUEST", "CONFLICT"],
+        }),
+      );
+    }
   }
 
   if (selectedTarget) {
     return (
-      <TastingForm
-        title="Record Tasting"
-        initialData={{
-          bottle: selectedTarget.bottle,
-          release: selectedTarget.release,
-        }}
-        initialImageFile={photoFile}
-        showReleasePickerDefault
-        suggestedTags={selectedTarget.suggestedTags}
-        onSubmit={submitTasting}
-      />
+      <>
+        <div className={submitStage ? "hidden" : undefined}>
+          <TastingForm
+            title="Record Tasting"
+            errorMessage={submitError}
+            initialData={{
+              bottle: selectedTarget.bottle,
+              release: selectedTarget.release,
+              imageUrl: photoResult?.pendingImage.imageUrl,
+            }}
+            showReleasePickerDefault
+            suggestedTags={selectedTarget.suggestedTags}
+            onSubmit={submitTasting}
+          />
+        </div>
+        {submitStage && (
+          <TastingSubmitProgressPanel
+            previewUrl={submitPreviewUrl}
+            stage={submitStage}
+          />
+        )}
+      </>
     );
   }
 
@@ -636,41 +876,15 @@ function AddTastingForm() {
           </>
         )}
 
-        {!isIdentifying && previewUrl && !photoResult && (
-          <>
-            <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
-              <div className="space-y-5">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-                  <img
-                    src={previewUrl}
-                    alt="Selected bottle label"
-                    className="h-24 w-24 rounded object-cover"
-                  />
-                  <div className="min-w-0 flex-1 space-y-4">
-                    <div className="flex items-start gap-3">
-                      <div className="text-highlight rounded-full bg-slate-800 p-2">
-                        <AlertTriangle className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-white">
-                          Use search instead
-                        </div>
-                        <div className="text-muted mt-1 text-sm">
-                          We could not read enough from this photo. Search can
-                          still find an existing bottle or start a new one.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-            <FallbackActions
-              searchHref="/search?tasting"
-              showStartOver
-              onStartOver={startOver}
-            />
-          </>
+        {!isIdentifying && previewUrl && !photoResult && photoError && (
+          <PhotoFailurePanel
+            previewUrl={previewUrl}
+            title="We couldn't read that photo"
+            description={photoError}
+            searchHref="/search?tasting"
+            onStartOver={startOver}
+            variant="error"
+          />
         )}
 
         {isIdentifying && (
@@ -742,18 +956,14 @@ function AddTastingForm() {
                       <EvidencePills result={photoResult} />
                     </ResultHeader>
                   ) : (
-                    <ResultHeader
+                    <PhotoFailurePanel
                       previewUrl={previewUrl}
-                      icon={
-                        <div className="text-highlight rounded-full bg-slate-800 p-2">
-                          <AlertTriangle className="h-5 w-5" />
-                        </div>
-                      }
                       title={manualResultCopy.title}
                       description={manualResultCopy.description}
-                    >
-                      <EvidencePills result={photoResult} />
-                    </ResultHeader>
+                      searchHref={searchHref}
+                      onStartOver={startOver}
+                      variant="no-match"
+                    />
                   )}
 
                   {createDecision && proposedName && (
@@ -768,26 +978,8 @@ function AddTastingForm() {
                         {createProposalLabel?.description ??
                           "Create a new bottle from this label."}
                       </div>
-                      {photoResult.diagnostics.classification.reason && (
-                        <div className="text-muted mt-2 line-clamp-3 text-xs">
-                          {photoResult.diagnostics.classification.reason}
-                        </div>
-                      )}
                     </div>
                   )}
-
-                  {!matchedBottleId &&
-                    !createDecision &&
-                    photoResult.diagnostics.classification.reason && (
-                      <div className="rounded border border-slate-800 bg-slate-950 p-3">
-                        <div className="text-muted text-xs uppercase tracking-wide">
-                          Result
-                        </div>
-                        <div className="text-muted mt-2 line-clamp-3 text-sm">
-                          {photoResult.diagnostics.classification.reason}
-                        </div>
-                      </div>
-                    )}
                 </div>
                 {matchedBottleId || createDecision ? (
                   <div className="mx-auto grid w-full gap-2 sm:w-1/2">
@@ -816,25 +1008,7 @@ function AddTastingForm() {
                       </Button>
                     )}
                   </div>
-                ) : (
-                  <div className="grid w-full gap-3 sm:w-auto sm:grid-cols-2">
-                    <Button
-                      href={searchHref}
-                      color="highlight"
-                      fullWidth
-                      icon={<Search className="h-4 w-4" />}
-                    >
-                      Search Bottles
-                    </Button>
-                    <Button
-                      fullWidth
-                      onClick={startOver}
-                      icon={<RotateCcw className="h-4 w-4" />}
-                    >
-                      Start Over
-                    </Button>
-                  </div>
-                )}
+                ) : null}
               </div>
             </section>
             {(matchedBottleId || createDecision) && (

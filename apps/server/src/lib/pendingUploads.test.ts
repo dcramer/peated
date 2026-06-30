@@ -7,6 +7,7 @@ import {
   createPendingImageUpload,
   PendingUploadExpiredError,
   PendingUploadNotFoundError,
+  PendingUploadPurposeError,
 } from "@peated/server/lib/pendingUploads";
 import { compressAndResizeImage } from "@peated/server/lib/uploads";
 import { and, eq } from "drizzle-orm";
@@ -94,6 +95,29 @@ describe("pending uploads", () => {
         attachedToId: 123,
       }),
     ).rejects.toBeInstanceOf(PendingUploadExpiredError);
+  });
+
+  test("rejects pending uploads for another purpose", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const pendingUpload = await createPendingImageUpload({
+      file: await fixtures.SampleSquareImage(),
+      createdById: defaults.user.id,
+      purpose: "avatar",
+      onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
+    });
+
+    await expect(
+      copyPendingUploadToPermanent({
+        id: pendingUpload.id,
+        userId: defaults.user.id,
+        purpose: "photo_tasting_entry",
+        destinationNamespace: "tastings",
+        attachedToType: "tasting",
+        attachedToId: 123,
+      }),
+    ).rejects.toBeInstanceOf(PendingUploadPurposeError);
   });
 
   test("deletes the stored object when pending upload row creation fails", async ({

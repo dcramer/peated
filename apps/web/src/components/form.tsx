@@ -8,9 +8,9 @@ export default function Form({
   return (
     <>
       {isSubmitting && (
-        <div className="fixed inset-0 z-10">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-slate-800 opacity-50" />
-          <Spinner />
+          <Spinner className="relative z-10 m-0 text-slate-800" />
         </div>
       )}
 

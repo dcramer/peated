@@ -2,6 +2,8 @@ const timestamp = "2026-06-07T12:00:00.000Z";
 
 export const createdBottleName = "Playwright Reserve";
 export const tastingNotes = "Smoke, lemon peel, and sea salt.";
+export const photoTastingNotes = "Photo flow: smoke, lemon peel, and sea salt.";
+export const failingTastingNotes = "Please make this tasting fail.";
 
 export const testUser = {
   id: 9101,

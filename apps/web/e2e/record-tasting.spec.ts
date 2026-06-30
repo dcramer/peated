@@ -5,6 +5,8 @@ import { expectNoHorizontalOverflow } from "./assertions";
 import {
   createdTastingId,
   existingBottle,
+  failingTastingNotes,
+  photoTastingNotes,
   tastingNotes,
 } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
@@ -25,7 +27,6 @@ test.describe("record tasting", () => {
     await page.getByRole("button", { name: "Save" }).click();
 
     await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
-    await expect(page.getByText(tastingNotes)).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
 
@@ -58,11 +59,49 @@ test.describe("record tasting", () => {
 
     await expect(page.getByText(existingBottle.fullName)).toBeVisible();
     await page.getByRole("button", { name: "Savor" }).click();
-    await page.getByLabel("Comments").fill(tastingNotes);
+    await page.getByLabel("Comments").fill(photoTastingNotes);
     await page.getByRole("button", { name: "Save" }).click();
 
     await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
-    await expect(page.getByText(tastingNotes)).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("returns to the filled photo tasting form when submit fails", async ({
+    context,
+    page,
+  }) => {
+    await signIn(context);
+
+    await page.goto("/addTasting");
+
+    await page.locator('input[type="file"]').setInputFiles({
+      name: "label.png",
+      mimeType: "image/png",
+      buffer: Buffer.from(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=",
+        "base64",
+      ),
+    });
+
+    await expect(page.getByText("Match found")).toBeVisible();
+    await page.getByRole("button", { name: "Continue" }).click();
+
+    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await page.getByRole("button", { name: "Savor" }).click();
+    await page.getByLabel("Comments").fill(failingTastingNotes);
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(page.getByText("Saving tasting")).toBeVisible();
+    await expect(page.getByAltText("Selected bottle label")).toBeHidden();
+
+    await expect(
+      page.getByRole("heading", {
+        name: "There was an error with your submission",
+      }),
+    ).toBeVisible();
+    await expect(page.getByText("Internal error")).toBeVisible();
+    await expect(page.getByLabel("Comments")).toHaveValue(failingTastingNotes);
+    await expect(page).toHaveURL(/\/addTasting$/);
     await expectNoHorizontalOverflow(page);
   });
 });

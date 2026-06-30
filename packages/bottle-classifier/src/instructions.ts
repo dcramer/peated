@@ -821,7 +821,7 @@ const BOTTLE_CLASSIFIER_INSTRUCTIONS = [
     "Use `identityBasis` to explain any bottle-vs-release or exact-cask boundary decision.",
     "Use `observation` for selector names, cask numbers, bottle numbers, outturn, market/exclusive wording, and exact facts that should not force canonical release split.",
     "For `proposedBottle.name`, use evidenced canonical name, not copied retailer title.",
-    "For standalone `create_bottle` decisions, include marketed differentiators such as age, vintage, release year, ABV, cask, batch, or cask-strength wording in `proposedBottle.name` when omitting them would create a weak generic parent.",
+    "For standalone `create_bottle` decisions, include marketed differentiators such as age, vintage, release year, cask, batch, or cask-strength wording in `proposedBottle.name` when omitting them would create a weak generic parent. Keep ABV in the structured `abv` field, not in `proposedBottle.name`.",
     "For `create_bottle`, keep all bottle-level identity traits on `proposedBottle`; if they are child-release traits, use a release action instead.",
     "Return `{ id, name }` objects for `brand`, `distillers`, `bottler`, and `series`; use `id: null` when unknown.",
     "Never invent websites, relationships, release details, or proof numbers.",

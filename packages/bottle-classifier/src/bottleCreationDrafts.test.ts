@@ -62,6 +62,49 @@ describe("splitProposedBottleReleaseDraft", () => {
     });
   });
 
+  test("removes explicit ABV from proposed bottle names", () => {
+    expect(
+      normalizeProposedBottleDraft({
+        ...buildProposedBottle(),
+        name: "Islay 2007 8-year-old 57.1% ABV",
+        statedAge: 8,
+        abv: null,
+      }),
+    ).toMatchObject({
+      name: "Islay 2007 8-year-old",
+      statedAge: 8,
+      abv: 57.1,
+    });
+  });
+
+  test("keeps structured ABV when removing duplicate ABV name text", () => {
+    expect(
+      normalizeProposedBottleDraft({
+        ...buildProposedBottle(),
+        name: "Islay 2007 8-year-old (57.1%)",
+        statedAge: 8,
+        abv: 57.1,
+      }),
+    ).toMatchObject({
+      name: "Islay 2007 8-year-old",
+      statedAge: 8,
+      abv: 57.1,
+    });
+  });
+
+  test("keeps implausible bare percentages in proposed bottle names", () => {
+    expect(
+      normalizeProposedBottleDraft({
+        ...buildProposedBottle(),
+        name: "Rare 8% Rye",
+        abv: null,
+      }),
+    ).toMatchObject({
+      name: "Rare 8% Rye",
+      abv: null,
+    });
+  });
+
   test("infers creation targets from the populated draft sides", () => {
     expect(
       inferBottleCreationTarget({
