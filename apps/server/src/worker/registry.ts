@@ -84,7 +84,7 @@ class Registry {
 
   get(name: string) {
     const rv = this.jobs[name];
-    if (typeof rv === undefined) {
+    if (typeof rv === "undefined") {
       throw new Error(`Unknown job: ${name}`);
     }
     return rv;

@@ -1,5 +1,0 @@
-tailwind.config.ts
-dev-dist/
-dist/
-build/
-pnpm-lock.yaml

@@ -11,6 +11,7 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { startRegistration } from "@simplewebauthn/browser";
 import { useMutation } from "@tanstack/react-query";
 import { KeyRound, Lock } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
@@ -123,9 +124,9 @@ export default function PasswordResetChangeForm({ token }: { token: string }) {
       {isInvalidToken && (
         <Alert>
           This recovery link has expired or is invalid.{" "}
-          <a href="/recover-account" className="text-highlight underline">
+          <Link href="/recover-account" className="text-highlight underline">
             Request a new one
-          </a>
+          </Link>
           .
         </Alert>
       )}
