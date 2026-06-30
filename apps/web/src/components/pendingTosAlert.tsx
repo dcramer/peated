@@ -1,13 +1,13 @@
 "use client";
 
 import { acceptTosForm, updateSession } from "@peated/web/lib/auth.actions";
-import { useEffect } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState, useEffect } from "react";
+import { useFormStatus } from "react-dom";
 import Alert from "./alert";
 import Link from "./link";
 
 export default function PendingTosAlert() {
-  const [state, acceptAction] = useFormState(acceptTosForm, undefined);
+  const [state, acceptAction] = useActionState(acceptTosForm, undefined);
 
   useEffect(() => {
     if (state?.ok) updateSession();

@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { toTitleCase } from "@peated/server/lib/strings";
 import ReleaseForm from "@peated/web/components/releaseForm";
@@ -10,11 +11,13 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 
-export default function AddBottling({
-  params: { bottleId },
-}: {
-  params: { bottleId: string };
+export default function AddBottling(props: {
+  params: Promise<{ bottleId: string }>;
 }) {
+  const params = use(props.params);
+
+  const { bottleId } = params;
+
   return (
     <VerifiedRequired>
       <AddBottlingForm bottleId={bottleId} />

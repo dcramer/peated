@@ -1,15 +1,18 @@
 "use client";
+import { use } from "react";
 
 import TastingComments from "@peated/web/components/tastingComments";
 import TastingList from "@peated/web/components/tastingList";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function Page({
-  params: { tastingId },
-}: {
-  params: { tastingId: string };
+export default function Page(props: {
+  params: Promise<{ tastingId: string }>;
 }) {
+  const params = use(props.params);
+
+  const { tastingId } = params;
+
   const orpc = useORPC();
   const { data: tasting } = useSuspenseQuery(
     orpc.tastings.details.queryOptions({

@@ -3,7 +3,8 @@
 import Button from "@peated/web/components/button";
 import TextField from "@peated/web/components/textField";
 import { passwordResetForm } from "@peated/web/lib/auth.actions";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import Alert from "./alert";
 
 function FormComponent() {
@@ -32,7 +33,7 @@ function FormComponent() {
 }
 
 export default function PasswordResetForm() {
-  const [result, formAction] = useFormState(passwordResetForm, undefined);
+  const [result, formAction] = useActionState(passwordResetForm, undefined);
 
   return (
     <div className="min-w-sm flex flex-auto flex-col gap-y-4">

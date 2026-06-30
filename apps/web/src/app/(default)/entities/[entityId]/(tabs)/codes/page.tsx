@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import {
   SMWS_CATEGORY_LIST,
@@ -11,11 +12,11 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { notFound } from "next/navigation";
 
-export default function Page({
-  params: { entityId },
-}: {
-  params: { entityId: string };
-}) {
+export default function Page(props: { params: Promise<{ entityId: string }> }) {
+  const params = use(props.params);
+
+  const { entityId } = params;
+
   const orpc = useORPC();
   const { data: entity } = useSuspenseQuery(
     orpc.entities.details.queryOptions({

@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
@@ -6,11 +7,13 @@ import PageHeader from "@peated/web/components/pageHeader";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function Page({
-  params: { countrySlug, regionSlug },
-}: {
-  params: { countrySlug: string; regionSlug: string };
+export default function Page(props: {
+  params: Promise<{ countrySlug: string; regionSlug: string }>;
 }) {
+  const params = use(props.params);
+
+  const { countrySlug, regionSlug } = params;
+
   const orpc = useORPC();
   const { data: country } = useSuspenseQuery(
     orpc.countries.details.queryOptions({

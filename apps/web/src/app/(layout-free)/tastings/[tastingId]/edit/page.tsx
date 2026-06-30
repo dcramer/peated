@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { useFlashMessages } from "@peated/web/components/flash";
 import TastingForm from "@peated/web/components/tastingForm";
@@ -9,11 +10,13 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-export default function Page({
-  params: { tastingId },
-}: {
-  params: { tastingId: string };
+export default function Page(props: {
+  params: Promise<{ tastingId: string }>;
 }) {
+  const params = use(props.params);
+
+  const { tastingId } = params;
+
   return (
     <AuthRequired>
       <TastingEditForm tastingId={tastingId} />

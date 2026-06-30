@@ -10,11 +10,13 @@ import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { type ReactNode } from "react";
 
-export async function generateMetadata({
-  params: { countrySlug, regionSlug },
-}: {
-  params: { countrySlug: string; regionSlug: string };
+export async function generateMetadata(props: {
+  params: Promise<{ countrySlug: string; regionSlug: string }>;
 }) {
+  const params = await props.params;
+
+  const { countrySlug, regionSlug } = params;
+
   const { client } = await getServerClient();
 
   const region = await resolveOrNotFound(
@@ -30,13 +32,16 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({
-  params: { countrySlug, regionSlug },
-  children,
-}: {
-  params: { countrySlug: string; regionSlug: string };
+export default async function Page(props: {
+  params: Promise<{ countrySlug: string; regionSlug: string }>;
   children: ReactNode;
 }) {
+  const params = await props.params;
+
+  const { countrySlug, regionSlug } = params;
+
+  const { children } = props;
+
   const { client } = await getServerClient();
 
   const region = await resolveOrNotFound(

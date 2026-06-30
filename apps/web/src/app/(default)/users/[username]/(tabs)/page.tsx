@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import TastingList from "@peated/web/components/tastingList";
@@ -7,11 +8,13 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const fetchCache = "default-no-store";
 
-export default function UserProfilePage({
-  params: { username },
-}: {
-  params: { username: string };
+export default function UserProfilePage(props: {
+  params: Promise<{ username: string }>;
 }) {
+  const params = use(props.params);
+
+  const { username } = params;
+
   const orpc = useORPC();
   const { data: tastings } = useSuspenseQuery(
     orpc.tastings.list.queryOptions({

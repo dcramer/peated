@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { type ExternalSiteType } from "@peated/server/types";
 import SiteForm from "@peated/web/components/admin/siteForm";
@@ -6,11 +7,13 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-export default function Page({
-  params: { siteId },
-}: {
-  params: { siteId: ExternalSiteType };
+export default function Page(props: {
+  params: Promise<{ siteId: ExternalSiteType }>;
 }) {
+  const params = use(props.params);
+
+  const { siteId } = params;
+
   const orpc = useORPC();
   const { data: site } = useSuspenseQuery(
     orpc.externalSites.details.queryOptions({

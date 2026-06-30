@@ -3,10 +3,11 @@
 import Button from "@peated/web/components/button";
 import { resendVerificationForm } from "@peated/web/lib/auth.actions";
 import type { ComponentProps } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 
 export default function ResendVerificationForm() {
-  const [state, resendVerificationAction] = useFormState(
+  const [state, resendVerificationAction] = useActionState(
     resendVerificationForm,
     undefined,
   );

@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import ReleaseForm from "@peated/web/components/releaseForm";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
@@ -7,11 +8,13 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-export default function Page({
-  params: { bottleId, bottlingId },
-}: {
-  params: { bottleId: string; bottlingId: string };
+export default function Page(props: {
+  params: Promise<{ bottleId: string; bottlingId: string }>;
 }) {
+  const params = use(props.params);
+
+  const { bottleId, bottlingId } = params;
+
   return (
     <ModRequired>
       <BottlingEditForm bottleId={bottleId} bottlingId={bottlingId} />

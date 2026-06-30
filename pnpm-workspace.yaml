@@ -34,7 +34,7 @@ catalog:
   "@playwright/test": "^1.60.0"
   zod: ^4.1.8
 
-  react: ^18.2.0
-  react-dom: ^18.2.0
-  "@types/react": ^18.2.0
-  "@types/react-dom": ^18.2.0
+  react: ^19.2.7
+  react-dom: ^19.2.7
+  "@types/react": ^19.2.17
+  "@types/react-dom": ^19.2.3

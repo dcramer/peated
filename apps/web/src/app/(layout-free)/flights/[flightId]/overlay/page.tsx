@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import BottleLink from "@peated/web/components/bottleLink";
 import { Distillers } from "@peated/web/components/bottleMetadata";
@@ -8,11 +9,11 @@ import QRCodeClient from "@peated/web/components/qrcode.client";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function Page({
-  params: { flightId },
-}: {
-  params: { flightId: string };
-}) {
+export default function Page(props: { params: Promise<{ flightId: string }> }) {
+  const params = use(props.params);
+
+  const { flightId } = params;
+
   const orpc = useORPC();
 
   // TODO: we'd like to use `useSuspenseQueries`, but oRPC has an issue atm:

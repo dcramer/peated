@@ -9,8 +9,8 @@ import config from "@peated/web/config";
 import { authenticate, authenticateForm } from "@peated/web/lib/auth.actions";
 import { Mail } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState, useState } from "react";
+import { useFormStatus } from "react-dom";
 import Alert from "./alert";
 
 function FormComponent({ showPassword }: { showPassword: boolean }) {
@@ -65,7 +65,7 @@ function FormComponent({ showPassword }: { showPassword: boolean }) {
 }
 
 export default function LoginForm() {
-  const [result, formAction] = useFormState(authenticateForm, undefined);
+  const [result, formAction] = useActionState(authenticateForm, undefined);
   const [showEmailForm, setShowEmailForm] = useState(false);
 
   return (

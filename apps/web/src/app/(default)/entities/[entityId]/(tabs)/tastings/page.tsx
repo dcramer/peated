@@ -1,15 +1,18 @@
 "use client";
+import { use } from "react";
 
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import TastingList from "@peated/web/components/tastingList";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function EntityTastings({
-  params: { entityId },
-}: {
-  params: { entityId: string };
+export default function EntityTastings(props: {
+  params: Promise<{ entityId: string }>;
 }) {
+  const params = use(props.params);
+
+  const { entityId } = params;
+
   const orpc = useORPC();
 
   const { data: tastingList } = useSuspenseQuery(

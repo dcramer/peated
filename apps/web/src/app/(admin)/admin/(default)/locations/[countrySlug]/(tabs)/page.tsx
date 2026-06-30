@@ -1,15 +1,18 @@
 "use client";
+import { use } from "react";
 
 import Table from "@peated/web/components/table";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function Page({
-  params: { countrySlug },
-}: {
-  params: { countrySlug: string };
+export default function Page(props: {
+  params: Promise<{ countrySlug: string }>;
 }) {
+  const params = use(props.params);
+
+  const { countrySlug } = params;
+
   const queryParams = useApiQueryParams({
     defaults: {
       sort: "-created",

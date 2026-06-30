@@ -3,11 +3,13 @@ import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 
 export { default } from "@peated/web/components/defaultLayout";
 
-export async function generateMetadata({
-  params: { countrySlug },
-}: {
-  params: { countrySlug: string };
+export async function generateMetadata(props: {
+  params: Promise<{ countrySlug: string }>;
 }) {
+  const params = await props.params;
+
+  const { countrySlug } = params;
+
   const { client } = await getServerClient();
   const country = await resolveOrNotFound(
     client.countries.details({

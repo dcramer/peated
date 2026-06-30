@@ -3,11 +3,13 @@ import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 
 export { default } from "@peated/web/components/defaultLayout";
 
-export async function generateMetadata({
-  params: { bottleId },
-}: {
-  params: { bottleId: string };
+export async function generateMetadata(props: {
+  params: Promise<{ bottleId: string }>;
 }) {
+  const params = await props.params;
+
+  const { bottleId } = params;
+
   const { client } = await getAnonymousServerClient();
 
   const bottle = await resolveOrNotFound(

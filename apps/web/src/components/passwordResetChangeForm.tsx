@@ -12,8 +12,8 @@ import { startRegistration } from "@simplewebauthn/browser";
 import { useMutation } from "@tanstack/react-query";
 import { KeyRound, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState, useState } from "react";
+import { useFormStatus } from "react-dom";
 import Alert from "./alert";
 
 function PasswordFormComponent({ token }: { token: string }) {
@@ -45,11 +45,11 @@ function PasswordFormComponent({ token }: { token: string }) {
 export default function PasswordResetChangeForm({ token }: { token: string }) {
   const orpc = useORPC();
   const router = useRouter();
-  const [result, formAction] = useFormState(
+  const [result, formAction] = useActionState(
     passwordResetConfirmForm,
     undefined,
   );
-  const [passkeyResult, passkeyFormAction] = useFormState(
+  const [passkeyResult, passkeyFormAction] = useActionState(
     passwordResetConfirmPasskeyForm,
     undefined,
   );

@@ -10,7 +10,7 @@ import TimeSince from "@peated/web/components/timeSince";
 import { formatDuration } from "@peated/web/lib/format";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { useState, type ReactNode } from "react";
+import { use, useState, type ReactNode } from "react";
 import { type z } from "zod";
 
 function TriggerJobButton({ siteId }: { siteId: ExternalSiteType }) {
@@ -37,13 +37,16 @@ function TriggerJobButton({ siteId }: { siteId: ExternalSiteType }) {
   );
 }
 
-export default function Layout({
-  params: { siteId },
-  children,
-}: {
-  params: { siteId: string };
+export default function Layout(props: {
+  params: Promise<{ siteId: string }>;
   children: ReactNode;
 }) {
+  const params = use(props.params);
+
+  const { siteId } = params;
+
+  const { children } = props;
+
   const orpc = useORPC();
   const { data: initialSite } = useSuspenseQuery(
     orpc.externalSites.details.queryOptions({

@@ -4,13 +4,13 @@ import {
   resendVerificationForm,
   updateSession,
 } from "@peated/web/lib/auth.actions";
-import { useEffect } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState, useEffect } from "react";
+import { useFormStatus } from "react-dom";
 import Alert from "./alert";
 import { useFlashMessages } from "./flash";
 
 export default function PendingVerificationAlert() {
-  const [state, resendVerificationAction] = useFormState(
+  const [state, resendVerificationAction] = useActionState(
     resendVerificationForm,
     undefined,
   );

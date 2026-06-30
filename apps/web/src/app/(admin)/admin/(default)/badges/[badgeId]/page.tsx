@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import BadgeImage from "@peated/web/components/badgeImage";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
@@ -12,11 +13,11 @@ import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function Page({
-  params: { badgeId },
-}: {
-  params: { badgeId: string };
-}) {
+export default function Page(props: { params: Promise<{ badgeId: string }> }) {
+  const params = use(props.params);
+
+  const { badgeId } = params;
+
   const orpc = useORPC();
   const { data: badge } = useSuspenseQuery(
     orpc.badges.details.queryOptions({

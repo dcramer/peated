@@ -12,7 +12,7 @@ import { toBlob } from "@peated/web/lib/blobs";
 import { getNewBottleBottlingPath } from "@peated/web/lib/bottlings";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -52,36 +52,30 @@ function AddBottleForm() {
     name,
   });
 
-  const queries = useQueries({
-    queries: [
-      {
-        ...orpc.entities.details.queryOptions({
-          input: { entity: Number(distiller) },
-        }),
-        enabled: !!distiller,
-      },
-      {
-        ...orpc.entities.details.queryOptions({
-          input: { entity: Number(brand) },
-        }),
-        enabled: !!brand,
-      },
-      {
-        ...orpc.entities.details.queryOptions({
-          input: { entity: Number(bottler) },
-        }),
-        enabled: !!bottler,
-      },
-      {
-        ...orpc.bottleSeries.details.queryOptions({
-          input: { series: Number(series) },
-        }),
-        enabled: !!series,
-      },
-    ],
+  const distillerQuery = useQuery({
+    ...orpc.entities.details.queryOptions({
+      input: { entity: Number(distiller) },
+    }),
+    enabled: !!distiller,
   });
-
-  const [distillerQuery, brandQuery, bottlerQuery, seriesQuery] = queries;
+  const brandQuery = useQuery({
+    ...orpc.entities.details.queryOptions({
+      input: { entity: Number(brand) },
+    }),
+    enabled: !!brand,
+  });
+  const bottlerQuery = useQuery({
+    ...orpc.entities.details.queryOptions({
+      input: { entity: Number(bottler) },
+    }),
+    enabled: !!bottler,
+  });
+  const seriesQuery = useQuery({
+    ...orpc.bottleSeries.details.queryOptions({
+      input: { series: Number(series) },
+    }),
+    enabled: !!series,
+  });
   const proposalQuery = useQuery({
     ...orpc.prices.matchQueue.details.queryOptions({
       input: { proposal: Number(proposalId) },
@@ -92,7 +86,10 @@ function AddBottleForm() {
   useEffect(() => {
     if (
       loading &&
-      !queries.some((q) => q.isLoading) &&
+      !distillerQuery.isLoading &&
+      !brandQuery.isLoading &&
+      !bottlerQuery.isLoading &&
+      !seriesQuery.isLoading &&
       (!proposalId || !proposalQuery.isLoading)
     ) {
       const proposalData = proposalQuery.data?.proposedBottle;
@@ -115,9 +112,13 @@ function AddBottleForm() {
     proposalId,
     proposalQuery.isLoading,
     proposalQuery.data,
+    distillerQuery.isLoading,
     distillerQuery.data,
+    brandQuery.isLoading,
     brandQuery.data,
+    bottlerQuery.isLoading,
     bottlerQuery.data,
+    seriesQuery.isLoading,
     seriesQuery.data,
   ]);
 

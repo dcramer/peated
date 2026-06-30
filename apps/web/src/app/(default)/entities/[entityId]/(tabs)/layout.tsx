@@ -4,13 +4,16 @@ import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { type ReactNode } from "react";
 
-export default async function Layout({
-  params: { entityId },
-  children,
-}: {
-  params: { entityId: string };
+export default async function Layout(props: {
+  params: Promise<{ entityId: string }>;
   children: ReactNode;
 }) {
+  const params = await props.params;
+
+  const { entityId } = params;
+
+  const { children } = props;
+
   const { client } = await getAnonymousServerClient();
 
   const entity = await resolveOrNotFound(
