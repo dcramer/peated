@@ -2,9 +2,6 @@ import { and, eq, sql } from "drizzle-orm";
 import { db, type AnyDatabase } from "../db";
 import { bottleAliases } from "../db/schema";
 
-/**
- * Returns confirmed, non-ignored exact aliases for the no-agent fast path.
- */
 export async function findBottleTarget(
   name: string,
   database: AnyDatabase = db,

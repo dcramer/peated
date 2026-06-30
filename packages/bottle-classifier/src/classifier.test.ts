@@ -699,6 +699,25 @@ const springbank10YearOldCandidate: BottleCandidate = {
   source: ["exact"],
 };
 
+const springbank10YearOldIdentity: BottleExtractedDetails = {
+  brand: "Springbank",
+  bottler: null,
+  expression: "10 Year Old",
+  series: null,
+  distillery: ["Springbank"],
+  category: "single_malt",
+  stated_age: 10,
+  abv: 46,
+  release_year: null,
+  vintage_year: null,
+  cask_type: null,
+  cask_size: null,
+  cask_fill: null,
+  cask_strength: null,
+  single_cask: null,
+  edition: null,
+};
+
 const cadbollEstateParentCandidate: BottleCandidate = {
   bottleId: 13442,
   releaseId: null,
@@ -1267,6 +1286,145 @@ describe("createBottleClassifier", () => {
         candidateExpansion: "initial_only",
       }),
     );
+  });
+
+  test("identifies existing bottles with the local-only classifier pass", async () => {
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "match",
+          confidence: 94,
+          rationale: "The local candidate safely covers the label.",
+          candidateBottleIds: [11],
+          identityScope: "product",
+          observation: null,
+          confidenceBasis: {
+            band: "auto_verification",
+            positiveEvidence: ["The local candidate matches."],
+            unresolvedRisks: [],
+            toolsUsed: ["initial_local_candidates", "openai_web_search"],
+            webEvidence: "supportive",
+          },
+          matchedBottleId: 11,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity: springbank10YearOldIdentity,
+          imageEvidence: null,
+          searchEvidence: [],
+          candidates: [springbank10YearOldCandidate],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity: springbank10YearOldIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.identifyExistingBottleReference({
+      reference: {
+        name: "Springbank 10-year-old",
+      },
+      extractedIdentity: springbank10YearOldIdentity,
+      initialCandidates: [springbank10YearOldCandidate],
+    });
+
+    expect(result).toMatchObject({
+      status: "classified",
+      decision: {
+        action: "match",
+        matchedBottleId: 11,
+        matchedReleaseId: null,
+        confidenceBasis: {
+          toolsUsed: ["initial_local_candidates"],
+          webEvidence: "not_used",
+        },
+      },
+    });
+    expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
+    const [[agentInput]] = runBottleClassifierAgent.mock.calls as unknown as [
+      [RunBottleClassifierAgentInput],
+    ];
+    expect(agentInput).toMatchObject({
+      candidateExpansion: "initial_only",
+      searchEvidence: [],
+      resolvedEntities: [],
+      investigationHint: null,
+      instructionMode: "local_identification",
+    });
+    expect(agentInput?.webSearchBudget?.tryConsume()).toBe(false);
+  });
+
+  test("converts non-match local identification decisions to no_match", async () => {
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "create_bottle",
+          confidence: 88,
+          rationale: "The label appears to be a new local product.",
+          candidateBottleIds: [],
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          proposedBottle: {
+            name: "Local Only",
+            series: null,
+            category: "single_malt",
+            edition: null,
+            statedAge: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: null,
+              name: "Example",
+            },
+            distillers: [],
+            bottler: null,
+          },
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity: null,
+          imageEvidence: null,
+          searchEvidence: [],
+          candidates: [springbank10YearOldCandidate],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity: null,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.identifyExistingBottleReference({
+      reference: {
+        name: "Example Local Only",
+      },
+      extractedIdentity: null,
+      initialCandidates: [springbank10YearOldCandidate],
+    });
+
+    expect(result).toMatchObject({
+      status: "classified",
+      decision: {
+        action: "no_match",
+        matchedBottleId: null,
+        proposedBottle: null,
+      },
+    });
   });
 
   test("seeds local entity results for the reasoning pass", async () => {

@@ -1,7 +1,9 @@
 import type {
+  BottleClassificationResult,
   BottleReference,
   ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier/contract";
+import { createDecidedBottleClassification } from "@peated/bottle-classifier/contract";
 import type { RunBottleClassifierAgentInput } from "@peated/bottle-classifier/internal/runtime";
 import { createBottleClassifier } from "@peated/bottle-classifier/internal/runtime";
 import {
@@ -10,6 +12,7 @@ import {
   type SearchEntitiesArgs,
 } from "@peated/bottle-classifier/internal/types";
 import config from "@peated/server/config";
+import { findBottleTarget } from "@peated/server/lib/bottleFinder";
 import {
   findBottleReferenceCandidates,
   getBottleCandidateById,
@@ -90,6 +93,143 @@ export async function classifyBottleReference(
       ...input,
       reference,
     });
+  });
+}
+
+async function identifyExactAliasReference({
+  input,
+}: {
+  input: ClassifyBottleReferenceInput;
+}): Promise<BottleClassificationResult | null> {
+  const target = await findBottleTarget(input.reference.name);
+  if (!target) {
+    return null;
+  }
+
+  const candidate = await getBottleCandidateById(
+    target.bottleId,
+    target.releaseId,
+  );
+  if (!candidate) {
+    return null;
+  }
+
+  return createDecidedBottleClassification({
+    decision: {
+      action: "match",
+      confidence: 100,
+      rationale:
+        "Stored bottle alias exactly matched the extracted label reference.",
+      candidateBottleIds: [target.bottleId],
+      identityScope: "product",
+      observation: null,
+      identityBasis: {
+        bottleTraits: ["literal stored alias"],
+        releaseTraits:
+          target.releaseId === null ? [] : ["literal stored alias"],
+        observationTraits: [],
+        yearInterpretation: "none",
+        siblingEvidence: "none",
+        uncertainties: [],
+      },
+      confidenceBasis: {
+        band: "auto_verification",
+        positiveEvidence: [
+          "The normalized extracted reference exactly matched one non-ignored stored bottle alias.",
+        ],
+        unresolvedRisks: [],
+        toolsUsed: ["initial_local_candidates"],
+        webEvidence: "not_needed",
+      },
+      matchedBottleId: target.bottleId,
+      matchedReleaseId: target.releaseId,
+      parentBottleId: null,
+      proposedBottle: null,
+      proposedRelease: null,
+    },
+    artifacts: {
+      extractedIdentity: input.extractedIdentity ?? null,
+      imageEvidence: input.imageEvidence ?? null,
+      candidates: [
+        {
+          ...candidate,
+          source: Array.from(new Set([...candidate.source, "exact"])),
+        },
+      ],
+      searchEvidence: [],
+      resolvedEntities: [],
+    },
+  });
+}
+
+function createLocalIdentificationNoMatch(
+  input: ClassifyBottleReferenceInput,
+): BottleClassificationResult {
+  return createDecidedBottleClassification({
+    decision: {
+      action: "no_match",
+      confidence: 0,
+      rationale: "Local identification did not find an exact alias match.",
+      candidateBottleIds: [],
+      identityScope: "product",
+      observation: null,
+      identityBasis: null,
+      confidenceBasis: {
+        band: "low",
+        positiveEvidence: [],
+        unresolvedRisks: ["No local identification agent is configured."],
+        toolsUsed: ["none"],
+        webEvidence: "not_used",
+      },
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId: null,
+      proposedBottle: null,
+      proposedRelease: null,
+    },
+    artifacts: {
+      extractedIdentity: input.extractedIdentity ?? null,
+      imageEvidence: input.imageEvidence ?? null,
+      candidates: [],
+      searchEvidence: [],
+      resolvedEntities: [],
+    },
+  });
+}
+
+export async function identifyExistingBottleReference(
+  input: ClassifyBottleReferenceInput,
+  options: {
+    allowExactAliasPreflight?: boolean;
+  } = {},
+) {
+  const reference = normalizeReferenceForClassifier(input.reference);
+  const normalizedInput = {
+    ...input,
+    reference,
+  };
+  const conversationId =
+    reference.id === undefined || reference.id === null
+      ? `bottle_identifier:${reference.name}`
+      : `bottle_identifier:${reference.id}`;
+
+  return await withSentryConversation(conversationId, async () => {
+    if (options.allowExactAliasPreflight !== false) {
+      const exactAliasClassification = await identifyExactAliasReference({
+        input: normalizedInput,
+      });
+      if (exactAliasClassification) {
+        return exactAliasClassification;
+      }
+    }
+
+    if (!config.OPENAI_API_KEY) {
+      return createLocalIdentificationNoMatch(normalizedInput);
+    }
+
+    return await getBottleClassifier().identifyExistingBottleReference(
+      normalizedInput,
+    );
   });
 }
 

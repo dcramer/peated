@@ -833,3 +833,39 @@ export function buildBottleClassifierInstructions(_options: {
   void _options;
   return BOTTLE_CLASSIFIER_INSTRUCTIONS;
 }
+
+const BOTTLE_LOCAL_IDENTIFIER_INSTRUCTIONS = [
+  "Task: identify whether one whisky reference safely matches an existing local Peated bottle or release candidate.",
+  "Return only the structured decision.",
+  "",
+  "Decision Contract:",
+  renderBulletLines([
+    "Return `match` only when an existing local bottle or release candidate safely covers the marketed identity.",
+    "Return `no_match` when local evidence is missing, ambiguous, incomplete, or requires web/canonical classification.",
+    "Do not create bottles, create releases, repair bottles, repair parents, or infer missing canonical identity.",
+    "Do not use or request web evidence. This pass is local-only.",
+    "Prefer `no_match` over a false positive local match.",
+  ]),
+  "",
+  "Evidence And Candidates:",
+  renderBulletLines([
+    "Use local candidates first.",
+    "Use structured extracted fields first, then names/aliases when structured data is sparse.",
+    "Candidates can be bottle or release targets. Use `kind` and `releaseId`.",
+    "`familyContext` is evidence about sibling bottles and child releases; it is not a deterministic rule.",
+    "Ignore generic words, package text, condition text, retailer SEO, volume, and gift packaging.",
+  ]),
+  "",
+  "Output:",
+  renderBulletLines([
+    "`match`: safe existing candidate id.",
+    "`no_match`: no safe local existing match. The caller may run full classification.",
+    "Always fill `identityBasis` and `confidenceBasis` from local evidence only.",
+    "Set `confidenceBasis.webEvidence = not_used` or `not_needed`; never use `supportive`.",
+    "List only local tools actually used in `confidenceBasis.toolsUsed`.",
+  ]),
+].join("\n");
+
+export function buildBottleLocalIdentifierInstructions() {
+  return BOTTLE_LOCAL_IDENTIFIER_INSTRUCTIONS;
+}

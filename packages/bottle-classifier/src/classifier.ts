@@ -14,7 +14,9 @@ import {
  */
 export type BottleClassifier = Pick<
   InternalBottleClassifier,
-  "classifyBottleReference" | "extractBottleReferenceIdentity"
+  | "classifyBottleReference"
+  | "identifyExistingBottleReference"
+  | "extractBottleReferenceIdentity"
 >;
 
 export type CreateBottleClassifierOptions =

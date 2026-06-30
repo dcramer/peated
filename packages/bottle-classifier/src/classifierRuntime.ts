@@ -36,7 +36,10 @@ import {
 import { BottleClassificationError } from "./error";
 import { createWhiskyLabelExtractor } from "./extractor";
 import type { ImageBottleEvidence } from "./imageEvidence";
-import { buildBottleClassifierInstructions } from "./instructions";
+import {
+  buildBottleClassifierInstructions,
+  buildBottleLocalIdentifierInstructions,
+} from "./instructions";
 import { getStableOpenAISettings } from "./openaiModelSettings";
 import {
   finalizeBottleReferenceClassification,
@@ -90,6 +93,7 @@ export type RunBottleClassifierAgentInput = {
   resolvedEntities?: EntityResolution[];
   investigationHint?: string | null;
   webSearchBudget?: BottleWebSearchBudget;
+  instructionMode?: "classification" | "local_identification";
 };
 
 export type BottleClassifierDataSource = {
@@ -142,6 +146,9 @@ export type BottleClassifier = {
   classifyBottleReference: (
     input: ClassifyBottleReferenceInput,
   ) => Promise<BottleClassificationResult>;
+  identifyExistingBottleReference: (
+    input: ClassifyBottleReferenceInput,
+  ) => Promise<BottleClassificationResult>;
   runBottleClassifierAgent: (
     input: RunBottleClassifierAgentInput,
   ) => Promise<BottleClassifierReasoningResult>;
@@ -170,6 +177,77 @@ function createIgnoredReferenceClassification(
     reason,
     artifacts,
   });
+}
+
+function createLocalIdentificationNoMatch({
+  decision,
+  artifacts,
+}: {
+  decision: BottleClassificationDecision;
+  artifacts: BottleClassificationArtifacts;
+}): BottleClassificationDecision {
+  if (decision.action === "no_match") {
+    return decision;
+  }
+
+  return {
+    action: "no_match",
+    confidence: Math.min(decision.confidence, 70),
+    rationale: [
+      decision.rationale,
+      `Local identification cannot return ${decision.action}; falling back to no_match for the match-only contract.`,
+    ]
+      .filter(Boolean)
+      .join(" "),
+    candidateBottleIds: decision.candidateBottleIds,
+    identityScope: decision.identityScope,
+    observation: decision.observation,
+    identityBasis: decision.identityBasis,
+    confidenceBasis: {
+      band: "review",
+      positiveEvidence: [],
+      unresolvedRisks: [
+        "The local-identification contract only allows existing matches.",
+      ],
+      toolsUsed: artifacts.candidates.length
+        ? ["initial_local_candidates"]
+        : [],
+      webEvidence: "not_used",
+    },
+    matchedBottleId: null,
+    matchedReleaseId: null,
+    parentBottleId: null,
+    proposedBottle: null,
+    proposedRelease: null,
+  };
+}
+
+function normalizeLocalIdentificationMatch(
+  decision: BottleClassificationDecision,
+): BottleClassificationDecision {
+  if (decision.action !== "match") {
+    return decision;
+  }
+
+  return {
+    ...decision,
+    confidenceBasis: {
+      band: decision.confidenceBasis?.band ?? "review",
+      positiveEvidence: decision.confidenceBasis?.positiveEvidence ?? [],
+      unresolvedRisks: decision.confidenceBasis?.unresolvedRisks ?? [],
+      toolsUsed: (decision.confidenceBasis?.toolsUsed ?? []).filter(
+        (tool) =>
+          tool === "initial_local_candidates" ||
+          tool === "search_bottles" ||
+          tool === "search_entities" ||
+          tool === "none",
+      ),
+      webEvidence:
+        decision.confidenceBasis?.webEvidence === "not_needed"
+          ? "not_needed"
+          : "not_used",
+    },
+  };
 }
 
 function hydratedCurrentBottleMatchesReference({
@@ -756,6 +834,7 @@ export async function prepareBottleClassifierAgentRun(
     resolvedEntities = [],
     investigationHint = null,
     webSearchBudget: inputWebSearchBudget,
+    instructionMode = "classification",
   }: RunBottleClassifierAgentInput,
 ): Promise<PreparedBottleClassifierAgentRun> {
   const dataSource = getBottleClassifierDataSource(options);
@@ -813,11 +892,15 @@ export async function prepareBottleClassifierAgentRun(
     createBottleWebSearchBudget(options.maxSearchQueries);
   const useFirecrawlWebSearch =
     allowCandidateExpansion && !!options.firecrawlApiKey;
-  const instructions = buildBottleClassifierInstructions({
-    maxSearchQueries: options.maxSearchQueries,
-    hasBottleSearch: allowCandidateExpansion,
-    hasEntitySearch: allowCandidateExpansion && !!dataSource.searchEntities,
-  });
+  const instructions =
+    instructionMode === "local_identification"
+      ? buildBottleLocalIdentifierInstructions()
+      : buildBottleClassifierInstructions({
+          maxSearchQueries: options.maxSearchQueries,
+          hasBottleSearch: allowCandidateExpansion,
+          hasEntitySearch:
+            allowCandidateExpansion && !!dataSource.searchEntities,
+        });
 
   const tools = allowCandidateExpansion
     ? [
@@ -1054,6 +1137,7 @@ export function createBottleClassifier(
     resolvedEntities = [],
     investigationHint = null,
     webSearchBudget,
+    instructionMode = "classification",
   }: RunBottleClassifierAgentInput): Promise<BottleClassifierReasoningRun> => {
     if (options.overrides?.runBottleClassifierAgent) {
       const reasoning = await options.overrides.runBottleClassifierAgent({
@@ -1066,6 +1150,7 @@ export function createBottleClassifier(
         resolvedEntities,
         investigationHint,
         webSearchBudget,
+        instructionMode,
       });
 
       return {
@@ -1097,6 +1182,7 @@ export function createBottleClassifier(
       resolvedEntities,
       investigationHint,
       webSearchBudget,
+      instructionMode,
     });
 
     return {
@@ -1288,8 +1374,143 @@ export function createBottleClassifier(
     }
   };
 
+  const identifyExistingBottleReference = async (
+    input: ClassifyBottleReferenceInput,
+  ): Promise<BottleClassificationResult> => {
+    const parsedInput = ClassifyBottleReferenceInputSchema.parse(input);
+    let artifacts = buildBottleClassificationArtifacts({});
+
+    try {
+      const deterministicIdentitySeed = getDeterministicIdentitySeed(
+        parsedInput.reference,
+      );
+      const rawExtractedIdentity =
+        parsedInput.extractedIdentity !== undefined
+          ? parsedInput.extractedIdentity
+          : (deterministicIdentitySeed ??
+            (await extractBottleReferenceIdentity(parsedInput.reference)));
+      const extractedIdentity = applyDeterministicIdentitySeed({
+        reference: parsedInput.reference,
+        extractedIdentity: rawExtractedIdentity,
+      });
+
+      artifacts = buildBottleClassificationArtifacts({
+        extractedIdentity,
+        imageEvidence: parsedInput.imageEvidence ?? null,
+      });
+
+      const autoIgnoreReason = getAutoIgnoreBottleReferenceReason(
+        parsedInput.reference.name,
+        artifacts.extractedIdentity,
+      );
+      if (autoIgnoreReason) {
+        return BottleClassificationResultSchema.parse(
+          createIgnoredReferenceClassification(autoIgnoreReason, artifacts),
+        );
+      }
+
+      const candidates = await resolveInitialCandidates({
+        reference: parsedInput.reference,
+        extractedIdentity,
+        initialCandidates: parsedInput.initialCandidates,
+      });
+
+      artifacts = buildBottleClassificationArtifacts({
+        extractedIdentity,
+        imageEvidence: parsedInput.imageEvidence ?? null,
+        candidates,
+      });
+
+      const deterministicDecision = resolveDeterministicBottleReference({
+        reference: parsedInput.reference,
+        artifacts,
+      });
+      if (candidates.length === 0) {
+        return BottleClassificationResultSchema.parse(
+          createDecidedBottleClassification({
+            decision: {
+              action: "no_match",
+              confidence: 0,
+              rationale:
+                "Local identification found no existing bottle or release candidates.",
+              candidateBottleIds: [],
+              identityScope: "product",
+              observation: null,
+              identityBasis: null,
+              confidenceBasis: {
+                band: "low",
+                positiveEvidence: [],
+                unresolvedRisks: ["No local candidates were found."],
+                toolsUsed: ["initial_local_candidates"],
+                webEvidence: "not_used",
+              },
+              matchedBottleId: null,
+              matchedReleaseId: null,
+              parentBottleId: null,
+              proposedBottle: null,
+              proposedRelease: null,
+            },
+            artifacts,
+          }),
+        );
+      }
+      if (deterministicDecision?.action === "match") {
+        return BottleClassificationResultSchema.parse(
+          createDecidedBottleClassification({
+            decision: deterministicDecision,
+            artifacts,
+          }),
+        );
+      }
+
+      const reasoningRun = await runBottleClassifierAgentWithBudget({
+        reference: parsedInput.reference,
+        extractedIdentity: artifacts.extractedIdentity,
+        imageEvidence: artifacts.imageEvidence,
+        initialCandidates: artifacts.candidates,
+        candidateExpansion: "initial_only",
+        searchEvidence: [],
+        resolvedEntities: [],
+        investigationHint: null,
+        webSearchBudget: createBottleWebSearchBudget(0),
+        instructionMode: "local_identification",
+      });
+      const { decision, artifacts: reasoningArtifacts } =
+        await finalizeBottleClassifierReasoningResult({
+          reference: parsedInput.reference,
+          reasoning: reasoningRun.reasoning,
+        });
+
+      return BottleClassificationResultSchema.parse(
+        createDecidedBottleClassification({
+          decision:
+            decision.action === "match"
+              ? normalizeLocalIdentificationMatch(decision)
+              : createLocalIdentificationNoMatch({
+                  decision,
+                  artifacts: reasoningArtifacts,
+                }),
+          artifacts: reasoningArtifacts,
+        }),
+      );
+    } catch (error) {
+      if (error instanceof BottleClassificationError) {
+        throw error;
+      }
+
+      throw new BottleClassificationError(
+        error instanceof Error ? error.message : "Unknown classifier error",
+        artifacts,
+        {
+          cause: error,
+        },
+      );
+    }
+  };
+
   return {
     classifyBottleReference,
+    identifyExistingBottleReference,
     runBottleClassifierAgent,
     extractBottleReferenceIdentity,
     extractFromImage,

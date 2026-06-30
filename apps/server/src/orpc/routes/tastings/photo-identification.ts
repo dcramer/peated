@@ -2,6 +2,7 @@
 // reuse a pending upload, but it must not create tastings, bottles, releases, or
 // durable classifier trace rows.
 import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
+import { identifyExistingBottleReference } from "@peated/server/agents/bottleClassifier/identifyExistingBottleReference";
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
@@ -229,7 +230,7 @@ export async function identifyPendingImage({
         pendingUpload: pendingImage,
       });
 
-    const classification = await classifyBottleReference({
+    const classificationInput = {
       reference: {
         id: pendingImage.id,
         name: buildPhotoReferenceName(extractedIdentity),
@@ -238,7 +239,18 @@ export async function identifyPendingImage({
       },
       extractedIdentity,
       imageEvidence,
-    });
+    };
+    const localIdentification = await identifyExistingBottleReference(
+      classificationInput,
+      {
+        allowExactAliasPreflight: false,
+      },
+    );
+    const classification =
+      localIdentification.status === "classified" &&
+      localIdentification.decision.action === "match"
+        ? localIdentification
+        : await classifyBottleReference(classificationInput);
 
     return {
       imageEvidence,
