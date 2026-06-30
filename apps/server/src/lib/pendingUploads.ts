@@ -24,6 +24,7 @@ export const DEFAULT_PENDING_UPLOAD_TTL_MS = 1000 * 60 * 60 * 48;
 export class PendingUploadError extends Error {}
 export class PendingUploadNotFoundError extends PendingUploadError {}
 export class PendingUploadExpiredError extends PendingUploadError {}
+export class PendingUploadPurposeError extends PendingUploadError {}
 
 type ProcessCallback = (
   stream: Readable,
@@ -184,15 +185,21 @@ export async function getUsablePendingUpload({
   return pendingUpload;
 }
 
+/**
+ * Copies a pending upload into a permanent namespace and marks it attached.
+ * When `purpose` is provided, it must match the pending upload's purpose.
+ */
 export async function copyPendingUploadToPermanent({
   id,
   userId,
+  purpose,
   destinationNamespace,
   attachedToType,
   attachedToId,
 }: {
   id: string;
   userId: number;
+  purpose?: NewPendingUpload["purpose"];
   destinationNamespace: (typeof PERMANENT_UPLOAD_NAMESPACES)[number];
   attachedToType: string;
   attachedToId: number;
@@ -202,6 +209,10 @@ export async function copyPendingUploadToPermanent({
   }
 
   const pendingUpload = await getUsablePendingUpload({ id, userId });
+  if (purpose && pendingUpload.purpose !== purpose) {
+    throw new PendingUploadPurposeError("Pending upload purpose mismatch.");
+  }
+
   const input = filenameFromUploadUrl(pendingUpload.imageUrl);
   const output = `${destinationNamespace}/${path.posix.basename(input)}`;
 

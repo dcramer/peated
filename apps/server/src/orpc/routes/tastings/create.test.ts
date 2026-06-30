@@ -1,6 +1,13 @@
 import { db } from "@peated/server/db";
-import { bottles, entities, tastings } from "@peated/server/db/schema";
+import {
+  bottles,
+  entities,
+  pendingUploads,
+  tastings,
+} from "@peated/server/db/schema";
+import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import waitError from "@peated/server/lib/test/waitError";
+import { compressAndResizeImage } from "@peated/server/lib/uploads";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
@@ -54,6 +61,78 @@ describe("POST /tastings", () => {
       .from(entities)
       .where(eq(entities.id, entity.id));
     expect(newEntity.totalTastings).toBe(1);
+  });
+
+  test("attaches a pending photo upload to the new tasting", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const pendingUpload = await createPendingImageUpload({
+      file: await fixtures.SampleSquareImage(),
+      createdById: defaults.user.id,
+      purpose: "photo_tasting_entry",
+      onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
+    });
+
+    const data = await routerClient.tastings.create(
+      {
+        bottle: bottle.id,
+        pendingImageId: pendingUpload.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data.tasting.imageUrl).toContain("/uploads/tastings/");
+
+    const [tasting] = await db
+      .select()
+      .from(tastings)
+      .where(eq(tastings.id, data.tasting.id));
+    expect(tasting.imageUrl).toMatch(
+      /^\/uploads\/tastings\/pending-upload-.+\.webp$/,
+    );
+
+    const attachedUpload = await db.query.pendingUploads.findFirst({
+      where: eq(pendingUploads.id, pendingUpload.id),
+    });
+    expect(attachedUpload).toMatchObject({
+      status: "attached",
+      attachedToType: "tasting",
+      attachedToId: tasting.id,
+    });
+  });
+
+  test("rejects an unusable pending photo upload before creating the tasting", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const pendingUpload = await createPendingImageUpload({
+      file: await fixtures.SampleSquareImage(),
+      createdById: defaults.user.id,
+      purpose: "avatar",
+      onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
+    });
+
+    const err = await waitError(() =>
+      routerClient.tastings.create(
+        {
+          bottle: bottle.id,
+          pendingImageId: pendingUpload.id,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Pending upload purpose mismatch.]`,
+    );
+
+    const tastingRows = await db
+      .select()
+      .from(tastings)
+      .where(eq(tastings.bottleId, bottle.id));
+    expect(tastingRows).toHaveLength(0);
   });
 
   test("creates a new tasting with tags", async ({ defaults, fixtures }) => {

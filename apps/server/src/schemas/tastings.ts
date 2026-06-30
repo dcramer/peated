@@ -109,6 +109,12 @@ export const TastingInputSchema = TastingSchema.omit({
     .nullish()
     .describe("Custom creation timestamp for the tasting"),
   image: z.null().optional().describe("Optional image upload for the tasting"),
+  pendingImageId: z
+    .string()
+    .trim()
+    .min(1)
+    .optional()
+    .describe("Pending image upload to attach to the tasting"),
   friends: z
     .array(z.number())
     .default([])

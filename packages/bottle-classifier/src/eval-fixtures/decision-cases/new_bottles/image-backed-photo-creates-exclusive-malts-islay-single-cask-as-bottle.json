@@ -108,6 +108,7 @@
     "action": "create_bottle",
     "identityScope": "exact_cask",
     "proposedBottle": {
+      "name": "Islay 2007 8-year-old",
       "brand": {
         "name": "The Exclusive Malts"
       },

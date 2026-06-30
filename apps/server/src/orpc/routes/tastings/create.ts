@@ -14,6 +14,11 @@ import {
 import { awardAllBadgeXp } from "@peated/server/lib/badges";
 import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
+import {
+  copyPendingUploadToPermanent,
+  getUsablePendingUpload,
+  PendingUploadError,
+} from "@peated/server/lib/pendingUploads";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -84,6 +89,25 @@ export default procedure
       }
     }
 
+    if (input.pendingImageId) {
+      try {
+        const pendingUpload = await getUsablePendingUpload({
+          id: input.pendingImageId,
+          userId: context.user.id,
+        });
+        if (pendingUpload.purpose !== "photo_tasting_entry") {
+          throw new PendingUploadError("Pending upload purpose mismatch.");
+        }
+      } catch (err) {
+        if (err instanceof PendingUploadError) {
+          throw errors.BAD_REQUEST({
+            message: err.message || "Pending photo is no longer available.",
+          });
+        }
+        throw err;
+      }
+    }
+
     let flight: Flight | null = null;
     if (input.flight) {
       const flightResults = await db
@@ -140,7 +164,7 @@ export default procedure
       data.friends = input.friends;
     }
 
-    const [tasting, awards] = await db.transaction(async (tx) => {
+    let [tasting, awards] = await db.transaction(async (tx) => {
       let tasting: Tasting | undefined;
       try {
         [tasting] = await tx.insert(tastings).values(data).returning();
@@ -225,6 +249,33 @@ export default procedure
       throw errors.INTERNAL_SERVER_ERROR({
         message: "Unable to create tasting.",
       });
+    }
+
+    if (input.pendingImageId) {
+      try {
+        const imageUrl = await copyPendingUploadToPermanent({
+          id: input.pendingImageId,
+          userId: context.user.id,
+          purpose: "photo_tasting_entry",
+          destinationNamespace: "tastings",
+          attachedToType: "tasting",
+          attachedToId: tasting.id,
+        });
+        [tasting] = await db
+          .update(tastings)
+          .set({ imageUrl })
+          .where(eq(tastings.id, tasting.id))
+          .returning();
+      } catch (err) {
+        logError(err, {
+          tasting: {
+            id: tasting.id,
+          },
+          pendingUpload: {
+            id: input.pendingImageId,
+          },
+        });
+      }
     }
 
     if (!context.user.private) {

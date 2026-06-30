@@ -73,8 +73,8 @@ function toReleaseOption(
 
 export default function TastingForm({
   onSubmit,
+  errorMessage,
   initialData,
-  initialImageFile,
   showReleasePickerDefault = false,
   title,
   suggestedTags,
@@ -84,10 +84,10 @@ export default function TastingForm({
       image: ImageValue;
     }
   >;
+  errorMessage?: string;
   initialData: Partial<z.infer<typeof TastingSchema>> & {
     bottle: Bottle;
   };
-  initialImageFile?: File | null;
   showReleasePickerDefault?: boolean;
   title: string;
   suggestedTags: Paginated<SuggestedTag>;
@@ -112,7 +112,7 @@ export default function TastingForm({
   });
 
   const [error, setError] = useState<string | undefined>();
-  const [image, setImage] = useState<ImageValue>(initialImageFile);
+  const [image, setImage] = useState<ImageValue>();
   const [friendsValue, setFriendsValue] = useState<Option[]>(
     initialData.friends ? initialData.friends.map(userToOption) : [],
   );
@@ -160,7 +160,9 @@ export default function TastingForm({
         />
       </div>
 
-      {error && <FormError values={[error]} />}
+      {(error || errorMessage) && (
+        <FormError values={[error, errorMessage].filter(Boolean)} />
+      )}
 
       <Form
         onSubmit={handleSubmit(onSubmitHandler)}
@@ -201,19 +203,21 @@ export default function TastingForm({
                     }}
                     value={releaseValue}
                   />
-                  <button
-                    className="text-muted text-sm underline"
-                    type="button"
-                    onClick={() => {
-                      onChange(null);
-                      setReleaseValue(undefined);
-                      if (!showReleasePickerDefault) {
-                        setShowReleasePicker(false);
-                      }
-                    }}
-                  >
-                    Use Bottle Instead
-                  </button>
+                  {(!showReleasePickerDefault || releaseValue) && (
+                    <Button
+                      size="small"
+                      type="button"
+                      onClick={() => {
+                        onChange(null);
+                        setReleaseValue(undefined);
+                        if (!showReleasePickerDefault) {
+                          setShowReleasePicker(false);
+                        }
+                      }}
+                    >
+                      Use main bottle
+                    </Button>
+                  )}
                 </div>
               ) : (
                 <div className="rounded border border-slate-800 bg-slate-950/40 p-4">
@@ -312,7 +316,6 @@ export default function TastingForm({
             name="image"
             label="Picture"
             value={initialData.imageUrl}
-            initialFile={initialImageFile}
             onChange={(value) => setImage(value)}
             imageWidth={1024 / 2}
             imageHeight={768 / 2}
