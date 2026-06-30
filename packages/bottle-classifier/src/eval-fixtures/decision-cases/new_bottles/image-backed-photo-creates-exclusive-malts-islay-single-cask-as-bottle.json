@@ -24,6 +24,68 @@
       "cask_strength": true,
       "single_cask": true,
       "edition": null
+    },
+    "imageEvidence": {
+      "sourceImageId": "exclusive-malts-islay-2007",
+      "extractors": [
+        {
+          "kind": "ocr",
+          "confidence": 0.96,
+          "textSpans": [
+            {
+              "text": "The Exclusive Malts Scotch Single Malt Whisky 2007 Aged 8 Years Distilled at an Islay Distillery Islay Distilled 17 October 2007 Bottled May 2016 Cask No. 1661 One of 312 Bottles 57.1% Cask Strength Natural Colour",
+              "confidence": 0.96
+            }
+          ],
+          "observations": [
+            "Label identifies this as a single-cask Islay bottling, cask no. 1661, one of 312 bottles."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "The Exclusive Malts",
+          "confidence": 0.97,
+          "sourceExtractorIndexes": [0]
+        },
+        "expression": {
+          "value": "Islay",
+          "confidence": 0.95,
+          "sourceExtractorIndexes": [0]
+        },
+        "statedAge": {
+          "value": 8,
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 57.1,
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "vintageYear": {
+          "value": 2007,
+          "confidence": 0.97,
+          "sourceExtractorIndexes": [0]
+        },
+        "releaseYear": {
+          "value": 2016,
+          "confidence": 0.95,
+          "sourceExtractorIndexes": [0]
+        },
+        "caskNumber": {
+          "value": "1661",
+          "confidence": 0.96,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": true,
+        "suitableAsBottleImage": true
+      },
+      "conflicts": []
     }
   },
   "provenance": {
@@ -46,7 +108,6 @@
     "action": "create_bottle",
     "identityScope": "exact_cask",
     "proposedBottle": {
-      "name": "Islay 8-year-old 2007",
       "brand": {
         "name": "The Exclusive Malts"
       },
@@ -61,8 +122,8 @@
       "caskStrength": true,
       "singleCask": true
     },
+    "proposedBottleNameIncludes": ["Islay", "8-year-old", "2007"],
     "proposedRelease": null,
-    "confidenceBand": "review",
     "verifyEligible": false,
     "summary": "Create one bottle for this The Exclusive Malts undisclosed Islay single-cask bottling. A generic The Exclusive Malts Islay parent is too weak to describe the marketed identity, and the age, vintage, ABV, and cask-strength/single-cask facts should not be hidden in a lone child release."
   },
