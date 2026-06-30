@@ -190,7 +190,7 @@ function getManualResultCopy(result: PhotoIdentification | null) {
 
   if (action === "match") {
     return {
-      title: "Use search instead",
+      title: "Possible match needs review",
       description:
         "We found a possible match, but it was not confident enough to use automatically.",
     };
@@ -198,9 +198,9 @@ function getManualResultCopy(result: PhotoIdentification | null) {
 
   if (action === "no_match") {
     return {
-      title: "Use search instead",
+      title: "No match found",
       description:
-        "We could not find a confident Peated match from this photo.",
+        "We couldn't find a confident Peated match from this photo. Search with the details we could read, or start over with a clearer photo.",
     };
   }
 
@@ -233,6 +233,42 @@ function EvidencePills({ result }: { result: PhotoIdentification | null }) {
           <span className="font-medium text-white">{value}</span>
         </div>
       ))}
+    </div>
+  );
+}
+
+function ResultHeader({
+  previewUrl,
+  icon,
+  title,
+  description,
+  children,
+}: {
+  previewUrl: string | null;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-start gap-4">
+      {previewUrl && (
+        <img
+          src={previewUrl}
+          alt=""
+          className="h-16 w-16 shrink-0 rounded object-cover sm:h-[96px] sm:w-[96px]"
+        />
+      )}
+      <div className="min-w-0 flex-1 space-y-3">
+        <div className="flex items-start gap-3">
+          {icon}
+          <div>
+            <div className="font-semibold text-white">{title}</div>
+            <div className="text-muted mt-1 text-sm">{description}</div>
+          </div>
+        </div>
+        {children}
+      </div>
     </div>
   );
 }
@@ -542,7 +578,7 @@ function AddTastingForm() {
             <button
               type="button"
               aria-label="Back"
-              className="text-muted group flex justify-center"
+              className="text-muted group flex justify-center lg:hidden"
               onClick={() => router.back()}
             >
               <div className="-my-1 rounded bg-slate-800 p-1 group-hover:bg-slate-700 group-hover:text-white">
@@ -638,18 +674,18 @@ function AddTastingForm() {
         )}
 
         {isIdentifying && (
-          <section className="flex min-h-[calc(100vh-12rem)] items-center justify-center px-3 py-8 text-center">
-            <div className="mx-auto max-w-md space-y-5">
+          <section className="flex min-h-[calc(100vh-12rem)] items-center justify-center px-3 py-8 text-center sm:min-h-0 sm:items-start sm:justify-start sm:py-10 sm:text-left">
+            <div className="mx-auto max-w-md space-y-5 sm:flex sm:max-w-3xl sm:items-center sm:gap-8 sm:space-y-0">
               {previewUrl && (
                 <img
                   src={previewUrl}
                   alt="Selected bottle label"
-                  className="mx-auto h-28 w-28 rounded object-cover"
+                  className="mx-auto h-28 w-28 rounded object-cover sm:mx-0 sm:h-56 sm:w-56"
                 />
               )}
               <div>
-                <LoaderCircle className="text-highlight mx-auto h-8 w-8 animate-spin" />
-                <h2 className="mt-4 text-xl font-semibold text-white">
+                <LoaderCircle className="text-highlight mx-auto h-8 w-8 animate-spin sm:hidden" />
+                <h2 className="add-tasting-loading-shimmer via-highlight mt-4 inline-block bg-gradient-to-r from-white to-white bg-[length:200%_100%] bg-clip-text text-xl font-semibold text-transparent sm:mt-0">
                   {loadingMessages[loadingMessageIndex]}
                 </h2>
                 <p className="text-muted mt-2 text-sm">
@@ -677,72 +713,48 @@ function AddTastingForm() {
               <div className="space-y-5">
                 <div className="space-y-4">
                   {matchedBottleId ? (
-                    <div className="flex items-start gap-3">
-                      {previewUrl && (
-                        <img
-                          src={previewUrl}
-                          alt=""
-                          className="h-8 w-8 rounded object-cover"
-                        />
-                      )}
-                      <div className="bg-highlight rounded-full p-2 text-black">
-                        <Check className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-white">
-                          Match found
+                    <ResultHeader
+                      previewUrl={previewUrl}
+                      icon={
+                        <div className="bg-highlight rounded-full p-2 text-black">
+                          <Check className="h-5 w-5" />
                         </div>
-                        <div className="text-muted mt-1 text-sm">
-                          We'll use the existing bottle for this tasting.
-                        </div>
-                      </div>
-                    </div>
+                      }
+                      title="Match found"
+                      description="We'll use the existing bottle for this tasting."
+                    >
+                      <EvidencePills result={photoResult} />
+                    </ResultHeader>
                   ) : createDecision ? (
-                    <div className="flex items-start gap-3">
-                      {previewUrl && (
-                        <img
-                          src={previewUrl}
-                          alt=""
-                          className="h-8 w-8 rounded object-cover"
-                        />
-                      )}
-                      <div className="bg-highlight rounded-full p-2 text-black">
-                        <Plus className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-white">
-                          {createProposalLabel?.title ?? "New bottle found"}
+                    <ResultHeader
+                      previewUrl={previewUrl}
+                      icon={
+                        <div className="bg-highlight rounded-full p-2 text-black">
+                          <Plus className="h-5 w-5" />
                         </div>
-                        <div className="text-muted mt-1 text-sm">
-                          {createProposalLabel?.description ??
-                            "We'll create this bottle before recording your tasting."}
-                        </div>
-                      </div>
-                    </div>
+                      }
+                      title={createProposalLabel?.title ?? "New bottle found"}
+                      description={
+                        createProposalLabel?.description ??
+                        "We'll create this bottle before recording your tasting."
+                      }
+                    >
+                      <EvidencePills result={photoResult} />
+                    </ResultHeader>
                   ) : (
-                    <div className="flex items-start gap-3">
-                      {previewUrl && (
-                        <img
-                          src={previewUrl}
-                          alt=""
-                          className="h-8 w-8 rounded object-cover"
-                        />
-                      )}
-                      <div className="text-highlight rounded-full bg-slate-800 p-2">
-                        <AlertTriangle className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-white">
-                          {manualResultCopy.title}
+                    <ResultHeader
+                      previewUrl={previewUrl}
+                      icon={
+                        <div className="text-highlight rounded-full bg-slate-800 p-2">
+                          <AlertTriangle className="h-5 w-5" />
                         </div>
-                        <div className="text-muted mt-1 text-sm">
-                          {manualResultCopy.description}
-                        </div>
-                      </div>
-                    </div>
+                      }
+                      title={manualResultCopy.title}
+                      description={manualResultCopy.description}
+                    >
+                      <EvidencePills result={photoResult} />
+                    </ResultHeader>
                   )}
-
-                  <EvidencePills result={photoResult} />
 
                   {createDecision && proposedName && (
                     <div className="rounded border border-slate-800 bg-slate-950 p-3">
@@ -777,43 +789,80 @@ function AddTastingForm() {
                       </div>
                     )}
                 </div>
-                <div className="mx-auto grid w-full gap-2 sm:w-1/2">
-                  {matchedBottleId && (
+                {matchedBottleId || createDecision ? (
+                  <div className="mx-auto grid w-full gap-2 sm:w-1/2">
+                    {matchedBottleId && (
+                      <Button
+                        color="highlight"
+                        fullWidth
+                        onClick={() =>
+                          void loadTarget(matchedBottleId, matchedReleaseId)
+                        }
+                      >
+                        Continue
+                      </Button>
+                    )}
+                    {createDecision && (
+                      <Button
+                        color="highlight"
+                        fullWidth
+                        icon={<Plus className="h-4 w-4" />}
+                        onClick={() => void acceptCreateProposal(photoResult)}
+                        disabled={photoIdentificationCreateMutation.isPending}
+                      >
+                        {photoIdentificationCreateMutation.isPending
+                          ? "Creating..."
+                          : "Continue"}
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="grid w-full gap-3 sm:w-auto sm:grid-cols-2">
                     <Button
+                      href={searchHref}
                       color="highlight"
                       fullWidth
-                      onClick={() =>
-                        void loadTarget(matchedBottleId, matchedReleaseId)
-                      }
+                      icon={<Search className="h-4 w-4" />}
                     >
-                      Continue
+                      Search Bottles
                     </Button>
-                  )}
-                  {createDecision && (
                     <Button
-                      color="highlight"
                       fullWidth
-                      icon={<Plus className="h-4 w-4" />}
-                      onClick={() => void acceptCreateProposal(photoResult)}
-                      disabled={photoIdentificationCreateMutation.isPending}
+                      onClick={startOver}
+                      icon={<RotateCcw className="h-4 w-4" />}
                     >
-                      {photoIdentificationCreateMutation.isPending
-                        ? "Creating..."
-                        : "Continue"}
+                      Start Over
                     </Button>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </section>
-            <FallbackActions
-              searchHref={searchHref}
-              showStartOver
-              onStartOver={startOver}
-            />
+            {(matchedBottleId || createDecision) && (
+              <FallbackActions
+                searchHref={searchHref}
+                showStartOver
+                onStartOver={startOver}
+              />
+            )}
           </>
         )}
 
         {error && <FormError values={[error]} />}
+
+        <style jsx global>{`
+          @keyframes add-tasting-loading-shimmer {
+            0% {
+              background-position: 200% 0;
+            }
+            100% {
+              background-position: -200% 0;
+            }
+          }
+
+          .add-tasting-loading-shimmer {
+            animation: add-tasting-loading-shimmer 2.4s ease-in-out infinite;
+          }
+        `}</style>
       </div>
     </Layout>
   );
