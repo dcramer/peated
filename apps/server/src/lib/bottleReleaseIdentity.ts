@@ -1,6 +1,7 @@
 import type { ReleaseIdentityInput } from "@peated/bottle-classifier/releaseIdentity";
 import { type AnyDatabase } from "@peated/server/db";
 import { bottleReleases } from "@peated/server/db/schema";
+import type { CaskFill, CaskSize, CaskType } from "@peated/server/types";
 import { and, eq, isNull, sql } from "drizzle-orm";
 
 function getBottleReleaseIdentityWhere({
@@ -35,14 +36,14 @@ function getBottleReleaseIdentityWhere({
     release.caskStrength !== null
       ? eq(bottleReleases.caskStrength, release.caskStrength)
       : isNull(bottleReleases.caskStrength),
-    release.caskSize !== null
-      ? eq(bottleReleases.caskSize, release.caskSize)
+    release.caskSize !== null && release.caskSize !== undefined
+      ? eq(bottleReleases.caskSize, release.caskSize as CaskSize)
       : isNull(bottleReleases.caskSize),
-    release.caskType !== null
-      ? eq(bottleReleases.caskType, release.caskType)
+    release.caskType !== null && release.caskType !== undefined
+      ? eq(bottleReleases.caskType, release.caskType as CaskType)
       : isNull(bottleReleases.caskType),
-    release.caskFill !== null
-      ? eq(bottleReleases.caskFill, release.caskFill)
+    release.caskFill !== null && release.caskFill !== undefined
+      ? eq(bottleReleases.caskFill, release.caskFill as CaskFill)
       : isNull(bottleReleases.caskFill),
     excludeReleaseId !== undefined
       ? sql`${bottleReleases.id} != ${excludeReleaseId}`

@@ -89,12 +89,12 @@ import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
 import type {
   BottleInputSchema,
   BottleReleaseInputSchema,
-  PriceMatchCandidateSchema,
   PriceMatchSearchEvidenceSchema,
   ProposedReleaseSchema,
 } from "@peated/server/schemas";
 import {
   ExtractedBottleDetailsSchema,
+  PriceMatchCandidateSchema,
   ProposedBottleSchema,
   StorePriceMatchDecisionSchema,
 } from "@peated/server/schemas";
@@ -111,6 +111,60 @@ type StorePriceMatchDecision = z.infer<typeof StorePriceMatchDecisionSchema>;
 type StorePriceMatchProposalForReview = StorePriceMatchProposal & {
   price: StorePrice;
 };
+
+function withStoreCaskBottleDefaults(
+  proposedBottle: BottleClassificationDecision["proposedBottle"],
+): ProposedBottle | null {
+  return proposedBottle
+    ? {
+        ...proposedBottle,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+      }
+    : null;
+}
+
+function withStoreCaskReleaseDefaults(
+  proposedRelease: BottleClassificationDecision["proposedRelease"],
+): ProposedRelease | null {
+  return proposedRelease
+    ? {
+        ...proposedRelease,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+      }
+    : null;
+}
+
+function withStoreExtractedLabelDefaults(
+  extractedLabel: ClassifyBottleReferenceInput["extractedIdentity"],
+): ExtractedBottleDetails | null {
+  return extractedLabel
+    ? {
+        ...extractedLabel,
+        cask_type: null,
+        cask_size: null,
+        cask_fill: null,
+      }
+    : null;
+}
+
+function withStoreCandidateDefaults(candidate: unknown): PriceMatchCandidate {
+  return PriceMatchCandidateSchema.parse({
+    ...(candidate as Record<string, unknown>),
+    caskType: null,
+    caskSize: null,
+    caskFill: null,
+  });
+}
+
+function withStoreCandidateDefaultsList(
+  candidates: unknown[],
+): PriceMatchCandidate[] {
+  return candidates.map(withStoreCandidateDefaults);
+}
 
 function parseStoredExtractedLabel(
   proposal: StorePriceMatchProposal | null | undefined,
@@ -466,11 +520,11 @@ function maybeBuildExistingBottleRepairDecision({
   if (
     !candidateMatchesRepairDraftIdentity(
       currentBottleCandidate,
-      decision.proposedBottle,
+      withStoreCaskBottleDefaults(decision.proposedBottle)!,
     ) ||
     !candidateNeedsExistingBottleRepair(
       currentBottleCandidate,
-      decision.proposedBottle,
+      withStoreCaskBottleDefaults(decision.proposedBottle)!,
     )
   ) {
     return null;
@@ -489,7 +543,7 @@ function maybeBuildExistingBottleRepairDecision({
     suggestedReleaseId: null,
     parentBottleId: null,
     creationTarget: null,
-    proposedBottle: decision.proposedBottle,
+    proposedBottle: withStoreCaskBottleDefaults(decision.proposedBottle),
     proposedRelease: null,
   };
 }
@@ -537,7 +591,7 @@ function toStorePriceMatchDecision({
       suggestedReleaseId: null,
       parentBottleId: null,
       creationTarget: null,
-      proposedBottle: decision.proposedBottle,
+      proposedBottle: withStoreCaskBottleDefaults(decision.proposedBottle),
       proposedRelease: null,
     };
   }
@@ -562,7 +616,7 @@ function toStorePriceMatchDecision({
       suggestedReleaseId: null,
       parentBottleId: null,
       creationTarget: "bottle",
-      proposedBottle: decision.proposedBottle,
+      proposedBottle: withStoreCaskBottleDefaults(decision.proposedBottle),
       proposedRelease: null,
     };
   }
@@ -579,7 +633,7 @@ function toStorePriceMatchDecision({
       parentBottleId: decision.parentBottleId,
       creationTarget: "release",
       proposedBottle: null,
-      proposedRelease: decision.proposedRelease,
+      proposedRelease: withStoreCaskReleaseDefaults(decision.proposedRelease),
     };
   }
 
@@ -594,8 +648,8 @@ function toStorePriceMatchDecision({
       suggestedReleaseId: null,
       parentBottleId: null,
       creationTarget: "bottle_and_release",
-      proposedBottle: decision.proposedBottle,
-      proposedRelease: decision.proposedRelease,
+      proposedBottle: withStoreCaskBottleDefaults(decision.proposedBottle),
+      proposedRelease: withStoreCaskReleaseDefaults(decision.proposedRelease),
     };
   }
 
@@ -615,8 +669,8 @@ function toStorePriceMatchDecision({
       suggestedReleaseId: null,
       parentBottleId: decision.parentBottleId,
       creationTarget: null,
-      proposedBottle: decision.proposedBottle,
-      proposedRelease: decision.proposedRelease,
+      proposedBottle: withStoreCaskBottleDefaults(decision.proposedBottle),
+      proposedRelease: withStoreCaskReleaseDefaults(decision.proposedRelease),
     };
   }
 
@@ -1909,8 +1963,12 @@ export async function resolveStorePriceMatchProposal(
 
     const classification = await classifyBottleReference(classificationInput);
 
-    extractedLabel = classification.artifacts.extractedIdentity;
-    candidates = classification.artifacts.candidates;
+    extractedLabel = withStoreExtractedLabelDefaults(
+      classification.artifacts.extractedIdentity,
+    );
+    candidates = withStoreCandidateDefaultsList(
+      classification.artifacts.candidates,
+    );
     searchEvidence = classification.artifacts.searchEvidence;
 
     if (isIgnoredBottleClassification(classification)) {
@@ -2094,11 +2152,11 @@ export async function resolveStorePriceMatchProposal(
       price,
       extractedLabel:
         err instanceof BottleClassificationError
-          ? err.artifacts.extractedIdentity
+          ? withStoreExtractedLabelDefaults(err.artifacts.extractedIdentity)
           : extractedLabel,
       candidates:
         err instanceof BottleClassificationError
-          ? err.artifacts.candidates
+          ? withStoreCandidateDefaultsList(err.artifacts.candidates)
           : candidates,
       searchEvidence:
         err instanceof BottleClassificationError

@@ -40,6 +40,17 @@ type StructuredAutomationIssue = {
   path?: unknown;
 };
 
+function normalizeStoredProposedBottle(
+  proposedBottle: unknown,
+): ReturnType<typeof ProposedBottleSchema.parse> {
+  return {
+    ...normalizeProposedBottleDraft(ProposedBottleSchema.parse(proposedBottle)),
+    caskType: null,
+    caskSize: null,
+    caskFill: null,
+  };
+}
+
 function getPersistedAutomationAssessment(proposal: StorePriceMatchProposal) {
   if (!proposal.automationAssessment) {
     return null;
@@ -66,9 +77,7 @@ function buildAutomationAssessmentFromProposal(
     ? ExtractedBottleDetailsSchema.parse(proposal.extractedLabel)
     : null;
   const normalizedProposedBottle = proposal.proposedBottle
-    ? normalizeProposedBottleDraft(
-        ProposedBottleSchema.parse(proposal.proposedBottle),
-      )
+    ? normalizeStoredProposedBottle(proposal.proposedBottle)
     : null;
   const proposedRelease = proposal.proposedRelease
     ? ProposedReleaseSchema.parse(proposal.proposedRelease)
@@ -299,9 +308,7 @@ export function serializeProposal(
     ? ExtractedBottleDetailsSchema.parse(proposal.extractedLabel)
     : null;
   const normalizedProposedBottle = proposal.proposedBottle
-    ? normalizeProposedBottleDraft(
-        ProposedBottleSchema.parse(proposal.proposedBottle),
-      )
+    ? normalizeStoredProposedBottle(proposal.proposedBottle)
     : null;
   const proposedRelease = proposal.proposedRelease
     ? ProposedReleaseSchema.parse(proposal.proposedRelease)

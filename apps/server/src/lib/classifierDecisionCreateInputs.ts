@@ -62,6 +62,9 @@ export function buildBottleInputFromProposedBottle(
     descriptionSrc: null,
     imageUrl: null,
     flavorProfile: null,
+    caskType: null,
+    caskSize: null,
+    caskFill: null,
   };
 }
 
@@ -78,6 +81,9 @@ export function buildBottleReleaseInputFromProposedRelease(
     description: proposedRelease.description ?? null,
     imageUrl: proposedRelease.imageUrl ?? null,
     tastingNotes: proposedRelease.tastingNotes ?? null,
+    caskType: null,
+    caskSize: null,
+    caskFill: null,
   };
 }
 

@@ -20,9 +20,6 @@ describe("splitProposedBottleReleaseDraft", () => {
           abv: 55.1,
           vintageYear: 2014,
           releaseYear: 2024,
-          caskType: "bourbon",
-          caskSize: "barrel",
-          caskFill: "1st_fill",
           brand: {
             id: null,
             name: "Maker's Mark",
@@ -47,9 +44,6 @@ describe("splitProposedBottleReleaseDraft", () => {
       abv: null,
       vintageYear: null,
       releaseYear: null,
-      caskType: null,
-      caskSize: null,
-      caskFill: null,
     });
     expect(proposedRelease).toMatchObject({
       edition: "S2B13",
@@ -59,9 +53,6 @@ describe("splitProposedBottleReleaseDraft", () => {
       abv: 55.1,
       vintageYear: 2014,
       releaseYear: 2024,
-      caskType: "bourbon",
-      caskSize: "barrel",
-      caskFill: "1st_fill",
     });
   });
 
@@ -79,9 +70,6 @@ describe("splitProposedBottleReleaseDraft", () => {
           abv: null,
           vintageYear: null,
           releaseYear: null,
-          caskType: null,
-          caskSize: null,
-          caskFill: null,
           brand: {
             id: null,
             name: "Macallan",
@@ -102,9 +90,6 @@ describe("splitProposedBottleReleaseDraft", () => {
           singleCask: null,
           vintageYear: null,
           releaseYear: null,
-          caskType: null,
-          caskSize: null,
-          caskFill: null,
           description: null,
           tastingNotes: null,
           imageUrl: null,

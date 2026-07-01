@@ -880,9 +880,6 @@ function buildCandidateFamilyContext({
         abv: release.abv,
         singleCask: release.singleCask,
         caskStrength: release.caskStrength,
-        caskFill: release.caskFill,
-        caskType: release.caskType,
-        caskSize: release.caskSize,
       })),
   };
 }
@@ -981,9 +978,6 @@ function buildBottleSiblingContext(
           abv: sibling.abv,
           singleCask: sibling.singleCask,
           caskStrength: sibling.caskStrength,
-          caskFill: sibling.caskFill,
-          caskType: sibling.caskType,
-          caskSize: sibling.caskSize,
         })),
     );
   }

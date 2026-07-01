@@ -44,9 +44,6 @@ const BottleReleaseTraitFieldEnum = z.enum([
   "abv",
   "singleCask",
   "caskStrength",
-  "caskFill",
-  "caskType",
-  "caskSize",
 ]);
 
 const PriceMatchCandidateReleaseSiblingSchema = z
@@ -73,9 +70,6 @@ const PriceMatchCandidateReleaseSiblingSchema = z
     abv: z.number().min(0).max(100).nullable().default(null),
     singleCask: z.boolean().nullable().default(null),
     caskStrength: z.boolean().nullable().default(null),
-    caskFill: CaskFillEnum.nullable().default(null),
-    caskType: CaskTypeEnum.nullable().default(null),
-    caskSize: CaskSizeEnum.nullable().default(null),
   })
   .strict();
 
@@ -103,9 +97,6 @@ const PriceMatchCandidateBottleSiblingSchema = z
     abv: z.number().min(0).max(100).nullable().default(null),
     singleCask: z.boolean().nullable().default(null),
     caskStrength: z.boolean().nullable().default(null),
-    caskFill: CaskFillEnum.nullable().default(null),
-    caskType: CaskTypeEnum.nullable().default(null),
-    caskSize: CaskSizeEnum.nullable().default(null),
   })
   .strict();
 

@@ -105,7 +105,6 @@ export function buildPhotoEvidenceFromExtractedIdentity({
       vintageYear: maybeField(extractedIdentity?.vintage_year),
       releaseYear: maybeField(extractedIdentity?.release_year),
       edition: maybeField(extractedIdentity?.edition),
-      caskType: maybeField(extractedIdentity?.cask_type),
     },
     photoSuitability: {
       isSingleBottlePhoto: Boolean(extractedIdentity),
