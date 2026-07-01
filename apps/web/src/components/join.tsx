@@ -9,7 +9,7 @@ export default function Join({
   divider: ReactNode;
 }) {
   return (
-    <>
+    <span>
       {children.map((child, index) => {
         return (
           <Fragment key={index}>
@@ -18,6 +18,6 @@ export default function Join({
           </Fragment>
         );
       })}
-    </>
+    </span>
   );
 }
