@@ -21,7 +21,6 @@ import {
   Camera,
   Check,
   ChevronLeft,
-  LoaderCircle,
   Plus,
   RotateCcw,
   Search,
@@ -482,8 +481,7 @@ function TastingSubmitProgressPanel({
             />
           )}
           <div>
-            <LoaderCircle className="text-highlight mx-auto h-8 w-8 animate-spin sm:hidden" />
-            <h2 className="add-tasting-loading-shimmer via-highlight mt-4 inline-block bg-gradient-to-r from-white to-white bg-[length:200%_100%] bg-clip-text text-xl font-semibold text-transparent sm:mt-0">
+            <h2 className="add-tasting-loading-shimmer via-highlight inline-block bg-gradient-to-r from-white to-white bg-[length:200%_100%] bg-clip-text text-xl font-semibold text-transparent">
               {copy.title}
             </h2>
             <p className="text-muted mt-2 text-sm">{copy.detail}</p>
@@ -898,8 +896,7 @@ function AddTastingForm() {
                 />
               )}
               <div>
-                <LoaderCircle className="text-highlight mx-auto h-8 w-8 animate-spin sm:hidden" />
-                <h2 className="add-tasting-loading-shimmer via-highlight mt-4 inline-block bg-gradient-to-r from-white to-white bg-[length:200%_100%] bg-clip-text text-xl font-semibold text-transparent sm:mt-0">
+                <h2 className="add-tasting-loading-shimmer via-highlight inline-block bg-gradient-to-r from-white to-white bg-[length:200%_100%] bg-clip-text text-xl font-semibold text-transparent">
                   {loadingMessages[loadingMessageIndex]}
                 </h2>
                 <p className="text-muted mt-2 text-sm">
