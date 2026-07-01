@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:35:45.106Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Series Vol 3 bourbon"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Heaven's Door Bootleg Series Vol 3 bourbon",
+    "summary": "Aged for 12 years, this limited-edition wheated straight bourbon is finished in air-dried, lightly toasted Limousin cigar barrels—reminiscent of those ... Aged for 12 years, this limited-edition wheated straight bourbon is finished in air-dried, lightly toasted Limousin cigar barrels—reminiscent of those ... [Skip to c",
+    "results": [
+      {
+        "title": "My first review! Heaven's Door Bootleg Volume 3",
+        "url": "https://www.reddit.com/r/bourbon/comments/vfifyt/my_first_review_heavens_door_bootleg_volume_3/",
+        "domain": "reddit.com",
+        "description": "Aged for 12 years, this limited-edition wheated straight bourbon is finished in air-dried, lightly toasted Limousin cigar barrels—reminiscent of those ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Bootleg Story – Heaven's Door",
+        "url": "https://buy.heavensdoor.com/pages/bootleg-story?srsltid=AfmBOopFU3ZZBoOWp_1-64GvXMypyhQS1pXemLJULb1y2c1XeM39uK-e",
+        "domain": "buy.heavensdoor.com",
+        "description": "Aged for 12 years, this limited-edition wheated straight bourbon is finished in air-dried, lightly toasted Limousin cigar barrels—reminiscent of those ...",
+        "extraSnippets": [
+          "[Skip to content](https://buy.heavensdoor.com/pages/bootleg-story#MainContent) ## Search Search ## Cart Your cart is empty Loading... ![](https://buy.heavensdoor.com/cdn/shop/files"
+        ]
+      },
+      {
+        "title": "Heaven's Door The Bootleg Series Volume 3",
+        "url": "https://markaysliquors.com/shop/product/heavens-door-the-bootleg-series-volume-3/614b93f13107887d31a02ba1?option-id=448701fcd722e75d9f696ebfe2aa4312bf3d595a91c2d828847c144b0cca4d8d&srsltid=AfmBOooj_fmWPdKYfRsVuEFpm7miNyESsaD0II_xVQJZ7UY0qqsUqaDN",
+        "domain": "markaysliquors.com",
+        "description": "The third annual Bootleg release, Bootleg Volume III, features a 13-year-old Kentucky bourbon finished in Vino de Naranja Casks. Bottled at cask strength with a ...",
+        "extraSnippets": [
+          "[Jump to content](https://markaysliquors.com/shop/product/heavens-door-the-bootleg-series-volume-3/614b93f13107887d31a02ba1?option-id=448701fcd722e75d9f696ebfe2aa4312bf3d595a91c2d8"
+        ]
+      },
+      {
+        "title": "Heaven's Door Bootleg Series Volume 3 Review",
+        "url": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": "For Volume 3, which was released late in 2021, the company chose to finish a 13 year Kentucky bourbon in used Vino De Naranja Casks. The company ...",
+        "extraSnippets": [
+          "By clicking **\"Accept\"**, you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts. View our [Privacy "
+        ]
+      },
+      {
+        "title": "Buy Heaven's Door Bootleg Series Vol. 6 12 Years Old ...",
+        "url": "https://www.blackwellswines.com/products/heavens-door-bootleg-series-vol-6-12-years-old-bourbon-whiskey-finished-in-limousin-cigar-barrels?srsltid=AfmBOoqKR8HO2TGzK5u95bEXvlgjKccV9rvWuWm3G2FEn4v9r67jmvTM",
+        "domain": "blackwellswines.com",
+        "description": "Proof/ABV, 121.2 proof (60.58% ABV) ; Age, Blend of 12, 13 & 14-year-old wheated bourbons ; Finish, Limousin oak cigar-shaped barrels, air-dried & toasted ; Styles ...",
+        "extraSnippets": [
+          "💰 Earn 1 point for every $1 you spend Join now Earn 100 points Already a member? Log in Join Blackwell's Insider Club Reviews The Reviews Tab is not available for mobile \\- \\| / S"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d57639c77c0fd3cd205ee1c8c8b5ebbe2b67c3def7e5afa0dfd295d3c82f30a5",
+    "mode": "auto"
+  }
+}

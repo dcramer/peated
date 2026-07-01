@@ -32,6 +32,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - Before opening a PR, run targeted tests/typechecks/lint for the touched surface; PR CI is the required full-repo `pnpm test` gate
 - Classifier/repair changes: preserve `docs/architecture/whisky-identity-model.md`; brand/entity identity is not prefix matching
 - Production-miss classifier evals must verify the real bottle online, state the exact Peated DB outcome, and encode that provenance in the fixture; do not substitute a generalized pretend case for the observed bottle.
+- Classifier eval changes must commit any generated `packages/bottle-classifier/.vitest-evals/recordings/**` files needed for replay.
 - oRPC route conventions: `docs/development/orpc-routes.md`
 - oRPC client usage: `docs/development/orpc-client.md`
 - Schema conventions: `docs/development/schema-conventions.md`

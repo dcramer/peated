@@ -3,9 +3,6 @@ import { z } from "zod";
 import {
   BottleCandidateSchema,
   BottleExtractedDetailsSchema,
-  CaskFillEnum,
-  CaskSizeEnum,
-  CaskTypeEnum,
   CategoryEnum,
 } from "./classifierTypes";
 import {
@@ -80,6 +77,7 @@ export const classifierEvalExpectationSchema = z.object({
   parentBottleId: z.number().int().nullable().optional(),
   proposedBottle: z.record(z.string(), z.unknown()).nullable().optional(),
   proposedBottleNameIncludes: z.array(z.string().min(1)).optional(),
+  proposedBottleNameExcludes: z.array(z.string().min(1)).optional(),
   proposedRelease: z.record(z.string(), z.unknown()).nullable().optional(),
   confidenceBand: z
     .enum(["low", "review", "auto_verification", "current_assignment"])
@@ -202,16 +200,35 @@ export const bottleNormalizationExpectationSchema = z
       "exact_cask",
       "review_required",
     ]),
+    classifierExpectations: z
+      .array(
+        z.enum([
+          "bottle",
+          "bottle_plus_release",
+          "exact_cask",
+          "review_required",
+        ]),
+      )
+      .min(1)
+      .optional(),
     deterministicReleaseExpectation: z.enum(["none", "strong_release_marker"]),
     releaseIdentity: bottleNormalizationReleaseIdentitySchema.nullable(),
+    releaseIdentities: z
+      .array(bottleNormalizationReleaseIdentitySchema)
+      .min(1)
+      .optional(),
   })
   .superRefine((value, ctx) => {
-    const hasReleaseIdentity = value.releaseIdentity !== null;
+    const classifierExpectations = value.classifierExpectations ?? [
+      value.classifierExpectation,
+    ];
+    const expectsRelease = classifierExpectations.includes(
+      "bottle_plus_release",
+    );
+    const hasReleaseIdentity =
+      value.releaseIdentity !== null || value.releaseIdentities !== undefined;
 
-    if (
-      value.classifierExpectation === "bottle_plus_release" &&
-      !hasReleaseIdentity
-    ) {
+    if (expectsRelease && !hasReleaseIdentity) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:
@@ -219,10 +236,7 @@ export const bottleNormalizationExpectationSchema = z
       });
     }
 
-    if (
-      value.classifierExpectation !== "bottle_plus_release" &&
-      hasReleaseIdentity
-    ) {
+    if (!expectsRelease && hasReleaseIdentity) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:
@@ -262,6 +276,7 @@ export const realWorldNewBottleFixtureSchema = z
     id: z.string().min(1),
     referenceName: z.string().min(1),
     expectedBottleName: z.string().min(1),
+    expectedBottleNames: z.array(z.string().min(1)).min(1).optional(),
     summary: z.string().min(1),
     peatedBottleIds: z.array(z.number().int().positive()).min(1),
     provenance: evalFixtureProvenanceSchema.optional(),
@@ -277,10 +292,7 @@ export const legacyReleaseRepairParentCandidateSchema = z
   .object({
     abv: z.number().min(0).max(100).nullable(),
     category: CategoryEnum.nullable(),
-    caskFill: CaskFillEnum.nullable(),
-    caskSize: CaskSizeEnum.nullable(),
     caskStrength: z.boolean().nullable(),
-    caskType: CaskTypeEnum.nullable(),
     edition: z.string().nullable(),
     fullName: z.string().min(1),
     id: z.number().int().positive(),

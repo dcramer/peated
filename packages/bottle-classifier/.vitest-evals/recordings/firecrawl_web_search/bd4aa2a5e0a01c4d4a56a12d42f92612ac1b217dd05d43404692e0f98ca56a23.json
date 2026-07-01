@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T02:32:47.367Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Ardbeg Traigh Bhan 19",
+    "summary": "The epitome of an aged Ardbeg – matured in American oak and Oloroso sherry casks – Ardbeg Traigh Bhan 19 Years Old achieves the impossible balance. ![Ardbeg Bhan 19 Year Single Malt Scotch Whisky](https://images.jjbuckley.com/Vintage/641/thumb_463x1162_7777-224355-750.jpg) BEST SELLER Roll over image to zoom in [![Gall",
+    "results": [
+      {
+        "title": "Ardbeg Bhan 19 Year Single Malt Scotch Whisky",
+        "url": "https://www.sfwtc.com/spirit/7777-ardbeg-bhan-19-year-single-malt-scotch-whisky/7777-224355-750/?srsltid=AfmBOorqFhWGKNsbh3is64KO1kN86xXkgEOot7FiGcIkO2NKpCwKYXu1",
+        "domain": "sfwtc.com",
+        "description": "The epitome of an aged Ardbeg – matured in American oak and Oloroso sherry casks – Ardbeg Traigh Bhan 19 Years Old achieves the impossible balance.",
+        "extraSnippets": [
+          "![Ardbeg Bhan 19 Year Single Malt Scotch Whisky](https://images.jjbuckley.com/Vintage/641/thumb_463x1162_7777-224355-750.jpg) BEST SELLER Roll over image to zoom in [![Gallery imag"
+        ]
+      },
+      {
+        "title": "Ardbeg Traigh Bhan 19 Years Old Batch 2 Single Malt Scotch Whisky",
+        "url": "https://www.ardbeg.com/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%202-2020ARDTB2.html",
+        "domain": "ardbeg.com",
+        "description": "Matured in American oak and Oloroso sherry casks, this sublime 19 year old whisky is the epitome of an aged Ardbeg. Non chill-filtered at 46.2% ABV.",
+        "extraSnippets": [
+          "![](https://www.ardbeg.com/dw/image/v2/BGMK_PRD/on/demandware.static/-/Library-Sites-Ardbeg-shared/default/dwd1fa42f7/Header/Header_Logo_Resized.png) Enter Date of Birth Country Un"
+        ]
+      },
+      {
+        "title": "r/Scotch - Review #2320 - Ardbeg 19 Years Old Traigh Bhan (Batch 4)",
+        "url": "https://www.reddit.com/r/Scotch/comments/1f6isil/review_2320_ardbeg_19_years_old_traigh_bhan_batch/",
+        "domain": "reddit.com",
+        "description": "This 19-year-old spirit was aged in American oak and Oloroso sherry casks. beg ABV: 46.2% ABV Age: Thin to medium mouthfeel with plenty of ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Ardbeg Traigh Bhan 19 Year Batch 1 - Scotch & Sheen",
+        "url": "https://scotchandsheen.com/2019/12/06/ardbeg-traigh-bhan-19-year/",
+        "domain": "scotchandsheen.com",
+        "description": "ABV: 46.2% Cask Type: Blend of Bourbon and Oloroso Sherry Casks Age: 19 Year Color: 0.5, Jonquil/Ripe corn. Full of a very sweet, barbecue like ...",
+        "extraSnippets": [
+          "[Skip to content](https://scotchandsheen.com/2019/12/06/ardbeg-traigh-bhan-19-year/#content) **Scotch Whisky Review #131: Ardbeg Traigh Bhan 19 Year Batch 1** ![](https://i.imgur.c"
+        ]
+      },
+      {
+        "title": "Review | Ardbeg 19-Year Traigh Bhan Batch 5 | Drams of Whisky",
+        "url": "https://dramsofwhisky.com/reviews/ardbeg-19-year-traigh-bhan-batch-5.html",
+        "domain": "dramsofwhisky.com",
+        "description": "46.2% ABV - Islay, Scotland Nose: Begins with malted grain and spices, orange-lime citrus, and tropical fruit atop a sweet, heavy peat smoke.",
+        "extraSnippets": [
+          "[<ARCHIVE>](https://dramsofwhisky.com/archive.html) \\| [CAMPBELTOWN](https://dramsofwhisky.com/archive/campbeltown.html) [HIGHLANDS](https://dramsofwhisky.com/archive/highlands.htm"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "bd4aa2a5e0a01c4d4a56a12d42f92612ac1b217dd05d43404692e0f98ca56a23",
+    "mode": "auto"
+  }
+}

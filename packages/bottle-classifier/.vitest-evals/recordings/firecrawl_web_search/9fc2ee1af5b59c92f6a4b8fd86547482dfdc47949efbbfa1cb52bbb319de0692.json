@@ -1,0 +1,14 @@
+{
+  "writtenAt": "2026-07-01T02:35:51.414Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official 46%"
+  },
+  "output": {
+    "error": "Firecrawl search failed: The operation was aborted due to timeout"
+  },
+  "metadata": {
+    "cacheKey": "9fc2ee1af5b59c92f6a4b8fd86547482dfdc47949efbbfa1cb52bbb319de0692",
+    "mode": "auto"
+  }
+}

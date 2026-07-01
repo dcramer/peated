@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T00:57:51.838Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Glengoyne Legacy Series Chapter Two 48% single malt"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Glengoyne Legacy Series Chapter Two 48% single malt",
+    "summary": "Bottling Date. September 2020 ; Alcohol. 48% ; Appearance. Bright gold ; Nose. Full of vanilla and banana, maple syrup, peaches, coconut, fruit soaked trifle ... Cart FareHarbor Cart: \\[\\[ indexCtrl.cartEntriesTotal \\]\\] Checkout 0 Checkout Checkout with company... [![Glengoyne Logo](https://www.glengoyne.com/static/im",
+    "results": [
+      {
+        "title": "Legacy Series - Highland Single Malt Scotch Whisky",
+        "url": "https://www.glengoyne.com/our-whisky/our-collection/legacy-series-chapter-2",
+        "domain": "glengoyne.com",
+        "description": "Bottling Date. September 2020 ; Alcohol. 48% ; Appearance. Bright gold ; Nose. Full of vanilla and banana, maple syrup, peaches, coconut, fruit soaked trifle ...",
+        "extraSnippets": [
+          "Cart FareHarbor Cart: \\[\\[ indexCtrl.cartEntriesTotal \\]\\] Checkout 0 Checkout Checkout with company... [![Glengoyne Logo](https://www.glengoyne.com/static/images/logo-dark.svg)](h"
+        ]
+      },
+      {
+        "title": "Review #520 - Glengoyne Legacy Series Chapter 2 : r/Scotch",
+        "url": "https://www.reddit.com/r/Scotch/comments/1jql1dv/review_520_glengoyne_legacy_series_chapter_2/",
+        "domain": "reddit.com",
+        "description": "Nose: Light and dry at first - some oak, a bit of grapefruit, white pepper. It's malty and even a bit musty, and sweetness develops with time: ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Glengoyne Legacy - Chapter Two - Whisky.com",
+        "url": "https://www.whisky.com/whisky-database/details/glengoyne-legacy-chapter-two.html",
+        "domain": "whisky.com",
+        "description": "Glengoyne Legacy - Chapter Two ; Country, Region: Scotland, Highlands ; Type: Single Malt Whisky ; Bottling date: 01. Jan 2020 ; ABV: 48%.",
+        "extraSnippets": [
+          "Delivery Country Delivery Country ![DE](https://www.whisky.com/typo3conf/ext/sitepackage/Resources/Public/Libraries/other_whisky_resources/src/public/images/flags/DE.svg?1781180576"
+        ]
+      },
+      {
+        "title": "Glengoyne Legacy Series: Chapter Two - Order Today",
+        "url": "https://sudsandspirits.com/glengoyne-legacy-series-chapter-two/?srsltid=AfmBOooO88Rypjt_91-yYy0MnrWMCFa482OZBuAQmTuNQuFSAb5yKAuV",
+        "domain": "sudsandspirits.com",
+        "description": "The second bottling in our Legacy Series follows on from Chapter One and 1869, when Cochrane Cartwright made innovations that define Glengoyne to this day.",
+        "extraSnippets": [
+          "Adult Signature (21+) Required by law +$7.99 Signature Fee Applied in checkout # Glengoyne Legacy Series: Chapter Two ## [Glengoyne](https://sudsandspirits.com/glengoyne/) (No revi"
+        ]
+      },
+      {
+        "title": "Glengoyne The Legacy Series Chapter Two Review",
+        "url": "https://jeffwhisky.com/glengoyne-legacy-chapter-two/",
+        "domain": "jeffwhisky.com",
+        "description": "Glengoyne The Legacy Series Chapter Two. Highland Single Malt Scotch Whisky 48%. Region: Highlands, Scotland. Age: NAS. Strength: 48% ABV. Colouring: Nope.",
+        "extraSnippets": [
+          "# Glengoyne The Legacy Series Chapter Two **Highland Single Malt Scotch Whisky 48%** **Region:** Highlands, Scotland **Age: NAS** **Strength:** 48% ABV **Colouring:** Nope **Chill "
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "007c072cc03487f27f3eba2f7700814487e95a66e1bcab012b0696d1e1e133ab",
+    "mode": "auto"
+  }
+}

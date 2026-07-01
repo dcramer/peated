@@ -1,0 +1,14 @@
+{
+  "writtenAt": "2026-07-01T02:00:27.856Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "The Glenlivet Caribbean Reserve product rum barrel selection"
+  },
+  "output": {
+    "error": "Firecrawl search failed: The operation was aborted due to timeout"
+  },
+  "metadata": {
+    "cacheKey": "77f0b1329092affa419884dccf515c47179de72b6710d8e1c571192cd5ff7b91",
+    "mode": "auto"
+  }
+}

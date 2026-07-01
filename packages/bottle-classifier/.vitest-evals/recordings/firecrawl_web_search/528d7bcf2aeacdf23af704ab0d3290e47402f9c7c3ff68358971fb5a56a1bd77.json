@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-06-30T23:47:20.727Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Shieldaig Speyside 21 year old single malt"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Shieldaig Speyside 21 year old single malt",
+    "summary": "A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate. Shieldaig Speyside Single Malt 21Yr Scotch Whisky 750ml Bottle - ![Shieldaig Speyside Single Malt 21Yr Scotch Whisky 750ml Bottle](https://www.totalwine.com/dyna",
+    "results": [
+      {
+        "title": "Shieldaig Speyside Single Malt 21Yr Scotch Whisky - Total Wine",
+        "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-single-malt-21yr-scotch-whisky/p/219098750?srsltid=AfmBOooHYUerzUWprA1n0r8WuWiHxMXuutmQbpJGCNn8YaGy_QAcO5Z_",
+        "domain": "totalwine.com",
+        "description": "A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate.",
+        "extraSnippets": [
+          "Shieldaig Speyside Single Malt 21Yr Scotch Whisky 750ml Bottle - ![Shieldaig Speyside Single Malt 21Yr Scotch Whisky 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/images"
+        ]
+      },
+      {
+        "title": "Shieldaig 21 Year Single Malt - Cornwall Wine and Spirits",
+        "url": "https://cornwallwines.com/shop/product/shieldaig-21-year-single-malt/5ee2bdc23b479231c557814d?option-id=52b0bf70260fbdd06cf96a789e2fe3029c0fd5b0af166d3befb67ebed9857b6d",
+        "domain": "cornwallwines.com",
+        "description": "Speyside, Scotland - A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice ...",
+        "extraSnippets": [
+          "[Jump to content](https://cornwallwines.com/shop/product/shieldaig-21-year-single-malt/5ee2bdc23b479231c557814d?option-id=52b0bf70260fbdd06cf96a789e2fe3029c0fd5b0af166d3befb67ebed9"
+        ]
+      },
+      {
+        "title": "Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky",
+        "url": "https://www.wine-searcher.com/find/shieldaig+21+old+single+malt+scotch+whisky+speyside+scotland?srsltid=AfmBOopoWx728dEFamq750HKJtWocO0VOHfaUPYR8DG2LvYMSnm3glnL",
+        "domain": "wine-searcher.com",
+        "description": "Find the best local price for Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky, Speyside, Scotland. Avg Price (ex-tax) $121 / 750ml.",
+        "extraSnippets": [
+          "~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at"
+        ]
+      },
+      {
+        "title": "Shieldaig Speyside. What changed? : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/1bf7ld2/shieldaig_speyside_what_changed/",
+        "domain": "reddit.com",
+        "description": "This was my daily speyside for years. My latest bottle is horrible. Smells and tastes like overly sweet raisins and nothing else.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Speyside Single Malt Scotch (750ml) - Bottles and Cases",
+        "url": "https://www.bottlesandcases.com/spirits/Single-Malt-Scotch/All/Akita/Speyside/?region=Speyside&item_type=spirits&size=750",
+        "domain": "bottlesandcases.com",
+        "description": "\"Pronounced \"Tom in T'owl\", this extraordinary Single Malt Scotch has been aged for 16 years in selected Oak Casks to produce a mature smooth whiskey of ...",
+        "extraSnippets": [
+          "[![Bottles and Cases](https://www.bottlesandcases.com/images/sites/bottlesandcases/bottles-and-cases-logo.gif?2)](https://www.bottlesandcases.com/) [0 ITEMS](https://www.bottlesand"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "528d7bcf2aeacdf23af704ab0d3290e47402f9c7c3ff68358971fb5a56a1bd77",
+    "mode": "auto"
+  }
+}

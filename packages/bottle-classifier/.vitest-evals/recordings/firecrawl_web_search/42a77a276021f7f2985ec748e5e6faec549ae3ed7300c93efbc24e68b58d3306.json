@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T15:30:16.437Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official 46% 4th edition"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official 46% 4th edition",
+    "summary": "14 year old single malt whisky matured in port casks. ABV: 46.0% | Volume: 75cl. Walnut and black pepper. Mandarin orange and melted marshmallow. Dark ... Some content that you'd like to display in a modalDismiss #### My Basket (0) Oh, your basket appears to be empty Add some of our delicious Whisky to your basket to d",
+    "results": [
+      {
+        "title": "Glenmorangie The Quinta Ruban 14 Years Old",
+        "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban?srsltid=AfmBOoroX2yo3wq0RbhCF2dY0T_-X41LavS7hext_EMGUb1lotwlnZOz",
+        "domain": "glenmorangie.com",
+        "description": "14 year old single malt whisky matured in port casks. ABV: 46.0% | Volume: 75cl. Walnut and black pepper. Mandarin orange and melted marshmallow. Dark ...",
+        "extraSnippets": [
+          "Some content that you'd like to display in a modalDismiss #### My Basket (0) Oh, your basket appears to be empty Add some of our delicious Whisky to your basket to discover the won"
+        ]
+      },
+      {
+        "title": "Review #874 - Glenmorangie 14 Quinta Ruban : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/12xm6z5/review_874_glenmorangie_14_quinta_ruban/",
+        "domain": "reddit.com",
+        "description": "Highland single malt. 46% ABV. Local price: $112 CAD in Ontario. Aged at least 14 years. apples, peaches, raisins, hint of pineapple.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Glenmorangie Quinta Ruban 14 years - YouTube",
+        "url": "https://www.youtube.com/watch?v=bdxEBQRkImA",
+        "domain": "youtube.com",
+        "description": "https://www.whisky.com/whisky-database/details/glenmorangie-quinta-ruban-port.html Nosing 2:50 Whisky.com reviews the Quinta Ruban 14 years.",
+        "extraSnippets": [
+          "![Thumbnail (1920x1080)](https://i.ytimg.com/vi/bdxEBQRkImA/maxresdefault.jpg) # [Glenmorangie Quinta Ruban 14 years](https://www.youtube.com/watch?v=bdxEBQRkImA) **Visibility**: P"
+        ]
+      },
+      {
+        "title": "Glenmorangie 14 year old Quinta Ruban - Whisky Advocate",
+        "url": "https://whiskyadvocate.com/glenmorangie-14-year-old-quinta-ruban",
+        "domain": "whiskyadvocate.com",
+        "description": "46% ○ Price: $55 ○ Style: Single Malt ○ Origin: Scotland (Highland). Buy Now. This Quinta Ruban succeeds the 12 year old version, adding two additional years ...",
+        "extraSnippets": [
+          "Back [Save](https://www.pinterest.com/pin/create/button/?guid=KFWqGHH0db5q-1&url=https%3A%2F%2Fwhiskyadvocate.com%2FGlenmorangie-14-year-old-Quinta-Ruban&media=%2Fget%2Ffiles%2Fima"
+        ]
+      },
+      {
+        "title": "Glenmorangie Quinta Ruban Reviews - Whisky Connosr",
+        "url": "https://www.connosr.com/glenmorangie-quinta-ruban-whisky-reviews-2154",
+        "domain": "connosr.com",
+        "description": "About $95 for a 14 year old malt bottled at 46% abv is quite reasonable in Ontario. I'll probably get another one. The drying and savoury finish might not be to ...",
+        "extraSnippets": [
+          "- [Scotch whisky](https://www.connosr.com/scotch-whisky) - [Japanese whisky](https://www.connosr.com/japanese-whisky) - [American whiskey](https://www.connosr.com/american-whiskey)"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "42a77a276021f7f2985ec748e5e6faec549ae3ed7300c93efbc24e68b58d3306",
+    "mode": "auto"
+  }
+}

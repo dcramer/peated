@@ -409,6 +409,12 @@ function addSearchPart(
   }
 }
 
+function referenceHasVariantSearchWording(referenceName: string): boolean {
+  return /\b(?:finish(?:ed)?|barrel[-\s]+finished|double[-\s]+oaked|oak|sherry|port|wine|rum|cognac|mizunara|bodega|distillers?\s+edition)\b/i.test(
+    referenceName,
+  );
+}
+
 function extractedIdentityLooksWebInvestigable({
   reference,
   extractedIdentity,
@@ -429,9 +435,6 @@ function extractedIdentityLooksWebInvestigable({
     extractedIdentity.stated_age !== null ||
     extractedIdentity.abv !== null ||
     extractedIdentity.edition !== null ||
-    extractedIdentity.cask_type !== null ||
-    extractedIdentity.cask_size !== null ||
-    extractedIdentity.cask_fill !== null ||
     extractedIdentity.cask_strength === true ||
     extractedIdentity.single_cask === true ||
     extractedIdentity.vintage_year !== null ||
@@ -564,9 +567,6 @@ function buildNoMatchInvestigationQuery({
   }
   addSearchPart(parts, extractedIdentity?.bottler);
   addSearchPart(parts, extractedIdentity?.edition);
-  addSearchPart(parts, extractedIdentity?.cask_type?.replace(/_/g, " "));
-  addSearchPart(parts, extractedIdentity?.cask_size?.replace(/_/g, " "));
-  addSearchPart(parts, extractedIdentity?.cask_fill?.replace(/_/g, " "));
   if (extractedIdentity?.cask_strength) {
     addSearchPart(parts, "cask strength");
   }
@@ -581,6 +581,10 @@ function buildNoMatchInvestigationQuery({
   }
   if (extractedIdentity?.release_year != null) {
     addSearchPart(parts, `${extractedIdentity.release_year} release`);
+  }
+
+  if (referenceHasVariantSearchWording(reference.name)) {
+    addSearchPart(parts, reference.name);
   }
 
   if (!parts.length) {

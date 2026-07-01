@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T15:13:56.760Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Glengoyne Legacy Series Chapter Two"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Glengoyne Legacy Series Chapter Two",
+    "summary": "Chapter Two. Glengoyne The Legacy Series. Overall rating: 83.80/100; ratings: 175. Whiskybase ID: WB165441; Category: Single Malt; Distillery. **Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/165441/glengoyne-the-legacy-series?__cf_chl_f_tk=s._BL0fwgQwV5NOhYCTQg5d",
+    "results": [
+      {
+        "title": "Glengoyne The Legacy Series - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/165441/glengoyne-the-legacy-series",
+        "domain": "whiskybase.com",
+        "description": "Chapter Two. Glengoyne The Legacy Series. Overall rating: 83.80/100; ratings: 175. Whiskybase ID: WB165441; Category: Single Malt; Distillery.",
+        "extraSnippets": [
+          "**Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/165441/glengoyne-the-legacy-series?__cf_chl_f_tk=s._BL0fwgQwV5NOhYCTQg5djpL"
+        ]
+      },
+      {
+        "title": "Glengoyne Legacy Series: Chapter Two",
+        "url": "https://www.glengoyne.com/glengoyne-legacy-series-chapter-two",
+        "domain": "glengoyne.com",
+        "description": "Chapter Two in our Legacy Series marries spirits matured in two distinct cask types – first fill bourbon and refill sherry barrels.",
+        "extraSnippets": [
+          "Cart FareHarbor Cart: \\[\\[ indexCtrl.cartEntriesTotal \\]\\] Checkout 0 Checkout Checkout with company... [![Glengoyne Logo](https://www.glengoyne.com/static/images/logo-dark.svg)](h"
+        ]
+      },
+      {
+        "title": "Just the Sip: Glengoyne Legacy Series Chapter Two Review",
+        "url": "https://thewhiskeyramble.com/2025/08/13/just-the-sip-glengoyne-legacy-series-chapter-two-review/",
+        "domain": "thewhiskeyramble.com",
+        "description": "Glengoyne Legacy Series: Chapter Two is a NAS product aged in a combination of ex-bourbon and ex-sherry casks before being bottled at 48% ABV.",
+        "extraSnippets": [
+          "[Skip to content](https://thewhiskeyramble.com/2025/08/13/just-the-sip-glengoyne-legacy-series-chapter-two-review/#wp--skip-link--target) ## Just the Sip: Glengoyne Legacy Series C"
+        ]
+      },
+      {
+        "title": "Glengoyne Legacy - Chapter Two - Whisky.com",
+        "url": "https://www.whisky.com/whisky-database/details/glengoyne-legacy-chapter-two.html",
+        "domain": "whisky.com",
+        "description": "The second bottling of the Glengoyne Legacy series 'Chapter Two' is honouring the Russel family, that is operating the distillery since 2003.",
+        "extraSnippets": [
+          "Delivery Country Delivery Country ![DE](https://www.whisky.com/typo3conf/ext/sitepackage/Resources/Public/Libraries/other_whisky_resources/src/public/images/flags/DE.svg?1781180576"
+        ]
+      },
+      {
+        "title": "Glengoyne Legacy Series: Chapter Two - Suds and Spirits",
+        "url": "https://sudsandspirits.com/glengoyne-legacy-series-chapter-two/?srsltid=AfmBOorbcJMNFvaAR55QT6fbntjvpBG12jgWvwlOqwdZypwk4bS5ULR3",
+        "domain": "sudsandspirits.com",
+        "description": "The second bottling in our Legacy Series follows on from Chapter One and 1869, when Cochrane Cartwright made innovations that define Glengoyne to this day.",
+        "extraSnippets": [
+          "Adult Signature (21+) Required by law +$7.99 Signature Fee Applied in checkout # Glengoyne Legacy Series: Chapter Two ## [Glengoyne](https://sudsandspirits.com/glengoyne/) (No revi"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "287dd4bfad36f110d602f481bdfa628d40a2284bdaedbbd57f0d0c0ef1b19793",
+    "mode": "auto"
+  }
+}

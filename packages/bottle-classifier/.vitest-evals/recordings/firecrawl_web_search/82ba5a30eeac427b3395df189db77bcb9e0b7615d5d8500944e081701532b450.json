@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T01:12:07.069Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition double matured 2001 1988"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker Distillers Edition double matured 2001 1988",
+    "summary": "Bottles from this series are double matured, a process where the whisky gets a second maturation period in casks that have previously held fortified wine. - [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&product",
+    "results": [
+      {
+        "title": "Talisker 1988, The Distillers Edition 2001 Bottling",
+        "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+        "domain": "thewhiskyvault.com",
+        "description": "Bottles from this series are double matured, a process where the whisky gets a second maturation period in casks that have previously held fortified wine.",
+        "extraSnippets": [
+          "- [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=25536) [CHFS"
+        ]
+      },
+      {
+        "title": "Talisker 1988 - Ratings and reviews",
+        "url": "https://www.whiskybase.com/whiskies/whisky/1214/talisker-1988",
+        "domain": "whiskybase.com",
+        "description": "This is the 700 ml from 1988. Overall rating 87.56/100 ratings 42. Type Double Matured in Amoroso Sherry Wood Cask number TD-S: 5CO Strength 45 ...",
+        "extraSnippets": [
+          "**Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/1214/talisker-1988?__cf_chl_f_tk=RIqCdmVTRaGmAdslsluiJzK5UrSZuQPyWSK86ClymA"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition 1988/2001 (45.8%, OB, TD-S: 5CO)",
+        "url": "https://masterquill.com/2012/06/17/talisker-distillers-edition-19882001-45-8-ob-td-s-5co/",
+        "domain": "masterquill.com",
+        "description": "Nose: Fresh, sea spray, a bit musty and woody. Easily recognizable as a Talisker with added sweetness, toffee and some meat (often with Sherry).",
+        "extraSnippets": [
+          "- [Leave a comment](https://masterquill.com/2012/06/17/talisker-distillers-edition-19882001-45-8-ob-td-s-5co/#respond) ![](https://masterquill.com/wp-content/uploads/2012/06/talisk"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition 1988 â€” 70cl, 45.8%",
+        "url": "https://glenbotal.co.uk/product/talisker-distillers-edition-1988/?srsltid=AfmBOooC1I1J87__ghyiwt_fcMb5uvbLIUqYiWQ5nWWrBLpe1jAluV8Q",
+        "domain": "glenbotal.co.uk",
+        "description": "Discover a captivating piece of Scotch whisky history with this Talisker Distillers Edition, distilled in 1988 and bottled in 2001.",
+        "extraSnippets": [
+          "td.doubleclick.net # td.doubleclick.net is blocked This page has been blocked by an extension - Try disabling your extensions. ERR\\_BLOCKED\\_BY\\_CLIENT Reload This page has been bl"
+        ]
+      },
+      {
+        "title": "Talisker 1988 12 Year Old Distillers Edition Bottled 2001 With ...",
+        "url": "https://shop.marklittler.com/products/talisker-1988-12-year-old-distillers-edition-bottled-2001-with-original-box?srsltid=AfmBOoqrI6umsr5Xy5H-n200Z3WPnrbfnY-zPFxHcQ71Xu_d97ZgEN6o",
+        "domain": "shop.marklittler.com",
+        "description": "This is a bottle of Talisker 1988 12 year old, 70cl, Bottled in 2001 45.8% ABV in original box. 45.8% ABV in original box. is not in pristine condition.",
+        "extraSnippets": [
+          "[Skip to content](https://shop.marklittler.com/products/talisker-1988-12-year-old-distillers-edition-bottled-2001-with-original-box#MainContent) # Talisker 1988 12 Year Old Distill"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "82ba5a30eeac427b3395df189db77bcb9e0b7615d5d8500944e081701532b450",
+    "mode": "auto"
+  }
+}

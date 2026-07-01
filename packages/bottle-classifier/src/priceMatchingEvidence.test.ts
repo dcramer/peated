@@ -25,9 +25,6 @@ function buildExtractedLabel(
     abv: 58.4,
     release_year: null,
     vintage_year: null,
-    cask_type: "tawny_port",
-    cask_size: null,
-    cask_fill: null,
     cask_strength: null,
     single_cask: null,
     edition: null,
@@ -56,9 +53,6 @@ function buildBottleCandidate(
     abv: null,
     vintageYear: null,
     releaseYear: null,
-    caskType: null,
-    caskSize: null,
-    caskFill: null,
     score: null,
     source: [],
     ...candidate,
@@ -96,7 +90,6 @@ describe("priceMatchingEvidence", () => {
         category: "rye",
         stated_age: null,
         abv: null,
-        cask_type: null,
       }),
       searchEvidence: [
         buildSearchEvidence({
@@ -140,7 +133,6 @@ describe("priceMatchingEvidence", () => {
         category: "rye",
         stated_age: null,
         abv: null,
-        cask_type: null,
       }),
       searchEvidence: [
         buildSearchEvidence({
@@ -211,7 +203,6 @@ describe("priceMatchingEvidence", () => {
         category: "single_malt",
         stated_age: 14,
         abv: null,
-        cask_type: null,
         edition: null,
       }),
       searchEvidence: [
@@ -279,7 +270,6 @@ describe("priceMatchingEvidence", () => {
           category: "single_grain",
           stated_age: null,
           abv: null,
-          cask_type: null,
         }),
       }),
     ).not.toContain("candidate category conflicts with extracted label");

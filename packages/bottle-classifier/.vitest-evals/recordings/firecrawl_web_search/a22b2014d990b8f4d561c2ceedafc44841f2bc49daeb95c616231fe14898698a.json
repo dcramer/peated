@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T00:06:31.531Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "The Whistler Bodega Cask Single Malt Irish Whiskey"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "The Whistler Bodega Cask Single Malt Irish Whiskey",
+    "summary": "The Whistler 5 Year Old Bodega Cask Single Malt is a triple distilled whiskey that has been wholly matured in the finest Spanish Sherry Butts for its whole ... [Skip to Content](https://thewhistlerwhiskey.com/whiskey/bodega-cask/#primary) [Skip to navigation](https://thewhistlerwhiskey.com/whiskey/bodega-cask/#primary-",
+    "results": [
+      {
+        "title": "Bodega Cask - The Whistler Whiskey",
+        "url": "https://thewhistlerwhiskey.com/whiskey/bodega-cask/",
+        "domain": "thewhistlerwhiskey.com",
+        "description": "The Whistler 5 Year Old Bodega Cask Single Malt is a triple distilled whiskey that has been wholly matured in the finest Spanish Sherry Butts for its whole ...",
+        "extraSnippets": [
+          "[Skip to Content](https://thewhistlerwhiskey.com/whiskey/bodega-cask/#primary) [Skip to navigation](https://thewhistlerwhiskey.com/whiskey/bodega-cask/#primary-nav) [![The Whistler"
+        ]
+      },
+      {
+        "title": "The Whistler Irish Whiskey • Bodega Cask - Spec's",
+        "url": "https://specsonline.com/shop/spirits/the-whistler-irish-whiskey-bodega-cask/",
+        "domain": "specsonline.com",
+        "description": "The Whistler 5-Year-Old Bodega Cask Single Malt is a triple distilled whiskey that has been wholly matured in the finest Spanish Sherry Butts for its whole ...",
+        "extraSnippets": [
+          "![Revisit consent button](https://cdn-cookieyes.com/assets/images/revisit.svg) ![](https://cdn-cookieyes.com/assets/images/close.svg) We value your privacy This website or its thir"
+        ]
+      },
+      {
+        "title": "The Whistler Bodega Cask Irish Whiskey - InternetWines.com",
+        "url": "https://internetwines.com/products/the-whistler-bodega-cask-irish-whiskey?srsltid=AfmBOopAlJjmdHPHkyJfvTaZOfm1rLQXvqc_w_PebtllkKWIjxjralc_",
+        "domain": "internetwines.com",
+        "description": "The Whistler 5 Year Old Bodega Cask Single Malt is a triple distilled whiskey that has been wholly matured in the finest Spanish Sherry Butts for its whole life ...",
+        "extraSnippets": [
+          "[Skip to content](https://internetwines.com/products/the-whistler-bodega-cask-irish-whiskey#sea-skip-target-main) [Skip to navigation](https://internetwines.com/products/the-whistl"
+        ]
+      },
+      {
+        "title": "The Whistler Bodega Cask Single Malt Irish Whiskey 750ml",
+        "url": "https://www.liquoronbroadway.com/products/the-whistler-bodega-cask-single-malt-irish-whiskey?srsltid=AfmBOorcDwtF3WM5rNITCYNDo8B8G1qAvM5Rb0C_6KwJetIdP3NWj3nu",
+        "domain": "liquoronbroadway.com",
+        "description": "Triple distilled and fully aged in sherry seasoned oak, this whiskey delivers a luxurious profile layered with dried fruits, warm spice, and nutty sweetness.",
+        "extraSnippets": [
+          "Gift Dad right — use code FORDAD for 5% off orders $199+ - ![Logo for 'Liquor on Broadway' in gold text on a white background](https://www.liquoronbroadway.com/products/the-whistle"
+        ]
+      },
+      {
+        "title": "Whiskey Review: The Whistler Bodega Cask Irish Single Malt",
+        "url": "https://thewhiskeywash.com/irish-whiskey/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+        "domain": "thewhiskeywash.com",
+        "description": "About: 92 proof, 46% ABV. Aged for five years in sherry butts from the Bodegas of Jerez de la Frontera. Appearance: A pale yellow, though ...",
+        "extraSnippets": [
+          "![Revisit consent button](https://thewhiskeywash.com/wp-content/plugins/cookie-law-info/lite/frontend/images/revisit.svg) We value your privacy We use cookies to enhance your brows"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a22b2014d990b8f4d561c2ceedafc44841f2bc49daeb95c616231fe14898698a",
+    "mode": "auto"
+  }
+}

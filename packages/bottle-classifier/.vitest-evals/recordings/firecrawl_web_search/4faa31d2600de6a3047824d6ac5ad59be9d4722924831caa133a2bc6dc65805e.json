@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-06-30T23:42:44.818Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition 2001"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker Distillers Edition 2001",
+    "summary": "Good sherry Tally, young, but very pleasant, well-balanced, with the distillery style traditionally growing in development - ash, sea notes, leather, lemon. **Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?__cf_chl_f_tk=h_2UUqcBQG_FKnixf1ZCmWek",
+    "results": [
+      {
+        "title": "Talisker 2001 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": "Good sherry Tally, young, but very pleasant, well-balanced, with the distillery style traditionally growing in development - ash, sea notes, leather, lemon.",
+        "extraSnippets": [
+          "**Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?__cf_chl_f_tk=h_2UUqcBQG_FKnixf1ZCmWekRePCzd8CRHU8Wuvwu"
+        ]
+      },
+      {
+        "title": "Talisker 1988, The Distillers Edition 2001 Bottling | The Whisky Vault",
+        "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+        "domain": "thewhiskyvault.com",
+        "description": "This rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001.",
+        "extraSnippets": [
+          "- [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=25536) [CHFS"
+        ]
+      },
+      {
+        "title": "Review #2340 - Talisker Distiller's Edition : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/1fklplw/review_2340_talisker_distillers_edition/",
+        "domain": "reddit.com",
+        "description": "Briny sea air with a pop of toffee, fruits, wine and sweet butter cream. Overall: Talisker knows just how to draw me in and keep me interested.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker \"Distillers Edition\" Isle of Skye Single Malt Scotch Whisky",
+        "url": "https://www.klwines.com/p/i?i=1053430&srsltid=AfmBOoqwJK-jaz1PfLclw8klBFpQo1CbOQc2HH79_6MceLLfBbgPuoCd",
+        "domain": "klwines.com",
+        "description": "This Edition has a very special bitter-sweet harmony where the peat softens on the palate to a rich, sweet, juicy fruit finish.",
+        "extraSnippets": [
+          "[Skip to page content](https://shop.klwines.com/products/details/1053430#content) ![Talisker \"Distillers Edition\" Isle of Skye Single Malt Scotch Whisky](https://shop.klwines.com/_"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition | Whisky Review - YouTube",
+        "url": "https://www.youtube.com/watch?v=mS3NIH0-v08",
+        "domain": "youtube.com",
+        "description": "... Talisker Distillers Edition. This Talisker belongs to the Distillers Edition of the Classic Malts of Scotland. The Single Malt matured for ...",
+        "extraSnippets": [
+          "![Thumbnail (1920x1080)](https://i.ytimg.com/vi/mS3NIH0-v08/maxresdefault.jpg) # [Talisker Distillers Edition | Whisky Review](https://www.youtube.com/watch?v=mS3NIH0-v08) **Visibi"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "4faa31d2600de6a3047824d6ac5ad59be9d4722924831caa133a2bc6dc65805e",
+    "mode": "auto"
+  }
+}

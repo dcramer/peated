@@ -9,8 +9,7 @@
     "classifierExpectation": "bottle_plus_release",
     "deterministicReleaseExpectation": "none",
     "releaseIdentity": {
-      "edition": "Volume III",
-      "releaseYear": 2021
+      "edition": "Volume III"
     }
   }
 }

@@ -1,6 +1,5 @@
 import {
   BottleClassificationDecisionSchema,
-  CaskTypeEnum,
   type BottleCandidate,
   type BottleClassificationDecision,
 } from "./classifierTypes";
@@ -165,9 +164,6 @@ function buildSmwsExactCaskBottleDraft({
   const extractedIdentity = artifacts.extractedIdentity;
   const smwsDetails = parseSmwsDetailsFromName(code);
   const extractedDistillers = extractedIdentity?.distillery ?? [];
-  const extractedCaskType = CaskTypeEnum.safeParse(
-    extractedIdentity?.cask_type,
-  );
   const extractedBrand = extractedIdentity?.brand ?? null;
   const extractedBottler = extractedIdentity?.bottler ?? null;
   const brandName =
@@ -200,9 +196,6 @@ function buildSmwsExactCaskBottleDraft({
     abv: extractedIdentity?.abv ?? null,
     vintageYear: extractedIdentity?.vintage_year ?? null,
     releaseYear: extractedIdentity?.release_year ?? null,
-    caskType: extractedCaskType.success ? extractedCaskType.data : null,
-    caskSize: extractedIdentity?.cask_size ?? null,
-    caskFill: extractedIdentity?.cask_fill ?? null,
     brand: {
       id: null,
       name: brandName,

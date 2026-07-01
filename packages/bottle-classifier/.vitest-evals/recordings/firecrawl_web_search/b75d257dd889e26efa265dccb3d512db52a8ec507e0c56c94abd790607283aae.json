@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:09:47.274Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker 2001 Distillers Edition"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker 2001 Distillers Edition",
+    "summary": "Good sherry Tally, young, but very pleasant, well-balanced, with the distillery style traditionally growing in development - ash, sea notes, leather, lemon. **Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?__cf_chl_f_tk=h_2UUqcBQG_FKnixf1ZCmWek",
+    "results": [
+      {
+        "title": "Talisker 2001 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": "Good sherry Tally, young, but very pleasant, well-balanced, with the distillery style traditionally growing in development - ash, sea notes, leather, lemon.",
+        "extraSnippets": [
+          "**Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?__cf_chl_f_tk=h_2UUqcBQG_FKnixf1ZCmWekRePCzd8CRHU8Wuvwu"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition Single Malt Scotch Whisky - Caskers",
+        "url": "https://www.caskers.com/talisker-distillers-edition-single-malt-scotch-whisky/?srsltid=AfmBOorMcxB0Dzu0bOMvGXk0Q6h_iJdIzqifSajY-S14MAtYiIoy90yP",
+        "domain": "caskers.com",
+        "description": "Aged for ten years, this limited edition single malt scotch whisky was finished in Amoroso sherry casks. $87.99. - +. Add to Cart. rewards-logo.",
+        "extraSnippets": [
+          "The store will not work correctly when cookies are disabled. **Unfortunately, we’re not open yet in your state.** Looks like we don't deliver to that state. click here to change yo"
+        ]
+      },
+      {
+        "title": "Review #2340 - Talisker Distiller's Edition : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/1fklplw/review_2340_talisker_distillers_edition/",
+        "domain": "reddit.com",
+        "description": "Briny sea air with a pop of toffee, fruits, wine and sweet butter cream. Overall: Talisker knows just how to draw me in and keep me interested.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker 1988, The Distillers Edition 2001 Bottling | The Whisky Vault",
+        "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+        "domain": "thewhiskyvault.com",
+        "description": "This rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001.",
+        "extraSnippets": [
+          "- [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=25536) [CHFS"
+        ]
+      },
+      {
+        "title": "Talisker Single Malt Scotch Whisky from the Islands - Whiskyfun",
+        "url": "https://www.whiskyfun.com/Talisker.html",
+        "domain": "whiskyfun.com",
+        "description": "Talisker scotch single malt whisky - index of all tasting notes, bits about the Talisker distillery and various comments.",
+        "extraSnippets": [
+          "| | | | | | | --- | --- | --- | --- | --- | | | | | | | | | | | --- | --- | --- | --- | --- | | | # **[Whiskyfun](https://www.whiskyfun.com/)** **[Home](https://www.whiskyfun.com/)"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b75d257dd889e26efa265dccb3d512db52a8ec507e0c56c94abd790607283aae",
+    "mode": "auto"
+  }
+}

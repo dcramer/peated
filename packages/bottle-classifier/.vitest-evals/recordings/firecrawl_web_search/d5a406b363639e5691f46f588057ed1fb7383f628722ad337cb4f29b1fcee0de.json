@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-06-30T22:29:10.783Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "\"Canadian Club\" Reserve 9 year old Canadian whisky"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "\"Canadian Club\" Reserve 9 year old Canadian whisky",
+    "summary": "Think of Reserve 9 year old as the more mature, older sibling of Canadian Club 1858 with a greater Rye influence. This whisky is aged for a full 9 years, ... [Skip to main content](https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky#main-content) ![canadian club](https://www.canadianclub.com/sites/",
+    "results": [
+      {
+        "title": "Reserve 9 Year Old Canadian Whisky",
+        "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "domain": "canadianclub.com",
+        "description": "Think of Reserve 9 year old as the more mature, older sibling of Canadian Club 1858 with a greater Rye influence. This whisky is aged for a full 9 years, ...",
+        "extraSnippets": [
+          "[Skip to main content](https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky#main-content) ![canadian club](https://www.canadianclub.com/sites/default/files/styl"
+        ]
+      },
+      {
+        "title": "Canadian Club Reserve 9 year - Thoughts? : r/worldwhisky - Reddit",
+        "url": "https://www.reddit.com/r/worldwhisky/comments/27g4vo/canadian_club_reserve_9_year_thoughts/",
+        "domain": "reddit.com",
+        "description": "Canadian Club is my go-to for mixing and getting trashed (because it's ~$16 for 1.75 l in my neighborhood). The 9 year is a tiny bit smoother, ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Canadian Club Blended Canadian Whiskey Reserve 9 Year 750 ml",
+        "url": "https://applejack.com/Canadian-Club-Blended-Canadian-Whiskey-Reserve-9-Year-750-ml?srsltid=AfmBOopn9D6nEd0NgkLQNOzK47Y3KQ-UBhvwMPV_94criyiI2cV8RiTk",
+        "domain": "applejack.com",
+        "description": "A step up the Canadian Club scale, a whisky aged for nine years before bottling. Peppery and fruity with balanced sweetness and bitter oak.",
+        "extraSnippets": [
+          "![](https://applejack.com/api/items?c=220530&country=US&currency=USD&custitem_sca_store=Wheat-Ridge&facet.exclude=pricelevel11%2Cthorntononline_0%2Ccustitem_thornton_store_price%2C"
+        ]
+      },
+      {
+        "title": "Canadian Club Canadian Whisky Reserve 9 Year",
+        "url": "https://whiskyandwhiskey.com/products/canadian-club-canadian-whisky-reserve-9-yr?srsltid=AfmBOoo63LcIRbgizXMq-_7npkeNHxetAb-E4gRZBDu21MT5SuvHownM",
+        "domain": "whiskyandwhiskey.com",
+        "description": "The aroma wafts up to greet you, filled with enticing notes of baking spice that mingle beautifully with subtle hints of mineral undertones, creating an ...",
+        "extraSnippets": [
+          "[Skip to content](https://whiskyandwhiskey.com/products/canadian-club-canadian-whisky-reserve-9-yr#main) Cart Your cart is empty Zoom picture ![Canadian Club Canadian Whisky Reserv"
+        ]
+      },
+      {
+        "title": "Canadian Club Reserve 9 Year Old Whisky - ShopWoodman's",
+        "url": "https://shopwoodmans.com/store/woodmans-food-markets/products/29578894-canadian-club-blended-canadian-whisky?srsltid=AfmBOorofD_3ShdpSvme9RMZPHEvHJPkFEG8mnbwr-lZVCvtOY8MoHbP",
+        "domain": "shopwoodmans.com",
+        "description": "Get Canadian Club Reserve 9 Year Old Whisky delivered to you in as fast as 1 hour with Woodman's Food Markets same-day delivery or curbside pickup.",
+        "extraSnippets": [
+          "# Order online from Woodman’s! Store Pick-Up or Delivery! Enter your ZIP code, Enter to submit Enter ZIP code Please enter a valid U.S. ZIP code Start Shopping Enable high contrast"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d5a406b363639e5691f46f588057ed1fb7383f628722ad337cb4f29b1fcee0de",
+    "mode": "auto"
+  }
+}

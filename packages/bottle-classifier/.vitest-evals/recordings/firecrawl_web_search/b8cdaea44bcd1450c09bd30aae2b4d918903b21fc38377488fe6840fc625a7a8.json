@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T17:08:29.640Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "site:fourrosesbourbon.com Four Roses Private Selection Barrel Strength"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "site:fourrosesbourbon.com Four Roses Private Selection Barrel Strength",
+    "summary": "It achieves a pronounced yet elegant flavor that is worth savoring. This bottle is the inspiration behind the Single Barrel Collection. 100 Proof / Aged 7 - 9 ... ![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You ",
+    "results": [
+      {
+        "title": "Single Barrel OBSV - Four Roses",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+        "domain": "fourrosesbourbon.com",
+        "description": "It achieves a pronounced yet elegant flavor that is worth savoring. This bottle is the inspiration behind the Single Barrel Collection. 100 Proof / Aged 7 - 9 ...",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      },
+      {
+        "title": "Limited Edition Four Roses Barrels Light Up Your Palate",
+        "url": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+        "domain": "fourrosesbourbon.com",
+        "description": "Bottled at barrel strength, the 2025 Limited Edition Small Batch is ... Non-chill filtered and bottled at a 114.2 proof, the Four Roses 2021 Limited ...",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      },
+      {
+        "title": "Featured Recipe: OBSQ - Four Roses Bourbon",
+        "url": "https://www.fourrosesbourbon.com/blog/featured-recipe-obsq",
+        "domain": "fourrosesbourbon.com",
+        "description": "However, once we started aging Q batches longer for our Private Selection Single Barrel Program, the taste changed, melding oak tones from the ...",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      },
+      {
+        "title": "Single Barrel OESK - Four Roses",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel-oesk",
+        "domain": "fourrosesbourbon.com",
+        "description": "It's a refined yet approachable pour that elevates and invites aromatic notes to bourbon-forward cocktails. 100 Proof / Aged 7 - 9 Years. Add to cart. find ...",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      },
+      {
+        "title": "Our “Fourth Rose” is Expanding to New States - Four Roses Bourbon",
+        "url": "https://www.fourrosesbourbon.com/blog/our-fourth-rose-is-expanding-to-new-states",
+        "domain": "fourrosesbourbon.com",
+        "description": "Four Roses Small Batch Select is a non-chill filtered, 104-proof ... Brent hand-selected and mingled barrels from six of our 10 distinct ...",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b8cdaea44bcd1450c09bd30aae2b4d918903b21fc38377488fe6840fc625a7a8",
+    "mode": "auto"
+  }
+}

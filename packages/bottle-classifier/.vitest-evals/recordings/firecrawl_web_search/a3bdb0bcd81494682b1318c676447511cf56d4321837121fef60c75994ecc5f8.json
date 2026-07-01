@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T02:33:20.623Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "site:fourrosesbourbon.com Four Roses Limited Edition Small Batch 2017"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "site:fourrosesbourbon.com Four Roses Limited Edition Small Batch 2017",
+    "summary": "Bottled at barrel strength, the 2025 Limited Edition Small Batch is built around two standout 13-year-old V batches, delivering luscious notes of apricot, ... ![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over",
+    "results": [
+      {
+        "title": "Limited Edition Four Roses Barrels Light Up Your Palate",
+        "url": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+        "domain": "fourrosesbourbon.com",
+        "description": "Bottled at barrel strength, the 2025 Limited Edition Small Batch is built around two standout 13-year-old V batches, delivering luscious notes of apricot, ...",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      },
+      {
+        "title": "2017 Limited Edition Small Batch - Four Roses Bourbon",
+        "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+        "domain": "fourrosesbourbon.com",
+        "description": "107.3 Proof / Aged Minimum 12-15 Years. Introduces warm aromas of allspice and vanilla bean, mingled with rich apricot and stewed fruits. Aged Minimum 5 Years ...",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      },
+      {
+        "title": "Celebrate 2017 Limited Edition Small Batch with us | Four Roses",
+        "url": "https://www.fourrosesbourbon.com/blog/celebrate-2017-limited-edition-small-batch-with-us",
+        "domain": "fourrosesbourbon.com",
+        "description": "Bottled at barrel strength with a proof of 107.3, the remarkably balanced 2017 Limited Edition Small Batch introduces warm aromas of allspice ...",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      },
+      {
+        "title": "Four Roses Al Young 50th Anniversary is Legendary",
+        "url": "https://www.fourrosesbourbon.com/bourbon/2017-al-young-50th-anniversary",
+        "domain": "fourrosesbourbon.com",
+        "description": "2017 Al Young 50th Anniversary Limited Edition Small Batch. 107.6 Proof ... An approachable bourbon for everyone. view details · Bottle of Four Roses Small batch ...",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      },
+      {
+        "title": "WHAT'S INSIDE SMALL BATCH SELECT? - Four Roses Bourbon",
+        "url": "https://www.fourrosesbourbon.com/blog/whats-inside-small-batch-select",
+        "domain": "fourrosesbourbon.com",
+        "description": "Non-chill filtered and bottled at 104 proof, Four Roses Small Batch Select marks the first permanent addition to our portfolio of premium ...",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a3bdb0bcd81494682b1318c676447511cf56d4321837121fef60c75994ecc5f8",
+    "mode": "auto"
+  }
+}

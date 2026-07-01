@@ -13,9 +13,6 @@
     "abv": null,
     "release_year": null,
     "vintage_year": null,
-    "cask_type": null,
-    "cask_size": null,
-    "cask_fill": null,
     "cask_strength": true,
     "single_cask": null,
     "edition": "Batch C923"

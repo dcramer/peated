@@ -95,7 +95,6 @@ export const ImageBottleFieldCandidatesSchema = z
     vintageYear: EvidenceYearFieldSchema.optional(),
     releaseYear: EvidenceYearFieldSchema.optional(),
     edition: EvidenceStringFieldSchema.optional(),
-    caskType: EvidenceStringFieldSchema.optional(),
     caskNumber: EvidenceStringFieldSchema.optional(),
   })
   .strict();

@@ -77,6 +77,15 @@ describe("local catalog data source", () => {
     }
   });
 
+  test("rejects removed structured cask fields on catalog rows", () => {
+    const result = LocalCatalogSchema.safeParse({
+      entities: [{ id: 1, name: "Shieldaig", type: ["brand"] }],
+      bottles: [{ id: 1, name: "Speyside", brandId: 1, caskType: "Sherry" }],
+    });
+
+    expect(result.success).toBe(false);
+  });
+
   test("derives initial candidates and sibling context from catalog rows", async () => {
     const dataSource = createLocalCatalogDataSource(shieldaigCatalog);
 
@@ -95,9 +104,6 @@ describe("local catalog data source", () => {
         abv: null,
         release_year: null,
         vintage_year: null,
-        cask_type: null,
-        cask_size: null,
-        cask_fill: null,
         cask_strength: null,
         single_cask: null,
         edition: null,

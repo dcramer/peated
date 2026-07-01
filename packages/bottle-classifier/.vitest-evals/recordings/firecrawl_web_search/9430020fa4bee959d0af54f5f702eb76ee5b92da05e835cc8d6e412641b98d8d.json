@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T04:28:08.583Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Glenmorangie Quinta Ruban 14 year old"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Glenmorangie Quinta Ruban 14 year old",
+    "summary": "The Quinta Ruban 14 Years Old is a whisky journey into the wild – a dark and delectable forest where the wind whistles with gusts of peppermint and dark swirls ... Some content that you'd like to display in a modalDismiss #### My Basket (0) Oh, your basket appears to be empty Add some of our delicious Whisky to your ba",
+    "results": [
+      {
+        "title": "Glenmorangie The Quinta Ruban 14 Years Old",
+        "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban?srsltid=AfmBOorGeZO25RbiMYSnChrXQbXncv8DOai2O90kmpfNOT-CD_bbtgFg",
+        "domain": "glenmorangie.com",
+        "description": "The Quinta Ruban 14 Years Old is a whisky journey into the wild – a dark and delectable forest where the wind whistles with gusts of peppermint and dark swirls ...",
+        "extraSnippets": [
+          "Some content that you'd like to display in a modalDismiss #### My Basket (0) Oh, your basket appears to be empty Add some of our delicious Whisky to your basket to discover the won"
+        ]
+      },
+      {
+        "title": "Glenmorangie Quinta Ruban Reviews - Whisky Connosr",
+        "url": "https://www.connosr.com/glenmorangie-quinta-ruban-whisky-reviews-2154",
+        "domain": "connosr.com",
+        "description": "This is the new 14yo Quinta Ruban, upgraded from a 12yo age statement. It is aged in bourbon casks and finished in port casks. As far as other Glenmo whiskies ...",
+        "extraSnippets": [
+          "- [Scotch whisky](https://www.connosr.com/scotch-whisky) - [Japanese whisky](https://www.connosr.com/japanese-whisky) - [American whiskey](https://www.connosr.com/american-whiskey)"
+        ]
+      },
+      {
+        "title": "Glenmorangie Quinta Ruban 14 Year Old: A rich and easy to drink ...",
+        "url": "https://thewhiskyknights.com/glenmorangie-quinta-ruban-14/",
+        "domain": "thewhiskyknights.com",
+        "description": "Palate: A candy-like arrival with fruits, chocolate, and vanilla that develop into orange and bitter notes of toasted oak. The overall flavor profile is rich ...",
+        "extraSnippets": [
+          "# Glenmorangie Quinta Ruban 14 Year Old: A rich and easy to drink single malt noviembre 27, 2023 ![](https://thewhiskyknights.com/wp-content/uploads/2023/11/glenmorangie-quintaruba"
+        ]
+      },
+      {
+        "title": "Review #874 - Glenmorangie 14 Quinta Ruban : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/12xm6z5/review_874_glenmorangie_14_quinta_ruban/",
+        "domain": "reddit.com",
+        "description": "Palate: Medium-light texture. Arrives sweet, but dries up quickly. More crisp apples and some candied ginger. Develops to varnished spicy oak, ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Glenmorangie Quinta Ruban 14 Year Single Malt Scotch - Total Wine",
+        "url": "https://www.totalwine.com/spirits/scotch/single-malt/glenmorangie-quinta-ruban-14-year-single-malt-scotch/p/220061750?srsltid=AfmBOoqcc88P6CSqJ6EUeTJTqc3fIUqIqIyrzyngcGYBg0W0znFgkdyU",
+        "domain": "totalwine.com",
+        "description": "Quinta Ruban 14 year has spent 10 years maturing in American white oak casks, before being transferred into specially selected ruby port pipes.",
+        "extraSnippets": [
+          "Glenmorangie Quinta Ruban 14 Year Single Malt Scotch 750ml Bottle - ![Glenmorangie Quinta Ruban 14 Year Single Malt Scotch 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9430020fa4bee959d0af54f5f702eb76ee5b92da05e835cc8d6e412641b98d8d",
+    "mode": "auto"
+  }
+}

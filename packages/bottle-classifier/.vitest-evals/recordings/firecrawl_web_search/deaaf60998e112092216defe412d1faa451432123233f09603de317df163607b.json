@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-06-30T23:43:45.308Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 2016 cask 1661 Creative Whisky Company"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 2016 cask 1661 Creative Whisky Company",
+    "summary": "Weight, 3.5 lbs. Country of Origin. Scotland. Region. Islay. Age. 8 Years Old. Cask Type. Refill Ex-Sherry Hogshead. Date Distilled. 17th October 2007. ![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](http",
+    "results": [
+      {
+        "title": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%)",
+        "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/",
+        "domain": "norfolkwineandspirits.com",
+        "description": "Weight, 3.5 lbs. Country of Origin. Scotland. Region. Islay. Age. 8 Years Old. Cask Type. Refill Ex-Sherry Hogshead. Date Distilled. 17th October 2007.",
+        "extraSnippets": [
+          "![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](https://norfolkw"
+        ]
+      },
+      {
+        "title": "Single Malt Report: Islay Distillery 8 year old 2007 ... - Diving for Pearls",
+        "url": "http://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-8.html",
+        "domain": "divingforpearlsblog.com",
+        "description": "Its color is amber, much lighter than yesterday's younger whisky. The nose is rawer, yeastier. It's lemony and very vegetal. Cruciferous veg, ...",
+        "extraSnippets": [
+          "Twitter Widget Iframe | | | | | --- | --- | --- | | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif) | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bub"
+        ]
+      },
+      {
+        "title": "The Creative Whisky Co. 'The Exclusive Malts' Islay Distillery 8 Year ...",
+        "url": "https://www.wine-searcher.com/find/the+creative+whisky+co+exclusive+malts+distil+eight+old+single+malt+scotch+islay+scotland/1/switzerland?srsltid=AfmBOopOz8ickYN50VnlN-I_tz-1waQ-MaW30Hty9ZM32CP_RhcgZsc1",
+        "domain": "wine-searcher.com",
+        "description": "Find the best local price for The Creative Whisky Co. 'The Exclusive Malts' Islay Distillery 8 Year Old Single Malt Scotch Whisky, Islay, Scotland.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Isle of Islay 10 Year Old 2007 Creative Whisky Company - YouTube",
+        "url": "https://www.youtube.com/watch?v=rJEgND2RwPo",
+        "domain": "youtube.com",
+        "description": "Mark Dermul, Belgian whisky blogger, tries an incognito Lagavulin. The Creative Whisky Company was founded by David Stirk, raised and then.",
+        "extraSnippets": [
+          "![Thumbnail (1920x1080)](https://i.ytimg.com/vi/rJEgND2RwPo/maxresdefault.jpg) # [Mark’s Whisky Ramblings 428: Isle of Islay 10 Year Old 2007 Creative Whisky Company](https://www.y"
+        ]
+      },
+      {
+        "title": "The Exclusive Malts “Islay” 8 Year 2007 (57.1% abv)",
+        "url": "https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/",
+        "domain": "maltimpostor.com",
+        "description": "Tasting notes: This whisky is, eponymously enough, an “Islay.” As if there is more than one Islay. As if Islays grow on trees.",
+        "extraSnippets": [
+          "[MENU](https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/#) _![](http://maltimpostor.com/wp-content/uploads/2017/01/Exclusive-Malts-Islay-8-Year-2007-26"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "deaaf60998e112092216defe412d1faa451432123233f09603de317df163607b",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T01:15:52.720Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Four Roses Limited Edition Small Batch annual release"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Four Roses Limited Edition Small Batch annual release",
+    "summary": "It's the annual Autumn Release Season, when Kentucky distilleries put out products designed to get people talking about their brand. Though ... Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog _I",
+    "results": [
+      {
+        "title": "Four Roses Limited Edition Small Batch, 2025 - BOURBON GUY",
+        "url": "https://www.bourbonguy.com/blog/2025/8/20/four-roses-limited-edition-small-batch-2025",
+        "domain": "bourbonguy.com",
+        "description": "It's the annual Autumn Release Season, when Kentucky distilleries put out products designed to get people talking about their brand. Though ...",
+        "extraSnippets": [
+          "Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog _I’d l"
+        ]
+      },
+      {
+        "title": "Limited Edition Four Roses Barrels Light Up Your Palate",
+        "url": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+        "domain": "fourrosesbourbon.com",
+        "description": "Bottled at barrel strength, the 2025 Limited Edition Small Batch is built around two standout 13-year-old V batches, delivering luscious notes of apricot, ...",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      },
+      {
+        "title": "Four Roses Limited Edition Small Batch Bourbon 2025 Review",
+        "url": "https://thebourbonculture.com/whiskey-reviews/four-roses-limited-edition-small-batch-bourbon-2025-review/",
+        "domain": "thebourbonculture.com",
+        "description": "When Four Roses nails it, they really nail it – and the 2025 release nailed it. If you see this bottle, do not waffle, just buy it. It's not ...",
+        "extraSnippets": [
+          "[Skip to Content](https://thebourbonculture.com/whiskey-reviews/four-roses-limited-edition-small-batch-bourbon-2025-review/#content) ![Four Roses Limited Edition Small Batch Bourbo"
+        ]
+      },
+      {
+        "title": "2025 Fall Limited Release Series Part III: Four Roses Small Batch ...",
+        "url": "https://whiskeyjar.blog/2025/11/25/2025-fall-limited-release-series-part-iii-four-roses-small-batch-limited-edition/",
+        "domain": "whiskeyjar.blog",
+        "description": "To me, the Four Roses annual release Small Batch Limited Edition is the pinnacle of the Fall Limited Release Bourbon season.",
+        "extraSnippets": [
+          "- ![](https://i0.wp.com/whiskeyjar.blog/wp-content/uploads/2025/11/img_0109.jpg?resize=676%2C901&ssl=1) - ![](https://i0.wp.com/whiskeyjar.blog/wp-content/uploads/2025/11/img_0110."
+        ]
+      },
+      {
+        "title": "Four Roses 2025 Limited Edition Small Batch",
+        "url": "https://www.whiskeyinmyweddingring.com/reviews/four-roses-2025-limited-edition-small-batch",
+        "domain": "whiskeyinmyweddingring.com",
+        "description": "The Four Roses 2025 Limited Edition Small Batch is a very good, even great, Four Roses bourbon. If you like fruity, you'll love it. If you like ...",
+        "extraSnippets": [
+          "[0](https://www.whiskeyinmyweddingring.com/cart) # Four Roses 2025 Limited Edition Small Batch [Reviews](https://www.whiskeyinmyweddingring.com/reviews/category/Reviews)[American W"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b82d69fceb143912ded80084ddfc3a26e01cc571c72beda45fd2be4d0f219ead",
+    "mode": "auto"
+  }
+}

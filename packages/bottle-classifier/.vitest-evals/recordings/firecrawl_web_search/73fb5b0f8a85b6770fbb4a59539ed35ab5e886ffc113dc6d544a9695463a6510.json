@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T01:34:38.748Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "site:ardbeg.com Ardbeg Traigh Bhan 19 Years Old batch"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "site:ardbeg.com Ardbeg Traigh Bhan 19 Years Old batch",
+    "summary": "This rare small batch 19-year-old Ardbeg is arguably the most tropical dram to leave the Distillery. Batch code: TB/05-12.02.2004/23.GM Non chill filtered at ... ![](https://www.ardbeg.com/dw/image/v2/BGMK_PRD/on/demandware.static/-/Library-Sites-Ardbeg-shared/default/dwd1fa42f7/Header/Header_Logo_Resized.png) Enter Da",
+    "results": [
+      {
+        "title": "Ardbeg 19 Years Old Traigh Bhan Batch 5",
+        "url": "https://www.ardbeg.com/en-gb/ardbeg-19-year-old-traigh-bhan-batch-5-1100173.html",
+        "domain": "ardbeg.com",
+        "description": "This rare small batch 19-year-old Ardbeg is arguably the most tropical dram to leave the Distillery. Batch code: TB/05-12.02.2004/23.GM Non chill filtered at ...",
+        "extraSnippets": [
+          "![](https://www.ardbeg.com/dw/image/v2/BGMK_PRD/on/demandware.static/-/Library-Sites-Ardbeg-shared/default/dwd1fa42f7/Header/Header_Logo_Resized.png) Enter Date of Birth Country Un"
+        ]
+      },
+      {
+        "title": "Ardbeg Traigh Bhan 19 Years Old Batch 2 Single Malt Scotch Whisky",
+        "url": "https://www.ardbeg.com/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%202-2020ARDTB2.html",
+        "domain": "ardbeg.com",
+        "description": "IMPOSSIBLE BALANCE AND HAARMONY. Matured in American oak and Oloroso sherry casks, this sublime 19 year old whisky is the epitome of an aged Ardbeg.",
+        "extraSnippets": [
+          "![](https://www.ardbeg.com/dw/image/v2/BGMK_PRD/on/demandware.static/-/Library-Sites-Ardbeg-shared/default/dwd1fa42f7/Header/Header_Logo_Resized.png) Enter Date of Birth Country Un"
+        ]
+      },
+      {
+        "title": "Ardbeg Traigh Bhan 19 Years Old Batch 4",
+        "url": "https://www.ardbeg.com/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%204-2022ARDTB4.html",
+        "domain": "ardbeg.com",
+        "description": "Intense notes of wood smoke and decadent dark chocolate crash over the palate, followed by a ripple of sweet lemon curd and peanut brittle.",
+        "extraSnippets": [
+          "![](https://www.ardbeg.com/dw/image/v2/BGMK_PRD/on/demandware.static/-/Library-Sites-Ardbeg-shared/default/dwd1fa42f7/Header/Header_Logo_Resized.png) Enter Date of Birth Country Un"
+        ]
+      },
+      {
+        "title": "Shop | Ardbeg Single Malt Scotch Whisky",
+        "url": "https://www.ardbeg.com/en-gb/Shop/",
+        "domain": "ardbeg.com",
+        "description": "Ardbeg 19 Years Old Traigh Bhan Batch 7 · Ardbeg 19 Years Old Traigh Bhan Batch 7. The Final Batch. Bottle with gift box ...",
+        "extraSnippets": [
+          "![](https://www.ardbeg.com/dw/image/v2/BGMK_PRD/on/demandware.static/-/Library-Sites-Ardbeg-shared/default/dwd1fa42f7/Header/Header_Logo_Resized.png) Enter Date of Birth Country Un"
+        ]
+      },
+      {
+        "title": "Ardbeg 19 Years Old Traigh Bhan Batch 3",
+        "url": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
+        "domain": "ardbeg.com",
+        "description": "Matured in a slightly higher proportion of Oloroso Sherry casks, this sublime 19 year old whisky is the epitome of an aged Ardbeg.",
+        "extraSnippets": [
+          "![](https://www.ardbeg.com/dw/image/v2/BGMK_PRD/on/demandware.static/-/Library-Sites-Ardbeg-shared/default/dwd1fa42f7/Header/Header_Logo_Resized.png) Enter Date of Birth Country Un"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "73fb5b0f8a85b6770fbb4a59539ed35ab5e886ffc113dc6d544a9695463a6510",
+    "mode": "auto"
+  }
+}

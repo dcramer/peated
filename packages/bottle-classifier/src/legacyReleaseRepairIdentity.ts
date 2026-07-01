@@ -73,10 +73,7 @@ const DISTINCT_CATEGORY_NAME_MARKERS = [
 export type LegacyReleaseRepairParentCandidate = {
   abv: null | number;
   category: BottleExtractedDetails["category"];
-  caskFill: ProposedRelease["caskFill"];
-  caskSize: ProposedRelease["caskSize"];
   caskStrength: null | boolean;
-  caskType: ProposedRelease["caskType"];
   edition: null | string;
   fullName: string;
   id: number;
@@ -407,10 +404,7 @@ export function hasDirtyLegacyReleaseRepairParent(
   row: Pick<
     LegacyReleaseRepairParentCandidate,
     | "abv"
-    | "caskFill"
-    | "caskSize"
     | "caskStrength"
-    | "caskType"
     | "edition"
     | "fullName"
     | "releaseYear"
@@ -435,10 +429,7 @@ export function hasDirtyLegacyReleaseRepairParent(
   return hasBlockingBottleLevelReleaseTraits({
     bottle: {
       abv: row.abv,
-      caskFill: row.caskFill,
-      caskSize: row.caskSize,
       caskStrength: row.caskStrength,
-      caskType: row.caskType,
       edition: row.edition,
       fullName: row.fullName,
       name: row.fullName,

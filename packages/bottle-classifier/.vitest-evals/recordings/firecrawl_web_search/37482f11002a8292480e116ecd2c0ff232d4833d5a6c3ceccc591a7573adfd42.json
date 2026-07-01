@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:58:03.635Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Glengoyne Legacy Series Chapter Two 48%"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Glengoyne Legacy Series Chapter Two 48%",
+    "summary": "48%Vol. Legacy Series: Chapter 2. Chapter Two in our Legacy Series marries spirits matured in two distinct cask types – first fill bourbon and refill sherry ... Cart FareHarbor Cart: \\[\\[ indexCtrl.cartEntriesTotal \\]\\] Checkout 0 Checkout Checkout with company... [![Glengoyne Logo](https://www.glengoyne.com/static/ima",
+    "results": [
+      {
+        "title": "Glengoyne Legacy Series | Highland Single Malt Scotch Whisky",
+        "url": "https://www.glengoyne.com/our-whisky/our-collection/legacy-series-chapter-2",
+        "domain": "glengoyne.com",
+        "description": "48%Vol. Legacy Series: Chapter 2. Chapter Two in our Legacy Series marries spirits matured in two distinct cask types – first fill bourbon and refill sherry ...",
+        "extraSnippets": [
+          "Cart FareHarbor Cart: \\[\\[ indexCtrl.cartEntriesTotal \\]\\] Checkout 0 Checkout Checkout with company... [![Glengoyne Logo](https://www.glengoyne.com/static/images/logo-dark.svg)](h"
+        ]
+      },
+      {
+        "title": "Glengoyne The Legacy Series Chapter 2 Single Malt Whisky",
+        "url": "https://reallygoodwhisky.com/en-us/products/glengoyne-the-legacy-series-chapter-2-single-malt-whisky-70cl-48?srsltid=AfmBOoolLFRqiIHgoaZkZsLYo3KG4x703BftfylRll343uORg4d2soXf",
+        "domain": "reallygoodwhisky.com",
+        "description": "The Legacy Series Chapter 2 Single Malt Whisky - 70cl 48% Glengoyne … $68.60 Sold out (1) are $686.11 away from 20% Off Shipping!",
+        "extraSnippets": [
+          "[Skip to content](https://reallygoodwhisky.com/en-us/products/glengoyne-the-legacy-series-chapter-2-single-malt-whisky-70cl-48#MainContent) ![Glengoyne The Legacy Series Chapter 2 "
+        ]
+      },
+      {
+        "title": "Glengoyne The Legacy Series Chapter Two Review - Jeff Whisky",
+        "url": "https://jeffwhisky.com/glengoyne-legacy-chapter-two/",
+        "domain": "jeffwhisky.com",
+        "description": "48% Region: Highlands, Scotland. The bottle is made up of 48% first-fill bourbon barrels, 35% in refill oak casks and then 17% dash of first fill sherry. Nose ...",
+        "extraSnippets": [
+          "# Glengoyne The Legacy Series Chapter Two **Highland Single Malt Scotch Whisky 48%** **Region:** Highlands, Scotland **Age: NAS** **Strength:** 48% ABV **Colouring:** Nope **Chill "
+        ]
+      },
+      {
+        "title": "Review #520 - Glengoyne Legacy Series Chapter 2 : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/1jql1dv/review_520_glengoyne_legacy_series_chapter_2/",
+        "domain": "reddit.com",
+        "description": "elevated strength of 48% ABV. Single Malt Price: USD 99 (2025) Age Statement: NAS Strength: 48% ABV. Oak tannins, vanilla, and malt",
+        "extraSnippets": []
+      },
+      {
+        "title": "Glengoyne Legacy - Chapter Two - Whisky.com",
+        "url": "https://www.whisky.com/whisky-database/details/glengoyne-legacy-chapter-two.html",
+        "domain": "whisky.com",
+        "description": "The cask combination of Sherry casks (5% European oak, 12% American oak) and Bourbon casks (48% first-fill, 35% refilled) is bringing tradition and future ...",
+        "extraSnippets": [
+          "Delivery Country Delivery Country ![DE](https://www.whisky.com/typo3conf/ext/sitepackage/Resources/Public/Libraries/other_whisky_resources/src/public/images/flags/DE.svg?1781180576"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "37482f11002a8292480e116ecd2c0ff232d4833d5a6c3ceccc591a7573adfd42",
+    "mode": "auto"
+  }
+}

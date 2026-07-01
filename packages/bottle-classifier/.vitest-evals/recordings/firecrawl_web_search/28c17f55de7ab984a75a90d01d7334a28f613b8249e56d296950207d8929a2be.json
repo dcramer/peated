@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T18:44:54.695Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Four Roses Private Selection Barrel Strength bourbon Single Barrel"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Four Roses Private Selection Barrel Strength bourbon Single Barrel",
+    "summary": "The high-rye mash bill shows itself through notes of anise, clove and a few indistinguishable herbal flavors. Fruits come by way of cherries and orange zest. [Skip to Content](https://thebourbonculture.com/whiskey-reviews/four-roses-private-selection-barrel-strength-bourbon-obsk-whole-foods-quick-review/#content) ![Fou",
+    "results": [
+      {
+        "title": "Four Roses Private Selection Barrel Strength ...",
+        "url": "https://thebourbonculture.com/whiskey-reviews/four-roses-private-selection-barrel-strength-bourbon-obsk-whole-foods-quick-review/",
+        "domain": "thebourbonculture.com",
+        "description": "The high-rye mash bill shows itself through notes of anise, clove and a few indistinguishable herbal flavors. Fruits come by way of cherries and orange zest.",
+        "extraSnippets": [
+          "[Skip to Content](https://thebourbonculture.com/whiskey-reviews/four-roses-private-selection-barrel-strength-bourbon-obsk-whole-foods-quick-review/#content) ![Four Roses Private Se"
+        ]
+      },
+      {
+        "title": "Single Barrel OBSV",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+        "domain": "fourrosesbourbon.com",
+        "description": "Four Roses Single Barrel embodies the uniqueness of an individual barrel hand-selected by our Master Distiller. It achieves a pronounced yet elegant flavor ...",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      },
+      {
+        "title": "Review #822: Four Roses Private Selection Barrel Strength ...",
+        "url": "https://www.reddit.com/r/bourbon/comments/1etp1ra/review_822_four_roses_private_selection_barrel/",
+        "domain": "reddit.com",
+        "description": "The high-rye mash bill shows itself through notes of anise, clove and a few indistinguishable herbal flavors. Fruits come by way of cherries and ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Four Roses Single Barrel 13-6L Bourbon Review Liquor ...",
+        "url": "https://www.amongstthewhiskey.com/post/four-roses-single-barrel-13-6l-bourbon-review-liquor-junction-amongst-the-whiskey-pick-embracing-t",
+        "domain": "amongstthewhiskey.com",
+        "description": "The private selection program at Four Roses Distillery allows enthusiasts and retailers to participate in this unique bourbon experience.",
+        "extraSnippets": [
+          "top of page Search Log in / Sign up ![Four Roses Bourbon](https://static.wixstatic.com/media/09a99b_edb9c960852f4358a6330544a68b4040~mv2.jpg/v1/fill/w_740,h_925,al_c,q_85,usm_0.66_"
+        ]
+      },
+      {
+        "title": "Four Roses Single Barrel Collection, 2025",
+        "url": "https://www.bourbonguy.com/blog/2025/1/15/four-roses-single-barrel-collection-2025",
+        "domain": "bourbonguy.com",
+        "description": "Details: Each recipe is aged from 7-9 years old and at 50% ABV. OBSF. Nose: Sweet and floral, with mint and oak. Mouth: Crème brûlée, mint ...",
+        "extraSnippets": [
+          "Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog _I’d l"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "28c17f55de7ab984a75a90d01d7334a28f613b8249e56d296950207d8929a2be",
+    "mode": "auto"
+  }
+}

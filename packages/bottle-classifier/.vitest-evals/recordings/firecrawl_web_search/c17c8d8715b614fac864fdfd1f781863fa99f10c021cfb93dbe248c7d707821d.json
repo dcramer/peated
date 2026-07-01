@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T00:12:21.190Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition 1988 2001 bottling"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker Distillers Edition 1988 2001 bottling",
+    "summary": "Talisker 1988 Distillers Edition. ABV: 45.8% - Size: 70cl. Talisker 1988, The Distillers Edition 2001 Bottling. Where to buy? [Skip to content](https://www.whiskymarketplace.com/whisky/talisker-1988-distillers-edition-island-single-malt-scotch#main-content) ![Talisker 1988 Distillers Edition](https://images.whiskymarke",
+    "results": [
+      {
+        "title": "Talisker 1988 Distillers Edition | Single Malt Scotch Whisky",
+        "url": "https://www.whiskymarketplace.com/whiskies/talisker-1988-distillers-edition-island-single-malt-scotch",
+        "domain": "whiskymarketplace.com",
+        "description": "Talisker 1988 Distillers Edition. ABV: 45.8% - Size: 70cl. Talisker 1988, The Distillers Edition 2001 Bottling. Where to buy?",
+        "extraSnippets": [
+          "[Skip to content](https://www.whiskymarketplace.com/whisky/talisker-1988-distillers-edition-island-single-malt-scotch#main-content) ![Talisker 1988 Distillers Edition](https://imag"
+        ]
+      },
+      {
+        "title": "Talisker 1988, The Distillers Edition 2001 Bottling",
+        "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+        "domain": "thewhiskyvault.com",
+        "description": "This rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001.",
+        "extraSnippets": [
+          "- [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=25536) [CHFS"
+        ]
+      },
+      {
+        "title": "Talisker 1988 - Ratings and reviews",
+        "url": "https://www.whiskybase.com/whiskies/whisky/1214/talisker-1988",
+        "domain": "whiskybase.com",
+        "description": "Bottler: Distillery Bottling; Bottling series: The Distillers Edition; Vintage: 1988; Bottled: 2001; Cask Type: Double Matured in Amoroso Sherry ...",
+        "extraSnippets": [
+          "**Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/1214/talisker-1988?__cf_chl_f_tk=RIqCdmVTRaGmAdslsluiJzK5UrSZuQPyWSK86ClymA"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition 1988/2001 (45.8%, OB, TD-S: 5CO)",
+        "url": "https://masterquill.com/2012/06/17/talisker-distillers-edition-19882001-45-8-ob-td-s-5co/",
+        "domain": "masterquill.com",
+        "description": "Nose: Fresh, sea spray, a bit musty and woody. Easily recognizable as a Talisker with added sweetness, toffee and some meat (often with Sherry).",
+        "extraSnippets": [
+          "- [Leave a comment](https://masterquill.com/2012/06/17/talisker-distillers-edition-19882001-45-8-ob-td-s-5co/#respond) ![](https://masterquill.com/wp-content/uploads/2012/06/talisk"
+        ]
+      },
+      {
+        "title": "Review: Talisker Distiller's Edition : r/Scotch",
+        "url": "https://www.reddit.com/r/Scotch/comments/1gvji4/review_talisker_distillers_edition/",
+        "domain": "reddit.com",
+        "description": "This was distilled in 2001, bottled 2012 with the new \"blue stripe\" label. Features a double maturation in Amoroso sherry casks, which I read as ...",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "c17c8d8715b614fac864fdfd1f781863fa99f10c021cfb93dbe248c7d707821d",
+    "mode": "auto"
+  }
+}

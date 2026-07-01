@@ -1,0 +1,14 @@
+{
+  "writtenAt": "2026-07-01T00:02:13.646Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Four Roses Limited Edition Small Batch annual releases 2017 2018"
+  },
+  "output": {
+    "error": "Firecrawl search failed: The operation was aborted due to timeout"
+  },
+  "metadata": {
+    "cacheKey": "e91c5cc00cd29a9ebe828f49953a88e80b6cba4388bafcba3a430ca8debd49bf",
+    "mode": "auto"
+  }
+}

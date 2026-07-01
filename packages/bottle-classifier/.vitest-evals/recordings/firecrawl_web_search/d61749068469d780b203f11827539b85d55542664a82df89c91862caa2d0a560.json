@@ -1,0 +1,14 @@
+{
+  "writtenAt": "2026-07-01T15:31:26.698Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Creag Isle 12 Island Single Malt"
+  },
+  "output": {
+    "error": "Firecrawl search failed: The operation was aborted due to timeout"
+  },
+  "metadata": {
+    "cacheKey": "d61749068469d780b203f11827539b85d55542664a82df89c91862caa2d0a560",
+    "mode": "auto"
+  }
+}

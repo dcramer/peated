@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T02:26:10.667Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Glenmorangie Cadboll Estate 15 year old Batch 4"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Glenmorangie Cadboll Estate 15 year old Batch 4",
+    "summary": "Batch 4 in 2024. ABV: 43% Age: 15-Year-Old Original SRP: ~$99 Price Paid: ~$89. Wonderfully balanced sweet vanilla and hints of lemons and ... Batch 4 $104.99. Aged 15 YO the first Cadboll Estate release to be wholly matured in our bespoke designer ex-bourbon casks. A unique barrel selection small ... Glenmorangie 15 Y",
+    "results": [
+      {
+        "title": "Review #11 - Glenmorangie 15 - The Cadboll Estate : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/1ow8vc3/review_11_glenmorangie_15_the_cadboll_estate/",
+        "domain": "reddit.com",
+        "description": "Batch 4 in 2024. ABV: 43% Age: 15-Year-Old Original SRP: ~$99 Price Paid: ~$89. Wonderfully balanced sweet vanilla and hints of lemons and ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Glenmorangie 15 Year Old Cadboll Estate Batch 4 - Total Wine",
+        "url": "https://www.totalwine.com/spirits/scotch/glenmorangie-15-year-old-cadboll-estate-batch-4/p/2126251327?srsltid=AfmBOoptG-YKteo2xHAE7ZroUL4xtrQoOjbETWdEtSNRSgo_hkTzGNLU",
+        "domain": "totalwine.com",
+        "description": "Batch 4 $104.99. Aged 15 YO the first Cadboll Estate release to be wholly matured in our bespoke designer ex-bourbon casks. A unique barrel selection small ...",
+        "extraSnippets": [
+          "Glenmorangie 15 Year Old Cadboll Estate Batch 4 750ml Bottle - ![Glenmorangie 15 Year Old Cadboll Estate Batch 4 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/images/212"
+        ]
+      },
+      {
+        "title": "Glenmorangie The Cadboll Estate 15 year old (Batch 4), 43%",
+        "url": "https://whiskyadvocate.com/Glenmorangie-The-Cadboll-Estate-15-year-old-Batch-4-43",
+        "domain": "whiskyadvocate.com",
+        "description": "The Cadboll Estate 15 year old (Batch 4), 43% Price: $100.00. The nose is buttery, with creamy vanilla, brioche, honeycomb, flowers, and delicate white pear, ...",
+        "extraSnippets": [
+          "Back Save ![](https://whiskyadvocate.com/get/files/image/galleries/Glenmorangie-Cadboll-70cl-2023-bottle-front-view_(1)_300.png) ### 94 Score # Glenmorangie The Cadboll Estate 15 y"
+        ]
+      },
+      {
+        "title": "The Cadboll Estate, 2024 Batch 4 - Glenmorangie Distillery",
+        "url": "https://www.glenmorangie.com/en-us/pages/the-cadboll-estate?srsltid=AfmBOoqw8c_7lBImsJipsCXNnHLecpQA89iLWHUNsdXUkTQEZsOA29b8",
+        "domain": "glenmorangie.com",
+        "description": "Buy Online. The Cadboll Estate 2024 is our whisky created entirely with Barley from our own fields & water from our Scottish Highlands spring.",
+        "extraSnippets": [
+          "Some content that you'd like to display in a modalDismiss #### My Basket (0) Oh, your basket appears to be empty Add some of our delicious Whisky to your basket to discover the won"
+        ]
+      },
+      {
+        "title": "Glenmorangie The Cadboll Estate 15 Year Scotch 2024 - Royal Batch",
+        "url": "https://www.royalbatch.com/glenmorangie-the-cadboll-estate-15-year-old-single-malt-scotch-whisky-2024-release?srsltid=AfmBOoqe16dbaIramTlhhJdv_q0P9M-Gdr6sseZR6sZvuysAulZiAj8z",
+        "domain": "royalbatch.com",
+        "description": "Experience the rich, estate-grown Glenmorangie The Cadboll Estate 15 Year Old—shop now at Royal Batch for a smooth, creamy, Highland single malt adventure.",
+        "extraSnippets": [
+          "``` (function() { 'use strict'; })(); ``` - [Home](https://www.royalbatch.com/home \"home\") - [Whiskey](https://www.royalbatch.com/collections/Whiskey \"whiskey\") - [Glenmorangie Whi"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "bb0f3676d066cc8839aa88bf2cc65db4e84cd2295d6a33f8c7232a5479ce366f",
+    "mode": "auto"
+  }
+}

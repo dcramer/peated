@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T01:56:35.773Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition annual release double matured 2001 label"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker Distillers Edition annual release double matured 2001 label",
+    "summary": "The big marketing word used to distinguish this Isle of Skye release is the use of (double) maturation in amoroso seasoned American oak. [Skip to content](https://thewhiskeyramble.com/2024/11/19/talisker-distillers-edition-2023-scoresheet-review/#wp--skip-link--target) ## Talisker Distillers Edition 2023 Scoresheet & R",
+    "results": [
+      {
+        "title": "Talisker Distillers Edition 2023 Scoresheet & Review",
+        "url": "https://thewhiskeyramble.com/2024/11/19/talisker-distillers-edition-2023-scoresheet-review/",
+        "domain": "thewhiskeyramble.com",
+        "description": "The big marketing word used to distinguish this Isle of Skye release is the use of (double) maturation in amoroso seasoned American oak.",
+        "extraSnippets": [
+          "[Skip to content](https://thewhiskeyramble.com/2024/11/19/talisker-distillers-edition-2023-scoresheet-review/#wp--skip-link--target) ## Talisker Distillers Edition 2023 Scoresheet "
+        ]
+      },
+      {
+        "title": "Shop Distillers Edition Scotch | Limited Edition Single Malt Whisky",
+        "url": "https://www.malts.com/en-us/distillers-edition-scotch",
+        "domain": "malts.com",
+        "description": "The Distillers Editions are an annual release of the finest single malts, double-matured in batches using individually prepared casks.",
+        "extraSnippets": [
+          "![Lagavulin, Oban, Talisker, Dalwhinnie, Cragganmore, Caol Isle and Glenkinchie Distillers Editions](https://images.ctfassets.net/glsfy1cpffmh/6IiBmWvgdD1EMSpw2mbhoR/f6f4230245c25f"
+        ]
+      },
+      {
+        "title": "Diageo Special Releases - The Facts - Whisky.Auction Magazine",
+        "url": "https://magazine.whisky.auction/how-to/how-to-read-a-diageo-special-releases-label/",
+        "domain": "magazine.whisky.auction",
+        "description": "Back at the dawn of the new century there were just two limited editions in the inaugural 2001 Diageo Special Releases. While the Talisker 28 ...",
+        "extraSnippets": [
+          "Navigate…Auction ResultsListsHow ToArticlesCalendar - [Auction Results](https://magazine.whisky.auction/category/results/) - [Lists](https://magazine.whisky.auction/category/lists/"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition | Whisky Review - YouTube",
+        "url": "https://www.youtube.com/watch?v=mS3NIH0-v08",
+        "domain": "youtube.com",
+        "description": "https://whisky.com/p.php?id=TALIS0022 Nosing 05:03 Whisky.com reviews the Talisker Distillers Edition. This Talisker belongs to the ...",
+        "extraSnippets": [
+          "Talisker Distillers Edition \\| Whisky Review Tap to unmute 2x Copy link Info Shopping ![](https://i.ytimg.com/an/nCE0-pPZuit8aud1l9rhkA/featured_channel.jpg?v=5ed8eafa) If playback"
+        ]
+      },
+      {
+        "title": "Talisker - 2001 Distillers Edition - Whisky.com",
+        "url": "https://www.whisky.com/whisky-database/details.html?tx_datamintsflaschendb_pi4%5Baction%5D=Detail&tx_datamintsflaschendb_pi4%5Bcontroller%5D=Flaschen&tx_datamintsflaschendb_pi4%5Bflasche%5D=11405&cHash=92eb1a352075c792879e40607f8744eb",
+        "domain": "whisky.com",
+        "description": "Distillation date: 2001. Bottling date: 2012. ABV: 45.8%. Bottle size: 0.7 l. Bottler: Original bottling. Series: Distillers Edition (Diageo). Maturing: Bourbon.",
+        "extraSnippets": [
+          "Delivery Country Delivery Country ![DE](https://www.whisky.com/typo3conf/ext/sitepackage/Resources/Public/Libraries/other_whisky_resources/src/public/images/flags/DE.svg?1781180576"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "818b22b793ee5ea718b23cfce6cfa04ae8704c92f0c9374883aee8cdb8f65ad8",
+    "mode": "auto"
+  }
+}

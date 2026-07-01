@@ -18,9 +18,6 @@
       "abv": 57.1,
       "release_year": 2016,
       "vintage_year": 2007,
-      "cask_type": null,
-      "cask_size": null,
-      "cask_fill": null,
       "cask_strength": true,
       "single_cask": true,
       "edition": null
@@ -108,7 +105,6 @@
     "action": "create_bottle",
     "identityScope": "exact_cask",
     "proposedBottle": {
-      "name": "Islay 2007 8-year-old",
       "brand": {
         "name": "The Exclusive Malts"
       },
@@ -119,7 +115,6 @@
       "statedAge": 8,
       "abv": 57.1,
       "vintageYear": 2007,
-      "releaseYear": 2016,
       "caskStrength": true,
       "singleCask": true
     },

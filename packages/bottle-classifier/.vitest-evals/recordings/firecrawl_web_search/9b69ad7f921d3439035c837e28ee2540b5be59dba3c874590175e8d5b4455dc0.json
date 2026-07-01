@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T16:16:28.574Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "The Glenlivet Caribbean Reserve"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "The Glenlivet Caribbean Reserve",
+    "summary": "Scotland- The Glenlivet Caribbean Reserve is a single malt scotch whisky selectively finished in Caribbean Rum Barrels. Intensely smooth and well balanced. It ... The Glenlivet Caribbean Reserve Single Malt Scotch 750ml Bottle - ![The Glenlivet Caribbean Reserve Single Malt Scotch 750ml Bottle](https://www.totalwine.co",
+    "results": [
+      {
+        "title": "The Glenlivet Caribbean Reserve Single Malt Scotch - Total Wine",
+        "url": "https://www.totalwine.com/spirits/scotch/single-malt/the-glenlivet-caribbean-reserve-single-malt-scotch/p/227473750?srsltid=AfmBOoo7_Hz_XymiZKTPWZNJM484nboS60BOaimjyzyIg8jNz9isdxAm",
+        "domain": "totalwine.com",
+        "description": "Scotland- The Glenlivet Caribbean Reserve is a single malt scotch whisky selectively finished in Caribbean Rum Barrels. Intensely smooth and well balanced. It ...",
+        "extraSnippets": [
+          "The Glenlivet Caribbean Reserve Single Malt Scotch 750ml Bottle - ![The Glenlivet Caribbean Reserve Single Malt Scotch 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/imag"
+        ]
+      },
+      {
+        "title": "Review #1. The Glenlivet Caribbean Reserve. : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/rl3tio/review_1_the_glenlivet_caribbean_reserve/",
+        "domain": "reddit.com",
+        "description": "Smell- Very sweet for a scotch. I can identify some vanilla and banana scents. Little hints of citrus as well. Palate- Very mellow, it's ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Caribbean Reserve Single Malt Scotch Whisky - The Glenlivet",
+        "url": "https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/",
+        "domain": "theglenlivet.com",
+        "description": "No information is available for this page. · Learn why",
+        "extraSnippets": [
+          "Select your country or region ![](https://www.theglenlivet.com/wp-content/themes/global-theme/static/images/icon/close.svg) [Canada - English](https://www.theglenlivet.com/en-ca/wh"
+        ]
+      },
+      {
+        "title": "The Glenlivet Caribbean Reserve - Brix Wine & Liquor",
+        "url": "https://brixwineandliquor.com/product/the-glenlivet-caribbean-reserve/",
+        "domain": "brixwineandliquor.com",
+        "description": "The Glenlivet Caribbean Reserve. $49.99. Notes of Pear & Red Apple on the nose that meet a tropical twist of Banana syrup. The palate offers rich Caramel Toffee ...",
+        "extraSnippets": [
+          "- [Telephone(518) 899-9559](tel:15188999559 \"\") - [Map MarkerDirections](https://brixwineandliquor.com/contact/ \"\") - [Cart](https://brixwineandliquor.com/shop/cart/ \"View Cart\") -"
+        ]
+      },
+      {
+        "title": "The Glenlivet Caribbean Reserve Single Malt Scotch Whisky 750mL",
+        "url": "http://honestboozereviews.com/the-glenlivet-caribbean-reserve-single-malt-scotch-whisky-750ml/",
+        "domain": "honestboozereviews.com",
+        "description": "A smooth, sweet whisky. Perfect to enjoy with a refreshing mixer or neat, just the way you like it. Taste: 4.0 – The caramel and orange combo is there, but it' ...",
+        "extraSnippets": [
+          "[Skip to main content](http://honestboozereviews.com/the-glenlivet-caribbean-reserve-single-malt-scotch-whisky-750ml/#content) Okay seriously, we’ll have an actual review of Glenle"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9b69ad7f921d3439035c837e28ee2540b5be59dba3c874590175e8d5b4455dc0",
+    "mode": "auto"
+  }
+}

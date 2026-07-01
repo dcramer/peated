@@ -17,9 +17,6 @@
       "abv": null,
       "release_year": null,
       "vintage_year": null,
-      "cask_type": "Peated Scotch Barrels",
-      "cask_size": null,
-      "cask_fill": null,
       "cask_strength": null,
       "single_cask": null,
       "edition": null
@@ -44,9 +41,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 1,
         "source": ["text"]
       },
@@ -69,9 +63,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.6679750018368795,
         "source": ["vector", "release"]
       },
@@ -94,9 +85,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.6532670600221517,
         "source": ["vector", "release"]
       }
@@ -125,9 +113,6 @@
           "abv": null,
           "vintageYear": null,
           "releaseYear": null,
-          "caskType": null,
-          "caskSize": null,
-          "caskFill": null,
           "score": 1,
           "source": ["text"]
         }

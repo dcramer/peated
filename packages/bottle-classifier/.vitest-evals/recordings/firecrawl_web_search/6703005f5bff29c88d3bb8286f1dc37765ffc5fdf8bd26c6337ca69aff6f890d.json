@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-06-30T23:40:59.544Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Four Roses Limited Edition Small Batch 2017 bourbon"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Four Roses Limited Edition Small Batch 2017 bourbon",
+    "summary": "The nose is fruity and spicy. There are hints of raspberry, plum, and black pepper. It's a little light. The sweetness is nice with caramel and floral. [Skip to content](http://bourbonr.com/blog/2017-four-roses-small-batch-le-review/#content) [Blake](http://bourbonr.com/blog/author/admin/)in [Posts](http://bourbonr.com",
+    "results": [
+      {
+        "title": "2017 Four Roses Small Batch LE Review – Blog - Bourbonr",
+        "url": "http://bourbonr.com/blog/2017-four-roses-small-batch-le-review/",
+        "domain": "bourbonr.com",
+        "description": "The nose is fruity and spicy. There are hints of raspberry, plum, and black pepper. It's a little light. The sweetness is nice with caramel and floral.",
+        "extraSnippets": [
+          "[Skip to content](http://bourbonr.com/blog/2017-four-roses-small-batch-le-review/#content) [Blake](http://bourbonr.com/blog/author/admin/)in [Posts](http://bourbonr.com/blog/catego"
+        ]
+      },
+      {
+        "title": "Four Roses 2017 Limited Edition \"Al Young\" 50th Anniversary Small ...",
+        "url": "https://thebourbonculture.com/whiskey-reviews/four-roses-2017-limited-edition-al-young-50th-anniversary-small-batch-review/",
+        "domain": "thebourbonculture.com",
+        "description": "Al Young's release was one of the oldest (average) limited edition small batch bourbons created at Four Roses up until that point.",
+        "extraSnippets": [
+          "[Skip to Content](https://thebourbonculture.com/whiskey-reviews/four-roses-2017-limited-edition-al-young-50th-anniversary-small-batch-review/#content) ![Four Roses 2017 Limited Edi"
+        ]
+      },
+      {
+        "title": "Four Roses Limited Edition Small Batch 2017 - Wooden Cork",
+        "url": "https://woodencork.com/products/four-roses-limited-edition-small-batch-2017?srsltid=AfmBOor2F-vDg34PJ4Gpv3F2WWeGH3YrANKL89tW3E9vkSSRLtvwUVS0",
+        "domain": "woodencork.com",
+        "description": "Four Roses produces 10 distinct bourbon recipes — two mashbills (high-rye OBSB and low-rye OESB) crossed with five proprietary yeast strains (V, ...",
+        "extraSnippets": [
+          "[Skip to content](https://woodencork.com/products/four-roses-limited-edition-small-batch-2017#MainContent) [Skip to navigation](https://woodencork.com/products/four-roses-limited-e"
+        ]
+      },
+      {
+        "title": "Four Roses 2017 Limited Edition Small Batch Bourbon",
+        "url": "https://www.bourbonguy.com/blog/2017/9/26/four-roses-2017-limited-edition-small-batch-bourbon",
+        "domain": "bourbonguy.com",
+        "description": "Mouth: Spicy and rich with a wonderful mouthfeel. Notes of caramel, nutmeg, fruit, and oak. Finish: Long, warm and sweet. Lingering ...",
+        "extraSnippets": [
+          "Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog View f"
+        ]
+      },
+      {
+        "title": "Review #241: Four Roses Limited Edition 2017 : r/bourbon - Reddit",
+        "url": "https://www.reddit.com/r/bourbon/comments/1e5mzsb/review_241_four_roses_limited_edition_2017/",
+        "domain": "reddit.com",
+        "description": "I really enjoyed this one, there were really nice notes that emphasized the age of the bourbon with aged oak tannins, leather, barrel char and pipe tobacco ...",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6703005f5bff29c88d3bb8286f1dc37765ffc5fdf8bd26c6337ca69aff6f890d",
+    "mode": "auto"
+  }
+}

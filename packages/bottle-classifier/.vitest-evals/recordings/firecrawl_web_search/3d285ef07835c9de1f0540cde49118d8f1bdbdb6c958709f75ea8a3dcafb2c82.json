@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T15:43:00.000Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Creag Isle 12 year old Island Single Malt Scotch Whisky"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Creag Isle 12 year old Island Single Malt Scotch Whisky",
+    "summary": "Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and inviting single malt. Grass and honey notes combine with smoke and wood ... Creag Isle 12Yr Island Single Malt Scotch Whisky 750ml Bottle - ![Creag Isle 12Yr Island Single Malt Scotch Whisky 750ml Bottle](https://www.totalwine.com/dynamic",
+    "results": [
+      {
+        "title": "Creag Isle 12Yr Island Single Malt Scotch Whisky | Total Wine & More",
+        "url": "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-12yr-island-single-malt-scotch-whisky/p/189848750?srsltid=AfmBOopcwcF9MbvGAinOARtjNC8LMBeoZjeWDXU7i6KGsJi8cLlfnU2N",
+        "domain": "totalwine.com",
+        "description": "Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and inviting single malt. Grass and honey notes combine with smoke and wood ...",
+        "extraSnippets": [
+          "Creag Isle 12Yr Island Single Malt Scotch Whisky 750ml Bottle - ![Creag Isle 12Yr Island Single Malt Scotch Whisky 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/images/1"
+        ]
+      },
+      {
+        "title": "Creag Isle Scotch | Total Wine & More",
+        "url": "https://www.totalwine.com/theme/creag-isle-scotch?srsltid=AfmBOorUwsu_LjiXF-8tCYjFFwd8EZUOe_2NuPOrBc1SYdmOP_IrE0mU",
+        "domain": "totalwine.com",
+        "description": "Islay and Islands, Scotland - Medium bodied aroma and powerful yet complex depth of flavor. Balanced with characteristically smoky notes.",
+        "extraSnippets": [
+          "# Creag Isle Scotch 1 - 4 of 4 results Items per page 24 items ### Brand Creag Isle (4) ### Country Scotland (4) ### Type Single Malt (4) ### Category Scotch (4) ### Size Standard "
+        ]
+      },
+      {
+        "title": "Creag Isle 12 Year Old Single Malt Scotch Whisky - Wine-Searcher",
+        "url": "https://www.wine-searcher.com/find/creag+isle+twelve+old+single+malt+scotch+whisky+island+scotland?srsltid=AfmBOool8aIKtwoR4u_QvHrguGBiHD502_jdzR_UiJJ1crJ4RKSQkAeS",
+        "domain": "wine-searcher.com",
+        "description": "Creag Isle 12 Year Old Single Malt Scotch Whisky ; Avg Price (ex-tax); $ 58 / 750ml ; Style Single Malt Scotch Whisky ; Style: Whisky - Single Malt ; Region: UK.",
+        "extraSnippets": [
+          "~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at"
+        ]
+      },
+      {
+        "title": "Creag Isle : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/139wvfq/creag_isle/",
+        "domain": "reddit.com",
+        "description": "Recommended as an alternative to Lagavulin. Heavy on the peatiness and smoke, but in an unbalanced and bitter way. Aftertaste was also greatly lacking.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Creag Isle 33 Year Islay Single Malt Scotch - Total Wine",
+        "url": "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-33-year-islay-single-malt-scotch/p/219122750?srsltid=AfmBOordsI8G-7-6Paikph3Xus9qNxXHs6kL52K-8NQXV0tVXbpPqLi6",
+        "domain": "totalwine.com",
+        "description": "Traditionally aged in oak casks for a minimum of 33 years. Vibrant and lively with a rich floral note of lavender and spring blossom.",
+        "extraSnippets": [
+          "Creag Isle 33 Year Islay Single Malt Scotch 750ml Bottle - ![Creag Isle 33 Year Islay Single Malt Scotch 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/images/219122750/2"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "3d285ef07835c9de1f0540cde49118d8f1bdbdb6c958709f75ea8a3dcafb2c82",
+    "mode": "auto"
+  }
+}

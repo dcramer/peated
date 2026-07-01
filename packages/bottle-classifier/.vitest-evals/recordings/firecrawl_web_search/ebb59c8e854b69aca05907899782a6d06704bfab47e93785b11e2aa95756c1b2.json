@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T16:28:27.167Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "The Glenlivet Caribbean Reserve Rum Barrel Selection Caribbean Reserve"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "The Glenlivet Caribbean Reserve Rum Barrel Selection Caribbean Reserve",
+    "summary": "Caribbean Reserve Rum Barrel Selection 750ml. Regular price $25.99 USD. Original price $52.99 Sale price $39.99 … a well-balanced, exceptionally ... ![Spinner: White decorative](https://cdn.userway.org/widgetapp/images/spin_wh.svg) ![](https://cdn.userway.org/widgetapp/images/body_wh.svg) ![Spinner: White decorative](h",
+    "results": [
+      {
+        "title": "Glenlivet Scotch Single Malt Caribbean Reserve Rum Barrel ...",
+        "url": "https://www.remedyliquor.com/products/glenlivet-scotch-single-malt-caribbean-reserve-rum-barrel-selection-750ml?srsltid=AfmBOoqPwDJQBDhMdTmfAskwh_CcgtEIgMRddSN2QNChWhyvgyJP4W58",
+        "domain": "remedyliquor.com",
+        "description": "Caribbean Reserve Rum Barrel Selection 750ml. Regular price $25.99 USD. Original price $52.99 Sale price $39.99 … a well-balanced, exceptionally ...",
+        "extraSnippets": [
+          "![Spinner: White decorative](https://cdn.userway.org/widgetapp/images/spin_wh.svg) ![](https://cdn.userway.org/widgetapp/images/body_wh.svg) ![Spinner: White decorative](https://cd"
+        ]
+      },
+      {
+        "title": "Glenlivet Caribbean Reserve - Rum Barrel Selection",
+        "url": "https://williamsburgwine.com/product/glenlivet-caribbean-reserve-rum-barrel-selection/?srsltid=AfmBOoohFf8Cmx8qeF6c360BgLu7uPKLMmMDFscCV4ipEITgVsdxzDsJ",
+        "domain": "williamsburgwine.com",
+        "description": "$54.99 17 in stock. The Glenlivet Caribbean Reserve is a single malt scotch whisky selectively finished in Caribbean Rum Barrels. Intensely smooth and well ...",
+        "extraSnippets": [
+          "Product Details [![🔍](https://s.w.org/images/core/emoji/2.4/svg/1f50d.svg)](https://williamsburgwine.com/product/glenlivet-caribbean-reserve-rum-barrel-selection/#) ![](https://wi"
+        ]
+      },
+      {
+        "title": "Review #3: The Glenlivet Caribbean Reserve : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/lsma4w/review_3_the_glenlivet_caribbean_reserve/",
+        "domain": "reddit.com",
+        "description": "ABV: 40% Cask: finished in barrels which previously held Caribbean rum” Age: NAS Cost: $34.99 Consumed: an absolute homerun!",
+        "extraSnippets": []
+      },
+      {
+        "title": "Glenlivet Caribbean Reserve Review - Rum Barrel Selection",
+        "url": "https://secretwhiskeysociety.com/glenlivet-caribbean-reserve-review-rum-barrel-selection/",
+        "domain": "secretwhiskeysociety.com",
+        "description": "ABV: 40% Proof: 80 Price: $50 Appearance: Light Gold Glenlivet Caribbean Reserve Tasting Notes Nose: Molasses, Sweet, Light Fruit – Oranges and ...",
+        "extraSnippets": [
+          "- About WordPress - [WordPress.org](https://wordpress.org/) - [Documentation](https://wordpress.org/documentation/) - [Learn WordPress](https://learn.wordpress.org/) - [Support](ht"
+        ]
+      },
+      {
+        "title": "Caribbean Reserve Single Malt Scotch Whisky - The Glenlivet",
+        "url": "https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/",
+        "domain": "theglenlivet.com",
+        "description": "No information is available for this page. · Learn why",
+        "extraSnippets": [
+          "Select your country or region ![](https://www.theglenlivet.com/wp-content/themes/global-theme/static/images/icon/close.svg) [Canada - English](https://www.theglenlivet.com/en-ca/wh"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "ebb59c8e854b69aca05907899782a6d06704bfab47e93785b11e2aa95756c1b2",
+    "mode": "auto"
+  }
+}

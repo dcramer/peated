@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-06-30T22:30:27.189Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "\"Wild Turkey Rare Breed Rye\" cask strength rye official"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "\"Wild Turkey Rare Breed Rye\" cask strength rye official",
+    "summary": "Wild Turkey Rare Breed Rye (2024). Kentucky Straight Rye Whiskey. Proof: 112.2. Age: not stated (reportedly a blend of 4-, 6-, and 8-year ... [Skip to content](https://rarebird101.com/2024/04/24/rare-breed-rye-2024/#main) Search for:Search ![Rare Breed Rye 2024](https://rarebird101.com/wp-content/uploads/2024/04/Rare-B",
+    "results": [
+      {
+        "title": "Rare Breed Rye (2024)",
+        "url": "https://rarebird101.com/2024/04/24/rare-breed-rye-2024/",
+        "domain": "rarebird101.com",
+        "description": "Wild Turkey Rare Breed Rye (2024). Kentucky Straight Rye Whiskey. Proof: 112.2. Age: not stated (reportedly a blend of 4-, 6-, and 8-year ...",
+        "extraSnippets": [
+          "[Skip to content](https://rarebird101.com/2024/04/24/rare-breed-rye-2024/#main) Search for:Search ![Rare Breed Rye 2024](https://rarebird101.com/wp-content/uploads/2024/04/Rare-Bre"
+        ]
+      },
+      {
+        "title": "Wild Turkey Rare Breed Rye Review - Whiskey in my Wedding Ring",
+        "url": "https://www.whiskeyinmyweddingring.com/reviews/wild-turkey-rare-breed-rye",
+        "domain": "whiskeyinmyweddingring.com",
+        "description": "Wild Turkey Rare Breed Rye · Classification: Rye · Origin: Wild Turkey Distillery · Mashbill: 51% Rye, 37% Corn, 12% Malted Barley · Proof: 112.2 ( ...",
+        "extraSnippets": [
+          "[0](https://www.whiskeyinmyweddingring.com/cart) # Wild Turkey Rare Breed Rye [Reviews](https://www.whiskeyinmyweddingring.com/reviews/category/Reviews)[American Whiskey](https://w"
+        ]
+      },
+      {
+        "title": "Rare Breed Rye: barrel proof rye whiskey | Wild Turkey Bourbon",
+        "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": "Wild Turkey Rare Breed Rye is a barrel proof, non-chill-filtered blend of 4-,6-, and 8-year-old Kentucky Straight Rye from Wild Turkey Distillery.",
+        "extraSnippets": [
+          "![Wild Turkey - en-us](https://www.wildturkeybourbon.com/app/uploads/sites/3/2025/09/wt-logo-black-new.webp) Are you of legal drinking age? Country/Region Select Your Country/Regio"
+        ]
+      },
+      {
+        "title": "Review #587: Wild Turkey Rare Breed Rye Whiskey - Reddit",
+        "url": "https://www.reddit.com/r/bourbon/comments/10l5sr5/review_587_wild_turkey_rare_breed_rye_whiskey/",
+        "domain": "reddit.com",
+        "description": "Review #587: Wild Turkey Rare Breed Rye Whiskey · 1 Undrinkable (Jeffers Creek, Gray Skies) · 2 Bad (Old St. · 3 Poor (AD Laws 4 Grain BiB, Clyde ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Wild Turkey Rare Breed Barrel Proof Straight Rye",
+        "url": "https://topshelfwineandspirits.com/products/wild-turkey-rare-breed-rye?srsltid=AfmBOortPx_5sRdtGwoaQFCyYJ1VqfazVjTaWNS1wkMSN8AxBzYn9x3C",
+        "domain": "topshelfwineandspirits.com",
+        "description": "This Rye is one of the few that is not chill-filtered. It is a powerful, Cask Strength version of the signature Rye that they launched just over a year ago.",
+        "extraSnippets": [
+          "[Skip to content](https://topshelfwineandspirits.com/products/wild-turkey-rare-breed-rye#main) ![Wild Turkey Rare Breed Barrel Proof Straight Rye](https://topshelfwineandspirits.co"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "f8254986c2271d92fc899d0be02dc1b09adeca17712a3a8f9d3ea7285cfc68fb",
+    "mode": "auto"
+  }
+}

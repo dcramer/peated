@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:01:47.519Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Glenmorangie The Cadboll Estate 15 Year Old Batch 4"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Glenmorangie The Cadboll Estate 15 Year Old Batch 4",
+    "summary": "Single-estate whisky made from the Cadboll Estate's 2007 harvest, matured in custom-toasted air-dried casks. The nose is buttery, with creamy vanilla, brioche, ... Back Save ![](https://whiskyadvocate.com/get/files/image/galleries/Glenmorangie-Cadboll-70cl-2023-bottle-front-view_(1)_300.png) ### 94 Score # Glenmorangie",
+    "results": [
+      {
+        "title": "Glenmorangie The Cadboll Estate 15 year old (Batch 4), 43%",
+        "url": "https://whiskyadvocate.com/Glenmorangie-The-Cadboll-Estate-15-year-old-Batch-4-43",
+        "domain": "whiskyadvocate.com",
+        "description": "Single-estate whisky made from the Cadboll Estate's 2007 harvest, matured in custom-toasted air-dried casks. The nose is buttery, with creamy vanilla, brioche, ...",
+        "extraSnippets": [
+          "Back Save ![](https://whiskyadvocate.com/get/files/image/galleries/Glenmorangie-Cadboll-70cl-2023-bottle-front-view_(1)_300.png) ### 94 Score # Glenmorangie The Cadboll Estate 15 y"
+        ]
+      },
+      {
+        "title": "Review #11 - Glenmorangie 15 - The Cadboll Estate",
+        "url": "https://www.reddit.com/r/Scotch/comments/1ow8vc3/review_11_glenmorangie_15_the_cadboll_estate/",
+        "domain": "reddit.com",
+        "description": "The previous two batches were bottled 2020 (Batch 1) and 2021 (Batch 2), followed by Batch 4 in 2024. ... 43% Age: 15-Year-Old Original SRP: ~$99",
+        "extraSnippets": []
+      },
+      {
+        "title": "The Cadboll Estate, 2024 Batch 4",
+        "url": "https://www.glenmorangie.com/en-us/pages/the-cadboll-estate?srsltid=AfmBOopf1dCs_Fn6MOrLyGOyFyv2F2lrx8rFN587mET8INn1GGvoS8KC",
+        "domain": "glenmorangie.com",
+        "description": "Buy Online. The Cadboll Estate 2024 is our whisky created entirely with Barley from our own fields & water from our Scottish Highlands spring.",
+        "extraSnippets": [
+          "Some content that you'd like to display in a modalDismiss #### My Basket (0) Oh, your basket appears to be empty Add some of our delicious Whisky to your basket to discover the won"
+        ]
+      },
+      {
+        "title": "Glenmorangie 15 Year Old Cadboll Estate Batch 4",
+        "url": "https://www.totalwine.com/spirits/scotch/glenmorangie-15-year-old-cadboll-estate-batch-4/p/2126251327?srsltid=AfmBOoqMOc1keR8nqzyJi89S3T79An041XFV72DlBlhjsHrHA7rLwezv",
+        "domain": "totalwine.com",
+        "description": "The first Cadboll Estate release to be wholly matured in our bespoke designer ex-bourbon casks. A unique barrel selection small batch release.",
+        "extraSnippets": [
+          "Glenmorangie 15 Year Old Cadboll Estate Batch 4 750ml Bottle - ![Glenmorangie 15 Year Old Cadboll Estate Batch 4 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/images/212"
+        ]
+      },
+      {
+        "title": "Glenmorangie The Cadboll Estate 15 Year Old Single Malt ...",
+        "url": "https://www.divinecellar.com/en/whisky/1813-glenmorangie-the-cadboll-estate-15-year-old-single-malt-scotch-whisky-5010494983203.html?srsltid=AfmBOoqv0qnKVQk0IeVpfwV72BdJvzDEB63OSOB56WWnZWjiRX1vqh-N",
+        "domain": "divinecellar.com",
+        "description": "The distillery's whiskies are characterized by notes of fruit, honey, hazelnut, and toasted oak, delivering a smooth and refined tasting experience.",
+        "extraSnippets": [
+          "# Glenmorangie The Cadboll Estate 15 Year Old Single Malt Scotch Whisky ![Spiriteux](https://www.divinecellar.com/themes/classic-child/assets/img/spiritueux.png) Scotch whisky - 70"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b5486c4e263f355ff246c86917551a88fed53cc628059e993fe62d67a722fa01",
+    "mode": "auto"
+  }
+}

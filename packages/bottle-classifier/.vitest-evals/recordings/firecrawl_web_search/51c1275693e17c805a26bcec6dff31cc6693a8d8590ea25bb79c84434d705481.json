@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T15:41:00.743Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 cask 1661 312 bottles Creative Whisky Company"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 cask 1661 312 bottles Creative Whisky Company",
+    "summary": "Its color is amber, much lighter than yesterday's younger whisky. The nose is rawer, yeastier. It's lemony and very vegetal. Cruciferous veg, ... Twitter Widget Iframe | | | | | --- | --- | --- | | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif) | ![](https://ssl.gstatic.com/s2/oz/images/stars/",
+    "results": [
+      {
+        "title": "Single Malt Report: Islay Distillery 8 year old 2007 ... - Diving for Pearls",
+        "url": "http://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-8.html",
+        "domain": "divingforpearlsblog.com",
+        "description": "Its color is amber, much lighter than yesterday's younger whisky. The nose is rawer, yeastier. It's lemony and very vegetal. Cruciferous veg, ...",
+        "extraSnippets": [
+          "Twitter Widget Iframe | | | | | --- | --- | --- | | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif) | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bub"
+        ]
+      },
+      {
+        "title": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%)",
+        "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/",
+        "domain": "norfolkwineandspirits.com",
+        "description": "Weight, 3.5 lbs. Country of Origin. Scotland. Region. Islay. Age. 8 Years Old. Cask Type. Refill Ex-Sherry Hogshead. Date Distilled. 17th October 2007.",
+        "extraSnippets": [
+          "![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](https://norfolkw"
+        ]
+      },
+      {
+        "title": "Isle of Islay 10 Year Old 2007 Creative Whisky Company - YouTube",
+        "url": "https://www.youtube.com/watch?v=rJEgND2RwPo",
+        "domain": "youtube.com",
+        "description": "... bottled for the online shop The Whisky Barrel. The cask yielded 285 bottles at 100 Proof or 57.1% ABV. Nice and pale, which suggests that ...",
+        "extraSnippets": [
+          "Mark’s Whisky Ramblings 428: Isle of Islay 10 Year Old 2007 Creative Whisky Company Tap to unmute 2x Copy link Info Shopping If playback doesn't begin shortly, try restarting your "
+        ]
+      },
+      {
+        "title": "The Creative Whisky Co. 'The Exclusive Malts' Islay Distillery 8 Year ...",
+        "url": "https://www.wine-searcher.com/find/the+creative+whisky+co+exclusive+malts+distil+eight+old+single+malt+scotch+islay+scotland?srsltid=AfmBOooOTsm8Q5uFZWkLCIepTnRPP_ZXEDppis1TqCeeoPwzfE8A3-HH",
+        "domain": "wine-searcher.com",
+        "description": "Cask strength - Natural color. This is more affordable than many whiskies from Islay. The price has been stable over the past year. Learn more Hide.",
+        "extraSnippets": [
+          "~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at"
+        ]
+      },
+      {
+        "title": "Islay Single Malt 8 Years Old The Whisky Agency Bottled Letters 2007",
+        "url": "https://www.musthavemalts.com/product/islay-single-malt-2007-twa-8-years-old/",
+        "domain": "musthavemalts.com",
+        "description": "A nicely crafted vintage 2007 single malt whisky by an undisclosed Islay distillery. German bottler The Whisky Agency released it in 2015, under their 'bottled ...",
+        "extraSnippets": [
+          "Search ``` ``` Search [![](https://208.wpcdnnode.com/musthavemalts.com/wp-content/uploads/2026/04/MHM-Logo.png)](https://www.musthavemalts.com/) No products in the cart. [€ 0.00€ 0"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "51c1275693e17c805a26bcec6dff31cc6693a8d8590ea25bb79c84434d705481",
+    "mode": "auto"
+  }
+}

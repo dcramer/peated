@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-06-30T23:43:17.325Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Woodford Reserve Double Double Oaked bourbon"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Woodford Reserve Double Double Oaked bourbon",
+    "summary": "A robust medley of rich maple syrup, dark butterscotch, brittle caramel, bittersweet chocolate, burnt marshmallow and sweet hickory smoke notes dominate the ... [Skip to main content](https://www.woodfordreserve.com/whiskey/double-double-oaked/#main-content) ![](https://www.woodfordreserve.com/wp-content/uploads/2023/0",
+    "results": [
+      {
+        "title": "Double Double Oaked",
+        "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": "A robust medley of rich maple syrup, dark butterscotch, brittle caramel, bittersweet chocolate, burnt marshmallow and sweet hickory smoke notes dominate the ...",
+        "extraSnippets": [
+          "[Skip to main content](https://www.woodfordreserve.com/whiskey/double-double-oaked/#main-content) ![](https://www.woodfordreserve.com/wp-content/uploads/2023/01/F25-WRDDO_RENDER-1-"
+        ]
+      },
+      {
+        "title": "Woodford Reserve Double Double Oaked Bourbon (2025) ...",
+        "url": "https://thebourbonculture.com/whiskey-reviews/woodford-reserve-double-double-oaked-bourbon-2025-review/",
+        "domain": "thebourbonculture.com",
+        "description": "Palate: The tannins are exceptionally strong for the proof. Each sip queues up a long line of oak, charred wood, saddle leather and dark ...",
+        "extraSnippets": [
+          "[Skip to Content](https://thebourbonculture.com/whiskey-reviews/woodford-reserve-double-double-oaked-bourbon-2025-review/#content) ![Woodford Reserve Double Double Oaked Bourbon (2"
+        ]
+      },
+      {
+        "title": "Review: The Woodford Reserve Double Double Oaked",
+        "url": "https://www.reddit.com/r/bourbon/comments/1ht2ryo/review_the_woodford_reserve_double_double_oaked/",
+        "domain": "reddit.com",
+        "description": "Finish: Wow- a slow rush of nice proof (tastes more than 90) and juicy oak waves hit. I want to emphasize juicy oak here because I had a fear ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "2026 Double Double Oaked",
+        "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "domain": "shop.woodfordreserve.com",
+        "description": "Double Double Oaked is handcrafted by finishing fully-mature Woodford Reserve Double Oaked Bourbon for an additional two years in a second, heavily toasted ...",
+        "extraSnippets": [
+          "[Skip to main content](https://shop.woodfordreserve.com/2026-double-double-oaked/#main-content) ![Woodford Reserve Bournbon Bottle](https://cdn11.bigcommerce.com/s-fqee318z5c/image"
+        ]
+      },
+      {
+        "title": "Woodford Reserve Double Double Oaked Review: Worth the ...",
+        "url": "https://www.bourbonbanter.com/woodford-reserve-double-double-oaked-review-worth-the-hype/",
+        "domain": "bourbonbanter.com",
+        "description": "Taste: Rich dried cherry and cranberry fruit swim in a blackberry jam brightened with hints of ripe apple. Chai tea and warming clove notes ...",
+        "extraSnippets": [
+          "Like what you're reading? [Toss a few bucks in the tip jar.](https://bourbonbantercom.outpost.pub/donate) ![](https://tracker.metricool.com/c3po.jpg?hash=a73d7fe0fb1cf07bb455428628"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "ddd7df75bbe9f0f25edc9b7f9a7c03f1b7ec2a5391a0daf5b3e658e077cdd340",
+    "mode": "auto"
+  }
+}

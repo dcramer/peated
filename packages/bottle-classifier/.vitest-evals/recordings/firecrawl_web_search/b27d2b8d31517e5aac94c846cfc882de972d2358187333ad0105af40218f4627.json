@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:34:56.182Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Elijah Craig Cask Strength bourbon Barrel Proof"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Elijah Craig Cask Strength bourbon Barrel Proof",
+    "summary": "Barrel Proof is to experience Bourbon in its purest form: uncut, straight from the barrel, and without chill filtering. Each bottle is hand labeled ![](https://insight.adsrvr.org/track/pxl/?adv=a824ckt&ct=0:a8tl4ma&fmt=3) ![Logo](https://elijahcraig.com/images/elijah-craig-white.png) ## Discover The Greatness Within Ar",
+    "results": [
+      {
+        "title": "Elijah Craig | Barrel Proof",
+        "url": "https://elijahcraig.com/barrel-proof",
+        "domain": "elijahcraig.com",
+        "description": "Barrel Proof is to experience Bourbon in its purest form: uncut, straight from the barrel, and without chill filtering. Each bottle is hand labeled",
+        "extraSnippets": [
+          "![](https://insight.adsrvr.org/track/pxl/?adv=a824ckt&ct=0:a8tl4ma&fmt=3) ![Logo](https://elijahcraig.com/images/elijah-craig-white.png) ## Discover The Greatness Within Are you of"
+        ]
+      },
+      {
+        "title": "Why I don't buy Elijah Craig Barrel Proof batches anymore",
+        "url": "https://www.reddit.com/r/bourbon/comments/xjaosg/why_i_dont_buy_elijah_craig_barrel_proof_batches/",
+        "domain": "reddit.com",
+        "description": "the proof is 126.8, drinks like its less but is really flavorful, just a wonderful bourbon. it is decadent but approachable, not “too sweet” ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Elijah Craig Barrel Proof",
+        "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+        "domain": "heavenhilldistillery.com",
+        "description": "Tasting Notes · Color: Deep amber · Aroma: Caramel with toasted oak, fruit notes of apple and orange · Taste: Rich vanilla, caramel and butterscotch along with ...",
+        "extraSnippets": [
+          "![](https://insight.adsrvr.org/track/pxl/?adv=g1bgici&ct=0:abm78v3&fmt=3) [![Heaven Hill Logo](https://heavenhilldistillery.com/images/hhd-logo-new-blue25.png)](https://heavenhilld"
+        ]
+      },
+      {
+        "title": "Elijah Craig A125 Barrel Proof Review: Best Batch Yet?",
+        "url": "https://www.bourbonbanter.com/elijah-craig-a125-barrel-proof-review-is-this-the-best-batch-yet/",
+        "domain": "bourbonbanter.com",
+        "description": "Barrel Proof Bourbon—aged 10 years, 7 months, and bottled at 118.2 proof. 78% Corn | 10% Rye | 12% (59.1% ABV) MSRP: $74.99",
+        "extraSnippets": [
+          "Like what you're reading? [Toss a few bucks in the tip jar.](https://bourbonbantercom.outpost.pub/donate) ![](https://tracker.metricool.com/c3po.jpg?hash=a73d7fe0fb1cf07bb455428628"
+        ]
+      },
+      {
+        "title": "Elijah Craig Barrel Proof Bourbon",
+        "url": "https://www.totalwine.com/spirits/bourbon/small-batch-bourbon/elijah-craig-barrel-proof-bourbon/p/132677750?srsltid=AfmBOoq3khq0uTheZiKyubN4kIxhoJ96bx24z57qZF6hyPvM5vMRwmMm",
+        "domain": "totalwine.com",
+        "description": "A gorgeous mahogany whiskey with woody aromas that blend well into the scents of caramel and vanilla. Pleasant dark caramel flavors and a mellow cinnamon spice",
+        "extraSnippets": [
+          "Elijah Craig Barrel Proof Bourbon 750ml Bottle - ![Elijah Craig Barrel Proof Bourbon 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/images/132677750/132677750-1-fr.png) z"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b27d2b8d31517e5aac94c846cfc882de972d2358187333ad0105af40218f4627",
+    "mode": "auto"
+  }
+}

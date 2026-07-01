@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T02:17:27.055Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 1661 312"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 1661 312",
+    "summary": "Its color is amber, much lighter than yesterday's younger whisky. The nose is rawer, yeastier. It's lemony and very vegetal. Cruciferous veg, ... Twitter Widget Iframe | | | | | --- | --- | --- | | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif) | ![](https://ssl.gstatic.com/s2/oz/images/stars/",
+    "results": [
+      {
+        "title": "Single Malt Report: Islay Distillery 8 year old 2007 ... - Diving for Pearls",
+        "url": "http://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-8.html",
+        "domain": "divingforpearlsblog.com",
+        "description": "Its color is amber, much lighter than yesterday's younger whisky. The nose is rawer, yeastier. It's lemony and very vegetal. Cruciferous veg, ...",
+        "extraSnippets": [
+          "Twitter Widget Iframe | | | | | --- | --- | --- | | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif) | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bub"
+        ]
+      },
+      {
+        "title": "The Exclusive Malts “Islay” 8 Year 2007 (57.1% abv)",
+        "url": "https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/",
+        "domain": "maltimpostor.com",
+        "description": "Tasting notes: This whisky is, eponymously enough, an “Islay.” As if there is more than one Islay. As if Islays grow on trees.",
+        "extraSnippets": [
+          "[MENU](https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/#) _![](http://maltimpostor.com/wp-content/uploads/2017/01/Exclusive-Malts-Islay-8-Year-2007-26"
+        ]
+      },
+      {
+        "title": "The Exclusive Malts Islay 7 year old 2007 (cask #904), 54.6%",
+        "url": "https://whiskyadvocate.com/The-Exclusive-Malts-Islay-7-year-old-2007-cask-N904-54-6",
+        "domain": "whiskyadvocate.com",
+        "description": "An Islay single malt of unknown origin aged in a bourbon barrel showcases many of the classic notes of a peated malt of this age with smoke, iodine, paste, ...",
+        "extraSnippets": [
+          "Back Save ![](https://whiskyadvocate.com/?resize=1290&crop=237x21,0x0) ### 87 Score # The Exclusive Malts Islay 7 year old 2007 (cask \\#904), 54.6% Price: $145.00● Issue: Summer 20"
+        ]
+      },
+      {
+        "title": "Review #675 - Isle of Islay 10 Year 2007 (Exclusive Malts) : r/Scotch",
+        "url": "https://www.reddit.com/r/Scotch/comments/cshru7/review_675_isle_of_islay_10_year_2007_exclusive/",
+        "domain": "reddit.com",
+        "description": "Taste: Smoke, dirt, smoldering wood embers, syrup covered cooked stone fruit, dark treacle, slight brine, oak spice, slight musty oak. Medium to ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%)",
+        "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/",
+        "domain": "norfolkwineandspirits.com",
+        "description": "Weight, 3.5 lbs. Country of Origin. Scotland. Region. Islay. Age. 8 Years Old. Cask Type. Refill Ex-Sherry Hogshead. Date Distilled. 17th October 2007.",
+        "extraSnippets": [
+          "![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](https://norfolkw"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "409924d214152ef9a43877adbf0ec419d37e22bf0059ce13ca7132d44942103b",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T15:24:00.652Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "site:woodfordreserve.com \"Double Double Oaked\" proof release annual"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "site:woodfordreserve.com \"Double Double Oaked\" proof release annual",
+    "summary": "Double Double Oaked is presented at 90.4 proof with a suggested retail price of $59.99 for a 375ml bottle. Double Double Oaked will also be available in limited ... [Skip to main content](https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/#main-content) **Versa",
+    "results": [
+      {
+        "title": "Woodford Reserve Double Double Oaked Returns as 2023 Winter ...",
+        "url": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+        "domain": "woodfordreserve.com",
+        "description": "Double Double Oaked is presented at 90.4 proof with a suggested retail price of $59.99 for a 375ml bottle. Double Double Oaked will also be available in limited ...",
+        "extraSnippets": [
+          "[Skip to main content](https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/#main-content) **Versailles, Ky (January 18, 20"
+        ]
+      },
+      {
+        "title": "2026 Double Double Oaked - Woodford Reserve",
+        "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "domain": "shop.woodfordreserve.com",
+        "description": "Double Double Oaked is handcrafted by finishing fully-mature Woodford Reserve Double Oaked Bourbon for an additional two years in a second, heavily toasted, ...",
+        "extraSnippets": [
+          "[Skip to main content](https://shop.woodfordreserve.com/2026-double-double-oaked/#main-content) ![Woodford Reserve Bournbon Bottle](https://cdn11.bigcommerce.com/s-fqee318z5c/image"
+        ]
+      },
+      {
+        "title": "Distillery Series - Woodford Reserve",
+        "url": "https://www.woodfordreserve.com/whiskey/distillery-series/",
+        "domain": "woodfordreserve.com",
+        "description": "Discover Special Releases. Woodford Reserve 2025 Batch Proof 119.5. Batch Proof. Woodford Reserve Distillery Series Double Double Oaked Bottle. Double Double ...",
+        "extraSnippets": [
+          "[Skip to main content](https://www.woodfordreserve.com/whiskey/distillery-series/#main-content) ![Cabernet Sauvignon Barrel Finish 375ml US](https://www.woodfordreserve.com/wp-cont"
+        ]
+      },
+      {
+        "title": "Kentucky Derby® Bottle - Woodford Reserve",
+        "url": "https://www.woodfordreserve.com/whiskey/kentucky-derby-bottle/",
+        "domain": "woodfordreserve.com",
+        "description": "Double Double Oaked. Woodford Reserve 2025 Batch Proof 119.5. Batch Proof. Woodford Reserve Kentucky Straight Bourbon Whiskey Bottle. Bourbon Whiskey. Woodford ...",
+        "extraSnippets": [
+          "[Skip to main content](https://www.woodfordreserve.com/whiskey/kentucky-derby-bottle/#main-content) ![](https://www.woodfordreserve.com/wp-content/uploads/2020/03/Global_Woodford-R"
+        ]
+      },
+      {
+        "title": "Master's Collection - Woodford Reserve",
+        "url": "https://www.woodfordreserve.com/whiskey/masters-collection/",
+        "domain": "woodfordreserve.com",
+        "description": "Double Double Oaked. Woodford Reserve 2025 Batch Proof 119.5. Batch Proof. Kentucky Derby® Bottle. Woodford Reserve Kentucky Straight Bourbon Whiskey Bottle ...",
+        "extraSnippets": [
+          "[Skip to main content](https://www.woodfordreserve.com/whiskey/masters-collection/#main-content) ![](https://www.woodfordreserve.com/wp-content/uploads/2025/10/masters-collection.p"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9d8892d2a8f6e4ff4c65720a9f68605489e398609add10f365e8655002cc9607",
+    "mode": "auto"
+  }
+}

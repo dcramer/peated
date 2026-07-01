@@ -15,7 +15,7 @@ export const BottleWebSearchArgsSchema = z.object({
     .trim()
     .min(1)
     .describe(
-      "Focused query for corroborating bottle evidence. Include the exact bottle name and decisive trait.",
+      "Focused query for corroborating bottle evidence. Include the brand and decisive product words, but do not wrap the full title in quotes; broad unquoted queries are more reliable for retailer wording variants.",
     ),
 });
 

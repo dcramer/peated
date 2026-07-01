@@ -1,0 +1,17 @@
+{
+  "writtenAt": "2026-06-30T23:08:12.908Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "\"Masterson's Straight Rye Whiskey French Oak Barrel Finished 10-year-old\""
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "\"Masterson's Straight Rye Whiskey French Oak Barrel Finished 10-year-old\"",
+    "summary": null,
+    "results": []
+  },
+  "metadata": {
+    "cacheKey": "af11fdd5a30e5c55c36395c256afb277bb15395d212b37f626d983c6f104641e",
+    "mode": "auto"
+  }
+}

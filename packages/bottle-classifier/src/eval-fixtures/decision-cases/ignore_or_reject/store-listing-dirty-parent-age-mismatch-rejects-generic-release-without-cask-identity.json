@@ -1,6 +1,6 @@
 {
-  "id": "store-listing-dirty-parent-age-mismatch-still-creates-a-child-release",
-  "name": "store listing: dirty parent age mismatch still creates a child release",
+  "id": "store-listing-dirty-parent-age-mismatch-rejects-generic-release-without-cask-identity",
+  "name": "store listing: dirty parent age mismatch rejects a generic release without cask identity",
   "input": {
     "reference": {
       "name": "Glenglassaugh 1978 Rare Cask Release (Batch 1) 35-year-old",
@@ -17,9 +17,6 @@
       "abv": null,
       "release_year": null,
       "vintage_year": null,
-      "cask_type": null,
-      "cask_size": null,
-      "cask_fill": null,
       "cask_strength": null,
       "single_cask": null,
       "edition": "Batch 1"
@@ -42,9 +39,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.95,
         "source": ["exact"],
         "bottleId": 2457,
@@ -54,22 +48,14 @@
   },
   "expected": {
     "status": "classified",
-    "action": "repair_parent_and_create_release",
+    "action": "no_match",
     "identityScope": "product",
-    "parentBottleId": 2457,
-    "proposedBottle": {
-      "name": "1978 Rare Cask Release",
-      "brand": {
-        "name": "Glenglassaugh"
-      },
-      "category": "single_malt",
-      "statedAge": null
-    },
-    "proposedRelease": {
-      "edition": "Batch 1",
-      "statedAge": 35
-    },
+    "matchedBottleId": null,
+    "matchedReleaseId": null,
+    "parentBottleId": null,
+    "proposedBottle": null,
+    "proposedRelease": null,
     "confidenceBand": "review",
-    "summary": "Repair the dirty Glenglassaugh parent by removing the unsupported bottle-level age, then create the supported 35-year-old Batch 1 child release."
+    "summary": "Reject a generic parent repair or release creation because web evidence shows Batch 1 refers to cask-specific 35-year-old bottlings while the source lacks the exact cask identity and the only local row conflicts on age."
   }
 }

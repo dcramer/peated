@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T02:19:32.990Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Series Vol 3 whiskey"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Heaven's Door Bootleg Series Vol 3 whiskey",
+    "summary": "Bootleg Volume III, features a 13-year-old Kentucky bourbon finished in Vino de Naranja Casks. Bottled at cask strength with a proof of 121.2, [Jump to content](https://markaysliquors.com/shop/product/heavens-door-the-bootleg-series-volume-3/614b93f13107887d31a02ba1?option-id=448701fcd722e75d9f696ebfe2aa4312bf3d595a91c",
+    "results": [
+      {
+        "title": "Heaven's Door The Bootleg Series Volume 3 - Markay's Wine & Spirits",
+        "url": "https://markaysliquors.com/shop/product/heavens-door-the-bootleg-series-volume-3/614b93f13107887d31a02ba1?option-id=448701fcd722e75d9f696ebfe2aa4312bf3d595a91c2d828847c144b0cca4d8d&srsltid=AfmBOoo1-y2v7MGj9GdkKhrJVvx7N4IVAZ8Bw_QoHQPW9ADG7zwV7-Oh",
+        "domain": "markaysliquors.com",
+        "description": "Bootleg Volume III, features a 13-year-old Kentucky bourbon finished in Vino de Naranja Casks. Bottled at cask strength with a proof of 121.2,",
+        "extraSnippets": [
+          "[Jump to content](https://markaysliquors.com/shop/product/heavens-door-the-bootleg-series-volume-3/614b93f13107887d31a02ba1?option-id=448701fcd722e75d9f696ebfe2aa4312bf3d595a91c2d8"
+        ]
+      },
+      {
+        "title": "The Bootleg Series - Heavens Door Whiskey",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": "Bootleg Vol. III (2021) from Heaven's Door features a cask strength 13-year Kentucky Bourbon finished in Spanish wine barrels.",
+        "extraSnippets": [
+          "top of page ![](https://static.wixstatic.com/media/04ebdd_4c2fcb998b704204a8d3a32c2b182b8d~mv2.jpg/v1/fill/w_147,h_147,al_c,q_80,usm_0.66_1.00_0.01,blur_2,enc_avif,quality_auto/04e"
+        ]
+      },
+      {
+        "title": "Heaven's Door Whiskey",
+        "url": "https://buy.heavensdoor.com/?srsltid=AfmBOopowqj3Y7azYE8MuJJ8jKnu1KqXB7QfNHT7uXhKdU436zh8PS9g",
+        "domain": "buy.heavensdoor.com",
+        "description": "collection of handcrafted American Whiskeys. Bootleg Series Volume V Regular price $599.99 USD Sale price $599.99 USD",
+        "extraSnippets": [
+          "[Skip to content](https://buy.heavensdoor.com/#MainContent) ## Search Search ## Cart Your cart is empty Loading... ![](https://buy.heavensdoor.com/cdn/shop/files/preview_images/18c"
+        ]
+      },
+      {
+        "title": "Heaven's Door Bootleg Series Volume 3 Review - Breaking Bourbon",
+        "url": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": "For Volume 3, which was released late in 2021, the company chose to finish a 13 year Kentucky bourbon in used Vino De Naranja Casks. The company ...",
+        "extraSnippets": [
+          "By clicking **\"Accept\"**, you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts. View our [Privacy "
+        ]
+      },
+      {
+        "title": "Heaven's Door Bootleg Series Vol. 6 12 Years Old Bourbon Whiskey ...",
+        "url": "https://www.blackwellswines.com/products/heavens-door-bootleg-series-vol-6-12-years-old-bourbon-whiskey-finished-in-limousin-cigar-barrels?srsltid=AfmBOorLOOTRcT9uzSsGUUEsg8fDvBivN8k6HbU6xinNX2fw1bRPHEd2",
+        "domain": "blackwellswines.com",
+        "description": "Bootleg Series Vol. VI is a rare and artful blend of 12-, 13-, and 14-year-old wheated bourbon finished oak “cigar barrels.” Bottled at 121.2 proof (60.6% ABV)",
+        "extraSnippets": [
+          "💰 Earn 1 point for every $1 you spend Join now Earn 100 points Already a member? Log in Join Blackwell's Insider Club Reviews The Reviews Tab is not available for mobile \\- \\| / S"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d5b15121ed8e77cc8fa672d96b5cddea39b8f8c6031feaab5aef861c3b8d9dc4",
+    "mode": "auto"
+  }
+}

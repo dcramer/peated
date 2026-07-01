@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:31:12.324Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Woodford Reserve Kentucky Straight Malt Whiskey ReserveBar"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Woodford Reserve Kentucky Straight Malt Whiskey ReserveBar",
+    "summary": "Woodford Reserve is a Kentucky Straight Malt Whiskey crafted from 51% malt and aged in new charred oak barrels, making it the malt whiskey for bourbon drinkers. Like what you're reading? [Toss a few bucks in the tip jar.](https://bourbonbantercom.outpost.pub/donate) ![](https://tracker.metricool.com/c3po.jpg?hash=a73d7",
+    "results": [
+      {
+        "title": "Woodford Reserve Malt Whiskey Review - Bourbon & Banter",
+        "url": "https://www.bourbonbanter.com/woodford-reserve-malt-whiskey-review/",
+        "domain": "bourbonbanter.com",
+        "description": "Woodford Reserve is a Kentucky Straight Malt Whiskey crafted from 51% malt and aged in new charred oak barrels, making it the malt whiskey for bourbon drinkers.",
+        "extraSnippets": [
+          "Like what you're reading? [Toss a few bucks in the tip jar.](https://bourbonbantercom.outpost.pub/donate) ![](https://tracker.metricool.com/c3po.jpg?hash=a73d7fe0fb1cf07bb455428628"
+        ]
+      },
+      {
+        "title": "Malt Whiskey - Woodford Reserve",
+        "url": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": "Woodford Reserve is a Kentucky Straight Malt Whiskey crafted from 51% malt and aged in new charred oak barrels, making it the malt whiskey for bourbon drinkers.",
+        "extraSnippets": [
+          "[Skip to main content](https://www.woodfordreserve.com/whiskey/malt-whiskey/#main-content) ![Star.](https://www.woodfordreserve.com/wp-content/themes/woodford/dist/img/icons/star.s"
+        ]
+      },
+      {
+        "title": "Woodford Reserve Straight Malt Whiskey - BOURBON GUY",
+        "url": "https://www.bourbonguy.com/blog/2018/6/5/woodford-reserve-straight-malt-whiskey",
+        "domain": "bourbonguy.com",
+        "description": "Details: 45.2% ABV. 51% Malt mashbill (via the brand website). Nose: Nutty with caramel/vanilla and uncooked oatmeal. Mouth: Sweetened, cooked ...",
+        "extraSnippets": [
+          "Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog View f"
+        ]
+      },
+      {
+        "title": "Woodford Reserve Kentucky Straight Malt Whiskey - Jerry's Foods",
+        "url": "https://www.jerrysfoods.com/store/jerrys-wine-and-spirits/products/18840715-woodford-reserve-whiskey-750-ml",
+        "domain": "jerrysfoods.com",
+        "description": "Woodford Reserve Kentucky Straight Malt Whiskey uses a base of 51% malt and is aged in new charred oak barrels, making it a richly flavorful and complex malt ...",
+        "extraSnippets": [
+          "[Skip Navigation](https://www.jerrysfoods.com/store/#store-wrapper) View Pricing Policy ![Front of Whiskey Woodford Reserve Kentucky Straight Malt Whiskey, image 1 of 5](https://ww"
+        ]
+      },
+      {
+        "title": "Review #209 - Woodford Reserve Kentucky Straight Malt Whiskey",
+        "url": "https://www.reddit.com/r/bourbon/comments/1ablfpn/review_209_woodford_reserve_kentucky_straight/",
+        "domain": "reddit.com",
+        "description": "Palate: Peppery and sharp, oaky, and a little hot for its strength. The mouthfeel is medium-thin, and it's bringing wood tannins, sweetness from ...",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2d30047294246f5a783c91d9278197452b97706076ab4b582a06d51afa410005",
+    "mode": "auto"
+  }
+}

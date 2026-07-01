@@ -1,0 +1,45 @@
+{
+  "writtenAt": "2026-06-30T22:43:45.314Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "\"Masterson's Straight Rye Whiskey\" \"French Oak\" \"10-year-old\""
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "\"Masterson's Straight Rye Whiskey\" \"French Oak\" \"10-year-old\"",
+    "summary": "Masterson's French Oak Barrel Finished 10 Year Old Straight Rye Whisky ... Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Years Old. Low ... ~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and ta",
+    "results": [
+      {
+        "title": "Masterson's French Oak Barrel Finished 10 Year Old Straight Rye ...",
+        "url": "https://www.wine-searcher.com/find/mastersons+france+oak+barrel+ten+old+straight+rye+whisky+canada?srsltid=AfmBOoreUELtgY-S0sinFpDYxD09KEPxTg0WCqKrbKnLIbaZLib8KJW6",
+        "domain": "wine-searcher.com",
+        "description": "Masterson's French Oak Barrel Finished 10 Year Old Straight Rye Whisky ... Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Years Old. Low ...",
+        "extraSnippets": [
+          "~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at"
+        ]
+      },
+      {
+        "title": "Masterson's 10-year-old - Market Value and Price Insights ...",
+        "url": "https://www.whiskystats.com/whisky/100753",
+        "domain": "whiskystats.com",
+        "description": "Track Masterson's 10-year-old insights ... Masterson's Straight Rye Whiskey. Masterson's 10-year-old ... Cask F2-020 French Oak, Medium Toasted. Batch 008 ...",
+        "extraSnippets": [
+          "We use cookies to improve your online experience. By using this site, you consent to this use as described in our [Privacy policy](https://www.whiskystats.com/privacy). [Ok](https:"
+        ]
+      },
+      {
+        "title": "Spirits - Philadelphia Magazine",
+        "url": "https://www.phillymag.com/whiskeyfest2015/spirits/",
+        "domain": "phillymag.com",
+        "description": "Laphroaig 10 year old Single Malt Scotch Whisky ... The Glenlivet French Oak Scotch 15 Year Old. The ... Masterson's Straight Rye Whiskey 10 Year Old ...",
+        "extraSnippets": [
+          "![starburst](https://cdn10.phillymag.com/wp-content/uploads/2014/10/starburst.jpg) # Spirits | | | | | --- | --- | --- | | Jefferson Small Batch Bourbon | Jefferson Reserve Straigh"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "0f0dc461e57721c38bbea06df43be469c6f5d6a180ed24b9b1922d252c64a314",
+    "mode": "auto"
+  }
+}

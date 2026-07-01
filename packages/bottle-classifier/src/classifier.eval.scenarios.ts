@@ -18,7 +18,6 @@ export const LIVE_CLASSIFIER_EVAL_SCENARIOS = [
   "new_bottles",
   "match_existing",
   "corrections",
-  "parent_repair_releases",
 ] as const;
 
 export type LiveClassifierEvalScenario =

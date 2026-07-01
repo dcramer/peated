@@ -9,7 +9,7 @@ import {
 } from "./sharedWebSearch";
 
 const FIRECRAWL_API_URL = "https://api.firecrawl.dev";
-const FIRECRAWL_SEARCH_TIMEOUT_MS = 15000;
+const FIRECRAWL_SEARCH_TIMEOUT_MS = 30000;
 
 const FirecrawlSearchResultSchema = z
   .object({

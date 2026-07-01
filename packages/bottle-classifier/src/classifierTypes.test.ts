@@ -2,8 +2,12 @@ import { describe, expect, test } from "vitest";
 import { z } from "zod";
 import {
   BottleCandidateSchema,
+  BottleCandidateSearchInputSchema,
   BottleClassificationDecisionSchema,
   BottleClassifierAgentDecisionSchema,
+  BottleExtractedDetailsSchema,
+  ProposedBottleSchema,
+  ProposedReleaseSchema,
 } from "./classifierTypes";
 
 describe("BottleClassifierAgentDecisionSchema", () => {
@@ -128,6 +132,33 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     expect(candidate.familyContext?.siblingBottles[0]?.statedAge).toBe(21);
     expect(decision.identityBasis?.yearInterpretation).toBe("vintage_year");
     expect(decision.confidenceBasis?.band).toBe("review");
+  });
+
+  test("rejects removed structured cask fields at classifier boundaries", () => {
+    expect(
+      BottleExtractedDetailsSchema.safeParse({ cask_type: "Sherry" }).success,
+    ).toBe(false);
+    expect(
+      BottleCandidateSchema.safeParse({
+        bottleId: 1,
+        fullName: "Example",
+        caskType: "Sherry",
+      }).success,
+    ).toBe(false);
+    expect(
+      BottleCandidateSearchInputSchema.safeParse({ cask_type: "Sherry" })
+        .success,
+    ).toBe(false);
+    expect(
+      ProposedBottleSchema.safeParse({
+        name: "Example",
+        brand: { id: null, name: "Example" },
+        caskType: "Sherry",
+      }).success,
+    ).toBe(false);
+    expect(
+      ProposedReleaseSchema.safeParse({ caskType: "Sherry" }).success,
+    ).toBe(false);
   });
 
   test("parses parent repair plus release creation decisions", () => {

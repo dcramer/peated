@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T02:34:28.507Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "site:bruichladdich.com Octomore 13.1"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "site:bruichladdich.com Octomore 13.1",
+    "summary": "Matured for five years, always super-heavily peated and bottled close to cask strength, Octomore's surprising elegance has led us to define it as The Impossible ... [Skip to content](https://www.bruichladdich.com/collections/octomore#MainContent) [Sign In](https://www.bruichladdich.com/account/login) Close menu - [BRUI",
+    "results": [
+      {
+        "title": "Octomore Single Malt Scotch Whisky - Bruichladdich Distillery",
+        "url": "https://www.bruichladdich.com/collections/octomore",
+        "domain": "bruichladdich.com",
+        "description": "Matured for five years, always super-heavily peated and bottled close to cask strength, Octomore's surprising elegance has led us to define it as The Impossible ...",
+        "extraSnippets": [
+          "[Skip to content](https://www.bruichladdich.com/collections/octomore#MainContent) [Sign In](https://www.bruichladdich.com/account/login) Close menu - [BRUICHLADDICH \\\\ \\\\ Unpeated "
+        ]
+      },
+      {
+        "title": "Octomore Single Malt Scotch Whisky | Bruichladdich Distillery US",
+        "url": "https://us.bruichladdich.com/collections/octomore",
+        "domain": "us.bruichladdich.com",
+        "description": "Matured for five years, always super-heavily peated and bottled close to cask strength, Octomore's surprising elegance has led us to define it as The Impossible ...",
+        "extraSnippets": [
+          "[Skip to content](https://us.bruichladdich.com/collections/octomore#MainContent) Close menu - [BRUICHLADDICH \\\\ \\\\ Unpeated Whisky Range](https://us.bruichladdich.com/collections/b"
+        ]
+      },
+      {
+        "title": "Octomore Edition 14.1 | Bruichladdich Distillery",
+        "url": "https://www.bruichladdich.com/products/octomore-edition-14-1",
+        "domain": "bruichladdich.com",
+        "description": "Sweet caramel and vanilla open on the nose, with bright citrus cutting through Octomore's signature smoke - elevated with roasted coffee and subtle spice. ENTER ...",
+        "extraSnippets": [
+          "[Skip to content](https://www.bruichladdich.com/products/octomore-edition-14-1#MainContent) It looks like you are visiting our global website from the United States. You can switch"
+        ]
+      },
+      {
+        "title": "Bruichladdich Black Art Edition 11 : 24 Aged Years",
+        "url": "https://us.bruichladdich.com/products/bruichladdich-black-art-edition-11",
+        "domain": "us.bruichladdich.com",
+        "description": "Oak and dried fruit come to the fore, with Christmas cake notes of sultanas, fig, marzipan, and lingering honey adding to the beautifully rounded finish.",
+        "extraSnippets": [
+          "[Skip to content](https://us.bruichladdich.com/products/bruichladdich-black-art-edition-11#MainContent) Close menu - [BRUICHLADDICH \\\\ \\\\ Unpeated Whisky Range](https://us.bruichla"
+        ]
+      },
+      {
+        "title": "Port Charlotte 10 | Bruichladdich Distillery US",
+        "url": "https://us.bruichladdich.com/products/port-charlotte-10",
+        "domain": "us.bruichladdich.com",
+        "description": "Port Charlotte 10 year old is conceived, distilled, matured and bottled only on Islay. Made from 100% Scottish barley, it is trickle distilled through tall, ...",
+        "extraSnippets": [
+          "[Skip to content](https://us.bruichladdich.com/products/port-charlotte-10#MainContent) Close menu - [BRUICHLADDICH \\\\ \\\\ Unpeated Whisky Range](https://us.bruichladdich.com/collect"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "616fcc940244f90bedd6af7aaad4c5035595bffa74ad8cb4b484c9e6ff1ecfe0",
+    "mode": "auto"
+  }
+}

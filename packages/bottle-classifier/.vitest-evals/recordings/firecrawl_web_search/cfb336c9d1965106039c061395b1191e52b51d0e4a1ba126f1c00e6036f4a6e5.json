@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T03:10:51.199Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition 2001 bottled 1988"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker Distillers Edition 2001 bottled 1988",
+    "summary": "This rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001. £600.00 £ ... - [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0",
+    "results": [
+      {
+        "title": "Talisker 1988, The Distillers Edition 2001 Bottling | The Whisky Vault",
+        "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+        "domain": "thewhiskyvault.com",
+        "description": "This rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001. £600.00 £ ...",
+        "extraSnippets": [
+          "- [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=25536) [CHFS"
+        ]
+      },
+      {
+        "title": "Talisker 1988 Distillers Edition | Single Malt Scotch Whisky",
+        "url": "https://www.whiskymarketplace.com/whiskies/talisker-1988-distillers-edition-island-single-malt-scotch",
+        "domain": "whiskymarketplace.com",
+        "description": "Comes in a regular 70cl bottle and is bottled at a healthy ABV of 45.8%. ... Delicious nose. Smokey, sweet, salty toffee. A tasty Talisker delivery with that ...",
+        "extraSnippets": [
+          "[Skip to content](https://www.whiskymarketplace.com/whisky/talisker-1988-distillers-edition-island-single-malt-scotch#main-content) ![Talisker 1988 Distillers Edition](https://imag"
+        ]
+      },
+      {
+        "title": "Talisker 1988 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/1214/talisker-1988",
+        "domain": "whiskybase.com",
+        "description": "This is the 700 ml from 1988. The strength of this whisky is 45.8 % Vol. Overall rating 87.56/100 ratings 42. Type Double Matured in Amoroso ...",
+        "extraSnippets": [
+          "**Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/1214/talisker-1988?__cf_chl_f_tk=RIqCdmVTRaGmAdslsluiJzK5UrSZuQPyWSK86ClymA"
+        ]
+      },
+      {
+        "title": "Talisker 1988 12 Year Old Distillers Edition Bottled 2001 With Origina",
+        "url": "https://shop.marklittler.com/products/talisker-1988-12-year-old-distillers-edition-bottled-2001-with-original-box?srsltid=AfmBOorxVziTMbCTKu-hkamTFw6DcYM1JNQnjPPkqUfb5_WX8F2tnmOa",
+        "domain": "shop.marklittler.com",
+        "description": "This is a bottle of Talisker 1988 12 year old, 70cl, Bottled in 2001 45.8% ABV in original box. is not in pristine condition. Prices start at £45:",
+        "extraSnippets": [
+          "[Skip to content](https://shop.marklittler.com/products/talisker-1988-12-year-old-distillers-edition-bottled-2001-with-original-box#MainContent) # Talisker 1988 12 Year Old Distill"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition 1988/2001 (45.8%, OB, TD-S: 5CO)",
+        "url": "https://masterquill.com/2012/06/17/talisker-distillers-edition-19882001-45-8-ob-td-s-5co/",
+        "domain": "masterquill.com",
+        "description": "Nose: Fresh, sea spray, a bit musty and woody. Easily recognizable as a Talisker with added sweetness, toffee and some meat (often with Sherry).",
+        "extraSnippets": [
+          "- [Leave a comment](https://masterquill.com/2012/06/17/talisker-distillers-edition-19882001-45-8-ob-td-s-5co/#respond) ![](https://masterquill.com/wp-content/uploads/2012/06/talisk"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "cfb336c9d1965106039c061395b1191e52b51d0e4a1ba126f1c00e6036f4a6e5",
+    "mode": "auto"
+  }
+}

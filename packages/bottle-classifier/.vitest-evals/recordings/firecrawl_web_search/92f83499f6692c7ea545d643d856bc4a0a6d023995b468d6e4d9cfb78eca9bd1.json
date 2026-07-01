@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T18:11:45.055Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Canadian Club Reserve 9 year old Triple Aged"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Canadian Club Reserve 9 year old Triple Aged",
+    "summary": "This new 9 year old version, though similar, has obvious differences. Pleasing heat rides an initial surge of toffee, dry grain, and dried dark fruit. A soon-to ... Back Save ![](https://whiskyadvocate.com/?resize=1290&crop=237x21,0x0) ### 77 Score # Canadian Club Reserve 9 year old Triple Aged, 40% Price: $17.00● Issu",
+    "results": [
+      {
+        "title": "Canadian Club Reserve 9 year old Triple Aged, 40%",
+        "url": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "domain": "whiskyadvocate.com",
+        "description": "This new 9 year old version, though similar, has obvious differences. Pleasing heat rides an initial surge of toffee, dry grain, and dried dark fruit. A soon-to ...",
+        "extraSnippets": [
+          "Back Save ![](https://whiskyadvocate.com/?resize=1290&crop=237x21,0x0) ### 77 Score # Canadian Club Reserve 9 year old Triple Aged, 40% Price: $17.00● Issue: Summer 2013 ● Reviewer"
+        ]
+      },
+      {
+        "title": "Canadian Club Reserve (9 Year Old) - The Rum Howler Blog",
+        "url": "https://therumhowlerblog.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/",
+        "domain": "therumhowlerblog.com",
+        "description": "The whisky brings along a bit of a bite as it crosses the palate with hard rye spices chasing flavours of butterscotch and maple.",
+        "extraSnippets": [
+          "# [The Rum Howler Blog](https://therumhowlerblog.com/) ## (A Website for Spirited Reviews) - ## Subscribe - [Entries (RSS)](https://therumhowlerblog.com/feed/) - [Comments (RSS)](h"
+        ]
+      },
+      {
+        "title": "Canadian Club Canadian Whisky Reserve Triple Aged 9 Years",
+        "url": "https://www.grandwinecellar.com/products/canadian-club-canadian-whisky-reserve-triple-aged-9-years?srsltid=AfmBOorQnLkSdTu2uivIWWo6f3atRBxOux0RvGhhty3rTitFITn3YbBK",
+        "domain": "grandwinecellar.com",
+        "description": "This reserve whisky is matured in white-oak barrels for 9 years and then barrel-blended by our Master Blender, to create a rich and smooth flavor.",
+        "extraSnippets": [
+          "[Help](https://www.grandwinecellar.com/products/canadian-club-canadian-whisky-reserve-triple-aged-9-years?variant=42143882117316) USD Currency ![USD](https://cdn.shopify.com/shopif"
+        ]
+      },
+      {
+        "title": "Canadian Club Canadian Whisky Reserve 9 Year",
+        "url": "https://whiskyandwhiskey.com/products/canadian-club-canadian-whisky-reserve-9-yr?srsltid=AfmBOopdZcOq5SWdVsTyOqFNxGF54j06zYNGAEIEjC6avtbSW3DeNRP4",
+        "domain": "whiskyandwhiskey.com",
+        "description": "The aroma wafts up to greet you, filled with enticing notes of baking spice that mingle beautifully with subtle hints of mineral undertones, creating an ...",
+        "extraSnippets": [
+          "[Skip to content](https://whiskyandwhiskey.com/products/canadian-club-canadian-whisky-reserve-9-yr#main) Cart Your cart is empty Zoom picture ![Canadian Club Canadian Whisky Reserv"
+        ]
+      },
+      {
+        "title": "Canadian Club Reserve 9 year - Thoughts? : r/worldwhisky - Reddit",
+        "url": "https://www.reddit.com/r/worldwhisky/comments/27g4vo/canadian_club_reserve_9_year_thoughts/",
+        "domain": "reddit.com",
+        "description": "The 9 year is a tiny bit smoother, but still isn't nearly as good as Crown. If you can get crown for a similar price do it. My favorite canadian ...",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "92f83499f6692c7ea545d643d856bc4a0a6d023995b468d6e4d9cfb78eca9bd1",
+    "mode": "auto"
+  }
+}

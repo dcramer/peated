@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T02:30:58.476Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Glenmorangie Cadboll Estate Batch 4 15 year"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Glenmorangie Cadboll Estate Batch 4 15 year",
+    "summary": "Single-estate whisky made from the Cadboll Estate's 2007 harvest, matured in custom-toasted air-dried casks. The nose is buttery, with creamy vanilla, brioche, ... Back Save ![](https://whiskyadvocate.com/get/files/image/galleries/Glenmorangie-Cadboll-70cl-2023-bottle-front-view_(1)_300.png) ### 94 Score # Glenmorangie",
+    "results": [
+      {
+        "title": "Glenmorangie The Cadboll Estate 15 year old (Batch 4), 43%",
+        "url": "https://whiskyadvocate.com/Glenmorangie-The-Cadboll-Estate-15-year-old-Batch-4-43",
+        "domain": "whiskyadvocate.com",
+        "description": "Single-estate whisky made from the Cadboll Estate's 2007 harvest, matured in custom-toasted air-dried casks. The nose is buttery, with creamy vanilla, brioche, ...",
+        "extraSnippets": [
+          "Back Save ![](https://whiskyadvocate.com/get/files/image/galleries/Glenmorangie-Cadboll-70cl-2023-bottle-front-view_(1)_300.png) ### 94 Score # Glenmorangie The Cadboll Estate 15 y"
+        ]
+      },
+      {
+        "title": "Review #11 - Glenmorangie 15 - The Cadboll Estate : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/1ow8vc3/review_11_glenmorangie_15_the_cadboll_estate/",
+        "domain": "reddit.com",
+        "description": "Distilled likely around 2005-2007, it was matured a full fifteen years in first filled bourbon casks, with an amontillado finish – unique for ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "The Cadboll Estate, 2024 Batch 4 - Glenmorangie Distillery",
+        "url": "https://www.glenmorangie.com/en-us/pages/the-cadboll-estate?srsltid=AfmBOoqB4oYAx0Zb-3W-AljBj5GsZDR0dvitKxZatZf8VHeutxyNzHgQ",
+        "domain": "glenmorangie.com",
+        "description": "Buy Online. The Cadboll Estate 2024 is our whisky created entirely with Barley from our own fields & water from our Scottish Highlands spring.",
+        "extraSnippets": [
+          "Some content that you'd like to display in a modalDismiss #### My Basket (0) Oh, your basket appears to be empty Add some of our delicious Whisky to your basket to discover the won"
+        ]
+      },
+      {
+        "title": "Glenmorangie 15 Year Old Cadboll Estate Batch 4 - Total Wine",
+        "url": "https://www.totalwine.com/spirits/scotch/glenmorangie-15-year-old-cadboll-estate-batch-4/p/2126251327?srsltid=AfmBOoqMPVhuLZGxLoVQtXPlSh0n9ppg9t72pcO7JIZg819LDKi-6fDI",
+        "domain": "totalwine.com",
+        "description": "The first Cadboll Estate release to be wholly matured in our bespoke designer ex-bourbon casks. A unique barrel selection small batch release.",
+        "extraSnippets": [
+          "Glenmorangie 15 Year Old Cadboll Estate Batch 4 750ml Bottle - ![Glenmorangie 15 Year Old Cadboll Estate Batch 4 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/images/212"
+        ]
+      },
+      {
+        "title": "Glenmorangie The Cadboll Estate Bourbon & Amontillado Casks 15 ...",
+        "url": "https://sf.flatiron-wines.com/products/glenmorangie-the-cadboll-estate-bourbon-amontillado-casks-15-year-old-single-malt-scotch-whisky?srsltid=AfmBOop-8zdF_ks9JqM2ZesS3XJY0i0MGAY-B3WEh0IJR4PTwLRmsmbV",
+        "domain": "sf.flatiron-wines.com",
+        "description": "This 15-year-old expression is aged first in ex-bourbon casks, then finished in Amontillado sherry casks, adding nutty, oxidative complexity. The ...",
+        "extraSnippets": [
+          "[Skip to content](https://sf.flatiron-wines.com/products/glenmorangie-the-cadboll-estate-bourbon-amontillado-casks-15-year-old-single-malt-scotch-whisky#main-content) **Recommended"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "4acfbae7324e0b970553cf4f01c732d14eb7c146527bc887fa0544eb631cb2ff",
+    "mode": "auto"
+  }
+}

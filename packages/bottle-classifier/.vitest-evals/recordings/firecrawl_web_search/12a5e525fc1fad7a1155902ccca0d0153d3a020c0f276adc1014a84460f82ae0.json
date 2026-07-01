@@ -1,0 +1,57 @@
+{
+  "writtenAt": "2026-07-01T15:36:12.431Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Glenmorangie Quinta Ruban 14 year old 4th edition"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Glenmorangie Quinta Ruban 14 year old 4th edition",
+    "summary": "In our giraffe-high stills, it begins soft and fruity, then gets darker and deeper as we let it age for 14 years in bourbon casks and port casks from Portugal. Some content that you'd like to display in a modalDismiss #### My Basket (0) Oh, your basket appears to be empty Add some of our delicious Whisky to your basket",
+    "results": [
+      {
+        "title": "The Quinta Ruban 14 Years Old",
+        "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban?srsltid=AfmBOoodu2v-Lt17lQFxlMSOz7AZoRanaJVrS7dzv76HCfsyIdFNARLQ",
+        "domain": "glenmorangie.com",
+        "description": "In our giraffe-high stills, it begins soft and fruity, then gets darker and deeper as we let it age for 14 years in bourbon casks and port casks from Portugal.",
+        "extraSnippets": [
+          "Some content that you'd like to display in a modalDismiss #### My Basket (0) Oh, your basket appears to be empty Add some of our delicious Whisky to your basket to discover the won"
+        ]
+      },
+      {
+        "title": "[Whisky Review #46] Glenmorangie Quinta Ruban 14",
+        "url": "https://www.reddit.com/r/Scotch/comments/1c5hnoa/whisky_review_46_glenmorangie_quinta_ruban_14/",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "What is wrong with Quinta Ruban 14?",
+        "url": "https://www.reddit.com/r/Scotch/comments/1gd6m8g/what_is_wrong_with_quinta_ruban_14/",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Glenmorangie 14 year old Quinta Ruban",
+        "url": "https://whiskyadvocate.com/glenmorangie-14-year-old-quinta-ruban",
+        "domain": "whiskyadvocate.com",
+        "description": "This Quinta Ruban succeeds the 12 year old version, adding two additional years of finishing in port casks, while maintaining the same bargain price.",
+        "extraSnippets": [
+          "Back [Save](https://www.pinterest.com/pin/create/button/?guid=KFWqGHH0db5q-1&url=https%3A%2F%2Fwhiskyadvocate.com%2FGlenmorangie-14-year-old-Quinta-Ruban&media=%2Fget%2Ffiles%2Fima"
+        ]
+      },
+      {
+        "title": "r/Scotch - Review #874 - Glenmorangie 14 Quinta Ruban",
+        "url": "https://www.reddit.com/r/Scotch/comments/12xm6z5/review_874_glenmorangie_14_quinta_ruban/",
+        "domain": "reddit.com",
+        "description": "Highland single malt. 46% ABV. Local price: $112 CAD. Aged at least 14 years. Lots of fruit – crisp apples, peaches, raisins, and an unexpected ...",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "12a5e525fc1fad7a1155902ccca0d0153d3a020c0f276adc1014a84460f82ae0",
+    "mode": "auto"
+  }
+}

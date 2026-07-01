@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-06-30T23:58:22.112Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Elijah Craig Barrel Proof Batch C923"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Elijah Craig Barrel Proof Batch C923",
+    "summary": "The suggested retail price is $74.99 … 66.5% ABV. Nose: Strong notes of cocoa, vanilla, and oak with touches of cinnamon and mint underneath. Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog _I’d",
+    "results": [
+      {
+        "title": "Elijah Craig Barrel Proof, C923 - BOURBON GUY",
+        "url": "https://www.bourbonguy.com/blog/2023/10/10/elijah-craig-barrel-proof-c923",
+        "domain": "bourbonguy.com",
+        "description": "The suggested retail price is $74.99 … 66.5% ABV. Nose: Strong notes of cocoa, vanilla, and oak with touches of cinnamon and mint underneath.",
+        "extraSnippets": [
+          "Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog _I’d l"
+        ]
+      },
+      {
+        "title": "Elijah Craig Barrel Proof Batch C923 - Whiskey in my Wedding Ring",
+        "url": "https://www.whiskeyinmyweddingring.com/reviews/elijah-craig-barrel-proof-batch-c923",
+        "domain": "whiskeyinmyweddingring.com",
+        "description": "12% Rye, 10% Malted Barley Proof: 133 (66.5% ABV) Age: 13 Years 7 Months. Eye: Dark amber. Dark chocolate-covered dried cherries, Final Rating: ...",
+        "extraSnippets": [
+          "[0](https://www.whiskeyinmyweddingring.com/cart) # Elijah Craig Barrel Proof Batch C923 [Reviews](https://www.whiskeyinmyweddingring.com/reviews/category/Reviews)[American Whiskey]"
+        ]
+      },
+      {
+        "title": "Elijah Craig Barrel Proof Bourbon C923 Review",
+        "url": "https://thebourbonculture.com/whiskey-reviews/elijah-craig-barrel-proof-bourbon-c923-review/",
+        "domain": "thebourbonculture.com",
+        "description": "Score: 8.4/10. Batch C923 was a joy to drink. It had everything I wanted in an ECBP with a little bit extra because of those fruit notes.",
+        "extraSnippets": [
+          "[Skip to Content](https://thebourbonculture.com/whiskey-reviews/elijah-craig-barrel-proof-bourbon-c923-review/#content) ![Elijah Craig Barrel Proof Bourbon C923 Review](https://the"
+        ]
+      },
+      {
+        "title": "Batch C923 & The Trajectory of Elijah Craig Barrel Proof ... - Reddit",
+        "url": "https://www.reddit.com/r/bourbon/comments/1iwl33h/reviews_163169_batch_c923_the_trajectory_of/",
+        "domain": "reddit.com",
+        "description": "Rich, velvety, a bit dry on the palate - finish is spicy & leathery. 8.3 | Excellent B521 Nose: toffee | raisin. MSRP is $75, 10+ year aged ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Elijah Craig - Nestor Liquor",
+        "url": "https://www.nestorliquor.com/collections/elijah-craig-1?srsltid=AfmBOopHSdjlmrDuDYMvzIG5aKRoeB-vlGQlQM2GCCKukzfV99qIvMoG",
+        "domain": "nestorliquor.com",
+        "description": "Elijah Craig Barrel Proof Batch# C922 750ml. Regular price $79.99 $79.99. Add to cart. Elijah Craig Barrel Proof Batch #B522 750 ml. Vendor ...",
+        "extraSnippets": [
+          "[My Wishlist](https://www.nestorliquor.com/collections/elijah-craig-1#swym-wishlist) 0 x * * * [by Timesact](https://timesact.com/) [Skip to content](https://www.nestorliquor.com/c"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e70f58c7775ed594d1998b0b0aca8632a35851427a97793e2b4ea57e93e753b2",
+    "mode": "auto"
+  }
+}

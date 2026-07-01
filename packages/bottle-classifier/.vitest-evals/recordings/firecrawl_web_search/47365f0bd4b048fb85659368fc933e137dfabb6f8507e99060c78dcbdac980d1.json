@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T02:33:50.452Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Series Vol 3 bourbon whiskey"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Heaven's Door Bootleg Series Vol 3 bourbon whiskey",
+    "summary": "Heaven&#39;s Door is a collection of handcrafted American Whiskeys. Bootleg Series Volume V Regular price $599.99 USD Sale price $599.99 USD [Skip to content](https://buy.heavensdoor.com/#MainContent) ## Search Search ## Cart Your cart is empty Loading... ![](https://buy.heavensdoor.com/cdn/shop/files/preview_images/18",
+    "results": [
+      {
+        "title": "Heaven's Door Whiskey",
+        "url": "https://buy.heavensdoor.com/?srsltid=AfmBOoojofxqzkeQry73fyFoUPeL00-Hq9olptfo7lourRO9GCNWSxxO",
+        "domain": "buy.heavensdoor.com",
+        "description": "Heaven&#39;s Door is a collection of handcrafted American Whiskeys. Bootleg Series Volume V Regular price $599.99 USD Sale price $599.99 USD",
+        "extraSnippets": [
+          "[Skip to content](https://buy.heavensdoor.com/#MainContent) ## Search Search ## Cart Your cart is empty Loading... ![](https://buy.heavensdoor.com/cdn/shop/files/preview_images/18c"
+        ]
+      },
+      {
+        "title": "Heaven's Door Bootleg Series Volume 3 Review",
+        "url": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": "For Volume 3, which was released late in 2021, the company chose to finish a 13 year Kentucky bourbon in used Vino De Naranja Casks. The company ...",
+        "extraSnippets": [
+          "By clicking **\"Accept\"**, you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts. View our [Privacy "
+        ]
+      },
+      {
+        "title": "Heaven's Door The Bootleg Series Vol. III Kentucky ...",
+        "url": "https://www.passionspirits.com/heavens-door-bootleg-volume-iii?srsltid=AfmBOorwIb8rXuBr82kAlwnhAWSm2IiQFF9k5VLmCdFADU69VjDW0uuU",
+        "domain": "passionspirits.com",
+        "description": "The Bootleg Series Vol III features a cask strength 13-year-old Kentucky Bourbon finished in Vino de Naranja Casks. This 2021 release is presented in a handmade ...",
+        "extraSnippets": [
+          "![logo passion spirits](https://platform-ps-files.s3.us-east-2.amazonaws.com/images/origin/favicon_resized_acbd290c0b_1_d800bbb136.png) Passion Spirits App [Download](https://www.p"
+        ]
+      },
+      {
+        "title": "My first review! Heaven's Door Bootleg Volume 3 : r/bourbon",
+        "url": "https://www.reddit.com/r/bourbon/comments/vfifyt/my_first_review_heavens_door_bootleg_volume_3/",
+        "domain": "reddit.com",
+        "description": "120 proof, 13 year aged bourbon finished in Spanish Orange Dessert wine barrels. At a little over $500, Single Barrel Bourbon 136.8 Proof",
+        "extraSnippets": []
+      },
+      {
+        "title": "The Bootleg Series | Heaven's Door Whiskey",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": "Bootleg Vol. III (2021) from Heaven&#39;s Door features a cask strength 13-year Kentucky Bourbon finished in Spanish wine barrels. 18-year-old straight bourbon ...",
+        "extraSnippets": [
+          "top of page ![](https://static.wixstatic.com/media/04ebdd_4c2fcb998b704204a8d3a32c2b182b8d~mv2.jpg/v1/fill/w_147,h_147,al_c,q_80,usm_0.66_1.00_0.01,blur_2,enc_avif,quality_auto/04e"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "47365f0bd4b048fb85659368fc933e137dfabb6f8507e99060c78dcbdac980d1",
+    "mode": "auto"
+  }
+}

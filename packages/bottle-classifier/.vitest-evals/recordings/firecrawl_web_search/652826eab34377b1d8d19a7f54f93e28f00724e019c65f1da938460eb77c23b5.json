@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-06-30T23:13:41.846Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Masterson's straight rye whiskey French oak barrel finished 10 year"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Masterson's straight rye whiskey French oak barrel finished 10 year",
+    "summary": "Fruity with dried dates and figs, peaches, peach pits, purple plum pits, and hints of black licorice. Tingling cloves and ginger add zip to traces of bitter ... Back Save ![](https://whiskyadvocate.com/?resize=1290&crop=237x21,0x0) ### 85 Score # Masterson's 10 year old Straight Rye French Oak Finish (Barrel F2-038), 4",
+    "results": [
+      {
+        "title": "Masterson's 10 year old Straight Rye French Oak Finish (Barrel F2 ...",
+        "url": "https://whiskyadvocate.com/Masterson-s-10-year-old-Straight-Rye-French-Oak-Finish-Barrel-F2-038-45",
+        "domain": "whiskyadvocate.com",
+        "description": "Fruity with dried dates and figs, peaches, peach pits, purple plum pits, and hints of black licorice. Tingling cloves and ginger add zip to traces of bitter ...",
+        "extraSnippets": [
+          "Back Save ![](https://whiskyadvocate.com/?resize=1290&crop=237x21,0x0) ### 85 Score # Masterson's 10 year old Straight Rye French Oak Finish (Barrel F2-038), 45% Price: $65.00● Iss"
+        ]
+      },
+      {
+        "title": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 ...",
+        "url": "https://shop.wiseguysliquors.com/shop/product/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-years-old/5a318d154ce3f9139e37778d?option-id=7411e9423c1fb0c7376d58871766ab99b5411403598c73da23dd3e747304a0cf",
+        "domain": "shop.wiseguysliquors.com",
+        "description": "After ten years of aging, the whiskey is finished in fine grain French oak barrels for 30 days. These barrels were air dried outdoors for two or more years ...",
+        "extraSnippets": [
+          "[Jump to content](https://shop.wiseguysliquors.com/shop/product/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-years-old/5a318d154ce3f9139e37778d?option-id=7411e9423"
+        ]
+      },
+      {
+        "title": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr",
+        "url": "https://bottlebuzz.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr?srsltid=AfmBOoo9zKN-srYJDQlEV39TrZXSqjMcVs2VhVCRQkZrtQxlgEOd1qWx",
+        "domain": "bottlebuzz.com",
+        "description": "It is a ten-year rye whiskey crafted with 100% rye from the Pacific Northwest, showcasing the distinct characteristics of the region. The Canadian whiskey is ...",
+        "extraSnippets": [
+          "[Skip to content](https://bottlebuzz.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr#MainContent) Pause slideshow Play slideshow ![Masterson's Straigh"
+        ]
+      },
+      {
+        "title": "Masterson's 10 Year Old Rye Whiskey Barrel Finished in French Oak",
+        "url": "https://www.caskers.com/masterson-s-10-year-old-rye-whiskey-barrel-finished-in-french-oak/?srsltid=AfmBOoqFWJDNsTvKrwELgplgz1u8qpkaT6_3O7plHxJohDYx29t91VDG",
+        "domain": "caskers.com",
+        "description": "This French finished rye is crafted from 100% rye grains grown in the verdant Pacific Northwest. $43.99.",
+        "extraSnippets": [
+          "The store will not work correctly when cookies are disabled. **Unfortunately, we’re not open yet in your state.** Looks like we don't deliver to that state. click here to change yo"
+        ]
+      },
+      {
+        "title": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 ...",
+        "url": "https://silverbrookwines.com/shop/product/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-years-old/5a318d154ce3f9139e37778d?option-id=7411e9423c1fb0c7376d58871766ab99b5411403598c73da23dd3e747304a0cf&srsltid=AfmBOoouTOt678XXJ-SrE0_biEjEDlhxcN6FJszEbxLc2yj251zZGRZe",
+        "domain": "silverbrookwines.com",
+        "description": "After ten years of aging, the whiskey is finished in fine grain French oak barrels for 30 days. These barrels were air dried outdoors for two or more years ...",
+        "extraSnippets": [
+          "[Jump to content](https://silverbrookwines.com/shop/product/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-years-old/5a318d154ce3f9139e37778d?option-id=7411e9423c1fb"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "652826eab34377b1d8d19a7f54f93e28f00724e019c65f1da938460eb77c23b5",
+    "mode": "auto"
+  }
+}

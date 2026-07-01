@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-06-30T19:30:30.144Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "\"The Exclusive Malts\" Islay 8 year old 2007 57.1% 2016 cask 1661"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "\"The Exclusive Malts\" Islay 8 year old 2007 57.1% 2016 cask 1661",
+    "summary": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%). $194.99 ... 8 Years Old. Cask Type. Refill Ex-Sherry Hogshead. Date Distilled. 17th ... ![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍",
+    "results": [
+      {
+        "title": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%)",
+        "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/",
+        "domain": "norfolkwineandspirits.com",
+        "description": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%). $194.99 ... 8 Years Old. Cask Type. Refill Ex-Sherry Hogshead. Date Distilled. 17th ...",
+        "extraSnippets": [
+          "![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](https://norfolkw"
+        ]
+      },
+      {
+        "title": "The Exclusive Malts “Islay” 8 Year 2007 (57.1% abv)",
+        "url": "https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/",
+        "domain": "maltimpostor.com",
+        "description": "The Exclusive Malts “Islay” 8 Year 2007 57% is Cash and Cary–In reference to Cary Grant and his second wife, Barbara Woolworth Hutton, heiress ...",
+        "extraSnippets": [
+          "[MENU](https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/#) _![](http://maltimpostor.com/wp-content/uploads/2017/01/Exclusive-Malts-Islay-8-Year-2007-26"
+        ]
+      },
+      {
+        "title": "The Exclusive Malts Islay 7 year old 2007 (cask #904), 54.6%",
+        "url": "https://whiskyadvocate.com/The-Exclusive-Malts-Islay-7-year-old-2007-cask-N904-54-6",
+        "domain": "whiskyadvocate.com",
+        "description": "An Islay single malt of unknown origin aged in a bourbon barrel showcases ... The Exclusive Malts Islay 7 year old 2007 (cask #904), 54.6%. Price: 145 ...",
+        "extraSnippets": [
+          "Back Save ![](https://whiskyadvocate.com/?resize=1290&crop=237x21,0x0) ### 87 Score # The Exclusive Malts Islay 7 year old 2007 (cask \\#904), 54.6% Price: $145.00● Issue: Summer 20"
+        ]
+      },
+      {
+        "title": "Creative Whisky Company The Exclusive Malts Islay 2007 8 Year ...",
+        "url": "https://www.whiskimen.com/product/creative-whisky-company-the-exclusive-malts-islay-2007-8-years-old-single-malt-whisky/",
+        "domain": "whiskimen.com",
+        "description": "Creative Whisky Company The Exclusive Malts Islay 2007 8 Year Old Single Malt Whisky. $1,550. In stock. Purchase this product now and earn 15 Points!",
+        "extraSnippets": [
+          "[Skip to content](https://www.whiskimen.com/product/creative-whisky-company-the-exclusive-malts-islay-2007-8-years-old-single-malt-whisky/#content) ## keep in touch ## with our lat"
+        ]
+      },
+      {
+        "title": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (56.2%)",
+        "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-56-2/",
+        "domain": "norfolkwineandspirits.com",
+        "description": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (56.2%). $194.99 ... 8 Years Old. Cask Type. Refill American Barrel. Date Distilled. 17th ...",
+        "extraSnippets": [
+          "![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](https://norfolkw"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e2690151a3a22d73d5bc16150c3ea34090e19e3593251d7ba6eb9465a93aa8ac",
+    "mode": "auto"
+  }
+}

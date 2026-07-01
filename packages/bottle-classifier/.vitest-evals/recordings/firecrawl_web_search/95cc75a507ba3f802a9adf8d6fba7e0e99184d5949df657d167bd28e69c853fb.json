@@ -1,0 +1,14 @@
+{
+  "writtenAt": "2026-06-30T23:44:29.825Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Macallan 18 Sherry Oak 1994 vintage"
+  },
+  "output": {
+    "error": "Firecrawl search failed: The operation was aborted due to timeout"
+  },
+  "metadata": {
+    "cacheKey": "95cc75a507ba3f802a9adf8d6fba7e0e99184d5949df657d167bd28e69c853fb",
+    "mode": "auto"
+  }
+}

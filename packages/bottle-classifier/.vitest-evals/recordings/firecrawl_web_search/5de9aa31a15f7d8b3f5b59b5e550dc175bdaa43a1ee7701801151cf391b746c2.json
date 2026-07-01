@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:14:13.935Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker 2001 Distillers Edition release year bottled code"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker 2001 Distillers Edition release year bottled code",
+    "summary": "Talisker; The Distillers Edition. Talisker 2001. Overall rating: 87.04/100; ratings: 328. Whiskybase ID: WB36535; Category: Single Malt ... **Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?__cf_chl_f_tk=h_2UUqcBQG_FKnixf1ZCmWekRePCzd8CRHU8Wuvwu",
+    "results": [
+      {
+        "title": "Talisker 2001 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": "Talisker; The Distillers Edition. Talisker 2001. Overall rating: 87.04/100; ratings: 328. Whiskybase ID: WB36535; Category: Single Malt ...",
+        "extraSnippets": [
+          "**Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?__cf_chl_f_tk=h_2UUqcBQG_FKnixf1ZCmWekRePCzd8CRHU8Wuvwu"
+        ]
+      },
+      {
+        "title": "Talisker Bottle Codes - Whisky Connosr",
+        "url": "https://www.connosr.com/talisker-bottle-codes-whisky-discussion-1843",
+        "domain": "connosr.com",
+        "description": "The codes for these are: 00410056 Distillers Edition: L5222CR000 second line. The first digit indicates the year the product was bottled and the next three ...",
+        "extraSnippets": [
+          "- [Scotch whisky](https://www.connosr.com/scotch-whisky) - [Japanese whisky](https://www.connosr.com/japanese-whisky) - [American whiskey](https://www.connosr.com/american-whiskey)"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition 1988 â€” 70cl, 45.8% | Glenbotal",
+        "url": "https://glenbotal.co.uk/product/talisker-distillers-edition-1988/?srsltid=AfmBOooUSKffi94Lg_E45120o33XQCDXew58xgxBdJhmVqp9Y8B3gNoi",
+        "domain": "glenbotal.co.uk",
+        "description": "distilled in 1988 and bottled in 2001. bottled in 2001. Adding an air of intrigue to this bottling is the enigmatic code TD-S: 5C0.",
+        "extraSnippets": [
+          "td.doubleclick.net # td.doubleclick.net is blocked This page has been blocked by an extension - Try disabling your extensions. ERR\\_BLOCKED\\_BY\\_CLIENT Reload This page has been bl"
+        ]
+      },
+      {
+        "title": "Diageo's Distiller's edition series – an attempt at a complete list",
+        "url": "https://tjederswhisky.se/diageos-distillers-edition-series-an-attempt-at-a-complete-list/",
+        "domain": "tjederswhisky.se",
+        "description": "2000 release: Talisker DE 1987. Bottle code: TD-S: 5BN. 2001 release: Talisker DE 1988. Bottle code: TD-S: 5CO. 2002 release: Talisker DE 1989. Bottle code ...",
+        "extraSnippets": [
+          "[Hoppa till innehåll](https://tjederswhisky.se/diageos-distillers-edition-series-an-attempt-at-a-complete-list/#site-content) 6 juli 2015 # Diageo’s Distiller’s edition series – an"
+        ]
+      },
+      {
+        "title": "Need help with Talisker 10 : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/15jh0ef/need_help_with_talisker_10/",
+        "domain": "reddit.com",
+        "description": "The code should start with “L#” That number indicates the year within the decade that it was bottled. There is no differentiation between ...",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5de9aa31a15f7d8b3f5b59b5e550dc175bdaa43a1ee7701801151cf391b746c2",
+    "mode": "auto"
+  }
+}

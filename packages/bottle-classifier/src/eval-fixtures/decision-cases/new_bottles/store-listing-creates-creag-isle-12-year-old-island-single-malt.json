@@ -19,9 +19,6 @@
       "abv": null,
       "release_year": null,
       "vintage_year": null,
-      "cask_type": null,
-      "cask_size": null,
-      "cask_fill": null,
       "cask_strength": null,
       "single_cask": null,
       "edition": null
@@ -46,9 +43,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.6766987566779481,
         "source": ["vector"]
       },
@@ -71,9 +65,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.6686730470483985,
         "source": ["vector", "release"]
       },
@@ -96,9 +87,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.6654145134290634,
         "source": ["vector"]
       },
@@ -121,9 +109,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.6482153044371689,
         "source": ["vector"]
       },
@@ -146,9 +131,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.6349567331853024,
         "source": ["vector"]
       },
@@ -171,9 +153,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.6289084134866856,
         "source": ["vector"]
       },
@@ -196,9 +175,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.62449783945006,
         "source": ["vector", "release"]
       },
@@ -221,9 +197,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.6201051407249524,
         "source": ["vector"]
       },
@@ -246,9 +219,6 @@
         "abv": null,
         "vintageYear": 2012,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.6197872198714235,
         "source": ["vector"]
       },
@@ -271,9 +241,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.6195273831622509,
         "source": ["vector"]
       },
@@ -296,9 +263,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.6186334016513708,
         "source": ["vector", "release"]
       },
@@ -321,9 +285,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.6185288407397437,
         "source": ["vector", "release"]
       },
@@ -346,9 +307,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.6165939663292056,
         "source": ["vector"]
       },
@@ -371,9 +329,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.6156561845551937,
         "source": ["vector"]
       }

@@ -17,9 +17,6 @@
       "abv": null,
       "release_year": null,
       "vintage_year": null,
-      "cask_type": null,
-      "cask_size": null,
-      "cask_fill": null,
       "cask_strength": null,
       "single_cask": null,
       "edition": null
@@ -42,9 +39,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 1,
         "source": ["exact"],
         "bottleId": 54083,
@@ -67,9 +61,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.9,
         "source": ["text"],
         "bottleId": 54082,
@@ -79,12 +70,9 @@
   },
   "expected": {
     "status": "classified",
-    "action": "create_release",
+    "action": "match",
     "identityScope": "product",
-    "parentBottleId": 54082,
-    "proposedRelease": {
-      "statedAge": 30
-    },
-    "summary": "Treat the local 30-year-old bottle row as a dirty release-like candidate and create a 30-year-old child release beneath the reusable Macallan Sherry Oak parent bottle instead."
+    "matchedBottleId": 54083,
+    "summary": "Treat the exact local 30-year-old Macallan Sherry Oak row as the existing marketed bottle identity when there is no edition, batch, year, or sibling evidence requiring a child release."
   }
 }

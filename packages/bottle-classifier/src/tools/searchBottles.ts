@@ -54,15 +54,6 @@ export function createSearchBottlesTool({
       abv: BottleCandidateSearchInputSchema.shape.abv.describe(
         "Alcohol by volume percentage as a number, for example 59.2. If the source gives proof, convert it to ABV first.",
       ),
-      cask_type: BottleCandidateSearchInputSchema.shape.cask_type.describe(
-        "Primary cask or finish wording such as First Fill Bourbon or PX Cask Finish.",
-      ),
-      cask_size: BottleCandidateSearchInputSchema.shape.cask_size.describe(
-        "Normalized cask size when explicitly stated, such as port_pipe or hogshead.",
-      ),
-      cask_fill: BottleCandidateSearchInputSchema.shape.cask_fill.describe(
-        "Normalized cask fill when explicitly stated, such as 1st_fill or refill.",
-      ),
       cask_strength:
         BottleCandidateSearchInputSchema.shape.cask_strength.describe(
           "True only when the reference explicitly says cask strength, barrel strength, barrel proof, full proof, or natural strength.",

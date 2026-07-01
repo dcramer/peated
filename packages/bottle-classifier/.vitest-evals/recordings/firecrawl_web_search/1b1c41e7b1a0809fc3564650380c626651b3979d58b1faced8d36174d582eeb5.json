@@ -1,0 +1,14 @@
+{
+  "writtenAt": "2026-07-01T01:38:47.606Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Shieldaig Speyside 30 year old single malt Scotch whisky Total Wine"
+  },
+  "output": {
+    "error": "Firecrawl search failed: The operation was aborted due to timeout"
+  },
+  "metadata": {
+    "cacheKey": "1b1c41e7b1a0809fc3564650380c626651b3979d58b1faced8d36174d582eeb5",
+    "mode": "auto"
+  }
+}

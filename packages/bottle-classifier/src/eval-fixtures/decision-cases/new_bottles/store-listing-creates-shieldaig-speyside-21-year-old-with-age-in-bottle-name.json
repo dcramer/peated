@@ -17,9 +17,6 @@
       "abv": null,
       "release_year": null,
       "vintage_year": null,
-      "cask_type": null,
-      "cask_size": null,
-      "cask_fill": null,
       "cask_strength": null,
       "single_cask": null,
       "edition": null
@@ -46,15 +43,14 @@
     "action": "create_bottle",
     "identityScope": "product",
     "proposedBottle": {
-      "name": "Speyside 21-year-old",
       "brand": {
         "name": "Shieldaig"
       },
       "category": "single_malt",
       "statedAge": 21
     },
+    "proposedBottleNameIncludes": ["Speyside", "21-year-old"],
     "proposedRelease": null,
-    "confidenceBand": "review",
     "verifyEligible": false,
     "summary": "Create a separate Shieldaig Speyside 21-year-old bottle and keep the age statement in the displayed bottle identity because same-family aged bottles would otherwise be confusing."
   },
