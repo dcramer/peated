@@ -39,6 +39,27 @@ function withoutCaskFields(value: Record<string, unknown>) {
   return rest;
 }
 
+function withoutExtractedCaskFields<T extends object>(
+  value: T | null | undefined,
+) {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  const {
+    cask_type: _caskType,
+    cask_size: _caskSize,
+    cask_fill: _caskFill,
+    ...rest
+  } = value as T & {
+    cask_type?: unknown;
+    cask_size?: unknown;
+    cask_fill?: unknown;
+  };
+
+  return rest;
+}
+
 function withoutCaskTraitFields(value: unknown) {
   return value !== "caskType" && value !== "caskSize" && value !== "caskFill";
 }
@@ -234,7 +255,7 @@ async function identifyExactAliasReference({
       proposedRelease: null,
     },
     artifacts: {
-      extractedIdentity: input.extractedIdentity ?? null,
+      extractedIdentity: withoutExtractedCaskFields(input.extractedIdentity),
       imageEvidence: input.imageEvidence ?? null,
       candidates: [
         {
@@ -274,7 +295,7 @@ function createLocalIdentificationNoMatch(
       proposedRelease: null,
     },
     artifacts: {
-      extractedIdentity: input.extractedIdentity ?? null,
+      extractedIdentity: withoutExtractedCaskFields(input.extractedIdentity),
       imageEvidence: input.imageEvidence ?? null,
       candidates: [],
       searchEvidence: [],
@@ -292,6 +313,7 @@ export async function identifyExistingBottleReference(
   const reference = normalizeReferenceForClassifier(input.reference);
   const normalizedInput = {
     ...input,
+    extractedIdentity: withoutExtractedCaskFields(input.extractedIdentity),
     reference,
   };
   const conversationId =
