@@ -1,0 +1,14 @@
+{
+  "writtenAt": "2026-07-01T15:29:43.850Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19 year old release batch annual"
+  },
+  "output": {
+    "error": "Firecrawl search failed: The operation was aborted due to timeout"
+  },
+  "metadata": {
+    "cacheKey": "815849288218b06aa95dc816945ffc0c5f2830cc8d31811c46c1700e65337e5a",
+    "mode": "auto"
+  }
+}

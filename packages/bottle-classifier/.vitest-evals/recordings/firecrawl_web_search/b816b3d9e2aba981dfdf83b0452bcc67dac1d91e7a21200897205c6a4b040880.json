@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T01:16:13.585Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "site:fourrosesbourbon.com Four Roses Single Barrel Barrel Strength Private Selection"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "site:fourrosesbourbon.com Four Roses Single Barrel Barrel Strength Private Selection",
+    "summary": "Four Roses Single Barrel embodies the uniqueness of an individual barrel hand-selected by our Master Distiller. It achieves a pronounced yet elegant flavor ... ![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Ove",
+    "results": [
+      {
+        "title": "Single Barrel OBSV - Four Roses Bourbon",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+        "domain": "fourrosesbourbon.com",
+        "description": "Four Roses Single Barrel embodies the uniqueness of an individual barrel hand-selected by our Master Distiller. It achieves a pronounced yet elegant flavor ...",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      },
+      {
+        "title": "Our Bourbons - Single Barrel Collection | Four Roses",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel-collection",
+        "domain": "fourrosesbourbon.com",
+        "description": "Each bottle in the Single Barrel Collection has its own unique profile that showcases a variety of flavors across the collection. 100 PROOF / AGED 7 - 9 YEARS.",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      },
+      {
+        "title": "Single Barrel OESK - Four Roses Bourbon",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel-oesk",
+        "domain": "fourrosesbourbon.com",
+        "description": "Rich caramel rounds out the profile, creating a bourbon with a smooth, lasting finish whether it's enjoyed neat or on the rocks.",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      },
+      {
+        "title": "Single Barrel OBSF - Four Roses Bourbon",
+        "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel-obsf",
+        "domain": "fourrosesbourbon.com",
+        "description": "One of three new single barrels, OBSF has lush notes of apple, vanilla, and cocoa greeting the palate with a luxurious richness, while a bright touch of rye ...",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      },
+      {
+        "title": "Featured Recipe: OBSQ - Four Roses Bourbon",
+        "url": "https://www.fourrosesbourbon.com/blog/featured-recipe-obsq",
+        "domain": "fourrosesbourbon.com",
+        "description": "However, once we started aging Q batches longer for our Private Selection Single Barrel Program, the taste changed, melding oak tones from the ...",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b816b3d9e2aba981dfdf83b0452bcc67dac1d91e7a21200897205c6a4b040880",
+    "mode": "auto"
+  }
+}

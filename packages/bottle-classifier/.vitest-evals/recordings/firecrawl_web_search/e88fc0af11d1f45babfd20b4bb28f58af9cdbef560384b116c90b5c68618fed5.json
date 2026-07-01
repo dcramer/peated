@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-06-30T23:56:05.559Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition 2001 bottling 1988"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker Distillers Edition 2001 bottling 1988",
+    "summary": "This rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001. - [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=255",
+    "results": [
+      {
+        "title": "Talisker 1988, The Distillers Edition 2001 Bottling | The Whisky Vault",
+        "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+        "domain": "thewhiskyvault.com",
+        "description": "This rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001.",
+        "extraSnippets": [
+          "- [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=25536) [CHFS"
+        ]
+      },
+      {
+        "title": "Talisker 1988 Distillers Edition | Single Malt Scotch Whisky",
+        "url": "https://www.whiskymarketplace.com/whiskies/talisker-1988-distillers-edition-island-single-malt-scotch",
+        "domain": "whiskymarketplace.com",
+        "description": "Talisker 1988 Distillers Edition. ABV: 45.8% - Size: 70cl. Talisker 1988, The Distillers Edition 2001 Bottling. Where to buy?",
+        "extraSnippets": [
+          "[Skip to content](https://www.whiskymarketplace.com/whisky/talisker-1988-distillers-edition-island-single-malt-scotch#main-content) ![Talisker 1988 Distillers Edition](https://imag"
+        ]
+      },
+      {
+        "title": "Talisker 1988 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/1214/talisker-1988",
+        "domain": "whiskybase.com",
+        "description": "A good example of a good whisky with its own character. Nose 88 88 A little smoke, sweet on the nose like prunes and candied cherries.",
+        "extraSnippets": [
+          "**Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/1214/talisker-1988?__cf_chl_f_tk=RIqCdmVTRaGmAdslsluiJzK5UrSZuQPyWSK86ClymA"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition 1988/2001 (45.8%, OB, TD-S: 5CO)",
+        "url": "https://masterquill.com/2012/06/17/talisker-distillers-edition-19882001-45-8-ob-td-s-5co/",
+        "domain": "masterquill.com",
+        "description": "Nose: Fresh, sea spray, a bit musty and woody. Easily recognizable as a Talisker with added sweetness, toffee and some meat (often with Sherry).",
+        "extraSnippets": [
+          "- [Leave a comment](https://masterquill.com/2012/06/17/talisker-distillers-edition-19882001-45-8-ob-td-s-5co/#respond) ![](https://masterquill.com/wp-content/uploads/2012/06/talisk"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition 1988 â€” 70cl, 45.8% | Glenbotal",
+        "url": "https://glenbotal.co.uk/product/talisker-distillers-edition-1988/?srsltid=AfmBOoo0zaWwbIz3XOPMrCZ8w8fSz2sahIHtYCQQs_G6eUQuf41-n9b3",
+        "domain": "glenbotal.co.uk",
+        "description": "Discover a captivating piece of Scotch whisky history with this Talisker Distillers Edition, distilled in 1988 and bottled in 2001.",
+        "extraSnippets": [
+          "[Free UK Delivery on Orders over £99](https://glenbotal.co.uk/shipping-policy/) [Home](https://glenbotal.co.uk/) ᐳ [Products](https://glenbotal.co.uk/shop/) ᐳ [Whisky](https://glen"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e88fc0af11d1f45babfd20b4bb28f58af9cdbef560384b116c90b5c68618fed5",
+    "mode": "auto"
+  }
+}

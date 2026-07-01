@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:53:27.497Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Elijah Craig Barrel Proof C923"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Elijah Craig Barrel Proof C923",
+    "summary": "66.5% ABV. 13 years, 7 months. Nose: Strong notes of cocoa, vanilla, and oak with touches of cinnamon and mint underneath. Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog _I’d like to thank the ",
+    "results": [
+      {
+        "title": "Elijah Craig Barrel Proof, C923 - BOURBON GUY",
+        "url": "https://www.bourbonguy.com/blog/2023/10/10/elijah-craig-barrel-proof-c923",
+        "domain": "bourbonguy.com",
+        "description": "66.5% ABV. 13 years, 7 months. Nose: Strong notes of cocoa, vanilla, and oak with touches of cinnamon and mint underneath.",
+        "extraSnippets": [
+          "Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog _I’d l"
+        ]
+      },
+      {
+        "title": "Elijah Craig Barrel Proof (Batch C923) Review - Breaking Bourbon",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": "This is what bourbon should be. Sweet upfront but yielding to a complexity of flavor notes that end with a vanilla oak finish. It impresses me ...",
+        "extraSnippets": [
+          "By clicking **\"Accept\"**, you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts. View our [Privacy "
+        ]
+      },
+      {
+        "title": "Review #2321 - Elijah Craig Barrel Proof 13 Year C923 : r/bourbon",
+        "url": "https://www.reddit.com/r/bourbon/comments/1f78skw/review_2321_elijah_craig_barrel_proof_13_year_c923/",
+        "domain": "reddit.com",
+        "description": "Taste: Rich on the palate, viscous and powerful. Lots of cocoa, honey, toffee, red berries, cherry cola and a dash of caramel character.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Review of Elijah Craig Barrel Proof C923 - Bourbon Bossman®",
+        "url": "https://bourbonbossman.com/2024/02/16/review-of-elijah-craig-barrel-proof-c923/",
+        "domain": "bourbonbossman.com",
+        "description": "Review of Elijah Craig Barrel Proof C923 · Nose: Prominent Vanilla, Brown Sugar, Caramel, Hazelnut, Spice, Oak, and A Bit of Ethanol · Palate: ...",
+        "extraSnippets": [
+          "[Skip to content](https://bourbonbossman.com/2024/02/16/review-of-elijah-craig-barrel-proof-c923/#wp--skip-link--target) ![](https://bourbonbossman.com/wp-content/uploads/2024/01/5"
+        ]
+      },
+      {
+        "title": "Elijah Craig Barrel Proof Batch C923 750ML | Feng Fine Wine & Spirits",
+        "url": "https://www.fengfinewine.com/product/elijah-craig-barrel-proof-batch-c923-750ml/728?srsltid=AfmBOoqJKkS47CM0Krh2kOWMq9ejO4C8NyQAOaCiQhpd2g2PSkTMo9f5",
+        "domain": "fengfinewine.com",
+        "description": "$249.99 ... Elijah Craig, a burly, lightly smoky monster that's loaded with barrel char, cloves, old leather, and musty book notes, though hints of incense point ...",
+        "extraSnippets": [
+          "Back to Cart Feng Fine Wine & Spirits Secure checkout by Square ![Apple Pay](https://www.fengfinewine.com/static/icons/payment-methods/applepay.svg)![Google Pay](https://www.fengfi"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "641667c962fb605b95a73e7b601dab5159366e047e045bb28f7ff70f9a9c1a86",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "writtenAt": "2026-07-01T01:19:37.586Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Shieldaig Speyside Single Malt 21 year old Scotch Whisky Total Wine Shieldaig 21"
+  },
+  "output": {
+    "error": "Firecrawl search failed: The operation was aborted due to timeout"
+  },
+  "metadata": {
+    "cacheKey": "d8b80bbed7497402083cc967335bd2d4bf49feea6d66aec594ef714d30633060",
+    "mode": "auto"
+  }
+}

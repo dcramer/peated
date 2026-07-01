@@ -1,0 +1,14 @@
+{
+  "writtenAt": "2026-07-01T01:15:19.600Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Elijah Craig Cask Strength Barrel Proof bourbon Heaven Hill"
+  },
+  "output": {
+    "error": "Firecrawl search failed: The operation was aborted due to timeout"
+  },
+  "metadata": {
+    "cacheKey": "683105eda8165a0a415d8ce1cb0065fb857b8f93ca2eac2935f0318dff5ac502",
+    "mode": "auto"
+  }
+}

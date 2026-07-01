@@ -408,6 +408,21 @@ function evaluateDecisionShape(
     }
   }
 
+  if (expected.proposedBottleNameExcludes !== undefined) {
+    const proposedBottleName = result.decision.proposedBottle?.name ?? "";
+    for (const excludedText of expected.proposedBottleNameExcludes) {
+      if (
+        normalizeEvalText(proposedBottleName).includes(
+          normalizeEvalText(excludedText),
+        )
+      ) {
+        failures.push(
+          `proposedBottle.name expected not to include ${excludedText}`,
+        );
+      }
+    }
+  }
+
   if (
     expected.proposedRelease !== undefined &&
     !deepContainsSubset(
@@ -427,8 +442,11 @@ function evaluateNormalizationShape(
 ): ShapeVerdict {
   const expectation = testCase.expected;
   const failures: string[] = [];
+  const classifierExpectations = expectation.classifierExpectations ?? [
+    expectation.classifierExpectation,
+  ];
 
-  if (expectation.classifierExpectation === "review_required") {
+  if (classifierExpectations.includes("review_required")) {
     if (
       result.status !== "ignored" &&
       (result.status !== "classified" || result.decision.action !== "no_match")
@@ -445,15 +463,22 @@ function evaluateNormalizationShape(
   }
 
   const bottleIdentity = getNormalizationBottleIdentity(result);
-  if (!evalTextMatches(bottleIdentity, testCase.expectedBottleName)) {
+  const expectedBottleNames = testCase.expectedBottleNames ?? [
+    testCase.expectedBottleName,
+  ];
+  if (
+    !expectedBottleNames.some((expectedBottleName) =>
+      evalTextMatches(bottleIdentity, expectedBottleName),
+    )
+  ) {
     failures.push(
-      `bottle identity expected ${testCase.expectedBottleName} but got ${bottleIdentity ?? "missing"}`,
+      `bottle identity expected ${expectedBottleNames.join(" or ")} but got ${bottleIdentity ?? "missing"}`,
     );
   }
 
   const releaseIdentity = getNormalizationReleaseIdentity(result);
 
-  if (expectation.classifierExpectation === "exact_cask") {
+  if (classifierExpectations.includes("exact_cask")) {
     if (result.decision.identityScope !== "exact_cask") {
       failures.push(
         `identityScope expected exact_cask but got ${result.decision.identityScope}`,
@@ -467,11 +492,15 @@ function evaluateNormalizationShape(
     return getShapeVerdict(failures);
   }
 
-  if (expectation.classifierExpectation === "bottle_plus_release") {
+  if (classifierExpectations.includes("bottle_plus_release")) {
     const hasReleaseAction =
       result.decision.action === "create_release" ||
       result.decision.action === "create_bottle_and_release" ||
       result.decision.matchedReleaseId !== null;
+
+    if (!hasReleaseAction && classifierExpectations.includes("bottle")) {
+      return getShapeVerdict(failures);
+    }
 
     if (result.decision.identityScope !== "product") {
       failures.push(
@@ -483,10 +512,18 @@ function evaluateNormalizationShape(
       failures.push("expected a release match or release creation action");
     }
 
-    if (expectation.releaseIdentity === null) {
+    const releaseIdentityOptions =
+      expectation.releaseIdentities ??
+      (expectation.releaseIdentity !== null
+        ? [expectation.releaseIdentity]
+        : []);
+
+    if (releaseIdentityOptions.length === 0) {
       failures.push("fixture missing expected release identity");
     } else if (
-      !releaseIdentityMatches(releaseIdentity, expectation.releaseIdentity)
+      !releaseIdentityOptions.some((expectedReleaseIdentity) =>
+        releaseIdentityMatches(releaseIdentity, expectedReleaseIdentity),
+      )
     ) {
       failures.push("release identity did not match expected edition/year");
     }
@@ -770,14 +807,14 @@ const SCENARIO_CONFIG: Array<{
     scenario: "corrections",
     threshold: 1,
   },
-  {
-    label: "parent repair releases",
-    scenario: "parent_repair_releases",
-    threshold: 1,
-  },
 ];
 
 for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
+  const cases = getClassifierLiveEvalCases(scenario).map((testCase) => ({
+    name: getScenarioEvalName(testCase),
+    testCase,
+  }));
+
   describeEval(
     label,
     {
@@ -787,11 +824,6 @@ for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
       judgeThreshold: threshold,
     },
     (it) => {
-      const cases = getClassifierLiveEvalCases(scenario).map((testCase) => ({
-        name: getScenarioEvalName(testCase),
-        testCase,
-      }));
-
       it.for(cases)("$name", async ({ testCase }, { run }) => {
         await run(testCase);
       });

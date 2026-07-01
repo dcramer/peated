@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:06:30.104Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition annual release 2001 bottling"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker Distillers Edition annual release 2001 bottling",
+    "summary": "This rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001. - [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=255",
+    "results": [
+      {
+        "title": "Talisker 1988, The Distillers Edition 2001 Bottling | The Whisky Vault",
+        "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+        "domain": "thewhiskyvault.com",
+        "description": "This rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001.",
+        "extraSnippets": [
+          "- [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=25536) [CHFS"
+        ]
+      },
+      {
+        "title": "Talisker 2001 Distillers Edition Single Malt Scotch Whisky 13 Year Old",
+        "url": "https://www.htfw.com/talisker-2001-distillers-edition-single-malt-scotch-1988-13-year-old-whisky?srsltid=AfmBOoqEcb3jG0N2n4mp98mYurfRXgtmPiJGUCO3LvtJA-0RPrKhaue0",
+        "domain": "htfw.com",
+        "description": "Distillery Bottling. Barbeque and Peat smoke combined with a little sherry to create almost perfection. 90.5 Points Jim Murray's Whisky Bible. ; Discover ...",
+        "extraSnippets": [
+          "- [Worldwide Delivery AvailableCheck Our Shipping Prices](https://www.htfw.com/delivery-information) - [Same Day DispatchFor Orders Before 4:30pm](https://www.htfw.com/delivery-inf"
+        ]
+      },
+      {
+        "title": "Review #2340 - Talisker Distiller's Edition : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/1fklplw/review_2340_talisker_distillers_edition/",
+        "domain": "reddit.com",
+        "description": "A 2020 release from Diageo-owned Scottish distillery Talisker, this is Talisker The Distillers Edition, a single malt aged in American oak and ex-Amoroso ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Single Malt Report: Talisker 25 year old 1975 (2001 bottling)",
+        "url": "http://www.divingforpearlsblog.com/2014/06/single-malt-report-talisker-25-year-old.html",
+        "domain": "divingforpearlsblog.com",
+        "description": "Single Malt Report: Talisker 25 year old 1975 (2001 bottling). Thirteen years ago, Diageo released the first annual(-ish) 25 year old Talisker.",
+        "extraSnippets": [
+          "Twitter Widget Iframe | | | | | --- | --- | --- | | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif) | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bub"
+        ]
+      },
+      {
+        "title": "Talisker - 2001 Distillers Edition - Whisky.com",
+        "url": "https://www.whisky.com/whisky-database/details.html?tx_datamintsflaschendb_pi4%5Baction%5D=Detail&tx_datamintsflaschendb_pi4%5Bcontroller%5D=Flaschen&tx_datamintsflaschendb_pi4%5Bflasche%5D=11405&cHash=92eb1a352075c792879e40607f8744eb",
+        "domain": "whisky.com",
+        "description": "Distillation date: 2001. Bottling date: 2012. ABV: 45.8%. Bottle size: 0.7 l. Bottler: Original bottling. Series: Distillers Edition (Diageo). Maturing: Bourbon.",
+        "extraSnippets": [
+          "Delivery Country Delivery Country ![DE](https://www.whisky.com/typo3conf/ext/sitepackage/Resources/Public/Libraries/other_whisky_resources/src/public/images/flags/DE.svg?1781180576"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "41c13be3386d108a67aa6250aa957ee473ab8c064157cab6e08ed0ecc2c28759",
+    "mode": "auto"
+  }
+}

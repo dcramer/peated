@@ -1,0 +1,14 @@
+{
+  "writtenAt": "2026-07-01T02:17:54.577Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Glengoyne Legacy Series Chapter Two 48% Chapter One Chapter Two"
+  },
+  "output": {
+    "error": "Firecrawl search failed: The operation was aborted due to timeout"
+  },
+  "metadata": {
+    "cacheKey": "796fce570a8ad7113bed246a1b55fd3416e41d9dabf7da84bba4ab34db2bd919",
+    "mode": "auto"
+  }
+}

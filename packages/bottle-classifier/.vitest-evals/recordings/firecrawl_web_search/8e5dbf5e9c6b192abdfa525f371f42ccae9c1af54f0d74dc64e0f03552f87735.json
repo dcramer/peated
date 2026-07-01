@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-06-30T23:58:48.946Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Shieldaig Speyside Single Malt 21 year old Scotch Whisky"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Shieldaig Speyside Single Malt 21 year old Scotch Whisky",
+    "summary": "A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate. Shieldaig Speyside Single Malt 21Yr Scotch Whisky 750ml Bottle - ![Shieldaig Speyside Single Malt 21Yr Scotch Whisky 750ml Bottle](https://www.totalwine.com/dyna",
+    "results": [
+      {
+        "title": "Shieldaig Speyside Single Malt 21Yr Scotch Whisky",
+        "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-single-malt-21yr-scotch-whisky/p/219098750?srsltid=AfmBOoph7E43wGyfejpixVm0jgvO6oPQkel0Gr_pugDqaXOyGSwsmrNJ",
+        "domain": "totalwine.com",
+        "description": "A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate.",
+        "extraSnippets": [
+          "Shieldaig Speyside Single Malt 21Yr Scotch Whisky 750ml Bottle - ![Shieldaig Speyside Single Malt 21Yr Scotch Whisky 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/images"
+        ]
+      },
+      {
+        "title": "Shieldaig 21 Year Single Malt",
+        "url": "https://cornwallwines.com/shop/product/shieldaig-21-year-single-malt/5ee2bdc23b479231c557814d?option-id=52b0bf70260fbdd06cf96a789e2fe3029c0fd5b0af166d3befb67ebed9857b6d",
+        "domain": "cornwallwines.com",
+        "description": "Speyside, Scotland - A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice ...",
+        "extraSnippets": [
+          "[Jump to content](https://cornwallwines.com/shop/product/shieldaig-21-year-single-malt/5ee2bdc23b479231c557814d?option-id=52b0bf70260fbdd06cf96a789e2fe3029c0fd5b0af166d3befb67ebed9"
+        ]
+      },
+      {
+        "title": "Shieldaig Speyside. What changed? : r/Scotch",
+        "url": "https://www.reddit.com/r/Scotch/comments/1bf7ld2/shieldaig_speyside_what_changed/",
+        "domain": "reddit.com",
+        "description": "This was my daily speyside for years. My latest bottle is horrible. Smells and tastes like overly sweet raisins and nothing else.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky",
+        "url": "https://www.wine-searcher.com/find/shieldaig+21+old+single+malt+scotch+whisky+speyside+scotland?srsltid=AfmBOorKt4nFA01Ls91UGWsyuHzNZ7Lb0MIw0z1zaS6cvCVF5YMysDlL",
+        "domain": "wine-searcher.com",
+        "description": "Find the best local price for Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky, Speyside, Scotland. Avg Price (ex-tax) $121 / 750ml.",
+        "extraSnippets": [
+          "~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at"
+        ]
+      },
+      {
+        "title": "Shieldaig Speyside Single Malt 21Yr",
+        "url": "https://bansumwineandliquor.com/shop/product/shieldaig-speyside-single-malt-21yr/6249f094da0f517093d6d4fc?option-id=97cd4149534a1fc1236e6e92560589b6f82d89a5ae7a6ea39f0bad209ff5c956&srsltid=AfmBOoop18FKBzKFz09sLkwRRLFBmVYnSQdqyObPxBFPA775xw47h_ta",
+        "domain": "bansumwineandliquor.com",
+        "description": "Scotland - A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice and pepper ...",
+        "extraSnippets": [
+          "[Jump to content](https://bansumwineandliquor.com/shop/product/shieldaig-speyside-single-malt-21yr/6249f094da0f517093d6d4fc?option-id=97cd4149534a1fc1236e6e92560589b6f82d89a5ae7a6e"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "8e5dbf5e9c6b192abdfa525f371f42ccae9c1af54f0d74dc64e0f03552f87735",
+    "mode": "auto"
+  }
+}

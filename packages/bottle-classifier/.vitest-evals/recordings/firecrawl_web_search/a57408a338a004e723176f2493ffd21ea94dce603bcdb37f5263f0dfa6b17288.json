@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:18:34.453Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Glenmorangie Quinta Ruban 14 year official 46%"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Glenmorangie Quinta Ruban 14 year official 46%",
+    "summary": "In our giraffe-high stills, it begins soft and fruity, then gets darker and deeper as we let it age for 14 years in bourbon casks and port casks from Portugal. Some content that you'd like to display in a modalDismiss #### My Basket (0) Oh, your basket appears to be empty Add some of our delicious Whisky to your basket",
+    "results": [
+      {
+        "title": "Glenmorangie The Quinta Ruban 14 Years Old",
+        "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban?srsltid=AfmBOoqt_b57HBMGsi0CoekUxwqgwBYuIotndmMeipavfMknfWDCqJJI",
+        "domain": "glenmorangie.com",
+        "description": "In our giraffe-high stills, it begins soft and fruity, then gets darker and deeper as we let it age for 14 years in bourbon casks and port casks from Portugal.",
+        "extraSnippets": [
+          "Some content that you'd like to display in a modalDismiss #### My Basket (0) Oh, your basket appears to be empty Add some of our delicious Whisky to your basket to discover the won"
+        ]
+      },
+      {
+        "title": "Glenmorangie Quinta Ruban 14 Year Old: A rich and easy to drink ...",
+        "url": "https://thewhiskyknights.com/glenmorangie-quinta-ruban-14/",
+        "domain": "thewhiskyknights.com",
+        "description": "Glenmorangie Region: Highlands Whisky Type: Single Malt (100% Malted Barley) Age: 14 years. ABV: 46% (Non-Chill Filtered) Aged in Cask: ex-bourbon, and ex ...",
+        "extraSnippets": [
+          "# Glenmorangie Quinta Ruban 14 Year Old: A rich and easy to drink single malt noviembre 27, 2023 ![](https://thewhiskyknights.com/wp-content/uploads/2023/11/glenmorangie-quintaruba"
+        ]
+      },
+      {
+        "title": "Review #874 - Glenmorangie 14 Quinta Ruban : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/12xm6z5/review_874_glenmorangie_14_quinta_ruban/",
+        "domain": "reddit.com",
+        "description": "46% ABV. No colour added, un-chillfiltered. Local price: $112 CAD in Ontario. Maturation: Aged at least 14 years. Initially matured in ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Glenmorangie Quinta Ruban 14 Year Single Malt Scotch - Total Wine",
+        "url": "https://www.totalwine.com/spirits/scotch/single-malt/glenmorangie-quinta-ruban-14-year-single-malt-scotch/p/220061750?srsltid=AfmBOorSfC_Ef1jHMghogYwly9-Wy4_IwMNacG25p2r-DfwYxupZNwrW",
+        "domain": "totalwine.com",
+        "description": "Quinta Ruban 14 year has spent 10 years maturing in American white oak casks, before being transferred into specially selected ruby port pipes.",
+        "extraSnippets": [
+          "Glenmorangie Quinta Ruban 14 Year Single Malt Scotch 750ml Bottle - ![Glenmorangie Quinta Ruban 14 Year Single Malt Scotch 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/"
+        ]
+      },
+      {
+        "title": "Glenmorangie 14 year old Quinta Ruban - Whisky Advocate",
+        "url": "https://whiskyadvocate.com/glenmorangie-14-year-old-quinta-ruban",
+        "domain": "whiskyadvocate.com",
+        "description": "ABV: 46% ○ Price: $55 ○ Style: Single Malt ○ Origin: Scotland (Highland). Buy Now. This Quinta Ruban succeeds the 12 year old version, adding two additional ...",
+        "extraSnippets": [
+          "Back [Save](https://www.pinterest.com/pin/create/button/?guid=KFWqGHH0db5q-1&url=https%3A%2F%2Fwhiskyadvocate.com%2FGlenmorangie-14-year-old-Quinta-Ruban&media=%2Fget%2Ffiles%2Fima"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a57408a338a004e723176f2493ffd21ea94dce603bcdb37f5263f0dfa6b17288",
+    "mode": "auto"
+  }
+}

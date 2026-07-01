@@ -25,9 +25,6 @@ describe("releaseIdentity", () => {
         abv: null,
         singleCask: null,
         caskStrength: null,
-        caskFill: null,
-        caskType: null,
-        caskSize: null,
       }),
     ).toBe(false);
 
@@ -66,9 +63,6 @@ describe("releaseIdentity", () => {
           abv: null,
           singleCask: true,
           caskStrength: null,
-          caskFill: null,
-          caskType: null,
-          caskSize: null,
         },
       }),
     ).toBe(false);
@@ -89,9 +83,6 @@ describe("releaseIdentity", () => {
           abv: null,
           singleCask: true,
           caskStrength: null,
-          caskFill: null,
-          caskType: null,
-          caskSize: null,
         },
       }),
     ).toBe(false);
@@ -112,9 +103,6 @@ describe("releaseIdentity", () => {
           abv: null,
           singleCask: null,
           caskStrength: true,
-          caskFill: null,
-          caskType: null,
-          caskSize: null,
         },
       }),
     ).toBe(false);
@@ -135,9 +123,6 @@ describe("releaseIdentity", () => {
           abv: null,
           singleCask: true,
           caskStrength: null,
-          caskFill: null,
-          caskType: null,
-          caskSize: null,
         },
       }),
     ).toBe(true);
@@ -217,9 +202,6 @@ describe("releaseIdentity", () => {
         abv: 43,
         singleCask: null,
         caskStrength: null,
-        caskFill: null,
-        caskType: null,
-        caskSize: null,
       },
     });
 
@@ -254,9 +236,6 @@ describe("releaseIdentity", () => {
           abv: null,
           singleCask: true,
           caskStrength: null,
-          caskFill: null,
-          caskType: null,
-          caskSize: null,
         },
       }),
     ).toEqual({
@@ -273,9 +252,6 @@ describe("releaseIdentity", () => {
         abv: null,
         release_year: null,
         vintage_year: null,
-        cask_type: null,
-        cask_size: null,
-        cask_fill: null,
         cask_strength: null,
         single_cask: null,
       }),
@@ -288,9 +264,6 @@ describe("releaseIdentity", () => {
         abv: null,
         release_year: null,
         vintage_year: null,
-        cask_type: null,
-        cask_size: null,
-        cask_fill: null,
         cask_strength: null,
         single_cask: null,
       }),

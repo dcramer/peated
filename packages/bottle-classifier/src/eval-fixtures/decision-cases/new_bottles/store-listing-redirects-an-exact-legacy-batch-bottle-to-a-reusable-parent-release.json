@@ -17,9 +17,6 @@
       "abv": null,
       "release_year": null,
       "vintage_year": null,
-      "cask_type": null,
-      "cask_size": null,
-      "cask_fill": null,
       "cask_strength": null,
       "single_cask": null,
       "edition": "Batch 4"
@@ -42,9 +39,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 1,
         "source": ["exact"],
         "bottleId": 661,
@@ -67,9 +61,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.91,
         "source": ["text"],
         "bottleId": 660,
@@ -92,9 +83,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.86,
         "source": ["text"],
         "bottleId": 662,
@@ -107,6 +95,9 @@
     "action": "create_release",
     "identityScope": "product",
     "parentBottleId": 660,
-    "summary": "Treat the exact batch bottle hit as a legacy release-like row and create Batch 4 beneath the reusable Cadboll Estate parent bottle instead."
+    "proposedRelease": {
+      "edition": "Batch 4"
+    },
+    "summary": "Treat the exact batch bottle hit as a legacy release-like row and create Batch 4 beneath the clean reusable Cadboll Estate parent bottle."
   }
 }

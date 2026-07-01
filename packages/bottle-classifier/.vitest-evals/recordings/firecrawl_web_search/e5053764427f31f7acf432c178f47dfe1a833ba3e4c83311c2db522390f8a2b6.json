@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T02:22:45.647Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Woodford Reserve Kentucky Straight Malt Whiskey ReserveBar 45.2"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Woodford Reserve Kentucky Straight Malt Whiskey ReserveBar 45.2",
+    "summary": "This malt whiskey shows some maple syrup and honey sweetness, but its character comes from savory notes of earthiness and wet leaves. Back Save ![](https://whiskyadvocate.com/?resize=1290&crop=237x21,0x0) ### 86 Score # Woodford Reserve Straight Malt Whiskey, 45.2% Price: $35.00● Issue: Fall 2018 ● Reviewer: Jeffery Li",
+    "results": [
+      {
+        "title": "Woodford Reserve Straight Malt Whiskey, 45.2%",
+        "url": "https://whiskyadvocate.com/Woodford-Reserve-Straight-Malt-Whiskey-45-2",
+        "domain": "whiskyadvocate.com",
+        "description": "This malt whiskey shows some maple syrup and honey sweetness, but its character comes from savory notes of earthiness and wet leaves.",
+        "extraSnippets": [
+          "Back Save ![](https://whiskyadvocate.com/?resize=1290&crop=237x21,0x0) ### 86 Score # Woodford Reserve Straight Malt Whiskey, 45.2% Price: $35.00● Issue: Fall 2018 ● Reviewer: Jeff"
+        ]
+      },
+      {
+        "title": "Malt Whiskey",
+        "url": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": "Woodford Reserve is a Kentucky Straight Malt Whiskey crafted from 51% malt and aged in new charred oak barrels, making it the malt whiskey for bourbon drinkers.",
+        "extraSnippets": [
+          "[Skip to main content](https://www.woodfordreserve.com/whiskey/malt-whiskey/#main-content) ![Star.](https://www.woodfordreserve.com/wp-content/themes/woodford/dist/img/icons/star.s"
+        ]
+      },
+      {
+        "title": "Woodford Reserve Kentucky Straight Malt Whiskey",
+        "url": "https://flaviar.com/products/woodford-reserve-kentucky-straight-malt-whiskey-750",
+        "domain": "flaviar.com",
+        "description": "This is an American Straight Malt Whiskey. So, that should tell you that the mash bill is 51% malted barley. The rest is 47% corn and only 2% rye.",
+        "extraSnippets": [
+          "[My Wishlist](https://flaviar.com/products/woodford-reserve-kentucky-straight-malt-whiskey-750#swym-wishlist) 0 Please note: This website includes an accessibility system. Press Co"
+        ]
+      },
+      {
+        "title": "Review #209 - Woodford Reserve Kentucky Straight Malt ...",
+        "url": "https://www.reddit.com/r/bourbon/comments/1ablfpn/review_209_woodford_reserve_kentucky_straight/",
+        "domain": "reddit.com",
+        "description": ": 45.2% ABV. Details: Mashbill contains 51% malted barley. Tasting Methodology: Reviewed 3 times over 15 months; bottles at 100%, 70%, and 50 ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Woodford Reserve Kentucky Straight Malt Whiskey 45.2% ...",
+        "url": "https://www.pricerunner.com/pl/1424-3200242299/Beer-Spirits/Woodford-Reserve-Kentucky-Straight-Malt-Whiskey-45.2-70cl-Compare-Prices",
+        "domain": "pricerunner.com",
+        "description": "Lowest price for Woodford Reserve Kentucky Straight Malt Whiskey 45.2% 70cl is £41.75. This is currently the cheapest offer among 6 stores. If you are looking ...",
+        "extraSnippets": [
+          "![Woodford Reserve Kentucky Straight Malt Whiskey 45.2% 70cl](https://owp.klarna.com/product/252x252/3002307021/Woodford-Reserve-Kentucky-Straight-Malt-Whiskey-45.2-70cl.jpg?ph=tru"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e5053764427f31f7acf432c178f47dfe1a833ba3e4c83311c2db522390f8a2b6",
+    "mode": "auto"
+  }
+}

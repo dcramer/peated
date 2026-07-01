@@ -64,9 +64,6 @@ function buildParentCandidate(
     abv: null,
     singleCask: null,
     caskStrength: null,
-    caskFill: null,
-    caskType: null,
-    caskSize: null,
     ...overrides,
   };
 }

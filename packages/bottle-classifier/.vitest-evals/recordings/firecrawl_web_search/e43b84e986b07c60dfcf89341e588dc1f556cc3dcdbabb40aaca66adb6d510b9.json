@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T04:22:13.221Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition 2001 whisky"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker Distillers Edition 2001 whisky",
+    "summary": "Soft, oily, sweet-woody, pepper wave, berry jam, creamy notes, caramel, light shades of burnt crackers and kvass, dry medicinal herbs, peat in ... **Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?__cf_chl_f_tk=h_2UUqcBQG_FKnixf1ZCmWekRePCzd8CRH",
+    "results": [
+      {
+        "title": "Talisker 2001 - Ratings and reviews",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": "Soft, oily, sweet-woody, pepper wave, berry jam, creamy notes, caramel, light shades of burnt crackers and kvass, dry medicinal herbs, peat in ...",
+        "extraSnippets": [
+          "**Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?__cf_chl_f_tk=h_2UUqcBQG_FKnixf1ZCmWekRePCzd8CRHU8Wuvwu"
+        ]
+      },
+      {
+        "title": "Talisker 1988, The Distillers Edition 2001 Bottling",
+        "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+        "domain": "thewhiskyvault.com",
+        "description": "This rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001.",
+        "extraSnippets": [
+          "- [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=25536) [CHFS"
+        ]
+      },
+      {
+        "title": "Review #2340 - Talisker Distiller's Edition : r/Scotch",
+        "url": "https://www.reddit.com/r/Scotch/comments/1fklplw/review_2340_talisker_distillers_edition/",
+        "domain": "reddit.com",
+        "description": "Briny sea air with a pop of toffee, fruits, wine and sweet butter cream. Overall: Talisker knows just how to draw me in and keep me interested.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker 2001 Distillers Edition",
+        "url": "https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition?srsltid=AfmBOop0SbHMXC-Z_G7F7tIPWENJFx-kFjyjTSK_6e4MH6oYcjN1LqvP",
+        "domain": "thewhiskybarrel.com",
+        "description": "Very clean and intense, with light smoke soon appearing. Creamy toffee, with fruit acidity. The palate is sweet to start, with smoke and tar abruptly exploding ...",
+        "extraSnippets": [
+          "[Skip to content](https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition#MainContent) ## Your cart is empty [Continue shopping](https://www.thewhiskybarrel.com/c"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition | Whisky Review",
+        "url": "https://www.youtube.com/watch?v=mS3NIH0-v08",
+        "domain": "youtube.com",
+        "description": "Taliska Distillers Edition belongs to my all-time favorite and this is it. So you immediately get a mouthful.",
+        "extraSnippets": [
+          "Talisker Distillers Edition \\| Whisky Review Tap to unmute 2x Copy link Info Shopping ![](https://i.ytimg.com/an/nCE0-pPZuit8aud1l9rhkA/featured_channel.jpg?v=5ed8eafa) If playback"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e43b84e986b07c60dfcf89341e588dc1f556cc3dcdbabb40aaca66adb6d510b9",
+    "mode": "auto"
+  }
+}

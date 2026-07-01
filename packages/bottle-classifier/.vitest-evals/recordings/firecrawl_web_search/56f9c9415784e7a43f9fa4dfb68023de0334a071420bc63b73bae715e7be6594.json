@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:17:29.447Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition double matured 2001 release year vintage"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker Distillers Edition double matured 2001 release year vintage",
+    "summary": "This rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001. - [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=255",
+    "results": [
+      {
+        "title": "Talisker 1988, The Distillers Edition 2001 Bottling | The Whisky Vault",
+        "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+        "domain": "thewhiskyvault.com",
+        "description": "This rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001.",
+        "extraSnippets": [
+          "- [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=25536) [CHFS"
+        ]
+      },
+      {
+        "title": "Review #2340 - Talisker Distiller's Edition : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/1fklplw/review_2340_talisker_distillers_edition/",
+        "domain": "reddit.com",
+        "description": "A 2020 release from Diageo-owned Scottish distillery Talisker, this is Talisker The Distillers Edition, a single malt aged in American oak and ex-Amoroso ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Review: Talisker Distillers Edition 2011 - Distilled 2001 - Drinkhacker",
+        "url": "https://www.drinkhacker.com/2012/05/21/review-talisker-distillers-edition-2012-distilled-2001/?srsltid=AfmBOordykkUyeK5y6-KWfAP6oQkQ1aMfqWVc5UcGwRNdRxSLrVEfxgV",
+        "domain": "drinkhacker.com",
+        "description": "Not overly woody (it's just 10 years old, after all) this is a well structured whisky that's both easy to sip on yet more complex than you'd ...",
+        "extraSnippets": [
+          "[Skip to content](https://www.drinkhacker.com/2012/05/21/review-talisker-distillers-edition-2012-distilled-2001/#fl-main-content) # Review: Talisker Distillers Edition 2011 – Disti"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition | Whisky Review - YouTube",
+        "url": "https://www.youtube.com/watch?v=mS3NIH0-v08",
+        "domain": "youtube.com",
+        "description": "... Talisker Distillers Edition. This Talisker belongs to the Distillers Edition of the Classic Malts of Scotland. The Single Malt matured for ...",
+        "extraSnippets": [
+          "Talisker Distillers Edition \\| Whisky Review Tap to unmute 2x Copy link Info Shopping ![](https://i.ytimg.com/an/nCE0-pPZuit8aud1l9rhkA/featured_channel.jpg?v=5ed8eafa) If playback"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition 1988/2001 (45.8%, OB, TD-S: 5CO)",
+        "url": "https://masterquill.com/2012/06/17/talisker-distillers-edition-19882001-45-8-ob-td-s-5co/",
+        "domain": "masterquill.com",
+        "description": "Taste: it's a Talisker all right. It seems to be less peaty, added licorice and more woody. The Amoroso casks do give off some extra wood. If ...",
+        "extraSnippets": [
+          "- [Leave a comment](https://masterquill.com/2012/06/17/talisker-distillers-edition-19882001-45-8-ob-td-s-5co/#respond) ![](https://masterquill.com/wp-content/uploads/2012/06/talisk"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "56f9c9415784e7a43f9fa4dfb68023de0334a071420bc63b73bae715e7be6594",
+    "mode": "auto"
+  }
+}

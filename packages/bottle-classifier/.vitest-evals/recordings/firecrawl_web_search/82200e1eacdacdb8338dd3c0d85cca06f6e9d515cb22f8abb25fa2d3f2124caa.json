@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:13:32.344Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Glenmorangie Cadboll Estate 15 Batch 4"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Glenmorangie Cadboll Estate 15 Batch 4",
+    "summary": "The first Cadboll Estate release to be wholly matured in our bespoke designer ex-bourbon casks. A unique barrel selection small batch release. Glenmorangie 15 Year Old Cadboll Estate Batch 4 750ml Bottle - ![Glenmorangie 15 Year Old Cadboll Estate Batch 4 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/images/",
+    "results": [
+      {
+        "title": "Glenmorangie 15 Year Old Cadboll Estate Batch 4",
+        "url": "https://www.totalwine.com/spirits/scotch/glenmorangie-15-year-old-cadboll-estate-batch-4/p/2126251327?srsltid=AfmBOooKqMGEGmfYZkkJ52JgP6Z1l7l2KW3z9eC3gkDGujmVq3DXX9Lx",
+        "domain": "totalwine.com",
+        "description": "The first Cadboll Estate release to be wholly matured in our bespoke designer ex-bourbon casks. A unique barrel selection small batch release.",
+        "extraSnippets": [
+          "Glenmorangie 15 Year Old Cadboll Estate Batch 4 750ml Bottle - ![Glenmorangie 15 Year Old Cadboll Estate Batch 4 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/images/212"
+        ]
+      },
+      {
+        "title": "Review #11 - Glenmorangie 15 - The Cadboll Estate",
+        "url": "https://www.reddit.com/r/Scotch/comments/1ow8vc3/review_11_glenmorangie_15_the_cadboll_estate/",
+        "domain": "reddit.com",
+        "description": "Batch 4 in 2024. ABV: 43% Age: 15-Year-Old Original SRP: ~$99 Price Paid: ~$89. Silky mouthfeel and sweet vanilla",
+        "extraSnippets": []
+      },
+      {
+        "title": "Glenmorangie The Cadboll Estate 15 year old (Batch 4), 43%",
+        "url": "https://whiskyadvocate.com/Glenmorangie-The-Cadboll-Estate-15-year-old-Batch-4-43",
+        "domain": "whiskyadvocate.com",
+        "description": "The Cadboll Estate 15 year old (Batch 4), 43% Price: $100.00. The nose is buttery, with creamy vanilla, brioche, honeycomb, flowers, and delicate white pear, ...",
+        "extraSnippets": [
+          "Back Save ![](https://whiskyadvocate.com/get/files/image/galleries/Glenmorangie-Cadboll-70cl-2023-bottle-front-view_(1)_300.png) ### 94 Score # Glenmorangie The Cadboll Estate 15 y"
+        ]
+      },
+      {
+        "title": "Glenmorangie The Cadboll Estate 15 Year Old",
+        "url": "https://flaviar.com/products/glenmorangie-the-cadboll-estate-15-year-old-750",
+        "domain": "flaviar.com",
+        "description": "Oaky nose with intense aromas of biscuit and citrus, enhanced with notes of honeycomb, rose, and jasmine. ... Rounded creaminess with flavors of butter, white ...",
+        "extraSnippets": [
+          "[My Wishlist](https://flaviar.com/products/glenmorangie-the-cadboll-estate-15-year-old-750#swym-wishlist) 0 Please note: This website includes an accessibility system. Press Contro"
+        ]
+      },
+      {
+        "title": "The Cadboll Estate, 2024 Batch 4",
+        "url": "https://www.glenmorangie.com/en-us/pages/the-cadboll-estate?srsltid=AfmBOooSXkTJojV6nAQXCCZLRigxoOP23TczfSPNB4OjlMc1cliWAM7A",
+        "domain": "glenmorangie.com",
+        "description": "Buy Online. The Cadboll Estate 2024 is our whisky created entirely with Barley from our own fields & water from our Scottish Highlands spring.",
+        "extraSnippets": [
+          "Some content that you'd like to display in a modalDismiss #### My Basket (0) Oh, your basket appears to be empty Add some of our delicious Whisky to your basket to discover the won"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "82200e1eacdacdb8338dd3c0d85cca06f6e9d515cb22f8abb25fa2d3f2124caa",
+    "mode": "auto"
+  }
+}

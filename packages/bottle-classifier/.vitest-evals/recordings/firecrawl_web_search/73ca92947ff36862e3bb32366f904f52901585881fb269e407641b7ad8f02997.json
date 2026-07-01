@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T01:21:06.436Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "The Glenlivet Caribbean Reserve rum barrel selection"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "The Glenlivet Caribbean Reserve rum barrel selection",
+    "summary": "The inviting palate offers caramel, toffee, citrus, vanilla, and melon notes. It's medium-bodied and mildly sweet with a long finish. Savour solo after a meal. [Skip to Content](https://www.lcbo.com/en/the-glenlivet-caribbean-reserve-single-malt-scotch-21309#contentarea) The store will not work correctly when cookies a",
+    "results": [
+      {
+        "title": "The Glenlivet Caribbean Reserve Single Malt Scotch Whisky - LCBO",
+        "url": "https://www.lcbo.com/en/the-glenlivet-caribbean-reserve-single-malt-scotch-21309?srsltid=AfmBOopsEQ-EuX-rWsVi8aF_az4Gvez-yf5p889DE6polbDgHpUhZZdk",
+        "domain": "lcbo.com",
+        "description": "The inviting palate offers caramel, toffee, citrus, vanilla, and melon notes. It's medium-bodied and mildly sweet with a long finish. Savour solo after a meal.",
+        "extraSnippets": [
+          "[Skip to Content](https://www.lcbo.com/en/the-glenlivet-caribbean-reserve-single-malt-scotch-21309#contentarea) The store will not work correctly when cookies are disabled. All sto"
+        ]
+      },
+      {
+        "title": "Glenlivet Caribbean Reserve Review - Rum Barrel Selection",
+        "url": "https://secretwhiskeysociety.com/glenlivet-caribbean-reserve-review-rum-barrel-selection/",
+        "domain": "secretwhiskeysociety.com",
+        "description": "Region: Banffshire, Scotland. Aging: No Age Statement – Selectively Finished In Caribbean Rum Barrels. ABV: 40%. Proof: 80. Price: $50.",
+        "extraSnippets": [
+          "- About WordPress - [WordPress.org](https://wordpress.org/) - [Documentation](https://wordpress.org/documentation/) - [Learn WordPress](https://learn.wordpress.org/) - [Support](ht"
+        ]
+      },
+      {
+        "title": "Glenlivet Caribbean Reserve Rum Barrel Selection 2021 Release ...",
+        "url": "https://caskcartel.com/products/glenlivet-caribbean-reserve-rum-barrel-selection-2021-release-single-malt-scotch-whisky-700ml",
+        "domain": "caskcartel.com",
+        "description": "Whiskey: Glenlivet Caribbean Reserve Rum Barrel Selection 2021 Release Single Malt Scotch | 700ML. The strength of this whisky is 40.0 % Vol. bottle ...",
+        "extraSnippets": [
+          "United States - [United States](https://caskcartel.com/products/glenlivet-caribbean-reserve-rum-barrel-selection-2021-release-single-malt-scotch-whisky-700ml) - [Spain](about:blank"
+        ]
+      },
+      {
+        "title": "The Glenlivet Caribbean Reserve Single Malt Whisky (Rum Barrel ...",
+        "url": "https://www.amazon.co.uk/Glenlivet-Caribbean-Reserve-Single-Whisky/dp/B08H6JBMR2",
+        "domain": "amazon.co.uk",
+        "description": "Speyside single malt finished in Caribbean rum barrels, with notes of ripe banana and pear. Enjoy neat, on the rocks, or in a pineapple and peach cocktail.",
+        "extraSnippets": [
+          "#### Select your cookie preferences We use cookies and similar tools that are necessary to enable you to make purchases, to enhance your shopping experiences and to provide our ser"
+        ]
+      },
+      {
+        "title": "Glenlivet Scotch Single Malt Caribbean Reserve Rum Barrel ...",
+        "url": "https://www.remedyliquor.com/products/glenlivet-scotch-single-malt-caribbean-reserve-rum-barrel-selection-750ml?srsltid=AfmBOoqvwPwiUTCWvA-viUkschrlci_e5Jg41Jc-C9xiY1Y1IOsTitQL",
+        "domain": "remedyliquor.com",
+        "description": "$30.99 USD Sale price $25.99 ...",
+        "extraSnippets": [
+          "![Spinner: White decorative](https://cdn.userway.org/widgetapp/images/spin_wh.svg) ![](https://cdn.userway.org/widgetapp/images/body_wh.svg) ![Spinner: White decorative](https://cd"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "73ca92947ff36862e3bb32366f904f52901585881fb269e407641b7ad8f02997",
+    "mode": "auto"
+  }
+}

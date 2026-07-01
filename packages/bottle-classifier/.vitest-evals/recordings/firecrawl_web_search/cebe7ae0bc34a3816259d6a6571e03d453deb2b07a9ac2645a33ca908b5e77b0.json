@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-06-30T23:51:13.699Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Glenglassaugh 1978 Rare Cask Release Batch 1 35 year old"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Glenglassaugh 1978 Rare Cask Release Batch 1 35 year old",
+    "summary": "A rare single cask Glenglassaugh 1978 bottled as a 35-year-old without colouring or chill filtration in 2014 for Batch 1 of the distillery's Rare Cask Releases. [Skip to content](https://www.whisky-online.com/products/glenglassaugh-1978-2014-35-year-old-rare-cask-release-single-cask-1803#mainContent) Search When using ",
+    "results": [
+      {
+        "title": "Glenglassaugh 1978 - 35 Year Old - Single Cask 1803",
+        "url": "https://www.whisky-online.com/products/glenglassaugh-1978-2014-35-year-old-rare-cask-release-single-cask-1803?srsltid=AfmBOooGDUm1KjqytJDQn1ShKvDxH0DlVobDt3nHzozAMRpVhDLauUgh",
+        "domain": "whisky-online.com",
+        "description": "A rare single cask Glenglassaugh 1978 bottled as a 35-year-old without colouring or chill filtration in 2014 for Batch 1 of the distillery's Rare Cask Releases.",
+        "extraSnippets": [
+          "[Skip to content](https://www.whisky-online.com/products/glenglassaugh-1978-2014-35-year-old-rare-cask-release-single-cask-1803#mainContent) Search When using our search, keep the "
+        ]
+      },
+      {
+        "title": "Glenglassaugh 1978 Batch 1 Port Hogshead Cask 1810 35 Year ...",
+        "url": "https://caskcartel.com/products/glenglassaugh-1978-batch-1-port-hogshead-cask-1810-35-year-old-single-malt-scotch-whisky",
+        "domain": "caskcartel.com",
+        "description": "Finished in single port wine cask. This bottle is part of Glenglassaugh's first series of rare cask whiskies and was distilled in 1978, just 279 ...",
+        "extraSnippets": [
+          "United States - [United States](https://caskcartel.com/products/glenglassaugh-1978-batch-1-port-hogshead-cask-1810-35-year-old-single-malt-scotch-whisky) - [Spain](about:blank#) - "
+        ]
+      },
+      {
+        "title": "Glenglassaugh 1978 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/53799/glenglassaugh-1978",
+        "domain": "whiskybase.com",
+        "description": "Glenglassaugh 1978 35 yr. This is the 700 ml from 1978. The strength of this whisky is 41.6 % Vol. A bottle from Glenglassaugh.",
+        "extraSnippets": [
+          "**Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/53799/glenglassaugh-1978?__cf_chl_f_tk=S16UemP4FSfqxBajOswewhYATPfdCmIaaDRI"
+        ]
+      },
+      {
+        "title": "Glenglassaugh Rare Cask Release 35 Year Old Port Hogshead ...",
+        "url": "https://www.wine-searcher.com/find/glenglassaugh+rare+cask+35+old+port+hogs+head+single+malt+scotch+whisky+highlands+scotland?srsltid=AfmBOorYa9LJPB78HtJZnZBwPp4tyHLjGyMBQecb9rWhp7KoN0seyXa1",
+        "domain": "wine-searcher.com",
+        "description": "Matured in a Port Hogshead cask numbered 1810. This is among the highest-priced whiskies from Highlands. The price has been stable over the past year.",
+        "extraSnippets": [
+          "~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at"
+        ]
+      },
+      {
+        "title": "Glenglassaugh - Whisky Online Cyprus",
+        "url": "https://whiskyonlinecy.com/product-category/glenglassaugh/",
+        "domain": "whiskyonlinecy.com",
+        "description": "Glenglassaugh 35 Year Old 1978 (cask 1810) Rare Cask Release Batch 1 70cl, 42.9%. €1,350 Original price was: €1,350. €1,180 ...",
+        "extraSnippets": [
+          "[Skip to content](https://whiskyonlinecy.com/product-category/glenglassaugh/?v=0b3b97fa6688#main) FilterFilter Showing all 17 results Default sortingSort by popularitySort by lates"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "cebe7ae0bc34a3816259d6a6571e03d453deb2b07a9ac2645a33ca908b5e77b0",
+    "mode": "auto"
+  }
+}

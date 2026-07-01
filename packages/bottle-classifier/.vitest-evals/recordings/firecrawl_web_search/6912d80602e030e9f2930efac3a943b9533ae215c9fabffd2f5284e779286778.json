@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-06-30T19:32:48.830Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "\"The Exclusive Malts\" Islay 8 year old 2007 57.1% 1661 312 bottles"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "\"The Exclusive Malts\" Islay 8 year old 2007 57.1% 1661 312 bottles",
+    "summary": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%). $194.99. In stock. The Exclusive Malts - Islay Distillery - 2007 - Aged 8 Years (57.1 ... ![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [",
+    "results": [
+      {
+        "title": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%)",
+        "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/",
+        "domain": "norfolkwineandspirits.com",
+        "description": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%). $194.99. In stock. The Exclusive Malts - Islay Distillery - 2007 - Aged 8 Years (57.1 ...",
+        "extraSnippets": [
+          "![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](https://norfolkw"
+        ]
+      },
+      {
+        "title": "The Exclusive Malts “Islay” 8 Year 2007 (57.1% abv)",
+        "url": "https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/",
+        "domain": "maltimpostor.com",
+        "description": "The Exclusive Malts “Islay” 8 Year 2007 57% is Cash and Cary–In reference to Cary Grant and his second wife, Barbara Woolworth Hutton, heiress ...",
+        "extraSnippets": [
+          "[MENU](https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/#) _![](http://maltimpostor.com/wp-content/uploads/2017/01/Exclusive-Malts-Islay-8-Year-2007-26"
+        ]
+      },
+      {
+        "title": "The Creative Whisky Co. 'The Exclusive Malts' Islay Distillery 8 Year ...",
+        "url": "https://www.wine-searcher.com/find/the+creative+whisky+co+exclusive+malts+distil+eight+old+single+malt+scotch+islay+scotland?srsltid=AfmBOoqG7oe_52AYQGB_CuPmu_CRw9nwMUjme2dcaEf2GKBTxlAHF1PQ",
+        "domain": "wine-searcher.com",
+        "description": "'The Exclusive Malts' Islay Distillery 8 Year Old Single Malt Scotch Whisky. Islay, Scotland. Avg Price (ex-tax); $ 195 ...",
+        "extraSnippets": [
+          "~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at"
+        ]
+      },
+      {
+        "title": "Creative Whisky Company The Exclusive Malts Islay 2007 8 Year ...",
+        "url": "https://www.whiskimen.com/product/creative-whisky-company-the-exclusive-malts-islay-2007-8-years-old-single-malt-whisky/",
+        "domain": "whiskimen.com",
+        "description": "Creative Whisky Company The Exclusive Malts Islay 2007 8 Year Old Single Malt Whisky. $1,550. In stock. Purchase this product now and earn 15 Points!",
+        "extraSnippets": [
+          "[Skip to content](https://www.whiskimen.com/product/creative-whisky-company-the-exclusive-malts-islay-2007-8-years-old-single-malt-whisky/#content) ## keep in touch ## with our lat"
+        ]
+      },
+      {
+        "title": "Isle Of Islay 2007 10 Year Old The Exclusive Malts - Lot 72917",
+        "url": "https://whisky.auction/auctions/lot/72917/isle-of-islay-2007-10-year-old-the-exclusive-malts",
+        "domain": "whisky.auction",
+        "description": "This is one of 285; it was bottled from cask number 200703. This Isle Of Islay 2007 10 Year Old The Exclusive Malts sold at our online auction for £50 ...",
+        "extraSnippets": [
+          "#### Confirm your bid ![Isle Of Islay 2007 10 Year Old The Exclusive Malts The Creative Whisky Co. - The Whisky Barrel 70cl / 57.1%](https://whisky.auction/Content/images/common/3x"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6912d80602e030e9f2930efac3a943b9533ae215c9fabffd2f5284e779286778",
+    "mode": "auto"
+  }
+}

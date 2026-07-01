@@ -1,0 +1,200 @@
+{
+  "id": "store-listing-creates-mastersons-french-oak-finish-instead-of-matching-plain-rye-or-barrel-specific-bottle",
+  "name": "store listing: creates Masterson's French Oak Finish instead of matching plain rye sibling",
+  "input": {
+    "reference": {
+      "name": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10-year-old",
+      "url": "https://woodencork.com/collections/whiskey/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr?utm=peated"
+    },
+    "extractedIdentity": {
+      "brand": "Masterson's",
+      "bottler": null,
+      "expression": null,
+      "series": null,
+      "distillery": [],
+      "category": "rye",
+      "stated_age": 10,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "bottleId": 16442,
+        "releaseId": null,
+        "alias": null,
+        "fullName": "Masterson's 10-year-old Straight Rye French Oak Finish (Barrel F2-038)",
+        "bottleFullName": "Masterson's 10-year-old Straight Rye French Oak Finish (Barrel F2-038)",
+        "brand": "Masterson's",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "rye",
+        "statedAge": 10,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 1,
+        "source": ["text"]
+      },
+      {
+        "kind": "bottle",
+        "bottleId": 44029,
+        "releaseId": null,
+        "alias": "Masterson's 10-year-old Rye",
+        "fullName": "Masterson's 10-year-old Rye",
+        "bottleFullName": "Masterson's 10-year-old Rye",
+        "brand": "Masterson's",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "rye",
+        "statedAge": 10,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.8278045975157606,
+        "source": ["vector"]
+      },
+      {
+        "kind": "release",
+        "bottleId": 44029,
+        "releaseId": 220,
+        "alias": "Masterson's 10-year-old Rye (batch PSF3)",
+        "fullName": "Masterson's 10-year-old Rye - Batch PSF3",
+        "bottleFullName": "Masterson's 10-year-old Rye",
+        "brand": "Masterson's",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "rye",
+        "statedAge": 10,
+        "edition": "Batch PSF3",
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.7830429440928286,
+        "source": ["vector", "release"]
+      },
+      {
+        "kind": "release",
+        "bottleId": 44029,
+        "releaseId": 221,
+        "alias": "Masterson's 10-year-old Rye (batch PSH3)",
+        "fullName": "Masterson's 10-year-old Rye - Batch PSH3",
+        "bottleFullName": "Masterson's 10-year-old Rye",
+        "brand": "Masterson's",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "rye",
+        "statedAge": 10,
+        "edition": "Batch PSH3",
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.7683974525911043,
+        "source": ["vector", "release"]
+      },
+      {
+        "kind": "release",
+        "bottleId": 44029,
+        "releaseId": 219,
+        "alias": "Masterson's 10-year-old Rye (batch PSA3)",
+        "fullName": "Masterson's 10-year-old Rye - Batch PSA3",
+        "bottleFullName": "Masterson's 10-year-old Rye",
+        "brand": "Masterson's",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "rye",
+        "statedAge": 10,
+        "edition": "Batch PSA3",
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.7639288083890696,
+        "source": ["vector", "release"]
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["masterson", "french", "oak"],
+      "results": [
+        {
+          "kind": "bottle",
+          "bottleId": 16442,
+          "releaseId": null,
+          "alias": null,
+          "fullName": "Masterson's 10-year-old Straight Rye French Oak Finish (Barrel F2-038)",
+          "bottleFullName": "Masterson's 10-year-old Straight Rye French Oak Finish (Barrel F2-038)",
+          "brand": "Masterson's",
+          "bottler": null,
+          "series": null,
+          "distillery": [],
+          "category": "rye",
+          "statedAge": 10,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "score": 1,
+          "source": ["text"]
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://whiskyadvocate.com/Masterson-s-10-year-old-Straight-Rye-French-Oak-Finish-Barrel-F2-038-45",
+      "https://www.caskers.com/masterson-s-10-year-old-straight-rye-whiskey/",
+      "https://bottlebuzz.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr?srsltid=AfmBOoqLcNQLm0OzwfezGxzwWX4HYIDymdGjfif0gG9gB6j1_oFyHkYo",
+      "https://www.caskers.com/masterson-s-10-year-old-rye-whiskey-barrel-finished-in-french-oak/?srsltid=AfmBOooPdFUlDye8WBWFK9PoqyylVhvxM3MrhVgzX_ib2dD04Xfk2j14"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "releaseId": null,
+      "createsBottle": true,
+      "createsRelease": false,
+      "summary": "Create a clean Masterson's 10-year-old Straight Rye French Oak Finish bottle for the store price. Do not redirect to the plain Masterson's 10-year-old Rye bottle 44029 or its batch-coded child releases; do not match the narrower Barrel F2-038 bottle 16442."
+    },
+    "notes": "Caskers search results list Masterson's 10 Year Old Straight Rye Whiskey and Masterson's 10 Year Old Rye Whiskey Barrel Finished in French Oak as separate product pages, so the French Oak wording is not merely an optional title suffix for the plain rye candidate. The existing Barrel F2-038 bottle is narrower than the observed store listing, so the correct current DB outcome is a clean French Oak bottle creation."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "matchedReleaseId": null,
+    "proposedBottle": {
+      "brand": {
+        "name": "Masterson's"
+      },
+      "category": "rye",
+      "statedAge": 10
+    },
+    "proposedBottleNameIncludes": ["French Oak"],
+    "proposedBottleNameExcludes": ["Barrel F2-038", "F2-038"],
+    "summary": "Create a clean Masterson's French Oak Finish bottle. The plain Masterson's 10-year-old Rye candidate and its PSA3/PSF3/PSH3 releases are different sibling identities, while the existing Barrel F2-038 bottle is a narrower cask-specific variant."
+  }
+}

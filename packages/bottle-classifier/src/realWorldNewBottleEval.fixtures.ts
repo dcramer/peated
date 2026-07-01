@@ -19,6 +19,7 @@ export type RealWorldNewBottleEvalCase = {
   input: ClassifyBottleReferenceInput;
   searchResponses?: SearchResponseFixture[];
   expectedBottleName: string;
+  expectedBottleNames?: string[];
   expected: BottleNormalizationExpectation;
   summary: string;
   peatedBottleIds: number[];
@@ -222,6 +223,7 @@ function buildEvalCase(
     },
     searchResponses: override?.searchResponses,
     expectedBottleName: fixture.expectedBottleName,
+    expectedBottleNames: fixture.expectedBottleNames,
     expected: fixture.expected,
     summary: fixture.summary,
     peatedBottleIds: fixture.peatedBottleIds,

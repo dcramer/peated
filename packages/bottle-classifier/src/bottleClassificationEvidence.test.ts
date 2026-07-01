@@ -26,9 +26,6 @@ function buildBottleCandidate(
     abv: null,
     vintageYear: null,
     releaseYear: null,
-    caskType: null,
-    caskSize: null,
-    caskFill: null,
     score: null,
     source: [],
     ...candidate,
@@ -192,9 +189,6 @@ describe("bottleClassificationEvidence", () => {
           abv: null,
           release_year: null,
           vintage_year: null,
-          cask_type: null,
-          cask_size: null,
-          cask_fill: null,
           cask_strength: null,
           single_cask: null,
           edition: null,
@@ -245,9 +239,6 @@ describe("bottleClassificationEvidence", () => {
           abv: null,
           release_year: null,
           vintage_year: null,
-          cask_type: null,
-          cask_size: null,
-          cask_fill: null,
           cask_strength: null,
           single_cask: null,
           edition: null,
@@ -298,9 +289,6 @@ describe("bottleClassificationEvidence", () => {
           abv: null,
           release_year: null,
           vintage_year: null,
-          cask_type: null,
-          cask_size: null,
-          cask_fill: null,
           cask_strength: null,
           single_cask: null,
           edition: "Batch 4",
@@ -311,7 +299,7 @@ describe("bottleClassificationEvidence", () => {
     ).toBe(false);
   });
 
-  test("does not treat plain age evidence as support when the extracted identity carries extra cask detail", () => {
+  test("treats plain age evidence as support after ignoring removed cask-detail fields", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 3233,
       fullName: "Isle of Jura 12-year-old Single Malt Scotch Whisky",
@@ -351,9 +339,6 @@ describe("bottleClassificationEvidence", () => {
           abv: null,
           release_year: null,
           vintage_year: null,
-          cask_type: "oloroso",
-          cask_size: null,
-          cask_fill: null,
           cask_strength: null,
           single_cask: null,
           edition: null,
@@ -361,7 +346,7 @@ describe("bottleClassificationEvidence", () => {
         targetCandidate,
         webEvidenceJudgment: "supportive",
       }),
-    ).toBe(false);
+    ).toBe(true);
   });
 
   test("does not treat plain age evidence as support for a named sibling expression", () => {
@@ -404,9 +389,6 @@ describe("bottleClassificationEvidence", () => {
           abv: null,
           release_year: null,
           vintage_year: null,
-          cask_type: null,
-          cask_size: null,
-          cask_fill: null,
           cask_strength: null,
           single_cask: null,
           edition: null,
@@ -474,9 +456,6 @@ describe("bottleClassificationEvidence", () => {
           abv: null,
           release_year: null,
           vintage_year: null,
-          cask_type: null,
-          cask_size: null,
-          cask_fill: null,
           cask_strength: null,
           single_cask: null,
           edition: "Batch 1",
@@ -501,9 +480,6 @@ describe("bottleClassificationEvidence", () => {
           abv: null,
           release_year: null,
           vintage_year: null,
-          cask_type: null,
-          cask_size: null,
-          cask_fill: null,
           cask_strength: null,
           single_cask: null,
           edition: null,
@@ -546,9 +522,6 @@ describe("bottleClassificationEvidence", () => {
           abv: null,
           release_year: null,
           vintage_year: null,
-          cask_type: null,
-          cask_size: null,
-          cask_fill: null,
           cask_strength: null,
           single_cask: null,
           edition: null,

@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-06-30T23:41:14.585Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Four Roses Single Barrel Barrel Strength bourbon"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Four Roses Single Barrel Barrel Strength bourbon",
+    "summary": "It is hard to believe this is a 100 proof bourbon. As each sip fades, currants and dark fruit leather mix with cinnamon, ginger, and pepper. There are also ... # Four Roses Single Barrel Review **Brian’s Four Roses Single Barrel** **Review** ![](https://i0.wp.com/whiskeyfortheages.com/wp-content/uploads/2019/11/Brian-P",
+    "results": [
+      {
+        "title": "Four Roses Single Barrel Review",
+        "url": "https://whiskeyfortheages.com/whiskey-reviews-brians-four-roses-single-barrel-review/",
+        "domain": "whiskeyfortheages.com",
+        "description": "It is hard to believe this is a 100 proof bourbon. As each sip fades, currants and dark fruit leather mix with cinnamon, ginger, and pepper. There are also ...",
+        "extraSnippets": [
+          "# Four Roses Single Barrel Review **Brian’s Four Roses Single Barrel** **Review** ![](https://i0.wp.com/whiskeyfortheages.com/wp-content/uploads/2019/11/Brian-Profile-Pic-2.jpg?res"
+        ]
+      },
+      {
+        "title": "Four Roses Single Barrel Collection, 2025",
+        "url": "https://www.bourbonguy.com/blog/2025/1/15/four-roses-single-barrel-collection-2025",
+        "domain": "bourbonguy.com",
+        "description": "This new lineup features three new 100-proof bourbons—OBSF, OESK, and OESO—alongside the classic OBSV. Each bottle, aged 7-9 years, showcases ...",
+        "extraSnippets": [
+          "Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog _I’d l"
+        ]
+      },
+      {
+        "title": "Review #4: Four Roses, single barrel, barrel strength, Fine ...",
+        "url": "https://www.reddit.com/r/bourbon/comments/1gpmru2/review_4_four_roses_single_barrel_barrel_strength/",
+        "domain": "reddit.com",
+        "description": "includes 35% Rye ABV: 56.8% minty, spicy, fruity, and robust. Strong and striking. s the strong herbal notes of mint and anise.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Four Roses Single Barrel Bourbon",
+        "url": "https://checkout.fourrosesbourbon.com/products/four-roses-single-barrel-bourbon",
+        "domain": "checkout.fourrosesbourbon.com",
+        "description": "100 proof. 50% ALC./VOL. Four Roses offers 4 distinct varieties; bourbon, small batch bourbon, single barrel bourbon, and small batch select bourbon. Four Roses ...",
+        "extraSnippets": [
+          "[Skip to content](https://checkout.fourrosesbourbon.com/products/four-roses-single-barrel-bourbon#MainContent) Welcome to our store ## Item added to your cart [View cart](https://c"
+        ]
+      },
+      {
+        "title": "Four Roses Private Selection Barrel Strength ...",
+        "url": "https://thebourbonculture.com/whiskey-reviews/four-roses-private-selection-barrel-strength-bourbon-obsk-whole-foods-quick-review/",
+        "domain": "thebourbonculture.com",
+        "description": "The high-rye mash bill shows itself through notes of anise, clove and a few indistinguishable herbal flavors. Fruits come by way of cherries and orange zest.",
+        "extraSnippets": [
+          "[Skip to Content](https://thebourbonculture.com/whiskey-reviews/four-roses-private-selection-barrel-strength-bourbon-obsk-whole-foods-quick-review/#content) ![Four Roses Private Se"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6e4f717a5bce6aed97a84a09f652edda6019b12f6d62200c8aa7baffb7a16343",
+    "mode": "auto"
+  }
+}

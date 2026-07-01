@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:16:45.811Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Highland Park Cask Strength No. 5"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Highland Park Cask Strength No. 5",
+    "summary": "Our fifth release has been matured predominantly in first-fill, sherry-seasoned European oak casks – including Pedro Ximénez casks – plus refill casks. [Skip to content](https://www.thewhiskeyshelf.com/highland-park-cask-strength-batch-5-review/#content \"Skip to content\") # Highland Park Cask Strength Batch 5 Review \\[",
+    "results": [
+      {
+        "title": "Highland Park Cask Strength Batch 5 Review [In Depth]",
+        "url": "https://www.thewhiskeyshelf.com/highland-park-cask-strength-batch-5-review/",
+        "domain": "thewhiskeyshelf.com",
+        "description": "Our fifth release has been matured predominantly in first-fill, sherry-seasoned European oak casks – including Pedro Ximénez casks – plus refill casks.",
+        "extraSnippets": [
+          "[Skip to content](https://www.thewhiskeyshelf.com/highland-park-cask-strength-batch-5-review/#content \"Skip to content\") # Highland Park Cask Strength Batch 5 Review \\[In Depth\\] #"
+        ]
+      },
+      {
+        "title": "Highland Park Cask Strength Island Single Malt Scotch ...",
+        "url": "https://www.tastings.com/Spirits-Review/Highland-Park-Cask-Strength-Island-Single-Malt-Scotch-Whisky-Release-No-5-Scotland-129-4-Proof-07-16-2024.aspx",
+        "domain": "tastings.com",
+        "description": "98 Points Platinum Medal Superlative $100 Golden amber color. Aromas of smoked cinnamon bun, raspberry, cherry nougat, fig preserves on bread pudding.",
+        "extraSnippets": [
+          "![](https://www.tastings.com/images/burger_menu.png) [![](https://www.tastings.com/images/Tastings-Mobile-Small.png)](https://www.tastings.com/Home.aspx) [![](https://www.tastings."
+        ]
+      },
+      {
+        "title": "Highland Park Cask Strength No 5 : r/whisky",
+        "url": "https://www.reddit.com/r/whisky/comments/1db2hvn/highland_park_cask_strength_no_5/",
+        "domain": "reddit.com",
+        "description": "Tried the first few sips without water, then added a bit of water which did calm it down a lot. The water brought out a hint of bitterness ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Highland Park Single Malt Whisky Cask Strength Release ...",
+        "url": "https://www.missionliquor.com/products/highland-park-single-malt-whisky-cask-strength-release-no-5-750ml",
+        "domain": "missionliquor.com",
+        "description": "Highland Park Single Malt Whisky Cask Strength Release No.5 750ml. No reviews. $92.99. SKU: 56938. Default Title. Qty. Add To Cart. Availability.",
+        "extraSnippets": [
+          "[My Wishlist](https://www.missionliquor.com/products/highland-park-single-malt-whisky-cask-strength-release-no-5-750ml#swym-wishlist) 0 [Skip to content](https://www.missionliquor."
+        ]
+      },
+      {
+        "title": "Highland Park Cask Strength Release No. 5",
+        "url": "https://www.barleycorndrinks.com/barleycorn-review-highland-park-cask-strength-release-no-5/",
+        "domain": "barleycorndrinks.com",
+        "description": "This 'Motion' expression pivoted from Oloroso to Pedro Ximénez casks. These “sweet, dark, dessert sherry wine matured in these casks, helps deliver notes of ...",
+        "extraSnippets": [
+          "# ![Barleycorn Drinks](https://www.barleycorndrinks.com/wp-content/uploads/2021/04/Barleycorn-drinks-logo-email-header.png) ## Are you 21 years of age? Yes No Remember me # BARLEYC"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "bad837e0644bd12aee51ff1c893517bc87f3e534f5272e2d3c74db4a8e4d0d0f",
+    "mode": "auto"
+  }
+}

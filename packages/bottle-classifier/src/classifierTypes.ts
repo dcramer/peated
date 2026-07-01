@@ -80,9 +80,6 @@ export const BOTTLE_RELEASE_TRAIT_FIELDS = [
   "abv",
   "singleCask",
   "caskStrength",
-  "caskFill",
-  "caskType",
-  "caskSize",
 ] as const;
 
 const BottleReleaseTraitFieldEnum = z.enum(BOTTLE_RELEASE_TRAIT_FIELDS);
@@ -111,9 +108,6 @@ const BottleCandidateReleaseSiblingSchema = z
     abv: z.number().min(0).max(100).nullable().default(null),
     singleCask: z.boolean().nullable().default(null),
     caskStrength: z.boolean().nullable().default(null),
-    caskFill: CaskFillEnum.nullable().default(null),
-    caskType: CaskTypeEnum.nullable().default(null),
-    caskSize: CaskSizeEnum.nullable().default(null),
   })
   .strict();
 
@@ -141,9 +135,6 @@ const BottleCandidateBottleSiblingSchema = z
     abv: z.number().min(0).max(100).nullable().default(null),
     singleCask: z.boolean().nullable().default(null),
     caskStrength: z.boolean().nullable().default(null),
-    caskFill: CaskFillEnum.nullable().default(null),
-    caskType: CaskTypeEnum.nullable().default(null),
-    caskSize: CaskSizeEnum.nullable().default(null),
   })
   .strict();
 
@@ -166,68 +157,66 @@ const BottleCandidateFamilyContextSchema = z
   })
   .strict();
 
-export const BottleExtractedDetailsSchema = z.object({
-  brand: z.string().nullable().default(null),
-  bottler: z.string().nullable().default(null),
-  expression: z.string().nullable().default(null),
-  series: z.string().nullable().default(null),
-  distillery: z.array(z.string()).nullable().default(null),
-  category: CategoryEnum.nullable().default(null),
-  stated_age: z.number().nullable().default(null),
-  abv: z.number().nullable().default(null),
-  release_year: z.number().nullable().default(null),
-  vintage_year: z.number().nullable().default(null),
-  cask_type: z.string().nullable().default(null),
-  cask_size: CaskSizeEnum.nullable().default(null),
-  cask_fill: CaskFillEnum.nullable().default(null),
-  cask_strength: z.boolean().nullable().default(null),
-  single_cask: z.boolean().nullable().default(null),
-  edition: z.string().nullable().default(null),
-});
+export const BottleExtractedDetailsSchema = z
+  .object({
+    brand: z.string().nullable().default(null),
+    bottler: z.string().nullable().default(null),
+    expression: z.string().nullable().default(null),
+    series: z.string().nullable().default(null),
+    distillery: z.array(z.string()).nullable().default(null),
+    category: CategoryEnum.nullable().default(null),
+    stated_age: z.number().nullable().default(null),
+    abv: z.number().nullable().default(null),
+    release_year: z.number().nullable().default(null),
+    vintage_year: z.number().nullable().default(null),
+    cask_strength: z.boolean().nullable().default(null),
+    single_cask: z.boolean().nullable().default(null),
+    edition: z.string().nullable().default(null),
+  })
+  .strict();
 
-export const BottleCandidateSchema = z.object({
-  kind: z
-    .enum(["bottle", "release"])
-    .optional()
-    .describe(
-      "Internal candidate discriminator: `bottle` means a parent bottle candidate and `release` means a child bottle_release candidate.",
-    ),
-  bottleId: z.number().int(),
-  releaseId: z.number().int().nullable().optional(),
-  alias: z.string().nullable().default(null),
-  fullName: z.string(),
-  bottleFullName: z.string().nullable().optional(),
-  brand: z.string().nullable().default(null),
-  bottler: z.string().nullable().default(null),
-  series: z.string().nullable().default(null),
-  distillery: z.array(z.string()).default([]),
-  category: CategoryEnum.nullable().default(null),
-  statedAge: z.number().min(0).max(100).nullable().default(null),
-  edition: z.string().trim().nullable().default(null),
-  caskStrength: z.boolean().nullable().default(null),
-  singleCask: z.boolean().nullable().default(null),
-  abv: z.number().min(0).max(100).nullable().default(null),
-  vintageYear: z
-    .number()
-    .int()
-    .gte(1800)
-    .lte(CURRENT_YEAR)
-    .nullable()
-    .default(null),
-  releaseYear: z
-    .number()
-    .int()
-    .gte(1800)
-    .lte(CURRENT_YEAR)
-    .nullable()
-    .default(null),
-  caskType: CaskTypeEnum.nullable().default(null),
-  caskSize: CaskSizeEnum.nullable().default(null),
-  caskFill: CaskFillEnum.nullable().default(null),
-  score: z.number().nullable().default(null),
-  source: z.array(z.string()).default([]),
-  familyContext: BottleCandidateFamilyContextSchema.nullable().optional(),
-});
+export const BottleCandidateSchema = z
+  .object({
+    kind: z
+      .enum(["bottle", "release"])
+      .optional()
+      .describe(
+        "Internal candidate discriminator: `bottle` means a parent bottle candidate and `release` means a child bottle_release candidate.",
+      ),
+    bottleId: z.number().int(),
+    releaseId: z.number().int().nullable().optional(),
+    alias: z.string().nullable().default(null),
+    fullName: z.string(),
+    bottleFullName: z.string().nullable().optional(),
+    brand: z.string().nullable().default(null),
+    bottler: z.string().nullable().default(null),
+    series: z.string().nullable().default(null),
+    distillery: z.array(z.string()).default([]),
+    category: CategoryEnum.nullable().default(null),
+    statedAge: z.number().min(0).max(100).nullable().default(null),
+    edition: z.string().trim().nullable().default(null),
+    caskStrength: z.boolean().nullable().default(null),
+    singleCask: z.boolean().nullable().default(null),
+    abv: z.number().min(0).max(100).nullable().default(null),
+    vintageYear: z
+      .number()
+      .int()
+      .gte(1800)
+      .lte(CURRENT_YEAR)
+      .nullable()
+      .default(null),
+    releaseYear: z
+      .number()
+      .int()
+      .gte(1800)
+      .lte(CURRENT_YEAR)
+      .nullable()
+      .default(null),
+    score: z.number().nullable().default(null),
+    source: z.array(z.string()).default([]),
+    familyContext: BottleCandidateFamilyContextSchema.nullable().optional(),
+  })
+  .strict();
 
 export const BottleSearchResultSchema = z.object({
   title: z.string(),
@@ -255,129 +244,129 @@ export const BottleEvidenceSourceTierEnum = z.enum([
   "unknown",
 ]);
 
-export const BottleEvidenceCheckSchema = z.object({
-  attribute: z.enum([
-    "brand",
-    "bottler",
-    "name",
-    "series",
-    "distillery",
-    "category",
-    "statedAge",
-    "edition",
-    "caskType",
-    "caskSize",
-    "caskFill",
-    "caskStrength",
-    "singleCask",
-    "abv",
-    "vintageYear",
-    "releaseYear",
-  ]),
-  expectedValue: z.string(),
-  required: z.boolean().default(false),
-  validated: z.boolean().default(false),
-  weaklySupported: z.boolean().default(false),
-  matchedSourceTiers: z.array(BottleEvidenceSourceTierEnum).default([]),
-  matchedSourceUrls: z.array(z.string().url()).default([]),
-});
+export const BottleEvidenceCheckSchema = z
+  .object({
+    attribute: z.enum([
+      "brand",
+      "bottler",
+      "name",
+      "series",
+      "distillery",
+      "category",
+      "statedAge",
+      "edition",
+      "caskStrength",
+      "singleCask",
+      "abv",
+      "vintageYear",
+      "releaseYear",
+    ]),
+    expectedValue: z.string(),
+    required: z.boolean().default(false),
+    validated: z.boolean().default(false),
+    weaklySupported: z.boolean().default(false),
+    matchedSourceTiers: z.array(BottleEvidenceSourceTierEnum).default([]),
+    matchedSourceUrls: z.array(z.string().url()).default([]),
+  })
+  .strict();
 
-export const ProposedEntityChoiceSchema = z.object({
-  id: z.number().int().nullable().default(null),
-  name: z.string().trim().min(1),
-});
+export const ProposedEntityChoiceSchema = z
+  .object({
+    id: z.number().int().nullable().default(null),
+    name: z.string().trim().min(1),
+  })
+  .strict();
 
-export const ProposedSeriesChoiceSchema = z.object({
-  id: z.number().int().nullable().default(null),
-  name: z.string().trim().min(1),
-});
+export const ProposedSeriesChoiceSchema = z
+  .object({
+    id: z.number().int().nullable().default(null),
+    name: z.string().trim().min(1),
+  })
+  .strict();
 
-export const ProposedBottleSchema = z.object({
-  name: z.string().trim().min(1),
-  series: ProposedSeriesChoiceSchema.nullable().default(null),
-  category: CategoryEnum.nullable().default(null),
-  edition: z.string().trim().nullable().default(null),
-  statedAge: z.number().int().min(0).max(100).nullable().default(null),
-  caskStrength: z.boolean().nullable().default(null),
-  singleCask: z.boolean().nullable().default(null),
-  abv: z.number().min(0).max(100).nullable().default(null),
-  vintageYear: z
-    .number()
-    .int()
-    .gte(1800)
-    .lte(CURRENT_YEAR)
-    .nullable()
-    .default(null),
-  releaseYear: z
-    .number()
-    .int()
-    .gte(1800)
-    .lte(CURRENT_YEAR)
-    .nullable()
-    .default(null),
-  caskType: CaskTypeEnum.nullable().default(null),
-  caskSize: CaskSizeEnum.nullable().default(null),
-  caskFill: CaskFillEnum.nullable().default(null),
-  brand: ProposedEntityChoiceSchema,
-  distillers: z.array(ProposedEntityChoiceSchema).default([]),
-  bottler: ProposedEntityChoiceSchema.nullable().default(null),
-});
+export const ProposedBottleSchema = z
+  .object({
+    name: z.string().trim().min(1),
+    series: ProposedSeriesChoiceSchema.nullable().default(null),
+    category: CategoryEnum.nullable().default(null),
+    edition: z.string().trim().nullable().default(null),
+    statedAge: z.number().int().min(0).max(100).nullable().default(null),
+    caskStrength: z.boolean().nullable().default(null),
+    singleCask: z.boolean().nullable().default(null),
+    abv: z.number().min(0).max(100).nullable().default(null),
+    vintageYear: z
+      .number()
+      .int()
+      .gte(1800)
+      .lte(CURRENT_YEAR)
+      .nullable()
+      .default(null),
+    releaseYear: z
+      .number()
+      .int()
+      .gte(1800)
+      .lte(CURRENT_YEAR)
+      .nullable()
+      .default(null),
+    brand: ProposedEntityChoiceSchema,
+    distillers: z.array(ProposedEntityChoiceSchema).default([]),
+    bottler: ProposedEntityChoiceSchema.nullable().default(null),
+  })
+  .strict();
 
-export const ProposedReleaseSchema = z.object({
-  edition: z.string().nullable().default(null),
-  statedAge: z.number().nullable().default(null),
-  abv: z.number().min(0).max(100).nullable().default(null),
-  caskStrength: z.boolean().nullable().default(null),
-  singleCask: z.boolean().nullable().default(null),
-  vintageYear: z
-    .number()
-    .gte(1800)
-    .lte(CURRENT_YEAR + 1)
-    .nullable()
-    .default(null),
-  releaseYear: z
-    .number()
-    .gte(1800)
-    .lte(CURRENT_YEAR + 1)
-    .nullable()
-    .default(null),
-  caskType: CaskTypeEnum.nullable().default(null),
-  caskSize: CaskSizeEnum.nullable().default(null),
-  caskFill: CaskFillEnum.nullable().default(null),
-  description: z.string().nullable().default(null),
-  tastingNotes: z
-    .object({
-      nose: z.string(),
-      palate: z.string(),
-      finish: z.string(),
-    })
-    .nullable()
-    .default(null),
-  imageUrl: z.string().nullable().default(null),
-});
+export const ProposedReleaseSchema = z
+  .object({
+    edition: z.string().nullable().default(null),
+    statedAge: z.number().nullable().default(null),
+    abv: z.number().min(0).max(100).nullable().default(null),
+    caskStrength: z.boolean().nullable().default(null),
+    singleCask: z.boolean().nullable().default(null),
+    vintageYear: z
+      .number()
+      .gte(1800)
+      .lte(CURRENT_YEAR + 1)
+      .nullable()
+      .default(null),
+    releaseYear: z
+      .number()
+      .gte(1800)
+      .lte(CURRENT_YEAR + 1)
+      .nullable()
+      .default(null),
+    description: z.string().nullable().default(null),
+    tastingNotes: z
+      .object({
+        nose: z.string(),
+        palate: z.string(),
+        finish: z.string(),
+      })
+      .nullable()
+      .default(null),
+    imageUrl: z.string().nullable().default(null),
+  })
+  .strict();
 
-export const BottleCandidateSearchInputSchema = z.object({
-  query: z.string().trim().nullable().default(null),
-  brand: z.string().trim().nullable().default(null),
-  bottler: z.string().trim().nullable().default(null),
-  expression: z.string().trim().nullable().default(null),
-  series: z.string().trim().nullable().default(null),
-  distillery: z.array(z.string().trim()).default([]),
-  category: z.enum(CATEGORY_LIST).nullable().default(null),
-  stated_age: z.number().nullable().default(null),
-  abv: z.number().nullable().default(null),
-  cask_type: z.string().trim().nullable().default(null),
-  cask_size: CaskSizeEnum.nullable().default(null),
-  cask_fill: CaskFillEnum.nullable().default(null),
-  cask_strength: z.boolean().nullable().default(null),
-  single_cask: z.boolean().nullable().default(null),
-  edition: z.string().trim().nullable().default(null),
-  vintage_year: z.number().int().nullable().default(null),
-  release_year: z.number().int().nullable().default(null),
-  currentBottleId: z.number().nullable().default(null),
-  currentReleaseId: z.number().nullable().default(null),
-  limit: z.number().int().min(1).max(25).default(15),
-});
+export const BottleCandidateSearchInputSchema = z
+  .object({
+    query: z.string().trim().nullable().default(null),
+    brand: z.string().trim().nullable().default(null),
+    bottler: z.string().trim().nullable().default(null),
+    expression: z.string().trim().nullable().default(null),
+    series: z.string().trim().nullable().default(null),
+    distillery: z.array(z.string().trim()).default([]),
+    category: z.enum(CATEGORY_LIST).nullable().default(null),
+    stated_age: z.number().nullable().default(null),
+    abv: z.number().nullable().default(null),
+    cask_strength: z.boolean().nullable().default(null),
+    single_cask: z.boolean().nullable().default(null),
+    edition: z.string().trim().nullable().default(null),
+    vintage_year: z.number().int().nullable().default(null),
+    release_year: z.number().int().nullable().default(null),
+    currentBottleId: z.number().nullable().default(null),
+    currentReleaseId: z.number().nullable().default(null),
+    limit: z.number().int().min(1).max(25).default(15),
+  })
+  .strict();
 
 export const SearchEntitiesArgsSchema = z.object({
   query: z
@@ -476,7 +465,7 @@ export const BottleConfidenceBasisSchema = z
       .array(z.string().trim().min(1))
       .default([])
       .describe(
-        "Concrete conflicts, missing traits, sibling ambiguity, or weak evidence that keeps confidence below automatic verification.",
+        "Material conflicts, missing traits, sibling ambiguity, or weak evidence that could change the action or target and keeps confidence below automatic verification.",
       ),
     toolsUsed: z
       .array(
@@ -652,7 +641,16 @@ export const BottleClassifierAgentDecisionSchema = z.object({
       "no_match",
     ])
     .describe(
-      "Decision action. Use no_match only when there is no safe existing match and no web-supported creation. If reliable web evidence supports a real bottle identity and local search finds no safe candidate, choose the appropriate create action.",
+      [
+        "Decision action.",
+        "match: existing bottle or release/bottling safely covers the marketed identity; set matchedBottleId and optionally matchedReleaseId.",
+        "repair_bottle: existing bottle is the right identity but needs bottle-level field repair; set matchedBottleId and proposedBottle.",
+        "create_bottle: create a standalone bottle with no child bottling; set proposedBottle only.",
+        "create_release: add a child bottling under a clean existing parent; set parentBottleId and proposedRelease.",
+        "create_bottle_and_release: create a missing stable parent plus child bottling; set proposedBottle and proposedRelease.",
+        "repair_parent_and_create_release: repair an existing family parent that stores bottling traits, then add the child bottling; set parentBottleId, proposedBottle, and proposedRelease.",
+        "no_match: no safe existing target and no supported create action, or creation would invent an ambiguous hybrid.",
+      ].join(" "),
     ),
   confidence: z.number().min(0).max(100),
   rationale: z.string().nullable().default(null),

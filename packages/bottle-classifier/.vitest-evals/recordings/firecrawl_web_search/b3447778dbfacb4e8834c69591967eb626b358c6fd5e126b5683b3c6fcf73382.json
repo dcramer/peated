@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T03:46:05.434Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition 2001 bottle release year double matured"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker Distillers Edition 2001 bottle release year double matured",
+    "summary": "This rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001. - [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=255",
+    "results": [
+      {
+        "title": "Talisker 1988, The Distillers Edition 2001 Bottling",
+        "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+        "domain": "thewhiskyvault.com",
+        "description": "This rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001.",
+        "extraSnippets": [
+          "- [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=25536) [CHFS"
+        ]
+      },
+      {
+        "title": "Talisker 2001 Distillers Edition",
+        "url": "https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition?srsltid=AfmBOooOVcIAKTME0zcRMpV1Gw-NodxMIxpS7gRJOJ7o4ZLMzG5m4rwx",
+        "domain": "thewhiskybarrel.com",
+        "description": "Double matured Amoroso sherry casks. Talisker. Talisker Distillery was established at Carbost on the Isle of Skye off the west coast of Scotland in 1830.",
+        "extraSnippets": [
+          "[Skip to content](https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition#MainContent) ## Your cart is empty [Continue shopping](https://www.thewhiskybarrel.com/c"
+        ]
+      },
+      {
+        "title": "Talisker Distiller's Edition 10 Years Double-Matured",
+        "url": "https://spiritsnetwork.com/talisker-distillers-edition-10-years-double-matured/",
+        "domain": "spiritsnetwork.com",
+        "description": "The oldest Single Malt Scotch Whisky made by the sea on the shores of the Isle of Skye, one of the most remote, rugged, yet beautiful landscapes in Scotland.",
+        "extraSnippets": [
+          "[My Wishlist](https://spiritsnetwork.com/talisker-distillers-edition-10-years-double-matured/#swym-wishlist) [![talisker-2005-2015-10-year-distillers-edition-PI-B.png](https://cdn1"
+        ]
+      },
+      {
+        "title": "Review #2340 - Talisker Distiller's Edition : r/Scotch",
+        "url": "https://www.reddit.com/r/Scotch/comments/1fklplw/review_2340_talisker_distillers_edition/",
+        "domain": "reddit.com",
+        "description": "A 2020 release from Diageo-owned Scottish distillery Talisker, this is Talisker The Distillers Edition, a single malt aged in American oak and ex-Amoroso ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker Distillers Edition | Whisky Review",
+        "url": "https://www.youtube.com/watch?v=mS3NIH0-v08",
+        "domain": "youtube.com",
+        "description": "Taliska Distillers Edition belongs to my all-time favorite and this is it. So you immediately get a mouthful.",
+        "extraSnippets": [
+          "Talisker Distillers Edition \\| Whisky Review Tap to unmute 2x Copy link Info Shopping ![](https://i.ytimg.com/an/nCE0-pPZuit8aud1l9rhkA/featured_channel.jpg?v=5ed8eafa) If playback"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b3447778dbfacb4e8834c69591967eb626b358c6fd5e126b5683b3c6fcf73382",
+    "mode": "auto"
+  }
+}

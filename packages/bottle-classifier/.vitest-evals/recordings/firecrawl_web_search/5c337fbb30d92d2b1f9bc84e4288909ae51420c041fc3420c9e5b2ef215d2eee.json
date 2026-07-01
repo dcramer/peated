@@ -1,0 +1,59 @@
+{
+  "writtenAt": "2026-07-01T15:19:23.515Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Shieldaig Speyside 21 year single malt"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Shieldaig Speyside 21 year single malt",
+    "summary": "A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate Shie",
+    "results": [
+      {
+        "title": "Shieldaig Speyside. What changed?",
+        "url": "https://www.reddit.com/r/Scotch/comments/1bf7ld2/shieldaig_speyside_what_changed/",
+        "domain": "reddit.com",
+        "description": "A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate",
+        "extraSnippets": []
+      },
+      {
+        "title": "Shieldaig Speyside Single Malt 21Yr Scotch Whisky",
+        "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-single-malt-21yr-scotch-whisky/p/219098750?srsltid=AfmBOorfNwBfcTTndTArBH8wnptcqoegpA-SO4MUbFby3Jq9sUm8w8rN",
+        "domain": "totalwine.com",
+        "description": "A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate",
+        "extraSnippets": [
+          "Shieldaig Speyside Single Malt 21Yr Scotch Whisky 750ml Bottle - ![Shieldaig Speyside Single Malt 21Yr Scotch Whisky 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/images"
+        ]
+      },
+      {
+        "title": "Review #21: Shieldaig The Classic",
+        "url": "https://www.reddit.com/r/Scotch/comments/hgjq4a/review_21_shieldaig_the_classic/",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Shieldaig 21 Year Single Malt",
+        "url": "https://cornwallwines.com/shop/product/shieldaig-21-year-single-malt/5ee2bdc23b479231c557814d?option-id=52b0bf70260fbdd06cf96a789e2fe3029c0fd5b0af166d3befb67ebed9857b6d",
+        "domain": "cornwallwines.com",
+        "description": "Shieldaig 21 Year Single Malt 750ml for $99.99. Speyside, Scotland - A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and ...",
+        "extraSnippets": [
+          "[Jump to content](https://cornwallwines.com/shop/product/shieldaig-21-year-single-malt/5ee2bdc23b479231c557814d?option-id=52b0bf70260fbdd06cf96a789e2fe3029c0fd5b0af166d3befb67ebed9"
+        ]
+      },
+      {
+        "title": "Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky",
+        "url": "https://www.wine-searcher.com/find/shieldaig+21+old+single+malt+scotch+whisky+speyside+scotland?srsltid=AfmBOorPhZvhPWks9LSF93mh9MxCLNd4-_JXvgbyHonllBQn2t9vUfV3",
+        "domain": "wine-searcher.com",
+        "description": "Old Single Malt Scotch Whisky, Speyside, Scotland. Avg Price (ex-tax) $121 / 750ml. Whisky 4.5 from 4 User Ratings Style",
+        "extraSnippets": [
+          "~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5c337fbb30d92d2b1f9bc84e4288909ae51420c041fc3420c9e5b2ef215d2eee",
+    "mode": "auto"
+  }
+}

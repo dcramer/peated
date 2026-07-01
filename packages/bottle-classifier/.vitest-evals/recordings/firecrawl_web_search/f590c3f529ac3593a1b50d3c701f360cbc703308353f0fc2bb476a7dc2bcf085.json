@@ -1,0 +1,14 @@
+{
+  "writtenAt": "2026-07-01T01:55:05.726Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Elijah Craig Cask Strength bourbon Elijah Craig Barrel Proof"
+  },
+  "output": {
+    "error": "Firecrawl search failed: The operation was aborted due to timeout"
+  },
+  "metadata": {
+    "cacheKey": "f590c3f529ac3593a1b50d3c701f360cbc703308353f0fc2bb476a7dc2bcf085",
+    "mode": "auto"
+  }
+}

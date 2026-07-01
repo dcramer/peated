@@ -1,7 +1,9 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import type { z } from "zod";
 import type { BottleCandidate } from "./classifierTypes";
 import type { ClassifyBottleReferenceInput } from "./contract";
+import type { classifierEvalExpectationSchema } from "./evalFixtureSchemas";
 import {
   classifierEvalFixtureSchema,
   listFixtureFiles,
@@ -13,30 +15,9 @@ export type SearchResponseFixture = {
   results: BottleCandidate[];
 };
 
-export type ClassifierEvalExpectation = {
-  status: "ignored" | "classified";
-  action?:
-    | "match"
-    | "create_bottle"
-    | "create_release"
-    | "create_bottle_and_release"
-    | "repair_parent_and_create_release"
-    | "no_match";
-  identityScope?: "product" | "exact_cask";
-  matchedBottleId?: number | null;
-  matchedReleaseId?: number | null;
-  parentBottleId?: number | null;
-  proposedBottle?: Record<string, unknown> | null;
-  proposedBottleNameIncludes?: string[];
-  proposedRelease?: Record<string, unknown> | null;
-  confidenceBand?:
-    | "low"
-    | "review"
-    | "auto_verification"
-    | "current_assignment";
-  verifyEligible?: boolean;
-  summary: string;
-};
+export type ClassifierEvalExpectation = z.infer<
+  typeof classifierEvalExpectationSchema
+>;
 
 export type ClassifierEvalCase = {
   fixtureId: string;

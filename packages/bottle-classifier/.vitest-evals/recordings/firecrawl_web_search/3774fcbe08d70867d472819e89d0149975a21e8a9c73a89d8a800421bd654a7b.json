@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-06-30T23:43:33.788Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Woodford Reserve Double Oaked bourbon"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Woodford Reserve Double Oaked bourbon",
+    "summary": "An innovative approach to twice-barreled bourbon creates the rich and colorful flavor of Woodford Reserve Double Oaked. [Skip to main content](https://www.woodfordreserve.com/whiskey/double-oaked/#main-content) ![Star.](https://www.woodfordreserve.com/wp-content/themes/woodford/dist/img/icons/star.svg) Double Gold Meda",
+    "results": [
+      {
+        "title": "Double Oaked",
+        "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": "An innovative approach to twice-barreled bourbon creates the rich and colorful flavor of Woodford Reserve Double Oaked.",
+        "extraSnippets": [
+          "[Skip to main content](https://www.woodfordreserve.com/whiskey/double-oaked/#main-content) ![Star.](https://www.woodfordreserve.com/wp-content/themes/woodford/dist/img/icons/star.s"
+        ]
+      },
+      {
+        "title": "Woodford Reserve Double Double Oaked Bourbon (2025) ...",
+        "url": "https://thebourbonculture.com/whiskey-reviews/woodford-reserve-double-double-oaked-bourbon-2025-review/",
+        "domain": "thebourbonculture.com",
+        "description": "Palate: The tannins are exceptionally strong for the proof. Each sip queues up a long line of oak, charred wood, saddle leather and dark ...",
+        "extraSnippets": [
+          "[Skip to Content](https://thebourbonculture.com/whiskey-reviews/woodford-reserve-double-double-oaked-bourbon-2025-review/#content) ![Woodford Reserve Double Double Oaked Bourbon (2"
+        ]
+      },
+      {
+        "title": "Woodford Reserve Double Oaked Kentucky Straight ...",
+        "url": "https://www.totalwine.com/spirits/bourbon/small-batch-bourbon/woodford-reserve-double-oaked-kentucky-straight-bourbon-whiskey/p/120640750?srsltid=AfmBOorCpg42BKj4xrKpB5RZc_VsNfEiNmHygGmSPF9AKzy5-bxCcb7l",
+        "domain": "totalwine.com",
+        "description": "Each sip offers a full-bodied mix of vanilla, caramel and spice that's perfect for enjoying neat or in cocktails.",
+        "extraSnippets": [
+          "Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey 750ml Bottle - ![Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey 750ml Bottle](https://www.totalwine"
+        ]
+      },
+      {
+        "title": "Woodford Reserve Double Oaked Bourbon Review",
+        "url": "https://www.breakingbourbon.com/review/woodford-reserve-double-oaked-bourbon",
+        "domain": "breakingbourbon.com",
+        "description": "Time-tested, Woodford Reserve Double Oaked Bourbon delivers a traditional tasting double-barreled sip that highlights the benefits of using ...",
+        "extraSnippets": [
+          "By clicking **\"Accept\"**, you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts. View our [Privacy "
+        ]
+      },
+      {
+        "title": "A Review of Woodford Reserve Double Oaked : r/bourbon",
+        "url": "https://www.reddit.com/r/bourbon/comments/14y8diw/from_newbie_to_bourbon_bliss_a_review_of_woodford/",
+        "domain": "reddit.com",
+        "description": "Woodford Reserve Double Oaked is a good bourbon for beginners like myself. It offers a pleasant nose, a smooth palate with flavors to appreciate, and a decent ...",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "3774fcbe08d70867d472819e89d0149975a21e8a9c73a89d8a800421bd654a7b",
+    "mode": "auto"
+  }
+}

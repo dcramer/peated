@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T02:21:06.301Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 1661 312 bottles"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 1661 312 bottles",
+    "summary": "Range: Exclusive Malts Age: 8 years (October 17, 2007 - February 2016). Maturation: probably a refill hogshead. Cask #: 1601. Bottles: 320. Twitter Widget Iframe | | | | | --- | --- | --- | | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif) | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bub",
+    "results": [
+      {
+        "title": "Single Malt Report: Islay Distillery 8 year old 2007 ...",
+        "url": "http://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-8.html",
+        "domain": "divingforpearlsblog.com",
+        "description": "Range: Exclusive Malts Age: 8 years (October 17, 2007 - February 2016). Maturation: probably a refill hogshead. Cask #: 1601. Bottles: 320.",
+        "extraSnippets": [
+          "Twitter Widget Iframe | | | | | --- | --- | --- | | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif) | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bub"
+        ]
+      },
+      {
+        "title": "Islay Distillery – 2007 – Aged 8 Years (57.1%)",
+        "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/",
+        "domain": "norfolkwineandspirits.com",
+        "description": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%). $194.99 ... 8 Years Old. Cask Type. Refill Ex-Sherry Hogshead. Date Distilled. 17th ...",
+        "extraSnippets": [
+          "![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](https://norfolkw"
+        ]
+      },
+      {
+        "title": "Islay Distillery 2007 8 Year Exclusive Malts",
+        "url": "https://dandm.com/products/islay-distillery-2007-8-year-exclusive-malts?srsltid=AfmBOorCZrG6eHPTS_RDMUR2FCOEEMr3SJ5iQpkINGvD0nBCiw2nC-CO",
+        "domain": "dandm.com",
+        "description": "Scotch Style Single Malt Country Scotland Region Islay Vintage 2007 Bottler Exclusive Malts Distillery Lagavulin ABV 57.1% Age in Years 8 Size 750mL. $149.99.",
+        "extraSnippets": [
+          "[Skip to content](https://dandm.com/products/islay-distillery-2007-8-year-exclusive-malts#main) San Francisco residents: Local delivery is here! Enter your address at checkout. [!["
+        ]
+      },
+      {
+        "title": "The Exclusive Malts “Islay” 8 Year 2007 (57.1% abv)",
+        "url": "https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/",
+        "domain": "maltimpostor.com",
+        "description": "Tasting notes: This whisky is, eponymously enough, an “Islay.” As if there is more than one Islay. As if Islays grow on trees.",
+        "extraSnippets": [
+          "[MENU](https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/#) _![](http://maltimpostor.com/wp-content/uploads/2017/01/Exclusive-Malts-Islay-8-Year-2007-26"
+        ]
+      },
+      {
+        "title": "Islay Single Malt 8 Years Old The Whisky Agency Bottled ...",
+        "url": "https://www.musthavemalts.com/product/islay-single-malt-2007-twa-8-years-old/",
+        "domain": "musthavemalts.com",
+        "description": "A nicely crafted vintage 2007 single malt whisky by an undisclosed Islay distillery. German bottler The Whisky Agency released it in 2015, under their 'bottled ...",
+        "extraSnippets": [
+          "Search ``` ``` Search [![](https://208.wpcdnnode.com/musthavemalts.com/wp-content/uploads/2026/04/MHM-Logo.png)](https://www.musthavemalts.com/) No products in the cart. [€ 0.00€ 0"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d0e61fb1a9e5ea86ad24795c635e4d2feef8e5acf04db821d8539f152c3dfa05",
+    "mode": "auto"
+  }
+}

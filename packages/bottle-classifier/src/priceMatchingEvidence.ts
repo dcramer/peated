@@ -44,9 +44,6 @@ const SPECIFIC_IDENTITY_WEB_SUPPORT_ATTRIBUTES = new Set<MatchAttribute>([
   "name",
   "series",
   "edition",
-  "caskType",
-  "caskSize",
-  "caskFill",
   "caskStrength",
   "singleCask",
   "abv",
@@ -295,9 +292,6 @@ function extractedLabelLooksLikePlainAgeStatement(
     !extractedLabel.edition &&
     extractedLabel.release_year === null &&
     extractedLabel.vintage_year === null &&
-    extractedLabel.cask_type === null &&
-    extractedLabel.cask_size === null &&
-    extractedLabel.cask_fill === null &&
     extractedLabel.cask_strength === null &&
     extractedLabel.single_cask === null &&
     extractedLabel.abv === null
@@ -311,9 +305,6 @@ function bottleCandidateIsPlainAgeAutoVerificationTarget(
     target.kind !== "release" &&
     (target.releaseId ?? null) === null &&
     target.abv === null &&
-    !target.caskType &&
-    !target.caskSize &&
-    !target.caskFill &&
     target.caskStrength !== true &&
     target.singleCask !== true &&
     targetLooksLikePlainAgeStatementBottle(target)
@@ -333,9 +324,6 @@ function extractedLabelCarriesUnsupportedSpecificity({
 
   return (
     Boolean(extractedLabel.edition && !target.edition) ||
-    Boolean(extractedLabel.cask_type && !target.caskType) ||
-    Boolean(extractedLabel.cask_size && !target.caskSize) ||
-    Boolean(extractedLabel.cask_fill && !target.caskFill) ||
     (extractedLabel.cask_strength === true && target.caskStrength === null) ||
     (extractedLabel.single_cask === true && target.singleCask === null) ||
     (extractedLabel.abv !== null && target.abv === null) ||
@@ -653,18 +641,6 @@ function buildExistingMatchSupportChecks({
     addCheckIfPresent(checks, "edition", label.edition, false);
   }
 
-  if (label?.cask_type && textsOverlap(target.caskType, label.cask_type)) {
-    addCheckIfPresent(checks, "caskType", label.cask_type, false);
-  }
-
-  if (label?.cask_size && textsOverlap(target.caskSize, label.cask_size)) {
-    addCheckIfPresent(checks, "caskSize", label.cask_size, false);
-  }
-
-  if (label?.cask_fill && textsOverlap(target.caskFill, label.cask_fill)) {
-    addCheckIfPresent(checks, "caskFill", label.cask_fill, false);
-  }
-
   if (
     label &&
     label.cask_strength !== null &&
@@ -731,21 +707,6 @@ function buildExistingMatchSupportChecks({
   if (!extractedLabel?.edition && target.edition) {
     addCheckIfPresent(checks, "edition", target.edition, true);
     differentiatingAttributes.add("edition");
-  }
-
-  if (!extractedLabel?.cask_type && target.caskType) {
-    addCheckIfPresent(checks, "caskType", target.caskType, true);
-    differentiatingAttributes.add("caskType");
-  }
-
-  if (extractedLabel?.cask_size === null && target.caskSize) {
-    addCheckIfPresent(checks, "caskSize", target.caskSize, true);
-    differentiatingAttributes.add("caskSize");
-  }
-
-  if (extractedLabel?.cask_fill === null && target.caskFill) {
-    addCheckIfPresent(checks, "caskFill", target.caskFill, true);
-    differentiatingAttributes.add("caskFill");
   }
 
   if (extractedLabel?.cask_strength === null && target.caskStrength) {
@@ -1114,30 +1075,6 @@ export function getExistingMatchIdentityConflicts({
     !textsOverlap(target.edition, extractedLabel.edition)
   ) {
     conflicts.push("candidate edition conflicts with extracted label");
-  }
-
-  if (
-    extractedLabel.cask_type &&
-    target.caskType &&
-    !textsOverlap(target.caskType, extractedLabel.cask_type)
-  ) {
-    conflicts.push("candidate cask type conflicts with extracted label");
-  }
-
-  if (
-    extractedLabel.cask_size &&
-    target.caskSize &&
-    !textsOverlap(target.caskSize, extractedLabel.cask_size)
-  ) {
-    conflicts.push("candidate cask size conflicts with extracted label");
-  }
-
-  if (
-    extractedLabel.cask_fill &&
-    target.caskFill &&
-    !textsOverlap(target.caskFill, extractedLabel.cask_fill)
-  ) {
-    conflicts.push("candidate cask fill conflicts with extracted label");
   }
 
   if (

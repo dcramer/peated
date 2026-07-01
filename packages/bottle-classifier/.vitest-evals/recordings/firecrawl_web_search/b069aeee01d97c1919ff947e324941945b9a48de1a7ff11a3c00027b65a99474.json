@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:35:29.942Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Four Roses Private Selection Barrel Strength bourbon"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Four Roses Private Selection Barrel Strength bourbon",
+    "summary": "The high-rye mash bill shows itself through notes of anise, clove and a few indistinguishable herbal flavors. Fruits come by way of cherries and orange zest. [Skip to Content](https://thebourbonculture.com/whiskey-reviews/four-roses-private-selection-barrel-strength-bourbon-obsk-whole-foods-quick-review/#content) ![Fou",
+    "results": [
+      {
+        "title": "Four Roses Private Selection Barrel Strength Bourbon OBSK (Whole ...",
+        "url": "https://thebourbonculture.com/whiskey-reviews/four-roses-private-selection-barrel-strength-bourbon-obsk-whole-foods-quick-review/",
+        "domain": "thebourbonculture.com",
+        "description": "The high-rye mash bill shows itself through notes of anise, clove and a few indistinguishable herbal flavors. Fruits come by way of cherries and orange zest.",
+        "extraSnippets": [
+          "[Skip to Content](https://thebourbonculture.com/whiskey-reviews/four-roses-private-selection-barrel-strength-bourbon-obsk-whole-foods-quick-review/#content) ![Four Roses Private Se"
+        ]
+      },
+      {
+        "title": "Review #822: Four Roses Private Selection Barrel Strength Bourbon ...",
+        "url": "https://www.reddit.com/r/bourbon/comments/1etp1ra/review_822_four_roses_private_selection_barrel/",
+        "domain": "reddit.com",
+        "description": "The high-rye mash bill shows itself through notes of anise, clove and a few indistinguishable herbal flavors. Fruits come by way of cherries and ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "FOUR ROSES HEALTHY SPIRITS BARREL STRENGTH OBSF 11 ...",
+        "url": "https://www.healthyspirits.com/products/four-roses-healthy-spirits-barrel-strength-obsf-11-year-single-barrel-bourbon-750ml?srsltid=AfmBOoqipGDTZ_ByMySn8woX6fpXbj_I_5AEelWjQDoBm4fns__Yr0_L",
+        "domain": "healthyspirits.com",
+        "description": "Four Roses Private Selection OBSF 11-Year Bourbon is a single barrel, cask-strength bourbon that's part of Four Roses' highly regarded private barrel program.",
+        "extraSnippets": [
+          "[Skip to main content](https://www.healthyspirits.com/products/four-roses-healthy-spirits-barrel-strength-obsf-11-year-single-barrel-bourbon-750ml#tile-product-details) FOUR San Fr"
+        ]
+      },
+      {
+        "title": "Four Roses Single Barrel 2025 (OBSV) Review - Breaking Bourbon",
+        "url": "https://www.breakingbourbon.com/review/four-roses-single-barrel-2025-obsv",
+        "domain": "breakingbourbon.com",
+        "description": "Four Roses uses two different mashbills and five different yeast strains to create 10 unique bourbon recipes. The OBSV mashbill consists of 60% ...",
+        "extraSnippets": [
+          "By clicking **\"Accept\"**, you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts. View our [Privacy "
+        ]
+      },
+      {
+        "title": "Four Roses Private Barrel Select Single Barrel Barrel Strength OESF ...",
+        "url": "https://www.universalfws.com/product/p-13343-four-roses-private-barrel-select-single-barrel-barrel-strength-kentucky-straight-bourbon-whiskey/",
+        "domain": "universalfws.com",
+        "description": "Kentucky Straight Bourbon Whiskey 750ml. key (Aged 11 Years and 1 Month) OESF: 20% Rye Mashbill /Herbal Notes 117.6 Proof / 58.8 % ALC",
+        "extraSnippets": [
+          "Copied to clipboard SKU: 040063400294 Share # Four Roses Private Barrel Select Single Barrel Barrel Strength OESF Kentucky Straight Bourbon Whiskey 750ml ![Four Roses Private Barre"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b069aeee01d97c1919ff947e324941945b9a48de1a7ff11a3c00027b65a99474",
+    "mode": "auto"
+  }
+}

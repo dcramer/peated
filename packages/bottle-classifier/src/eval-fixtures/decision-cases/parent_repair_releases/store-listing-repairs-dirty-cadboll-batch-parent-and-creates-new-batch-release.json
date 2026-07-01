@@ -1,0 +1,67 @@
+{
+  "id": "store-listing-repairs-dirty-cadboll-batch-parent-and-creates-new-batch-release",
+  "name": "store listing: repairs dirty Cadboll batch parent and creates new batch release",
+  "input": {
+    "reference": {
+      "name": "Glenmorangie The Cadboll Estate Batch 2 15-year-old"
+    },
+    "extractedIdentity": {
+      "brand": "Glenmorangie",
+      "bottler": null,
+      "expression": "The Cadboll Estate",
+      "series": null,
+      "distillery": [],
+      "category": "single_malt",
+      "stated_age": 15,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": "Batch 2"
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "bottleId": 661,
+        "releaseId": null,
+        "alias": null,
+        "fullName": "Glenmorangie The Cadboll Estate Batch 1",
+        "bottleFullName": "Glenmorangie The Cadboll Estate Batch 1",
+        "brand": "Glenmorangie",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "single_malt",
+        "statedAge": 15,
+        "edition": "Batch 1",
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.91,
+        "source": ["vector"]
+      }
+    ]
+  },
+  "expected": {
+    "status": "classified",
+    "action": "repair_parent_and_create_release",
+    "identityScope": "product",
+    "parentBottleId": 661,
+    "proposedBottle": {
+      "brand": {
+        "name": "Glenmorangie"
+      },
+      "name": "The Cadboll Estate",
+      "category": "single_malt",
+      "statedAge": 15,
+      "edition": null
+    },
+    "proposedRelease": {
+      "edition": "Batch 2"
+    },
+    "summary": "Repair the existing dirty Cadboll batch bottle into the reusable Cadboll Estate parent, then create Batch 2 as a child release."
+  }
+}

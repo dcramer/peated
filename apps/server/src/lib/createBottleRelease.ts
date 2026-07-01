@@ -14,6 +14,7 @@ import { queueBottleCreationVerification } from "@peated/server/lib/catalogVerif
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
 import type { BottleReleaseInputSchema } from "@peated/server/schemas";
+import type { CaskFill, CaskSize, CaskType } from "@peated/server/types";
 import { pushJob } from "@peated/server/worker/client";
 import { eq, sql } from "drizzle-orm";
 import type { z } from "zod";
@@ -138,9 +139,9 @@ export async function createBottleReleaseInTransaction(
       singleCask: resolvedReleaseIdentity.singleCask,
       caskStrength: resolvedReleaseIdentity.caskStrength,
       statedAge: resolvedReleaseIdentity.statedAge,
-      caskSize: resolvedReleaseIdentity.caskSize,
-      caskType: resolvedReleaseIdentity.caskType,
-      caskFill: resolvedReleaseIdentity.caskFill,
+      caskSize: resolvedReleaseIdentity.caskSize as CaskSize | null,
+      caskType: resolvedReleaseIdentity.caskType as CaskType | null,
+      caskFill: resolvedReleaseIdentity.caskFill as CaskFill | null,
       description: input.description,
       imageUrl: input.imageUrl,
       tastingNotes: input.tastingNotes,

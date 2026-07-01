@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T02:26:56.053Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker 2001 The Distillers Edition"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker 2001 The Distillers Edition",
+    "summary": "Soft, oily, sweet-woody, pepper wave, berry jam, creamy notes, caramel, light shades of burnt crackers and kvass, dry medicinal herbs, peat in ... **Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?__cf_chl_f_tk=h_2UUqcBQG_FKnixf1ZCmWekRePCzd8CRH",
+    "results": [
+      {
+        "title": "Talisker 2001 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": "Soft, oily, sweet-woody, pepper wave, berry jam, creamy notes, caramel, light shades of burnt crackers and kvass, dry medicinal herbs, peat in ...",
+        "extraSnippets": [
+          "**Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?__cf_chl_f_tk=h_2UUqcBQG_FKnixf1ZCmWekRePCzd8CRHU8Wuvwu"
+        ]
+      },
+      {
+        "title": "Talisker \"Distillers Edition\" Isle of Skye Single Malt Scotch Whisky",
+        "url": "https://www.klwines.com/p/i?i=1053430&srsltid=AfmBOoor5szUtjWTOqgbm7O-2PQFJ3h8gmwoV5Atz5EBQ0ZwNniCtOik",
+        "domain": "klwines.com",
+        "description": "This Edition has a very special bitter-sweet harmony where the peat softens on the palate to a rich, sweet, juicy fruit finish.",
+        "extraSnippets": [
+          "[Skip to page content](https://shop.klwines.com/products/details/1053430#content) ![Talisker \"Distillers Edition\" Isle of Skye Single Malt Scotch Whisky](https://shop.klwines.com/_"
+        ]
+      },
+      {
+        "title": "Review #22 - Talisker, The Distillers Edition : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/1npsyre/review_22_talisker_the_distillers_edition/",
+        "domain": "reddit.com",
+        "description": "Palate: More grilled fruit and very mild tarry creosote. Briny. Palate stays mostly true to the nose, but is also sweeter, with a bit of stewed ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker 2001 Distillers Edition - The Whisky Barrel",
+        "url": "https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition?srsltid=AfmBOopoGtY9x9XJ_UCr18qudqzlPWmMoFDLo0Q1DEY57eDlTluVPBZ6",
+        "domain": "thewhiskybarrel.com",
+        "description": "Very clean and intense, with light smoke soon appearing. Creamy toffee, with fruit acidity. The palate is sweet to start, with smoke and tar abruptly exploding ...",
+        "extraSnippets": [
+          "[Skip to content](https://www.thewhiskybarrel.com/products/talisker-2001-distillers-edition#MainContent) ## Your cart is empty [Continue shopping](https://www.thewhiskybarrel.com/c"
+        ]
+      },
+      {
+        "title": "Talisker Single Malt Scotch Whisky from the Islands - Whiskyfun",
+        "url": "https://www.whiskyfun.com/Talisker.html",
+        "domain": "whiskyfun.com",
+        "description": "Talisker scotch single malt whisky - index of all tasting notes, bits about the Talisker distillery and various comments.",
+        "extraSnippets": [
+          "| | | | | | | --- | --- | --- | --- | --- | | | | | | | | | | | --- | --- | --- | --- | --- | | | # **[Whiskyfun](https://www.whiskyfun.com/)** **[Home](https://www.whiskyfun.com/)"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "677fccd17eb10da3ba140ae22d753a0d14a345eb177ff56bdfc7c7243770977b",
+    "mode": "auto"
+  }
+}

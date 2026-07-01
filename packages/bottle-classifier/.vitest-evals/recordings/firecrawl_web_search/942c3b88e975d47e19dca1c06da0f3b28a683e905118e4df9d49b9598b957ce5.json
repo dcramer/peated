@@ -1,0 +1,14 @@
+{
+  "writtenAt": "2026-06-30T23:52:34.212Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker 2001 The Distillers Edition Talisker Distillers Edition 2001"
+  },
+  "output": {
+    "error": "Firecrawl search failed: The operation was aborted due to timeout"
+  },
+  "metadata": {
+    "cacheKey": "942c3b88e975d47e19dca1c06da0f3b28a683e905118e4df9d49b9598b957ce5",
+    "mode": "auto"
+  }
+}

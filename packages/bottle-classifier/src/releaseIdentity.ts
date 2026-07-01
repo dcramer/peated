@@ -7,25 +7,21 @@
  * reviewed classifier, not in these helpers. New hardcoded phrase rules need
  * verified whisky research and focused tests before being added here.
  */
-import type {
-  BottleExtractedDetails,
-  ProposedRelease,
-} from "./classifierTypes";
+import type { BottleExtractedDetails } from "./classifierTypes";
 import { normalizeBottle } from "./normalize";
 
-export type ReleaseIdentityInput = Pick<
-  ProposedRelease,
-  | "abv"
-  | "caskFill"
-  | "caskSize"
-  | "caskStrength"
-  | "caskType"
-  | "edition"
-  | "releaseYear"
-  | "singleCask"
-  | "statedAge"
-  | "vintageYear"
->;
+export type ReleaseIdentityInput = {
+  edition: string | null;
+  statedAge: number | null;
+  releaseYear: number | null;
+  vintageYear: number | null;
+  abv: number | null;
+  singleCask: boolean | null;
+  caskStrength: boolean | null;
+  caskType?: string | null;
+  caskSize?: string | null;
+  caskFill?: string | null;
+};
 
 export type BottleLevelReleaseTraitsInput = Omit<
   ReleaseIdentityInput,
@@ -42,9 +38,6 @@ type ExtractedReleaseIdentityInput = Pick<
   | "abv"
   | "release_year"
   | "vintage_year"
-  | "cask_type"
-  | "cask_size"
-  | "cask_fill"
   | "cask_strength"
   | "single_cask"
 >;
@@ -67,9 +60,9 @@ export const RELEASE_IDENTITY_FIELDS = [
   "abv",
   "singleCask",
   "caskStrength",
-  "caskFill",
   "caskType",
   "caskSize",
+  "caskFill",
 ] as const satisfies ReadonlyArray<keyof ReleaseIdentityInput>;
 
 export const BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS = [
@@ -79,9 +72,9 @@ export const BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS = [
   "abv",
   "singleCask",
   "caskStrength",
-  "caskFill",
   "caskType",
   "caskSize",
+  "caskFill",
 ] as const satisfies ReadonlyArray<keyof BottleLevelReleaseTraitsInput>;
 
 const STABLE_BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS = [
@@ -100,18 +93,9 @@ export const EXTRACTED_RELEASE_IDENTITY_FIELDS = [
   "abv",
   "release_year",
   "vintage_year",
-  "cask_type",
-  "cask_size",
-  "cask_fill",
   "cask_strength",
   "single_cask",
 ] as const satisfies ReadonlyArray<keyof ExtractedReleaseIdentityInput>;
-
-function formatReleaseEnum(value: string): string {
-  return value
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-}
 
 export function getReleaseObservationFacts(
   release: Partial<ReleaseIdentityInput>,
@@ -125,9 +109,9 @@ export function getReleaseObservationFacts(
       abv: release.abv ?? null,
       singleCask: release.singleCask ?? null,
       caskStrength: release.caskStrength ?? null,
-      caskFill: release.caskFill ?? null,
       caskType: release.caskType ?? null,
       caskSize: release.caskSize ?? null,
+      caskFill: release.caskFill ?? null,
     }).filter(([, value]) => value !== null && value !== undefined),
   );
 }
@@ -143,9 +127,9 @@ export function getBottleLevelReleaseTraits(
       abv: bottle.abv ?? null,
       singleCask: bottle.singleCask ?? null,
       caskStrength: bottle.caskStrength ?? null,
-      caskFill: bottle.caskFill ?? null,
       caskType: bottle.caskType ?? null,
       caskSize: bottle.caskSize ?? null,
+      caskFill: bottle.caskFill ?? null,
     }).filter(([, value]) => value !== null && value !== undefined),
   );
 }
@@ -319,10 +303,6 @@ function formatReleaseTraitLabel(
       return value ? "Single Cask" : null;
     case "caskStrength":
       return value ? "Cask Strength" : null;
-    case "caskFill":
-    case "caskType":
-    case "caskSize":
-      return formatReleaseEnum(`${value}`);
     default:
       return null;
   }
@@ -354,9 +334,9 @@ export function getResolvedReleaseIdentity({
     abv: release.abv ?? null,
     singleCask: release.singleCask ?? null,
     caskStrength: release.caskStrength ?? null,
-    caskFill: release.caskFill ?? null,
     caskType: release.caskType ?? null,
     caskSize: release.caskSize ?? null,
+    caskFill: release.caskFill ?? null,
   };
 }
 
@@ -414,7 +394,7 @@ export function formatCanonicalReleaseName({
     }
 
     const value = resolvedRelease[field];
-    if (value === null) {
+    if (value === null || value === undefined) {
       continue;
     }
 

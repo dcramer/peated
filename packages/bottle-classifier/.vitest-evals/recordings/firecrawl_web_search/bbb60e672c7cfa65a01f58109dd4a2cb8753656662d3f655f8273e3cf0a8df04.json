@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:37:08.083Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 1661"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 1661",
+    "summary": "The nose leads with big gorgeous peat, then mint, menthol, and burlap. notes of strawberry bubblegum, whipped cream, tangerines, and praline. Twitter Widget Iframe | | | | | --- | --- | --- | | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif) | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/b",
+    "results": [
+      {
+        "title": "Single Malt Report: Islay Distillery 7 year old 2007 ...",
+        "url": "http://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-7.html",
+        "domain": "divingforpearlsblog.com",
+        "description": "The nose leads with big gorgeous peat, then mint, menthol, and burlap. notes of strawberry bubblegum, whipped cream, tangerines, and praline.",
+        "extraSnippets": [
+          "Twitter Widget Iframe | | | | | --- | --- | --- | | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif) | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bub"
+        ]
+      },
+      {
+        "title": "Islay Distillery – 2007 – Aged 8 Years (57.1%)",
+        "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/",
+        "domain": "norfolkwineandspirits.com",
+        "description": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%) $194.99 In stock. Weight 3.5 lbs Country of Origin Scotland Region … 57.1% Size 750 mL",
+        "extraSnippets": [
+          "![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](https://norfolkw"
+        ]
+      },
+      {
+        "title": "The Exclusive Malts “Islay” 8 Year 2007 (57.1% abv)",
+        "url": "https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/",
+        "domain": "maltimpostor.com",
+        "description": "Tasting notes: This whisky is, eponymously enough, an “Islay.” As if there is more than one Islay. As if Islays grow on trees.",
+        "extraSnippets": [
+          "[MENU](https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/#) _![](http://maltimpostor.com/wp-content/uploads/2017/01/Exclusive-Malts-Islay-8-Year-2007-26"
+        ]
+      },
+      {
+        "title": "2007 Exclusive Malts Isle of Islay 10 Years Review",
+        "url": "https://thewhiskeyjug.com/whiskey/2007-exclusive-malts-isle-of-islay-10-years-review/",
+        "domain": "thewhiskeyjug.com",
+        "description": "2007 Exclusive Malts Isle of Islay 10 Years Review: Bottled at 55.7%, aged 10 years and priced around $140. A big heavy harmonious whisky.",
+        "extraSnippets": [
+          "- [Skip to primary navigation](https://thewhiskeyjug.com/whiskey/2007-exclusive-malts-isle-of-islay-10-years-review/#genesis-mobile-nav-primary) - [Skip to main content](https://th"
+        ]
+      },
+      {
+        "title": "Review #675 - Isle of Islay 10 Year 2007 (Exclusive Malts)",
+        "url": "https://www.reddit.com/r/Scotch/comments/cshru7/review_675_isle_of_islay_10_year_2007_exclusive/",
+        "domain": "reddit.com",
+        "description": "Taste: Smoke, dirt, smoldering wood embers, syrup covered cooked stone fruit, dark treacle, slight brine, oak spice, slight musty oak. Medium to ...",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "bbb60e672c7cfa65a01f58109dd4a2cb8753656662d3f655f8273e3cf0a8df04",
+    "mode": "auto"
+  }
+}

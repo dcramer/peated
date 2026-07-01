@@ -1,0 +1,14 @@
+{
+  "writtenAt": "2026-06-30T23:47:53.988Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Shieldaig Speyside single malt 30 year old Scotch whisky"
+  },
+  "output": {
+    "error": "Firecrawl search failed: The operation was aborted due to timeout"
+  },
+  "metadata": {
+    "cacheKey": "6c448988542b12a4ab0ff2799e152e229e68411465e8225bfec523a33232595a",
+    "mode": "auto"
+  }
+}

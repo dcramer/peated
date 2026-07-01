@@ -12,9 +12,6 @@ const CANDIDATE_METADATA_FIELDS = [
   "abv",
   "vintageYear",
   "releaseYear",
-  "caskType",
-  "caskSize",
-  "caskFill",
 ] as const satisfies ReadonlyArray<keyof BottleCandidate>;
 
 function getBottleCandidateKey(

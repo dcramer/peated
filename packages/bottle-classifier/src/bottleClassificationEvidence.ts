@@ -60,9 +60,6 @@ export function extractedIdentityLooksLikePlainAgeStatementReference(
     !extractedLabel.edition &&
     extractedLabel.release_year === null &&
     extractedLabel.vintage_year === null &&
-    extractedLabel.cask_type === null &&
-    extractedLabel.cask_size === null &&
-    extractedLabel.cask_fill === null &&
     extractedLabel.cask_strength === null &&
     extractedLabel.single_cask === null &&
     extractedLabel.abv === null

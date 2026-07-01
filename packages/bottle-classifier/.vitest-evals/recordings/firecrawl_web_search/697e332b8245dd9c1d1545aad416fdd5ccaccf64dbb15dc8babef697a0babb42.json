@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-06-30T23:59:25.186Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Elijah Craig Barrel Proof C923 batch"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Elijah Craig Barrel Proof C923 batch",
+    "summary": "66.5% ABV. 13 years, 7 months. Nose: Strong notes of cocoa, vanilla, and oak with touches of cinnamon and mint underneath. Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog _I’d like to thank the ",
+    "results": [
+      {
+        "title": "Elijah Craig Barrel Proof, C923 - BOURBON GUY",
+        "url": "https://www.bourbonguy.com/blog/2023/10/10/elijah-craig-barrel-proof-c923",
+        "domain": "bourbonguy.com",
+        "description": "66.5% ABV. 13 years, 7 months. Nose: Strong notes of cocoa, vanilla, and oak with touches of cinnamon and mint underneath.",
+        "extraSnippets": [
+          "Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog _I’d l"
+        ]
+      },
+      {
+        "title": "Elijah Craig Barrel Proof Batch C923 - Whiskey in my Wedding Ring",
+        "url": "https://www.whiskeyinmyweddingring.com/reviews/elijah-craig-barrel-proof-batch-c923",
+        "domain": "whiskeyinmyweddingring.com",
+        "description": "This is a standout batch among the modern batches (A117 and forward). The dark fruit at the end elevates the Heaven Hill notes I love about ECBP.",
+        "extraSnippets": [
+          "[0](https://www.whiskeyinmyweddingring.com/cart) # Elijah Craig Barrel Proof Batch C923 [Reviews](https://www.whiskeyinmyweddingring.com/reviews/category/Reviews)[American Whiskey]"
+        ]
+      },
+      {
+        "title": "Elijah Craig Barrel Proof (Batch C923) Review - Breaking Bourbon",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": "Elijah Craig Barrel Proof Batch C923 is an amazing bourbon. Like any amazing bourbon, its greatness is the result of a flavor profile that comes together (near ...",
+        "extraSnippets": [
+          "By clicking **\"Accept\"**, you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts. View our [Privacy "
+        ]
+      },
+      {
+        "title": "Batch C923 & The Trajectory of Elijah Craig Barrel Proof ... - Reddit",
+        "url": "https://www.reddit.com/r/bourbon/comments/1iwl33h/reviews_163169_batch_c923_the_trajectory_of/",
+        "domain": "reddit.com",
+        "description": "MSRP is $75, no matter what batch, for 10+ year aged stated barrel proof from a legacy distillery, that's a great value. And I don't care what ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Elijah Craig Barrel Proof Bourbon C923 Review",
+        "url": "https://thebourbonculture.com/whiskey-reviews/elijah-craig-barrel-proof-bourbon-c923-review/",
+        "domain": "thebourbonculture.com",
+        "description": "Score: 8.4/10. Batch C923 was a joy to drink. It had everything I wanted in an ECBP with a little bit extra because of those fruit notes.",
+        "extraSnippets": [
+          "[Skip to Content](https://thebourbonculture.com/whiskey-reviews/elijah-craig-barrel-proof-bourbon-c923-review/#content) ![Elijah Craig Barrel Proof Bourbon C923 Review](https://the"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "697e332b8245dd9c1d1545aad416fdd5ccaccf64dbb15dc8babef697a0babb42",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "writtenAt": "2026-07-01T03:12:49.738Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Shieldaig Speyside 30 year old single malt Scotch whisky Total Wine Shieldaig"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Shieldaig Speyside 30 year old single malt Scotch whisky Total Wine Shieldaig",
+    "summary": "Scotland- Wonderfully refined with notes of citrus, spice and creamy milk chocolate. Dries nicely and builds with a beautiful nutty, cocoa and fruity finish. A ... Shieldaig Speyside Sin Malt 30Yr Scotch Whisky 750ml Bottle - ![Shieldaig Speyside Sin Malt 30Yr Scotch Whisky 750ml Bottle](https://www.totalwine.com/dynam",
+    "results": [
+      {
+        "title": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky | Total Wine & More",
+        "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-sin-malt-30yr-scotch-whisky/p/219106750?srsltid=AfmBOopFZSY7E28XwMV-6tBpwWhyazEjd-P4Bd8wB8p7IqtwSRS4vmB8",
+        "domain": "totalwine.com",
+        "description": "Scotland- Wonderfully refined with notes of citrus, spice and creamy milk chocolate. Dries nicely and builds with a beautiful nutty, cocoa and fruity finish. A ...",
+        "extraSnippets": [
+          "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky 750ml Bottle - ![Shieldaig Speyside Sin Malt 30Yr Scotch Whisky 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/images/21910"
+        ]
+      },
+      {
+        "title": "Shieldaig Scotch | Total Wine & More",
+        "url": "https://www.totalwine.com/theme/shieldaig-scotch?srsltid=AfmBOoo8ghxPiIDRN7x1j3xJXrpzuOxeWTlfNXuqEQLk2cun0Eg2CXSN",
+        "domain": "totalwine.com",
+        "description": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky ... Scotland- Wonderfully refined with notes of citrus, spice and creamy milk chocolate. Dries ...",
+        "extraSnippets": [
+          "# Shieldaig Scotch 1 - 18 of 18 results Items per page 24 items ### Brand Shieldaig (18) ### Country Scotland (18) ### Kosher Yes (1) ### Type Single Malt (12) Blended Scotch (6) #"
+        ]
+      },
+      {
+        "title": "Buy Shieldaig | Total Wine & More",
+        "url": "https://www.totalwine.com/spirits/brand/shieldaig?srsltid=AfmBOorc7uQIoRZfx5AH_NT-guPLoDh53cBbtid2r_yEH1Q9cpq_SKNT",
+        "domain": "totalwine.com",
+        "description": "Scotland- A smooth, classic blend containing Speyside and Island malts, each matured for at least 12 years. Harmonious oak, malt ...",
+        "extraSnippets": [
+          "# Shieldaig 0 results Items per page 24 items Sort Relevance Get It Fast Pick Up Pick Up OptionsChesapeake, VAAll Stores Deliver to 23320 Ship to Virginia Not available in Chesapea"
+        ]
+      },
+      {
+        "title": "Shieldaig Speyside. What changed? : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/1bf7ld2/shieldaig_speyside_what_changed/",
+        "domain": "reddit.com",
+        "description": "Shieldaig is a total wine spirits direct scotch and is usually garbage, it's essentially discarded casks from single malt distilleries.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Shieldaig 'Speyside' 30 Year Old Single Malt Scotch Whisky",
+        "url": "https://www.wine-searcher.com/find/shieldaig+thirty+old+single+malt+scotch+whisky+speyside+scotland/1/usa-ct?srsltid=AfmBOortF3bI-PkauvPhW918NhOq9KCE0MI9WhNs6awPcTL2Ns-wOiMI",
+        "domain": "wine-searcher.com",
+        "description": "Find the best local price for Shieldaig 'Speyside' 30 Year Old Single Malt Scotch Whisky, Speyside, Scotland. Avg Price (ex-tax) $200 / 750ml.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b3ef91e19677a117b51503453eba5c90cd0689b643a6c9669ba693358eb5fee1",
+    "mode": "auto"
+  }
+}

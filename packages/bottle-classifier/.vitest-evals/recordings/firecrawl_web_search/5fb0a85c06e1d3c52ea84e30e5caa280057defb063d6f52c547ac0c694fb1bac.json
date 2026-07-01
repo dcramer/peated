@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:55:30.777Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Four Roses Limited Edition Small Batch annual release 2017"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Four Roses Limited Edition Small Batch annual release 2017",
+    "summary": "The 2017 Limited Edition Small Batch from Four Roses — a documented recipe combination of OBSV 13 Year, OBSK 16 Year, OESV 15 Year, and OESK 14 ... [Skip to content](https://woodencork.com/products/four-roses-limited-edition-small-batch-2017#MainContent) [Skip to navigation](https://woodencork.com/products/four-roses-l",
+    "results": [
+      {
+        "title": "Four Roses Limited Edition Small Batch 2017 - Wooden Cork",
+        "url": "https://woodencork.com/products/four-roses-limited-edition-small-batch-2017?srsltid=AfmBOopSKSYLZ-Ixv9jjzcNc8lGo_Q4PKbYgeTT8_FEqL-CzTfV_6OSK",
+        "domain": "woodencork.com",
+        "description": "The 2017 Limited Edition Small Batch from Four Roses — a documented recipe combination of OBSV 13 Year, OBSK 16 Year, OESV 15 Year, and OESK 14 ...",
+        "extraSnippets": [
+          "[Skip to content](https://woodencork.com/products/four-roses-limited-edition-small-batch-2017#MainContent) [Skip to navigation](https://woodencork.com/products/four-roses-limited-e"
+        ]
+      },
+      {
+        "title": "Four Roses 2017 Limited Edition Small Batch Bourbon",
+        "url": "https://www.bourbonguy.com/blog/2017/9/26/four-roses-2017-limited-edition-small-batch-bourbon",
+        "domain": "bourbonguy.com",
+        "description": "Purchase Info: $130 at Four Roses Gift Center, Lawrenceburg, KY. · Details: 54% ABV. · Nose: Fruity and soft with notes of vanilla, caramel, ...",
+        "extraSnippets": [
+          "Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog View f"
+        ]
+      },
+      {
+        "title": "Review #241: Four Roses Limited Edition 2017 : r/bourbon - Reddit",
+        "url": "https://www.reddit.com/r/bourbon/comments/1e5mzsb/review_241_four_roses_limited_edition_2017/",
+        "domain": "reddit.com",
+        "description": "It's not exactly a secret, but Four Roses Limited Edition Small Batch is the best value among the big name yearly limited release bottles.",
+        "extraSnippets": []
+      },
+      {
+        "title": "2017 Four Roses Small Batch LE Review – Blog - Bourbonr",
+        "url": "http://bourbonr.com/blog/2017-four-roses-small-batch-le-review/",
+        "domain": "bourbonr.com",
+        "description": "The nose is fruity and spicy. There are hints of raspberry, plum, and black pepper. It's a little light. The sweetness is nice with caramel and floral.",
+        "extraSnippets": [
+          "[Skip to content](http://bourbonr.com/blog/2017-four-roses-small-batch-le-review/#content) [Blake](http://bourbonr.com/blog/author/admin/)in [Posts](http://bourbonr.com/blog/catego"
+        ]
+      },
+      {
+        "title": "Limited Edition Four Roses Barrels Light Up Your Palate",
+        "url": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+        "domain": "fourrosesbourbon.com",
+        "description": "This special release, stand-out barrels of Limited Edition Four Roses Bourbon are expertly crafted using refined recipes for Bourbon enthusiasts.",
+        "extraSnippets": [
+          "![Four roses logo](https://www.fourrosesbourbon.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffour-roses-vertical-logo.1369804e.png&w=480&q=75) ## Are You Over 21? yes, i amno, i"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5fb0a85c06e1d3c52ea84e30e5caa280057defb063d6f52c547ac0c694fb1bac",
+    "mode": "auto"
+  }
+}

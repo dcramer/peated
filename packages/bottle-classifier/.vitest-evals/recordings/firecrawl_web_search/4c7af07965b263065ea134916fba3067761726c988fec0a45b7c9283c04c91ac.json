@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T02:18:03.075Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Shieldaig Speyside 30 year old single malt scotch whisky"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Shieldaig Speyside 30 year old single malt scotch whisky",
+    "summary": "Scotland- Wonderfully refined with notes of citrus, spice and creamy milk chocolate. Dries nicely and builds with a beautiful nutty, cocoa and fruity finish. A ... Shieldaig Speyside Sin Malt 30Yr Scotch Whisky 750ml Bottle - ![Shieldaig Speyside Sin Malt 30Yr Scotch Whisky 750ml Bottle](https://www.totalwine.com/dynam",
+    "results": [
+      {
+        "title": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky | Total Wine & More",
+        "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-sin-malt-30yr-scotch-whisky/p/219106750?srsltid=AfmBOop3065BfhA72KhZwuOM_O4xYoB11GhDb6WHNEKerLGENsIYo0wI",
+        "domain": "totalwine.com",
+        "description": "Scotland- Wonderfully refined with notes of citrus, spice and creamy milk chocolate. Dries nicely and builds with a beautiful nutty, cocoa and fruity finish. A ...",
+        "extraSnippets": [
+          "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky 750ml Bottle - ![Shieldaig Speyside Sin Malt 30Yr Scotch Whisky 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/images/21910"
+        ]
+      },
+      {
+        "title": "Shieldaig Speyside 30 Year Single Malt Scotch Whisky",
+        "url": "https://jjspiritshop.com/shop/product/shieldaig-speyside-30-year-single-malt-scotch-whisky/5f87608516bd8402175bd45a?option-id=56daede98f49d30bc250238e4616c15b006d302e8372846f42df59b0f5affdee&srsltid=AfmBOor-GdJBDs0rR6YojMghaTQHEsV6FvdfKcHSyGRTGKymt2_UbdwF",
+        "domain": "jjspiritshop.com",
+        "description": "Description: Wonderfully refined with notes of citrus, spice and creamy milk chocolate. Dries nicely and builds with a beautiful nutty, cocoa and fruity finish.",
+        "extraSnippets": [
+          "[Jump to content](https://jjspiritshop.com/shop/product/shieldaig-speyside-30-year-single-malt-scotch-whisky/5f87608516bd8402175bd45a?option-id=56daede98f49d30bc250238e4616c15b006d"
+        ]
+      },
+      {
+        "title": "Shieldaig - Flaviar",
+        "url": "https://flaviar.com/collections/shieldaig",
+        "domain": "flaviar.com",
+        "description": "Some of the most popular expressions of Shieldaig include: Shielding 30 Year Old Speyside Scotch Whisky, Shieldaig Islay Single Malt Whisky, Shieldaig The ...",
+        "extraSnippets": [
+          "[My Wishlist](https://flaviar.com/collections/shieldaig?filter.v.m.custom.country_coverage_list=US&filter.v.m.custom.state_coverage_list=NY#swym-wishlist) 0 Please note: This websi"
+        ]
+      },
+      {
+        "title": "Shieldaig Speyside. What changed? : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/1bf7ld2/shieldaig_speyside_what_changed/",
+        "domain": "reddit.com",
+        "description": "This was my daily speyside for years. My latest bottle is horrible. Smells and tastes like overly sweet raisins and nothing else.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Shieldaig Speyside 30 Year Single Malt Scotch Whisky",
+        "url": "https://emliquor.com/shop/product/shieldaig-speyside-30-year-single-malt-scotch-whisky/5f87608516bd8402175bd45a?option-id=56daede98f49d30bc250238e4616c15b006d302e8372846f42df59b0f5affdee&srsltid=AfmBOopfjbRLnoQvjgsdIYSzL6DgQqtNSFCwMSTgAVo4Eul-HXvt9LwT",
+        "domain": "emliquor.com",
+        "description": "Wonderfully refined with notes of citrus, spice and creamy milk chocolate. Dries nicely and builds with a beautiful nutty, cocoa and fruity finish.",
+        "extraSnippets": [
+          "[Jump to content](https://emliquor.com/shop/product/shieldaig-speyside-30-year-single-malt-scotch-whisky/5f87608516bd8402175bd45a?option-id=56daede98f49d30bc250238e4616c15b006d302e"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "4c7af07965b263065ea134916fba3067761726c988fec0a45b7c9283c04c91ac",
+    "mode": "auto"
+  }
+}

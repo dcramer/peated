@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:04:14.757Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition double matured amoroso casks 2001 bottling"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker Distillers Edition double matured amoroso casks 2001 bottling",
+    "summary": "Bottles from this series are double matured, a process where the whisky gets a second maturation period in casks that have previously held fortified wine. - [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&product",
+    "results": [
+      {
+        "title": "Talisker 1988, The Distillers Edition 2001 Bottling",
+        "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+        "domain": "thewhiskyvault.com",
+        "description": "Bottles from this series are double matured, a process where the whisky gets a second maturation period in casks that have previously held fortified wine.",
+        "extraSnippets": [
+          "- [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=25536) [CHFS"
+        ]
+      },
+      {
+        "title": "Review #2: Talisker Distillers Edition Double Matured in ...",
+        "url": "https://www.reddit.com/r/Scotch/comments/16dgqiu/review_2_talisker_distillers_edition_double/",
+        "domain": "reddit.com",
+        "description": "Overall: It's not super complex and the mouthfeel is a bit lacking for me, but I very much enjoyed this with friends and will remember this ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker Distiller's Edition - A Bona Fide Beast",
+        "url": "http://smokybeast.blogspot.com/2012/12/smokybeast-review-talisker-distillers.html",
+        "domain": "smokybeast.blogspot.com",
+        "description": "\"Richer than the regular bottling, this wonderfully rounded DISTILLER'S EDITION double-matured in ex-Amoroso casks has a lucious, fruity ...",
+        "extraSnippets": [
+          "[![SmokyBeast](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj_VU2bzTeHKjkaB1TSLvj_HuvjFB4duSaeAfQuNWlV3uTiugjWM1LA6yUIPbNzu5Xwi0tk8meQCNyfSerggx5hkI6FLX0eotOhBk_Vr_R5"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition Double Matured Amoroso Sherry ...",
+        "url": "https://www.wine-searcher.com/find/talisker+distil+edition+double+amoroso+sherry+cask+wood+single+malt+scotch+whisky+isle+skye+island+scotland?srsltid=AfmBOoo3gBiKAg6cKBm1Kv_AzL_lC7OJb3Fwloq4WsCiO2eHbbjJIa_6",
+        "domain": "wine-searcher.com",
+        "description": "Avg Price (ex-tax); $ 92 / 750ml ; Style Single Malt Scotch Whisky ; Available in various bottlings · please refer to merchant for more specific information.",
+        "extraSnippets": [
+          "~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition Double Matured Amoroso ...",
+        "url": "https://www.missionliquor.com/products/talisker-distillers-edition-double-matured-amoroso-seasoned-american-oak-casks-single-malt-whisky-750ml",
+        "domain": "missionliquor.com",
+        "description": "Talisker Distillers Edition Double Matured Amoroso Seasoned American Oak Casks Single Malt Whisky 750ml. $79.99. SKU: 43299.",
+        "extraSnippets": [
+          "[My Wishlist](https://www.missionliquor.com/products/talisker-distillers-edition-double-matured-amoroso-seasoned-american-oak-casks-single-malt-whisky-750ml#swym-wishlist) 0 [Skip "
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "357a41f0b694154a967079a8172f2dcf23270bfc22756f189b3ab34d0496f9dc",
+    "mode": "auto"
+  }
+}

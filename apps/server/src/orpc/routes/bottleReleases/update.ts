@@ -18,6 +18,7 @@ import {
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
+import type { CaskFill, CaskSize, CaskType } from "@peated/server/types";
 import { pushJob } from "@peated/server/worker/client";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -243,9 +244,9 @@ export default procedure
           singleCask: resolvedReleaseIdentity.singleCask,
           caskStrength: resolvedReleaseIdentity.caskStrength,
           statedAge: resolvedReleaseIdentity.statedAge,
-          caskSize: resolvedReleaseIdentity.caskSize,
-          caskType: resolvedReleaseIdentity.caskType,
-          caskFill: resolvedReleaseIdentity.caskFill,
+          caskSize: resolvedReleaseIdentity.caskSize as CaskSize | null,
+          caskType: resolvedReleaseIdentity.caskType as CaskType | null,
+          caskFill: resolvedReleaseIdentity.caskFill as CaskFill | null,
           description: nextReleaseMetadata.description,
           imageUrl: nextReleaseMetadata.imageUrl,
           tastingNotes: nextReleaseMetadata.tastingNotes,

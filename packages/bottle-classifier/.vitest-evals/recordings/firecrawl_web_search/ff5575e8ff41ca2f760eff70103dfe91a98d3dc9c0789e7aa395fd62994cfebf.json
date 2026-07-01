@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:18:19.331Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 1661 Creative Whisky Company"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 1661 Creative Whisky Company",
+    "summary": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%) $194.99 In stock. Weight 3.5 lbs Country of Origin Scotland Region … 57.1% Size 750 mL ![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](",
+    "results": [
+      {
+        "title": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%)",
+        "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/",
+        "domain": "norfolkwineandspirits.com",
+        "description": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%) $194.99 In stock. Weight 3.5 lbs Country of Origin Scotland Region … 57.1% Size 750 mL",
+        "extraSnippets": [
+          "![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](https://norfolkw"
+        ]
+      },
+      {
+        "title": "Single Malt Report: Islay Distillery 8 year old 2007 ... - Diving for Pearls",
+        "url": "http://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-8.html",
+        "domain": "divingforpearlsblog.com",
+        "description": "320 Alcohol by Volume: 56.2% NEAT Its color is amber, It's lemony and very vegetal. Hints of bacon and Dove soap.",
+        "extraSnippets": [
+          "Twitter Widget Iframe | | | | | --- | --- | --- | | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif) | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bub"
+        ]
+      },
+      {
+        "title": "The Creative Whisky Co. 'The Exclusive Malts' Islay Distillery 8 Year ...",
+        "url": "https://www.wine-searcher.com/find/the+creative+whisky+co+exclusive+malts+distil+eight+old+single+malt+scotch+islay+scotland/1/switzerland?srsltid=AfmBOooSUgWlULk7XIUROS0GVWkIIeXY2uECZ6pOd9ttPC0Joxt-zxMC",
+        "domain": "wine-searcher.com",
+        "description": "2007 Bottle (750ml). The Exclusive Malts - Islay Distillery - 2007 - Aged 8 Years (57.1%), 8 Years Old, Refill Ex-Sherry Hogshead, Scotland. In stock (). Check ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Isle of Islay 10 Year Old 2007 Creative Whisky Company - YouTube",
+        "url": "https://www.youtube.com/watch?v=rJEgND2RwPo",
+        "domain": "youtube.com",
+        "description": "... shop The Whisky Barrel. The cask yielded 285 bottles at 100 Proof or 57.1% ABV. Nice and pale, which suggests that this is spirit-driven.",
+        "extraSnippets": [
+          "Mark’s Whisky Ramblings 428: Isle of Islay 10 Year Old 2007 Creative Whisky Company Tap to unmute 2x Copy link Info Shopping If playback doesn't begin shortly, try restarting your "
+        ]
+      },
+      {
+        "title": "The Exclusive Malts “Islay” 8 Year 2007 (57.1% abv)",
+        "url": "https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/",
+        "domain": "maltimpostor.com",
+        "description": "Tasting notes: This whisky is, eponymously enough, an “Islay.” As if there is more than one Islay. As if Islays grow on trees.",
+        "extraSnippets": [
+          "[MENU](https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/#) _![](http://maltimpostor.com/wp-content/uploads/2017/01/Exclusive-Malts-Islay-8-Year-2007-26"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "ff5575e8ff41ca2f760eff70103dfe91a98d3dc9c0789e7aa395fd62994cfebf",
+    "mode": "auto"
+  }
+}

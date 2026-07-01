@@ -23,9 +23,6 @@ function buildProposedBottle(): ProposedBottle {
     abv: 55.1,
     vintageYear: 2014,
     releaseYear: 2024,
-    caskType: "bourbon",
-    caskSize: "barrel",
-    caskFill: "1st_fill",
     brand: {
       id: null,
       name: "Maker's Mark",
@@ -142,9 +139,6 @@ describe("splitProposedBottleReleaseDraft", () => {
           abv: 55.1,
           vintageYear: 2014,
           releaseYear: 2024,
-          caskType: "bourbon",
-          caskSize: "barrel",
-          caskFill: "1st_fill",
           brand: {
             id: null,
             name: "Maker's Mark",
@@ -169,9 +163,6 @@ describe("splitProposedBottleReleaseDraft", () => {
       abv: null,
       vintageYear: null,
       releaseYear: null,
-      caskType: null,
-      caskSize: null,
-      caskFill: null,
     });
     expect(proposedRelease).toMatchObject({
       edition: "S2B13",
@@ -181,9 +172,6 @@ describe("splitProposedBottleReleaseDraft", () => {
       abv: 55.1,
       vintageYear: 2014,
       releaseYear: 2024,
-      caskType: "bourbon",
-      caskSize: "barrel",
-      caskFill: "1st_fill",
     });
   });
 
@@ -201,9 +189,6 @@ describe("splitProposedBottleReleaseDraft", () => {
           abv: null,
           vintageYear: null,
           releaseYear: null,
-          caskType: null,
-          caskSize: null,
-          caskFill: null,
           brand: {
             id: null,
             name: "Macallan",
@@ -224,9 +209,6 @@ describe("splitProposedBottleReleaseDraft", () => {
           singleCask: null,
           vintageYear: null,
           releaseYear: null,
-          caskType: null,
-          caskSize: null,
-          caskFill: null,
           description: null,
           tastingNotes: null,
           imageUrl: null,
@@ -237,6 +219,85 @@ describe("splitProposedBottleReleaseDraft", () => {
     expect(proposedBottle.statedAge).toBe(18);
     expect(proposedRelease).toMatchObject({
       statedAge: 12,
+    });
+  });
+
+  test("drops a release age that only repeats the proposed parent bottle age", () => {
+    const { proposedBottle, proposedRelease } = splitProposedBottleReleaseDraft(
+      {
+        proposedBottle: {
+          name: "Masterson's 10-year-old Straight Rye French Oak Finish",
+          series: null,
+          category: "rye",
+          edition: null,
+          statedAge: 10,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          brand: {
+            id: null,
+            name: "Masterson's",
+          },
+          distillers: [],
+          bottler: null,
+        },
+        proposedRelease: {
+          edition: null,
+          statedAge: 10,
+          abv: null,
+          caskStrength: null,
+          singleCask: null,
+          vintageYear: null,
+          releaseYear: null,
+          description: null,
+          tastingNotes: null,
+          imageUrl: null,
+        },
+      },
+    );
+
+    expect(proposedBottle.statedAge).toBe(10);
+    expect(proposedRelease).toBeNull();
+  });
+
+  test("drops a release edition that only repeats the release year", () => {
+    const { proposedRelease } = splitProposedBottleReleaseDraft({
+      proposedBottle: {
+        ...buildProposedBottle(),
+        name: "Limited Edition Small Batch",
+        statedAge: null,
+        edition: null,
+        abv: null,
+        caskStrength: null,
+        singleCask: null,
+        vintageYear: null,
+        releaseYear: null,
+        brand: {
+          id: null,
+          name: "Four Roses",
+        },
+        bottler: null,
+        distillers: [],
+      },
+      proposedRelease: {
+        edition: "2017",
+        statedAge: null,
+        abv: null,
+        caskStrength: null,
+        singleCask: null,
+        vintageYear: null,
+        releaseYear: 2017,
+        description: null,
+        tastingNotes: null,
+        imageUrl: null,
+      },
+    });
+
+    expect(proposedRelease).toMatchObject({
+      edition: null,
+      releaseYear: 2017,
     });
   });
 

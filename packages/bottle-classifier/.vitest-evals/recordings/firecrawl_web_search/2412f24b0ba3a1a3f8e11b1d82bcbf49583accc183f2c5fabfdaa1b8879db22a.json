@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:02:46.143Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition double matured 2001 bottling"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker Distillers Edition double matured 2001 bottling",
+    "summary": "Bottles from this series are double matured, a process where the whisky gets a second maturation period in casks that have previously held fortified wine. - [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&product",
+    "results": [
+      {
+        "title": "Talisker 1988, The Distillers Edition 2001 Bottling | The Whisky Vault",
+        "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+        "domain": "thewhiskyvault.com",
+        "description": "Bottles from this series are double matured, a process where the whisky gets a second maturation period in casks that have previously held fortified wine.",
+        "extraSnippets": [
+          "- [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=25536) [CHFS"
+        ]
+      },
+      {
+        "title": "Talisker 2001 Distillers Edition Bot.2012 - The Whisky Exchange",
+        "url": "https://www.thewhiskyexchange.com/p/22187/talisker-2001-distillers-edition-bot2012",
+        "domain": "thewhiskyexchange.com",
+        "description": "The 2001 vintage of Talisker's Distillers Edition, which is double matured, with the finish taking place in Amoroso casks, similar in style to sweet oloroso ...",
+        "extraSnippets": [
+          "- [![Friends of TWE icon](https://www.thewhiskyexchange.com/media/rtwe/assets/application-v2/images/icons/rebrand-icon_fotwe.svg)\\\\ \\\\ Friends of The Whisky Exchange](https://www.t"
+        ]
+      },
+      {
+        "title": "Talisker 2001 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": "Soft, oily, sweet-woody, pepper wave, berry jam, creamy notes, caramel, light shades of burnt crackers and kvass, dry medicinal herbs, peat in ...",
+        "extraSnippets": [
+          "**Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?__cf_chl_f_tk=h_2UUqcBQG_FKnixf1ZCmWekRePCzd8CRHU8Wuvwu"
+        ]
+      },
+      {
+        "title": "Review #2340 - Talisker Distiller's Edition : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/1fklplw/review_2340_talisker_distillers_edition/",
+        "domain": "reddit.com",
+        "description": "Briny sea air with a pop of toffee, fruits, wine and sweet butter cream. Overall: Talisker knows just how to draw me in and keep me interested.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker Distiller's Edition - A Bona Fide Beast - SmokyBeast",
+        "url": "http://smokybeast.blogspot.com/2012/12/smokybeast-review-talisker-distillers.html",
+        "domain": "smokybeast.blogspot.com",
+        "description": "The Distiller's Edition - distilled in 2001 and bottled in 2012, an 11-year variety that's been double matured in Amoroso sherry casks. At $70. ...",
+        "extraSnippets": [
+          "[![SmokyBeast](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj_VU2bzTeHKjkaB1TSLvj_HuvjFB4duSaeAfQuNWlV3uTiugjWM1LA6yUIPbNzu5Xwi0tk8meQCNyfSerggx5hkI6FLX0eotOhBk_Vr_R5"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2412f24b0ba3a1a3f8e11b1d82bcbf49583accc183f2c5fabfdaa1b8879db22a",
+    "mode": "auto"
+  }
+}

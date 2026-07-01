@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T00:59:50.778Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Glengoyne Legacy Series Chapter Two Chapter One series 48%"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Glengoyne Legacy Series Chapter Two Chapter One series 48%",
+    "summary": "Chapter Two in our Legacy Series marries spirits matured in two distinct cask types – first fill bourbon and refill sherry barrels. Cart FareHarbor Cart: \\[\\[ indexCtrl.cartEntriesTotal \\]\\] Checkout 0 Checkout Checkout with company... [![Glengoyne Logo](https://www.glengoyne.com/static/images/logo-dark.svg)](https://w",
+    "results": [
+      {
+        "title": "Glengoyne Legacy Series: Chapter Two",
+        "url": "https://www.glengoyne.com/glengoyne-legacy-series-chapter-two",
+        "domain": "glengoyne.com",
+        "description": "Chapter Two in our Legacy Series marries spirits matured in two distinct cask types – first fill bourbon and refill sherry barrels.",
+        "extraSnippets": [
+          "Cart FareHarbor Cart: \\[\\[ indexCtrl.cartEntriesTotal \\]\\] Checkout 0 Checkout Checkout with company... [![Glengoyne Logo](https://www.glengoyne.com/static/images/logo-dark.svg)](h"
+        ]
+      },
+      {
+        "title": "Glengoyne The Legacy Series Chapter One, 48% - Whisky Advocate",
+        "url": "https://whiskyadvocate.com/Glengoyne-The-Legacy-Series-Chapter-One-48",
+        "domain": "whiskyadvocate.com",
+        "description": "Dates, brittle toffee, dried fruits, and old leather on the nose, then a hint of ripe peaches surfaces. Smooth in the mouth, with sherry, damsons, ...",
+        "extraSnippets": [
+          "Back Save ![](https://whiskyadvocate.com/?resize=1290&crop=237x21,0x0) ### 87 Score # Glengoyne The Legacy Series Chapter One, 48% Price: $70.00● Issue: Summer 2019 ● Reviewer: Gav"
+        ]
+      },
+      {
+        "title": "Reviews #138, 139: Glengoyne, the Legacy Series, Chapters 1 & 2 ...",
+        "url": "https://www.reddit.com/r/Scotch/comments/xmz1pt/reviews_138_139_glengoyne_the_legacy_series/",
+        "domain": "reddit.com",
+        "description": "The Legacy Series: Chapter 1 (48% ABV, non-chillfiltered, natural color, NAS) Nose: Dry oak, sawdust, baking spices, mostly nutmeg and clove",
+        "extraSnippets": []
+      },
+      {
+        "title": "Glengoyne The Legacy Series Chapter Two (48%)",
+        "url": "https://bottegawhiskey.com/product/glengoyne-the-legacy-series-chapter-two-48/?srsltid=AfmBOorSYJPTTPYbZn1P9WNan5Es5ZdER2CIy-81rhlyajaiSrIfbW4z",
+        "domain": "bottegawhiskey.com",
+        "description": "A trio of casks make up this fruity expression, specifically 48% was aged in first-fill bourbon barrels, with 17% in first-fill sherry casks and 35% in oak ...",
+        "extraSnippets": [
+          "[Skip to content](https://bottegawhiskey.com/product/glengoyne-the-legacy-series-chapter-two-48/?__cf_chl_f_tk=dc6RqL_aNOEfyy7Ca6VQVUkmTMRphBHPwF1KHflG0X0-1782867583-1.0.1.1-XdZdBz"
+        ]
+      },
+      {
+        "title": "Glengoyne - Legacy Series Chapter 2 Highland Single Malt Scotch ...",
+        "url": "https://www.htfw.com/glengoyne-legacy-series-chapter-2-highland-single-malt-scotch-whisky?srsltid=AfmBOorHWlKg80rj6l1Jue4x4I_sQTCiQ8JkMMpNRad00Jee3BEvBdC3",
+        "domain": "htfw.com",
+        "description": "Product Details ; Alcohol ABV 48% ABV ; Year Bottled 2020 ; Cask Wood Type Oak ; Country of Origin Scotland ; Packaging Original Box ...",
+        "extraSnippets": [
+          "- [Worldwide Delivery AvailableCheck Our Shipping Prices](https://www.htfw.com/delivery-information) - [Same Day DispatchFor Orders Before 4:30pm](https://www.htfw.com/delivery-inf"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "8ef95de385c936e016742e5d8aa55bbfedf015d5198be75bc63114cc6bc2123d",
+    "mode": "auto"
+  }
+}

@@ -47,8 +47,8 @@ describe("POST /bottle-releases", () => {
       vintageYear: 2013,
       edition: "Batch 1",
       fullName:
-        "Ardbeg Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV - Refill - Bourbon - Hogshead",
-      name: "Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV - Refill - Bourbon - Hogshead",
+        "Ardbeg Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV",
+      name: "Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV",
       hasTasted: false,
       isFavorite: false,
       totalTastings: 0,
@@ -70,10 +70,10 @@ describe("POST /bottle-releases", () => {
     expect(release.releaseYear).toBe(2023);
     expect(release.vintageYear).toBe(2013);
     expect(release.fullName).toBe(
-      "Ardbeg Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV - Refill - Bourbon - Hogshead",
+      "Ardbeg Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV",
     );
     expect(release.name).toBe(
-      "Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV - Refill - Bourbon - Hogshead",
+      "Urquhart - Batch 1 - 10-year-old - 2023 Release - 2013 Vintage - 46.1% ABV",
     );
 
     const releaseAlias = await db.query.bottleAliases.findFirst({
@@ -143,9 +143,8 @@ describe("POST /bottle-releases", () => {
       releaseYear: 2023,
       vintageYear: 2013,
       edition: "Batch 1",
-      fullName:
-        "Ardbeg 10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV - Refill - Bourbon - Hogshead",
-      name: "10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV - Refill - Bourbon - Hogshead",
+      fullName: "Ardbeg 10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV",
+      name: "10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV",
       hasTasted: false,
       isFavorite: false,
       totalTastings: 0,
@@ -167,10 +166,10 @@ describe("POST /bottle-releases", () => {
     expect(release.releaseYear).toBe(2023);
     expect(release.vintageYear).toBe(2013);
     expect(release.fullName).toBe(
-      "Ardbeg 10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV - Refill - Bourbon - Hogshead", // No age in name since it's in bottle
+      "Ardbeg 10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV",
     );
     expect(release.name).toBe(
-      "10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV - Refill - Bourbon - Hogshead", // No age in name since it's in bottle
+      "10 - Batch 1 - 2023 Release - 2013 Vintage - 46.0% ABV",
     );
 
     // Verify numReleases was incremented
@@ -388,7 +387,7 @@ describe("POST /bottle-releases", () => {
     );
 
     expect(result.fullName).toBe(
-      "Ardbeg Distillery Reserve - Single Cask - Cask Strength - 1st Fill - Tawny Port - Hogshead",
+      "Ardbeg Distillery Reserve - Single Cask - Cask Strength",
     );
   });
 
@@ -434,9 +433,7 @@ describe("POST /bottle-releases", () => {
     );
 
     expect(result.caskType).toBe("oloroso");
-    expect(result.fullName).toBe(
-      "Ardbeg Distillery Reserve - 46.0% ABV - Refill - Oloroso - Hogshead",
-    );
+    expect(result.fullName).toBe("Ardbeg Distillery Reserve - 46.0% ABV");
   });
 
   it("throws error if release with same attributes exists", async function ({

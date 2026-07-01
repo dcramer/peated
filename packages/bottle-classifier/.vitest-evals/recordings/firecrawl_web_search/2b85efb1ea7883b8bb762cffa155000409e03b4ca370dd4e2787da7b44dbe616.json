@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T02:36:50.302Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Penelope Bourbon Barrel Strength Batch 11"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Penelope Bourbon Barrel Strength Batch 11",
+    "summary": "This stretches 4 year whiskey to the max. You can tell it lacks years in the barrel, but the blend eliminates most of the harsh notes away. This is a blend of 3 different MGP bourbon mashbills, rye'd and wheated mashbills, that leads to the four grain blend of corn, wheat, rye, and barley. [Skip to content](https://www",
+    "results": [
+      {
+        "title": "Top of the Amp Review #43: Penelope Barrel Strength Batch 11",
+        "url": "https://www.reddit.com/r/bourbon/comments/131viof/top_of_the_amp_review_43_penelope_barrel_strength/",
+        "domain": "reddit.com",
+        "description": "This stretches 4 year whiskey to the max. You can tell it lacks years in the barrel, but the blend eliminates most of the harsh notes away.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Penelope Bourbon Barrel Strength Four Grain | The Whiskey Shelf",
+        "url": "https://www.thewhiskeyshelf.com/penelope-bourbon-barrel-strength-four-grain-review/",
+        "domain": "thewhiskeyshelf.com",
+        "description": "This is a blend of 3 different MGP bourbon mashbills, rye'd and wheated mashbills, that leads to the four grain blend of corn, wheat, rye, and barley.",
+        "extraSnippets": [
+          "[Skip to content](https://www.thewhiskeyshelf.com/penelope-bourbon-barrel-strength-four-grain-review/#content \"Skip to content\") # Penelope Bourbon Barrel Strength Four Grain Revie"
+        ]
+      },
+      {
+        "title": "Barrel Strength - Penelope Bourbon",
+        "url": "https://shop.penelopebourbon.com/products/barrel-strength",
+        "domain": "shop.penelopebourbon.com",
+        "description": "Each batch of our Barrel Strength is blended from three bourbon mash bills and aged in hand-selected new American oak barrels, imparting notes of caramel syrup ...",
+        "extraSnippets": [
+          "Skip to main contentEnable accessibility for low visionOpen the accessibility menu ![Spinner: White decorative](https://cdn.userway.org/widgetapp/images/spin_wh.svg) ![](https://cd"
+        ]
+      },
+      {
+        "title": "Penelope Barrel Strength Bourbon, Batch 14",
+        "url": "https://www.bourbonguy.com/blog/2023/5/25/penelope-barrel-strength-bourbon",
+        "domain": "bourbonguy.com",
+        "description": "4 years old. 56% ABV. Batch 14. Blend of three bourbon mash bills combining to the ratio 74% Corn, 16% Wheat, 7% Rye, and 3% Malted Barley.",
+        "extraSnippets": [
+          "Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog ![](ht"
+        ]
+      },
+      {
+        "title": "Penelope Barrel Strength Batch #11 Straight Bourbon Whiskey",
+        "url": "https://caskcartel.com/products/penelope-barrel-strength-batch-11-straight-bourbon-whiskey",
+        "domain": "caskcartel.com",
+        "description": "Each batch is blended from three bourbon mash bills aged in new American oak barrels and completely uncut and non-chill-filtered. Order from the ...",
+        "extraSnippets": [
+          "United States - [United States](https://caskcartel.com/products/penelope-barrel-strength-batch-11-straight-bourbon-whiskey) - [Spain](about:blank#) - [France](about:blank#) - [Port"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2b85efb1ea7883b8bb762cffa155000409e03b4ca370dd4e2787da7b44dbe616",
+    "mode": "auto"
+  }
+}

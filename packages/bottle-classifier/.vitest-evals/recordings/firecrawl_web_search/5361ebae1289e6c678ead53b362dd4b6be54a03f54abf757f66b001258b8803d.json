@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T00:57:18.692Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition bottled 2001 double matured"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker Distillers Edition bottled 2001 double matured",
+    "summary": "Bottles from this series are double matured, a process where the whisky gets a second maturation period in casks that have previously held fortified wine. - [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&product",
+    "results": [
+      {
+        "title": "Talisker 1988, The Distillers Edition 2001 Bottling",
+        "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+        "domain": "thewhiskyvault.com",
+        "description": "Bottles from this series are double matured, a process where the whisky gets a second maturation period in casks that have previously held fortified wine.",
+        "extraSnippets": [
+          "- [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=25536) [CHFS"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition 2012",
+        "url": "https://www.musthavemalts.com/product/talisker-distillers-edition-2012/",
+        "domain": "musthavemalts.com",
+        "description": "This richly flavoured maritime malt, distilled in 2001, has been double matured in Amoroso cask wood. Its luscious, fruity sweetness perfectly complements ...",
+        "extraSnippets": [
+          "Search ``` ``` Search [![](https://208.wpcdnnode.com/musthavemalts.com/wp-content/uploads/2026/04/MHM-Logo.png)](https://www.musthavemalts.com/) No products in the cart. [€ 0.00€ 0"
+        ]
+      },
+      {
+        "title": "Talisker 2001 - Ratings and reviews",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": "Soft, oily, sweet-woody, pepper wave, berry jam, creamy notes, caramel, light shades of burnt crackers and kvass, dry medicinal herbs, peat in ...",
+        "extraSnippets": [
+          "**Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?__cf_chl_f_tk=h_2UUqcBQG_FKnixf1ZCmWekRePCzd8CRHU8Wuvwu"
+        ]
+      },
+      {
+        "title": "Review #2340 - Talisker Distiller's Edition : r/Scotch",
+        "url": "https://www.reddit.com/r/Scotch/comments/1fklplw/review_2340_talisker_distillers_edition/",
+        "domain": "reddit.com",
+        "description": "Briny sea air with a pop of toffee, fruits, wine and sweet butter cream. Overall: Talisker knows just how to draw me in and keep me interested.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker Distillers Edition | Whisky Review",
+        "url": "https://www.youtube.com/watch?v=mS3NIH0-v08",
+        "domain": "youtube.com",
+        "description": "Taliska Distillers Edition belongs to my all-time favorite and this is it. So you immediately get a mouthful.",
+        "extraSnippets": [
+          "Talisker Distillers Edition \\| Whisky Review Tap to unmute 2x Copy link Info Shopping ![](https://i.ytimg.com/an/nCE0-pPZuit8aud1l9rhkA/featured_channel.jpg?v=5ed8eafa) If playback"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5361ebae1289e6c678ead53b362dd4b6be54a03f54abf757f66b001258b8803d",
+    "mode": "auto"
+  }
+}

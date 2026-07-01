@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T00:59:14.242Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition bottled 2001"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker Distillers Edition bottled 2001",
+    "summary": "Soft, oily, sweet-woody, pepper wave, berry jam, creamy notes, caramel, light shades of burnt crackers and kvass, dry medicinal herbs, peat in ... **Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?__cf_chl_f_tk=h_2UUqcBQG_FKnixf1ZCmWekRePCzd8CRH",
+    "results": [
+      {
+        "title": "Talisker 2001 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": "Soft, oily, sweet-woody, pepper wave, berry jam, creamy notes, caramel, light shades of burnt crackers and kvass, dry medicinal herbs, peat in ...",
+        "extraSnippets": [
+          "**Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?__cf_chl_f_tk=h_2UUqcBQG_FKnixf1ZCmWekRePCzd8CRHU8Wuvwu"
+        ]
+      },
+      {
+        "title": "Talisker 1988, The Distillers Edition 2001 Bottling | The Whisky Vault",
+        "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+        "domain": "thewhiskyvault.com",
+        "description": "This rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001.",
+        "extraSnippets": [
+          "- [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=25536) [CHFS"
+        ]
+      },
+      {
+        "title": "Talisker - 2001 Distillers Edition - Whisky.com",
+        "url": "https://www.whisky.com/whisky-database/details.html?tx_datamintsflaschendb_pi4%5Baction%5D=Detail&tx_datamintsflaschendb_pi4%5Bcontroller%5D=Flaschen&tx_datamintsflaschendb_pi4%5Bflasche%5D=11405&cHash=92eb1a352075c792879e40607f8744eb",
+        "domain": "whisky.com",
+        "description": "Talisker - 2001 Distillers Edition ; Distillation date: 2001 ; Bottling date: 2012 ; ABV: 45.8% ; Bottle size: 0.7 l.",
+        "extraSnippets": [
+          "Delivery Country Delivery Country ![DE](https://www.whisky.com/typo3conf/ext/sitepackage/Resources/Public/Libraries/other_whisky_resources/src/public/images/flags/DE.svg?1781180576"
+        ]
+      },
+      {
+        "title": "Review #2340 - Talisker Distiller's Edition : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/1fklplw/review_2340_talisker_distillers_edition/",
+        "domain": "reddit.com",
+        "description": "Briny sea air with a pop of toffee, fruits, wine and sweet butter cream. Overall: Talisker knows just how to draw me in and keep me interested.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker 2001 Distillers Edition Single Malt Scotch Whisky 13 Year Old",
+        "url": "https://www.htfw.com/talisker-2001-distillers-edition-single-malt-scotch-1988-13-year-old-whisky?srsltid=AfmBOoqGQLnkGEWZYEhxWN0QObRZySS1tL4e-1x-7_zT71AmrV5gd110",
+        "domain": "htfw.com",
+        "description": "Product Details. Distillery/Brand Talisker. Region Islands. Age 13 year old. Alcohol ABV 45.8% ABV. Vintage 1988. Year Bottled 2001. Cask Wood Type Sherry.",
+        "extraSnippets": [
+          "- [Worldwide Delivery AvailableCheck Our Shipping Prices](https://www.htfw.com/delivery-information) - [Same Day DispatchFor Orders Before 4:30pm](https://www.htfw.com/delivery-inf"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "34e27f5a43c1479b085d0b56d515779c61de045f41163e6f7a1dba1513da5af3",
+    "mode": "auto"
+  }
+}

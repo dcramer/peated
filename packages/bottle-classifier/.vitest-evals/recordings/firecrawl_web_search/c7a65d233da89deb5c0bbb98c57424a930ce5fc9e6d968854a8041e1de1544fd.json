@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-06-30T22:47:16.610Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "\"Masterson's Straight Rye Whiskey\" \"French Oak\" \"10 year\""
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "\"Masterson's Straight Rye Whiskey\" \"French Oak\" \"10 year\"",
+    "summary": "This meticulous aging process contributes to its exceptional quality, making it a sought-after choice for whiskey enthusiasts and connoisseurs alike. The ... [Skip to content](https://bottlebuzz.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr#MainContent) Pause slideshow Play slideshow ![M",
+    "results": [
+      {
+        "title": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr",
+        "url": "https://bottlebuzz.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr?srsltid=AfmBOopE5qEPTbmd0_cWz-lavysILJzx3K2BAQocvCnmmVyp1um_xBaV",
+        "domain": "bottlebuzz.com",
+        "description": "This meticulous aging process contributes to its exceptional quality, making it a sought-after choice for whiskey enthusiasts and connoisseurs alike. The ...",
+        "extraSnippets": [
+          "[Skip to content](https://bottlebuzz.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr#MainContent) Pause slideshow Play slideshow ![Masterson's Straigh"
+        ]
+      },
+      {
+        "title": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr",
+        "url": "https://woodencork.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr?srsltid=AfmBOoql4ADCXFHpvo-nq8d5lEzKTm2oxUC0vvXJozx_I9JoDMY5uLNV",
+        "domain": "woodencork.com",
+        "description": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr - Available at Wooden Cork ... Masterson's Rye Whiskey 10 Year. Masterson's. $89 $89.99.",
+        "extraSnippets": [
+          "[Skip to content](https://woodencork.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr#MainContent) [Skip to navigation](https://woodencork.com/products"
+        ]
+      },
+      {
+        "title": "Masterson's French Oak Barrel Finished 10 Year Old Straight Rye ...",
+        "url": "https://www.wine-searcher.com/find/mastersons+france+oak+barrel+ten+old+straight+rye+whisky+canada?srsltid=AfmBOoouYUimZ89Vjpn-Rby7HfI0lH4Pwk3F-12f5AYuF_l_F2_8bquH",
+        "domain": "wine-searcher.com",
+        "description": "Masterson's French Oak Barrel Finished 10 Year Old Straight Rye Whisky ... Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Years Old. Low ...",
+        "extraSnippets": [
+          "~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at"
+        ]
+      },
+      {
+        "title": "Masterson's 10-year-old - Market Value and Price Insights ...",
+        "url": "https://www.whiskystats.com/whisky/100753",
+        "domain": "whiskystats.com",
+        "description": "Track Masterson's 10-year-old insights ... Masterson's Straight Rye Whiskey. Masterson's 10-year-old ... Cask F2-020 French Oak, Medium Toasted. Batch 008 ...",
+        "extraSnippets": [
+          "We use cookies to improve your online experience. By using this site, you consent to this use as described in our [Privacy policy](https://www.whiskystats.com/privacy). [Ok](https:"
+        ]
+      },
+      {
+        "title": "Spirits - Philadelphia Magazine",
+        "url": "https://www.phillymag.com/whiskeyfest2015/spirits/",
+        "domain": "phillymag.com",
+        "description": "Laphroaig 10 year old Single Malt Scotch Whisky ... The Glenlivet French Oak Scotch 15 Year Old. The ... Masterson's Straight Rye Whiskey 10 Year Old ...",
+        "extraSnippets": [
+          "![starburst](https://cdn10.phillymag.com/wp-content/uploads/2014/10/starburst.jpg) # Spirits | | | | | --- | --- | --- | | Jefferson Small Batch Bourbon | Jefferson Reserve Straigh"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "c7a65d233da89deb5c0bbb98c57424a930ce5fc9e6d968854a8041e1de1544fd",
+    "mode": "auto"
+  }
+}

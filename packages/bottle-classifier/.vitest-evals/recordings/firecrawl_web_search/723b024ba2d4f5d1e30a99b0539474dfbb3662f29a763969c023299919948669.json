@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T02:20:40.095Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "site:woodfordreserve.com Woodford Reserve Double Double Oaked proof"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "site:woodfordreserve.com Woodford Reserve Double Double Oaked proof",
+    "summary": "Woodford Reserve Kentucky Straight Whiskey 45.2% Alc. by Vol. The Woodford Reserve Distillery, Versailles, KY. ... To learn more about responsible consumption, ... [Skip to main content](https://www.woodfordreserve.com/whiskey/double-double-oaked/#main-content) ![](https://www.woodfordreserve.com/wp-content/uploads/202",
+    "results": [
+      {
+        "title": "Double Double Oaked - Woodford Reserve",
+        "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": "Woodford Reserve Kentucky Straight Whiskey 45.2% Alc. by Vol. The Woodford Reserve Distillery, Versailles, KY. ... To learn more about responsible consumption, ...",
+        "extraSnippets": [
+          "[Skip to main content](https://www.woodfordreserve.com/whiskey/double-double-oaked/#main-content) ![](https://www.woodfordreserve.com/wp-content/uploads/2023/01/F25-WRDDO_RENDER-1-"
+        ]
+      },
+      {
+        "title": "Double Oaked - Woodford Reserve",
+        "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": "Tasting Notes. Proof. 90.4 °. Appearance. Deep Amber. Nose. Rich notes of dark fruit, caramel, sharp honey, chocolate, marzipan and toasted oak. Taste. A full ...",
+        "extraSnippets": [
+          "[Skip to main content](https://www.woodfordreserve.com/whiskey/double-oaked/#main-content) ![Star.](https://www.woodfordreserve.com/wp-content/themes/woodford/dist/img/icons/star.s"
+        ]
+      },
+      {
+        "title": "2026 Double Double Oaked - Woodford Reserve",
+        "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "domain": "shop.woodfordreserve.com",
+        "description": "Presented at 90.4 Proof. Limit 2 bottles per person. More Info. Double Double Oaked is handcrafted by finishing fully-mature Woodford Reserve Double Oaked ...",
+        "extraSnippets": [
+          "[Skip to main content](https://shop.woodfordreserve.com/2026-double-double-oaked/#main-content) ![Woodford Reserve Bournbon Bottle](https://cdn11.bigcommerce.com/s-fqee318z5c/image"
+        ]
+      },
+      {
+        "title": "Woodford Reserve Double Double Oaked Returns as 2023 Winter ...",
+        "url": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+        "domain": "woodfordreserve.com",
+        "description": "Double Double Oaked is presented at 90.4 proof with a suggested retail price of $59.99 for a 375ml bottle. Double Double Oaked will also be available in ...",
+        "extraSnippets": [
+          "[Skip to main content](https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/#main-content) **Versailles, Ky (January 18, 20"
+        ]
+      },
+      {
+        "title": "Woodford Reserve Official Store | Premium Kentucky Bourbon ...",
+        "url": "https://shop.woodfordreserve.com/",
+        "domain": "shop.woodfordreserve.com",
+        "description": "It is bottled at 90.4 proof. Woodford Reserve Double Oaked takes that same fully matured bourbon and ages it a second time in a different kind of barrel ...",
+        "extraSnippets": [
+          "[Skip to main content](https://shop.woodfordreserve.com/#main-content) ![Woodford Reserve Bournbon Bottle](https://cdn11.bigcommerce.com/s-fqee318z5c/images/stencil/original/image-"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "723b024ba2d4f5d1e30a99b0539474dfbb3662f29a763969c023299919948669",
+    "mode": "auto"
+  }
+}

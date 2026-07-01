@@ -17,9 +17,6 @@
       "abv": null,
       "release_year": null,
       "vintage_year": 1994,
-      "cask_type": "sherry",
-      "cask_size": null,
-      "cask_fill": null,
       "cask_strength": null,
       "single_cask": null,
       "edition": null
@@ -42,9 +39,6 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": "oloroso",
-        "caskSize": null,
-        "caskFill": null,
         "score": 0.94,
         "source": ["text"],
         "familyContext": {
@@ -61,10 +55,7 @@
               "vintageYear": 1993,
               "abv": null,
               "singleCask": null,
-              "caskStrength": null,
-              "caskFill": null,
-              "caskType": null,
-              "caskSize": null
+              "caskStrength": null
             }
           ]
         },

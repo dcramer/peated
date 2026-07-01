@@ -1,0 +1,59 @@
+{
+  "writtenAt": "2026-06-30T23:52:08.719Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Maker's Mark Private Selection S2B13"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Maker's Mark Private Selection S2B13",
+    "summary": "Nose: It has very pleasant and lovely aromas. Palate: A rich, complex, and smooth taste. Finish: Perfect, long lasting finish. Distillery Information Maker's ... ![world of whiskey sales](https://worldofwhiskeysale.com/wp-content/uploads/2024/05/Screenshot_2025-10-17_at_3.41.50_AM-removebg-preview.png) ## ARE YOU OF LE",
+    "results": [
+      {
+        "title": "Maker's Mark Private Selection #S2B13 Kentucky Straight ...",
+        "url": "https://worldofwhiskeysale.com/product/makers-mark-private-selection-s2b13-kentucky-straight-bourbon-whisky/?srsltid=AfmBOoo7o-pk1KBnFRNTIsOe1fD2zjjqKwxW_vEarTDnbx0fKYxZuqEd",
+        "domain": "worldofwhiskeysale.com",
+        "description": "Nose: It has very pleasant and lovely aromas. Palate: A rich, complex, and smooth taste. Finish: Perfect, long lasting finish. Distillery Information Maker's ...",
+        "extraSnippets": [
+          "![world of whiskey sales](https://worldofwhiskeysale.com/wp-content/uploads/2024/05/Screenshot_2025-10-17_at_3.41.50_AM-removebg-preview.png) ## ARE YOU OF LEGAL DRINKING AGE? Are "
+        ]
+      },
+      {
+        "title": "Makers Mark",
+        "url": "https://www.reservebar.com/collections/makers-mark",
+        "domain": "reservebar.com",
+        "description": "MAKER'S MARK PRIVATE SELECTION KENTUCKY BOURBON WHISKY S2B13. 750 ML. $80.99. Add to cart ...",
+        "extraSnippets": [
+          "## HOME/SPIRITS/WHISKEY # Maker's Mark Discover the handmade bourbon that changed the industry. Famous for its hand-dipped red wax seal, our Maker's Mark collection highlights a si"
+        ]
+      },
+      {
+        "title": "Review: Maker's Mark Private Selection (\"The Stipulation\")",
+        "url": "https://www.reddit.com/r/bourbon/comments/1smnmp2/review_makers_mark_private_selection_the/",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Review: Maker's Mark Private Select – Bourbon Street Wine & Spirits Pick",
+        "url": "https://www.reddit.com/r/bourbon/comments/1s0kfgm/review_makers_mark_private_select_bourbon_street/",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Private Selection Bourbon: Premium Whisky | Maker's Mark®",
+        "url": "https://www.makersmark.com/en-us/bourbons/makers-mark-private-selection",
+        "domain": "makersmark.com",
+        "description": "Maker's Mark Private Selection offers a new customized take on the Maker's Mark 46 process and begins with cask-strength Maker's Mark as the base.",
+        "extraSnippets": [
+          "[Skip to main content](https://www.makersmark.com/en-us/bourbons/makers-mark-private-selection#main-content) ![test](https://www.makersmark.com/sites/default/files/styles/original/"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "39e69dde72341b1f5f15c29f3751ce74c39a9f16545822bdfe0c4189d3b0649c",
+    "mode": "auto"
+  }
+}

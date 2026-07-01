@@ -11,7 +11,10 @@ import {
   type Bottle,
   type LegacyReleaseRepairReview,
 } from "@peated/server/db/schema";
-import { reviewLegacyCreateParentResolutionWithClassifier } from "@peated/server/lib/legacyReleaseRepairClassifier";
+import {
+  reviewLegacyCreateParentResolutionWithClassifier,
+  type LegacyReleaseRepairClassifierParentCandidate,
+} from "@peated/server/lib/legacyReleaseRepairClassifier";
 import {
   getLegacyReleaseRepairBottleFingerprint,
   getLegacyReleaseRepairParentCandidatesFingerprint,
@@ -257,7 +260,12 @@ export async function refreshLegacyReleaseRepairReview({
   const classifierResolution =
     await reviewLegacyCreateParentResolutionWithClassifier({
       legacyBottle,
-      parentRows: parentRows as LegacyReleaseRepairParentCandidate[],
+      parentRows: parentRows.map((row) => ({
+        ...row,
+        caskFill: null,
+        caskSize: null,
+        caskType: null,
+      })) as LegacyReleaseRepairClassifierParentCandidate[],
     });
   const legacyBottleFingerprint =
     getLegacyReleaseRepairBottleFingerprint(legacyBottle);

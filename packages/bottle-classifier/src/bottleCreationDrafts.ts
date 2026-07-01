@@ -16,9 +16,6 @@ const EMPTY_PROPOSED_RELEASE: ProposedRelease = {
   singleCask: null,
   vintageYear: null,
   releaseYear: null,
-  caskType: null,
-  caskSize: null,
-  caskFill: null,
   description: null,
   tastingNotes: null,
   imageUrl: null,
@@ -131,23 +128,40 @@ export function normalizeProposedBottleDraft(
   };
 }
 
-function hasReleaseSpecificDraft(proposedRelease: ProposedRelease | null) {
+function hasReleaseSpecificDraft(
+  proposedRelease: ProposedRelease | null,
+  proposedBottle?: ProposedBottle | null,
+) {
   if (!proposedRelease) {
     return false;
   }
 
   return [
     proposedRelease.edition,
-    proposedRelease.statedAge,
+    proposedRelease.statedAge !== proposedBottle?.statedAge
+      ? proposedRelease.statedAge
+      : null,
     proposedRelease.abv,
     proposedRelease.caskStrength,
     proposedRelease.singleCask,
     proposedRelease.vintageYear,
     proposedRelease.releaseYear,
-    proposedRelease.caskType,
-    proposedRelease.caskSize,
-    proposedRelease.caskFill,
   ].some((value) => value !== null && value !== undefined);
+}
+
+function normalizeProposedReleaseDraft(
+  proposedRelease: ProposedRelease,
+): ProposedRelease {
+  const normalizedEdition = normalizeString(proposedRelease.edition ?? "");
+  const redundantYearEdition =
+    /^\d{4}$/.test(normalizedEdition) &&
+    (Number(normalizedEdition) === proposedRelease.releaseYear ||
+      Number(normalizedEdition) === proposedRelease.vintageYear);
+
+  return {
+    ...proposedRelease,
+    edition: redundantYearEdition ? null : proposedRelease.edition,
+  };
 }
 
 export function inferBottleCreationTarget({
@@ -191,15 +205,13 @@ export function splitProposedBottleReleaseDraft({
     singleCask: normalizedBottle.singleCask,
     vintageYear: normalizedBottle.vintageYear,
     releaseYear: normalizedBottle.releaseYear,
-    caskType: normalizedBottle.caskType,
-    caskSize: normalizedBottle.caskSize,
-    caskFill: normalizedBottle.caskFill,
   };
 
   const mergedRelease: ProposedRelease = {
     ...releaseFromBottle,
     ...(proposedRelease ?? {}),
   };
+  const normalizedRelease = normalizeProposedReleaseDraft(mergedRelease);
 
   const bottleWithoutReleaseLeak: ProposedBottle = {
     ...normalizedBottle,
@@ -209,15 +221,15 @@ export function splitProposedBottleReleaseDraft({
     singleCask: null,
     vintageYear: null,
     releaseYear: null,
-    caskType: null,
-    caskSize: null,
-    caskFill: null,
   };
 
   return {
     proposedBottle: bottleWithoutReleaseLeak,
-    proposedRelease: hasReleaseSpecificDraft(mergedRelease)
-      ? mergedRelease
+    proposedRelease: hasReleaseSpecificDraft(
+      normalizedRelease,
+      normalizedBottle,
+    )
+      ? normalizedRelease
       : null,
   };
 }
@@ -255,7 +267,9 @@ export function normalizeBottleCreationDrafts({
       })
     : {
         proposedBottle: null,
-        proposedRelease: proposedRelease ?? null,
+        proposedRelease: proposedRelease
+          ? normalizeProposedReleaseDraft(proposedRelease)
+          : null,
       };
 
   if (requestedCreationTarget === "release") {

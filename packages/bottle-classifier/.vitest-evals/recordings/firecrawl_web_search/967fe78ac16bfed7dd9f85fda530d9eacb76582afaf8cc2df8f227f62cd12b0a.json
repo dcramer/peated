@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:57:48.605Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Elijah Craig Barrel Proof Batch C923 12 year"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Elijah Craig Barrel Proof Batch C923 12 year",
+    "summary": "66.5% ABV. 13 years, 7 months. Nose: Strong notes of cocoa, vanilla, and oak with touches of cinnamon and mint underneath. Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog _I’d like to thank the ",
+    "results": [
+      {
+        "title": "Elijah Craig Barrel Proof, C923 - BOURBON GUY",
+        "url": "https://www.bourbonguy.com/blog/2023/10/10/elijah-craig-barrel-proof-c923",
+        "domain": "bourbonguy.com",
+        "description": "66.5% ABV. 13 years, 7 months. Nose: Strong notes of cocoa, vanilla, and oak with touches of cinnamon and mint underneath.",
+        "extraSnippets": [
+          "Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog _I’d l"
+        ]
+      },
+      {
+        "title": "Elijah Craig Barrel Proof Batch C923 - Whiskey in my Wedding Ring",
+        "url": "https://www.whiskeyinmyweddingring.com/reviews/elijah-craig-barrel-proof-batch-c923",
+        "domain": "whiskeyinmyweddingring.com",
+        "description": "The product maintained a 12 year age statement, but anyone who knows the size of Heaven Hill's warehouses knows that 12 years in one place will ...",
+        "extraSnippets": [
+          "[0](https://www.whiskeyinmyweddingring.com/cart) # Elijah Craig Barrel Proof Batch C923 [Reviews](https://www.whiskeyinmyweddingring.com/reviews/category/Reviews)[American Whiskey]"
+        ]
+      },
+      {
+        "title": "Elijah Craig Barrel Proof Batch #C923 - Nestor Liquor",
+        "url": "https://www.nestorliquor.com/products/elijah-craig-barrel-proof-batch-c923?srsltid=AfmBOopCOKwjEGl-J_poSXXbrtG_CKN_M16Gxi-5u60SExbCuO1J41v3",
+        "domain": "nestorliquor.com",
+        "description": "Aged for an impressive 13 years and 7 months, it surpasses the previous 12-year age statement, making it a collector's dream. This batch, part of the third ...",
+        "extraSnippets": [
+          "[My Wishlist](https://www.nestorliquor.com/products/elijah-craig-barrel-proof-batch-c923#swym-wishlist) 0 x * * * [by Timesact](https://timesact.com/) [Skip to content](https://www"
+        ]
+      },
+      {
+        "title": "Elijah Craig Barrel Proof Bourbon C923 Review",
+        "url": "https://thebourbonculture.com/whiskey-reviews/elijah-craig-barrel-proof-bourbon-c923-review/",
+        "domain": "thebourbonculture.com",
+        "description": "Score: 8.4/10. Batch C923 was a joy to drink. It had everything I wanted in an ECBP with a little bit extra because of those fruit notes.",
+        "extraSnippets": [
+          "[Skip to Content](https://thebourbonculture.com/whiskey-reviews/elijah-craig-barrel-proof-bourbon-c923-review/#content) ![Elijah Craig Barrel Proof Bourbon C923 Review](https://the"
+        ]
+      },
+      {
+        "title": "Review #2321 - Elijah Craig Barrel Proof 13 Year C923 : r/bourbon",
+        "url": "https://www.reddit.com/r/bourbon/comments/1f78skw/review_2321_elijah_craig_barrel_proof_13_year_c923/",
+        "domain": "reddit.com",
+        "description": "Taste: Rich on the palate, viscous and powerful. Lots of cocoa, honey, toffee, red berries, cherry cola and a dash of caramel character.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "967fe78ac16bfed7dd9f85fda530d9eacb76582afaf8cc2df8f227f62cd12b0a",
+    "mode": "auto"
+  }
+}

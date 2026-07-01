@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T16:46:22.408Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Shibui Grain Select whisky"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Shibui Grain Select whisky",
+    "summary": "Select Whisky $59.99. A light, and subtly sweet whisky made with 95% wheat & 5% malted barley. European Oloroso Sherry Casks & finished in rare Japanese ... Shibui Grain Select Whisky 750ml Bottle - ![Shibui Grain Select Whisky 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/images/231071750/231071750-1-fr.png",
+    "results": [
+      {
+        "title": "Shibui Grain Select Whisky | Total Wine & More",
+        "url": "https://www.totalwine.com/spirits/japanese-whisky/shibui-grain-select-whisky/p/231071750?srsltid=AfmBOorpTt9JiREUVt3Sw6nf9_7mLJNDk3qAFsvBfCoqUmRpJWpuxDbP",
+        "domain": "totalwine.com",
+        "description": "Select Whisky $59.99. A light, and subtly sweet whisky made with 95% wheat & 5% malted barley. European Oloroso Sherry Casks & finished in rare Japanese ...",
+        "extraSnippets": [
+          "Shibui Grain Select Whisky 750ml Bottle - ![Shibui Grain Select Whisky 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/images/231071750/231071750-1-fr.png) zoom - ![Shibui"
+        ]
+      },
+      {
+        "title": "Shibui Grain Select - The Whisky Shop - San Francisco",
+        "url": "https://www.whiskyshopusa.com/shibui-grain-select-whisky/",
+        "domain": "whiskyshopusa.com",
+        "description": "A light & subtly sweet whisky made with 95% wheat & 5% malted barley. Matured in American Ex-Bourbon Barrels, European Oloroso Sherry Casks & finished in rare ...",
+        "extraSnippets": [
+          "[Toggle menu](https://www.whiskyshopusa.com/shibui-grain-select-whisky/#) 415 989-1030 - [USD](https://www.whiskyshopusa.com/shibui-grain-select-whisky/# \"Currency Selector\") - [**"
+        ]
+      },
+      {
+        "title": "Shibui Grain Select Whiskey? : r/ATXwhisky - Reddit",
+        "url": "https://www.reddit.com/r/ATXwhisky/comments/tymg15/shibui_grain_select_whiskey/",
+        "domain": "reddit.com",
+        "description": "Yes, it's pretty tasty, very clean with a pretty nose. Their ten year selections are really nice, albeit arguably a bit overpriced much like ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Grain Select World Whisky",
+        "url": "https://www.shibuiwhisky.com/grain-select",
+        "domain": "shibuiwhisky.com",
+        "description": "Matured in American Ex-Bourbon Barrels, European Oloroso Sherry Casks & finished in rare Japanese Mizunara Oak, Shibui Grain Select is the perfect whisky to be ...",
+        "extraSnippets": [
+          "[0](https://www.shibuiwhisky.com/cart) ![](https://images.squarespace-cdn.com/content/v1/5f0de829f8367c07d976dd53/83bffd1d-1a7a-4ff3-bfc6-6ce7fb762385/Header.jpg) ![](https://image"
+        ]
+      },
+      {
+        "title": "Whisky Reviews: Shibui Grain Select & Single ... - The Whiskey Wash",
+        "url": "https://thewhiskeywash.com/world/whisky-reviews-shibui-grain-select-single-grain-whiskies/",
+        "domain": "thewhiskeywash.com",
+        "description": "The Grain Select bottle today is a 100% wheat whiskey, Shibui Single Grain 10-Year-Old Whisky Vital Stats: 80 Proof, 40% ABV, Aged in ex- ...",
+        "extraSnippets": [
+          "![Revisit consent button](https://thewhiskeywash.com/wp-content/plugins/cookie-law-info/lite/frontend/images/revisit.svg) We value your privacy We use cookies to enhance your brows"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "fb86138e22089e3a558a1d259e0ff4a4970713a72da6e2f34cce5296db288064",
+    "mode": "auto"
+  }
+}

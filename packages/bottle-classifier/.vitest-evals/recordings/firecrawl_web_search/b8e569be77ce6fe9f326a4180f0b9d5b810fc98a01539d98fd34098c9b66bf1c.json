@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-01T01:37:26.142Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Glenmorangie Quinta Ruban 14 Year Old product 46% port cask"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Glenmorangie Quinta Ruban 14 Year Old product 46% port cask",
+    "summary": "In our giraffe-high stills, it begins soft and fruity, then gets darker and deeper as we let it age for 14 years in bourbon casks and port casks from Portugal. Some content that you'd like to display in a modalDismiss #### My Basket (0) Oh, your basket appears to be empty Add some of our delicious Whisky to your basket",
+    "results": [
+      {
+        "title": "Glenmorangie The Quinta Ruban 14 Years Old",
+        "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban?srsltid=AfmBOoqdx5wVF62ebxb9S_AaFYRjmoRjSZmfE9Qt0nLrNXpl8BgwdTgn",
+        "domain": "glenmorangie.com",
+        "description": "In our giraffe-high stills, it begins soft and fruity, then gets darker and deeper as we let it age for 14 years in bourbon casks and port casks from Portugal.",
+        "extraSnippets": [
+          "Some content that you'd like to display in a modalDismiss #### My Basket (0) Oh, your basket appears to be empty Add some of our delicious Whisky to your basket to discover the won"
+        ]
+      },
+      {
+        "title": "Glenmorangie 14 Year Old The Quinta Ruban - Port Cask Finish 70 ...",
+        "url": "https://www.finedrams.com/glenmorangie-14-year-old-the-quinta-ruban-port-cask-finish-whisky.html?srsltid=AfmBOor8sazxI0yK555cJ_LzKfuft3KMXUX9KWSe4hsRsKlBFL0pCrBs",
+        "domain": "finedrams.com",
+        "description": "The result is a terrifically rich and sweet whisky, with notes of dark chocolate, rose petal, fresh raspberries, cherries and red grapes, vanilla, Seville ...",
+        "extraSnippets": [
+          "Shipping![](https://d1wd5rt8ssn8ry.cloudfront.net/image/flags/NO.png)Norway - DHL 15,00 € flat rate [Close](https://www.finedrams.com/glenmorangie-14-year-old-the-quinta-ruban-port"
+        ]
+      },
+      {
+        "title": "Glenmorangie Quinta Ruban 14 Year Old Single Malt Whisky 750ml",
+        "url": "https://www.missionliquor.com/products/glenmorangie-quinta-ruban-port-cask-finish-14yr-750ml-1",
+        "domain": "missionliquor.com",
+        "description": "It is then finished in ruby port casks to create velvety depth overlaid with chocolate, tangerine, sandalwood and nutmeg flavors. 92 pts Whisky Advocate.",
+        "extraSnippets": [
+          "[My Wishlist](https://www.missionliquor.com/products/glenmorangie-quinta-ruban-port-cask-finish-14yr-750ml-1#swym-wishlist) 0 [Skip to content](https://www.missionliquor.com/produc"
+        ]
+      },
+      {
+        "title": "Review #874 - Glenmorangie 14 Quinta Ruban : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/12xm6z5/review_874_glenmorangie_14_quinta_ruban/",
+        "domain": "reddit.com",
+        "description": "Glenmorangie 14 Quinta Ruban. Highland single malt. 46% ABV. No colour added, un-chillfiltered. Local price: $112 CAD in Ontario. Maturation: Aged at least 14 ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Glenmorangie Quinta Ruban Port Cask Finish 14 Years old",
+        "url": "https://www.worldwidespirits.com/whisk-e-y/single-malt-scotch-whisky/highlands/2071/glenmorangie-quinta-ruban-port-cask-finish-14-years-old",
+        "domain": "worldwidespirits.com",
+        "description": "This Single Malt Whisky is matured in Bourbon Casks then extra matured or finished in the very finest Ruby Port casks.",
+        "extraSnippets": [
+          "- Persönliche Beratung unter [0 68 73 - 800 99-0](tel:+496873800990) - Kostenloser [Versand ab 150 € Bestellwert](https://www.worldwidespirits.com/versand-und-zahlungsbedingungen \""
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b8e569be77ce6fe9f326a4180f0b9d5b810fc98a01539d98fd34098c9b66bf1c",
+    "mode": "auto"
+  }
+}

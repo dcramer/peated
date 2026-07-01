@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-01T01:22:02.436Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Wild Turkey Rare Breed Rye barrel proof rye official retailer"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Wild Turkey Rare Breed Rye barrel proof rye official retailer",
+    "summary": "Wild Turkey Rare Breed Rye is a barrel proof, non-chill-filtered blend of 4-,6-, and 8-year-old Kentucky Straight Rye from Wild Turkey Distillery. ![Wild Turkey - en-us](https://www.wildturkeybourbon.com/app/uploads/sites/3/2025/09/wt-logo-black-new.webp) Are you of legal drinking age? Country/Region Select Your Countr",
+    "results": [
+      {
+        "title": "Rare Breed Rye: barrel proof rye whiskey | Wild Turkey Bourbon",
+        "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": "Wild Turkey Rare Breed Rye is a barrel proof, non-chill-filtered blend of 4-,6-, and 8-year-old Kentucky Straight Rye from Wild Turkey Distillery.",
+        "extraSnippets": [
+          "![Wild Turkey - en-us](https://www.wildturkeybourbon.com/app/uploads/sites/3/2025/09/wt-logo-black-new.webp) Are you of legal drinking age? Country/Region Select Your Country/Regio"
+        ]
+      },
+      {
+        "title": "Wild Turkey Rare Breed Rye - BOURBON GUY",
+        "url": "https://www.bourbonguy.com/blog/2020/10/8/wild-turkey-rare-breed-rye",
+        "domain": "bourbonguy.com",
+        "description": "56.1% ABV ... Nose: Mint, a hint of dill, brown sugar, cinnamon, and cedar ... Mouth: Bright and lively. Mint, ginger, citrus zest, cinnamon.",
+        "extraSnippets": [
+          "Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog View f"
+        ]
+      },
+      {
+        "title": "Wild Turkey Rare Breed Barrel Proof Rye 112 Proof 750ml",
+        "url": "https://barrelshoppe.com/products/wild-turkey-rare-breed-barrel-proof-rye?srsltid=AfmBOor831EBBNl-j_45rdUt9jyvqQzVL-xrkMS_xbKDD8o1gADuu7SL",
+        "domain": "barrelshoppe.com",
+        "description": "A small batch, barrel proof, non-chill filtered blend of select ryes, Rare Breed Rye ages perfectly in charred oak barrels, resulting in rich complexity and a ...",
+        "extraSnippets": [
+          "[Skip to content](https://barrelshoppe.com/products/wild-turkey-rare-breed-barrel-proof-rye#MainContent) ## Your cart is empty [Continue shopping](https://barrelshoppe.com/collecti"
+        ]
+      },
+      {
+        "title": "WILD TURKEY RARE BREED RYE PRIVATE BARREL",
+        "url": "https://beveragewarehousemi.com/products/wild-turkey-rare-breed-rye?srsltid=AfmBOort21bNYgxukNOETn3zVJ7lDh12mJFp04Qj1BpatLoeMMO3FEqx",
+        "domain": "beveragewarehousemi.com",
+        "description": "Shop this WILD TURKEY RARE BREED RYE at Beverage Warehouse, today. ... It is barrel-proof, meaning that it's uncut, bottled directly from the barrels at the ...",
+        "extraSnippets": [
+          "[Skip to content](https://beveragewarehousemi.com/products/wild-turkey-rare-breed-rye#main) Cart Your cart is empty Zoom picture ![WILD TURKEY RARE BREED RYE PRIVATE BARREL](https:"
+        ]
+      },
+      {
+        "title": "Wild Turkey Rare Breed Rye Barrel Proof 750ml - Mission Liquor",
+        "url": "https://www.missionliquor.com/products/wild-turkey-rare-breed-750ml-1",
+        "domain": "missionliquor.com",
+        "description": "This expression is barrel strength at 112.2 proof. Wild Turkey Rare Breed Rye is a blend of four-, six-, and eight-year-old non-chill filtered ryes.",
+        "extraSnippets": [
+          "[My Wishlist](https://www.missionliquor.com/products/wild-turkey-rare-breed-750ml-1#swym-wishlist) 0 [Skip to content](https://www.missionliquor.com/products/wild-turkey-rare-breed"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "ce7a64029410831124f3d2857602a6c95a1a5645f7af0b17a5734287cb1571b8",
+    "mode": "auto"
+  }
+}

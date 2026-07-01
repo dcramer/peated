@@ -25,9 +25,6 @@ const existingPrivateCask: BottleCandidate = {
   abv: null,
   vintageYear: null,
   releaseYear: null,
-  caskType: null,
-  caskSize: null,
-  caskFill: null,
   score: 0.9,
   source: ["exact"],
 };
@@ -60,9 +57,6 @@ const repairParentCandidate: BottleCandidate = {
   abv: null,
   vintageYear: null,
   releaseYear: null,
-  caskType: null,
-  caskSize: null,
-  caskFill: null,
   score: null,
   source: ["repair_parent"],
 };
@@ -86,11 +80,41 @@ const ageBearingParentCandidate: BottleCandidate = {
   abv: null,
   vintageYear: null,
   releaseYear: null,
-  caskType: null,
-  caskSize: null,
-  caskFill: null,
   score: 1,
   source: ["exact"],
+};
+
+const cleanCadbollParentCandidate: BottleCandidate = {
+  bottleId: 660,
+  releaseId: null,
+  kind: "bottle",
+  alias: null,
+  fullName: "Glenmorangie The Cadboll Estate",
+  bottleFullName: "Glenmorangie The Cadboll Estate",
+  brand: "Glenmorangie",
+  bottler: null,
+  series: null,
+  distillery: [],
+  category: "single_malt",
+  statedAge: 15,
+  edition: null,
+  caskStrength: null,
+  singleCask: null,
+  abv: null,
+  vintageYear: null,
+  releaseYear: null,
+  score: 0.86,
+  source: ["vector"],
+};
+
+const dirtyCadbollSiblingCandidate: BottleCandidate = {
+  ...cleanCadbollParentCandidate,
+  bottleId: 661,
+  alias: null,
+  fullName: "Glenmorangie The Cadboll Estate Batch 2",
+  bottleFullName: "Glenmorangie The Cadboll Estate Batch 2",
+  edition: "Batch 2",
+  score: 0.91,
 };
 
 const shieldaigSiblingAgeCandidate: BottleCandidate = {
@@ -115,9 +139,6 @@ const shieldaigSiblingAgeCandidate: BottleCandidate = {
         abv: null,
         caskStrength: null,
         singleCask: null,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
       },
     ],
     siblingReleases: [],
@@ -162,9 +183,6 @@ function buildShieldaigAgeCreationDecision(
       abv: null,
       vintageYear: null,
       releaseYear: null,
-      caskType: null,
-      caskSize: null,
-      caskFill: null,
       brand: {
         id: null,
         name: "Shieldaig",
@@ -197,9 +215,6 @@ function classifyShieldaigAgeCreation(
         abv: null,
         release_year: null,
         vintage_year: null,
-        cask_type: null,
-        cask_size: null,
-        cask_fill: null,
         cask_strength: null,
         single_cask: null,
         edition: null,
@@ -232,9 +247,6 @@ function classifyAgeCreationWithoutSiblingConflict(
         abv: null,
         release_year: null,
         vintage_year: null,
-        cask_type: null,
-        cask_size: null,
-        cask_fill: null,
         cask_strength: null,
         single_cask: null,
         edition: null,
@@ -247,21 +259,21 @@ function classifyAgeCreationWithoutSiblingConflict(
 }
 
 describe("finalizeBottleReferenceClassification", () => {
-  test("downgrades bottle creation when bottle-level age is omitted from display name", () => {
+  test("restores bottle-level age when same-family conflict proves it belongs in the display name", () => {
     const result = classifyShieldaigAgeCreation(
       buildShieldaigAgeCreationDecision("Speyside"),
     );
 
     expect(result).toMatchObject({
-      action: "no_match",
+      action: "create_bottle",
       matchedBottleId: null,
       matchedReleaseId: null,
-      proposedBottle: null,
+      proposedBottle: {
+        name: "Speyside 30-year-old",
+        statedAge: 30,
+      },
       proposedRelease: null,
     });
-    expect(result.rationale).toContain(
-      "proposed bottle display name omits bottle-level traits (statedAge)",
-    );
   });
 
   test("does not downgrade omitted bottle age without same-family age conflict evidence", () => {
@@ -321,9 +333,6 @@ describe("finalizeBottleReferenceClassification", () => {
           abv: null,
           release_year: null,
           vintage_year: null,
-          cask_type: null,
-          cask_size: null,
-          cask_fill: null,
           cask_strength: null,
           single_cask: null,
           edition: null,
@@ -343,7 +352,7 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
-  test("downgrades bottle-and-release creation when bottle-level age is omitted from parent display name", () => {
+  test("restores bottle-level age for bottle-and-release creation when same-family conflict proves it belongs in the parent display name", () => {
     const decision = {
       ...buildShieldaigAgeCreationDecision("Speyside"),
       action: "create_bottle_and_release",
@@ -355,22 +364,21 @@ describe("finalizeBottleReferenceClassification", () => {
         singleCask: null,
         vintageYear: null,
         releaseYear: null,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
       },
     } satisfies BottleClassifierAgentDecisionInput;
 
     const result = classifyShieldaigAgeCreation(decision);
 
     expect(result).toMatchObject({
-      action: "no_match",
-      proposedBottle: null,
-      proposedRelease: null,
+      action: "create_bottle_and_release",
+      proposedBottle: {
+        name: "Speyside 30-year-old",
+        statedAge: 30,
+      },
+      proposedRelease: {
+        edition: "Batch 1",
+      },
     });
-    expect(result.rationale).toContain(
-      "proposed bottle display name omits bottle-level traits (statedAge)",
-    );
   });
 
   test("does not let generic cask details bypass duplicate product creation checks", () => {
@@ -404,9 +412,6 @@ describe("finalizeBottleReferenceClassification", () => {
         abv: null,
         vintageYear: null,
         releaseYear: null,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
         brand: {
           id: null,
           name: "Example",
@@ -473,9 +478,6 @@ describe("finalizeBottleReferenceClassification", () => {
         abv: null,
         vintageYear: null,
         releaseYear: null,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
         brand: {
           id: null,
           name: "Example",
@@ -504,9 +506,6 @@ describe("finalizeBottleReferenceClassification", () => {
           abv: null,
           release_year: null,
           vintage_year: null,
-          cask_type: null,
-          cask_size: null,
-          cask_fill: null,
           cask_strength: null,
           single_cask: true,
           edition: null,
@@ -548,9 +547,6 @@ describe("finalizeBottleReferenceClassification", () => {
         vintageYear: null,
         caskStrength: null,
         singleCask: null,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
       },
     };
 
@@ -572,9 +568,6 @@ describe("finalizeBottleReferenceClassification", () => {
           abv: null,
           release_year: null,
           vintage_year: null,
-          cask_type: null,
-          cask_size: null,
-          cask_fill: null,
           cask_strength: null,
           single_cask: null,
           edition: "S2B13",
@@ -616,9 +609,6 @@ describe("finalizeBottleReferenceClassification", () => {
         vintageYear: null,
         caskStrength: null,
         singleCask: null,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
       },
     };
 
@@ -640,9 +630,6 @@ describe("finalizeBottleReferenceClassification", () => {
           abv: null,
           release_year: null,
           vintage_year: null,
-          cask_type: null,
-          cask_size: null,
-          cask_fill: null,
           cask_strength: null,
           single_cask: null,
           edition: null,
@@ -688,9 +675,6 @@ describe("finalizeBottleReferenceClassification", () => {
         singleCask: null,
         vintageYear: null,
         releaseYear: null,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
         edition: null,
         distillers: [],
       },
@@ -702,9 +686,6 @@ describe("finalizeBottleReferenceClassification", () => {
         vintageYear: null,
         caskStrength: null,
         singleCask: null,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
       },
     };
 
@@ -726,9 +707,6 @@ describe("finalizeBottleReferenceClassification", () => {
           abv: null,
           release_year: null,
           vintage_year: null,
-          cask_type: null,
-          cask_size: null,
-          cask_fill: null,
           cask_strength: null,
           single_cask: null,
           edition: null,
@@ -753,6 +731,93 @@ describe("finalizeBottleReferenceClassification", () => {
       },
       proposedRelease: {
         statedAge: 21,
+      },
+    });
+  });
+
+  test("keeps parent repair on the classifier-selected dirty parent", () => {
+    const decision: BottleClassifierAgentDecisionInput = {
+      action: "repair_parent_and_create_release",
+      confidence: 91,
+      rationale:
+        "The selected candidate is a dirty same-family bottling row, so repair it before creating the Batch 2 bottling.",
+      candidateBottleIds: [
+        dirtyCadbollSiblingCandidate.bottleId,
+        cleanCadbollParentCandidate.bottleId,
+      ],
+      identityScope: "product",
+      observation: null,
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId: dirtyCadbollSiblingCandidate.bottleId,
+      proposedBottle: {
+        name: "The Cadboll Estate",
+        brand: {
+          id: null,
+          name: "Glenmorangie",
+        },
+        bottler: null,
+        series: null,
+        category: "single_malt",
+        statedAge: 15,
+        abv: null,
+        caskStrength: null,
+        singleCask: null,
+        vintageYear: null,
+        releaseYear: null,
+        edition: null,
+        distillers: [],
+      },
+      proposedRelease: {
+        edition: "Batch 2",
+        statedAge: null,
+        abv: null,
+        releaseYear: null,
+        vintageYear: null,
+        caskStrength: null,
+        singleCask: null,
+      },
+    };
+
+    const result = finalizeBottleReferenceClassification({
+      reference: {
+        name: "Glenmorangie The Cadboll Estate Batch 2 15-year-old",
+      },
+      decision,
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [dirtyCadbollSiblingCandidate, cleanCadbollParentCandidate],
+        extractedIdentity: {
+          brand: "Glenmorangie",
+          bottler: null,
+          expression: "The Cadboll Estate",
+          series: null,
+          distillery: [],
+          category: "single_malt",
+          stated_age: 15,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: "Batch 2",
+        },
+      }),
+      options: {
+        enforceCreateWebEvidence: false,
+      },
+    });
+
+    expect(result).toMatchObject({
+      action: "repair_parent_and_create_release",
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId: dirtyCadbollSiblingCandidate.bottleId,
+      proposedBottle: {
+        name: "The Cadboll Estate",
+        edition: null,
+      },
+      proposedRelease: {
+        edition: "Batch 2",
       },
     });
   });
