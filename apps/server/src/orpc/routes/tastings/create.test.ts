@@ -9,6 +9,7 @@ import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import waitError from "@peated/server/lib/test/waitError";
 import { compressAndResizeImage } from "@peated/server/lib/uploads";
 import { routerClient } from "@peated/server/orpc/router";
+import mergeBottle from "@peated/server/worker/jobs/mergeBottle";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
@@ -61,6 +62,40 @@ describe("POST /tastings", () => {
       .from(entities)
       .where(eq(entities.id, entity.id));
     expect(newEntity.totalTastings).toBe(1);
+  });
+
+  test("creates a tasting using a merged bottle id", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const sourceBottle = await fixtures.Bottle();
+    const targetBottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: sourceBottle.id });
+    const flight = await fixtures.Flight({ bottles: [sourceBottle.id] });
+
+    await mergeBottle({
+      fromBottleIds: [sourceBottle.id],
+      toBottleId: targetBottle.id,
+    });
+
+    const data = await routerClient.tastings.create(
+      {
+        bottle: sourceBottle.id,
+        release: release.id,
+        flight: flight.publicId,
+        rating: 2,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    const [tasting] = await db
+      .select()
+      .from(tastings)
+      .where(eq(tastings.id, data.tasting.id));
+
+    expect(tasting.bottleId).toEqual(targetBottle.id);
+    expect(tasting.releaseId).toEqual(release.id);
+    expect(tasting.flightId).toEqual(flight.id);
   });
 
   test("attaches a pending photo upload to the new tasting", async ({

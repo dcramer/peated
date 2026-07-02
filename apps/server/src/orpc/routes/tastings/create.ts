@@ -5,6 +5,7 @@ import {
   bottleReleases,
   bottles,
   bottleTags,
+  bottleTombstones,
   entities,
   flightBottles,
   flights,
@@ -38,6 +39,21 @@ import { pushJob } from "@peated/server/worker/client";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 
+async function findTastingBottle(bottleId: number) {
+  return await db.query.bottles.findFirst({
+    where: eq(bottles.id, bottleId),
+    with: {
+      bottler: true,
+      brand: true,
+      bottlesToDistillers: {
+        with: {
+          distiller: true,
+        },
+      },
+    },
+  });
+}
+
 export default procedure
   .use(requireAuth)
   .use(requireTosAccepted)
@@ -57,18 +73,15 @@ export default procedure
     }),
   )
   .handler(async function ({ input, context, errors }) {
-    const bottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, input.bottle),
-      with: {
-        bottler: true,
-        brand: true,
-        bottlesToDistillers: {
-          with: {
-            distiller: true,
-          },
-        },
-      },
-    });
+    let bottle = await findTastingBottle(input.bottle);
+    if (!bottle) {
+      const tombstone = await db.query.bottleTombstones.findFirst({
+        where: eq(bottleTombstones.bottleId, input.bottle),
+      });
+      if (tombstone?.newBottleId) {
+        bottle = await findTastingBottle(tombstone.newBottleId);
+      }
+    }
     if (!bottle) {
       throw errors.BAD_REQUEST({
         message: "Cannot identify bottle.",
