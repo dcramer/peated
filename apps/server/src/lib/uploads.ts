@@ -15,6 +15,9 @@ import { pipeline } from "node:stream/promises";
 import config from "../config";
 import { getStorage } from "./gcs";
 
+/**
+ * Normalizes EXIF orientation, resizes the image, and emits a WebP stream.
+ */
 export const compressAndResizeImage = (
   stream: Readable,
   filename: string,
@@ -22,6 +25,7 @@ export const compressAndResizeImage = (
   maxHeight?: number,
 ) => {
   const transformer = sharp()
+    .rotate()
     .resize({
       width: maxWidth,
       height: maxHeight,
