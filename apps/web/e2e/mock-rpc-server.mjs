@@ -9,6 +9,8 @@ import {
   createdBottleName,
   createdReleaseId,
   createdTastingId,
+  displayImageBottleId,
+  displayImageUrl,
   emptyList,
   existingBottle,
   existingBottleId,
@@ -266,6 +268,11 @@ async function handleRpcRequest({ request, response, url }) {
 
       if (getAccessToken(request).includes("photo-no-match")) {
         sendRpcResponse(response, buildNoMatchPhotoIdentification());
+        return true;
+      }
+
+      if (getAccessToken(request).includes("photo-needs-review")) {
+        sendRpcResponse(response, buildNeedsReviewPhotoIdentification());
         return true;
       }
 
@@ -910,18 +917,34 @@ function buildNoMatchPhotoIdentification() {
         {
           kind: "vision",
           model: "playwright",
-          confidence: 0.2,
-          textSpans: [],
-          observations: ["No readable whisky label was found."],
+          confidence: 0.82,
+          textSpans: [
+            {
+              text: `${testBrand.name} ${createdBottleName}`,
+              confidence: 0.82,
+            },
+          ],
+          observations: ["Single bottle label is readable."],
         },
       ],
-      fieldCandidates: {},
+      fieldCandidates: {
+        brand: {
+          value: testBrand.name,
+          confidence: 0.82,
+          sourceExtractorIndexes: [0],
+        },
+        expression: {
+          value: createdBottleName,
+          confidence: 0.8,
+          sourceExtractorIndexes: [0],
+        },
+      },
       photoSuitability: {
         isSingleBottlePhoto: true,
-        labelReadable: false,
-        suitableAsTastingImage: false,
-        suitableAsBottleImage: false,
-        reason: "The label is not readable.",
+        labelReadable: true,
+        suitableAsTastingImage: true,
+        suitableAsBottleImage: true,
+        reason: "The label is readable.",
       },
       conflicts: [],
     },
@@ -937,8 +960,8 @@ function buildNoMatchPhotoIdentification() {
     suggestedNextStep: "manual_search",
     diagnostics: {
       extraction: {
-        status: "empty",
-        summary: null,
+        status: "found",
+        summary: `${testBrand.name} ${createdBottleName}`,
       },
       candidates: {
         count: 0,
@@ -947,7 +970,89 @@ function buildNoMatchPhotoIdentification() {
         status: "classified",
         action: "no_match",
         confidence: 0,
-        reason: "No usable label text.",
+        reason: "No existing Peated bottle matched the label details.",
+      },
+    },
+  };
+}
+
+function buildNeedsReviewPhotoIdentification() {
+  return {
+    pendingImage: {
+      id: "playwright-photo-upload",
+      imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
+      expiresAt: "2026-06-07T13:00:00.000Z",
+    },
+    imageEvidence: {
+      sourceImageId: "playwright-photo-upload",
+      sourceImageHash: "playwright-photo-hash",
+      extractors: [
+        {
+          kind: "vision",
+          model: "playwright",
+          confidence: 0.72,
+          textSpans: [
+            {
+              text: `${testBrand.name} ${existingBottle.name}`,
+              confidence: 0.72,
+            },
+          ],
+          observations: ["Single bottle label is partly readable."],
+        },
+      ],
+      fieldCandidates: {
+        brand: {
+          value: testBrand.name,
+          confidence: 0.72,
+          sourceExtractorIndexes: [0],
+        },
+        expression: {
+          value: existingBottle.name,
+          confidence: 0.68,
+          sourceExtractorIndexes: [0],
+        },
+      },
+      photoSuitability: {
+        isSingleBottlePhoto: true,
+        labelReadable: true,
+        suitableAsTastingImage: true,
+        suitableAsBottleImage: false,
+        reason: "The photo is too uncertain for catalog creation.",
+      },
+      conflicts: [],
+    },
+    classification: {
+      status: "classified",
+      decision: {
+        action: "match",
+        matchedBottleId: existingBottleId,
+        matchedReleaseId: null,
+      },
+      artifacts: {
+        candidates: [
+          {
+            bottleId: existingBottleId,
+            releaseId: null,
+            bottleFullName: existingBottle.fullName,
+            fullName: existingBottle.fullName,
+          },
+        ],
+      },
+    },
+    suggestedNextStep: "needs_review",
+    diagnostics: {
+      extraction: {
+        status: "found",
+        summary: `${testBrand.name} ${existingBottle.name}`,
+      },
+      candidates: {
+        count: 1,
+      },
+      classification: {
+        status: "classified",
+        action: "match",
+        confidence: 55,
+        reason: "Possible match needs user review.",
       },
     },
   };
@@ -978,6 +1083,14 @@ function buildBottleForId(id) {
       id: createdBottleId,
       name: createdBottleName,
       brand: testBrand,
+    });
+  }
+
+  if (id === displayImageBottleId) {
+    return buildBottle({
+      id: displayImageBottleId,
+      name: "Display Image Reserve",
+      displayImageUrl,
     });
   }
 

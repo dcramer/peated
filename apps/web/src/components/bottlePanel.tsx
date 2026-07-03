@@ -4,6 +4,7 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import { type Bottle } from "@peated/server/types";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense, type ComponentPropsWithoutRef } from "react";
+import { getAddBottleHref } from "../lib/addBottle";
 import { useORPC } from "../lib/orpc/context";
 import BottleHeader from "./bottleHeader";
 import BottleOverview from "./bottleOverview";
@@ -28,6 +29,12 @@ export default function BottlePanel({
   const { data } = useSuspenseQuery(
     orpc.bottles.details.queryOptions({ input: { bottle: bottle.id } }),
   );
+  const tastingHref =
+    tastingPath ??
+    getAddBottleHref({
+      bottleId: bottle.id,
+      intent: "tasting",
+    });
 
   return (
     <SidePanel {...props}>
@@ -49,10 +56,7 @@ export default function BottlePanel({
               <CollectionAction bottleId={bottle.id} />
             </Suspense>
 
-            <Button
-              href={tastingPath ?? `/bottles/${bottle.id}/addTasting`}
-              color="primary"
-            >
+            <Button href={tastingHref} color="primary">
               Log Tasting
             </Button>
 
@@ -78,7 +82,7 @@ export default function BottlePanel({
           <ClientOnly>
             {() => (
               <QRCodeClient
-                value={`${window.location.protocol}//${window.location.host}${tastingPath}`}
+                value={`${window.location.protocol}//${window.location.host}${tastingHref}`}
               />
             )}
           </ClientOnly>

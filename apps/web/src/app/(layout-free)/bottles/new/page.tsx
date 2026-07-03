@@ -8,6 +8,7 @@ import { useFlashMessages } from "@peated/web/components/flash";
 import Spinner from "@peated/web/components/spinner";
 import useAuth from "@peated/web/hooks/useAuth";
 import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
+import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { toBlob } from "@peated/web/lib/blobs";
 import { getNewBottleBottlingPath } from "@peated/web/lib/bottlings";
 import { logError } from "@peated/web/lib/log";
@@ -210,11 +211,21 @@ function CreateBottleForm() {
         } else if (returnAction === "addBottle") {
           router.replace("/addBottle");
         } else if (returnAction === "tasting") {
-          router.replace(`/bottles/${createdBottle.id}/addTasting`);
+          router.replace(
+            getAddBottleHref({
+              bottleId: createdBottle.id,
+              intent: "tasting",
+            }),
+          );
         } else if (returnTo) {
           router.push(returnTo);
         } else {
-          router.replace(`/bottles/${createdBottle.id}/addTasting`);
+          router.replace(
+            getAddBottleHref({
+              bottleId: createdBottle.id,
+              intent: "tasting",
+            }),
+          );
         }
       }}
       initialData={initialData}

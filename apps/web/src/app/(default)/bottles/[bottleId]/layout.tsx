@@ -5,6 +5,7 @@ import CollectionAction from "@peated/web/components/collectionAction";
 import FlavorProfile from "@peated/web/components/flavorProfile";
 import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
+import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { summarize } from "@peated/web/lib/markdown";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
@@ -92,7 +93,13 @@ export default async function Layout(props: {
               <CollectionAction bottleId={bottle.id} />
             </Suspense>
 
-            <Button href={`/bottles/${bottle.id}/addTasting`} color="primary">
+            <Button
+              href={getAddBottleHref({
+                bottleId: bottle.id,
+                intent: "tasting",
+              })}
+              color="primary"
+            >
               <PeatedGlyph className="h-4 w-4" /> Log Tasting
             </Button>
 

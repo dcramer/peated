@@ -67,6 +67,12 @@ type Props = {
 };
 
 type CatalogImageApprovalTarget = "bottle" | "release";
+type ManualResultCopy = {
+  title: string;
+  description: string;
+  createLabel?: string;
+  primaryAction?: "search" | "create";
+};
 type PhotoIdentificationCreateInput =
   Inputs["tastings"]["photoIdentificationCreate"];
 
@@ -100,6 +106,17 @@ function getSearchSeed(result: PhotoIdentification | null) {
   const brand = getFieldValue(result, "brand");
   const expression = getFieldValue(result, "expression");
   return [brand, expression].filter(Boolean).join(" ");
+}
+
+function hasRecognizedLabelDetails(result: PhotoIdentification | null) {
+  return Boolean(
+    getFieldValue(result, "brand") ||
+    getFieldValue(result, "expression") ||
+    getFieldValue(result, "statedAge") ||
+    getFieldValue(result, "abv") ||
+    getFieldValue(result, "edition") ||
+    getFieldValue(result, "vintageYear"),
+  );
 }
 
 function getMatchedBottleId(result: PhotoIdentification | null) {
@@ -183,7 +200,7 @@ function getCreateProposalLabel(result: PhotoIdentification | null) {
 
   if (decision.action === "create_release") {
     return {
-      title: "Bottle found",
+      title: "Bottling not in Peated",
       description: parentBottleName
         ? `Create a new bottling for ${parentBottleName}.`
         : "Create a new bottling for this bottle.",
@@ -192,13 +209,13 @@ function getCreateProposalLabel(result: PhotoIdentification | null) {
 
   if (decision.action === "create_bottle_and_release") {
     return {
-      title: "Bottle found",
+      title: "Bottle not in Peated",
       description: "Create the bottle and its specific bottling.",
     };
   }
 
   return {
-    title: "Bottle found",
+    title: "Bottle not in Peated",
     description: "Create a new bottle from this label.",
   };
 }
@@ -239,7 +256,9 @@ function getCatalogImageApprovalCopy(target: CatalogImageApprovalTarget) {
   };
 }
 
-function getManualResultCopy(result: PhotoIdentification | null) {
+function getManualResultCopy(
+  result: PhotoIdentification | null,
+): ManualResultCopy {
   const action =
     result?.classification.status === "classified"
       ? result.classification.decision.action
@@ -250,6 +269,7 @@ function getManualResultCopy(result: PhotoIdentification | null) {
       title: "We couldn't identify this bottle",
       description:
         "We found a possible match, but it was not reliable enough to use automatically. Search can still find the right bottle.",
+      createLabel: undefined,
     };
   }
 
@@ -258,14 +278,27 @@ function getManualResultCopy(result: PhotoIdentification | null) {
       title: "We couldn't confirm the match",
       description:
         "We found a possible match, but it was not reliable enough to use automatically.",
+      createLabel: undefined,
     };
   }
 
   if (action === "no_match") {
+    if (hasRecognizedLabelDetails(result)) {
+      return {
+        title: "Bottle details found",
+        description:
+          "We found details on the label, but need you to review them before creating a bottle in Peated.",
+        createLabel: "Review and Create",
+        primaryAction: "create" as const,
+      };
+    }
+
     return {
       title: "We couldn't identify the bottle",
       description:
         "Search can still find it, or you can start over with a clearer photo.",
+      createLabel: "Create Manually",
+      primaryAction: "search" as const,
     };
   }
 
@@ -273,6 +306,8 @@ function getManualResultCopy(result: PhotoIdentification | null) {
     title: "We couldn't identify the bottle",
     description:
       "Search can still find it, or you can start over with another photo.",
+    createLabel: "Create Manually",
+    primaryAction: "search" as const,
   };
 }
 
@@ -358,8 +393,11 @@ function PhotoFailurePanel({
   searchHref,
   searchLabel,
   createBottleHref,
+  createBottleLabel = "Create Manually",
+  primaryAction = "search",
   onStartOver,
   variant,
+  children,
 }: {
   previewUrl: string | null;
   title: string;
@@ -367,8 +405,11 @@ function PhotoFailurePanel({
   searchHref: string;
   searchLabel: string;
   createBottleHref?: string | null;
+  createBottleLabel?: string;
+  primaryAction?: "search" | "create";
   onStartOver: () => void;
   variant: "error" | "no-match";
+  children?: ReactNode;
 }) {
   const isError = variant === "error";
 
@@ -409,6 +450,7 @@ function PhotoFailurePanel({
                 <div className="text-muted mt-1 text-sm">{description}</div>
               </div>
             </div>
+            {children}
           </div>
         </div>
         <div
@@ -416,22 +458,44 @@ function PhotoFailurePanel({
             createBottleHref ? "sm:grid-cols-3" : "sm:grid-cols-2"
           }`}
         >
-          <Button
-            href={searchHref}
-            color="highlight"
-            fullWidth
-            icon={<Search className="h-4 w-4" />}
-          >
-            {searchLabel}
-          </Button>
-          {createBottleHref && (
-            <Button
-              href={createBottleHref}
-              fullWidth
-              icon={<Plus className="h-4 w-4" />}
-            >
-              Create Bottle
-            </Button>
+          {primaryAction === "create" && createBottleHref ? (
+            <>
+              <Button
+                href={createBottleHref}
+                color="highlight"
+                fullWidth
+                icon={<Plus className="h-4 w-4" />}
+              >
+                {createBottleLabel}
+              </Button>
+              <Button
+                href={searchHref}
+                fullWidth
+                icon={<Search className="h-4 w-4" />}
+              >
+                {searchLabel}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                href={searchHref}
+                color="highlight"
+                fullWidth
+                icon={<Search className="h-4 w-4" />}
+              >
+                {searchLabel}
+              </Button>
+              {createBottleHref && (
+                <Button
+                  href={createBottleHref}
+                  fullWidth
+                  icon={<Plus className="h-4 w-4" />}
+                >
+                  {createBottleLabel}
+                </Button>
+              )}
+            </>
           )}
           <Button
             fullWidth
@@ -717,9 +781,7 @@ export default function BottleResolver({
   const searchSeed = getSearchSeed(photoResult);
   const searchHref = searchHrefForQuery(searchSeed);
   const createBottleHref =
-    photoResult?.classification.status === "classified" &&
-    photoResult.classification.decision.action === "no_match" &&
-    createBottleHrefForQuery
+    photoResult && createBottleHrefForQuery
       ? createBottleHrefForQuery(searchSeed ?? "")
       : null;
   const manualResultCopy = getManualResultCopy(photoResult);
@@ -798,6 +860,7 @@ export default function BottleResolver({
             description={photoError}
             searchHref={defaultSearchHref}
             searchLabel={searchActionLabel}
+            createBottleHref={createBottleHrefForQuery?.("") ?? null}
             onStartOver={startOver}
             variant="error"
           />
@@ -877,10 +940,16 @@ export default function BottleResolver({
                       description={manualResultCopy.description}
                       searchHref={searchHref}
                       searchLabel={searchActionLabel}
-                      createBottleHref={createBottleHref}
+                      createBottleHref={
+                        manualResultCopy.createLabel ? createBottleHref : null
+                      }
+                      createBottleLabel={manualResultCopy.createLabel}
+                      primaryAction={manualResultCopy.primaryAction}
                       onStartOver={startOver}
                       variant="no-match"
-                    />
+                    >
+                      <EvidencePills result={photoResult} />
+                    </PhotoFailurePanel>
                   )}
 
                   {createDecision && proposedName && (
@@ -956,6 +1025,7 @@ export default function BottleResolver({
                       ))}
                     {createDecision && (
                       <Button
+                        color="highlight"
                         fullWidth
                         icon={<Plus className="h-4 w-4" />}
                         onClick={() => void acceptCreateProposal(photoResult)}

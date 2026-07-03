@@ -3,6 +3,10 @@ import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
+import {
+  getAddBottleHref,
+  type AddBottleRouteIntent,
+} from "@peated/web/lib/addBottle";
 import { formatBottlingCountLabel } from "@peated/web/lib/bottlings";
 import { type ReactNode } from "react";
 import Join from "../join";
@@ -10,13 +14,7 @@ export type BottleResult = {
   type: "bottle";
   ref: Bottle;
 };
-
-export type AddBottleRouteIntent =
-  | "addBottle"
-  | "choose"
-  | "library"
-  | "tasting"
-  | "view";
+export type { AddBottleRouteIntent };
 
 /**
  * Builds the bottle-row destination, with Add Bottle route intents taking
@@ -32,13 +30,11 @@ export function getBottleResultHref({
   addBottleIntent?: AddBottleRouteIntent;
 }) {
   if (addBottleIntent) {
-    const params = new URLSearchParams({ bottle: String(bottleId) });
-    params.set("intent", addBottleIntent);
-    return `/addBottle?${params.toString()}`;
+    return getAddBottleHref({ bottleId, intent: addBottleIntent });
   }
 
   if (directToTasting) {
-    return `/bottles/${bottleId}/addTasting`;
+    return getAddBottleHref({ bottleId, intent: "tasting" });
   }
 
   return `/bottles/${bottleId}`;

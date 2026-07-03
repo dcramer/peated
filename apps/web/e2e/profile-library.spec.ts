@@ -1,10 +1,54 @@
 import { expect, type Locator, type Page, test } from "@playwright/test";
 import { Buffer } from "node:buffer";
 
-import { existingBottle, testAccessToken, testUser } from "./rpc-fixtures.mjs";
+import {
+  displayImageBottleId,
+  displayImageUrl,
+  existingBottle,
+  testAccessToken,
+  testUser,
+} from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
 test.describe("profile library", () => {
+  test("renders a bottle display image fallback on the detail page", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: [
+        testAccessToken,
+        "display-image",
+        testInfo.project.name,
+      ].join("-"),
+    });
+
+    await page.goto(`/bottles/${displayImageBottleId}`, {
+      waitUntil: "commit",
+    });
+
+    await expect(
+      page.getByRole("heading", { name: "Lagavulin Display Image Reserve" }),
+    ).toBeVisible();
+    const displayImage = page.locator(`img[src="${displayImageUrl}"]`);
+
+    if (testInfo.project.name.includes("mobile")) {
+      await expect(displayImage).toHaveCount(1);
+    } else {
+      await expect(displayImage).toBeVisible();
+    }
+
+    const schemaTexts = await page
+      .locator('script[type="application/ld+json"]')
+      .evaluateAll((scripts) =>
+        scripts.map((script) => script.textContent ?? ""),
+      );
+    expect(schemaTexts.some((text) => text.includes('"@type":"Product"'))).toBe(
+      true,
+    );
+    expect(schemaTexts.join("\n")).not.toContain(displayImageUrl);
+  });
+
   test("saves a bottle to Library without adding it to Favorites", async ({
     context,
     page,

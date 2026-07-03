@@ -6,6 +6,7 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import BottleLink from "@peated/web/components/bottleLink";
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Button from "@peated/web/components/button";
+import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import ModActions from "./modActions";
@@ -81,7 +82,11 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
                   <Button
                     color={bottle.hasTasted ? "default" : "highlight"}
                     size="small"
-                    href={`/bottles/${bottle.id}/addTasting?flight=${flight.id}`}
+                    href={getAddBottleHref({
+                      bottleId: bottle.id,
+                      flightId: flight.id,
+                      intent: "tasting",
+                    })}
                   >
                     Log Tasting
                   </Button>

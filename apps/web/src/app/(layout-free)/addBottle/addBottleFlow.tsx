@@ -500,6 +500,7 @@ function AddBottleFlowContent() {
   const requestedReleaseId = parseId(
     searchParams.get("release") ?? searchParams.get("bottling"),
   );
+  const requestedFlightId = searchParams.get("flight") || null;
   const requestedTargetKey = useMemo(() => {
     if (!requestedBottleId) return null;
     return `${requestedBottleId}:${requestedReleaseId ?? "base"}`;
@@ -704,6 +705,7 @@ function AddBottleFlowContent() {
         data.release === undefined
           ? (tastingDraft.release?.id ?? null)
           : data.release,
+      flight: requestedFlightId,
       createdAt: tastingDraft.createdAt,
       pendingImageId,
     });
@@ -749,7 +751,11 @@ function AddBottleFlowContent() {
       }
     }
 
-    router.push(`/tastings/${tasting.id}`);
+    router.push(
+      requestedFlightId
+        ? `/flights/${requestedFlightId}`
+        : `/tastings/${tasting.id}`,
+    );
   }
 
   if (loadingTarget) {

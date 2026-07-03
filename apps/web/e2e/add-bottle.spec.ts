@@ -71,13 +71,16 @@ test.describe("create bottle", () => {
     await page.getByRole("button", { name: "Create Bottle" }).click();
 
     await expect(page).toHaveURL(
-      new RegExp(`/bottles/${createdBottleId}/addTasting$`),
+      new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=tasting$`),
     );
     await expect(
-      page.getByRole("heading", { name: "Log Tasting" }),
+      page.getByRole("heading", { name: "Add Bottle" }),
     ).toBeVisible();
     await expect(
       page.getByText(`${testBrand.name} ${createdBottleName}`),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Log Tasting" }),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
@@ -94,8 +97,12 @@ test.describe("create bottle", () => {
     await submitCreateBottle(page);
 
     await expect(page).toHaveURL(
-      new RegExp(`/bottles/${createdBottleId}/addTasting$`),
+      new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=tasting$`),
     );
+    await expect(
+      page.getByRole("heading", { name: "Add Bottle" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Log Tasting" }).click();
     await expect(
       page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
@@ -542,7 +549,7 @@ test.describe("add bottle flow", () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test("offers Create Bottle when a scan has no usable match", async ({
+  test("offers review and create when a scan has label details but no usable match", async ({
     context,
     page,
   }, testInfo) => {
@@ -553,10 +560,12 @@ test.describe("add bottle flow", () => {
     await page.goto("/addBottle");
     await uploadLabel(page);
 
-    await expect(
-      page.getByText("We couldn't identify the bottle"),
-    ).toBeVisible();
-    const createBottleLink = page.getByRole("link", { name: "Create Bottle" });
+    await expect(page.getByText("Bottle details found")).toBeVisible();
+    await expect(page.getByText(testBrand.name)).toBeVisible();
+    await expect(page.getByText(createdBottleName)).toBeVisible();
+    const createBottleLink = page.getByRole("link", {
+      name: "Review and Create",
+    });
     await expect(createBottleLink).toBeVisible();
     const href = await createBottleLink.getAttribute("href");
     expect(href).not.toBeNull();
@@ -564,6 +573,40 @@ test.describe("add bottle flow", () => {
     const createUrl = new URL(href!, page.url());
     expect(createUrl.pathname).toBe("/bottles/new");
     expect(createUrl.searchParams.get("returnAction")).toBe("addBottle");
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("does not offer manual creation for an uncertain scan match", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: `${testAccessToken}-photo-needs-review-${testInfo.project.name}`,
+    });
+
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+
+    await expect(
+      page.getByText("We couldn't identify this bottle"),
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        "We found a possible match, but it was not reliable enough to use automatically.",
+      ),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Search Again" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Create Manually" }),
+    ).toBeHidden();
+    await expect(
+      page.getByRole("link", { name: "Review and Create" }),
+    ).toBeHidden();
+    await expect(
+      page.getByRole("button", { name: "Start Over" }),
+    ).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
 
@@ -578,7 +621,7 @@ test.describe("add bottle flow", () => {
     await page.goto("/addBottle");
     await uploadLabel(page);
 
-    await page.getByRole("link", { name: "Create Bottle" }).click();
+    await page.getByRole("link", { name: "Review and Create" }).click();
     await expect(
       page.getByRole("heading", { name: "Create Bottle" }),
     ).toBeVisible();

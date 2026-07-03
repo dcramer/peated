@@ -122,6 +122,15 @@ export const BottleSchema = z.object({
     .default(null)
     .readonly()
     .describe("URL to the bottle's image"),
+  displayImageUrl: z
+    .string()
+    .url()
+    .nullable()
+    .default(null)
+    .readonly()
+    .describe(
+      "Best available image URL for displaying this bottle, preferring the bottle image and falling back to a bottling image",
+    ),
   flavorProfile: FlavorProfileEnum.nullable()
     .default(null)
     .describe("Primary flavor characteristics of the whisky"),
@@ -228,6 +237,7 @@ export const BottleInputSchema = BottleSchema.omit({
   isLibrary: true,
   hasTasted: true,
   numReleases: true,
+  displayImageUrl: true,
 }).extend({
   name: z
     .string()

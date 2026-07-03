@@ -37,12 +37,12 @@ describe("search result create bottle links", () => {
     ).toBe("/addBottle?bottle=123&intent=addBottle");
   });
 
-  it("keeps the legacy tasting search shortcut for bottle rows", () => {
+  it("routes tasting search shortcuts through the Add Bottle flow", () => {
     expect(
       getBottleResultHref({
         bottleId: 123,
         directToTasting: true,
       }),
-    ).toBe("/bottles/123/addTasting");
+    ).toBe("/addBottle?bottle=123&intent=tasting");
   });
 });

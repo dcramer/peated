@@ -51,11 +51,16 @@ export const createdBottleId = 9302;
 export const existingReleaseId = 9303;
 export const createdReleaseId = 9304;
 export const createdTastingId = 9401;
+export const displayImageBottleId = 9501;
+export const displayImageUrl =
+  "http://127.0.0.1:4999/uploads/display-bottle.webp";
 
 export function buildBottle({
   id = existingBottleId,
   name = "16-year-old",
   brand = testBrand,
+  imageUrl = null,
+  displayImageUrl = null,
   totalTastings = 0,
   people = 0,
   hasTasted = false,
@@ -81,7 +86,8 @@ export function buildBottle({
     bottler: null,
     description: null,
     descriptionSrc: null,
-    imageUrl: null,
+    imageUrl,
+    displayImageUrl: displayImageUrl ?? imageUrl,
     flavorProfile: null,
     tastingNotes: null,
     suggestedTags: [],

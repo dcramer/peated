@@ -33,7 +33,7 @@ export default function Sidebar() {
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
               <li>
                 <Button href="/addBottle" fullWidth color="highlight">
-                  Add Bottle
+                  Record Bottle
                 </Button>
               </li>
               <li>

@@ -5,6 +5,7 @@ import { expectNoHorizontalOverflow } from "./assertions";
 import {
   createdTastingId,
   existingBottle,
+  existingReleaseId,
   failingTastingNotes,
   photoTastingNotes,
   tastingNotes,
@@ -13,16 +14,46 @@ import {
 import { signIn } from "./session";
 
 test.describe("log tasting", () => {
+  test("preserves query params when redirecting legacy bottle tasting links", async ({
+    context,
+    page,
+  }) => {
+    await signIn(context);
+
+    await page.goto(
+      `/bottles/${existingBottle.id}/addTasting?bottling=${existingReleaseId}&flight=flight-qa`,
+    );
+
+    await expect(page).toHaveURL(/\/addBottle\?/);
+    const currentUrl = new URL(page.url());
+    expect(currentUrl.pathname).toBe("/addBottle");
+    expect(currentUrl.searchParams.get("bottle")).toBe(
+      String(existingBottle.id),
+    );
+    expect(currentUrl.searchParams.get("bottling")).toBe(
+      String(existingReleaseId),
+    );
+    expect(currentUrl.searchParams.get("flight")).toBe("flight-qa");
+    expect(currentUrl.searchParams.get("intent")).toBe("tasting");
+  });
+
   test("logs a tasting for a fixture bottle", async ({ context, page }) => {
     await signIn(context);
 
     await page.goto(`/bottles/${existingBottle.id}/addTasting`);
 
+    await expect(page).toHaveURL(
+      new RegExp(`/addBottle\\?bottle=${existingBottle.id}&intent=tasting$`),
+    );
+    await expect(
+      page.getByRole("heading", { name: "Add Bottle" }),
+    ).toBeVisible();
+    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await page.getByRole("button", { name: "Log Tasting" }).click();
+
     await expect(
       page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
-    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
-
     await page.getByRole("button", { name: "Savor" }).click();
     await page.getByLabel("Comments").fill(tastingNotes);
     await page.getByRole("button", { name: "Save" }).click();
@@ -76,6 +107,9 @@ test.describe("log tasting", () => {
 
     await page.goto("/addTasting");
     await expect(page).toHaveURL(/\/addBottle\?intent=tasting$/);
+    await expect(
+      page.getByRole("heading", { name: "Add Bottle" }),
+    ).toBeVisible();
 
     await uploadLabel(page);
 
@@ -101,15 +135,30 @@ test.describe("log tasting", () => {
 });
 
 async function uploadLabel(page: Page) {
-  const fileChooserPromise = page.waitForEvent("filechooser");
-  await page.getByRole("button", { name: /Take or upload a photo/ }).click();
-  const fileChooser = await fileChooserPromise;
-  await fileChooser.setFiles({
-    name: "label.png",
-    mimeType: "image/png",
-    buffer: Buffer.from(
-      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=",
-      "base64",
-    ),
-  });
+  await expect(
+    page.getByRole("button", { name: /Take or upload a photo/ }),
+  ).toBeVisible();
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const requestPromise = page
+      .waitForRequest(
+        (request) =>
+          request.url().includes("/rpc/tastings/photoIdentification"),
+        { timeout: 5000 },
+      )
+      .catch(() => null);
+
+    await page.locator('input[type="file"]').setInputFiles({
+      name: `label-${attempt}.png`,
+      mimeType: "image/png",
+      buffer: Buffer.from(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=",
+        "base64",
+      ),
+    });
+
+    if (await requestPromise) return;
+  }
+
+  throw new Error("Photo identification request was not sent.");
 }
