@@ -32,7 +32,9 @@ const corsHeaders = {
 };
 
 const collectionStateByToken = new Map();
+const pendingUploadStateByToken = new Map();
 let collectionBottleId = 1;
+let pendingUploadId = 1;
 
 const server = http.createServer(async (request, response) => {
   if (request.method === "OPTIONS") {
@@ -358,6 +360,15 @@ async function handleRpcRequest({ request, response, url }) {
         mutateCollectionBottle(request, input, "create"),
       );
       return true;
+    case "pendingUploads/create":
+      sendRpcResponse(response, createPendingUpload(request, input));
+      return true;
+    case "collections/bottles/imageUpdate":
+      sendRpcResponse(response, updateCollectionBottleImage(request, input));
+      return true;
+    case "collections/bottles/imageDelete":
+      sendRpcResponse(response, deleteCollectionBottleImage(request, input));
+      return true;
     case "collections/bottles/delete":
       mutateCollectionBottle(request, input, "delete");
       sendRpcResponse(response, {});
@@ -406,6 +417,16 @@ function getCollectionState(request) {
   return collectionStateByToken.get(token);
 }
 
+function getPendingUploadState(request) {
+  const token = getAccessToken(request);
+
+  if (!pendingUploadStateByToken.has(token)) {
+    pendingUploadStateByToken.set(token, new Map());
+  }
+
+  return pendingUploadStateByToken.get(token);
+}
+
 function getAccessToken(request) {
   const authorization = request.headers.authorization;
   return (
@@ -414,6 +435,44 @@ function getAccessToken(request) {
       "",
     ) ?? "anonymous"
   );
+}
+
+function createPendingUpload(request, input) {
+  if (input?.__mockHasUploadFile !== true) {
+    throw new Error("Expected pending upload file payload");
+  }
+
+  const purpose = input?.purpose ?? "photo_tasting_entry";
+  if (purpose !== "photo_tasting_entry") {
+    throw new Error("Unexpected pending upload purpose");
+  }
+  if (typeof input?.idempotencyKey !== "string" || !input.idempotencyKey) {
+    throw new Error("Expected pending upload idempotency key");
+  }
+
+  const uploads = getPendingUploadState(request);
+  for (const upload of uploads.values()) {
+    if (
+      upload.purpose === purpose &&
+      upload.idempotencyKey === input.idempotencyKey
+    ) {
+      return upload;
+    }
+  }
+
+  const id = `playwright-library-upload-${pendingUploadId++}`;
+  const upload = {
+    id,
+    imageUrl: `http://127.0.0.1:4999/uploads/${id}.webp`,
+    kind: "image",
+    purpose,
+    status: "pending",
+    idempotencyKey: input.idempotencyKey,
+    expiresAt: "2026-06-07T13:00:00.000Z",
+  };
+
+  uploads.set(id, upload);
+  return upload;
 }
 
 function getCollection(input) {
@@ -490,6 +549,69 @@ function mutateCollectionBottle(request, input, action) {
   }
 
   return entries.get(key);
+}
+
+function findCollectionBottleEntry(request, input) {
+  if (
+    input?.user !== "me" &&
+    input?.user !== testUser.username &&
+    input?.user !== testUser.id
+  ) {
+    throw new Error("Unexpected collection image user payload");
+  }
+  if (input?.collection !== "library") {
+    throw new Error("Unexpected collection image collection payload");
+  }
+  if (typeof input?.collectionBottle !== "number") {
+    throw new Error("Unexpected collection image entry payload");
+  }
+
+  const entries = getCollectionState(request).library;
+  const entry = Array.from(entries.values()).find(
+    (candidate) => candidate.id === input.collectionBottle,
+  );
+  if (!entry) {
+    throw new Error("Collection entry missing for image mutation");
+  }
+
+  return entry;
+}
+
+function replaceCollectionBottleEntry(request, updatedEntry) {
+  const entries = getCollectionState(request).library;
+  for (const [key, entry] of entries.entries()) {
+    if (entry.id === updatedEntry.id) {
+      entries.set(key, updatedEntry);
+      return {
+        ...updatedEntry,
+        bottle: withCollectionStatus(request, updatedEntry.bottle),
+      };
+    }
+  }
+
+  throw new Error("Collection entry missing for image replacement");
+}
+
+function updateCollectionBottleImage(request, input) {
+  const entry = findCollectionBottleEntry(request, input);
+  const uploads = getPendingUploadState(request);
+  if (!uploads.has(input?.pendingImageId)) {
+    throw new Error("Unexpected collection image pending upload payload");
+  }
+
+  return replaceCollectionBottleEntry(request, {
+    ...entry,
+    imageUrl: `http://127.0.0.1:4999/uploads/library-replaced-${entry.id}.webp`,
+  });
+}
+
+function deleteCollectionBottleImage(request, input) {
+  const entry = findCollectionBottleEntry(request, input);
+
+  return replaceCollectionBottleEntry(request, {
+    ...entry,
+    imageUrl: null,
+  });
 }
 
 /**
@@ -625,6 +747,13 @@ async function readRpcInput(request, url) {
   const contentType = request.headers["content-type"] ?? "";
   if (
     typeof contentType === "string" &&
+    contentType.includes("multipart/form-data")
+  ) {
+    return await readMultipartRpcInput(request, contentType);
+  }
+
+  if (
+    typeof contentType === "string" &&
     !contentType.includes("application/json")
   ) {
     request.resume();
@@ -637,10 +766,45 @@ async function readRpcInput(request, url) {
   return JSON.parse(body).json;
 }
 
-function readBody(request) {
+async function readMultipartRpcInput(request, contentType) {
+  const boundaryMatch = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/);
+  const boundary = boundaryMatch?.[1] ?? boundaryMatch?.[2];
+  if (!boundary) {
+    request.resume();
+    return {};
+  }
+
+  const body = await readBody(request, "latin1");
+  const parts = body.split(`--${boundary}`);
+  let data;
+  let hasUploadFile = false;
+
+  for (const part of parts) {
+    const separatorIndex = part.indexOf("\r\n\r\n");
+    if (separatorIndex === -1) continue;
+
+    const headers = part.slice(0, separatorIndex);
+    const name = headers.match(/name="([^"]+)"/)?.[1];
+    if (!name) continue;
+
+    const value = part.slice(separatorIndex + 4).replace(/\r\n$/, "");
+    if (name === "data") {
+      data = JSON.parse(value).json;
+    } else if (/^\d+$/.test(name)) {
+      hasUploadFile = true;
+    }
+  }
+
+  return {
+    ...(data && typeof data === "object" ? data : {}),
+    __mockHasUploadFile: hasUploadFile,
+  };
+}
+
+function readBody(request, encoding = "utf8") {
   return new Promise((resolve, reject) => {
     let body = "";
-    request.setEncoding("utf8");
+    request.setEncoding(encoding);
     request.on("data", (chunk) => {
       body += chunk;
     });

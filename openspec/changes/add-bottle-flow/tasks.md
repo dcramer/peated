@@ -44,7 +44,7 @@
 - [x] 6.3 Add an Added to Library terminal state showing the saved entry and image.
 - [x] 6.4 Add Add Another Bottle behavior that resets the resolver and starts a fresh Add Bottle flow.
 - [x] 6.5 Add View Library behavior that routes to the current user's Library page.
-- [ ] 6.6 Add Library image replace/remove UI at the selected Library editing surface.
+- [x] 6.6 Add Library image replace/remove UI at the selected Library editing surface.
 
 ## 7. Catalog Image Approval
 

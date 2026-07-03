@@ -1,4 +1,5 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, type Locator, type Page, test } from "@playwright/test";
+import { Buffer } from "node:buffer";
 
 import { existingBottle, testAccessToken, testUser } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
@@ -80,7 +81,114 @@ test.describe("profile library", () => {
     );
     await expectNoHorizontalOverflow(page);
   });
+
+  test("lets the owner replace and remove a Library entry image", async ({
+    context,
+    page,
+  }, testInfo) => {
+    const runId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const accessToken = [
+      testAccessToken,
+      "library-image",
+      testInfo.project.name,
+      testInfo.workerIndex,
+      testInfo.retry,
+      runId,
+    ].join("-");
+    const bottleId =
+      existingBottle.id +
+      200_000 +
+      (testInfo.project.name.includes("mobile") ? 100_000 : 0) +
+      (Date.now() % 100_000);
+    const savedBottleName = `${existingBottle.brand.name} 16-year-old ${bottleId}`;
+
+    await signIn(context, { accessToken });
+    await page.goto(`/bottles/${bottleId}`, {
+      waitUntil: "commit",
+    });
+    await page.locator('button[data-collection-action="library"]').click();
+
+    await page.goto(`/users/${testUser.username}/library`, {
+      waitUntil: "commit",
+    });
+    const savedBottleRow = page.locator("tr").filter({
+      hasText: savedBottleName,
+    });
+
+    await expect(savedBottleRow.getByText("Library entry image")).toBeVisible();
+    await expect(
+      savedBottleRow.getByText(
+        "Only for this Library entry. It won't change public bottle or release images, or tasting photos.",
+      ),
+    ).toBeVisible();
+    await expect(
+      savedBottleRow.getByRole("button", { name: "Replace" }),
+    ).toBeVisible();
+    await expect(
+      savedBottleRow.getByRole("button", { name: "Remove" }),
+    ).toBeDisabled();
+
+    await uploadLibraryImage(page, savedBottleRow);
+
+    await expect(
+      savedBottleRow.getByRole("img", {
+        name: `Library entry image for ${savedBottleName}`,
+      }),
+    ).toHaveAttribute("src", /library-replaced-\d+\.webp$/);
+    await expect(
+      savedBottleRow.getByRole("button", { name: "Remove" }),
+    ).toBeEnabled();
+
+    await savedBottleRow.getByRole("button", { name: "Remove" }).click();
+
+    await expect(
+      savedBottleRow.getByRole("img", {
+        name: `Library entry image for ${savedBottleName}`,
+      }),
+    ).toHaveCount(0);
+    await expect(
+      savedBottleRow.getByRole("button", { name: "Remove" }),
+    ).toBeDisabled();
+    await expectNoHorizontalOverflow(page);
+
+    await signIn(context, {
+      accessToken,
+      user: {
+        ...testUser,
+        id: testUser.id + 1,
+        username: "library-viewer",
+        email: "library-viewer@example.com",
+      },
+    });
+    await page.goto(`/users/${testUser.username}/library`, {
+      waitUntil: "commit",
+    });
+
+    await expect(
+      page
+        .getByRole("link", { name: savedBottleName })
+        .filter({ visible: true }),
+    ).toHaveCount(1);
+    await expect(page.getByRole("button", { name: "Replace" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Remove" })).toHaveCount(0);
+    await expect(page.getByText("Library entry image")).toHaveCount(0);
+    await expectNoHorizontalOverflow(page);
+  });
 });
+
+async function uploadLibraryImage(page: Page, row: Locator) {
+  const fileChooserPromise = page.waitForEvent("filechooser");
+  await row.getByRole("button", { name: "Replace" }).click();
+  const fileChooser = await fileChooserPromise;
+  await fileChooser.setFiles({
+    name: "library-label.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=",
+      "base64",
+    ),
+  });
+}
 
 async function expectNoHorizontalOverflow(page: Page) {
   await expect

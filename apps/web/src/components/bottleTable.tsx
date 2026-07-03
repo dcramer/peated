@@ -9,7 +9,7 @@ import type {
 } from "@peated/server/types";
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { formatBottlingName } from "../lib/bottlings";
 import BottleLink from "./bottleLink";
 import SimpleRatingIndicator from "./simpleRatingIndicator";
@@ -18,22 +18,30 @@ import Table from "./table";
 
 type BottleRow = {
   bottle: Bottle;
+  collectionBottle?: CollectionBottle;
   release: BottleRelease | null;
   key: string;
 };
 
+/**
+ * Renders bottle rows and lets collection callers attach row-scoped controls
+ * when the source item is a CollectionBottle.
+ */
 export default function BottleTable({
   bottleList,
   rel,
+  renderCollectionBottleActions,
   ...props
 }: Omit<ComponentProps<typeof Table>, "items" | "rel" | "columns"> & {
   bottleList: (Bottle | CollectionBottle)[];
   rel?: PagingRel;
+  renderCollectionBottleActions?: (item: CollectionBottle) => ReactNode;
 }) {
   const rows: BottleRow[] = bottleList.map((item) =>
     "bottle" in item
       ? {
           bottle: item.bottle,
+          collectionBottle: item,
           release: item.release ?? null,
           key: `collection-${item.id}`,
         }
@@ -54,7 +62,7 @@ export default function BottleTable({
           className: "min-w-full sm:w-1/2",
           value: (item) => {
             return (
-              <div className="flex flex-col justify-center">
+              <div className="flex flex-col justify-center gap-y-2">
                 <div className="flex items-center gap-x-1">
                   <BottleLink
                     bottle={item.bottle}
@@ -86,6 +94,8 @@ export default function BottleTable({
                     </Link>
                   )}
                 </div>
+                {item.collectionBottle &&
+                  renderCollectionBottleActions?.(item.collectionBottle)}
               </div>
             );
           },
