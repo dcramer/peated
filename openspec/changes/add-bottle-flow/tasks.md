@@ -57,12 +57,12 @@
 ## 8. User-Facing Copy
 
 - [x] 8.1 Replace visible Add Tasting and Record Tasting copy with Log Tasting across buttons, page titles, empty states, and resolver actions.
-- [ ] 8.2 Keep Add Bottle copy for the universal flow and Create Bottle copy for catalog creation.
-- [ ] 8.3 Review error and success copy for plain-language consistency.
+- [x] 8.2 Keep Add Bottle copy for the universal flow and Create Bottle copy for catalog creation.
+- [x] 8.3 Review error and success copy for plain-language consistency.
 
 ## 9. Verification
 
 - [x] 9.1 Run targeted backend tests for collection bottle routes, pending uploads, and tasting image attach behavior.
 - [x] 9.2 Run targeted web checks for Add Bottle, Create Bottle, search intent, and Log Tasting copy changes.
-- [ ] 9.3 Use local UI verification at mobile and desktop widths for scan to Library, search to Library, create bottle, Add Another Bottle, View Library, and Log Tasting paths.
+- [x] 9.3 Use local UI verification at mobile and desktop widths for scan to Library, search to Library, create bottle, Add Another Bottle, View Library, and Log Tasting paths.
 - [x] 9.4 Run relevant package typechecks and lint for touched server and web surfaces.

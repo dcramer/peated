@@ -278,11 +278,35 @@ test.describe("add bottle flow", () => {
     ).toBeVisible();
   });
 
+  test("adds a searched bottle to Library from the Add Bottle resolver", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: `${testAccessToken}-search-library-${testInfo.project.name}`,
+    });
+
+    await page.goto("/search?intent=addBottle&q=Lagavulin");
+    await page.getByRole("link", { name: existingBottle.fullName }).click();
+    await page.getByRole("button", { name: "Add to Library" }).click();
+
+    await expect(page.getByText("No Library image selected")).toBeVisible();
+    await page.getByRole("button", { name: "Add to Library" }).click();
+
+    await expect(
+      page.getByRole("heading", { name: "Added to Library" }),
+    ).toBeVisible();
+    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  });
+
   test("adds a matched scan to Library with an explicit Library image choice", async ({
     context,
     page,
-  }) => {
-    await signIn(context);
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: `${testAccessToken}-scan-library-${testInfo.project.name}`,
+    });
 
     await page.goto("/addBottle");
     await uploadLabel(page);
@@ -315,6 +339,21 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("link", { name: "View Library" }),
     ).toHaveAttribute("href", `/users/${testUser.username}/library`);
+
+    await page.getByRole("link", { name: "View Library" }).click();
+    await expect(page).toHaveURL(
+      new RegExp(`/users/${testUser.username}/library$`),
+    );
+    await expect(
+      page.getByRole("link", { name: existingBottle.fullName }),
+    ).toBeVisible();
+
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+    await expect(page.getByText("Match found")).toBeVisible();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Add to Library" }).click();
+    await page.getByRole("button", { name: "Add to Library" }).click();
 
     await page.getByRole("button", { name: "Add Another Bottle" }).click();
     await expect(page).toHaveURL(/\/addBottle$/);
@@ -523,6 +562,37 @@ test.describe("add bottle flow", () => {
     const createUrl = new URL(href!, page.url());
     expect(createUrl.pathname).toBe("/bottles/new");
     expect(createUrl.searchParams.get("returnAction")).toBe("addBottle");
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("creates a catalog bottle from a no-match scan and returns to Add Bottle", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: `${testAccessToken}-photo-no-match-create-${testInfo.project.name}`,
+    });
+
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+
+    await page.getByRole("link", { name: "Create Bottle" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Create Bottle" }),
+    ).toBeVisible();
+    await page.getByLabel("Bottle").fill(createdBottleName);
+
+    await page.getByText("e.g. Laphroaig").click();
+    await page.getByPlaceholder("Search").fill(testBrand.name);
+    await page.getByRole("button", { name: testBrand.name }).click();
+    await expect(page.getByPlaceholder("Search")).toBeHidden();
+    await page.getByRole("button", { name: "Create Bottle" }).click();
+
+    await expect(page).toHaveURL(/\/addBottle$/);
+    await expect(
+      page.getByRole("heading", { name: "Add Bottle" }),
+    ).toBeVisible();
+    await expect(page.getByText("Take or upload a photo")).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
 });

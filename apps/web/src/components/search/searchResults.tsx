@@ -51,12 +51,11 @@ export default function SearchResults({
             <div className="text-highlight-dark mt-1 flex gap-x-1 leading-5">
               {query !== "" ? (
                 <span>
-                  Tap here to add{" "}
-                  <strong className="truncate">{toTitleCase(query)}</strong> to
-                  the database.
+                  Create Bottle for{" "}
+                  <strong className="truncate">{toTitleCase(query)}</strong>.
                 </span>
               ) : (
-                <span>Tap here to add a new bottle to the database.</span>
+                <span>Create a catalog bottle.</span>
               )}
             </div>
           </div>

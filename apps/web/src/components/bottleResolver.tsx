@@ -232,17 +232,17 @@ function getManualResultCopy(result: PhotoIdentification | null) {
 
   if (result?.suggestedNextStep === "needs_review") {
     return {
-      title: "This one needs a human squint",
+      title: "We couldn't identify this bottle",
       description:
-        "We got close, but not close enough to trust it. Search can still find the right bottle.",
+        "We found a possible match, but it was not reliable enough to use automatically. Search can still find the right bottle.",
     };
   }
 
   if (action === "match") {
     return {
-      title: "Almost, but not quite",
+      title: "We couldn't confirm the match",
       description:
-        "We spotted a possible match, but it was too wobbly to use automatically.",
+        "We found a possible match, but it was not reliable enough to use automatically.",
     };
   }
 
@@ -250,14 +250,14 @@ function getManualResultCopy(result: PhotoIdentification | null) {
     return {
       title: "We couldn't identify the bottle",
       description:
-        "That label kept its poker face. Search can still find it, or start over with a clearer photo.",
+        "Search can still find it, or you can start over with a clearer photo.",
     };
   }
 
   return {
     title: "We couldn't identify the bottle",
     description:
-      "The label kept its secrets. Search can still find it, or start over with another photo.",
+      "Search can still find it, or you can start over with another photo.",
   };
 }
 
@@ -642,7 +642,7 @@ export default function BottleResolver({
         },
       });
       setPhotoError(
-        "Our label reader had a wobble. Search can still find the bottle, or you can try another photo.",
+        "We couldn't read that photo. Search can still find the bottle, or you can try another photo.",
       );
     }
   }
