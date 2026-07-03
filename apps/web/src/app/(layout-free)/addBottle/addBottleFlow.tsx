@@ -19,6 +19,7 @@ import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
 import {
+  AlertTriangle,
   BookOpen,
   Check,
   Eye,
@@ -217,6 +218,18 @@ function OutcomeSelection({
     <Layout footer={null} header={<FlowHeader>{null}</FlowHeader>}>
       <div className="mx-auto mt-5 max-w-3xl space-y-5">
         <TargetPanel target={target} previewUrl={target.previewUrl} />
+        {target.warnings?.length ? (
+          <section className="rounded border border-amber-900/70 bg-amber-950/30 p-4 text-sm text-amber-100">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+              <div className="space-y-1">
+                {target.warnings.map((warning) => (
+                  <p key={warning}>{warning}</p>
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : null}
         <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
           <div className="space-y-4">
             <div>
@@ -618,6 +631,7 @@ function AddBottleFlowContent() {
       matchedResultDescription="Use this existing bottle for your next step."
       createProposalActionLabel="Create Bottle"
       searchActionLabel="Search Again"
+      enableCatalogImageApproval
       onResolve={(target) => {
         setSelectedTarget(target);
         setConfirmingLibrary(false);

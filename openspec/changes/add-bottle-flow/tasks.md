@@ -48,11 +48,11 @@
 
 ## 7. Catalog Image Approval
 
-- [ ] 7.1 Add approval controls for creating a new public bottle or release image from a scan when promotion policy allows it.
-- [ ] 7.2 Use Set as Bottle Image copy with help text explaining the photo will be shown as the public image for the new bottle.
-- [ ] 7.3 Use Set as Release Image copy with help text explaining the photo will be shown as the public image for the new release.
-- [ ] 7.4 Ensure unchecked or disallowed catalog image approval never writes canonical bottle or release image URLs.
-- [ ] 7.5 Return partial-success messaging if catalog image copy fails after bottle or release creation succeeds.
+- [x] 7.1 Add approval controls for creating a new public bottle or release image from a scan when promotion policy allows it.
+- [x] 7.2 Use Set as Bottle Image copy with help text explaining the photo will be shown as the public image for the new bottle.
+- [x] 7.3 Use Set as Release Image copy with help text explaining the photo will be shown as the public image for the new release.
+- [x] 7.4 Ensure unchecked or disallowed catalog image approval never writes canonical bottle or release image URLs.
+- [x] 7.5 Return partial-success messaging if catalog image copy fails after bottle or release creation succeeds.
 
 ## 8. User-Facing Copy
 

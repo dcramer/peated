@@ -49,6 +49,7 @@ export const testBrand = {
 export const existingBottleId = 9301;
 export const createdBottleId = 9302;
 export const existingReleaseId = 9303;
+export const createdReleaseId = 9304;
 export const createdTastingId = 9401;
 
 export function buildBottle({

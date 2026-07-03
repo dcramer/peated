@@ -2,10 +2,12 @@ import http from "node:http";
 
 import {
   buildBottle,
+  buildBottleRelease,
   buildCollectionBottle,
   buildTasting,
   createdBottleId,
   createdBottleName,
+  createdReleaseId,
   createdTastingId,
   emptyList,
   existingBottle,
@@ -217,6 +219,51 @@ async function handleRpcRequest({ request, response, url }) {
     }
     case "tastings/photoIdentification":
       // E2E access-token suffixes select alternate mock photo-identification scenarios.
+      if (getAccessToken(request).includes("photo-create-warning")) {
+        sendRpcResponse(
+          response,
+          buildCreateProposalPhotoIdentification({ action: "create_bottle" }),
+        );
+        return true;
+      }
+
+      if (getAccessToken(request).includes("photo-create-unsuitable")) {
+        sendRpcResponse(
+          response,
+          buildCreateProposalPhotoIdentification({
+            action: "create_bottle",
+            suitableAsBottleImage: false,
+          }),
+        );
+        return true;
+      }
+
+      if (getAccessToken(request).includes("photo-create-release-approval")) {
+        sendRpcResponse(
+          response,
+          buildCreateProposalPhotoIdentification({
+            action: "create_bottle_and_release",
+          }),
+        );
+        return true;
+      }
+
+      if (getAccessToken(request).includes("photo-create-bottle-unchecked")) {
+        sendRpcResponse(
+          response,
+          buildCreateProposalPhotoIdentification({ action: "create_bottle" }),
+        );
+        return true;
+      }
+
+      if (getAccessToken(request).includes("photo-create-bottle-approval")) {
+        sendRpcResponse(
+          response,
+          buildCreateProposalPhotoIdentification({ action: "create_bottle" }),
+        );
+        return true;
+      }
+
       if (getAccessToken(request).includes("photo-no-match")) {
         sendRpcResponse(response, buildNoMatchPhotoIdentification());
         return true;
@@ -306,6 +353,12 @@ async function handleRpcRequest({ request, response, url }) {
           },
         },
       });
+      return true;
+    case "tastings/photoIdentificationCreate":
+      sendRpcResponse(
+        response,
+        createPhotoIdentificationTarget(request, input),
+      );
       return true;
     case "tastings/imageUpdate":
       sendRpcResponse(response, {
@@ -612,6 +665,232 @@ function deleteCollectionBottleImage(request, input) {
     ...entry,
     imageUrl: null,
   });
+}
+
+function buildCreateProposalPhotoIdentification({
+  action,
+  suitableAsBottleImage = true,
+}) {
+  const proposedRelease = {
+    edition: "First Fill Oloroso",
+    statedAge: null,
+    abv: 46,
+    caskStrength: null,
+    singleCask: null,
+    vintageYear: null,
+    releaseYear: 2026,
+  };
+  const proposedBottle = {
+    name: createdBottleName,
+    category: "single_malt",
+    series: null,
+    edition: null,
+    statedAge: null,
+    caskStrength: null,
+    singleCask: null,
+    abv: null,
+    vintageYear: null,
+    releaseYear: null,
+    brand: {
+      id: testBrand.id,
+      name: testBrand.name,
+    },
+    distillers: [
+      {
+        id: testBrand.id,
+        name: testBrand.name,
+      },
+    ],
+    bottler: null,
+  };
+  const decision =
+    action === "create_release"
+      ? {
+          action,
+          parentBottleId: existingBottleId,
+          proposedRelease,
+        }
+      : action === "create_bottle_and_release"
+        ? {
+            action,
+            proposedBottle,
+            proposedRelease,
+          }
+        : {
+            action,
+            proposedBottle,
+          };
+
+  return {
+    pendingImage: {
+      id: "playwright-photo-upload",
+      imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
+      expiresAt: "2026-06-07T13:00:00.000Z",
+    },
+    imageEvidence: {
+      sourceImageId: "playwright-photo-upload",
+      sourceImageHash: "playwright-photo-hash",
+      extractors: [
+        {
+          kind: "vision",
+          model: "playwright",
+          confidence: 0.92,
+          textSpans: [
+            {
+              text: `${testBrand.name} ${createdBottleName}`,
+              confidence: 0.92,
+            },
+          ],
+          observations: ["Single bottle label is readable."],
+        },
+      ],
+      fieldCandidates: {
+        brand: {
+          value: testBrand.name,
+          confidence: 0.95,
+          sourceExtractorIndexes: [0],
+        },
+        expression: {
+          value: createdBottleName,
+          confidence: 0.9,
+          sourceExtractorIndexes: [0],
+        },
+        edition:
+          action === "create_bottle"
+            ? undefined
+            : {
+                value: proposedRelease.edition,
+                confidence: 0.88,
+                sourceExtractorIndexes: [0],
+              },
+      },
+      photoSuitability: {
+        isSingleBottlePhoto: true,
+        labelReadable: true,
+        suitableAsTastingImage: true,
+        suitableAsBottleImage,
+        reason: suitableAsBottleImage
+          ? null
+          : "The photo is not suitable as a public catalog image.",
+      },
+      conflicts: [],
+    },
+    classification: {
+      status: "classified",
+      decision,
+      artifacts: {
+        candidates: [
+          {
+            bottleId: existingBottleId,
+            releaseId: null,
+            bottleFullName: existingBottle.fullName,
+            fullName: existingBottle.fullName,
+          },
+        ],
+      },
+    },
+    suggestedNextStep: "confirm_create",
+    diagnostics: {
+      extraction: {
+        status: "found",
+        summary: `${testBrand.name} ${createdBottleName}`,
+      },
+      candidates: {
+        count: 1,
+      },
+      classification: {
+        status: "classified",
+        action,
+        confidence: 92,
+        reason: "Create proposal fixture.",
+      },
+    },
+  };
+}
+
+function createPhotoIdentificationTarget(request, input) {
+  if (input?.pendingImageId !== "playwright-photo-upload") {
+    throw new Error("Unexpected photo identification create pending image");
+  }
+
+  const token = getAccessToken(request);
+  const approvalTarget = input?.catalogImageApproval?.target;
+  const bottle = buildBottle({
+    id: createdBottleId,
+    name: createdBottleName,
+    brand: testBrand,
+  });
+
+  if (token.includes("photo-create-warning")) {
+    if (approvalTarget !== "bottle") {
+      throw new Error("Expected bottle catalog image approval");
+    }
+
+    return {
+      bottle,
+      release: null,
+      warnings: [
+        {
+          code: "CATALOG_IMAGE_COPY_FAILED",
+          message:
+            "The bottle was created, but the public image was not saved.",
+        },
+      ],
+    };
+  }
+
+  if (token.includes("photo-create-unsuitable")) {
+    if (input?.catalogImageApproval !== undefined) {
+      throw new Error("Unexpected catalog image approval for unsuitable photo");
+    }
+
+    return {
+      bottle,
+      release: null,
+    };
+  }
+
+  if (token.includes("photo-create-release-approval")) {
+    if (approvalTarget !== "release") {
+      throw new Error("Expected release catalog image approval");
+    }
+
+    return {
+      bottle,
+      release: buildBottleRelease({
+        id: createdReleaseId,
+        bottleId: createdBottleId,
+        fullName: `${bottle.fullName} First Fill Oloroso`,
+        name: "First Fill Oloroso",
+        edition: "First Fill Oloroso",
+        releaseYear: 2026,
+      }),
+    };
+  }
+
+  if (token.includes("photo-create-bottle-unchecked")) {
+    if (input?.catalogImageApproval !== undefined) {
+      throw new Error("Unexpected catalog image approval");
+    }
+
+    return {
+      bottle,
+      release: null,
+    };
+  }
+
+  if (token.includes("photo-create-bottle-approval")) {
+    if (approvalTarget !== "bottle") {
+      throw new Error("Expected bottle catalog image approval");
+    }
+
+    return {
+      bottle,
+      release: null,
+    };
+  }
+
+  throw new Error("Unexpected photo identification create scenario");
 }
 
 /**

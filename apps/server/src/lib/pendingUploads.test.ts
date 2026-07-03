@@ -4,6 +4,7 @@ import { pendingUploads } from "@peated/server/db/schema";
 import {
   cleanupPendingUploads,
   copyPendingImageToBottle,
+  copyPendingImageToBottleRelease,
   copyPendingImageToCollectionBottle,
   copyPendingImageToTasting,
   createPendingImageUpload,
@@ -139,6 +140,12 @@ describe("pending uploads", () => {
       purpose: "photo_tasting_entry",
       bottleId: 404,
     });
+    const releaseImageUrl = await copyPendingImageToBottleRelease({
+      id: pendingUpload.id,
+      userId: defaults.user.id,
+      purpose: "photo_tasting_entry",
+      releaseId: 505,
+    });
 
     expect(collectionImageUrl).toMatch(
       /^\/uploads\/collection-bottles\/collection_bottle-303-pending-upload-.+\.webp$/,
@@ -146,7 +153,12 @@ describe("pending uploads", () => {
     expect(bottleImageUrl).toMatch(
       /^\/uploads\/bottles\/bottle-404-pending-upload-.+\.webp$/,
     );
+    expect(releaseImageUrl).toMatch(
+      /^\/uploads\/bottle-releases\/bottle_release-505-pending-upload-.+\.webp$/,
+    );
     expect(collectionImageUrl).not.toBe(bottleImageUrl);
+    expect(collectionImageUrl).not.toBe(releaseImageUrl);
+    expect(bottleImageUrl).not.toBe(releaseImageUrl);
     await expect(
       access(
         path.join(config.UPLOAD_PATH, relativeUploadPath(collectionImageUrl)),
@@ -154,6 +166,11 @@ describe("pending uploads", () => {
     ).resolves.toBeUndefined();
     await expect(
       access(path.join(config.UPLOAD_PATH, relativeUploadPath(bottleImageUrl))),
+    ).resolves.toBeUndefined();
+    await expect(
+      access(
+        path.join(config.UPLOAD_PATH, relativeUploadPath(releaseImageUrl)),
+      ),
     ).resolves.toBeUndefined();
   });
 

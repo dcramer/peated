@@ -295,6 +295,23 @@ export async function copyPendingImageToBottle({
   });
 }
 
+/** Copies an approved pending image to a canonical bottle release image slot. */
+export async function copyPendingImageToBottleRelease({
+  id,
+  userId,
+  purpose,
+  releaseId,
+}: PendingImageCopyInput & { releaseId: number }): Promise<string> {
+  return await copyPendingImageToPermanentDestination({
+    id,
+    userId,
+    purpose,
+    destinationNamespace: "bottle-releases",
+    destinationType: "bottle_release",
+    destinationId: releaseId,
+  });
+}
+
 /** Expires pending sources after TTL; permanent copies live in their destination namespace. */
 export async function cleanupPendingUploads({
   now = new Date(),

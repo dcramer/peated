@@ -1,6 +1,6 @@
 "use client";
 
-import type { Outputs } from "@peated/server/orpc/router";
+import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import type { Bottle, BottleRelease } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import FormError from "@peated/web/components/formError";
@@ -14,6 +14,7 @@ import {
   Camera,
   Check,
   ChevronLeft,
+  ImageIcon,
   Plus,
   RotateCcw,
   Search,
@@ -36,6 +37,7 @@ export type BottleResolverTarget = {
   pendingImage: PhotoIdentification["pendingImage"] | null;
   /** Blob preview ownership transfers to the resolver caller only after onResolve succeeds. */
   previewUrl: string | null;
+  warnings?: string[];
 };
 
 type Props = {
@@ -46,7 +48,12 @@ type Props = {
   matchedResultDescription?: string;
   createProposalActionLabel?: string;
   searchActionLabel?: string;
+  enableCatalogImageApproval?: boolean;
 };
+
+type CatalogImageApprovalTarget = "bottle" | "release";
+type PhotoIdentificationCreateInput =
+  Inputs["tastings"]["photoIdentificationCreate"];
 
 const loadingMessages = [
   "Holding it up to the light",
@@ -178,6 +185,42 @@ function getCreateProposalLabel(result: PhotoIdentification | null) {
   return {
     title: "Bottle found",
     description: "Create a new bottle from this label.",
+  };
+}
+
+function getCatalogImageApprovalTarget(
+  action: "create_bottle" | "create_release" | "create_bottle_and_release",
+): CatalogImageApprovalTarget {
+  return action === "create_bottle" ? "bottle" : "release";
+}
+
+function getAllowedCatalogImageApprovalTarget(
+  result: PhotoIdentification,
+  enabled: boolean,
+) {
+  const decision = getCreateDecision(result);
+  if (
+    !enabled ||
+    !decision ||
+    result.imageEvidence.photoSuitability.suitableAsBottleImage !== true
+  ) {
+    return null;
+  }
+
+  return getCatalogImageApprovalTarget(decision.action);
+}
+
+function getCatalogImageApprovalCopy(target: CatalogImageApprovalTarget) {
+  if (target === "bottle") {
+    return {
+      label: "Set as Bottle Image",
+      help: "This photo will be shown as the public image for the new bottle.",
+    };
+  }
+
+  return {
+    label: "Set as Release Image",
+    help: "This photo will be shown as the public image for the new release.",
   };
 }
 
@@ -452,6 +495,7 @@ export default function BottleResolver({
   matchedResultDescription = "We'll use the existing bottle for this tasting.",
   createProposalActionLabel = "Continue",
   searchActionLabel = "Search Bottles",
+  enableCatalogImageApproval = false,
 }: Props) {
   const router = useRouter();
   const orpc = useORPC();
@@ -466,6 +510,7 @@ export default function BottleResolver({
   const [error, setError] = useState<string | null>(null);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const [catalogImageApproved, setCatalogImageApproved] = useState(false);
 
   const photoIdentificationMutation = useMutation(
     orpc.tastings.photoIdentification.mutationOptions(),
@@ -513,6 +558,7 @@ export default function BottleResolver({
   async function resolveTarget(target: {
     bottle: Bottle;
     release: BottleRelease | null;
+    warnings?: string[];
   }) {
     const currentPreviewUrl = previewUrl;
     await onResolve({
@@ -542,12 +588,26 @@ export default function BottleResolver({
     }
 
     try {
-      const created = await photoIdentificationCreateMutation.mutateAsync({
+      const catalogImageApprovalTarget = getAllowedCatalogImageApprovalTarget(
+        result,
+        enableCatalogImageApproval,
+      );
+      const payload: PhotoIdentificationCreateInput = {
         pendingImageId: result.pendingImage.id,
-      });
+        ...(catalogImageApproved && catalogImageApprovalTarget
+          ? { catalogImageApproval: { target: catalogImageApprovalTarget } }
+          : {}),
+      };
+      const created =
+        await photoIdentificationCreateMutation.mutateAsync(payload);
       await resolveTarget({
         bottle: created.bottle,
         release: created.release,
+        warnings: (created.warnings ?? []).map(
+          (warning) =>
+            warning.message ||
+            "The bottle was created, but the public image was not saved.",
+        ),
       });
     } catch (err) {
       logError(err);
@@ -561,6 +621,7 @@ export default function BottleResolver({
     setError(null);
     setPhotoError(null);
     setPhotoResult(null);
+    setCatalogImageApproved(false);
 
     const nextPreviewUrl = URL.createObjectURL(file);
     replacePreviewUrl(nextPreviewUrl);
@@ -597,6 +658,7 @@ export default function BottleResolver({
     setError(null);
     setPhotoError(null);
     setPhotoResult(null);
+    setCatalogImageApproved(false);
     replacePreviewUrl(null);
   }
 
@@ -605,6 +667,15 @@ export default function BottleResolver({
   const createDecision = getCreateDecision(photoResult);
   const proposedName = getProposedName(photoResult);
   const createProposalLabel = getCreateProposalLabel(photoResult);
+  const catalogImageApprovalTarget = photoResult
+    ? getAllowedCatalogImageApprovalTarget(
+        photoResult,
+        enableCatalogImageApproval,
+      )
+    : null;
+  const catalogImageApprovalCopy = catalogImageApprovalTarget
+    ? getCatalogImageApprovalCopy(catalogImageApprovalTarget)
+    : null;
   const defaultSearchHref = searchHrefForQuery();
   const searchSeed = getSearchSeed(photoResult);
   const searchHref = searchHrefForQuery(searchSeed);
@@ -788,6 +859,28 @@ export default function BottleResolver({
                           "Create a new bottle from this label."}
                       </div>
                     </div>
+                  )}
+                  {createDecision && catalogImageApprovalCopy && (
+                    <label className="flex items-start gap-3 rounded border border-slate-800 bg-slate-950 p-3">
+                      <input
+                        type="checkbox"
+                        className="mt-1 h-4 w-4"
+                        checked={catalogImageApproved}
+                        disabled={photoIdentificationCreateMutation.isPending}
+                        onChange={(event) =>
+                          setCatalogImageApproved(event.target.checked)
+                        }
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-center gap-2 font-semibold text-white">
+                          <ImageIcon className="h-4 w-4" />
+                          {catalogImageApprovalCopy.label}
+                        </span>
+                        <span className="text-muted mt-1 block text-sm">
+                          {catalogImageApprovalCopy.help}
+                        </span>
+                      </span>
+                    </label>
                   )}
                 </div>
                 {matchedBottleId || createDecision ? (

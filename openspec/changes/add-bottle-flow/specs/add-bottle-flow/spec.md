@@ -110,6 +110,18 @@ The system SHALL require explicit user approval before a scan image is saved as 
 - **WHEN** catalog image promotion policy does not allow using the scan image
 - **THEN** the system does not save the scan image as a public bottle or release image
 
+#### Scenario: Promotion not approved
+
+- **WHEN** the user creates a bottle or release from a scan without approving catalog image promotion
+- **THEN** the system does not save the scan image as a public bottle or release image
+
+#### Scenario: Catalog image copy fails after creation
+
+- **WHEN** the user approves catalog image promotion and the bottle or release is created
+- **AND** the catalog image copy fails
+- **THEN** the system returns the created bottle or release
+- **AND** the system surfaces a partial-success warning that the public image was not saved
+
 ### Requirement: Existing tasting deep links
 
 The system SHALL preserve existing bottle-scoped tasting deep links while user-facing copy changes to Log Tasting.
