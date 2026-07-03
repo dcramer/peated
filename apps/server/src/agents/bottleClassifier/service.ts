@@ -26,6 +26,7 @@ import {
   withSentryConversation,
 } from "@peated/server/lib/openaiClient";
 import { absoluteUrl } from "@peated/server/lib/urls";
+import { randomUUID } from "node:crypto";
 
 let bottleClassifier: ReturnType<typeof createBottleClassifier> | null = null;
 
@@ -148,6 +149,31 @@ function normalizeReferenceForClassifier(
   };
 }
 
+function buildReferenceConversationId(
+  prefix: string,
+  reference: BottleReference,
+  conversationId?: string,
+) {
+  const explicitConversationId = conversationId?.trim();
+  if (explicitConversationId) {
+    return explicitConversationId;
+  }
+
+  const id =
+    reference.id === undefined || reference.id === null || reference.id === ""
+      ? randomUUID()
+      : reference.id;
+
+  return `${prefix}:${id}`;
+}
+
+async function withReferenceConversation<T>(
+  conversationId: string,
+  callback: () => Promise<T>,
+) {
+  return await withSentryConversation(conversationId, callback);
+}
+
 export function getBottleClassifier() {
   if (bottleClassifier) {
     return bottleClassifier;
@@ -190,15 +216,17 @@ export async function classifyBottleReference(
   input: ClassifyBottleReferenceInput,
 ) {
   const reference = normalizeReferenceForClassifier(input.reference);
-  const conversationId =
-    reference.id === undefined || reference.id === null
-      ? `bottle_classifier:${reference.name}`
-      : `bottle_reference:${reference.id}`;
+  const conversationId = buildReferenceConversationId(
+    "bottle_reference",
+    reference,
+    input.conversationId,
+  );
 
-  return await withSentryConversation(conversationId, async () => {
+  return await withReferenceConversation(conversationId, async () => {
     return await getBottleClassifier().classifyBottleReference({
       ...input,
       reference,
+      conversationId,
     });
   });
 }
@@ -311,17 +339,19 @@ export async function identifyExistingBottleReference(
   } = {},
 ) {
   const reference = normalizeReferenceForClassifier(input.reference);
+  const conversationId = buildReferenceConversationId(
+    "bottle_identifier",
+    reference,
+    input.conversationId,
+  );
   const normalizedInput = {
     ...input,
+    conversationId,
     extractedIdentity: withoutExtractedCaskFields(input.extractedIdentity),
     reference,
   };
-  const conversationId =
-    reference.id === undefined || reference.id === null
-      ? `bottle_identifier:${reference.name}`
-      : `bottle_identifier:${reference.id}`;
 
-  return await withSentryConversation(conversationId, async () => {
+  return await withReferenceConversation(conversationId, async () => {
     if (options.allowExactAliasPreflight !== false) {
       const exactAliasClassification = await identifyExactAliasReference({
         input: normalizedInput,
@@ -345,15 +375,21 @@ export async function runBottleClassifierAgent(
   input: RunBottleClassifierAgentInput,
 ) {
   const reference = normalizeReferenceForClassifier(input.reference);
-  const conversationId =
-    reference.id === undefined || reference.id === null
-      ? `bottle_classifier:${reference.name}`
-      : `bottle_reference:${reference.id}`;
+  const conversationPrefix =
+    input.instructionMode === "local_identification"
+      ? "bottle_identifier"
+      : "bottle_reference";
+  const conversationId = buildReferenceConversationId(
+    conversationPrefix,
+    reference,
+    input.conversationId,
+  );
 
-  return await withSentryConversation(conversationId, async () => {
+  return await withReferenceConversation(conversationId, async () => {
     return await getBottleClassifier().runBottleClassifierAgent({
       ...input,
       reference,
+      conversationId,
     });
   });
 }

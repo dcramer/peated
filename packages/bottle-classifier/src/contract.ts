@@ -113,6 +113,7 @@ export const CandidateExpansionModeSchema = z.enum(["open", "initial_only"]);
 export const ClassifyBottleReferenceInputSchema = z
   .object({
     reference: BottleReferenceSchema,
+    conversationId: z.string().trim().min(1).optional(),
     extractedIdentity: BottleExtractedDetailsSchema.nullable().optional(),
     imageEvidence: ImageBottleEvidenceSchema.nullable().optional(),
     initialCandidates: z.array(BottleCandidateSchema).optional(),
@@ -150,6 +151,7 @@ export type CandidateExpansionMode = z.infer<
 >;
 export type ClassifyBottleReferenceInput = {
   reference: BottleReference;
+  conversationId?: string;
   extractedIdentity?: null | z.infer<typeof BottleExtractedDetailsSchema>;
   imageEvidence?: null | z.infer<typeof ImageBottleEvidenceSchema>;
   initialCandidates?: z.infer<typeof BottleCandidateSchema>[];

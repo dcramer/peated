@@ -19,6 +19,13 @@ TypeScript assumptions.
 - Keep platform clients and SDK details inside the layer that owns them. Expose
   narrow capability functions such as `queue`, `store`, `dispatch`, or `verify`
   rather than raw clients.
+- AI agent runs should always own an observability conversation id. Prefer a
+  durable entity id with a stable domain prefix; when no durable id exists,
+  generate a run-scoped UUID instead of using names or other fuzzy identifiers.
+- Tests for SDK-owned scope or context behavior should spy on the real SDK
+  surface, such as scope instances or prototypes, when practical. Avoid
+  whole-module mocks for observability clients such as Sentry because they erase
+  the runtime state the integration is meant to protect.
 - Require deterministic idempotency or uniqueness for APIs that create durable
   records from retryable contexts.
 - Validate model or agent output before persistence. Model output may propose;

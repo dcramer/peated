@@ -4,6 +4,7 @@ import {
   Runner,
   type NonStreamRunOptions,
 } from "@openai/agents";
+import { randomUUID } from "node:crypto";
 import type OpenAI from "openai";
 import { normalizePotentialProofLikeDecision } from "./abv";
 import {
@@ -85,6 +86,7 @@ type BottleClassifierReasoningRun = {
 
 export type RunBottleClassifierAgentInput = {
   reference: BottleReference;
+  conversationId?: string;
   extractedIdentity?: BottleExtractedDetails | null;
   imageEvidence?: ImageBottleEvidence | null;
   initialCandidates?: BottleCandidate[];
@@ -298,6 +300,28 @@ export type PreparedBottleClassifierAgentRun = {
   runner: Runner;
   webSearchBudget: BottleWebSearchBudget;
 };
+
+function buildClassifierConversationId(
+  reference: BottleReference,
+  instructionMode: RunBottleClassifierAgentInput["instructionMode"],
+  conversationId?: string,
+) {
+  const explicitConversationId = conversationId?.trim();
+  if (explicitConversationId) {
+    return explicitConversationId;
+  }
+
+  const prefix =
+    instructionMode === "local_identification"
+      ? "bottle_identifier"
+      : "bottle_reference";
+  const id =
+    reference.id === undefined || reference.id === null || reference.id === ""
+      ? randomUUID()
+      : reference.id;
+
+  return `${prefix}:${id}`;
+}
 
 function mergeSearchEvidence(
   searchEvidence: BottleClassificationArtifacts["searchEvidence"],
@@ -839,6 +863,7 @@ export async function prepareBottleClassifierAgentRun(
     investigationHint = null,
     webSearchBudget: inputWebSearchBudget,
     instructionMode = "classification",
+    conversationId,
   }: RunBottleClassifierAgentInput,
 ): Promise<PreparedBottleClassifierAgentRun> {
   const dataSource = getBottleClassifierDataSource(options);
@@ -966,17 +991,20 @@ export async function prepareBottleClassifierAgentRun(
     outputType: BottleClassifierAgentDecisionSchema,
     tools,
   });
+  const resolvedConversationId = buildClassifierConversationId(
+    reference,
+    instructionMode,
+    conversationId,
+  );
   const runner = new Runner({
     modelProvider: new OpenAIProvider({
       openAIClient: options.client,
       useResponses: true,
     }),
     workflowName: "Bottle Classifier",
-    groupId:
-      reference.id === undefined || reference.id === null
-        ? undefined
-        : `bottle_reference:${reference.id}`,
+    groupId: resolvedConversationId,
     traceMetadata: {
+      "gen_ai.conversation.id": resolvedConversationId,
       source_id:
         reference.id === undefined || reference.id === null
           ? "none"
@@ -1142,10 +1170,18 @@ export function createBottleClassifier(
     investigationHint = null,
     webSearchBudget,
     instructionMode = "classification",
+    conversationId,
   }: RunBottleClassifierAgentInput): Promise<BottleClassifierReasoningRun> => {
+    const resolvedConversationId = buildClassifierConversationId(
+      reference,
+      instructionMode,
+      conversationId,
+    );
+
     if (options.overrides?.runBottleClassifierAgent) {
       const reasoning = await options.overrides.runBottleClassifierAgent({
         reference,
+        conversationId: resolvedConversationId,
         extractedIdentity,
         imageEvidence,
         initialCandidates,
@@ -1178,6 +1214,7 @@ export function createBottleClassifier(
 
     const preparedRun = await prepareBottleClassifierAgentRun(options, {
       reference,
+      conversationId: resolvedConversationId,
       initialCandidates,
       extractedIdentity,
       imageEvidence,
@@ -1206,6 +1243,11 @@ export function createBottleClassifier(
     input: ClassifyBottleReferenceInput,
   ): Promise<BottleClassificationResult> => {
     const parsedInput = ClassifyBottleReferenceInputSchema.parse(input);
+    const conversationId = buildClassifierConversationId(
+      parsedInput.reference,
+      "classification",
+      parsedInput.conversationId,
+    );
     let artifacts = buildBottleClassificationArtifacts({});
 
     try {
@@ -1293,6 +1335,7 @@ export function createBottleClassifier(
 
       const reasoningRun = await runBottleClassifierAgentWithBudget({
         reference: parsedInput.reference,
+        conversationId,
         extractedIdentity: artifacts.extractedIdentity,
         imageEvidence: artifacts.imageEvidence,
         initialCandidates: artifacts.candidates,
@@ -1337,6 +1380,7 @@ export function createBottleClassifier(
         ) {
           const retryReasoningRun = await runBottleClassifierAgentWithBudget({
             reference: parsedInput.reference,
+            conversationId,
             extractedIdentity: investigationArtifacts.extractedIdentity,
             imageEvidence: investigationArtifacts.imageEvidence,
             initialCandidates: investigationArtifacts.candidates,
@@ -1382,6 +1426,11 @@ export function createBottleClassifier(
     input: ClassifyBottleReferenceInput,
   ): Promise<BottleClassificationResult> => {
     const parsedInput = ClassifyBottleReferenceInputSchema.parse(input);
+    const conversationId = buildClassifierConversationId(
+      parsedInput.reference,
+      "local_identification",
+      parsedInput.conversationId,
+    );
     let artifacts = buildBottleClassificationArtifacts({});
 
     try {
@@ -1480,6 +1529,7 @@ export function createBottleClassifier(
 
       const reasoningRun = await runBottleClassifierAgentWithBudget({
         reference: parsedInput.reference,
+        conversationId,
         extractedIdentity: artifacts.extractedIdentity,
         imageEvidence: artifacts.imageEvidence,
         initialCandidates: artifacts.candidates,
