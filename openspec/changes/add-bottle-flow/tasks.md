@@ -31,8 +31,8 @@
 
 ## 5. Add Bottle Resolver UI
 
-- [ ] 5.1 Extract photo scan, preview, identification, result review, start-over, and search fallback from `/addTasting` into a reusable resolver component.
-- [ ] 5.2 Update `/addTasting` or its replacement path to use the resolver with tasting intent without changing successful tasting behavior.
+- [x] 5.1 Extract photo scan, preview, identification, result review, start-over, and search fallback from `/addTasting` into a reusable resolver component.
+- [x] 5.2 Update `/addTasting` or its replacement path to use the resolver with tasting intent without changing successful tasting behavior.
 - [ ] 5.3 Make `/addBottle` render the resolver and outcome selection for existing, missing, and create-proposal results.
 - [ ] 5.4 Update `/search` to understand Add Bottle intent instead of only the `tasting` boolean.
 - [ ] 5.5 Add View Bottle, Add to Library, Log Tasting, Search Again, Start Over, and Create Bottle actions for the appropriate resolver states.

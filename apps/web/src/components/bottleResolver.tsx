@@ -1,0 +1,816 @@
+"use client";
+
+import type { Outputs } from "@peated/server/orpc/router";
+import type { Bottle, BottleRelease } from "@peated/server/types";
+import Button from "@peated/web/components/button";
+import FormError from "@peated/web/components/formError";
+import Header from "@peated/web/components/header";
+import Layout from "@peated/web/components/layout";
+import { logError } from "@peated/web/lib/log";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useMutation } from "@tanstack/react-query";
+import {
+  AlertTriangle,
+  Camera,
+  Check,
+  ChevronLeft,
+  Plus,
+  RotateCcw,
+  Search,
+  SearchX,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  type ChangeEvent,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+type PhotoIdentification = Outputs["tastings"]["photoIdentification"];
+
+export type BottleResolverTarget = {
+  bottle: Bottle;
+  release: BottleRelease | null;
+  pendingImage: PhotoIdentification["pendingImage"] | null;
+  /** Blob preview ownership transfers to the resolver caller only after onResolve succeeds. */
+  previewUrl: string | null;
+};
+
+type Props = {
+  onResolve: (target: BottleResolverTarget) => Promise<void> | void;
+  searchHrefForQuery: (query?: string) => string;
+  title: string;
+};
+
+const loadingMessages = [
+  "Holding it up to the light",
+  "Letting the label breathe",
+  "Checking the dusty shelf",
+  "Asking the tasting room",
+  "Comparing the fine print",
+];
+
+function createIdempotencyKey() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function getFieldValue(
+  result: PhotoIdentification | null,
+  field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
+) {
+  const value = result?.imageEvidence.fieldCandidates[field]?.value;
+  if (value === undefined || value === null) return null;
+  if (field === "statedAge") return `${value} years`;
+  if (field === "abv") return `${value}% ABV`;
+  return String(value);
+}
+
+function getSearchSeed(result: PhotoIdentification | null) {
+  const brand = getFieldValue(result, "brand");
+  const expression = getFieldValue(result, "expression");
+  return [brand, expression].filter(Boolean).join(" ");
+}
+
+function getMatchedBottleId(result: PhotoIdentification | null) {
+  if (
+    result?.suggestedNextStep === "confirm_match" &&
+    result.classification.status === "classified" &&
+    result.classification.decision.action === "match"
+  ) {
+    return result.classification.decision.matchedBottleId;
+  }
+  return null;
+}
+
+function getMatchedReleaseId(result: PhotoIdentification | null) {
+  if (
+    result?.classification.status === "classified" &&
+    result.classification.decision.action === "match"
+  ) {
+    return result.classification.decision.matchedReleaseId;
+  }
+  return null;
+}
+
+function getCreateDecision(result: PhotoIdentification | null) {
+  if (
+    result?.suggestedNextStep !== "confirm_create" ||
+    result.classification.status !== "classified"
+  ) {
+    return null;
+  }
+
+  switch (result.classification.decision.action) {
+    case "create_bottle":
+    case "create_release":
+    case "create_bottle_and_release":
+      return result.classification.decision;
+    default:
+      return null;
+  }
+}
+
+function getProposedName(result: PhotoIdentification | null) {
+  const decision = getCreateDecision(result);
+  if (!decision) return null;
+
+  if (decision.action === "create_release") {
+    return decision.proposedRelease.edition ?? "New release";
+  }
+
+  if (decision.action === "create_bottle_and_release") {
+    return [
+      decision.proposedBottle.brand.name,
+      decision.proposedBottle.name,
+      decision.proposedRelease.edition,
+    ]
+      .filter(Boolean)
+      .join(" ");
+  }
+
+  return [decision.proposedBottle.brand.name, decision.proposedBottle.name]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function getParentBottleName(result: PhotoIdentification | null) {
+  const decision = getCreateDecision(result);
+  if (!decision || decision.action !== "create_release") return null;
+
+  const parent = result?.classification.artifacts.candidates.find(
+    (candidate) =>
+      candidate.bottleId === decision.parentBottleId &&
+      (candidate.releaseId === null || candidate.releaseId === undefined),
+  );
+  return parent?.bottleFullName || parent?.fullName || null;
+}
+
+function getCreateProposalLabel(result: PhotoIdentification | null) {
+  const decision = getCreateDecision(result);
+  if (!decision) return null;
+  const parentBottleName = getParentBottleName(result);
+
+  if (decision.action === "create_release") {
+    return {
+      title: "Bottle found",
+      description: parentBottleName
+        ? `Create a new bottling for ${parentBottleName}.`
+        : "Create a new bottling for this bottle.",
+    };
+  }
+
+  if (decision.action === "create_bottle_and_release") {
+    return {
+      title: "Bottle found",
+      description: "Create the bottle and its specific bottling.",
+    };
+  }
+
+  return {
+    title: "Bottle found",
+    description: "Create a new bottle from this label.",
+  };
+}
+
+function getManualResultCopy(result: PhotoIdentification | null) {
+  const action =
+    result?.classification.status === "classified"
+      ? result.classification.decision.action
+      : null;
+
+  if (result?.suggestedNextStep === "needs_review") {
+    return {
+      title: "This one needs a human squint",
+      description:
+        "We got close, but not close enough to trust it. Search can still find the right bottle.",
+    };
+  }
+
+  if (action === "match") {
+    return {
+      title: "Almost, but not quite",
+      description:
+        "We spotted a possible match, but it was too wobbly to use automatically.",
+    };
+  }
+
+  if (action === "no_match") {
+    return {
+      title: "We couldn't identify the bottle",
+      description:
+        "That label kept its poker face. Search can still find it, or start over with a clearer photo.",
+    };
+  }
+
+  return {
+    title: "We couldn't identify the bottle",
+    description:
+      "The label kept its secrets. Search can still find it, or start over with another photo.",
+  };
+}
+
+function EvidencePills({ result }: { result: PhotoIdentification | null }) {
+  const fields = [
+    ["Brand", getFieldValue(result, "brand")],
+    ["Expression", getFieldValue(result, "expression")],
+    ["Age", getFieldValue(result, "statedAge")],
+    ["ABV", getFieldValue(result, "abv")],
+    ["Edition", getFieldValue(result, "edition")],
+    ["Vintage", getFieldValue(result, "vintageYear")],
+  ].filter(([, value]) => value);
+
+  if (!fields.length) return null;
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {fields.map(([label, value]) => (
+        <div
+          key={label}
+          className="rounded border border-slate-800 bg-slate-950 px-3 py-2 text-sm"
+        >
+          <span className="text-muted">{label}</span>{" "}
+          <span className="font-medium text-white">{value}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ResultHeader({
+  previewUrl,
+  icon,
+  title,
+  description,
+  children,
+}: {
+  previewUrl: string | null;
+  icon: ReactNode;
+  title: string;
+  description: string;
+  children?: ReactNode;
+}) {
+  return (
+    <div className="flex items-start gap-4">
+      {previewUrl && (
+        <img
+          src={previewUrl}
+          alt=""
+          className="h-16 w-16 shrink-0 rounded object-cover sm:h-[96px] sm:w-[96px]"
+        />
+      )}
+      <div className="min-w-0 flex-1 space-y-3">
+        <div className="flex items-start gap-3">
+          {icon}
+          <div>
+            <div className="font-semibold text-white">{title}</div>
+            <div className="text-muted mt-1 text-sm">{description}</div>
+          </div>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function OrDivider() {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="h-px flex-1 bg-slate-800" />
+      <div className="text-muted text-xs font-semibold uppercase tracking-wide">
+        Or
+      </div>
+      <div className="h-px flex-1 bg-slate-800" />
+    </div>
+  );
+}
+
+function PhotoFailurePanel({
+  previewUrl,
+  title,
+  description,
+  searchHref,
+  onStartOver,
+  variant,
+}: {
+  previewUrl: string | null;
+  title: string;
+  description: string;
+  searchHref: string;
+  onStartOver: () => void;
+  variant: "error" | "no-match";
+}) {
+  const isError = variant === "error";
+
+  return (
+    <div
+      className={`rounded border p-4 lg:p-6 ${
+        isError
+          ? "border-red-900/70 bg-red-950/20"
+          : "border-slate-800 bg-slate-950/50"
+      }`}
+    >
+      <div className="space-y-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+          {previewUrl && (
+            <img
+              src={previewUrl}
+              alt="Selected bottle label"
+              className="h-24 w-24 rounded object-cover"
+            />
+          )}
+          <div className="min-w-0 flex-1 space-y-4">
+            <div className="flex items-start gap-3">
+              <div
+                className={`rounded-full p-2 ${
+                  isError
+                    ? "bg-red-900/60 text-red-100"
+                    : "text-highlight bg-slate-800"
+                }`}
+              >
+                {isError ? (
+                  <AlertTriangle className="h-5 w-5" />
+                ) : (
+                  <SearchX className="h-5 w-5" />
+                )}
+              </div>
+              <div>
+                <div className="font-semibold text-white">{title}</div>
+                <div className="text-muted mt-1 text-sm">{description}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="grid w-full gap-3 sm:grid-cols-2">
+          <Button
+            href={searchHref}
+            color="highlight"
+            fullWidth
+            icon={<Search className="h-4 w-4" />}
+          >
+            Search Bottles
+          </Button>
+          <Button
+            fullWidth
+            onClick={onStartOver}
+            icon={<RotateCcw className="h-4 w-4" />}
+          >
+            Start Over
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FallbackActions({
+  searchHref,
+  onStartOver,
+  showStartOver = false,
+}: {
+  searchHref: string;
+  onStartOver?: () => void;
+  showStartOver?: boolean;
+}) {
+  return (
+    <div className="space-y-3">
+      <OrDivider />
+      <div className="mx-auto grid w-full gap-3 sm:w-1/2 sm:grid-cols-2">
+        <Button
+          href={searchHref}
+          fullWidth
+          icon={<Search className="h-4 w-4" />}
+        >
+          Search Bottles
+        </Button>
+        {showStartOver && onStartOver && (
+          <Button
+            fullWidth
+            onClick={onStartOver}
+            icon={<RotateCcw className="h-4 w-4" />}
+          >
+            Start Over
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SearchBottleCallout({ searchHref }: { searchHref: string }) {
+  return (
+    <section className="mx-3 rounded border border-slate-800 bg-slate-950/50 p-4 sm:mx-0">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="font-semibold text-white">Prefer to search?</div>
+          <div className="text-muted mt-1 text-sm">
+            Find an existing bottle or start a new one manually.
+          </div>
+        </div>
+        <div className="shrink-0">
+          <Button href={searchHref} icon={<Search className="h-4 w-4" />}>
+            Search Bottles
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export default function BottleResolver({
+  onResolve,
+  searchHrefForQuery,
+  title,
+}: Props) {
+  const router = useRouter();
+  const orpc = useORPC();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const previewUrlRef = useRef<string | null>(null);
+  const transferredPreviewUrlRef = useRef<string | null>(null);
+
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [photoResult, setPhotoResult] = useState<PhotoIdentification | null>(
+    null,
+  );
+  const [error, setError] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+
+  const photoIdentificationMutation = useMutation(
+    orpc.tastings.photoIdentification.mutationOptions(),
+  );
+  const photoIdentificationCreateMutation = useMutation(
+    orpc.tastings.photoIdentificationCreate.mutationOptions(),
+  );
+  const isIdentifying = photoIdentificationMutation.isPending;
+
+  useEffect(() => {
+    previewUrlRef.current = previewUrl;
+  }, [previewUrl]);
+
+  useEffect(() => {
+    return () => {
+      const current = previewUrlRef.current;
+      if (current && current !== transferredPreviewUrlRef.current) {
+        URL.revokeObjectURL(current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isIdentifying) {
+      setLoadingMessageIndex(0);
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setLoadingMessageIndex((index) => (index + 1) % loadingMessages.length);
+    }, 2700);
+
+    return () => window.clearInterval(timer);
+  }, [isIdentifying]);
+
+  function replacePreviewUrl(nextPreviewUrl: string | null) {
+    setPreviewUrl((current) => {
+      if (current && current !== transferredPreviewUrlRef.current) {
+        URL.revokeObjectURL(current);
+      }
+      return nextPreviewUrl;
+    });
+  }
+
+  async function resolveTarget(target: {
+    bottle: Bottle;
+    release: BottleRelease | null;
+  }) {
+    const currentPreviewUrl = previewUrl;
+    await onResolve({
+      ...target,
+      pendingImage: photoResult?.pendingImage ?? null,
+      previewUrl: currentPreviewUrl,
+    });
+    transferredPreviewUrlRef.current = currentPreviewUrl;
+  }
+
+  async function loadTarget(bottleId: number, releaseId: number | null = null) {
+    const [bottle, release] = await Promise.all([
+      orpc.bottles.details.call({ bottle: bottleId }),
+      releaseId
+        ? orpc.bottleReleases.details.call({ release: releaseId })
+        : Promise.resolve(null),
+    ]);
+    await resolveTarget({ bottle, release });
+  }
+
+  async function acceptCreateProposal(result: PhotoIdentification) {
+    if (
+      result.classification.status !== "classified" ||
+      !getCreateDecision(result)
+    ) {
+      return;
+    }
+
+    try {
+      const created = await photoIdentificationCreateMutation.mutateAsync({
+        pendingImageId: result.pendingImage.id,
+      });
+      await resolveTarget({
+        bottle: created.bottle,
+        release: created.release,
+      });
+    } catch (err) {
+      logError(err);
+      setError(
+        "We couldn't create that bottle from the photo. Search for the bottle to keep going.",
+      );
+    }
+  }
+
+  async function identifyPhoto(file: File) {
+    setError(null);
+    setPhotoError(null);
+    setPhotoResult(null);
+
+    const nextPreviewUrl = URL.createObjectURL(file);
+    replacePreviewUrl(nextPreviewUrl);
+
+    try {
+      const result = await photoIdentificationMutation.mutateAsync({
+        file,
+        idempotencyKey: createIdempotencyKey(),
+      });
+      setPhotoResult(result);
+    } catch (err) {
+      logError(err, {
+        context: "add_tasting_photo_identification",
+        rpc: "tastings.photoIdentification",
+        file: {
+          size: file.size,
+          type: file.type || null,
+        },
+      });
+      setPhotoError(
+        "Our label reader had a wobble. Search can still find the bottle, or you can try another photo.",
+      );
+    }
+  }
+
+  function onFileChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    void identifyPhoto(file);
+    event.target.value = "";
+  }
+
+  function startOver() {
+    setError(null);
+    setPhotoError(null);
+    setPhotoResult(null);
+    replacePreviewUrl(null);
+  }
+
+  const matchedBottleId = getMatchedBottleId(photoResult);
+  const matchedReleaseId = getMatchedReleaseId(photoResult);
+  const createDecision = getCreateDecision(photoResult);
+  const proposedName = getProposedName(photoResult);
+  const createProposalLabel = getCreateProposalLabel(photoResult);
+  const defaultSearchHref = searchHrefForQuery();
+  const searchSeed = getSearchSeed(photoResult);
+  const searchHref = searchHrefForQuery(searchSeed);
+  const manualResultCopy = getManualResultCopy(photoResult);
+
+  return (
+    <Layout
+      footer={null}
+      header={
+        <Header>
+          <div className="flex w-full items-center gap-3">
+            <button
+              type="button"
+              aria-label="Back"
+              className="text-muted group flex justify-center lg:hidden"
+              onClick={() => router.back()}
+            >
+              <div className="-my-1 rounded bg-slate-800 p-1 group-hover:bg-slate-700 group-hover:text-white">
+                <ChevronLeft className="h-8 w-8" />
+              </div>
+            </button>
+            <h1 className="text-2xl font-bold">{title}</h1>
+          </div>
+        </Header>
+      }
+    >
+      <input
+        ref={fileInputRef}
+        className="hidden"
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={onFileChange}
+      />
+
+      <div className="mx-auto mt-5 max-w-3xl space-y-5">
+        {!previewUrl && !photoResult && !isIdentifying && (
+          <>
+            <section className="px-3 sm:px-0">
+              <div className="space-y-5">
+                <div className="text-center">
+                  <div className="text-muted text-sm">
+                    Start with a bottle photo
+                  </div>
+                  <h2 className="mt-1 text-2xl font-semibold text-white">
+                    Capture the label, then confirm the match.
+                  </h2>
+                </div>
+
+                <button
+                  type="button"
+                  className="flex min-h-72 w-full flex-col items-center justify-center gap-4 rounded border border-slate-800 bg-black p-6 text-center transition hover:border-slate-700 hover:bg-slate-950"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <div className="rounded-full border border-slate-700 bg-slate-950 p-5">
+                    <Camera className="text-highlight h-10 w-10" />
+                  </div>
+                  <div>
+                    <div className="text-lg font-semibold text-white">
+                      Take or upload a photo
+                    </div>
+                    <div className="text-muted mt-1 text-sm">
+                      Use a clear bottle label for the fastest match.
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </section>
+            <SearchBottleCallout searchHref={defaultSearchHref} />
+          </>
+        )}
+
+        {!isIdentifying && previewUrl && !photoResult && photoError && (
+          <PhotoFailurePanel
+            previewUrl={previewUrl}
+            title="We couldn't read that photo"
+            description={photoError}
+            searchHref={defaultSearchHref}
+            onStartOver={startOver}
+            variant="error"
+          />
+        )}
+
+        {isIdentifying && (
+          <section className="flex min-h-[calc(100vh-12rem)] items-center justify-center px-3 py-8 text-center sm:min-h-0 sm:items-start sm:justify-start sm:py-10 sm:text-left">
+            <div className="mx-auto max-w-md space-y-5 sm:flex sm:max-w-3xl sm:items-center sm:gap-8 sm:space-y-0">
+              {previewUrl && (
+                <img
+                  src={previewUrl}
+                  alt="Selected bottle label"
+                  className="mx-auto h-28 w-28 rounded object-cover sm:mx-0 sm:h-56 sm:w-56"
+                />
+              )}
+              <div>
+                <h2 className="bottle-resolver-loading-shimmer via-highlight inline-block bg-gradient-to-r from-white to-white bg-[length:200%_100%] bg-clip-text text-xl font-semibold text-transparent">
+                  {loadingMessages[loadingMessageIndex]}
+                </h2>
+                <p className="text-muted mt-2 text-sm">
+                  Reading the label and checking Peated for a match.
+                </p>
+                <p className="text-muted mt-1 text-sm">
+                  This can take up to 30 seconds.
+                </p>
+                <div className="mt-5">
+                  <Button
+                    href={defaultSearchHref}
+                    icon={<Search className="h-4 w-4" />}
+                  >
+                    Search Bottles
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {!isIdentifying && photoResult && (
+          <>
+            <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
+              <div className="space-y-5">
+                <div className="space-y-4">
+                  {matchedBottleId ? (
+                    <ResultHeader
+                      previewUrl={previewUrl}
+                      icon={
+                        <div className="bg-highlight rounded-full p-2 text-black">
+                          <Check className="h-5 w-5" />
+                        </div>
+                      }
+                      title="Match found"
+                      description="We'll use the existing bottle for this tasting."
+                    >
+                      <EvidencePills result={photoResult} />
+                    </ResultHeader>
+                  ) : createDecision ? (
+                    <ResultHeader
+                      previewUrl={previewUrl}
+                      icon={
+                        <div className="bg-highlight rounded-full p-2 text-black">
+                          <Plus className="h-5 w-5" />
+                        </div>
+                      }
+                      title={createProposalLabel?.title ?? "New bottle found"}
+                      description={
+                        createProposalLabel?.description ??
+                        "We'll create this bottle before recording your tasting."
+                      }
+                    >
+                      <EvidencePills result={photoResult} />
+                    </ResultHeader>
+                  ) : (
+                    <PhotoFailurePanel
+                      previewUrl={previewUrl}
+                      title={manualResultCopy.title}
+                      description={manualResultCopy.description}
+                      searchHref={searchHref}
+                      onStartOver={startOver}
+                      variant="no-match"
+                    />
+                  )}
+
+                  {createDecision && proposedName && (
+                    <div className="rounded border border-slate-800 bg-slate-950 p-3">
+                      <div className="text-muted text-xs uppercase tracking-wide">
+                        Proposed
+                      </div>
+                      <div className="mt-1 font-semibold text-white">
+                        {proposedName}
+                      </div>
+                      <div className="text-muted mt-2 text-sm">
+                        {createProposalLabel?.description ??
+                          "Create a new bottle from this label."}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {matchedBottleId || createDecision ? (
+                  <div className="mx-auto grid w-full gap-2 sm:w-1/2">
+                    {matchedBottleId && (
+                      <Button
+                        color="highlight"
+                        fullWidth
+                        onClick={() =>
+                          void loadTarget(matchedBottleId, matchedReleaseId)
+                        }
+                      >
+                        Continue
+                      </Button>
+                    )}
+                    {createDecision && (
+                      <Button
+                        color="highlight"
+                        fullWidth
+                        icon={<Plus className="h-4 w-4" />}
+                        onClick={() => void acceptCreateProposal(photoResult)}
+                        disabled={photoIdentificationCreateMutation.isPending}
+                      >
+                        {photoIdentificationCreateMutation.isPending
+                          ? "Creating..."
+                          : "Continue"}
+                      </Button>
+                    )}
+                  </div>
+                ) : null}
+              </div>
+            </section>
+            {(matchedBottleId || createDecision) && (
+              <FallbackActions
+                searchHref={searchHref}
+                showStartOver
+                onStartOver={startOver}
+              />
+            )}
+          </>
+        )}
+
+        {error && <FormError values={[error]} />}
+
+        <style jsx global>{`
+          @keyframes bottle-resolver-loading-shimmer {
+            0% {
+              background-position: 200% 0;
+            }
+            100% {
+              background-position: -200% 0;
+            }
+          }
+
+          .bottle-resolver-loading-shimmer {
+            animation: bottle-resolver-loading-shimmer 2.4s ease-in-out infinite;
+          }
+        `}</style>
+      </div>
+    </Layout>
+  );
+}
