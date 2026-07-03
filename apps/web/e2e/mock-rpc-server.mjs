@@ -437,6 +437,14 @@ function hasBottleInCollection(collection, bottleId) {
 }
 
 function buildBottleForId(id) {
+  if (id === createdBottleId) {
+    return buildBottle({
+      id: createdBottleId,
+      name: createdBottleName,
+      brand: testBrand,
+    });
+  }
+
   return buildBottle({
     id,
     name: `16-year-old ${id}`,

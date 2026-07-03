@@ -44,7 +44,7 @@ export default function ModActions({ bottle }: { bottle: Bottle }) {
         </MenuItem>
         <MenuItem
           as={Link}
-          href={`/addBottle?${new URLSearchParams({
+          href={`/bottles/new?${new URLSearchParams({
             series: bottle.series ? `${bottle.series.id}` : "",
             brand: `${bottle.brand.id}`,
             bottler: bottle.bottler ? `${bottle.bottler.id}` : "",

@@ -3,6 +3,10 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import type { Outputs } from "@peated/server/orpc/router";
 import Link from "@peated/web/components/link";
 import ListItem from "../listItem";
+import {
+  type CreateBottleReturnAction,
+  getCreateBottleHref,
+} from "./createBottleHref";
 import ResultRow from "./result";
 
 export default function SearchResults({
@@ -10,11 +14,13 @@ export default function SearchResults({
   results,
   canSuggestAdd = false,
   directToTasting = false,
+  createBottleReturnAction,
 }: {
   query: string;
   results: Outputs["search"]["results"];
   canSuggestAdd?: boolean;
   directToTasting?: boolean;
+  createBottleReturnAction?: CreateBottleReturnAction;
 }) {
   return (
     <ul
@@ -28,7 +34,10 @@ export default function SearchResults({
           <div className="min-w-0 flex-auto">
             <div className="font-semibold leading-6">
               <Link
-                href={`/addBottle?name=${encodeURIComponent(toTitleCase(query))}`}
+                href={getCreateBottleHref({
+                  query,
+                  returnAction: createBottleReturnAction,
+                })}
               >
                 <span className="absolute inset-x-0 -top-px bottom-0" />
                 {results.length === 0

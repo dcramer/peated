@@ -13,6 +13,15 @@ import SearchResults from "./searchResults";
 import { SkeletonItem } from "./skeletonItem";
 
 const maxResults = 50;
+const addBottleIntents = ["addBottle", "choose", "library", "tasting", "view"];
+
+function getCreateBottleReturnAction(intent: string | null) {
+  if (intent === "choose" || intent === "addBottle") return "addBottle";
+  if (intent === "library" || intent === "tasting" || intent === "view") {
+    return intent;
+  }
+  return undefined;
+}
 
 export type Props = {
   value?: string;
@@ -29,7 +38,11 @@ export default function SearchPanel({
 }: Props) {
   const { user } = useAuth();
   const qs = useSearchParams();
-  const directToTasting = qs.has("tasting");
+  const intent = qs.get("intent");
+  const directToTasting = qs.has("tasting") || intent === "tasting";
+  const createBottleReturnAction =
+    getCreateBottleReturnAction(intent) ??
+    (directToTasting ? "tasting" : undefined);
 
   const router = useRouter();
 
@@ -96,11 +109,12 @@ export default function SearchPanel({
               onQuery(value);
             }}
             onSubmit={(value) => {
-              router.replace(
-                `${location.pathname}?q=${encodeURIComponent(value)}&${
-                  directToTasting ? "tasting" : ""
-                }`,
-              );
+              const params = new URLSearchParams({ q: value });
+              if (qs.has("tasting")) params.set("tasting", "");
+              if (intent && addBottleIntents.includes(intent)) {
+                params.set("intent", intent);
+              }
+              router.replace(`${location.pathname}?${params.toString()}`);
             }}
             loading={state === "loading"}
             onClose={onClose}
@@ -116,6 +130,7 @@ export default function SearchPanel({
           results={results}
           canSuggestAdd={!isUserQuery}
           directToTasting={directToTasting}
+          createBottleReturnAction={createBottleReturnAction}
         />
       )}
     </Layout>

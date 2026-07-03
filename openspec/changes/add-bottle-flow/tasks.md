@@ -24,10 +24,10 @@
 
 ## 4. Route Restructure
 
-- [ ] 4.1 Move the current manual `/addBottle` form to `/bottles/new` with visible Create Bottle copy.
-- [ ] 4.2 Add compatibility redirects or link updates for current `/addBottle` create-form query patterns.
-- [ ] 4.3 Update manual bottle creation return behavior so it can continue to Library, Log Tasting, View Bottle, or Add Bottle outcomes.
-- [ ] 4.4 Update search add-missing-bottle links to target Create Bottle while preserving Add Bottle intent.
+- [x] 4.1 Move the current manual `/addBottle` form to `/bottles/new` with visible Create Bottle copy.
+- [x] 4.2 Add compatibility redirects or link updates for current `/addBottle` create-form query patterns.
+- [x] 4.3 Update manual bottle creation return behavior so it can continue to Library, Log Tasting, View Bottle, or Add Bottle outcomes.
+- [x] 4.4 Update search add-missing-bottle links to target Create Bottle while preserving Add Bottle intent.
 
 ## 5. Add Bottle Resolver UI
 
