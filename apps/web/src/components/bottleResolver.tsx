@@ -40,12 +40,27 @@ export type BottleResolverTarget = {
   warnings?: string[];
 };
 
+export type BottleResolverMatchedAction = "library" | "tasting";
+
+export type BottleResolverMatchedActionsProps = {
+  bottleId: number;
+  releaseId: number | null;
+  resolvingAction: BottleResolverMatchedAction | null;
+  onResolve: (action: BottleResolverMatchedAction) => void;
+};
+
 type Props = {
-  onResolve: (target: BottleResolverTarget) => Promise<void> | void;
+  onResolve: (
+    target: BottleResolverTarget,
+    action?: BottleResolverMatchedAction,
+  ) => Promise<void> | void;
   searchHrefForQuery: (query?: string) => string;
   createBottleHrefForQuery?: (query: string) => string;
   title: string;
   matchedResultDescription?: string;
+  renderMatchedResultActions?: (
+    props: BottleResolverMatchedActionsProps,
+  ) => ReactNode;
   createProposalActionLabel?: string;
   searchActionLabel?: string;
   enableCatalogImageApproval?: boolean;
@@ -493,6 +508,7 @@ export default function BottleResolver({
   createBottleHrefForQuery,
   title,
   matchedResultDescription = "We'll use the existing bottle for this tasting.",
+  renderMatchedResultActions,
   createProposalActionLabel = "Continue",
   searchActionLabel = "Search Bottles",
   enableCatalogImageApproval = false,
@@ -511,6 +527,8 @@ export default function BottleResolver({
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const [catalogImageApproved, setCatalogImageApproved] = useState(false);
+  const [resolvingAction, setResolvingAction] =
+    useState<BottleResolverMatchedAction | null>(null);
 
   const photoIdentificationMutation = useMutation(
     orpc.tastings.photoIdentification.mutationOptions(),
@@ -555,28 +573,47 @@ export default function BottleResolver({
     });
   }
 
-  async function resolveTarget(target: {
-    bottle: Bottle;
-    release: BottleRelease | null;
-    warnings?: string[];
-  }) {
+  async function resolveTarget(
+    target: {
+      bottle: Bottle;
+      release: BottleRelease | null;
+      warnings?: string[];
+    },
+    action?: BottleResolverMatchedAction,
+  ) {
     const currentPreviewUrl = previewUrl;
-    await onResolve({
-      ...target,
-      pendingImage: photoResult?.pendingImage ?? null,
-      previewUrl: currentPreviewUrl,
-    });
+    await onResolve(
+      {
+        ...target,
+        pendingImage: photoResult?.pendingImage ?? null,
+        previewUrl: currentPreviewUrl,
+      },
+      action,
+    );
     transferredPreviewUrlRef.current = currentPreviewUrl;
   }
 
-  async function loadTarget(bottleId: number, releaseId: number | null = null) {
-    const [bottle, release] = await Promise.all([
-      orpc.bottles.details.call({ bottle: bottleId }),
-      releaseId
-        ? orpc.bottleReleases.details.call({ release: releaseId })
-        : Promise.resolve(null),
-    ]);
-    await resolveTarget({ bottle, release });
+  async function loadTarget(
+    bottleId: number,
+    releaseId: number | null = null,
+    action?: BottleResolverMatchedAction,
+  ) {
+    setError(null);
+    setResolvingAction(action ?? "library");
+    try {
+      const [bottle, release] = await Promise.all([
+        orpc.bottles.details.call({ bottle: bottleId }),
+        releaseId
+          ? orpc.bottleReleases.details.call({ release: releaseId })
+          : Promise.resolve(null),
+      ]);
+      await resolveTarget({ bottle, release }, action);
+    } catch (err) {
+      logError(err);
+      setError("We couldn't load that bottle. Search for it to keep going.");
+    } finally {
+      setResolvingAction(null);
+    }
   }
 
   async function acceptCreateProposal(result: PhotoIdentification) {
@@ -884,21 +921,41 @@ export default function BottleResolver({
                   )}
                 </div>
                 {matchedBottleId || createDecision ? (
-                  <div className="mx-auto grid w-full gap-2 sm:w-1/2">
-                    {matchedBottleId && (
-                      <Button
-                        color="highlight"
-                        fullWidth
-                        onClick={() =>
-                          void loadTarget(matchedBottleId, matchedReleaseId)
-                        }
-                      >
-                        Continue
-                      </Button>
-                    )}
+                  <div
+                    className={`mx-auto grid w-full gap-2 ${
+                      matchedBottleId && renderMatchedResultActions
+                        ? ""
+                        : "sm:w-1/2"
+                    }`}
+                  >
+                    {matchedBottleId &&
+                      (renderMatchedResultActions ? (
+                        renderMatchedResultActions({
+                          bottleId: matchedBottleId,
+                          releaseId: matchedReleaseId,
+                          resolvingAction,
+                          onResolve: (action) => {
+                            void loadTarget(
+                              matchedBottleId,
+                              matchedReleaseId,
+                              action,
+                            );
+                          },
+                        })
+                      ) : (
+                        <Button
+                          color="highlight"
+                          fullWidth
+                          disabled={Boolean(resolvingAction)}
+                          onClick={() =>
+                            void loadTarget(matchedBottleId, matchedReleaseId)
+                          }
+                        >
+                          Continue
+                        </Button>
+                      ))}
                     {createDecision && (
                       <Button
-                        color="highlight"
                         fullWidth
                         icon={<Plus className="h-4 w-4" />}
                         onClick={() => void acceptCreateProposal(photoResult)}

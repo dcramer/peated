@@ -32,8 +32,8 @@ export default function Sidebar() {
           <nav className="flex flex-1 flex-col">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
               <li>
-                <Button href="/addTasting" fullWidth color="highlight">
-                  Log Tasting
+                <Button href="/addBottle" fullWidth color="highlight">
+                  Add Bottle
                 </Button>
               </li>
               <li>

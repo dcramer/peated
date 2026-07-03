@@ -201,8 +201,8 @@ test.describe("add bottle flow", () => {
       page.getByRole("button", { name: "Add to Library" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("main").getByRole("link", { name: "Log Tasting" }),
-    ).toHaveAttribute("href", `/bottles/${existingBottle.id}/addTasting`);
+      page.getByRole("main").getByRole("button", { name: "Log Tasting" }),
+    ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "View Bottle" }),
     ).toHaveAttribute("href", `/bottles/${existingBottle.id}`);
@@ -236,11 +236,8 @@ test.describe("add bottle flow", () => {
     await expect(page.getByText(existingBottle.fullName)).toBeVisible();
     await expect(page.getByText("Distillers Edition (2024)")).toBeVisible();
     await expect(
-      page.getByRole("main").getByRole("link", { name: "Log Tasting" }),
-    ).toHaveAttribute(
-      "href",
-      `/bottles/${existingBottle.id}/addTasting?release=${existingReleaseId}`,
-    );
+      page.getByRole("main").getByRole("button", { name: "Log Tasting" }),
+    ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "View Bottle" }),
     ).toHaveAttribute(
@@ -274,7 +271,7 @@ test.describe("add bottle flow", () => {
       page.getByRole("button", { name: "Add to Library" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("main").getByRole("link", { name: "Log Tasting" }),
+      page.getByRole("main").getByRole("button", { name: "Log Tasting" }),
     ).toBeVisible();
   });
 
@@ -312,7 +309,13 @@ test.describe("add bottle flow", () => {
     await uploadLabel(page);
 
     await expect(page.getByText("Match found")).toBeVisible();
-    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page.getByRole("button", { name: "Continue" })).toBeHidden();
+    await expect(
+      page.getByRole("button", { name: "Log Tasting" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "View Bottle" }),
+    ).toHaveAttribute("href", `/bottles/${existingBottle.id}`);
     await page.getByRole("button", { name: "Add to Library" }).click();
 
     const imageChoice = page.getByLabel("Use scanned photo as Library image");
@@ -351,7 +354,6 @@ test.describe("add bottle flow", () => {
     await page.goto("/addBottle");
     await uploadLabel(page);
     await expect(page.getByText("Match found")).toBeVisible();
-    await page.getByRole("button", { name: "Continue" }).click();
     await page.getByRole("button", { name: "Add to Library" }).click();
     await page.getByRole("button", { name: "Add to Library" }).click();
 

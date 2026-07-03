@@ -28,7 +28,7 @@ export default function EntityTastings(props: {
       {tastingList.results.length ? (
         <TastingList values={tastingList.results} />
       ) : (
-        <EmptyActivity href="/addTasting">
+        <EmptyActivity href="/addBottle?intent=tasting">
           <span className="mt-2 block font-semibold ">
             Are you enjoying a dram?
           </span>
