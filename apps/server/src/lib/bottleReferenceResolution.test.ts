@@ -1,3 +1,5 @@
+import { db } from "@peated/server/db";
+import { bottles } from "@peated/server/db/schema";
 import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -26,6 +28,35 @@ function buildClassification(decision: Record<string, unknown>) {
       resolvedEntities: [],
     },
   };
+}
+
+function buildSmwsProposedBottle() {
+  return {
+    name: "35.331",
+    series: null,
+    category: "single_malt",
+    edition: null,
+    statedAge: null,
+    caskStrength: null,
+    singleCask: true,
+    abv: null,
+    vintageYear: null,
+    releaseYear: null,
+    brand: {
+      id: null,
+      name: "SMWS",
+    },
+    distillers: [],
+    bottler: {
+      id: null,
+      name: "SMWS",
+    },
+  };
+}
+
+async function countBottles() {
+  const rows = await db.select({ id: bottles.id }).from(bottles);
+  return rows.length;
 }
 
 describe("resolveBottleReferenceTarget", () => {
@@ -194,5 +225,149 @@ describe("resolveBottleReferenceTarget", () => {
       createdBottle: false,
       createdRelease: false,
     });
+  });
+
+  test("reuses existing SMWS bottles by code when a classifier create omits the subtitle", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ admin: true });
+    const brand = await fixtures.Entity({
+      type: ["brand", "bottler"],
+      name: "SMWS Guard Society",
+      shortName: "SMWS",
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      name: "35.331 Ultra hoggie",
+      singleCask: true,
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      name: "35.3310 False lead",
+      singleCask: true,
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      name: "135.331 False lead",
+      singleCask: true,
+    });
+
+    const bottleCount = await countBottles();
+
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification({
+        action: "create_bottle",
+        confidence: 100,
+        identityScope: "exact_cask",
+        observation: {
+          caskNumber: "35.331",
+        },
+        matchedBottleId: null,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: buildSmwsProposedBottle(),
+        proposedRelease: null,
+      }),
+    );
+
+    const result = await resolveBottleReferenceTarget({
+      reference: {
+        name: "SMWS 35.331",
+        url: null,
+        imageUrl: null,
+        currentBottleId: null,
+        currentReleaseId: null,
+      },
+      aliasLookupNames: [],
+      user,
+    });
+
+    expect(result).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      source: "classifier_create_bottle",
+      createdBottle: false,
+      createdRelease: false,
+    });
+
+    expect(await countBottles()).toBe(bottleCount);
+  });
+
+  test("reuses existing SMWS bottles by code for combined classifier create decisions", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ admin: true });
+    const brand = await fixtures.Entity({
+      type: ["brand", "bottler"],
+      name: "SMWS Combined Guard Society",
+      shortName: "SMWS",
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      name: "35.331 Ultra hoggie",
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      name: "35.3310 False lead",
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      name: "135.331 False lead",
+    });
+
+    const bottleCount = await countBottles();
+
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification({
+        action: "create_bottle_and_release",
+        confidence: 100,
+        identityScope: "exact_cask",
+        observation: {
+          caskNumber: "35.331",
+        },
+        matchedBottleId: null,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: buildSmwsProposedBottle(),
+        proposedRelease: {
+          edition: "Ultra hoggie",
+          statedAge: null,
+          abv: null,
+          caskStrength: null,
+          singleCask: null,
+          vintageYear: null,
+          releaseYear: null,
+          description: null,
+          tastingNotes: null,
+          imageUrl: null,
+        },
+      }),
+    );
+
+    const result = await resolveBottleReferenceTarget({
+      reference: {
+        name: "SMWS 35.331",
+        url: null,
+        imageUrl: null,
+        currentBottleId: null,
+        currentReleaseId: null,
+      },
+      aliasLookupNames: [],
+      user,
+    });
+
+    expect(result).toMatchObject({
+      bottleId: bottle.id,
+      source: "classifier_create_bottle_and_release",
+      createdBottle: false,
+      createdRelease: true,
+    });
+    expect(await countBottles()).toBe(bottleCount);
   });
 });

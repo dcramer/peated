@@ -8,6 +8,7 @@ import {
   normalizeBottleBatchNumber,
   normalizeString,
 } from "@peated/bottle-classifier/normalize";
+import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
 import config from "@peated/server/config";
 import { CATEGORY_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
@@ -244,6 +245,34 @@ function buildRawSearchName(input: BottleCandidateSearchInput) {
     .trim();
 }
 
+function getSmwsExtractedLabelCode(
+  extractedLabel: BottleReferenceIdentity | null,
+): string | null {
+  if (!extractedLabel) {
+    return null;
+  }
+
+  const identityAnchors = [extractedLabel.brand, extractedLabel.bottler].filter(
+    Boolean,
+  );
+  const codeFields = [extractedLabel.edition, extractedLabel.expression].filter(
+    Boolean,
+  );
+
+  for (const identityAnchor of identityAnchors) {
+    for (const codeField of codeFields) {
+      const code = parseSmwsReferenceName(
+        `${identityAnchor} ${codeField}`,
+      )?.code;
+      if (code) {
+        return code;
+      }
+    }
+  }
+
+  return null;
+}
+
 function getBottleCandidateKey(
   candidate: Pick<BottleCandidate, "bottleId" | "releaseId" | "kind">,
 ) {
@@ -435,6 +464,10 @@ function normalizeComparableText(value: string | null | undefined) {
 
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function getExactCaskCodeSqlPattern(code: string) {
+  return `(^|[^A-Z0-9])${escapeRegExp(code)}([^A-Z0-9]|$)`;
 }
 
 function getParentSearchSignals({
@@ -1545,11 +1578,24 @@ async function getBrandCandidates(
   if (!brandName) {
     return [];
   }
-  const expression = extractedLabel.expression || normalizedName;
+  const smwsCode = getSmwsExtractedLabelCode(extractedLabel);
+  const expression = smwsCode ?? extractedLabel.expression ?? normalizedName;
   const comparableExpression = normalizeComparableText(expression);
   const comparableExpressionClause = comparableExpression
     ? sql`OR LOWER(REPLACE(${bottles.fullName}, ${"'"}, '')) LIKE ${`%${comparableExpression}%`}`
     : sql``;
+  const smwsCodePattern = smwsCode
+    ? getExactCaskCodeSqlPattern(smwsCode)
+    : null;
+  const expressionClause = smwsCodePattern
+    ? sql`(
+        ${bottles.name} ~* ${smwsCodePattern}
+        OR ${bottles.fullName} ~* ${smwsCodePattern}
+      )`
+    : sql`(
+        LOWER(${bottles.fullName}) LIKE LOWER(${`%${expression}%`})
+        ${comparableExpressionClause}
+      )`;
 
   const result = await db.execute<{
     bottleId: number;
@@ -1586,10 +1632,7 @@ async function getBrandCandidates(
       LOWER(${entities.name}) = LOWER(${brandName})
       OR LOWER(COALESCE(${entities.shortName}, '')) = LOWER(${brandName})
     )
-      AND (
-        LOWER(${bottles.fullName}) LIKE LOWER(${`%${expression}%`})
-        ${comparableExpressionClause}
-      )
+      AND ${expressionClause}
     ORDER BY ${bottles.fullName} ASC
     LIMIT ${BRAND_CANDIDATE_LIMIT}
   `);

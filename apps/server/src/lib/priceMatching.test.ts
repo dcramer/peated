@@ -19,6 +19,7 @@ import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import {
   applyApprovedStorePriceMatch,
   canClearIgnoredStorePriceAssignment,
+  createBottleFromStorePriceMatchProposal,
   ignoreStorePriceMatchProposal,
   resolveStorePriceMatchProposal,
 } from "@peated/server/lib/priceMatching";
@@ -146,6 +147,11 @@ function buildMockBottleReferenceClassification(
     },
     ...restOverrides,
   } as any;
+}
+
+async function countBottles() {
+  const rows = await db.select({ id: bottles.id }).from(bottles);
+  return rows.length;
 }
 
 function normalizeMockBottleClassifierDecision(decision: Record<string, any>) {
@@ -354,6 +360,207 @@ describe("priceMatching", () => {
         }),
       ]),
     );
+  });
+
+  test("finds existing SMWS bottles by code when the source omits the subtitle", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const brand = await fixtures.Entity({
+      type: ["brand", "bottler"],
+      name: "SMWS Candidate Society",
+      shortName: "SMWS",
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      name: "35.331 Ultra hoggie",
+      singleCask: true,
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      name: "35.3310 False lead",
+      singleCask: true,
+    });
+    for (let index = 1; index <= 6; index += 1) {
+      await fixtures.Bottle({
+        brandId: brand.id,
+        bottlerId: brand.id,
+        name: `135.331 False lead ${index}`,
+        singleCask: true,
+      });
+    }
+
+    const candidates = await searchBottleCandidates({
+      query: "SMWS 35.331",
+      brand: "SMWS",
+      expression: null,
+      series: null,
+      distillery: [],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      cask_type: null,
+      cask_strength: null,
+      single_cask: true,
+      edition: "35.331",
+      vintage_year: null,
+      release_year: null,
+      currentBottleId: null,
+      limit: 15,
+    });
+
+    expect(candidates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          bottleId: bottle.id,
+          fullName: "SMWS 35.331 Ultra hoggie",
+          source: expect.arrayContaining(["brand"]),
+        }),
+      ]),
+    );
+  });
+
+  test("create_new proposal approval reuses existing SMWS bottles by code", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const reviewer = await fixtures.User();
+    const brand = await fixtures.Entity({
+      type: ["brand", "bottler"],
+      name: "SMWS Price Guard Society",
+      shortName: "SMWS",
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      name: "35.331 Ultra hoggie",
+      singleCask: true,
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      name: "35.3310 False lead",
+      singleCask: true,
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      name: "135.331 False lead",
+      singleCask: true,
+    });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "SMWS 35.331",
+      imageUrl: null,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "create_new",
+        creationTarget: "bottle",
+        extractedLabel: {
+          brand: "SMWS",
+          bottler: "SMWS",
+          expression: null,
+          series: null,
+          distillery: [],
+          category: "single_malt",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: true,
+          edition: "35.331",
+        },
+        proposedBottle: {
+          name: "35.331",
+          series: null,
+          category: "single_malt",
+          edition: null,
+          statedAge: null,
+          caskStrength: null,
+          singleCask: true,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          brand: {
+            id: brand.id,
+            name: "SMWS",
+          },
+          distillers: [],
+          bottler: {
+            id: brand.id,
+            name: "SMWS",
+          },
+        },
+        proposedRelease: null,
+      })
+      .returning();
+    const bottleCount = await countBottles();
+
+    const result = await createBottleFromStorePriceMatchProposal({
+      proposalId: proposal.id,
+      input: {
+        name: "35.331",
+        series: null,
+        category: "single_malt",
+        edition: null,
+        statedAge: null,
+        caskStrength: null,
+        singleCask: true,
+        abv: null,
+        vintageYear: null,
+        releaseYear: null,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+        brand: brand.id,
+        distillers: [],
+        bottler: brand.id,
+        description: null,
+        descriptionSrc: null,
+        imageUrl: null,
+        flavorProfile: null,
+      },
+      user: reviewer,
+    });
+
+    const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
+      where: eq(storePriceMatchProposals.id, proposal.id),
+    });
+    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
+      where: and(
+        eq(incomingBottleDecisionLogs.sourceKind, "store_price"),
+        eq(incomingBottleDecisionLogs.sourceId, price.id),
+      ),
+    });
+
+    expect(result.bottle.id).toBe(bottle.id);
+    expect(await countBottles()).toBe(bottleCount);
+    expect(updatedProposal).toMatchObject({
+      status: "approved",
+      suggestedBottleId: bottle.id,
+    });
+    expect(decisionLog).toMatchObject({
+      decision: "create_bottle",
+      bottleId: bottle.id,
+      createdBottle: false,
+    });
   });
 
   test("prefers a literal exact alias over apostrophe-normalized fallback matches", async ({

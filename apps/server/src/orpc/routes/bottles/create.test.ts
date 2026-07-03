@@ -561,6 +561,49 @@ describe("POST /bottles", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
+  test("rejects duplicate SMWS bottle codes without requiring the subtitle", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      type: ["brand", "bottler"],
+      name: "SMWS Manual Guard Society",
+      shortName: "SMWS",
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      name: "35.331 Ultra hoggie",
+      singleCask: true,
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      bottlerId: brand.id,
+      name: "35.3310 False lead",
+      singleCask: true,
+    });
+    const bottleCount = (await db.select({ id: bottles.id }).from(bottles))
+      .length;
+
+    const err = await waitError(
+      routerClient.bottles.create(
+        {
+          name: "35.331",
+          brand: brand.id,
+          bottler: brand.id,
+          singleCask: true,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(`[Error: Bottle already exists.]`);
+    expect((await db.select({ id: bottles.id }).from(bottles)).length).toBe(
+      bottleCount,
+    );
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
   test("updates statedAge bottle w/ age signal", async ({
     defaults,
     fixtures,

@@ -1,3 +1,4 @@
+import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
 import { type CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, Entity, NewBottle, User } from "@peated/server/db/schema";
@@ -7,6 +8,7 @@ import {
   bottleSeries,
   bottlesToDistillers,
   changes,
+  entities,
 } from "@peated/server/db/schema";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
 import {
@@ -29,6 +31,7 @@ import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { BottlePreviewResult } from "@peated/server/types";
 import { pushJob } from "@peated/server/worker/client";
 import { and, eq, isNull, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import type { z } from "zod";
 
 export class BottleCreateBadRequestError extends Error {
@@ -52,6 +55,11 @@ export type CreateBottleResult = {
   seriesCreated: boolean;
 };
 
+type SmwsEntityName = {
+  name: string;
+  shortName?: string | null;
+};
+
 async function getExistingBottleIdForAlias(
   tx: AnyTransaction,
   aliasName: string,
@@ -65,6 +73,166 @@ async function getExistingBottleIdForAlias(
     .limit(1);
 
   return result?.bottleId ?? null;
+}
+
+function getSmwsCodeFromValues(values: Array<string | null | undefined>) {
+  for (const value of values) {
+    const code = parseSmwsReferenceName(value)?.code;
+    if (code) {
+      return code;
+    }
+  }
+
+  return null;
+}
+
+function valuesHaveSmwsCode(
+  values: Array<string | null | undefined>,
+  code: string,
+) {
+  return values.some((value) => parseSmwsReferenceName(value)?.code === code);
+}
+
+function entityNameVariants(
+  entity: SmwsEntityName | null,
+  name: string | null,
+) {
+  if (!entity || !name) {
+    return [];
+  }
+
+  return [
+    entity.shortName ? `${entity.shortName} ${name}` : null,
+    `${entity.name} ${name}`,
+  ];
+}
+
+function getSmwsCodeForBottleCreate({
+  name,
+  fullName,
+  brand,
+  bottler,
+}: {
+  name: string;
+  fullName: string;
+  brand: SmwsEntityName;
+  bottler: SmwsEntityName | null;
+}) {
+  return getSmwsCodeFromValues([
+    fullName,
+    ...entityNameVariants(brand, name),
+    ...entityNameVariants(bottler, name),
+  ]);
+}
+
+function rowHasSmwsCode(
+  row: {
+    aliasName: string | null;
+    bottleName: string;
+    fullName: string;
+    brandName: string | null;
+    brandShortName: string | null;
+    bottlerName: string | null;
+    bottlerShortName: string | null;
+  },
+  code: string,
+) {
+  const brand = { name: row.brandName ?? "", shortName: row.brandShortName };
+  const bottler = {
+    name: row.bottlerName ?? "",
+    shortName: row.bottlerShortName,
+  };
+
+  return valuesHaveSmwsCode(
+    [
+      row.aliasName,
+      row.fullName,
+      ...entityNameVariants(brand, row.bottleName),
+      ...entityNameVariants(brand, row.aliasName),
+      ...entityNameVariants(bottler, row.bottleName),
+      ...entityNameVariants(bottler, row.aliasName),
+    ],
+    code,
+  );
+}
+
+async function findExistingSmwsBottleIdForCreate(
+  tx: AnyTransaction,
+  {
+    name,
+    fullName,
+    brand,
+    bottler,
+  }: {
+    name: string;
+    fullName: string;
+    brand: SmwsEntityName;
+    bottler: SmwsEntityName | null;
+  },
+): Promise<number | null> {
+  const code = getSmwsCodeForBottleCreate({
+    name,
+    fullName,
+    brand,
+    bottler,
+  });
+  if (!code) {
+    return null;
+  }
+
+  await tx.execute(
+    sql`SELECT pg_advisory_xact_lock(hashtext(${`smws:${code}`}))`,
+  );
+
+  const brandEntity = alias(entities, "smws_create_brand");
+  const bottlerEntity = alias(entities, "smws_create_bottler");
+  const codeSearch = `%${code}%`;
+  const smwsSearch = "%SMWS%";
+  const societySearch = "%Scotch Malt Whisky Society%";
+
+  const rows = await tx
+    .select({
+      bottleId: bottles.id,
+      bottleName: bottles.name,
+      fullName: bottles.fullName,
+      aliasName: bottleAliases.name,
+      brandName: brandEntity.name,
+      brandShortName: brandEntity.shortName,
+      bottlerName: bottlerEntity.name,
+      bottlerShortName: bottlerEntity.shortName,
+    })
+    .from(bottles)
+    .innerJoin(brandEntity, eq(brandEntity.id, bottles.brandId))
+    .leftJoin(bottlerEntity, eq(bottlerEntity.id, bottles.bottlerId))
+    .leftJoin(
+      bottleAliases,
+      and(
+        eq(bottleAliases.bottleId, bottles.id),
+        sql`${bottleAliases.ignored} IS DISTINCT FROM true`,
+      ),
+    )
+    .where(
+      and(
+        sql`(
+          ${bottles.name} ILIKE ${codeSearch}
+          OR ${bottles.fullName} ILIKE ${codeSearch}
+          OR ${bottleAliases.name} ILIKE ${codeSearch}
+        )`,
+        sql`(
+          LOWER(${brandEntity.name}) IN ('smws', 'the scotch malt whisky society', 'scotch malt whisky society')
+          OR LOWER(COALESCE(${brandEntity.shortName}, '')) = 'smws'
+          OR LOWER(COALESCE(${bottlerEntity.name}, '')) IN ('smws', 'the scotch malt whisky society', 'scotch malt whisky society')
+          OR LOWER(COALESCE(${bottlerEntity.shortName}, '')) = 'smws'
+          OR ${bottles.fullName} ILIKE ${smwsSearch}
+          OR ${bottles.fullName} ILIKE ${societySearch}
+          OR ${bottleAliases.name} ILIKE ${smwsSearch}
+          OR ${bottleAliases.name} ILIKE ${societySearch}
+        )`,
+      ),
+    )
+    .orderBy(bottles.id);
+
+  return rows.find((row) => rowHasSmwsCode(row, code))?.bottleId ?? null;
 }
 
 export async function createBottleInTransaction(
@@ -97,6 +265,19 @@ export async function createBottleInTransaction(
   const newAliases: string[] = [];
   const newEntityIds: Set<number> = new Set();
   let seriesCreated = false;
+
+  const existingSmwsBottleId = await findExistingSmwsBottleIdForCreate(tx, {
+    name: bottleData.name,
+    fullName: formatBottleName({
+      ...bottleData,
+      name: `${bottleData.brand.shortName || bottleData.brand.name} ${bottleData.name}`,
+    }),
+    brand: bottleData.brand,
+    bottler: bottleData.bottler ?? null,
+  });
+  if (existingSmwsBottleId) {
+    throw new BottleAlreadyExistsError(existingSmwsBottleId);
+  }
 
   const brandUpsert = await upsertEntity({
     db: tx,
