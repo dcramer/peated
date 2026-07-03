@@ -41,7 +41,11 @@ export type BottleResolverTarget = {
 type Props = {
   onResolve: (target: BottleResolverTarget) => Promise<void> | void;
   searchHrefForQuery: (query?: string) => string;
+  createBottleHrefForQuery?: (query: string) => string;
   title: string;
+  matchedResultDescription?: string;
+  createProposalActionLabel?: string;
+  searchActionLabel?: string;
 };
 
 const loadingMessages = [
@@ -294,6 +298,8 @@ function PhotoFailurePanel({
   title,
   description,
   searchHref,
+  searchLabel,
+  createBottleHref,
   onStartOver,
   variant,
 }: {
@@ -301,6 +307,8 @@ function PhotoFailurePanel({
   title: string;
   description: string;
   searchHref: string;
+  searchLabel: string;
+  createBottleHref?: string | null;
   onStartOver: () => void;
   variant: "error" | "no-match";
 }) {
@@ -345,15 +353,28 @@ function PhotoFailurePanel({
             </div>
           </div>
         </div>
-        <div className="grid w-full gap-3 sm:grid-cols-2">
+        <div
+          className={`grid w-full gap-3 ${
+            createBottleHref ? "sm:grid-cols-3" : "sm:grid-cols-2"
+          }`}
+        >
           <Button
             href={searchHref}
             color="highlight"
             fullWidth
             icon={<Search className="h-4 w-4" />}
           >
-            Search Bottles
+            {searchLabel}
           </Button>
+          {createBottleHref && (
+            <Button
+              href={createBottleHref}
+              fullWidth
+              icon={<Plus className="h-4 w-4" />}
+            >
+              Create Bottle
+            </Button>
+          )}
           <Button
             fullWidth
             onClick={onStartOver}
@@ -369,10 +390,12 @@ function PhotoFailurePanel({
 
 function FallbackActions({
   searchHref,
+  searchLabel,
   onStartOver,
   showStartOver = false,
 }: {
   searchHref: string;
+  searchLabel: string;
   onStartOver?: () => void;
   showStartOver?: boolean;
 }) {
@@ -385,7 +408,7 @@ function FallbackActions({
           fullWidth
           icon={<Search className="h-4 w-4" />}
         >
-          Search Bottles
+          {searchLabel}
         </Button>
         {showStartOver && onStartOver && (
           <Button
@@ -424,7 +447,11 @@ function SearchBottleCallout({ searchHref }: { searchHref: string }) {
 export default function BottleResolver({
   onResolve,
   searchHrefForQuery,
+  createBottleHrefForQuery,
   title,
+  matchedResultDescription = "We'll use the existing bottle for this tasting.",
+  createProposalActionLabel = "Continue",
+  searchActionLabel = "Search Bottles",
 }: Props) {
   const router = useRouter();
   const orpc = useORPC();
@@ -581,6 +608,12 @@ export default function BottleResolver({
   const defaultSearchHref = searchHrefForQuery();
   const searchSeed = getSearchSeed(photoResult);
   const searchHref = searchHrefForQuery(searchSeed);
+  const createBottleHref =
+    photoResult?.classification.status === "classified" &&
+    photoResult.classification.decision.action === "no_match" &&
+    createBottleHrefForQuery
+      ? createBottleHrefForQuery(searchSeed ?? "")
+      : null;
   const manualResultCopy = getManualResultCopy(photoResult);
 
   return (
@@ -656,6 +689,7 @@ export default function BottleResolver({
             title="We couldn't read that photo"
             description={photoError}
             searchHref={defaultSearchHref}
+            searchLabel={searchActionLabel}
             onStartOver={startOver}
             variant="error"
           />
@@ -708,7 +742,7 @@ export default function BottleResolver({
                         </div>
                       }
                       title="Match found"
-                      description="We'll use the existing bottle for this tasting."
+                      description={matchedResultDescription}
                     >
                       <EvidencePills result={photoResult} />
                     </ResultHeader>
@@ -723,7 +757,7 @@ export default function BottleResolver({
                       title={createProposalLabel?.title ?? "New bottle found"}
                       description={
                         createProposalLabel?.description ??
-                        "We'll create this bottle before recording your tasting."
+                        "Create the bottle from this label."
                       }
                     >
                       <EvidencePills result={photoResult} />
@@ -734,6 +768,8 @@ export default function BottleResolver({
                       title={manualResultCopy.title}
                       description={manualResultCopy.description}
                       searchHref={searchHref}
+                      searchLabel={searchActionLabel}
+                      createBottleHref={createBottleHref}
                       onStartOver={startOver}
                       variant="no-match"
                     />
@@ -777,7 +813,7 @@ export default function BottleResolver({
                       >
                         {photoIdentificationCreateMutation.isPending
                           ? "Creating..."
-                          : "Continue"}
+                          : createProposalActionLabel}
                       </Button>
                     )}
                   </div>
@@ -787,6 +823,7 @@ export default function BottleResolver({
             {(matchedBottleId || createDecision) && (
               <FallbackActions
                 searchHref={searchHref}
+                searchLabel={searchActionLabel}
                 showStartOver
                 onStartOver={startOver}
               />

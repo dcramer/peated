@@ -48,6 +48,7 @@ export const testBrand = {
 
 export const existingBottleId = 9301;
 export const createdBottleId = 9302;
+export const existingReleaseId = 9303;
 export const createdTastingId = 9401;
 
 export function buildBottle({
@@ -111,14 +112,58 @@ export function buildBottle({
 
 export const existingBottle = buildBottle();
 
-export function buildCollectionBottle({
-  id = 1,
-  bottle = existingBottle,
+/**
+ * Builds the bottle-release RPC fixture used by bottling-specific E2E flows.
+ */
+export function buildBottleRelease({
+  id = existingReleaseId,
+  bottleId = existingBottleId,
+  fullName = `${existingBottle.fullName} Distillers Edition`,
+  name = "Distillers Edition",
+  edition = "Distillers Edition",
+  releaseYear = 2024,
 } = {}) {
   return {
     id,
+    bottleId,
+    fullName,
+    name,
+    edition,
+    statedAge: null,
+    abv: null,
+    caskStrength: null,
+    singleCask: null,
+    vintageYear: null,
+    releaseYear,
+    caskType: null,
+    caskSize: null,
+    caskFill: null,
+    description: null,
+    tastingNotes: null,
+    imageUrl: null,
+    avgRating: null,
+    totalTastings: 0,
+    suggestedTags: [],
+    isFavorite: false,
+    hasTasted: false,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+}
+
+export const existingRelease = buildBottleRelease();
+
+export function buildCollectionBottle({
+  id = 1,
+  bottle = existingBottle,
+  release = null,
+  imageUrl = null,
+} = {}) {
+  return {
+    id,
+    imageUrl,
     bottle,
-    release: null,
+    release,
   };
 }
 

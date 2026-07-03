@@ -1,15 +1,36 @@
 import { expect, type Page, test } from "@playwright/test";
+import { Buffer } from "node:buffer";
 
 import { expectNoHorizontalOverflow } from "./assertions";
 import {
   createdBottleId,
   createdBottleName,
+  existingBottle,
+  existingRelease,
+  existingReleaseId,
+  testAccessToken,
   testBrand,
   testUser,
 } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
 test.describe("create bottle", () => {
+  test("renders the Add Bottle resolver at the plain route", async ({
+    context,
+    page,
+  }) => {
+    await signIn(context);
+
+    await page.goto("/addBottle");
+
+    await expect(page).toHaveURL(/\/addBottle$/);
+    await expect(
+      page.getByRole("heading", { name: "Add Bottle" }),
+    ).toBeVisible();
+    await expect(page.getByText("Take or upload a photo")).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  });
+
   test("redirects legacy add bottle create links", async ({
     context,
     page,
@@ -108,11 +129,11 @@ test.describe("create bottle", () => {
     );
     await submitCreateBottle(page);
 
-    await expect(page).toHaveURL(/\/bottles\/new$/);
+    await expect(page).toHaveURL(/\/addBottle$/);
     await expect(
-      page.getByRole("heading", { name: "Create Bottle" }),
+      page.getByRole("heading", { name: "Add Bottle" }),
     ).toBeVisible();
-    await expect(page.getByLabel("Bottle")).toHaveValue("");
+    await expect(page.getByText("Take or upload a photo")).toBeVisible();
   });
 
   test("adds the created bottle to library from library intent", async ({
@@ -160,6 +181,181 @@ test.describe("create bottle", () => {
     await expectNoHorizontalOverflow(page);
   });
 });
+
+test.describe("add bottle flow", () => {
+  test("shows outcome actions for a resolved bottle query", async ({
+    context,
+    page,
+  }) => {
+    await signIn(context);
+
+    await page.goto(`/addBottle?bottle=${existingBottle.id}`);
+
+    await expect(
+      page.getByRole("heading", { name: "Add Bottle" }),
+    ).toBeVisible();
+    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Add to Library" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("main").getByRole("link", { name: "Log Tasting" }),
+    ).toHaveAttribute("href", `/bottles/${existingBottle.id}/addTasting`);
+    await expect(
+      page.getByRole("link", { name: "View Bottle" }),
+    ).toHaveAttribute("href", `/bottles/${existingBottle.id}`);
+    await expect(
+      page.getByRole("link", { name: "Search Again" }),
+    ).toHaveAttribute("href", "/search?intent=addBottle");
+
+    await page.getByRole("button", { name: "Add to Library" }).click();
+    await expect(page.getByText("No Library image selected")).toBeVisible();
+    await page.getByRole("button", { name: "Add to Library" }).click();
+
+    await expect(
+      page.getByRole("heading", { name: "Added to Library" }),
+    ).toBeVisible();
+    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("shows release-specific actions for a resolved bottling query", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: `${testAccessToken}-release-${testInfo.project.name}`,
+    });
+
+    await page.goto(
+      `/addBottle?bottle=${existingBottle.id}&release=${existingReleaseId}&intent=library`,
+    );
+
+    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expect(page.getByText("Distillers Edition (2024)")).toBeVisible();
+    await expect(
+      page.getByRole("main").getByRole("link", { name: "Log Tasting" }),
+    ).toHaveAttribute(
+      "href",
+      `/bottles/${existingBottle.id}/addTasting?release=${existingReleaseId}`,
+    );
+    await expect(
+      page.getByRole("link", { name: "View Bottle" }),
+    ).toHaveAttribute(
+      "href",
+      `/bottles/${existingBottle.id}/bottlings/${existingReleaseId}`,
+    );
+
+    await page.getByRole("button", { name: "Add to Library" }).click();
+    await expect(page.getByText("No Library image selected")).toBeVisible();
+    await page.getByRole("button", { name: "Add to Library" }).click();
+
+    await expect(
+      page.getByRole("heading", { name: "Added to Library" }),
+    ).toBeVisible();
+    await expect(page.getByText(existingRelease.edition)).toBeVisible();
+  });
+
+  test("routes Add Bottle search results into the resolver outcome", async ({
+    context,
+    page,
+  }) => {
+    await signIn(context);
+
+    await page.goto("/search?intent=addBottle&q=Lagavulin");
+    await page.getByRole("link", { name: existingBottle.fullName }).click();
+
+    await expect(page).toHaveURL(
+      new RegExp(`/addBottle\\?bottle=${existingBottle.id}&intent=addBottle$`),
+    );
+    await expect(
+      page.getByRole("button", { name: "Add to Library" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("main").getByRole("link", { name: "Log Tasting" }),
+    ).toBeVisible();
+  });
+
+  test("adds a matched scan to Library with an explicit Library image choice", async ({
+    context,
+    page,
+  }) => {
+    await signIn(context);
+
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+
+    await expect(page.getByText("Match found")).toBeVisible();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Add to Library" }).click();
+
+    const imageChoice = page.getByLabel("Use scanned photo as Library image");
+    await expect(imageChoice).toBeChecked();
+    await expect(
+      page.getByText(
+        "It will not attach the photo to a tasting or make it the public bottle image.",
+      ),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "Add to Library" }).click();
+
+    await expect(
+      page.getByRole("heading", { name: "Added to Library" }),
+    ).toBeVisible();
+    await expect(page.getByAltText("Selected bottle label")).toHaveAttribute(
+      "src",
+      /library\.webp$/,
+    );
+    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Add Another Bottle" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "View Library" }),
+    ).toHaveAttribute("href", `/users/${testUser.username}/library`);
+
+    await page.getByRole("button", { name: "Add Another Bottle" }).click();
+    await expect(page).toHaveURL(/\/addBottle$/);
+    await expect(page.getByText("Take or upload a photo")).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("offers Create Bottle when a scan has no usable match", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: `${testAccessToken}-photo-no-match-${testInfo.project.name}`,
+    });
+
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+
+    await expect(
+      page.getByText("We couldn't identify the bottle"),
+    ).toBeVisible();
+    const createBottleLink = page.getByRole("link", { name: "Create Bottle" });
+    await expect(createBottleLink).toBeVisible();
+    const href = await createBottleLink.getAttribute("href");
+    expect(href).not.toBeNull();
+
+    const createUrl = new URL(href!, page.url());
+    expect(createUrl.pathname).toBe("/bottles/new");
+    expect(createUrl.searchParams.get("returnAction")).toBe("addBottle");
+    await expectNoHorizontalOverflow(page);
+  });
+});
+
+async function uploadLabel(page: Page) {
+  await page.locator('input[type="file"]').setInputFiles({
+    name: "label.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=",
+      "base64",
+    ),
+  });
+}
 
 async function submitCreateBottle(page: Page) {
   await expect(

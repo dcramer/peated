@@ -10,6 +10,8 @@ import {
   emptyList,
   existingBottle,
   existingBottleId,
+  existingRelease,
+  existingReleaseId,
   failingTastingNotes,
   photoTastingNotes,
   suggestedTags,
@@ -77,6 +79,26 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
       return false;
+    case "search":
+      if (
+        !Array.isArray(input?.include) ||
+        input.include.length !== 1 ||
+        input.include[0] !== "bottles"
+      ) {
+        sendRpcError(response, "Expected bottle search");
+        return true;
+      }
+
+      sendRpcResponse(response, {
+        query: input.query ?? "",
+        results: [
+          {
+            type: "bottle",
+            ref: withCollectionStatus(request, existingBottle),
+          },
+        ],
+      });
+      return true;
     case "bottles/create": {
       if (input?.name !== createdBottleName || input?.brand !== testBrand.id) {
         sendRpcError(response, "Unexpected bottle create payload");
@@ -121,6 +143,15 @@ async function handleRpcRequest({ request, response, url }) {
             : buildBottleForId(input.bottle),
         ),
       );
+      return true;
+    }
+    case "bottleReleases/details": {
+      if (input?.release !== existingReleaseId) {
+        sendRpcError(response, "Unexpected bottle release details payload");
+        return true;
+      }
+
+      sendRpcResponse(response, existingRelease);
       return true;
     }
     case "bottles/suggestedTags":
@@ -183,6 +214,12 @@ async function handleRpcRequest({ request, response, url }) {
       return true;
     }
     case "tastings/photoIdentification":
+      // E2E access-token suffixes select alternate mock photo-identification scenarios.
+      if (getAccessToken(request).includes("photo-no-match")) {
+        sendRpcResponse(response, buildNoMatchPhotoIdentification());
+        return true;
+      }
+
       sendRpcResponse(response, {
         pendingImage: {
           id: "playwright-photo-upload",
@@ -316,8 +353,10 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, listCollectionBottles(request, input));
       return true;
     case "collections/bottles/create":
-      mutateCollectionBottle(request, input, "create");
-      sendRpcResponse(response, {});
+      sendRpcResponse(
+        response,
+        mutateCollectionBottle(request, input, "create"),
+      );
       return true;
     case "collections/bottles/delete":
       mutateCollectionBottle(request, input, "delete");
@@ -355,12 +394,7 @@ async function handleRpcRequest({ request, response, url }) {
  * mutate Favorites and Library independently against one mock RPC server.
  */
 function getCollectionState(request) {
-  const authorization = request.headers.authorization;
-  const token =
-    (Array.isArray(authorization) ? authorization[0] : authorization)?.replace(
-      /^Bearer\s+/i,
-      "",
-    ) ?? "anonymous";
+  const token = getAccessToken(request);
 
   if (!collectionStateByToken.has(token)) {
     collectionStateByToken.set(token, {
@@ -370,6 +404,16 @@ function getCollectionState(request) {
   }
 
   return collectionStateByToken.get(token);
+}
+
+function getAccessToken(request) {
+  const authorization = request.headers.authorization;
+  return (
+    (Array.isArray(authorization) ? authorization[0] : authorization)?.replace(
+      /^Bearer\s+/i,
+      "",
+    ) ?? "anonymous"
+  );
 }
 
 function getCollection(input) {
@@ -392,6 +436,20 @@ function mutateCollectionBottle(request, input, action) {
   if (input?.user !== "me" || typeof input?.bottle !== "number") {
     throw new Error("Unexpected collection mutation payload");
   }
+  if (
+    input?.release !== undefined &&
+    input.release !== null &&
+    (input.release !== existingReleaseId ||
+      input.bottle !== existingRelease.bottleId)
+  ) {
+    throw new Error("Unexpected collection release payload");
+  }
+  if (
+    input?.pendingImageId !== undefined &&
+    input.pendingImageId !== "playwright-photo-upload"
+  ) {
+    throw new Error("Unexpected collection pending image payload");
+  }
 
   const state = getCollectionState(request);
   const collection = getCollection(input);
@@ -412,9 +470,86 @@ function mutateCollectionBottle(request, input, action) {
           input.bottle === existingBottleId
             ? existingBottle
             : buildBottleForId(input.bottle),
+        release: input.release === existingReleaseId ? existingRelease : null,
+        imageUrl: input.pendingImageId
+          ? "http://127.0.0.1:4999/uploads/library.webp"
+          : null,
       }),
     );
+  } else {
+    const entry = entries.get(key);
+    if (!entry) {
+      throw new Error("Collection entry missing after key lookup");
+    }
+    if (!input.pendingImageId) return entry;
+
+    entries.set(key, {
+      ...entry,
+      imageUrl: "http://127.0.0.1:4999/uploads/library.webp",
+    });
   }
+
+  return entries.get(key);
+}
+
+/**
+ * Builds the no-match photo-identification RPC fixture for Add Bottle fallback tests.
+ */
+function buildNoMatchPhotoIdentification() {
+  return {
+    pendingImage: {
+      id: "playwright-photo-upload",
+      imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
+      expiresAt: "2026-06-07T13:00:00.000Z",
+    },
+    imageEvidence: {
+      sourceImageId: "playwright-photo-upload",
+      sourceImageHash: "playwright-photo-hash",
+      extractors: [
+        {
+          kind: "vision",
+          model: "playwright",
+          confidence: 0.2,
+          textSpans: [],
+          observations: ["No readable whisky label was found."],
+        },
+      ],
+      fieldCandidates: {},
+      photoSuitability: {
+        isSingleBottlePhoto: true,
+        labelReadable: false,
+        suitableAsTastingImage: false,
+        suitableAsBottleImage: false,
+        reason: "The label is not readable.",
+      },
+      conflicts: [],
+    },
+    classification: {
+      status: "classified",
+      decision: {
+        action: "no_match",
+      },
+      artifacts: {
+        candidates: [],
+      },
+    },
+    suggestedNextStep: "manual_search",
+    diagnostics: {
+      extraction: {
+        status: "empty",
+        summary: null,
+      },
+      candidates: {
+        count: 0,
+      },
+      classification: {
+        status: "classified",
+        action: "no_match",
+        confidence: 0,
+        reason: "No usable label text.",
+      },
+    },
+  };
 }
 
 /**

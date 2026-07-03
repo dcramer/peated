@@ -61,6 +61,12 @@ The system SHALL show a terminal confirmation state after adding a bottle or rel
 - **WHEN** the user adds a resolved bottle or release to Library
 - **THEN** the system shows an Added to Library confirmation with the saved bottle or release
 
+#### Scenario: Library scan image choice
+
+- **WHEN** the user adds a resolved bottle or release to Library from a scan with a pending image
+- **THEN** the system lets the user explicitly choose whether to save the scan as the Library image
+- **AND** the system explains that the saved image applies only to the Library entry and not to tasting or public bottle images
+
 #### Scenario: Add another bottle
 
 - **WHEN** the user chooses Add Another Bottle from the Added to Library confirmation

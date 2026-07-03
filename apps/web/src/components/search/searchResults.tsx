@@ -3,6 +3,7 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import type { Outputs } from "@peated/server/orpc/router";
 import Link from "@peated/web/components/link";
 import ListItem from "../listItem";
+import type { AddBottleRouteIntent } from "./bottleResult";
 import {
   type CreateBottleReturnAction,
   getCreateBottleHref,
@@ -14,12 +15,14 @@ export default function SearchResults({
   results,
   canSuggestAdd = false,
   directToTasting = false,
+  addBottleIntent,
   createBottleReturnAction,
 }: {
   query: string;
   results: Outputs["search"]["results"];
   canSuggestAdd?: boolean;
   directToTasting?: boolean;
+  addBottleIntent?: AddBottleRouteIntent;
   createBottleReturnAction?: CreateBottleReturnAction;
 }) {
   return (
@@ -62,7 +65,11 @@ export default function SearchResults({
       {results.map((result) => {
         return (
           <ListItem key={`${result.type}-${result.ref.id}`}>
-            <ResultRow result={result} directToTasting={directToTasting} />
+            <ResultRow
+              result={result}
+              directToTasting={directToTasting}
+              addBottleIntent={addBottleIntent}
+            />
           </ListItem>
         );
       })}

@@ -33,17 +33,17 @@
 
 - [x] 5.1 Extract photo scan, preview, identification, result review, start-over, and search fallback from `/addTasting` into a reusable resolver component.
 - [x] 5.2 Update `/addTasting` or its replacement path to use the resolver with tasting intent without changing successful tasting behavior.
-- [ ] 5.3 Make `/addBottle` render the resolver and outcome selection for existing, missing, and create-proposal results.
-- [ ] 5.4 Update `/search` to understand Add Bottle intent instead of only the `tasting` boolean.
-- [ ] 5.5 Add View Bottle, Add to Library, Log Tasting, Search Again, Start Over, and Create Bottle actions for the appropriate resolver states.
+- [x] 5.3 Make `/addBottle` render the resolver and outcome selection for existing, missing, and create-proposal results.
+- [x] 5.4 Update `/search` to understand Add Bottle intent instead of only the `tasting` boolean.
+- [x] 5.5 Add View Bottle, Add to Library, Log Tasting, Search Again, Start Over, and Create Bottle actions for the appropriate resolver states.
 
 ## 6. Library Flow UI
 
-- [ ] 6.1 Add a Library confirmation step with bottle or release card and image field seeded from the scan image when present.
-- [ ] 6.2 Submit Library adds through the collection bottle create API with optional `pendingImageId`.
-- [ ] 6.3 Add an Added to Library terminal state showing the saved entry and image.
-- [ ] 6.4 Add Add Another Bottle behavior that resets the resolver and starts a fresh Add Bottle flow.
-- [ ] 6.5 Add View Library behavior that routes to the current user's Library page.
+- [x] 6.1 Add a Library confirmation step with bottle or release card and image field seeded from the scan image when present.
+- [x] 6.2 Submit Library adds through the collection bottle create API with optional `pendingImageId`.
+- [x] 6.3 Add an Added to Library terminal state showing the saved entry and image.
+- [x] 6.4 Add Add Another Bottle behavior that resets the resolver and starts a fresh Add Bottle flow.
+- [x] 6.5 Add View Library behavior that routes to the current user's Library page.
 - [ ] 6.6 Add Library image replace/remove UI at the selected Library editing surface.
 
 ## 7. Catalog Image Approval
@@ -63,6 +63,6 @@
 ## 9. Verification
 
 - [x] 9.1 Run targeted backend tests for collection bottle routes, pending uploads, and tasting image attach behavior.
-- [ ] 9.2 Run targeted web checks for Add Bottle, Create Bottle, search intent, and Log Tasting copy changes.
+- [x] 9.2 Run targeted web checks for Add Bottle, Create Bottle, search intent, and Log Tasting copy changes.
 - [ ] 9.3 Use local UI verification at mobile and desktop widths for scan to Library, search to Library, create bottle, Add Another Bottle, View Library, and Log Tasting paths.
-- [ ] 9.4 Run relevant package typechecks and lint for touched server and web surfaces.
+- [x] 9.4 Run relevant package typechecks and lint for touched server and web surfaces.

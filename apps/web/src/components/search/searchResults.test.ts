@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { getBottleResultHref } from "./bottleResult";
 import { getCreateBottleHref } from "./createBottleHref";
 
 describe("search result create bottle links", () => {
@@ -25,5 +26,23 @@ describe("search result create bottle links", () => {
         returnAction: "addBottle",
       }),
     ).toBe("/bottles/new?name=Peated+Reserve&returnAction=addBottle");
+  });
+
+  it("routes Add Bottle intent bottle rows through the Add Bottle flow", () => {
+    expect(
+      getBottleResultHref({
+        bottleId: 123,
+        addBottleIntent: "addBottle",
+      }),
+    ).toBe("/addBottle?bottle=123&intent=addBottle");
+  });
+
+  it("keeps the legacy tasting search shortcut for bottle rows", () => {
+    expect(
+      getBottleResultHref({
+        bottleId: 123,
+        directToTasting: true,
+      }),
+    ).toBe("/bottles/123/addTasting");
   });
 });

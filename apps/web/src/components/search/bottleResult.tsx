@@ -11,12 +11,47 @@ export type BottleResult = {
   ref: Bottle;
 };
 
+export type AddBottleRouteIntent =
+  | "addBottle"
+  | "choose"
+  | "library"
+  | "tasting"
+  | "view";
+
+/**
+ * Builds the bottle-row destination, with Add Bottle route intents taking
+ * precedence over the legacy direct-to-tasting shortcut.
+ */
+export function getBottleResultHref({
+  bottleId,
+  directToTasting = false,
+  addBottleIntent,
+}: {
+  bottleId: number;
+  directToTasting?: boolean;
+  addBottleIntent?: AddBottleRouteIntent;
+}) {
+  if (addBottleIntent) {
+    const params = new URLSearchParams({ bottle: String(bottleId) });
+    params.set("intent", addBottleIntent);
+    return `/addBottle?${params.toString()}`;
+  }
+
+  if (directToTasting) {
+    return `/bottles/${bottleId}/addTasting`;
+  }
+
+  return `/bottles/${bottleId}`;
+}
+
 export default function BottleResultRow({
   result: { ref: bottle },
   directToTasting = false,
+  addBottleIntent,
 }: {
   result: BottleResult;
   directToTasting: boolean;
+  addBottleIntent?: AddBottleRouteIntent;
 }) {
   const metadata: ReactNode[] = [];
   if (bottle.distillers.length)
@@ -37,11 +72,11 @@ export default function BottleResultRow({
       <div className="min-w-0 flex-auto">
         <div className="flex items-center space-x-1 font-semibold leading-6">
           <Link
-            href={
-              directToTasting
-                ? `/bottles/${bottle.id}/addTasting`
-                : `/bottles/${bottle.id}`
-            }
+            href={getBottleResultHref({
+              bottleId: bottle.id,
+              directToTasting,
+              addBottleIntent,
+            })}
           >
             <span className="absolute inset-x-0 -top-px bottom-0" />
             <div className="flex flex-col gap-x-2 sm:flex-row sm:items-center">
