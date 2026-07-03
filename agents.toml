@@ -12,18 +12,6 @@ allow_all = true
 name = "dotagents"
 source = "getsentry/dotagents"
 
-[[skills]]
-name = "skill-writer"
-source = "getsentry/skills"
-
-[[skills]]
-name = "code-simplifier"
-source = "getsentry/skills"
-
 [[mcp]]
 name = "sentry"
 url = "https://mcp.sentry.dev/mcp/peated/peated?experimental=1"
-
-[[skills]]
-name = "agents-md"
-source = "getsentry/skills"
