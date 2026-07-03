@@ -1,3 +1,4 @@
+import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { collectionBottles } from "@peated/server/db/schema";
 import { getDefaultCollection } from "@peated/server/lib/db";
@@ -160,6 +161,53 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     expect(results.map((r) => r.bottle.id).sort()).toEqual(
       [bottle1.id, bottle2.id].sort(),
     );
+  });
+
+  test("serializes collection bottle image URLs and null image URLs", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottleWithImage = await fixtures.Bottle();
+    const bottleWithoutImage = await fixtures.Bottle();
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const imagePath = "/uploads/collection-bottles/library-entry.webp";
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: libraryCollection.id,
+        bottleId: bottleWithImage.id,
+        imageUrl: imagePath,
+        releaseId: null,
+      },
+      {
+        collectionId: libraryCollection.id,
+        bottleId: bottleWithoutImage.id,
+        releaseId: null,
+      },
+    ]);
+
+    const { results } = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "library",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    const withImage = results.find(
+      (result) => result.bottle.id === bottleWithImage.id,
+    );
+    const withoutImage = results.find(
+      (result) => result.bottle.id === bottleWithoutImage.id,
+    );
+
+    expect(withImage?.imageUrl).toBe(
+      `${new URL(config.API_SERVER).origin}${imagePath}`,
+    );
+    expect(withoutImage?.imageUrl).toBeNull();
   });
 
   test("lists legacy non-library collection for default alias", async ({

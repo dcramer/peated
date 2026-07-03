@@ -4,6 +4,7 @@ import {
   bigserial,
   index,
   pgTable,
+  text,
   timestamp,
   unique,
   uniqueIndex,
@@ -59,6 +60,7 @@ export const collectionBottles = pgTable(
     releaseId: bigint("release_id", { mode: "number" }).references(
       () => bottleReleases.id,
     ),
+    imageUrl: text("image_url"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [

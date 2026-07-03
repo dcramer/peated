@@ -16,7 +16,7 @@ import { awardAllBadgeXp } from "@peated/server/lib/badges";
 import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
 import {
-  copyPendingUploadToPermanent,
+  copyPendingImageToTasting,
   getUsablePendingUpload,
   PendingUploadError,
 } from "@peated/server/lib/pendingUploads";
@@ -266,13 +266,11 @@ export default procedure
 
     if (input.pendingImageId) {
       try {
-        const imageUrl = await copyPendingUploadToPermanent({
+        const imageUrl = await copyPendingImageToTasting({
           id: input.pendingImageId,
           userId: context.user.id,
           purpose: "photo_tasting_entry",
-          destinationNamespace: "tastings",
-          attachedToType: "tasting",
-          attachedToId: tasting.id,
+          tastingId: tasting.id,
         });
         [tasting] = await db
           .update(tastings)

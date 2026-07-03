@@ -304,9 +304,11 @@ keeps the state simple:
 - permanent object is not under the pending lifecycle rule
 - database rows never point at TTL-managed objects after final save
 
-After successful copy, mark the pending upload `attached`. A cleanup job can
-delete attached pending objects early, but correctness must not depend on that
-job succeeding.
+After successful copy, mark the pending upload `attached` but keep the pending
+source object usable until `expiresAt`. The same owned, unexpired pending image
+can be copied to more than one permanent destination, such as a Library entry
+and a tasting. Cleanup deletes attached pending source objects only after they
+expire; correctness must not depend on that job succeeding.
 
 ### GCS Lifecycle Configuration
 

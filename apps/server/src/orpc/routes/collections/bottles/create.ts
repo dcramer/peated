@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import type { CollectionBottle } from "@peated/server/db/schema";
 import {
   bottleReleases,
   bottles,
@@ -11,14 +12,26 @@ import {
   isReservedCollectionSlug,
   reservedCollectionSlugs,
 } from "@peated/server/lib/db";
+import { logError } from "@peated/server/lib/log";
+import { PendingUploadError } from "@peated/server/lib/pendingUploads";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
-import { CollectionBottleInputSchema } from "@peated/server/schemas";
-import { and, eq, sql } from "drizzle-orm";
+import {
+  CollectionBottleInputSchema,
+  CollectionBottleSchema,
+} from "@peated/server/schemas";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
+import {
+  copyPendingImageForCollectionBottle,
+  findCollectionBottleWithTarget,
+  isLibraryCollection,
+  serializeCollectionBottleEntry,
+  validatePendingImageForCollectionBottle,
+} from "./imageHelpers";
 
 export default procedure
   .use(requireAuth)
@@ -34,10 +47,11 @@ export default procedure
   .input(
     CollectionBottleInputSchema.extend({
       collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
+      pendingImageId: z.string().trim().min(1).optional(),
       user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
     }),
   )
-  .output(z.object({}))
+  .output(CollectionBottleSchema)
   .handler(async function ({ input, context, errors }) {
     const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
@@ -97,25 +111,150 @@ export default procedure
       }
     }
 
-    await db.transaction(async (tx) => {
-      const [cb] = await tx
+    if (input.pendingImageId) {
+      if (!isLibraryCollection(collection)) {
+        throw errors.BAD_REQUEST({
+          message: "Collection images are only supported for Library entries.",
+        });
+      }
+      try {
+        await validatePendingImageForCollectionBottle({
+          pendingImageId: input.pendingImageId,
+          userId: context.user.id,
+        });
+      } catch (err) {
+        if (err instanceof PendingUploadError) {
+          throw errors.BAD_REQUEST({
+            message: err.message || "Pending photo is no longer available.",
+          });
+        }
+        throw err;
+      }
+    }
+
+    let collectionBottleResult:
+      | { collectionBottle: CollectionBottle; created: boolean }
+      | null
+      | undefined;
+    collectionBottleResult = await db.transaction(async (tx) => {
+      const [createdCollectionBottle] = await tx
         .insert(collectionBottles)
         .values({
           collectionId: collection.id,
           bottleId: bottle.id,
-          releaseId: input.release || null,
+          releaseId: input.release ?? null,
         })
         .onConflictDoNothing()
         .returning();
-      if (cb) {
+
+      let collectionBottle = createdCollectionBottle;
+      if (collectionBottle) {
         await tx
           .update(collections)
           .set({
             totalBottles: sql`${collections.totalBottles} + 1`,
           })
           .where(eq(collections.id, collection.id));
+        return { collectionBottle, created: true };
+      } else {
+        const [existingCollectionBottle] = await tx
+          .select()
+          .from(collectionBottles)
+          .where(
+            and(
+              eq(collectionBottles.collectionId, collection.id),
+              eq(collectionBottles.bottleId, bottle.id),
+              input.release != null
+                ? eq(collectionBottles.releaseId, input.release)
+                : isNull(collectionBottles.releaseId),
+            ),
+          )
+          .limit(1);
+        collectionBottle = existingCollectionBottle;
       }
+
+      if (!collectionBottle) {
+        return null;
+      }
+
+      return { collectionBottle, created: false };
     });
 
-    return {};
+    if (!collectionBottleResult) {
+      throw errors.INTERNAL_SERVER_ERROR({
+        message: "Unable to save collection bottle.",
+      });
+    }
+
+    let collectionBottle = collectionBottleResult.collectionBottle;
+    if (input.pendingImageId) {
+      try {
+        const imageUrl = await copyPendingImageForCollectionBottle({
+          pendingImageId: input.pendingImageId,
+          userId: context.user.id,
+          collectionBottleId: collectionBottle.id,
+        });
+
+        const [updatedCollectionBottle] = await db
+          .update(collectionBottles)
+          .set({ imageUrl })
+          .where(eq(collectionBottles.id, collectionBottle.id))
+          .returning();
+
+        if (!updatedCollectionBottle) {
+          throw errors.INTERNAL_SERVER_ERROR({
+            message: "Unable to save collection bottle image.",
+          });
+        }
+
+        collectionBottle = updatedCollectionBottle;
+      } catch (err) {
+        if (err instanceof PendingUploadError) {
+          if (collectionBottleResult.created) {
+            await db.transaction(async (tx) => {
+              await tx
+                .delete(collectionBottles)
+                .where(eq(collectionBottles.id, collectionBottle.id));
+              await tx
+                .update(collections)
+                .set({
+                  totalBottles: sql`${collections.totalBottles} - 1`,
+                })
+                .where(eq(collections.id, collection.id));
+            });
+          }
+
+          throw errors.BAD_REQUEST({
+            message: err.message || "Pending photo is no longer available.",
+          });
+        }
+
+        logError(err, {
+          collection: {
+            id: collection.id,
+          },
+          collectionBottle: {
+            id: collectionBottle.id,
+          },
+          pendingUpload: {
+            id: input.pendingImageId,
+          },
+          user: {
+            id: context.user.id,
+          },
+        });
+      }
+    }
+
+    const result = await findCollectionBottleWithTarget({
+      collectionBottleId: collectionBottle.id,
+      collectionId: collection.id,
+    });
+    if (!result) {
+      throw errors.INTERNAL_SERVER_ERROR({
+        message: "Unable to load collection bottle.",
+      });
+    }
+
+    return await serializeCollectionBottleEntry(result, context.user);
   });

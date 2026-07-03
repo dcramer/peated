@@ -1,5 +1,6 @@
 import { type z } from "zod";
 import { serialize, serializer } from ".";
+import config from "../config";
 import type {
   Bottle,
   BottleRelease,
@@ -7,6 +8,7 @@ import type {
   User,
 } from "../db/schema";
 import { notEmpty } from "../lib/filter";
+import { absoluteUrl } from "../lib/urls";
 import { type CollectionBottleSchema } from "../schemas";
 import { BottleSerializer } from "./bottle";
 import { BottleReleaseSerializer } from "./bottleRelease";
@@ -21,7 +23,7 @@ export const CollectionBottleSerializer = serializer({
   attrs: async (
     itemList: (CollectionBottle & {
       bottle: Bottle;
-      release: BottleRelease;
+      release: BottleRelease | null;
     })[],
     currentUser?: User,
   ): Promise<Record<number, CollectionBottleAttrs>> => {
@@ -53,12 +55,16 @@ export const CollectionBottleSerializer = serializer({
   item: (
     item: CollectionBottle & {
       bottle: Bottle;
+      release: BottleRelease | null;
     },
     attrs: CollectionBottleAttrs,
     currentUser?: User,
   ): z.infer<typeof CollectionBottleSchema> => {
     return {
       id: item.id,
+      imageUrl: item.imageUrl
+        ? absoluteUrl(config.API_SERVER, item.imageUrl)
+        : null,
       bottle: attrs.bottle,
       release: attrs.release,
     };
