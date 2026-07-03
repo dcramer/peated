@@ -11,14 +11,14 @@ import {
 } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
-test.describe("record tasting", () => {
-  test("records a tasting for a fixture bottle", async ({ context, page }) => {
+test.describe("log tasting", () => {
+  test("logs a tasting for a fixture bottle", async ({ context, page }) => {
     await signIn(context);
 
     await page.goto(`/bottles/${existingBottle.id}/addTasting`);
 
     await expect(
-      page.getByRole("heading", { name: "Record Tasting" }),
+      page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
     await expect(page.getByText(existingBottle.fullName)).toBeVisible();
 
@@ -30,7 +30,7 @@ test.describe("record tasting", () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test("records a tasting from a matched bottle photo", async ({
+  test("logs a tasting from a matched bottle photo", async ({
     context,
     page,
   }) => {
@@ -39,7 +39,7 @@ test.describe("record tasting", () => {
     await page.goto("/addTasting");
 
     await expect(
-      page.getByRole("heading", { name: "Record Tasting" }),
+      page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
 
     await page.locator('input[type="file"]').setInputFiles({

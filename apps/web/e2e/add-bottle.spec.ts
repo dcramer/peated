@@ -53,7 +53,7 @@ test.describe("create bottle", () => {
       new RegExp(`/bottles/${createdBottleId}/addTasting$`),
     );
     await expect(
-      page.getByRole("heading", { name: "Record Tasting" }),
+      page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
     await expect(
       page.getByText(`${testBrand.name} ${createdBottleName}`),
@@ -76,7 +76,7 @@ test.describe("create bottle", () => {
       new RegExp(`/bottles/${createdBottleId}/addTasting$`),
     );
     await expect(
-      page.getByRole("heading", { name: "Record Tasting" }),
+      page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
   });
 

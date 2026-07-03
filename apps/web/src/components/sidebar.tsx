@@ -33,7 +33,7 @@ export default function Sidebar() {
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
               <li>
                 <Button href="/addTasting" fullWidth color="highlight">
-                  Record a Tasting
+                  Log Tasting
                 </Button>
               </li>
               <li>

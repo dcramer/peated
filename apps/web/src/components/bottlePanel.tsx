@@ -53,7 +53,7 @@ export default function BottlePanel({
               href={tastingPath ?? `/bottles/${bottle.id}/addTasting`}
               color="primary"
             >
-              Record a Tasting
+              Log Tasting
             </Button>
 
             <ShareButton

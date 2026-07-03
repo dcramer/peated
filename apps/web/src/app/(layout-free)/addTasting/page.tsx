@@ -461,7 +461,7 @@ function TastingSubmitProgressPanel({
       header={
         <Header>
           <div className="flex w-full items-center gap-3">
-            <h1 className="text-2xl font-bold">Record Tasting</h1>
+            <h1 className="text-2xl font-bold">Log Tasting</h1>
           </div>
         </Header>
       }
@@ -776,7 +776,7 @@ function AddTastingForm() {
       <>
         <div className={submitStage ? "hidden" : undefined}>
           <TastingForm
-            title="Record Tasting"
+            title="Log Tasting"
             errorMessage={submitError}
             initialData={{
               bottle: selectedTarget.bottle,
@@ -823,7 +823,7 @@ function AddTastingForm() {
                 <ChevronLeft className="h-8 w-8" />
               </div>
             </button>
-            <h1 className="text-2xl font-bold">Record Tasting</h1>
+            <h1 className="text-2xl font-bold">Log Tasting</h1>
           </div>
         </Header>
       }

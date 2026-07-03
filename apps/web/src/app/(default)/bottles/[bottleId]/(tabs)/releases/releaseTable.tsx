@@ -122,7 +122,7 @@ function ReleaseTableSection({
                 <Button
                   href={`/bottles/${bottleId}/addTasting?bottling=${item.id}`}
                   size="small"
-                  title="Record a Tasting"
+                  title="Log Tasting"
                 >
                   <PeatedGlyph className="h-3 w-3" />
                 </Button>

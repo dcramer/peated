@@ -83,7 +83,7 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
                     size="small"
                     href={`/bottles/${bottle.id}/addTasting?flight=${flight.id}`}
                   >
-                    Record Tasting
+                    Log Tasting
                   </Button>
                 </td>
               </tr>

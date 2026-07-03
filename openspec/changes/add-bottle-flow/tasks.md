@@ -56,7 +56,7 @@
 
 ## 8. User-Facing Copy
 
-- [ ] 8.1 Replace visible Add Tasting and Record Tasting copy with Log Tasting across buttons, page titles, empty states, and resolver actions.
+- [x] 8.1 Replace visible Add Tasting and Record Tasting copy with Log Tasting across buttons, page titles, empty states, and resolver actions.
 - [ ] 8.2 Keep Add Bottle copy for the universal flow and Create Bottle copy for catalog creation.
 - [ ] 8.3 Review error and success copy for plain-language consistency.
 

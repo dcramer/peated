@@ -87,7 +87,7 @@ function AddTastingForm({ bottleId }: { bottleId: string }) {
 
   return (
     <TastingForm
-      title="Record Tasting"
+      title="Log Tasting"
       initialData={{ bottle, release }}
       suggestedTags={suggestedTags}
       onSubmit={async ({ image, ...data }) => {

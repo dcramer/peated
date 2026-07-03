@@ -469,7 +469,7 @@ export default async function Page(props: {
               color="primary"
             >
               <PeatedGlyph className="h-4 w-4" />
-              Record a Tasting
+              Log Tasting
             </Button>
             <ShareButton
               title={bottling.fullName}
