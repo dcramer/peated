@@ -4,10 +4,10 @@ import { bottleReleases, bottles } from "@peated/server/db/schema";
 import { applyClassifierCreateDecision } from "@peated/server/lib/bottleReferenceResolution";
 import { logError } from "@peated/server/lib/log";
 import {
-  PendingUploadError,
   copyPendingImageToBottle,
   copyPendingImageToBottleRelease,
   getUsablePendingUpload,
+  PendingUploadError,
 } from "@peated/server/lib/pendingUploads";
 import { procedure } from "@peated/server/orpc";
 import type { Context } from "@peated/server/orpc/context";
@@ -21,7 +21,10 @@ import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import bottleReleasesDetails from "../bottleReleases/details";
 import bottlesDetails from "../bottles/details";
-import { identifyPendingImage } from "./photo-identification";
+import {
+  identifyPendingImage,
+  isPhotoIdentificationCreateDecisionAutoCreatable,
+} from "./photo-identification";
 
 type AuthenticatedContext = Context & {
   user: NonNullable<Context["user"]>;
@@ -346,6 +349,12 @@ export default procedure
     ) {
       throw errors.BAD_REQUEST({
         message: "Photo identification result is not a create proposal.",
+      });
+    }
+    if (!isPhotoIdentificationCreateDecisionAutoCreatable(decision)) {
+      throw errors.BAD_REQUEST({
+        message:
+          "Photo identification result needs review before creating a bottle.",
       });
     }
     decision = stripUnapprovedCatalogImages(decision);

@@ -11,6 +11,7 @@ import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import type { ComponentProps, ReactNode } from "react";
 import { formatBottlingName } from "../lib/bottlings";
+import classNames from "../lib/classNames";
 import BottleLink from "./bottleLink";
 import SimpleRatingIndicator from "./simpleRatingIndicator";
 import SingleCaskChip from "./singleCaskChip";
@@ -61,41 +62,60 @@ export default function BottleTable({
           sortDefaultOrder: "asc",
           className: "min-w-full sm:w-1/2",
           value: (item) => {
+            const collectionActions =
+              item.collectionBottle &&
+              renderCollectionBottleActions?.(item.collectionBottle);
+
             return (
-              <div className="flex flex-col justify-center gap-y-2">
-                <div className="flex items-center gap-x-1">
-                  <BottleLink
-                    bottle={item.bottle}
-                    className="font-medium hover:underline"
-                  >
-                    {item.bottle.brand.shortName || item.bottle.brand.name}{" "}
-                    {item.bottle.name}
-                  </BottleLink>
-                  <BottleStatusIcons bottle={item.bottle} />
-                  {!item.release && item.bottle.singleCask && (
-                    <SingleCaskChip />
+              <div
+                className={classNames(
+                  "min-w-0",
+                  collectionActions
+                    ? "flex items-start gap-3"
+                    : "flex flex-col justify-center gap-y-2",
+                )}
+              >
+                {collectionActions}
+                <div
+                  className={classNames(
+                    "min-w-0",
+                    collectionActions
+                      ? "order-1 flex flex-1 flex-col justify-center gap-y-2"
+                      : "flex flex-col justify-center gap-y-2",
                   )}
-                </div>
-                <div className="text-muted flex flex-col gap-y-1 text-sm">
-                  {item.release && (
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span>
-                        Specific Bottling: {formatBottlingName(item.release)}
-                      </span>
-                      {item.release.singleCask && <SingleCaskChip />}
-                    </div>
-                  )}
-                  {item.bottle.category && (
-                    <Link
-                      href={`/bottles/?category=${item.bottle.category}`}
-                      className="hover:underline"
+                >
+                  <div className="flex min-w-0 flex-wrap items-center gap-x-1">
+                    <BottleLink
+                      bottle={item.bottle}
+                      className="font-medium hover:underline"
                     >
-                      {formatCategoryName(item.bottle.category)}
-                    </Link>
-                  )}
+                      {item.bottle.brand.shortName || item.bottle.brand.name}{" "}
+                      {item.bottle.name}
+                    </BottleLink>
+                    <BottleStatusIcons bottle={item.bottle} />
+                    {!item.release && item.bottle.singleCask && (
+                      <SingleCaskChip />
+                    )}
+                  </div>
+                  <div className="text-muted flex flex-col gap-y-1 text-sm">
+                    {item.release && (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span>
+                          Specific Bottling: {formatBottlingName(item.release)}
+                        </span>
+                        {item.release.singleCask && <SingleCaskChip />}
+                      </div>
+                    )}
+                    {item.bottle.category && (
+                      <Link
+                        href={`/bottles/?category=${item.bottle.category}`}
+                        className="hover:underline"
+                      >
+                        {formatCategoryName(item.bottle.category)}
+                      </Link>
+                    )}
+                  </div>
                 </div>
-                {item.collectionBottle &&
-                  renderCollectionBottleActions?.(item.collectionBottle)}
               </div>
             );
           },

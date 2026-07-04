@@ -62,6 +62,30 @@ The system SHALL allow the owner of a Library collection bottle entry to replace
 - **WHEN** the Library owner attempts to replace an entry image with an expired pending image
 - **THEN** the system rejects the request without changing the existing entry image URL
 
+### Requirement: Library row image controls
+
+The system SHALL show Library entry images as consumer-facing bottle photos and expose owner actions from a row options menu.
+
+#### Scenario: Library row thumbnail
+
+- **WHEN** a Library entry has a saved image
+- **THEN** the Library row shows the image as a thumbnail without technical Library-image explanatory copy
+
+#### Scenario: Owner edits Library row image
+
+- **WHEN** the Library owner chooses Edit Image from the row options menu
+- **THEN** the system lets the owner replace the Library entry image
+
+#### Scenario: Owner removes Library row entry
+
+- **WHEN** the Library owner chooses Remove from Library from the row options menu
+- **THEN** the system removes the Library entry
+
+#### Scenario: Non-owner cannot edit row image
+
+- **WHEN** a viewer opens another user's Library
+- **THEN** the system does not show the Library row options menu
+
 ### Requirement: Remove Library image
 
 The system SHALL allow the owner of a Library collection bottle entry to remove its image.

@@ -6,6 +6,7 @@ import Button from "@peated/web/components/button";
 import FormError from "@peated/web/components/formError";
 import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
+import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
@@ -34,6 +35,7 @@ type PhotoIdentification = Outputs["tastings"]["photoIdentification"];
 export type BottleResolverTarget = {
   bottle: Bottle;
   release: BottleRelease | null;
+  hasExactLibraryEntry: boolean;
   pendingImage: PhotoIdentification["pendingImage"] | null;
   /** Blob preview ownership transfers to the resolver caller only after onResolve succeeds. */
   previewUrl: string | null;
@@ -45,6 +47,8 @@ export type BottleResolverMatchedAction = "library" | "tasting";
 export type BottleResolverMatchedActionsProps = {
   bottleId: number;
   releaseId: number | null;
+  hasExactLibraryEntry: boolean;
+  loadingExactLibraryStatus: boolean;
   resolvingAction: BottleResolverMatchedAction | null;
   onResolve: (action: BottleResolverMatchedAction) => void;
 };
@@ -55,7 +59,10 @@ type Props = {
     action?: BottleResolverMatchedAction,
   ) => Promise<void> | void;
   searchHrefForQuery: (query?: string) => string;
-  createBottleHrefForQuery?: (query: string) => string;
+  createBottleHrefForResult?: (
+    query: string,
+    prefill?: CreateBottlePrefill,
+  ) => string;
   title: string;
   matchedResultDescription?: string;
   renderMatchedResultActions?: (
@@ -102,10 +109,67 @@ function getFieldValue(
   return String(value);
 }
 
+function getRawFieldValue(
+  result: PhotoIdentification | null,
+  field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
+) {
+  const value = result?.imageEvidence.fieldCandidates[field]?.value;
+  if (value === undefined || value === null || value === "") return null;
+  return value;
+}
+
+function getRawStringFieldValue(
+  result: PhotoIdentification | null,
+  field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
+) {
+  const value = getRawFieldValue(result, field);
+  return typeof value === "string" ? value : null;
+}
+
+function getRawNumberFieldValue(
+  result: PhotoIdentification | null,
+  field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
+) {
+  const value = getRawFieldValue(result, field);
+  return typeof value === "number" ? value : null;
+}
+
 function getSearchSeed(result: PhotoIdentification | null) {
   const brand = getFieldValue(result, "brand");
   const expression = getFieldValue(result, "expression");
   return [brand, expression].filter(Boolean).join(" ");
+}
+
+function getCreateNameSeed(result: PhotoIdentification | null) {
+  const decision = getCreateDecisionLike(result);
+  return (
+    getRawStringFieldValue(result, "expression") ??
+    getProposedBottle(decision)?.name ??
+    ""
+  );
+}
+
+function getCreateBottlePrefill(
+  result: PhotoIdentification | null,
+): CreateBottlePrefill {
+  const decision = getCreateDecisionLike(result);
+  const proposedBottle = getProposedBottle(decision);
+  const proposedRelease = getProposedRelease(decision);
+
+  return {
+    brandName:
+      getRawStringFieldValue(result, "brand") ??
+      proposedBottle?.brand.name ??
+      null,
+    statedAge: getRawNumberFieldValue(result, "statedAge"),
+    abv: getRawNumberFieldValue(result, "abv"),
+    edition:
+      getRawStringFieldValue(result, "edition") ??
+      proposedRelease?.edition ??
+      null,
+    vintageYear: getRawNumberFieldValue(result, "vintageYear"),
+    releaseYear: getRawNumberFieldValue(result, "releaseYear"),
+  };
 }
 
 function hasRecognizedLabelDetails(result: PhotoIdentification | null) {
@@ -148,6 +212,14 @@ function getCreateDecision(result: PhotoIdentification | null) {
     return null;
   }
 
+  return getCreateDecisionLike(result);
+}
+
+function getCreateDecisionLike(result: PhotoIdentification | null) {
+  if (result?.classification.status !== "classified") {
+    return null;
+  }
+
   switch (result.classification.decision.action) {
     case "create_bottle":
     case "create_release":
@@ -156,6 +228,30 @@ function getCreateDecision(result: PhotoIdentification | null) {
     default:
       return null;
   }
+}
+
+type CreateDecisionLike = NonNullable<ReturnType<typeof getCreateDecisionLike>>;
+
+function getProposedBottle(decision: CreateDecisionLike | null) {
+  if (!decision) return null;
+  if (
+    decision.action === "create_bottle" ||
+    decision.action === "create_bottle_and_release"
+  ) {
+    return decision.proposedBottle;
+  }
+  return null;
+}
+
+function getProposedRelease(decision: CreateDecisionLike | null) {
+  if (!decision) return null;
+  if (
+    decision.action === "create_release" ||
+    decision.action === "create_bottle_and_release"
+  ) {
+    return decision.proposedRelease;
+  }
+  return null;
 }
 
 function getProposedName(result: PhotoIdentification | null) {
@@ -285,10 +381,10 @@ function getManualResultCopy(
   if (action === "no_match") {
     if (hasRecognizedLabelDetails(result)) {
       return {
-        title: "Bottle details found",
+        title: "Bottle not in Peated yet",
         description:
-          "We found details on the label, but need you to review them before creating a bottle in Peated.",
-        createLabel: "Review and Create",
+          "We found label details, but not enough to create it automatically. Review them to create the bottle in Peated.",
+        createLabel: "Create Bottle",
         primaryAction: "create" as const,
       };
     }
@@ -299,6 +395,20 @@ function getManualResultCopy(
         "Search can still find it, or you can start over with a clearer photo.",
       createLabel: "Create Manually",
       primaryAction: "search" as const,
+    };
+  }
+
+  if (
+    action === "create_bottle" ||
+    action === "create_release" ||
+    action === "create_bottle_and_release"
+  ) {
+    return {
+      title: "Bottle not in Peated yet",
+      description:
+        "We found label details, but not enough to create it automatically. Review them to create the bottle in Peated.",
+      createLabel: "Create Bottle",
+      primaryAction: "create" as const,
     };
   }
 
@@ -553,7 +663,7 @@ function SearchBottleCallout({ searchHref }: { searchHref: string }) {
         <div>
           <div className="font-semibold text-white">Prefer to search?</div>
           <div className="text-muted mt-1 text-sm">
-            Find an existing bottle or start a new one manually.
+            Find a bottle in Peated or start a new one manually.
           </div>
         </div>
         <div className="shrink-0">
@@ -569,9 +679,9 @@ function SearchBottleCallout({ searchHref }: { searchHref: string }) {
 export default function BottleResolver({
   onResolve,
   searchHrefForQuery,
-  createBottleHrefForQuery,
+  createBottleHrefForResult,
   title,
-  matchedResultDescription = "We'll use the existing bottle for this tasting.",
+  matchedResultDescription = "We identified this bottle in Peated.",
   renderMatchedResultActions,
   createProposalActionLabel = "Continue",
   searchActionLabel = "Search Bottles",
@@ -593,6 +703,12 @@ export default function BottleResolver({
   const [catalogImageApproved, setCatalogImageApproved] = useState(false);
   const [resolvingAction, setResolvingAction] =
     useState<BottleResolverMatchedAction | null>(null);
+  const [matchedBottleStatus, setMatchedBottleStatus] = useState<{
+    bottleId: number;
+    releaseId: number | null;
+    hasExactLibraryEntry: boolean;
+    loading: boolean;
+  } | null>(null);
 
   const photoIdentificationMutation = useMutation(
     orpc.tastings.photoIdentification.mutationOptions(),
@@ -641,6 +757,7 @@ export default function BottleResolver({
     target: {
       bottle: Bottle;
       release: BottleRelease | null;
+      hasExactLibraryEntry: boolean;
       warnings?: string[];
     },
     action?: BottleResolverMatchedAction,
@@ -665,13 +782,27 @@ export default function BottleResolver({
     setError(null);
     setResolvingAction(action ?? "library");
     try {
-      const [bottle, release] = await Promise.all([
+      const [bottle, release, collectionStatus] = await Promise.all([
         orpc.bottles.details.call({ bottle: bottleId }),
         releaseId
           ? orpc.bottleReleases.details.call({ release: releaseId })
           : Promise.resolve(null),
+        orpc.collections.bottles.list.call({
+          user: "me",
+          collection: "library",
+          bottle: bottleId,
+          release: releaseId ?? undefined,
+          baseOnly: releaseId == null,
+        }),
       ]);
-      await resolveTarget({ bottle, release }, action);
+      await resolveTarget(
+        {
+          bottle,
+          release,
+          hasExactLibraryEntry: collectionStatus.results.length > 0,
+        },
+        action,
+      );
     } catch (err) {
       logError(err);
       setError("We couldn't load that bottle. Search for it to keep going.");
@@ -704,6 +835,7 @@ export default function BottleResolver({
       await resolveTarget({
         bottle: created.bottle,
         release: created.release,
+        hasExactLibraryEntry: false,
         warnings: (created.warnings ?? []).map(
           (warning) =>
             warning.message ||
@@ -760,6 +892,7 @@ export default function BottleResolver({
     setPhotoError(null);
     setPhotoResult(null);
     setCatalogImageApproved(false);
+    setMatchedBottleStatus(null);
     replacePreviewUrl(null);
   }
 
@@ -780,11 +913,76 @@ export default function BottleResolver({
   const defaultSearchHref = searchHrefForQuery();
   const searchSeed = getSearchSeed(photoResult);
   const searchHref = searchHrefForQuery(searchSeed);
+  const createBottlePrefill = getCreateBottlePrefill(photoResult);
   const createBottleHref =
-    photoResult && createBottleHrefForQuery
-      ? createBottleHrefForQuery(searchSeed ?? "")
+    photoResult && createBottleHrefForResult
+      ? createBottleHrefForResult(
+          getCreateNameSeed(photoResult),
+          createBottlePrefill,
+        )
       : null;
   const manualResultCopy = getManualResultCopy(photoResult);
+  const matchedBottleHasExactLibraryEntry =
+    matchedBottleStatus?.bottleId === matchedBottleId &&
+    matchedBottleStatus.releaseId === matchedReleaseId
+      ? matchedBottleStatus.hasExactLibraryEntry
+      : false;
+  const matchedBottleExactLibraryStatusLoading =
+    Boolean(matchedBottleId) &&
+    (matchedBottleStatus?.bottleId !== matchedBottleId ||
+      matchedBottleStatus?.releaseId !== matchedReleaseId ||
+      matchedBottleStatus.loading);
+
+  useEffect(() => {
+    if (!matchedBottleId) {
+      setMatchedBottleStatus(null);
+      return;
+    }
+
+    const statusBottleId = matchedBottleId;
+    const statusReleaseId = matchedReleaseId;
+    let cancelled = false;
+    setMatchedBottleStatus({
+      bottleId: statusBottleId,
+      releaseId: statusReleaseId,
+      hasExactLibraryEntry: false,
+      loading: true,
+    });
+
+    async function loadMatchedBottleStatus() {
+      try {
+        const collectionStatus = await orpc.collections.bottles.list.call({
+          user: "me",
+          collection: "library",
+          bottle: statusBottleId,
+          release: statusReleaseId ?? undefined,
+          baseOnly: statusReleaseId == null,
+        });
+        if (cancelled) return;
+        setMatchedBottleStatus({
+          bottleId: statusBottleId,
+          releaseId: statusReleaseId,
+          hasExactLibraryEntry: collectionStatus.results.length > 0,
+          loading: false,
+        });
+      } catch (err) {
+        logError(err);
+        if (cancelled) return;
+        setMatchedBottleStatus({
+          bottleId: statusBottleId,
+          releaseId: statusReleaseId,
+          hasExactLibraryEntry: false,
+          loading: false,
+        });
+      }
+    }
+
+    void loadMatchedBottleStatus();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [matchedBottleId, matchedReleaseId, orpc]);
 
   return (
     <Layout
@@ -860,7 +1058,7 @@ export default function BottleResolver({
             description={photoError}
             searchHref={defaultSearchHref}
             searchLabel={searchActionLabel}
-            createBottleHref={createBottleHrefForQuery?.("") ?? null}
+            createBottleHref={createBottleHrefForResult?.("") ?? null}
             onStartOver={startOver}
             variant="error"
           />
@@ -1002,6 +1200,10 @@ export default function BottleResolver({
                         renderMatchedResultActions({
                           bottleId: matchedBottleId,
                           releaseId: matchedReleaseId,
+                          hasExactLibraryEntry:
+                            matchedBottleHasExactLibraryEntry,
+                          loadingExactLibraryStatus:
+                            matchedBottleExactLibraryStatusLoading,
                           resolvingAction,
                           onResolve: (action) => {
                             void loadTarget(

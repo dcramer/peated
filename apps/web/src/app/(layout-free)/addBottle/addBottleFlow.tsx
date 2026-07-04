@@ -13,6 +13,7 @@ import FormError from "@peated/web/components/formError";
 import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
 import Link from "@peated/web/components/link";
+import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import Spinner from "@peated/web/components/spinner";
 import TastingForm from "@peated/web/components/tastingForm";
@@ -29,7 +30,6 @@ import {
   BookOpen,
   Check,
   Eye,
-  ImageIcon,
   Plus,
   RotateCcw,
   Search,
@@ -225,6 +225,8 @@ function OutcomeButton({
 function MatchedOutcomeActions({
   bottleId,
   releaseId,
+  hasExactLibraryEntry,
+  loadingExactLibraryStatus,
   resolvingAction,
   onResolve,
 }: BottleResolverMatchedActionsProps) {
@@ -234,10 +236,14 @@ function MatchedOutcomeActions({
         onClick={() => onResolve("library")}
         icon={<BookOpen className="h-4 w-4" />}
         emphasized
-        disabled={Boolean(resolvingAction)}
-        loading={resolvingAction === "library"}
+        disabled={
+          Boolean(resolvingAction) ||
+          loadingExactLibraryStatus ||
+          hasExactLibraryEntry
+        }
+        loading={resolvingAction === "library" || loadingExactLibraryStatus}
       >
-        Add to Library
+        {hasExactLibraryEntry ? "In Library" : "Add to Library"}
       </OutcomeButton>
       <OutcomeButton
         onClick={() => onResolve("tasting")}
@@ -264,6 +270,7 @@ function OutcomeSelection({
   onAddToLibrary,
   onLogTasting,
   onStartOver,
+  addingToLibrary,
   loggingTasting,
   error,
 }: {
@@ -272,6 +279,7 @@ function OutcomeSelection({
   onAddToLibrary: () => void;
   onLogTasting: () => void;
   onStartOver: () => void;
+  addingToLibrary: boolean;
   loggingTasting: boolean;
   error?: string;
 }) {
@@ -305,9 +313,14 @@ function OutcomeSelection({
                 onClick={onAddToLibrary}
                 icon={<BookOpen className="h-4 w-4" />}
                 emphasized
-                disabled={loggingTasting}
+                disabled={
+                  target.hasExactLibraryEntry ||
+                  addingToLibrary ||
+                  loggingTasting
+                }
+                loading={addingToLibrary}
               >
-                Add to Library
+                {target.hasExactLibraryEntry ? "In Library" : "Add to Library"}
               </OutcomeButton>
               <OutcomeButton
                 onClick={onLogTasting}
@@ -343,94 +356,6 @@ function OutcomeSelection({
             Start Over
           </Button>
         </div>
-      </div>
-    </Layout>
-  );
-}
-
-function LibraryConfirmation({
-  target,
-  error,
-  saving,
-  onCancel,
-  onSubmit,
-}: {
-  target: BottleResolverTarget;
-  error?: string;
-  saving: boolean;
-  onCancel: () => void;
-  onSubmit: (useScanImage: boolean) => void;
-}) {
-  const hasPendingImage = Boolean(target.pendingImage);
-  const [useScanImage, setUseScanImage] = useState(hasPendingImage);
-
-  useEffect(() => {
-    setUseScanImage(hasPendingImage);
-  }, [hasPendingImage, target.pendingImage?.id]);
-
-  return (
-    <Layout footer={null} header={<FlowHeader>{null}</FlowHeader>}>
-      <div className="mx-auto mt-5 max-w-3xl space-y-5">
-        <TargetPanel target={target} previewUrl={target.previewUrl} />
-        <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
-          <div className="space-y-5">
-            <div>
-              <h2 className="font-semibold text-white">Add to Library</h2>
-              <p className="text-muted mt-1 text-sm">
-                Save this bottle to your Library.
-              </p>
-            </div>
-
-            {hasPendingImage ? (
-              <label className="flex items-start gap-3 rounded border border-slate-800 bg-slate-950 p-3">
-                <input
-                  type="checkbox"
-                  className="mt-1 h-4 w-4"
-                  checked={useScanImage}
-                  onChange={(event) => setUseScanImage(event.target.checked)}
-                />
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-2 font-semibold text-white">
-                    <ImageIcon className="h-4 w-4" />
-                    Use scanned photo as Library image
-                  </span>
-                  <span className="text-muted mt-1 block text-sm">
-                    This saves a copy on your Library entry only. It will not
-                    attach the photo to a tasting or make it the public bottle
-                    image.
-                  </span>
-                </span>
-              </label>
-            ) : (
-              <div className="rounded border border-slate-800 bg-slate-950 p-3">
-                <div className="flex items-center gap-2 font-semibold text-white">
-                  <ImageIcon className="h-4 w-4" />
-                  No Library image selected
-                </div>
-                <p className="text-muted mt-1 text-sm">
-                  You can add the bottle now without saving an image.
-                </p>
-              </div>
-            )}
-
-            {error && <FormError values={[error]} />}
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Button
-                color="highlight"
-                fullWidth
-                icon={<BookOpen className="h-4 w-4" />}
-                disabled={saving}
-                onClick={() => onSubmit(useScanImage)}
-              >
-                {saving ? "Adding..." : "Add to Library"}
-              </Button>
-              <Button fullWidth onClick={onCancel}>
-                Back
-              </Button>
-            </div>
-          </div>
-        </section>
       </div>
     </Layout>
   );
@@ -511,7 +436,6 @@ function AddBottleFlowContent() {
   const [targetLoadError, setTargetLoadError] = useState<string | null>(null);
   const [selectedTarget, setSelectedTarget] =
     useState<BottleResolverTarget | null>(null);
-  const [confirmingLibrary, setConfirmingLibrary] = useState(false);
   const [libraryError, setLibraryError] = useState<string | undefined>();
   const [addedEntry, setAddedEntry] = useState<CollectionBottle | null>(null);
   const [tastingDraft, setTastingDraft] = useState<TastingDraft | null>(null);
@@ -550,19 +474,25 @@ function AddBottleFlowContent() {
     async function loadRequestedTarget() {
       setLoadingTarget(true);
       setTargetLoadError(null);
-      setConfirmingLibrary(false);
       setAddedEntry(null);
       setTastingDraft(null);
       setTastingLoadError(undefined);
 
       try {
-        const [bottle, release] = await Promise.all([
+        const [bottle, release, collectionStatus] = await Promise.all([
           orpc.bottles.details.call({ bottle: bottleId }),
           requestedReleaseId
             ? orpc.bottleReleases.details.call({
                 release: requestedReleaseId,
               })
             : Promise.resolve(null),
+          orpc.collections.bottles.list.call({
+            user: "me",
+            collection: "library",
+            bottle: bottleId,
+            release: requestedReleaseId ?? undefined,
+            baseOnly: requestedReleaseId == null,
+          }),
         ]);
 
         if (cancelled) return;
@@ -577,6 +507,7 @@ function AddBottleFlowContent() {
         setSelectedTarget({
           bottle,
           release,
+          hasExactLibraryEntry: collectionStatus.results.length > 0,
           pendingImage: null,
           previewUrl: null,
         });
@@ -611,7 +542,6 @@ function AddBottleFlowContent() {
 
   function startOver() {
     setSelectedTarget(null);
-    setConfirmingLibrary(false);
     setLibraryError(undefined);
     setAddedEntry(null);
     setTastingDraft(null);
@@ -628,7 +558,6 @@ function AddBottleFlowContent() {
       const suggestedTags = await orpc.bottles.suggestedTags.call({
         bottle: target.bottle.id,
       });
-      setConfirmingLibrary(false);
       setLibraryError(undefined);
       setTastingDraft({
         ...target,
@@ -650,43 +579,42 @@ function AddBottleFlowContent() {
     action?: "library" | "tasting",
   ) {
     setSelectedTarget(target);
-    setConfirmingLibrary(false);
     setLibraryError(undefined);
     setAddedEntry(null);
     setTastingDraft(null);
     setTastingLoadError(undefined);
 
     if (action === "library") {
-      setConfirmingLibrary(true);
+      await addToLibrary(target);
     } else if (action === "tasting") {
       await startLogTasting(target);
     }
   }
 
-  async function addToLibrary(useScanImage: boolean) {
-    if (!selectedTarget) return;
+  async function addToLibrary(target = selectedTarget) {
+    if (!target) return;
 
+    setSelectedTarget(target);
     setLibraryError(undefined);
     setTastingDraft(null);
+    if (target.hasExactLibraryEntry) return;
+
     try {
       const entry = await libraryCreateMutation.mutateAsync({
-        bottle: selectedTarget.bottle.id,
-        release: selectedTarget.release?.id ?? null,
+        bottle: target.bottle.id,
+        release: target.release?.id ?? null,
         user: "me",
         collection: "library",
-        pendingImageId:
-          useScanImage && selectedTarget.pendingImage
-            ? selectedTarget.pendingImage.id
-            : undefined,
+        pendingImageId: target.pendingImage?.id,
       });
       setAddedEntry(entry);
       setSelectedTarget(null);
-      setConfirmingLibrary(false);
     } catch (err) {
       logError(err);
       setLibraryError(
         getFormErrorMessage(err, {
           expectedErrorNames: ["BAD_REQUEST", "CONFLICT"],
+          fallbackMessage: "Could not save to Library.",
         }),
       );
     }
@@ -796,35 +724,21 @@ function AddBottleFlowContent() {
     );
   }
 
-  if (selectedTarget && confirmingLibrary) {
-    return (
-      <LibraryConfirmation
-        target={selectedTarget}
-        error={libraryError}
-        saving={libraryCreateMutation.isPending}
-        onCancel={() => {
-          setLibraryError(undefined);
-          setConfirmingLibrary(false);
-        }}
-        onSubmit={(useScanImage) => void addToLibrary(useScanImage)}
-      />
-    );
-  }
-
   if (selectedTarget) {
     return (
       <OutcomeSelection
         target={selectedTarget}
         intent={intent}
-        error={tastingLoadError}
+        error={libraryError ?? tastingLoadError}
         onAddToLibrary={() => {
           setLibraryError(undefined);
           setTastingDraft(null);
           setTastingLoadError(undefined);
-          setConfirmingLibrary(true);
+          void addToLibrary(selectedTarget);
         }}
         onLogTasting={() => void startLogTasting(selectedTarget)}
         onStartOver={startOver}
+        addingToLibrary={libraryCreateMutation.isPending}
         loggingTasting={loadingTastingDraft}
       />
     );
@@ -834,13 +748,17 @@ function AddBottleFlowContent() {
     <BottleResolver
       title="Add Bottle"
       searchHrefForQuery={(query) => getSearchHref(query, intent)}
-      createBottleHrefForQuery={(query) =>
+      createBottleHrefForResult={(
+        query: string,
+        prefill?: CreateBottlePrefill,
+      ) =>
         getCreateBottleHref({
           query,
           returnAction: getCreateReturnAction(intent),
+          prefill,
         })
       }
-      matchedResultDescription="Use this existing bottle for your next step."
+      matchedResultDescription="We identified this bottle in Peated."
       createProposalActionLabel="Create Bottle"
       searchActionLabel="Search Again"
       enableCatalogImageApproval
@@ -854,8 +772,8 @@ function AddBottleFlowContent() {
 
 /**
  * Owns the standalone Add Bottle route: auth-gated resolution, direct
- * bottle/release query targets, Library confirmation, and tasting continuation
- * stay in this flow so scan image reuse remains attached to the user's choice.
+ * bottle/release query targets, direct Library saves, and tasting continuation
+ * stay in this flow so scan image reuse remains attached to the user's action.
  */
 export default function AddBottleFlow() {
   return (

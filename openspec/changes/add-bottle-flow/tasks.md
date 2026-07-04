@@ -39,12 +39,12 @@
 
 ## 6. Library Flow UI
 
-- [x] 6.1 Add a Library confirmation step with bottle or release card and image field seeded from the scan image when present.
+- [x] 6.1 Add direct Library save behavior that uses the scan image when present and shows exact-target In Library state when already saved.
 - [x] 6.2 Submit Library adds through the collection bottle create API with optional `pendingImageId`.
 - [x] 6.3 Add an Added to Library terminal state showing the saved entry and image.
 - [x] 6.4 Add Add Another Bottle behavior that resets the resolver and starts a fresh Add Bottle flow.
 - [x] 6.5 Add View Library behavior that routes to the current user's Library page.
-- [x] 6.6 Add Library image replace/remove UI at the selected Library editing surface.
+- [x] 6.6 Add Library row thumbnail/options UI for editing the entry image or removing the entry from Library.
 
 ## 7. Catalog Image Approval
 

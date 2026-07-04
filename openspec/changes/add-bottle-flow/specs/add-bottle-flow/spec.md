@@ -23,6 +23,12 @@ The system SHALL resolve scan, search, and manual creation paths into a bottle t
 - **WHEN** the resolver identifies an existing bottle or release
 - **THEN** the system shows actions to Add to Library, Log Tasting, and View Bottle
 
+#### Scenario: Existing target already in Library
+
+- **WHEN** the resolver identifies a bottle or release that is already saved in the user's Library for that exact target
+- **THEN** the system shows the Library action as In Library
+- **AND** the Library action is disabled while Log Tasting and View Bottle remain available
+
 #### Scenario: No bottle resolved
 
 - **WHEN** the resolver cannot identify a usable bottle match
@@ -59,22 +65,21 @@ The system SHALL show a terminal confirmation state after adding a bottle or rel
 #### Scenario: Added to Library
 
 - **WHEN** the user adds a resolved bottle or release to Library
-- **THEN** the system shows an Added to Library confirmation with the saved bottle or release
+- **THEN** the system shows an Added to Library state with the saved bottle or release
 
-#### Scenario: Library scan image choice
+#### Scenario: Library scan image save
 
 - **WHEN** the user adds a resolved bottle or release to Library from a scan with a pending image
-- **THEN** the system lets the user explicitly choose whether to save the scan as the Library image
-- **AND** the system explains that the saved image applies only to the Library entry and not to tasting or public bottle images
+- **THEN** the system saves the scan image as the Library entry image without requiring a second confirmation step
 
 #### Scenario: Add another bottle
 
-- **WHEN** the user chooses Add Another Bottle from the Added to Library confirmation
+- **WHEN** the user chooses Add Another Bottle from the Added to Library state
 - **THEN** the system clears resolver state and starts a fresh Add Bottle flow
 
 #### Scenario: View Library
 
-- **WHEN** the user chooses View Library from the Added to Library confirmation
+- **WHEN** the user chooses View Library from the Added to Library state
 - **THEN** the system routes to the user's Library page
 
 ### Requirement: Log Tasting language

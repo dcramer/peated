@@ -28,6 +28,25 @@ describe("search result create bottle links", () => {
     ).toBe("/bottles/new?name=Peated+Reserve&returnAction=addBottle");
   });
 
+  it("prefills extracted scan details for reviewed bottle creation", () => {
+    expect(
+      getCreateBottleHref({
+        query: "playwright reserve",
+        returnAction: "addBottle",
+        prefill: {
+          brandName: "Lagavulin",
+          statedAge: 16,
+          abv: 43,
+          edition: "Distillers Edition",
+          vintageYear: 2008,
+          releaseYear: 2024,
+        },
+      }),
+    ).toBe(
+      "/bottles/new?name=Playwright+Reserve&returnAction=addBottle&brandName=Lagavulin&statedAge=16&abv=43&edition=Distillers+Edition&vintageYear=2008&releaseYear=2024",
+    );
+  });
+
   it("routes Add Bottle intent bottle rows through the Add Bottle flow", () => {
     expect(
       getBottleResultHref({

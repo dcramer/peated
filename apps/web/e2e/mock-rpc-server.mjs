@@ -106,7 +106,12 @@ async function handleRpcRequest({ request, response, url }) {
       });
       return true;
     case "bottles/create": {
-      if (input?.name !== createdBottleName || input?.brand !== testBrand.id) {
+      const expectedBrand =
+        input?.brand === testBrand.id ||
+        (input?.brand &&
+          typeof input.brand === "object" &&
+          input.brand.name === testBrand.name);
+      if (input?.name !== createdBottleName || !expectedBrand) {
         sendRpcError(response, "Unexpected bottle create payload");
         return true;
       }
@@ -415,6 +420,10 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, listCollectionBottles(request, input));
       return true;
     case "collections/bottles/create":
+      if (getAccessToken(request).includes("library-create-failure")) {
+        sendRpcError(response, "Could not save to Library.");
+        return true;
+      }
       sendRpcResponse(
         response,
         mutateCollectionBottle(request, input, "create"),
@@ -425,9 +434,6 @@ async function handleRpcRequest({ request, response, url }) {
       return true;
     case "collections/bottles/imageUpdate":
       sendRpcResponse(response, updateCollectionBottleImage(request, input));
-      return true;
-    case "collections/bottles/imageDelete":
-      sendRpcResponse(response, deleteCollectionBottleImage(request, input));
       return true;
     case "collections/bottles/delete":
       mutateCollectionBottle(request, input, "delete");
@@ -662,15 +668,6 @@ function updateCollectionBottleImage(request, input) {
   return replaceCollectionBottleEntry(request, {
     ...entry,
     imageUrl: `http://127.0.0.1:4999/uploads/library-replaced-${entry.id}.webp`,
-  });
-}
-
-function deleteCollectionBottleImage(request, input) {
-  const entry = findCollectionBottleEntry(request, input);
-
-  return replaceCollectionBottleEntry(request, {
-    ...entry,
-    imageUrl: null,
   });
 }
 

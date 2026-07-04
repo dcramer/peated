@@ -14,6 +14,7 @@ import type * as photoIdentificationModule from "@peated/server/lib/photoIdentif
 import waitError from "@peated/server/lib/test/waitError";
 import type { Context } from "@peated/server/orpc/context";
 import { routerClient } from "@peated/server/orpc/router";
+import type * as SentryNode from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, vi } from "vitest";
 
@@ -22,8 +23,19 @@ const extractPhotoBottleEvidenceMock = vi.hoisted(() => vi.fn());
 const copyPendingImageToBottleMock = vi.hoisted(() => vi.fn());
 const copyPendingImageToBottleReleaseMock = vi.hoisted(() => vi.fn());
 const logErrorMock = vi.hoisted(() => vi.fn());
+const sentryLoggerInfoMock = vi.hoisted(() => vi.fn());
 const originalOpenAiApiKey = config.OPENAI_API_KEY;
 
+vi.mock("@sentry/node", async (importOriginal) => {
+  const actual = await importOriginal<typeof SentryNode>();
+  return {
+    ...actual,
+    logger: {
+      ...actual.logger,
+      info: sentryLoggerInfoMock,
+    },
+  };
+});
 vi.mock(
   "@peated/server/agents/bottleClassifier/classifyBottleReference",
   () => ({
@@ -122,14 +134,45 @@ function buildClassification(
 function buildCreateBottleDecision({
   brandName,
   bottleName,
+  confidence = 91,
+  confidenceBasis,
 }: {
   brandName: string;
   bottleName: string;
+  confidence?: number;
+  confidenceBasis?: {
+    band: "low" | "review" | "auto_verification" | "current_assignment";
+    positiveEvidence?: string[];
+    unresolvedRisks?: string[];
+    toolsUsed?: (
+      | "initial_local_candidates"
+      | "search_bottles"
+      | "search_entities"
+      | "openai_web_search"
+      | "firecrawl_web_search"
+      | "none"
+    )[];
+    webEvidence?:
+      | "not_needed"
+      | "not_used"
+      | "supportive"
+      | "weak"
+      | "conflicting";
+  };
 }) {
   return {
     action: "create_bottle",
-    confidence: 91,
+    confidence,
     rationale: "Reliable photo evidence supports creating the bottle.",
+    confidenceBasis: confidenceBasis
+      ? {
+          positiveEvidence: [],
+          unresolvedRisks: [],
+          toolsUsed: [],
+          webEvidence: "not_used",
+          ...confidenceBasis,
+        }
+      : undefined,
     proposedBottle: {
       name: bottleName,
       series: null,
@@ -277,6 +320,7 @@ describe("POST /tastings/photo-identification", () => {
     copyPendingImageToBottleMock.mockClear();
     copyPendingImageToBottleReleaseMock.mockClear();
     logErrorMock.mockClear();
+    sentryLoggerInfoMock.mockClear();
   });
 
   afterEach(() => {
@@ -485,6 +529,20 @@ describe("POST /tastings/photo-identification", () => {
 
     expect(response.suggestedNextStep).toBe("manual_search");
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+    expect(sentryLoggerInfoMock).toHaveBeenCalledWith(
+      "Photo identification completed",
+      expect.objectContaining({
+        "photo_identification.user_id": defaults.user.id,
+        "photo_identification.idempotency_key":
+          "photo-identification-manual-search",
+        "photo_identification.suggested_next_step": "manual_search",
+        "photo_identification.extraction_status": "empty",
+        "photo_identification.final.status": "classified",
+        "photo_identification.final.action": "no_match",
+        "photo_identification.field.brand": "Ardbeg",
+        "photo_identification.field.expression": "Uigeadail",
+      }),
+    );
   });
 
   test("rejects when extraction fails", async ({ fixtures, defaults }) => {
@@ -508,6 +566,17 @@ describe("POST /tastings/photo-identification", () => {
       `[Error: Unable to identify bottle from photo.]`,
     );
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    expect(sentryLoggerInfoMock).toHaveBeenCalledWith(
+      "Photo identification completed",
+      expect.objectContaining({
+        "photo_identification.user_id": defaults.user.id,
+        "photo_identification.idempotency_key":
+          "photo-identification-extraction-failure",
+        "photo_identification.outcome": "failed",
+        "photo_identification.error_name": "Error",
+        "photo_identification.error_message": "vision provider unavailable",
+      }),
+    );
   });
 
   test("creates bottle and release from a reviewed photo identification proposal", async ({
@@ -602,6 +671,134 @@ describe("POST /tastings/photo-identification", () => {
       edition: "Exploration Series No. 1",
       abv: 43,
     });
+  });
+
+  test("routes low-confidence create proposals to manual review", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const identification = await identifyCreateProposal({
+      fixtures,
+      user: defaults.user,
+      idempotencyKey: "photo-identification-low-confidence-create",
+      decision: buildCreateBottleDecision({
+        brandName: "Low Confidence Photo Brand",
+        bottleName: "Review Bottle",
+        confidence: 55,
+      }),
+    });
+
+    expect(identification.suggestedNextStep).toBe("manual_search");
+    expect(identification.classification).toMatchObject({
+      status: "classified",
+      decision: {
+        action: "create_bottle",
+        proposedBottle: {
+          name: "Review Bottle",
+          brand: {
+            name: "Low Confidence Photo Brand",
+          },
+        },
+      },
+    });
+  });
+
+  test("routes review-band create proposals to manual review", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const identification = await identifyCreateProposal({
+      fixtures,
+      user: defaults.user,
+      idempotencyKey: "photo-identification-review-band-create",
+      decision: buildCreateBottleDecision({
+        brandName: "Review Band Photo Brand",
+        bottleName: "Review Band Bottle",
+        confidence: 90,
+        confidenceBasis: {
+          band: "review",
+          positiveEvidence: ["The label text matches a plausible bottle."],
+          unresolvedRisks: ["The bottle versus bottling model is uncertain."],
+          toolsUsed: ["initial_local_candidates"],
+          webEvidence: "not_used",
+        },
+      }),
+    });
+
+    expect(identification.suggestedNextStep).toBe("manual_search");
+  });
+
+  test("rejects low-confidence create proposals before persistence", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const identification = await identifyCreateProposal({
+      fixtures,
+      user: defaults.user,
+      idempotencyKey: "photo-identification-create-low-confidence-reject",
+      decision: buildCreateBottleDecision({
+        brandName: "Rejected Low Confidence Brand",
+        bottleName: "Review Before Save",
+        confidence: 55,
+      }),
+    });
+    const before = await countRows();
+
+    const err = await waitError(
+      routerClient.tastings.photoIdentificationCreate(
+        {
+          pendingImageId: identification.pendingImage.id,
+        },
+        {
+          context: { user: defaults.user },
+        },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Photo identification result needs review before creating a bottle.]`,
+    );
+    await expect(countRows()).resolves.toEqual(before);
+  });
+
+  test("rejects review-band create proposals before persistence", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const identification = await identifyCreateProposal({
+      fixtures,
+      user: defaults.user,
+      idempotencyKey: "photo-identification-create-review-band-reject",
+      decision: buildCreateBottleDecision({
+        brandName: "Rejected Review Band Brand",
+        bottleName: "Review Band Before Save",
+        confidence: 90,
+        confidenceBasis: {
+          band: "review",
+          positiveEvidence: ["The label text matches a plausible bottle."],
+          unresolvedRisks: ["The bottle versus bottling model is uncertain."],
+          toolsUsed: ["initial_local_candidates"],
+          webEvidence: "not_used",
+        },
+      }),
+    });
+    const before = await countRows();
+
+    const err = await waitError(
+      routerClient.tastings.photoIdentificationCreate(
+        {
+          pendingImageId: identification.pendingImage.id,
+        },
+        {
+          context: { user: defaults.user },
+        },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Photo identification result needs review before creating a bottle.]`,
+    );
+    await expect(countRows()).resolves.toEqual(before);
   });
 
   test("approved bottle image on a create bottle proposal writes the canonical bottle image", async ({

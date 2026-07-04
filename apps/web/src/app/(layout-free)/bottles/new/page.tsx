@@ -19,6 +19,31 @@ import { useEffect, useState } from "react";
 
 type ReturnAction = "addBottle" | "library" | "tasting" | "view";
 
+function parseDecimalParam(value: string | null, min: number, max: number) {
+  const trimmed = value?.trim();
+  if (!trimmed) return null;
+
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) && parsed >= min && parsed <= max
+    ? parsed
+    : null;
+}
+
+function parseIntegerParam(value: string | null, min: number, max: number) {
+  const trimmed = value?.trim();
+  if (!trimmed) return null;
+
+  const parsed = Number(trimmed);
+  return Number.isInteger(parsed) && parsed >= min && parsed <= max
+    ? parsed
+    : null;
+}
+
+function getNameChoice(value: string | null) {
+  const name = value?.trim();
+  return name ? { name } : undefined;
+}
+
 function getReturnAction(value: string | null): ReturnAction | null {
   if (value === "addBottle" || value === "choose") {
     return "addBottle";
@@ -53,6 +78,24 @@ function CreateBottleForm() {
   const brand = searchParams.get("brand") || null;
   const bottler = searchParams.get("bottler") || null;
   const series = searchParams.get("series") || null;
+  const brandName = getNameChoice(searchParams.get("brandName"));
+  const currentYear = new Date().getFullYear();
+  const statedAge = parseIntegerParam(searchParams.get("statedAge"), 0, 100);
+  const abv = parseDecimalParam(searchParams.get("abv"), 0, 100);
+  const edition = searchParams.get("edition")?.trim() || null;
+  const vintageYear = parseIntegerParam(
+    searchParams.get("vintageYear"),
+    1800,
+    currentYear,
+  );
+  const releaseYear = parseIntegerParam(
+    searchParams.get("releaseYear"),
+    1800,
+    currentYear,
+  );
+  const showBottleReleaseDetails = Boolean(
+    edition || abv !== null || vintageYear !== null || releaseYear !== null,
+  );
   const canReviewProposal = !!(user?.mod || user?.admin);
 
   if (proposalId && user && !canReviewProposal) {
@@ -66,6 +109,12 @@ function CreateBottleForm() {
 
   const [initialData, setInitialData] = useState<BottleFormInitialData>({
     name,
+    ...(brandName ? { brand: brandName } : {}),
+    ...(statedAge !== null ? { statedAge } : {}),
+    ...(abv !== null ? { abv } : {}),
+    ...(edition ? { edition } : {}),
+    ...(vintageYear !== null ? { vintageYear } : {}),
+    ...(releaseYear !== null ? { releaseYear } : {}),
   });
 
   const distillerQuery = useQuery({
@@ -232,6 +281,7 @@ function CreateBottleForm() {
       title="Create Bottle"
       saveLabel="Create Bottle"
       returnTo={returnTo}
+      showBottleReleaseDetails={showBottleReleaseDetails}
     />
   );
 }

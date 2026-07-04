@@ -1,17 +1,19 @@
 "use client";
 
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { CollectionBottle, PagingRel } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ImagePlus, Trash2 } from "lucide-react";
+import { ImagePlus } from "lucide-react";
 import { useRef, useState } from "react";
 
 const PENDING_UPLOAD_PURPOSE = "photo_tasting_entry";
 
-export default function LibraryEntryImageActions({
+export default function LibraryEntryActions({
   entry,
   username,
 }: {
@@ -28,8 +30,8 @@ export default function LibraryEntryImageActions({
   const imageUpdateMutation = useMutation(
     orpc.collections.bottles.imageUpdate.mutationOptions(),
   );
-  const imageDeleteMutation = useMutation(
-    orpc.collections.bottles.imageDelete.mutationOptions(),
+  const entryDeleteMutation = useMutation(
+    orpc.collections.bottles.delete.mutationOptions(),
   );
   const listQueryKey = orpc.collections.bottles.list.key({
     input: {
@@ -37,10 +39,19 @@ export default function LibraryEntryImageActions({
       collection: "library",
     },
   });
+  const collectionStatusQueryKey = orpc.collections.bottles.list.key({
+    input: {
+      user: "me",
+      collection: "library",
+      bottle: entry.bottle.id,
+      release: entry.release?.id ?? undefined,
+      baseOnly: entry.release == null,
+    },
+  });
   const isBusy =
     pendingUploadMutation.isPending ||
     imageUpdateMutation.isPending ||
-    imageDeleteMutation.isPending;
+    entryDeleteMutation.isPending;
 
   function updateCachedEntry(updatedEntry: CollectionBottle) {
     queryClient.setQueryData<{
@@ -54,6 +65,20 @@ export default function LibraryEntryImageActions({
         results: current.results.map((item) =>
           item.id === updatedEntry.id ? updatedEntry : item,
         ),
+      };
+    });
+  }
+
+  function removeCachedEntry() {
+    queryClient.setQueryData<{
+      results: CollectionBottle[];
+      rel: PagingRel;
+    }>(listQueryKey, (current) => {
+      if (!current) return current;
+
+      return {
+        ...current,
+        results: current.results.filter((item) => item.id !== entry.id),
       };
     });
   }
@@ -79,6 +104,9 @@ export default function LibraryEntryImageActions({
         queryKey: listQueryKey,
         exact: true,
       });
+      await queryClient.invalidateQueries({
+        queryKey: collectionStatusQueryKey,
+      });
     } catch (err) {
       logError(err, { context: "library_image_replace" });
       setError(
@@ -91,22 +119,27 @@ export default function LibraryEntryImageActions({
     }
   }
 
-  async function removeImage() {
+  async function removeFromLibrary() {
     setError(null);
     try {
-      const updatedEntry = await imageDeleteMutation.mutateAsync({
-        user: username,
+      await entryDeleteMutation.mutateAsync({
+        bottle: entry.bottle.id,
+        release: entry.release?.id ?? null,
+        baseOnly: entry.release == null,
+        user: "me",
         collection: "library",
-        collectionBottle: entry.id,
       });
 
-      updateCachedEntry(updatedEntry);
+      removeCachedEntry();
       await queryClient.invalidateQueries({
         queryKey: listQueryKey,
         exact: true,
       });
+      await queryClient.invalidateQueries({
+        queryKey: collectionStatusQueryKey,
+      });
     } catch (err) {
-      logError(err, { context: "library_image_remove" });
+      logError(err, { context: "library_entry_remove" });
       setError(
         getFormErrorMessage(err, {
           expectedErrorNames: ["BAD_REQUEST", "FORBIDDEN", "NOT_FOUND"],
@@ -116,62 +149,61 @@ export default function LibraryEntryImageActions({
   }
 
   return (
-    <div className="flex max-w-full flex-col gap-2 rounded border border-slate-800 bg-slate-950/40 p-2 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex min-w-0 items-center gap-3">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-800 bg-slate-900">
-          {entry.imageUrl ? (
-            <img
-              src={entry.imageUrl}
-              alt={`Library entry image for ${entry.bottle.fullName}`}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <ImagePlus className="text-muted h-6 w-6" aria-hidden="true" />
-          )}
-        </div>
-        <div className="min-w-0">
-          <div className="text-xs font-semibold text-white">
-            Library entry image
+    <div className="contents">
+      <button
+        type="button"
+        className="order-0 flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-800 bg-slate-900 disabled:opacity-60"
+        aria-label={`Edit image for ${entry.bottle.fullName}`}
+        disabled={isBusy}
+        onClick={() => fileInputRef.current?.click()}
+      >
+        {entry.imageUrl ? (
+          <img
+            src={entry.imageUrl}
+            alt={`Photo of ${entry.bottle.fullName}`}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <ImagePlus className="text-muted h-6 w-6" aria-hidden="true" />
+        )}
+      </button>
+      <div className="order-2 min-w-0 shrink-0 self-start">
+        <Menu as="div" className="menu">
+          <MenuButton as={Button} size="small" title="Bottle options">
+            <EllipsisVerticalIcon className="h-5 w-5" aria-hidden="true" />
+            <span className="sr-only">Bottle options</span>
+          </MenuButton>
+          <MenuItems
+            className="absolute left-0 z-40 mt-2 w-44 origin-top-left"
+            unmount={false}
+          >
+            <MenuItem
+              as="button"
+              disabled={isBusy}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Edit Image
+            </MenuItem>
+            <MenuItem
+              as="button"
+              disabled={isBusy}
+              onClick={() => void removeFromLibrary()}
+            >
+              Remove from Library
+            </MenuItem>
+          </MenuItems>
+        </Menu>
+        {error && (
+          <div className="mt-1 text-xs font-medium text-red-300" role="alert">
+            {error}
           </div>
-          <div className="text-muted text-xs">
-            Only for this Library entry. It won't change public bottle or
-            release images, or tasting photos.
-          </div>
-          {error && (
-            <div className="mt-1 text-xs font-medium text-red-300" role="alert">
-              {error}
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="flex shrink-0 flex-wrap gap-2">
-        <Button
-          size="small"
-          icon={<ImagePlus className="h-4 w-4" aria-hidden="true" />}
-          disabled={isBusy}
-          loading={
-            pendingUploadMutation.isPending || imageUpdateMutation.isPending
-          }
-          onClick={() => fileInputRef.current?.click()}
-        >
-          Replace
-        </Button>
-        <Button
-          size="small"
-          color="danger"
-          icon={<Trash2 className="h-4 w-4" aria-hidden="true" />}
-          disabled={isBusy || !entry.imageUrl}
-          loading={imageDeleteMutation.isPending}
-          onClick={() => void removeImage()}
-        >
-          Remove
-        </Button>
+        )}
         <input
           ref={fileInputRef}
           type="file"
           accept="image/*"
           className="hidden"
-          aria-label={`Replace Library entry image for ${entry.bottle.fullName}`}
+          aria-label={`Edit image for ${entry.bottle.fullName}`}
           onChange={(event) => {
             const file = event.currentTarget.files?.[0];
             if (file) void replaceImage(file);

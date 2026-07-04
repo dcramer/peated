@@ -39,7 +39,7 @@ Alternative considered: create a new route such as `/checkIn` or `/captureBottle
 
 Extract the scan/search/review logic from `/addTasting` into a reusable Bottle Resolver. The resolver returns a bottle target, optional release, optional pending image, and result provenance. Intent controls the preferred next action:
 
-- `intent=library`: add to Library confirmation is primary.
+- `intent=library`: Add to Library is primary.
 - `intent=tasting`: Log Tasting is primary.
 - no intent or `intent=choose`: show all applicable outcomes.
 
@@ -49,7 +49,7 @@ Existing bottle matches show Add to Library, Log Tasting, and View Bottle. Missi
 
 Add `image_url` to `collection_bottle`. This represents a user's photo for their saved bottle or release. It does not replace `bottles.image_url` or `bottle_releases.image_url`, and it should be serialized with collection bottle list/detail responses.
 
-Library add can save the resolver's pending image to the collection entry. Image replacement/removal should be implemented as explicit entry image actions so users can update a Library image later without toggling saved state.
+Library add can save the resolver's pending image to the collection entry. Library rows should show the saved image as a thumbnail and expose owner actions for editing the image or removing the entry from Library.
 
 ### Pending images remain reusable until expiry
 
@@ -68,7 +68,7 @@ For a release target, use **Set as release image** and **This photo will be show
 
 The control should be unchecked unless product decides the scan suitability and creation context make opt-in-by-default acceptable. Regardless of default, saving must require the user's submitted form state. The copy should describe approval, not generic upload reuse.
 
-### Library confirmation is a terminal state
+### Added to Library is a terminal state
 
 After adding to Library, keep the user in the Add Bottle flow and show an Added to Library state with the saved entry and image. Primary action: Add Another Bottle. Secondary action: View Library. Add Another Bottle clears resolver state and starts a fresh Add Bottle flow.
 
@@ -86,7 +86,7 @@ After adding to Library, keep the user in the Add Bottle flow and show an Added 
 2. Move the current manual `/addBottle` form to `/bottles/new` and add redirects for legacy create links.
 3. Extract the existing `/addTasting` resolver into a reusable component while keeping current tasting behavior intact.
 4. Make `/addBottle` render the Add Bottle resolver and outcome selection.
-5. Add Library confirmation and image replacement UI.
+5. Add the Added to Library terminal state and Library row image/menu UI.
 6. Update user-facing copy to Log Tasting across navigation, buttons, titles, and empty states.
 
 ## Open Questions

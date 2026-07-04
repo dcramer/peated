@@ -126,7 +126,7 @@ test.describe("profile library", () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test("lets the owner replace and remove a Library entry image", async ({
+  test("lets the owner edit the image and remove a Library entry", async ({
     context,
     page,
   }, testInfo) => {
@@ -159,41 +159,23 @@ test.describe("profile library", () => {
       hasText: savedBottleName,
     });
 
-    await expect(savedBottleRow.getByText("Library entry image")).toBeVisible();
     await expect(
-      savedBottleRow.getByText(
-        "Only for this Library entry. It won't change public bottle or release images, or tasting photos.",
-      ),
+      savedBottleRow.getByRole("button", { name: "Bottle options" }),
     ).toBeVisible();
+    await expect(savedBottleRow.getByText("Library entry image")).toHaveCount(
+      0,
+    );
     await expect(
-      savedBottleRow.getByRole("button", { name: "Replace" }),
-    ).toBeVisible();
-    await expect(
-      savedBottleRow.getByRole("button", { name: "Remove" }),
-    ).toBeDisabled();
+      savedBottleRow.getByText("Only for this Library entry."),
+    ).toHaveCount(0);
 
     await uploadLibraryImage(page, savedBottleRow);
 
     await expect(
       savedBottleRow.getByRole("img", {
-        name: `Library entry image for ${savedBottleName}`,
+        name: `Photo of ${savedBottleName}`,
       }),
     ).toHaveAttribute("src", /library-replaced-\d+\.webp$/);
-    await expect(
-      savedBottleRow.getByRole("button", { name: "Remove" }),
-    ).toBeEnabled();
-
-    await savedBottleRow.getByRole("button", { name: "Remove" }).click();
-
-    await expect(
-      savedBottleRow.getByRole("img", {
-        name: `Library entry image for ${savedBottleName}`,
-      }),
-    ).toHaveCount(0);
-    await expect(
-      savedBottleRow.getByRole("button", { name: "Remove" }),
-    ).toBeDisabled();
-    await expectNoHorizontalOverflow(page);
 
     await signIn(context, {
       accessToken,
@@ -207,22 +189,42 @@ test.describe("profile library", () => {
     await page.goto(`/users/${testUser.username}/library`, {
       waitUntil: "commit",
     });
-
     await expect(
       page
         .getByRole("link", { name: savedBottleName })
         .filter({ visible: true }),
     ).toHaveCount(1);
-    await expect(page.getByRole("button", { name: "Replace" })).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Remove" })).toHaveCount(0);
+    await expect(
+      page.getByRole("button", { name: "Bottle options" }),
+    ).toHaveCount(0);
     await expect(page.getByText("Library entry image")).toHaveCount(0);
+    await expectNoHorizontalOverflow(page);
+
+    await signIn(context, { accessToken });
+    await page.goto(`/users/${testUser.username}/library`, {
+      waitUntil: "commit",
+    });
+
+    await savedBottleRow
+      .getByRole("button", { name: "Bottle options" })
+      .click();
+    await expect(
+      page.getByRole("menuitem", { name: "Remove from Library" }),
+    ).toBeVisible();
+    await page.getByRole("menuitem", { name: "Remove from Library" }).click();
+
+    await expect(savedBottleRow).toHaveCount(0);
+    await expect(
+      page.getByText("No library bottles recorded yet."),
+    ).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
 });
 
 async function uploadLibraryImage(page: Page, row: Locator) {
   const fileChooserPromise = page.waitForEvent("filechooser");
-  await row.getByRole("button", { name: "Replace" }).click();
+  await row.getByRole("button", { name: "Bottle options" }).click();
+  await page.getByRole("menuitem", { name: "Edit Image" }).click();
   const fileChooser = await fileChooserPromise;
   await fileChooser.setFiles({
     name: "library-label.png",
