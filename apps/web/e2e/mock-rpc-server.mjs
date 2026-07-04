@@ -424,6 +424,9 @@ async function handleRpcRequest({ request, response, url }) {
         sendRpcError(response, "Could not save to Library.");
         return true;
       }
+      if (getAccessToken(request).includes("library-create-slow")) {
+        await delay(500);
+      }
       sendRpcResponse(
         response,
         mutateCollectionBottle(request, input, "create"),

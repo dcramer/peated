@@ -145,6 +145,12 @@ function LoadingTargetPanel() {
   );
 }
 
+function revokeBlobPreviewUrl(target: BottleResolverTarget) {
+  if (target.previewUrl?.startsWith("blob:")) {
+    URL.revokeObjectURL(target.previewUrl);
+  }
+}
+
 function TargetLoadErrorPanel({
   message,
   onStartOver,
@@ -585,8 +591,10 @@ function AddBottleFlowContent() {
         suggestedTags,
         createdAt: new Date().toISOString(),
       });
+      revokeBlobPreviewUrl(target);
     } catch (err) {
       logError(err);
+      setSelectedTarget(target);
       setTastingLoadError(
         "We couldn't load the tasting form. Try again or search for the bottle.",
       );
@@ -599,23 +607,33 @@ function AddBottleFlowContent() {
     target: BottleResolverTarget,
     action?: "library" | "tasting",
   ) {
-    setSelectedTarget(target);
     setLibraryError(undefined);
     setAddedEntry(null);
     setTastingDraft(null);
     setTastingLoadError(undefined);
 
     if (action === "library") {
-      await addToLibrary(target);
+      await addToLibrary(target, { showOutcomeWhileSaving: false });
     } else if (action === "tasting") {
       await startLogTasting(target);
+    } else {
+      setSelectedTarget(target);
     }
   }
 
-  async function addToLibrary(target = selectedTarget) {
+  async function addToLibrary(
+    target = selectedTarget,
+    {
+      showOutcomeWhileSaving = true,
+    }: {
+      showOutcomeWhileSaving?: boolean;
+    } = {},
+  ) {
     if (!target) return;
 
-    setSelectedTarget(target);
+    if (showOutcomeWhileSaving) {
+      setSelectedTarget(target);
+    }
     setLibraryError(undefined);
     setTastingDraft(null);
     if (target.hasExactLibraryEntry) return;
@@ -630,8 +648,10 @@ function AddBottleFlowContent() {
       });
       setAddedEntry(entry);
       setSelectedTarget(null);
+      revokeBlobPreviewUrl(target);
     } catch (err) {
       logError(err);
+      setSelectedTarget(target);
       setLibraryError(
         getFormErrorMessage(err, {
           expectedErrorNames: ["BAD_REQUEST", "CONFLICT"],

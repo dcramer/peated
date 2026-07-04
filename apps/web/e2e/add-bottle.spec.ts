@@ -393,7 +393,7 @@ test.describe("add bottle flow", () => {
     page,
   }, testInfo) => {
     await signIn(context, {
-      accessToken: uniqueAccessToken(testInfo, "scan-library"),
+      accessToken: uniqueAccessToken(testInfo, "scan-library-create-slow"),
     });
 
     await page.goto("/addBottle");
@@ -408,6 +408,10 @@ test.describe("add bottle flow", () => {
       page.getByRole("link", { name: "View Bottle" }),
     ).toHaveAttribute("href", `/bottles/${existingBottle.id}`);
     await page.getByRole("button", { name: "Add to Library" }).click();
+    await expect(page.getByText("Match found")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Bottle found" }),
+    ).toBeHidden();
 
     await expect(
       page.getByRole("heading", { name: "Added to Library" }),
