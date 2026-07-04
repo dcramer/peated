@@ -1,7 +1,9 @@
 "use client";
 import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import LibraryEntryActions from "@peated/web/components/libraryEntryActions";
+import LibraryEntryActions, {
+  LibraryEntryImage,
+} from "@peated/web/components/libraryEntryActions";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -34,6 +36,11 @@ function UserLibraryTable({ username }: { username: string }) {
     <BottleTable
       bottleList={bottles.results}
       rel={bottles.rel}
+      renderCollectionBottleImage={
+        canEditLibraryImages
+          ? (entry) => <LibraryEntryImage entry={entry} username={username} />
+          : undefined
+      }
       renderCollectionBottleActions={
         canEditLibraryImages
           ? (entry) => <LibraryEntryActions entry={entry} username={username} />

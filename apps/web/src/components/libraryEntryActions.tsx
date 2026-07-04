@@ -13,7 +13,7 @@ import { useRef, useState } from "react";
 
 const PENDING_UPLOAD_PURPOSE = "photo_tasting_entry";
 
-export default function LibraryEntryActions({
+function useLibraryEntryMutations({
   entry,
   username,
 }: {
@@ -148,11 +148,33 @@ export default function LibraryEntryActions({
     }
   }
 
+  return {
+    error,
+    fileInputRef,
+    isBusy,
+    removeFromLibrary,
+    replaceImage,
+  };
+}
+
+export function LibraryEntryImage({
+  entry,
+  username,
+}: {
+  entry: CollectionBottle;
+  username: string;
+}) {
+  const { error, fileInputRef, isBusy, replaceImage } =
+    useLibraryEntryMutations({
+      entry,
+      username,
+    });
+
   return (
-    <div className="contents">
+    <div className="min-w-0 shrink-0">
       <button
         type="button"
-        className="order-0 flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-800 bg-slate-900 disabled:opacity-60"
+        className="flex h-12 w-12 items-center justify-center overflow-hidden rounded border border-slate-800 bg-slate-900 disabled:opacity-60"
         aria-label={`Edit image for ${entry.bottle.fullName}`}
         disabled={isBusy}
         onClick={() => fileInputRef.current?.click()}
@@ -167,49 +189,82 @@ export default function LibraryEntryActions({
           <ImagePlus className="text-muted h-6 w-6" aria-hidden="true" />
         )}
       </button>
-      <div className="order-2 min-w-0 shrink-0 self-start">
-        <Menu as="div" className="menu">
-          <MenuButton as={Button} size="small" title="Bottle options">
-            <EllipsisVerticalIcon className="h-5 w-5" aria-hidden="true" />
-            <span className="sr-only">Bottle options</span>
-          </MenuButton>
-          <MenuItems
-            className="absolute left-0 z-40 mt-2 w-44 origin-top-left"
-            unmount={false}
+      {error && (
+        <div className="mt-1 text-xs font-medium text-red-300" role="alert">
+          {error}
+        </div>
+      )}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        aria-label={`Edit image for ${entry.bottle.fullName}`}
+        onChange={(event) => {
+          const file = event.currentTarget.files?.[0];
+          if (file) void replaceImage(file);
+        }}
+      />
+    </div>
+  );
+}
+
+export default function LibraryEntryActions({
+  entry,
+  username,
+}: {
+  entry: CollectionBottle;
+  username: string;
+}) {
+  const { error, fileInputRef, isBusy, removeFromLibrary, replaceImage } =
+    useLibraryEntryMutations({
+      entry,
+      username,
+    });
+
+  return (
+    <div className="min-w-0 shrink-0">
+      <Menu as="div" className="menu">
+        <MenuButton as={Button} size="small" title="Bottle options">
+          <EllipsisVerticalIcon className="h-5 w-5" aria-hidden="true" />
+          <span className="sr-only">Bottle options</span>
+        </MenuButton>
+        <MenuItems
+          className="absolute right-0 z-40 mt-2 w-44 origin-top-right"
+          unmount={false}
+        >
+          <MenuItem
+            as="button"
+            disabled={isBusy}
+            onClick={() => fileInputRef.current?.click()}
           >
-            <MenuItem
-              as="button"
-              disabled={isBusy}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              Edit Image
-            </MenuItem>
-            <MenuItem
-              as="button"
-              disabled={isBusy}
-              onClick={() => void removeFromLibrary()}
-            >
-              Remove from Library
-            </MenuItem>
-          </MenuItems>
-        </Menu>
-        {error && (
-          <div className="mt-1 text-xs font-medium text-red-300" role="alert">
-            {error}
-          </div>
-        )}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          aria-label={`Edit image for ${entry.bottle.fullName}`}
-          onChange={(event) => {
-            const file = event.currentTarget.files?.[0];
-            if (file) void replaceImage(file);
-          }}
-        />
-      </div>
+            Edit Image
+          </MenuItem>
+          <MenuItem
+            as="button"
+            disabled={isBusy}
+            onClick={() => void removeFromLibrary()}
+          >
+            Remove from Library
+          </MenuItem>
+        </MenuItems>
+      </Menu>
+      {error && (
+        <div className="mt-1 text-xs font-medium text-red-300" role="alert">
+          {error}
+        </div>
+      )}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        aria-label={`Edit image for ${entry.bottle.fullName}`}
+        onChange={(event) => {
+          const file = event.currentTarget.files?.[0];
+          if (file) void replaceImage(file);
+        }}
+      />
     </div>
   );
 }

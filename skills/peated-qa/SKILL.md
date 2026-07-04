@@ -106,18 +106,39 @@ Minimal input-file payload:
 ## UI QA
 
 1. Start API and web with matched origins.
-2. Use `agent-browser` for browser checks.
-3. Verify desktop and mobile widths for changed user-facing flows.
-4. Prefer normal login:
+2. Read `docs/development/local-ui-verification.md` before protected,
+   owner-only, or moderator UI checks.
+3. Choose the auth primitive before opening the target route:
+   - Public/read-only route: no session setup.
+   - Normal protected workflow: use the UI login path.
+   - Owner/moderator-only visual check: use the local verification playbook to
+     create a session cookie for the exact user/role being inspected, then
+     reload the target route.
+   - Protected mutation: use a real local user and access token/session, not a
+     display-only cookie.
+4. Use `agent-browser` for browser checks.
+5. Open the exact target route after auth is ready, then inspect it with both
+   accessibility snapshots and screenshots.
+6. Verify desktop and mobile widths for changed user-facing flows.
+7. Prefer normal login:
    `/login?redirectTo=/addBottle` -> `Sign in with Email` -> `Or sign in with a password`.
-5. For local protected UI checks, seed a throwaway verified active user with
+8. For local protected UI checks, seed a throwaway verified active user with
    `termsAcceptedAt`, then log in through the UI. Do not use bearer-token API
    setup or a manually sealed `_session` cookie for UI QA unless normal UI login
    is blocked by unrelated local service noise.
-6. For moderator flows, set that throwaway user `mod: true`.
-7. For bottle entry changes, check `/addBottle` and `/bottles/<id>/edit`.
-8. Inspect rendered state, network/API outcome, persistence after reload, and error/empty/loading states when changed.
-9. Clean up throwaway local users/records when done.
+9. For moderator flows, set that throwaway user `mod: true`.
+10. For bottle entry changes, check `/addBottle` and `/bottles/<id>/edit`.
+11. Inspect rendered state, network/API outcome, persistence after reload, and error/empty/loading states when changed.
+12. Clean up throwaway local users/records when done.
+
+Agent-browser primitives:
+
+- Set the viewport before capture: desktop first, then mobile.
+- Use `snapshot -i -c` to verify reachable controls and table/list structure.
+- Save screenshots under `/tmp` with names that include the route and viewport.
+- For owner-only columns or controls, verify the public state only if it is part
+  of the requested behavior; otherwise authenticate first and avoid spending
+  time on the wrong state.
 
 ## Finish With Evidence
 

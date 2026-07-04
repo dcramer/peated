@@ -31,11 +31,13 @@ type BottleRow = {
 export default function BottleTable({
   bottleList,
   rel,
+  renderCollectionBottleImage,
   renderCollectionBottleActions,
   ...props
 }: Omit<ComponentProps<typeof Table>, "items" | "rel" | "columns"> & {
   bottleList: (Bottle | CollectionBottle)[];
   rel?: PagingRel;
+  renderCollectionBottleImage?: (item: CollectionBottle) => ReactNode;
   renderCollectionBottleActions?: (item: CollectionBottle) => ReactNode;
 }) {
   const rows: BottleRow[] = bottleList.map((item) =>
@@ -62,7 +64,10 @@ export default function BottleTable({
           sortDefaultOrder: "asc",
           className: "min-w-full sm:w-1/2",
           value: (item) => {
-            const collectionActions =
+            const collectionImage =
+              item.collectionBottle &&
+              renderCollectionBottleImage?.(item.collectionBottle);
+            const mobileCollectionActions =
               item.collectionBottle &&
               renderCollectionBottleActions?.(item.collectionBottle);
 
@@ -70,17 +75,17 @@ export default function BottleTable({
               <div
                 className={classNames(
                   "min-w-0",
-                  collectionActions
+                  collectionImage
                     ? "flex items-start gap-3"
                     : "flex flex-col justify-center gap-y-2",
                 )}
               >
-                {collectionActions}
+                {collectionImage}
                 <div
                   className={classNames(
                     "min-w-0",
-                    collectionActions
-                      ? "order-1 flex flex-1 flex-col justify-center gap-y-2"
+                    collectionImage
+                      ? "flex flex-1 flex-col justify-center gap-y-2"
                       : "flex flex-col justify-center gap-y-2",
                   )}
                 >
@@ -116,6 +121,11 @@ export default function BottleTable({
                     )}
                   </div>
                 </div>
+                {mobileCollectionActions && (
+                  <div className="ml-auto shrink-0 sm:hidden">
+                    {mobileCollectionActions}
+                  </div>
+                )}
               </div>
             );
           },
@@ -147,6 +157,22 @@ export default function BottleTable({
           className: "sm:w-1/6",
           sortDefaultOrder: "desc",
         },
+        ...(renderCollectionBottleActions
+          ? [
+              {
+                name: "actions",
+                title: "",
+                align: "right" as const,
+                value: (item: BottleRow) =>
+                  item.collectionBottle ? (
+                    <div className="hidden justify-end sm:flex">
+                      {renderCollectionBottleActions(item.collectionBottle)}
+                    </div>
+                  ) : null,
+                className: "sm:w-16",
+              },
+            ]
+          : []),
       ]}
       {...props}
     />
