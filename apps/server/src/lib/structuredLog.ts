@@ -1,4 +1,5 @@
 import { logger } from "@sentry/node";
+import config from "../config";
 
 type StructuredLogAttributes = Record<
   string,
@@ -6,5 +7,9 @@ type StructuredLogAttributes = Record<
 >;
 
 export function logInfo(message: string, attributes: StructuredLogAttributes) {
+  if (config.ENV === "development") {
+    console.info(`[structured] ${message}`, attributes);
+  }
+
   logger.info(message, attributes);
 }
