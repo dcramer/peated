@@ -633,10 +633,10 @@ test.describe("add bottle flow", () => {
     await page.goto("/addBottle");
     await uploadLabel(page);
 
-    await expect(page.getByText("Bottle not in Peated yet")).toBeVisible();
+    await expect(page.getByText("We couldn't find this bottle")).toBeVisible();
     await expect(
       page.getByText(
-        "We found label details, but not enough to create it automatically.",
+        "We found label details, but not enough to choose an existing bottle automatically.",
       ),
     ).toBeVisible();
     await expect(page.getByText(testBrand.name)).toBeVisible();

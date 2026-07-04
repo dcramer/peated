@@ -501,6 +501,84 @@ describe("POST /tastings/photo-identification", () => {
     );
     expect(extractPhotoBottleEvidenceMock).not.toHaveBeenCalled();
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    expect(sentryLoggerInfoMock).toHaveBeenCalledWith(
+      "Bottle photo identification completed",
+      expect.objectContaining({
+        "photo_identification.user_id": defaults.user.id,
+        "photo_identification.idempotency_key":
+          "photo-identification-oversized",
+        "photo_identification.outcome": "rejected",
+        "photo_identification.error_message":
+          "File exceeded maximum upload size of 20.0 MiB.",
+      }),
+    );
+  });
+
+  test("uses exact Peated aliases before full photo classification", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "Uigeadail" });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Ardbeg Uigeadail",
+    });
+    extractPhotoBottleEvidenceMock.mockImplementation(
+      async ({ pendingUpload }) => ({
+        extractedIdentity: {
+          brand: "Ardbeg",
+          expression: "Uigeadail",
+          series: null,
+          distillery: ["Ardbeg"],
+          bottler: null,
+          category: "single_malt",
+          stated_age: null,
+          abv: null,
+          vintage_year: null,
+          release_year: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        imageEvidence: buildImageEvidence(pendingUpload.id),
+      }),
+    );
+
+    const response = await routerClient.tastings.photoIdentification(
+      {
+        file: await fixtures.SampleSquareImage(),
+        idempotencyKey: "photo-identification-exact-alias",
+      },
+      {
+        context: { user: defaults.user },
+      },
+    );
+
+    expect(response.suggestedNextStep).toBe("confirm_match");
+    expect(response.classification).toMatchObject({
+      status: "classified",
+      decision: {
+        action: "match",
+        matchedBottleId: bottle.id,
+        matchedReleaseId: null,
+      },
+    });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    expect(sentryLoggerInfoMock).toHaveBeenCalledWith(
+      "Bottle photo identification completed",
+      expect.objectContaining({
+        "photo_identification.user_id": defaults.user.id,
+        "photo_identification.idempotency_key":
+          "photo-identification-exact-alias",
+        "photo_identification.reference_name": "Ardbeg Uigeadail",
+        "photo_identification.local.action": "match",
+        "photo_identification.final.action": "match",
+        "photo_identification.final.matched_bottle_id": bottle.id,
+        "photo_identification.final.candidate_names": expect.arrayContaining([
+          bottle.fullName,
+        ]),
+      }),
+    );
   });
 
   test("falls back to manual search when classifier does not match", async ({
@@ -514,7 +592,27 @@ describe("POST /tastings/photo-identification", () => {
       }),
     );
     classifyBottleReferenceMock.mockResolvedValue(
-      buildClassification({ action: "no_match" }),
+      buildClassification(
+        { action: "no_match" },
+        {
+          searchEvidence: [
+            {
+              provider: "openai",
+              query: "Ardbeg Uigeadail whisky",
+              summary: "Ardbeg Uigeadail is a real whisky.",
+              results: [
+                {
+                  title: "Ardbeg Uigeadail",
+                  url: "https://www.ardbeg.com/en-us/whiskies/uigeadail",
+                  domain: "ardbeg.com",
+                  description: "Official product page.",
+                  extraSnippets: [],
+                },
+              ],
+            },
+          ],
+        },
+      ),
     );
 
     const response = await routerClient.tastings.photoIdentification(
@@ -530,7 +628,7 @@ describe("POST /tastings/photo-identification", () => {
     expect(response.suggestedNextStep).toBe("manual_search");
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
     expect(sentryLoggerInfoMock).toHaveBeenCalledWith(
-      "Photo identification completed",
+      "Bottle photo identification completed",
       expect.objectContaining({
         "photo_identification.user_id": defaults.user.id,
         "photo_identification.idempotency_key":
@@ -539,6 +637,14 @@ describe("POST /tastings/photo-identification", () => {
         "photo_identification.extraction_status": "empty",
         "photo_identification.final.status": "classified",
         "photo_identification.final.action": "no_match",
+        "photo_identification.final.search_evidence_count": 1,
+        "photo_identification.final.search_evidence_result_count": 1,
+        "photo_identification.final.search_queries": [
+          "Ardbeg Uigeadail whisky",
+        ],
+        "photo_identification.final.search_result_summaries": [
+          "Ardbeg Uigeadail - ardbeg.com",
+        ],
         "photo_identification.field.brand": "Ardbeg",
         "photo_identification.field.expression": "Uigeadail",
       }),
@@ -567,7 +673,7 @@ describe("POST /tastings/photo-identification", () => {
     );
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
     expect(sentryLoggerInfoMock).toHaveBeenCalledWith(
-      "Photo identification completed",
+      "Bottle photo identification completed",
       expect.objectContaining({
         "photo_identification.user_id": defaults.user.id,
         "photo_identification.idempotency_key":

@@ -381,9 +381,9 @@ function getManualResultCopy(
   if (action === "no_match") {
     if (hasRecognizedLabelDetails(result)) {
       return {
-        title: "Bottle not in Peated yet",
+        title: "We couldn't find this bottle",
         description:
-          "We found label details, but not enough to create it automatically. Review them to create the bottle in Peated.",
+          "We found label details, but not enough to choose an existing bottle automatically. Review them before creating it in Peated.",
         createLabel: "Create Bottle",
         primaryAction: "create" as const,
       };
@@ -404,9 +404,9 @@ function getManualResultCopy(
     action === "create_bottle_and_release"
   ) {
     return {
-      title: "Bottle not in Peated yet",
+      title: "We couldn't find this bottle",
       description:
-        "We found label details, but not enough to create it automatically. Review them to create the bottle in Peated.",
+        "We found label details, but not enough to choose an existing bottle automatically. Review them before creating it in Peated.",
       createLabel: "Create Bottle",
       primaryAction: "create" as const,
     };

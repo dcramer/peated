@@ -37,6 +37,8 @@ type PhotoIdentificationClassification = Awaited<
 >;
 
 export const PHOTO_IDENTIFICATION_CREATE_CONFIDENCE_THRESHOLD = 70;
+const PHOTO_IDENTIFICATION_LOG_MESSAGE =
+  "Bottle photo identification completed";
 
 const photoIdentificationRateLimit = createRateLimit<AuthenticatedContext>({
   windowMs: 60 * 60 * 1000,
@@ -307,6 +309,29 @@ function getClassificationLogAttributes(
   return attrs;
 }
 
+function getSearchEvidenceLogAttributes(
+  prefix: string,
+  classification: PhotoIdentificationClassification,
+) {
+  const searchEvidence = classification.artifacts.searchEvidence;
+  const resultSummaries = searchEvidence.flatMap((evidence) =>
+    evidence.results.map((result) =>
+      [result.title, result.domain ?? new URL(result.url).hostname]
+        .filter(Boolean)
+        .join(" - "),
+    ),
+  );
+
+  return {
+    [`${prefix}.search_evidence_count`]: searchEvidence.length,
+    [`${prefix}.search_evidence_result_count`]: resultSummaries.length,
+    [`${prefix}.search_queries`]: searchEvidence
+      .map((evidence) => evidence.query)
+      .slice(0, 5),
+    [`${prefix}.search_result_summaries`]: resultSummaries.slice(0, 5),
+  };
+}
+
 /**
  * Emits one searchable event for each completed photo identification call so
  * production misses can be debugged without reconstructing classifier spans.
@@ -362,6 +387,10 @@ function logPhotoIdentificationOutcome({
         "photo_identification.final",
         classification,
       ),
+      ...getSearchEvidenceLogAttributes(
+        "photo_identification.final",
+        classification,
+      ),
     };
 
   if (diagnostics.extraction.summary) {
@@ -386,7 +415,30 @@ function logPhotoIdentificationOutcome({
       candidate.confidence;
   }
 
-  logInfo("Photo identification completed", attrs);
+  logInfo(PHOTO_IDENTIFICATION_LOG_MESSAGE, attrs);
+}
+
+function logPhotoIdentificationRejected({
+  context,
+  idempotencyKey,
+  file,
+  outcome,
+  reason,
+}: {
+  context: AuthenticatedContext;
+  idempotencyKey: string;
+  file: Blob;
+  outcome: string;
+  reason: string;
+}) {
+  logInfo(PHOTO_IDENTIFICATION_LOG_MESSAGE, {
+    "photo_identification.user_id": context.user.id,
+    "photo_identification.idempotency_key": idempotencyKey,
+    "photo_identification.outcome": outcome,
+    "photo_identification.file_size": file.size,
+    "photo_identification.file_type": file.type || "unknown",
+    "photo_identification.error_message": reason,
+  });
 }
 
 function logPhotoIdentificationFailure({
@@ -404,7 +456,7 @@ function logPhotoIdentificationFailure({
 }) {
   const error = err instanceof Error ? err : null;
 
-  logInfo("Photo identification completed", {
+  logInfo(PHOTO_IDENTIFICATION_LOG_MESSAGE, {
     "photo_identification.user_id": context.user.id,
     "photo_identification.pending_image_id": pendingImage.id,
     "photo_identification.idempotency_key": idempotencyKey,
@@ -442,12 +494,8 @@ export async function identifyPendingImage({
       extractedIdentity,
       imageEvidence,
     };
-    const localIdentification = await identifyExistingBottleReference(
-      classificationInput,
-      {
-        allowExactAliasPreflight: false,
-      },
-    );
+    const localIdentification =
+      await identifyExistingBottleReference(classificationInput);
     const classification =
       localIdentification.status === "classified" &&
       localIdentification.decision.action === "match"
@@ -486,18 +534,43 @@ export default procedure
     const { file, idempotencyKey } = input;
 
     if (file.size > MAX_FILESIZE) {
+      logPhotoIdentificationRejected({
+        context,
+        idempotencyKey,
+        file,
+        outcome: "rejected",
+        reason: `File exceeded maximum upload size of ${humanizeBytes(MAX_FILESIZE)}.`,
+      });
       throw errors.PAYLOAD_TOO_LARGE({
         message: `File exceeded maximum upload size of ${humanizeBytes(MAX_FILESIZE)}.`,
       });
     }
 
-    const pendingImage = await createPendingImageUpload({
-      file,
-      purpose: "photo_tasting_entry",
-      idempotencyKey,
-      createdById: context.user.id,
-      onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
-    });
+    let pendingImage: Awaited<ReturnType<typeof createPendingImageUpload>>;
+    try {
+      pendingImage = await createPendingImageUpload({
+        file,
+        purpose: "photo_tasting_entry",
+        idempotencyKey,
+        createdById: context.user.id,
+        onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
+      });
+    } catch (err) {
+      const error = err instanceof Error ? err : null;
+      logPhotoIdentificationRejected({
+        context,
+        idempotencyKey,
+        file,
+        outcome: "failed",
+        reason:
+          error?.message ??
+          "Unable to create pending image for photo identification.",
+      });
+      throw errors.INTERNAL_SERVER_ERROR({
+        message: "Unable to process bottle photo.",
+        cause: err,
+      });
+    }
 
     let identification: Awaited<ReturnType<typeof identifyPendingImage>>;
     try {
