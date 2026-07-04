@@ -133,7 +133,7 @@ test.describe("create bottle", () => {
     ).toBeVisible();
   });
 
-  test("starts another add bottle flow from add bottle intent", async ({
+  test("returns to the created bottle from add bottle intent", async ({
     context,
     page,
   }) => {
@@ -144,11 +144,15 @@ test.describe("create bottle", () => {
     );
     await submitCreateBottle(page);
 
-    await expect(page).toHaveURL(/\/addBottle$/);
+    await expect(page).toHaveURL(
+      new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=addBottle$`),
+    );
     await expect(
-      page.getByRole("heading", { name: "Add Bottle" }),
+      page.getByRole("heading", { name: "Bottle found" }),
     ).toBeVisible();
-    await expect(page.getByText("Take or upload a photo")).toBeVisible();
+    await expect(
+      page.getByText(`${testBrand.name} ${createdBottleName}`),
+    ).toBeVisible();
   });
 
   test("adds the created bottle to library from library intent", async ({
@@ -163,12 +167,16 @@ test.describe("create bottle", () => {
     await submitCreateBottle(page);
 
     await expect(page).toHaveURL(
-      new RegExp(`/users/${testUser.username}/library$`),
+      new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=library$`),
     );
     await expect(
-      page.getByRole("link", {
-        name: `${testBrand.name} ${createdBottleName}`,
-      }),
+      page.getByRole("heading", { name: "Bottle found" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(`${testBrand.name} ${createdBottleName}`),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "In Library" }),
     ).toBeVisible();
   });
 
@@ -414,12 +422,10 @@ test.describe("add bottle flow", () => {
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "View Library" }),
-    ).toHaveAttribute("href", `/users/${testUser.username}/library`);
+    ).toHaveAttribute("href", "/library");
 
     await page.getByRole("link", { name: "View Library" }).click();
-    await expect(page).toHaveURL(
-      new RegExp(`/users/${testUser.username}/library$`),
-    );
+    await expect(page).toHaveURL(/\/library$/);
     await expect(
       page.getByRole("link", { name: existingBottle.fullName }),
     ).toBeVisible();
@@ -680,7 +686,7 @@ test.describe("add bottle flow", () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test("creates a catalog bottle from a no-match scan and returns to Add Bottle", async ({
+  test("creates a catalog bottle from a no-match scan and shows the created bottle", async ({
     context,
     page,
   }, testInfo) => {
@@ -701,11 +707,15 @@ test.describe("add bottle flow", () => {
     ).toBeVisible();
     await page.getByRole("button", { name: "Create Bottle" }).click();
 
-    await expect(page).toHaveURL(/\/addBottle$/);
+    await expect(page).toHaveURL(
+      new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=addBottle$`),
+    );
     await expect(
-      page.getByRole("heading", { name: "Add Bottle" }),
+      page.getByRole("heading", { name: "Bottle found" }),
     ).toBeVisible();
-    await expect(page.getByText("Take or upload a photo")).toBeVisible();
+    await expect(
+      page.getByText(`${testBrand.name} ${createdBottleName}`),
+    ).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
 });

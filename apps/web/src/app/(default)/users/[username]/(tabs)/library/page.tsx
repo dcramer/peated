@@ -3,6 +3,7 @@ import BottleTable from "@peated/web/components/bottleTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import LibraryEntryActions, {
   LibraryEntryImage,
+  LibraryEntryThumbnail,
 } from "@peated/web/components/libraryEntryActions";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -36,10 +37,13 @@ function UserLibraryTable({ username }: { username: string }) {
     <BottleTable
       bottleList={bottles.results}
       rel={bottles.rel}
-      renderCollectionBottleImage={
-        canEditLibraryImages
-          ? (entry) => <LibraryEntryImage entry={entry} username={username} />
-          : undefined
+      showBottleStats={false}
+      renderCollectionBottleImage={(entry) =>
+        canEditLibraryImages ? (
+          <LibraryEntryImage entry={entry} username={username} />
+        ) : (
+          <LibraryEntryThumbnail entry={entry} />
+        )
       }
       renderCollectionBottleActions={
         canEditLibraryImages

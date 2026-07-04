@@ -253,12 +253,12 @@ function CreateBottleForm() {
             collection: "library",
           });
           router.replace(
-            user?.username ? `/users/${user.username}/library` : "/bottles",
+            getAddBottleHref({ bottleId: createdBottle.id, intent: "library" }),
           );
         } else if (returnAction === "view") {
           router.replace(`/bottles/${createdBottle.id}`);
         } else if (returnAction === "addBottle") {
-          router.replace("/addBottle");
+          router.replace(getAddBottleHref({ bottleId: createdBottle.id }));
         } else if (returnAction === "tasting") {
           router.replace(
             getAddBottleHref({

@@ -17,7 +17,6 @@ import type { CreateBottlePrefill } from "@peated/web/components/search/createBo
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import Spinner from "@peated/web/components/spinner";
 import TastingForm from "@peated/web/components/tastingForm";
-import useAuth from "@peated/web/hooks/useAuth";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { getBottleBottlingPath } from "@peated/web/lib/bottlings";
@@ -228,40 +227,52 @@ function MatchedOutcomeActions({
   hasExactLibraryEntry,
   loadingExactLibraryStatus,
   resolvingAction,
+  intent,
   onResolve,
-}: BottleResolverMatchedActionsProps) {
-  return (
-    <div className="grid gap-3 sm:grid-cols-3">
-      <OutcomeButton
-        onClick={() => onResolve("library")}
-        icon={<BookOpen className="h-4 w-4" />}
-        emphasized
-        disabled={
-          Boolean(resolvingAction) ||
-          loadingExactLibraryStatus ||
-          hasExactLibraryEntry
-        }
-        loading={resolvingAction === "library" || loadingExactLibraryStatus}
-      >
-        {hasExactLibraryEntry ? "In Library" : "Add to Library"}
-      </OutcomeButton>
-      <OutcomeButton
-        onClick={() => onResolve("tasting")}
-        icon={<Wine className="h-4 w-4" />}
-        emphasized
-        disabled={Boolean(resolvingAction)}
-        loading={resolvingAction === "tasting"}
-      >
-        Log Tasting
-      </OutcomeButton>
-      <OutcomeButton
-        href={getViewBottleHrefByIds(bottleId, releaseId)}
-        icon={<Eye className="h-4 w-4" />}
-      >
-        View Bottle
-      </OutcomeButton>
-    </div>
+}: BottleResolverMatchedActionsProps & { intent: AddBottleIntent }) {
+  const libraryButton = (
+    <OutcomeButton
+      key="library"
+      onClick={() => onResolve("library")}
+      icon={<BookOpen className="h-4 w-4" />}
+      emphasized
+      disabled={
+        Boolean(resolvingAction) ||
+        loadingExactLibraryStatus ||
+        hasExactLibraryEntry
+      }
+      loading={resolvingAction === "library" || loadingExactLibraryStatus}
+    >
+      {hasExactLibraryEntry ? "In Library" : "Add to Library"}
+    </OutcomeButton>
   );
+  const tastingButton = (
+    <OutcomeButton
+      key="tasting"
+      onClick={() => onResolve("tasting")}
+      icon={<Wine className="h-4 w-4" />}
+      emphasized
+      disabled={Boolean(resolvingAction)}
+      loading={resolvingAction === "tasting"}
+    >
+      Log Tasting
+    </OutcomeButton>
+  );
+  const viewButton = (
+    <OutcomeButton
+      key="view"
+      href={getViewBottleHrefByIds(bottleId, releaseId)}
+      icon={<Eye className="h-4 w-4" />}
+    >
+      View Bottle
+    </OutcomeButton>
+  );
+  const actionButtons =
+    intent === "tasting"
+      ? [tastingButton, libraryButton, viewButton]
+      : [libraryButton, tastingButton, viewButton];
+
+  return <div className="grid gap-3 sm:grid-cols-3">{actionButtons}</div>;
 }
 
 function OutcomeSelection({
@@ -283,6 +294,46 @@ function OutcomeSelection({
   loggingTasting: boolean;
   error?: string;
 }) {
+  const libraryButton = (
+    <OutcomeButton
+      key="library"
+      onClick={onAddToLibrary}
+      icon={<BookOpen className="h-4 w-4" />}
+      emphasized
+      disabled={
+        target.hasExactLibraryEntry || addingToLibrary || loggingTasting
+      }
+      loading={addingToLibrary}
+    >
+      {target.hasExactLibraryEntry ? "In Library" : "Add to Library"}
+    </OutcomeButton>
+  );
+  const tastingButton = (
+    <OutcomeButton
+      key="tasting"
+      onClick={onLogTasting}
+      icon={<Wine className="h-4 w-4" />}
+      emphasized
+      disabled={loggingTasting}
+      loading={loggingTasting}
+    >
+      Log Tasting
+    </OutcomeButton>
+  );
+  const viewButton = (
+    <OutcomeButton
+      key="view"
+      href={getViewBottleHref(target)}
+      icon={<Eye className="h-4 w-4" />}
+    >
+      View Bottle
+    </OutcomeButton>
+  );
+  const actionButtons =
+    intent === "tasting"
+      ? [tastingButton, libraryButton, viewButton]
+      : [libraryButton, tastingButton, viewButton];
+
   return (
     <Layout footer={null} header={<FlowHeader>{null}</FlowHeader>}>
       <div className="mx-auto mt-5 max-w-3xl space-y-5">
@@ -308,36 +359,7 @@ function OutcomeSelection({
                 Choose what you want to do with this bottle.
               </p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <OutcomeButton
-                onClick={onAddToLibrary}
-                icon={<BookOpen className="h-4 w-4" />}
-                emphasized
-                disabled={
-                  target.hasExactLibraryEntry ||
-                  addingToLibrary ||
-                  loggingTasting
-                }
-                loading={addingToLibrary}
-              >
-                {target.hasExactLibraryEntry ? "In Library" : "Add to Library"}
-              </OutcomeButton>
-              <OutcomeButton
-                onClick={onLogTasting}
-                icon={<Wine className="h-4 w-4" />}
-                emphasized
-                disabled={loggingTasting}
-                loading={loggingTasting}
-              >
-                Log Tasting
-              </OutcomeButton>
-              <OutcomeButton
-                href={getViewBottleHref(target)}
-                icon={<Eye className="h-4 w-4" />}
-              >
-                View Bottle
-              </OutcomeButton>
-            </div>
+            <div className="grid gap-3 sm:grid-cols-3">{actionButtons}</div>
           </div>
         </section>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -415,7 +437,6 @@ function AddedToLibrary({
 }
 
 function AddBottleFlowContent() {
-  const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const orpc = useORPC();
@@ -700,9 +721,7 @@ function AddBottleFlowContent() {
     return (
       <AddedToLibrary
         entry={addedEntry}
-        userLibraryHref={
-          user?.username ? `/users/${user.username}/library` : "/bottles"
-        }
+        userLibraryHref="/library"
         onAddAnother={startOver}
       />
     );
@@ -763,7 +782,7 @@ function AddBottleFlowContent() {
       searchActionLabel="Search Again"
       enableCatalogImageApproval
       renderMatchedResultActions={(props) => (
-        <MatchedOutcomeActions {...props} />
+        <MatchedOutcomeActions {...props} intent={intent} />
       )}
       onResolve={handleResolvedTarget}
     />

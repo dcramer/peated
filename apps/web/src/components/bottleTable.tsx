@@ -10,7 +10,7 @@ import type {
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import type { ComponentProps, ReactNode } from "react";
-import { formatBottlingName } from "../lib/bottlings";
+import { getBottleBottlingPath } from "../lib/bottlings";
 import classNames from "../lib/classNames";
 import BottleLink from "./bottleLink";
 import SimpleRatingIndicator from "./simpleRatingIndicator";
@@ -33,12 +33,14 @@ export default function BottleTable({
   rel,
   renderCollectionBottleImage,
   renderCollectionBottleActions,
+  showBottleStats = true,
   ...props
 }: Omit<ComponentProps<typeof Table>, "items" | "rel" | "columns"> & {
   bottleList: (Bottle | CollectionBottle)[];
   rel?: PagingRel;
   renderCollectionBottleImage?: (item: CollectionBottle) => ReactNode;
   renderCollectionBottleActions?: (item: CollectionBottle) => ReactNode;
+  showBottleStats?: boolean;
 }) {
   const rows: BottleRow[] = bottleList.map((item) =>
     "bottle" in item
@@ -90,35 +92,41 @@ export default function BottleTable({
                   )}
                 >
                   <div className="flex min-w-0 flex-wrap items-center gap-x-1">
-                    <BottleLink
-                      bottle={item.bottle}
-                      className="font-medium hover:underline"
-                    >
-                      {item.bottle.brand.shortName || item.bottle.brand.name}{" "}
-                      {item.bottle.name}
-                    </BottleLink>
+                    {item.release ? (
+                      <Link
+                        href={getBottleBottlingPath(
+                          item.bottle.id,
+                          item.release.id,
+                        )}
+                        className="font-medium hover:underline"
+                      >
+                        {item.release.fullName}
+                      </Link>
+                    ) : (
+                      <BottleLink
+                        bottle={item.bottle}
+                        className="font-medium hover:underline"
+                      >
+                        {item.bottle.brand.shortName || item.bottle.brand.name}{" "}
+                        {item.bottle.name}
+                      </BottleLink>
+                    )}
                     <BottleStatusIcons bottle={item.bottle} />
                     {!item.release && item.bottle.singleCask && (
                       <SingleCaskChip />
                     )}
+                    {item.release?.singleCask && <SingleCaskChip />}
                   </div>
                   <div className="text-muted flex flex-col gap-y-1 text-sm">
-                    {item.release && (
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span>
-                          Specific Bottling: {formatBottlingName(item.release)}
-                        </span>
-                        {item.release.singleCask && <SingleCaskChip />}
-                      </div>
-                    )}
-                    {item.bottle.category && (
-                      <Link
-                        href={`/bottles/?category=${item.bottle.category}`}
-                        className="hover:underline"
-                      >
-                        {formatCategoryName(item.bottle.category)}
-                      </Link>
-                    )}
+                    {item.bottle.category &&
+                      String(item.bottle.category) !== "other" && (
+                        <Link
+                          href={`/bottles/?category=${item.bottle.category}`}
+                          className="hover:underline"
+                        >
+                          {formatCategoryName(item.bottle.category)}
+                        </Link>
+                      )}
                   </div>
                 </div>
                 {mobileCollectionActions && (
@@ -130,33 +138,38 @@ export default function BottleTable({
             );
           },
         },
-        {
-          name: "tastings",
-          value: (item) => item.bottle.totalTastings.toLocaleString(),
-          className: "sm:w-1/6",
-          sortDefaultOrder: "desc",
-        },
-        {
-          name: "rating",
-          value: (item) => (
-            <SimpleRatingIndicator avgRating={item.bottle.avgRating} />
-          ),
-          className: "sm:w-1/6",
-          sortDefaultOrder: "desc",
-          align: "center",
-        },
-        {
-          name: "age",
-          value: (item) =>
-            item.bottle.statedAge ? (
-              <Link
-                className="hover:underline"
-                href={`/bottles/?age=${item.bottle.statedAge}`}
-              >{`${item.bottle.statedAge} years`}</Link>
-            ) : null,
-          className: "sm:w-1/6",
-          sortDefaultOrder: "desc",
-        },
+        ...(showBottleStats
+          ? [
+              {
+                name: "tastings",
+                value: (item: BottleRow) =>
+                  item.bottle.totalTastings.toLocaleString(),
+                className: "sm:w-24",
+                sortDefaultOrder: "desc" as const,
+              },
+              {
+                name: "rating",
+                value: (item: BottleRow) => (
+                  <SimpleRatingIndicator avgRating={item.bottle.avgRating} />
+                ),
+                className: "sm:w-20",
+                sortDefaultOrder: "desc" as const,
+                align: "center" as const,
+              },
+              {
+                name: "age",
+                value: (item: BottleRow) =>
+                  item.bottle.statedAge ? (
+                    <Link
+                      className="hover:underline"
+                      href={`/bottles/?age=${item.bottle.statedAge}`}
+                    >{`${item.bottle.statedAge} years`}</Link>
+                  ) : null,
+                className: "sm:w-24",
+                sortDefaultOrder: "desc" as const,
+              },
+            ]
+          : []),
         ...(renderCollectionBottleActions
           ? [
               {

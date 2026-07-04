@@ -157,6 +157,18 @@ function useLibraryEntryMutations({
   };
 }
 
+export function LibraryEntryThumbnail({ entry }: { entry: CollectionBottle }) {
+  return entry.imageUrl ? (
+    <div className="h-12 w-12 shrink-0 overflow-hidden rounded border border-slate-800 bg-slate-900">
+      <img
+        src={entry.imageUrl}
+        alt={`Photo of ${entry.bottle.fullName}`}
+        className="h-full w-full object-cover"
+      />
+    </div>
+  ) : null;
+}
+
 export function LibraryEntryImage({
   entry,
   username,

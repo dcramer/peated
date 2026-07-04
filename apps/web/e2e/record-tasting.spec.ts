@@ -49,6 +49,13 @@ test.describe("log tasting", () => {
       page.getByRole("heading", { name: "Add Bottle" }),
     ).toBeVisible();
     await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expect(
+      page
+        .locator("main section")
+        .filter({ hasText: "Bottle found" })
+        .getByRole("button")
+        .first(),
+    ).toHaveText("Log Tasting");
     await page.getByRole("button", { name: "Log Tasting" }).click();
 
     await expect(
@@ -82,6 +89,13 @@ test.describe("log tasting", () => {
     await expect(page.getByText("Match found")).toBeVisible();
     await expect(page.getByText("Lagavulin")).toBeVisible();
     await expect(page.getByText("16 years")).toBeVisible();
+    await expect(
+      page
+        .locator("main section")
+        .filter({ hasText: "Match found" })
+        .getByRole("button")
+        .first(),
+    ).toHaveText("Log Tasting");
 
     await page.getByRole("button", { name: "Log Tasting" }).click();
 

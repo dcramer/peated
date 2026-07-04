@@ -114,6 +114,31 @@ test.describe("profile library", () => {
       page.getByText("No library bottles recorded yet."),
     ).toHaveCount(0);
 
+    await page.goto("/library", {
+      waitUntil: "commit",
+    });
+    await expect(page.getByRole("heading", { name: "Library" })).toBeVisible();
+    await expect(
+      page.getByRole("main").getByRole("link", { name: "Add Bottle" }),
+    ).toHaveAttribute("href", "/addBottle?intent=library");
+    await expect(
+      page.getByRole("link", { name: savedBottleName }).first(),
+    ).toBeVisible();
+    if (!testInfo.project.name.includes("mobile")) {
+      await expect(
+        page.getByRole("columnheader", { name: "Bottle" }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("columnheader", { name: "Tastings" }),
+      ).toHaveCount(0);
+      await expect(
+        page.getByRole("columnheader", { name: "Rating" }),
+      ).toHaveCount(0);
+      await expect(page.getByRole("columnheader", { name: "Age" })).toHaveCount(
+        0,
+      );
+    }
+
     await page.goto(`/users/${testUser.username}/favorites`, {
       waitUntil: "commit",
     });

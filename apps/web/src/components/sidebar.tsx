@@ -2,6 +2,7 @@
 
 import { MapIcon } from "@heroicons/react/20/solid";
 import {
+  BookOpenIcon,
   GiftTopIcon,
   HomeIcon,
   InformationCircleIcon,
@@ -53,6 +54,13 @@ export default function Sidebar() {
                     active={pathname.startsWith("/favorites")}
                   >
                     Favorites
+                  </SidebarLink>
+                  <SidebarLink
+                    href="/library"
+                    icon={BookOpenIcon}
+                    active={pathname.startsWith("/library")}
+                  >
+                    Library
                   </SidebarLink>
                   <SidebarLink
                     href="/tastings"
