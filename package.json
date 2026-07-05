@@ -45,6 +45,7 @@
   "author": "David Cramer",
   "license": "Apache-2.0",
   "dependencies": {
+    "@fission-ai/openspec": "^1.5.0",
     "@orpc/client": "1.13.6",
     "@orpc/openapi": "1.13.6",
     "@orpc/server": "1.13.6",
