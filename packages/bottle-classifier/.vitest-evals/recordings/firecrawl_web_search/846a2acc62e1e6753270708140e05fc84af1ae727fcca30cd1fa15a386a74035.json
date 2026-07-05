@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-05T18:59:09.314Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Elijah Craig 18 year old single barrel bourbon 45%"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Elijah Craig 18 year old single barrel bourbon 45%",
+    "summary": "Tasting Notes · Color: Warm, deep leather · Aroma: Aged oak, spiced vanilla, with notes of mint and chocolate · Taste: Richly textured nutty and semisweet, initial ... ![](https://insight.adsrvr.org/track/pxl/?adv=g1bgici&ct=0:abm78v3&fmt=3) [![Heaven Hill Logo](https://heavenhilldistillery.com/images/hhd-logo-new-blue",
+    "results": [
+      {
+        "title": "Elijah Craig 18-Year-Old Single Barrel",
+        "url": "https://heavenhilldistillery.com/elijah-craig-single-barrel18.php",
+        "domain": "heavenhilldistillery.com",
+        "description": "Tasting Notes · Color: Warm, deep leather · Aroma: Aged oak, spiced vanilla, with notes of mint and chocolate · Taste: Richly textured nutty and semisweet, initial ...",
+        "extraSnippets": [
+          "![](https://insight.adsrvr.org/track/pxl/?adv=g1bgici&ct=0:abm78v3&fmt=3) [![Heaven Hill Logo](https://heavenhilldistillery.com/images/hhd-logo-new-blue25.png)](https://heavenhilld"
+        ]
+      },
+      {
+        "title": "Elijah Craig 18 Year Single Barrel Review",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-18-year-single-barrel",
+        "domain": "breakingbourbon.com",
+        "description": "Elijah Craig 18 Year may forgo uniqueness for constancy, but in return delivers an impressive age statement, good value, and drinkability.",
+        "extraSnippets": [
+          "By clicking **\"Accept\"**, you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts. View our [Privacy "
+        ]
+      },
+      {
+        "title": "Review #6 - Elijah Craig 18 Year Single Barrel (2023)",
+        "url": "https://www.reddit.com/r/bourbon/comments/1d27cl5/review_6_elijah_craig_18_year_single_barrel_2023/",
+        "domain": "reddit.com",
+        "description": "The nose, palate, and finish are quite good for a lower proof bourbon. While not an exceptional pour, it is very good and an enjoyable pour.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Elijah Craig 18-Year-Old Single Barrel",
+        "url": "https://balboastaphouse.com/products/elijah-craig-18-year-old-single-barrel?srsltid=AfmBOoq0OpEYVHkU2z4nV7jXiT2tNmz7qJGYlnjzfAnTP8e6-IhlmTkS",
+        "domain": "balboastaphouse.com",
+        "description": "Truly a Bourbon for the avid collector, this bottle has won countless awards and is regularly listed as a top choice by those who appreciate its smooth yet ...",
+        "extraSnippets": [
+          "### Age Verification By clicking enter you are verifying that you are 21 years or older. [ENTER](https://balboastaphouse.com/products/elijah-craig-18-year-old-single-barrel#) Loadi"
+        ]
+      },
+      {
+        "title": "Palate Comparison: Two Perspectives on Elijah Craig 18 ...",
+        "url": "https://the-right-spirit.com/2020/05/22/palate-comparison-two-perspectives-on-elijah-craig-18-year-single-barrel/",
+        "domain": "the-right-spirit.com",
+        "description": "At least this particular barrel is not over oaked. It's never tannic or sharp. I don't get a lot of musty, wet oak flavors. I have had the ...",
+        "extraSnippets": [
+          "[Skip to content](https://the-right-spirit.com/2020/05/22/palate-comparison-two-perspectives-on-elijah-craig-18-year-single-barrel/#content) Menu > ELIJAH CRAIG 18 YEAR SINGLE BARR"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "846a2acc62e1e6753270708140e05fc84af1ae727fcca30cd1fa15a386a74035",
+    "mode": "auto"
+  }
+}

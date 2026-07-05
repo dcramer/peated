@@ -27,6 +27,9 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 
 - Monorepo packages: `apps/server`, `apps/web`, `apps/cli`, `packages/*`
 - `pnpm dev*` and `pnpm cli <cmd>` load `.env.local`; backend tests load `.env.test`
+- Tests and live evals are separate gates: `pnpm test` runs Vitest tests, while
+  classifier live/model evals run via `pnpm evals` or
+  `pnpm --filter @peated/bottle-classifier evals`.
 - Backend testing policy: `docs/development/backend-testing.md`
 - Frontend testing policy: `docs/development/frontend-testing.md`
 - Before opening a PR, run targeted tests/typechecks/lint for the touched surface; PR CI is the required full-repo `pnpm test` gate
