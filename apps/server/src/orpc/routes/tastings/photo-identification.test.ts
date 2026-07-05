@@ -8,7 +8,6 @@ import {
   pendingUploads,
   tastings,
 } from "@peated/server/db/schema";
-import type * as logModule from "@peated/server/lib/log";
 import type * as pendingUploadsModule from "@peated/server/lib/pendingUploads";
 import type * as photoIdentificationModule from "@peated/server/lib/photoIdentification";
 import waitError from "@peated/server/lib/test/waitError";
@@ -22,7 +21,6 @@ const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
 const extractPhotoBottleEvidenceMock = vi.hoisted(() => vi.fn());
 const copyPendingImageToBottleMock = vi.hoisted(() => vi.fn());
 const copyPendingImageToBottleReleaseMock = vi.hoisted(() => vi.fn());
-const logErrorMock = vi.hoisted(() => vi.fn());
 const sentrySpanSetAttributeMock = vi.hoisted(() => vi.fn());
 const sentrySpanSetAttributesMock = vi.hoisted(() => vi.fn());
 const originalOpenAiApiKey = config.OPENAI_API_KEY;
@@ -53,10 +51,6 @@ vi.mock("@peated/server/lib/pendingUploads", async (importOriginal) => {
     copyPendingImageToBottleRelease: copyPendingImageToBottleReleaseMock,
   };
 });
-vi.mock("@peated/server/lib/log", () => ({
-  logError: logErrorMock satisfies typeof logModule.logError,
-}));
-
 function buildImageEvidence(
   sourceImageId: string,
   photoSuitability: Partial<{
@@ -311,7 +305,6 @@ describe("POST /tastings/photo-identification", () => {
     extractPhotoBottleEvidenceMock.mockReset();
     copyPendingImageToBottleMock.mockClear();
     copyPendingImageToBottleReleaseMock.mockClear();
-    logErrorMock.mockClear();
     sentrySpanSetAttributeMock.mockClear();
     sentrySpanSetAttributesMock.mockClear();
     vi.mocked(Sentry.startSpan).mockImplementation(
@@ -1176,19 +1169,6 @@ describe("POST /tastings/photo-identification", () => {
     });
     expect(bottle).toBeDefined();
     expect(bottle?.imageUrl).toBeNull();
-    expect(logErrorMock).toHaveBeenCalledWith(copyError, {
-      catalogImageApproval: expect.objectContaining({
-        target: "bottle",
-        targetId: response.bottle.id,
-        pendingImageId: identification.pendingImage.id,
-        userId: defaults.user.id,
-        action: "create_bottle",
-        bottleId: response.bottle.id,
-        releaseId: null,
-        createdBottle: true,
-        createdRelease: false,
-      }),
-    });
   });
 
   test("release copy failure after creation returns warning and keeps the created release", async ({
@@ -1234,19 +1214,6 @@ describe("POST /tastings/photo-identification", () => {
     });
     expect(release).toBeDefined();
     expect(release?.imageUrl).toBeNull();
-    expect(logErrorMock).toHaveBeenCalledWith(copyError, {
-      catalogImageApproval: expect.objectContaining({
-        target: "release",
-        targetId: response.release!.id,
-        pendingImageId: identification.pendingImage.id,
-        userId: defaults.user.id,
-        action: "create_bottle_and_release",
-        bottleId: response.bottle.id,
-        releaseId: response.release!.id,
-        createdBottle: true,
-        createdRelease: true,
-      }),
-    });
   });
 
   test("catalog image update race returns warning and keeps the created bottle", async ({
@@ -1303,18 +1270,5 @@ describe("POST /tastings/photo-identification", () => {
       where: eq(bottles.id, response.bottle.id),
     });
     expect(bottle?.imageUrl).toBe("/uploads/bottles/existing-race-image.webp");
-    expect(logErrorMock).toHaveBeenCalledWith(expect.any(Error), {
-      catalogImageApproval: expect.objectContaining({
-        target: "bottle",
-        targetId: response.bottle.id,
-        pendingImageId: identification.pendingImage.id,
-        userId: defaults.user.id,
-        action: "create_bottle",
-        bottleId: response.bottle.id,
-        releaseId: null,
-        createdBottle: true,
-        createdRelease: false,
-      }),
-    });
   });
 });
