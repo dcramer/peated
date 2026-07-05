@@ -79,7 +79,7 @@
     "@types/react": "^19.2.17",
     "@types/react-avatar-editor": "^13.0.2",
     "@types/react-dom": "^19.2.3",
-    "postcss": "^8.5.9",
+    "postcss": "^8.5.10",
     "tailwind-scrollbar": "^3.1.0",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
