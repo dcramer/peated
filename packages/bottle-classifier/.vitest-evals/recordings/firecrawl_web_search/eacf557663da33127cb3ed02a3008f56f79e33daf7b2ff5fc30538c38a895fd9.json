@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-05T02:41:15.610Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Macallan 18 Year Old Sherry Oak 1994 vintage"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Macallan 18 Year Old Sherry Oak 1994 vintage",
+    "summary": "1994 The Macallan 18 Year Old Sherry Oak Single Malt Scotch Whisky. Speyside - Highlands, Scotland. Avg Price (ex-tax); $ 1,843 / 750ml. ~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at ch",
+    "results": [
+      {
+        "title": "1994 The Macallan 18 Year Old Sherry Oak Single Malt ...",
+        "url": "https://www.wine-searcher.com/find/the+macallan+eighteen+old+sherry+oak+single+malt+scotch+whisky+speyside+highlands+scotland/1994?srsltid=AfmBOooUna-fF8pKzcvHq3CkFmXuDxCUXB1Q8L9k1nK3HnHfG0es4FTX",
+        "domain": "wine-searcher.com",
+        "description": "1994 The Macallan 18 Year Old Sherry Oak Single Malt Scotch Whisky. Speyside - Highlands, Scotland. Avg Price (ex-tax); $ 1,843 / 750ml.",
+        "extraSnippets": [
+          "~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at"
+        ]
+      },
+      {
+        "title": "Buy Macallan 18 Years Old 1994 Sherry Oak Cask Online",
+        "url": "https://whiskeycaviar.com/products/macallan-18-years-old-1994-sherry-oak-casks?srsltid=AfmBOooQXralre-mBL8oeVyw9T7MQwN8bXu9q02B0pAMwVeGpafxhiHx",
+        "domain": "whiskeycaviar.com",
+        "description": "The 1994-and-earlier 'vintage' edition of Macallan's iconic sherry cask 18 ... The Macallan 18 Years Old 1994 Sherry Oak Cask Scotch Whisky. $1,799.99 ...",
+        "extraSnippets": [
+          "[Skip to content](https://whiskeycaviar.com/products/macallan-18-years-old-1994-sherry-oak-casks#main) Cart Your cart is empty [🔥 4th of July Flash Sale! Save 10% Sitewide – Code:"
+        ]
+      },
+      {
+        "title": "Macallan 18 Vintage 1994 : r/Scotch",
+        "url": "https://www.reddit.com/r/Scotch/comments/x53ion/macallan_18_vintage_1994/",
+        "domain": "reddit.com",
+        "description": "Palate - intense sherry sweetness, caramelized brown sugar, and super mouth watering. Cherry cola, dates, raisins, dark fruits. Very tasty.",
+        "extraSnippets": []
+      },
+      {
+        "title": "The Macallan 1994 18yo Sherry Oak 750ml 43%abv",
+        "url": "https://collezionenewyork.com/products/the-macallan-1994-18yo-sherry-oak-750ml-43-abv?srsltid=AfmBOoo9pHskQaDvXt-ZatJ7sjGgZG9Bihz7RfzkfQPKRZFFuTK-3p4L",
+        "domain": "collezionenewyork.com",
+        "description": "The Macallan 1994 18-Year-Old Sherry Oak is a highly sought after, full bodied single malt Scotch whisky, known for its rich dried fruit, spice, and oak ...",
+        "extraSnippets": [
+          "[Skip to content](https://collezionenewyork.com/products/the-macallan-1994-18yo-sherry-oak-750ml-43-abv#MainContent) [Rare & Vintage Spirits](https://collezionenewyork.com/collecti"
+        ]
+      },
+      {
+        "title": "Old & Rare Vintage Macallan Whisky",
+        "url": "https://flaskfinewines.com/collections/old-rare-vintage-macallan-single-malt-scotch-whisky?srsltid=AfmBOoqwJzqG-XG_WhmtG5VTEK7A4CI4Wynmki_juqGAtxksQhEwR9eh",
+        "domain": "flaskfinewines.com",
+        "description": "The 1983 and 1994 vintage releases represent the furthest back in this range, commanding attention from collectors where the current 18 Year Old 2022 serves as ...",
+        "extraSnippets": [
+          "[Skip to content](https://flaskfinewines.com/collections/old-rare-vintage-macallan-single-malt-scotch-whisky#MainContent) # Old & Rare Vintage Macallan Whisky View Full Description"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "eacf557663da33127cb3ed02a3008f56f79e33daf7b2ff5fc30538c38a895fd9",
+    "mode": "auto"
+  }
+}

@@ -1254,10 +1254,7 @@ function restoreExactCaskBottleDisplayName({
     ? proposedBottle
     : {
         ...proposedBottle,
-        name: normalizeBottle({
-          name,
-          statedAge: proposedBottle.statedAge,
-        }).name,
+        name: normalizeString(name),
       };
 }
 

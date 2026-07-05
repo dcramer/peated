@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-05T02:42:37.161Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Canadian Club 9 year old Reserve Canadian Whisky ReserveBar Triple Aged"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Canadian Club 9 year old Reserve Canadian Whisky ReserveBar Triple Aged",
+    "summary": "## HOME/Spirits/Whiskey/Canadian Whiskey ![Product image](https://www.reservebar.com/_next/image?url=https%3A%2F%2Fassets.liquidcommerce.co%2Fcatalog%2Fpartner%2Fimg%2Fa0fd0087-98c1-4686-804a-b38ffe556181.jpg&w=1920&q=75) ![image-0](https://www.reservebar.com/_next/image?url=https%3A%2F%2Fassets.liquidcommerce.co%2Fcat",
+    "results": [
+      {
+        "title": "Canadian Club 9 Year Old Reserve Canadian Whisky",
+        "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+        "domain": "reservebar.com",
+        "description": null,
+        "extraSnippets": [
+          "## HOME/Spirits/Whiskey/Canadian Whiskey ![Product image](https://www.reservebar.com/_next/image?url=https%3A%2F%2Fassets.liquidcommerce.co%2Fcatalog%2Fpartner%2Fimg%2Fa0fd0087-98c"
+        ]
+      },
+      {
+        "title": "Canadian Club 9 Year Old Reserve Whiskey - Spec's",
+        "url": "https://specsonline.com/shop/spirits/canadian-club-reserve-9yr-2/",
+        "domain": "specsonline.com",
+        "description": null,
+        "extraSnippets": [
+          "![Revisit consent button](https://cdn-cookieyes.com/assets/images/revisit.svg) ![](https://cdn-cookieyes.com/assets/images/close.svg) Privacy and Cookie Settings We use cookies and"
+        ]
+      },
+      {
+        "title": "Canadian Club Reserve (9 Year Old) - The Rum Howler Blog",
+        "url": "https://therumhowlerblog.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/",
+        "domain": "therumhowlerblog.com",
+        "description": null,
+        "extraSnippets": [
+          "# [The Rum Howler Blog](https://therumhowlerblog.com/) ## (A Website for Spirited Reviews) - ## Subscribe - [Entries (RSS)](https://therumhowlerblog.com/feed/) - [Comments (RSS)](h"
+        ]
+      },
+      {
+        "title": "Canadian Club Reserve 9 year old Triple Aged, 40%",
+        "url": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": [
+          "Back Save ![](https://whiskyadvocate.com/?resize=1290&crop=237x21,0x0) ### 77 Score # Canadian Club Reserve 9 year old Triple Aged, 40% Price: $17.00● Issue: Summer 2013 ● Reviewer"
+        ]
+      },
+      {
+        "title": "Canadian Club Reserve 9 Year Canadian Whisky Review! - YouTube",
+        "url": "https://www.youtube.com/watch?v=x9pR1DL4Fx8",
+        "domain": "youtube.com",
+        "description": null,
+        "extraSnippets": [
+          "![Thumbnail (1920x1080)](https://i.ytimg.com/vi/x9pR1DL4Fx8/maxresdefault.jpg) # [Canadian Club Reserve 9 Year Canadian Whisky Review!](https://www.youtube.com/watch?v=x9pR1DL4Fx8)"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "1fb0bfd56dc2de8bbfee76c2d600148a08ee53ff1e780d868cb576ff75a274f6",
+    "mode": "auto"
+  }
+}

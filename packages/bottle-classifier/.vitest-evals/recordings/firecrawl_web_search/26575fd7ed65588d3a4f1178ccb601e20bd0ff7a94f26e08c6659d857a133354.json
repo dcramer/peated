@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-05T02:29:54.604Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Elijah Craig Cask Strength Barrel Proof Heaven Hill bourbon"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Elijah Craig Cask Strength Barrel Proof Heaven Hill bourbon",
+    "summary": "Tasting Notes · Color: Deep amber · Aroma: Caramel with toasted oak, fruit notes of apple and orange · Taste: Rich vanilla, caramel and butterscotch along with ... ![](https://insight.adsrvr.org/track/pxl/?adv=g1bgici&ct=0:abm78v3&fmt=3) [![Heaven Hill Logo](https://heavenhilldistillery.com/images/hhd-logo-new-blue25.p",
+    "results": [
+      {
+        "title": "Elijah Craig Barrel Proof - Heaven Hill Distillery",
+        "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+        "domain": "heavenhilldistillery.com",
+        "description": "Tasting Notes · Color: Deep amber · Aroma: Caramel with toasted oak, fruit notes of apple and orange · Taste: Rich vanilla, caramel and butterscotch along with ...",
+        "extraSnippets": [
+          "![](https://insight.adsrvr.org/track/pxl/?adv=g1bgici&ct=0:abm78v3&fmt=3) [![Heaven Hill Logo](https://heavenhilldistillery.com/images/hhd-logo-new-blue25.png)](https://heavenhilld"
+        ]
+      },
+      {
+        "title": "Barrel Proof - Elijah Craig",
+        "url": "https://elijahcraig.com/barrel-proof",
+        "domain": "elijahcraig.com",
+        "description": "It is a mouth-filling, deeply satisfying whiskey, amazingly palatable even at full proof, that will delight many drinkers at a great price.",
+        "extraSnippets": [
+          "![](https://insight.adsrvr.org/track/pxl/?adv=a824ckt&ct=0:a8tl4ma&fmt=3) ![Logo](https://elijahcraig.com/images/elijah-craig-white.png) ## Discover The Greatness Within Are you of"
+        ]
+      },
+      {
+        "title": "Heaven Hill Distilleries Offers Limited Edition Elijah Craig Barrel ...",
+        "url": "https://heavenhill.com/news-and-notes/heaven-hill-distilleries-offers-limited-edition-elijah-craig-barrel-proof-bourbon-to-select-markets-nationwide/",
+        "domain": "heavenhill.com",
+        "description": "The new Elijah Craig Barrel Proof Small Batch Release will begin shipping in mid-March to retailers and fine restaurants and bars in nearly every market ...",
+        "extraSnippets": [
+          "[Skip to content](https://heavenhill.com/news-and-notes/heaven-hill-distilleries-offers-limited-edition-elijah-craig-barrel-proof-bourbon-to-select-markets-nationwide/#content) ![]"
+        ]
+      },
+      {
+        "title": "Review #458 - Elijah Craig Barrel Select : r/bourbon - Reddit",
+        "url": "https://www.reddit.com/r/bourbon/comments/1hvujxu/review_458_elijah_craig_barrel_select/",
+        "domain": "reddit.com",
+        "description": "This is a nice high-proof version of Elijah Craig. It's a bit more rounded or 'smooth' than some of the Elijah Craig Barrel Proof batches.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Elijah Craig Barrel Proof Batch 8 - Wooden Cork",
+        "url": "https://woodencork.com/products/elijah-craig-barrel-proof-kentucky-straight-bourbon-whiskey-batch-8?srsltid=AfmBOoo3tgw9JYS6H2mcGiIk6fg1N4OAZn0bXNAFfitRIEtklTJmitmI",
+        "domain": "woodencork.com",
+        "description": "Elijah Craig Barrel Proof Batch 8 — mid-series barrel proof release. Heaven Hill high-rye cask strength bourbon. Ships fast.",
+        "extraSnippets": [
+          "[Skip to content](https://woodencork.com/products/elijah-craig-barrel-proof-kentucky-straight-bourbon-whiskey-batch-8#MainContent) [Skip to navigation](https://woodencork.com/produ"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "26575fd7ed65588d3a4f1178ccb601e20bd0ff7a94f26e08c6659d857a133354",
+    "mode": "auto"
+  }
+}

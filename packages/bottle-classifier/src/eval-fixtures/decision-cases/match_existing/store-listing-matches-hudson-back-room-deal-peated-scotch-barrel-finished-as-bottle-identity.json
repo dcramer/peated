@@ -142,8 +142,6 @@
     "identityScope": "product",
     "matchedBottleId": 11904,
     "matchedReleaseId": null,
-    "confidenceBand": "auto_verification",
-    "verifyEligible": true,
     "summary": "Match the exact local Hudson Back Room Deal Peated Scotch Barrel Finished bottle. The peated Scotch barrel finish is part of this bottle identity, so the correct result is product-scope bottle 11904 with no child release."
   }
 }

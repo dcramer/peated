@@ -3980,6 +3980,105 @@ describe("createBottleClassifier", () => {
     });
   });
 
+  test("preserves exact-cask age and vintage in standalone bottle display names", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "The Exclusive Malts",
+      bottler: "Creative Whisky Company",
+      expression: "Islay",
+      series: null,
+      distillery: [],
+      category: "single_malt",
+      stated_age: 8,
+      abv: 57.1,
+      release_year: 2016,
+      vintage_year: 2007,
+      cask_strength: true,
+      single_cask: true,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "create_bottle",
+          confidence: 86,
+          rationale:
+            "The label supports this as a standalone single-cask bottling.",
+          identityScope: "exact_cask",
+          observation: {
+            selector: null,
+            caskNumber: "1661",
+            barrelNumber: null,
+            bottleNumber: null,
+            outturn: 312,
+            market: null,
+            exclusive: null,
+          },
+          confidenceBasis: supportiveWebEvidenceConfidenceBasis,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [],
+          proposedBottle: {
+            name: "Islay",
+            series: null,
+            category: "single_malt",
+            edition: null,
+            statedAge: 8,
+            caskStrength: true,
+            singleCask: true,
+            abv: 57.1,
+            vintageYear: 2007,
+            releaseYear: 2016,
+            brand: {
+              id: null,
+              name: "The Exclusive Malts",
+            },
+            distillers: [],
+            bottler: {
+              id: null,
+              name: "Creative Whisky Company",
+            },
+          },
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "The Exclusive Malts Islay 8 year old 2007",
+      },
+      extractedIdentity,
+      initialCandidates: [],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "create_bottle",
+      identityScope: "exact_cask",
+      proposedBottle: {
+        name: "Islay 8-year-old 2007",
+        statedAge: 8,
+        vintageYear: 2007,
+      },
+      proposedRelease: null,
+    });
+  });
+
   test("preserves a more specific batch-A match selected by the classifier", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Redbreast",

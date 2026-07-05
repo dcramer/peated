@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-05T02:20:27.204Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Octomore 13.1 Bruichladdich Octomore series"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Octomore 13.1 Bruichladdich Octomore series",
+    "summary": "The whisky has a deep golden colour, with aromas of peat smoke, toffee, and dried fruits. On the palate, there are notes of sweet honey, toasted oak, and a hint ... # Menu USD ![](https://cdn.shoplightspeed.com/shops/640576/files/65549745/65x75x2/image.jpg) ##### Bruichladdich Octomore 13.1 Single Malt Scotch \\| 750ml ",
+    "results": [
+      {
+        "title": "Bruichladdich Octomore 13.1 Single Malt Scotch | 750ml",
+        "url": "https://www.gasparsliquorshoppe.com/bruichladdich-octomore-13-1-ml.html",
+        "domain": "gasparsliquorshoppe.com",
+        "description": "The whisky has a deep golden colour, with aromas of peat smoke, toffee, and dried fruits. On the palate, there are notes of sweet honey, toasted oak, and a hint ...",
+        "extraSnippets": [
+          "# Menu USD ![](https://cdn.shoplightspeed.com/shops/640576/files/65549745/65x75x2/image.jpg) ##### Bruichladdich Octomore 13.1 Single Malt Scotch \\| 750ml $179.99Excl. tax [Add to "
+        ]
+      },
+      {
+        "title": "Review #27 - Bruichladdich Octomore 13.1 : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/ym1d21/review_27_bruichladdich_octomore_131/",
+        "domain": "reddit.com",
+        "description": "It's earthy and a bit green, with a touch of vanilla, cream soda, white pepper, and dry wood coming in from the casks. Then the Islay ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Octomore 13 Series Review (13.1, 13.2 & 13.3) - Two Whisky Bros",
+        "url": "https://twowhiskybros.co.uk/blogs/blog/octomore-13-series",
+        "domain": "twowhiskybros.co.uk",
+        "description": "It's not bad, it has a good mouthfeel, some nice sweet notes, but a little too hot and lacks the peat punch we wanted.",
+        "extraSnippets": [
+          "Search - [Home](https://twowhiskybros.co.uk/) - [About us](https://twowhiskybros.co.uk/pages/about-us) - [Blog](https://twowhiskybros.co.uk/blogs/blog) - [Contact us](https://twowh"
+        ]
+      },
+      {
+        "title": "Bruichladdich Octomore 13.1 - Whisky Saga",
+        "url": "https://www.whiskysaga.com/blog/bruichladdich-octomore-131",
+        "domain": "whiskysaga.com",
+        "description": "This 13.1 expression clocks in at 137.3 ppm. It has been matured exclusively in 1st fill ex-bourbon casks, and produced using 100 % Scottish ...",
+        "extraSnippets": [
+          "[0](https://www.whiskysaga.com/cart) # Bruichladdich Octomore 13.1 [Islay](https://www.whiskysaga.com/blog/category/Islay)[Scotland](https://www.whiskysaga.com/blog/category/Scotla"
+        ]
+      },
+      {
+        "title": "Bruichladdich Octomore 13.1. » Buy Online - Flaviar",
+        "url": "https://flaviar.com/products/bruichladdich-octomore-13-1-750",
+        "domain": "flaviar.com",
+        "description": "It's made from a 2015 harvest of 100% Scottish Mainland barley and aged for 5 years in American oak. It also has a nice 'little' kick to it with 59.2% ABV.",
+        "extraSnippets": [
+          "[My Wishlist](https://flaviar.com/products/bruichladdich-octomore-13-1-750#swym-wishlist) 0 Please note: This website includes an accessibility system. Press Control-F11 to adjust "
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a3cb74e4868e7c310ee82c91387025b67b2c2c7d3a3d3381293a7e18a193a2a4",
+    "mode": "auto"
+  }
+}
