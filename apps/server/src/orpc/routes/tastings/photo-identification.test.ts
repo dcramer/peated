@@ -14,7 +14,7 @@ import type * as photoIdentificationModule from "@peated/server/lib/photoIdentif
 import waitError from "@peated/server/lib/test/waitError";
 import type { Context } from "@peated/server/orpc/context";
 import { routerClient } from "@peated/server/orpc/router";
-import type * as SentryNode from "@sentry/node";
+import * as Sentry from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, vi } from "vitest";
 
@@ -23,19 +23,11 @@ const extractPhotoBottleEvidenceMock = vi.hoisted(() => vi.fn());
 const copyPendingImageToBottleMock = vi.hoisted(() => vi.fn());
 const copyPendingImageToBottleReleaseMock = vi.hoisted(() => vi.fn());
 const logErrorMock = vi.hoisted(() => vi.fn());
-const sentryLoggerInfoMock = vi.hoisted(() => vi.fn());
+const sentrySpanSetAttributeMock = vi.hoisted(() => vi.fn());
+const sentrySpanSetAttributesMock = vi.hoisted(() => vi.fn());
 const originalOpenAiApiKey = config.OPENAI_API_KEY;
 
-vi.mock("@sentry/node", async (importOriginal) => {
-  const actual = await importOriginal<typeof SentryNode>();
-  return {
-    ...actual,
-    logger: {
-      ...actual.logger,
-      info: sentryLoggerInfoMock,
-    },
-  };
-});
+vi.mock("@sentry/node", { spy: true });
 vi.mock(
   "@peated/server/agents/bottleClassifier/classifyBottleReference",
   () => ({
@@ -320,11 +312,20 @@ describe("POST /tastings/photo-identification", () => {
     copyPendingImageToBottleMock.mockClear();
     copyPendingImageToBottleReleaseMock.mockClear();
     logErrorMock.mockClear();
-    sentryLoggerInfoMock.mockClear();
+    sentrySpanSetAttributeMock.mockClear();
+    sentrySpanSetAttributesMock.mockClear();
+    vi.mocked(Sentry.startSpan).mockImplementation(
+      async (_context, callback) =>
+        await callback({
+          setAttribute: sentrySpanSetAttributeMock,
+          setAttributes: sentrySpanSetAttributesMock,
+        } as unknown as Parameters<typeof callback>[0]),
+    );
   });
 
   afterEach(() => {
     config.OPENAI_API_KEY = originalOpenAiApiKey;
+    vi.mocked(Sentry.startSpan).mockReset();
   });
 
   test("requires authentication", async ({ fixtures }) => {
@@ -437,6 +438,26 @@ describe("POST /tastings/photo-identification", () => {
     });
 
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+    expect(classifyBottleReferenceMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        conversationId: `photo_identification:${response.pendingImage.id}`,
+      }),
+    );
+    expect(Sentry.startSpan).toHaveBeenCalledWith(
+      expect.objectContaining({
+        op: "gen_ai.invoke_agent",
+        name: "invoke_agent Photo Identification",
+        attributes: expect.objectContaining({
+          "gen_ai.conversation.id": `photo_identification:${response.pendingImage.id}`,
+          "photo_identification.pending_image_id": response.pendingImage.id,
+        }),
+      }),
+      expect.any(Function),
+    );
+    expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
+      "photo_identification.suggested_next_step",
+      "confirm_match",
+    );
   });
 
   test("reuses pending upload for idempotent retries", async ({
@@ -501,17 +522,6 @@ describe("POST /tastings/photo-identification", () => {
     );
     expect(extractPhotoBottleEvidenceMock).not.toHaveBeenCalled();
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
-    expect(sentryLoggerInfoMock).toHaveBeenCalledWith(
-      "Bottle photo identification completed",
-      expect.objectContaining({
-        "photo_identification.user_id": defaults.user.id,
-        "photo_identification.idempotency_key":
-          "photo-identification-oversized",
-        "photo_identification.outcome": "rejected",
-        "photo_identification.error_message":
-          "File exceeded maximum upload size of 20.0 MiB.",
-      }),
-    );
   });
 
   test("uses exact Peated aliases before full photo classification", async ({
@@ -564,21 +574,6 @@ describe("POST /tastings/photo-identification", () => {
       },
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
-    expect(sentryLoggerInfoMock).toHaveBeenCalledWith(
-      "Bottle photo identification completed",
-      expect.objectContaining({
-        "photo_identification.user_id": defaults.user.id,
-        "photo_identification.idempotency_key":
-          "photo-identification-exact-alias",
-        "photo_identification.reference_name": "Ardbeg Uigeadail",
-        "photo_identification.local.action": "match",
-        "photo_identification.final.action": "match",
-        "photo_identification.final.matched_bottle_id": bottle.id,
-        "photo_identification.final.candidate_names": expect.arrayContaining([
-          bottle.fullName,
-        ]),
-      }),
-    );
   });
 
   test("falls back to manual search when classifier does not match", async ({
@@ -627,28 +622,6 @@ describe("POST /tastings/photo-identification", () => {
 
     expect(response.suggestedNextStep).toBe("manual_search");
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
-    expect(sentryLoggerInfoMock).toHaveBeenCalledWith(
-      "Bottle photo identification completed",
-      expect.objectContaining({
-        "photo_identification.user_id": defaults.user.id,
-        "photo_identification.idempotency_key":
-          "photo-identification-manual-search",
-        "photo_identification.suggested_next_step": "manual_search",
-        "photo_identification.extraction_status": "empty",
-        "photo_identification.final.status": "classified",
-        "photo_identification.final.action": "no_match",
-        "photo_identification.final.search_evidence_count": 1,
-        "photo_identification.final.search_evidence_result_count": 1,
-        "photo_identification.final.search_queries": [
-          "Ardbeg Uigeadail whisky",
-        ],
-        "photo_identification.final.search_result_summaries": [
-          "Ardbeg Uigeadail - ardbeg.com",
-        ],
-        "photo_identification.field.brand": "Ardbeg",
-        "photo_identification.field.expression": "Uigeadail",
-      }),
-    );
   });
 
   test("keeps photo identification successful when log search result URL is malformed", async ({
@@ -691,17 +664,6 @@ describe("POST /tastings/photo-identification", () => {
     );
 
     expect(response.suggestedNextStep).toBe("manual_search");
-    expect(sentryLoggerInfoMock).toHaveBeenCalledWith(
-      "Bottle photo identification completed",
-      expect.objectContaining({
-        "photo_identification.user_id": defaults.user.id,
-        "photo_identification.idempotency_key":
-          "photo-identification-malformed-search-url",
-        "photo_identification.final.search_result_summaries": [
-          "Malformed Search Result - not a url",
-        ],
-      }),
-    );
   });
 
   test("rejects when extraction fails", async ({ fixtures, defaults }) => {
@@ -725,17 +687,6 @@ describe("POST /tastings/photo-identification", () => {
       `[Error: Unable to identify bottle from photo.]`,
     );
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
-    expect(sentryLoggerInfoMock).toHaveBeenCalledWith(
-      "Bottle photo identification completed",
-      expect.objectContaining({
-        "photo_identification.user_id": defaults.user.id,
-        "photo_identification.idempotency_key":
-          "photo-identification-extraction-failure",
-        "photo_identification.outcome": "failed",
-        "photo_identification.error_name": "Error",
-        "photo_identification.error_message": "vision provider unavailable",
-      }),
-    );
   });
 
   test("creates bottle and release from a reviewed photo identification proposal", async ({

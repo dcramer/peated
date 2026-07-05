@@ -41,6 +41,7 @@ import {
   buildBottleClassifierInstructions,
   buildBottleLocalIdentifierInstructions,
 } from "./instructions";
+import { startAgentSpan, type AgentSpanAttributes } from "./observability";
 import { getStableOpenAISettings } from "./openaiModelSettings";
 import {
   finalizeBottleReferenceClassification,
@@ -296,6 +297,11 @@ export type PreparedBottleClassifierAgentRun = {
   getArtifacts: () => BottleClassificationArtifacts;
   getReasoningResult: (result: unknown) => BottleClassifierReasoningResult;
   input: string;
+  conversationId: string;
+  instructionMode: NonNullable<
+    RunBottleClassifierAgentInput["instructionMode"]
+  >;
+  spanAttributes: AgentSpanAttributes;
   runOptions: NonStreamRunOptions<unknown, BottleClassifierAgent>;
   runner: Runner;
   webSearchBudget: BottleWebSearchBudget;
@@ -1042,6 +1048,24 @@ export async function prepareBottleClassifierAgentRun(
     agent,
     runner,
     input,
+    conversationId: resolvedConversationId,
+    instructionMode,
+    spanAttributes: {
+      "gen_ai.request.model": options.model,
+      "bottle_classifier.instruction_mode": instructionMode,
+      "bottle_classifier.reference_id":
+        reference.id === undefined || reference.id === null
+          ? "none"
+          : `${reference.id}`,
+      "bottle_classifier.current_bottle_id":
+        reference.currentBottleId == null
+          ? "none"
+          : `${reference.currentBottleId}`,
+      "bottle_classifier.current_release_id":
+        reference.currentReleaseId == null
+          ? "none"
+          : `${reference.currentReleaseId}`,
+    },
     runOptions: {
       maxTurns: CLASSIFIER_MAX_TURNS,
       stream: false,
@@ -1141,13 +1165,27 @@ export function createBottleClassifier(
     preparedRun: PreparedBottleClassifierAgentRun,
   ): Promise<BottleClassifierReasoningResult> => {
     try {
-      const result = await preparedRun.runner.run(
-        preparedRun.agent,
-        preparedRun.input,
-        preparedRun.runOptions,
-      );
+      return await startAgentSpan({
+        name:
+          preparedRun.instructionMode === "local_identification"
+            ? "Bottle Local Identifier"
+            : "Bottle Classifier",
+        conversationId: preparedRun.conversationId,
+        attributes: {
+          ...preparedRun.spanAttributes,
+          "bottle_classifier.initial_candidate_count":
+            preparedRun.getArtifacts().candidates.length,
+        },
+        callback: async () => {
+          const result = await preparedRun.runner.run(
+            preparedRun.agent,
+            preparedRun.input,
+            preparedRun.runOptions,
+          );
 
-      return preparedRun.getReasoningResult(result);
+          return preparedRun.getReasoningResult(result);
+        },
+      });
     } catch (error) {
       throw new BottleClassificationError(
         error instanceof Error ? error.message : "Unknown classifier error",

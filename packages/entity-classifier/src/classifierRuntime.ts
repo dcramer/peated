@@ -19,6 +19,7 @@ import {
 } from "./contract";
 import { EntityClassificationError } from "./error";
 import { buildEntityClassifierInstructions } from "./instructions";
+import { startAgentSpan } from "./observability";
 import { getDeterministicOpenAISettings } from "./openaiModelSettings";
 import { finalizeEntityClassification } from "./reviewPolicy";
 import { createOpenAIWebSearchTool, createSearchEntitiesTool } from "./tools";
@@ -150,21 +151,33 @@ export function createEntityClassifier(
       outputType: EntityClassificationDecisionSchema,
       tools,
     });
+    const conversationId = `entity:${reference.entity.id}`;
     const runner = new Runner({
       modelProvider: new OpenAIProvider({
         openAIClient: options.client,
         useResponses: true,
       }),
       workflowName: "Entity Classifier",
-      groupId: `entity:${reference.entity.id}`,
+      groupId: conversationId,
       traceMetadata: {
+        "gen_ai.conversation.id": conversationId,
         entity_id: `${reference.entity.id}`,
       },
     });
 
     try {
-      const result = await runner.run(agent, buildAgentInput(reference), {
-        maxTurns: ENTITY_CLASSIFIER_MAX_TURNS,
+      const result = await startAgentSpan({
+        name: "Entity Classifier",
+        conversationId,
+        attributes: {
+          "gen_ai.request.model": options.model,
+          "entity_classifier.entity_id": `${reference.entity.id}`,
+          "entity_classifier.entity_name": reference.entity.name,
+        },
+        callback: async () =>
+          await runner.run(agent, buildAgentInput(reference), {
+            maxTurns: ENTITY_CLASSIFIER_MAX_TURNS,
+          }),
       });
       if (!result.finalOutput) {
         throw new Error("Agent returned empty output");

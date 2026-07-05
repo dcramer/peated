@@ -6,6 +6,7 @@ import {
   EntityClassificationSearchEvidenceSchema,
   type EntityClassificationSearchEvidence,
 } from "../classifierTypes";
+import { startToolSpan } from "../observability";
 import { getDeterministicOpenAISettings } from "../openaiModelSettings";
 
 const WebSearchArgsSchema = z
@@ -13,6 +14,8 @@ const WebSearchArgsSchema = z
     query: z.string().trim().min(1),
   })
   .strict();
+const OPENAI_WEB_SEARCH_TOOL_DESCRIPTION =
+  "Search the live web for official producer naming, website, location, and branding evidence. Prefer official sources and use this only when local entity evidence is still ambiguous.";
 
 function getResultDomain(url: string): string {
   try {
@@ -149,37 +152,43 @@ export function createOpenAIWebSearchTool({
 
   return tool({
     name: "openai_web_search",
-    description:
-      "Search the live web for official producer naming, website, location, and branding evidence. Prefer official sources and use this only when local entity evidence is still ambiguous.",
+    description: OPENAI_WEB_SEARCH_TOOL_DESCRIPTION,
     parameters: WebSearchArgsSchema,
     execute: async (args) => {
-      if (remainingQueries <= 0) {
-        return {
-          error: "Web search budget exhausted.",
-        };
-      }
+      return await startToolSpan({
+        name: "openai_web_search",
+        description: OPENAI_WEB_SEARCH_TOOL_DESCRIPTION,
+        args,
+        callback: async () => {
+          if (remainingQueries <= 0) {
+            return {
+              error: "Web search budget exhausted.",
+            };
+          }
 
-      remainingQueries -= 1;
-      const parsedArgs = WebSearchArgsSchema.parse(args);
+          remainingQueries -= 1;
+          const parsedArgs = WebSearchArgsSchema.parse(args);
 
-      try {
-        const response = await client.responses.create(
-          buildOpenAIWebSearchRequest({
-            model,
-            query: parsedArgs.query,
-          }),
-        );
-        const evidence = extractSearchEvidence(parsedArgs.query, response);
-        onEvidence?.(evidence);
-        return evidence;
-      } catch (error) {
-        return {
-          error:
-            error instanceof Error
-              ? `OpenAI web search failed: ${error.message}`
-              : "OpenAI web search failed",
-        };
-      }
+          try {
+            const response = await client.responses.create(
+              buildOpenAIWebSearchRequest({
+                model,
+                query: parsedArgs.query,
+              }),
+            );
+            const evidence = extractSearchEvidence(parsedArgs.query, response);
+            onEvidence?.(evidence);
+            return evidence;
+          } catch (error) {
+            return {
+              error:
+                error instanceof Error
+                  ? `OpenAI web search failed: ${error.message}`
+                  : "OpenAI web search failed",
+            };
+          }
+        },
+      });
     },
   });
 }
