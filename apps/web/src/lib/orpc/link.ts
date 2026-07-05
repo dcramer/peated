@@ -1,11 +1,26 @@
 import { RPCLink } from "@orpc/client/fetch";
 import { BatchLinkPlugin } from "@orpc/client/plugins";
+import { isORPCClientError } from "@peated/orpc/client/errors";
 import sentryInterceptor from "@peated/orpc/client/interceptors";
+
+class ORPCUnauthorizedRedirectError extends Error {
+  name = "ORPCUnauthorizedRedirectError";
+}
+
+export function isORPCUnauthorizedRedirectError(
+  error: unknown,
+): error is ORPCUnauthorizedRedirectError {
+  return (
+    error instanceof ORPCUnauthorizedRedirectError ||
+    (error instanceof Error && error.name === "ORPCUnauthorizedRedirectError")
+  );
+}
 
 export function getLink({
   apiServer,
   accessToken,
   getAccessToken,
+  onUnauthorized,
   batch,
   userAgent,
   traceContext,
@@ -13,6 +28,7 @@ export function getLink({
   apiServer: string;
   accessToken?: string | null;
   getAccessToken?: () => string | null | undefined;
+  onUnauthorized?: () => boolean | Promise<boolean>;
   batch?: boolean;
   userAgent: string;
   traceContext?: {
@@ -36,7 +52,24 @@ export function getLink({
       };
     },
     url: `${apiServer}/rpc`,
-    interceptors: [sentryInterceptor({ captureInputs: true })],
+    interceptors: [
+      async ({ next, ...options }) => {
+        try {
+          return await next(options);
+        } catch (err) {
+          if (
+            isORPCClientError(err) &&
+            (err.status === 401 || err.name === "UNAUTHORIZED")
+          ) {
+            if (await onUnauthorized?.()) {
+              throw new ORPCUnauthorizedRedirectError();
+            }
+          }
+          throw err;
+        }
+      },
+      sentryInterceptor({ captureInputs: true }),
+    ],
     plugins: [
       new BatchLinkPlugin({
         groups: [

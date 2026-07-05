@@ -13,17 +13,21 @@ import { getQueryClient } from "./query";
 export default function ORPCProvider({
   accessToken,
   apiServer,
+  onUnauthorized,
   ...props
-}: { accessToken?: string | null; apiServer: string } & Omit<
-  ComponentProps<typeof ORPCContext.Provider>,
-  "value"
->) {
+}: {
+  accessToken?: string | null;
+  apiServer: string;
+  onUnauthorized?: () => boolean | Promise<boolean>;
+} & Omit<ComponentProps<typeof ORPCContext.Provider>, "value">) {
   const queryClient = getQueryClient(false);
   const traceData = getTraceData();
   const accessTokenRef = useRef(accessToken);
   const previousAccessTokenRef = useRef(accessToken);
+  const onUnauthorizedRef = useRef(onUnauthorized);
 
   accessTokenRef.current = accessToken;
+  onUnauthorizedRef.current = onUnauthorized;
 
   useEffect(() => {
     if (previousAccessTokenRef.current !== accessToken) {
@@ -38,6 +42,7 @@ export default function ORPCProvider({
         apiServer,
         getAccessToken: () => accessTokenRef.current,
         userAgent: "@peated/web (orpc/tanstack-query)",
+        onUnauthorized: () => onUnauthorizedRef.current?.() ?? false,
         traceContext: {
           sentryTrace: traceData["sentry-trace"],
           baggage: traceData.baggage,

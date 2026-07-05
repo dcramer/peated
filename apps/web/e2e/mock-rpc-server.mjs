@@ -226,6 +226,11 @@ async function handleRpcRequest({ request, response, url }) {
     }
     case "tastings/photoIdentification":
       // E2E access-token suffixes select alternate mock photo-identification scenarios.
+      if (getAccessToken(request).includes("photo-unauthorized")) {
+        sendRpcUnauthorized(response);
+        return true;
+      }
+
       if (getAccessToken(request).includes("photo-create-warning")) {
         sendRpcResponse(
           response,
@@ -386,6 +391,11 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, buildTasting());
       return true;
     case "users/details":
+      if (getAccessToken(request).includes("photo-unauthorized-expired")) {
+        sendRpcUnauthorized(response);
+        return true;
+      }
+
       if (
         input?.user === "me" ||
         input?.user === testUser.id ||
@@ -1225,4 +1235,22 @@ function sendRpcError(response, message) {
       "Content-Type": "application/json",
     })
     .end(JSON.stringify({ error: { code: "BAD_REQUEST", message } }));
+}
+
+function sendRpcUnauthorized(response) {
+  response
+    .writeHead(401, {
+      ...corsHeaders,
+      "Content-Type": "application/json",
+    })
+    .end(
+      JSON.stringify({
+        json: {
+          defined: true,
+          code: "UNAUTHORIZED",
+          status: 401,
+          message: "Unauthorized.",
+        },
+      }),
+    );
 }

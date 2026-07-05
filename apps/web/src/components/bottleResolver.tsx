@@ -9,6 +9,7 @@ import Layout from "@peated/web/components/layout";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { isORPCUnauthorizedRedirectError } from "@peated/web/lib/orpc/link";
 import { useMutation } from "@tanstack/react-query";
 import {
   AlertTriangle,
@@ -843,6 +844,8 @@ export default function BottleResolver({
         ),
       });
     } catch (err) {
+      if (isORPCUnauthorizedRedirectError(err)) return;
+
       logError(err);
       setError(
         "We couldn't create that bottle from the photo. Search for the bottle to keep going.",
@@ -866,6 +869,8 @@ export default function BottleResolver({
       });
       setPhotoResult(result);
     } catch (err) {
+      if (isORPCUnauthorizedRedirectError(err)) return;
+
       logError(err, {
         context: "add_tasting_photo_identification",
         rpc: "tastings.photoIdentification",
