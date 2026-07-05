@@ -168,7 +168,7 @@ function TargetLoadErrorPanel({
             fullWidth
             icon={<Search className="h-4 w-4" />}
           >
-            Search Again
+            Search Bottles
           </Button>
           <Button
             fullWidth
@@ -374,7 +374,7 @@ function OutcomeSelection({
             fullWidth
             icon={<Search className="h-4 w-4" />}
           >
-            Search Again
+            Search Bottles
           </Button>
           <Button
             fullWidth
@@ -799,7 +799,7 @@ function AddBottleFlowContent() {
       }
       matchedResultDescription="We identified this bottle in Peated."
       createProposalActionLabel="Create Bottle"
-      searchActionLabel="Search Again"
+      searchActionLabel="Search Bottles"
       enableCatalogImageApproval
       renderMatchedResultActions={(props) => (
         <MatchedOutcomeActions {...props} intent={intent} />

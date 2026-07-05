@@ -50,9 +50,10 @@ reference.
 
 - Match an existing candidate only when it covers the marketed identity without
   unsupported extra traits.
-- Create a bottle or release only when reliable external evidence supports the
-  missing canonical identity, unless a closed-form deterministic resolver
-  applies.
+- Create a bottle or release only when reviewed source, label, image,
+  local-catalog, or web evidence supports the missing canonical identity.
+  Automatic verification of creation requires corroborating evidence or a
+  closed-form deterministic anchor.
 - Repair only when the existing bottle identity is right but stored canonical
   fields conflict with evidence.
 - Use `repair_parent_and_create_release` when a supported child release cannot
@@ -72,11 +73,10 @@ evidence bars:
   local evidence is ambiguous, incomplete, or requires canonical interpretation.
 - Full classification is required when the caller wants a create, repair,
   release, parent-repair, or other canonical DB outcome.
-- Web evidence is not required for every existing local match. It is required
-  when the full classifier needs external support for missing canonical
-  identity; creation and release outcomes may also be supported by closed-form
-  deterministic anchors or explicit local parent/sibling evidence where policy
-  allows them.
+- Web evidence is not required for every existing local match. It is one way to
+  corroborate missing canonical identity, but creation and release outcomes may
+  also be supported by reviewed label/image evidence, closed-form deterministic
+  anchors, or explicit local parent/sibling evidence where policy allows them.
 
 ## Execution
 
@@ -95,7 +95,7 @@ The pipeline is:
    tools.
 8. Validate model output against known candidates and resolved entities.
 9. Normalize create and repair drafts.
-10. Downgrade unsupported or impossible decisions.
+10. Downgrade impossible decisions and decisions with concrete conflicts.
 
 Downstream code may gate persistence and automation. It should not promote a
 semantic identity decision the classifier did not make.
@@ -129,12 +129,22 @@ Deterministic code is allowed for closed-form behavior:
 - confidence caps and automation gates
 - exact identity anchors such as SMWS bottle codes
 - unambiguous literal stored alias lookup for match-only local identification
+- direct field contradictions, such as an extracted brand, category, distillery,
+  stated age, ABV, vintage year, release year, cask flag, expression, or edition
+  that conflicts with the matched local candidate
 
 Deterministic code is not allowed for whisky-family semantics. Brand prefixes,
 years, batch-like tokens, `single cask`, `barrel`, producer names, domain names,
 retailer wording, vector similarity, text-search rank, fuzzy aliases, and
 comparable-name matches are not enough to choose bottle versus release scope,
 create canonical identity, or bypass agent judgment.
+
+Post-agent deterministic review must not turn a classifier `match` into
+`no_match` merely because code cannot prove the match from local text, fuzzy
+name comparison, search rank, or structured-support heuristics. Missing
+deterministic support can cap automation confidence or require review, but only
+binary invalid state or direct extracted-field conflict may erase the agent's
+semantic match.
 
 A literal stored alias shortcut is allowed only when the normalized input
 matches a non-ignored stored alias attached to exactly one bottle or release. If
@@ -234,7 +244,8 @@ Keep responsibilities narrow:
 
 - `classifierRuntime.ts`: extraction, retrieval, tools, agent loop
 - `runtime/deterministic.ts`: pre-agent deterministic resolver registry
-- `reviewPolicy.ts`: validation, normalization, and downgrades
+- `reviewPolicy.ts`: validation, normalization, invalid-state rejection, and
+  confidence caps
 - `exactCaskPolicy.ts`: generic exact-cask signal validation for reviewed scope
 - `instructions.ts`: stable classifier and extractor prompts
 - `priceMatchingEvidence.ts`: pure evidence checks shared with price matching

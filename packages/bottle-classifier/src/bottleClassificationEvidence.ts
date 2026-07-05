@@ -193,6 +193,56 @@ export function getExistingMatchIdentityConflicts({
   }
 
   if (
+    extractedLabel?.abv !== null &&
+    extractedLabel?.abv !== undefined &&
+    targetCandidate.abv !== null &&
+    targetCandidate.abv !== undefined &&
+    extractedLabel.abv !== targetCandidate.abv
+  ) {
+    conflicts.push("abv");
+  }
+
+  if (
+    extractedLabel?.vintage_year !== null &&
+    extractedLabel?.vintage_year !== undefined &&
+    targetCandidate.vintageYear !== null &&
+    targetCandidate.vintageYear !== undefined &&
+    extractedLabel.vintage_year !== targetCandidate.vintageYear
+  ) {
+    conflicts.push("vintage_year");
+  }
+
+  if (
+    extractedLabel?.release_year !== null &&
+    extractedLabel?.release_year !== undefined &&
+    targetCandidate.releaseYear !== null &&
+    targetCandidate.releaseYear !== undefined &&
+    extractedLabel.release_year !== targetCandidate.releaseYear
+  ) {
+    conflicts.push("release_year");
+  }
+
+  if (
+    extractedLabel?.cask_strength !== null &&
+    extractedLabel?.cask_strength !== undefined &&
+    targetCandidate.caskStrength !== null &&
+    targetCandidate.caskStrength !== undefined &&
+    extractedLabel.cask_strength !== targetCandidate.caskStrength
+  ) {
+    conflicts.push("cask_strength");
+  }
+
+  if (
+    extractedLabel?.single_cask !== null &&
+    extractedLabel?.single_cask !== undefined &&
+    targetCandidate.singleCask !== null &&
+    targetCandidate.singleCask !== undefined &&
+    extractedLabel.single_cask !== targetCandidate.singleCask
+  ) {
+    conflicts.push("single_cask");
+  }
+
+  if (
     extractedLabel?.edition &&
     targetCandidate.edition &&
     !textsOverlap(extractedLabel.edition, targetCandidate.edition)

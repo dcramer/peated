@@ -1,0 +1,191 @@
+{
+  "id": "image-backed-photo-matches-existing-exclusive-malts-islay-2007-bottle",
+  "name": "image-backed photo: matches existing The Exclusive Malts Islay 2007 8-year-old bottle",
+  "input": {
+    "reference": {
+      "name": "The Exclusive Malts 8 year old 2007",
+      "url": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/exclusive-malts-islay-2007.jpg",
+      "imageUrl": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/exclusive-malts-islay-2007.jpg"
+    },
+    "extractedIdentity": {
+      "brand": "The Exclusive Malts",
+      "bottler": null,
+      "expression": null,
+      "series": null,
+      "distillery": ["Islay Distillery"],
+      "category": "single_malt",
+      "stated_age": 8,
+      "abv": 57.1,
+      "release_year": 2016,
+      "vintage_year": 2007,
+      "cask_strength": true,
+      "single_cask": null,
+      "edition": null
+    },
+    "imageEvidence": {
+      "sourceImageId": "exclusive-malts-islay-2007",
+      "extractors": [
+        {
+          "kind": "ocr",
+          "confidence": 0.96,
+          "textSpans": [
+            {
+              "text": "The Exclusive Malts Scotch Single Malt Whisky 2007 Aged 8 Years Distilled at an Islay Distillery Islay Distilled 17 October 2007 Bottled May 2016 Cask No. 1661 One of 312 Bottles 57.1% Cask Strength Natural Colour",
+              "confidence": 0.96
+            }
+          ],
+          "observations": [
+            "Label identifies The Exclusive Malts, 2007 vintage, 8 years old, bottled May 2016, 57.1% ABV, cask strength, and distilled at an Islay distillery."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "The Exclusive Malts",
+          "confidence": 0.97,
+          "sourceExtractorIndexes": [0]
+        },
+        "statedAge": {
+          "value": 8,
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 57.1,
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "vintageYear": {
+          "value": 2007,
+          "confidence": 0.97,
+          "sourceExtractorIndexes": [0]
+        },
+        "releaseYear": {
+          "value": 2016,
+          "confidence": 0.95,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": true,
+        "suitableAsBottleImage": true
+      },
+      "conflicts": []
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "The Exclusive Malts Islay 2007 8-year-old 57.1%",
+        "brand": "The Exclusive Malts",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Islay Distillery"],
+        "category": "single_malt",
+        "statedAge": 8,
+        "edition": null,
+        "caskStrength": true,
+        "singleCask": null,
+        "abv": 57.1,
+        "vintageYear": 2007,
+        "releaseYear": 2016,
+        "score": 0.99,
+        "source": ["text"],
+        "bottleId": 347,
+        "fullName": "The Exclusive Malts Islay 2007 8-year-old 57.1%"
+      },
+      {
+        "kind": "release",
+        "releaseId": 1,
+        "alias": null,
+        "bottleFullName": "Pōkeno Totara Cask",
+        "brand": "Pōkeno",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Pōkeno"],
+        "category": "single_malt",
+        "statedAge": null,
+        "edition": "01 - Other",
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.63,
+        "source": ["vector", "release"],
+        "bottleId": 346,
+        "fullName": "Pōkeno Totara Cask - 01 - Other"
+      },
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Pōkeno Totara Cask",
+        "brand": "Pōkeno",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Pōkeno"],
+        "category": "single_malt",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.61,
+        "source": ["vector"],
+        "bottleId": 346,
+        "fullName": "Pōkeno Totara Cask"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["exclusive", "malts", "islay", "2007"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "The Exclusive Malts Islay 2007 8-year-old 57.1%",
+          "brand": "The Exclusive Malts",
+          "bottler": null,
+          "series": null,
+          "distillery": ["Islay Distillery"],
+          "category": "single_malt",
+          "statedAge": 8,
+          "edition": null,
+          "caskStrength": true,
+          "singleCask": null,
+          "abv": 57.1,
+          "vintageYear": 2007,
+          "releaseYear": 2016,
+          "score": 0.99,
+          "source": ["text"],
+          "bottleId": 347,
+          "fullName": "The Exclusive Malts Islay 2007 8-year-old 57.1%"
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/exclusive-malts-islay-2007.jpg"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/exclusive-malts-islay-2007.jpg",
+    "notes": "Added from a local Add Bottle photo-identification log where the classifier selected bottle 347 with high confidence but deterministic review downgraded the match to no_match. The fixture preserves the extracted fields and candidate set from that log so the full classifier eval guards against repeating the same end-to-end failure."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 347,
+    "matchedReleaseId": null,
+    "summary": "Use the extracted label identity and local candidates to match existing bottle 347. The deterministic review layer must not turn this non-conflicting classifier-selected match into no_match just because deterministic support heuristics are incomplete."
+  }
+}

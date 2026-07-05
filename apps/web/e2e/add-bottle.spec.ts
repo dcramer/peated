@@ -230,7 +230,7 @@ test.describe("add bottle flow", () => {
       page.getByRole("link", { name: "View Bottle" }),
     ).toHaveAttribute("href", `/bottles/${existingBottle.id}`);
     await expect(
-      page.getByRole("link", { name: "Search Again" }),
+      page.getByRole("link", { name: "Search Bottles" }),
     ).toHaveAttribute("href", "/search?intent=addBottle");
 
     await page.getByRole("button", { name: "Add to Library" }).click();
@@ -676,7 +676,7 @@ test.describe("add bottle flow", () => {
       ),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Search Again" }),
+      page.getByRole("link", { name: "Search Bottles" }),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Create Manually" }),

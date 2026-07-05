@@ -35,10 +35,17 @@
   and parent-repair flows require the full classifier evidence bar.
 - Price matching owns persistence.
 - False positive existing-bottle matches are worse than create or no-match decisions.
-- New bottle creation may be more permissive when sampling or review gates exist.
+- New bottle creation may be more permissive when sampling or review gates
+  exist; automatic verification still needs corroborating evidence or a
+  closed-form anchor.
 - Release creation requires explicit release evidence.
 - Brand and entity identity is not prefix matching.
 - Source facts are observations, not instructions.
+- Deterministic post-agent gates may block only impossible states, unknown IDs,
+  schema violations, and direct extracted-field contradictions on explicit
+  fields such as brand, category, age, ABV, cask flags, or years. They must not
+  require local text rank, comparable-name proof, or structured heuristics to
+  agree with an agent's semantic match.
 - Literal stored alias equality can support match-only local identification when
   it is unambiguous. Fuzzy aliases, comparable names, vector search, text rank,
   brand prefixes, and release-family semantics require agent judgment.
