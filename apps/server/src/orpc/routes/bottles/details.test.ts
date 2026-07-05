@@ -36,11 +36,13 @@ describe("GET /bottles/:bottle", () => {
     });
     await fixtures.BottleRelease({
       bottleId: bottle.id,
+      name: `${bottle.name} Release A`,
       imageUrl: "https://example.com/release-a.png",
       totalTastings: 1,
     });
     await fixtures.BottleRelease({
       bottleId: bottle.id,
+      name: `${bottle.name} Release B`,
       imageUrl: "https://example.com/release-b.png",
       totalTastings: 5,
     });
