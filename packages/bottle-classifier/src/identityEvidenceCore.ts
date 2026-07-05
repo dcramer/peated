@@ -137,9 +137,14 @@ export function classifySearchResultSource({
   return "external";
 }
 
+/**
+ * Matches explicit ABV text, plus numeric proof only when the caller has
+ * structured context that makes the U.S. proof scale deterministic.
+ */
 export function getAbvSupportLevel(
   text: string,
   expectedValue: number,
+  options: { usProofEligible?: boolean } = {},
 ): "none" | "close" | "exact" {
   const exactPattern = new RegExp(
     `\\b${escapeRegExp(expectedValue.toFixed(1))}%?(?:\\s*abv)?\\b|\\b${escapeRegExp(
@@ -150,6 +155,16 @@ export function getAbvSupportLevel(
 
   if (exactPattern.test(text)) {
     return "exact";
+  }
+
+  const proofValues = getUsProofValues(text, options).map((value) => value / 2);
+
+  if (proofValues.some((value) => Math.abs(value - expectedValue) <= 0.05)) {
+    return "exact";
+  }
+
+  if (proofValues.some((value) => Math.abs(value - expectedValue) <= 0.3)) {
+    return "close";
   }
 
   const match = text.match(/(\d{1,2}(?:\.\d)?)\s*%?\s*abv/i);
@@ -163,4 +178,35 @@ export function getAbvSupportLevel(
   }
 
   return Math.abs(value - expectedValue) <= 0.3 ? "close" : "none";
+}
+
+function getUsProofValues(
+  text: string,
+  { usProofEligible = false }: { usProofEligible?: boolean },
+): number[] {
+  const values: number[] = [];
+  const explicitUsProofPatterns = [
+    /\b(\d{1,3}(?:\.\d+)?)\s*(?:-| )?\s*(?:u\.?s\.?|united states)\s*proof\b/gi,
+    /\b(?:u\.?s\.?|united states)\s*proof\s*:\s*(\d{1,3}(?:\.\d+)?)\b/gi,
+  ];
+  const proofPatterns = usProofEligible
+    ? [
+        ...explicitUsProofPatterns,
+        /\b(\d{1,3}(?:\.\d+)?)\s*(?:-| )?\s*proof\b/gi,
+        /\bproof\s*:\s*(\d{1,3}(?:\.\d+)?)\b/gi,
+      ]
+    : explicitUsProofPatterns;
+
+  for (const pattern of proofPatterns) {
+    for (const match of text.matchAll(pattern)) {
+      const value = Number(match[1]);
+      if (!Number.isFinite(value) || value < 0 || value > 200) {
+        continue;
+      }
+
+      values.push(value);
+    }
+  }
+
+  return values;
 }
