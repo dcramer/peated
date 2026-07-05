@@ -6,6 +6,7 @@ import {
   storePriceHistories,
   storePrices,
 } from "@peated/server/db/schema";
+import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { findBottleId } from "@peated/server/lib/bottleFinder";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { pushUniqueJob } from "@peated/server/worker/client";
@@ -107,6 +108,7 @@ subcommand
 
 subcommand.command("backfill-aliases").action(async (options) => {
   const step = 1000;
+  const systemActor = await getPeatedSystemActor();
   const baseQuery = db.select().from(storePrices).orderBy(asc(storePrices.id));
 
   let hasResults = true;
@@ -116,7 +118,9 @@ subcommand.command("backfill-aliases").action(async (options) => {
     const query = await baseQuery.offset(offset).limit(step);
     for (const price of query) {
       if (price.bottleId) {
-        await upsertBottleAlias(db, price.name, price.bottleId);
+        await upsertBottleAlias(db, price.name, price.bottleId, null, {
+          assignedByActorId: systemActor.id,
+        });
       }
       hasResults = true;
     }

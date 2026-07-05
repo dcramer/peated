@@ -6,6 +6,7 @@ import {
   entities,
   entityAliases,
 } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import { omit } from "@peated/server/lib/filter";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -632,5 +633,8 @@ describe("PATCH /entities/:entity", () => {
       .where(eq(bottleAliases.name, existingAlias.name));
     expect(newAlias.name).toEqual("Cool Cats Single Barrel Bourbon");
     expect(newAlias.bottleId).toEqual(newBottle.id);
+    expect(newAlias.assignedByActorId).toEqual(
+      (await getUserActor(modUser)).id,
+    );
   });
 });
