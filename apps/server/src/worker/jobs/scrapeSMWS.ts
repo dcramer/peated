@@ -10,6 +10,9 @@ import {
   type StorePriceInputSchema,
 } from "@peated/server/schemas";
 import { type z } from "zod";
+import { logScrapeWarning } from "./scrapeLogging";
+
+const SITE = "smws";
 
 function parseAbv(value: string | number | null | undefined): number | null {
   if (value === null || value === undefined) return null;
@@ -74,16 +77,22 @@ export async function scrapeBottles(
       items.map(async (item) => {
         const caskName = item.name;
         if (!caskName) {
-          console.warn(`Cannot find cask name for product`);
+          logScrapeWarning(SITE, "Cannot find cask name for product");
           return;
         }
         const details = parseDetailsFromName(`${item.cask_no} ${caskName}`);
         if (!details?.distiller) {
-          console.error(`Cannot find distiller: ${item.cask_no} ${caskName}`);
+          logScrapeWarning(SITE, "Cannot find distiller", {
+            caskNumber: item.cask_no,
+            caskName,
+          });
           return;
         }
         if (!details?.category) {
-          console.error(`Unsupported spirit: ${item.cask_no} ${caskName}`);
+          logScrapeWarning(SITE, "Unsupported spirit", {
+            caskNumber: item.cask_no,
+            caskName,
+          });
           return;
         }
 

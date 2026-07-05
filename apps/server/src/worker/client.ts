@@ -5,7 +5,7 @@ import type { JobsOptions } from "bullmq";
 import { Worker } from "bullmq";
 import IORedis from "ioredis";
 import config from "../config";
-import { logError } from "../lib/log";
+import { logError, logInfo } from "../lib/log";
 import "./jobs";
 import scheduleScrapers from "./jobs/scheduleScrapers";
 import registry from "./registry";
@@ -165,7 +165,11 @@ export async function runWorker() {
   });
 
   async function termProcess(signal: string) {
-    console.log(`Received ${signal}, closing server...`);
+    logInfo("Received {signal}, closing worker", {
+      extra: {
+        signal,
+      },
+    });
 
     await worker.close();
     await defaultQueue.close();
@@ -178,5 +182,5 @@ export async function runWorker() {
   process.on("SIGTERM", () => termProcess("SIGTERM"));
 
   worker.run();
-  console.log("Worker Running...");
+  logInfo("Worker running", {});
 }

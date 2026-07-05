@@ -17,7 +17,7 @@ import {
 } from "@peated/server/db/schema";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { formatReleaseName } from "@peated/server/lib/format";
-import { logError } from "@peated/server/lib/log";
+import { logError, logInfo } from "@peated/server/lib/log";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { eq, inArray, or, sql } from "drizzle-orm";
 
@@ -31,9 +31,12 @@ export default async function mergeBottle({
   fromBottleIds: number[];
   db?: AnyDatabase;
 }) {
-  console.log(
-    `Merging bottles ${fromBottleIds.join(", ")} into ${toBottleId}.`,
-  );
+  logInfo("Merging bottles into {toBottleId}", {
+    extra: {
+      fromBottleIds,
+      toBottleId,
+    },
+  });
 
   // Get the target bottle to get its name for release updates
   const [targetBottle] = await db

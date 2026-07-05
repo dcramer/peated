@@ -22,7 +22,7 @@ import {
 } from "../db/schema";
 import type { EmailVerifySchema, PasswordResetSchema } from "../schemas";
 import { generateMagicLink, signPayload } from "./auth";
-import { logError } from "./log";
+import { logError, logInfo } from "./log";
 
 let mailTransport: Transporter<SMTPTransport.SentMessageInfo>;
 
@@ -121,9 +121,12 @@ export async function notifyComment({
     NewCommentTemplate({ baseUrl: config.URL_PREFIX, comment }),
   );
 
-  console.log(
-    `Sending email notification for comment ${comment.id} to ${comment.tasting.createdBy.email}`,
-  );
+  logInfo("Sending comment notification email for comment {commentId}", {
+    extra: {
+      commentId: comment.id,
+      recipient: comment.tasting.createdBy.email,
+    },
+  });
 
   for (const email of emailList) {
     try {

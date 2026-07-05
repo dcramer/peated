@@ -3,7 +3,7 @@ import {
   defaultHeaders,
   SCRAPER_PRICE_BATCH_SIZE,
 } from "@peated/server/constants";
-import { logError } from "@peated/server/lib/log";
+import { logError, logInfo } from "@peated/server/lib/log";
 import { orpcClient } from "@peated/server/lib/orpc-client/server";
 import type { ExternalSiteType } from "@peated/server/types";
 import { type Category } from "@peated/server/types";
@@ -40,10 +40,18 @@ export async function getUrl(
   let data = "",
     status = 0;
   if (!existsSync(filename) || noCache) {
-    console.log(`${url} not cached, fetching from internet`);
+    logInfo("URL not cached, fetching from internet", {
+      extra: {
+        url,
+      },
+    });
     ({ data, status } = await cacheUrl(url, filename, headers));
   } else if (statSync(filename).mtimeMs < new Date().getTime() - CACHE_EXPIRE) {
-    console.log(`${url} cache outdated, fetching from internet`);
+    logInfo("URL cache outdated, fetching from internet", {
+      extra: {
+        url,
+      },
+    });
     ({ data, status } = await cacheUrl(url, filename, headers));
   } else {
     const fs = await open(filename, "r");
@@ -150,7 +158,11 @@ export async function handleBottle(
   imageUrl?: string | null,
 ) {
   if (process.env.ACCESS_TOKEN) {
-    console.log(`Submitting [${formatBottleName(bottle)}]`);
+    logInfo("Submitting bottle {bottleName}", {
+      extra: {
+        bottleName: formatBottleName(bottle),
+      },
+    });
 
     const {
       data: bottleResult,
@@ -158,7 +170,11 @@ export async function handleBottle(
       isDefined,
     } = await safe(orpcClient.bottles.upsert(bottle));
     if (error && (!isDefined || error.name !== "CONFLICT")) {
-      logError(error, { bottle });
+      logError(error, {
+        extra: {
+          bottle,
+        },
+      });
       return;
     }
 
@@ -170,7 +186,11 @@ export async function handleBottle(
           file: blob,
         });
       } catch (err) {
-        logError(err, { bottle });
+        logError(err, {
+          extra: {
+            bottle,
+          },
+        });
       }
     }
 
@@ -182,11 +202,20 @@ export async function handleBottle(
         }),
       );
       if (priceError && (!priceIsDefined || priceError.name !== "CONFLICT")) {
-        logError(priceError, { bottle, price });
+        logError(priceError, {
+          extra: {
+            bottle,
+            price,
+          },
+        });
       }
     }
   } else {
-    console.log(`Dry Run [${formatBottleName(bottle)}]`);
+    logInfo("Dry run bottle {bottleName}", {
+      extra: {
+        bottleName: formatBottleName(bottle),
+      },
+    });
   }
 }
 
@@ -206,7 +235,12 @@ export default async function scrapePrices(
   const workQueue = new BatchQueue<StorePrice>(
     SCRAPER_PRICE_BATCH_SIZE,
     async (prices) => {
-      console.log("Pushing new price data to API");
+      logInfo("Pushing new price data to API", {
+        extra: {
+          site,
+          count: prices.length,
+        },
+      });
       await orpcClient.prices.createBatch({
         site,
         prices,
@@ -221,7 +255,13 @@ export default async function scrapePrices(
   while (hasProducts) {
     hasProducts = false;
     await scrapeProducts(urlFn(page), async (product) => {
-      console.log(`${product.name} - ${(product.price / 100).toFixed(2)}`);
+      logInfo("Scraped product price {name}", {
+        extra: {
+          name: product.name,
+          price: product.price,
+          site,
+        },
+      });
       const productKey = getScrapedProductKey(product);
       if (uniqueProducts.has(productKey)) return;
       await workQueue.push(product);
@@ -237,5 +277,10 @@ export default async function scrapePrices(
 
   await workQueue.processRemaining();
 
-  console.log(`Complete - ${uniqueProducts.size} products found`);
+  logInfo("Scrape complete", {
+    extra: {
+      site,
+      count: uniqueProducts.size,
+    },
+  });
 }

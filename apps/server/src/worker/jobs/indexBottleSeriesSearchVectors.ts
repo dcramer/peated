@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleSeries, entities } from "@peated/server/db/schema";
+import { logInfo } from "@peated/server/lib/log";
 import { buildBottleSeriesSearchVector } from "@peated/server/lib/search";
 import { eq } from "drizzle-orm";
 
@@ -18,7 +19,11 @@ export default async ({ seriesId }: { seriesId: number }) => {
 
   const searchVector = buildBottleSeriesSearchVector(series, brand!) || null;
 
-  console.log(`Updating searchVector for Series ${series.id}`);
+  logInfo("Updating search vector for series {seriesId}", {
+    extra: {
+      seriesId: series.id,
+    },
+  });
 
   await db
     .update(bottleSeries)

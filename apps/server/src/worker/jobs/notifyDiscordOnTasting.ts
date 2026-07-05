@@ -1,11 +1,11 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { formatColor } from "@peated/server/lib/format";
-import { logError } from "@peated/server/lib/log";
+import { logError, logWarn } from "@peated/server/lib/log";
 import { absoluteUrl } from "@peated/server/lib/urls";
 
 if (!config.DISCORD_WEBHOOK) {
-  console.error("DISCORD_WEBHOOK is not configured");
+  logWarn("DISCORD_WEBHOOK is not configured", {});
 }
 
 export default async function ({ tastingId }: { tastingId: number }) {
@@ -109,6 +109,5 @@ export default async function ({ tastingId }: { tastingId: number }) {
         "payload.json": body,
       },
     );
-    console.error({ error: data });
   }
 }

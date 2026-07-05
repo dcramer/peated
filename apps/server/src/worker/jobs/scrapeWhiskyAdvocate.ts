@@ -2,11 +2,15 @@ import {
   normalizeBottle,
   normalizeCategory,
 } from "@peated/bottle-classifier/normalize";
-import { logError } from "@peated/server/lib/log";
+import {
+  logError,
+  logInfo,
+  logTelemetryError,
+  logWarn,
+} from "@peated/server/lib/log";
 import { orpcClient } from "@peated/server/lib/orpc-client/server";
 import { getUrl, type BottleReview } from "@peated/server/lib/scraper";
 import { absoluteUrl } from "@peated/server/lib/urls";
-import { logger } from "@sentry/node";
 import { load as cheerio } from "cheerio";
 
 export default async function scrapeWhiskeyAdvocate() {
@@ -18,9 +22,11 @@ export default async function scrapeWhiskeyAdvocate() {
     return;
   }
 
-  logger.info(
-    logger.fmt`[Whisky Advocate] Found ${String(issueList.length)} issues`,
-  );
+  logInfo("[Whisky Advocate] Found {issueCount} issues", {
+    extra: {
+      issueCount: issueList.length,
+    },
+  });
 
   const processedIssues = process.env.ACCESS_TOKEN
     ? await orpcClient.externalSites.config.get({
@@ -32,25 +38,33 @@ export default async function scrapeWhiskeyAdvocate() {
 
   const newIssues = issueList.filter((i) => !processedIssues.includes(i));
   if (newIssues.length === 0) {
-    logger.info(logger.fmt`[Whisky Advocate] No unprocessed issues found`);
+    logInfo("[Whisky Advocate] No unprocessed issues found", {});
     return;
   }
 
-  logger.info(
-    logger.fmt`[Whisky Advocate] Found ${String(newIssues.length)} new issues`,
-  );
+  logInfo("[Whisky Advocate] Found {issueCount} new issues", {
+    extra: {
+      issueCount: newIssues.length,
+    },
+  });
 
   for (const issueName of newIssues) {
-    logger.info(
-      logger.fmt`[Whisky Advocate] Fetching reviews for issue [${issueName}]`,
-    );
+    logInfo("[Whisky Advocate] Fetching reviews for issue {issueName}", {
+      extra: {
+        issueName,
+      },
+    });
     await scrapeReviews(
       `https://whiskyadvocate.com/ratings-reviews?custom_rating_issue%5B0%5D=${encodeURIComponent(
         issueName,
       )}&order_by=published_desc`,
       async (item) => {
         if (process.env.ACCESS_TOKEN) {
-          logger.info(logger.fmt`[Whisky Advocate] Submitting [${item.name}]`);
+          logInfo("[Whisky Advocate] Submitting {name}", {
+            extra: {
+              name: item.name,
+            },
+          });
 
           try {
             await orpcClient.reviews.create({
@@ -58,18 +72,28 @@ export default async function scrapeWhiskeyAdvocate() {
               ...item,
             });
           } catch (err) {
-            console.error(err);
+            logTelemetryError(err, {
+              extra: {
+                name: item.name,
+              },
+            });
           }
         } else {
-          logger.info(logger.fmt`[Whisky Advocate] Dry Run [${item.name}]`);
+          logInfo("[Whisky Advocate] Dry Run {name}", {
+            extra: {
+              name: item.name,
+            },
+          });
         }
       },
     );
 
     processedIssues.push(issueName);
-    logger.info(
-      logger.fmt`[Whisky Advocate] Done processing issue [${issueName}]`,
-    );
+    logInfo("[Whisky Advocate] Done processing issue {issueName}", {
+      extra: {
+        issueName,
+      },
+    });
 
     if (process.env.ACCESS_TOKEN) {
       await orpcClient.externalSites.config.set({
@@ -111,7 +135,7 @@ export async function scrapeReviews(
     // <h5>Claxton's Mannochmore 7 year old Oloroso Hogshead, 50% </h5>
     const rawName = $(".postsItemContent > h5", el).first().text().trim();
     if (!rawName) {
-      logger.warn(logger.fmt`[Whisky Advocate] Unable to identify bottle name`);
+      logWarn("[Whisky Advocate] Unable to identify bottle name", {});
       continue;
     }
     const { name } = normalizeBottle({
@@ -123,26 +147,33 @@ export async function scrapeReviews(
 
     const reviewUrl = $("a.postsItemLink", el).first().attr("href");
     if (!reviewUrl) {
-      logger.warn(
-        logger.fmt`[Whisky Advocate] Unable to identify review URL: ${rawName}`,
-      );
+      logWarn("[Whisky Advocate] Unable to identify review URL for {rawName}", {
+        extra: {
+          rawName,
+        },
+      });
       continue;
     }
 
     const rawRating = $(".postsItemRanking > h2", el).first().text().trim();
     if (!rawRating || Number(rawRating) < 1 || Number(rawRating) > 100) {
-      logger.warn(
-        logger.fmt`[Whisky Advocate] Unable to identify valid rating: ${rawName} (${rawRating})`,
-      );
+      logWarn("[Whisky Advocate] Unable to identify valid rating", {
+        extra: {
+          rawName,
+          rawRating,
+        },
+      });
       continue;
     }
     const rating = Number(rawRating);
 
     const issue = $(".postsItemIssue", el).first().text().trim();
     if (!issue) {
-      logger.warn(
-        logger.fmt`[Whisky Advocate] Unable to identify issue name: ${rawName}`,
-      );
+      logWarn("[Whisky Advocate] Unable to identify issue name for {rawName}", {
+        extra: {
+          rawName,
+        },
+      });
       continue;
     }
 

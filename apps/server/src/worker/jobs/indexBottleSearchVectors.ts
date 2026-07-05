@@ -5,6 +5,7 @@ import {
   bottlesToDistillers,
   entities,
 } from "@peated/server/db/schema";
+import { logInfo } from "@peated/server/lib/log";
 import { buildBottleSearchVector } from "@peated/server/lib/search";
 import { eq, getTableColumns } from "drizzle-orm";
 
@@ -52,7 +53,11 @@ export default async ({ bottleId }: { bottleId: number }) => {
       distillerList,
     ) || null;
 
-  console.log(`Updating searchVector for Bottle ${bottle.id}`);
+  logInfo("Updating search vector for bottle {bottleId}", {
+    extra: {
+      bottleId: bottle.id,
+    },
+  });
 
   await db
     .update(bottles)

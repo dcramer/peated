@@ -13,6 +13,9 @@ catalog:
   "@sentry/core": 10.53.0
   "@sentry/nextjs": 10.53.0
   "@sentry/node": 10.53.0
+  "@logtape/hono": 2.2.3
+  "@logtape/logtape": 2.2.3
+  "@logtape/redaction": 2.2.3
   "@opentelemetry/api": 1.9.1
   superjson: ^2.2.6
   tailwindcss: ^3.4.19

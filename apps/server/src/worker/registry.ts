@@ -1,5 +1,5 @@
 import cuid2 from "@paralleldrive/cuid2";
-import { logError } from "@peated/server/lib/log";
+import { logError, logInfo } from "@peated/server/lib/log";
 import * as Sentry from "@sentry/node";
 import { type JobFunction } from "./types";
 
@@ -41,7 +41,12 @@ function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
               span.setAttribute("messaging.message.id", jobId);
               span.setAttribute("messaging.system", "bullmq");
 
-              console.log(`Running job [${jobName} - ${jobId}]`);
+              logInfo("Running job {jobName} {jobId}", {
+                extra: {
+                  jobName,
+                  jobId,
+                },
+              });
               const start = new Date().getTime();
               let success = false;
               try {
@@ -59,11 +64,14 @@ function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
 
               const duration = new Date().getTime() - start;
 
-              console.log(
-                `Job ${
-                  success ? "succeeded" : "failed"
-                } [${jobName} - ${jobId}] in ${(duration / 1000).toFixed(3)}s`,
-              );
+              logInfo("Job {status} {jobName} {jobId}", {
+                extra: {
+                  status: success ? "succeeded" : "failed",
+                  jobName,
+                  jobId,
+                  durationMs: duration,
+                },
+              });
             },
           );
         });

@@ -9,6 +9,15 @@ catalogs:
     '@fontsource/raleway':
       specifier: ^5.0.19
       version: 5.0.19
+    '@logtape/hono':
+      specifier: 2.2.3
+      version: 2.2.3
+    '@logtape/logtape':
+      specifier: 2.2.3
+      version: 2.2.3
+    '@logtape/redaction':
+      specifier: 2.2.3
+      version: 2.2.3
     '@opentelemetry/api':
       specifier: 1.9.1
       version: 1.9.1
@@ -216,6 +225,15 @@ importers:
       '@hono/node-server':
         specifier: ^1.19.13
         version: 1.19.13(hono@4.12.12)
+      '@logtape/hono':
+        specifier: 'catalog:'
+        version: 2.2.3(@logtape/logtape@2.2.3)(hono@4.12.12)
+      '@logtape/logtape':
+        specifier: 'catalog:'
+        version: 2.2.3
+      '@logtape/redaction':
+        specifier: 'catalog:'
+        version: 2.2.3(@logtape/logtape@2.2.3)
       '@openai/agents':
         specifier: ^0.6.0
         version: 0.6.0(ws@8.18.3)(zod@4.3.6)
@@ -433,6 +451,12 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.4.0
         version: 5.4.0(react-hook-form@7.78.0(react@19.2.7))
+      '@logtape/logtape':
+        specifier: 'catalog:'
+        version: 2.2.3
+      '@logtape/redaction':
+        specifier: 'catalog:'
+        version: 2.2.3(@logtape/logtape@2.2.3)
       '@orpc/client':
         specifier: ^1.13.6
         version: 1.13.6(@opentelemetry/api@1.9.1)
@@ -2701,6 +2725,20 @@ packages:
 
   '@levischuck/tiny-cbor@0.2.11':
     resolution: {integrity: sha512-llBRm4dT4Z89aRsm6u2oEZ8tfwL/2l6BwpZ7JcyieouniDECM5AqNgr/y08zalEIvW3RSK4upYyybDcmjXqAow==}
+
+  '@logtape/hono@2.2.3':
+    resolution: {integrity: sha512-r33+8t2NO+NAfJi1SaqUeKREz4bigija9h2bELwpAGEo5+LpgX1YpUQ/iGeyKuKruXDENy1YGxXfQ8KwF97JBg==}
+    peerDependencies:
+      '@logtape/logtape': ^2.2.3
+      hono: ^4.0.0
+
+  '@logtape/logtape@2.2.3':
+    resolution: {integrity: sha512-NIPzXBJneBv7Ar6sFBbEo5L8zZr2lopQnlVeT881y68qGNcJBy/Y8s8uAwUaVhobB8GIiMluOY7j3bOsaaIhQQ==}
+
+  '@logtape/redaction@2.2.3':
+    resolution: {integrity: sha512-yHrAFtSCBEUcwAC/n72mbxkv9HLdEf5gLFC/SJ8j+HuUinED5i+NlHJJJ3LSd/ix7fJ2E5VSLnRQ08lWb4zWjQ==}
+    peerDependencies:
+      '@logtape/logtape': ^2.2.3
 
   '@mapbox/node-pre-gyp@1.0.11':
     resolution: {integrity: sha512-Yhlar6v9WQgUp/He7BdgzOz8lqMQ8sU+jkCq7Wx8Myc5YFJLbEe7lgui/V7G1qB1DJykHSGwreceSaD60Y0PUQ==}
@@ -11953,6 +11991,17 @@ snapshots:
       unified: 11.0.5
 
   '@levischuck/tiny-cbor@0.2.11': {}
+
+  '@logtape/hono@2.2.3(@logtape/logtape@2.2.3)(hono@4.12.12)':
+    dependencies:
+      '@logtape/logtape': 2.2.3
+      hono: 4.12.12
+
+  '@logtape/logtape@2.2.3': {}
+
+  '@logtape/redaction@2.2.3(@logtape/logtape@2.2.3)':
+    dependencies:
+      '@logtape/logtape': 2.2.3
 
   '@mapbox/node-pre-gyp@1.0.11':
     dependencies:

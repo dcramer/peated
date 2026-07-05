@@ -9,7 +9,7 @@ import type { Bottle } from "@peated/server/db/schema";
 import { bottles, changes } from "@peated/server/db/schema";
 import { arraysEqual, objectsShallowEqual } from "@peated/server/lib/equals";
 import { notesForProfile } from "@peated/server/lib/format";
-import { logError } from "@peated/server/lib/log";
+import { logError, logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { CategoryEnum, FlavorProfileEnum } from "@peated/server/schemas";
@@ -18,7 +18,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 if (!config.OPENAI_API_KEY) {
-  console.warn("OPENAI_API_KEY is not configured.");
+  logWarn("OPENAI_API_KEY is not configured", {});
 }
 
 function generatePrompt(bottle: Partial<Bottle>, tagList: string[]) {

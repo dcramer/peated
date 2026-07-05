@@ -10,6 +10,7 @@ import {
   recordIncomingBottleDecisionInTransaction,
   shouldRecordIncomingBottleDecision,
 } from "@peated/server/lib/incomingBottleDecisionLog";
+import { logInfo, logTelemetryError } from "@peated/server/lib/log";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import { and, asc, gt, isNull } from "drizzle-orm";
@@ -53,13 +54,27 @@ export default async function createMissingBottles() {
       });
 
       if (resolution.bottleId) {
-        console.log(
-          `Resolved bottle for review [${review.id}] via ${resolution.source}`,
-        );
+        logInfo("Resolved bottle for review {reviewId}", {
+          extra: {
+            reviewId: review.id,
+            bottleId: resolution.bottleId,
+            releaseId: resolution.releaseId,
+            source: resolution.source,
+          },
+        });
       } else {
-        console.log(`Unable to resolve bottle for review [${review.id}]`);
+        logInfo("Unable to resolve bottle for review {reviewId}", {
+          extra: {
+            reviewId: review.id,
+            source: resolution.source,
+          },
+        });
         if (resolution.error) {
-          console.error(resolution.error);
+          logTelemetryError(resolution.error, {
+            extra: {
+              reviewId: review.id,
+            },
+          });
         }
         continue;
       }

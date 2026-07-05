@@ -1,16 +1,20 @@
 import { defaultHeaders } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { storePrices } from "@peated/server/db/schema";
+import { logInfo, logTelemetryError } from "@peated/server/lib/log";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { logger } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { Readable } from "stream";
 
 async function fetchAndStoreImage(imageUrl: string): Promise<string | null> {
   const filename = imageUrl.split("/").pop() || "image";
 
-  logger.info(logger.fmt`Fetching image [${imageUrl}]`);
+  logInfo("Fetching image {imageUrl}", {
+    extra: {
+      imageUrl,
+    },
+  });
   const req = await fetch(imageUrl, { headers: defaultHeaders(imageUrl) });
   if (!req.body) return null;
   const file = Readable.fromWeb(req.body as any);
@@ -45,7 +49,12 @@ export default async ({
 
   const newImageUrl = await fetchAndStoreImage(imageUrl);
   if (!newImageUrl) {
-    console.error(`Failed to fetch image at ${imageUrl}`);
+    logTelemetryError("Failed to fetch price image", {
+      extra: {
+        imageUrl,
+        priceId,
+      },
+    });
     return;
   }
 

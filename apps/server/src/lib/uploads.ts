@@ -14,6 +14,7 @@ import type { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import config from "../config";
 import { getStorage } from "./gcs";
+import { logInfo } from "./log";
 
 /**
  * Normalizes EXIF orientation, resizes the image, and emits a WebP stream.
@@ -272,7 +273,11 @@ export const storeFile = async ({
           },
         );
 
-        console.info(`File written to ${uploadPath}`);
+        logInfo("File written to {uploadPath}", {
+          extra: {
+            uploadPath,
+          },
+        });
       }
 
       return `${urlPrefix}/${outputFilename}`;

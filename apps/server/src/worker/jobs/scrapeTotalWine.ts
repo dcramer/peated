@@ -7,6 +7,9 @@ import type { ScrapePricesCallback } from "@peated/server/lib/scraper";
 import scrapePrices, { getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
+import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
+
+const SITE = "totalwine";
 
 export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const data = await getUrl(url);
@@ -16,7 +19,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   $("#main article").each((_, el) => {
     const rawName = $("h2.title__2RoYeYuO > a", el).first().text();
     if (!rawName) {
-      console.warn("Unable to identify Product Name");
+      logScrapeWarning(SITE, "Unable to identify product name");
       return;
     }
     const { name } = normalizeBottle({ name: rawName });
@@ -24,12 +27,12 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
     const volumeRaw = $("h2.title__2RoYeYuO > span", el).first().text();
     const volume = volumeRaw ? normalizeVolume(volumeRaw) : null;
     if (!volume) {
-      console.warn(`Invalid size: ${volumeRaw}`);
+      logScrapeWarning(SITE, "Invalid product size", { volumeRaw });
       return;
     }
 
     if (!ALLOWED_VOLUMES.includes(volume)) {
-      console.warn(`Invalid size: ${volume}`);
+      logScrapeWarning(SITE, "Invalid product size", { volume });
       return;
     }
 
@@ -41,10 +44,10 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
       $("span.price__1JvDDp_x", el).first().text();
     const price = parsePrice(priceRaw);
     if (!price) {
-      console.warn(`Invalid price: ${priceRaw}`);
+      logScrapeWarning(SITE, "Invalid product price", { priceRaw });
       return;
     }
-    console.log(`${name} - ${(price / 100).toFixed(2)}`);
+    logScrapedProduct(SITE, { name, price });
     promises.push(
       cb({
         name,
@@ -61,14 +64,14 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 
 export default async function scrapeTotalWine() {
   await scrapePrices(
-    "totalwine",
+    SITE,
     (page) =>
       `https://www.totalwine.com/spirits/scotch/c/000887?viewall=true&pageSize=120&aty=0,0,0,0&page=${page}`,
     scrapeProducts,
   );
 
   await scrapePrices(
-    "totalwine",
+    SITE,
     (page) =>
       `https://www.totalwine.com/spirits/whiskey/c/9238919?viewall=true&pageSize=120&aty=0,0,0,0&page=${page}`,
     scrapeProducts,

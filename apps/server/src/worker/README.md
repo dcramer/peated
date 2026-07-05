@@ -17,11 +17,16 @@ Create a new file in `jobs/` directory:
 
 ```typescript
 // jobs/myNewJob.ts
+import { logInfo } from "@peated/server/lib/log";
 import { type JobFunction } from "../types";
 
 const myNewJob: JobFunction = async (params, context) => {
   // Your job logic here
-  console.log("Running job with params:", params);
+  logInfo("Running job with params", {
+    extra: {
+      params,
+    },
+  });
 };
 
 export default myNewJob;

@@ -22,7 +22,6 @@ import { open } from "fs/promises";
 import { Hono } from "hono";
 import { cache } from "hono/cache";
 import { cors } from "hono/cors";
-import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import { lookup } from "mime-types";
 import { Readable } from "node:stream";
@@ -33,7 +32,7 @@ import { ZodError } from "zod";
 import config from "./config";
 import { getUserFromHeader } from "./lib/auth";
 import { getStorage } from "./lib/gcs";
-import { logError } from "./lib/log";
+import { httpLogger, logError, logInfo, logWarn } from "./lib/log";
 import router from "./orpc/router";
 import {
   AuthSchema,
@@ -113,8 +112,10 @@ const rpcHandler = new RPCHandler(router, {
         // If you only use Zod you can safely cast to ZodIssue[]
         const zodError = new ZodError(error.cause.issues as ZodIssue[]);
 
-        console.log("INPUT_VALIDATION_ERROR", {
-          zodError: zodError.toString(),
+        logWarn("Input validation failed", {
+          extra: {
+            zodError: zodError.toString(),
+          },
         });
 
         throw new ORPCError("INPUT_VALIDATION_FAILED", {
@@ -131,8 +132,10 @@ const rpcHandler = new RPCHandler(router, {
       ) {
         const zodError = new ZodError(error.cause.issues as ZodIssue[]);
 
-        console.log("OUTPUT_VALIDATION_ERROR", {
-          zodError: zodError.toString(),
+        logError("Output validation failed", {
+          extra: {
+            zodError: zodError.toString(),
+          },
         });
 
         throw new ORPCError("OUTPUT_VALIDATION_FAILED", {
@@ -164,7 +167,7 @@ export const app = new Hono()
     logError(err);
     return c.json({ error: "Internal Server Error" }, 500);
   })
-  .use("*", logger())
+  .use("*", httpLogger())
   .use(
     "*",
     cors({
@@ -190,7 +193,11 @@ export const app = new Hono()
   )
   .use("*", async (c, next) => {
     if (config.ENV === "development") {
-      console.log("Adding 300ms delay to all requests");
+      logInfo("Adding development request delay", {
+        extra: {
+          delayMs: 300,
+        },
+      });
 
       await setTimeout(300);
     }

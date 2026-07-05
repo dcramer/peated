@@ -1,3 +1,5 @@
+import { logTelemetryError } from "./log";
+
 export default class BatchQueue<T> {
   private queue: T[] = [];
   private batchSize: number;
@@ -36,7 +38,11 @@ export default class BatchQueue<T> {
     try {
       await this.processBatchCallback(batch);
     } catch (error) {
-      console.error("Error processing batch:", error);
+      logTelemetryError(error, {
+        extra: {
+          batchSize: batch.length,
+        },
+      });
     } finally {
       this.processingBatch = false;
     }

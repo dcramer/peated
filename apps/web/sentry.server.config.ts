@@ -4,9 +4,11 @@
 
 import * as Sentry from "@sentry/nextjs";
 import { SharedSentryConfig } from "./src/config";
+import { configureLogging } from "./src/lib/log";
 
 Sentry.init({
   ...SharedSentryConfig,
 });
 
 Sentry.setTag("service", "@peated/web");
+configureLogging();

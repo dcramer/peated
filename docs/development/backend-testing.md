@@ -100,6 +100,11 @@ Mocking is allowed only at boundaries that are expensive, unsafe, or inappropria
 
 Do not mock internal business logic purely to make a backend test look unit-sized.
 
+Do not mock or suppress logging. Leave the logging facade and console methods
+wired so emitted logs remain available during test runs. Tests should verify the
+observable behavior that caused a log, not assert that a particular log call
+happened.
+
 ## File Placement and Naming
 
 - Co-locate tests with the code they cover as `*.test.ts`.

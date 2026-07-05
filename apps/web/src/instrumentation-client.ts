@@ -3,6 +3,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 import * as Sentry from "@sentry/nextjs";
 import { SharedSentryConfig } from "./config";
+import { configureLogging } from "./lib/log";
 
 Sentry.init({
   ...SharedSentryConfig,
@@ -26,5 +27,6 @@ Sentry.init({
 });
 
 Sentry.setTag("service", "@peated/web");
+configureLogging();
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

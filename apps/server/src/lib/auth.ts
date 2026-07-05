@@ -1,4 +1,3 @@
-import { logger } from "@sentry/node";
 import { hashSync } from "bcrypt";
 import { eq } from "drizzle-orm";
 import config from "../config";
@@ -9,7 +8,7 @@ import { users } from "../db/schema";
 import { random } from "../lib/rand";
 import { serialize } from "../serializers";
 import { UserSerializer } from "../serializers/user";
-import { logError } from "./log";
+import { logWarn } from "./log";
 import { absoluteUrl } from "./urls";
 
 // I love to ESM.
@@ -62,23 +61,31 @@ export async function getUserFromHeader(
   try {
     payload = await verifyPayload(token);
   } catch {
-    logger.warn(`Invalid Bearer token`);
+    logWarn("Invalid Bearer token", {});
     return null;
   }
 
   const { id } = (payload ?? {}) as any;
   if (!id) {
-    logger.warn(`Invalid Bearer token`);
+    logWarn("Invalid Bearer token", {});
     return null;
   }
   const [user] = await db.select().from(users).where(eq(users.id, id));
   if (!user) {
-    logError("User not found", { userId: id });
+    logWarn("Token user not found", {
+      extra: {
+        userId: id,
+      },
+    });
     return null;
   }
 
   if (!user.active) {
-    logger.warn(`Inactive user found for token`);
+    logWarn("Inactive user found for token", {
+      extra: {
+        userId: id,
+      },
+    });
     return null;
   }
 
@@ -137,7 +144,11 @@ export async function createUser(
   if (!user.verified) {
     await sendVerificationEmail({ user });
   } else {
-    logger.warn(logger.fmt`Skipping email verification for ${user.email}`);
+    logWarn("Skipping email verification for {email}", {
+      extra: {
+        email: user.email,
+      },
+    });
   }
 
   return user;
