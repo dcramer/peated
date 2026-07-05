@@ -62,7 +62,6 @@ type RepairBottle = Pick<
   | "caskStrength"
   | "caskType"
   | "category"
-  | "createdById"
   | "description"
   | "edition"
   | "flavorProfile"
@@ -162,7 +161,6 @@ async function getLegacyBottleForRepair(
       flavorProfile: bottles.flavorProfile,
       brandId: bottles.brandId,
       bottlerId: bottles.bottlerId,
-      createdById: bottles.createdById,
       numReleases: bottles.numReleases,
       totalTastings: bottles.totalTastings,
     })
@@ -208,7 +206,6 @@ async function getLegacyBottleSnapshotForRepair(legacyBottleId: number) {
       flavorProfile: bottles.flavorProfile,
       brandId: bottles.brandId,
       bottlerId: bottles.bottlerId,
-      createdById: bottles.createdById,
       numReleases: bottles.numReleases,
       totalTastings: bottles.totalTastings,
     })
@@ -431,7 +428,6 @@ async function createParentBottleForRepair(
       brandId: legacyBottle.brandId,
       bottlerId: legacyBottle.bottlerId,
       flavorProfile: legacyBottle.flavorProfile,
-      createdById: user.id,
       createdByActorId: actorId,
     })
     .returning();
@@ -443,7 +439,6 @@ async function createParentBottleForRepair(
     null,
     {
       assignmentSource: "canonical",
-      assignedById: user.id,
       assignedByActorId: actorId,
     },
   );
@@ -457,7 +452,6 @@ async function createParentBottleForRepair(
     objectType: "bottle",
     objectId: parentBottle.id,
     createdAt: parentBottle.createdAt,
-    createdById: user.id,
     actorId,
     displayName: parentBottle.fullName,
     type: "add",
@@ -767,6 +761,7 @@ export async function applyLegacyReleaseRepairInTransaction(
       aliasName,
       parentBottle.id,
       release.id,
+      { assignedByActorId: actorId },
     );
     if (
       alias.bottleId !== parentBottle.id ||
@@ -987,7 +982,6 @@ export async function applyLegacyReleaseRepairInTransaction(
     tx.insert(changes).values({
       objectType: "bottle",
       objectId: legacyBottle.id,
-      createdById: user.id,
       actorId,
       displayName: legacyBottle.fullName,
       type: "delete",

@@ -2,6 +2,7 @@ import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { bottles } from "@peated/server/db/schema";
+import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { humanizeBytes } from "@peated/server/lib/strings";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
@@ -54,10 +55,12 @@ export default procedure
       });
     }
 
+    const userActor = await getUserActorForDatabase(db, context.user);
+
     if (
-      targetBottle.createdById !== context.user.id &&
       !context.user.admin &&
-      !context.user.mod
+      !context.user.mod &&
+      targetBottle.createdByActorId !== userActor.id
     ) {
       throw errors.FORBIDDEN({
         message: "You don't have permission to update this bottle.",

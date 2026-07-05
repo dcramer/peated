@@ -6,6 +6,7 @@ import {
   bottlesToDistillers,
   changes,
 } from "@peated/server/db/schema";
+import { getUserActorByIdForDatabase } from "@peated/server/lib/actors";
 import { repairBottleBrandDistilleryAssignments } from "@peated/server/lib/repairBottleBrandDistilleryAssignments";
 import { and, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -190,7 +191,11 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       ),
       orderBy: (changes, { desc }) => [desc(changes.createdAt)],
     });
-    expect(change?.createdById).toEqual(systemUser.id);
+    const systemUserActor = await getUserActorByIdForDatabase(
+      db,
+      systemUser.id,
+    );
+    expect(change?.actorId).toEqual(systemUserActor.id);
     expect(change?.data).toEqual({
       brandId: toBrand.id,
       fullName: targetBottleFullName,

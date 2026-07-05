@@ -50,7 +50,6 @@ export default procedure
         tx.insert(changes).values({
           objectType: "bottle_release",
           objectId: release.bottleId,
-          createdById: context.user.id,
           actorId,
           displayName: release.fullName,
           type: "delete",

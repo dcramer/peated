@@ -27,45 +27,26 @@ export class FailedToSaveBottleAliasError extends Error {
   }
 }
 
-export type BottleAliasAssignmentOptions =
-  | {
-      assignmentSource?: undefined;
-      assignedById?: undefined;
-      assignedByActorId?: undefined;
-    }
-  | {
-      assignmentSource?: BottleAliasAssignmentSource;
-      assignedById?: number | null;
-      assignedByActorId: number;
-    }
-  | {
-      assignmentSource?: BottleAliasAssignmentSource;
-      assignedById: number | null;
-      assignedByActorId: number;
-    };
+export type BottleAliasAssignmentOptions = {
+  assignmentSource?: BottleAliasAssignmentSource;
+  assignedByActorId: number;
+};
 
 type BottleAliasAssignmentValues = {
   assignmentSource?: BottleAliasAssignmentSource;
-  assignedById?: number | null;
-  assignedByActorId?: number | null;
+  assignedByActorId: number;
 };
 
 function hasExplicitAssignmentOptions(options: BottleAliasAssignmentValues) {
-  return (
-    options.assignmentSource !== undefined ||
-    options.assignedById !== undefined ||
-    options.assignedByActorId !== undefined
-  );
+  return options.assignmentSource !== undefined;
 }
 
 function getAssignmentInsertValues({
   assignmentSource = "legacy",
-  assignedById = null,
-  assignedByActorId = null,
+  assignedByActorId,
 }: BottleAliasAssignmentValues) {
   return {
     assignmentSource,
-    assignedById,
     assignedByActorId,
   };
 }
@@ -75,12 +56,7 @@ function getAssignmentUpdateValues(options: BottleAliasAssignmentValues) {
     ...(options.assignmentSource !== undefined
       ? { assignmentSource: options.assignmentSource }
       : {}),
-    ...(options.assignedById !== undefined
-      ? { assignedById: options.assignedById }
-      : {}),
-    ...(options.assignedByActorId !== undefined
-      ? { assignedByActorId: options.assignedByActorId }
-      : {}),
+    assignedByActorId: options.assignedByActorId,
   };
 }
 
@@ -100,7 +76,6 @@ export async function assignBottleAliasInTransaction(
     backfillNames = [],
     volume,
     assignmentSource,
-    assignedById,
     assignedByActorId,
   }: {
     bottleId: number;
@@ -118,7 +93,6 @@ export async function assignBottleAliasInTransaction(
 
   const assignmentOptions: BottleAliasAssignmentValues = {
     assignmentSource,
-    assignedById,
     assignedByActorId,
   };
   const existingAlias = await tx.query.bottleAliases.findFirst({
@@ -143,7 +117,8 @@ export async function assignBottleAliasInTransaction(
     if (
       existingAlias.name !== name ||
       (existingAlias.releaseId ?? null) !== nextAliasReleaseId ||
-      hasExplicitAssignmentOptions(assignmentOptions)
+      hasExplicitAssignmentOptions(assignmentOptions) ||
+      existingAlias.assignedByActorId !== assignmentOptions.assignedByActorId
     ) {
       [alias] = await tx
         .update(bottleAliases)

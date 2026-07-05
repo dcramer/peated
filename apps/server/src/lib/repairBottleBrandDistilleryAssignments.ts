@@ -394,7 +394,6 @@ export async function repairBottleBrandDistilleryAssignments({
           null,
           {
             assignmentSource: "canonical",
-            assignedById: user!.id,
             assignedByActorId: actorId,
           },
         );
@@ -449,7 +448,6 @@ export async function repairBottleBrandDistilleryAssignments({
             release.id,
             {
               assignmentSource: "canonical",
-              assignedById: user!.id,
               assignedByActorId: actorId,
             },
           );
@@ -490,7 +488,6 @@ export async function repairBottleBrandDistilleryAssignments({
           objectType: "bottle",
           type: "update",
           displayName: nextBottleFullName,
-          createdById: user!.id,
           actorId,
           data: {
             brandId: toBrand.id,

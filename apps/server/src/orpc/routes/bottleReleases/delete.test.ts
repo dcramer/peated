@@ -33,6 +33,7 @@ describe("DELETE /bottle-releases/:release", () => {
       releaseId: release.id,
       name: "Test Alias",
       bottleId: release.bottleId,
+      assignedByActorId: release.createdByActorId,
     });
 
     await db.insert(collectionBottles).values({

@@ -225,11 +225,14 @@ export default procedure
 
         // we do insert vs update to handle the ON CONFLICT scenario
         await tx.execute(sql`
-            INSERT INTO ${bottleAliases} (name, bottle_id)
-            SELECT ${bottles.fullName}, ${bottles.id} FROM ${bottles}
+            INSERT INTO ${bottleAliases} (name, bottle_id, assigned_by_actor_id)
+            SELECT ${bottles.fullName}, ${bottles.id}, ${actorId} FROM ${bottles}
             WHERE ${bottles.brandId} = ${newEntity.id}
             ON CONFLICT (LOWER(name))
-            DO UPDATE SET bottle_id = excluded.bottle_id WHERE ${bottleAliases.bottleId} IS NULL
+            DO UPDATE SET
+              bottle_id = excluded.bottle_id,
+              assigned_by_actor_id = excluded.assigned_by_actor_id
+            WHERE ${bottleAliases.bottleId} IS NULL
         `);
 
         if (
@@ -250,7 +253,6 @@ export default procedure
         objectType: "entity",
         objectId: newEntity.id,
         displayName: newEntity.name,
-        createdById: user.id,
         actorId,
         type: "update",
         data: {

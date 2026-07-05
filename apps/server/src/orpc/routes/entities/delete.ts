@@ -42,7 +42,6 @@ export default procedure
         tx.insert(changes).values({
           objectType: "entity",
           objectId: entity.id,
-          createdById: context.user.id,
           actorId,
           displayName: entity.name,
           type: "delete",

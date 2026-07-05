@@ -50,6 +50,7 @@ export default procedure
           bottleId: input.bottle!,
           releaseId: input.release ?? null,
           reviewedById: context.user.id,
+          actorType: "user",
         });
         return {};
       }

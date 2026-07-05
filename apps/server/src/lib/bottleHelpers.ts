@@ -66,7 +66,6 @@ export async function processSeries({
       fullName,
       brandId: brand.id,
       numReleases: 1,
-      createdById: userId,
       createdByActorId: actorId,
     })
     .returning();
@@ -82,7 +81,6 @@ export async function processSeries({
       fullName: newSeries.fullName,
       brandId: newSeries.brandId,
     },
-    createdById: userId,
     actorId,
   });
 

@@ -2,6 +2,7 @@ import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import { bottleAliases, reviews } from "@peated/server/db/schema";
+import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { findBottleId } from "@peated/server/lib/bottleFinder";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { asc, eq } from "drizzle-orm";
@@ -62,6 +63,7 @@ subcommand
 
 subcommand.command("backfill-aliases").action(async (options) => {
   const step = 1000;
+  const systemActor = await getPeatedSystemActor();
   const baseQuery = db.select().from(reviews).orderBy(asc(reviews.id));
 
   let hasResults = true;
@@ -71,12 +73,15 @@ subcommand.command("backfill-aliases").action(async (options) => {
     const query = await baseQuery.offset(offset).limit(step);
     for (const price of query) {
       if (price.bottleId) {
-        await upsertBottleAlias(db, price.name, price.bottleId);
+        await upsertBottleAlias(db, price.name, price.bottleId, null, {
+          assignedByActorId: systemActor.id,
+        });
       } else {
         await db
           .insert(bottleAliases)
           .values({
             name: price.name,
+            assignedByActorId: systemActor.id,
           })
           .onConflictDoNothing();
       }

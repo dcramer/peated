@@ -1,3 +1,4 @@
+import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
@@ -43,6 +44,31 @@ describe("GET /users/:user", () => {
     );
     expect(data.id).toBe(user.id);
     expect(data.friendStatus).toBe("friends");
+  });
+
+  test("counts actor-backed catalog contributions", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const targetActor = await getUserActor(defaults.user);
+    const otherUser = await fixtures.User();
+    const otherActor = await getUserActor(otherUser);
+
+    await fixtures.Entity({
+      name: "Target Contribution",
+      createdByActorId: targetActor.id,
+    });
+    await fixtures.Entity({
+      name: "Other Contribution",
+      createdByActorId: otherActor.id,
+    });
+
+    const data = await routerClient.users.details(
+      { user: defaults.user.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data.stats.contributions).toBe(1);
   });
 
   test("errors on invalid username", async () => {

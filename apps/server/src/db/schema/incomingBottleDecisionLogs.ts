@@ -16,7 +16,6 @@ import { actors } from "./actors";
 import { bottleReleases, bottles } from "./bottles";
 import { externalSites } from "./externalSites";
 import { storePriceMatchProposals } from "./stores";
-import { users } from "./users";
 
 export const incomingBottleDecisionSourceKindEnum = pgEnum(
   "incoming_bottle_decision_source_kind",
@@ -31,11 +30,6 @@ export const incomingBottleDecisionTypeEnum = pgEnum(
     "create_bottle_and_release",
   ],
 );
-export const incomingBottleDecisionActorTypeEnum = pgEnum(
-  "incoming_bottle_decision_actor_type",
-  ["system", "user"],
-);
-
 export const incomingBottleDecisionLogs = pgTable(
   "incoming_bottle_decision_log",
   {
@@ -52,14 +46,9 @@ export const incomingBottleDecisionLogs = pgTable(
     name: text("name").notNull(),
     url: text("url"),
     decision: incomingBottleDecisionTypeEnum("decision").notNull(),
-    actorType: incomingBottleDecisionActorTypeEnum("actor_type").notNull(),
     actorId: bigint("actor_id", { mode: "number" })
       .references(() => actors.id)
       .notNull(),
-    actorUserId: bigint("actor_user_id", { mode: "number" }).references(
-      () => users.id,
-      { onDelete: "set null" },
-    ),
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
@@ -89,8 +78,6 @@ export const incomingBottleDecisionLogs = pgTable(
     index("incoming_bottle_decision_bottle_idx").on(table.bottleId),
     index("incoming_bottle_decision_release_idx").on(table.releaseId),
     index("incoming_bottle_decision_actor_ref_idx").on(table.actorId),
-    index("incoming_bottle_decision_actor_idx").on(table.actorType),
-    index("incoming_bottle_decision_actor_user_idx").on(table.actorUserId),
   ],
 );
 
@@ -104,10 +91,6 @@ export const incomingBottleDecisionLogsRelations = relations(
     proposal: one(storePriceMatchProposals, {
       fields: [incomingBottleDecisionLogs.proposalId],
       references: [storePriceMatchProposals.id],
-    }),
-    actorUser: one(users, {
-      fields: [incomingBottleDecisionLogs.actorUserId],
-      references: [users.id],
     }),
     actor: one(actors, {
       fields: [incomingBottleDecisionLogs.actorId],

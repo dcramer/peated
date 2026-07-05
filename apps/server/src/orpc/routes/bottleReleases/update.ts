@@ -270,7 +270,6 @@ export default procedure
         updatedRelease.id,
         {
           assignmentSource: "canonical",
-          assignedById: user.id,
           assignedByActorId: actorId,
         },
       );
@@ -288,7 +287,6 @@ export default procedure
       await tx.insert(changes).values({
         objectType: "bottle_release",
         objectId: updatedRelease.id,
-        createdById: user.id,
         actorId,
         displayName: updatedRelease.fullName,
         type: "update",

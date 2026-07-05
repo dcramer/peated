@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottles } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
@@ -101,11 +102,12 @@ describe("GET /bottles/canon-repair-candidates", () => {
     const brand = await fixtures.Entity({ name: "Elijah Craig" });
     const noiseBrand = await fixtures.Entity({ name: "Noise Brand" });
     const user = await fixtures.User({ mod: true });
+    const actor = await getUserActor(user);
 
     await db.insert(bottles).values(
       Array.from({ length: 2000 }, (_, index) => ({
         brandId: noiseBrand.id,
-        createdById: user.id,
+        createdByActorId: actor.id,
         fullName: `Noise Brand Noise ${index + 1}`,
         name: `Noise ${index + 1}`,
         totalTastings: 5000 - index,

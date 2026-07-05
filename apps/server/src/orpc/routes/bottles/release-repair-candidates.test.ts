@@ -1143,6 +1143,7 @@ describe("GET /bottles/release-repair-candidates", () => {
     await db.insert(bottleAliases).values({
       bottleId: conflictingBottle.id,
       name: "Alias Conflict Distillery Warehouse Session",
+      assignedByActorId: conflictingBottle.createdByActorId,
     });
     const user = await fixtures.User({ mod: true });
 
@@ -1197,6 +1198,7 @@ describe("GET /bottles/release-repair-candidates", () => {
       bottleId: parentBottle.id,
       releaseId: release.id,
       name: "Release Alias Distillery Warehouse Session",
+      assignedByActorId: release.createdByActorId,
     });
     const user = await fixtures.User({ mod: true });
 

@@ -596,7 +596,6 @@ export async function applyDirtyParentAgeRepairInTransaction(
   await tx.insert(changes).values({
     objectType: "bottle",
     objectId: updatedBottle.id,
-    createdById: user.id,
     actorId,
     displayName: updatedBottle.fullName,
     type: "update",

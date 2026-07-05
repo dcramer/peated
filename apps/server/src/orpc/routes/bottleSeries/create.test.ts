@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleSeries, changes } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq } from "drizzle-orm";
@@ -59,7 +60,7 @@ describe("POST /bottle-series", () => {
         description: data.description,
         brandId: brand.id,
       },
-      createdById: defaults.user.id,
+      actorId: (await getUserActor(defaults.user)).id,
     });
   });
 

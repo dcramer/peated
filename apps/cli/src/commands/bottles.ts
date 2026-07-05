@@ -7,6 +7,7 @@ import {
   bottles,
   entities,
 } from "@peated/server/db/schema";
+import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
   applyRepairBackfillProposals,
   type BatchApplicableRepairBackfillProposalType,
@@ -173,6 +174,8 @@ subcommand
   .option("--dry-run")
   .action(async (bottleIds, options) => {
     const step = 1000;
+    let systemActor: Awaited<ReturnType<typeof getPeatedSystemActor>> | null =
+      null;
     const baseQuery = db
       .select()
       .from(bottles)
@@ -219,9 +222,12 @@ subcommand
               await tx.update(bottles).set(values).where(eq(bottles.id, id));
               if (values.fullName) {
                 const aliasName = values.fullName;
-                await tx
-                  .insert(bottleAliases)
-                  .values({ name: aliasName, bottleId: id });
+                systemActor ??= await getPeatedSystemActor();
+                await tx.insert(bottleAliases).values({
+                  name: aliasName,
+                  bottleId: id,
+                  assignedByActorId: systemActor.id,
+                });
               }
             });
           }
@@ -644,6 +650,7 @@ subcommand
   .description("Update bottle aliases")
   .action(async (options) => {
     const step = 1000;
+    const systemActor = await getPeatedSystemActor();
     const baseQuery = db
       .select({
         bottle: bottles,
@@ -671,7 +678,15 @@ subcommand
               .update(bottles)
               .set({ fullName })
               .where(eq(bottles.id, bottle.id));
-            const alias = await upsertBottleAlias(tx, fullName, bottle.id);
+            const alias = await upsertBottleAlias(
+              tx,
+              fullName,
+              bottle.id,
+              null,
+              {
+                assignedByActorId: systemActor.id,
+              },
+            );
             if (alias.bottleId !== bottle.id) {
               throw new Error(
                 `Alias mismatch: bottle ${bottle.id} != ${alias.bottleId}`,

@@ -106,7 +106,6 @@ export default procedure
         objectType: "entity",
         objectId: entity.id,
         displayName: entity.name,
-        createdById: context.user.id,
         actorId,
         type: "update",
         data: {

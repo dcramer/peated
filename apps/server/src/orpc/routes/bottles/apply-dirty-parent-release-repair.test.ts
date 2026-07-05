@@ -11,6 +11,7 @@ import {
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq, inArray, isNull } from "drizzle-orm";
@@ -36,6 +37,7 @@ describe("POST /bottles/:bottle/apply-dirty-parent-release-repair", () => {
   }) => {
     const brand = await fixtures.Entity({ name: "Aberlour" });
     const mod = await fixtures.User({ mod: true });
+    const modActor = await getUserActor(mod);
     const bottle = await fixtures.Bottle({
       brandId: brand.id,
       name: "A'bunadh",
@@ -43,7 +45,7 @@ describe("POST /bottles/:bottle/apply-dirty-parent-release-repair", () => {
       statedAge: 12,
       description: "Dirty parent description",
       imageUrl: "/images/abunadh-batch31.png",
-      createdById: mod.id,
+      createdByActorId: modActor.id,
     });
 
     const tasting = await fixtures.Tasting({
@@ -229,12 +231,13 @@ describe("POST /bottles/:bottle/apply-dirty-parent-release-repair", () => {
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
+    const modActor = await getUserActor(mod);
     const bottle = await fixtures.Bottle({
       name: "Distillers Edition",
       edition: "2011 Release",
       releaseYear: 2011,
       description: "Recovered metadata",
-      createdById: mod.id,
+      createdByActorId: modActor.id,
     });
     const genericParentName = bottle.fullName.replace(/ - 2011 Release$/, "");
     const existingRelease = await fixtures.BottleRelease({
@@ -242,7 +245,7 @@ describe("POST /bottles/:bottle/apply-dirty-parent-release-repair", () => {
       edition: "2011 Release",
       releaseYear: 2011,
       description: null,
-      createdById: mod.id,
+      createdByActorId: modActor.id,
     });
     const releaseReview = await fixtures.Review({
       bottleId: bottle.id,

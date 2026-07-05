@@ -199,7 +199,6 @@ describe("POST /reviews", () => {
       bottleId: bottle!.id,
       assignmentSource: "classifier_approved",
       assignedByActorId: systemActor.id,
-      assignedById: adminUser.id,
     });
 
     const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
@@ -213,9 +212,7 @@ describe("POST /reviews", () => {
       sourceId: review!.id,
       externalSiteId: site.id,
       decision: "create_bottle",
-      actorType: "system",
       actorId: systemActor.id,
-      actorUserId: null,
       bottleId: bottle!.id,
       releaseId: null,
       createdBottle: true,
@@ -370,7 +367,6 @@ describe("POST /reviews", () => {
     });
     expect(decisionLog).toMatchObject({
       decision: "create_release",
-      actorType: "system",
       bottleId: bottle.id,
       releaseId: release!.id,
       createdBottle: false,
@@ -657,9 +653,7 @@ describe("POST /reviews", () => {
     });
     expect(decisionLog).toMatchObject({
       decision: "match_existing",
-      actorType: "system",
       actorId: (await getPeatedSystemActor()).id,
-      actorUserId: null,
       bottleId: bottle.id,
       releaseId: null,
       createdBottle: false,

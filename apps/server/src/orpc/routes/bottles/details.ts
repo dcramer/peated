@@ -9,13 +9,11 @@ import { procedure } from "@peated/server/orpc";
 import {
   BottleSchema,
   StorePriceSchema,
-  UserSchema,
   detailsResponse,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { StorePriceSerializer } from "@peated/server/serializers/storePrice";
-import { UserSerializer } from "@peated/server/serializers/user";
 import { and, desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -23,7 +21,6 @@ import { z } from "zod";
 const OutputSchema = z.intersection(
   BottleSchema,
   z.object({
-    createdBy: UserSchema.nullable(),
     people: z.number(),
     lastPrice: StorePriceSchema.nullable(),
   }),
@@ -35,7 +32,7 @@ export default procedure
     path: "/bottles/{bottle}",
     summary: "Get bottle details",
     description:
-      "Retrieve detailed information about a specific bottle including creator, pricing, and tasting statistics",
+      "Retrieve detailed information about a specific bottle including pricing and tasting statistics",
     spec: (spec) => ({
       ...spec,
       operationId: "getBottle",
@@ -69,10 +66,6 @@ export default procedure
       }
     }
 
-    const createdBy = await db.query.users.findFirst({
-      where: (table, { eq }) => eq(table.id, bottle.createdById),
-    });
-
     const [lastPrice] = await db
       .select()
       .from(storePrices)
@@ -89,9 +82,6 @@ export default procedure
 
     return {
       ...(await serialize(BottleSerializer, bottle, context.user)),
-      createdBy: createdBy
-        ? await serialize(UserSerializer, createdBy, context.user)
-        : null,
       people: Number(totalPeople),
       lastPrice: lastPrice
         ? await serialize(StorePriceSerializer, lastPrice, context.user)

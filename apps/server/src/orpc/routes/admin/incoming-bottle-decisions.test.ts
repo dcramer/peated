@@ -54,9 +54,7 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         name: review.name,
         url: review.url,
         decision: "match_existing",
-        actorType: "user",
         actorId: userActor.id,
-        actorUserId: actorUser.id,
         bottleId: bottle.id,
         releaseId: release.id,
         confidence: 87,
@@ -69,9 +67,7 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         name: price.name,
         url: price.url,
         decision: "create_bottle",
-        actorType: "system",
         actorId: systemActor.id,
-        actorUserId: null,
         bottleId: bottle.id,
         createdBottle: true,
         confidence: 92,
@@ -84,18 +80,18 @@ describe("GET /admin/incoming-bottle-decisions", () => {
     });
 
     expect(result.results).toHaveLength(2);
+    expect("actorType" in result.results[0]).toBe(false);
+    expect("actorUser" in result.results[0]).toBe(false);
     expect(result.results[0]).toMatchObject({
       sourceKind: "store_price",
       sourceId: price.id,
       decision: "create_bottle",
-      actorType: "system",
       actor: {
         id: systemActor.id,
         type: "system",
         key: "peated",
         displayName: "Peated",
       },
-      actorUser: null,
       bottle: {
         id: bottle.id,
         fullName: bottle.fullName,
@@ -108,16 +104,11 @@ describe("GET /admin/incoming-bottle-decisions", () => {
       sourceKind: "review",
       sourceId: review.id,
       decision: "match_existing",
-      actorType: "user",
       actor: {
         id: userActor.id,
         type: "user",
         key: String(actorUser.id),
         displayName: actorUser.username,
-      },
-      actorUser: {
-        id: actorUser.id,
-        username: actorUser.username,
       },
       release: {
         id: release.id,
@@ -141,9 +132,7 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         externalSiteId: site.id,
         name: "User Decision",
         decision: "match_existing",
-        actorType: "user",
         actorId: userActor.id,
-        actorUserId: admin.id,
         bottleId: bottle.id,
       },
       {
@@ -152,21 +141,19 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         externalSiteId: site.id,
         name: "System Decision",
         decision: "create_bottle",
-        actorType: "system",
         actorId: systemActor.id,
         bottleId: bottle.id,
       },
     ]);
 
     const result = await routerClient.admin.incomingBottleDecisions(
-      { actorType: "system" },
+      { actor: "system" },
       { context: { user: admin } },
     );
 
     expect(result.results).toHaveLength(1);
     expect(result.results[0]).toMatchObject({
       name: "System Decision",
-      actorType: "system",
       actor: {
         id: systemActor.id,
         type: "system",

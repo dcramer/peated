@@ -17,6 +17,7 @@ import {
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import {
   getLegacyReleaseRepairBottleFingerprint,
   getLegacyReleaseRepairParentCandidatesFingerprint,
@@ -176,6 +177,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     const brand = await fixtures.Entity({ name: "Aberlour" });
     const distiller = await fixtures.Entity({ name: "Speyside Distillery" });
     const mod = await fixtures.User({ mod: true });
+    const modActor = await getUserActor(mod);
 
     const parent = await fixtures.Bottle({
       brandId: brand.id,
@@ -188,7 +190,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       totalTastings: 12,
       description: "Legacy release description",
       imageUrl: "/images/legacy-abunadh.jpg",
-      createdById: mod.id,
+      createdByActorId: modActor.id,
     });
 
     await db.insert(bottlesToDistillers).values({
@@ -199,6 +201,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     await db.insert(bottleAliases).values({
       bottleId: legacyBottle.id,
       name: "A'bunadh",
+      assignedByActorId: legacyBottle.createdByActorId,
     });
 
     await db.insert(bottleTags).values({
@@ -490,6 +493,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     await db.insert(bottleAliases).values({
       bottleId: legacyBottle.id,
       name: "Festival Distillery Warehouse Session",
+      assignedByActorId: legacyBottle.createdByActorId,
     });
     const mod = await fixtures.User({ mod: true });
 
@@ -1369,6 +1373,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
   }) => {
     const brand = await fixtures.Entity({ name: "Aberlour" });
     const mod = await fixtures.User({ mod: true });
+    const modActor = await getUserActor(mod);
     const parent = await fixtures.Bottle({
       brandId: brand.id,
       name: "A'bunadh",
@@ -1380,7 +1385,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       description: null,
       imageUrl: "https://example.com/existing-release.png",
       tastingNotes: null,
-      createdById: mod.id,
+      createdByActorId: modActor.id,
     });
     const legacyBottle = await fixtures.Bottle({
       brandId: brand.id,
@@ -1392,7 +1397,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
         palate: "Chocolate",
         finish: "Spice",
       },
-      createdById: mod.id,
+      createdByActorId: modActor.id,
     });
 
     const collection = await fixtures.Collection();
@@ -1472,6 +1477,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
   }) => {
     const brand = await fixtures.Entity({ name: "Glendronach" });
     const mod = await fixtures.User({ mod: true });
+    const modActor = await getUserActor(mod);
     const parent = await fixtures.Bottle({
       brandId: brand.id,
       name: "1972 Single Cask",
@@ -1485,7 +1491,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       statedAge: 48,
       singleCask: true,
       totalTastings: 5,
-      createdById: mod.id,
+      createdByActorId: modActor.id,
     });
 
     const result = await routerClient.bottles.applyReleaseRepair(

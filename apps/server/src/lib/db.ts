@@ -342,7 +342,6 @@ export const upsertEntity = async ({
       type: Array.from(
         new Set([...(type ? [type] : []), ...(data.type || [])]),
       ),
-      createdById: userId,
       createdByActorId: actorId,
     })
     .onConflictDoNothing()
@@ -363,7 +362,6 @@ export const upsertEntity = async ({
             }
           : {}),
       },
-      createdById: userId,
       actorId,
       createdAt: result.createdAt,
     });
@@ -481,24 +479,20 @@ export async function upsertBottleAlias(
   name: string,
   bottleId: number | null = null,
   releaseId: number | null = null,
-  options: BottleAliasAssignmentOptions = {},
+  options: BottleAliasAssignmentOptions,
 ) {
-  const { assignmentSource, assignedById, assignedByActorId } = options;
-  const hasExplicitAssignmentOptions =
-    assignmentSource !== undefined ||
-    "assignedById" in options ||
-    "assignedByActorId" in options;
+  const { assignmentSource, assignedByActorId } = options;
+  const hasExplicitAssignmentSource = assignmentSource !== undefined;
   const nextAssignmentSource = assignmentSource ?? "legacy";
-  const nextAssignedById = assignedById ?? null;
-  const nextAssignedByActorId = assignedByActorId ?? null;
+  const nextAssignedByActorId = assignedByActorId;
 
   // Preserve existing targets on conflicts. Explicit provenance may update an
   // already-bound alias only when the incoming target is the same target.
   const query =
     bottleId || releaseId
       ? await db.execute<BottleAlias>(
-          sql`INSERT INTO ${bottleAliases} (bottle_id, release_id, name, assignment_source, assigned_by_id, assigned_by_actor_id)
-      VALUES (${bottleId}, ${releaseId}, ${name}, ${nextAssignmentSource}, ${nextAssignedById}, ${nextAssignedByActorId})
+          sql`INSERT INTO ${bottleAliases} (bottle_id, release_id, name, assignment_source, assigned_by_actor_id)
+      VALUES (${bottleId}, ${releaseId}, ${name}, ${nextAssignmentSource}, ${nextAssignedByActorId})
       ON CONFLICT (LOWER(name))
       DO UPDATE SET
         bottle_id = CASE
@@ -513,7 +507,7 @@ export async function upsertBottleAlias(
           END,
         assignment_source = CASE
           WHEN ${bottleAliases.bottleId} IS NULL OR (
-            ${hasExplicitAssignmentOptions}
+            ${hasExplicitAssignmentSource}
             AND ${bottleAliases.bottleId} IS NOT DISTINCT FROM EXCLUDED.bottle_id
             AND (
               ${bottleAliases.releaseId} IS NULL
@@ -523,22 +517,9 @@ export async function upsertBottleAlias(
             THEN EXCLUDED.assignment_source
             ELSE ${bottleAliases.assignmentSource}
           END,
-        assigned_by_id = CASE
-          WHEN ${bottleAliases.bottleId} IS NULL OR (
-            ${hasExplicitAssignmentOptions}
-            AND ${bottleAliases.bottleId} IS NOT DISTINCT FROM EXCLUDED.bottle_id
-            AND (
-              ${bottleAliases.releaseId} IS NULL
-              OR ${bottleAliases.releaseId} IS NOT DISTINCT FROM EXCLUDED.release_id
-            )
-          )
-            THEN EXCLUDED.assigned_by_id
-            ELSE ${bottleAliases.assignedById}
-          END,
         assigned_by_actor_id = CASE
           WHEN ${bottleAliases.bottleId} IS NULL OR (
-            ${hasExplicitAssignmentOptions}
-            AND ${bottleAliases.bottleId} IS NOT DISTINCT FROM EXCLUDED.bottle_id
+            ${bottleAliases.bottleId} IS NOT DISTINCT FROM EXCLUDED.bottle_id
             AND (
               ${bottleAliases.releaseId} IS NULL
               OR ${bottleAliases.releaseId} IS NOT DISTINCT FROM EXCLUDED.release_id
@@ -550,8 +531,8 @@ export async function upsertBottleAlias(
       RETURNING *`,
         )
       : await db.execute<BottleAlias>(
-          sql`INSERT INTO ${bottleAliases} (bottle_id, release_id, name, assignment_source, assigned_by_id, assigned_by_actor_id)
-      VALUES (${bottleId}, ${releaseId}, ${name}, ${nextAssignmentSource}, ${nextAssignedById}, ${nextAssignedByActorId})
+          sql`INSERT INTO ${bottleAliases} (bottle_id, release_id, name, assignment_source, assigned_by_actor_id)
+      VALUES (${bottleId}, ${releaseId}, ${name}, ${nextAssignmentSource}, ${nextAssignedByActorId})
       ON CONFLICT (LOWER(name))
       DO UPDATE SET name = ${bottleAliases.name}
       RETURNING *`,

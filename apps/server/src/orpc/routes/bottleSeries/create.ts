@@ -67,7 +67,6 @@ export default procedure
           fullName,
           description: input.description,
           brandId: input.brand,
-          createdById: user.id,
           createdByActorId: actorId,
         })
         .returning();
@@ -84,7 +83,6 @@ export default procedure
           description: series.description,
           brandId: series.brandId,
         },
-        createdById: user.id,
         actorId,
       });
 

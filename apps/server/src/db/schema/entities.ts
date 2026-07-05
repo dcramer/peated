@@ -18,7 +18,6 @@ import { geometry_point } from "../columns/geometry";
 import { actors } from "./actors";
 import { contentSourceEnum } from "./enums";
 import { regions } from "./regions";
-import { users } from "./users";
 
 export type EntityType = "brand" | "distiller" | "bottler";
 
@@ -67,12 +66,11 @@ export const entities = pgTable(
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
-    createdById: bigint("created_by_id", { mode: "number" })
-      .references(() => users.id)
-      .notNull(),
     createdByActorId: bigint("created_by_actor_id", {
       mode: "number",
-    }).references(() => actors.id, { onDelete: "set null" }),
+    })
+      .references(() => actors.id)
+      .notNull(),
   },
   (table) => [
     uniqueIndex("entity_name_unq").using("btree", sql`LOWER(${table.name})`),
@@ -84,7 +82,6 @@ export const entities = pgTable(
     index("entity_search_idx").using("gin", table.searchVector),
     index("entity_country_by_idx").on(table.countryId),
     index("entity_region_idx").on(table.regionId),
-    index("entity_created_by_idx").on(table.createdById),
     index("entity_created_by_actor_idx").on(table.createdByActorId),
   ],
 );
@@ -99,10 +96,6 @@ export const entitiesRelations = relations(entities, ({ one, many }) => ({
   region: one(regions, {
     fields: [entities.countryId],
     references: [regions.id],
-  }),
-  createdBy: one(users, {
-    fields: [entities.createdById],
-    references: [users.id],
   }),
   createdByActor: one(actors, {
     fields: [entities.createdByActorId],

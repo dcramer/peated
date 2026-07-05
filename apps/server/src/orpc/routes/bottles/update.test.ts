@@ -7,6 +7,7 @@ import {
   changes,
   entities,
 } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import { omit } from "@peated/server/lib/filter";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -263,7 +264,7 @@ describe("PUT /bottles/:bottle", () => {
       .where(eq(entities.id, bottle2.brandId));
 
     expect(newBrand.name).toBe("New Brand Name");
-    expect(newBrand.createdById).toBe(modUser.id);
+    expect(newBrand.createdByActorId).toBe((await getUserActor(modUser)).id);
     expect(bottle2.fullName).toBe(`${newBrand.name} ${bottle.name}`);
 
     // Verify change record was created for the new brand
@@ -309,7 +310,7 @@ describe("PUT /bottles/:bottle", () => {
         and(
           eq(changes.objectId, existingBrand.id),
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, modUser.id),
+          eq(changes.actorId, (await getUserActor(modUser)).id),
         ),
       );
     expect(brandChanges.length).toBe(0);
@@ -416,7 +417,7 @@ describe("PUT /bottles/:bottle", () => {
     expect(distillers.length).toBe(1);
     const { distiller } = distillers[0];
     expect(distiller.name).toBe("New Distillery");
-    expect(distiller.createdById).toBe(modUser.id);
+    expect(distiller.createdByActorId).toBe((await getUserActor(modUser)).id);
 
     // Verify change record was created for the new distiller
     const distillerChange = await db.query.changes.findFirst({
@@ -468,7 +469,7 @@ describe("PUT /bottles/:bottle", () => {
         and(
           eq(changes.objectId, existingDistiller.id),
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, modUser.id),
+          eq(changes.actorId, (await getUserActor(modUser)).id),
         ),
       );
     expect(distillerChanges.length).toBe(0);
@@ -538,7 +539,7 @@ describe("PUT /bottles/:bottle", () => {
       .where(eq(entities.id, newBottle.bottlerId!));
 
     expect(bottler.name).toBe("New Bottler");
-    expect(bottler.createdById).toBe(modUser.id);
+    expect(bottler.createdByActorId).toBe((await getUserActor(modUser)).id);
 
     // Verify change record was created for the new bottler
     const bottlerChange = await db.query.changes.findFirst({
@@ -581,7 +582,7 @@ describe("PUT /bottles/:bottle", () => {
         and(
           eq(changes.objectId, existingBottler.id),
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, modUser.id),
+          eq(changes.actorId, (await getUserActor(modUser)).id),
         ),
       );
     expect(bottlerChanges.length).toBe(0);
@@ -961,9 +962,10 @@ describe("PUT /bottles/:bottle", () => {
 
   test("removes image as creator", async ({ fixtures }) => {
     const creator = await fixtures.User({ mod: true });
+    const creatorActor = await getUserActor(creator);
     const bottle = await fixtures.Bottle({
       imageUrl: "https://example.com/image.jpg",
-      createdById: creator.id,
+      createdByActorId: creatorActor.id,
     });
 
     const data = await routerClient.bottles.update(
@@ -989,9 +991,10 @@ describe("PUT /bottles/:bottle", () => {
   }) => {
     const creator = await fixtures.User({ mod: true });
     const otherMod = await fixtures.User({ mod: true }); // Different mod user
+    const creatorActor = await getUserActor(creator);
     const bottle = await fixtures.Bottle({
       imageUrl: "https://example.com/image.jpg",
-      createdById: creator.id,
+      createdByActorId: creatorActor.id,
     });
 
     const data = await routerClient.bottles.update(
@@ -1168,7 +1171,7 @@ describe("PUT /bottles/:bottle", () => {
     expect(change!.objectId).toEqual(series.id);
     expect(change!.objectType).toEqual("bottle_series");
     expect(change!.type).toEqual("add");
-    expect(change!.createdById).toEqual(modUser.id);
+    expect(change!.actorId).toEqual((await getUserActor(modUser)).id);
     expect(change!.displayName).toEqual(`${brand.name} ${data.series.name}`);
     expect(change!.data).toEqual({
       name: data.series.name,

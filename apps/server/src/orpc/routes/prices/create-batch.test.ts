@@ -93,7 +93,6 @@ describe("POST /external-sites/:site/prices", () => {
     expect(alias).toMatchObject({
       bottleId: bottle.id,
       assignmentSource: "source_approved",
-      assignedById: user.id,
     });
     expect(workerClient.pushJob).toHaveBeenCalledWith("CapturePriceImage", {
       priceId: prices[0].id,
@@ -337,7 +336,6 @@ describe("POST /external-sites/:site/prices", () => {
     expect(alias).toMatchObject({
       bottleId: bottle.id,
       assignmentSource: "source_approved",
-      assignedById: user.id,
     });
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
   });
@@ -425,7 +423,6 @@ describe("POST /external-sites/:site/prices", () => {
     expect(alias).toMatchObject({
       bottleId: bottle.id,
       assignmentSource: "source_approved",
-      assignedById: user.id,
     });
     expect(
       await db.query.bottleAliases.findFirst({

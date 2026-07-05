@@ -10,6 +10,7 @@ import {
   entities,
   users,
 } from "../db/schema";
+import { getUserActor } from "../lib/actors";
 import { RESERVED_COLLECTIONS } from "../lib/db";
 import { Entity, User } from "../lib/test/fixtures";
 import { BottleSerializer } from "./bottle";
@@ -29,12 +30,13 @@ describe("BottleSerializer", () => {
       // Create two users - one who will favorite the bottle and one who will view it
       const favoriter = await User();
       const viewer = await User();
+      const favoriterActor = await getUserActor(favoriter);
 
       // Create a brand entity for the bottle
       const brand = await Entity({
         name: "Test Brand",
         type: ["brand"],
-        createdById: favoriter.id,
+        createdByActorId: favoriterActor.id,
       });
 
       // Create a bottle
@@ -44,7 +46,7 @@ describe("BottleSerializer", () => {
           brandId: brand.id,
           name: "Test Bottle",
           fullName: "Test Brand Test Bottle",
-          createdById: favoriter.id,
+          createdByActorId: brand.createdByActorId,
         })
         .returning();
 
@@ -72,11 +74,12 @@ describe("BottleSerializer", () => {
 
     it("should reflect the current user's legacy default collection", async () => {
       const viewer = await User();
+      const viewerActor = await getUserActor(viewer);
 
       const brand = await Entity({
         name: "Legacy Brand",
         type: ["brand"],
-        createdById: viewer.id,
+        createdByActorId: viewerActor.id,
       });
 
       const [bottle] = await db
@@ -85,7 +88,7 @@ describe("BottleSerializer", () => {
           brandId: brand.id,
           name: "Legacy Bottle",
           fullName: "Legacy Brand Legacy Bottle",
-          createdById: viewer.id,
+          createdByActorId: brand.createdByActorId,
         })
         .returning();
 
@@ -113,11 +116,12 @@ describe("BottleSerializer", () => {
     it("should reflect the current user's library collection only", async () => {
       const owner = await User();
       const viewer = await User();
+      const ownerActor = await getUserActor(owner);
 
       const brand = await Entity({
         name: "Library Brand",
         type: ["brand"],
-        createdById: owner.id,
+        createdByActorId: ownerActor.id,
       });
 
       const [bottle] = await db
@@ -126,7 +130,7 @@ describe("BottleSerializer", () => {
           brandId: brand.id,
           name: "Library Bottle",
           fullName: "Library Brand Library Bottle",
-          createdById: owner.id,
+          createdByActorId: brand.createdByActorId,
         })
         .returning();
 

@@ -1,4 +1,5 @@
 import config from "@peated/server/config";
+import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import path from "path";
@@ -8,7 +9,10 @@ describe("POST /bottles/:bottle/image", () => {
   test("cannot update another user's bottle", async ({ fixtures }) => {
     const user = await fixtures.User();
     const otherUser = await fixtures.User();
-    const bottle = await fixtures.Bottle({ createdById: otherUser.id });
+    const otherActor = await getUserActor(otherUser);
+    const bottle = await fixtures.Bottle({
+      createdByActorId: otherActor.id,
+    });
 
     const err = await waitError(
       routerClient.bottles.imageUpdate(
@@ -29,7 +33,10 @@ describe("POST /bottles/:bottle/image", () => {
   test("can update another user's bottle as mod", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const otherUser = await fixtures.User();
-    const bottle = await fixtures.Bottle({ createdById: otherUser.id });
+    const otherActor = await getUserActor(otherUser);
+    const bottle = await fixtures.Bottle({
+      createdByActorId: otherActor.id,
+    });
 
     const response = await routerClient.bottles.imageUpdate(
       {
@@ -45,8 +52,9 @@ describe("POST /bottles/:bottle/image", () => {
   });
 
   test("bottle image does resize down", async ({ fixtures, defaults }) => {
+    const actor = await getUserActor(defaults.user);
     const bottle = await fixtures.Bottle({
-      createdById: defaults.user.id,
+      createdByActorId: actor.id,
     });
 
     const response = await routerClient.bottles.imageUpdate(

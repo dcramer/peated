@@ -44,7 +44,6 @@ export default procedure
           name: input.name,
           assignmentSource: "human_approved",
           assignedByActorId: actor.id,
-          assignedById: context.user.id,
         },
         {
           bottle: {

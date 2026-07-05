@@ -5,6 +5,7 @@ import {
   reviews,
   storePrices,
 } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
@@ -22,6 +23,7 @@ describe("POST /bottle-aliases", () => {
   test("creates a new bottle alias", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const user = await fixtures.User({ mod: true });
+    const actor = await getUserActor(user);
 
     const result = await routerClient.bottleAliases.upsert(
       {
@@ -40,7 +42,7 @@ describe("POST /bottle-aliases", () => {
     expect(alias).toBeDefined();
     expect(alias?.bottleId).toBe(bottle.id);
     expect(alias?.assignmentSource).toBe("human_approved");
-    expect(alias?.assignedById).toBe(user.id);
+    expect(alias?.assignedByActorId).toBe(actor.id);
   });
 
   test("updates store prices with matching name", async ({ fixtures }) => {

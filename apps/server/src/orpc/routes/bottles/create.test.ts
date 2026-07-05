@@ -9,6 +9,7 @@ import {
   changes,
   entities,
 } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import type * as catalogVerificationModule from "@peated/server/lib/catalogVerification";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -132,7 +133,9 @@ describe("POST /bottles", () => {
     expect(bottle.brandId).toEqual(brand.id);
     expect(bottle.statedAge).toEqual(12);
     expect(bottle.flavorProfile).toEqual(FLAVOR_PROFILES[0]);
-    expect(bottle.createdById).toBe(defaults.user.id);
+    expect(bottle.createdByActorId).toBe(
+      (await getUserActor(defaults.user)).id,
+    );
     const distillers = await db
       .select({ distillerId: bottlesToDistillers.distillerId })
       .from(bottlesToDistillers)
@@ -143,7 +146,7 @@ describe("POST /bottles", () => {
     const changeList = await db
       .select({ change: changes })
       .from(changes)
-      .where(eq(changes.createdById, defaults.user.id));
+      .where(eq(changes.actorId, (await getUserActor(defaults.user)).id));
 
     expect(changeList.length).toBe(1);
     expect(changeList[0].change.objectId).toBe(bottle.id);
@@ -199,7 +202,7 @@ describe("POST /bottles", () => {
       .where(
         and(
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, defaults.user.id),
+          eq(changes.actorId, (await getUserActor(defaults.user)).id),
         ),
       );
 
@@ -239,7 +242,7 @@ describe("POST /bottles", () => {
     expect(bottle.name).toEqual("Delicious Wood");
     expect(bottle.brandId).toBeDefined();
     expect(brand.name).toBe("Hard Knox");
-    expect(brand.createdById).toBe(defaults.user.id);
+    expect(brand.createdByActorId).toBe((await getUserActor(defaults.user)).id);
     expect(brand.countryId).toEqual(country.id);
     expect(brand.regionId).toEqual(region.id);
     expect(workerClient.pushJob).toHaveBeenCalledWith("OnEntityChange", {
@@ -257,7 +260,7 @@ describe("POST /bottles", () => {
       .where(
         and(
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, defaults.user.id),
+          eq(changes.actorId, (await getUserActor(defaults.user)).id),
         ),
       );
 
@@ -330,7 +333,7 @@ describe("POST /bottles", () => {
       .where(
         and(
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, defaults.user.id),
+          eq(changes.actorId, (await getUserActor(defaults.user)).id),
         ),
       );
 
@@ -377,7 +380,9 @@ describe("POST /bottles", () => {
     const { distiller } = distillers[0];
     expect(distiller.id).toBeDefined();
     expect(distiller.name).toBe("Hard Knox");
-    expect(distiller.createdById).toBe(defaults.user.id);
+    expect(distiller.createdByActorId).toBe(
+      (await getUserActor(defaults.user)).id,
+    );
 
     // it should create a change entry for the distiller
     const changeList = await db
@@ -386,7 +391,7 @@ describe("POST /bottles", () => {
       .where(
         and(
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, defaults.user.id),
+          eq(changes.actorId, (await getUserActor(defaults.user)).id),
         ),
       );
     expect(changeList.length).toBe(1);
@@ -431,7 +436,9 @@ describe("POST /bottles", () => {
     const { distiller } = distillers[0];
     expect(distiller.id).toBeDefined();
     expect(distiller.name).toBe("Hard Knox");
-    expect(distiller.createdById).toBe(defaults.user.id);
+    expect(distiller.createdByActorId).toBe(
+      (await getUserActor(defaults.user)).id,
+    );
 
     const [brand] = await db
       .select()
@@ -446,7 +453,7 @@ describe("POST /bottles", () => {
       .where(
         and(
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, defaults.user.id),
+          eq(changes.actorId, (await getUserActor(defaults.user)).id),
         ),
       );
     expect(changeList.length).toBe(2);
@@ -491,7 +498,9 @@ describe("POST /bottles", () => {
     const { distiller } = distillers[0];
     expect(distiller.id).toEqual(bottle.brandId);
     expect(distiller.name).toBe("Hard Knox");
-    expect(distiller.createdById).toBe(defaults.user.id);
+    expect(distiller.createdByActorId).toBe(
+      (await getUserActor(defaults.user)).id,
+    );
     expect(distiller.id).toBe(bottle.brandId);
 
     // it should create a change entry for the brand and distiller
@@ -501,7 +510,7 @@ describe("POST /bottles", () => {
       .where(
         and(
           eq(changes.objectType, "entity"),
-          eq(changes.createdById, defaults.user.id),
+          eq(changes.actorId, (await getUserActor(defaults.user)).id),
         ),
       );
     expect(changeList.length).toBe(1);
@@ -810,7 +819,9 @@ describe("POST /bottles", () => {
     expect(newSeries.description).toEqual("Special release series");
     expect(newSeries.brandId).toEqual(brand.id);
     expect(newSeries.numReleases).toEqual(1);
-    expect(newSeries.createdById).toEqual(defaults.user.id);
+    expect(newSeries.createdByActorId).toEqual(
+      (await getUserActor(defaults.user)).id,
+    );
 
     // Verify change was recorded
     const [change] = await db

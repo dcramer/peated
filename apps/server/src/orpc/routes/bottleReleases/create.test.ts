@@ -5,6 +5,7 @@ import {
   bottles,
   changes,
 } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq } from "drizzle-orm";
@@ -38,6 +39,7 @@ describe("POST /bottle-releases", () => {
     const result = await routerClient.bottleReleases.create(data, {
       context: { user: defaults.user },
     });
+    const actor = await getUserActor(defaults.user);
 
     // Verify key properties of the response
     expect(result).toMatchObject({
@@ -100,7 +102,7 @@ describe("POST /bottle-releases", () => {
         and(
           eq(changes.objectType, "bottle_release"),
           eq(changes.objectId, release.id),
-          eq(changes.createdById, defaults.user.id),
+          eq(changes.actorId, actor.id),
         ),
       );
 
@@ -157,6 +159,7 @@ describe("POST /bottle-releases", () => {
       .select()
       .from(bottleReleases)
       .where(eq(bottleReleases.id, result.id));
+    const actor = await getUserActor(defaults.user);
 
     expect(release).toBeDefined();
     expect(release.bottleId).toBe(bottle.id);
@@ -187,7 +190,7 @@ describe("POST /bottle-releases", () => {
         and(
           eq(changes.objectType, "bottle_release"),
           eq(changes.objectId, release.id),
-          eq(changes.createdById, defaults.user.id),
+          eq(changes.actorId, actor.id),
         ),
       );
 

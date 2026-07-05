@@ -11,6 +11,7 @@ describe("GET /entities/:entity", () => {
       entity: brand.id,
     });
     expect(data.id).toEqual(brand.id);
+    expect("createdBy" in data).toBe(false);
   });
 
   test("errors on invalid entity", async () => {

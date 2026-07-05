@@ -7,6 +7,7 @@ import {
   entityAliases,
   entityTombstones,
 } from "@peated/server/db/schema";
+import { getPeatedSystemActorForDatabase } from "@peated/server/lib/actors";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { formatBottleName, formatReleaseName } from "@peated/server/lib/format";
 import { logError, logInfo, logWarn } from "@peated/server/lib/log";
@@ -47,6 +48,7 @@ export default async function mergeEntity({
   const updatedReleaseIds: number[] = [];
   const updatedAliasNames = new Set<string>();
   await db.transaction(async (tx) => {
+    const actor = await getPeatedSystemActorForDatabase(tx);
     const bottleList = await tx
       .select()
       .from(bottles)
@@ -59,7 +61,9 @@ export default async function mergeEntity({
         ...bottle,
         name: `${toEntity.shortName || toEntity.name} ${bottle.name}`,
       });
-      const alias = await upsertBottleAlias(tx, fullName, bottle.id);
+      const alias = await upsertBottleAlias(tx, fullName, bottle.id, null, {
+        assignedByActorId: actor.id,
+      });
       // alias.bottleId is always set, but I don't want to deal w/ TS
       if (alias.bottleId && alias.bottleId !== bottle.id) {
         const [existingBottle] = await tx
@@ -136,6 +140,7 @@ export default async function mergeEntity({
             newFullName,
             bottle.id,
             release.id,
+            { assignedByActorId: actor.id },
           );
           if (
             releaseAlias.bottleId !== bottle.id ||

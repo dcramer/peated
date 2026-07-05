@@ -152,7 +152,6 @@ export default procedure
               externalSiteId: site.id,
               assignmentSource: "classifier_approved",
               assignedByActorId: systemActor.id,
-              assignedById: context.user!.id,
             })
           : await assignBottleAliasInTransaction(tx, {
               bottleId,
@@ -160,6 +159,7 @@ export default procedure
               name: aliasKey,
               backfillNames: [reviewName, rawName],
               externalSiteId: site.id,
+              assignedByActorId: systemActor.id,
             });
 
       const decision = getIncomingBottleDecisionFromResolutionSource(

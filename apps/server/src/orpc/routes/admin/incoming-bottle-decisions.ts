@@ -5,7 +5,6 @@ import {
   bottles,
   externalSites,
   incomingBottleDecisionLogs,
-  users,
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
@@ -29,7 +28,7 @@ const IncomingBottleDecisionListInputSchema = z
     cursor: z.coerce.number().gte(1).default(1),
     limit: z.coerce.number().gte(1).lte(100).default(50),
     sourceKind: IncomingBottleDecisionSourceKindSchema.optional(),
-    actorType: IncomingBottleDecisionActorTypeSchema.optional(),
+    actor: IncomingBottleDecisionActorTypeSchema.optional(),
   })
   .default({
     cursor: 1,
@@ -51,21 +50,12 @@ const IncomingBottleDecisionListResponseSchema = z.object({
       name: z.string(),
       url: z.string().nullable(),
       decision: IncomingBottleDecisionTypeSchema,
-      actorType: IncomingBottleDecisionActorTypeSchema,
-      actor: z
-        .object({
-          id: z.number(),
-          type: z.enum(["system", "user"]),
-          key: z.string(),
-          displayName: z.string(),
-        })
-        .nullable(),
-      actorUser: z
-        .object({
-          id: z.number(),
-          username: z.string(),
-        })
-        .nullable(),
+      actor: z.object({
+        id: z.number(),
+        type: z.enum(["system", "user"]),
+        key: z.string(),
+        displayName: z.string(),
+      }),
       bottle: z.object({
         id: z.number(),
         fullName: z.string(),
@@ -110,8 +100,8 @@ export default procedure
     if (input.sourceKind) {
       where.push(eq(incomingBottleDecisionLogs.sourceKind, input.sourceKind));
     }
-    if (input.actorType) {
-      where.push(eq(incomingBottleDecisionLogs.actorType, input.actorType));
+    if (input.actor) {
+      where.push(eq(actors.type, input.actor));
     }
 
     const rows = await db
@@ -125,10 +115,6 @@ export default procedure
         release: {
           id: bottleReleases.id,
           fullName: bottleReleases.fullName,
-        },
-        actorUser: {
-          id: users.id,
-          username: users.username,
         },
         actor: {
           id: actors.id,
@@ -147,8 +133,7 @@ export default procedure
         bottleReleases,
         eq(bottleReleases.id, incomingBottleDecisionLogs.releaseId),
       )
-      .leftJoin(users, eq(users.id, incomingBottleDecisionLogs.actorUserId))
-      .leftJoin(actors, eq(actors.id, incomingBottleDecisionLogs.actorId))
+      .innerJoin(actors, eq(actors.id, incomingBottleDecisionLogs.actorId))
       .where(where.length ? and(...where) : undefined)
       .orderBy(
         desc(incomingBottleDecisionLogs.createdAt),
@@ -173,21 +158,7 @@ export default procedure
         name: row.log.name,
         url: row.log.url,
         decision: row.log.decision,
-        actorType: row.log.actorType,
-        actor: row.actor?.id
-          ? {
-              id: row.actor.id,
-              type: row.actor.type!,
-              key: row.actor.key!,
-              displayName: row.actor.displayName!,
-            }
-          : null,
-        actorUser: row.actorUser?.id
-          ? {
-              id: row.actorUser.id,
-              username: row.actorUser.username,
-            }
-          : null,
+        actor: row.actor,
         bottle: row.bottle,
         release: row.release?.id
           ? {

@@ -309,6 +309,10 @@ export const Entity = async (
     `${faker.word.adjective().toLowerCase()} ${choose(distilleryNames)}`;
 
   return await db.transaction(async (tx) => {
+    const createdByActorId =
+      data.createdByActorId ??
+      (await getUserActorByIdForDatabase(tx, (await User({}, tx)).id)).id;
+
     const entityData: dbSchema.NewEntity = {
       name,
       countryId: data.countryId ?? (await Country({}, tx)).id,
@@ -316,10 +320,8 @@ export const Entity = async (
       createdAt: new Date(),
       updatedAt: new Date(),
       ...data,
-      createdById: data.createdById || (await User({}, tx)).id,
+      createdByActorId,
     };
-    const actor = await getUserActorByIdForDatabase(tx, entityData.createdById);
-    entityData.createdByActorId = actor.id;
 
     const searchVector = buildEntitySearchVector(entityData);
 
@@ -342,8 +344,7 @@ export const Entity = async (
       type: "add",
       displayName: entity.name,
       createdAt: entity.createdAt,
-      createdById: entity.createdById,
-      actorId: actor.id,
+      actorId: entity.createdByActorId,
       data: entity,
     });
 
@@ -401,6 +402,10 @@ export const Bottle = async (
       name: `${brand.shortName || brand.name} ${name}`,
     });
 
+    const createdByActorId =
+      data.createdByActorId ??
+      (await getUserActorByIdForDatabase(tx, (await User({}, tx)).id)).id;
+
     const bottleData: dbSchema.NewBottle = {
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -408,10 +413,8 @@ export const Bottle = async (
       name,
       fullName,
       brandId: brand.id,
-      createdById: data.createdById || (await User({}, tx)).id,
+      createdByActorId,
     };
-    const actor = await getUserActorByIdForDatabase(tx, bottleData.createdById);
-    bottleData.createdByActorId = actor.id;
 
     const distillerList = distillerIds.length
       ? await tx.query.entities.findMany({
@@ -461,6 +464,7 @@ export const Bottle = async (
       bottleId: bottle.id,
       name: bottle.fullName,
       createdAt: bottle.createdAt,
+      assignedByActorId: bottle.createdByActorId,
     });
 
     await tx.insert(changes).values({
@@ -469,8 +473,7 @@ export const Bottle = async (
       displayName: bottle.fullName,
       type: "add",
       createdAt: bottle.createdAt,
-      createdById: bottle.createdById,
-      actorId: actor.id,
+      actorId: bottle.createdByActorId,
       data: bottle,
     });
 
@@ -483,6 +486,10 @@ export const BottleAlias = async (
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.BottleAlias> => {
   const [result] = await db.transaction(async (tx) => {
+    const assignedByActorId =
+      data.assignedByActorId ??
+      (await getUserActorByIdForDatabase(tx, (await User({}, tx)).id)).id;
+
     return await tx
       .insert(bottleAliases)
       .values({
@@ -491,6 +498,7 @@ export const BottleAlias = async (
         name: `${toTitleCase(faker.word.noun())} ${chooseBottleName()}`,
         createdAt: new Date(),
         ...data,
+        assignedByActorId,
       })
       .returning();
   });
@@ -983,7 +991,9 @@ export const BottleRelease = async (
       createdAt: new Date(),
       updatedAt: new Date(),
       ...data,
-      createdById: data.createdById ?? (await User({}, tx)).id,
+      createdByActorId:
+        data.createdByActorId ??
+        (await getUserActorByIdForDatabase(tx, (await User({}, tx)).id)).id,
     };
 
     return await tx
@@ -1007,11 +1017,6 @@ export async function BottleSeries(
       data.brandId = brand.id;
     }
 
-    if (!data.createdById) {
-      const user = await User({}, tx);
-      data.createdById = user.id;
-    }
-
     // Get the brand to build fullName
     const brand = await tx.query.entities.findFirst({
       where: (entities, { eq }) => eq(entities.id, data.brandId as number),
@@ -1026,7 +1031,9 @@ export async function BottleSeries(
       fullName,
       description: data.description ?? faker.lorem.sentence(),
       brandId: data.brandId,
-      createdById: data.createdById,
+      createdByActorId:
+        data.createdByActorId ??
+        (await getUserActorByIdForDatabase(tx, (await User({}, tx)).id)).id,
       createdAt: data.createdAt ?? new Date(),
       updatedAt: data.updatedAt ?? new Date(),
       numReleases: data.numReleases ?? 0,

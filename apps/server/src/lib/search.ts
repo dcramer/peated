@@ -45,7 +45,7 @@ export function buildEntitySearchVector(
 export function buildBottleSearchVector(
   bottle: NewBottle,
   brand: NewEntity,
-  aliasList?: NewBottleAlias[],
+  aliasList?: Pick<NewBottleAlias, "name">[],
   bottler?: NewEntity,
   distillerList?: NewEntity[],
 ): TSVector[] {

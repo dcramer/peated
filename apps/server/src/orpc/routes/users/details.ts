@@ -73,13 +73,20 @@ export default procedure
       .where(eq(collections.createdById, user.id))
       .limit(1);
 
-    const [{ totalContributions }] = await db
-      .select({
-        totalContributions: sql<string>`COUNT(${changes.createdById})`,
-      })
-      .from(changes)
-      .where(eq(changes.createdById, user.id))
-      .limit(1);
+    const userActor = await db.query.actors.findFirst({
+      where: (table, { and, eq }) =>
+        and(eq(table.type, "user"), eq(table.key, String(user.id))),
+    });
+
+    const [{ totalContributions }] = userActor
+      ? await db
+          .select({
+            totalContributions: sql<string>`COUNT(${changes.actorId})`,
+          })
+          .from(changes)
+          .where(eq(changes.actorId, userActor.id))
+          .limit(1)
+      : [{ totalContributions: "0" }];
 
     return {
       ...(await serialize(UserSerializer, user, context.user)),

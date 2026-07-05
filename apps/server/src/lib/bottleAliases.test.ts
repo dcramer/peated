@@ -25,6 +25,7 @@ describe("assignBottleAliasInTransaction", () => {
         releaseId: release.id,
         aliasReleaseId: null,
         name: release.fullName,
+        assignedByActorId: bottle.createdByActorId,
       });
     });
 
@@ -58,6 +59,7 @@ describe("assignBottleAliasInTransaction", () => {
         bottleId: bottle.id,
         releaseId: release.id,
         name: release.fullName,
+        assignedByActorId: bottle.createdByActorId,
       });
     });
 
@@ -91,6 +93,7 @@ describe("assignBottleAliasInTransaction", () => {
         releaseId: release.id,
         aliasReleaseId: null,
         name: release.fullName,
+        assignedByActorId: bottle.createdByActorId,
       });
     });
 
@@ -137,6 +140,7 @@ describe("assignBottleAliasInTransaction", () => {
         backfillNames: [storedName],
         externalSiteId: price.externalSiteId,
         volume: price.volume,
+        assignedByActorId: bottle.createdByActorId,
       });
     });
 
@@ -199,6 +203,7 @@ describe("assignBottleAliasInTransaction", () => {
         name: storedName,
         externalSiteId: price.externalSiteId,
         volume: price.volume,
+        assignedByActorId: bottle.createdByActorId,
       });
     });
 
@@ -241,6 +246,7 @@ describe("assignBottleAliasInTransaction", () => {
         assignBottleAliasInTransaction(tx, {
           bottleId: bottle.id,
           name: "   ",
+          assignedByActorId: bottle.createdByActorId,
         }),
       ),
     ).rejects.toThrow("Failed to save alias.");
@@ -279,7 +285,6 @@ describe("assignBottleAliasInTransaction", () => {
         name: "Moderator Alias",
         assignmentSource: "human_approved",
         assignedByActorId: assignedByActor.id,
-        assignedById: assignedBy.id,
       });
     });
 
@@ -291,7 +296,6 @@ describe("assignBottleAliasInTransaction", () => {
       bottleId: bottle.id,
       assignmentSource: "human_approved",
       assignedByActorId: assignedByActor.id,
-      assignedById: assignedBy.id,
     });
   });
 
@@ -320,6 +324,7 @@ describe("assignBottleAliasInTransaction", () => {
         releaseId: null,
         aliasReleaseId: null,
         name: release.fullName,
+        assignedByActorId: bottle.createdByActorId,
       });
     });
 
