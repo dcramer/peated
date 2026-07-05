@@ -6,6 +6,7 @@ import {
 } from "@peated/bottle-classifier/releaseIdentity";
 import { db } from "@peated/server/db";
 import { bottleReleases, bottles, changes } from "@peated/server/db/schema";
+import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { findExistingBottleReleaseByIdentity } from "@peated/server/lib/bottleReleaseIdentity";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
@@ -92,6 +93,7 @@ export default procedure
     const user = context.user;
 
     const updatedRelease = await db.transaction(async (tx) => {
+      const actorId = (await getUserActorForDatabase(tx, user)).id;
       // Get the existing release with a lock
       const [release] = await tx
         .select()
@@ -269,6 +271,7 @@ export default procedure
         {
           assignmentSource: "canonical",
           assignedById: user.id,
+          assignedByActorId: actorId,
         },
       );
 
@@ -286,6 +289,7 @@ export default procedure
         objectType: "bottle_release",
         objectId: updatedRelease.id,
         createdById: user.id,
+        actorId,
         displayName: updatedRelease.fullName,
         type: "update",
         data: {

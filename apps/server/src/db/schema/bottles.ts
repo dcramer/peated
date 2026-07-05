@@ -25,6 +25,7 @@ import {
 } from "@peated/server/constants";
 import { tsvector } from "../columns";
 import { vector } from "../columns/vector";
+import { actors } from "./actors";
 import { entities } from "./entities";
 import { categoryEnum, contentSourceEnum, flavorProfileEnum } from "./enums";
 import { externalSites } from "./externalSites";
@@ -75,6 +76,9 @@ export const bottleSeries = pgTable(
     createdById: bigint("created_by_id", { mode: "number" })
       .references(() => users.id)
       .notNull(),
+    createdByActorId: bigint("created_by_actor_id", {
+      mode: "number",
+    }).references(() => actors.id, { onDelete: "set null" }),
   },
   (table) => [
     uniqueIndex("bottle_series_full_name_key").using(
@@ -84,6 +88,7 @@ export const bottleSeries = pgTable(
     index("bottle_series_search_idx").using("gin", table.searchVector),
     index("bottle_series_brand_idx").on(table.brandId),
     index("bottle_series_created_by_idx").on(table.createdById),
+    index("bottle_series_created_by_actor_idx").on(table.createdByActorId),
   ],
 );
 
@@ -209,12 +214,16 @@ export const bottles = pgTable(
     createdById: bigint("created_by_id", { mode: "number" })
       .references(() => users.id)
       .notNull(),
+    createdByActorId: bigint("created_by_actor_id", {
+      mode: "number",
+    }).references(() => actors.id, { onDelete: "set null" }),
   },
   (table) => [
     index("bottle_search_idx").using("gin", table.searchVector),
     index("bottle_brand_idx").on(table.brandId),
     index("bottle_bottler_idx").on(table.bottlerId),
     index("bottle_created_by_idx").on(table.createdById),
+    index("bottle_created_by_actor_idx").on(table.createdByActorId),
     index("bottle_category_idx").on(table.category),
     index("bottle_flavor_profile_idx").on(table.flavorProfile),
     check(
@@ -247,6 +256,10 @@ export const bottlesRelations = relations(bottles, ({ one, many }) => ({
     fields: [bottles.createdById],
     references: [users.id],
   }),
+  createdByActor: one(actors, {
+    fields: [bottles.createdByActorId],
+    references: [actors.id],
+  }),
 }));
 
 export const bottleSeriesRelations = relations(
@@ -262,6 +275,10 @@ export const bottleSeriesRelations = relations(
     createdBy: one(users, {
       fields: [bottleSeries.createdById],
       references: [users.id],
+    }),
+    createdByActor: one(actors, {
+      fields: [bottleSeries.createdByActorId],
+      references: [actors.id],
     }),
   }),
 );
@@ -345,10 +362,14 @@ export const bottleReleases = pgTable(
     createdById: bigint("created_by_id", { mode: "number" })
       .references(() => users.id)
       .notNull(),
+    createdByActorId: bigint("created_by_actor_id", {
+      mode: "number",
+    }).references(() => actors.id, { onDelete: "set null" }),
   },
   (table) => [
     index("bottle_release_bottle_idx").on(table.bottleId),
     index("bottle_release_created_by_idx").on(table.createdById),
+    index("bottle_release_created_by_actor_idx").on(table.createdByActorId),
     uniqueIndex("bottle_release_full_name_idx").on(table.fullName),
     check(
       "bottle_release_stated_age_check",
@@ -368,6 +389,10 @@ export const bottleReleasesRelations = relations(
     createdBy: one(users, {
       fields: [bottleReleases.createdById],
       references: [users.id],
+    }),
+    createdByActor: one(actors, {
+      fields: [bottleReleases.createdByActorId],
+      references: [actors.id],
     }),
   }),
 );
@@ -518,6 +543,9 @@ export const bottleAliases = pgTable(
     assignedById: bigint("assigned_by_id", { mode: "number" }).references(
       () => users.id,
     ),
+    assignedByActorId: bigint("assigned_by_actor_id", {
+      mode: "number",
+    }).references(() => actors.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
@@ -527,6 +555,7 @@ export const bottleAliases = pgTable(
     ),
     index("bottle_alias_bottle_idx").on(table.bottleId),
     index("bottle_alias_release_idx").on(table.releaseId),
+    index("bottle_alias_assigned_by_actor_idx").on(table.assignedByActorId),
   ],
 );
 
@@ -542,6 +571,10 @@ export const bottleAliasesRelations = relations(bottleAliases, ({ one }) => ({
   assignedBy: one(users, {
     fields: [bottleAliases.assignedById],
     references: [users.id],
+  }),
+  assignedByActor: one(actors, {
+    fields: [bottleAliases.assignedByActorId],
+    references: [actors.id],
   }),
 }));
 

@@ -18,6 +18,7 @@ import type { CaskFill, CaskSize, CaskType } from "@peated/server/types";
 import { pushJob } from "@peated/server/worker/client";
 import { eq, sql } from "drizzle-orm";
 import type { z } from "zod";
+import { getUserActor } from "./actors";
 
 export class BottleReleaseCreateBadRequestError extends Error {
   constructor(message: string) {
@@ -39,18 +40,25 @@ export type CreateBottleReleaseResult = {
   newAliases: string[];
 };
 
+/**
+ * Creates a release and its aliases under a required actor id for write
+ * attribution. Callers must resolve the actor before entering this helper.
+ */
 export async function createBottleReleaseInTransaction(
   tx: AnyTransaction,
   {
     bottleId,
+    createdByActorId,
     input,
     user,
   }: {
     bottleId: number;
+    createdByActorId: number;
     input: z.infer<typeof BottleReleaseInputSchema>;
     user: User;
   },
 ): Promise<CreateBottleReleaseResult> {
+  const actorId = createdByActorId;
   const [bottle] = await tx
     .select()
     .from(bottles)
@@ -146,6 +154,7 @@ export async function createBottleReleaseInTransaction(
       imageUrl: input.imageUrl,
       tastingNotes: input.tastingNotes,
       createdById: user.id,
+      createdByActorId: actorId,
     })
     .returning();
 
@@ -154,6 +163,7 @@ export async function createBottleReleaseInTransaction(
     const alias = await upsertBottleAlias(tx, aliasName, bottleId, release.id, {
       assignmentSource: "canonical",
       assignedById: user.id,
+      assignedByActorId: actorId,
     });
     if (
       alias.bottleId !== bottleId ||
@@ -173,6 +183,7 @@ export async function createBottleReleaseInTransaction(
       objectType: "bottle_release",
       objectId: release.id,
       createdById: user.id,
+      actorId,
       createdAt: release.createdAt,
       displayName: release.fullName,
       type: "add",
@@ -254,9 +265,11 @@ export async function createBottleRelease({
   input: z.infer<typeof BottleReleaseInputSchema>;
   user: User;
 }) {
+  const actor = await getUserActor(user);
   const result = await db.transaction(async (tx) =>
     createBottleReleaseInTransaction(tx, {
       bottleId,
+      createdByActorId: actor.id,
       input,
       user,
     }),

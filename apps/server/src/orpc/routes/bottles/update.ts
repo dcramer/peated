@@ -10,6 +10,7 @@ import {
   changes,
   entities,
 } from "@peated/server/db/schema";
+import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
 import { queueEntityCreationVerification } from "@peated/server/lib/catalogVerification";
 import {
@@ -154,6 +155,7 @@ export default procedure
     let seriesCreated = false;
 
     const newBottle = await db.transaction(async (tx) => {
+      const actorId = (await getUserActorForDatabase(tx, user)).id;
       let brand: Entity | null = null;
       if (bottleData.brand) {
         if (
@@ -166,6 +168,7 @@ export default procedure
             data: coerceToUpsert(bottleData.brand),
             creationSource: "manual_entry",
             userId: user.id,
+            createdByActorId: actorId,
             type: "brand",
           });
           if (!brandUpsert)
@@ -197,6 +200,7 @@ export default procedure
           series: input.series,
           brand,
           userId: user.id,
+          createdByActorId: actorId,
           tx,
         });
 
@@ -221,6 +225,7 @@ export default procedure
             data: coerceToUpsert(bottleData.bottler),
             creationSource: "manual_entry",
             userId: user.id,
+            createdByActorId: actorId,
             type: "bottler",
           });
           if (!bottlerUpsert) {
@@ -260,6 +265,7 @@ export default procedure
               data: coerceToUpsert(distData),
               creationSource: "manual_entry",
               userId: user.id,
+              createdByActorId: actorId,
               type: "distiller",
             });
             if (!distUpsert) {
@@ -364,6 +370,7 @@ export default procedure
             {
               assignmentSource: "canonical",
               assignedById: user.id,
+              assignedByActorId: actorId,
             },
           );
           if (
@@ -397,6 +404,7 @@ export default procedure
           {
             assignmentSource: "canonical",
             assignedById: user.id,
+            assignedByActorId: actorId,
           },
         );
         // alias.bottleId is always set, but I don't want to deal w/ TS
@@ -453,6 +461,7 @@ export default procedure
         objectType: "bottle",
         objectId: newBottle.id,
         createdById: user.id,
+        actorId,
         displayName: newBottle.fullName,
         type: "update",
         data: {

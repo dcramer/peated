@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleSeries, changes, entities } from "@peated/server/db/schema";
+import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { procedure } from "@peated/server/orpc";
 import { ConflictError } from "@peated/server/orpc/errors";
 import {
@@ -32,6 +33,7 @@ export default procedure
     const user = context.user;
 
     const series = await db.transaction(async (tx) => {
+      const actorId = (await getUserActorForDatabase(tx, user)).id;
       // Get the brand to ensure it exists and to build fullName
       const [brand] = await tx
         .select()
@@ -66,6 +68,7 @@ export default procedure
           description: input.description,
           brandId: input.brand,
           createdById: user.id,
+          createdByActorId: actorId,
         })
         .returning();
 
@@ -82,6 +85,7 @@ export default procedure
           brandId: series.brandId,
         },
         createdById: user.id,
+        actorId,
       });
 
       return series;

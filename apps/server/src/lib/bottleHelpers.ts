@@ -6,12 +6,16 @@ import { eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 import type { AnyTransaction } from "../db";
 
-// returns [seriesId, created]
+/**
+ * Resolves or creates a bottle series using the caller-provided actor for
+ * creation attribution. Returns [seriesId, created].
+ */
 export async function processSeries({
   tx,
   series,
   brand,
   userId,
+  createdByActorId,
 }: {
   tx: AnyTransaction;
   series:
@@ -20,6 +24,7 @@ export async function processSeries({
     | null;
   brand: Entity;
   userId: number;
+  createdByActorId: number;
 }): Promise<[number | null, boolean]> {
   if (!series) return [null, false];
 
@@ -50,6 +55,8 @@ export async function processSeries({
     return [existingSeries.id, false];
   }
 
+  const actorId = createdByActorId;
+
   // Create new series
   const [newSeries] = await tx
     .insert(bottleSeries)
@@ -60,6 +67,7 @@ export async function processSeries({
       brandId: brand.id,
       numReleases: 1,
       createdById: userId,
+      createdByActorId: actorId,
     })
     .returning();
 
@@ -75,6 +83,7 @@ export async function processSeries({
       brandId: newSeries.brandId,
     },
     createdById: userId,
+    actorId,
   });
 
   return [newSeries.id, true];

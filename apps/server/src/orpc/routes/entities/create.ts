@@ -8,6 +8,7 @@ import {
   entities,
   regions,
 } from "@peated/server/db/schema";
+import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { queueEntityCreationVerification } from "@peated/server/lib/catalogVerification";
 import {
   DuplicateEntityAliasError,
@@ -83,10 +84,12 @@ export default procedure
 
     const user = context.user;
     const result = await db.transaction(async (tx) => {
+      const actorId = (await getUserActorForDatabase(tx, user)).id;
       const [entity] = await tx
         .insert(entities)
         .values({
           ...data,
+          createdByActorId: actorId,
           searchVector: buildEntitySearchVector(data),
         })
         .onConflictDoNothing()
@@ -139,6 +142,7 @@ export default procedure
         type: "add",
         createdAt: entity.createdAt,
         createdById: user.id,
+        actorId,
         data: {
           ...data,
           catalogVerification:

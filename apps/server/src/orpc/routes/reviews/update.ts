@@ -5,6 +5,7 @@ import {
   reviews,
   type BottleRelease,
 } from "@peated/server/db/schema";
+import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import {
   recordIncomingBottleDecisionInTransaction,
   shouldRecordIncomingBottleDecision,
@@ -123,6 +124,7 @@ export default procedure
     }
 
     const newReview = await db.transaction(async (tx) => {
+      const actor = await getUserActorForDatabase(tx, context.user);
       const [updatedReview] = await tx
         .update(reviews)
         .set({
@@ -153,8 +155,7 @@ export default procedure
           name: updatedReview.name,
           url: updatedReview.url,
           decision: "match_existing",
-          actorType: "user",
-          actorUserId: context.user.id,
+          actor,
           bottleId: updatedReview.bottleId!,
           releaseId: updatedReview.releaseId,
         });

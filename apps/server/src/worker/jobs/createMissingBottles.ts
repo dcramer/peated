@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { reviews } from "@peated/server/db/schema";
+import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
@@ -17,6 +18,7 @@ import { and, asc, gt, isNull } from "drizzle-orm";
 
 export default async function createMissingBottles() {
   const systemUser = await getAutomationModeratorUser();
+  const systemActor = await getPeatedSystemActor();
 
   // Advance by id so unresolved reviews are visited once per run instead of
   // hot-looping forever on the same null bottle assignments.
@@ -51,6 +53,7 @@ export default async function createMissingBottles() {
         // parent before the classifier reviews the full reference title.
         aliasLookupNames: [aliasKey, review.name],
         user: systemUser,
+        createdByActorId: systemActor.id,
       });
 
       if (resolution.bottleId) {
@@ -85,19 +88,25 @@ export default async function createMissingBottles() {
       );
 
       const aliasAssignment = await db.transaction(async (tx) => {
-        const aliasAssignment = await assignBottleAliasInTransaction(tx, {
-          bottleId,
-          releaseId: resolution.releaseId,
-          name: aliasKey,
-          backfillNames: [review.name],
-          externalSiteId: review.externalSiteId,
-          ...(resolution.source !== "exact_alias"
-            ? {
-                assignmentSource: "classifier_approved" as const,
+        const aliasAssignment =
+          resolution.source !== "exact_alias"
+            ? await assignBottleAliasInTransaction(tx, {
+                bottleId,
+                releaseId: resolution.releaseId,
+                name: aliasKey,
+                backfillNames: [review.name],
+                externalSiteId: review.externalSiteId,
+                assignmentSource: "classifier_approved",
                 assignedById: systemUser.id,
-              }
-            : {}),
-        });
+                assignedByActorId: systemActor.id,
+              })
+            : await assignBottleAliasInTransaction(tx, {
+                bottleId,
+                releaseId: resolution.releaseId,
+                name: aliasKey,
+                backfillNames: [review.name],
+                externalSiteId: review.externalSiteId,
+              });
 
         if (
           decision !== null &&
@@ -114,8 +123,7 @@ export default async function createMissingBottles() {
             name: review.name,
             url: review.url,
             decision,
-            actorType: "system",
-            actorUserId: systemUser.id,
+            actor: systemActor,
             bottleId,
             releaseId: resolution.releaseId,
             createdBottle: resolution.createdBottle,

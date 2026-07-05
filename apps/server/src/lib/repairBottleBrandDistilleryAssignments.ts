@@ -11,6 +11,7 @@ import {
   bottlesToDistillers,
   changes,
 } from "@peated/server/db/schema";
+import { getUserActorByIdForDatabase } from "@peated/server/lib/actors";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { formatBottleName, formatReleaseName } from "@peated/server/lib/format";
@@ -112,11 +113,13 @@ async function syncSeriesBottleCount({
 }
 
 async function ensureTargetSeries({
+  actorId,
   currentSeries,
   db,
   toBrand,
   userId,
 }: {
+  actorId: number;
   currentSeries: BottleSeries;
   db: AnyTransaction;
   toBrand: Entity;
@@ -138,6 +141,7 @@ async function ensureTargetSeries({
     },
     brand: toBrand,
     userId,
+    createdByActorId: actorId,
   });
 
   if (!seriesId) {
@@ -356,8 +360,11 @@ export async function repairBottleBrandDistilleryAssignments({
       let nextSeriesId = bottle.seriesId ?? null;
 
       await db.transaction(async (tx) => {
+        const actorId = (await getUserActorByIdForDatabase(tx, user!.id)).id;
+
         if (currentSeries) {
           const ensuredSeries = await ensureTargetSeries({
+            actorId,
             currentSeries,
             db: tx,
             toBrand,
@@ -384,6 +391,12 @@ export async function repairBottleBrandDistilleryAssignments({
           tx,
           nextBottleFullName,
           bottle.id,
+          null,
+          {
+            assignmentSource: "canonical",
+            assignedById: user!.id,
+            assignedByActorId: actorId,
+          },
         );
         if (bottleAlias.bottleId !== bottle.id) {
           throw new Error(
@@ -434,6 +447,11 @@ export async function repairBottleBrandDistilleryAssignments({
             nextReleaseFullName,
             bottle.id,
             release.id,
+            {
+              assignmentSource: "canonical",
+              assignedById: user!.id,
+              assignedByActorId: actorId,
+            },
           );
           if (
             releaseAlias.bottleId !== bottle.id ||
@@ -473,6 +491,7 @@ export async function repairBottleBrandDistilleryAssignments({
           type: "update",
           displayName: nextBottleFullName,
           createdById: user!.id,
+          actorId,
           data: {
             brandId: toBrand.id,
             ...(nextBottleFullName !== bottle.fullName

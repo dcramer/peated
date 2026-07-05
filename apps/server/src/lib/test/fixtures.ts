@@ -4,6 +4,7 @@ import type { AnyDatabase } from "@peated/server/db";
 import { db as dbConn } from "@peated/server/db";
 import * as dbSchema from "@peated/server/db/schema";
 import {
+  actors,
   badgeAwards,
   badges,
   bottleAliases,
@@ -38,6 +39,7 @@ import {
   FLAVOR_PROFILES,
   TAG_CATEGORIES,
 } from "../../constants";
+import { getUserActorByIdForDatabase } from "../actors";
 import { createAccessToken, generatePasswordHash } from "../auth";
 import { mapRows } from "../db";
 import { formatBottleName } from "../format";
@@ -160,6 +162,24 @@ export const User = async (
     })
     .returning();
   if (!result) throw new Error("Unable to create User fixture");
+
+  await db
+    .insert(actors)
+    .values({
+      type: "user",
+      key: String(result.id),
+      displayName: result.username,
+      userId: result.id,
+    })
+    .onConflictDoUpdate({
+      target: [actors.type, actors.key],
+      set: {
+        displayName: result.username,
+        userId: result.id,
+        active: true,
+      },
+    });
+
   return result;
 };
 
@@ -298,6 +318,8 @@ export const Entity = async (
       ...data,
       createdById: data.createdById || (await User({}, tx)).id,
     };
+    const actor = await getUserActorByIdForDatabase(tx, entityData.createdById);
+    entityData.createdByActorId = actor.id;
 
     const searchVector = buildEntitySearchVector(entityData);
 
@@ -321,6 +343,7 @@ export const Entity = async (
       displayName: entity.name,
       createdAt: entity.createdAt,
       createdById: entity.createdById,
+      actorId: actor.id,
       data: entity,
     });
 
@@ -387,6 +410,8 @@ export const Bottle = async (
       brandId: brand.id,
       createdById: data.createdById || (await User({}, tx)).id,
     };
+    const actor = await getUserActorByIdForDatabase(tx, bottleData.createdById);
+    bottleData.createdByActorId = actor.id;
 
     const distillerList = distillerIds.length
       ? await tx.query.entities.findMany({
@@ -445,6 +470,7 @@ export const Bottle = async (
       type: "add",
       createdAt: bottle.createdAt,
       createdById: bottle.createdById,
+      actorId: actor.id,
       data: bottle,
     });
 

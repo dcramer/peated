@@ -33,6 +33,7 @@ import { pushJob } from "@peated/server/worker/client";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { z } from "zod";
+import { getUserActor } from "./actors";
 
 export class BottleCreateBadRequestError extends Error {
   constructor(message: string) {
@@ -235,19 +236,26 @@ async function findExistingSmwsBottleIdForCreate(
   return rows.find((row) => rowHasSmwsCode(row, code))?.bottleId ?? null;
 }
 
+/**
+ * Creates all bottle-owned rows under a required actor id for write
+ * attribution. Callers must resolve the actor before entering this helper.
+ */
 export async function createBottleInTransaction(
   tx: AnyTransaction,
   {
     creationSource = "manual_entry",
+    createdByActorId,
     input,
     context,
   }: {
     creationSource?: CatalogVerificationCreationSource;
+    createdByActorId: number;
     input: z.infer<typeof BottleInputSchema>;
     context: Context & { user: User };
   },
 ): Promise<CreateBottleResult> {
   const user = context.user;
+  const actorId = createdByActorId;
   const bottleData: BottlePreviewResult & Record<string, any> =
     await bottleNormalize({ input, context, entityDb: tx });
 
@@ -285,6 +293,7 @@ export async function createBottleInTransaction(
     creationSource,
     type: "brand",
     userId: user.id,
+    createdByActorId: actorId,
   });
 
   if (!brandUpsert) {
@@ -302,6 +311,7 @@ export async function createBottleInTransaction(
       creationSource,
       type: "bottler",
       userId: user.id,
+      createdByActorId: actorId,
     });
     if (!bottlerUpsert) {
       throw new BottleCreateBadRequestError("Could not identify bottler.");
@@ -316,6 +326,7 @@ export async function createBottleInTransaction(
       series: input.series,
       brand,
       userId: user.id,
+      createdByActorId: actorId,
       tx,
     });
 
@@ -337,6 +348,7 @@ export async function createBottleInTransaction(
         data: coerceToUpsert(distData),
         creationSource,
         userId: user.id,
+        createdByActorId: actorId,
         type: "distiller",
       });
       if (!distUpsert) {
@@ -358,6 +370,7 @@ export async function createBottleInTransaction(
     bottlerId: bottler?.id || null,
     seriesId,
     createdById: user.id,
+    createdByActorId: actorId,
     fullName,
   };
 
@@ -377,6 +390,7 @@ export async function createBottleInTransaction(
       bottleId: bottle.id,
       assignmentSource: "canonical",
       assignedById: user.id,
+      assignedByActorId: actorId,
     })
     .where(
       and(
@@ -406,6 +420,7 @@ export async function createBottleInTransaction(
       objectId: bottle.id,
       createdAt: bottle.createdAt,
       createdById: user.id,
+      actorId,
       displayName: bottle.fullName,
       type: "add",
       data: {
@@ -531,9 +546,11 @@ export async function createBottle({
   input: z.infer<typeof BottleInputSchema>;
   context: Context & { user: User };
 }) {
+  const actor = await getUserActor(context.user);
   const result = await db.transaction(async (tx) =>
     createBottleInTransaction(tx, {
       creationSource,
+      createdByActorId: actor.id,
       input,
       context,
     }),

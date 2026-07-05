@@ -5,6 +5,7 @@ import {
   entityAliases,
   entityTombstones,
 } from "@peated/server/db/schema";
+import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { eq } from "drizzle-orm";
@@ -35,11 +36,14 @@ export default procedure
     }
 
     await db.transaction(async (tx) => {
+      const actorId = (await getUserActorForDatabase(tx, context.user)).id;
+
       await Promise.all([
         tx.insert(changes).values({
           objectType: "entity",
           objectId: entity.id,
           createdById: context.user.id,
+          actorId,
           displayName: entity.name,
           type: "delete",
           data: {

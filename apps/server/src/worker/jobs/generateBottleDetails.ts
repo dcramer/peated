@@ -1,12 +1,9 @@
 import config from "@peated/server/config";
-import {
-  CATEGORY_LIST,
-  DEFAULT_CREATED_BY_ID,
-  FLAVOR_PROFILES,
-} from "@peated/server/constants";
+import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
 import { bottles, changes } from "@peated/server/db/schema";
+import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { arraysEqual, objectsShallowEqual } from "@peated/server/lib/equals";
 import { notesForProfile } from "@peated/server/lib/format";
 import { logError, logWarn } from "@peated/server/lib/log";
@@ -206,6 +203,7 @@ export default async function ({ bottleId }: { bottleId: number }) {
   }
 
   if (Object.keys(data).length === 0) return;
+  const actor = await getPeatedSystemActor();
 
   await db.transaction(async (tx) => {
     await tx.update(bottles).set(data).where(eq(bottles.id, bottle.id));
@@ -214,7 +212,7 @@ export default async function ({ bottleId }: { bottleId: number }) {
       objectType: "bottle",
       objectId: bottle.id,
       displayName: bottle.fullName,
-      createdById: DEFAULT_CREATED_BY_ID,
+      actorId: actor.id,
       type: "update",
       data: {
         ...data,

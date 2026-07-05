@@ -4,6 +4,7 @@ import {
 } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import { externalSites, reviews } from "@peated/server/db/schema";
+import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
@@ -36,6 +37,8 @@ export default procedure
   .input(ReviewInputSchema)
   .output(ReviewSchema)
   .handler(async function ({ input, context, errors }) {
+    const systemActor = await getPeatedSystemActor();
+
     const site = await db.query.externalSites.findFirst({
       where: eq(externalSites.type, input.site),
     });
@@ -65,6 +68,7 @@ export default procedure
         category: input.category,
       },
       user: context.user!,
+      createdByActorId: systemActor.id,
     });
     if (resolution.error) {
       logError(resolution.error, {
@@ -138,19 +142,25 @@ export default procedure
 
       if (!bottleId) return { review, aliasAssignment: null };
 
-      const aliasAssignment = await assignBottleAliasInTransaction(tx, {
-        bottleId,
-        releaseId,
-        name: aliasKey,
-        backfillNames: [reviewName, rawName],
-        externalSiteId: site.id,
-        ...(resolution.source !== "exact_alias"
-          ? {
-              assignmentSource: "classifier_approved" as const,
+      const aliasAssignment =
+        resolution.source !== "exact_alias"
+          ? await assignBottleAliasInTransaction(tx, {
+              bottleId,
+              releaseId,
+              name: aliasKey,
+              backfillNames: [reviewName, rawName],
+              externalSiteId: site.id,
+              assignmentSource: "classifier_approved",
+              assignedByActorId: systemActor.id,
               assignedById: context.user!.id,
-            }
-          : {}),
-      });
+            })
+          : await assignBottleAliasInTransaction(tx, {
+              bottleId,
+              releaseId,
+              name: aliasKey,
+              backfillNames: [reviewName, rawName],
+              externalSiteId: site.id,
+            });
 
       const decision = getIncomingBottleDecisionFromResolutionSource(
         resolution.source,
@@ -170,8 +180,7 @@ export default procedure
           name: reviewName,
           url: input.url,
           decision,
-          actorType: "system",
-          actorUserId: context.user!.id,
+          actor: systemActor,
           bottleId,
           releaseId,
           createdBottle: resolution.createdBottle,
@@ -182,6 +191,7 @@ export default procedure
           metadata: {
             resolutionSource: resolution.source,
             issue: input.issue,
+            initiatedByUserId: context.user!.id,
           },
         });
       }

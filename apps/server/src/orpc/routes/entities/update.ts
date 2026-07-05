@@ -9,6 +9,7 @@ import {
   entities,
   regions,
 } from "@peated/server/db/schema";
+import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import {
   DuplicateEntityAliasError,
   upsertEntityAliases,
@@ -162,6 +163,7 @@ export default procedure
 
     const user = context.user;
     const newEntity = await db.transaction(async (tx) => {
+      const actorId = (await getUserActorForDatabase(tx, user)).id;
       let newEntity: Entity | undefined;
 
       try {
@@ -249,6 +251,7 @@ export default procedure
         objectId: newEntity.id,
         displayName: newEntity.name,
         createdById: user.id,
+        actorId,
         type: "update",
         data: {
           ...data,
