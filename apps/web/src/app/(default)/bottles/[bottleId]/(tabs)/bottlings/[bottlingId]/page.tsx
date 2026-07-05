@@ -18,6 +18,7 @@ import SingleCaskChip from "@peated/web/components/singleCaskChip";
 import SkeletonButton from "@peated/web/components/skeletonButton";
 import TastingList from "@peated/web/components/tastingList";
 import TimeSince from "@peated/web/components/timeSince";
+import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import {
   formatBottlingName,
   getBottleBottlingsPath,
@@ -465,11 +466,15 @@ export default async function Page(props: {
               <CollectionAction bottleId={bottle.id} releaseId={bottling.id} />
             </Suspense>
             <Button
-              href={`/bottles/${bottle.id}/addTasting?bottling=${bottling.id}`}
+              href={getAddBottleHref({
+                bottleId: bottle.id,
+                releaseId: bottling.id,
+                intent: "tasting",
+              })}
               color="primary"
             >
               <PeatedGlyph className="h-4 w-4" />
-              Record a Tasting
+              Log Tasting
             </Button>
             <ShareButton
               title={bottling.fullName}

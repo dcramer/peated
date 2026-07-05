@@ -48,12 +48,19 @@ export const testBrand = {
 
 export const existingBottleId = 9301;
 export const createdBottleId = 9302;
+export const existingReleaseId = 9303;
+export const createdReleaseId = 9304;
 export const createdTastingId = 9401;
+export const displayImageBottleId = 9501;
+export const displayImageUrl =
+  "http://127.0.0.1:4999/uploads/display-bottle.webp";
 
 export function buildBottle({
   id = existingBottleId,
   name = "16-year-old",
   brand = testBrand,
+  imageUrl = null,
+  displayImageUrl = null,
   totalTastings = 0,
   people = 0,
   hasTasted = false,
@@ -79,7 +86,8 @@ export function buildBottle({
     bottler: null,
     description: null,
     descriptionSrc: null,
-    imageUrl: null,
+    imageUrl,
+    displayImageUrl: displayImageUrl ?? imageUrl,
     flavorProfile: null,
     tastingNotes: null,
     suggestedTags: [],
@@ -111,14 +119,58 @@ export function buildBottle({
 
 export const existingBottle = buildBottle();
 
-export function buildCollectionBottle({
-  id = 1,
-  bottle = existingBottle,
+/**
+ * Builds the bottle-release RPC fixture used by bottling-specific E2E flows.
+ */
+export function buildBottleRelease({
+  id = existingReleaseId,
+  bottleId = existingBottleId,
+  fullName = `${existingBottle.fullName} Distillers Edition`,
+  name = "Distillers Edition",
+  edition = "Distillers Edition",
+  releaseYear = 2024,
 } = {}) {
   return {
     id,
+    bottleId,
+    fullName,
+    name,
+    edition,
+    statedAge: null,
+    abv: null,
+    caskStrength: null,
+    singleCask: null,
+    vintageYear: null,
+    releaseYear,
+    caskType: null,
+    caskSize: null,
+    caskFill: null,
+    description: null,
+    tastingNotes: null,
+    imageUrl: null,
+    avgRating: null,
+    totalTastings: 0,
+    suggestedTags: [],
+    isFavorite: false,
+    hasTasted: false,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+}
+
+export const existingRelease = buildBottleRelease();
+
+export function buildCollectionBottle({
+  id = 1,
+  bottle = existingBottle,
+  release = null,
+  imageUrl = null,
+} = {}) {
+  return {
+    id,
+    imageUrl,
     bottle,
-    release: null,
+    release,
   };
 }
 

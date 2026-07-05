@@ -2,14 +2,20 @@ import http from "node:http";
 
 import {
   buildBottle,
+  buildBottleRelease,
   buildCollectionBottle,
   buildTasting,
   createdBottleId,
   createdBottleName,
+  createdReleaseId,
   createdTastingId,
+  displayImageBottleId,
+  displayImageUrl,
   emptyList,
   existingBottle,
   existingBottleId,
+  existingRelease,
+  existingReleaseId,
   failingTastingNotes,
   photoTastingNotes,
   suggestedTags,
@@ -30,7 +36,9 @@ const corsHeaders = {
 };
 
 const collectionStateByToken = new Map();
+const pendingUploadStateByToken = new Map();
 let collectionBottleId = 1;
+let pendingUploadId = 1;
 
 const server = http.createServer(async (request, response) => {
   if (request.method === "OPTIONS") {
@@ -77,8 +85,33 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
       return false;
+    case "search":
+      if (
+        !Array.isArray(input?.include) ||
+        input.include.length !== 1 ||
+        input.include[0] !== "bottles"
+      ) {
+        sendRpcError(response, "Expected bottle search");
+        return true;
+      }
+
+      sendRpcResponse(response, {
+        query: input.query ?? "",
+        results: [
+          {
+            type: "bottle",
+            ref: withCollectionStatus(request, existingBottle),
+          },
+        ],
+      });
+      return true;
     case "bottles/create": {
-      if (input?.name !== createdBottleName || input?.brand !== testBrand.id) {
+      const expectedBrand =
+        input?.brand === testBrand.id ||
+        (input?.brand &&
+          typeof input.brand === "object" &&
+          input.brand.name === testBrand.name);
+      if (input?.name !== createdBottleName || !expectedBrand) {
         sendRpcError(response, "Unexpected bottle create payload");
         return true;
       }
@@ -121,6 +154,15 @@ async function handleRpcRequest({ request, response, url }) {
             : buildBottleForId(input.bottle),
         ),
       );
+      return true;
+    }
+    case "bottleReleases/details": {
+      if (input?.release !== existingReleaseId) {
+        sendRpcError(response, "Unexpected bottle release details payload");
+        return true;
+      }
+
+      sendRpcResponse(response, existingRelease);
       return true;
     }
     case "bottles/suggestedTags":
@@ -183,6 +225,62 @@ async function handleRpcRequest({ request, response, url }) {
       return true;
     }
     case "tastings/photoIdentification":
+      // E2E access-token suffixes select alternate mock photo-identification scenarios.
+      if (getAccessToken(request).includes("photo-create-warning")) {
+        sendRpcResponse(
+          response,
+          buildCreateProposalPhotoIdentification({ action: "create_bottle" }),
+        );
+        return true;
+      }
+
+      if (getAccessToken(request).includes("photo-create-unsuitable")) {
+        sendRpcResponse(
+          response,
+          buildCreateProposalPhotoIdentification({
+            action: "create_bottle",
+            suitableAsBottleImage: false,
+          }),
+        );
+        return true;
+      }
+
+      if (getAccessToken(request).includes("photo-create-release-approval")) {
+        sendRpcResponse(
+          response,
+          buildCreateProposalPhotoIdentification({
+            action: "create_bottle_and_release",
+          }),
+        );
+        return true;
+      }
+
+      if (getAccessToken(request).includes("photo-create-bottle-unchecked")) {
+        sendRpcResponse(
+          response,
+          buildCreateProposalPhotoIdentification({ action: "create_bottle" }),
+        );
+        return true;
+      }
+
+      if (getAccessToken(request).includes("photo-create-bottle-approval")) {
+        sendRpcResponse(
+          response,
+          buildCreateProposalPhotoIdentification({ action: "create_bottle" }),
+        );
+        return true;
+      }
+
+      if (getAccessToken(request).includes("photo-no-match")) {
+        sendRpcResponse(response, buildNoMatchPhotoIdentification());
+        return true;
+      }
+
+      if (getAccessToken(request).includes("photo-needs-review")) {
+        sendRpcResponse(response, buildNeedsReviewPhotoIdentification());
+        return true;
+      }
+
       sendRpcResponse(response, {
         pendingImage: {
           id: "playwright-photo-upload",
@@ -268,6 +366,12 @@ async function handleRpcRequest({ request, response, url }) {
         },
       });
       return true;
+    case "tastings/photoIdentificationCreate":
+      sendRpcResponse(
+        response,
+        createPhotoIdentificationTarget(request, input),
+      );
+      return true;
     case "tastings/imageUpdate":
       sendRpcResponse(response, {
         imageUrl: "http://127.0.0.1:4999/uploads/tasting.webp",
@@ -316,8 +420,23 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, listCollectionBottles(request, input));
       return true;
     case "collections/bottles/create":
-      mutateCollectionBottle(request, input, "create");
-      sendRpcResponse(response, {});
+      if (getAccessToken(request).includes("library-create-failure")) {
+        sendRpcError(response, "Could not save to Library.");
+        return true;
+      }
+      if (getAccessToken(request).includes("library-create-slow")) {
+        await delay(500);
+      }
+      sendRpcResponse(
+        response,
+        mutateCollectionBottle(request, input, "create"),
+      );
+      return true;
+    case "pendingUploads/create":
+      sendRpcResponse(response, createPendingUpload(request, input));
+      return true;
+    case "collections/bottles/imageUpdate":
+      sendRpcResponse(response, updateCollectionBottleImage(request, input));
       return true;
     case "collections/bottles/delete":
       mutateCollectionBottle(request, input, "delete");
@@ -355,12 +474,7 @@ async function handleRpcRequest({ request, response, url }) {
  * mutate Favorites and Library independently against one mock RPC server.
  */
 function getCollectionState(request) {
-  const authorization = request.headers.authorization;
-  const token =
-    (Array.isArray(authorization) ? authorization[0] : authorization)?.replace(
-      /^Bearer\s+/i,
-      "",
-    ) ?? "anonymous";
+  const token = getAccessToken(request);
 
   if (!collectionStateByToken.has(token)) {
     collectionStateByToken.set(token, {
@@ -370,6 +484,64 @@ function getCollectionState(request) {
   }
 
   return collectionStateByToken.get(token);
+}
+
+function getPendingUploadState(request) {
+  const token = getAccessToken(request);
+
+  if (!pendingUploadStateByToken.has(token)) {
+    pendingUploadStateByToken.set(token, new Map());
+  }
+
+  return pendingUploadStateByToken.get(token);
+}
+
+function getAccessToken(request) {
+  const authorization = request.headers.authorization;
+  return (
+    (Array.isArray(authorization) ? authorization[0] : authorization)?.replace(
+      /^Bearer\s+/i,
+      "",
+    ) ?? "anonymous"
+  );
+}
+
+function createPendingUpload(request, input) {
+  if (input?.__mockHasUploadFile !== true) {
+    throw new Error("Expected pending upload file payload");
+  }
+
+  const purpose = input?.purpose ?? "photo_tasting_entry";
+  if (purpose !== "photo_tasting_entry") {
+    throw new Error("Unexpected pending upload purpose");
+  }
+  if (typeof input?.idempotencyKey !== "string" || !input.idempotencyKey) {
+    throw new Error("Expected pending upload idempotency key");
+  }
+
+  const uploads = getPendingUploadState(request);
+  for (const upload of uploads.values()) {
+    if (
+      upload.purpose === purpose &&
+      upload.idempotencyKey === input.idempotencyKey
+    ) {
+      return upload;
+    }
+  }
+
+  const id = `playwright-library-upload-${pendingUploadId++}`;
+  const upload = {
+    id,
+    imageUrl: `http://127.0.0.1:4999/uploads/${id}.webp`,
+    kind: "image",
+    purpose,
+    status: "pending",
+    idempotencyKey: input.idempotencyKey,
+    expiresAt: "2026-06-07T13:00:00.000Z",
+  };
+
+  uploads.set(id, upload);
+  return upload;
 }
 
 function getCollection(input) {
@@ -392,6 +564,20 @@ function mutateCollectionBottle(request, input, action) {
   if (input?.user !== "me" || typeof input?.bottle !== "number") {
     throw new Error("Unexpected collection mutation payload");
   }
+  if (
+    input?.release !== undefined &&
+    input.release !== null &&
+    (input.release !== existingReleaseId ||
+      input.bottle !== existingRelease.bottleId)
+  ) {
+    throw new Error("Unexpected collection release payload");
+  }
+  if (
+    input?.pendingImageId !== undefined &&
+    input.pendingImageId !== "playwright-photo-upload"
+  ) {
+    throw new Error("Unexpected collection pending image payload");
+  }
 
   const state = getCollectionState(request);
   const collection = getCollection(input);
@@ -412,9 +598,464 @@ function mutateCollectionBottle(request, input, action) {
           input.bottle === existingBottleId
             ? existingBottle
             : buildBottleForId(input.bottle),
+        release: input.release === existingReleaseId ? existingRelease : null,
+        imageUrl: input.pendingImageId
+          ? "http://127.0.0.1:4999/uploads/library.webp"
+          : null,
       }),
     );
+  } else {
+    const entry = entries.get(key);
+    if (!entry) {
+      throw new Error("Collection entry missing after key lookup");
+    }
+    if (!input.pendingImageId) return entry;
+
+    entries.set(key, {
+      ...entry,
+      imageUrl: "http://127.0.0.1:4999/uploads/library.webp",
+    });
   }
+
+  return entries.get(key);
+}
+
+function findCollectionBottleEntry(request, input) {
+  if (
+    input?.user !== "me" &&
+    input?.user !== testUser.username &&
+    input?.user !== testUser.id
+  ) {
+    throw new Error("Unexpected collection image user payload");
+  }
+  if (input?.collection !== "library") {
+    throw new Error("Unexpected collection image collection payload");
+  }
+  if (typeof input?.collectionBottle !== "number") {
+    throw new Error("Unexpected collection image entry payload");
+  }
+
+  const entries = getCollectionState(request).library;
+  const entry = Array.from(entries.values()).find(
+    (candidate) => candidate.id === input.collectionBottle,
+  );
+  if (!entry) {
+    throw new Error("Collection entry missing for image mutation");
+  }
+
+  return entry;
+}
+
+function replaceCollectionBottleEntry(request, updatedEntry) {
+  const entries = getCollectionState(request).library;
+  for (const [key, entry] of entries.entries()) {
+    if (entry.id === updatedEntry.id) {
+      entries.set(key, updatedEntry);
+      return {
+        ...updatedEntry,
+        bottle: withCollectionStatus(request, updatedEntry.bottle),
+      };
+    }
+  }
+
+  throw new Error("Collection entry missing for image replacement");
+}
+
+function updateCollectionBottleImage(request, input) {
+  const entry = findCollectionBottleEntry(request, input);
+  const uploads = getPendingUploadState(request);
+  if (!uploads.has(input?.pendingImageId)) {
+    throw new Error("Unexpected collection image pending upload payload");
+  }
+
+  return replaceCollectionBottleEntry(request, {
+    ...entry,
+    imageUrl: `http://127.0.0.1:4999/uploads/library-replaced-${entry.id}.webp`,
+  });
+}
+
+function buildCreateProposalPhotoIdentification({
+  action,
+  suitableAsBottleImage = true,
+}) {
+  const proposedRelease = {
+    edition: "First Fill Oloroso",
+    statedAge: null,
+    abv: 46,
+    caskStrength: null,
+    singleCask: null,
+    vintageYear: null,
+    releaseYear: 2026,
+  };
+  const proposedBottle = {
+    name: createdBottleName,
+    category: "single_malt",
+    series: null,
+    edition: null,
+    statedAge: null,
+    caskStrength: null,
+    singleCask: null,
+    abv: null,
+    vintageYear: null,
+    releaseYear: null,
+    brand: {
+      id: testBrand.id,
+      name: testBrand.name,
+    },
+    distillers: [
+      {
+        id: testBrand.id,
+        name: testBrand.name,
+      },
+    ],
+    bottler: null,
+  };
+  const decision =
+    action === "create_release"
+      ? {
+          action,
+          parentBottleId: existingBottleId,
+          proposedRelease,
+        }
+      : action === "create_bottle_and_release"
+        ? {
+            action,
+            proposedBottle,
+            proposedRelease,
+          }
+        : {
+            action,
+            proposedBottle,
+          };
+
+  return {
+    pendingImage: {
+      id: "playwright-photo-upload",
+      imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
+      expiresAt: "2026-06-07T13:00:00.000Z",
+    },
+    imageEvidence: {
+      sourceImageId: "playwright-photo-upload",
+      sourceImageHash: "playwright-photo-hash",
+      extractors: [
+        {
+          kind: "vision",
+          model: "playwright",
+          confidence: 0.92,
+          textSpans: [
+            {
+              text: `${testBrand.name} ${createdBottleName}`,
+              confidence: 0.92,
+            },
+          ],
+          observations: ["Single bottle label is readable."],
+        },
+      ],
+      fieldCandidates: {
+        brand: {
+          value: testBrand.name,
+          confidence: 0.95,
+          sourceExtractorIndexes: [0],
+        },
+        expression: {
+          value: createdBottleName,
+          confidence: 0.9,
+          sourceExtractorIndexes: [0],
+        },
+        edition:
+          action === "create_bottle"
+            ? undefined
+            : {
+                value: proposedRelease.edition,
+                confidence: 0.88,
+                sourceExtractorIndexes: [0],
+              },
+      },
+      photoSuitability: {
+        isSingleBottlePhoto: true,
+        labelReadable: true,
+        suitableAsTastingImage: true,
+        suitableAsBottleImage,
+        reason: suitableAsBottleImage
+          ? null
+          : "The photo is not suitable as a public catalog image.",
+      },
+      conflicts: [],
+    },
+    classification: {
+      status: "classified",
+      decision,
+      artifacts: {
+        candidates: [
+          {
+            bottleId: existingBottleId,
+            releaseId: null,
+            bottleFullName: existingBottle.fullName,
+            fullName: existingBottle.fullName,
+          },
+        ],
+      },
+    },
+    suggestedNextStep: "confirm_create",
+    diagnostics: {
+      extraction: {
+        status: "found",
+        summary: `${testBrand.name} ${createdBottleName}`,
+      },
+      candidates: {
+        count: 1,
+      },
+      classification: {
+        status: "classified",
+        action,
+        confidence: 92,
+        reason: "Create proposal fixture.",
+      },
+    },
+  };
+}
+
+function createPhotoIdentificationTarget(request, input) {
+  if (input?.pendingImageId !== "playwright-photo-upload") {
+    throw new Error("Unexpected photo identification create pending image");
+  }
+
+  const token = getAccessToken(request);
+  const approvalTarget = input?.catalogImageApproval?.target;
+  const bottle = buildBottle({
+    id: createdBottleId,
+    name: createdBottleName,
+    brand: testBrand,
+  });
+
+  if (token.includes("photo-create-warning")) {
+    if (approvalTarget !== "bottle") {
+      throw new Error("Expected bottle catalog image approval");
+    }
+
+    return {
+      bottle,
+      release: null,
+      warnings: [
+        {
+          code: "CATALOG_IMAGE_COPY_FAILED",
+          message:
+            "The bottle was created, but the public image was not saved.",
+        },
+      ],
+    };
+  }
+
+  if (token.includes("photo-create-unsuitable")) {
+    if (input?.catalogImageApproval !== undefined) {
+      throw new Error("Unexpected catalog image approval for unsuitable photo");
+    }
+
+    return {
+      bottle,
+      release: null,
+    };
+  }
+
+  if (token.includes("photo-create-release-approval")) {
+    if (approvalTarget !== "release") {
+      throw new Error("Expected release catalog image approval");
+    }
+
+    return {
+      bottle,
+      release: buildBottleRelease({
+        id: createdReleaseId,
+        bottleId: createdBottleId,
+        fullName: `${bottle.fullName} First Fill Oloroso`,
+        name: "First Fill Oloroso",
+        edition: "First Fill Oloroso",
+        releaseYear: 2026,
+      }),
+    };
+  }
+
+  if (token.includes("photo-create-bottle-unchecked")) {
+    if (input?.catalogImageApproval !== undefined) {
+      throw new Error("Unexpected catalog image approval");
+    }
+
+    return {
+      bottle,
+      release: null,
+    };
+  }
+
+  if (token.includes("photo-create-bottle-approval")) {
+    if (approvalTarget !== "bottle") {
+      throw new Error("Expected bottle catalog image approval");
+    }
+
+    return {
+      bottle,
+      release: null,
+    };
+  }
+
+  throw new Error("Unexpected photo identification create scenario");
+}
+
+/**
+ * Builds the no-match photo-identification RPC fixture for Add Bottle fallback tests.
+ */
+function buildNoMatchPhotoIdentification() {
+  return {
+    pendingImage: {
+      id: "playwright-photo-upload",
+      imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
+      expiresAt: "2026-06-07T13:00:00.000Z",
+    },
+    imageEvidence: {
+      sourceImageId: "playwright-photo-upload",
+      sourceImageHash: "playwright-photo-hash",
+      extractors: [
+        {
+          kind: "vision",
+          model: "playwright",
+          confidence: 0.82,
+          textSpans: [
+            {
+              text: `${testBrand.name} ${createdBottleName}`,
+              confidence: 0.82,
+            },
+          ],
+          observations: ["Single bottle label is readable."],
+        },
+      ],
+      fieldCandidates: {
+        brand: {
+          value: testBrand.name,
+          confidence: 0.82,
+          sourceExtractorIndexes: [0],
+        },
+        expression: {
+          value: createdBottleName,
+          confidence: 0.8,
+          sourceExtractorIndexes: [0],
+        },
+      },
+      photoSuitability: {
+        isSingleBottlePhoto: true,
+        labelReadable: true,
+        suitableAsTastingImage: true,
+        suitableAsBottleImage: true,
+        reason: "The label is readable.",
+      },
+      conflicts: [],
+    },
+    classification: {
+      status: "classified",
+      decision: {
+        action: "no_match",
+      },
+      artifacts: {
+        candidates: [],
+      },
+    },
+    suggestedNextStep: "manual_search",
+    diagnostics: {
+      extraction: {
+        status: "found",
+        summary: `${testBrand.name} ${createdBottleName}`,
+      },
+      candidates: {
+        count: 0,
+      },
+      classification: {
+        status: "classified",
+        action: "no_match",
+        confidence: 0,
+        reason: "No existing Peated bottle matched the label details.",
+      },
+    },
+  };
+}
+
+function buildNeedsReviewPhotoIdentification() {
+  return {
+    pendingImage: {
+      id: "playwright-photo-upload",
+      imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
+      expiresAt: "2026-06-07T13:00:00.000Z",
+    },
+    imageEvidence: {
+      sourceImageId: "playwright-photo-upload",
+      sourceImageHash: "playwright-photo-hash",
+      extractors: [
+        {
+          kind: "vision",
+          model: "playwright",
+          confidence: 0.72,
+          textSpans: [
+            {
+              text: `${testBrand.name} ${existingBottle.name}`,
+              confidence: 0.72,
+            },
+          ],
+          observations: ["Single bottle label is partly readable."],
+        },
+      ],
+      fieldCandidates: {
+        brand: {
+          value: testBrand.name,
+          confidence: 0.72,
+          sourceExtractorIndexes: [0],
+        },
+        expression: {
+          value: existingBottle.name,
+          confidence: 0.68,
+          sourceExtractorIndexes: [0],
+        },
+      },
+      photoSuitability: {
+        isSingleBottlePhoto: true,
+        labelReadable: true,
+        suitableAsTastingImage: true,
+        suitableAsBottleImage: false,
+        reason: "The photo is too uncertain for catalog creation.",
+      },
+      conflicts: [],
+    },
+    classification: {
+      status: "classified",
+      decision: {
+        action: "match",
+        matchedBottleId: existingBottleId,
+        matchedReleaseId: null,
+      },
+      artifacts: {
+        candidates: [
+          {
+            bottleId: existingBottleId,
+            releaseId: null,
+            bottleFullName: existingBottle.fullName,
+            fullName: existingBottle.fullName,
+          },
+        ],
+      },
+    },
+    suggestedNextStep: "needs_review",
+    diagnostics: {
+      extraction: {
+        status: "found",
+        summary: `${testBrand.name} ${existingBottle.name}`,
+      },
+      candidates: {
+        count: 1,
+      },
+      classification: {
+        status: "classified",
+        action: "match",
+        confidence: 55,
+        reason: "Possible match needs user review.",
+      },
+    },
+  };
 }
 
 /**
@@ -437,6 +1078,22 @@ function hasBottleInCollection(collection, bottleId) {
 }
 
 function buildBottleForId(id) {
+  if (id === createdBottleId) {
+    return buildBottle({
+      id: createdBottleId,
+      name: createdBottleName,
+      brand: testBrand,
+    });
+  }
+
+  if (id === displayImageBottleId) {
+    return buildBottle({
+      id: displayImageBottleId,
+      name: "Display Image Reserve",
+      displayImageUrl,
+    });
+  }
+
   return buildBottle({
     id,
     name: `16-year-old ${id}`,
@@ -482,6 +1139,13 @@ async function readRpcInput(request, url) {
   const contentType = request.headers["content-type"] ?? "";
   if (
     typeof contentType === "string" &&
+    contentType.includes("multipart/form-data")
+  ) {
+    return await readMultipartRpcInput(request, contentType);
+  }
+
+  if (
+    typeof contentType === "string" &&
     !contentType.includes("application/json")
   ) {
     request.resume();
@@ -494,10 +1158,45 @@ async function readRpcInput(request, url) {
   return JSON.parse(body).json;
 }
 
-function readBody(request) {
+async function readMultipartRpcInput(request, contentType) {
+  const boundaryMatch = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/);
+  const boundary = boundaryMatch?.[1] ?? boundaryMatch?.[2];
+  if (!boundary) {
+    request.resume();
+    return {};
+  }
+
+  const body = await readBody(request, "latin1");
+  const parts = body.split(`--${boundary}`);
+  let data;
+  let hasUploadFile = false;
+
+  for (const part of parts) {
+    const separatorIndex = part.indexOf("\r\n\r\n");
+    if (separatorIndex === -1) continue;
+
+    const headers = part.slice(0, separatorIndex);
+    const name = headers.match(/name="([^"]+)"/)?.[1];
+    if (!name) continue;
+
+    const value = part.slice(separatorIndex + 4).replace(/\r\n$/, "");
+    if (name === "data") {
+      data = JSON.parse(value).json;
+    } else if (/^\d+$/.test(name)) {
+      hasUploadFile = true;
+    }
+  }
+
+  return {
+    ...(data && typeof data === "object" ? data : {}),
+    __mockHasUploadFile: hasUploadFile,
+  };
+}
+
+function readBody(request, encoding = "utf8") {
   return new Promise((resolve, reject) => {
     let body = "";
-    request.setEncoding("utf8");
+    request.setEncoding(encoding);
     request.on("data", (chunk) => {
       body += chunk;
     });

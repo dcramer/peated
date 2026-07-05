@@ -1,0 +1,14 @@
+{
+  "writtenAt": "2026-07-05T02:30:45.075Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Four Roses Barrel Strength single barrel private selection"
+  },
+  "output": {
+    "error": "Firecrawl search failed: The operation was aborted due to timeout"
+  },
+  "metadata": {
+    "cacheKey": "7383f5cc0435992f1be591db8b030481a82355b459f412bd97286ce0e7651726",
+    "mode": "auto"
+  }
+}

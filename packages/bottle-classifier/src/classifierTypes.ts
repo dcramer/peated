@@ -459,7 +459,7 @@ export const BottleConfidenceBasisSchema = z
       .array(z.string().trim().min(1))
       .default([])
       .describe(
-        "Concrete evidence that increases confidence, such as exact local aliases, unique structured local traits, exact-cask codes, or agent-reviewed supportive web evidence.",
+        "Concrete evidence that increases confidence, such as exact local aliases, exact-cask codes, label text, image evidence, or agent-reviewed supportive web evidence.",
       ),
     unresolvedRisks: z
       .array(z.string().trim().min(1))

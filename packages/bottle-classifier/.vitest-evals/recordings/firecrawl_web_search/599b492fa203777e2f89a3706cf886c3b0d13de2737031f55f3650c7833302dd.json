@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-05T02:28:22.268Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Hudson Whiskey Back Room Deal peated scotch barrels New York Straight Rye"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Hudson Whiskey Back Room Deal peated scotch barrels New York Straight Rye",
+    "summary": "FINISH That peat lasts long on the finish, with just a little bit of sweetness. New York Straight Rye Whiskey Finished in Peated Scotch Barrels Aged a ... [Skip to content](https://internetwines.com/products/hudson-whiskey-ny-back-room-deal-rye-whiskey#sea-skip-target-main) [Skip to navigation](https://internetwines.co",
+    "results": [
+      {
+        "title": "Hudson Whiskey NY Back Room Deal Rye Whiskey",
+        "url": "https://internetwines.com/products/hudson-whiskey-ny-back-room-deal-rye-whiskey?srsltid=AfmBOooKb-sN81n9B0rquKu_QVpgDAOdhW_WfIfIgcRzXFfVyEyxV76j",
+        "domain": "internetwines.com",
+        "description": "FINISH That peat lasts long on the finish, with just a little bit of sweetness. New York Straight Rye Whiskey Finished in Peated Scotch Barrels Aged a ...",
+        "extraSnippets": [
+          "[Skip to content](https://internetwines.com/products/hudson-whiskey-ny-back-room-deal-rye-whiskey#sea-skip-target-main) [Skip to navigation](https://internetwines.com/products/huds"
+        ]
+      },
+      {
+        "title": "Backroom Deal | Hudson Peated Rye Whiskey",
+        "url": "https://www.hudsonwhiskey.com/en-US/our-range/backroom-deal-peated/",
+        "domain": "hudsonwhiskey.com",
+        "description": "New York Straight Rye Whiskey · Finished in. Peated Scotch Barrels · Aged a minimum of 3 years · 95% Rye / 5% Malted Barley · ABV 46% / 92 Proof · A bit of smoke, a ...",
+        "extraSnippets": [
+          "[Fully owned by William Grant & Sons, a fifth-generation Scottish family distiller](https://www.williamgrant.com/) ![Banner](https://www.hudsonwhiskey.com/assets/Uploads/products/e"
+        ]
+      },
+      {
+        "title": "Straight Rye Whiskey finished in Peated Scotch Barrels ...",
+        "url": "https://www.oldtowntequila.com/hudson-whiskey-ny-back-room-deal-straight-rye-whiskey-finished-in-peated-scotch-barrels-750ml/?srsltid=AfmBOopKpkFQFiGcyrGATnBSmNVTBjvQfKAoSJOUSDEk3M7j5QkEZ_Mt",
+        "domain": "oldtowntequila.com",
+        "description": "Hudson Whiskey NY Back Room Deal - Straight Rye Whiskey finished in Peated Scotch Barrels 750ml ... MSRP: Now: $59.99. Was: — You save.",
+        "extraSnippets": [
+          "Search ##### [Hudson](https://www.oldtowntequila.com/brands/Hudson.html) # Hudson Whiskey NY Back Room Deal - Straight Rye Whiskey finished in Peated Scotch Barrels 750ml (No revie"
+        ]
+      },
+      {
+        "title": "Hudson Whiskey NY Back Room Deal Straight Rye Whiskey",
+        "url": "https://www.caskers.com/hudson-whiskey-ny-back-room-deal-straight-rye-whiskey/?srsltid=AfmBOopZHHl0_ZH1lrhLSY6HUa1ChC_g3CrXdrr-2OBGL5M_k4iRYAYc",
+        "domain": "caskers.com",
+        "description": "Hudson Whiskey NY Back Room Deal is a straight rye whiskey, finished in peated Scotch barrels. The whiskey, made with a mash bill of 95% New York rye and 5 ...",
+        "extraSnippets": [
+          "The store will not work correctly when cookies are disabled. **Unfortunately, we’re not open yet in your state.** Looks like we don't deliver to that state. click here to change yo"
+        ]
+      },
+      {
+        "title": "Hudson Whiskey (Tuthilltown Spirits) \"Back Room Deal ...",
+        "url": "https://www.shawnfinewine.com/products/210000012439?srsltid=AfmBOopQq6TFHmQxChPlfPo8qaduoDUHxU9hP4ISb4H15w9eTPVjLZBZ",
+        "domain": "shawnfinewine.com",
+        "description": "The whiskey is aged a minimum of three years, and contains 95% Rye and 5% Malted Barley. Silver Medal at the 2021 International Spirits Challenge.",
+        "extraSnippets": [
+          "[Skip to content](https://www.shawnfinewine.com/products/210000012439#MainContent) $15 SHIPPING - $250 MINIMUM PURCHASE ## Item added to your cart [View cart](https://www.shawnfine"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "599b492fa203777e2f89a3706cf886c3b0d13de2737031f55f3650c7833302dd",
+    "mode": "auto"
+  }
+}

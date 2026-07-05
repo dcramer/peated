@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-05T02:19:48.900Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Series Volume 3 bourbon whiskey"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Heaven's Door Bootleg Series Volume 3 bourbon whiskey",
+    "summary": "For Volume 3, which was released late in 2021, the company chose to finish a 13 year Kentucky bourbon in used Vino De Naranja Casks. The company ... By clicking **\"Accept\"**, you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts. View our ",
+    "results": [
+      {
+        "title": "Heaven's Door Bootleg Series Volume 3 Review - Breaking Bourbon",
+        "url": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": "For Volume 3, which was released late in 2021, the company chose to finish a 13 year Kentucky bourbon in used Vino De Naranja Casks. The company ...",
+        "extraSnippets": [
+          "By clicking **\"Accept\"**, you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts. View our [Privacy "
+        ]
+      },
+      {
+        "title": "Bootleg Story - Heaven's Door Whiskey",
+        "url": "https://buy.heavensdoor.com/pages/bootleg-story?srsltid=AfmBOooN5LvpVhifoszPk0Ts-bDXHUL0n9kE1EGDOM-DGEwzpqIXg_9w",
+        "domain": "buy.heavensdoor.com",
+        "description": "Aged for 12 years, this limited-edition wheated straight bourbon is finished in air-dried, lightly toasted Limousin cigar barrels—reminiscent of those ...",
+        "extraSnippets": [
+          "[Skip to content](https://buy.heavensdoor.com/pages/bootleg-story#MainContent) ## Search Search ## Cart Your cart is empty Loading... ![](https://buy.heavensdoor.com/cdn/shop/files"
+        ]
+      },
+      {
+        "title": "Heaven's Door The Bootleg Series Volume 3 - Markay's Wine & Spirits",
+        "url": "https://markaysliquors.com/shop/product/heavens-door-the-bootleg-series-volume-3/614b93f13107887d31a02ba1?option-id=448701fcd722e75d9f696ebfe2aa4312bf3d595a91c2d828847c144b0cca4d8d&srsltid=AfmBOopAcbzL2Ln-kMKabrFXC9Lm4YsQJGyBAmS2TgbnZ0-_rdOtxODU",
+        "domain": "markaysliquors.com",
+        "description": "The third annual Bootleg release, Bootleg Volume III, features a 13-year-old Kentucky bourbon finished in Vino de Naranja Casks. Bottled at cask strength with a ...",
+        "extraSnippets": [
+          "[Jump to content](https://markaysliquors.com/shop/product/heavens-door-the-bootleg-series-volume-3/614b93f13107887d31a02ba1?option-id=448701fcd722e75d9f696ebfe2aa4312bf3d595a91c2d8"
+        ]
+      },
+      {
+        "title": "Heaven's Door The Bootleg Series Vol III Vino de Naranja Cask ...",
+        "url": "https://therarewhiskeyshop.com/products/heavens-door-the-bootleg-series-vol-iii-vino-de-naranja-cask-finish-13-year-old-bourbon?srsltid=AfmBOooup4Nn0mMqYrSuy5-JP3YxRjJwvHcCokpy6cibLdrcACcIX89f",
+        "domain": "therarewhiskeyshop.com",
+        "description": "It's a cask strength 13-year-old Kentucky Bourbon finished in Vino de Naranja Cask. Each release features rare and unreleased whiskeys.",
+        "extraSnippets": [
+          "[Skip to content](https://therarewhiskeyshop.com/products/heavens-door-the-bootleg-series-vol-iii-vino-de-naranja-cask-finish-13-year-old-bourbon#MainContent) icon-XClose menu - [B"
+        ]
+      },
+      {
+        "title": "The Bootleg Series - Heavens Door Whiskey",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": "Bootleg Vol. III (2021) from Heaven's Door features a cask strength 13-year Kentucky Bourbon finished in Spanish wine barrels.",
+        "extraSnippets": [
+          "top of page ![](https://static.wixstatic.com/media/04ebdd_4c2fcb998b704204a8d3a32c2b182b8d~mv2.jpg/v1/fill/w_147,h_147,al_c,q_80,usm_0.66_1.00_0.01,blur_2,enc_avif,quality_auto/04e"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "45a2afc5f6f43d136cb875a70de717f0dc01f4b35886914054ea56ded027806d",
+    "mode": "auto"
+  }
+}

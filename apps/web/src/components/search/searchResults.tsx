@@ -3,6 +3,11 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import type { Outputs } from "@peated/server/orpc/router";
 import Link from "@peated/web/components/link";
 import ListItem from "../listItem";
+import type { AddBottleRouteIntent } from "./bottleResult";
+import {
+  type CreateBottleReturnAction,
+  getCreateBottleHref,
+} from "./createBottleHref";
 import ResultRow from "./result";
 
 export default function SearchResults({
@@ -10,11 +15,15 @@ export default function SearchResults({
   results,
   canSuggestAdd = false,
   directToTasting = false,
+  addBottleIntent,
+  createBottleReturnAction,
 }: {
   query: string;
   results: Outputs["search"]["results"];
   canSuggestAdd?: boolean;
   directToTasting?: boolean;
+  addBottleIntent?: AddBottleRouteIntent;
+  createBottleReturnAction?: CreateBottleReturnAction;
 }) {
   return (
     <ul
@@ -28,7 +37,10 @@ export default function SearchResults({
           <div className="min-w-0 flex-auto">
             <div className="font-semibold leading-6">
               <Link
-                href={`/addBottle?name=${encodeURIComponent(toTitleCase(query))}`}
+                href={getCreateBottleHref({
+                  query,
+                  returnAction: createBottleReturnAction,
+                })}
               >
                 <span className="absolute inset-x-0 -top-px bottom-0" />
                 {results.length === 0
@@ -39,12 +51,11 @@ export default function SearchResults({
             <div className="text-highlight-dark mt-1 flex gap-x-1 leading-5">
               {query !== "" ? (
                 <span>
-                  Tap here to add{" "}
-                  <strong className="truncate">{toTitleCase(query)}</strong> to
-                  the database.
+                  Create Bottle for{" "}
+                  <strong className="truncate">{toTitleCase(query)}</strong>.
                 </span>
               ) : (
-                <span>Tap here to add a new bottle to the database.</span>
+                <span>Create a catalog bottle.</span>
               )}
             </div>
           </div>
@@ -53,7 +64,11 @@ export default function SearchResults({
       {results.map((result) => {
         return (
           <ListItem key={`${result.type}-${result.ref.id}`}>
-            <ResultRow result={result} directToTasting={directToTasting} />
+            <ResultRow
+              result={result}
+              directToTasting={directToTasting}
+              addBottleIntent={addBottleIntent}
+            />
           </ListItem>
         );
       })}

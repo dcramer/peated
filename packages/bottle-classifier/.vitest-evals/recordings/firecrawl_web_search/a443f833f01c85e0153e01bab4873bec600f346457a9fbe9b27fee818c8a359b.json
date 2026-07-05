@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-05T02:22:26.877Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Shieldaig Speyside 21 year single malt Total Wine"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Shieldaig Speyside 21 year single malt Total Wine",
+    "summary": "A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate Shieldaig Speyside Single Malt 21Yr Scotch Whisky 750ml Bottle - ![Shieldaig Speyside Single Malt 21Yr Scotch Whisky 750ml Bottle](https://www.totalwine.com/dynam",
+    "results": [
+      {
+        "title": "Shieldaig Speyside Single Malt 21Yr Scotch Whisky - Total Wine",
+        "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-single-malt-21yr-scotch-whisky/p/219098750?srsltid=AfmBOorFR5yNa_Cxe6qMWyqtshFEAmh77m-0Plhde1xvRsk1wQM_zyrA",
+        "domain": "totalwine.com",
+        "description": "A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate",
+        "extraSnippets": [
+          "Shieldaig Speyside Single Malt 21Yr Scotch Whisky 750ml Bottle - ![Shieldaig Speyside Single Malt 21Yr Scotch Whisky 750ml Bottle](https://www.totalwine.com/dynamic/x1000,sq/images"
+        ]
+      },
+      {
+        "title": "Liquor from Speyside - Buy Liquor and Spirits Online - Total Wine",
+        "url": "https://www.totalwine.com/spirits/scotland/speyside/c/001099?srsltid=AfmBOooDoO4Ap5mOaAvPsE7OMMGhGXVaYxTUOdgit1piSvPEmJqepws4",
+        "domain": "totalwine.com",
+        "description": "Buy liquor from Speyside, Scotland at Total. Balanced flavor, with notes of pineapple and vanilla. Long, creamy, smooth finish. 21 Year Old ...",
+        "extraSnippets": [
+          "# Speyside 0 results Items per page 24 items Sort Relevance Get It Fast Pick Up Pick Up OptionsChesapeake, VAAll Stores Deliver to 23320 Ship to Virginia Not available in Chesapeak"
+        ]
+      },
+      {
+        "title": "Shieldaig Scotch | Total Wine & More",
+        "url": "https://www.totalwine.com/theme/shieldaig-scotch?srsltid=AfmBOopgVGH0S0q3pOiUtQslzD3gW_08sfg4G1N11s1CY5NSjPmT5gYn",
+        "domain": "totalwine.com",
+        "description": "A classic single malt with herbal and citrus notes. Wonderfully refined with notes of citrus, spice and creamy milk chocolate. Dries nicely ...",
+        "extraSnippets": [
+          "# Shieldaig Scotch 1 - 18 of 18 results Items per page 24 items ### Brand Shieldaig (18) ### Country Scotland (18) ### Kosher Yes (1) ### Type Single Malt (12) Blended Scotch (6) #"
+        ]
+      },
+      {
+        "title": "Shieldaig Speyside. What changed? : r/Scotch - Reddit",
+        "url": "https://www.reddit.com/r/Scotch/comments/1bf7ld2/shieldaig_speyside_what_changed/",
+        "domain": "reddit.com",
+        "description": "Shieldaig is a total wine spirits direct scotch and is usually garbage, it's essentially discarded casks from single malt distilleries.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky",
+        "url": "https://www.wine-searcher.com/find/shieldaig+21+old+single+malt+scotch+whisky+speyside+scotland?srsltid=AfmBOopIB9Pkr2GRJGgp2FvxpWcvUMAFUD-AzkxwPx1En6_2NBvPhcEV",
+        "domain": "wine-searcher.com",
+        "description": "Find the best local price for Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky, Speyside, Scotland. Avg Price (ex-tax) $121 / 750ml.",
+        "extraSnippets": [
+          "~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a443f833f01c85e0153e01bab4873bec600f346457a9fbe9b27fee818c8a359b",
+    "mode": "auto"
+  }
+}

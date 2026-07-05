@@ -113,6 +113,7 @@ export default function BottleForm({
   initialData,
   title,
   returnTo,
+  saveLabel,
   showBottleReleaseDetails = false,
 }: {
   onSubmit: SubmitHandler<
@@ -123,6 +124,7 @@ export default function BottleForm({
   initialData: BottleFormInitialData;
   title: string;
   returnTo?: string | null;
+  saveLabel?: string;
   showBottleReleaseDetails?: boolean;
 }) {
   const {
@@ -202,6 +204,7 @@ export default function BottleForm({
     <FormScreen
       title={title}
       saveDisabled={isSubmitting}
+      saveLabel={saveLabel}
       onSave={handleSubmit(onSubmitHandler)}
       onClose={() => (returnTo ? router.push(returnTo) : router.back())}
     >

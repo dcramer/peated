@@ -1484,11 +1484,18 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 91,
+          confidence: 97,
           rationale: "No local bottle matched the reference.",
           candidateBottleIds: [],
           identityScope: "product",
           observation: null,
+          confidenceBasis: {
+            band: "auto_verification",
+            positiveEvidence: ["The label supports the proposed bottle."],
+            unresolvedRisks: [],
+            toolsUsed: ["none"],
+            webEvidence: "not_needed",
+          },
           matchedBottleId: null,
           matchedReleaseId: null,
           parentBottleId: null,
@@ -1548,15 +1555,21 @@ describe("createBottleClassifier", () => {
     if (result.status !== "classified") return;
     expect(result.artifacts.searchEvidence).toHaveLength(0);
     expect(result.decision).toMatchObject({
-      action: "no_match",
-      proposedBottle: null,
+      action: "create_bottle",
+      confidence: 94,
+      confidenceBasis: {
+        band: "review",
+      },
+      proposedBottle: {
+        name: "Warehouse Session",
+      },
     });
     expect(result.decision.rationale).toContain(
-      "Server downgraded creation because creation requires external web evidence.",
+      "Server moved creation out of automatic verification because supporting source evidence or a deterministic anchor was not available.",
     );
   });
 
-  test("rejects create decisions when external web evidence does not support the proposed bottle", async () => {
+  test("preserves create decisions when external web evidence does not support the proposed bottle", async () => {
     const runBottleClassifierAgent = vi.fn(
       async (): Promise<ReasoningResult> => ({
         decision: {
@@ -1624,12 +1637,11 @@ describe("createBottleClassifier", () => {
     expect(result.status).toBe("classified");
     if (result.status !== "classified") return;
     expect(result.decision).toMatchObject({
-      action: "no_match",
-      proposedBottle: null,
+      action: "create_bottle",
+      proposedBottle: {
+        name: "Warehouse Session",
+      },
     });
-    expect(result.decision.rationale).toContain(
-      "Server downgraded creation because creation requires external web evidence.",
-    );
   });
 
   test("accepts reviewed create decisions with matching non-origin web evidence without a domain allowlist", async () => {
@@ -1726,7 +1738,7 @@ describe("createBottleClassifier", () => {
     });
   });
 
-  test("rejects create decisions when the agent marks matching web evidence weak", async () => {
+  test("preserves create decisions when the agent marks matching web evidence weak", async () => {
     const runBottleClassifierAgent = vi.fn(
       async (): Promise<ReasoningResult> => ({
         decision: {
@@ -1813,14 +1825,15 @@ describe("createBottleClassifier", () => {
     expect(result.status).toBe("classified");
     if (result.status !== "classified") return;
     expect(result.decision).toMatchObject({
-      action: "no_match",
+      action: "create_bottle",
+      confidenceBasis: {
+        band: "review",
+        webEvidence: "weak",
+      },
     });
-    expect(result.decision.rationale).toContain(
-      "creation requires external web evidence",
-    );
   });
 
-  test("rejects create decisions when external web evidence has not been judged supportive", async () => {
+  test("preserves create decisions when external web evidence has not been judged supportive", async () => {
     const runBottleClassifierAgent = vi.fn(
       async (): Promise<ReasoningResult> => ({
         decision: {
@@ -1895,11 +1908,11 @@ describe("createBottleClassifier", () => {
     expect(result.status).toBe("classified");
     if (result.status !== "classified") return;
     expect(result.decision).toMatchObject({
-      action: "no_match",
+      action: "create_bottle",
+      proposedBottle: {
+        name: "Warehouse Session",
+      },
     });
-    expect(result.decision.rationale).toContain(
-      "creation requires external web evidence",
-    );
   });
 
   test("preloads web evidence for whisky-like references without exact local candidates", async () => {
@@ -2338,7 +2351,7 @@ describe("createBottleClassifier", () => {
     expect(result.status).toBe("classified");
     if (result.status !== "classified") return;
     expect(result.decision).toMatchObject({
-      action: "no_match",
+      action: "create_bottle",
     });
   });
 
@@ -2490,7 +2503,7 @@ describe("createBottleClassifier", () => {
     expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
   });
 
-  test("downgrades unsupported non-exact existing matches inside the classifier", async () => {
+  test("preserves non-exact existing matches selected by the classifier", async () => {
     const runBottleClassifierAgent = vi.fn(
       async ({ initialCandidates }): Promise<ReasoningResult> => ({
         decision: {
@@ -2534,8 +2547,8 @@ describe("createBottleClassifier", () => {
     }
 
     expect(result.decision).toMatchObject({
-      action: "no_match",
-      matchedBottleId: null,
+      action: "match",
+      matchedBottleId: 7,
     });
   });
 
@@ -2625,13 +2638,13 @@ describe("createBottleClassifier", () => {
     }
 
     expect(result.decision).toMatchObject({
-      action: "match",
+      action: "no_match",
       candidateBottleIds: [springbank10YearOldCandidate.bottleId],
-      matchedBottleId: springbank10YearOldCandidate.bottleId,
+      matchedBottleId: null,
       proposedBottle: null,
     });
     expect(result.decision.rationale).toContain(
-      "structured local traits uniquely support that candidate",
+      "duplicates an existing local bottle candidate",
     );
   });
 
@@ -3494,14 +3507,14 @@ describe("createBottleClassifier", () => {
 
     expect(result.decision).toMatchObject({
       action: "match",
-      confidence: 96,
+      confidence: 91,
       matchedBottleId: 16913,
       matchedReleaseId: null,
       parentBottleId: null,
       identityScope: "product",
       confidenceBasis: {
-        band: "auto_verification",
-        unresolvedRisks: [],
+        band: "review",
+        unresolvedRisks: ["A broader sibling omits the age statement."],
       },
     });
     expect(result.decision.rationale).not.toContain(
@@ -3509,7 +3522,7 @@ describe("createBottleClassifier", () => {
     );
   });
 
-  test("redirects bottle creation to a uniquely supported existing structured match", async () => {
+  test("preserves bottle creation instead of rewriting it to a structured local match", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Canadian Club",
       bottler: null,
@@ -3596,14 +3609,18 @@ describe("createBottleClassifier", () => {
     }
 
     expect(result.decision).toMatchObject({
-      action: "match",
-      matchedBottleId: 16913,
+      action: "create_bottle",
+      matchedBottleId: null,
       matchedReleaseId: null,
       identityScope: "product",
+      proposedBottle: {
+        name: "Reserve",
+        statedAge: 9,
+      },
     });
   });
 
-  test("downgrades a plain age parent when the extracted identity includes extra cask detail", async () => {
+  test("preserves a plain age parent match when cask wording is not an extracted field conflict", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Jura",
       bottler: null,
@@ -3662,12 +3679,12 @@ describe("createBottleClassifier", () => {
     }
 
     expect(result.decision).toMatchObject({
-      action: "no_match",
-      matchedBottleId: null,
+      action: "match",
+      matchedBottleId: 3233,
       matchedReleaseId: null,
       parentBottleId: null,
     });
-    expect(result.decision.rationale).toContain(
+    expect(result.decision.rationale).not.toContain(
       "Server downgraded the existing-match recommendation",
     );
   });
@@ -3963,7 +3980,106 @@ describe("createBottleClassifier", () => {
     });
   });
 
-  test("still downgrades a more specific batch-A bottle when the listing omits the lettered release suffix", async () => {
+  test("preserves exact-cask age and vintage in standalone bottle display names", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "The Exclusive Malts",
+      bottler: "Creative Whisky Company",
+      expression: "Islay",
+      series: null,
+      distillery: [],
+      category: "single_malt",
+      stated_age: 8,
+      abv: 57.1,
+      release_year: 2016,
+      vintage_year: 2007,
+      cask_strength: true,
+      single_cask: true,
+      edition: null,
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "create_bottle",
+          confidence: 86,
+          rationale:
+            "The label supports this as a standalone single-cask bottling.",
+          identityScope: "exact_cask",
+          observation: {
+            selector: null,
+            caskNumber: "1661",
+            barrelNumber: null,
+            bottleNumber: null,
+            outturn: 312,
+            market: null,
+            exclusive: null,
+          },
+          confidenceBasis: supportiveWebEvidenceConfidenceBasis,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [],
+          proposedBottle: {
+            name: "Islay",
+            series: null,
+            category: "single_malt",
+            edition: null,
+            statedAge: 8,
+            caskStrength: true,
+            singleCask: true,
+            abv: 57.1,
+            vintageYear: 2007,
+            releaseYear: 2016,
+            brand: {
+              id: null,
+              name: "The Exclusive Malts",
+            },
+            distillers: [],
+            bottler: {
+              id: null,
+              name: "Creative Whisky Company",
+            },
+          },
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "The Exclusive Malts Islay 8 year old 2007",
+      },
+      extractedIdentity,
+      initialCandidates: [],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "create_bottle",
+      identityScope: "exact_cask",
+      proposedBottle: {
+        name: "Islay 8-year-old 2007",
+        statedAge: 8,
+        vintageYear: 2007,
+      },
+      proposedRelease: null,
+    });
+  });
+
+  test("preserves a more specific batch-A match selected by the classifier", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Redbreast",
       bottler: null,
@@ -4021,12 +4137,12 @@ describe("createBottleClassifier", () => {
     }
 
     expect(result.decision).toMatchObject({
-      action: "no_match",
-      matchedBottleId: null,
+      action: "match",
+      matchedBottleId: 9101,
       matchedReleaseId: null,
       parentBottleId: null,
     });
-    expect(result.decision.rationale).toContain(
+    expect(result.decision.rationale).not.toContain(
       "Server downgraded the existing-match recommendation",
     );
   });
@@ -4194,7 +4310,7 @@ describe("createBottleClassifier", () => {
     );
   });
 
-  test("does not treat retailer-only off-origin web results as supportive evidence for a parent bottle match", async () => {
+  test("does not require supportive web evidence for a classifier-selected existing match", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Lagavulin",
       bottler: null,
@@ -4270,12 +4386,12 @@ describe("createBottleClassifier", () => {
     }
 
     expect(result.decision).toMatchObject({
-      action: "no_match",
-      matchedBottleId: null,
+      action: "match",
+      matchedBottleId: 44006,
       matchedReleaseId: null,
       parentBottleId: null,
     });
-    expect(result.decision.rationale).toContain(
+    expect(result.decision.rationale).not.toContain(
       "Server downgraded the existing-match recommendation",
     );
   });
@@ -4355,7 +4471,7 @@ describe("createBottleClassifier", () => {
     );
   });
 
-  test("downgrades an annual release match when the surfaced sibling releases still tie on the same bare year", async () => {
+  test("preserves an annual release match selected by the classifier when siblings share a bare year", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Lagavulin",
       bottler: null,
@@ -4421,17 +4537,17 @@ describe("createBottleClassifier", () => {
     }
 
     expect(result.decision).toMatchObject({
-      action: "no_match",
-      matchedBottleId: null,
-      matchedReleaseId: null,
+      action: "match",
+      matchedBottleId: 44006,
+      matchedReleaseId: 79,
       parentBottleId: null,
     });
-    expect(result.decision.rationale).toContain(
+    expect(result.decision.rationale).not.toContain(
       "Server downgraded the existing-match recommendation",
     );
   });
 
-  test("downgrades a plain parent-bottle match when the listing still carries release identity and an existing release candidate blocks promotion", async () => {
+  test("preserves a parent-bottle match selected by the classifier when a release candidate is available", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Glenmorangie",
       bottler: null,
@@ -4495,12 +4611,12 @@ describe("createBottleClassifier", () => {
     }
 
     expect(result.decision).toMatchObject({
-      action: "no_match",
-      matchedBottleId: null,
+      action: "match",
+      matchedBottleId: 13442,
       matchedReleaseId: null,
       parentBottleId: null,
     });
-    expect(result.decision.rationale).toContain(
+    expect(result.decision.rationale).not.toContain(
       "Server downgraded the existing-match recommendation",
     );
   });

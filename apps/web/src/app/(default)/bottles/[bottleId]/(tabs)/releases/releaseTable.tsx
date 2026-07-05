@@ -9,6 +9,7 @@ import Link from "@peated/web/components/link";
 import PaginationButtons from "@peated/web/components/paginationButtons";
 import SingleCaskChip from "@peated/web/components/singleCaskChip";
 import Table from "@peated/web/components/table";
+import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import {
   formatBottlingName,
   getBottleBottlingPath,
@@ -120,9 +121,13 @@ function ReleaseTableSection({
             return (
               <div className="flex flex-row justify-end gap-2">
                 <Button
-                  href={`/bottles/${bottleId}/addTasting?bottling=${item.id}`}
+                  href={getAddBottleHref({
+                    bottleId,
+                    releaseId: item.id,
+                    intent: "tasting",
+                  })}
                   size="small"
-                  title="Record a Tasting"
+                  title="Log Tasting"
                 >
                   <PeatedGlyph className="h-3 w-3" />
                 </Button>

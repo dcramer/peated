@@ -16,6 +16,15 @@ const nextConfig = {
     GITHUB_REPO: "https://github.com/dcramer/peated",
     DISCORD_LINK: "https://discord.gg/d7GFPfy88Z",
   },
+  async redirects() {
+    return [
+      {
+        source: "/bottles/:bottleId/addTasting",
+        destination: "/addBottle?bottle=:bottleId&intent=tasting",
+        permanent: false,
+      },
+    ];
+  },
   turbopack: {
     rules: {
       "*.svg": {

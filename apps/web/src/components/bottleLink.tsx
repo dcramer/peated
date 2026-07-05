@@ -2,6 +2,7 @@
 
 import { type Bottle } from "@peated/server/types";
 import Link from "@peated/web/components/link";
+import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { useState, type ComponentPropsWithoutRef } from "react";
 import BottlePanel from "./bottlePanel";
 import { ClientOnly } from "./clientOnly";
@@ -21,9 +22,11 @@ export default function BottleLink({
 }: Props) {
   const [open, setOpen] = useState(false);
 
-  const tastingPath = flightId
-    ? `/bottles/${bottle.id}/addTasting?flight=${flightId}`
-    : `/bottles/${bottle.id}/addTasting`;
+  const tastingPath = getAddBottleHref({
+    bottleId: bottle.id,
+    flightId,
+    intent: "tasting",
+  });
 
   return (
     <>

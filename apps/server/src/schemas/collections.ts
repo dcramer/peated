@@ -23,6 +23,12 @@ export const CollectionInputSchema = z.object({
 
 export const CollectionBottleSchema = z.object({
   id: z.number().describe("Unique identifier for the collection bottle entry"),
+  imageUrl: z
+    .string()
+    .nullable()
+    .default(null)
+    .readonly()
+    .describe("URL to the collection entry's image"),
   bottle: BottleSchema.describe("The bottle in this collection"),
   release: BottleReleaseSchema.nullish().describe(
     "Specific release of the bottle, if applicable",

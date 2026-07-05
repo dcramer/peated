@@ -14,6 +14,7 @@ import { Readable } from "node:stream";
 export const PENDING_UPLOAD_NAMESPACE = "pending-uploads";
 export const PERMANENT_UPLOAD_NAMESPACES = [
   "tastings",
+  "collection-bottles",
   "bottles",
   "bottle-releases",
   "badges",
@@ -158,6 +159,7 @@ export async function createPendingImageUpload({
   return pendingUpload;
 }
 
+/** Returns an owned pending source that can still be copied before its TTL expires. */
 export async function getUsablePendingUpload({
   id,
   userId,
@@ -178,7 +180,12 @@ export async function getUsablePendingUpload({
     throw new PendingUploadNotFoundError("Pending upload not found.");
   }
 
-  if (pendingUpload.status !== "pending" || pendingUpload.expiresAt <= now) {
+  if (
+    (pendingUpload.status !== "pending" &&
+      pendingUpload.status !== "attached") ||
+    pendingUpload.objectDeletedAt ||
+    pendingUpload.expiresAt <= now
+  ) {
     throw new PendingUploadExpiredError("Pending upload has expired.");
   }
 
@@ -186,35 +193,34 @@ export async function getUsablePendingUpload({
 }
 
 /**
- * Copies a pending upload into a permanent namespace and marks it attached.
- * When `purpose` is provided, it must match the pending upload's purpose.
+ * Stores a permanent copy named by destination type/id without consuming the pending source.
  */
-export async function copyPendingUploadToPermanent({
+async function copyPendingImageToPermanentDestination({
   id,
   userId,
   purpose,
   destinationNamespace,
-  attachedToType,
-  attachedToId,
+  destinationType,
+  destinationId,
 }: {
   id: string;
   userId: number;
-  purpose?: NewPendingUpload["purpose"];
+  purpose: NewPendingUpload["purpose"];
   destinationNamespace: (typeof PERMANENT_UPLOAD_NAMESPACES)[number];
-  attachedToType: string;
-  attachedToId: number;
+  destinationType: string;
+  destinationId: number;
 }): Promise<string> {
   if (!isPermanentUploadNamespace(destinationNamespace)) {
     throw new PendingUploadError("Invalid permanent upload namespace.");
   }
 
   const pendingUpload = await getUsablePendingUpload({ id, userId });
-  if (purpose && pendingUpload.purpose !== purpose) {
+  if (pendingUpload.purpose !== purpose) {
     throw new PendingUploadPurposeError("Pending upload purpose mismatch.");
   }
 
   const input = filenameFromUploadUrl(pendingUpload.imageUrl);
-  const output = `${destinationNamespace}/${path.posix.basename(input)}`;
+  const output = `${destinationNamespace}/${destinationType}-${destinationId}-${path.posix.basename(input)}`;
 
   const imageUrl = await copyFile({
     input,
@@ -226,14 +232,87 @@ export async function copyPendingUploadToPermanent({
     .update(pendingUploads)
     .set({
       status: "attached",
-      attachedToType,
-      attachedToId,
     })
     .where(eq(pendingUploads.id, pendingUpload.id));
 
   return imageUrl;
 }
 
+type PendingImageCopyInput = {
+  id: string;
+  userId: number;
+  purpose: NewPendingUpload["purpose"];
+};
+
+/** Copies an approved pending image to a tasting image slot. */
+export async function copyPendingImageToTasting({
+  id,
+  userId,
+  purpose,
+  tastingId,
+}: PendingImageCopyInput & { tastingId: number }): Promise<string> {
+  return await copyPendingImageToPermanentDestination({
+    id,
+    userId,
+    purpose,
+    destinationNamespace: "tastings",
+    destinationType: "tasting",
+    destinationId: tastingId,
+  });
+}
+
+/** Copies an approved pending image to a user's collection bottle image slot. */
+export async function copyPendingImageToCollectionBottle({
+  id,
+  userId,
+  purpose,
+  collectionBottleId,
+}: PendingImageCopyInput & { collectionBottleId: number }): Promise<string> {
+  return await copyPendingImageToPermanentDestination({
+    id,
+    userId,
+    purpose,
+    destinationNamespace: "collection-bottles",
+    destinationType: "collection_bottle",
+    destinationId: collectionBottleId,
+  });
+}
+
+/** Copies an approved pending image to a canonical bottle image slot. */
+export async function copyPendingImageToBottle({
+  id,
+  userId,
+  purpose,
+  bottleId,
+}: PendingImageCopyInput & { bottleId: number }): Promise<string> {
+  return await copyPendingImageToPermanentDestination({
+    id,
+    userId,
+    purpose,
+    destinationNamespace: "bottles",
+    destinationType: "bottle",
+    destinationId: bottleId,
+  });
+}
+
+/** Copies an approved pending image to a canonical bottle release image slot. */
+export async function copyPendingImageToBottleRelease({
+  id,
+  userId,
+  purpose,
+  releaseId,
+}: PendingImageCopyInput & { releaseId: number }): Promise<string> {
+  return await copyPendingImageToPermanentDestination({
+    id,
+    userId,
+    purpose,
+    destinationNamespace: "bottle-releases",
+    destinationType: "bottle_release",
+    destinationId: releaseId,
+  });
+}
+
+/** Expires pending sources after TTL; permanent copies live in their destination namespace. */
 export async function cleanupPendingUploads({
   now = new Date(),
   limit = 100,
@@ -242,15 +321,14 @@ export async function cleanupPendingUploads({
   limit?: number;
 } = {}): Promise<{ expired: number; deletedAttached: number }> {
   const candidates = await db.query.pendingUploads.findMany({
-    where: or(
-      and(
+    where: and(
+      or(
         eq(pendingUploads.status, "pending"),
-        lte(pendingUploads.expiresAt, now),
-      ),
-      and(
         eq(pendingUploads.status, "attached"),
-        isNull(pendingUploads.objectDeletedAt),
+        eq(pendingUploads.status, "expired"),
       ),
+      lte(pendingUploads.expiresAt, now),
+      isNull(pendingUploads.objectDeletedAt),
     ),
     limit,
   });
@@ -263,21 +341,33 @@ export async function cleanupPendingUploads({
 
     try {
       filename = filenameFromUploadUrl(pendingUpload.imageUrl);
-      await deleteFile({ filename });
-
-      if (pendingUpload.status === "pending") {
-        await db
+      if (pendingUpload.status !== "expired") {
+        const [expiredUpload] = await db
           .update(pendingUploads)
           .set({ status: "expired" })
-          .where(eq(pendingUploads.id, pendingUpload.id));
-        expired += 1;
-      } else {
-        await db
-          .update(pendingUploads)
-          .set({ objectDeletedAt: now })
-          .where(eq(pendingUploads.id, pendingUpload.id));
-        deletedAttached += 1;
+          .where(
+            and(
+              eq(pendingUploads.id, pendingUpload.id),
+              isNull(pendingUploads.objectDeletedAt),
+            ),
+          )
+          .returning();
+        if (!expiredUpload) {
+          continue;
+        }
+
+        if (pendingUpload.status === "pending") {
+          expired += 1;
+        }
+        continue;
       }
+
+      await deleteFile({ filename });
+
+      await db
+        .update(pendingUploads)
+        .set({ objectDeletedAt: now })
+        .where(eq(pendingUploads.id, pendingUpload.id));
     } catch (err) {
       logError(err, {
         pendingUpload: {

@@ -1,6 +1,9 @@
-import { GlobeAmericasIcon, UserGroupIcon } from "@heroicons/react/20/solid";
+import {
+  GlobeAmericasIcon,
+  PlusIcon,
+  UserGroupIcon,
+} from "@heroicons/react/20/solid";
 import { StarIcon } from "@heroicons/react/24/outline";
-import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import NavLink from "./navLink";
 import NotificationsPanel from "./notifications/panel";
 
@@ -15,10 +18,11 @@ export default function AppFooter() {
       </NavLink>
 
       <NavLink
-        href="/addTasting"
+        href="/addBottle"
+        aria-label="Add Bottle"
         className="focus:ring-highlight text-muted relative -mt-5 flex max-w-xs items-center rounded border-t border-t-slate-700 bg-slate-950 text-sm hover:bg-slate-700 focus:outline-none focus:ring"
       >
-        <PeatedGlyph className="m-5 h-9 w-9" />
+        <PlusIcon className="m-5 h-9 w-9" />
       </NavLink>
       <NavLink href="/friends">
         <UserGroupIcon className="h-8 w-8 sm:h-9 sm:w-9" />

@@ -22,19 +22,20 @@ export async function generateMetadata(props: {
   );
 
   const description = summarize(bottle.description || "", 200);
+  const images = bottle.imageUrl ? [bottle.imageUrl] : [];
 
   return {
     title: bottle.fullName,
     description,
-    images: [bottle.imageUrl],
+    images,
     openGraph: {
       title: bottle.fullName,
       description: description,
-      images: [bottle.imageUrl],
+      images,
     },
     twitter: {
       card: "summary",
-      images: [bottle.imageUrl],
+      images,
     },
   };
 }

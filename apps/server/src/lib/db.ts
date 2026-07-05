@@ -34,7 +34,10 @@ export type UpsertOutcome<T> =
 export const reservedCollectionSlugs = ["default", "library"] as const;
 
 export type ReservedCollectionSlug = (typeof reservedCollectionSlugs)[number];
-export type ReservedCollection = Pick<Collection, "id" | "createdById">;
+export type ReservedCollection = Pick<
+  Collection,
+  "id" | "createdById" | "name"
+>;
 
 export const RESERVED_COLLECTIONS: Record<
   ReservedCollectionSlug,

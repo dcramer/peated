@@ -772,19 +772,19 @@ function getCreateProposalActions(
         editLabel: "Edit Bottling Draft",
         editHref: item.parentBottle
           ? `${getNewBottleBottlingPath(item.parentBottle.id)}?${queryString}`
-          : `/addBottle?${queryString}`,
+          : `/bottles/new?${queryString}`,
       };
     case "bottle_and_release":
       return {
         applyLabel: "Apply Create Draft",
         editLabel: "Edit Create Draft",
-        editHref: `/addBottle?${queryString}`,
+        editHref: `/bottles/new?${queryString}`,
       };
     default:
       return {
         applyLabel: "Apply Bottle Draft",
         editLabel: "Edit Bottle Draft",
-        editHref: `/addBottle?${queryString}`,
+        editHref: `/bottles/new?${queryString}`,
       };
   }
 }

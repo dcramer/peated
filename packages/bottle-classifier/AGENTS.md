@@ -29,7 +29,14 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - Preserve the reviewed boundary in `src/contract.ts` and `src/classifier.ts`.
 - Internal adapter-facing modules should stay behind the `internal/*` package namespace.
 - Pre-agent deterministic resolvers live in `src/runtime/deterministic.ts`; only add a resolver when it is correct from closed syntax or curated reference data alone.
-- Deterministic validation and downgrades live in `src/reviewPolicy.ts`; generic `identityScope` signal validation lives in `src/exactCaskPolicy.ts`.
+- Deterministic validation, invalid-state rejection, and confidence caps live in
+  `src/reviewPolicy.ts`; generic `identityScope` signal validation lives in
+  `src/exactCaskPolicy.ts`.
+- Post-agent deterministic gates may reject only unknown targets, schema
+  violations, impossible states, and direct extracted-field conflicts on
+  explicit fields such as brand, category, age, ABV, cask flags, or years. They
+  must not require text-search rank, comparable-name support, or structured
+  bottle/release heuristics to corroborate an agent's semantic `match`.
 - Bottle-versus-release semantics are model-led. Retrieval may expose sibling
   context, but do not encode brand/family-specific release splits in
   deterministic code.
@@ -44,7 +51,10 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - Bounded ambiguity should collapse to conservative `no_match` at this boundary. Downstream consumers own any review workflow.
 - `exact_cask` needs strong marketed identity signals. SMWS codes are deterministic; other cask or barrel numbers still need classifier-reviewed evidence that the number is part of the marketed identity.
 - Model-sensitive behavior changes should update realistic eval fixtures; add unit tests only for deterministic invariants changed to support them.
-- Creation requires external web evidence. Never invent evidence or create without source support.
+- Creation may use agent-reviewed source, label, image, local-catalog, or web
+  evidence. Automatic verification of creation requires corroborating evidence
+  or a closed-form anchor; never invent evidence or create without source
+  support.
 - Do not add critic, reviewer, database, or retailer domain allowlists for reviewed create decisions. Let the agent judge source quality from content, independence, specificity, and corroboration, then enforce only the reviewed confidence/evidence contract in code.
 - Production-miss evals require the exact observed input, independent web verification of the real bottle, and an explicit Peated DB outcome before the expected result is encoded. Use fixture `provenance.source = "production_miss"` with `verifiedSourceUrls` and `dbOutcome`.
 - Expected eval outcomes must name the exact Peated bottle/release ids, exact create action, and auto-verification expectation when those are known. Do not replace a production miss with a generalized or pretend outcome.

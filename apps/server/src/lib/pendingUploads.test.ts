@@ -3,14 +3,17 @@ import { db } from "@peated/server/db";
 import { pendingUploads } from "@peated/server/db/schema";
 import {
   cleanupPendingUploads,
-  copyPendingUploadToPermanent,
+  copyPendingImageToBottle,
+  copyPendingImageToBottleRelease,
+  copyPendingImageToCollectionBottle,
+  copyPendingImageToTasting,
   createPendingImageUpload,
   PendingUploadExpiredError,
   PendingUploadNotFoundError,
   PendingUploadPurposeError,
 } from "@peated/server/lib/pendingUploads";
 import { compressAndResizeImage } from "@peated/server/lib/uploads";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { access } from "node:fs/promises";
 import path from "node:path";
 
@@ -19,7 +22,7 @@ function relativeUploadPath(imageUrl: string) {
 }
 
 describe("pending uploads", () => {
-  test("copies owned pending upload into a permanent namespace", async ({
+  test("copies owned pending upload into a tasting destination", async ({
     fixtures,
     defaults,
   }) => {
@@ -30,15 +33,16 @@ describe("pending uploads", () => {
       onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
     });
 
-    const imageUrl = await copyPendingUploadToPermanent({
+    const imageUrl = await copyPendingImageToTasting({
       id: pendingUpload.id,
       userId: defaults.user.id,
-      destinationNamespace: "tastings",
-      attachedToType: "tasting",
-      attachedToId: 123,
+      purpose: "photo_tasting_entry",
+      tastingId: 123,
     });
 
-    expect(imageUrl).toMatch(/^\/uploads\/tastings\/pending-upload-.+\.webp$/);
+    expect(imageUrl).toMatch(
+      /^\/uploads\/tastings\/tasting-123-pending-upload-.+\.webp$/,
+    );
     await expect(
       access(path.join(config.UPLOAD_PATH, relativeUploadPath(imageUrl))),
     ).resolves.toBeUndefined();
@@ -49,9 +53,125 @@ describe("pending uploads", () => {
 
     expect(updated).toMatchObject({
       status: "attached",
-      attachedToType: "tasting",
-      attachedToId: 123,
+      attachedToType: null,
+      attachedToId: null,
     });
+  });
+
+  test("copies the same pending upload to collection bottle and tasting destinations", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const pendingUpload = await createPendingImageUpload({
+      file: await fixtures.SampleSquareImage(),
+      createdById: defaults.user.id,
+      purpose: "photo_tasting_entry",
+      onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
+    });
+
+    const collectionImageUrl = await copyPendingImageToCollectionBottle({
+      id: pendingUpload.id,
+      userId: defaults.user.id,
+      purpose: "photo_tasting_entry",
+      collectionBottleId: 101,
+    });
+    const tastingImageUrl = await copyPendingImageToTasting({
+      id: pendingUpload.id,
+      userId: defaults.user.id,
+      purpose: "photo_tasting_entry",
+      tastingId: 202,
+    });
+
+    expect(collectionImageUrl).toMatch(
+      /^\/uploads\/collection-bottles\/collection_bottle-101-pending-upload-.+\.webp$/,
+    );
+    expect(tastingImageUrl).toMatch(
+      /^\/uploads\/tastings\/tasting-202-pending-upload-.+\.webp$/,
+    );
+    expect(collectionImageUrl).not.toBe(tastingImageUrl);
+    const updated = await db.query.pendingUploads.findFirst({
+      where: eq(pendingUploads.id, pendingUpload.id),
+    });
+    expect(updated).toMatchObject({
+      status: "attached",
+      attachedToType: null,
+      attachedToId: null,
+    });
+    await expect(
+      access(
+        path.join(config.UPLOAD_PATH, relativeUploadPath(collectionImageUrl)),
+      ),
+    ).resolves.toBeUndefined();
+    await expect(
+      access(
+        path.join(config.UPLOAD_PATH, relativeUploadPath(tastingImageUrl)),
+      ),
+    ).resolves.toBeUndefined();
+    await expect(
+      access(
+        path.join(
+          config.UPLOAD_PATH,
+          relativeUploadPath(pendingUpload.imageUrl),
+        ),
+      ),
+    ).resolves.toBeUndefined();
+  });
+
+  test("copies the same pending upload to collection bottle and catalog destinations", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const pendingUpload = await createPendingImageUpload({
+      file: await fixtures.SampleSquareImage(),
+      createdById: defaults.user.id,
+      purpose: "photo_tasting_entry",
+      onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
+    });
+
+    const collectionImageUrl = await copyPendingImageToCollectionBottle({
+      id: pendingUpload.id,
+      userId: defaults.user.id,
+      purpose: "photo_tasting_entry",
+      collectionBottleId: 303,
+    });
+    const bottleImageUrl = await copyPendingImageToBottle({
+      id: pendingUpload.id,
+      userId: defaults.user.id,
+      purpose: "photo_tasting_entry",
+      bottleId: 404,
+    });
+    const releaseImageUrl = await copyPendingImageToBottleRelease({
+      id: pendingUpload.id,
+      userId: defaults.user.id,
+      purpose: "photo_tasting_entry",
+      releaseId: 505,
+    });
+
+    expect(collectionImageUrl).toMatch(
+      /^\/uploads\/collection-bottles\/collection_bottle-303-pending-upload-.+\.webp$/,
+    );
+    expect(bottleImageUrl).toMatch(
+      /^\/uploads\/bottles\/bottle-404-pending-upload-.+\.webp$/,
+    );
+    expect(releaseImageUrl).toMatch(
+      /^\/uploads\/bottle-releases\/bottle_release-505-pending-upload-.+\.webp$/,
+    );
+    expect(collectionImageUrl).not.toBe(bottleImageUrl);
+    expect(collectionImageUrl).not.toBe(releaseImageUrl);
+    expect(bottleImageUrl).not.toBe(releaseImageUrl);
+    await expect(
+      access(
+        path.join(config.UPLOAD_PATH, relativeUploadPath(collectionImageUrl)),
+      ),
+    ).resolves.toBeUndefined();
+    await expect(
+      access(path.join(config.UPLOAD_PATH, relativeUploadPath(bottleImageUrl))),
+    ).resolves.toBeUndefined();
+    await expect(
+      access(
+        path.join(config.UPLOAD_PATH, relativeUploadPath(releaseImageUrl)),
+      ),
+    ).resolves.toBeUndefined();
   });
 
   test("rejects pending uploads owned by another user", async ({
@@ -67,12 +187,11 @@ describe("pending uploads", () => {
     });
 
     await expect(
-      copyPendingUploadToPermanent({
+      copyPendingImageToTasting({
         id: pendingUpload.id,
         userId: defaults.user.id,
-        destinationNamespace: "tastings",
-        attachedToType: "tasting",
-        attachedToId: 123,
+        purpose: "photo_tasting_entry",
+        tastingId: 123,
       }),
     ).rejects.toBeInstanceOf(PendingUploadNotFoundError);
   });
@@ -87,12 +206,11 @@ describe("pending uploads", () => {
     });
 
     await expect(
-      copyPendingUploadToPermanent({
+      copyPendingImageToTasting({
         id: pendingUpload.id,
         userId: defaults.user.id,
-        destinationNamespace: "tastings",
-        attachedToType: "tasting",
-        attachedToId: 123,
+        purpose: "photo_tasting_entry",
+        tastingId: 123,
       }),
     ).rejects.toBeInstanceOf(PendingUploadExpiredError);
   });
@@ -109,13 +227,11 @@ describe("pending uploads", () => {
     });
 
     await expect(
-      copyPendingUploadToPermanent({
+      copyPendingImageToTasting({
         id: pendingUpload.id,
         userId: defaults.user.id,
         purpose: "photo_tasting_entry",
-        destinationNamespace: "tastings",
-        attachedToType: "tasting",
-        attachedToId: 123,
+        tastingId: 123,
       }),
     ).rejects.toBeInstanceOf(PendingUploadPurposeError);
   });
@@ -144,7 +260,7 @@ describe("pending uploads", () => {
     ).rejects.toMatchObject({ code: "ENOENT" });
   });
 
-  test("cleanup expires pending rows and deletes attached pending objects", async ({
+  test("cleanup keeps reusable copied sources until expiry", async ({
     fixtures,
     defaults,
   }) => {
@@ -161,19 +277,22 @@ describe("pending uploads", () => {
       purpose: "photo_tasting_entry",
       onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
     });
-    await db
-      .update(pendingUploads)
-      .set({ status: "attached", attachedToType: "tasting", attachedToId: 1 })
-      .where(eq(pendingUploads.id, attachedPending.id));
+    const copiedImageUrl = await copyPendingImageToTasting({
+      id: attachedPending.id,
+      userId: defaults.user.id,
+      purpose: "photo_tasting_entry",
+      tastingId: 1,
+    });
 
     const result = await cleanupPendingUploads();
 
-    expect(result).toEqual({ expired: 1, deletedAttached: 1 });
+    expect(result).toEqual({ expired: 1, deletedAttached: 0 });
 
     const expiredRow = await db.query.pendingUploads.findFirst({
       where: eq(pendingUploads.id, expiredPending.id),
     });
     expect(expiredRow?.status).toBe("expired");
+    expect(expiredRow?.objectDeletedAt).toBeNull();
 
     await expect(
       access(
@@ -182,7 +301,49 @@ describe("pending uploads", () => {
           relativeUploadPath(expiredPending.imageUrl),
         ),
       ),
-    ).rejects.toMatchObject({ code: "ENOENT" });
+    ).resolves.toBeUndefined();
+    await expect(
+      access(
+        path.join(
+          config.UPLOAD_PATH,
+          relativeUploadPath(attachedPending.imageUrl),
+        ),
+      ),
+    ).resolves.toBeUndefined();
+    await expect(
+      access(path.join(config.UPLOAD_PATH, relativeUploadPath(copiedImageUrl))),
+    ).resolves.toBeUndefined();
+
+    await db
+      .update(pendingUploads)
+      .set({ expiresAt: new Date(Date.now() - 1000) })
+      .where(eq(pendingUploads.id, attachedPending.id));
+
+    await expect(cleanupPendingUploads()).resolves.toEqual({
+      expired: 0,
+      deletedAttached: 0,
+    });
+
+    const expiredAttachedRow = await db.query.pendingUploads.findFirst({
+      where: eq(pendingUploads.id, attachedPending.id),
+    });
+    expect(expiredAttachedRow?.status).toBe("expired");
+    expect(expiredAttachedRow?.objectDeletedAt).toBeNull();
+
+    await expect(
+      access(
+        path.join(
+          config.UPLOAD_PATH,
+          relativeUploadPath(attachedPending.imageUrl),
+        ),
+      ),
+    ).resolves.toBeUndefined();
+
+    await expect(cleanupPendingUploads()).resolves.toEqual({
+      expired: 0,
+      deletedAttached: 0,
+    });
+
     await expect(
       access(
         path.join(
@@ -191,21 +352,49 @@ describe("pending uploads", () => {
         ),
       ),
     ).rejects.toMatchObject({ code: "ENOENT" });
+    await expect(
+      access(path.join(config.UPLOAD_PATH, relativeUploadPath(copiedImageUrl))),
+    ).resolves.toBeUndefined();
+
+    await expect(cleanupPendingUploads()).resolves.toEqual({
+      expired: 0,
+      deletedAttached: 0,
+    });
+  });
+
+  test("cleanup retries storage deletion for already expired rows", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const expiredPending = await createPendingImageUpload({
+      file: await fixtures.SampleSquareImage(),
+      createdById: defaults.user.id,
+      purpose: "photo_tasting_entry",
+      ttlMs: -1000,
+      onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
+    });
+    await db
+      .update(pendingUploads)
+      .set({ status: "expired" })
+      .where(eq(pendingUploads.id, expiredPending.id));
 
     await expect(cleanupPendingUploads()).resolves.toEqual({
       expired: 0,
       deletedAttached: 0,
     });
 
-    const attachedRows = await db
-      .select()
-      .from(pendingUploads)
-      .where(
-        and(
-          eq(pendingUploads.createdById, defaults.user.id),
-          eq(pendingUploads.status, "attached"),
+    const deletedRow = await db.query.pendingUploads.findFirst({
+      where: eq(pendingUploads.id, expiredPending.id),
+    });
+    expect(deletedRow?.status).toBe("expired");
+    expect(deletedRow?.objectDeletedAt).toBeInstanceOf(Date);
+    await expect(
+      access(
+        path.join(
+          config.UPLOAD_PATH,
+          relativeUploadPath(expiredPending.imageUrl),
         ),
-      );
-    expect(attachedRows).toHaveLength(1);
+      ),
+    ).rejects.toMatchObject({ code: "ENOENT" });
   });
 });

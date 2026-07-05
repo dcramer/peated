@@ -21,11 +21,13 @@ export default function BottleListSidebar() {
       <ul role="list" className="flex flex-auto flex-col gap-y-7">
         <li>
           <Button
-            href={`/addBottle?returnTo=${encodeURIComponent("/bottles")}`}
+            href={`/bottles/new?${new URLSearchParams({
+              returnTo: "/bottles",
+            }).toString()}`}
             fullWidth
             color="highlight"
           >
-            Add Bottle
+            Create Bottle
           </Button>
         </li>
         <FilterSidebarSection

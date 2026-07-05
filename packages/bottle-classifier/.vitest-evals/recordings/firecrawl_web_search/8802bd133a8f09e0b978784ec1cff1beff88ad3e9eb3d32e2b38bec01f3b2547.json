@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-05T02:40:40.830Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 cask 1661 312 bottles"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 cask 1661 312 bottles",
+    "summary": "This thing was plucked and bottled at the right time, rich at 7 years. Had this been left to age until 10 it may have been totally overoaked. Twitter Widget Iframe | | | | | --- | --- | --- | | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif) | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/b",
+    "results": [
+      {
+        "title": "Single Malt Report: Islay Distillery 7 year old 2007 ... - Diving for Pearls",
+        "url": "http://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-7.html",
+        "domain": "divingforpearlsblog.com",
+        "description": "This thing was plucked and bottled at the right time, rich at 7 years. Had this been left to age until 10 it may have been totally overoaked.",
+        "extraSnippets": [
+          "Twitter Widget Iframe | | | | | --- | --- | --- | | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif) | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bub"
+        ]
+      },
+      {
+        "title": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%)",
+        "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/",
+        "domain": "norfolkwineandspirits.com",
+        "description": "Weight, 3.5 lbs. Country of Origin. Scotland. Region. Islay. Age. 8 Years Old. Cask Type. Refill Ex-Sherry Hogshead. Date Distilled. 17th October 2007.",
+        "extraSnippets": [
+          "![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](https://norfolkw"
+        ]
+      },
+      {
+        "title": "2007 Exclusive Malts Isle of Islay 10 Years Review - The Whiskey Jug",
+        "url": "https://thewhiskeyjug.com/whiskey/2007-exclusive-malts-isle-of-islay-10-years-review/",
+        "domain": "thewhiskeyjug.com",
+        "description": "2007 Exclusive Malts Isle of Islay 10 Years Review: Bottled at 55.7%, aged 10 years and priced around $140. A big heavy harmonious whisky.",
+        "extraSnippets": [
+          "- [Skip to primary navigation](https://thewhiskeyjug.com/whiskey/2007-exclusive-malts-isle-of-islay-10-years-review/#genesis-mobile-nav-primary) - [Skip to main content](https://th"
+        ]
+      },
+      {
+        "title": "Review #675 - Isle of Islay 10 Year 2007 (Exclusive Malts) : r/Scotch",
+        "url": "https://www.reddit.com/r/Scotch/comments/cshru7/review_675_isle_of_islay_10_year_2007_exclusive/",
+        "domain": "reddit.com",
+        "description": "Taste: Smoke, dirt, smoldering wood embers, syrup covered cooked stone fruit, dark treacle, slight brine, oak spice, slight musty oak. Medium to ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Islay Distillery 2007 8 Year Exclusive Malts - D&M Wines and Liquors",
+        "url": "https://dandm.com/products/islay-distillery-2007-8-year-exclusive-malts?srsltid=AfmBOor_UsYoylUCJ3u2gUETffiddxJNJZHziF6HW6B8WT4Xnx6PZ4Nw",
+        "domain": "dandm.com",
+        "description": "Scotch Style Single Malt Country Scotland Region Islay Vintage 2007 Bottler Exclusive Malts Distillery Lagavulin ABV 57.1% Age in Years 8 Size 750mL. $149.99.",
+        "extraSnippets": [
+          "[Skip to content](https://dandm.com/products/islay-distillery-2007-8-year-exclusive-malts#main) San Francisco residents: Local delivery is here! Enter your address at checkout. [!["
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "8802bd133a8f09e0b978784ec1cff1beff88ad3e9eb3d32e2b38bec01f3b2547",
+    "mode": "auto"
+  }
+}

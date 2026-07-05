@@ -125,7 +125,7 @@ describe("POST /tastings", () => {
       .from(tastings)
       .where(eq(tastings.id, data.tasting.id));
     expect(tasting.imageUrl).toMatch(
-      /^\/uploads\/tastings\/pending-upload-.+\.webp$/,
+      /^\/uploads\/tastings\/tasting-\d+-pending-upload-.+\.webp$/,
     );
 
     const attachedUpload = await db.query.pendingUploads.findFirst({
@@ -133,8 +133,8 @@ describe("POST /tastings", () => {
     });
     expect(attachedUpload).toMatchObject({
       status: "attached",
-      attachedToType: "tasting",
-      attachedToId: tasting.id,
+      attachedToType: null,
+      attachedToId: null,
     });
   });
 

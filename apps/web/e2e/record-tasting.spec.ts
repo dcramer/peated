@@ -1,27 +1,66 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 import { Buffer } from "node:buffer";
 
 import { expectNoHorizontalOverflow } from "./assertions";
 import {
   createdTastingId,
   existingBottle,
+  existingReleaseId,
   failingTastingNotes,
   photoTastingNotes,
   tastingNotes,
+  testAccessToken,
 } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
-test.describe("record tasting", () => {
-  test("records a tasting for a fixture bottle", async ({ context, page }) => {
+test.describe("log tasting", () => {
+  test("preserves query params when redirecting legacy bottle tasting links", async ({
+    context,
+    page,
+  }) => {
+    await signIn(context);
+
+    await page.goto(
+      `/bottles/${existingBottle.id}/addTasting?bottling=${existingReleaseId}&flight=flight-qa`,
+    );
+
+    await expect(page).toHaveURL(/\/addBottle\?/);
+    const currentUrl = new URL(page.url());
+    expect(currentUrl.pathname).toBe("/addBottle");
+    expect(currentUrl.searchParams.get("bottle")).toBe(
+      String(existingBottle.id),
+    );
+    expect(currentUrl.searchParams.get("bottling")).toBe(
+      String(existingReleaseId),
+    );
+    expect(currentUrl.searchParams.get("flight")).toBe("flight-qa");
+    expect(currentUrl.searchParams.get("intent")).toBe("tasting");
+  });
+
+  test("logs a tasting for a fixture bottle", async ({ context, page }) => {
     await signIn(context);
 
     await page.goto(`/bottles/${existingBottle.id}/addTasting`);
 
+    await expect(page).toHaveURL(
+      new RegExp(`/addBottle\\?bottle=${existingBottle.id}&intent=tasting$`),
+    );
     await expect(
-      page.getByRole("heading", { name: "Record Tasting" }),
+      page.getByRole("heading", { name: "Add Bottle" }),
     ).toBeVisible();
     await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expect(
+      page
+        .locator("main section")
+        .filter({ hasText: "Bottle found" })
+        .getByRole("button")
+        .first(),
+    ).toHaveText("Log Tasting");
+    await page.getByRole("button", { name: "Log Tasting" }).click();
 
+    await expect(
+      page.getByRole("heading", { name: "Log Tasting" }),
+    ).toBeVisible();
     await page.getByRole("button", { name: "Savor" }).click();
     await page.getByLabel("Comments").fill(tastingNotes);
     await page.getByRole("button", { name: "Save" }).click();
@@ -30,33 +69,39 @@ test.describe("record tasting", () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test("records a tasting from a matched bottle photo", async ({
+  test("logs a tasting from a matched bottle photo", async ({
     context,
     page,
-  }) => {
-    await signIn(context);
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: `${testAccessToken}-photo-tasting-${testInfo.project.name}`,
+    });
 
     await page.goto("/addTasting");
 
+    await expect(page).toHaveURL(/\/addBottle\?intent=tasting$/);
     await expect(
-      page.getByRole("heading", { name: "Record Tasting" }),
+      page.getByRole("heading", { name: "Add Bottle" }),
     ).toBeVisible();
 
-    await page.locator('input[type="file"]').setInputFiles({
-      name: "label.png",
-      mimeType: "image/png",
-      buffer: Buffer.from(
-        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=",
-        "base64",
-      ),
-    });
+    await uploadLabel(page);
 
     await expect(page.getByText("Match found")).toBeVisible();
     await expect(page.getByText("Lagavulin")).toBeVisible();
     await expect(page.getByText("16 years")).toBeVisible();
+    await expect(
+      page
+        .locator("main section")
+        .filter({ hasText: "Match found" })
+        .getByRole("button")
+        .first(),
+    ).toHaveText("Log Tasting");
 
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Log Tasting" }).click();
 
+    await expect(
+      page.getByRole("heading", { name: "Log Tasting" }),
+    ).toBeVisible();
     await expect(page.getByText(existingBottle.fullName)).toBeVisible();
     await page.getByRole("button", { name: "Savor" }).click();
     await page.getByLabel("Comments").fill(photoTastingNotes);
@@ -69,30 +114,26 @@ test.describe("record tasting", () => {
   test("returns to the filled photo tasting form when submit fails", async ({
     context,
     page,
-  }) => {
-    await signIn(context);
-
-    await page.goto("/addTasting");
-
-    await page.locator('input[type="file"]').setInputFiles({
-      name: "label.png",
-      mimeType: "image/png",
-      buffer: Buffer.from(
-        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=",
-        "base64",
-      ),
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: `${testAccessToken}-photo-tasting-fail-${testInfo.project.name}`,
     });
 
+    await page.goto("/addTasting");
+    await expect(page).toHaveURL(/\/addBottle\?intent=tasting$/);
+    await expect(
+      page.getByRole("heading", { name: "Add Bottle" }),
+    ).toBeVisible();
+
+    await uploadLabel(page);
+
     await expect(page.getByText("Match found")).toBeVisible();
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Log Tasting" }).click();
 
     await expect(page.getByText(existingBottle.fullName)).toBeVisible();
     await page.getByRole("button", { name: "Savor" }).click();
     await page.getByLabel("Comments").fill(failingTastingNotes);
     await page.getByRole("button", { name: "Save" }).click();
-
-    await expect(page.getByText("Saving tasting")).toBeVisible();
-    await expect(page.getByAltText("Selected bottle label")).toBeHidden();
 
     await expect(
       page.getByRole("heading", {
@@ -101,7 +142,37 @@ test.describe("record tasting", () => {
     ).toBeVisible();
     await expect(page.getByText("Internal error")).toBeVisible();
     await expect(page.getByLabel("Comments")).toHaveValue(failingTastingNotes);
-    await expect(page).toHaveURL(/\/addTasting$/);
+    await expect(page.getByAltText("uploaded image")).toBeVisible();
+    await expect(page).toHaveURL(/\/addBottle\?intent=tasting$/);
     await expectNoHorizontalOverflow(page);
   });
 });
+
+async function uploadLabel(page: Page) {
+  await expect(
+    page.getByRole("button", { name: /Take or upload a photo/ }),
+  ).toBeVisible();
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const requestPromise = page
+      .waitForRequest(
+        (request) =>
+          request.url().includes("/rpc/tastings/photoIdentification"),
+        { timeout: 5000 },
+      )
+      .catch(() => null);
+
+    await page.locator('input[type="file"]').setInputFiles({
+      name: `label-${attempt}.png`,
+      mimeType: "image/png",
+      buffer: Buffer.from(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=",
+        "base64",
+      ),
+    });
+
+    if (await requestPromise) return;
+  }
+
+  throw new Error("Photo identification request was not sent.");
+}

@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-05T02:19:05.753Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19 year old Batch 1 Batch 2 annual release"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Ardbeg Traigh Bhan 19 year old Batch 1 Batch 2 annual release",
+    "summary": "Ardbeg 'Traigh Bhan' 19 year old 'First Annual Release Batch 1' The Ultimate Islay Single Malt Scotch Whisky 46.2% 70cl. The Ardbeg Distillery lies on the ... [![Ardbeg Traigh Bhan 19 year old First Annual Release Batch 1 The Ultimate Islay Single Malt Scotch Whisky 46.2% 70cl](https://cdn11.bigcommerce.com/s-43mjurk6p",
+    "results": [
+      {
+        "title": "Ardbeg Traigh Bhan 19 year old First Annual Release ...",
+        "url": "https://whiskycastle.com/ardbeg-traigh-bhan-19-year-old-first-annual-release-batch-1-the-ultimate-islay-single-malt-scotch-whisky-46-2-70cl/",
+        "domain": "whiskycastle.com",
+        "description": "Ardbeg 'Traigh Bhan' 19 year old 'First Annual Release Batch 1' The Ultimate Islay Single Malt Scotch Whisky 46.2% 70cl. The Ardbeg Distillery lies on the ...",
+        "extraSnippets": [
+          "[![Ardbeg Traigh Bhan 19 year old First Annual Release Batch 1 The Ultimate Islay Single Malt Scotch Whisky 46.2% 70cl](https://cdn11.bigcommerce.com/s-43mjurk6pb/images/stencil/25"
+        ]
+      },
+      {
+        "title": "Ardbeg Traigh Bhan 19 Years Old Batch 2",
+        "url": "https://www.ardbeg.com/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%202-2020ARDTB2.html",
+        "domain": "ardbeg.com",
+        "description": "Part of a highly sought-after and collectable Ardbeg series, 19 Years Old Batch 2 is a new permanent expression, released only in limited batches each year.",
+        "extraSnippets": [
+          "![](https://www.ardbeg.com/dw/image/v2/BGMK_PRD/on/demandware.static/-/Library-Sites-Ardbeg-shared/default/dwd1fa42f7/Header/Header_Logo_Resized.png) Enter Date of Birth Country Un"
+        ]
+      },
+      {
+        "title": "Review #2320 - Ardbeg 19 Years Old Traigh Bhan (Batch 4)",
+        "url": "https://www.reddit.com/r/Scotch/comments/1f6isil/review_2320_ardbeg_19_years_old_traigh_bhan_batch/",
+        "domain": "reddit.com",
+        "description": "This annual small-batch release from Islay producer Ardbeg, Traigh Banh is named for Islay's Traigh Bhan beach, aka the Singing Sands.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Ardbeg Traigh Bhan - Batch 7 - 19 Years | Whisky Review",
+        "url": "https://www.youtube.com/watch?v=Q0_wPtylAog",
+        "domain": "youtube.com",
+        "description": "ARDBEG 19 Traigh Bhan - Batch 1 vs Batch 2. Malt Activist•1.3K views ... Ardbeg Traigh Bhan 19 Year Old Islay Single Malt Scotch Whisky.",
+        "extraSnippets": [
+          "![Thumbnail (1920x1080)](https://i.ytimg.com/vi/Q0_wPtylAog/maxresdefault.jpg) # [Ardbeg Traigh Bhan - Batch 7 - 19 Years | Whisky Review](https://www.youtube.com/watch?v=Q0_wPtylA"
+        ]
+      },
+      {
+        "title": "Ardbeg Traigh Bhan 19-year-old",
+        "url": "https://moredramslessdrama.com/2022/10/14/ardbeg-traigh-bhan-19-year-old/",
+        "domain": "moredramslessdrama.com",
+        "description": "The second batch of Ardbeg Traigh Bhan was released in September 2020. From its batch code TB/02-18.09.00/20.JT we can get than the youngest ...",
+        "extraSnippets": [
+          "[Skip to content](https://moredramslessdrama.com/2022/10/14/ardbeg-traigh-bhan-19-year-old/#content) [Ardbeg](https://www.ardbeg.com/) introduced in September 2019 a new expression"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9745f159dccc880ad721bfe5f0914eab3e503c694640afa4932dcd64cb5d7b9c",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-05T02:28:05.014Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 cask 1661 Creative Whisky Company"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 cask 1661 Creative Whisky Company",
+    "summary": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%) $194.99 In stock. Weight 3.5 lbs Country of Origin Scotland Region … 57.1% Size 750 mL ![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](",
+    "results": [
+      {
+        "title": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%)",
+        "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/",
+        "domain": "norfolkwineandspirits.com",
+        "description": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%) $194.99 In stock. Weight 3.5 lbs Country of Origin Scotland Region … 57.1% Size 750 mL",
+        "extraSnippets": [
+          "![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](https://norfolkw"
+        ]
+      },
+      {
+        "title": "Single Malt Report: Islay Distillery 8 year old 2007 ... - Diving for Pearls",
+        "url": "http://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-8.html",
+        "domain": "divingforpearlsblog.com",
+        "description": "Its color is amber, much lighter than yesterday's younger whisky. The nose is rawer, yeastier. It's lemony and very vegetal. Cruciferous veg, ...",
+        "extraSnippets": [
+          "Twitter Widget Iframe | | | | | --- | --- | --- | | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif) | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bub"
+        ]
+      },
+      {
+        "title": "The Creative Whisky Co. 'The Exclusive Malts' Islay Distillery 8 Year ...",
+        "url": "https://www.wine-searcher.com/find/the+creative+whisky+co+exclusive+malts+distil+eight+old+single+malt+scotch+islay+scotland?srsltid=AfmBOorWvEId_e20F-NRzHJpRe7xrR6AJ7ZSCI1VpfEhTEkJ-CZE0ENI",
+        "domain": "wine-searcher.com",
+        "description": "Avg Price (ex-tax) $ 195 / 750ml … $194.99 $259.99 / 1000ml no sales tax applies 2007 Bottle (750ml) shead, Scotland In stock ()",
+        "extraSnippets": [
+          "~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at"
+        ]
+      },
+      {
+        "title": "The Creative Whisky Co. 'The Exclusive Malts' 10th Anniversary 'Islay",
+        "url": "https://fineliquors.com/products/exclusice-malts-2007-an-islay-7-year?srsltid=AfmBOorse3DJ9FdnMsb8BGiI2PZtm-PnYOM1WKoKJCKldeqbCmUGdXmt",
+        "domain": "fineliquors.com",
+        "description": "This cask-strength Islay single malt, from cask 904, is a true mystery, with its origins unknown. Bottled at natural color and limited to only 293 bottles.",
+        "extraSnippets": [
+          "[Skip to content](https://fineliquors.com/products/exclusice-malts-2007-an-islay-7-year#main) Cart Your cart is empty HAPPY 4TH OF JULY, ENJOY 5% OFF STOREWIDE! GIVEN THE CURRENT H"
+        ]
+      },
+      {
+        "title": "Creative Whisky Company The Exclusive Malts Islay 2007 8 Year ...",
+        "url": "https://www.whiskimen.com/product/creative-whisky-company-the-exclusive-malts-islay-2007-8-years-old-single-malt-whisky/",
+        "domain": "whiskimen.com",
+        "description": "Creative Whisky Company The Exclusive Malts Islay 2007 8 Year Old Single Malt Whisky. $1,550. In stock. Purchase this product now and earn 15 Points!",
+        "extraSnippets": [
+          "[Skip to content](https://www.whiskimen.com/product/creative-whisky-company-the-exclusive-malts-islay-2007-8-years-old-single-malt-whisky/#content) ## keep in touch ## with our lat"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d20685d76ec4d1700d6bc56e6513847f116ab413884b914efe05eefc03aff5f2",
+    "mode": "auto"
+  }
+}

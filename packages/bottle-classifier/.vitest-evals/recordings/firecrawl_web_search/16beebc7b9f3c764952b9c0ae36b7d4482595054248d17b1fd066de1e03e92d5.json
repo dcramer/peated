@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-07-05T02:32:13.501Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 Creative Whisky Company cask 1661"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 Creative Whisky Company cask 1661",
+    "summary": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%) $194.99 In stock. Weight 3.5 lbs Country of Origin Scotland Region … 57.1% Size 750 mL ![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](",
+    "results": [
+      {
+        "title": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%)",
+        "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/",
+        "domain": "norfolkwineandspirits.com",
+        "description": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%) $194.99 In stock. Weight 3.5 lbs Country of Origin Scotland Region … 57.1% Size 750 mL",
+        "extraSnippets": [
+          "![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo [🔍](https://norfolkw"
+        ]
+      },
+      {
+        "title": "Single Malt Report: Islay Distillery 7 year old 2007 ... - Diving for Pearls",
+        "url": "http://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-7.html",
+        "domain": "divingforpearlsblog.com",
+        "description": "The nose leads with big gorgeous peat, then mint, menthol, and burlap. whisky picks up vibrant notes of strawberry bubblegum, whipped cream, ...",
+        "extraSnippets": [
+          "Twitter Widget Iframe | | | | | --- | --- | --- | | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif) | ![](https://ssl.gstatic.com/s2/oz/images/stars/po/bub"
+        ]
+      },
+      {
+        "title": "The Creative Whisky Co. 'The Exclusive Malts' Islay Distillery 8 Year ...",
+        "url": "https://www.wine-searcher.com/find/the+creative+whisky+co+exclusive+malts+distil+eight+old+single+malt+scotch+islay+scotland/1/switzerland?srsltid=AfmBOoo2aAsftymshKo0nWe7l_a5fQUebFXjMXdnUkcjTlwCBke-oSRC",
+        "domain": "wine-searcher.com",
+        "description": "'The Exclusive Malts' Islay Distillery 8 Year Old Single. Avg Price (ex-tax) $ 195 / 750ml. The Exclusive Malts - Islay Distillery - 2007 - Aged 8 Years (57.1% ...",
+        "extraSnippets": [
+          "~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at"
+        ]
+      },
+      {
+        "title": "Isle of Islay 10 Year Old 2007 Creative Whisky Company - YouTube",
+        "url": "https://www.youtube.com/watch?v=rJEgND2RwPo",
+        "domain": "youtube.com",
+        "description": "... Whisky Barrel. The cask yielded 285 bottles at 100 Proof or 57.1% ABV. Nice and pale, which suggests that this is spirit-driven. Mark's ...",
+        "extraSnippets": [
+          "![Thumbnail (1920x1080)](https://i.ytimg.com/vi/rJEgND2RwPo/maxresdefault.jpg) # [Mark’s Whisky Ramblings 428: Isle of Islay 10 Year Old 2007 Creative Whisky Company](https://www.y"
+        ]
+      },
+      {
+        "title": "Creative Whisky Company The Exclusive Malts Islay 2007 8 Year ...",
+        "url": "https://www.whiskimen.com/product/creative-whisky-company-the-exclusive-malts-islay-2007-8-years-old-single-malt-whisky/",
+        "domain": "whiskimen.com",
+        "description": "The Exclusive Malts Islay 2007 8 Year Old Single Malt Whisky $1,550 In stock Purchase this product now and earn 15 Points! ABV 56.30% Volume 70cl",
+        "extraSnippets": [
+          "[Skip to content](https://www.whiskimen.com/product/creative-whisky-company-the-exclusive-malts-islay-2007-8-years-old-single-malt-whisky/#content) ## keep in touch ## with our lat"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "16beebc7b9f3c764952b9c0ae36b7d4482595054248d17b1fd066de1e03e92d5",
+    "mode": "auto"
+  }
+}

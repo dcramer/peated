@@ -2,6 +2,7 @@
 
 import { MapIcon } from "@heroicons/react/20/solid";
 import {
+  BookOpenIcon,
   GiftTopIcon,
   HomeIcon,
   InformationCircleIcon,
@@ -32,8 +33,8 @@ export default function Sidebar() {
           <nav className="flex flex-1 flex-col">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
               <li>
-                <Button href="/addTasting" fullWidth color="highlight">
-                  Record a Tasting
+                <Button href="/addBottle" fullWidth color="highlight">
+                  Record Bottle
                 </Button>
               </li>
               <li>
@@ -53,6 +54,13 @@ export default function Sidebar() {
                     active={pathname.startsWith("/favorites")}
                   >
                     Favorites
+                  </SidebarLink>
+                  <SidebarLink
+                    href="/library"
+                    icon={BookOpenIcon}
+                    active={pathname.startsWith("/library")}
+                  >
+                    Library
                   </SidebarLink>
                   <SidebarLink
                     href="/tastings"

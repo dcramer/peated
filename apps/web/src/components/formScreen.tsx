@@ -11,6 +11,7 @@ type Props = {
   onClose?: () => void;
   onSave: (e: FormEvent<HTMLFormElement | HTMLButtonElement>) => void;
   saveDisabled?: boolean;
+  saveLabel?: string;
   sidebar?: ReactNode;
   title: string;
 };
@@ -21,6 +22,7 @@ export default function FormScreen({
   onClose,
   onSave,
   saveDisabled = false,
+  saveLabel,
   sidebar,
   title,
 }: Props) {
@@ -32,6 +34,7 @@ export default function FormScreen({
           <FormHeader
             title={title}
             saveDisabled={saveDisabled}
+            saveLabel={saveLabel}
             onSave={onSave}
             onClose={onClose}
           />

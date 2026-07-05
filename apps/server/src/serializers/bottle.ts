@@ -1,4 +1,4 @@
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
@@ -29,6 +29,7 @@ type Attrs = {
   distillers: ReturnType<(typeof EntitySerializer)["item"]>[];
   bottler: ReturnType<(typeof EntitySerializer)["item"]> | null;
   series: ReturnType<(typeof BottleSeriesSerializer)["item"]> | null;
+  displayImageUrl: string | null;
 };
 
 type Context =
@@ -45,6 +46,9 @@ export const BottleSerializer = serializer({
     context?: Context,
   ): Promise<Record<number, Attrs>> => {
     const itemIds = itemList.map((t) => t.id);
+    const missingImageIds = itemList
+      .filter((item) => !item.imageUrl)
+      .map((item) => item.id);
     const releaseCounts = itemIds.length
       ? await db
           .select({
@@ -58,6 +62,32 @@ export const BottleSerializer = serializer({
     const releaseCountByBottleId = Object.fromEntries(
       releaseCounts.map((row) => [row.bottleId, Number(row.count)]),
     );
+    const releaseImageRows = missingImageIds.length
+      ? await db
+          .select({
+            bottleId: bottleReleases.bottleId,
+            imageUrl: bottleReleases.imageUrl,
+          })
+          .from(bottleReleases)
+          .where(
+            and(
+              inArray(bottleReleases.bottleId, missingImageIds),
+              isNotNull(bottleReleases.imageUrl),
+            ),
+          )
+          .orderBy(
+            asc(bottleReleases.bottleId),
+            desc(bottleReleases.totalTastings),
+            asc(bottleReleases.id),
+          )
+      : [];
+    const releaseImageByBottleId: Record<number, string> = {};
+    for (const row of releaseImageRows) {
+      // Rows are sorted so the first image per bottle is the best display fallback.
+      if (row.imageUrl && !releaseImageByBottleId[row.bottleId]) {
+        releaseImageByBottleId[row.bottleId] = row.imageUrl;
+      }
+    }
 
     const distillerList = await db
       .select()
@@ -187,6 +217,8 @@ export const BottleSerializer = serializer({
             distillers: distillersByBottleId[item.id] || [],
             bottler: item.bottlerId ? entitiesById[item.bottlerId] : null,
             series: item.seriesId ? seriesById[item.seriesId] : null,
+            displayImageUrl:
+              item.imageUrl ?? releaseImageByBottleId[item.id] ?? null,
           },
         ];
       }),
@@ -232,6 +264,9 @@ export const BottleSerializer = serializer({
 
       imageUrl: item.imageUrl
         ? absoluteUrl(config.API_SERVER, item.imageUrl)
+        : null,
+      displayImageUrl: attrs.displayImageUrl
+        ? absoluteUrl(config.API_SERVER, attrs.displayImageUrl)
         : null,
 
       avgRating: item.avgRating,

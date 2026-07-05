@@ -8,11 +8,33 @@ import { useDebounceCallback } from "usehooks-ts";
 import Header from "../header";
 import Layout from "../layout";
 import SearchHeader from "../searchHeader";
+import type { AddBottleRouteIntent } from "./bottleResult";
 import type { Result } from "./result";
 import SearchResults from "./searchResults";
 import { SkeletonItem } from "./skeletonItem";
 
 const maxResults = 50;
+const addBottleIntents: AddBottleRouteIntent[] = [
+  "addBottle",
+  "choose",
+  "library",
+  "tasting",
+  "view",
+];
+
+function getAddBottleIntent(
+  value: string | null,
+): AddBottleRouteIntent | undefined {
+  return addBottleIntents.find((intent) => intent === value);
+}
+
+function getCreateBottleReturnAction(intent: string | null) {
+  if (intent === "choose" || intent === "addBottle") return "addBottle";
+  if (intent === "library" || intent === "tasting" || intent === "view") {
+    return intent;
+  }
+  return undefined;
+}
 
 export type Props = {
   value?: string;
@@ -29,7 +51,13 @@ export default function SearchPanel({
 }: Props) {
   const { user } = useAuth();
   const qs = useSearchParams();
+  const intent = qs.get("intent");
+  const addBottleIntent = getAddBottleIntent(intent);
+  // The empty ?tasting flag is the legacy direct shortcut; intent=tasting keeps the Add Bottle resolver.
   const directToTasting = qs.has("tasting");
+  const createBottleReturnAction =
+    getCreateBottleReturnAction(intent) ??
+    (directToTasting ? "tasting" : undefined);
 
   const router = useRouter();
 
@@ -51,10 +79,16 @@ export default function SearchPanel({
       const isUserQuery = query.indexOf("@") !== -1 && user;
 
       const include: ("bottles" | "entities" | "users")[] = [];
-      if (directToTasting || !isUserQuery) include.push("bottles");
-      if (!directToTasting && user && (isUserQuery || query))
+      if (directToTasting || addBottleIntent || !isUserQuery)
+        include.push("bottles");
+      if (
+        !directToTasting &&
+        !addBottleIntent &&
+        user &&
+        (isUserQuery || query)
+      )
         include.push("users");
-      if (!directToTasting) include.push("entities");
+      if (!directToTasting && !addBottleIntent) include.push("entities");
 
       const { results } = await orpc.search.call({
         query,
@@ -66,7 +100,7 @@ export default function SearchPanel({
       setState("ready");
       setInitialState("ready");
     },
-    [directToTasting, user],
+    [addBottleIntent, directToTasting, user],
   );
 
   // TODO: handle errors
@@ -96,11 +130,12 @@ export default function SearchPanel({
               onQuery(value);
             }}
             onSubmit={(value) => {
-              router.replace(
-                `${location.pathname}?q=${encodeURIComponent(value)}&${
-                  directToTasting ? "tasting" : ""
-                }`,
-              );
+              const params = new URLSearchParams({ q: value });
+              if (qs.has("tasting")) params.set("tasting", "");
+              if (addBottleIntent) {
+                params.set("intent", addBottleIntent);
+              }
+              router.replace(`${location.pathname}?${params.toString()}`);
             }}
             loading={state === "loading"}
             onClose={onClose}
@@ -116,6 +151,8 @@ export default function SearchPanel({
           results={results}
           canSuggestAdd={!isUserQuery}
           directToTasting={directToTasting}
+          addBottleIntent={addBottleIntent}
+          createBottleReturnAction={createBottleReturnAction}
         />
       )}
     </Layout>

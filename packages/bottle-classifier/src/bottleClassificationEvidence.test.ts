@@ -465,6 +465,72 @@ describe("bottleClassificationEvidence", () => {
     ).toContain("stated_age");
   });
 
+  test("treats explicit strength, cask flag, and year mismatches as hard existing-match conflicts", () => {
+    const targetCandidate = buildBottleCandidate({
+      bottleId: 347,
+      fullName: "The Exclusive Malts Islay 2007 8-year-old 57.1%",
+      brand: "The Exclusive Malts",
+      distillery: ["Islay Distillery"],
+      category: "single_malt",
+      statedAge: 8,
+      abv: 57.1,
+      releaseYear: 2016,
+      vintageYear: 2007,
+      caskStrength: true,
+      singleCask: true,
+    });
+
+    expect(
+      getExistingMatchIdentityConflicts({
+        referenceName: "The Exclusive Malts 8 year old 2008",
+        extractedLabel: {
+          brand: "The Exclusive Malts",
+          bottler: null,
+          expression: null,
+          series: null,
+          distillery: ["Islay Distillery"],
+          category: "single_malt",
+          stated_age: 8,
+          abv: 46,
+          release_year: 2017,
+          vintage_year: 2008,
+          cask_strength: false,
+          single_cask: false,
+          edition: null,
+        },
+        targetCandidate,
+      }),
+    ).toEqual([
+      "abv",
+      "vintage_year",
+      "release_year",
+      "cask_strength",
+      "single_cask",
+    ]);
+
+    expect(
+      getExistingMatchIdentityConflicts({
+        referenceName: "The Exclusive Malts 8 year old",
+        extractedLabel: {
+          brand: "The Exclusive Malts",
+          bottler: null,
+          expression: null,
+          series: null,
+          distillery: ["Islay Distillery"],
+          category: "single_malt",
+          stated_age: 8,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        targetCandidate,
+      }),
+    ).toEqual([]);
+  });
+
   test("does not treat the legacy generic spirit category as a hard existing-match conflict", () => {
     expect(
       getExistingMatchIdentityConflicts({

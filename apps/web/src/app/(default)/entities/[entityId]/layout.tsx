@@ -84,6 +84,15 @@ export default async function Layout(props: {
         ]
       : [],
   };
+  const createBottleParams = new URLSearchParams({
+    returnTo: `/entities/${entityId}`,
+  });
+  if (entity.type.includes("brand"))
+    createBottleParams.set("brand", `${entity.id}`);
+  if (entity.type.includes("distiller"))
+    createBottleParams.set("distiller", `${entity.id}`);
+  if (entity.type.includes("bottler"))
+    createBottleParams.set("bottler", `${entity.id}`);
 
   return (
     <>
@@ -98,18 +107,10 @@ export default async function Layout(props: {
           <div className="flex-auto">
             <div className="my-8 flex justify-center gap-4 lg:justify-start">
               <Button
-                href={`/addBottle?returnTo=${encodeURIComponent(`/entities/${entityId}`)}&${
-                  entity.type.includes("brand") ? `brand=${entity.id}&` : ""
-                }${
-                  entity.type.includes("distiller")
-                    ? `distiller=${entity.id}&`
-                    : ""
-                }${
-                  entity.type.includes("bottler") ? `bottler=${entity.id}&` : ""
-                }`}
+                href={`/bottles/new?${createBottleParams.toString()}`}
                 color="primary"
               >
-                Add a Bottle
+                Create Bottle
               </Button>
 
               <ShareButton title={entity.name} url={`/entities/${entity.id}`} />
