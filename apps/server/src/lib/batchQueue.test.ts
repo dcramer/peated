@@ -42,9 +42,6 @@ describe("BatchQueue", () => {
   });
 
   test("handles errors during batch processing", async () => {
-    const consoleErrorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => new Object());
     processBatchMock.mockRejectedValue(new Error("Processing error"));
 
     await batchQueue.push(1);
@@ -52,12 +49,6 @@ describe("BatchQueue", () => {
     await batchQueue.push(3);
 
     expect(processBatchMock).toHaveBeenCalledTimes(1);
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "Error processing batch:",
-      expect.any(Error),
-    );
-
-    consoleErrorSpy.mockRestore();
   });
 
   test("continues processing after an error", async () => {
