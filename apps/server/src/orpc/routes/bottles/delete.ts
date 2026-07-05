@@ -16,6 +16,7 @@ import {
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
+import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { notEmpty } from "@peated/server/lib/filter";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
@@ -155,11 +156,14 @@ export default procedure
     }
 
     await db.transaction(async (tx) => {
+      const actorId = (await getUserActorForDatabase(tx, context.user)).id;
+
       await Promise.all([
         tx.insert(changes).values({
           objectType: "bottle",
           objectId: bottle.id,
           createdById: context.user.id,
+          actorId,
           displayName: bottle.fullName,
           type: "delete",
           data: {

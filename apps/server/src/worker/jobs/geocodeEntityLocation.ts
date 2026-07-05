@@ -1,6 +1,5 @@
 import { Client } from "@googlemaps/google-maps-services-js";
 import config from "@peated/server/config";
-import { DEFAULT_CREATED_BY_ID } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   changes,
@@ -9,6 +8,7 @@ import {
   type Entity,
   type Region,
 } from "@peated/server/db/schema";
+import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { logInfo } from "@peated/server/lib/log";
 import { eq } from "drizzle-orm";
 
@@ -135,6 +135,7 @@ export default async ({
     address: match.formatted_address,
     location: [match.geometry.location.lat, match.geometry.location.lng],
   };
+  const actor = await getPeatedSystemActor();
 
   await db.transaction(async (tx) => {
     await tx.update(entities).set(data).where(eq(entities.id, entity.id));
@@ -143,7 +144,7 @@ export default async ({
       objectType: "entity",
       objectId: entity.id,
       displayName: entity.name,
-      createdById: DEFAULT_CREATED_BY_ID,
+      actorId: actor.id,
       type: "update",
       data,
     });

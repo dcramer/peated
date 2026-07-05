@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottles } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -71,6 +72,7 @@ describe("resolveBottleReferenceTarget", () => {
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
+    const actor = await getUserActor(user);
     const bottle = await fixtures.Bottle({
       name: "10-year-old",
       brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
@@ -85,6 +87,7 @@ describe("resolveBottleReferenceTarget", () => {
         currentReleaseId: null,
       },
       aliasLookupNames: [bottle.fullName],
+      createdByActorId: actor.id,
       user,
     });
 
@@ -102,6 +105,7 @@ describe("resolveBottleReferenceTarget", () => {
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
+    const actor = await getUserActor(user);
     await fixtures.Bottle({
       name: "10-year-old",
       brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
@@ -116,6 +120,7 @@ describe("resolveBottleReferenceTarget", () => {
         currentReleaseId: null,
       },
       aliasLookupNames: ["Ardbeg 10 years old"],
+      createdByActorId: actor.id,
       user,
     });
 
@@ -141,6 +146,7 @@ describe("resolveBottleReferenceTarget", () => {
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
+    const actor = await getUserActor(user);
     const bottle = await fixtures.Bottle({
       name: "10-year-old",
       brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
@@ -161,6 +167,7 @@ describe("resolveBottleReferenceTarget", () => {
         currentReleaseId: null,
       },
       aliasLookupNames: ["Ardbeg Ten Years"],
+      createdByActorId: actor.id,
       user,
     });
 
@@ -176,6 +183,7 @@ describe("resolveBottleReferenceTarget", () => {
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
+    const actor = await getUserActor(user);
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification({
         action: "repair_parent_and_create_release",
@@ -213,6 +221,7 @@ describe("resolveBottleReferenceTarget", () => {
         currentReleaseId: null,
       },
       aliasLookupNames: [],
+      createdByActorId: actor.id,
       user,
     });
 
@@ -231,6 +240,7 @@ describe("resolveBottleReferenceTarget", () => {
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
+    const actor = await getUserActor(user);
     const brand = await fixtures.Entity({
       type: ["brand", "bottler"],
       name: "SMWS Guard Society",
@@ -282,6 +292,7 @@ describe("resolveBottleReferenceTarget", () => {
         currentReleaseId: null,
       },
       aliasLookupNames: [],
+      createdByActorId: actor.id,
       user,
     });
 
@@ -300,6 +311,7 @@ describe("resolveBottleReferenceTarget", () => {
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
+    const actor = await getUserActor(user);
     const brand = await fixtures.Entity({
       type: ["brand", "bottler"],
       name: "SMWS Combined Guard Society",
@@ -359,6 +371,7 @@ describe("resolveBottleReferenceTarget", () => {
         currentReleaseId: null,
       },
       aliasLookupNames: [],
+      createdByActorId: actor.id,
       user,
     });
 

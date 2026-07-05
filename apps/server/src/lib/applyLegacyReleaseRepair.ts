@@ -30,6 +30,7 @@ import {
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
+import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import {
   BottleReleaseAlreadyExistsError,
   BottleReleaseCreateBadRequestError,
@@ -401,11 +402,13 @@ async function getProposedParentBottleName(
 async function createParentBottleForRepair(
   tx: AnyTransaction,
   {
+    actorId,
     distillerIds,
     legacyBottle,
     proposedParentFullName,
     user,
   }: {
+    actorId: number;
     distillerIds: number[];
     legacyBottle: RepairBottle;
     proposedParentFullName: string;
@@ -429,6 +432,7 @@ async function createParentBottleForRepair(
       bottlerId: legacyBottle.bottlerId,
       flavorProfile: legacyBottle.flavorProfile,
       createdById: user.id,
+      createdByActorId: actorId,
     })
     .returning();
 
@@ -437,6 +441,11 @@ async function createParentBottleForRepair(
     parentBottle.fullName,
     parentBottle.id,
     null,
+    {
+      assignmentSource: "canonical",
+      assignedById: user.id,
+      assignedByActorId: actorId,
+    },
   );
   if (alias.bottleId !== parentBottle.id || alias.releaseId !== null) {
     throw new LegacyReleaseRepairBadRequestError(
@@ -449,6 +458,7 @@ async function createParentBottleForRepair(
     objectId: parentBottle.id,
     createdAt: parentBottle.createdAt,
     createdById: user.id,
+    actorId,
     displayName: parentBottle.fullName,
     type: "add",
     data: {
@@ -467,6 +477,7 @@ async function createParentBottleForRepair(
 async function resolveParentBottleForRepair(
   tx: AnyTransaction,
   {
+    actorId,
     classifierResolution,
     distillerIds,
     legacyBottle,
@@ -475,6 +486,7 @@ async function resolveParentBottleForRepair(
     releaseInput,
     user,
   }: {
+    actorId: number;
     classifierResolution: ClassifierReviewedCreateParentResolution | null;
     distillerIds: number[];
     legacyBottle: RepairBottle;
@@ -558,6 +570,7 @@ async function resolveParentBottleForRepair(
     }
 
     return createParentBottleForRepair(tx, {
+      actorId,
       distillerIds,
       legacyBottle,
       proposedParentFullName,
@@ -637,6 +650,7 @@ export async function applyLegacyReleaseRepairInTransaction(
     user: User;
   },
 ): Promise<ApplyLegacyReleaseRepairResult> {
+  const actorId = (await getUserActorForDatabase(tx, user)).id;
   const legacyBottle = await getLegacyBottleForRepair(tx, legacyBottleId);
   const { input: releaseInput, releaseIdentity } =
     getReleaseInput(legacyBottle);
@@ -700,6 +714,7 @@ export async function applyLegacyReleaseRepairInTransaction(
     legacyBottleId,
     proposedParentFullName: releaseIdentity.proposedParentFullName,
     releaseInput,
+    actorId,
     user,
   });
   if (parentAliasName) {
@@ -711,6 +726,7 @@ export async function applyLegacyReleaseRepairInTransaction(
   try {
     const result = await createBottleReleaseInTransaction(tx, {
       bottleId: parentBottle.id,
+      createdByActorId: actorId,
       input: releaseInput,
       user,
     });
@@ -972,6 +988,7 @@ export async function applyLegacyReleaseRepairInTransaction(
       objectType: "bottle",
       objectId: legacyBottle.id,
       createdById: user.id,
+      actorId,
       displayName: legacyBottle.fullName,
       type: "delete",
       data: {

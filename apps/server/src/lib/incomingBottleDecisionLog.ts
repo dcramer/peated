@@ -1,6 +1,7 @@
 import { db, type AnyDatabase } from "@peated/server/db";
 import {
   incomingBottleDecisionLogs,
+  type Actor,
   type IncomingBottleDecisionLog,
 } from "@peated/server/db/schema";
 
@@ -9,6 +10,7 @@ export type IncomingBottleDecisionActorType =
   IncomingBottleDecisionLog["actorType"];
 export type IncomingBottleDecisionSourceKind =
   IncomingBottleDecisionLog["sourceKind"];
+export type IncomingBottleDecisionActor = Pick<Actor, "id" | "type" | "userId">;
 
 export function normalizeIncomingBottleDecisionConfidence(
   confidence: number | null | undefined,
@@ -63,6 +65,11 @@ export function shouldRecordIncomingBottleDecision({
   return previousBottleId == null && bottleId != null && decision !== null;
 }
 
+/**
+ * Records the durable actor that made an incoming-bottle decision. Legacy
+ * actor columns are derived from the actor row so system writes cannot drift
+ * from actor attribution.
+ */
 export async function recordIncomingBottleDecisionInTransaction(
   tx: AnyDatabase,
   {
@@ -73,8 +80,7 @@ export async function recordIncomingBottleDecisionInTransaction(
     name,
     url = null,
     decision,
-    actorType,
-    actorUserId = null,
+    actor,
     bottleId,
     releaseId = null,
     createdBottle = false,
@@ -91,8 +97,7 @@ export async function recordIncomingBottleDecisionInTransaction(
     name: string;
     url?: string | null;
     decision: IncomingBottleDecisionType;
-    actorType: IncomingBottleDecisionActorType;
-    actorUserId?: number | null;
+    actor: IncomingBottleDecisionActor;
     bottleId: number;
     releaseId?: number | null;
     createdBottle?: boolean;
@@ -103,6 +108,10 @@ export async function recordIncomingBottleDecisionInTransaction(
     metadata?: Record<string, unknown>;
   },
 ) {
+  if (actor.type === "user" && !actor.userId) {
+    throw new Error(`User actor ${actor.id} is missing user attribution.`);
+  }
+
   const [log] = await tx
     .insert(incomingBottleDecisionLogs)
     .values({
@@ -113,8 +122,9 @@ export async function recordIncomingBottleDecisionInTransaction(
       name,
       url,
       decision,
-      actorType,
-      actorUserId,
+      actorType: actor.type,
+      actorId: actor.id,
+      actorUserId: actor.type === "user" ? actor.userId : null,
       bottleId,
       releaseId,
       createdBottle,

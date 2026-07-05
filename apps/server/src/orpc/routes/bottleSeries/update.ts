@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleSeries, changes, entities } from "@peated/server/db/schema";
+import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { procedure } from "@peated/server/orpc";
 import { ConflictError } from "@peated/server/orpc/errors";
 import { requireMod } from "@peated/server/orpc/middleware/auth";
@@ -37,6 +38,7 @@ export default procedure
     const user = context.user;
 
     const updatedSeries = await db.transaction(async (tx) => {
+      const actorId = (await getUserActorForDatabase(tx, user)).id;
       // Get the existing series with a lock
       const [series] = await tx
         .select()
@@ -121,6 +123,7 @@ export default procedure
               : undefined,
         },
         createdById: user.id,
+        actorId,
       });
 
       return updatedSeries;

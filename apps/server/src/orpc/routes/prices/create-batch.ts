@@ -9,6 +9,7 @@ import {
   storePriceHistories,
   storePrices,
 } from "@peated/server/db/schema";
+import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { assignBottleAliasInTransaction } from "@peated/server/lib/bottleAliases";
 import { findBottleTarget } from "@peated/server/lib/bottleFinder";
 import { chunked } from "@peated/server/lib/scraper";
@@ -85,6 +86,7 @@ export default procedure
               RETURNING id, image_url as imageUrl
             `);
             const priceId = Number(rawPriceId);
+            const actor = await getUserActorForDatabase(tx, context.user);
 
             await tx
               .insert(storePriceHistories)
@@ -106,6 +108,7 @@ export default procedure
                 externalSiteId: site.id,
                 volume: sp.volume,
                 assignmentSource: "source_approved",
+                assignedByActorId: actor.id,
                 assignedById: context.user.id,
               });
             }

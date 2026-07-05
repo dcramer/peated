@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleAliases, reviews, storePrices } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import { assignBottleAliasInTransaction } from "@peated/server/lib/bottleAliases";
 import { eq } from "drizzle-orm";
 
@@ -270,12 +271,14 @@ describe("assignBottleAliasInTransaction", () => {
   }) => {
     const bottle = await fixtures.Bottle();
     const assignedBy = await fixtures.User({ mod: true });
+    const assignedByActor = await getUserActor(assignedBy);
 
     await db.transaction(async (tx) => {
       await assignBottleAliasInTransaction(tx, {
         bottleId: bottle.id,
         name: "Moderator Alias",
         assignmentSource: "human_approved",
+        assignedByActorId: assignedByActor.id,
         assignedById: assignedBy.id,
       });
     });
@@ -287,6 +290,7 @@ describe("assignBottleAliasInTransaction", () => {
     expect(alias).toMatchObject({
       bottleId: bottle.id,
       assignmentSource: "human_approved",
+      assignedByActorId: assignedByActor.id,
       assignedById: assignedBy.id,
     });
   });

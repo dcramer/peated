@@ -5,6 +5,7 @@ import {
   reviews,
   storePrices,
 } from "@peated/server/db/schema";
+import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import createMissingBottles from "@peated/server/worker/jobs/createMissingBottles";
 import { and, eq } from "drizzle-orm";
@@ -68,6 +69,7 @@ describe("createMissingBottles", () => {
       admin: true,
       username: "dcramer",
     });
+    const systemActor = await getPeatedSystemActor();
     getAutomationModeratorUserMock.mockResolvedValue(systemUser);
     const review = await fixtures.Review({
       externalSiteId: site.id,
@@ -130,6 +132,7 @@ describe("createMissingBottles", () => {
     expect(alias).toMatchObject({
       bottleId: updatedReview?.bottleId,
       assignmentSource: "classifier_approved",
+      assignedByActorId: systemActor.id,
       assignedById: systemUser.id,
     });
 
@@ -149,7 +152,8 @@ describe("createMissingBottles", () => {
       sourceId: review.id,
       decision: "create_bottle",
       actorType: "system",
-      actorUserId: systemUser.id,
+      actorId: systemActor.id,
+      actorUserId: null,
       bottleId: updatedReview?.bottleId,
       releaseId: null,
       createdBottle: true,

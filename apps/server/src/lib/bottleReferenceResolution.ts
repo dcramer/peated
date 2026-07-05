@@ -123,6 +123,7 @@ async function getExistingRelease(releaseId: number): Promise<BottleRelease> {
 export async function applyClassifierCreateDecision({
   decision,
   user,
+  createdByActorId,
 }: {
   decision: Extract<
     BottleClassificationDecision,
@@ -131,6 +132,7 @@ export async function applyClassifierCreateDecision({
     }
   >;
   user: User;
+  createdByActorId: number;
 }): Promise<{
   bottleId: number;
   releaseId: number | null;
@@ -150,6 +152,7 @@ export async function applyClassifierCreateDecision({
       const result = await db.transaction(async (tx) =>
         createBottleInTransaction(tx, {
           creationSource: "bottle_classifier",
+          createdByActorId,
           input,
           context: { user },
         }),
@@ -189,6 +192,7 @@ export async function applyClassifierCreateDecision({
       const result = await db.transaction(async (tx) =>
         createBottleReleaseInTransaction(tx, {
           bottleId: decision.parentBottleId,
+          createdByActorId,
           input: releaseInput,
           user,
         }),
@@ -231,6 +235,7 @@ export async function applyClassifierCreateDecision({
     try {
       bottleResult = await createBottleInTransaction(tx, {
         creationSource: "bottle_classifier",
+        createdByActorId,
         input,
         context: { user },
       });
@@ -247,6 +252,7 @@ export async function applyClassifierCreateDecision({
     try {
       releaseResult = await createBottleReleaseInTransaction(tx, {
         bottleId,
+        createdByActorId,
         input: releaseInput,
         user,
       });
@@ -320,11 +326,13 @@ export async function resolveBottleReferenceTarget({
   aliasLookupNames = [],
   extractedIdentity = null,
   user,
+  createdByActorId,
 }: {
   reference: BottleReference;
   aliasLookupNames?: string[];
   extractedIdentity?: Partial<BottleExtractedDetails> | null;
   user: User;
+  createdByActorId: number;
 }): Promise<BottleReferenceResolution> {
   const uniqueAliasLookupNames = Array.from(
     new Set(aliasLookupNames.map((name) => name.trim()).filter(Boolean)),
@@ -456,6 +464,7 @@ export async function resolveBottleReferenceTarget({
     const result = await applyClassifierCreateDecision({
       decision: classification.decision,
       user,
+      createdByActorId,
     });
 
     return {

@@ -1,4 +1,4 @@
-import type { Change, PagingRel, User } from "@peated/server/types";
+import type { Change, PagingRel } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import { AnimatePresence } from "framer-motion";
 import ListItem from "./listItem";
@@ -6,15 +6,18 @@ import PaginationButtons from "./paginationButtons";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
 
-const ChangeAuthor = ({ user }: { user?: User | null }) => {
-  if (!user) return <div>An anonymous wizard</div>;
+type ChangeActor = Change["createdByActor"];
+
+const ChangeAuthor = ({ actor }: { actor: ChangeActor }) => {
+  if (!actor.user) return <div>{actor.displayName}</div>;
+
   return (
     <div className="flex items-center gap-x-2">
       <Link
-        href={`/users/${user.username}`}
+        href={`/users/${actor.user.username}`}
         className="text-highlight font-medium hover:underline"
       >
-        {user.username}
+        {actor.displayName}
       </Link>
     </div>
   );
@@ -86,10 +89,10 @@ export default function ChangeList({
           {values.map((change) => (
             <ListItem key={change.id}>
               <div className="flex items-center gap-x-2 text-sm">
-                <UserAvatar user={change.createdBy} size={36} />
+                <UserAvatar user={change.createdByActor.user} size={36} />
                 <div>
                   <div className="flex flex-wrap items-start justify-start gap-x-1">
-                    <ChangeAuthor user={change.createdBy} />
+                    <ChangeAuthor actor={change.createdByActor} />
                     <ChangeType type={change.type} />
                     <ObjectDesc
                       objectType={change.objectType}

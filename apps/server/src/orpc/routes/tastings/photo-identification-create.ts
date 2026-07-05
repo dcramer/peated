@@ -1,6 +1,7 @@
 import { call } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottleReleases, bottles } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import { applyClassifierCreateDecision } from "@peated/server/lib/bottleReferenceResolution";
 import { logError } from "@peated/server/lib/log";
 import {
@@ -363,8 +364,10 @@ export default procedure
       ...context,
       user,
     };
+    const actor = await getUserActor(user);
 
     const result = await applyClassifierCreateDecision({
+      createdByActorId: actor.id,
       decision,
       user,
     });

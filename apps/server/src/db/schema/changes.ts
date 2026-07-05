@@ -10,6 +10,7 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
+import { actors } from "./actors";
 import { objectTypeEnum } from "./enums";
 import { users } from "./users";
 
@@ -25,14 +26,24 @@ export const changes = pgTable(
     displayName: text("display_name"),
     data: jsonb("data").default({}).notNull().$type<Record<string, any>>(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-    createdById: bigint("created_by_id", { mode: "number" })
-      .references(() => users.id)
+    actorId: bigint("actor_id", { mode: "number" })
+      .references(() => actors.id)
       .notNull(),
+    createdById: bigint("created_by_id", { mode: "number" }).references(
+      () => users.id,
+    ),
   },
-  (table) => [index("change_created_by_idx").on(table.createdById)],
+  (table) => [
+    index("change_actor_idx").on(table.actorId),
+    index("change_created_by_idx").on(table.createdById),
+  ],
 );
 
 export const changesRelations = relations(changes, ({ one }) => ({
+  actor: one(actors, {
+    fields: [changes.actorId],
+    references: [actors.id],
+  }),
   createdBy: one(users, {
     fields: [changes.createdById],
     references: [users.id],

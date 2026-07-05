@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ActorSchema } from "./actors";
 import { ObjectTypeEnum } from "./shared";
 import { UserSchema } from "./users";
 
@@ -14,6 +15,7 @@ export const ChangeSchema = z.object({
     .describe("Display name of the changed object"),
   type: ChangeTypeEnum.describe("Type of change (add, update, delete)"),
   createdBy: UserSchema.nullable().describe("User who made the change"),
+  createdByActor: ActorSchema.describe("Actor that made the change"),
   createdAt: z
     .string()
     .datetime()

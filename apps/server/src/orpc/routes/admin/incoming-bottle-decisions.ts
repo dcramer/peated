@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  actors,
   bottleReleases,
   bottles,
   externalSites,
@@ -51,6 +52,14 @@ const IncomingBottleDecisionListResponseSchema = z.object({
       url: z.string().nullable(),
       decision: IncomingBottleDecisionTypeSchema,
       actorType: IncomingBottleDecisionActorTypeSchema,
+      actor: z
+        .object({
+          id: z.number(),
+          type: z.enum(["system", "user"]),
+          key: z.string(),
+          displayName: z.string(),
+        })
+        .nullable(),
       actorUser: z
         .object({
           id: z.number(),
@@ -121,6 +130,12 @@ export default procedure
           id: users.id,
           username: users.username,
         },
+        actor: {
+          id: actors.id,
+          type: actors.type,
+          key: actors.key,
+          displayName: actors.displayName,
+        },
       })
       .from(incomingBottleDecisionLogs)
       .innerJoin(
@@ -133,6 +148,7 @@ export default procedure
         eq(bottleReleases.id, incomingBottleDecisionLogs.releaseId),
       )
       .leftJoin(users, eq(users.id, incomingBottleDecisionLogs.actorUserId))
+      .leftJoin(actors, eq(actors.id, incomingBottleDecisionLogs.actorId))
       .where(where.length ? and(...where) : undefined)
       .orderBy(
         desc(incomingBottleDecisionLogs.createdAt),
@@ -158,6 +174,14 @@ export default procedure
         url: row.log.url,
         decision: row.log.decision,
         actorType: row.log.actorType,
+        actor: row.actor?.id
+          ? {
+              id: row.actor.id,
+              type: row.actor.type!,
+              key: row.actor.key!,
+              displayName: row.actor.displayName!,
+            }
+          : null,
         actorUser: row.actorUser?.id
           ? {
               id: row.actorUser.id,

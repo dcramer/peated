@@ -1,11 +1,9 @@
 import config from "@peated/server/config";
-import {
-  BOT_USER_AGENT,
-  DEFAULT_CREATED_BY_ID,
-} from "@peated/server/constants";
+import { BOT_USER_AGENT } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import { changes, entities } from "@peated/server/db/schema";
+import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { logTelemetryError, logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
@@ -198,6 +196,8 @@ export default async ({
     }
   }
 
+  const actor = await getPeatedSystemActor();
+
   await db.transaction(async (tx) => {
     await tx.update(entities).set(data).where(eq(entities.id, entity.id));
 
@@ -205,7 +205,7 @@ export default async ({
       objectType: "entity",
       objectId: entity.id,
       displayName: entity.name,
-      createdById: DEFAULT_CREATED_BY_ID,
+      actorId: actor.id,
       type: "update",
       data: {
         ...data,

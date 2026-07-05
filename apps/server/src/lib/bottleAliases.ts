@@ -27,29 +27,46 @@ export class FailedToSaveBottleAliasError extends Error {
   }
 }
 
-type BottleAliasAssignmentOptions = {
-  assignmentSource?: BottleAliasAssignmentSource;
-  assignedById?: number | null;
-};
+export type BottleAliasAssignmentOptions =
+  | {
+      assignmentSource?: undefined;
+      assignedById?: undefined;
+      assignedByActorId?: undefined;
+    }
+  | {
+      assignmentSource?: BottleAliasAssignmentSource;
+      assignedById?: number | null;
+      assignedByActorId: number;
+    }
+  | {
+      assignmentSource?: BottleAliasAssignmentSource;
+      assignedById: number | null;
+      assignedByActorId: number;
+    };
 
 type BottleAliasAssignmentValues = {
   assignmentSource?: BottleAliasAssignmentSource;
   assignedById?: number | null;
+  assignedByActorId?: number | null;
 };
 
 function hasExplicitAssignmentOptions(options: BottleAliasAssignmentValues) {
   return (
-    options.assignmentSource !== undefined || options.assignedById !== undefined
+    options.assignmentSource !== undefined ||
+    options.assignedById !== undefined ||
+    options.assignedByActorId !== undefined
   );
 }
 
 function getAssignmentInsertValues({
   assignmentSource = "legacy",
   assignedById = null,
+  assignedByActorId = null,
 }: BottleAliasAssignmentValues) {
   return {
     assignmentSource,
     assignedById,
+    assignedByActorId,
   };
 }
 
@@ -60,6 +77,9 @@ function getAssignmentUpdateValues(options: BottleAliasAssignmentValues) {
       : {}),
     ...(options.assignedById !== undefined
       ? { assignedById: options.assignedById }
+      : {}),
+    ...(options.assignedByActorId !== undefined
+      ? { assignedByActorId: options.assignedByActorId }
       : {}),
   };
 }
@@ -81,6 +101,7 @@ export async function assignBottleAliasInTransaction(
     volume,
     assignmentSource,
     assignedById,
+    assignedByActorId,
   }: {
     bottleId: number;
     releaseId?: number | null;
@@ -98,6 +119,7 @@ export async function assignBottleAliasInTransaction(
   const assignmentOptions: BottleAliasAssignmentValues = {
     assignmentSource,
     assignedById,
+    assignedByActorId,
   };
   const existingAlias = await tx.query.bottleAliases.findFirst({
     where: eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()),

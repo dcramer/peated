@@ -1,6 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import { db } from "../db";
 import { bottleAliases } from "../db/schema";
+import { getUserActor, getUserActorByIdForDatabase } from "./actors";
 import { upsertBottleAlias } from "./db";
 
 describe("upsertBottleAlias", () => {
@@ -13,11 +14,16 @@ describe("upsertBottleAlias", () => {
       assignedById: originalAssignedBy.id,
     });
     const newBottle = await fixtures.Bottle({ name: "B" });
+    const newBottleActor = await getUserActorByIdForDatabase(
+      db,
+      newBottle.createdById,
+    );
     const otherAlias = await fixtures.BottleAlias({ bottleId: null });
 
     const result = await upsertBottleAlias(db, alias.name, newBottle.id, null, {
       assignmentSource: "source_approved",
       assignedById: newBottle.createdById,
+      assignedByActorId: newBottleActor.id,
     });
     expect(result).toBeDefined();
     expect(result.bottleId).toEqual(bottle.id);
@@ -57,6 +63,7 @@ describe("upsertBottleAlias", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ name: "A" });
+    const actor = await getUserActorByIdForDatabase(db, bottle.createdById);
     const alias = await fixtures.BottleAlias({
       bottleId: bottle.id,
       assignmentSource: "legacy",
@@ -65,12 +72,14 @@ describe("upsertBottleAlias", () => {
     const result = await upsertBottleAlias(db, alias.name, bottle.id, null, {
       assignmentSource: "source_approved",
       assignedById: bottle.createdById,
+      assignedByActorId: actor.id,
     });
 
     expect(result).toMatchObject({
       bottleId: bottle.id,
       assignmentSource: "source_approved",
       assignedById: bottle.createdById,
+      assignedByActorId: actor.id,
     });
   });
 
@@ -78,6 +87,7 @@ describe("upsertBottleAlias", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ name: "A" });
+    const actor = await getUserActorByIdForDatabase(db, bottle.createdById);
     const release = await fixtures.BottleRelease({ bottleId: bottle.id });
     const alias = await fixtures.BottleAlias({
       bottleId: bottle.id,
@@ -94,6 +104,7 @@ describe("upsertBottleAlias", () => {
       {
         assignmentSource: "canonical",
         assignedById: bottle.createdById,
+        assignedByActorId: actor.id,
       },
     );
 
@@ -102,6 +113,7 @@ describe("upsertBottleAlias", () => {
       releaseId: release.id,
       assignmentSource: "canonical",
       assignedById: bottle.createdById,
+      assignedByActorId: actor.id,
     });
   });
 
@@ -110,6 +122,7 @@ describe("upsertBottleAlias", () => {
   }) => {
     const bottle = await fixtures.Bottle({ name: "A" });
     const assignedBy = await fixtures.User({ mod: true });
+    const assignedByActor = await getUserActor(assignedBy);
     const alias = await fixtures.BottleAlias({
       bottleId: bottle.id,
       assignmentSource: "human_approved",
@@ -119,12 +132,14 @@ describe("upsertBottleAlias", () => {
     const result = await upsertBottleAlias(db, alias.name, bottle.id, null, {
       assignmentSource: "canonical",
       assignedById: null,
+      assignedByActorId: assignedByActor.id,
     });
 
     expect(result).toMatchObject({
       bottleId: bottle.id,
       assignmentSource: "canonical",
       assignedById: null,
+      assignedByActorId: assignedByActor.id,
     });
   });
 
@@ -160,16 +175,19 @@ describe("upsertBottleAlias", () => {
     const alias = await fixtures.BottleAlias({ bottleId: null });
     const otherAlias = await fixtures.BottleAlias({ bottleId: null });
     const newBottle = await fixtures.Bottle({ name: "B" });
+    const actor = await getUserActorByIdForDatabase(db, newBottle.createdById);
 
     const result = await upsertBottleAlias(db, alias.name, newBottle.id, null, {
       assignmentSource: "canonical",
       assignedById: newBottle.createdById,
+      assignedByActorId: actor.id,
     });
     expect(result).toBeDefined();
     expect(result.bottleId).toEqual(newBottle.id);
     expect(result.name).toEqual(alias.name);
     expect(result.assignmentSource).toBe("canonical");
     expect(result.assignedById).toBe(newBottle.createdById);
+    expect(result.assignedByActorId).toBe(actor.id);
 
     const [newOtherAlias] = await db
       .select()

@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottles, bottleSeries, changes } from "@peated/server/db/schema";
+import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { eq } from "drizzle-orm";
@@ -30,12 +31,15 @@ export default procedure
     }
 
     await db.transaction(async (tx) => {
+      const actorId = (await getUserActorForDatabase(tx, context.user)).id;
+
       await Promise.all([
         // Log the deletion in changes table
         tx.insert(changes).values({
           objectType: "bottle_series",
           objectId: series.id,
           createdById: context.user.id,
+          actorId,
           displayName: series.name,
           type: "delete",
           data: series,

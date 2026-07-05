@@ -2,6 +2,7 @@ import { normalizeEntityName } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import type { EntityAlias } from "@peated/server/db/schema";
 import { changes, entities, entityAliases } from "@peated/server/db/schema";
+import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
@@ -54,6 +55,7 @@ export default procedure
     const lowerAliasName = aliasName.toLowerCase();
 
     const alias = await db.transaction(async (tx) => {
+      const actorId = (await getUserActorForDatabase(tx, context.user)).id;
       const existingAlias = await tx.query.entityAliases.findFirst({
         where: eq(sql`LOWER(${entityAliases.name})`, lowerAliasName),
       });
@@ -105,6 +107,7 @@ export default procedure
         objectId: entity.id,
         displayName: entity.name,
         createdById: context.user.id,
+        actorId,
         type: "update",
         data: {
           alias: aliasName,

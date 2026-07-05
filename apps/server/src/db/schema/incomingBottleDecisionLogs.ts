@@ -12,6 +12,7 @@ import {
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
+import { actors } from "./actors";
 import { bottleReleases, bottles } from "./bottles";
 import { externalSites } from "./externalSites";
 import { storePriceMatchProposals } from "./stores";
@@ -52,6 +53,9 @@ export const incomingBottleDecisionLogs = pgTable(
     url: text("url"),
     decision: incomingBottleDecisionTypeEnum("decision").notNull(),
     actorType: incomingBottleDecisionActorTypeEnum("actor_type").notNull(),
+    actorId: bigint("actor_id", { mode: "number" })
+      .references(() => actors.id)
+      .notNull(),
     actorUserId: bigint("actor_user_id", { mode: "number" }).references(
       () => users.id,
       { onDelete: "set null" },
@@ -84,6 +88,7 @@ export const incomingBottleDecisionLogs = pgTable(
     ),
     index("incoming_bottle_decision_bottle_idx").on(table.bottleId),
     index("incoming_bottle_decision_release_idx").on(table.releaseId),
+    index("incoming_bottle_decision_actor_ref_idx").on(table.actorId),
     index("incoming_bottle_decision_actor_idx").on(table.actorType),
     index("incoming_bottle_decision_actor_user_idx").on(table.actorUserId),
   ],
@@ -103,6 +108,10 @@ export const incomingBottleDecisionLogsRelations = relations(
     actorUser: one(users, {
       fields: [incomingBottleDecisionLogs.actorUserId],
       references: [users.id],
+    }),
+    actor: one(actors, {
+      fields: [incomingBottleDecisionLogs.actorId],
+      references: [actors.id],
     }),
     bottle: one(bottles, {
       fields: [incomingBottleDecisionLogs.bottleId],

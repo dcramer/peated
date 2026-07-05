@@ -4,6 +4,7 @@ import {
   incomingBottleDecisionLogs,
   reviews,
 } from "@peated/server/db/schema";
+import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -151,6 +152,7 @@ describe("POST /reviews", () => {
     const site = await fixtures.ExternalSiteOrExisting();
     const brand = await fixtures.Entity({ name: "Springbank" });
     const adminUser = await fixtures.User({ admin: true });
+    const systemActor = await getPeatedSystemActor();
 
     classifyBottleReferenceMock.mockResolvedValue(
       buildCreateBottleDecision({
@@ -196,6 +198,7 @@ describe("POST /reviews", () => {
     expect(alias).toMatchObject({
       bottleId: bottle!.id,
       assignmentSource: "classifier_approved",
+      assignedByActorId: systemActor.id,
       assignedById: adminUser.id,
     });
 
@@ -211,13 +214,17 @@ describe("POST /reviews", () => {
       externalSiteId: site.id,
       decision: "create_bottle",
       actorType: "system",
-      actorUserId: adminUser.id,
+      actorId: systemActor.id,
+      actorUserId: null,
       bottleId: bottle!.id,
       releaseId: null,
       createdBottle: true,
       createdRelease: false,
       confidence: 92,
       rationale: "test fixture",
+      metadata: expect.objectContaining({
+        initiatedByUserId: adminUser.id,
+      }),
     });
     expect(pushUniqueJobMock).toHaveBeenCalledWith("IndexBottleSearchVectors", {
       bottleId: bottle!.id,
@@ -651,12 +658,16 @@ describe("POST /reviews", () => {
     expect(decisionLog).toMatchObject({
       decision: "match_existing",
       actorType: "system",
-      actorUserId: adminUser.id,
+      actorId: (await getPeatedSystemActor()).id,
+      actorUserId: null,
       bottleId: bottle.id,
       releaseId: null,
       createdBottle: false,
       createdRelease: false,
       confidence: 92,
+      metadata: expect.objectContaining({
+        initiatedByUserId: adminUser.id,
+      }),
     });
   });
 

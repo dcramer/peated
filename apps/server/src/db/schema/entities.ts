@@ -15,6 +15,7 @@ import {
 import { bottles, bottlesToDistillers, countries } from ".";
 import { tsvector } from "../columns";
 import { geometry_point } from "../columns/geometry";
+import { actors } from "./actors";
 import { contentSourceEnum } from "./enums";
 import { regions } from "./regions";
 import { users } from "./users";
@@ -69,6 +70,9 @@ export const entities = pgTable(
     createdById: bigint("created_by_id", { mode: "number" })
       .references(() => users.id)
       .notNull(),
+    createdByActorId: bigint("created_by_actor_id", {
+      mode: "number",
+    }).references(() => actors.id, { onDelete: "set null" }),
   },
   (table) => [
     uniqueIndex("entity_name_unq").using("btree", sql`LOWER(${table.name})`),
@@ -81,6 +85,7 @@ export const entities = pgTable(
     index("entity_country_by_idx").on(table.countryId),
     index("entity_region_idx").on(table.regionId),
     index("entity_created_by_idx").on(table.createdById),
+    index("entity_created_by_actor_idx").on(table.createdByActorId),
   ],
 );
 
@@ -98,6 +103,10 @@ export const entitiesRelations = relations(entities, ({ one, many }) => ({
   createdBy: one(users, {
     fields: [entities.createdById],
     references: [users.id],
+  }),
+  createdByActor: one(actors, {
+    fields: [entities.createdByActorId],
+    references: [actors.id],
   }),
 }));
 

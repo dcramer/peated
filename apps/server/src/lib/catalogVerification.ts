@@ -4,9 +4,9 @@ import {
   buildCatalogVerificationCreationMetadata,
   buildCatalogVerificationResult,
 } from "@peated/catalog-verifier";
-import { DEFAULT_CREATED_BY_ID } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { changes } from "@peated/server/db/schema";
+import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { pushUniqueJob } from "@peated/server/worker/client";
 
 export function getCatalogVerificationCreationMetadata(
@@ -60,12 +60,14 @@ export async function recordCatalogVerificationResult({
   objectType: "bottle" | "entity";
   result: Omit<CatalogVerificationResult, "phase">;
 }) {
+  const actor = await getPeatedSystemActor();
+
   await db.insert(changes).values({
     objectType,
     objectId,
     displayName,
     type: "update",
-    createdById: DEFAULT_CREATED_BY_ID,
+    actorId: actor.id,
     data: {
       catalogVerification: buildCatalogVerificationResult(result),
     },

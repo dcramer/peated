@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottles } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import {
   assignBottleAlias,
   DuplicateBottleAliasError,
@@ -36,11 +37,13 @@ export default procedure
     }
 
     try {
+      const actor = await getUserActor(context.user);
       await assignBottleAlias(
         {
           bottleId: input.bottle,
           name: input.name,
           assignmentSource: "human_approved",
+          assignedByActorId: actor.id,
           assignedById: context.user.id,
         },
         {

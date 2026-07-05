@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { incomingBottleDecisionLogs } from "@peated/server/db/schema";
+import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
@@ -26,7 +27,9 @@ describe("GET /admin/incoming-bottle-decisions", () => {
 
   test("lists incoming bottle decisions", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
-    const actor = await fixtures.User({ username: "moderator" });
+    const actorUser = await fixtures.User({ username: "moderator" });
+    const userActor = await getUserActor(actorUser);
+    const systemActor = await getPeatedSystemActor();
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const bottle = await fixtures.Bottle();
     const release = await fixtures.BottleRelease({ bottleId: bottle.id });
@@ -52,7 +55,8 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         url: review.url,
         decision: "match_existing",
         actorType: "user",
-        actorUserId: actor.id,
+        actorId: userActor.id,
+        actorUserId: actorUser.id,
         bottleId: bottle.id,
         releaseId: release.id,
         confidence: 87,
@@ -66,6 +70,7 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         url: price.url,
         decision: "create_bottle",
         actorType: "system",
+        actorId: systemActor.id,
         actorUserId: null,
         bottleId: bottle.id,
         createdBottle: true,
@@ -84,6 +89,12 @@ describe("GET /admin/incoming-bottle-decisions", () => {
       sourceId: price.id,
       decision: "create_bottle",
       actorType: "system",
+      actor: {
+        id: systemActor.id,
+        type: "system",
+        key: "peated",
+        displayName: "Peated",
+      },
       actorUser: null,
       bottle: {
         id: bottle.id,
@@ -98,9 +109,15 @@ describe("GET /admin/incoming-bottle-decisions", () => {
       sourceId: review.id,
       decision: "match_existing",
       actorType: "user",
+      actor: {
+        id: userActor.id,
+        type: "user",
+        key: String(actorUser.id),
+        displayName: actorUser.username,
+      },
       actorUser: {
-        id: actor.id,
-        username: actor.username,
+        id: actorUser.id,
+        username: actorUser.username,
       },
       release: {
         id: release.id,
@@ -112,6 +129,8 @@ describe("GET /admin/incoming-bottle-decisions", () => {
 
   test("filters by actor type", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
+    const userActor = await getUserActor(admin);
+    const systemActor = await getPeatedSystemActor();
     const site = await fixtures.ExternalSiteOrExisting();
     const bottle = await fixtures.Bottle();
 
@@ -123,6 +142,7 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         name: "User Decision",
         decision: "match_existing",
         actorType: "user",
+        actorId: userActor.id,
         actorUserId: admin.id,
         bottleId: bottle.id,
       },
@@ -133,6 +153,7 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         name: "System Decision",
         decision: "create_bottle",
         actorType: "system",
+        actorId: systemActor.id,
         bottleId: bottle.id,
       },
     ]);
@@ -146,6 +167,12 @@ describe("GET /admin/incoming-bottle-decisions", () => {
     expect(result.results[0]).toMatchObject({
       name: "System Decision",
       actorType: "system",
+      actor: {
+        id: systemActor.id,
+        type: "system",
+        key: "peated",
+        displayName: "Peated",
+      },
     });
   });
 });

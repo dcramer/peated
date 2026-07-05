@@ -22,6 +22,7 @@ import {
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
+import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import {
   BottleReleaseAlreadyExistsError,
   BottleReleaseCreateBadRequestError,
@@ -300,6 +301,7 @@ export async function applyDirtyParentAgeRepairInTransaction(
     user: User;
   },
 ): Promise<ApplyDirtyParentAgeRepairResult> {
+  const actorId = (await getUserActorForDatabase(tx, user)).id;
   const bottle = await getBottleForRepair(tx, bottleId);
   const lockedReleases = await getLockedReleasesForRepair(tx, bottle.id);
   const conflictingReleases = getConflictingAgeReleases(bottle, lockedReleases);
@@ -385,6 +387,7 @@ export async function applyDirtyParentAgeRepairInTransaction(
     try {
       const result = await createBottleReleaseInTransaction(tx, {
         bottleId: bottle.id,
+        createdByActorId: actorId,
         input: {
           edition: null,
           statedAge: parentStatedAge,
@@ -594,6 +597,7 @@ export async function applyDirtyParentAgeRepairInTransaction(
     objectType: "bottle",
     objectId: updatedBottle.id,
     createdById: user.id,
+    actorId,
     displayName: updatedBottle.fullName,
     type: "update",
     data: {
