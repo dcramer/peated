@@ -14,6 +14,7 @@ import type { SQL } from "drizzle-orm";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { BadgeCheckType } from "../../types";
+import { logInfo } from "../log";
 import { getCheck } from "./checks";
 import { getFormula } from "./formula";
 import { getTracker } from "./trackers";
@@ -103,7 +104,11 @@ export async function rescanBadge(badge: Badge) {
     offset += results.length;
 
     for (const { tasting, brand, bottler, bottle } of results) {
-      console.info(`[badges] Backfill XP for tasting ${tasting.id}`);
+      logInfo("Backfilling badge XP for tasting {tastingId}", {
+        extra: {
+          tastingId: tasting.id,
+        },
+      });
       await awardXp(
         db,
         {
@@ -140,7 +145,12 @@ async function awardXp(
   tasting: TastingWithRelations,
   badge: Badge,
 ) {
-  console.info(`[badges] Checking badge ${badge.id} for ${tasting.id}`);
+  logInfo("Checking badge {badgeId} for tasting {tastingId}", {
+    extra: {
+      badgeId: badge.id,
+      tastingId: tasting.id,
+    },
+  });
 
   const checks = await Promise.all(
     badge.checks.map(async ({ type, config }) => {
@@ -156,7 +166,12 @@ async function awardXp(
   const trackedObjects: TrackedObject[] = [];
   for (const check of checks) {
     if (!check.impl.test(check.config, tasting)) {
-      console.info(`[badges] Badge ${badge.id} did not test successfully.`);
+      logInfo("Badge {badgeId} did not test successfully", {
+        extra: {
+          badgeId: badge.id,
+          tastingId: tasting.id,
+        },
+      });
       return;
     }
   }
@@ -169,7 +184,12 @@ async function awardXp(
   }
 
   if (!trackedObjects.length) {
-    console.info(`[badges] Badge ${badge.id} did not track any objects.`);
+    logInfo("Badge {badgeId} did not track any objects", {
+      extra: {
+        badgeId: badge.id,
+        tastingId: tasting.id,
+      },
+    });
     return;
   }
 
@@ -211,11 +231,22 @@ async function awardXp(
 
     // there were no new entries
     if (!count) {
-      console.info(`[badges] Already tracked objects for badge ${badge.id}.`);
+      logInfo("Already tracked objects for badge {badgeId}", {
+        extra: {
+          badgeId: badge.id,
+          tastingId: tasting.id,
+        },
+      });
       return;
     }
 
-    console.info(`[badges] Awarding ${count} xp for badge ${badge.id}.`);
+    logInfo("Awarding badge XP for badge {badgeId}", {
+      extra: {
+        badgeId: badge.id,
+        tastingId: tasting.id,
+        xp: count,
+      },
+    });
 
     [award] = await tx
       .update(badgeAwards)

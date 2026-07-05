@@ -6,6 +6,9 @@ import type { ScrapePricesCallback } from "@peated/server/lib/scraper";
 import scrapePrices, { getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
+import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
+
+const SITE = "woodencork";
 
 function extractVolume(name: string) {
   const match = name.match(/^(.+)\s([\d.]+(?:ml|l))$/i);
@@ -35,7 +38,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   $("#CollectionAjaxContent div.grid-item").each((_, el) => {
     const bottle = $("div.grid-product__title", el).first().text();
     if (!bottle) {
-      console.warn("Unable to identify Product Name");
+      logScrapeWarning(SITE, "Unable to identify product name");
       return;
     }
 
@@ -48,12 +51,12 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
     // XXX: WC seems to default to 750ml in listings
     const volume = volumeRaw ? normalizeVolume(volumeRaw) : 750;
     if (!volume) {
-      console.warn(`Invalid size: ${volumeRaw}`);
+      logScrapeWarning(SITE, "Invalid product size", { volumeRaw });
       return;
     }
 
     if (volume < 500) {
-      console.warn(`Invalid size: ${volume}`);
+      logScrapeWarning(SITE, "Invalid product size", { volume });
       return;
     }
 
@@ -65,7 +68,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
       .text();
     const price = parsePrice(priceRaw);
     if (!price) {
-      console.warn(`Invalid price: ${priceRaw}`);
+      logScrapeWarning(SITE, "Invalid product price", { priceRaw });
       return;
     }
 
@@ -81,7 +84,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
     //     ? imgSrc.replace("{width}", JSON.parse(imgWidths).slice(-1))
     //     : null;
 
-    console.log(`${name} - ${(price / 100).toFixed(2)}`);
+    logScrapedProduct(SITE, { name, price });
 
     promises.push(
       cb({
@@ -100,7 +103,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 
 export default async function scrapeWoodenCork() {
   await scrapePrices(
-    "woodencork",
+    SITE,
     (page) => `https://woodencork.com/collections/whiskey?cursor=${page}`,
     scrapeProducts,
   );

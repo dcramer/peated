@@ -9,7 +9,7 @@ import {
 } from "@peated/server/db/schema";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { formatBottleName, formatReleaseName } from "@peated/server/lib/format";
-import { logError } from "@peated/server/lib/log";
+import { logError, logInfo, logWarn } from "@peated/server/lib/log";
 import { ConflictError } from "@peated/server/orpc/errors";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { eq, inArray } from "drizzle-orm";
@@ -23,16 +23,23 @@ export default async function mergeEntity({
   toEntityId: number;
   fromEntityIds: number[];
 }) {
-  console.log(
-    `Merging entities ${fromEntityIds.join(", ")} into ${toEntityId}.`,
-  );
+  logInfo("Merging entities into {toEntityId}", {
+    extra: {
+      fromEntityIds,
+      toEntityId,
+    },
+  });
 
   const [toEntity] = await db
     .select()
     .from(entities)
     .where(eq(entities.id, toEntityId));
   if (!toEntity) {
-    console.warn(`Entity not found: ${toEntityId}`);
+    logWarn("Merge target entity not found", {
+      extra: {
+        toEntityId,
+      },
+    });
     return;
   }
 

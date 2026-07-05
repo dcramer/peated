@@ -2,10 +2,10 @@
 import "./sentry";
 
 import { createAdaptorServer } from "@hono/node-server";
-import * as Sentry from "@sentry/node";
 import type { AddressInfo } from "node:net";
 import { app } from "./app";
 import config from "./config";
+import { logError, logInfo } from "./lib/log";
 
 const getServerUrl = (address: AddressInfo | string | null) => {
   if (!address || typeof address === "string") {
@@ -21,8 +21,11 @@ const getServerUrl = (address: AddressInfo | string | null) => {
 };
 
 const exitWithError = (message: string, err: unknown) => {
-  Sentry.captureException(err);
-  console.error(`${message}: ${err}`, err);
+  logError(err, {
+    extra: {
+      message,
+    },
+  });
   process.exit(1);
 };
 
@@ -37,7 +40,11 @@ const start = () => {
   });
 
   server.listen(config.PORT, config.HOST, () => {
-    console.info(`API exposed at ${getServerUrl(server.address())}`);
+    logInfo("API exposed at {url}", {
+      extra: {
+        url: getServerUrl(server.address()),
+      },
+    });
   });
 };
 

@@ -3,6 +3,7 @@
 import { useGoogleLogin } from "@react-oauth/google";
 import { useSearchParams } from "next/navigation";
 import { type ComponentProps, useState } from "react";
+import { logWarn } from "../lib/log";
 import Button from "./button";
 
 export default function GoogleLoginButton({
@@ -29,7 +30,7 @@ export default function GoogleLoginButton({
       setLoading(false);
     },
     onError: () => {
-      console.log("Login Failed");
+      logWarn("Google login failed", {});
       setLoading(false);
     },
   });

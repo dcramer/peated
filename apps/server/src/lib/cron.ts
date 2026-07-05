@@ -1,5 +1,5 @@
 import cuid2 from "@paralleldrive/cuid2";
-import { logError } from "@peated/server/lib/log";
+import { logError, logInfo } from "@peated/server/lib/log";
 import * as Sentry from "@sentry/node";
 import { AsyncTask, CronJob, ToadScheduler } from "toad-scheduler";
 
@@ -41,7 +41,12 @@ export function scheduledJob(
             span.setAttribute("checkin.id", checkInId);
             span.setAttribute("checkin.slug", jobName);
 
-            console.log(`Running job [${jobName} - ${jobId}]`);
+            logInfo("Running cron job {jobName} {jobId}", {
+              extra: {
+                jobName,
+                jobId,
+              },
+            });
             const start = new Date().getTime();
             let success = false;
 
@@ -71,11 +76,14 @@ export function scheduledJob(
 
             const duration = new Date().getTime() - start;
 
-            console.log(
-              `Job ${
-                success ? "succeeded" : "failed"
-              } [${jobName} - ${jobId}] in ${(duration / 1000).toFixed(3)}s`,
-            );
+            logInfo("Cron job {status} {jobName} {jobId}", {
+              extra: {
+                status: success ? "succeeded" : "failed",
+                jobName,
+                jobId,
+                durationMs: duration,
+              },
+            });
           },
         );
       });

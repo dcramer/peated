@@ -1,3 +1,5 @@
+import { logInfo } from "./log";
+
 export enum AuditEvent {
   // Authentication events
   LOGIN_SUCCESS = "auth.login.success",
@@ -39,10 +41,11 @@ export function auditLog(entry: AuditLogEntry): void {
     userId: entry.userId,
     ip: entry.ip,
     userAgent: entry.userAgent,
-    ...entry.metadata,
+    metadata: entry.metadata,
     timestamp: new Date().toISOString(),
   };
 
-  // Use console for audit logs (will be picked up by log aggregation)
-  console.log(JSON.stringify(logData));
+  logInfo("Audit event {event}", {
+    extra: logData,
+  });
 }

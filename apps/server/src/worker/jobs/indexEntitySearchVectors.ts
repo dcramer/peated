@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { entities, entityAliases } from "@peated/server/db/schema";
+import { logInfo } from "@peated/server/lib/log";
 import { buildEntitySearchVector } from "@peated/server/lib/search";
 import { eq } from "drizzle-orm";
 
@@ -18,7 +19,11 @@ export default async ({ entityId }: { entityId: number }) => {
 
   const searchVector = buildEntitySearchVector(entity, aliasList) || null;
 
-  console.log(`Updating searchVector for Entity ${entity.id}`);
+  logInfo("Updating search vector for entity {entityId}", {
+    extra: {
+      entityId: entity.id,
+    },
+  });
 
   await db
     .update(entities)

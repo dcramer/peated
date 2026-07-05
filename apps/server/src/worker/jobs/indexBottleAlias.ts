@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import { bottleAliases } from "@peated/server/db/schema";
 import { formatCategoryName } from "@peated/server/lib/format";
+import { logInfo } from "@peated/server/lib/log";
 import { getOpenAIEmbedding } from "@peated/server/lib/openaiEmbeddings";
 import { eq, sql } from "drizzle-orm";
 
@@ -44,7 +45,11 @@ export default async ({ name }: { name: string }) => {
     throw new Error(`Unknown bottle alias: ${name}`);
   }
 
-  console.log(`Updating index for bottle alias: ${name}`);
+  logInfo("Updating index for bottle alias {name}", {
+    extra: {
+      name,
+    },
+  });
 
   const { bottle, release } = alias;
   const brand = bottle?.brand;

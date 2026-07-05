@@ -6,6 +6,7 @@ import {
 import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import { changes, entities } from "@peated/server/db/schema";
+import { logTelemetryError, logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { EntityTypeEnum } from "@peated/server/schemas";
@@ -14,7 +15,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 if (!config.OPENAI_API_KEY) {
-  console.warn("OPENAI_API_KEY is not configured.");
+  logWarn("OPENAI_API_KEY is not configured", {});
 }
 
 type InputEntity = Partial<Entity> & {
@@ -185,10 +186,13 @@ export default async ({
         },
       });
     } catch (err) {
-      console.error(
-        `Discarded website (${data.website}) as possible hallucination`,
-        err,
-      );
+      logTelemetryError(err, {
+        extra: {
+          entityId,
+          website: data.website,
+          message: "Discarded website as possible hallucination",
+        },
+      });
       // dont allow LLMs to hallucinate fake URLs
       data.website = null;
     }

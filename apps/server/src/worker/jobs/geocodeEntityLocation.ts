@@ -9,6 +9,7 @@ import {
   type Entity,
   type Region,
 } from "@peated/server/db/schema";
+import { logInfo } from "@peated/server/lib/log";
 import { eq } from "drizzle-orm";
 
 async function locateAddress(
@@ -121,9 +122,14 @@ export default async ({
     throw new Error("Unable to identify geometry");
   }
 
-  console.log(
-    `Updating location for Entity ${entity.id}: ${match.formatted_address} (${match.geometry.location.lat}, ${match.geometry.location.lng})`,
-  );
+  logInfo("Updating location for entity {entityId}", {
+    extra: {
+      entityId: entity.id,
+      address: match.formatted_address,
+      latitude: match.geometry.location.lat,
+      longitude: match.geometry.location.lng,
+    },
+  });
 
   const data: Partial<Entity> = {
     address: match.formatted_address,

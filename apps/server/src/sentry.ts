@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/node";
 import config from "./config";
+import { configureLogging } from "./lib/log";
 
 if (config.ENV !== "test") {
   Sentry.init({
@@ -11,11 +12,10 @@ if (config.ENV !== "test") {
     tracePropagationTargets: ["localhost", "api.peated.com", "peated.com"],
     includeLocalVariables: true,
     sendDefaultPii: true,
-    integrations: [
-      Sentry.consoleLoggingIntegration(),
-      Sentry.zodErrorsIntegration(),
-    ],
+    integrations: [Sentry.zodErrorsIntegration()],
   });
 
   Sentry.setTag("service", config.SENTRY_SERVICE);
 }
+
+configureLogging();

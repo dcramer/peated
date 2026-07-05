@@ -1,9 +1,10 @@
 import { type User } from "@peated/server/types";
 import { getIronSession, type SessionOptions } from "iron-session";
 import { cookies } from "next/headers";
+import { logWarn } from "./log";
 
 if (!process.env.SESSION_SECRET) {
-  console.warn("SESSION_SECRET is not defined.");
+  logWarn("SESSION_SECRET is not defined", {});
 }
 
 export interface SessionData {

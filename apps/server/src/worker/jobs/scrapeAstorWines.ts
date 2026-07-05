@@ -7,6 +7,9 @@ import type { ScrapePricesCallback } from "@peated/server/lib/scraper";
 import scrapePrices, { getUrl, parsePrice } from "@peated/server/lib/scraper";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
+import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
+
+const SITE = "astorwines";
 
 export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const data = await getUrl(url);
@@ -16,7 +19,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   $("#search-results .item-teaser").each((_, el) => {
     const rawName = ($(".header > h2", el).first().attr("title") || "").trim();
     if (!rawName) {
-      console.warn("Unable to identify Product Name");
+      logScrapeWarning(SITE, "Unable to identify product name");
       return;
     }
 
@@ -28,25 +31,25 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
     const volumeRaw = $(".teaser__item__meta__2 > div", el).last().text();
     const volume = volumeRaw ? normalizeVolume(volumeRaw) : null;
     if (!volume) {
-      console.warn(`Invalid size: ${volumeRaw}`);
+      logScrapeWarning(SITE, "Invalid product size", { volumeRaw });
       return;
     }
 
     if (!ALLOWED_VOLUMES.includes(volume)) {
-      console.warn(`Invalid size: ${volume}`);
+      logScrapeWarning(SITE, "Invalid product size", { volume });
       return;
     }
 
     const priceRaw = $("span.price-bottle.display-2", el).first().text().trim();
     const price = parsePrice(priceRaw);
     if (!price) {
-      console.warn(`Invalid price: ${priceRaw}`);
+      logScrapeWarning(SITE, "Invalid product price", { priceRaw });
       return;
     }
 
     const imageUrl = $(".item-image img", el).first().attr("src")?.trim();
 
-    console.log(`${name} - ${(price / 100).toFixed(2)}`);
+    logScrapedProduct(SITE, { name, price });
 
     promises.push(
       cb({
@@ -65,14 +68,14 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 
 export default async function scrapeAstorWines() {
   await scrapePrices(
-    "astorwines",
+    SITE,
     (page) =>
       `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=3_41&srt=1&instockonly=True&Page=${page}`,
     scrapeProducts,
   );
 
   await scrapePrices(
-    "astorwines",
+    SITE,
     (page) =>
       `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=2_32&srt=1&instockonly=True&Page=${page}`,
     scrapeProducts,

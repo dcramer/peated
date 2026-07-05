@@ -1,6 +1,7 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { regions } from "@peated/server/db/schema";
+import { logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { type Region } from "@peated/server/types";
@@ -9,7 +10,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 if (!config.OPENAI_API_KEY) {
-  console.warn("OPENAI_API_KEY is not configured.");
+  logWarn("OPENAI_API_KEY is not configured", {});
 }
 
 type InputRegion = Partial<Region> & Pick<Region, "country">;

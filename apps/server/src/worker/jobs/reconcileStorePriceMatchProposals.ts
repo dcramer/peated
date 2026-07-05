@@ -3,7 +3,7 @@ import {
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
-import { logError } from "@peated/server/lib/log";
+import { logError, logInfo } from "@peated/server/lib/log";
 import { pushJob } from "@peated/server/worker/client";
 import { desc, eq, sql } from "drizzle-orm";
 
@@ -67,9 +67,11 @@ export default async function reconcileStorePriceMatchProposals({
   }
 
   if (queuedCount > 0) {
-    console.log(
-      `Queued ${queuedCount} unmatched store price${queuedCount === 1 ? "" : "s"} without match proposals`,
-    );
+    logInfo("Queued unmatched store prices without match proposals", {
+      extra: {
+        queuedCount,
+      },
+    });
   }
 
   return {

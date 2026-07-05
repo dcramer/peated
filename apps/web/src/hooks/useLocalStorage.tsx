@@ -1,5 +1,5 @@
-import { logger } from "@sentry/nextjs";
 import { useState } from "react";
+import { logTelemetryError } from "../lib/log";
 
 export default function useLocalStorage<T>(key: string, initialValue: T) {
   // State to store our value
@@ -15,9 +15,12 @@ export default function useLocalStorage<T>(key: string, initialValue: T) {
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       // If error also return initialValue
-      logger.error(
-        logger.fmt`Error getting local storage value for key [${key}]: ${error}`,
-      );
+      logTelemetryError(error, {
+        extra: {
+          action: "get",
+          key,
+        },
+      });
       return initialValue;
     }
   });
@@ -36,9 +39,12 @@ export default function useLocalStorage<T>(key: string, initialValue: T) {
       }
     } catch (error) {
       // A more advanced implementation would handle the error case
-      logger.error(
-        logger.fmt`Error setting local storage value for key [${key}]: ${error}`,
-      );
+      logTelemetryError(error, {
+        extra: {
+          action: "set",
+          key,
+        },
+      });
     }
   };
   return [storedValue, setValue] as const;

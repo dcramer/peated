@@ -4,6 +4,7 @@ import { safe } from "@orpc/client";
 import { createServerClient } from "@peated/web/lib/orpc/client.server";
 import { redirect } from "next/navigation";
 import { getSafeRedirect } from "./auth";
+import { logInfo, logTelemetryError } from "./log";
 import type { SessionData } from "./session.server";
 import { getSession } from "./session.server";
 
@@ -327,7 +328,11 @@ export async function updateSession(): Promise<SessionData> {
       session.destroy();
       return { user: null, accessToken: null, ts: null };
     }
-    console.error("Failed to refresh session:", err);
+    logTelemetryError(err, {
+      extra: {
+        message: "Failed to refresh session",
+      },
+    });
   }
 
   return {
@@ -343,7 +348,11 @@ export async function ensureSessionSynced(): Promise<SessionData> {
     if (!session.user) return session;
 
     if (!session.ts || session.ts < Date.now() / 1000 - SESSION_REFRESH) {
-      console.log(`Refreshing session for user_id='${session.user.id}'`);
+      logInfo("Refreshing session for user {userId}", {
+        extra: {
+          userId: session.user.id,
+        },
+      });
       session = await updateSession();
     }
 
@@ -351,7 +360,11 @@ export async function ensureSessionSynced(): Promise<SessionData> {
       ...session,
     };
   } catch (err) {
-    console.error("ensureSessionSynced failed:", err);
+    logTelemetryError(err, {
+      extra: {
+        message: "ensureSessionSynced failed",
+      },
+    });
     throw err;
   }
 }

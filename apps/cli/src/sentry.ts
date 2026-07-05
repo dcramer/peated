@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/node";
+import { configureCliLogging } from "./log";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -8,10 +9,8 @@ Sentry.init({
   tracesSampleRate: 1.0,
   tracePropagationTargets: ["localhost", "api.peated.com", "peated.com"],
   profilesSampleRate: 1.0,
-  integrations: [Sentry.consoleLoggingIntegration()],
-  _experiments: {
-    enableLogs: true,
-  },
+  enableLogs: true,
 });
 
 Sentry.setTag("service", "@peated/cli");
+configureCliLogging();

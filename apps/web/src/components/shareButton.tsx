@@ -1,6 +1,7 @@
 "use client";
 
 import { ShareIcon } from "@heroicons/react/24/outline";
+import { logTelemetryError } from "../lib/log";
 import Button from "./button";
 import { ClientOnly } from "./clientOnly";
 
@@ -26,7 +27,7 @@ export default function ShareButton({
                     title: title ?? document.title,
                     url: url ?? document.location.href,
                   })
-                  .catch((error) => console.error("Error sharing", error));
+                  .catch((error) => logTelemetryError(error, {}));
               }
             }}
             {...props}

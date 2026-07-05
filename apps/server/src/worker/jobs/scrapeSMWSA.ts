@@ -12,6 +12,9 @@ import {
 
 import { load as cheerio } from "cheerio";
 import { type z } from "zod";
+import { logScrapeWarning } from "./scrapeLogging";
+
+const SITE = "smwsa";
 
 export default async function scrapeSMWSA() {
   await scrapeBottles(
@@ -85,7 +88,9 @@ export async function scrapeBottles(
       .first()
       .attr("href");
     if (!url) {
-      console.error(`Cannot find url: ${caskName}`);
+      logScrapeWarning(SITE, "Cannot find product URL", {
+        caskName,
+      });
       continue;
     }
 
@@ -102,11 +107,17 @@ export async function scrapeBottles(
 
     const details = parseDetailsFromName(`${itemType} ${caskName}`);
     if (!details?.distiller) {
-      console.error(`Cannot find distiller: ${itemType}`);
+      logScrapeWarning(SITE, "Cannot find distiller", {
+        itemType,
+        caskName,
+      });
       continue;
     }
     if (!details.category) {
-      console.error(`Unsupported spirit: ${itemType}`);
+      logScrapeWarning(SITE, "Unsupported spirit", {
+        itemType,
+        caskName,
+      });
       continue;
     }
 

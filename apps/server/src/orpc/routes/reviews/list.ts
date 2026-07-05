@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { externalSites, reviews } from "@peated/server/db/schema";
+import { logWarn } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import {
   ExternalSiteTypeEnum,
@@ -77,9 +78,11 @@ export default procedure
     const requiresModerator = input.onlyUnknown || !hasPublicScope;
 
     if (requiresModerator && !context.user?.admin && !context.user?.mod) {
-      console.error(
-        `User requested reviewList without mod: ${context.user?.id}`,
-      );
+      logWarn("User requested review list without moderator permissions", {
+        extra: {
+          userId: context.user?.id,
+        },
+      });
       throw errors.BAD_REQUEST({
         message: "Must be a moderator to list all reviews.",
       });
