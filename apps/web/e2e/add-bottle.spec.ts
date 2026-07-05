@@ -443,6 +443,38 @@ test.describe("add bottle flow", () => {
     await expectNoHorizontalOverflow(page);
   });
 
+  test("redirects to login when a scan hits an expired session", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "photo-unauthorized-expired"),
+    });
+
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+
+    await expect(page).toHaveURL(/\/login\?redirectTo=%2FaddBottle$/);
+    await expect(page.getByText("We couldn't read that photo")).toBeHidden();
+  });
+
+  test("keeps local scan errors when a 401 is not an expired session", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "photo-unauthorized-valid"),
+    });
+
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+
+    await expect(page).toHaveURL(/\/addBottle$/);
+    await expect(
+      page.getByText("We couldn't read that photo", { exact: true }),
+    ).toBeVisible();
+  });
+
   test("creates a bottle from a scan with explicit bottle image approval", async ({
     context,
     page,
