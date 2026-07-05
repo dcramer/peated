@@ -79,6 +79,8 @@ web server is already running with the API pointed at a compatible test target.
   costs such as Next dev route compilation.
 - Mock external/API boundaries for layout and loading tests; use real services
   only when the behavior under test requires them.
+- Do not mock or suppress logging. Logs should remain visible to test output;
+  assert user-visible behavior or state changes instead of logger calls.
 - Keep Playwright output under `apps/web/.playwright`; it is ignored by git.
 - When a Playwright failure is not obvious from the terminal, run
   `pnpm test:e2e:report` and inspect the retained trace.

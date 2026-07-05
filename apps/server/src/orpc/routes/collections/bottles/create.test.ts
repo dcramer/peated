@@ -302,9 +302,6 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
     fixtures,
     defaults,
   }) => {
-    const consoleError = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
     const bottle = await fixtures.Bottle();
     const pendingUpload = await createPendingImageUpload({
       file: await fixtures.SampleSquareImage(),
@@ -317,39 +314,34 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
       .set({ imageUrl: "/uploads/pending-uploads/missing-source.webp" })
       .where(eq(pendingUploads.id, pendingUpload.id));
 
-    try {
-      const err = await waitError(() =>
-        routerClient.collections.bottles.create(
-          {
-            user: "me",
-            collection: "library",
-            bottle: bottle.id,
-            pendingImageId: pendingUpload.id,
-          },
-          { context: { user: defaults.user } },
+    const err = await waitError(() =>
+      routerClient.collections.bottles.create(
+        {
+          user: "me",
+          collection: "library",
+          bottle: bottle.id,
+          pendingImageId: pendingUpload.id,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(err).toMatchObject({ code: "ENOENT" });
+
+    const rows = await db
+      .select()
+      .from(collectionBottles)
+      .where(eq(collectionBottles.bottleId, bottle.id));
+    expect(rows).toHaveLength(0);
+
+    const libraryCollection = await db.query.collections.findFirst({
+      where: (collections, { and, eq }) =>
+        and(
+          eq(collections.createdById, defaults.user.id),
+          eq(collections.name, "Library"),
         ),
-      );
-
-      expect(err).toMatchObject({ code: "ENOENT" });
-      expect(consoleError).toHaveBeenCalled();
-
-      const rows = await db
-        .select()
-        .from(collectionBottles)
-        .where(eq(collectionBottles.bottleId, bottle.id));
-      expect(rows).toHaveLength(0);
-
-      const libraryCollection = await db.query.collections.findFirst({
-        where: (collections, { and, eq }) =>
-          and(
-            eq(collections.createdById, defaults.user.id),
-            eq(collections.name, "Library"),
-          ),
-      });
-      expect(libraryCollection?.totalBottles).toBe(0);
-    } finally {
-      consoleError.mockRestore();
-    }
+    });
+    expect(libraryCollection?.totalBottles).toBe(0);
   });
 
   test("uses legacy non-library collection for default alias", async ({
