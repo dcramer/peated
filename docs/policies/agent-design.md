@@ -22,6 +22,11 @@
 - Prompts must keep stable policy separate from dynamic context.
 - Improve retrieval, candidates, and source context before expanding prompts.
 - Use production misses as eval fixtures only when reusable.
+- When improving behavior from an eval or production miss, prove the fix with a
+  separate regression case that differs from the motivating fixture in the
+  relevant concrete values, such as a different ABV/proof pair, cask finish,
+  age statement, brand, or release marker. The production fixture preserves the
+  miss; the implementation test proves the generalized rule.
 - Track accepted, rejected, corrected, ignored, false-positive, and false-negative outcomes.
 - Prefer thresholded auto-apply plus sampling over blocking review.
 - Add multiple agents only for distinct contracts, tools, trust boundaries, or measured improvement.

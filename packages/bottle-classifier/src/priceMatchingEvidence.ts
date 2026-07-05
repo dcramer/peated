@@ -420,6 +420,7 @@ function attributeMatchesText(
   attribute: MatchAttribute,
   expectedValue: string,
   text: string,
+  options: { usProofEligible?: boolean } = {},
 ): boolean {
   const normalizedText = normalizeComparableText(text);
   if (!normalizedText) {
@@ -429,7 +430,8 @@ function attributeMatchesText(
   switch (attribute) {
     case "abv":
       return (
-        getAbvSupportLevel(normalizedText, Number(expectedValue)) !== "none"
+        getAbvSupportLevel(normalizedText, Number(expectedValue), options) !==
+        "none"
       );
     case "caskStrength":
       return /\b(cask strength|barrel strength|barrel proof|full proof|natural strength|original strength)\b/i.test(
@@ -755,6 +757,11 @@ function evaluateSearchEvidenceChecks({
     return checks;
   }
 
+  const usProofEligible = checks.some(
+    (check) =>
+      check.attribute === "category" && check.expectedValue === "bourbon",
+  );
+
   return checks.map((check) => {
     const matchedSourceTiers = new Set<SourceTier>();
     const matchedSourceUrls = new Set<string>();
@@ -762,7 +769,11 @@ function evaluateSearchEvidenceChecks({
     for (const evidence of searchEvidence) {
       for (const result of evidence.results) {
         const text = getSearchResultText(evidence, result);
-        if (!attributeMatchesText(check.attribute, check.expectedValue, text)) {
+        if (
+          !attributeMatchesText(check.attribute, check.expectedValue, text, {
+            usProofEligible,
+          })
+        ) {
           continue;
         }
 

@@ -735,6 +735,346 @@ describe("priceMatchingAutomation", () => {
     });
   });
 
+  test("validates auto-create ABV evidence from exact US proof", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "create_new",
+      modelConfidence: 95,
+      price: {
+        bottleId: null,
+        name: "Example Distillery 12-year-old Single Barrel Bourbon",
+        url: "https://shop.example/example-single-barrel-bourbon",
+      },
+      suggestedBottleId: null,
+      extractedLabel: buildExtractedLabel({
+        brand: "Example Distillery",
+        expression: "Single Barrel",
+        distillery: ["Example Distillery"],
+        category: "bourbon",
+        stated_age: 12,
+        abv: 50,
+        cask_type: null,
+        single_cask: true,
+      }),
+      proposedBottle: {
+        name: "12-year-old Single Barrel Bourbon",
+        series: null,
+        category: "bourbon",
+        edition: null,
+        statedAge: 12,
+        caskStrength: null,
+        singleCask: true,
+        abv: 50,
+        vintageYear: null,
+        releaseYear: null,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+        brand: {
+          id: null,
+          name: "Example Distillery",
+        },
+        distillers: [],
+        bottler: null,
+      },
+      searchEvidence: [
+        {
+          provider: "firecrawl",
+          query:
+            "Example Distillery 12 Year Old Single Barrel Bourbon 100 proof",
+          summary:
+            "The producer confirms Example Distillery 12-Year-Old Single Barrel Bourbon. Proof: 100 Proof. Age: 12 Years Old.",
+          results: [
+            {
+              title: "Example Distillery 12-Year-Old Single Barrel Bourbon",
+              url: "https://www.exampledistillery.com/single-barrel-bourbon",
+              domain: "exampledistillery.com",
+              description:
+                "Example Distillery 12-Year-Old Single Barrel Bourbon. Proof: 100 Proof. Age: 12 Years Old.",
+              extraSnippets: [],
+            },
+          ],
+        },
+      ],
+      candidateBottles: [
+        buildCandidate({
+          bottleId: 16142,
+          fullName:
+            "Example Distillery 12-year-old Single Barrel Bourbon Select",
+          bottleFullName:
+            "Example Distillery 12-year-old Single Barrel Bourbon Select",
+          brand: "Example Distillery",
+          distillery: [],
+          category: "bourbon",
+          statedAge: 12,
+          singleCask: true,
+          abv: null,
+          caskType: null,
+          source: ["brand", "text"],
+        }),
+      ],
+      webEvidenceJudgment: "supportive",
+    });
+
+    expect(assessment.automationEligible).toBe(true);
+    expect(assessment.automationBlockers).toEqual([]);
+    expect(
+      assessment.webEvidenceChecks.find((check) => check.attribute === "abv"),
+    ).toMatchObject({
+      validated: true,
+      matchedSourceTiers: expect.arrayContaining(["external"]),
+    });
+  });
+
+  test("does not convert numeric proof from bourbon cask context", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "create_new",
+      modelConfidence: 95,
+      price: {
+        bottleId: null,
+        name: "Example Distillery 10 Year",
+        url: "https://shop.example/example-10",
+      },
+      suggestedBottleId: null,
+      extractedLabel: buildExtractedLabel({
+        abv: 35,
+        cask_type: null,
+      }),
+      proposedBottle: {
+        name: "10-year-old",
+        series: null,
+        category: "single_malt",
+        edition: null,
+        statedAge: 10,
+        caskStrength: null,
+        singleCask: null,
+        abv: 35,
+        vintageYear: null,
+        releaseYear: null,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+        brand: {
+          id: null,
+          name: "Example Distillery",
+        },
+        distillers: [
+          {
+            id: null,
+            name: "Example Distillery",
+          },
+        ],
+        bottler: null,
+      },
+      searchEvidence: [
+        {
+          provider: "openai",
+          query: "Example Distillery 10 Year 70 proof",
+          summary:
+            "The official page describes Example Distillery 10 Year as a single malt finished in bourbon whiskey barrels at 70 proof.",
+          results: [
+            {
+              title: "Example Distillery 10 Year",
+              url: "https://www.exampledistillery.com/10-year",
+              domain: "exampledistillery.com",
+              description: "Example Distillery 10 Year is listed at 70 proof.",
+              extraSnippets: ["Finished in bourbon whiskey barrels."],
+            },
+          ],
+        },
+      ],
+      candidateBottles: [
+        buildCandidate({
+          bottleId: 9,
+          fullName: "Example Distillery 10 Year",
+          abv: null,
+          caskType: null,
+          score: 0.87,
+          source: ["vector"],
+        }),
+      ],
+      webEvidenceJudgment: "supportive",
+    });
+
+    expect(assessment.automationEligible).toBe(false);
+    expect(
+      assessment.webEvidenceChecks.find((check) => check.attribute === "abv"),
+    ).toMatchObject({
+      validated: false,
+    });
+  });
+
+  test("does not convert numeric proof from Canadian rye wording", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "create_new",
+      modelConfidence: 95,
+      price: {
+        bottleId: null,
+        name: "Example Canadian Rye 10 Year",
+        url: "https://shop.example/canadian-rye-10",
+      },
+      suggestedBottleId: null,
+      extractedLabel: buildExtractedLabel({
+        brand: "Example Canadian",
+        expression: "Rye",
+        distillery: ["Example Canadian"],
+        category: "rye",
+        stated_age: 10,
+        abv: 35,
+        cask_type: null,
+      }),
+      proposedBottle: {
+        name: "Rye 10-year-old",
+        series: null,
+        category: "rye",
+        edition: null,
+        statedAge: 10,
+        caskStrength: null,
+        singleCask: null,
+        abv: 35,
+        vintageYear: null,
+        releaseYear: null,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+        brand: {
+          id: null,
+          name: "Example Canadian",
+        },
+        distillers: [
+          {
+            id: null,
+            name: "Example Canadian",
+          },
+        ],
+        bottler: null,
+      },
+      searchEvidence: [
+        {
+          provider: "openai",
+          query: "Example Canadian Rye 10 Year 70 proof",
+          summary:
+            "The producer describes Example Canadian Rye 10 Year as a Canadian rye whisky at 70 proof.",
+          results: [
+            {
+              title: "Example Canadian Rye 10 Year",
+              url: "https://www.examplecanadian.com/rye-10",
+              domain: "examplecanadian.com",
+              description:
+                "Example Canadian Rye 10 Year is a Canadian rye whisky at 70 proof.",
+              extraSnippets: [],
+            },
+          ],
+        },
+      ],
+      candidateBottles: [
+        buildCandidate({
+          bottleId: 9,
+          fullName: "Example Canadian Rye 10 Year",
+          brand: "Example Canadian",
+          distillery: [],
+          category: "rye",
+          statedAge: 10,
+          abv: null,
+          caskType: null,
+          score: 0.87,
+          source: ["vector"],
+        }),
+      ],
+      webEvidenceJudgment: "supportive",
+    });
+
+    expect(assessment.automationEligible).toBe(false);
+    expect(
+      assessment.webEvidenceChecks.find((check) => check.attribute === "abv"),
+    ).toMatchObject({
+      validated: false,
+    });
+  });
+
+  test("does not infer numeric ABV from generic proof wording", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "create_new",
+      modelConfidence: 95,
+      price: {
+        bottleId: null,
+        name: "Example Distillery Barrel Proof 10 Year",
+        url: "https://shop.example/barrel-proof",
+      },
+      suggestedBottleId: null,
+      extractedLabel: buildExtractedLabel({
+        abv: 45,
+        cask_strength: true,
+        cask_type: null,
+      }),
+      proposedBottle: {
+        name: "Barrel Proof",
+        series: null,
+        category: "single_malt",
+        edition: null,
+        statedAge: 10,
+        caskStrength: true,
+        singleCask: null,
+        abv: 45,
+        vintageYear: null,
+        releaseYear: null,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+        brand: {
+          id: null,
+          name: "Example Distillery",
+        },
+        distillers: [
+          {
+            id: null,
+            name: "Example Distillery",
+          },
+        ],
+        bottler: null,
+      },
+      searchEvidence: [
+        {
+          provider: "openai",
+          query: "Example Distillery Barrel Proof",
+          summary:
+            "The official page describes Example Distillery Barrel Proof as a barrel proof 10 year release.",
+          results: [
+            {
+              title: "Example Distillery Barrel Proof",
+              url: "https://www.exampledistillery.com/barrel-proof",
+              domain: "exampledistillery.com",
+              description:
+                "Example Distillery Barrel Proof is a barrel proof 10 year release.",
+              extraSnippets: [],
+            },
+          ],
+        },
+      ],
+      candidateBottles: [
+        buildCandidate({
+          bottleId: 9,
+          fullName: "Example Distillery 10 Year",
+          abv: null,
+          caskStrength: null,
+          caskType: null,
+          score: 0.87,
+          source: ["vector"],
+        }),
+      ],
+      webEvidenceJudgment: "supportive",
+    });
+
+    expect(assessment.automationEligible).toBe(false);
+    expect(assessment.automationBlockers).toContain(
+      "supportive external web evidence did not validate the differentiating bottle traits",
+    );
+    expect(
+      assessment.webEvidenceChecks.find((check) => check.attribute === "abv"),
+    ).toMatchObject({
+      validated: false,
+    });
+  });
+
   test("treats agent-supported web evidence as support when it validates an omitted canonical trait", () => {
     const supported = hasSupportiveWebEvidenceForExistingMatch({
       priceUrl: "https://shop.example/wild-turkey-rare-breed-rye",
