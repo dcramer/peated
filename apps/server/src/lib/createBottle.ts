@@ -369,12 +369,19 @@ export async function createBottleInTransaction(
     brandId: brand.id,
     bottlerId: bottler?.id || null,
     seriesId,
-    createdById: user.id,
     createdByActorId: actorId,
     fullName,
   };
 
-  const alias = await upsertBottleAlias(tx, bottleInsertData.fullName);
+  const alias = await upsertBottleAlias(
+    tx,
+    bottleInsertData.fullName,
+    null,
+    null,
+    {
+      assignedByActorId: actorId,
+    },
+  );
   if (alias.bottleId) {
     throw new BottleAlreadyExistsError(alias.bottleId);
   }
@@ -389,7 +396,6 @@ export async function createBottleInTransaction(
     .set({
       bottleId: bottle.id,
       assignmentSource: "canonical",
-      assignedById: user.id,
       assignedByActorId: actorId,
     })
     .where(
@@ -419,7 +425,6 @@ export async function createBottleInTransaction(
       objectType: "bottle",
       objectId: bottle.id,
       createdAt: bottle.createdAt,
-      createdById: user.id,
       actorId,
       displayName: bottle.fullName,
       type: "add",

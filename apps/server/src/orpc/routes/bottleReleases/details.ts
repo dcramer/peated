@@ -13,7 +13,7 @@ export default procedure
     path: "/bottle-releases/{release}",
     summary: "Get bottle bottling details",
     description:
-      "Retrieve detailed information about a specific bottling including bottle and creator information",
+      "Retrieve detailed information about a specific bottling including bottle information",
     spec: (spec) => ({
       ...spec,
       operationId: "getBottleRelease",
@@ -27,7 +27,6 @@ export default procedure
       where: eq(bottleReleases.id, input.release),
       with: {
         bottle: true,
-        createdBy: true,
       },
     });
 

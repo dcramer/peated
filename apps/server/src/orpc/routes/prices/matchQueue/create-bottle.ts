@@ -70,6 +70,7 @@ export default procedure
         input: input.bottle,
         releaseInput: input.release,
         user: context.user,
+        actorType: "user",
       });
 
       return {

@@ -67,7 +67,6 @@ import {
   recordIncomingBottleDecisionInTransaction,
   shouldRecordIncomingBottleDecision,
   type IncomingBottleDecisionActor,
-  type IncomingBottleDecisionActorType,
   type IncomingBottleDecisionType,
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { logError } from "@peated/server/lib/log";
@@ -117,6 +116,7 @@ type StorePriceMatchDecision = z.infer<typeof StorePriceMatchDecisionSchema>;
 type StorePriceMatchProposalForReview = StorePriceMatchProposal & {
   price: StorePrice;
 };
+type IncomingBottleDecisionActorType = IncomingBottleDecisionActor["type"];
 
 function withStoreCaskBottleDefaults(
   proposedBottle: BottleClassificationDecision["proposedBottle"],
@@ -1239,7 +1239,6 @@ async function applyBottleRepairDraftInTransaction(
     null,
     {
       assignmentSource: "canonical",
-      assignedById: user.id,
       assignedByActorId: actorId,
     },
   );
@@ -1298,7 +1297,6 @@ async function applyBottleRepairDraftInTransaction(
         release.id,
         {
           assignmentSource: "canonical",
-          assignedById: user.id,
           assignedByActorId: actorId,
         },
       );
@@ -1355,7 +1353,6 @@ async function applyBottleRepairDraftInTransaction(
   await tx.insert(changes).values({
     objectType: "bottle",
     objectId: updatedBottle.id,
-    createdById: user.id,
     actorId,
     displayName: updatedBottle.fullName,
     type: "update",
@@ -1841,7 +1838,7 @@ export async function createBottleFromStorePriceMatchProposal({
   releaseInput,
   user,
   creationSource = "price_match_review",
-  actorType = "user",
+  actorType,
   expectedProcessingToken,
 }: {
   proposalId: number;
@@ -1849,7 +1846,7 @@ export async function createBottleFromStorePriceMatchProposal({
   releaseInput?: z.infer<typeof BottleReleaseInputSchema>;
   user: User;
   creationSource?: CatalogVerificationCreationSource;
-  actorType?: IncomingBottleDecisionActorType;
+  actorType: IncomingBottleDecisionActorType;
   expectedProcessingToken?: string;
 }) {
   const result = await db.transaction(async (tx) =>
@@ -2399,7 +2396,6 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     backfillNames: [proposal.price.name],
     volume: proposal.price.volume,
     assignmentSource: "source_approved",
-    assignedById: reviewedById,
     assignedByActorId: actor.id,
   });
 
@@ -2464,14 +2460,14 @@ export async function applyApprovedStorePriceMatchInTransaction(
     bottleId,
     releaseId,
     reviewedById,
-    actorType = "user",
+    actorType,
     expectedProcessingToken,
   }: {
     proposalId: number;
     bottleId: number;
     releaseId?: number | null;
     reviewedById: number;
-    actorType?: IncomingBottleDecisionActorType;
+    actorType: IncomingBottleDecisionActorType;
     expectedProcessingToken?: string;
   },
 ) {
@@ -2502,14 +2498,14 @@ export async function applyApprovedStorePriceMatch({
   bottleId,
   releaseId,
   reviewedById,
-  actorType = "user",
+  actorType,
   expectedProcessingToken,
 }: {
   proposalId: number;
   bottleId: number;
   releaseId?: number | null;
   reviewedById: number;
-  actorType?: IncomingBottleDecisionActorType;
+  actorType: IncomingBottleDecisionActorType;
   expectedProcessingToken?: string;
 }) {
   const aliasResult = await db.transaction(async (tx) =>

@@ -4,18 +4,8 @@ import { procedure } from "@peated/server/orpc";
 import { EntitySchema, detailsResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
-import { UserSerializer } from "@peated/server/serializers/user";
 import { eq, getTableColumns } from "drizzle-orm";
 import { z } from "zod";
-
-const OutputSchema = EntitySchema.extend({
-  createdBy: z
-    .object({
-      id: z.number(),
-      username: z.string(),
-    })
-    .nullable(),
-});
 
 export default procedure
   .route({
@@ -23,12 +13,12 @@ export default procedure
     path: "/entities/{entity}",
     summary: "Get entity details",
     description:
-      "Retrieve detailed information about a specific entity (brand, distillery, or bottler) including creator information",
+      "Retrieve detailed information about a specific entity (brand, distillery, or bottler)",
     operationId: "getEntity",
   })
   .input(z.object({ entity: z.coerce.number() }))
   // TODO(response-envelope): wrap in { data } by updating detailsResponse() at cutover
-  .output(detailsResponse(OutputSchema))
+  .output(detailsResponse(EntitySchema))
   .handler(async function ({ input, context, errors }) {
     const { entity: entityId } = input;
 
@@ -52,14 +42,5 @@ export default procedure
       }
     }
 
-    const createdBy = await db.query.users.findFirst({
-      where: (table, { eq }) => eq(table.id, entity.createdById),
-    });
-
-    return {
-      ...(await serialize(EntitySerializer, entity, context.user)),
-      createdBy: createdBy
-        ? await serialize(UserSerializer, createdBy, context.user)
-        : null,
-    };
+    return await serialize(EntitySerializer, entity, context.user);
   });

@@ -250,7 +250,6 @@ export default procedure
         objectType: "entity",
         objectId: newEntity.id,
         displayName: newEntity.name,
-        createdById: user.id,
         actorId,
         type: "update",
         data: {

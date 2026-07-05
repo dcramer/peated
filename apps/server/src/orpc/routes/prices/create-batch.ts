@@ -109,7 +109,6 @@ export default procedure
                 volume: sp.volume,
                 assignmentSource: "source_approved",
                 assignedByActorId: actor.id,
-                assignedById: context.user.id,
               });
             }
 

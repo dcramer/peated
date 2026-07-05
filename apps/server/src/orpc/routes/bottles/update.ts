@@ -71,6 +71,7 @@ export default procedure
         message: "Bottle not found.",
       });
     }
+    const userActorId = (await getUserActorForDatabase(db, user)).id;
 
     const normalizedInput = BottleInputSchema.parse({
       name: bottle.name,
@@ -144,7 +145,7 @@ export default procedure
 
     if (
       input.image === null &&
-      (user?.admin || user?.mod || user?.id === bottle.createdById)
+      (user?.admin || user?.mod || userActorId === bottle.createdByActorId)
     ) {
       bottleData.imageUrl = null;
     }
@@ -155,7 +156,7 @@ export default procedure
     let seriesCreated = false;
 
     const newBottle = await db.transaction(async (tx) => {
-      const actorId = (await getUserActorForDatabase(tx, user)).id;
+      const actorId = userActorId;
       let brand: Entity | null = null;
       if (bottleData.brand) {
         if (
@@ -369,7 +370,6 @@ export default procedure
             release.id,
             {
               assignmentSource: "canonical",
-              assignedById: user.id,
               assignedByActorId: actorId,
             },
           );
@@ -403,7 +403,6 @@ export default procedure
           null,
           {
             assignmentSource: "canonical",
-            assignedById: user.id,
             assignedByActorId: actorId,
           },
         );
@@ -460,7 +459,6 @@ export default procedure
       await tx.insert(changes).values({
         objectType: "bottle",
         objectId: newBottle.id,
-        createdById: user.id,
         actorId,
         displayName: newBottle.fullName,
         type: "update",

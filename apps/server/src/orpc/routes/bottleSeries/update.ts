@@ -122,7 +122,6 @@ export default procedure
               ? updatedSeries.fullName
               : undefined,
         },
-        createdById: user.id,
         actorId,
       });
 

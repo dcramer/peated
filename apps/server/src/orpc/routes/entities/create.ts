@@ -41,11 +41,10 @@ export default procedure
   .input(EntityInputSchema)
   .output(EntitySchema)
   .handler(async function ({ input, context, errors }) {
-    const data: NewEntity = {
+    const data: Omit<NewEntity, "createdByActorId"> = {
       ...input,
       name: normalizeEntityName(input.name),
       type: input.type || [],
-      createdById: context.user.id,
     };
 
     if (input.country) {
@@ -85,12 +84,15 @@ export default procedure
     const user = context.user;
     const result = await db.transaction(async (tx) => {
       const actorId = (await getUserActorForDatabase(tx, user)).id;
+      const entityData: NewEntity = {
+        ...data,
+        createdByActorId: actorId,
+      };
       const [entity] = await tx
         .insert(entities)
         .values({
-          ...data,
-          createdByActorId: actorId,
-          searchVector: buildEntitySearchVector(data),
+          ...entityData,
+          searchVector: buildEntitySearchVector(entityData),
         })
         .onConflictDoNothing()
         .returning();
@@ -141,7 +143,6 @@ export default procedure
         displayName: entity.name,
         type: "add",
         createdAt: entity.createdAt,
-        createdById: user.id,
         actorId,
         data: {
           ...data,

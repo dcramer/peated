@@ -40,6 +40,7 @@ describe("GET /bottles", () => {
       bottleId: bottle.id,
       releaseId: release.id,
       name: release.fullName,
+      assignedByActorId: release.createdByActorId,
     });
 
     const { results } = await routerClient.bottles.list({

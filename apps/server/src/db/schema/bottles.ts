@@ -73,12 +73,11 @@ export const bottleSeries = pgTable(
       .notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
-    createdById: bigint("created_by_id", { mode: "number" })
-      .references(() => users.id)
-      .notNull(),
     createdByActorId: bigint("created_by_actor_id", {
       mode: "number",
-    }).references(() => actors.id, { onDelete: "set null" }),
+    })
+      .references(() => actors.id)
+      .notNull(),
   },
   (table) => [
     uniqueIndex("bottle_series_full_name_key").using(
@@ -87,7 +86,6 @@ export const bottleSeries = pgTable(
     ),
     index("bottle_series_search_idx").using("gin", table.searchVector),
     index("bottle_series_brand_idx").on(table.brandId),
-    index("bottle_series_created_by_idx").on(table.createdById),
     index("bottle_series_created_by_actor_idx").on(table.createdByActorId),
   ],
 );
@@ -211,18 +209,16 @@ export const bottles = pgTable(
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
-    createdById: bigint("created_by_id", { mode: "number" })
-      .references(() => users.id)
-      .notNull(),
     createdByActorId: bigint("created_by_actor_id", {
       mode: "number",
-    }).references(() => actors.id, { onDelete: "set null" }),
+    })
+      .references(() => actors.id)
+      .notNull(),
   },
   (table) => [
     index("bottle_search_idx").using("gin", table.searchVector),
     index("bottle_brand_idx").on(table.brandId),
     index("bottle_bottler_idx").on(table.bottlerId),
-    index("bottle_created_by_idx").on(table.createdById),
     index("bottle_created_by_actor_idx").on(table.createdByActorId),
     index("bottle_category_idx").on(table.category),
     index("bottle_flavor_profile_idx").on(table.flavorProfile),
@@ -252,10 +248,6 @@ export const bottlesRelations = relations(bottles, ({ one, many }) => ({
   bottlesToDistillers: many(bottlesToDistillers),
   releases: many(bottleReleases),
   observations: many(bottleObservations),
-  createdBy: one(users, {
-    fields: [bottles.createdById],
-    references: [users.id],
-  }),
   createdByActor: one(actors, {
     fields: [bottles.createdByActorId],
     references: [actors.id],
@@ -271,10 +263,6 @@ export const bottleSeriesRelations = relations(
     }),
     bottles: many(bottles, {
       relationName: "series",
-    }),
-    createdBy: one(users, {
-      fields: [bottleSeries.createdById],
-      references: [users.id],
     }),
     createdByActor: one(actors, {
       fields: [bottleSeries.createdByActorId],
@@ -359,16 +347,14 @@ export const bottleReleases = pgTable(
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
-    createdById: bigint("created_by_id", { mode: "number" })
-      .references(() => users.id)
-      .notNull(),
     createdByActorId: bigint("created_by_actor_id", {
       mode: "number",
-    }).references(() => actors.id, { onDelete: "set null" }),
+    })
+      .references(() => actors.id)
+      .notNull(),
   },
   (table) => [
     index("bottle_release_bottle_idx").on(table.bottleId),
-    index("bottle_release_created_by_idx").on(table.createdById),
     index("bottle_release_created_by_actor_idx").on(table.createdByActorId),
     uniqueIndex("bottle_release_full_name_idx").on(table.fullName),
     check(
@@ -386,10 +372,6 @@ export const bottleReleasesRelations = relations(
       references: [bottles.id],
     }),
     observations: many(bottleObservations),
-    createdBy: one(users, {
-      fields: [bottleReleases.createdById],
-      references: [users.id],
-    }),
     createdByActor: one(actors, {
       fields: [bottleReleases.createdByActorId],
       references: [actors.id],
@@ -540,12 +522,11 @@ export const bottleAliases = pgTable(
     assignmentSource: bottleAliasAssignmentSourceEnum("assignment_source")
       .default("legacy")
       .notNull(),
-    assignedById: bigint("assigned_by_id", { mode: "number" }).references(
-      () => users.id,
-    ),
     assignedByActorId: bigint("assigned_by_actor_id", {
       mode: "number",
-    }).references(() => actors.id, { onDelete: "set null" }),
+    })
+      .references(() => actors.id)
+      .notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
@@ -567,10 +548,6 @@ export const bottleAliasesRelations = relations(bottleAliases, ({ one }) => ({
   release: one(bottleReleases, {
     fields: [bottleAliases.releaseId],
     references: [bottleReleases.id],
-  }),
-  assignedBy: one(users, {
-    fields: [bottleAliases.assignedById],
-    references: [users.id],
   }),
   assignedByActor: one(actors, {
     fields: [bottleAliases.assignedByActorId],

@@ -153,7 +153,6 @@ export async function createBottleReleaseInTransaction(
       description: input.description,
       imageUrl: input.imageUrl,
       tastingNotes: input.tastingNotes,
-      createdById: user.id,
       createdByActorId: actorId,
     })
     .returning();
@@ -162,7 +161,6 @@ export async function createBottleReleaseInTransaction(
   for (const aliasName of getCanonicalReleaseAliasNames({ fullName })) {
     const alias = await upsertBottleAlias(tx, aliasName, bottleId, release.id, {
       assignmentSource: "canonical",
-      assignedById: user.id,
       assignedByActorId: actorId,
     });
     if (
@@ -182,7 +180,6 @@ export async function createBottleReleaseInTransaction(
     tx.insert(changes).values({
       objectType: "bottle_release",
       objectId: release.id,
-      createdById: user.id,
       actorId,
       createdAt: release.createdAt,
       displayName: release.fullName,

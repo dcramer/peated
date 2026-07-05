@@ -11,11 +11,9 @@ import DefinitionList from "./definitionList";
 import Heading from "./heading";
 import Markdown from "./markdown";
 import SimpleRatingStats from "./simpleRatingStats";
-import TimeSince from "./timeSince";
-import UserAvatar from "./userAvatar";
 
 export default function BottleOverview({
-  bottle: { createdBy, ...bottle },
+  bottle,
 }: {
   bottle: Outputs["bottles"]["details"];
 }) {
@@ -186,27 +184,6 @@ export default function BottleOverview({
               <DefinitionList.Details>
                 {formatBottlingSummary(bottle.numReleases)}
               </DefinitionList.Details>
-              <>
-                <DefinitionList.Term>Added By</DefinitionList.Term>
-                <DefinitionList.Details>
-                  {createdBy ? (
-                    <>
-                      <Link
-                        href={`/users/${createdBy.username}`}
-                        className="flex items-center gap-x-2 truncate hover:underline"
-                      >
-                        <UserAvatar size={16} user={createdBy} />
-                        {createdBy.username}
-                      </Link>
-                      {bottle.createdAt && (
-                        <TimeSince date={bottle.createdAt} />
-                      )}
-                    </>
-                  ) : (
-                    <em>unknown</em>
-                  )}
-                </DefinitionList.Details>
-              </>
             </DefinitionList>
           </div>
           <div className="hidden w-64 lg:block">

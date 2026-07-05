@@ -97,7 +97,6 @@ export default async function createMissingBottles() {
                 backfillNames: [review.name],
                 externalSiteId: review.externalSiteId,
                 assignmentSource: "classifier_approved",
-                assignedById: systemUser.id,
                 assignedByActorId: systemActor.id,
               })
             : await assignBottleAliasInTransaction(tx, {
@@ -106,6 +105,7 @@ export default async function createMissingBottles() {
                 name: aliasKey,
                 backfillNames: [review.name],
                 externalSiteId: review.externalSiteId,
+                assignedByActorId: systemActor.id,
               });
 
         if (

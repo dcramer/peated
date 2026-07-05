@@ -17,7 +17,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 type DecisionLogItem =
   Outputs["admin"]["incomingBottleDecisions"]["results"][number];
 type SourceKind = DecisionLogItem["sourceKind"];
-type ActorType = DecisionLogItem["actorType"];
+type ActorType = DecisionLogItem["actor"]["type"];
 
 const SOURCE_OPTIONS: Array<{ id: SourceKind | null; label: string }> = [
   { id: null, label: "All Sources" },
@@ -69,15 +69,11 @@ function getSourceLabel(item: DecisionLogItem): string {
 }
 
 function getActorLabel(item: DecisionLogItem): string {
-  if (item.actorType === "system") {
-    return "System";
-  }
-
-  return item.actorUser ? item.actorUser.username : "User";
+  return item.actor.displayName;
 }
 
 function getDecisionTone(item: DecisionLogItem): string {
-  if (item.actorType === "system") {
+  if (item.actor.type === "system") {
     return "border-sky-800 bg-sky-950/50 text-sky-200";
   }
 
@@ -144,8 +140,7 @@ export default function Page() {
   const searchParams = useSearchParams();
   const currentSourceKind =
     (searchParams.get("sourceKind") as SourceKind | null) ?? null;
-  const currentActorType =
-    (searchParams.get("actorType") as ActorType | null) ?? null;
+  const currentActor = (searchParams.get("actor") as ActorType | null) ?? null;
   const queryParams = useApiQueryParams({
     numericFields: ["cursor", "limit"],
   });
@@ -196,11 +191,11 @@ export default function Page() {
             <Button
               key={option.label}
               href={buildDecisionHref(pathname, searchParams, {
-                actorType: option.id,
+                actor: option.id,
                 cursor: null,
               })}
               size="small"
-              active={currentActorType === option.id}
+              active={currentActor === option.id}
             >
               {option.label}
             </Button>

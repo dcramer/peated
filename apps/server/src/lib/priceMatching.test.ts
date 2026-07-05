@@ -538,6 +538,7 @@ describe("priceMatching", () => {
         flavorProfile: null,
       },
       user: reviewer,
+      actorType: "user",
     });
 
     const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
@@ -1168,7 +1169,6 @@ describe("priceMatching", () => {
       sourceId: price.id,
       proposalId: proposal.id,
       decision: "match_existing",
-      actorType: "system",
       bottleId: bottle.id,
       releaseId: null,
       createdBottle: false,
@@ -3854,7 +3854,6 @@ describe("priceMatching", () => {
       sourceId: price.id,
       proposalId: proposal.id,
       decision: "create_bottle",
-      actorType: "system",
       bottleId: proposal.suggestedBottleId,
       releaseId: null,
       createdBottle: true,
@@ -5869,6 +5868,7 @@ describe("priceMatching", () => {
       proposalId: reviewableProposal.id,
       bottleId: bottle.id,
       reviewedById: user.id,
+      actorType: "user",
     });
 
     const updatedReviewableProposal =
@@ -5986,6 +5986,7 @@ describe("priceMatching", () => {
       bottleId: bottle.id,
       releaseId: release.id,
       reviewedById: reviewer.id,
+      actorType: "user",
     });
 
     const observation = await db.query.bottleObservations.findFirst({
@@ -6002,7 +6003,6 @@ describe("priceMatching", () => {
       sourceUrl: price.url,
       externalSiteId: price.externalSiteId,
       rawText: price.name,
-      createdById: reviewer.id,
       parsedIdentity: expect.objectContaining({
         brand: "Observation Brand",
         edition: "Batch 7",
@@ -6035,8 +6035,6 @@ describe("priceMatching", () => {
       sourceId: price.id,
       proposalId: proposal.id,
       decision: "match_existing",
-      actorType: "user",
-      actorUserId: reviewer.id,
       bottleId: bottle.id,
       releaseId: release.id,
       createdBottle: false,

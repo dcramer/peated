@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { changes } from "@peated/server/db/schema";
+import { actors, changes } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { ChangeSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -42,9 +42,26 @@ export default procedure
           throw errors.UNAUTHORIZED();
         }
 
-        where.push(eq(changes.createdById, context.user.id));
+        const [actor] = await db
+          .select({ id: actors.id })
+          .from(actors)
+          .where(
+            and(
+              eq(actors.type, "user"),
+              eq(actors.key, String(context.user.id)),
+            ),
+          )
+          .limit(1);
+        where.push(eq(changes.actorId, actor?.id ?? -1));
       } else {
-        where.push(eq(changes.createdById, rest.user));
+        const [actor] = await db
+          .select({ id: actors.id })
+          .from(actors)
+          .where(
+            and(eq(actors.type, "user"), eq(actors.key, String(rest.user))),
+          )
+          .limit(1);
+        where.push(eq(changes.actorId, actor?.id ?? -1));
       }
     }
 

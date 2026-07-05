@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleReleases, bottles } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -149,12 +150,13 @@ describe("GET /bottles/age-repair-candidates", () => {
   }) => {
     const brand = await fixtures.Entity({ name: "Springbank" });
     const user = await fixtures.User({ mod: true });
+    const actor = await getUserActor(user);
     const falsePositiveBottles = await db
       .insert(bottles)
       .values(
         Array.from({ length: 2000 }, (_, index) => ({
           brandId: brand.id,
-          createdById: user.id,
+          createdByActorId: actor.id,
           fullName: `Springbank 10yo Noise ${index + 1}`,
           name: `10yo Noise ${index + 1}`,
           statedAge: 10,
@@ -171,7 +173,7 @@ describe("GET /bottles/age-repair-candidates", () => {
     await db.insert(bottleReleases).values(
       falsePositiveBottles.map((bottle) => ({
         bottleId: bottle.id,
-        createdById: user.id,
+        createdByActorId: actor.id,
         fullName: `${bottle.fullName} - Batch 1`,
         name: `${bottle.name} - Batch 1`,
         edition: "Batch 1",

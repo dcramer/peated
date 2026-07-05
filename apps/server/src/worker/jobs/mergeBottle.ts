@@ -15,6 +15,7 @@ import {
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
+import { getPeatedSystemActorForDatabase } from "@peated/server/lib/actors";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { formatReleaseName } from "@peated/server/lib/format";
 import { logError, logInfo } from "@peated/server/lib/log";
@@ -53,6 +54,7 @@ export default async function mergeBottle({
   const updatedReleaseIds = new Set<number>();
   const updatedEntityIds = new Set<number>();
   await db.transaction(async (tx) => {
+    const actor = await getPeatedSystemActorForDatabase(tx);
     const [
       sourceBottles,
       sourceCollectionRows,
@@ -286,6 +288,7 @@ export default async function mergeBottle({
         newFullName,
         toBottleId,
         release.id,
+        { assignedByActorId: actor.id },
       );
       if (
         releaseAlias.bottleId !== toBottleId ||

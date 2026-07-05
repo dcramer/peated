@@ -11,6 +11,7 @@ describe("GET /bottles/:bottle", () => {
       bottle: bottle.id,
     });
     expect(data.id).toEqual(bottle.id);
+    expect("createdBy" in data).toBe(false);
   });
 
   test("uses bottle image as display image", async ({ fixtures }) => {

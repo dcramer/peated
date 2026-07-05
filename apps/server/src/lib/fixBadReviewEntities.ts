@@ -91,13 +91,13 @@ export async function fixBadReviewEntities({
           name: review.name,
           assignmentSource: "classifier_approved",
           assignedByActorId: actor.id,
-          assignedById: user.id,
         });
       } else {
         await assignBottleAlias({
           bottleId: targetBottleId,
           releaseId: targetReleaseId,
           name: review.name,
+          assignedByActorId: actor.id,
         });
       }
 
@@ -112,13 +112,13 @@ export async function fixBadReviewEntities({
         name: review.name,
         assignmentSource: "classifier_approved",
         assignedByActorId: actor.id,
-        assignedById: user.id,
       });
     } else {
       await assignBottleAlias({
         bottleId: targetBottleId,
         releaseId: targetReleaseId,
         name: review.name,
+        assignedByActorId: actor.id,
       });
     }
 

@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottles, bottlesToDistillers } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -35,11 +36,12 @@ describe("POST /bottles/:bottle/apply-brand-repair", () => {
       type: ["brand"],
     });
     const mod = await fixtures.User({ mod: true });
+    const modActor = await getUserActor(mod);
     const bottle = await fixtures.Bottle({
       brandId: currentBrand.id,
       name: "12-year-old Single Malt Scotch Whisky",
       totalTastings: 10,
-      createdById: mod.id,
+      createdByActorId: modActor.id,
     });
     await fixtures.BottleAlias({
       bottleId: bottle.id,
@@ -92,10 +94,11 @@ describe("POST /bottles/:bottle/apply-brand-repair", () => {
       type: ["brand"],
     });
     const mod = await fixtures.User({ mod: true });
+    const modActor = await getUserActor(mod);
     const bottle = await fixtures.Bottle({
       brandId: currentBrand.id,
       name: "12-year-old",
-      createdById: mod.id,
+      createdByActorId: modActor.id,
     });
     await fixtures.BottleAlias({
       bottleId: bottle.id,

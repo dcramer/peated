@@ -11,6 +11,7 @@ import {
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq, inArray } from "drizzle-orm";
@@ -36,6 +37,7 @@ describe("POST /bottles/:bottle/apply-age-repair", () => {
   }) => {
     const brand = await fixtures.Entity({ name: "Glenglassaugh" });
     const mod = await fixtures.User({ mod: true });
+    const modActor = await getUserActor(mod);
     const bottle = await fixtures.Bottle({
       brandId: brand.id,
       name: "1978 Rare Cask Release",
@@ -47,7 +49,7 @@ describe("POST /bottles/:bottle/apply-age-repair", () => {
         palate: "Dried fruit",
         finish: "Old leather",
       },
-      createdById: mod.id,
+      createdByActorId: modActor.id,
     });
     const batch1 = await fixtures.BottleRelease({
       bottleId: bottle.id,
@@ -67,6 +69,7 @@ describe("POST /bottles/:bottle/apply-age-repair", () => {
     await db.insert(bottleAliases).values({
       bottleId: bottle.id,
       name: "Glenglassaugh 1978 Rare Cask Release 40-year-old",
+      assignedByActorId: bottle.createdByActorId,
     });
 
     const genericReview = await fixtures.Review({
@@ -272,6 +275,7 @@ describe("POST /bottles/:bottle/apply-age-repair", () => {
   }) => {
     const brand = await fixtures.Entity({ name: "Glenglassaugh" });
     const mod = await fixtures.User({ mod: true });
+    const modActor = await getUserActor(mod);
     const bottle = await fixtures.Bottle({
       brandId: brand.id,
       name: "1978 Rare Cask Release",
@@ -283,7 +287,7 @@ describe("POST /bottles/:bottle/apply-age-repair", () => {
         palate: "Citrus oil",
         finish: "Long oak",
       },
-      createdById: mod.id,
+      createdByActorId: modActor.id,
     });
     await fixtures.BottleRelease({
       bottleId: bottle.id,

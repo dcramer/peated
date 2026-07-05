@@ -12,7 +12,6 @@ import {
 
 import { actors } from "./actors";
 import { objectTypeEnum } from "./enums";
-import { users } from "./users";
 
 export const changeTypeEnum = pgEnum("type", ["add", "update", "delete"]);
 
@@ -29,24 +28,14 @@ export const changes = pgTable(
     actorId: bigint("actor_id", { mode: "number" })
       .references(() => actors.id)
       .notNull(),
-    createdById: bigint("created_by_id", { mode: "number" }).references(
-      () => users.id,
-    ),
   },
-  (table) => [
-    index("change_actor_idx").on(table.actorId),
-    index("change_created_by_idx").on(table.createdById),
-  ],
+  (table) => [index("change_actor_idx").on(table.actorId)],
 );
 
 export const changesRelations = relations(changes, ({ one }) => ({
   actor: one(actors, {
     fields: [changes.actorId],
     references: [actors.id],
-  }),
-  createdBy: one(users, {
-    fields: [changes.createdById],
-    references: [users.id],
   }),
 }));
 

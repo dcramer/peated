@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottles } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -40,11 +41,12 @@ describe("POST /bottles/apply-brand-repair-group", () => {
       type: ["brand"],
     });
     const mod = await fixtures.User({ mod: true });
+    const modActor = await getUserActor(mod);
 
     const reserveBottle = await fixtures.Bottle({
       brandId: currentBrand.id,
       name: "Reserve 9-year-old Triple Aged",
-      createdById: mod.id,
+      createdByActorId: modActor.id,
       totalTastings: 9,
     });
     await fixtures.BottleAlias({
@@ -55,7 +57,7 @@ describe("POST /bottles/apply-brand-repair-group", () => {
     const premiumBottle = await fixtures.Bottle({
       brandId: currentBrand.id,
       name: "Premium",
-      createdById: mod.id,
+      createdByActorId: modActor.id,
       totalTastings: 5,
     });
     await fixtures.BottleAlias({
@@ -66,7 +68,7 @@ describe("POST /bottles/apply-brand-repair-group", () => {
     const mistBottle = await fixtures.Bottle({
       brandId: currentBrand.id,
       name: "Mist Black Diamond",
-      createdById: mod.id,
+      createdByActorId: modActor.id,
       totalTastings: 3,
     });
     await fixtures.BottleAlias({
@@ -77,7 +79,7 @@ describe("POST /bottles/apply-brand-repair-group", () => {
     const survivorBottle = await fixtures.Bottle({
       brandId: currentBrand.id,
       name: "83",
-      createdById: mod.id,
+      createdByActorId: modActor.id,
       totalTastings: 1,
     });
 

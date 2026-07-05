@@ -133,7 +133,6 @@ describe("createMissingBottles", () => {
       bottleId: updatedReview?.bottleId,
       assignmentSource: "classifier_approved",
       assignedByActorId: systemActor.id,
-      assignedById: systemUser.id,
     });
 
     const updatedPrice = await db.query.storePrices.findFirst({
@@ -151,9 +150,7 @@ describe("createMissingBottles", () => {
       sourceKind: "review",
       sourceId: review.id,
       decision: "create_bottle",
-      actorType: "system",
       actorId: systemActor.id,
-      actorUserId: null,
       bottleId: updatedReview?.bottleId,
       releaseId: null,
       createdBottle: true,
