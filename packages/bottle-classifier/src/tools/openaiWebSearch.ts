@@ -8,6 +8,7 @@ import {
   BottleSearchEvidenceSchema,
   type BottleSearchEvidence,
 } from "../classifierTypes";
+import { startToolSpan } from "../observability";
 import { getStableOpenAISettings } from "../openaiModelSettings";
 import {
   BottleWebSearchArgsSchema,
@@ -22,6 +23,8 @@ import {
 const OPENAI_WEB_SEARCH_RESPONSE_INCLUDES: ResponseIncludable[] = [
   "web_search_call.action.sources",
 ];
+const OPENAI_WEB_SEARCH_TOOL_DESCRIPTION =
+  "Search live web evidence for decisive bottle or release traits after local search is insufficient. Keep queries narrow and judge results by source content, independence, specificity, and corroboration.";
 
 export function extractOpenAISearchEvidence(
   query: string,
@@ -163,16 +166,21 @@ export function createOpenAIWebSearchTool({
 }) {
   return tool({
     name: "openai_web_search",
-    description:
-      "Search live web evidence for decisive bottle or release traits after local search is insufficient. Keep queries narrow and judge results by source content, independence, specificity, and corroboration.",
+    description: OPENAI_WEB_SEARCH_TOOL_DESCRIPTION,
     parameters: BottleWebSearchArgsSchema,
     execute: async (args) => {
-      return await runBottleWebEvidenceSearch({
-        client,
-        model,
-        budget,
-        query: args.query,
-        onEvidence,
+      return await startToolSpan({
+        name: "openai_web_search",
+        description: OPENAI_WEB_SEARCH_TOOL_DESCRIPTION,
+        args,
+        callback: async () =>
+          await runBottleWebEvidenceSearch({
+            client,
+            model,
+            budget,
+            query: args.query,
+            onEvidence,
+          }),
       });
     },
   });

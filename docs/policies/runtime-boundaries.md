@@ -23,9 +23,13 @@ TypeScript assumptions.
   durable entity id with a stable domain prefix; when no durable id exists,
   generate a run-scoped UUID instead of using names or other fuzzy identifiers.
 - Tests for SDK-owned scope or context behavior should spy on the real SDK
-  surface, such as scope instances or prototypes, when practical. Avoid
-  whole-module mocks for observability clients such as Sentry because they erase
-  the runtime state the integration is meant to protect.
+  surface, such as exported functions, logger methods, scope instances, or
+  prototypes. Do not whole-module mock observability clients such as Sentry;
+  whole-module mocks erase the runtime state the integration is meant to
+  protect.
+- Observability tests should stay minimal: assert the existence of the span,
+  operation, conversation id, and a few critical safe attributes. Do not snapshot
+  broad telemetry payloads or duplicate provider SDK behavior in unit tests.
 - Require deterministic idempotency or uniqueness for APIs that create durable
   records from retryable contexts.
 - Validate model or agent output before persistence. Model output may propose;

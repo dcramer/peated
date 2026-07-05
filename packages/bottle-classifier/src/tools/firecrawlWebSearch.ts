@@ -1,6 +1,7 @@
 import { tool } from "@openai/agents";
 import { z } from "zod";
 import type { BottleSearchEvidence } from "../classifierTypes";
+import { startToolSpan } from "../observability";
 import {
   BottleWebSearchArgsSchema,
   buildBottleSearchEvidence,
@@ -10,6 +11,8 @@ import {
 
 const FIRECRAWL_API_URL = "https://api.firecrawl.dev";
 const FIRECRAWL_SEARCH_TIMEOUT_MS = 30000;
+const FIRECRAWL_WEB_SEARCH_TOOL_DESCRIPTION =
+  "Search web pages and return readable page excerpts for decisive bottle or release evidence. Use focused queries when local search is insufficient, especially when exact ABV, cask, vintage, or bottle/release scope matters.";
 
 const FirecrawlSearchResultSchema = z
   .object({
@@ -93,25 +96,31 @@ export function createFirecrawlWebSearchTool({
 }) {
   return tool({
     name: "firecrawl_web_search",
-    description:
-      "Search web pages and return readable page excerpts for decisive bottle or release evidence. Use focused queries when local search is insufficient, especially when exact ABV, cask, vintage, or bottle/release scope matters.",
+    description: FIRECRAWL_WEB_SEARCH_TOOL_DESCRIPTION,
     parameters: BottleWebSearchArgsSchema,
     execute: async (args) => {
-      if (!budget.tryConsume()) {
-        return budget.getExhaustedError();
-      }
+      return await startToolSpan({
+        name: "firecrawl_web_search",
+        description: FIRECRAWL_WEB_SEARCH_TOOL_DESCRIPTION,
+        args,
+        callback: async () => {
+          if (!budget.tryConsume()) {
+            return budget.getExhaustedError();
+          }
 
-      const evidence = await runFirecrawlWebSearch({
-        apiKey,
-        apiUrl,
-        query: args.query,
+          const evidence = await runFirecrawlWebSearch({
+            apiKey,
+            apiUrl,
+            query: args.query,
+          });
+
+          if (!("error" in evidence) && evidence.results.length > 0) {
+            onEvidence?.(evidence);
+          }
+
+          return evidence;
+        },
       });
-
-      if (!("error" in evidence) && evidence.results.length > 0) {
-        onEvidence?.(evidence);
-      }
-
-      return evidence;
     },
   });
 }

@@ -27,6 +27,7 @@ import {
   type PhotoIdentificationDiagnosticsSchema,
   type PhotoIdentificationSuggestedNextStepEnum,
 } from "@peated/server/schemas";
+import * as Sentry from "@sentry/node";
 import type { z } from "zod";
 
 type AuthenticatedContext = Context & {
@@ -35,6 +36,15 @@ type AuthenticatedContext = Context & {
 type PhotoIdentificationClassification = Awaited<
   ReturnType<typeof classifyBottleReference>
 >;
+type PhotoIdentificationAttributeValue =
+  | boolean
+  | number
+  | string
+  | string[]
+  | number[];
+type SentrySpanLike = {
+  setAttribute: (key: string, value: PhotoIdentificationAttributeValue) => void;
+};
 
 export const PHOTO_IDENTIFICATION_CREATE_CONFIDENCE_THRESHOLD = 70;
 const PHOTO_IDENTIFICATION_LOG_MESSAGE =
@@ -346,6 +356,15 @@ function getSearchResultDomain({
   }
 }
 
+function setSpanAttributes(
+  span: SentrySpanLike,
+  attrs: Record<string, PhotoIdentificationAttributeValue>,
+) {
+  for (const [key, value] of Object.entries(attrs)) {
+    span.setAttribute(key, value);
+  }
+}
+
 /**
  * Emits one searchable event for each completed photo identification call so
  * production misses can be debugged without reconstructing classifier spans.
@@ -486,48 +505,90 @@ function logPhotoIdentificationFailure({
 /**
  * Runs label extraction and local matching for a pending scan, using the full
  * classifier only when the local pass does not produce a match.
+ *
+ * This is the shared Photo Identification agent span boundary for all callers.
  */
 export async function identifyPendingImage({
   pendingImage,
 }: {
   pendingImage: Awaited<ReturnType<typeof createPendingImageUpload>>;
 }) {
-  return await (async () => {
-    const { extractedIdentity, imageEvidence } =
-      await extractPhotoBottleEvidence({
-        pendingUpload: pendingImage,
-      });
+  const conversationId = `photo_identification:${pendingImage.id}`;
 
-    const classificationInput = {
-      reference: {
-        id: pendingImage.id,
-        name: buildPhotoReferenceName(extractedIdentity),
-        url: null,
-        imageUrl: absoluteUrl(config.API_SERVER, pendingImage.imageUrl),
+  return await Sentry.startSpan(
+    {
+      op: "gen_ai.invoke_agent",
+      name: "invoke_agent Photo Identification",
+      attributes: {
+        "gen_ai.operation.name": "invoke_agent",
+        "gen_ai.agent.name": "Photo Identification",
+        "gen_ai.conversation.id": conversationId,
+        "photo_identification.pending_image_id": pendingImage.id,
+        "photo_identification.source_image_url": absoluteUrl(
+          config.API_SERVER,
+          pendingImage.imageUrl,
+        ),
+        "photo_identification.upload_path": pendingImage.imageUrl,
       },
-      extractedIdentity,
-      imageEvidence,
-    };
-    const localIdentification =
-      await identifyExistingBottleReference(classificationInput);
-    const classification =
-      localIdentification.status === "classified" &&
-      localIdentification.decision.action === "match"
-        ? localIdentification
-        : await classifyBottleReference(classificationInput);
+    },
+    async (span) => {
+      const { extractedIdentity, imageEvidence } =
+        await extractPhotoBottleEvidence({
+          pendingUpload: pendingImage,
+        });
 
-    return {
-      imageEvidence,
-      localIdentification,
-      classification,
-      referenceName: classificationInput.reference.name,
-      diagnostics: buildPhotoIdentificationDiagnostics({
+      const classificationInput = {
+        reference: {
+          id: pendingImage.id,
+          name: buildPhotoReferenceName(extractedIdentity),
+          url: null,
+          imageUrl: absoluteUrl(config.API_SERVER, pendingImage.imageUrl),
+        },
+        conversationId,
+        extractedIdentity,
+        imageEvidence,
+      };
+      const localIdentification =
+        await identifyExistingBottleReference(classificationInput);
+      const classification =
+        localIdentification.status === "classified" &&
+        localIdentification.decision.action === "match"
+          ? localIdentification
+          : await classifyBottleReference(classificationInput);
+      const referenceName = classificationInput.reference.name;
+      const diagnostics = buildPhotoIdentificationDiagnostics({
         extractionStatus: extractedIdentity ? "found" : "empty",
         extractionSummary: summarizeExtraction(imageEvidence),
         classification,
-      }),
-    };
-  })();
+      });
+      const suggestedNextStep = getSuggestedNextStep(classification);
+
+      setSpanAttributes(span, {
+        "photo_identification.reference_name": referenceName,
+        "photo_identification.extracted_identity_summary": referenceName,
+        "photo_identification.image_evidence_summary":
+          diagnostics.extraction.summary ?? "none",
+        "photo_identification.initial_candidate_count":
+          localIdentification.artifacts.candidates.length,
+        "photo_identification.final_candidate_count":
+          classification.artifacts.candidates.length,
+        "photo_identification.suggested_next_step": suggestedNextStep,
+        ...getClassificationLogAttributes(
+          "photo_identification.final",
+          classification,
+        ),
+      });
+
+      return {
+        imageEvidence,
+        localIdentification,
+        classification,
+        referenceName,
+        diagnostics,
+        suggestedNextStep,
+      };
+    },
+  );
 }
 
 export default procedure
@@ -611,8 +672,8 @@ export default procedure
       classification,
       referenceName,
       diagnostics,
+      suggestedNextStep,
     } = identification;
-    const suggestedNextStep = getSuggestedNextStep(classification);
     logPhotoIdentificationOutcome({
       context,
       pendingImage,

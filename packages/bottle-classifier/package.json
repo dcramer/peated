@@ -99,6 +99,7 @@
   "dependencies": {
     "@openai/agents": "^0.8.5",
     "@peated/tsconfig": "workspace:*",
+    "@sentry/core": "catalog:",
     "openai": "^6.27.0",
     "zod": "catalog:"
   },
