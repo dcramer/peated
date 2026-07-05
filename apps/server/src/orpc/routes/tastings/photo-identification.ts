@@ -316,9 +316,7 @@ function getSearchEvidenceLogAttributes(
   const searchEvidence = classification.artifacts.searchEvidence;
   const resultSummaries = searchEvidence.flatMap((evidence) =>
     evidence.results.map((result) =>
-      [result.title, result.domain ?? new URL(result.url).hostname]
-        .filter(Boolean)
-        .join(" - "),
+      [result.title, getSearchResultDomain(result)].filter(Boolean).join(" - "),
     ),
   );
 
@@ -330,6 +328,22 @@ function getSearchEvidenceLogAttributes(
       .slice(0, 5),
     [`${prefix}.search_result_summaries`]: resultSummaries.slice(0, 5),
   };
+}
+
+function getSearchResultDomain({
+  domain,
+  url,
+}: {
+  domain?: string | null;
+  url: string;
+}) {
+  if (domain) return domain;
+
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return url;
+  }
 }
 
 /**

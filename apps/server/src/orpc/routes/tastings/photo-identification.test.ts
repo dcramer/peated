@@ -651,6 +651,59 @@ describe("POST /tastings/photo-identification", () => {
     );
   });
 
+  test("keeps photo identification successful when log search result URL is malformed", async ({
+    fixtures,
+    defaults,
+  }) => {
+    extractPhotoBottleEvidenceMock.mockImplementation(
+      async ({ pendingUpload }) => ({
+        extractedIdentity: null,
+        imageEvidence: buildImageEvidence(pendingUpload.id),
+      }),
+    );
+    const classification = buildClassification({ action: "no_match" });
+    classification.artifacts.searchEvidence = [
+      {
+        provider: "openai",
+        query: "Ardbeg Uigeadail whisky",
+        summary: "Ardbeg Uigeadail is a real whisky.",
+        results: [
+          {
+            title: "Malformed Search Result",
+            url: "not a url",
+            domain: null,
+            description: "Third-party search result with a malformed URL.",
+            extraSnippets: [],
+          },
+        ],
+      },
+    ];
+    classifyBottleReferenceMock.mockResolvedValue(classification);
+
+    const response = await routerClient.tastings.photoIdentification(
+      {
+        file: await fixtures.SampleSquareImage(),
+        idempotencyKey: "photo-identification-malformed-search-url",
+      },
+      {
+        context: { user: defaults.user },
+      },
+    );
+
+    expect(response.suggestedNextStep).toBe("manual_search");
+    expect(sentryLoggerInfoMock).toHaveBeenCalledWith(
+      "Bottle photo identification completed",
+      expect.objectContaining({
+        "photo_identification.user_id": defaults.user.id,
+        "photo_identification.idempotency_key":
+          "photo-identification-malformed-search-url",
+        "photo_identification.final.search_result_summaries": [
+          "Malformed Search Result - not a url",
+        ],
+      }),
+    );
+  });
+
   test("rejects when extraction fails", async ({ fixtures, defaults }) => {
     extractPhotoBottleEvidenceMock.mockRejectedValue(
       new Error("vision provider unavailable"),
