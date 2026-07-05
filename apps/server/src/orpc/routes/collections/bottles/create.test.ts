@@ -298,7 +298,7 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
     expect(rows).toHaveLength(0);
   });
 
-  test("keeps new library entry when image copy fails after validation", async ({
+  test("fails and rolls back new library entry when image copy fails after validation", async ({
     fixtures,
     defaults,
   }) => {
@@ -318,25 +318,26 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
       .where(eq(pendingUploads.id, pendingUpload.id));
 
     try {
-      const result = await routerClient.collections.bottles.create(
-        {
-          user: "me",
-          collection: "library",
-          bottle: bottle.id,
-          pendingImageId: pendingUpload.id,
-        },
-        { context: { user: defaults.user } },
+      const err = await waitError(() =>
+        routerClient.collections.bottles.create(
+          {
+            user: "me",
+            collection: "library",
+            bottle: bottle.id,
+            pendingImageId: pendingUpload.id,
+          },
+          { context: { user: defaults.user } },
+        ),
       );
 
-      expect(result.imageUrl).toBeNull();
+      expect(err).toMatchObject({ code: "ENOENT" });
       expect(consoleError).toHaveBeenCalled();
 
       const rows = await db
         .select()
         .from(collectionBottles)
         .where(eq(collectionBottles.bottleId, bottle.id));
-      expect(rows).toHaveLength(1);
-      expect(rows[0].imageUrl).toBeNull();
+      expect(rows).toHaveLength(0);
 
       const libraryCollection = await db.query.collections.findFirst({
         where: (collections, { and, eq }) =>
@@ -345,7 +346,7 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
             eq(collections.name, "Library"),
           ),
       });
-      expect(libraryCollection?.totalBottles).toBe(1);
+      expect(libraryCollection?.totalBottles).toBe(0);
     } finally {
       consoleError.mockRestore();
     }

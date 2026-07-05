@@ -292,6 +292,7 @@ describe("pending uploads", () => {
       where: eq(pendingUploads.id, expiredPending.id),
     });
     expect(expiredRow?.status).toBe("expired");
+    expect(expiredRow?.objectDeletedAt).toBeNull();
 
     await expect(
       access(
@@ -300,7 +301,7 @@ describe("pending uploads", () => {
           relativeUploadPath(expiredPending.imageUrl),
         ),
       ),
-    ).rejects.toMatchObject({ code: "ENOENT" });
+    ).resolves.toBeUndefined();
     await expect(
       access(
         path.join(
@@ -320,7 +321,27 @@ describe("pending uploads", () => {
 
     await expect(cleanupPendingUploads()).resolves.toEqual({
       expired: 0,
-      deletedAttached: 1,
+      deletedAttached: 0,
+    });
+
+    const expiredAttachedRow = await db.query.pendingUploads.findFirst({
+      where: eq(pendingUploads.id, attachedPending.id),
+    });
+    expect(expiredAttachedRow?.status).toBe("expired");
+    expect(expiredAttachedRow?.objectDeletedAt).toBeNull();
+
+    await expect(
+      access(
+        path.join(
+          config.UPLOAD_PATH,
+          relativeUploadPath(attachedPending.imageUrl),
+        ),
+      ),
+    ).resolves.toBeUndefined();
+
+    await expect(cleanupPendingUploads()).resolves.toEqual({
+      expired: 0,
+      deletedAttached: 0,
     });
 
     await expect(
@@ -339,5 +360,41 @@ describe("pending uploads", () => {
       expired: 0,
       deletedAttached: 0,
     });
+  });
+
+  test("cleanup retries storage deletion for already expired rows", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const expiredPending = await createPendingImageUpload({
+      file: await fixtures.SampleSquareImage(),
+      createdById: defaults.user.id,
+      purpose: "photo_tasting_entry",
+      ttlMs: -1000,
+      onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
+    });
+    await db
+      .update(pendingUploads)
+      .set({ status: "expired" })
+      .where(eq(pendingUploads.id, expiredPending.id));
+
+    await expect(cleanupPendingUploads()).resolves.toEqual({
+      expired: 0,
+      deletedAttached: 0,
+    });
+
+    const deletedRow = await db.query.pendingUploads.findFirst({
+      where: eq(pendingUploads.id, expiredPending.id),
+    });
+    expect(deletedRow?.status).toBe("expired");
+    expect(deletedRow?.objectDeletedAt).toBeInstanceOf(Date);
+    await expect(
+      access(
+        path.join(
+          config.UPLOAD_PATH,
+          relativeUploadPath(expiredPending.imageUrl),
+        ),
+      ),
+    ).rejects.toMatchObject({ code: "ENOENT" });
   });
 });

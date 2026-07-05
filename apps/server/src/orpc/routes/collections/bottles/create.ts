@@ -188,6 +188,24 @@ export default procedure
 
     let collectionBottle = collectionBottleResult.collectionBottle;
     if (input.pendingImageId) {
+      const removeCreatedCollectionBottle = async () => {
+        if (!collectionBottleResult.created) {
+          return;
+        }
+
+        await db.transaction(async (tx) => {
+          await tx
+            .delete(collectionBottles)
+            .where(eq(collectionBottles.id, collectionBottle.id));
+          await tx
+            .update(collections)
+            .set({
+              totalBottles: sql`${collections.totalBottles} - 1`,
+            })
+            .where(eq(collections.id, collection.id));
+        });
+      };
+
       try {
         const imageUrl = await copyPendingImageForCollectionBottle({
           pendingImageId: input.pendingImageId,
@@ -210,19 +228,7 @@ export default procedure
         collectionBottle = updatedCollectionBottle;
       } catch (err) {
         if (err instanceof PendingUploadError) {
-          if (collectionBottleResult.created) {
-            await db.transaction(async (tx) => {
-              await tx
-                .delete(collectionBottles)
-                .where(eq(collectionBottles.id, collectionBottle.id));
-              await tx
-                .update(collections)
-                .set({
-                  totalBottles: sql`${collections.totalBottles} - 1`,
-                })
-                .where(eq(collections.id, collection.id));
-            });
-          }
+          await removeCreatedCollectionBottle();
 
           throw errors.BAD_REQUEST({
             message: err.message || "Pending photo is no longer available.",
@@ -243,6 +249,8 @@ export default procedure
             id: context.user.id,
           },
         });
+        await removeCreatedCollectionBottle();
+        throw err;
       }
     }
 

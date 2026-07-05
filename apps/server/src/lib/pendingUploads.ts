@@ -325,6 +325,7 @@ export async function cleanupPendingUploads({
       or(
         eq(pendingUploads.status, "pending"),
         eq(pendingUploads.status, "attached"),
+        eq(pendingUploads.status, "expired"),
       ),
       lte(pendingUploads.expiresAt, now),
       isNull(pendingUploads.objectDeletedAt),
@@ -340,21 +341,33 @@ export async function cleanupPendingUploads({
 
     try {
       filename = filenameFromUploadUrl(pendingUpload.imageUrl);
+      if (pendingUpload.status !== "expired") {
+        const [expiredUpload] = await db
+          .update(pendingUploads)
+          .set({ status: "expired" })
+          .where(
+            and(
+              eq(pendingUploads.id, pendingUpload.id),
+              isNull(pendingUploads.objectDeletedAt),
+            ),
+          )
+          .returning();
+        if (!expiredUpload) {
+          continue;
+        }
+
+        if (pendingUpload.status === "pending") {
+          expired += 1;
+        }
+        continue;
+      }
+
       await deleteFile({ filename });
 
-      if (pendingUpload.status === "pending") {
-        await db
-          .update(pendingUploads)
-          .set({ status: "expired", objectDeletedAt: now })
-          .where(eq(pendingUploads.id, pendingUpload.id));
-        expired += 1;
-      } else {
-        await db
-          .update(pendingUploads)
-          .set({ status: "expired", objectDeletedAt: now })
-          .where(eq(pendingUploads.id, pendingUpload.id));
-        deletedAttached += 1;
-      }
+      await db
+        .update(pendingUploads)
+        .set({ objectDeletedAt: now })
+        .where(eq(pendingUploads.id, pendingUpload.id));
     } catch (err) {
       logError(err, {
         pendingUpload: {
