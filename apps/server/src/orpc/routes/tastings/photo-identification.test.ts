@@ -101,7 +101,6 @@ function buildClassification(
   return BottleClassificationResultSchema.parse({
     status: "classified" as const,
     decision: {
-      confidence: 90,
       rationale: "test fixture",
       candidateBottleIds: [],
       ...decision,
@@ -120,12 +119,10 @@ function buildClassification(
 function buildCreateBottleDecision({
   brandName,
   bottleName,
-  confidence = 91,
   confidenceBasis,
 }: {
   brandName: string;
   bottleName: string;
-  confidence?: number;
   confidenceBasis?: {
     positiveEvidence?: string[];
     unresolvedRisks?: {
@@ -157,7 +154,6 @@ function buildCreateBottleDecision({
 }) {
   return {
     action: "create_bottle",
-    confidence,
     rationale: "Reliable photo evidence supports creating the bottle.",
     confidenceBasis: confidenceBasis
       ? {
@@ -207,7 +203,6 @@ function buildCreateBottleAndReleaseDecision({
 }) {
   return {
     action: "create_bottle_and_release",
-    confidence: 91,
     rationale: "Reliable photo evidence supports the product identity.",
     proposedBottle: {
       name: bottleName,
@@ -256,7 +251,6 @@ function buildCreateReleaseDecision({
 }) {
   return {
     action: "create_release",
-    confidence: 91,
     rationale: "Reliable photo evidence supports the release identity.",
     parentBottleId,
     proposedRelease: {
@@ -789,7 +783,6 @@ describe("POST /tastings/photo-identification", () => {
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification({
         action: "create_bottle_and_release",
-        confidence: 91,
         rationale: "Reliable web evidence supports the product identity.",
         proposedBottle: {
           name: "Totara Cask",
@@ -908,7 +901,6 @@ describe("POST /tastings/photo-identification", () => {
       decision: buildCreateBottleDecision({
         brandName: "Review Band Photo Brand",
         bottleName: "Review Band Bottle",
-        confidence: 90,
         confidenceBasis: {
           positiveEvidence: ["The label text matches a plausible bottle."],
           unresolvedRisks: [
