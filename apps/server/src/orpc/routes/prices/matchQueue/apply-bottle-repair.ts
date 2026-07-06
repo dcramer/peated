@@ -1,3 +1,4 @@
+import { getUserActor } from "@peated/server/lib/actors";
 import {
   DuplicateBottleAliasError,
   FailedToSaveBottleAliasError,
@@ -39,6 +40,7 @@ export default procedure
       const bottle = await applyStorePriceBottleRepairFromProposal({
         proposalId: input.proposal,
         user: context.user,
+        actor: await getUserActor(context.user),
       });
 
       return await serialize(BottleSerializer, bottle, context.user);

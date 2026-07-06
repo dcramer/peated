@@ -1,3 +1,4 @@
+import { getUserActor } from "@peated/server/lib/actors";
 import {
   DuplicateBottleAliasError,
   FailedToSaveBottleAliasError,
@@ -50,7 +51,7 @@ export default procedure
           bottleId: input.bottle!,
           releaseId: input.release ?? null,
           reviewedById: context.user.id,
-          actorType: "user",
+          actor: await getUserActor(context.user),
         });
         return {};
       }
@@ -58,6 +59,7 @@ export default procedure
       await ignoreStorePriceMatchProposal({
         proposalId: input.proposal,
         reviewedById: context.user.id,
+        actor: await getUserActor(context.user),
       });
       return {};
     } catch (err) {
