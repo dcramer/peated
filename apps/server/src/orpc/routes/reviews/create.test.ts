@@ -217,7 +217,7 @@ describe("POST /reviews", () => {
       releaseId: null,
       createdBottle: true,
       createdRelease: false,
-      confidence: 92,
+      confidence: null,
       rationale: "test fixture",
       metadata: expect.objectContaining({
         initiatedByUserId: adminUser.id,
@@ -658,7 +658,7 @@ describe("POST /reviews", () => {
       releaseId: null,
       createdBottle: false,
       createdRelease: false,
-      confidence: 92,
+      confidence: null,
       metadata: expect.objectContaining({
         initiatedByUserId: adminUser.id,
       }),

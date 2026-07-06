@@ -23,7 +23,6 @@ import {
   createBottleReleaseInTransaction,
   finalizeCreatedBottleRelease,
 } from "@peated/server/lib/createBottleRelease";
-import { normalizeIncomingBottleDecisionConfidence } from "@peated/server/lib/incomingBottleDecisionLog";
 import { and, eq } from "drizzle-orm";
 import { buildClassifierCreateInputs } from "./classifierDecisionCreateInputs";
 
@@ -408,9 +407,10 @@ export async function resolveBottleReferenceTarget({
 
   try {
     assertKnownClassifierTarget(classification.decision, classification);
-    const decisionConfidence = normalizeIncomingBottleDecisionConfidence(
-      classification.decision.confidence,
-    );
+    // Numeric confidence was removed from the classifier contract; the stored
+    // telemetry column is written null. Automation gating is derived from the
+    // structured evidence, not this value.
+    const decisionConfidence = null;
     const decisionRationale = classification.decision.rationale ?? null;
 
     if (

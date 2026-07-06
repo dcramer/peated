@@ -26,7 +26,11 @@ import {
 } from "./contract";
 import { createEvalClassifierOptions } from "./evalSupport";
 import { createLocalCatalogDataSource } from "./localCatalog";
-import { isExistingMatchConfidenceEligibleForVerification } from "./priceMatchingEvidence";
+import {
+  agentActionRiskClass,
+  deriveAutomationTier,
+  type AutomationTier,
+} from "./priceMatchingEvidence";
 import type { RealWorldNewBottleEvalCase } from "./realWorldNewBottleEval.fixtures";
 import { getAutoIgnoreBottleReferenceReason } from "./reviewPolicy";
 import { buildDefaultBottleSearchInput } from "./runtime/agentInput";
@@ -85,6 +89,53 @@ function buildSearchBottlesAdapter(testCase: SearchFixtureCase) {
   };
 }
 
+// Derives the code-owned automation tier for an eval result, mirroring the
+// production consumers (`deriveAutomationTier`). Numeric confidence and the
+// confidence band were removed from the contract, so the tier is derived from
+// the action risk class plus the structured evidence and anchors. Photo/image
+// fixtures carry primary image evidence; exact-cask identity is the closed-form
+// deterministic anchor.
+function getDerivedAutomationTier(
+  testCase: ClassifierEvalCase,
+  result: BottleClassificationResult,
+): AutomationTier {
+  if (result.status !== "classified") {
+    return "review";
+  }
+
+  const decision = result.decision;
+  const currentBottleId = testCase.input.reference.currentBottleId ?? null;
+  const currentReleaseId = testCase.input.reference.currentReleaseId ?? null;
+  const reaffirmsCurrentAssignment =
+    currentBottleId != null &&
+    decision.matchedBottleId === currentBottleId &&
+    (decision.matchedReleaseId ?? null) === (currentReleaseId ?? null);
+
+  return deriveAutomationTier({
+    actionRiskClass: agentActionRiskClass(decision.action),
+    hasUnresolvedRisks:
+      (decision.confidenceBasis?.unresolvedRisks.length ?? 0) > 0,
+    webEvidence: decision.confidenceBasis?.webEvidence ?? null,
+    hasMatchTarget:
+      decision.action === "match" && decision.matchedBottleId !== null,
+    reaffirmsCurrentAssignment,
+    replacesCurrentAssignment:
+      currentBottleId != null && !reaffirmsCurrentAssignment,
+    matchesFreshReleaseTarget:
+      !reaffirmsCurrentAssignment &&
+      decision.action === "match" &&
+      (decision.matchedReleaseId ?? null) !== null,
+    hasExactAliasAnchor: false,
+    hasDeterministicAnchor: decision.identityScope === "exact_cask",
+    // Image-backed fixtures either pre-seed `input.imageEvidence` or carry only
+    // `reference.imageUrl` and rely on live extraction; both mean the run has
+    // primary label/image evidence, matching the photo-identification consumer.
+    hasPrimaryLabelOrImageEvidence:
+      testCase.input.imageEvidence != null ||
+      Boolean(testCase.input.reference.imageUrl),
+  });
+}
+
 function getDerivedVerifyEligibility(
   testCase: ClassifierEvalCase,
   result: BottleClassificationResult,
@@ -93,17 +144,11 @@ function getDerivedVerifyEligibility(
     return false;
   }
 
-  return isExistingMatchConfidenceEligibleForVerification({
-    confidence: result.decision.confidence,
-    currentBottleId: testCase.input.reference.currentBottleId ?? null,
-    currentReleaseId: testCase.input.reference.currentReleaseId ?? null,
-    identityScope: result.decision.identityScope,
-    matchedBottleId: result.decision.matchedBottleId,
-    matchedReleaseId: result.decision.matchedReleaseId,
-  });
+  return getDerivedAutomationTier(testCase, result) === "auto";
 }
 
 function getDerivedSuggestedNextStep(
+  testCase: ClassifierEvalCase,
   result: BottleClassificationResult,
 ): "confirm_match" | "confirm_create" | "manual_search" | "needs_review" {
   if (result.status === "ignored") {
@@ -111,19 +156,14 @@ function getDerivedSuggestedNextStep(
   }
 
   const decision = result.decision;
+  const tier = getDerivedAutomationTier(testCase, result);
   switch (decision.action) {
     case "match":
-      return decision.confidence >= 70 ? "confirm_match" : "manual_search";
+      return tier === "auto" ? "confirm_match" : "manual_search";
     case "create_bottle":
     case "create_release":
-    case "create_bottle_and_release": {
-      const confidenceBasisBand = decision.confidenceBasis?.band;
-      return decision.confidence >= 70 &&
-        (confidenceBasisBand === undefined ||
-          confidenceBasisBand === "auto_verification")
-        ? "confirm_create"
-        : "manual_search";
-    }
+    case "create_bottle_and_release":
+      return tier === "auto" ? "confirm_create" : "manual_search";
     case "repair_parent_and_create_release":
     case "repair_bottle":
       return "needs_review";
@@ -412,13 +452,13 @@ function evaluateDecisionShape(
     );
   }
 
-  if (
-    expected.confidenceBand !== undefined &&
-    result.decision.confidenceBasis?.band !== expected.confidenceBand
-  ) {
-    failures.push(
-      `confidenceBand expected ${expected.confidenceBand} but got ${result.decision.confidenceBasis?.band ?? "missing"}`,
-    );
+  if (expected.expectedTier !== undefined) {
+    const derivedTier = getDerivedAutomationTier(testCase, result);
+    if (derivedTier !== expected.expectedTier) {
+      failures.push(
+        `expectedTier expected ${expected.expectedTier} but got ${derivedTier}`,
+      );
+    }
   }
 
   if (
@@ -430,10 +470,10 @@ function evaluateDecisionShape(
 
   if (
     expected.suggestedNextStep !== undefined &&
-    getDerivedSuggestedNextStep(result) !== expected.suggestedNextStep
+    getDerivedSuggestedNextStep(testCase, result) !== expected.suggestedNextStep
   ) {
     failures.push(
-      `suggestedNextStep expected ${expected.suggestedNextStep} but got ${getDerivedSuggestedNextStep(result)}`,
+      `suggestedNextStep expected ${expected.suggestedNextStep} but got ${getDerivedSuggestedNextStep(testCase, result)}`,
     );
   }
 

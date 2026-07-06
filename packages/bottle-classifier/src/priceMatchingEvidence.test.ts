@@ -11,7 +11,6 @@ import {
   deriveAutomationTier,
   getExistingMatchIdentityConflicts,
   hasSupportiveWebEvidenceForExistingMatch,
-  isExistingMatchConfidenceEligibleForVerification,
 } from "./priceMatchingEvidence";
 
 function buildExtractedLabel(
@@ -277,106 +276,14 @@ describe("priceMatchingEvidence", () => {
       }),
     ).not.toContain("candidate category conflicts with extracted label");
   });
-
-  test("allows a lower confidence threshold when the classifier reaffirms the current assignment", () => {
-    expect(
-      isExistingMatchConfidenceEligibleForVerification({
-        confidence: 80,
-        currentBottleId: 3,
-        currentReleaseId: null,
-        matchedBottleId: 3,
-        matchedReleaseId: null,
-      }),
-    ).toBe(true);
-    expect(
-      isExistingMatchConfidenceEligibleForVerification({
-        confidence: 79,
-        currentBottleId: 3,
-        currentReleaseId: null,
-        matchedBottleId: 3,
-        matchedReleaseId: null,
-      }),
-    ).toBe(false);
-  });
-
-  test("requires a higher confidence threshold for unmatched bottle-only matches", () => {
-    expect(
-      isExistingMatchConfidenceEligibleForVerification({
-        confidence: 96,
-        currentBottleId: null,
-        currentReleaseId: null,
-        matchedBottleId: 4,
-        matchedReleaseId: null,
-      }),
-    ).toBe(true);
-    expect(
-      isExistingMatchConfidenceEligibleForVerification({
-        confidence: 95,
-        currentBottleId: null,
-        currentReleaseId: null,
-        matchedBottleId: 4,
-        matchedReleaseId: null,
-      }),
-    ).toBe(false);
-  });
-
-  test("allows exact-cask code matches at the exact-cask confidence threshold", () => {
-    expect(
-      isExistingMatchConfidenceEligibleForVerification({
-        confidence: 95,
-        currentBottleId: null,
-        currentReleaseId: null,
-        identityScope: "exact_cask",
-        matchedBottleId: 41,
-        matchedReleaseId: null,
-      }),
-    ).toBe(true);
-    expect(
-      isExistingMatchConfidenceEligibleForVerification({
-        confidence: 94,
-        currentBottleId: null,
-        currentReleaseId: null,
-        identityScope: "exact_cask",
-        matchedBottleId: 41,
-        matchedReleaseId: null,
-      }),
-    ).toBe(false);
-  });
-
-  test("does not allow corrections from confidence alone", () => {
-    expect(
-      isExistingMatchConfidenceEligibleForVerification({
-        confidence: 100,
-        currentBottleId: 4,
-        currentReleaseId: null,
-        matchedBottleId: 5,
-        matchedReleaseId: null,
-      }),
-    ).toBe(false);
-  });
-
-  test("does not allow unmatched release-level matches from confidence alone", () => {
-    expect(
-      isExistingMatchConfidenceEligibleForVerification({
-        confidence: 100,
-        currentBottleId: null,
-        currentReleaseId: null,
-        matchedBottleId: 5,
-        matchedReleaseId: 12,
-      }),
-    ).toBe(false);
-  });
 });
 
-// Default band is null (neutral: neither a downgrade nor the interim
-// auto_verification anchor) so anchor logic can be exercised in isolation.
 function buildTierInput(
   overrides: Partial<AutomationTierInput> = {},
 ): AutomationTierInput {
   return {
     actionRiskClass: "match",
     hasUnresolvedRisks: false,
-    band: null,
     webEvidence: "not_used",
     hasMatchTarget: true,
     reaffirmsCurrentAssignment: false,
@@ -431,70 +338,6 @@ describe("deriveAutomationTier", () => {
           }),
         ),
       ).toBe("review");
-    });
-  });
-
-  describe("downgrade-only band veto", () => {
-    test.each(["low", "review"] as const)(
-      "band %s forces review even with a strong anchor",
-      (band) => {
-        expect(
-          deriveAutomationTier(
-            buildTierInput({
-              band,
-              reaffirmsCurrentAssignment: true,
-              hasDeterministicAnchor: true,
-            }),
-          ),
-        ).toBe("review");
-      },
-    );
-
-    test.each(["auto_verification", "current_assignment", null, undefined])(
-      "band %s does not itself force review",
-      (band) => {
-        expect(
-          deriveAutomationTier(
-            buildTierInput({
-              band: band as AutomationTierInput["band"],
-              reaffirmsCurrentAssignment: true,
-            }),
-          ),
-        ).toBe("auto");
-      },
-    );
-
-    test("band auto_verification never overrides the model veto", () => {
-      expect(
-        deriveAutomationTier(
-          buildTierInput({
-            band: "auto_verification",
-            hasUnresolvedRisks: true,
-          }),
-        ),
-      ).toBe("review");
-    });
-
-    test("band auto_verification never overrides a structural review rule (correction)", () => {
-      expect(
-        deriveAutomationTier(
-          buildTierInput({
-            band: "auto_verification",
-            replacesCurrentAssignment: true,
-          }),
-        ),
-      ).toBe("review");
-    });
-
-    test("band auto_verification is the interim anchor for an otherwise unanchored match", () => {
-      expect(
-        deriveAutomationTier(
-          buildTierInput({
-            band: "auto_verification",
-            webEvidence: "not_needed",
-          }),
-        ),
-      ).toBe("auto");
     });
   });
 
@@ -566,7 +409,24 @@ describe("deriveAutomationTier", () => {
       ).toBe("auto");
     });
 
-    test.each(["not_needed", "not_used", "weak", "conflicting"] as const)(
+    test("webEvidence=not_needed anchors an auto match (clear local match, no risks)", () => {
+      expect(
+        deriveAutomationTier(buildTierInput({ webEvidence: "not_needed" })),
+      ).toBe("auto");
+    });
+
+    test("webEvidence=not_needed does not override the model veto", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({
+            webEvidence: "not_needed",
+            hasUnresolvedRisks: true,
+          }),
+        ),
+      ).toBe("review");
+    });
+
+    test.each(["not_used", "weak", "conflicting"] as const)(
       "unanchored match with webEvidence=%s routes to review",
       (webEvidence) => {
         expect(deriveAutomationTier(buildTierInput({ webEvidence }))).toBe(
@@ -610,17 +470,8 @@ describe("deriveAutomationTier", () => {
       ).toBe("auto");
     });
 
-    test("band auto_verification is the interim create anchor", () => {
-      expect(
-        deriveAutomationTier(
-          buildTierInput({
-            actionRiskClass: "create",
-            band: "auto_verification",
-          }),
-        ),
-      ).toBe("auto");
-    });
-
+    // `not_needed` anchors a match but must NOT rescue a create: writing new
+    // canonical identity needs concrete support, not the absence of a search.
     test.each(["not_needed", "not_used", "weak", "conflicting"] as const)(
       "unsupported create with webEvidence=%s routes to review",
       (webEvidence) => {
@@ -664,6 +515,17 @@ describe("deriveAutomationTier", () => {
           buildTierInput({
             actionRiskClass: "repair",
             webEvidence: "not_used",
+          }),
+        ),
+      ).toBe("review");
+    });
+
+    test("webEvidence=not_needed does not rescue a repair", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({
+            actionRiskClass: "repair",
+            webEvidence: "not_needed",
           }),
         ),
       ).toBe("review");

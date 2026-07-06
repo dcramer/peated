@@ -450,25 +450,47 @@ export const BottleIdentityBasisSchema = z
   })
   .strict();
 
+// Typed categories for unresolved risks. `other` is the uncategorizable
+// holistic veto ("something feels off") that still forces review. Any asserted
+// risk routes an automated decision to review; risks never upgrade a decision.
+export const UNRESOLVED_RISK_CATEGORIES = [
+  "trait_conflict",
+  "sibling_ambiguity",
+  "release_ambiguity",
+  "web_evidence_conflict",
+  "insufficient_evidence",
+  "identity_ambiguity",
+  "other",
+] as const;
+
+export const UnresolvedRiskCategoryEnum = z.enum(UNRESOLVED_RISK_CATEGORIES);
+
+export const UnresolvedRiskSchema = z
+  .object({
+    category: UnresolvedRiskCategoryEnum.describe(
+      "Typed risk category the review queue can sort on. Use `other` for a holistic concern that no specific category fits.",
+    ),
+    note: z
+      .string()
+      .trim()
+      .min(1)
+      .describe("Short freeform reason describing the risk."),
+  })
+  .strict();
+
 export const BottleConfidenceBasisSchema = z
   .object({
-    band: z
-      .enum(["low", "review", "auto_verification", "current_assignment"])
-      .default("review")
-      .describe(
-        "Confidence band implied by the evidence. Use auto_verification only when the evidence is strong enough for downstream automatic verification and unresolvedRisks is empty; do not use it for no_match.",
-      ),
     positiveEvidence: z
       .array(z.string().trim().min(1))
       .default([])
       .describe(
-        "Concrete evidence that increases confidence, such as exact local aliases, exact-cask codes, label text, image evidence, or agent-reviewed supportive web evidence.",
+        "Concrete evidence that supports the decision, such as exact local aliases, exact-cask codes, label text, image evidence, a reaffirmed current assignment, or agent-reviewed supportive web evidence.",
       ),
     unresolvedRisks: z
-      .array(z.string().trim().min(1))
+      .array(UnresolvedRiskSchema)
       .default([])
       .describe(
-        "Material conflicts, missing traits, sibling ambiguity, or weak evidence that could change the action or target and keeps confidence below automatic verification.",
+        "Material conflicts, missing traits, sibling ambiguity, or weak evidence that could change the action or target. Any entry forces automated flows to route the decision to human review.",
       ),
     toolsUsed: z
       .array(
@@ -495,7 +517,6 @@ export const BottleConfidenceBasisSchema = z
   .strict();
 
 const BottleClassifierDecisionBaseSchema = z.object({
-  confidence: z.number().min(0).max(100),
   rationale: z.string().nullable().default(null),
   candidateBottleIds: z.array(z.number().int()).default([]),
   identityScope: BottleIdentityScopeEnum.default("product").describe(
@@ -658,7 +679,6 @@ export const BottleClassifierAgentDecisionSchema = z.object({
         "no_match: no safe existing target and no supported create action, or creation would invent an ambiguous hybrid.",
       ].join(" "),
     ),
-  confidence: z.number().min(0).max(100),
   rationale: z.string().nullable().default(null),
   candidateBottleIds: z.array(z.number().int()).default([]),
   identityScope: BottleIdentityScopeEnum.nullable().default(null),
@@ -699,6 +719,8 @@ export type BottleExtractedDetails = z.infer<
   typeof BottleExtractedDetailsSchema
 >;
 export type BottleConfidenceBasis = z.infer<typeof BottleConfidenceBasisSchema>;
+export type UnresolvedRisk = z.infer<typeof UnresolvedRiskSchema>;
+export type UnresolvedRiskCategory = z.infer<typeof UnresolvedRiskCategoryEnum>;
 export type BottleIdentityBasis = z.infer<typeof BottleIdentityBasisSchema>;
 export type AliasScope = z.infer<typeof AliasScopeEnum>;
 export type BottleEvidenceSourceTier = z.infer<

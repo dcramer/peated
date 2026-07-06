@@ -35,10 +35,6 @@ type ExistingMatchWebEvidenceEvaluation = {
   hasSupportiveWebEvidence: boolean;
 };
 
-export const REAFFIRMED_EXISTING_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD = 80;
-export const UNMATCHED_BOTTLE_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD = 96;
-export const EXACT_CASK_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD = 95;
-type BottleIdentityScope = "product" | "exact_cask";
 const SPECIFIC_IDENTITY_WEB_SUPPORT_ATTRIBUTES = new Set<MatchAttribute>([
   "bottler",
   "name",
@@ -87,56 +83,6 @@ const TITLE_IGNORABLE_NAME_TOKENS = new Set([
   "world",
 ]);
 
-export function isExistingMatchConfidenceEligibleForVerification({
-  confidence,
-  currentBottleId,
-  currentReleaseId,
-  identityScope = "product",
-  matchedBottleId,
-  matchedReleaseId,
-}: {
-  confidence: number;
-  currentBottleId?: null | number;
-  currentReleaseId?: null | number;
-  identityScope?: BottleIdentityScope | null;
-  matchedBottleId: null | number;
-  matchedReleaseId?: null | number;
-}): boolean {
-  // Downstream existing-match verification should be a thin confidence gate.
-  // Exact/title/web evidence should affect classifier confidence upstream rather
-  // than being re-implemented as separate approval heuristics.
-  if (matchedBottleId === null) {
-    return false;
-  }
-
-  const reaffirmsCurrentAssignment =
-    currentBottleId != null &&
-    matchedBottleId === currentBottleId &&
-    (matchedReleaseId ?? null) === (currentReleaseId ?? null);
-
-  if (reaffirmsCurrentAssignment) {
-    return (
-      confidence >= REAFFIRMED_EXISTING_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD
-    );
-  }
-
-  // Replacing an existing assignment is a downstream correction, not an
-  // existing-match verification candidate.
-  if (currentBottleId != null) {
-    return false;
-  }
-
-  if (matchedReleaseId !== null && matchedReleaseId !== undefined) {
-    return false;
-  }
-
-  if (identityScope === "exact_cask") {
-    return confidence >= EXACT_CASK_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD;
-  }
-
-  return confidence >= UNMATCHED_BOTTLE_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD;
-}
-
 // Code-derived automation tier. Automated consumers (price scraping, ingestion)
 // derive whether a classifier decision may act automatically from the action's
 // risk class and the structured evidence the agent asserts, instead of reading
@@ -156,17 +102,6 @@ export const AUTOMATION_ACTION_RISK_CLASSES = [
 export type AutomationActionRiskClass =
   (typeof AUTOMATION_ACTION_RISK_CLASSES)[number];
 
-// Interim `confidenceBasis.band`. The agent still emits a band while the numeric
-// score is being retired; a later pass (tasks.md 4.3) removes the read entirely
-// and expresses the veto as a typed unresolved risk.
-export type AutomationConfidenceBand =
-  | "low"
-  | "review"
-  | "auto_verification"
-  | "current_assignment"
-  | null
-  | undefined;
-
 export type AutomationTierInput = {
   // Risk class of the classifier action. Callers map their own action
   // vocabulary (agent enum or price-match enum) onto this shared class.
@@ -174,8 +109,6 @@ export type AutomationTierInput = {
   // Model veto: any asserted unresolved risk forces review (design.md model
   // veto scenario). Callers pass whether the risk list is non-empty.
   hasUnresolvedRisks: boolean;
-  // Downgrade-only band veto (interim). See `bandForcesReview`.
-  band: AutomationConfidenceBand;
   // How web/source evidence affected the decision.
   webEvidence: WebEvidenceJudgment;
   // Match anchors ----------------------------------------------------------
@@ -199,41 +132,13 @@ export type AutomationTierInput = {
   hasPrimaryLabelOrImageEvidence: boolean;
 };
 
-// The band is downgrade-only: it can force review but can never upgrade a
-// decision that carries a model veto or fails a structural review rule. Only
-// the explicit downgrade bands (`low`, `review`) force review. `auto_verification`
-// and `current_assignment` do not downgrade — `current_assignment` reaffirms
-// the existing assignment and design.md treats it as positive evidence — and an
-// absent band carries no signal (this preserves the historical photo behavior
-// of not blocking when the agent omitted a band). This band read is removed
-// entirely in the confidence-removal pass (tasks.md 4.3), where the typed
-// positive-evidence anchors replace it.
-function bandForcesReview(band: AutomationConfidenceBand): boolean {
-  return band === "low" || band === "review";
-}
-
-// Interim evidence-equivalent of the retired numeric thresholds. reviewPolicy
-// caps band to "review" whenever `isExistingMatchConfidenceEligibleForVerification`
-// (the numeric gate) fails and whenever a creation lacks supporting evidence, so
-// a surviving `band === "auto_verification"` is a code-produced assertion that
-// the retiring threshold for this risk class was met. Reading the band here
-// (never the number) preserves behavioral intent during the interim; it is
-// dropped from the anchor set in tasks.md 4.3 once typed positive evidence
-// lands. The band never overrides the model veto or the structural review rules
-// checked before it, so it can only ever permit auto, never force one past a
-// risk or a correction.
-function bandAssertsAutoVerification(band: AutomationConfidenceBand): boolean {
-  return band === "auto_verification";
-}
-
 function deriveMatchTier(input: AutomationTierInput): AutomationTier {
   if (!input.hasMatchTarget) {
     return "review";
   }
 
   // Replacing a different current assignment is a downstream correction, not an
-  // existing-match verification (mirrors the currentBottleId guard in
-  // `isExistingMatchConfidenceEligibleForVerification`).
+  // existing-match verification.
   if (input.replacesCurrentAssignment) {
     return "review";
   }
@@ -243,20 +148,25 @@ function deriveMatchTier(input: AutomationTierInput): AutomationTier {
     return "review";
   }
 
-  // Evidence-condition mapping of the retired numeric thresholds:
-  //   reaffirmed (80)  -> current-assignment reaffirmation anchor
-  //   exact_cask (95)  -> deterministic anchor
-  //   unmatched (96)   -> supportive web evidence, an exact alias, primary
-  //                       label/image evidence, or (interim) the band
-  //                       auto_verification assertion that encodes the numeric
-  //                       gate having passed.
+  // An unmatched existing match auto-verifies only with an explicit typed
+  // anchor: a reaffirmed current assignment, a closed-form deterministic anchor
+  // (exact_cask/SMWS), an exact accepted alias, primary label/image evidence,
+  // agent-reviewed supportive web evidence, or the agent's affirmative
+  // `webEvidence = not_needed` judgment. `not_needed` anchors a match because
+  // the spec's evidence requirement explicitly allows a clear existing match to
+  // skip web search when local/label evidence suffices, and the deterministic
+  // conflict gates (unknown-id rejection, extracted-field contradiction checks)
+  // still run before the tier as the safety net. `not_used` must NOT anchor:
+  // it only says the web was not consulted and makes no claim of clarity,
+  // whereas `not_needed` is the agent's judgment that the local evidence
+  // settles the match. Absent all anchors, the match goes to review.
   const hasMatchAnchor =
     input.reaffirmsCurrentAssignment ||
     input.hasDeterministicAnchor ||
     input.hasExactAliasAnchor ||
     input.hasPrimaryLabelOrImageEvidence ||
     input.webEvidence === "supportive" ||
-    bandAssertsAutoVerification(input.band);
+    input.webEvidence === "not_needed";
 
   return hasMatchAnchor ? "auto" : "review";
 }
@@ -264,14 +174,13 @@ function deriveMatchTier(input: AutomationTierInput): AutomationTier {
 function deriveCreateOrRepairTier(input: AutomationTierInput): AutomationTier {
   // Creates and repairs require corroborating evidence: supportive web
   // evidence, a closed-form deterministic anchor, or reviewed label/image
-  // primary evidence. This matches the existing creation-automation contract
-  // (reviewPolicy `capUnverifiedCreationAutomation`, which is exactly what caps
-  // band to "review" when that evidence is missing).
+  // primary evidence. `webEvidence = not_needed` does NOT anchor here — writing
+  // new canonical identity needs concrete support, not just the absence of a
+  // search.
   const hasCreationEvidence =
     input.webEvidence === "supportive" ||
     input.hasDeterministicAnchor ||
-    input.hasPrimaryLabelOrImageEvidence ||
-    bandAssertsAutoVerification(input.band);
+    input.hasPrimaryLabelOrImageEvidence;
 
   return hasCreationEvidence ? "auto" : "review";
 }
@@ -288,11 +197,6 @@ export function deriveAutomationTier(
   // including an uncategorizable holistic concern, forces review regardless of
   // anchors.
   if (input.hasUnresolvedRisks) {
-    return "review";
-  }
-
-  // Downgrade-only band veto (interim; removed in tasks.md 4.3).
-  if (bandForcesReview(input.band)) {
     return "review";
   }
 

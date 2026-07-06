@@ -91,7 +91,6 @@ vi.mock("@peated/server/worker/client", () => ({
 }));
 
 const supportiveWebEvidenceConfidenceBasis = {
-  band: "auto_verification",
   positiveEvidence: ["Web evidence supports the required bottle identity."],
   unresolvedRisks: [],
   toolsUsed: ["openai_web_search"],
@@ -99,14 +98,14 @@ const supportiveWebEvidenceConfidenceBasis = {
 };
 
 // The code-derived automation tier reads structured evidence, not the numeric
-// confidence score. A surviving `band: "auto_verification"` (with no unresolved
-// risks) is the interim evidence-equivalent of a passing verification gate.
+// confidence score. Supportive web evidence (with no unresolved risks) is the
+// anchor that auto-verifies an unmatched existing bottle match; it replaces the
+// retired `band: "auto_verification"` signal.
 const autoVerificationConfidenceBasis = {
-  band: "auto_verification",
   positiveEvidence: ["The candidate covers the observed bottle identity."],
   unresolvedRisks: [],
-  toolsUsed: ["initial_local_candidates"],
-  webEvidence: "not_needed",
+  toolsUsed: ["initial_local_candidates", "openai_web_search"],
+  webEvidence: "supportive",
 };
 
 function buildMockBottleReferenceClassification(
@@ -862,11 +861,11 @@ describe("priceMatching", () => {
 
     expect(proposal.status).toBe("pending_review");
     expect(proposal.proposalType).toBe("match_existing");
-    expect(proposal.confidence).toBe(88);
+    expect(proposal.confidence).toBeNull();
     expect(proposal.automationAssessment).toMatchObject({
-      modelConfidence: 88,
+      modelConfidence: null,
       automationEligible: false,
-      automationScore: expect.any(Number),
+      automationScore: null,
     });
   });
 
@@ -1294,7 +1293,7 @@ describe("priceMatching", () => {
       releaseId: null,
       createdBottle: false,
       createdRelease: false,
-      confidence: 97,
+      confidence: null,
     });
   });
 
@@ -2188,7 +2187,7 @@ describe("priceMatching", () => {
 
     expect(proposal.status).toBe("pending_review");
     expect(proposal.proposalType).toBe("create_new");
-    expect(proposal.confidence).toBe(95);
+    expect(proposal.confidence).toBeNull();
   });
 
   test("routes same-bottle create drafts into correction review when the current bottle metadata is wrong", async ({
@@ -2857,7 +2856,7 @@ describe("priceMatching", () => {
     });
 
     expect(proposal.status).toBe("pending_review");
-    expect(proposal.confidence).toBe(96);
+    expect(proposal.confidence).toBeNull();
     expect(proposal.extractedLabel).toMatchObject({
       category: null,
       edition: "Batch 1",
@@ -2959,7 +2958,7 @@ describe("priceMatching", () => {
 
     expect(proposal.status).toBe("pending_review");
     expect(proposal.proposalType).toBe("create_new");
-    expect(proposal.confidence).toBe(95);
+    expect(proposal.confidence).toBeNull();
     expect(updatedPrice?.bottleId).toBeNull();
   });
 
@@ -4164,7 +4163,7 @@ describe("priceMatching", () => {
       releaseId: null,
       createdBottle: true,
       createdRelease: false,
-      confidence: 92,
+      confidence: null,
     });
     expect(queueBottleCreationVerification).toHaveBeenCalledWith({
       bottleId: proposal.suggestedBottleId,
@@ -5410,7 +5409,7 @@ describe("priceMatching", () => {
       proposalType: "match_existing",
       initialStatus: "pending_review",
       finalStatus: null,
-      confidence: 84,
+      confidence: null,
       suggestedBottleId: bottle.id,
     });
 

@@ -109,7 +109,7 @@
       "abv": 49.3,
       "releaseYear": 2022
     },
-    "confidenceBand": "auto_verification",
+    "expectedTier": "auto",
     "suggestedNextStep": "confirm_create",
     "summary": "Create release Act 10 Scene 4 under bottle 43397."
   },

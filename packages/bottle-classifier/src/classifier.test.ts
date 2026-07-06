@@ -47,7 +47,6 @@ function createReliableSearchEvidence({
 }
 
 const supportiveWebEvidenceConfidenceBasis = {
-  band: "review",
   positiveEvidence: [
     "Reliable non-origin web evidence supports the proposed bottle identity.",
   ],
@@ -964,7 +963,6 @@ describe("createBottleClassifier", () => {
     const reasoning = preparedRun.getReasoningResult({
       finalOutput: {
         action: "no_match",
-        confidence: 72,
         rationale: "No local candidate was provided.",
         candidateBottleIds: [],
         identityScope: "product",
@@ -1128,7 +1126,6 @@ describe("createBottleClassifier", () => {
       }: RunBottleClassifierAgentInput): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 82,
           rationale: "Closed-set review could not reuse a parent bottle.",
           candidateBottleIds: [],
           identityScope: "product",
@@ -1188,13 +1185,11 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 94,
           rationale: "The local candidate safely covers the label.",
           candidateBottleIds: [11],
           identityScope: "product",
           observation: null,
           confidenceBasis: {
-            band: "auto_verification",
             positiveEvidence: ["The local candidate matches."],
             unresolvedRisks: [],
             toolsUsed: ["initial_local_candidates", "openai_web_search"],
@@ -1259,7 +1254,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 88,
           rationale: "The label appears to be a new local product.",
           candidateBottleIds: [],
           identityScope: "product",
@@ -1348,7 +1342,6 @@ describe("createBottleClassifier", () => {
       status: "classified",
       decision: {
         action: "no_match",
-        confidence: 70,
         matchedBottleId: null,
         proposedBottle: null,
         confidenceBasis: {
@@ -1394,7 +1387,6 @@ describe("createBottleClassifier", () => {
       async ({ resolvedEntities }): Promise<ReasoningResult> => ({
         decision: {
           action: "no_match",
-          confidence: 45,
           rationale: "Entity context was available but no bottle matched.",
           candidateBottleIds: [],
           identityScope: "product",
@@ -1484,13 +1476,11 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 97,
           rationale: "No local bottle matched the reference.",
           candidateBottleIds: [],
           identityScope: "product",
           observation: null,
           confidenceBasis: {
-            band: "auto_verification",
             positiveEvidence: ["The label supports the proposed bottle."],
             unresolvedRisks: [],
             toolsUsed: ["none"],
@@ -1556,17 +1546,10 @@ describe("createBottleClassifier", () => {
     expect(result.artifacts.searchEvidence).toHaveLength(0);
     expect(result.decision).toMatchObject({
       action: "create_bottle",
-      confidence: 94,
-      confidenceBasis: {
-        band: "review",
-      },
       proposedBottle: {
         name: "Warehouse Session",
       },
     });
-    expect(result.decision.rationale).toContain(
-      "Server moved creation out of automatic verification because supporting source evidence or a deterministic anchor was not available.",
-    );
   });
 
   test("preserves create decisions when external web evidence does not support the proposed bottle", async () => {
@@ -1574,7 +1557,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 91,
           rationale: "No local bottle matched the reference.",
           candidateBottleIds: [],
           identityScope: "product",
@@ -1649,14 +1631,12 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 84,
           rationale:
             "A non-origin source corroborates the proposed bottle identity.",
           candidateBottleIds: [],
           identityScope: "product",
           observation: null,
           confidenceBasis: {
-            band: "review",
             positiveEvidence: [
               "A non-origin source corroborates the exact bottle name.",
             ],
@@ -1743,7 +1723,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 84,
           rationale:
             "The source text matches the proposed bottle but the web result is weak.",
           candidateBottleIds: [],
@@ -1751,12 +1730,14 @@ describe("createBottleClassifier", () => {
           observation: null,
           identityBasis: null,
           confidenceBasis: {
-            band: "review",
             positiveEvidence: [
               "A non-origin page mentions the same bottle name.",
             ],
             unresolvedRisks: [
-              "The corroborating result may be copied retailer text.",
+              {
+                category: "web_evidence_conflict",
+                note: "The corroborating result may be copied retailer text.",
+              },
             ],
             toolsUsed: ["openai_web_search"],
             webEvidence: "weak",
@@ -1827,7 +1808,6 @@ describe("createBottleClassifier", () => {
     expect(result.decision).toMatchObject({
       action: "create_bottle",
       confidenceBasis: {
-        band: "review",
         webEvidence: "weak",
       },
     });
@@ -1838,7 +1818,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 84,
           rationale:
             "A non-origin source text matches the proposed bottle identity.",
           candidateBottleIds: [],
@@ -1956,7 +1935,6 @@ describe("createBottleClassifier", () => {
           return {
             decision: {
               action: "create_bottle",
-              confidence: 94,
               rationale:
                 "Web evidence confirms Creag Isle 12-year-old Island Single Malt as a standalone bottle.",
               candidateBottleIds: [],
@@ -1998,7 +1976,6 @@ describe("createBottleClassifier", () => {
         return {
           decision: {
             action: "no_match",
-            confidence: 12,
             rationale:
               "No safe local match, and creation was not allowed without web confirmation.",
             candidateBottleIds: [],
@@ -2116,7 +2093,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "no_match",
-          confidence: 12,
           rationale: "No safe local match.",
           candidateBottleIds: [],
           identityScope: "product",
@@ -2243,7 +2219,6 @@ describe("createBottleClassifier", () => {
           return {
             decision: {
               action: "create_bottle",
-              confidence: 91,
               rationale: "Web evidence confirms Ardbeg Eureka.",
               candidateBottleIds: [],
               identityScope: "product",
@@ -2285,7 +2260,6 @@ describe("createBottleClassifier", () => {
         return {
           decision: {
             action: "no_match",
-            confidence: 30,
             rationale: "No safe local match.",
             candidateBottleIds: [],
             identityScope: "product",
@@ -2360,7 +2334,6 @@ describe("createBottleClassifier", () => {
       async ({ extractedIdentity }): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 88,
           rationale: "Used the text fallback.",
           candidateBottleIds: [],
           identityScope: null,
@@ -2445,7 +2418,6 @@ describe("createBottleClassifier", () => {
       async ({ extractedIdentity }): Promise<ReasoningResult> => ({
         decision: {
           action: "no_match",
-          confidence: 70,
           rationale: "Image failed, text fallback still ran.",
           candidateBottleIds: [],
           identityScope: null,
@@ -2508,7 +2480,6 @@ describe("createBottleClassifier", () => {
       async ({ initialCandidates }): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 82,
           rationale: "Closest local candidate.",
           identityScope: "product",
           observation: null,
@@ -2572,7 +2543,6 @@ describe("createBottleClassifier", () => {
       async ({ initialCandidates }): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 90,
           rationale: "No local bottle matched the reference.",
           identityScope: "product",
           observation: null,
@@ -2653,7 +2623,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle_and_release",
-          confidence: 80,
           rationale:
             "Web evidence suggests Johnnie Walker Blenders' Batch Sherry Cask Finish EXP#7.",
           identityScope: "product",
@@ -2766,7 +2735,6 @@ describe("createBottleClassifier", () => {
       async ({ initialCandidates }): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 90,
           rationale: "Recovered the exact Rare Breed Rye bottle.",
           identityScope: "product",
           observation: null,
@@ -2837,15 +2805,16 @@ describe("createBottleClassifier", () => {
       async ({ initialCandidates }): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 97,
           rationale: "Recovered the Rare Breed Rye bottle.",
           identityScope: "product",
           observation: null,
           confidenceBasis: {
-            band: "auto_verification",
             positiveEvidence: ["Local search found the rye sibling."],
             unresolvedRisks: [
-              "The source omits the barrel-proof wording on the canonical bottle.",
+              {
+                category: "web_evidence_conflict",
+                note: "The source omits the barrel-proof wording on the canonical bottle.",
+              },
             ],
             toolsUsed: ["initial_local_candidates"],
             webEvidence: "not_needed",
@@ -2885,11 +2854,7 @@ describe("createBottleClassifier", () => {
 
     expect(result.decision).toMatchObject({
       action: "match",
-      confidence: 94,
       matchedBottleId: 501,
-      confidenceBasis: {
-        band: "review",
-      },
     });
   });
 
@@ -2920,12 +2885,10 @@ describe("createBottleClassifier", () => {
       async ({ initialCandidates }): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 97,
           rationale: "Recovered the Rare Breed Rye bottle.",
           identityScope: "product",
           observation: null,
           confidenceBasis: {
-            band: "auto_verification",
             positiveEvidence: ["Local search found the rye sibling."],
             unresolvedRisks: [],
             toolsUsed: ["initial_local_candidates"],
@@ -2967,11 +2930,7 @@ describe("createBottleClassifier", () => {
 
     expect(result.decision).toMatchObject({
       action: "match",
-      confidence: 94,
       matchedBottleId: 501,
-      confidenceBasis: {
-        band: "review",
-      },
     });
   });
 
@@ -2995,7 +2954,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 86,
           rationale: "Woodford Reserve Kentucky Straight Malt Whiskey exists.",
           identityScope: "product",
           observation: null,
@@ -3090,7 +3048,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 95,
           rationale:
             "The generic 12-year-old local bottle is the safest match.",
           identityScope: "product",
@@ -3165,7 +3122,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 94,
           rationale: "The local alias is an exact wording match.",
           identityScope: "product",
           observation: null,
@@ -3231,7 +3187,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 89,
           rationale: "The local bottle identity matches the listing cleanly.",
           identityScope: "product",
           observation: null,
@@ -3300,7 +3255,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 88,
           rationale:
             "The local bottle aligns on brand, distillery, category, and the distinctive expression name.",
           identityScope: "product",
@@ -3376,7 +3330,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 87,
           rationale:
             "The local bottle aligns on the Jura brand family, category, and the 12-year-old age-statement core bottling.",
           identityScope: "product",
@@ -3446,17 +3399,20 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 91,
           rationale:
             "The 9-year Reserve bottle is the strongest existing match, and Triple Aged reads as extra label wording rather than a separate product family.",
           identityScope: "product",
           observation: null,
           confidenceBasis: {
-            band: "review",
             positiveEvidence: [
               "Official web evidence supports Canadian Club Reserve 9 Year Old.",
             ],
-            unresolvedRisks: ["A broader sibling omits the age statement."],
+            unresolvedRisks: [
+              {
+                category: "sibling_ambiguity",
+                note: "A broader sibling omits the age statement.",
+              },
+            ],
             toolsUsed: ["openai_web_search"],
             webEvidence: "supportive",
           },
@@ -3507,14 +3463,17 @@ describe("createBottleClassifier", () => {
 
     expect(result.decision).toMatchObject({
       action: "match",
-      confidence: 91,
       matchedBottleId: 16913,
       matchedReleaseId: null,
       parentBottleId: null,
       identityScope: "product",
       confidenceBasis: {
-        band: "review",
-        unresolvedRisks: ["A broader sibling omits the age statement."],
+        unresolvedRisks: [
+          {
+            category: "sibling_ambiguity",
+            note: "A broader sibling omits the age statement.",
+          },
+        ],
       },
     });
     expect(result.decision.rationale).not.toContain(
@@ -3542,7 +3501,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 88,
           rationale: "Web evidence supports Canadian Club Reserve 9-year-old.",
           identityScope: "product",
           observation: null,
@@ -3640,7 +3598,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 82,
           rationale:
             "The local Jura 12-year-old bottle appears close to the listing.",
           identityScope: "product",
@@ -3709,7 +3666,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 86,
           rationale:
             "Web evidence supports a specific Rare Cask Release bottling.",
           identityScope: "exact_cask",
@@ -3815,16 +3771,17 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 82,
           rationale:
             "The exact local parent matches but has a conflicting structured age.",
           identityScope: "product",
           observation: null,
           confidenceBasis: {
-            band: "review",
             positiveEvidence: ["The exact local parent covers the family."],
             unresolvedRisks: [
-              "Age conflict between source and matched bottle record.",
+              {
+                category: "trait_conflict",
+                note: "Age conflict between source and matched bottle record.",
+              },
             ],
             toolsUsed: ["initial_local_candidates"],
             webEvidence: "not_used",
@@ -3894,7 +3851,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 88,
           rationale:
             "Web evidence found a 2001 vintage and 2012 bottling year.",
           identityScope: "exact_cask",
@@ -4000,7 +3956,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 86,
           rationale:
             "The label supports this as a standalone single-cask bottling.",
           identityScope: "exact_cask",
@@ -4099,7 +4054,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 84,
           rationale: "The local candidate looks close to the listing.",
           identityScope: "product",
           observation: null,
@@ -4167,7 +4121,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 90,
           rationale: "The local bottle identity matches the listing cleanly.",
           identityScope: "product",
           observation: null,
@@ -4236,7 +4189,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 91,
           rationale: "The existing 2023 release matches the listing cleanly.",
           identityScope: "product",
           observation: null,
@@ -4330,7 +4282,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 89,
           rationale: "The parent bottle is the closest local candidate.",
           identityScope: "product",
           observation: null,
@@ -4416,7 +4367,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 91,
           rationale: "The existing 2023 release matches the listing cleanly.",
           identityScope: "product",
           observation: null,
@@ -4491,7 +4441,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 89,
           rationale: "One of the 2023 releases appears to match the listing.",
           identityScope: "product",
           observation: null,
@@ -4567,7 +4516,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          confidence: 88,
           rationale: "The parent bottle is the closest local match.",
           identityScope: "product",
           observation: null,
@@ -4641,7 +4589,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 96,
           rationale: "This is marketed as a standalone single-cask bottle.",
           candidateBottleIds: [],
           identityScope: null,
@@ -4733,7 +4680,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 91,
           rationale:
             "This is a bottle-level product, but the reference does not identify a specific cask.",
           candidateBottleIds: [],
@@ -4821,7 +4767,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "create_bottle",
-          confidence: 89,
           rationale:
             "This is a barrel-strength single-barrel bourbon, not a numbered exact-cask program bottle.",
           candidateBottleIds: [],
@@ -4899,7 +4844,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "no_match",
-          confidence: 0,
           rationale: "Agent should not run for SMWS code references.",
           candidateBottleIds: [],
           identityScope: "product",
@@ -4931,7 +4875,6 @@ describe("createBottleClassifier", () => {
 
     expect(result.decision).toMatchObject({
       action: "create_bottle",
-      confidence: 100,
       identityScope: "exact_cask",
       proposedRelease: null,
       proposedBottle: {
@@ -4949,7 +4892,6 @@ describe("createBottleClassifier", () => {
         caskNumber: "RW6.5",
       },
       confidenceBasis: {
-        band: "auto_verification",
         webEvidence: "not_needed",
       },
     });
@@ -4983,7 +4925,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "no_match",
-          confidence: 70,
           rationale: "Needs user confirmation.",
           candidateBottleIds: [],
           identityScope: "product",
@@ -5058,7 +4999,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "no_match",
-          confidence: 0,
           rationale: "Agent should not run for SMWS code references.",
           candidateBottleIds: [],
           identityScope: "product",
@@ -5090,7 +5030,6 @@ describe("createBottleClassifier", () => {
 
     expect(result.decision).toMatchObject({
       action: "match",
-      confidence: 100,
       identityScope: "exact_cask",
       matchedBottleId: 6505,
       observation: {
@@ -5106,7 +5045,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "no_match",
-          confidence: 0,
           rationale: "Agent should not run for SMWS code references.",
           candidateBottleIds: [],
           identityScope: "product",
@@ -5162,7 +5100,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "no_match",
-          confidence: 0,
           rationale: "ABV lookalikes need agent review.",
           candidateBottleIds: [],
           identityScope: "product",
@@ -5248,7 +5185,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "repair_bottle",
-          confidence: 98,
           rationale:
             "The exact local bottle matches, but the stored category is generic.",
           candidateBottleIds: [13025],
@@ -5305,7 +5241,6 @@ describe("createBottleClassifier", () => {
 
     expect(result.decision).toMatchObject({
       action: "match",
-      confidence: 98,
       matchedBottleId: 13025,
       matchedReleaseId: null,
       proposedBottle: null,
@@ -5355,7 +5290,6 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "repair_bottle",
-          confidence: 92,
           rationale:
             "The bottle identity matches, but the stored distillery and category are wrong.",
           candidateBottleIds: [currentBottleCandidate.bottleId],

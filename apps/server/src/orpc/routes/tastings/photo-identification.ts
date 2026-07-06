@@ -78,7 +78,6 @@ function derivePhotoIdentificationTier(decision: PhotoIdentificationDecision) {
   return deriveAutomationTier({
     actionRiskClass: agentActionRiskClass(decision.action),
     hasUnresolvedRisks: (confidenceBasis?.unresolvedRisks.length ?? 0) > 0,
-    band: confidenceBasis?.band ?? null,
     webEvidence: confidenceBasis?.webEvidence ?? null,
     hasMatchTarget:
       decision.action === "match" && decision.matchedBottleId !== null,
@@ -277,7 +276,7 @@ function buildPhotoIdentificationDiagnostics({
     classification: {
       status: "classified",
       action: classification.decision.action,
-      confidence: classification.decision.confidence,
+      confidence: null,
       reason: classification.decision.rationale,
     },
   };
@@ -330,9 +329,7 @@ function getClassificationLogAttributes(
 
   const { decision } = classification;
   attrs[`${prefix}.action`] = decision.action;
-  attrs[`${prefix}.confidence`] = decision.confidence;
   if (decision.confidenceBasis) {
-    attrs[`${prefix}.confidence_basis_band`] = decision.confidenceBasis.band;
     attrs[`${prefix}.confidence_basis_web_evidence`] =
       decision.confidenceBasis.webEvidence;
     attrs[`${prefix}.confidence_basis_positive_evidence_count`] =

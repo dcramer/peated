@@ -55,7 +55,7 @@
     "parentBottleId": null,
     "proposedBottle": null,
     "proposedRelease": null,
-    "confidenceBand": "review",
+    "expectedTier": "review",
     "summary": "Reject a generic parent repair or release creation because web evidence shows Batch 1 refers to cask-specific 35-year-old bottlings while the source lacks the exact cask identity and the only local row conflicts on age."
   }
 }

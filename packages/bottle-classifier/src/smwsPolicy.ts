@@ -387,7 +387,6 @@ export function maybeResolveSmwsExactCaskCodeDecision({
   if (existingTarget) {
     return {
       action: "match",
-      confidence: decision.confidence,
       rationale: appendRationale(
         decision.rationale,
         "Server matched the SMWS exact-cask code because SMWS bottle identity is anchored by code, not subtitle.",
@@ -417,7 +416,6 @@ export function maybeResolveSmwsExactCaskCodeDecision({
 
   return {
     action: "create_bottle",
-    confidence: decision.confidence,
     rationale: appendRationale(
       decision.rationale,
       "Server created the SMWS exact-cask bottle because the SMWS code is the bottle identity anchor and no local bottle uses it.",
@@ -482,7 +480,6 @@ export function resolveSmwsExactCaskReference({
   const confidenceBasis: NonNullable<
     BottleClassificationDecision["confidenceBasis"]
   > = {
-    band: "auto_verification",
     positiveEvidence: [
       `SMWS exact-cask code ${smwsCode} deterministically identifies the bottle.`,
     ],
@@ -494,7 +491,6 @@ export function resolveSmwsExactCaskReference({
   if (existingTarget) {
     return BottleClassificationDecisionSchema.parse({
       action: "match",
-      confidence: 100,
       rationale:
         "Server matched the SMWS exact-cask code without agent reasoning because SMWS bottle identity is anchored by code.",
       candidateBottleIds,
@@ -512,7 +508,6 @@ export function resolveSmwsExactCaskReference({
 
   return BottleClassificationDecisionSchema.parse({
     action: "create_bottle",
-    confidence: 100,
     rationale:
       "Server created the SMWS exact-cask bottle without agent reasoning because the SMWS code is the bottle identity anchor and no local bottle uses it.",
     candidateBottleIds,

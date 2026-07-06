@@ -3,10 +3,7 @@ import type {
   CandidateExpansionMode,
   ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier/contract";
-import type {
-  AutomationConfidenceBand,
-  WebEvidenceJudgment,
-} from "@peated/bottle-classifier/priceMatchingEvidence";
+import type { WebEvidenceJudgment } from "@peated/bottle-classifier/priceMatchingEvidence";
 import {
   getReleaseObservationFacts,
   isAddingBottleLevelReleaseTraits,
@@ -235,11 +232,6 @@ export class StorePriceMatchProposalNotReviewableError extends Error {
   }
 }
 
-function normalizeClassifierConfidence(confidence: number): number {
-  const percentageConfidence = confidence <= 1 ? confidence * 100 : confidence;
-  return Math.min(100, Math.max(0, Math.round(percentageConfidence)));
-}
-
 function normalizeClassifierDecisionForPriceMatching(
   decision: BottleClassificationDecision,
   candidates: PriceMatchCandidate[],
@@ -303,10 +295,7 @@ function normalizeClassifierDecisionForPriceMatching(
     );
   }
 
-  return {
-    ...decision,
-    confidence: normalizeClassifierConfidence(decision.confidence),
-  };
+  return decision;
 }
 
 function buildBottleRepairInputFromProposedBottle(
@@ -571,7 +560,7 @@ function maybeBuildExistingBottleRepairDecision({
 
   return {
     action: "correction",
-    confidence: decision.confidence,
+    confidence: null,
     rationale: appendRationale(
       decision.rationale,
       "The current bottle appears to be the right base identity, but its stored bottle metadata conflicts with the extracted traits. Review this as an existing-bottle repair instead of creating a duplicate bottle.",
@@ -611,7 +600,7 @@ export function toStorePriceMatchDecision({
 
     return {
       action,
-      confidence: decision.confidence,
+      confidence: null,
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
@@ -628,7 +617,7 @@ export function toStorePriceMatchDecision({
   if (decision.action === "repair_bottle") {
     return {
       action: "correction",
-      confidence: decision.confidence,
+      confidence: null,
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
@@ -654,7 +643,7 @@ export function toStorePriceMatchDecision({
 
     return {
       action: "create_new",
-      confidence: decision.confidence,
+      confidence: null,
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
@@ -671,7 +660,7 @@ export function toStorePriceMatchDecision({
   if (decision.action === "create_release") {
     return {
       action: "create_new",
-      confidence: decision.confidence,
+      confidence: null,
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
@@ -688,7 +677,7 @@ export function toStorePriceMatchDecision({
   if (decision.action === "create_bottle_and_release") {
     return {
       action: "create_new",
-      confidence: decision.confidence,
+      confidence: null,
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
@@ -707,7 +696,7 @@ export function toStorePriceMatchDecision({
     // needs the parent repair and child release drafts intact.
     return {
       action: "no_match",
-      confidence: decision.confidence,
+      confidence: null,
       rationale: appendRationale(
         decision.rationale,
         "Classifier found that the safe outcome requires repairing the existing parent bottle before creating a release; price matching cannot persist that compound repair yet.",
@@ -726,7 +715,7 @@ export function toStorePriceMatchDecision({
 
   return {
     action: "no_match",
-    confidence: decision.confidence,
+    confidence: null,
     rationale: decision.rationale,
     candidateBottleIds: decision.candidateBottleIds,
     identityScope: decision.identityScope,
@@ -812,7 +801,6 @@ function getProposalType(
 // alongside the translated price-match decision because the derived tier no
 // longer reads the numeric `confidence` score.
 type StorePriceMatchDecisionEvidence = {
-  band: AutomationConfidenceBand;
   hasUnresolvedRisks: boolean;
   webEvidence: WebEvidenceJudgment;
 };
@@ -832,7 +820,6 @@ function getProposalStatus(
       identityScope: decision.identityScope,
       suggestedBottleId: decision.suggestedBottleId,
       suggestedReleaseId: decision.suggestedReleaseId ?? null,
-      band: decisionEvidence?.band ?? null,
       hasUnresolvedRisks: decisionEvidence?.hasUnresolvedRisks ?? false,
       webEvidence: decisionEvidence?.webEvidence ?? null,
       automationBlockers: automationAssessment.automationBlockers,
@@ -2124,7 +2111,6 @@ export async function resolveStorePriceMatchProposal(
       candidates,
       decision,
       decisionEvidence: {
-        band: classification.decision.confidenceBasis?.band ?? null,
         hasUnresolvedRisks:
           (classification.decision.confidenceBasis?.unresolvedRisks.length ??
             0) > 0,

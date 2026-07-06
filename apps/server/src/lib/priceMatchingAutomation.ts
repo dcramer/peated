@@ -9,7 +9,6 @@ import {
   textsOverlap,
 } from "@peated/bottle-classifier/identityEvidenceCore";
 import {
-  type AutomationConfidenceBand,
   deriveAutomationTier,
   evaluateExistingMatchWebEvidence,
   getExistingMatchIdentityConflicts,
@@ -1167,7 +1166,6 @@ export function shouldVerifyStorePriceMatch(params: {
   identityScope?: MatchIdentityScope | null;
   suggestedBottleId: number | null;
   suggestedReleaseId: number | null;
-  band: AutomationConfidenceBand;
   hasUnresolvedRisks: boolean;
   webEvidence?: WebEvidenceJudgment;
   automationBlockers: string[];
@@ -1181,7 +1179,6 @@ export function shouldVerifyStorePriceMatch(params: {
     identityScope,
     suggestedBottleId,
     suggestedReleaseId,
-    band,
     hasUnresolvedRisks,
     webEvidence,
     plainAgeBottleAutoVerifyEligible = false,
@@ -1221,7 +1218,6 @@ export function shouldVerifyStorePriceMatch(params: {
     deriveAutomationTier({
       actionRiskClass: "match",
       hasUnresolvedRisks,
-      band,
       webEvidence: webEvidence ?? null,
       hasMatchTarget: true,
       reaffirmsCurrentAssignment,

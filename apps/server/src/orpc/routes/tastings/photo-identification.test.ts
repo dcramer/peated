@@ -127,9 +127,18 @@ function buildCreateBottleDecision({
   bottleName: string;
   confidence?: number;
   confidenceBasis?: {
-    band: "low" | "review" | "auto_verification" | "current_assignment";
     positiveEvidence?: string[];
-    unresolvedRisks?: string[];
+    unresolvedRisks?: {
+      category:
+        | "trait_conflict"
+        | "sibling_ambiguity"
+        | "release_ambiguity"
+        | "web_evidence_conflict"
+        | "insufficient_evidence"
+        | "identity_ambiguity"
+        | "other";
+      note: string;
+    }[];
     toolsUsed?: (
       | "initial_local_candidates"
       | "search_bottles"
@@ -859,9 +868,13 @@ describe("POST /tastings/photo-identification", () => {
         brandName: "Low Confidence Photo Brand",
         bottleName: "Review Bottle",
         confidenceBasis: {
-          band: "low",
           positiveEvidence: [],
-          unresolvedRisks: [],
+          unresolvedRisks: [
+            {
+              category: "insufficient_evidence",
+              note: "Evidence is too weak to auto-create this bottle.",
+            },
+          ],
           toolsUsed: [],
           webEvidence: "not_used",
         },
@@ -897,9 +910,13 @@ describe("POST /tastings/photo-identification", () => {
         bottleName: "Review Band Bottle",
         confidence: 90,
         confidenceBasis: {
-          band: "review",
           positiveEvidence: ["The label text matches a plausible bottle."],
-          unresolvedRisks: ["The bottle versus bottling model is uncertain."],
+          unresolvedRisks: [
+            {
+              category: "identity_ambiguity",
+              note: "The bottle versus bottling model is uncertain.",
+            },
+          ],
           toolsUsed: ["initial_local_candidates"],
           webEvidence: "not_used",
         },

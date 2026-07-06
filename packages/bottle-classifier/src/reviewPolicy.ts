@@ -35,7 +35,6 @@ import {
   stripDuplicateBrandPrefixFromBottleName,
 } from "./normalize";
 import { normalizeObservation } from "./observation";
-import { isExistingMatchConfidenceEligibleForVerification } from "./priceMatchingEvidence";
 import {
   candidateLooksSmws,
   getSmwsCodeAnchor,
@@ -189,11 +188,6 @@ const AGE_WORD_TENS: Record<number, string> = {
   80: "eighty",
   90: "ninety",
 };
-function normalizeClassifierConfidence(confidence: number): number {
-  const percentageConfidence = confidence <= 1 ? confidence * 100 : confidence;
-  return Math.min(100, Math.max(0, Math.round(percentageConfidence)));
-}
-
 function appendRationale(
   rationale: string | null,
   addition: string,
@@ -2021,7 +2015,6 @@ function maybeResolveExactCaskCreateToExistingMatch({
 
   return {
     action: "match",
-    confidence: decision.confidence,
     rationale: appendRationale(
       decision.rationale,
       "Server resolved exact-cask creation to the existing local bottle because the exact code anchor already exists.",
@@ -2440,7 +2433,6 @@ function maybeSplitMisScopedExactCaskBottleCreation({
 
   return {
     action: "create_bottle_and_release",
-    confidence: decision.confidence,
     rationale: appendRationale(
       decision.rationale,
       "Server redirected exact-cask bottle creation to bottle-and-release creation because the non-SMWS identity only had year-level release traits, not an exact cask anchor.",
@@ -2465,10 +2457,7 @@ function createNoMatchDecision({
   observation,
   identityScope,
 }: {
-  decision: Pick<
-    BottleClassifierAgentDecision,
-    "confidence" | "rationale" | "identityScope"
-  > &
+  decision: Pick<BottleClassifierAgentDecision, "rationale" | "identityScope"> &
     Partial<Pick<BottleClassifierAgentDecision, "aliasScope">> &
     Partial<
       Pick<BottleClassifierAgentDecision, "identityBasis" | "confidenceBasis">
@@ -2480,7 +2469,6 @@ function createNoMatchDecision({
 }): BottleClassificationDecision {
   return BottleClassificationDecisionSchema.parse({
     action: "no_match",
-    confidence: decision.confidence,
     rationale,
     candidateBottleIds,
     identityScope: identityScope ?? decision.identityScope ?? "product",
@@ -2553,131 +2541,6 @@ function rejectInvalidExistingMatch({
     identityScope: decision.identityScope,
     rationale: downgradedRationale,
   });
-}
-
-function capUnverifiedCreationAutomation({
-  reference,
-  decision,
-  artifacts,
-}: {
-  reference: BottleReference;
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-}): BottleClassificationDecision {
-  if (
-    decision.action !== "create_bottle" &&
-    decision.action !== "create_release" &&
-    decision.action !== "create_bottle_and_release" &&
-    decision.action !== "repair_parent_and_create_release"
-  ) {
-    return decision;
-  }
-
-  if (
-    hasSupportiveExternalWebEvidenceForCreation({
-      reference,
-      decision,
-      artifacts,
-    }) ||
-    hasSmwsCodeAnchoredCreationEvidence({
-      reference,
-      decision,
-      artifacts,
-    }) ||
-    hasImageLabelAnchoredExactCaskCreationEvidence({
-      decision,
-      artifacts,
-    }) ||
-    hasLocalParentAnchoredReleaseCreationEvidence({
-      decision,
-      artifacts,
-    }) ||
-    hasLocalSiblingAnchoredBottleAndReleaseCreationEvidence({
-      decision,
-      artifacts,
-    })
-  ) {
-    return decision;
-  }
-
-  if (decision.confidenceBasis?.band !== "auto_verification") {
-    return decision;
-  }
-
-  return {
-    ...decision,
-    confidence: Math.min(decision.confidence, 94),
-    rationale: appendRationale(
-      decision.rationale,
-      "Server moved creation out of automatic verification because supporting source evidence or a deterministic anchor was not available.",
-    ),
-    confidenceBasis: {
-      ...decision.confidenceBasis,
-      band: "review",
-    },
-  };
-}
-
-function capAutoVerificationWithUnresolvedRisks(
-  decision: BottleClassificationDecision,
-): BottleClassificationDecision {
-  const confidenceBasis = decision.confidenceBasis;
-  if (
-    confidenceBasis?.band !== "auto_verification" ||
-    confidenceBasis.unresolvedRisks.length === 0
-  ) {
-    return decision;
-  }
-
-  return {
-    ...decision,
-    confidence: Math.min(decision.confidence, 94),
-    rationale: appendRationale(
-      decision.rationale,
-      "Server moved the decision out of automatic verification because the classifier reported unresolved risks.",
-    ),
-    confidenceBasis: {
-      ...confidenceBasis,
-      band: "review",
-    },
-  };
-}
-
-function capIneligibleExistingMatchAutoVerification({
-  reference,
-  decision,
-}: {
-  reference: BottleReference;
-  decision: BottleClassificationDecision;
-}): BottleClassificationDecision {
-  const confidenceBasis = decision.confidenceBasis;
-  if (
-    decision.action !== "match" ||
-    confidenceBasis?.band !== "auto_verification" ||
-    isExistingMatchConfidenceEligibleForVerification({
-      confidence: decision.confidence,
-      currentBottleId: reference.currentBottleId ?? null,
-      currentReleaseId: reference.currentReleaseId ?? null,
-      identityScope: decision.identityScope,
-      matchedBottleId: decision.matchedBottleId,
-      matchedReleaseId: decision.matchedReleaseId,
-    })
-  ) {
-    return decision;
-  }
-
-  return {
-    ...decision,
-    confidence: Math.min(decision.confidence, 94),
-    rationale: appendRationale(
-      decision.rationale,
-      "Server moved the existing match out of automatic verification because downstream verification is not eligible for this assignment context.",
-    ),
-    confidenceBasis: {
-      ...confidenceBasis,
-      band: "review",
-    },
-  };
 }
 
 function textLooksLikeUnsupportedHouseCategoryStyle(
@@ -2884,9 +2747,6 @@ function sanitizeClassifierDecision({
   const resolvedEntitiesById = new Map(
     artifacts.resolvedEntities.map((entity) => [entity.entityId, entity]),
   );
-  const normalizedConfidence = normalizeClassifierConfidence(
-    decision.confidence,
-  );
   const filteredCandidateBottleIds = decision.candidateBottleIds.filter((id) =>
     candidateBottleIds.has(id),
   );
@@ -2896,7 +2756,6 @@ function sanitizeClassifierDecision({
     if (decision.matchedBottleId === null) {
       return createNoMatchDecision({
         decision: {
-          confidence: normalizedConfidence,
           rationale: decision.rationale,
           identityScope: decision.identityScope,
         },
@@ -2941,7 +2800,6 @@ function sanitizeClassifierDecision({
 
     return {
       action: "match",
-      confidence: normalizedConfidence,
       rationale: decision.rationale,
       candidateBottleIds: filteredCandidateBottleIds,
       identityScope: inferBottleIdentityScope({
@@ -2967,7 +2825,6 @@ function sanitizeClassifierDecision({
       return createNoMatchDecision({
         decision: {
           ...decision,
-          confidence: normalizedConfidence,
         },
         candidateBottleIds: filteredCandidateBottleIds,
         observation,
@@ -3001,7 +2858,6 @@ function sanitizeClassifierDecision({
       return createNoMatchDecision({
         decision: {
           ...decision,
-          confidence: normalizedConfidence,
         },
         candidateBottleIds: filteredCandidateBottleIds,
         observation,
@@ -3076,7 +2932,6 @@ function sanitizeClassifierDecision({
       decision: {
         ...decision,
         action: "create_bottle",
-        confidence: normalizedConfidence,
         identityScope: decision.identityScope ?? "product",
         aliasScope: decision.aliasScope ?? undefined,
         matchedBottleId: null,
@@ -3105,7 +2960,6 @@ function sanitizeClassifierDecision({
         return createNoMatchDecision({
           decision: {
             ...decision,
-            confidence: normalizedConfidence,
           },
           candidateBottleIds: filteredCandidateBottleIds,
           observation,
@@ -3131,7 +2985,6 @@ function sanitizeClassifierDecision({
       return createNoMatchDecision({
         decision: {
           ...decision,
-          confidence: normalizedConfidence,
         },
         candidateBottleIds: Array.from(
           new Set([
@@ -3160,7 +3013,6 @@ function sanitizeClassifierDecision({
       return createNoMatchDecision({
         decision: {
           ...decision,
-          confidence: normalizedConfidence,
         },
         candidateBottleIds: filteredCandidateBottleIds,
         observation,
@@ -3174,7 +3026,6 @@ function sanitizeClassifierDecision({
 
     return {
       action: "create_bottle",
-      confidence: normalizedConfidence,
       rationale: decision.rationale,
       candidateBottleIds: filteredCandidateBottleIds,
       identityScope: inferBottleIdentityScope({
@@ -3208,7 +3059,6 @@ function sanitizeClassifierDecision({
     if (decision.parentBottleId === null) {
       return createNoMatchDecision({
         decision: {
-          confidence: normalizedConfidence,
           rationale: decision.rationale,
           identityScope: decision.identityScope,
         },
@@ -3239,7 +3089,6 @@ function sanitizeClassifierDecision({
     if (!normalizedDrafts.proposedRelease) {
       return {
         action: "match",
-        confidence: normalizedConfidence,
         rationale: appendRationale(
           decision.rationale,
           "Server downgraded release creation to a bottle match because no reusable release identity remained after normalization.",
@@ -3269,7 +3118,6 @@ function sanitizeClassifierDecision({
       return createNoMatchDecision({
         decision: {
           ...decision,
-          confidence: normalizedConfidence,
         },
         candidateBottleIds: filteredCandidateBottleIds,
         observation,
@@ -3285,7 +3133,6 @@ function sanitizeClassifierDecision({
 
     return {
       action: "create_release",
-      confidence: normalizedConfidence,
       rationale: decision.rationale,
       candidateBottleIds: filteredCandidateBottleIds,
       identityScope: "product",
@@ -3303,7 +3150,6 @@ function sanitizeClassifierDecision({
       return createNoMatchDecision({
         decision: {
           ...decision,
-          confidence: normalizedConfidence,
         },
         candidateBottleIds: filteredCandidateBottleIds,
         observation,
@@ -3327,7 +3173,6 @@ function sanitizeClassifierDecision({
       return createNoMatchDecision({
         decision: {
           ...decision,
-          confidence: normalizedConfidence,
         },
         candidateBottleIds: filteredCandidateBottleIds,
         observation,
@@ -3353,7 +3198,6 @@ function sanitizeClassifierDecision({
       return createNoMatchDecision({
         decision: {
           ...decision,
-          confidence: normalizedConfidence,
         },
         candidateBottleIds: filteredCandidateBottleIds,
         observation,
@@ -3390,7 +3234,6 @@ function sanitizeClassifierDecision({
     ) {
       return {
         action: "create_release",
-        confidence: normalizedConfidence,
         rationale: appendRationale(
           decision.rationale,
           "Server normalized parent repair to create_release because the selected parent is already a clean reusable parent for the proposed release.",
@@ -3408,7 +3251,6 @@ function sanitizeClassifierDecision({
 
     return {
       action: "repair_parent_and_create_release",
-      confidence: normalizedConfidence,
       rationale: decision.rationale,
       candidateBottleIds: filteredCandidateBottleIds,
       identityScope: "product",
@@ -3426,7 +3268,6 @@ function sanitizeClassifierDecision({
       return createNoMatchDecision({
         decision: {
           ...decision,
-          confidence: normalizedConfidence,
         },
         candidateBottleIds: filteredCandidateBottleIds,
         observation,
@@ -3464,7 +3305,6 @@ function sanitizeClassifierDecision({
       return createNoMatchDecision({
         decision: {
           ...decision,
-          confidence: normalizedConfidence,
         },
         candidateBottleIds: filteredCandidateBottleIds,
         observation,
@@ -3520,7 +3360,6 @@ function sanitizeClassifierDecision({
         return createNoMatchDecision({
           decision: {
             ...decision,
-            confidence: normalizedConfidence,
           },
           candidateBottleIds: filteredCandidateBottleIds,
           observation,
@@ -3536,7 +3375,6 @@ function sanitizeClassifierDecision({
 
       return {
         action: "create_bottle",
-        confidence: normalizedConfidence,
         rationale: appendRationale(
           decision.rationale,
           "Server downgraded bottle-and-release creation to bottle creation because no reusable release identity remained after normalization.",
@@ -3564,7 +3402,6 @@ function sanitizeClassifierDecision({
       return createNoMatchDecision({
         decision: {
           ...decision,
-          confidence: normalizedConfidence,
         },
         candidateBottleIds: filteredCandidateBottleIds,
         observation,
@@ -3590,7 +3427,6 @@ function sanitizeClassifierDecision({
       return createNoMatchDecision({
         decision: {
           ...decision,
-          confidence: normalizedConfidence,
         },
         candidateBottleIds: filteredCandidateBottleIds,
         observation,
@@ -3625,7 +3461,6 @@ function sanitizeClassifierDecision({
 
       return {
         action: "create_bottle",
-        confidence: normalizedConfidence,
         rationale: appendRationale(
           decision.rationale,
           "Server downgraded bottle-and-release creation to bottle creation because exact-cask identity cannot create a child release beneath the bottle.",
@@ -3643,7 +3478,6 @@ function sanitizeClassifierDecision({
 
     return {
       action: "create_bottle_and_release",
-      confidence: normalizedConfidence,
       rationale: decision.rationale,
       candidateBottleIds: filteredCandidateBottleIds,
       identityScope: "product",
@@ -3661,7 +3495,6 @@ function sanitizeClassifierDecision({
       return createNoMatchDecision({
         decision: {
           ...decision,
-          confidence: normalizedConfidence,
         },
         candidateBottleIds: filteredCandidateBottleIds,
         observation,
@@ -3677,7 +3510,6 @@ function sanitizeClassifierDecision({
       return createNoMatchDecision({
         decision: {
           ...decision,
-          confidence: normalizedConfidence,
         },
         candidateBottleIds: filteredCandidateBottleIds,
         observation,
@@ -3716,7 +3548,6 @@ function sanitizeClassifierDecision({
       return createNoMatchDecision({
         decision: {
           ...decision,
-          confidence: normalizedConfidence,
         },
         candidateBottleIds: filteredCandidateBottleIds,
         observation,
@@ -3742,7 +3573,6 @@ function sanitizeClassifierDecision({
     ) {
       return {
         action: "match",
-        confidence: normalizedConfidence,
         rationale: appendRationale(
           decision.rationale,
           "Server normalized repair_bottle to a match because the proposed repair only restates the matched bottle identity or a legacy generic category.",
@@ -3768,7 +3598,6 @@ function sanitizeClassifierDecision({
 
     return {
       action: "repair_bottle",
-      confidence: normalizedConfidence,
       rationale: decision.rationale,
       candidateBottleIds: filteredCandidateBottleIds,
       identityScope: inferBottleIdentityScope({
@@ -3791,7 +3620,6 @@ function sanitizeClassifierDecision({
 
   return createNoMatchDecision({
     decision: {
-      confidence: normalizedConfidence,
       rationale: decision.rationale,
       identityScope: inferBottleIdentityScope({
         requestedIdentityScope: decision.identityScope,
@@ -3868,16 +3696,11 @@ export function finalizeBottleReferenceClassification({
   reference,
   decision,
   artifacts,
-  options = {},
 }: {
   reference: BottleReference;
   decision: BottleClassifierAgentDecisionInput;
   artifacts: BottleClassificationArtifacts;
-  options?: {
-    enforceCreateWebEvidence?: boolean;
-  };
 }): BottleClassificationDecision {
-  const enforceCreateWebEvidence = options.enforceCreateWebEvidence ?? true;
   const parsedDecision = BottleClassifierAgentDecisionSchema.parse(
     normalizePotentialProofLikeDecision(decision),
   );
@@ -3917,24 +3740,14 @@ export function finalizeBottleReferenceClassification({
       exactCaskAdjustedDecision.confidenceBasis ??
       parsedDecision.confidenceBasis,
   };
-  const evidenceAdjustedDecision = enforceCreateWebEvidence
-    ? capUnverifiedCreationAutomation({
-        reference,
-        decision: agentBasisAdjustedDecision,
-        artifacts,
-      })
-    : agentBasisAdjustedDecision;
-  const confidenceAdjustedDecision = capAutoVerificationWithUnresolvedRisks(
-    evidenceAdjustedDecision,
-  );
-  const verificationEligibleConfidenceAdjustedDecision =
-    capIneligibleExistingMatchAutoVerification({
-      reference,
-      decision: confidenceAdjustedDecision,
-    });
+  // The former numeric/band reconciliation caps (capUnverifiedCreationAutomation,
+  // capAutoVerificationWithUnresolvedRisks, capIneligibleExistingMatchAutoVerification)
+  // were retired with numeric confidence and the confidence band. Automated
+  // consumers now derive review routing from structured evidence via
+  // `deriveAutomationTier`, so review gating no longer lives in this pipeline.
   const reviewedDecision = rejectInvalidExistingMatch({
     reference,
-    decision: verificationEligibleConfidenceAdjustedDecision,
+    decision: agentBasisAdjustedDecision,
     artifacts,
   });
   const finalDecision =

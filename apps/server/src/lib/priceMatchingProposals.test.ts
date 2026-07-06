@@ -11,7 +11,6 @@ describe("toStorePriceMatchDecision", () => {
       candidates: [],
       decision: {
         action: "match",
-        confidence: 97,
         rationale: "Exact source page identifies a generic listing title.",
         candidateBottleIds: [123],
         identityScope: "product",

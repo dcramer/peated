@@ -137,7 +137,8 @@ Deterministic code is allowed for closed-form behavior:
 - normalization
 - known-id validation
 - impossible-state blocking
-- confidence caps and automation gates
+- the code-derived automation tier (`deriveAutomationTier`), which routes an
+  automated decision to review or auto from action risk plus structured evidence
 - exact identity anchors such as SMWS bottle codes
 - unambiguous literal stored alias lookup for match-only local identification
 - direct field contradictions, such as an extracted brand, category, distillery,
@@ -153,9 +154,9 @@ create canonical identity, or bypass agent judgment.
 Post-agent deterministic review must not turn a classifier `match` into
 `no_match` merely because code cannot prove the match from local text, fuzzy
 name comparison, search rank, or structured-support heuristics. Missing
-deterministic support can cap automation confidence or require review, but only
-binary invalid state or direct extracted-field conflict may erase the agent's
-semantic match.
+deterministic support can route the decision to review through the derived
+automation tier, but only binary invalid state or direct extracted-field
+conflict may erase the agent's semantic match.
 
 A literal stored alias shortcut is allowed only when the normalized input
 matches a non-ignored stored alias attached to exactly one bottle or release. If
@@ -205,18 +206,23 @@ patterns alone.
 there against this boundary:
 
 - Keep schema normalization, unknown-id rejection, impossible-state rejection,
-  non-whisky rejection, and confidence caps that enforce explicit automation
-  contracts.
+  and non-whisky rejection.
 - Keep checks that validate the selected target exists in the reviewed candidate
   set.
 - Keep direct extracted-field conflict rejection only for explicit conflicts on
   populated fields.
+- Do not reintroduce numeric-confidence or confidence-band reconciliation caps.
+  The classifier contract carries no numeric `confidence` and no
+  `confidenceBasis.band`; automated flows derive review routing in code from the
+  structured evidence via `deriveAutomationTier`, and the model's veto is a typed
+  `unresolvedRisks` entry (category plus note) that only forces review.
 - Remove or narrow checks that re-score names, infer family modeling, require
   local text-rank proof, or turn a clear agent match/create into `no_match`
   because the catalog row is incomplete or has non-target-defining cleanup work.
-- Remove or narrow caps that treat lack of web corroboration as a blocker when
-  the source label, image evidence, local candidates, or a closed-form anchor
-  already supports the exact target.
+- Keep review routing that treats lack of web corroboration as a downgrade in the
+  derived tier only, never as an erasure of the agent's match; the source label,
+  image evidence, local candidates, or a closed-form anchor can each be the
+  auto-tier anchor instead of web evidence.
 - Prefer adding an eval that proves the agent decision is right before relaxing
   a review-policy gate. Only relax the gate when the remaining failure is the
   gate itself.
@@ -233,8 +239,13 @@ Use the agent for:
 - match decisions that are not closed-form local id assertions
 
 The full classifier agent must fill `identityBasis` and `confidenceBasis` for
-reviewed decisions. `confidenceBasis.webEvidence = supportive` is required
-before automation can treat web-backed create evidence as validated.
+reviewed decisions. The contract has no numeric confidence score and no
+confidence band; the agent expresses certainty only through positive evidence,
+typed `unresolvedRisks` (category plus note), `webEvidence`, and the action
+itself. Any asserted unresolved risk forces automated review and no field can
+upgrade a decision the derived tier routes to review.
+`confidenceBasis.webEvidence = supportive` is required before automation can
+treat web-backed create evidence as validated.
 
 ## Evidence And Tools
 
@@ -284,9 +295,12 @@ Exact-cask identity does not create child releases.
 ## Evals
 
 Classifier evals should score final action, ids, create drafts, release scope,
-required fields, incorrect fields, and confidence calibration. Encoded expected
-fields are required. Missing unencoded optional enrichment can be tolerated;
-wrong required identity fields should fail.
+required fields, and incorrect fields. There is no numeric confidence to
+calibrate; instead evals assert the code-derived automation tier
+(`expectedTier: auto | review`) computed deterministically from the decision by
+`deriveAutomationTier`, and that derivation is covered by unit tests rather than
+model-scored confidence. Encoded expected fields are required. Missing unencoded
+optional enrichment can be tolerated; wrong required identity fields should fail.
 
 Local-identification evals should be scored separately from full
 classification evals. They should cover exact alias matches, safe non-exact
@@ -310,11 +324,11 @@ Keep responsibilities narrow:
 
 - `classifierRuntime.ts`: extraction, retrieval, tools, agent loop
 - `runtime/deterministic.ts`: pre-agent deterministic resolver registry
-- `reviewPolicy.ts`: validation, normalization, invalid-state rejection, and
-  confidence caps
+- `reviewPolicy.ts`: validation, normalization, and invalid-state rejection
 - `exactCaskPolicy.ts`: generic exact-cask signal validation for reviewed scope
 - `instructions.ts`: stable classifier and extractor prompts
-- `priceMatchingEvidence.ts`: pure evidence checks shared with price matching
+- `priceMatchingEvidence.ts`: pure evidence checks and the code-derived
+  automation tier (`deriveAutomationTier`) shared with price matching
 - `smws.ts`: SMWS parsing and exact-code behavior
 - `apps/server/src/agents/bottleClassifier/service.ts`: server adapter wiring
 

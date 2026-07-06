@@ -252,7 +252,6 @@ async function identifyExactAliasReference({
   return createDecidedBottleClassification({
     decision: {
       action: "match",
-      confidence: 100,
       rationale:
         "Stored bottle alias exactly matched the extracted label reference.",
       candidateBottleIds: [target.bottleId],
@@ -268,7 +267,6 @@ async function identifyExactAliasReference({
         uncertainties: [],
       },
       confidenceBasis: {
-        band: "auto_verification",
         positiveEvidence: [
           "The normalized extracted reference exactly matched one non-ignored stored bottle alias.",
         ],
@@ -303,16 +301,19 @@ function createLocalIdentificationNoMatch(
   return createDecidedBottleClassification({
     decision: {
       action: "no_match",
-      confidence: 0,
       rationale: "Local identification did not find an exact alias match.",
       candidateBottleIds: [],
       identityScope: "product",
       observation: null,
       identityBasis: null,
       confidenceBasis: {
-        band: "low",
         positiveEvidence: [],
-        unresolvedRisks: ["No local identification agent is configured."],
+        unresolvedRisks: [
+          {
+            category: "other",
+            note: "No local identification agent is configured.",
+          },
+        ],
         toolsUsed: ["none"],
         webEvidence: "not_used",
       },

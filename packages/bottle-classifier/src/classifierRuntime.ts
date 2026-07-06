@@ -195,7 +195,6 @@ function createLocalIdentificationNoMatch({
 
   return {
     action: "no_match",
-    confidence: Math.min(decision.confidence, 70),
     rationale: [
       decision.rationale,
       `Local identification cannot return ${decision.action}; falling back to no_match for the match-only contract.`,
@@ -207,10 +206,12 @@ function createLocalIdentificationNoMatch({
     observation: decision.observation,
     identityBasis: decision.identityBasis,
     confidenceBasis: {
-      band: "review",
       positiveEvidence: [],
       unresolvedRisks: [
-        "The local-identification contract only allows existing matches.",
+        {
+          category: "other",
+          note: "The local-identification contract only allows existing matches.",
+        },
       ],
       toolsUsed: artifacts.candidates.length
         ? ["initial_local_candidates"]
@@ -235,7 +236,6 @@ function normalizeLocalIdentificationMatch(
   return {
     ...decision,
     confidenceBasis: {
-      band: decision.confidenceBasis?.band ?? "review",
       positiveEvidence: decision.confidenceBasis?.positiveEvidence ?? [],
       unresolvedRisks: decision.confidenceBasis?.unresolvedRisks ?? [],
       toolsUsed: (decision.confidenceBasis?.toolsUsed ?? []).filter(
@@ -1521,7 +1521,6 @@ export function createBottleClassifier(
           createDecidedBottleClassification({
             decision: {
               action: "no_match",
-              confidence: 0,
               rationale:
                 "Local identification found no existing bottle or release candidates.",
               candidateBottleIds: [],
@@ -1529,9 +1528,13 @@ export function createBottleClassifier(
               observation: null,
               identityBasis: null,
               confidenceBasis: {
-                band: "low",
                 positiveEvidence: [],
-                unresolvedRisks: ["No local candidates were found."],
+                unresolvedRisks: [
+                  {
+                    category: "insufficient_evidence",
+                    note: "No local candidates were found.",
+                  },
+                ],
                 toolsUsed: ["initial_local_candidates"],
                 webEvidence: "not_used",
               },

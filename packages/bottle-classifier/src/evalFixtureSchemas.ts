@@ -133,9 +133,7 @@ export const classifierEvalExpectationSchema = z.object({
   proposedBottleNameIncludes: z.array(z.string().min(1)).optional(),
   proposedBottleNameExcludes: z.array(z.string().min(1)).optional(),
   proposedRelease: z.record(z.string(), z.unknown()).nullable().optional(),
-  confidenceBand: z
-    .enum(["low", "review", "auto_verification", "current_assignment"])
-    .optional(),
+  expectedTier: z.enum(["auto", "review"]).optional(),
   verifyEligible: z.boolean().optional(),
   suggestedNextStep: z
     .enum(["confirm_match", "confirm_create", "manual_search", "needs_review"])

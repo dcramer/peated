@@ -95,7 +95,7 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 65001,
-    "confidenceBand": "auto_verification",
+    "expectedTier": "auto",
     "summary": "Keep the plain Tomatin 12-year-old bottle match instead of inventing a child release beneath the unrelated Tomatin Cask Strength family."
   }
 }

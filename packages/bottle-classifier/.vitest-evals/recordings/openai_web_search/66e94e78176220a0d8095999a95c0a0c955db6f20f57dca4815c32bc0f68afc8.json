@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T20:20:52.403Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 2016 cask 1661 Creative Whisky Company"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 2016 cask 1661 Creative Whisky Company",
+    "summary": "I found a bottle-specific match, but **not** for the exact cask number you gave.\n\n**Confirmed bottle matching your main specs**  \n- **Bottler:** Creative Whisky Company (CWC) ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/82715/islay-2007-cwc))  \n- **Series:** The Exclusive Malts ([whiskybase.com](https:/",
+    "results": [
+      {
+        "title": "Islay 2007 CWC - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/82715/islay-2007-cwc",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.spiritradar.com/whisky-db/brands/creative-whisky-company/",
+        "url": "https://www.spiritradar.com/whisky-db/brands/creative-whisky-company/",
+        "domain": "spiritradar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://maltrunners.com/2024/05/29/speyside-8-exclusive-regions/",
+        "url": "https://maltrunners.com/2024/05/29/speyside-8-exclusive-regions/",
+        "domain": "maltrunners.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskyhammer.com/item/149853/Balmenach/Balmenach---8-Year-Old-2007-The-Exclusive-Malts-75cl.html",
+        "url": "https://www.whiskyhammer.com/item/149853/Balmenach/Balmenach---8-Year-Old-2007-The-Exclusive-Malts-75cl.html",
+        "domain": "whiskyhammer.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/bunnahabhain-the-exclusive-malts.html",
+        "url": "https://www.whisky.com/whisky-database/details/bunnahabhain-the-exclusive-malts.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/elements-of-islay/torba-elements-of-islay-velier-70th-anniversary-exclusive-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/elements-of-islay/torba-elements-of-islay-velier-70th-anniversary-exclusive-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "66e94e78176220a0d8095999a95c0a0c955db6f20f57dca4815c32bc0f68afc8",
+    "mode": "auto"
+  }
+}

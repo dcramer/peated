@@ -34,7 +34,6 @@ describe("BottleClassifierAgentDecisionSchema", () => {
   test("parses first-class existing-bottle repair decisions", () => {
     const decision = BottleClassificationDecisionSchema.parse({
       action: "repair_bottle",
-      confidence: 91,
       rationale: "Bottle identity matches, but distillery metadata is wrong.",
       candidateBottleIds: [123],
       matchedBottleId: 123,
@@ -73,7 +72,6 @@ describe("BottleClassifierAgentDecisionSchema", () => {
   test("accepts legacy decisions without alias metadata", () => {
     const decision = BottleClassificationDecisionSchema.parse({
       action: "no_match",
-      confidence: 40,
       candidateBottleIds: [],
     });
 
@@ -84,7 +82,6 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     expect(
       BottleClassificationDecisionSchema.safeParse({
         action: "match",
-        confidence: 96,
         candidateBottleIds: [123],
         matchedBottleId: 123,
         aliasScope: "global_alias",
@@ -94,7 +91,6 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     expect(
       BottleClassifierAgentDecisionSchema.safeParse({
         action: "match",
-        confidence: 96,
         candidateBottleIds: [123],
         identityScope: "product",
         aliasScope: "none",
@@ -132,7 +128,6 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     });
     const decision = BottleClassifierAgentDecisionSchema.parse({
       action: "create_release",
-      confidence: 88,
       rationale: "A second vintage establishes the reusable parent.",
       candidateBottleIds: [100],
       identityScope: "product",
@@ -147,9 +142,13 @@ describe("BottleClassifierAgentDecisionSchema", () => {
         uncertainties: [],
       },
       confidenceBasis: {
-        band: "review",
         positiveEvidence: ["local parent candidate exists"],
-        unresolvedRisks: ["new vintage release needs review"],
+        unresolvedRisks: [
+          {
+            category: "release_ambiguity",
+            note: "new vintage release needs review",
+          },
+        ],
         toolsUsed: ["initial_local_candidates"],
         webEvidence: "not_used",
       },
@@ -165,7 +164,6 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     expect(candidate.familyContext?.siblingReleases[0]?.vintageYear).toBe(1993);
     expect(candidate.familyContext?.siblingBottles[0]?.statedAge).toBe(21);
     expect(decision.identityBasis?.yearInterpretation).toBe("vintage_year");
-    expect(decision.confidenceBasis?.band).toBe("review");
   });
 
   test("rejects removed structured cask fields at classifier boundaries", () => {
@@ -198,7 +196,6 @@ describe("BottleClassifierAgentDecisionSchema", () => {
   test("parses parent repair plus release creation decisions", () => {
     const decision = BottleClassificationDecisionSchema.parse({
       action: "repair_parent_and_create_release",
-      confidence: 90,
       rationale:
         "The existing parent has a bottle-level age that must move before adding the sibling age statement.",
       candidateBottleIds: [44175],

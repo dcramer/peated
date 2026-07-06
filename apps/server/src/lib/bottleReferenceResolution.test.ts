@@ -230,7 +230,7 @@ describe("resolveBottleReferenceTarget", () => {
       releaseId: null,
       source: "unresolved",
       error: null,
-      confidence: 90,
+      confidence: null,
       createdBottle: false,
       createdRelease: false,
     });

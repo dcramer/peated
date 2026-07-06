@@ -150,7 +150,6 @@ function buildShieldaigAgeCreationDecision(
 ): BottleClassifierAgentDecisionInput {
   return {
     action: "create_bottle",
-    confidence: 87,
     rationale:
       "The source supports a new Shieldaig Speyside 30-year-old bottle distinct from existing age-stated siblings.",
     candidateBottleIds: [ageBearingParentCandidate.bottleId],
@@ -163,9 +162,13 @@ function buildShieldaigAgeCreationDecision(
       siblingEvidence: "dirty_sibling_candidates",
     },
     confidenceBasis: {
-      band: "review",
       positiveEvidence: ["source title states 30-year-old"],
-      unresolvedRisks: ["same-family aged bottle siblings exist"],
+      unresolvedRisks: [
+        {
+          category: "sibling_ambiguity",
+          note: "same-family aged bottle siblings exist",
+        },
+      ],
       toolsUsed: ["initial_local_candidates"],
       webEvidence: "not_used",
     },
@@ -220,9 +223,6 @@ function classifyShieldaigAgeCreation(
         edition: null,
       },
     }),
-    options: {
-      enforceCreateWebEvidence: false,
-    },
   });
 }
 
@@ -252,9 +252,6 @@ function classifyAgeCreationWithoutSiblingConflict(
         edition: null,
       },
     }),
-    options: {
-      enforceCreateWebEvidence: false,
-    },
   });
 }
 
@@ -266,7 +263,6 @@ describe("finalizeBottleReferenceClassification", () => {
       },
       decision: {
         action: "match",
-        confidence: 91,
         rationale: "The existing candidate matches.",
         candidateBottleIds: [existingPrivateCask.bottleId],
         identityScope: "product",
@@ -280,9 +276,6 @@ describe("finalizeBottleReferenceClassification", () => {
       artifacts: buildBottleClassificationArtifacts({
         candidates: [existingPrivateCask],
       }),
-      options: {
-        enforceCreateWebEvidence: false,
-      },
     });
 
     expect(result).toMatchObject({
@@ -299,7 +292,6 @@ describe("finalizeBottleReferenceClassification", () => {
       },
       decision: {
         action: "match",
-        confidence: 97,
         rationale: "The listing title is safe as a reusable alias.",
         candidateBottleIds: [existingPrivateCask.bottleId],
         identityScope: "product",
@@ -314,9 +306,6 @@ describe("finalizeBottleReferenceClassification", () => {
       artifacts: buildBottleClassificationArtifacts({
         candidates: [existingPrivateCask],
       }),
-      options: {
-        enforceCreateWebEvidence: false,
-      },
     });
 
     expect(result).toMatchObject({
@@ -404,9 +393,6 @@ describe("finalizeBottleReferenceClassification", () => {
           edition: null,
         },
       }),
-      options: {
-        enforceCreateWebEvidence: false,
-      },
     });
 
     expect(result).toMatchObject({
@@ -450,7 +436,6 @@ describe("finalizeBottleReferenceClassification", () => {
   test("does not let generic cask details bypass duplicate product creation checks", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "create_bottle",
-      confidence: 88,
       rationale:
         "The source appears to describe a private cask product, but not a separate exact-cask bottle identity.",
       candidateBottleIds: [existingPrivateCask.bottleId],
@@ -496,9 +481,6 @@ describe("finalizeBottleReferenceClassification", () => {
       artifacts: buildBottleClassificationArtifacts({
         candidates: [existingPrivateCask],
       }),
-      options: {
-        enforceCreateWebEvidence: true,
-      },
     });
 
     expect(result).toMatchObject({
@@ -516,7 +498,6 @@ describe("finalizeBottleReferenceClassification", () => {
   test("does not resolve exact-cask creation to a wrong-family code match", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "create_bottle",
-      confidence: 91,
       rationale:
         "The source and web evidence support an exact-cask bottle for Example.",
       candidateBottleIds: [wrongFamilyExactCodeCandidate.bottleId],
@@ -577,9 +558,6 @@ describe("finalizeBottleReferenceClassification", () => {
           edition: null,
         },
       }),
-      options: {
-        enforceCreateWebEvidence: false,
-      },
     });
 
     expect(result).toMatchObject({
@@ -595,7 +573,6 @@ describe("finalizeBottleReferenceClassification", () => {
   test("lets reviewed repair parents anchor child release creation", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "create_release",
-      confidence: 92,
       rationale:
         "The local repair parent is the reusable product and S2B13 is release identity.",
       candidateBottleIds: [repairParentCandidate.bottleId],
@@ -657,7 +634,6 @@ describe("finalizeBottleReferenceClassification", () => {
   test("lets readable image evidence anchor exact-cask bottle creation automation", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "create_bottle",
-      confidence: 94,
       rationale:
         "The readable label identifies an exact single-cask bottle with no safe local match.",
       candidateBottleIds: [],
@@ -674,7 +650,6 @@ describe("finalizeBottleReferenceClassification", () => {
       },
       identityBasis: null,
       confidenceBasis: {
-        band: "auto_verification",
         positiveEvidence: ["Readable bottle label states barrel 4779."],
         unresolvedRisks: [],
         toolsUsed: ["initial_local_candidates"],
@@ -775,9 +750,6 @@ describe("finalizeBottleReferenceClassification", () => {
 
     expect(result).toMatchObject({
       action: "create_bottle",
-      confidenceBasis: {
-        band: "auto_verification",
-      },
     });
   });
 
@@ -811,7 +783,6 @@ describe("finalizeBottleReferenceClassification", () => {
       },
       decision: {
         action: "match",
-        confidence: 94,
         rationale: "The source appears to match the coded candidate.",
         candidateBottleIds: [targetCandidate.bottleId],
         identityScope: "exact_cask",
@@ -827,7 +798,6 @@ describe("finalizeBottleReferenceClassification", () => {
         },
         identityBasis: null,
         confidenceBasis: {
-          band: "auto_verification",
           positiveEvidence: ["The source uses cask code 95.71."],
           unresolvedRisks: [],
           toolsUsed: ["initial_local_candidates"],
@@ -872,7 +842,6 @@ describe("finalizeBottleReferenceClassification", () => {
       },
       decision: {
         action: "no_match",
-        confidence: 89,
         rationale: "No local bottle matched the readable SMWS label.",
         candidateBottleIds: [],
         identityScope: "product",
@@ -901,9 +870,6 @@ describe("finalizeBottleReferenceClassification", () => {
           edition: "95.71",
         },
       }),
-      options: {
-        enforceCreateWebEvidence: false,
-      },
     });
 
     expect(result).toMatchObject({
@@ -927,7 +893,6 @@ describe("finalizeBottleReferenceClassification", () => {
       },
       decision: {
         action: "create_bottle",
-        confidence: 89,
         rationale: "The readable SMWS label identifies an exact-cask bottle.",
         candidateBottleIds: [],
         identityScope: "exact_cask",
@@ -984,9 +949,6 @@ describe("finalizeBottleReferenceClassification", () => {
           edition: "95.71",
         },
       }),
-      options: {
-        enforceCreateWebEvidence: false,
-      },
     });
 
     expect(result).toMatchObject({
@@ -1004,7 +966,6 @@ describe("finalizeBottleReferenceClassification", () => {
   test("downgrades release creation when the parent has conflicting bottle-level release traits", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "create_release",
-      confidence: 90,
       rationale:
         "The local parent matches the family, but the source age differs.",
       candidateBottleIds: [ageBearingParentCandidate.bottleId],
@@ -1048,9 +1009,6 @@ describe("finalizeBottleReferenceClassification", () => {
           edition: null,
         },
       }),
-      options: {
-        enforceCreateWebEvidence: false,
-      },
     });
 
     expect(result).toMatchObject({
@@ -1065,7 +1023,6 @@ describe("finalizeBottleReferenceClassification", () => {
   test("keeps parent repair plus release creation decisions", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "repair_parent_and_create_release",
-      confidence: 90,
       rationale:
         "The existing parent should be repaired into a clean reusable Shieldaig Speyside bottle before creating the supported 21-year-old child release.",
       candidateBottleIds: [ageBearingParentCandidate.bottleId],
@@ -1125,9 +1082,6 @@ describe("finalizeBottleReferenceClassification", () => {
           edition: null,
         },
       }),
-      options: {
-        enforceCreateWebEvidence: true,
-      },
     });
 
     expect(result).toMatchObject({
@@ -1151,7 +1105,6 @@ describe("finalizeBottleReferenceClassification", () => {
   test("keeps parent repair on the classifier-selected dirty parent", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "repair_parent_and_create_release",
-      confidence: 91,
       rationale:
         "The selected candidate is a dirty same-family bottling row, so repair it before creating the Batch 2 bottling.",
       candidateBottleIds: [
@@ -1215,9 +1168,6 @@ describe("finalizeBottleReferenceClassification", () => {
           edition: "Batch 2",
         },
       }),
-      options: {
-        enforceCreateWebEvidence: false,
-      },
     });
 
     expect(result).toMatchObject({
