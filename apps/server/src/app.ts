@@ -30,6 +30,7 @@ import path from "path";
 import type { ZodIssue } from "zod";
 import { ZodError } from "zod";
 import config from "./config";
+import { userToActorContext, withActorContext } from "./lib/actorContext";
 import { getUserFromHeader } from "./lib/auth";
 import { getStorage } from "./lib/gcs";
 import { httpLogger, logError, logInfo, logWarn } from "./lib/log";
@@ -335,37 +336,39 @@ export const app = new Hono()
         })
       : setUser(null);
 
-    // Enforce ToS acceptance for authenticated users except reserved auth paths
-    if (user && !user.termsAcceptedAt) {
-      const path = new URL(c.req.url).pathname;
-      const allowed = path.startsWith("/v1/auth/");
-      if (!allowed) {
-        return c.json(
-          {
-            message: "Terms acceptance required.",
-            error: "Forbidden",
-            statusCode: 403,
-          },
-          403,
-        );
+    return await withActorContext(userToActorContext(user), async () => {
+      // Enforce ToS acceptance for authenticated users except reserved auth paths
+      if (user && !user.termsAcceptedAt) {
+        const path = new URL(c.req.url).pathname;
+        const allowed = path.startsWith("/v1/auth/");
+        if (!allowed) {
+          return c.json(
+            {
+              message: "Terms acceptance required.",
+              error: "Forbidden",
+              statusCode: 403,
+            },
+            403,
+          );
+        }
       }
-    }
 
-    const connInfo = getConnInfo(c);
-    const { matched, response } = await openapiHandler.handle(c.req.raw, {
-      prefix: "/v1",
-      context: {
-        user,
-        ip: getClientIp(c.req.raw, connInfo),
-        userAgent: c.req.header("user-agent"),
-      },
+      const connInfo = getConnInfo(c);
+      const { matched, response } = await openapiHandler.handle(c.req.raw, {
+        prefix: "/v1",
+        context: {
+          user,
+          ip: getClientIp(c.req.raw, connInfo),
+          userAgent: c.req.header("user-agent"),
+        },
+      });
+
+      if (matched) {
+        return c.newResponse(response.body, response);
+      }
+
+      await next();
     });
-
-    if (matched) {
-      return c.newResponse(response.body, response);
-    }
-
-    await next();
   })
   .use("/rpc/*", async (c, next) => {
     const user = await getUserFromHeader(c.req.header("authorization"));
@@ -378,37 +381,39 @@ export const app = new Hono()
         })
       : setUser(null);
 
-    // Enforce ToS acceptance for authenticated users except reserved auth paths
-    if (user && !user.termsAcceptedAt) {
-      const path = new URL(c.req.url).pathname;
-      const allowed = path.startsWith("/rpc/auth/");
-      if (!allowed) {
-        return c.json(
-          {
-            message: "Terms acceptance required.",
-            error: "Forbidden",
-            statusCode: 403,
-          },
-          403,
-        );
+    return await withActorContext(userToActorContext(user), async () => {
+      // Enforce ToS acceptance for authenticated users except reserved auth paths
+      if (user && !user.termsAcceptedAt) {
+        const path = new URL(c.req.url).pathname;
+        const allowed = path.startsWith("/rpc/auth/");
+        if (!allowed) {
+          return c.json(
+            {
+              message: "Terms acceptance required.",
+              error: "Forbidden",
+              statusCode: 403,
+            },
+            403,
+          );
+        }
       }
-    }
 
-    const connInfo = getConnInfo(c);
-    const { matched, response } = await rpcHandler.handle(c.req.raw, {
-      prefix: "/rpc",
-      context: {
-        user,
-        ip: getClientIp(c.req.raw, connInfo),
-        userAgent: c.req.header("user-agent"),
-      },
+      const connInfo = getConnInfo(c);
+      const { matched, response } = await rpcHandler.handle(c.req.raw, {
+        prefix: "/rpc",
+        context: {
+          user,
+          ip: getClientIp(c.req.raw, connInfo),
+          userAgent: c.req.header("user-agent"),
+        },
+      });
+
+      if (matched) {
+        return c.newResponse(response.body, response);
+      }
+
+      await next();
     });
-
-    if (matched) {
-      return c.newResponse(response.body, response);
-    }
-
-    await next();
   });
 
 export type AppType = typeof app;

@@ -63,9 +63,9 @@ Without this step, TypeScript will not allow you to queue the job.
 ### Queue a Job
 
 ```typescript
-import { addJob } from "@peated/server/worker/client";
+import { pushJob } from "@peated/server/worker/client";
 
-await addJob("MyNewJob", { param1: "value" });
+await pushJob("MyNewJob", { param1: "value" });
 ```
 
 ### Run Immediately (Testing)
@@ -93,7 +93,7 @@ scheduledJob("0 3 * * *", "cleanup-job", async () => {
 ```typescript
 type JobFunction = (
   args?: any, // Job parameters
-  context?: JobContext, // Trace context for Sentry
+  context?: JobContext, // Trace and app-owned actor context
 ) => Promise<unknown>;
 ```
 
@@ -101,5 +101,7 @@ type JobFunction = (
 
 - **Automatic Sentry instrumentation**: All jobs are wrapped with error tracking
 - **Trace propagation**: Supports distributed tracing via context
+- **Actor propagation**: Carries authenticated user attribution into queued
+  worker context and applies it to Sentry user/attributes in the worker
 - **Logging**: Automatic success/failure logging with duration
 - **Type safety**: TypeScript ensures job names are valid

@@ -7,7 +7,8 @@ Backend tests in this repo are integration-first. Test behavior over real wiring
 - Prefer integration tests over isolated unit tests.
 - Verify observable behavior, not implementation details.
 - Do not add fluff unit tests that mock internal collaborators, route layers, database access, serializers, or random call chains that do not need separate verification.
-- Only mock true external boundaries or unavoidable side effects, such as email delivery, worker dispatch, passkey verification, third-party HTTP, or AI providers.
+- Only mock true external boundaries or unavoidable side effects, such as email delivery, passkey verification, third-party HTTP, or AI providers.
+- First-party services should not be mocked when their contract is the behavior under test. Exercise the real owned boundary, use an existing fixture, or extract a small deterministic helper for payload construction.
 - Small deterministic helpers may be tested directly when there is no useful integration surface and the test does not require unnecessary mocking. These cases should be uncommon.
 
 ## What Integration Means Here
@@ -93,12 +94,17 @@ If a helper test starts building fake collaborators or asserting internal call s
 Mocking is allowed only at boundaries that are expensive, unsafe, or inappropriate to invoke in tests:
 
 - outbound email;
-- worker queue dispatch;
+- worker queue dispatch when the enqueue itself is incidental to the behavior under test;
 - passkey or auth provider verification;
 - third-party HTTP services;
 - AI providers or other hosted external systems.
 
 Do not mock internal business logic purely to make a backend test look unit-sized.
+
+When queue serialization or worker context propagation is the behavior under
+test, do not whole-module mock `worker/client`. Assert against a real queue
+fixture if one exists, or against the deterministic first-party payload builder
+used by the enqueue path.
 
 Do not mock or suppress logging. Leave the logging facade and console methods
 wired so emitted logs remain available during test runs. Tests should verify the
