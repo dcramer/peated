@@ -17,6 +17,8 @@ export const CATEGORY_LIST = [
 
 export const ENTITY_TYPE_LIST = ["brand", "bottler", "distiller"] as const;
 
+export const ALIAS_SCOPES = ["global_alias", "none"] as const;
+
 export const CASK_FILLS = ["1st_fill", "2nd_fill", "refill", "other"] as const;
 
 export const CASK_TYPES = [
@@ -69,6 +71,7 @@ export const CaskTypeEnum = z.enum(CASK_TYPE_IDS);
 export const CaskSizeEnum = z.enum(CASK_SIZE_IDS);
 export const CategoryEnum = z.enum(CATEGORY_LIST);
 export const EntityTypeEnum = z.enum(ENTITY_TYPE_LIST);
+export const AliasScopeEnum = z.enum(ALIAS_SCOPES);
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -498,6 +501,9 @@ const BottleClassifierDecisionBaseSchema = z.object({
   identityScope: BottleIdentityScopeEnum.default("product").describe(
     "`product` for stable bottle-family identity; `exact_cask` only when the exact cask itself is the marketed bottle identity. SMWS codes qualify; generic cask/barrel details do not qualify without reliable evidence that the listed product is an exact single-cask identity.",
   ),
+  aliasScope: AliasScopeEnum.optional().describe(
+    "`global_alias` only when the listing label is safe to store as a reusable bottle alias; `none` when no reusable alias should be created.",
+  ),
   observation: BottleObservationSchema.nullable().default(null),
   identityBasis: BottleIdentityBasisSchema.nullable().optional(),
   confidenceBasis: BottleConfidenceBasisSchema.nullable().optional(),
@@ -656,6 +662,7 @@ export const BottleClassifierAgentDecisionSchema = z.object({
   rationale: z.string().nullable().default(null),
   candidateBottleIds: z.array(z.number().int()).default([]),
   identityScope: BottleIdentityScopeEnum.nullable().default(null),
+  aliasScope: AliasScopeEnum.nullable().default(null),
   observation: BottleObservationSchema.nullable().default(null),
   identityBasis: BottleIdentityBasisSchema.nullable().default(null),
   confidenceBasis: BottleConfidenceBasisSchema.nullable().default(null),
@@ -693,6 +700,7 @@ export type BottleExtractedDetails = z.infer<
 >;
 export type BottleConfidenceBasis = z.infer<typeof BottleConfidenceBasisSchema>;
 export type BottleIdentityBasis = z.infer<typeof BottleIdentityBasisSchema>;
+export type AliasScope = z.infer<typeof AliasScopeEnum>;
 export type BottleEvidenceSourceTier = z.infer<
   typeof BottleEvidenceSourceTierEnum
 >;
@@ -707,15 +715,25 @@ export type BottleCandidateSearchInput = z.infer<
   typeof BottleCandidateSearchInputSchema
 >;
 export type SearchEntitiesArgs = z.infer<typeof SearchEntitiesArgsSchema>;
-export type BottleClassifierAgentDecision = z.infer<
+type BottleClassifierAgentDecisionOutput = z.infer<
   typeof BottleClassifierAgentDecisionSchema
 >;
-export type BottleClassificationDecision = z.infer<
+type BottleClassificationDecisionOutput = z.infer<
   typeof BottleClassificationDecisionSchema
 >;
-export type BottleClassifierAgentDecisionInput = z.input<
-  typeof BottleClassifierAgentDecisionSchema
->;
+export type BottleClassifierAgentDecision = Omit<
+  BottleClassifierAgentDecisionOutput,
+  "aliasScope"
+> & {
+  aliasScope?: AliasScope | null;
+};
+export type BottleClassificationDecision = BottleClassificationDecisionOutput;
+export type BottleClassifierAgentDecisionInput = Omit<
+  z.input<typeof BottleClassifierAgentDecisionSchema>,
+  "aliasScope"
+> & {
+  aliasScope?: AliasScope | null;
+};
 export type BottleObservation = z.infer<typeof BottleObservationSchema>;
 export type EntityResolution = z.infer<typeof EntityResolutionSchema>;
 export type ProposedBottle = z.infer<typeof ProposedBottleSchema>;

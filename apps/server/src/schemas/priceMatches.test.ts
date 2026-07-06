@@ -99,6 +99,41 @@ describe("StorePriceMatchDecisionSchema", () => {
     );
   });
 
+  test("accepts alias metadata on match decisions", () => {
+    const parsed = StorePriceMatchDecisionSchema.parse({
+      action: "match_existing",
+      confidence: 96,
+      suggestedBottleId: 123,
+      aliasScope: "global_alias",
+    });
+
+    expect(parsed).toMatchObject({
+      aliasScope: "global_alias",
+    });
+  });
+
+  test("rejects unsupported alias scope values", () => {
+    expect(
+      StorePriceMatchDecisionSchema.safeParse({
+        action: "match_existing",
+        confidence: 96,
+        suggestedBottleId: 123,
+        aliasScope: "local_alias",
+      }).success,
+    ).toBe(false);
+
+    expect(
+      StorePriceMatchAgentResponseSchema.safeParse({
+        decision: {
+          action: "match_existing",
+          confidence: 96,
+          suggestedBottleId: 123,
+          aliasScope: "local_alias",
+        },
+      }).success,
+    ).toBe(false);
+  });
+
   test("uses fully required proposedBottle fields for structured outputs", () => {
     const jsonSchema = z.toJSONSchema(
       StorePriceMatchDecisionSchema,

@@ -2401,6 +2401,7 @@ function createNoMatchDecision({
     BottleClassifierAgentDecision,
     "confidence" | "rationale" | "identityScope"
   > &
+    Partial<Pick<BottleClassifierAgentDecision, "aliasScope">> &
     Partial<
       Pick<BottleClassifierAgentDecision, "identityBasis" | "confidenceBasis">
     >;
@@ -2409,12 +2410,13 @@ function createNoMatchDecision({
   observation: BottleObservation | null;
   identityScope?: BottleClassificationDecision["identityScope"];
 }): BottleClassificationDecision {
-  return {
+  return BottleClassificationDecisionSchema.parse({
     action: "no_match",
     confidence: decision.confidence,
     rationale,
     candidateBottleIds,
     identityScope: identityScope ?? decision.identityScope ?? "product",
+    aliasScope: decision.aliasScope ?? "none",
     observation,
     identityBasis: decision.identityBasis ?? null,
     confidenceBasis: decision.confidenceBasis ?? null,
@@ -2423,7 +2425,7 @@ function createNoMatchDecision({
     parentBottleId: null,
     proposedBottle: null,
     proposedRelease: null,
-  };
+  });
 }
 
 function rejectInvalidExistingMatch({
@@ -2974,6 +2976,7 @@ function sanitizeClassifierDecision({
         action: "create_bottle",
         confidence: normalizedConfidence,
         identityScope: decision.identityScope ?? "product",
+        aliasScope: decision.aliasScope ?? undefined,
         matchedBottleId: null,
         matchedReleaseId: null,
         parentBottleId: null,
@@ -3846,6 +3849,7 @@ export function finalizeBottleReferenceClassification({
 
   return BottleClassificationDecisionSchema.parse({
     ...finalDecision,
+    aliasScope: finalDecision.aliasScope ?? parsedDecision.aliasScope ?? "none",
     identityBasis: finalDecision.identityBasis ?? parsedDecision.identityBasis,
     confidenceBasis:
       finalDecision.confidenceBasis ?? parsedDecision.confidenceBasis,

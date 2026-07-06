@@ -70,6 +70,39 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     });
   });
 
+  test("accepts legacy decisions without alias metadata", () => {
+    const decision = BottleClassificationDecisionSchema.parse({
+      action: "no_match",
+      confidence: 40,
+      candidateBottleIds: [],
+    });
+
+    expect(decision.aliasScope).toBeUndefined();
+  });
+
+  test("accepts explicit alias scope values", () => {
+    expect(
+      BottleClassificationDecisionSchema.safeParse({
+        action: "match",
+        confidence: 96,
+        candidateBottleIds: [123],
+        matchedBottleId: 123,
+        aliasScope: "global_alias",
+      }).success,
+    ).toBe(true);
+
+    expect(
+      BottleClassifierAgentDecisionSchema.safeParse({
+        action: "match",
+        confidence: 96,
+        candidateBottleIds: [123],
+        identityScope: "product",
+        aliasScope: "none",
+        matchedBottleId: 123,
+      }).success,
+    ).toBe(true);
+  });
+
   test("parses identity basis and candidate family context", () => {
     const candidate = BottleCandidateSchema.parse({
       kind: "bottle",
@@ -103,6 +136,7 @@ describe("BottleClassifierAgentDecisionSchema", () => {
       rationale: "A second vintage establishes the reusable parent.",
       candidateBottleIds: [100],
       identityScope: "product",
+      aliasScope: "none",
       observation: null,
       identityBasis: {
         bottleTraits: ["brand", "18-year-old"],

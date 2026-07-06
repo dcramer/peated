@@ -574,6 +574,7 @@ function maybeBuildExistingBottleRepairDecision({
     ),
     candidateBottleIds: decision.candidateBottleIds,
     identityScope: decision.identityScope,
+    aliasScope: decision.aliasScope ?? "none",
     suggestedBottleId: price.bottleId,
     suggestedReleaseId: null,
     parentBottleId: null,
@@ -583,7 +584,11 @@ function maybeBuildExistingBottleRepairDecision({
   };
 }
 
-function toStorePriceMatchDecision({
+/**
+ * Converts classifier decisions into store-price match decisions while carrying
+ * review metadata needed by later proposal handling.
+ */
+export function toStorePriceMatchDecision({
   price,
   decision,
   candidates,
@@ -606,6 +611,7 @@ function toStorePriceMatchDecision({
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
+      aliasScope: decision.aliasScope ?? "none",
       suggestedBottleId: decision.matchedBottleId,
       suggestedReleaseId: decision.matchedReleaseId,
       parentBottleId: null,
@@ -622,6 +628,7 @@ function toStorePriceMatchDecision({
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
+      aliasScope: decision.aliasScope ?? "none",
       suggestedBottleId: decision.matchedBottleId,
       suggestedReleaseId: null,
       parentBottleId: null,
@@ -647,6 +654,7 @@ function toStorePriceMatchDecision({
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
+      aliasScope: decision.aliasScope ?? "none",
       suggestedBottleId: null,
       suggestedReleaseId: null,
       parentBottleId: null,
@@ -663,6 +671,7 @@ function toStorePriceMatchDecision({
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
+      aliasScope: decision.aliasScope ?? "none",
       suggestedBottleId: null,
       suggestedReleaseId: null,
       parentBottleId: decision.parentBottleId,
@@ -679,6 +688,7 @@ function toStorePriceMatchDecision({
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
+      aliasScope: decision.aliasScope ?? "none",
       suggestedBottleId: null,
       suggestedReleaseId: null,
       parentBottleId: null,
@@ -700,6 +710,7 @@ function toStorePriceMatchDecision({
       ),
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
+      aliasScope: decision.aliasScope ?? "none",
       suggestedBottleId: null,
       suggestedReleaseId: null,
       parentBottleId: decision.parentBottleId,
@@ -715,6 +726,7 @@ function toStorePriceMatchDecision({
     rationale: decision.rationale,
     candidateBottleIds: decision.candidateBottleIds,
     identityScope: decision.identityScope,
+    aliasScope: decision.aliasScope ?? "none",
     suggestedBottleId: null,
     suggestedReleaseId: null,
     parentBottleId: null,
