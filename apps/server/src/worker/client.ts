@@ -8,6 +8,11 @@ import config from "../config";
 import { logError, logInfo } from "../lib/log";
 import "./jobs";
 import scheduleScrapers from "./jobs/scheduleScrapers";
+import {
+  buildJobContext,
+  buildQueuedJobData,
+  parseQueuedJobData,
+} from "./payload";
 import registry from "./registry";
 import { type JobName } from "./types";
 
@@ -33,7 +38,7 @@ export async function runJob<T>(jobName: JobName, args?: Record<string, any>) {
 
   const jobFn = registry.get(jobName);
   if (!jobFn) throw new Error(`Unknown job: ${jobName}`);
-  return await jobFn(args, { traceContext: activeContext });
+  return await jobFn(args, buildJobContext(activeContext));
 }
 
 export async function pushUniqueJob(
@@ -78,10 +83,7 @@ export async function pushJob(
       try {
         await defaultQueue.add(
           jobName,
-          {
-            args,
-            context: { traceContext: activeContext },
-          },
+          buildQueuedJobData(args, activeContext),
           opts,
         );
       } catch (e) {
@@ -146,7 +148,7 @@ export async function runWorker() {
     defaultQueue.name,
     async (job) => {
       const jobFn = registry.get(job.name);
-      const { args, context } = job.data;
+      const { args, context } = parseQueuedJobData(job.data);
       return await jobFn(args, context);
     },
     { connection, autorun: false },

@@ -17,12 +17,13 @@ export function createOpenAIClient(): OpenAI {
   });
 }
 
+/** Run an AI conversation scope without clearing inherited Sentry attribution. */
 export async function withSentryConversation<T>(
   conversationId: string,
   callback: () => Promise<T>,
 ): Promise<T> {
-  return await Sentry.withIsolationScope(async () => {
-    Sentry.setConversationId(conversationId);
+  return await Sentry.withIsolationScope(async (scope) => {
+    scope.setConversationId(conversationId);
     return await callback();
   });
 }
