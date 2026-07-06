@@ -10,7 +10,7 @@
 
 ## 2. Prompt Structure
 
-- [ ] 2.1 Reorder classifier instructions into task and success criteria, input map, bottle identity model, evidence policy and tool use, decision workflow, action semantics, and output contract as a pure-move pass; run focused evals against the baseline.
+- [x] 2.1 Reorder classifier instructions into task and success criteria, input map, bottle identity model, evidence policy and tool use, decision workflow, action semantics, and output contract as a pure-move pass; run focused evals against the baseline.
 - [ ] 2.2 Write the input map covering the full envelope, including candidate field semantics for `kind`, `fullName`, `bottleFullName`, `releaseId`, and `familyContext`.
 - [ ] 2.3 Consolidate in slices: fold precedence-override rules into the decision workflow order, remove duplicated prose and bottle-specific exceptions, and replace undefined jargon with glossary terms; run focused evals per slice with eval parity required.
 - [ ] 2.4 Resolve the instruction/tool-surface mismatch for `candidateExpansion = initial_only` classification (instructions reference search tools that are not attached) and remove or use the dead options on `buildBottleClassifierInstructions`.
