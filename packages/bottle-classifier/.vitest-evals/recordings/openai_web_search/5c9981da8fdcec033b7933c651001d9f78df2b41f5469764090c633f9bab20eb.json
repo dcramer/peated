@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T18:05:42.897Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Wild Turkey Rare Breed Rye whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Wild Turkey Rare Breed Rye whiskey",
+    "summary": "Wild Turkey Rare Breed Rye is a **Kentucky Straight Rye Whiskey** from **Wild Turkey Distillery** in **Lawrenceburg, Kentucky**. It is a **permanent expression** in the lineup, introduced in **2020**. ([wildturkeybourbon.com](https://www.wildturkeybourbon.com/products/rare-breed-rye/?utm_source=openai))\n\nConfirmed bott",
+    "results": [
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ryecentral.com/products/wild-turkey-rare-breed-barrel-proof-rye-whiskey-review",
+        "url": "https://www.ryecentral.com/products/wild-turkey-rare-breed-barrel-proof-rye-whiskey-review",
+        "domain": "ryecentral.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskeyconsensus.com/wild-turkey-rare-breed-rye-review/",
+        "url": "https://whiskeyconsensus.com/wild-turkey-rare-breed-rye-review/",
+        "domain": "whiskeyconsensus.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.bevnet.com/spirits/2020/wild-turkey-debuts-rare-breed-rye",
+        "url": "https://www.bevnet.com/spirits/2020/wild-turkey-debuts-rare-breed-rye",
+        "domain": "bevnet.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.kroger.com/p/wild-turkey-rare-breed-barrel-proof-rye-whiskey/0072105900314",
+        "url": "https://www.kroger.com/p/wild-turkey-rare-breed-barrel-proof-rye-whiskey/0072105900314",
+        "domain": "kroger.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskeyshelf.com/products/wild-turkey-rare-breed-rye-whiskey-750ml",
+        "url": "https://whiskeyshelf.com/products/wild-turkey-rare-breed-rye-whiskey-750ml",
+        "domain": "whiskeyshelf.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5c9981da8fdcec033b7933c651001d9f78df2b41f5469764090c633f9bab20eb",
+    "mode": "auto"
+  }
+}

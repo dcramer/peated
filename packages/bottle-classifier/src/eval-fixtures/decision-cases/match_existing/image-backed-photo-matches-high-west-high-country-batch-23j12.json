@@ -74,15 +74,18 @@
     "source": "production_miss",
     "verifiedSourceUrls": [
       "https://highwest.com/",
+      "https://ship.highwest.com/products/high-country-american-single-malt",
+      "https://www.breakingbourbon.com/review/high-west-high-country-american-single-malt-2022-release",
+      "https://whiskyadvocate.com/High-West-High-Country-American-Single-Malt-Batch-19I04-44",
       "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/high-west-high-country-batch-23j12.jpg"
     ],
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/high-west-high-country-batch-23j12.jpg",
     "dbOutcome": {
-      "bottleId": 44284,
+      "bottleId": 12825,
       "releaseId": null,
       "createsBottle": false,
       "createsRelease": false,
-      "summary": "Production DB outcome: match existing bottle 44284, High West High Country - Batch No. 23J12. Nearby broad parent row: bottle 12825, High West High Country."
+      "summary": "Original production outcome matched flattened lot-code row 44284, High West High Country - Batch No. 23J12. Re-verification on 2026-07-06 established High Country is an ongoing product sold as one undifferentiated SKU whose year-prefixed 'Batch No.' codes (22J11, 19I04, 23J12) are bottling lot codes, not marketed batch identity, so the correct catalog outcome is match plain parent bottle 12825 with the lot code preserved as an observation; row 44284 is downstream repair, not a match target."
     },
     "catalogFieldObservations": [
       {
@@ -94,19 +97,19 @@
         "source": "image_evidence",
         "issue": "missing_in_production",
         "safeToAutoFill": false,
-        "notes": "The parent production bottle lacks ABV, but the observed 44% belongs to the Batch No. 23J12 bottling/release."
+        "notes": "The parent production bottle lacks ABV; the observed 44% is the ongoing product's label strength seen on this lot-coded bottle, corroborated at 44% on independent batch reviews, but is left to enrichment rather than auto-fill."
       }
     ],
-    "notes": "Added from a failed image addBottle flow using the checked-in photo as the observed source. The label reads High West High Country American Single Malt Whiskey, 44% ABV, batch no. 23J12. Production bottle 44284 already represents this exact batch as a legacy standalone bottle row; production bottle 12825 is the broader parent."
+    "notes": "Added from a failed image addBottle flow using the checked-in photo as the observed source. The label reads High West High Country American Single Malt Whiskey, 44% ABV, batch no. 23J12. Production bottle 44284 is a legacy standalone row flattened around the lot code; production bottle 12825 is the plain ongoing product. Producer and retailers sell High Country as one SKU with no per-batch marketing (unlike High West's A Midwinter Night's Dram, which is sold by Act/Scene release identity), so 'Batch No. 23J12' is a lot-code observation and the plain parent is the correct match target."
   },
   "expected": {
     "status": "classified",
     "action": "match",
     "identityScope": "product",
-    "matchedBottleId": 44284,
+    "matchedBottleId": 12825,
     "matchedReleaseId": null,
     "suggestedNextStep": "confirm_match",
-    "summary": "Match existing bottle 44284, High West High Country - Batch No. 23J12."
+    "summary": "Match the plain ongoing product bottle 12825, High West High Country; 'Batch No. 23J12' is a bottling lot code carried as an observation, and the flattened lot-code row 44284 is downstream repair, not a match target."
   },
   "localCatalog": {
     "entities": [

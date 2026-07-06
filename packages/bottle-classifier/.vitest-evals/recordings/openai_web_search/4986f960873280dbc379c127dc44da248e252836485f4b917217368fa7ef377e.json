@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T17:25:08.292Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Wild Turkey Rare Breed Rye barrel proof rye whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Wild Turkey Rare Breed Rye barrel proof rye whiskey",
+    "summary": "**Wild Turkey Rare Breed Rye** is a **barrel proof Kentucky straight rye whiskey** from **Wild Turkey Distillery** in Lawrenceburg, Kentucky. It’s an **ongoing core expression**, not a limited one-off. ([wildturkeybourbon.com](https://www.wildturkeybourbon.com/products/rare-breed-rye/?utm_source=openai))\n\nConfirmed bot",
+    "results": [
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.camparigroup.com/en/news/2020-06-10/wild-turkeyr-debuts-rare-breed-rye",
+        "url": "https://www.camparigroup.com/en/news/2020-06-10/wild-turkeyr-debuts-rare-breed-rye",
+        "domain": "camparigroup.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "url": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ryecentral.com/products/wild-turkey-rare-breed-barrel-proof-rye-whiskey-review",
+        "url": "https://www.ryecentral.com/products/wild-turkey-rare-breed-barrel-proof-rye-whiskey-review",
+        "domain": "ryecentral.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskeyshelf.com/products/wild-turkey-rare-breed-rye-whiskey-750ml",
+        "url": "https://whiskeyshelf.com/products/wild-turkey-rare-breed-rye-whiskey-750ml",
+        "domain": "whiskeyshelf.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.memywifeandwhisky.com/reviews/review-393-wild-turkey-rare-breed-rye",
+        "url": "https://www.memywifeandwhisky.com/reviews/review-393-wild-turkey-rare-breed-rye",
+        "domain": "memywifeandwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "4986f960873280dbc379c127dc44da248e252836485f4b917217368fa7ef377e",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T16:56:30.488Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Wild Turkey Rare Breed Rye cask strength rye whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Wild Turkey Rare Breed Rye cask strength rye whiskey",
+    "summary": "**Wild Turkey Rare Breed Rye** is a **Kentucky Straight Rye Whiskey** from **Wild Turkey Distillery**, released as a **permanent core expression** in **June 2020**. It is marketed as **barrel proof / cask strength**, **uncut**, and **non-chill filtered**. ([wildturkeybourbon.com](https://www.wildturkeybourbon.com/produ",
+    "results": [
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.camparigroup.com/en/news/2020-06-10/wild-turkeyr-debuts-rare-breed-rye",
+        "url": "https://www.camparigroup.com/en/news/2020-06-10/wild-turkeyr-debuts-rare-breed-rye",
+        "domain": "camparigroup.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/wild-turkey-rare-breed-rye-112-2-proof",
+        "url": "https://www.breakingbourbon.com/review/wild-turkey-rare-breed-rye-112-2-proof",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us/latest-news/proof-barrel-proof-cask-strength/",
+        "url": "https://www.wildturkeybourbon.com/en-us/latest-news/proof-barrel-proof-cask-strength/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us/products/",
+        "url": "https://www.wildturkeybourbon.com/en-us/products/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us/latest-news/rye-whiskey-vs-bourbon/",
+        "url": "https://www.wildturkeybourbon.com/en-us/latest-news/rye-whiskey-vs-bourbon/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "da2f3071fe106f6400cbe7f27fd5ec55b7c2d34a3852cfae72e6dfd0a1718f17",
+    "mode": "auto"
+  }
+}

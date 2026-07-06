@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T18:12:28.166Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 2016 cask 1661"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 2016 cask 1661",
+    "summary": "Here’s the **best bottle-specific match I could confirm** for **“The Exclusive Malts Islay 2007 8 year old 57.1 2016 cask 1661”**:\n\n- **Bottler:** Creative Whisky Company (CWC)  \n- **Series:** The Exclusive Malts  \n- **Label name:** **Islay 2007**  \n- **Region/style:** Islay single malt, distillery not named on label  ",
+    "results": [
+      {
+        "title": "Islay 2007 CWC - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/82715/islay-2007-cwc",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://fineliquors.com/products/exclusice-malts-2007-an-islay-7-year",
+        "url": "https://fineliquors.com/products/exclusice-malts-2007-an-islay-7-year",
+        "domain": "fineliquors.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/bunnahabhain-the-exclusive-malts.html",
+        "url": "https://www.whisky.com/whisky-database/details/bunnahabhain-the-exclusive-malts.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/41475/kilchoman-2007-10-year-old-sherry-cask-twe-exclusive",
+        "url": "https://www.thewhiskyexchange.com/p/41475/kilchoman-2007-10-year-old-sherry-cask-twe-exclusive",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/6/about%3Flanguage%3Den",
+        "url": "https://www.whiskybase.com/whiskies/distillery/6/about%3Flanguage%3Den",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/dailuaine-2007-10-year-cask-2049-the-exclusive-malts",
+        "url": "https://distiller.com/spirits/dailuaine-2007-10-year-cask-2049-the-exclusive-malts",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "4d02620366cea427fef484d57337b2eacd89590fcd55c11d15016e32770ce5e2",
+    "mode": "auto"
+  }
+}

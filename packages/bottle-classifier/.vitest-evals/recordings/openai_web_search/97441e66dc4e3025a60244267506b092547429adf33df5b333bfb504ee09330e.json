@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T16:58:01.778Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19 year old release batch annual"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Ardbeg Traigh Bhan 19 year old release batch annual",
+    "summary": "Ardbeg **Traigh Bhan 19 Year Old** is an **annual small-batch release** from Ardbeg, first launched in **2019** as Batch 1. Ardbeg’s own history page says Batch 1 launched in 2019, and multiple official product pages describe the series as a small-batch 19-year-old recurring release. ([ardbeg.com](https://www.ardbeg.co",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/market/whisky/363983",
+        "url": "https://www.whiskybase.com/market/whisky/363983",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyauctioneer.com/learn/explore-whisky/series/ardbeg-traigh-bhan-batches",
+        "url": "https://whiskyauctioneer.com/learn/explore-whisky/series/ardbeg-traigh-bhan-batches",
+        "domain": "whiskyauctioneer.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://scotchwhisky.com/magazine/latest-news/27070/ardbeg-reveals-19-year-old-traigh-bhan/",
+        "url": "https://scotchwhisky.com/magazine/latest-news/27070/ardbeg-reveals-19-year-old-traigh-bhan/",
+        "domain": "scotchwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/131177/ardbeg-traigh-bhan?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/131177/ardbeg-traigh-bhan?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky/news/newsdetail/article/ardbeg-19-jahre-traigh-bhan-batch-5-erscheint0.html",
+        "url": "https://www.whisky.com/whisky/news/newsdetail/article/ardbeg-19-jahre-traigh-bhan-batch-5-erscheint0.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywench.com/2026/02/17/ardbeg-traigh-bhan-19-year-small-batch-release-batch-tb-03-10-10-01-21-bl/",
+        "url": "https://thewhiskeywench.com/2026/02/17/ardbeg-traigh-bhan-19-year-small-batch-release-batch-tb-03-10-10-01-21-bl/",
+        "domain": "thewhiskeywench.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "97441e66dc4e3025a60244267506b092547429adf33df5b333bfb504ee09330e",
+    "mode": "auto"
+  }
+}

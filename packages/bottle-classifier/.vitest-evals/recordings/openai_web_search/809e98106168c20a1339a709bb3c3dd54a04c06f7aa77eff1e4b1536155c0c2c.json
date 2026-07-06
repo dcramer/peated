@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T18:09:56.148Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Barrel Proof bourbon cask strength"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Barrel Proof bourbon cask strength",
+    "summary": "**Elijah Craig Barrel Proof** is a **cask-strength / barrel-proof Kentucky straight bourbon** from **Heaven Hill Distillery**.\n\nKey bottle traits:\n- **Producer/Bottler:** Heaven Hill Distillery\n- **Brand:** Elijah Craig\n- **Style:** Barrel Proof Bourbon\n- **Strength:** **Uncut, straight from the barrel** — ABV varies b",
+    "results": [
+      {
+        "title": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+        "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/barrel-proof",
+        "url": "https://elijahcraig.com/barrel-proof",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskeyconsensus.com/elijah-craig-barrel-proof/",
+        "url": "https://whiskeyconsensus.com/elijah-craig-barrel-proof/",
+        "domain": "whiskeyconsensus.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c921",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c921",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-a121",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-a121",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "809e98106168c20a1339a709bb3c3dd54a04c06f7aa77eff1e4b1536155c0c2c",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T17:20:57.917Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official",
+    "summary": "**Glenmorangie Quinta Ruban 14 Year Old — official bottle details**\n\n- **Official name:** *The Quinta Ruban 14 Years Old* ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n- **Producer / brand:** **Glenmorangie** ([glenmorangie.com](https://www.glenmorangie.com/en-us/p",
+    "results": [
+      {
+        "title": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.glenmorangie.com/products/the-quinta-ruban",
+        "url": "https://www.glenmorangie.com/products/the-quinta-ruban",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.glenmorangie.com/en-us/products/the-elementa-14-years-old",
+        "url": "https://www.glenmorangie.com/en-us/products/the-elementa-14-years-old",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.glenmorangie.com/en-us/collections/core-expressions",
+        "url": "https://www.glenmorangie.com/en-us/collections/core-expressions",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.glenmorangie.com/collections/all",
+        "url": "https://www.glenmorangie.com/collections/all",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.glenmorangie.com/collections/core-expressions",
+        "url": "https://www.glenmorangie.com/collections/core-expressions",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "35bc4e4177ff72760ad6f14b4fb8184d7487e2e498df8e24bbdf69bd2f40cc57",
+    "mode": "auto"
+  }
+}

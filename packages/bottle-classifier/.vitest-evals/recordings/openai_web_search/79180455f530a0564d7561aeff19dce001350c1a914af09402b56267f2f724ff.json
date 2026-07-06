@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T16:43:26.027Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Cask Strength bourbon Barrel Proof"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Cask Strength bourbon Barrel Proof",
+    "summary": "**Elijah Craig Barrel Proof Bourbon** — also commonly called **Elijah Craig Cask Strength** by drinkers/retailers — is the **barrel-proof bourbon** expression in the Elijah Craig lineup from **Heaven Hill Distillery**. The official brand page describes it as **uncut** and **non-chill filtered**, with **each bottle hand",
+    "results": [
+      {
+        "title": "https://en.wikipedia.org/wiki/Elijah_Craig_%28bourbon%29",
+        "url": "https://en.wikipedia.org/wiki/Elijah_Craig_%28bourbon%29",
+        "domain": "en.wikipedia.org",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/barrel-proof",
+        "url": "https://elijahcraig.com/barrel-proof",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskeyconsensus.com/elijah-craig-barrel-proof/",
+        "url": "https://whiskeyconsensus.com/elijah-craig-barrel-proof/",
+        "domain": "whiskeyconsensus.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.gobourbon.com/10-facts-you-may-not-know-about-elijah-craig-barrel-proof/",
+        "url": "https://www.gobourbon.com/10-facts-you-may-not-know-about-elijah-craig-barrel-proof/",
+        "domain": "gobourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.mensjournal.com/drink/elijah-craig-barrel-proof-bourbon-review",
+        "url": "https://www.mensjournal.com/drink/elijah-craig-barrel-proof-bourbon-review",
+        "domain": "mensjournal.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinkhacker.com/2025/12/28/elijah-craig-barrel-proof-all-batches-updated-2025/",
+        "url": "https://www.drinkhacker.com/2025/12/28/elijah-craig-barrel-proof-all-batches-updated-2025/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "79180455f530a0564d7561aeff19dce001350c1a914af09402b56267f2f724ff",
+    "mode": "auto"
+  }
+}

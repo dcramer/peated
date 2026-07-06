@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T17:48:45.904Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Willett Family Estate Bottled Single Barrel Bourbon Barrel No. 4769 5 year 64.2%"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Willett Family Estate Bottled Single Barrel Bourbon Barrel No. 4769 5 year 64.2%",
+    "summary": "Confirmed bottle-specific details for **Willett Family Estate Bottled Single Barrel Bourbon Barrel No. 4769**:\n\n- **Producer / bottler:** Willett Distillery, **distillery bottling**. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/150553/willett-05-year-old?utm_source=openai))\n- **Series:** **Family Estate",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/84774/whiskies?language=ko",
+        "url": "https://www.whiskybase.com/whiskies/distillery/84774/whiskies?language=ko",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/234534/family-estate?language=ko",
+        "url": "https://www.whiskybase.com/whiskies/whisky/234534/family-estate?language=ko",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/84774/whiskies",
+        "url": "https://www.whiskybase.com/whiskies/distillery/84774/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/259749/willett-family-estate-bottled-single-barrel-bourbon?language=zh-CN",
+        "url": "https://www.whiskybase.com/whiskies/whisky/259749/willett-family-estate-bottled-single-barrel-bourbon?language=zh-CN",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/brand/81549/whiskies",
+        "url": "https://www.whiskybase.com/whiskies/brand/81549/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/brand/81549/willett?language=ko",
+        "url": "https://www.whiskybase.com/whiskies/brand/81549/willett?language=ko",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "fcaa5a24717cc624c366ae95a6651b154aacaa59a6a2db2a17324ed4e800edfe",
+    "mode": "auto"
+  }
+}

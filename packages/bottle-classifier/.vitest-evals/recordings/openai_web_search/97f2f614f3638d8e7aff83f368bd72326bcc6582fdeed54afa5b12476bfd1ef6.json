@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T17:52:57.408Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Wild Turkey Rare Breed Rye 56.1 rye"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Wild Turkey Rare Breed Rye 56.1 rye",
+    "summary": "**Wild Turkey Rare Breed Rye 56.1% ABV** is a **barrel proof Kentucky straight rye whiskey** from **Wild Turkey Distillery**. Wild Turkey describes it as **uncut and non-chill filtered**, bottled at **112.2 proof / 56.1% ABV**, and as a **permanent expression** in the lineup rather than a one-off limited release. ([wil",
+    "results": [
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "url": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/wild-turkey-rare-breed-rye-112-2-proof",
+        "url": "https://www.breakingbourbon.com/review/wild-turkey-rare-breed-rye-112-2-proof",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.camparigroup.com/en/news/2020-06-10/wild-turkeyr-debuts-rare-breed-rye",
+        "url": "https://www.camparigroup.com/en/news/2020-06-10/wild-turkeyr-debuts-rare-breed-rye",
+        "domain": "camparigroup.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thebarreltap.com/products/wild-turkey-rare-breed-rye-whiskey-750ml",
+        "url": "https://www.thebarreltap.com/products/wild-turkey-rare-breed-rye-whiskey-750ml",
+        "domain": "thebarreltap.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.camparigroup.info/usa/wild-turkey/rare-breed-rye/",
+        "url": "https://www.camparigroup.info/usa/wild-turkey/rare-breed-rye/",
+        "domain": "camparigroup.info",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "97f2f614f3638d8e7aff83f368bd72326bcc6582fdeed54afa5b12476bfd1ef6",
+    "mode": "auto"
+  }
+}

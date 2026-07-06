@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T17:03:09.717Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Canadian Club 9 year old Reserve Canadian Whisky ReserveBar Triple Aged"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Canadian Club 9 year old Reserve Canadian Whisky ReserveBar Triple Aged",
+    "summary": "I found a likely match, but the **“Triple Aged”** part does **not** appear to be the official bottle name.\n\n**Most likely bottle:** **Canadian Club Reserve 9 Year Old Canadian Whisky**. The official Canadian Club product lineup includes **“Reserve 9 Year Old Canadian Whisky,”** confirming the brand, age statement, and ",
+    "results": [
+      {
+        "title": "https://www.canadianclub.com/products",
+        "url": "https://www.canadianclub.com/products",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.bswliquor.com/products/canadian-club-9-year-reserve",
+        "url": "https://www.bswliquor.com/products/canadian-club-9-year-reserve",
+        "domain": "bswliquor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+        "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+        "domain": "reservebar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://therumhowlerblog.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/",
+        "url": "https://therumhowlerblog.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/",
+        "domain": "therumhowlerblog.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://liquorverse.com/products/canadian-club-9-year-old-reserve-canadian-whisky-750-ml-1",
+        "url": "https://liquorverse.com/products/canadian-club-9-year-old-reserve-canadian-whisky-750-ml-1",
+        "domain": "liquorverse.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.1001spirits.com/product/7207/canadian-club-9-yo-reserve--40--005-l",
+        "url": "https://www.1001spirits.com/product/7207/canadian-club-9-yo-reserve--40--005-l",
+        "domain": "1001spirits.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d2d41cbce27e343051930e8cf190853b4d64e16e045de59f792ef6db93c09aee",
+    "mode": "auto"
+  }
+}
