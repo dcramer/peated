@@ -27,14 +27,13 @@ export function ProfileDropdown() {
         <>
           <MenuButton
             ref={buttonRef}
+            type="button"
             className={classNames(
-              "relative flex max-w-xs items-center p-2 text-sm hover:bg-slate-800 hover:text-white focus:outline-none",
+              "relative flex max-w-xs appearance-none items-center p-2 text-sm hover:bg-slate-800 hover:text-white focus:outline-none",
               open
                 ? "rounded-b-none rounded-t bg-slate-800 text-white"
                 : "text-muted rounded",
             )}
-            as={Link}
-            href={`/users/${user.username}`}
           >
             <span className="sr-only">Open user menu</span>
             <div className="h-8 w-8">
