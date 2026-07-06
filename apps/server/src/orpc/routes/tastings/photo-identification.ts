@@ -260,20 +260,40 @@ function getClassificationLogAttributes(
   prefix: string,
   classification: PhotoIdentificationClassification,
 ) {
+  const candidates = classification.artifacts.candidates;
+  const candidateBottleIds = classification.artifacts.candidates
+    .map((candidate) => candidate.bottleId)
+    .filter((id): id is number => typeof id === "number");
+  const candidateReleaseIds = classification.artifacts.candidates
+    .map((candidate) => candidate.releaseId)
+    .filter((id): id is number => typeof id === "number");
+  const candidateNames = classification.artifacts.candidates
+    .map((candidate) => candidate.fullName)
+    .filter(Boolean)
+    .slice(0, 5);
+  // Sentry span attributes support scalar arrays, not object arrays, so keep a
+  // bounded route-owned JSON-string projection for candidate trait debugging.
+  const candidateIdentity = candidates.slice(0, 5).map((candidate) =>
+    JSON.stringify({
+      bottleId: candidate.bottleId,
+      releaseId: candidate.releaseId,
+      fullName: candidate.fullName,
+      category: candidate.category,
+      statedAge: candidate.statedAge,
+      abv: candidate.abv,
+      vintageYear: candidate.vintageYear,
+      releaseYear: candidate.releaseYear,
+      edition: candidate.edition,
+    }),
+  );
   const attrs: Record<string, string | number | boolean | string[] | number[]> =
     {
       [`${prefix}.status`]: classification.status,
-      [`${prefix}.candidate_count`]: classification.artifacts.candidates.length,
-      [`${prefix}.candidate_bottle_ids`]: classification.artifacts.candidates
-        .map((candidate) => candidate.bottleId)
-        .filter((id): id is number => typeof id === "number"),
-      [`${prefix}.candidate_release_ids`]: classification.artifacts.candidates
-        .map((candidate) => candidate.releaseId)
-        .filter((id): id is number => typeof id === "number"),
-      [`${prefix}.candidate_names`]: classification.artifacts.candidates
-        .map((candidate) => candidate.fullName)
-        .filter(Boolean)
-        .slice(0, 5),
+      [`${prefix}.candidate_count`]: candidates.length,
+      [`${prefix}.candidate_bottle_ids`]: candidateBottleIds,
+      [`${prefix}.candidate_release_ids`]: candidateReleaseIds,
+      [`${prefix}.candidate_names`]: candidateNames,
+      [`${prefix}.candidate_identity`]: candidateIdentity,
     };
 
   if (classification.status === "ignored") {
@@ -314,6 +334,31 @@ function getClassificationLogAttributes(
   if ("proposedRelease" in decision && decision.proposedRelease?.edition) {
     attrs[`${prefix}.proposed_release_edition`] =
       decision.proposedRelease.edition;
+  }
+
+  return attrs;
+}
+
+function getImageEvidenceFieldAttributes(
+  imageEvidence: z.infer<typeof PhotoIdentificationSchema>["imageEvidence"],
+) {
+  const attrs: Record<string, string | number> = {};
+  const fieldCandidates = imageEvidence.fieldCandidates;
+
+  for (const field of [
+    "brand",
+    "expression",
+    "statedAge",
+    "abv",
+    "vintageYear",
+    "releaseYear",
+    "edition",
+  ] as const) {
+    const candidate = fieldCandidates[field];
+    if (!candidate) continue;
+    attrs[`photo_identification.field.${field}`] = candidate.value;
+    attrs[`photo_identification.field.${field}.confidence`] =
+      candidate.confidence;
   }
 
   return attrs;
@@ -431,22 +476,7 @@ function logPhotoIdentificationOutcome({
       diagnostics.extraction.summary;
   }
 
-  const fieldCandidates = imageEvidence.fieldCandidates;
-  for (const field of [
-    "brand",
-    "expression",
-    "statedAge",
-    "abv",
-    "vintageYear",
-    "releaseYear",
-    "edition",
-  ] as const) {
-    const candidate = fieldCandidates[field];
-    if (!candidate) continue;
-    attrs[`photo_identification.field.${field}`] = candidate.value;
-    attrs[`photo_identification.field.${field}.confidence`] =
-      candidate.confidence;
-  }
+  Object.assign(attrs, getImageEvidenceFieldAttributes(imageEvidence));
 
   logInfo(PHOTO_IDENTIFICATION_LOG_MESSAGE, attrs);
 }
@@ -573,6 +603,11 @@ export async function identifyPendingImage({
         "photo_identification.final_candidate_count":
           classification.artifacts.candidates.length,
         "photo_identification.suggested_next_step": suggestedNextStep,
+        ...getImageEvidenceFieldAttributes(imageEvidence),
+        ...getClassificationLogAttributes(
+          "photo_identification.local",
+          localIdentification,
+        ),
         ...getClassificationLogAttributes(
           "photo_identification.final",
           classification,

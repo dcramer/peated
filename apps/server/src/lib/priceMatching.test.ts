@@ -270,6 +270,112 @@ describe("priceMatching", () => {
     );
   });
 
+  test("finds age-specific photo candidates when stored bottles are missing ABV", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const brand = await fixtures.Entity({
+      type: ["brand", "distiller"],
+      name: "Pappy Van Winkle's",
+    });
+    const fifteenYearBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "15-year-old Family Reserve",
+      category: "bourbon",
+      statedAge: 15,
+      abv: null,
+    });
+    const twentyYearBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "20-year-old Family Reserve",
+      category: "bourbon",
+      statedAge: 20,
+      abv: null,
+    });
+
+    for (const [age, abv, bottle] of [
+      [15, 53.5, fifteenYearBottle],
+      [20, 45.2, twentyYearBottle],
+    ] as const) {
+      const candidates = await findBottleReferenceCandidates(
+        {
+          name: `Pappy Van Winkle's Family Reserve ${age} year old`,
+          bottleId: null,
+        },
+        {
+          brand: "Pappy Van Winkle's",
+          bottler: null,
+          expression: "Family Reserve",
+          series: null,
+          distillery: [],
+          category: "bourbon",
+          stated_age: age,
+          abv,
+          release_year: null,
+          vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+      );
+
+      expect(candidates).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            bottleId: bottle.id,
+            fullName: `Pappy Van Winkle's ${age}-year-old Family Reserve`,
+            statedAge: age,
+            abv: null,
+          }),
+        ]),
+      );
+    }
+
+    const fifteenYearPhotoCandidates = await findBottleReferenceCandidates(
+      {
+        name: "Pappy Van Winkle's Family Reserve 15 year old",
+        bottleId: null,
+      },
+      {
+        brand: "Pappy Van Winkle's",
+        bottler: null,
+        expression: "Family Reserve",
+        series: null,
+        distillery: [],
+        category: "bourbon",
+        stated_age: 15,
+        abv: 53.5,
+        release_year: null,
+        vintage_year: null,
+        cask_type: null,
+        cask_size: null,
+        cask_fill: null,
+        cask_strength: null,
+        single_cask: null,
+        edition: null,
+      },
+    );
+
+    expect(fifteenYearPhotoCandidates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          bottleId: fifteenYearBottle.id,
+          statedAge: 15,
+          abv: null,
+        }),
+        expect.objectContaining({
+          bottleId: twentyYearBottle.id,
+          statedAge: 20,
+          abv: null,
+        }),
+      ]),
+    );
+  });
+
   test("prefers structured extracted identity over noisy retailer titles for exact lookup", async ({
     fixtures,
   }) => {
@@ -1638,6 +1744,171 @@ describe("priceMatching", () => {
       reviewedById: expect.any(Number),
     });
     expect(updatedPrice?.bottleId).toBe(bottle.id);
+  });
+
+  test("auto-approves high-confidence unassigned correction assignments without applying repair fields", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+
+    const { extractFromText } =
+      await import("@peated/server/agents/whisky/labelExtractor");
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const brand = await fixtures.Entity({
+      name: "Example Heritage",
+      type: ["brand"],
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Table Whiskey",
+      category: "spirit",
+      statedAge: null,
+      abv: null,
+      distillerIds: [],
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Example Heritage Table Whiskey",
+      imageUrl: null,
+      url: "https://example.com/table-whiskey",
+    });
+
+    vi.mocked(extractFromText).mockResolvedValue({
+      brand: "Example Heritage",
+      bottler: null,
+      expression: "Table Whiskey",
+      series: null,
+      distillery: [],
+      category: null,
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    });
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        extractedLabel: {
+          brand: "Example Heritage",
+          bottler: null,
+          expression: "Table Whiskey",
+          series: null,
+          distillery: [],
+          category: null,
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        decision: {
+          action: "repair_bottle",
+          confidence: 97,
+          rationale:
+            "The existing bottle is the marketed identity, but the proposed canonical fields need review.",
+          matchedBottleId: bottle.id,
+          matchedReleaseId: null,
+          candidateBottleIds: [bottle.id],
+          proposedBottle: {
+            name: "Table Whiskey",
+            series: null,
+            category: "bourbon",
+            edition: null,
+            statedAge: 7,
+            caskStrength: null,
+            singleCask: null,
+            abv: 50,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: {
+              id: brand.id,
+              name: "Example Heritage",
+            },
+            distillers: [
+              {
+                id: null,
+                name: "Example Heritage Distilling",
+              },
+            ],
+            bottler: null,
+          },
+        },
+        searchEvidence: [],
+        candidateBottles: [
+          {
+            kind: "bottle",
+            bottleId: bottle.id,
+            releaseId: null,
+            alias: "Example Heritage Table Whiskey",
+            fullName: "Example Heritage Table Whiskey",
+            bottleFullName: "Example Heritage Table Whiskey",
+            brand: "Example Heritage",
+            bottler: null,
+            series: null,
+            distillery: [],
+            category: "spirit",
+            statedAge: null,
+            edition: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            score: 1,
+            source: ["exact"],
+          },
+        ],
+        resolvedEntities: [],
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+    const updatedBottle = await db.query.bottles.findFirst({
+      where: eq(bottles.id, bottle.id),
+    });
+    const distillerRows = await db
+      .select({ bottleId: bottlesToDistillers.bottleId })
+      .from(bottlesToDistillers)
+      .where(eq(bottlesToDistillers.bottleId, bottle.id));
+
+    expect(proposal).toMatchObject({
+      status: "approved",
+      proposalType: "correction",
+      currentBottleId: bottle.id,
+      suggestedBottleId: bottle.id,
+      enteredQueueAt: null,
+      reviewedById: expect.any(Number),
+    });
+    expect(updatedPrice?.bottleId).toBe(bottle.id);
+    expect(updatedBottle).toMatchObject({
+      category: "spirit",
+      statedAge: null,
+      abv: null,
+    });
+    expect(distillerRows).toEqual([]);
   });
 
   test("keeps exact-ish bottle matches when only generic retailer words differ", async ({

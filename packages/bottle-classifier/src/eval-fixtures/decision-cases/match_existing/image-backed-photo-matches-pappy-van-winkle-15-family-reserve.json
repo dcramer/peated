@@ -1,0 +1,247 @@
+{
+  "id": "image-backed-photo-matches-pappy-van-winkle-15-family-reserve",
+  "name": "image-backed photo: matches Pappy Van Winkle's 15-year-old Family Reserve from label evidence",
+  "input": {
+    "reference": {
+      "name": "Bottle photo upload",
+      "url": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/pappy-van-winkle-15-family-reserve.jpg",
+      "imageUrl": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/pappy-van-winkle-15-family-reserve.jpg"
+    },
+    "extractedIdentity": {
+      "brand": "Pappy Van Winkle's",
+      "bottler": "Old Rip Van Winkle Distillery",
+      "expression": "Family Reserve",
+      "series": null,
+      "distillery": [],
+      "category": "bourbon",
+      "stated_age": 15,
+      "abv": 53.5,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "imageEvidence": {
+      "sourceImageId": "pappy-van-winkle-15-family-reserve",
+      "extractors": [
+        {
+          "kind": "ocr",
+          "confidence": 0.96,
+          "textSpans": [
+            {
+              "text": "Pappy Van Winkle's Family Reserve Kentucky Straight Bourbon Whiskey 15 years old 750 ML ALC. 53.5% VOL (107 PROOF)",
+              "confidence": 0.96
+            }
+          ],
+          "observations": [
+            "Label identifies Pappy Van Winkle's Family Reserve, Kentucky Straight Bourbon Whiskey, 15 years old, 750ml, 53.5% ABV, 107 proof."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "Pappy Van Winkle's",
+          "confidence": 0.96,
+          "sourceExtractorIndexes": [0]
+        },
+        "expression": {
+          "value": "Family Reserve",
+          "confidence": 0.95,
+          "sourceExtractorIndexes": [0]
+        },
+        "statedAge": {
+          "value": 15,
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 53.5,
+          "confidence": 0.97,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": true,
+        "suitableAsBottleImage": true
+      },
+      "conflicts": []
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Pappy Van Winkle's 15-year-old Family Reserve",
+        "brand": "Pappy Van Winkle's",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Buffalo Trace Distillery"],
+        "category": "bourbon",
+        "statedAge": 15,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.99,
+        "source": ["text", "vector"],
+        "bottleId": 11868,
+        "fullName": "Pappy Van Winkle's 15-year-old Family Reserve"
+      },
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Pappy Van Winkle's 20-year-old Family Reserve",
+        "brand": "Pappy Van Winkle's",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Buffalo Trace Distillery"],
+        "category": "bourbon",
+        "statedAge": 20,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.96,
+        "source": ["text", "vector"],
+        "bottleId": 11867,
+        "fullName": "Pappy Van Winkle's 20-year-old Family Reserve"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["pappy", "van", "winkle", "family", "reserve"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Pappy Van Winkle's 15-year-old Family Reserve",
+          "brand": "Pappy Van Winkle's",
+          "bottler": null,
+          "series": null,
+          "distillery": ["Buffalo Trace Distillery"],
+          "category": "bourbon",
+          "statedAge": 15,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "score": 0.99,
+          "source": ["text", "vector"],
+          "bottleId": 11868,
+          "fullName": "Pappy Van Winkle's 15-year-old Family Reserve"
+        },
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Pappy Van Winkle's 20-year-old Family Reserve",
+          "brand": "Pappy Van Winkle's",
+          "bottler": null,
+          "series": null,
+          "distillery": ["Buffalo Trace Distillery"],
+          "category": "bourbon",
+          "statedAge": 20,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "score": 0.96,
+          "source": ["text", "vector"],
+          "bottleId": 11867,
+          "fullName": "Pappy Van Winkle's 20-year-old Family Reserve"
+        }
+      ]
+    },
+    {
+      "when": ["pappy", "15"],
+      "results": [
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Pappy Van Winkle's 15-year-old Family Reserve",
+          "brand": "Pappy Van Winkle's",
+          "bottler": null,
+          "series": null,
+          "distillery": ["Buffalo Trace Distillery"],
+          "category": "bourbon",
+          "statedAge": 15,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "score": 0.99,
+          "source": ["text", "vector"],
+          "bottleId": 11868,
+          "fullName": "Pappy Van Winkle's 15-year-old Family Reserve"
+        },
+        {
+          "kind": "bottle",
+          "releaseId": null,
+          "alias": null,
+          "bottleFullName": "Pappy Van Winkle's 20-year-old Family Reserve",
+          "brand": "Pappy Van Winkle's",
+          "bottler": null,
+          "series": null,
+          "distillery": ["Buffalo Trace Distillery"],
+          "category": "bourbon",
+          "statedAge": 20,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "score": 0.96,
+          "source": ["text", "vector"],
+          "bottleId": 11867,
+          "fullName": "Pappy Van Winkle's 20-year-old Family Reserve"
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://en.wikipedia.org/wiki/Pappy_Van_Winkle%27s_Family_Reserve",
+      "https://www.foodandwine.com/buffalo-trace-van-winkle-collection-2025-11807881",
+      "https://peated.com/bottles/11868",
+      "https://peated.com/bottles/11867"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/pappy-van-winkle-15-family-reserve.jpg",
+    "dbOutcome": {
+      "bottleId": 11868,
+      "releaseId": null,
+      "createsBottle": false,
+      "createsRelease": false,
+      "summary": "Assign the photo tasting to existing Peated bottle 11868, Pappy Van Winkle's 15-year-old Family Reserve, with releaseId null. Do not create a new Pappy Van Winkle bottle and do not match the 20-year sibling."
+    },
+    "notes": "Added from a failed production photo auto-match using the preserved uploaded image. The label visibly shows Pappy Van Winkle's Family Reserve, Kentucky Straight Bourbon Whiskey, 15 years old, 750ml, 53.5% ABV / 107 proof. External bottle references verify the Pappy Van Winkle's Family Reserve family, the 15/20/23-year variants, and the 15-year expression at 107 proof. At the time of the production miss, bottle 11868 had no stored ABV; missing stored ABV is not a conflict when the label age and product identity disambiguate the existing bottle. Production search surfaced both existing Pappy candidates, 11868 and 11867; the expected outcome is bottle 11868 because the label age disambiguates it from the 20-year sibling."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 11868,
+    "matchedReleaseId": null,
+    "confidenceBand": "auto_verification",
+    "verifyEligible": true,
+    "summary": "Use the uploaded bottle photo label evidence, especially the 15-year age statement, to match existing bottle 11868 rather than the 20-year sibling 11867."
+  }
+}

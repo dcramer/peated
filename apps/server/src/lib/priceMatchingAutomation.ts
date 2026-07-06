@@ -755,7 +755,7 @@ function getExistingMatchAssessment({
       decisiveMatchAttributes: [] as MatchAttribute[],
       structuredMatchRequiresStatedAge: false,
       plainAgeBottleAutoVerifyEligible: false,
-      automationBlockers: [] as string[],
+      automationBlockers: ["suggested match candidate was not found"],
       differentiatingAttributes: [] as MatchAttribute[],
       webEvidenceChecks: [] as EvidenceCheck[],
     };
@@ -1012,6 +1012,10 @@ function getCreateNewScore({
   };
 }
 
+/**
+ * Builds the review/automation assessment for a classifier proposal without
+ * applying any proposed repair fields.
+ */
 export function getStorePriceMatchAutomationAssessment({
   action,
   modelConfidence,
@@ -1026,6 +1030,37 @@ export function getStorePriceMatchAutomationAssessment({
   searchEvidence,
   webEvidenceJudgment,
 }: MatchAutomationInput): StorePriceMatchAutomationAssessment {
+  if (
+    action === "correction" &&
+    price.bottleId === null &&
+    suggestedBottleId !== null
+  ) {
+    const matchAssessment = getExistingMatchAssessment({
+      modelConfidence,
+      price,
+      suggestedBottleId,
+      suggestedReleaseId: suggestedReleaseId ?? null,
+      candidateBottles,
+      extractedLabel,
+      searchEvidence,
+      webEvidenceJudgment,
+    });
+
+    return {
+      modelConfidence,
+      automationScore: matchAssessment.automationScore,
+      automationEligible: false,
+      automationBlockers: matchAssessment.automationBlockers,
+      decisiveMatchAttributes: matchAssessment.decisiveMatchAttributes,
+      structuredMatchRequiresStatedAge:
+        matchAssessment.structuredMatchRequiresStatedAge,
+      plainAgeBottleAutoVerifyEligible:
+        matchAssessment.plainAgeBottleAutoVerifyEligible,
+      differentiatingAttributes: matchAssessment.differentiatingAttributes,
+      webEvidenceChecks: matchAssessment.webEvidenceChecks,
+    };
+  }
+
   if (
     (action === "create_new" || action === "correction") &&
     (proposedBottle || proposedRelease)
@@ -1115,6 +1150,11 @@ function getSuggestedMatchCandidate({
   );
 }
 
+/**
+ * Gates whether an existing bottle assignment can be verified immediately.
+ * Unassigned correction proposals may assign an existing bottle, but only via
+ * the normal confidence gate; repair fields remain review-only.
+ */
 export function shouldVerifyStorePriceMatch(params: {
   action: MatchAction;
   currentBottleId: null | number;
@@ -1138,7 +1178,11 @@ export function shouldVerifyStorePriceMatch(params: {
     plainAgeBottleAutoVerifyEligible = false,
   } = params;
 
-  if (action !== "match_existing" || suggestedBottleId === null) {
+  if (
+    suggestedBottleId === null ||
+    (action !== "match_existing" &&
+      (action !== "correction" || currentBottleId !== null))
+  ) {
     return false;
   }
 
@@ -1147,6 +1191,7 @@ export function shouldVerifyStorePriceMatch(params: {
   }
 
   if (
+    action === "match_existing" &&
     currentBottleId === null &&
     (suggestedReleaseId ?? null) === null &&
     identityScope !== "exact_cask" &&
