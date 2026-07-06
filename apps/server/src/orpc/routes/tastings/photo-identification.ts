@@ -721,17 +721,7 @@ export default procedure
       diagnostics,
       suggestedNextStep,
     });
-    const traceId =
-      Sentry.getActiveSpan()?.spanContext().traceId ?? context.sentryTraceId;
-
-    if (!traceId) {
-      throw errors.INTERNAL_SERVER_ERROR({
-        message: "Unable to resolve Sentry trace id.",
-      });
-    }
-
     return {
-      traceId,
       pendingImage: {
         id: pendingImage.id,
         imageUrl: absoluteUrl(config.API_SERVER, pendingImage.imageUrl),

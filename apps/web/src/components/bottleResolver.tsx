@@ -641,10 +641,13 @@ function PhotoFailurePanel({
   );
 }
 
-function getPhotoIdentificationCopyPayload(result: PhotoIdentification) {
+function getPhotoIdentificationCopyPayload(
+  result: PhotoIdentification,
+  traceId: string,
+) {
   return JSON.stringify(
     {
-      traceId: result.traceId,
+      traceId,
       pendingImage: result.pendingImage,
       suggestedNextStep: result.suggestedNextStep,
       diagnostics: result.diagnostics,
@@ -794,6 +797,9 @@ export default function BottleResolver({
   const [photoResult, setPhotoResult] = useState<PhotoIdentification | null>(
     null,
   );
+  const [photoIdentificationTraceId, setPhotoIdentificationTraceId] = useState<
+    string | null
+  >(null);
   const [error, setError] = useState<string | null>(null);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [photoFailureTrace, setPhotoFailureTrace] =
@@ -955,6 +961,7 @@ export default function BottleResolver({
     setError(null);
     setPhotoError(null);
     setPhotoResult(null);
+    setPhotoIdentificationTraceId(null);
     setPhotoFailureTrace(null);
     setCatalogImageApproved(false);
 
@@ -969,6 +976,7 @@ export default function BottleResolver({
         idempotencyKey,
       });
       setPhotoResult(result);
+      setPhotoIdentificationTraceId(getLastORPCResponseSentryTraceId());
     } catch (err) {
       if (isORPCUnauthorizedRedirectError(err)) return;
 
@@ -1013,6 +1021,7 @@ export default function BottleResolver({
     setError(null);
     setPhotoError(null);
     setPhotoResult(null);
+    setPhotoIdentificationTraceId(null);
     setPhotoFailureTrace(null);
     setCatalogImageApproved(false);
     setMatchedBottleStatus(null);
@@ -1373,10 +1382,15 @@ export default function BottleResolver({
                 >
                   <EvidencePills result={photoResult} />
                 </PhotoFailurePanel>
-                <PhotoIdentificationTraceFootnote
-                  traceId={photoResult.traceId}
-                  copyPayload={getPhotoIdentificationCopyPayload(photoResult)}
-                />
+                {photoIdentificationTraceId && (
+                  <PhotoIdentificationTraceFootnote
+                    traceId={photoIdentificationTraceId}
+                    copyPayload={getPhotoIdentificationCopyPayload(
+                      photoResult,
+                      photoIdentificationTraceId,
+                    )}
+                  />
+                )}
               </>
             )}
             {(matchedBottleId || createDecision) && (

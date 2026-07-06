@@ -32,6 +32,7 @@ const corsHeaders = {
     "authorization, baggage, content-type, sentry-trace",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Origin": "*",
+  "Access-Control-Expose-Headers": "x-sentry-trace-id",
   Vary: "Origin",
 };
 
@@ -246,6 +247,7 @@ async function handleRpcRequest({ request, response, url }) {
             action: "create_bottle",
             suitableAsBottleImage: false,
           }),
+          "44444444444444444444444444444444",
         );
         return true;
       }
@@ -256,6 +258,7 @@ async function handleRpcRequest({ request, response, url }) {
           buildCreateProposalPhotoIdentification({
             action: "create_bottle_and_release",
           }),
+          "22222222222222222222222222222222",
         );
         return true;
       }
@@ -264,6 +267,7 @@ async function handleRpcRequest({ request, response, url }) {
         sendRpcResponse(
           response,
           buildCreateProposalPhotoIdentification({ action: "create_bottle" }),
+          "44444444444444444444444444444444",
         );
         return true;
       }
@@ -272,105 +276,117 @@ async function handleRpcRequest({ request, response, url }) {
         sendRpcResponse(
           response,
           buildCreateProposalPhotoIdentification({ action: "create_bottle" }),
+          "44444444444444444444444444444444",
         );
         return true;
       }
 
       if (getAccessToken(request).includes("photo-no-match")) {
-        sendRpcResponse(response, buildNoMatchPhotoIdentification());
+        sendRpcResponse(
+          response,
+          buildNoMatchPhotoIdentification(),
+          "55555555555555555555555555555555",
+        );
         return true;
       }
 
       if (getAccessToken(request).includes("photo-needs-review")) {
-        sendRpcResponse(response, buildNeedsReviewPhotoIdentification());
+        sendRpcResponse(
+          response,
+          buildNeedsReviewPhotoIdentification(),
+          "66666666666666666666666666666666",
+        );
         return true;
       }
 
-      sendRpcResponse(response, {
-        traceId: "11111111111111111111111111111111",
-        pendingImage: {
-          id: "playwright-photo-upload",
-          imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
-          expiresAt: "2026-06-07T13:00:00.000Z",
-        },
-        imageEvidence: {
-          sourceImageId: "playwright-photo-upload",
-          sourceImageHash: "playwright-photo-hash",
-          extractors: [
-            {
-              kind: "vision",
-              model: "playwright",
-              confidence: 0.95,
-              textSpans: [
-                {
-                  text: "Lagavulin 16",
-                  confidence: 0.95,
-                },
-              ],
-              observations: ["Single bottle label is readable."],
-            },
-          ],
-          fieldCandidates: {
-            brand: {
-              value: testBrand.name,
-              confidence: 0.98,
-              sourceExtractorIndexes: [0],
-            },
-            expression: {
-              value: existingBottle.name,
-              confidence: 0.94,
-              sourceExtractorIndexes: [0],
-            },
-            statedAge: {
-              value: 16,
-              confidence: 0.94,
-              sourceExtractorIndexes: [0],
-            },
+      sendRpcResponse(
+        response,
+        {
+          pendingImage: {
+            id: "playwright-photo-upload",
+            imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
+            expiresAt: "2026-06-07T13:00:00.000Z",
           },
-          photoSuitability: {
-            isSingleBottlePhoto: true,
-            labelReadable: true,
-            suitableAsTastingImage: true,
-            suitableAsBottleImage: true,
-            reason: null,
-          },
-          conflicts: [],
-        },
-        classification: {
-          status: "classified",
-          decision: {
-            action: "match",
-            matchedBottleId: existingBottleId,
-            matchedReleaseId: null,
-          },
-          artifacts: {
-            candidates: [
+          imageEvidence: {
+            sourceImageId: "playwright-photo-upload",
+            sourceImageHash: "playwright-photo-hash",
+            extractors: [
               {
-                bottleId: existingBottleId,
-                releaseId: null,
-                bottleFullName: existingBottle.fullName,
-                fullName: existingBottle.fullName,
+                kind: "vision",
+                model: "playwright",
+                confidence: 0.95,
+                textSpans: [
+                  {
+                    text: "Lagavulin 16",
+                    confidence: 0.95,
+                  },
+                ],
+                observations: ["Single bottle label is readable."],
               },
             ],
-          },
-        },
-        suggestedNextStep: "confirm_match",
-        diagnostics: {
-          extraction: {
-            status: "found",
-            summary: "Lagavulin 16",
-          },
-          candidates: {
-            count: 1,
+            fieldCandidates: {
+              brand: {
+                value: testBrand.name,
+                confidence: 0.98,
+                sourceExtractorIndexes: [0],
+              },
+              expression: {
+                value: existingBottle.name,
+                confidence: 0.94,
+                sourceExtractorIndexes: [0],
+              },
+              statedAge: {
+                value: 16,
+                confidence: 0.94,
+                sourceExtractorIndexes: [0],
+              },
+            },
+            photoSuitability: {
+              isSingleBottlePhoto: true,
+              labelReadable: true,
+              suitableAsTastingImage: true,
+              suitableAsBottleImage: true,
+              reason: null,
+            },
+            conflicts: [],
           },
           classification: {
             status: "classified",
-            action: "match",
-            confidence: 95,
-            reason: "Matched the fixture bottle.",
+            decision: {
+              action: "match",
+              matchedBottleId: existingBottleId,
+              matchedReleaseId: null,
+            },
+            artifacts: {
+              candidates: [
+                {
+                  bottleId: existingBottleId,
+                  releaseId: null,
+                  bottleFullName: existingBottle.fullName,
+                  fullName: existingBottle.fullName,
+                },
+              ],
+            },
+          },
+          suggestedNextStep: "confirm_match",
+          diagnostics: {
+            extraction: {
+              status: "found",
+              summary: "Lagavulin 16",
+            },
+            candidates: {
+              count: 1,
+            },
+            classification: {
+              status: "classified",
+              action: "match",
+              confidence: 95,
+              reason: "Matched the fixture bottle.",
+            },
           },
         },
-      });
+        "11111111111111111111111111111111",
+      );
       return true;
     case "tastings/photoIdentificationCreate":
       sendRpcResponse(
@@ -740,12 +756,6 @@ function buildCreateProposalPhotoIdentification({
           };
 
   return {
-    traceId:
-      action === "create_bottle_and_release"
-        ? "22222222222222222222222222222222"
-        : action === "create_release"
-          ? "33333333333333333333333333333333"
-          : "44444444444444444444444444444444",
     pendingImage: {
       id: "playwright-photo-upload",
       imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
@@ -922,7 +932,6 @@ function createPhotoIdentificationTarget(request, input) {
  */
 function buildNoMatchPhotoIdentification() {
   return {
-    traceId: "55555555555555555555555555555555",
     pendingImage: {
       id: "playwright-photo-upload",
       imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
@@ -1016,7 +1025,6 @@ function buildNoMatchPhotoIdentification() {
 
 function buildNeedsReviewPhotoIdentification() {
   return {
-    traceId: "66666666666666666666666666666666",
     pendingImage: {
       id: "playwright-photo-upload",
       imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
@@ -1248,11 +1256,12 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function sendRpcResponse(response, data) {
+function sendRpcResponse(response, data, sentryTraceId = null) {
   response
     .writeHead(200, {
       ...corsHeaders,
       "Content-Type": "application/json",
+      ...(sentryTraceId ? { "x-sentry-trace-id": sentryTraceId } : {}),
     })
     .end(JSON.stringify({ json: data }));
 }

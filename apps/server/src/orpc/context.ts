@@ -5,5 +5,4 @@ export type Context = {
   ip?: string;
   userAgent?: string;
   resHeaders?: Headers;
-  sentryTraceId?: string;
 };

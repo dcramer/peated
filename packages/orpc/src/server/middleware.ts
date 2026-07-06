@@ -46,17 +46,11 @@ const sentryMiddleware = (options: Options = {}) =>
         const traceId = span.spanContext().traceId;
         const contextWithHeaders = context as typeof context & {
           resHeaders?: Headers;
-          sentryTraceId?: string;
         };
         contextWithHeaders.resHeaders?.set("x-sentry-trace-id", traceId);
 
         try {
-          return await next({
-            context: {
-              ...context,
-              sentryTraceId: traceId,
-            },
-          });
+          return await next();
         } catch (error) {
           span.setStatus({
             code: 2,

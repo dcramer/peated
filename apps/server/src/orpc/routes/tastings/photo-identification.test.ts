@@ -13,12 +13,10 @@ import type * as photoIdentificationModule from "@peated/server/lib/photoIdentif
 import waitError from "@peated/server/lib/test/waitError";
 import type { Context } from "@peated/server/orpc/context";
 import { routerClient } from "@peated/server/orpc/router";
-import * as SentryCore from "@sentry/core";
 import * as Sentry from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, vi } from "vitest";
 
-const sentryTraceId = "0123456789abcdef0123456789abcdef";
 const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
 const extractPhotoBottleEvidenceMock = vi.hoisted(() => vi.fn());
 const copyPendingImageToBottleMock = vi.hoisted(() => vi.fn());
@@ -27,7 +25,6 @@ const sentrySpanSetAttributeMock = vi.hoisted(() => vi.fn());
 const sentrySpanSetAttributesMock = vi.hoisted(() => vi.fn());
 const originalOpenAiApiKey = config.OPENAI_API_KEY;
 
-vi.mock("@sentry/core", { spy: true });
 vi.mock("@sentry/node", { spy: true });
 vi.mock(
   "@peated/server/agents/bottleClassifier/classifyBottleReference",
@@ -317,23 +314,11 @@ describe("POST /tastings/photo-identification", () => {
           setAttributes: sentrySpanSetAttributesMock,
         } as unknown as Parameters<typeof callback>[0]),
     );
-    vi.mocked(SentryCore.startSpan).mockImplementation(
-      async (_context, callback) =>
-        await callback({
-          setStatus: vi.fn(),
-          spanContext: () => ({
-            traceId: sentryTraceId,
-            spanId: "bbbbbbbbbbbbbbbb",
-            traceFlags: 1,
-          }),
-        } as unknown as Parameters<typeof callback>[0]),
-    );
   });
 
   afterEach(() => {
     config.OPENAI_API_KEY = originalOpenAiApiKey;
     vi.mocked(Sentry.startSpan).mockReset();
-    vi.mocked(SentryCore.startSpan).mockReset();
   });
 
   test("requires authentication", async ({ fixtures }) => {
@@ -410,7 +395,6 @@ describe("POST /tastings/photo-identification", () => {
       },
     );
 
-    expect(response.traceId).toBe(sentryTraceId);
     expect(response.pendingImage.id).toBeDefined();
     expect(response.pendingImage.imageUrl).toContain(
       "/uploads/pending-uploads/",
