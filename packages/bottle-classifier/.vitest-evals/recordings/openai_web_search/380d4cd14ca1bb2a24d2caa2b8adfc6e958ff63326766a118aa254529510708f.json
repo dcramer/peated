@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T06:53:36.375Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Four Roses Limited Edition Small Batch 2017 bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Four Roses Limited Edition Small Batch 2017 bourbon",
+    "summary": "**Four Roses Limited Edition Small Batch 2017** is the regular 2017 annual Limited Edition Small Batch release from Four Roses Distillery in Kentucky, released in **September 2017**. Four Roses’ official page describes it as a barrel-strength limited edition bourbon built from **four recipes**: **12-year-old OESV, 15-y",
+    "results": [
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+        "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thebourbonbabe.com/2017/09/12/four-roses-2017-limited-edition-small-batch/",
+        "url": "https://thebourbonbabe.com/2017/09/12/four-roses-2017-limited-edition-small-batch/",
+        "domain": "thebourbonbabe.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thebourbonbabe.com/2017/06/07/four-roses-2017-limited-edition-50th-anniversary-small-batch/",
+        "url": "https://thebourbonbabe.com/2017/06/07/four-roses-2017-limited-edition-50th-anniversary-small-batch/",
+        "domain": "thebourbonbabe.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskeyinmyweddingring.com/reviews/four-roses-2017-limited-edition-small-batch",
+        "url": "https://www.whiskeyinmyweddingring.com/reviews/four-roses-2017-limited-edition-small-batch",
+        "domain": "whiskeyinmyweddingring.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskymag.com/tastings/four-roses-2017-limited-edition-small-batch-bourbon-barrel-strength/",
+        "url": "https://whiskymag.com/tastings/four-roses-2017-limited-edition-small-batch-bourbon-barrel-strength/",
+        "domain": "whiskymag.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/bourbon/whiskey-review-four-roses-2017-limited-edition-small-batch/",
+        "url": "https://thewhiskeywash.com/bourbon/whiskey-review-four-roses-2017-limited-edition-small-batch/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "380d4cd14ca1bb2a24d2caa2b8adfc6e958ff63326766a118aa254529510708f",
+    "mode": "auto"
+  }
+}

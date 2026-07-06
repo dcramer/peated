@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T06:53:44.313Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Canadian Club Reserve 9 year old Triple Aged"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Canadian Club Reserve 9 year old Triple Aged",
+    "summary": "Here’s the most defensible bottle ID I could confirm for **Canadian Club Reserve 9 Year Old Triple Aged**:\n\n- **Brand / producer:** Canadian Club, made by **Hiram Walker & Sons** in Canada. Whiskybase lists the 9-year Reserve under Hiram Walker & Sons, and the official Canadian Club product page confirms the expression",
+    "results": [
+      {
+        "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "url": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "url": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://therumhowlerblog.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/",
+        "url": "https://therumhowlerblog.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/",
+        "domain": "therumhowlerblog.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://woodencork.com/collections/whiskey/products/canadian-club-canadian-whisky-reserve-triple-aged-9-yr",
+        "url": "https://woodencork.com/collections/whiskey/products/canadian-club-canadian-whisky-reserve-triple-aged-9-yr",
+        "domain": "woodencork.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://bevmo.com/products/33945",
+        "url": "https://bevmo.com/products/33945",
+        "domain": "bevmo.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "ce59d90020a5f9b25f564ee86e41332ef9a25c6935a17f40296bfc32c767f902",
+    "mode": "auto"
+  }
+}

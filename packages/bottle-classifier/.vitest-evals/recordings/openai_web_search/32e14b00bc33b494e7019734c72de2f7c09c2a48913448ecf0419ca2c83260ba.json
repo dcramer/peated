@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T06:57:39.372Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Woodford Reserve Kentucky Straight Malt Whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Woodford Reserve Kentucky Straight Malt Whiskey",
+    "summary": "**Woodford Reserve Kentucky Straight Malt Whiskey** appears to be the standard **Distiller’s Select** malt expression from **Woodford Reserve Distillery / Brown-Forman** in Kentucky. It is a **Kentucky Straight Malt Whiskey**, not a single malt, and Woodford’s official product page says it is made from a mash bill with",
+    "results": [
+      {
+        "title": "https://www.woodfordreserve.com/en-au/whiskey/malt-whiskey/",
+        "url": "https://www.woodfordreserve.com/en-au/whiskey/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/fr/whiskey/malt-whiskey/",
+        "url": "https://www.woodfordreserve.com/fr/whiskey/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/en-au/whiskey/straight-bourbon-whiskey/",
+        "url": "https://www.woodfordreserve.com/en-au/whiskey/straight-bourbon-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/de/whiskey/malt-whiskey/",
+        "url": "https://www.woodfordreserve.com/de/whiskey/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.spiritradar.com/whisky-db/woodford-reserve-distillers-select-kentucky-straight-malt-whisky-45.2-percent-700ml/",
+        "url": "https://www.spiritradar.com/whisky-db/woodford-reserve-distillers-select-kentucky-straight-malt-whisky-45.2-percent-700ml/",
+        "domain": "spiritradar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.nationwideliquor.com/135788/woodford-reserve-distillers-select-kentucky-straight-malt-whiskey-70cl-45.2-abv",
+        "url": "https://www.nationwideliquor.com/135788/woodford-reserve-distillers-select-kentucky-straight-malt-whiskey-70cl-45.2-abv",
+        "domain": "nationwideliquor.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "32e14b00bc33b494e7019734c72de2f7c09c2a48913448ecf0419ca2c83260ba",
+    "mode": "auto"
+  }
+}

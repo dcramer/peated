@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T06:54:57.428Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition 2001"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Talisker Distillers Edition 2001",
+    "summary": "**Talisker Distillers Edition 2001** appears to be the **2001 vintage / 2012 bottling** of Talisker’s annual Distillers Edition release. Confirmed bottle traits:\n\n- **Producer/distillery:** **Talisker**, an **Islands / Isle of Skye** single malt, and an **original/distillery bottling**. ([whisky.com](https://www.whisky",
+    "results": [
+      {
+        "title": "Talisker - 2001 - Whisky.com",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.whiskybase.com/us/talisker-1991.html",
+        "url": "https://shop.whiskybase.com/us/talisker-1991.html",
+        "domain": "shop.whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "url": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+        "domain": "whiskynotes.be",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker 2001 Distillers Edition Whisky | Whisky Auctioneer",
+        "url": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/talisker-2001-distillers-edition",
+        "domain": "whiskyauctioneer.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskybewertung.hpage.com/whiskybewertungen/talisker-destillers-edition-2001.html",
+        "url": "https://whiskybewertung.hpage.com/whiskybewertungen/talisker-destillers-edition-2001.html",
+        "domain": "whiskybewertung.hpage.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskyhammer.com/item/238649/Talisker/Talisker---The-Distillers-Edition-2001.html",
+        "url": "https://www.whiskyhammer.com/item/238649/Talisker/Talisker---The-Distillers-Edition-2001.html",
+        "domain": "whiskyhammer.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a9acac5dd084830f2507f99329030e255216cab3d522457b2830f0b221a46236",
+    "mode": "auto"
+  }
+}

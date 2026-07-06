@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T06:54:02.387Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Series Volume 3 bourbon whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Heaven's Door Bootleg Series Volume 3 bourbon whiskey",
+    "summary": "Heaven’s Door **Bootleg Series Volume III** is a **2021 limited release** in the brand’s annual Bootleg Series. The producer describes the Bootleg line as rare, limited whiskeys tied to Bob Dylan artwork, and independent bottle writeups consistently identify Volume III as the 2021 edition. ([heavensdoor.com](https://ww",
+    "results": [
+      {
+        "title": "https://www.heavensdoor.com/bootleg-series",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "url": "https://breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+        "url": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://intoxicology.net/new-release-bootleg-vol-iii-by-heavens-door-whiskey/",
+        "url": "https://intoxicology.net/new-release-bootleg-vol-iii-by-heavens-door-whiskey/",
+        "domain": "intoxicology.net",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.lanereport.com/149995/2021/12/new-release-bootleg-series-vol-iii/",
+        "url": "https://www.lanereport.com/149995/2021/12/new-release-bootleg-series-vol-iii/",
+        "domain": "lanereport.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.astorwines.com/item/45526",
+        "url": "https://www.astorwines.com/item/45526",
+        "domain": "astorwines.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "99da5c815daf7cbd34779a31a81632f50e96501a0067f9099f60a59cc900b664",
+    "mode": "auto"
+  }
+}

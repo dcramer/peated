@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T06:56:48.787Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Creag Isle 12 year old Island Single Malt Scotch Whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Creag Isle 12 year old Island Single Malt Scotch Whisky",
+    "summary": "Here’s the bottle-specific evidence I could confirm for **Creag Isle 12 Year Old Island Single Malt Scotch Whisky**:\n\n- **Name:** Creag Isle 12-year-old\n- **Category:** **Single Malt Scotch Whisky** ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/122192/creag-isle-12-year-old?utm_source=openai))\n- **Age st",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/122192/creag-isle-12-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/122192/creag-isle-12-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/293214/creag-isle-30-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/293214/creag-isle-30-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/brand/86602/creag-isle",
+        "url": "https://www.whiskybase.com/whiskies/brand/86602/creag-isle",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/122190/creag-isle-25-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/122190/creag-isle-25-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/147013/creag-isle-33-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/147013/creag-isle-33-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/122191/creag-isle-blended-malt-scotch-whisky",
+        "url": "https://www.whiskybase.com/whiskies/whisky/122191/creag-isle-blended-malt-scotch-whisky",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a1e7bdaba3b3d28e9a09240c4d930685ed4b436ea778f2fd509c1f0840fcafd4",
+    "mode": "auto"
+  }
+}
