@@ -489,6 +489,7 @@ export default function BottleResolver({
                 catalogImageApproved={catalogImageApproved}
                 createPending={photoIdentificationCreateMutation.isPending}
                 createActionLabel={createProposalActionLabel}
+                traceId={photoIdentificationTraceId}
                 resolvingAction={resolvingAction}
                 hasExactLibraryEntry={matchedBottleHasExactLibraryEntry}
                 loadingExactLibraryStatus={

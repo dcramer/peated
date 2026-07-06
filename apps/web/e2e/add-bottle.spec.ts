@@ -400,6 +400,12 @@ test.describe("add bottle flow", () => {
     await uploadLabel(page);
 
     await expect(page.getByText("Match found")).toBeVisible();
+    await expect(
+      page.getByText("Trace ID: 11111111111111111111111111111111"),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Copy photo identification payload" }),
+    ).toBeVisible();
     await expect(page.getByRole("button", { name: "Continue" })).toBeHidden();
     await expect(
       page.getByRole("button", { name: "Log Tasting" }),
