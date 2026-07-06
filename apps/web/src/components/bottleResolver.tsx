@@ -9,9 +9,9 @@ import type { CreateBottlePrefill } from "@peated/web/components/search/createBo
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
-  clearLastORPCResponseSentryTraceId,
-  getLastORPCResponseSentryTraceId,
+  createORPCResponseTraceContext,
   isORPCUnauthorizedRedirectError,
+  type ORPCResponseTraceContext,
 } from "@peated/web/lib/orpc/link";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -147,9 +147,24 @@ export default function BottleResolver({
     loading: boolean;
   } | null>(null);
 
-  const photoIdentificationMutation = useMutation(
-    orpc.tastings.photoIdentification.mutationOptions(),
-  );
+  const photoIdentificationMutation = useMutation({
+    mutationFn: async (
+      {
+        responseTraceContext,
+        ...input
+      }: {
+        file: File;
+        idempotencyKey: string;
+        responseTraceContext: ORPCResponseTraceContext;
+      },
+      mutationContext,
+    ) => {
+      const { mutationFn } = orpc.tastings.photoIdentification.mutationOptions({
+        context: { responseTraceContext },
+      });
+      return mutationFn!(input, mutationContext);
+    },
+  });
   const photoIdentificationCreateMutation = useMutation(
     orpc.tastings.photoIdentificationCreate.mutationOptions(),
   );
@@ -300,15 +315,16 @@ export default function BottleResolver({
     const nextPreviewUrl = URL.createObjectURL(file);
     replacePreviewUrl(nextPreviewUrl);
     const idempotencyKey = createIdempotencyKey();
-    clearLastORPCResponseSentryTraceId();
+    const responseTraceContext = createORPCResponseTraceContext();
 
     try {
       const result = await photoIdentificationMutation.mutateAsync({
         file,
         idempotencyKey,
+        responseTraceContext,
       });
       setPhotoResult(result);
-      setPhotoIdentificationTraceId(getLastORPCResponseSentryTraceId());
+      setPhotoIdentificationTraceId(responseTraceContext.sentryTraceId);
     } catch (err) {
       if (isORPCUnauthorizedRedirectError(err)) return;
 
@@ -323,7 +339,7 @@ export default function BottleResolver({
       setPhotoError(
         "We couldn't read that photo. Search can still find the bottle, or you can try another photo.",
       );
-      const sentryTraceId = getLastORPCResponseSentryTraceId();
+      const sentryTraceId = responseTraceContext.sentryTraceId;
       if (sentryTraceId) {
         setPhotoFailureTrace({
           traceId: sentryTraceId,
